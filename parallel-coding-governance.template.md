@@ -3,7 +3,7 @@
 *Template **v1.4** · last updated 2026-06-30. When you instantiate this in a repo, record the adopted
 version in the copy; diff your copy against this source by `§` heading body (ignore filled `{{…}}` + the
 deleted Customize block) to pull in improvements. Change history: the `…-v-N-N.md` snapshot files
-alongside this one (this folder isn't a git repo).*
+alongside this one, plus this repo's git history.*
 
 <!-- governance-template: v1.4 -->
 
