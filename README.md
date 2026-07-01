@@ -28,6 +28,6 @@ New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\session-kicko
 ln -s <this-repo>/skills/session-kickoff ~/.claude/skills/session-kickoff
 ```
 
-Restart Claude Code and confirm `/session-kickoff` is listed. If a project previously shipped
-its own copy of the skill (e.g. a repo-local `.claude/skills` junction), remove that wiring —
-duplicate same-name skills confuse discovery and drift apart.
+Restart Claude Code and confirm `/session-kickoff` is listed. A project may deliberately keep
+its own project-tuned variant alongside this one (both then appear in that project's skill
+list — pick by description); the generic engine still serves every other project.
