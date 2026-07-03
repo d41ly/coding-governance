@@ -7,7 +7,13 @@ conflicts: **`CLAUDE.md` > this file > the skill** — flag any conflict so it g
 this file SHORT: it holds only what the engine can't derive from git or `CLAUDE.md`; the full
 multi-node ruleset (if adopted) lives in the governance doc, referenced — not duplicated — here.
 
-## §A — Task template (fill per kickoff)
+## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
+
+The agent fills §A from the `/session-kickoff` message plus the adjacent memory (the project's decision
+logs, backlog, journals, ledger) and the code — to the fullest extent possible. It uses
+**`AskUserQuestion`** ONLY for a field it genuinely cannot derive to any extent (a real fork between
+approaches, or a non-code prereq only the user knows — the most common one). The template below is the
+*shape the agent fills*, not a form the user completes.
 
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
@@ -18,7 +24,13 @@ multi-node ruleset (if adopted) lives in the governance doc, referenced — not 
 > - **Gates it must pass:** …
 > - **Risk tier:** {{TIER_VALUES e.g. "1 | 2" — or delete if single-tier}}
 
-## §B — Orientation (project facts the engine reads)
+## §B — Orientation (the agent DERIVES these — the user does NOT fill them)
+
+The agent fills §B by deriving every field it can from the repo (git state, the tree, `CLAUDE.md`,
+`package.json` / `Makefile` / CI config) and the adjacent memory. It uses **`AskUserQuestion`** ONLY for
+what the repo genuinely can't reveal (node registry, stream ownership, tier policy). §B is written once
+when this manifest is instantiated; thereafter each session READS it, and re-derives a field only if the
+code contradicts it.
 
 - **Repo layout:** {{LAYOUT — e.g. "single checkout at repo root" | "worktrees as siblings
   under <root>/, primary tree (default branch) at <root>/main"}}
@@ -65,6 +77,6 @@ for detail.}}
 
 **Customize before use** *(the agent does this during scaffolding, then deletes this block):*
 fill every `{{PLACEHOLDER}}` — derive what the repo reveals (gates from `package.json` /
-`Makefile` / CI config; layout from the tree), ask the user only for the rest (nodes, streams,
-tier policy). Delete sections marked deletable when they don't apply. Finish with `grep '{{'`
+`Makefile` / CI config; layout from the tree), ask the user (via `AskUserQuestion`) only for the
+rest (nodes, streams, tier policy). Delete sections marked deletable when they don't apply. Finish with `grep '{{'`
 — no placeholder may survive.
