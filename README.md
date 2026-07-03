@@ -12,6 +12,11 @@ machines/sessions on the same repo.
   *engine* (git-state guards, closed-scope collection, READY card). Project specifics come
   from a per-repo **kickoff manifest** the skill discovers (see its Step 2 search list);
   `MANIFEST-TEMPLATE.md` is the starter it scaffolds into manifest-less projects.
+- **`memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
+  per-feature `builds/` folders, index budgets + rotation, status vocabulary, an 11-check hygiene
+  gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
+  across repos. Scaffold a fresh tree with `adopt-memory-tree.sh --scaffold`, or migrate an existing
+  one in a single landing. See `memory-tree/README.md`. Operationalizes the playbook's §5/§6.
 
 ## Install the skill (once per machine)
 

@@ -108,6 +108,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index page; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
+- **Optional but recommended: a structured, machine-linted memory tree** (the `memory-tree/` kit alongside this playbook). Operationalizes everything above into one `{{MEMORY_ROOT}}/` tree organised by discipline (`{{MEMORY_DISCIPLINES}}`) with `project/` for session machinery, per-feature `builds/YYYY-MM-DD-<FAMILY>-<slug>/` folders (`spec/ build/ reviews/ prompts/`), index caps (≤20 KB / 250 lines) + a ≤300-char one-line entry budget with archive rotation, a status vocabulary (`OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`), and an **11-check hygiene gate** wired into CI + the pre-commit hook + `{{GATE_RUNNER}}`. Project specifics (root · disciplines · discipline→id-family map · migrated-from tombstone) live in one repo-root `.memory-tree.conf`; the rules live in `{{MEMORY_ROOT}}/HYGIENE.md`; adopt by scaffolding a fresh tree or migrating an existing one in a single landing.
+- Two ratchet manifests keep that gate honest without a flag-day: `legacy-files.txt` (migrated recordings keep historical names) + `curation-debt.txt` (fat legacy indexes exempt from the caps until slimmed) — both shrink-only, CI-guarded against a stale line.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -283,6 +285,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - `{{PROJECT_NAME}}` — the repo this governs (discoverable, not an ask).
 - Fleet *(ask user)*: node registry rows `{{TAG_A}}`/`{{MACHINE_A}}`/`{{PRIMARY_TREE_A}}`/`{{WORKTREE_ROOT_A}}`/`{{VARIANCES_A}}` (… one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).
 - Records & docs: `{{ID_FAMILIES}}` · `{{DOC_ROUTING_TABLE}}` · `{{PRODUCT_PREAMBLE}}` · `{{REPO_LAYOUT_MAP}}` · `{{COMMAND_CATALOG}}` · `{{PRODUCT_CONTEXT_HOME}}` · `{{HELP_DIR}}` · `{{REVIEW_DIR}}`.
+- Memory tree (only if adopting the `memory-tree/` kit — else drop these + the two §5 memory-tree lines): `{{MEMORY_ROOT}}` (default `memory`) · `{{MEMORY_DISCIPLINES}}` (the space-separated discipline folders + their discipline→FAMILY id map, written into the repo-root `.memory-tree.conf`; `{{ID_FAMILIES}}` supplies the families). Adopt: `memory-tree/adopt-memory-tree.sh --scaffold` (new) or a one-landing migration (existing).
 - Gates & git: `{{GATE_COMMANDS}}` · `{{CI_FILE}}` · `{{GATE_RUNNER}}` · `{{COMMIT_TRAILER}}` · `{{WORKTREE_SCRIPT}}` · `{{TOOLCHAIN_NOTES}}`.
 - Runtime & verification: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - Architecture & design system: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}` · `{{TOKENS_LOCATION}}` · `{{SPACING_SCALE}}` · `{{TYPE_SCALE}}` · `{{BREAKPOINTS}}` · `{{MIN_TOUCH_TARGET}}` · `{{GALLERY_ROUTE}}` · `{{VISUAL_CONTRACT_DOC}}`.
