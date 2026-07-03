@@ -260,6 +260,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Kickoff/DoR reporting = one bookkeeping line (the `READY` micro-format) + ONLY the unresolved open questions; never restate scope/AC/protocol already in the plan doc; a scope-approval menu IS the open questions — never capped or link-only'd.
 - Facts land on disk before the wrap-up: ledger row, journal/memory note, and shas are written BEFORE the final message is composed — a dead turn may lose prose, never facts.
 - Secrets: never print a real credential in chat — say where it lives; throwaway local-dev creds may ride the access-point line.
+- Readable beats dense — brevity comes from OMITTING items, never from compressing prose: cramming the same inventory into fewer, denser lines violates this section (the "wall of barely punctuated text" failure). Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. What survives the cut is complete sentences, one idea per sentence/bullet; >~5 items becomes a short bulleted list, one readable sentence each; everything past that is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these mechanical events; every other rule in this section binds in substance but its exact formatting is advisory (wit lives in the freeform sentences around the templates, never inside):
   - `committed <sha> <branch> — <subject>`
   - `pushed <remote>/main <old>..<new> (ff, N commits)`
@@ -268,7 +269,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
   - `up — <service> :<port> (<tree>) · … · admin <user> / <pw-or-where-it-lives>`
   - `READY — <slug> · node <tag> · <branch> off <sha> · Tier-N · gates: <list>`
   - `⏳ <what's running> (~<est>) — results land in the final message`
-- Pre-send self-check (documented check — prose has no machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg?
+- Pre-send self-check (documented check — prose has no machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg? would a tired reader parse every line in one pass (no `·`-chains or paren-inventories outside micro-formats)?
 - The discipline is measured, not vibes: keep an audit script (`{{PROSE_AUDIT}}`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.
 
 ## §17 — User-facing file references (make them clickable)
