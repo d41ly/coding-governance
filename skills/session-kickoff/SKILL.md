@@ -3,7 +3,7 @@ name: session-kickoff
 description: >-
   Start a work-unit cleanly in ANY project. Verifies git state (clean-tree + branch guards,
   fetch + fast-forward, pinned BASE SHA), loads the project's kickoff manifest when one
-  exists, collects a CLOSED task scope (goal, in/out, acceptance, gates), and surfaces the
+  exists, derives a CLOSED task scope (goal, in/out, acceptance, gates), and surfaces the
   governing docs + first code entrypoints. In a repo without a manifest, offers to scaffold
   one from the parallel-coding-governance template. Invoke explicitly with /session-kickoff
   at the start of a work session. The project's CLAUDE.md and its manifest always outrank
@@ -75,9 +75,13 @@ it defines a step, its version replaces the generic default below.
 **No manifest found** → say so plainly and offer (one `AskUserQuestion`) to scaffold one — see
 **Scaffolding** at the bottom. Whether or not they accept, continue with the generic Steps 3–5.
 
-## Step 3 — Collect a CLOSED task scope (ask the user)
+## Step 3 — Derive a CLOSED task scope (from the message + memory; ask only for gaps)
 
-Fields — press hardest on the three that prevent mid-build churn:
+**DERIVE these fields yourself** — from the `/session-kickoff` message plus the adjacent memory
+(decision logs, backlog, journals, ledger) and the code — filling every one you can. Use
+`AskUserQuestion` ONLY for a field you genuinely cannot derive to any extent (a real fork between
+approaches, or a non-code prereq only the owner knows). Don't hand the user a blank form. Press hardest
+on the three that prevent mid-build churn:
 
 - **Title** + **Goal** (1–2 sentences) · **IN scope**.
 - **OUT / non-goals** — an explicit cut-line (never "high-value first" / a menu; resolve now).
@@ -90,7 +94,8 @@ Fields — press hardest on the three that prevent mid-build churn:
   high-risk → the DoR is a **design pass**: written spec (goal · scope · non-goals ·
   acceptance) approved BEFORE building, recorded per the project's plan convention.
 
-If the user can't state acceptance + gates, say so plainly: it isn't Ready — split or clarify
+If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
+(`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
 before any code.
 
 ## Step 4 — Point at the right code + project protocol
