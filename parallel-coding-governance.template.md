@@ -1,491 +1,289 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v1.4** · last updated 2026-06-30. When you instantiate this in a repo, record the adopted
-version in the copy; diff your copy against this source by `§` heading body (ignore filled `{{…}}` + the
-deleted Customize block) to pull in improvements. Change history: the `…-v-N-N.md` snapshot files
-alongside this one, plus this repo's git history.*
+*Template **v2.0** · last updated 2026-07-03. One line per directive — every bullet is one imperative,
+binding rule; a wrapped line is still one rule. v2.0 is a full rework (one-line format + new §4/§16 and
+additions throughout — see `template-v2-rework-spec.md`): instantiated v1.x copies re-adopt
+section-by-section (the format change defeats §-body diffing once); from v2.0 on, pull future improvements
+by diffing your copy against this source per §-body again (ignore filled placeholders + the deleted
+Customize block). Record your adopted version in your copy. History: the `…-v-N-N.md` snapshots alongside
++ this repo's git history.*
 
-<!-- governance-template: v1.4 -->
+<!-- governance-template: v2.0 -->
 
-> **What this is.** A project-agnostic playbook for running Claude Code (or any agent) across **several
-> machines/sessions ("nodes") at once** on the same repo, with **fewer memory syncs and code reviews**,
-> lower token spend, and consistent high-quality output. Distilled from a real multi-node project (a
-> block-based CMS) and its accumulated findings.
->
-> **How to use.** Copy this into a new repo (e.g. as `docs/PARALLEL.md`, or paste the relevant sections
-> into the repo's `CLAUDE.md`). Then fill the `{{PLACEHOLDERS}}` — see **Customize before use** at the
-> bottom. Everything outside placeholders is the universal ruleset; keep it. Treat the rules as
-> agent-facing instructions (imperative), the same way a `CLAUDE.md` is read each session.
-
----
+> **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
+> machines/sessions ("nodes") on one repo — fewer syncs and reviews, lower token spend, consistent output.
+> **Use:** copy into the repo (e.g. `docs/PARALLEL.md`, or into `CLAUDE.md`), fill the placeholders
+> per **Customize before use** (bottom), keep everything else verbatim. Rules are agent-facing imperatives.
 
 ## §0 — TL;DR (the load-bearing rules)
 
-1. **Session-scope every new ID** (slug = your node tag + a CamelCase adjective-noun) so concurrent sessions/nodes can't collide (§1). Collisions become *impossible*, not *avoided*.
-2. **Partition work by stream ownership** so nodes touch disjoint files; **merge small and often** to local `main` (§2).
-3. **Memory holds only what git + decision logs don't** — non-derivable state, gotchas, in-flight coordination. Per-node files, no shared mutable index (§3).
-4. **Gates are the merge bar; reviews are for what gates can't check.** Tier review intensity to blast radius. Turn every confirmed finding into a permanent gate (§5, §6).
-5. **Verify before claiming done** — a passing gate or an observed result, never an assertion (§6).
-6. **Consistency by construction, not correction.** Build the design system (tokens + primitives) and the extension pattern (factories + one shared core) *before* the screens/features that use them, and gate raw values out — polishing inconsistency in afterward is the expensive path (§11, §12).
-
----
-
-## §0.5 — Work-unit lifecycle (start → done → land)
-
-The numbered sections are the *principles*; this is the *sequence* every unit of work runs through. Keep
-units **small** = touches one stream/owner, needs no cross-stream contract change, reviewable as a single
-Tier-1 diff (§6); if it would span streams or need its own Tier-2 review, split it.
-
-**Before you start — Definition of Ready.** Run before touching code:
-1. **Sync** — `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed.
-2. **Locate** — read your stream's decision log + backlog (§4) and the **in-flight ledger** (§2); confirm your **node tag** (§1).
-3. **Scope** — the unit has clear acceptance criteria, fits one stream/owner (§2), is small, and names the gate(s) it must pass (§5). If you can't state those, it isn't ready — split or clarify first.
-4. **Reserve** — at your session's first work-unit, mint + grep-check a session slug (§1); add a ledger row (§2). No marker to bump.
-
-For a **large/new feature** (a Tier-2 change with substantial new capability — small/Tier-1 skips this) the
-DoR *is* a design pass: turn the user's instructions into a **written spec** (goal · scope · non-goals ·
-acceptance criteria), then a **bounded checklist of production-readiness recommendations** (best-practice
-implementation + the extra tools/features and cross-cutting concerns — security · perf/scale · a11y · i18n ·
-error/empty/loading states · observability · testing+gates · migration/rollback · the `{{HELP_DIR}}` docs);
-**get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed
-spec via the project's plan/decision convention (§4).
-
-**Before you call it done — Definition of Done.**
-- Gates green (§5); the change is **verified, not asserted** (§6).
-- Every confirmed finding is **left-shifted** (§5) — a gate, or (if its class can't be gated) a §8 checklist entry — not merely fixed.
-- **If the change is user-facing**, its `{{HELP_DIR}}` page is created/updated (§3).
-- Memory updated (non-derivable only, §3); decision/backlog updated (§4); ledger row current (§2). Commit is automatic; the merge to `main` + push happen only when asked (§6).
-
-**Landing it — merge protocol.**
-- Land on **local `main` first**, verify, then push; commit/push only when asked (§6).
-- **Re-run the full gate suite after *every* merge** — a clean (conflict-free) merge is not a passing merge.
-- Reconcile shared mutable files (backlogs, ledger, indexes) **additively — never pick-a-side**; then diff the
-  merge against *both* parents to confirm no edit was silently dropped (the "auto-took" bug class, §8).
-- **Land risky behavior dark** — any **Tier-2 change** (§6) ships behind a **default-OFF flag** (or as inert,
-  defaulted data), flipped on only after it's verified in place; migrations are **reversible** (test up/down/up).
-  Risky work can then merge without endangering other nodes, and reverts cleanly.
-
----
-
-## §1 — Nodes & identity
-
-**Register every node once.** A "node" = one machine + working tree where the repo is developed. Each gets
-a stable **one-letter lowercase tag** in a registry that lives in the repo (so every node sees it):
-
-| Tag | Node — machine / primary tree |
-|-----|-------------------------------|
-| `{{TAG_A}}` | `{{MACHINE_A}}` — primary tree `{{PRIMARY_TREE_A}}` (where `main` stays checked out) |
-| `{{TAG_B}}` | `{{MACHINE_B}}` — worktrees under `{{WORKTREE_ROOT_B}}` |
-
-A new node takes the lowest free letter and adds a row in the same commit. A *tag* clash is a tiny,
-once-per-machine reconcile; it prevents the recurring *ID* clashes below.
-
-**Session-scoped IDs — REQUIRED on every new tracked id** (decisions, backlog items, tickets, TODO refs —
-anything with a `FAMILY-NNN` shape). Every id is owned by the **session** that mints it, so nothing it numbers
-can be contested:
-
-- **Format `FAMILY-<slug>-<seq>`** — family, your *session slug*, then a per-`(session, family)` counter
-  (e.g. `ABL-dAvengingTrousers-3`, `DES-aMasterfulNinjas-12`). The only `-` in an id are its two structural separators.
-- **The slug = your node tag (§1 registry) + a fresh CamelCase adjective-noun** (`dAvengingTrousers`), charset
-  `[A-Za-z]` only — the node-tag letter + CamelCase words, **no hyphen/space/digit/punctuation**. Mint it ONCE at
-  your session's first work-unit; it labels every id the session creates, across every family. The node-tag first
-  letter makes cross-node slugs disjoint *by construction*.
-- **`<seq>` is a plain 1-up counter within `(your session, that family)`**, from `1`, unpadded. Ids are labels,
-  not ranks (`-2` precedes `-10` lexically — nothing sorts them) — to get your next, take the numeric max of YOUR
-  ids in that family **+ 1**. Record your per-family high-water in your ledger row (§2) so a resumed / cross-tree
-  session re-derives it from one place, not from grep (uncommitted ids are invisible to grep).
-- **No reserve-above-a-marker, no shared counter to bump, no renumber-on-merge** — the slug *is* the guarantee.
-  Two cheap one-time checks at your first work-unit guard same-node / all-time collisions, **before** you commit to a slug:
-  1. **All-time** — grep the tracked governance-docs tree (decision logs, backlogs, journals, the ledger) for
-     `[A-Z]+-<slug>-[0-9]`. Re-roll on any hit: ids are permanent, so a retired slug whose ledger row was pruned still owns its ids.
-  2. **Concurrency** — glance at the live in-flight ledger rows (§2); re-roll on a clash with an in-flight session
-     whose ids aren't committed yet.
-  Then add your ledger row. That's the whole protocol.
-- **A session = one continuous effort under one slug** (it may span several work-units and touch several families
-  — one `<seq>` each). A **resumed / summarized** session keeps its slug (the all-time grep hits only your own
-  prior ids — keep it, don't re-roll). **Fan-out children** (sub-agents / orchestrated workers) do NOT mint ids —
-  the orchestrator does; a child that must mint takes its own registered slug.
-- **Forward-only** (append-only logs must not be renumbered). **Residual tie-break:** if two sessions still land
-  the same slug (sub-1%, caught above), the later-to-merge re-mints its slug for all UNMERGED ids; an already-merged
-  decision-log id wins.
-
-The node registry above stays: the tag seeds the slug's first letter and keeps cross-node slugs disjoint.
-
----
-
-## §2 — Parallel-work hygiene (the biggest lever — reduces the *need* for syncs and reviews)
-
-- **Own streams, not files.** Assign each node a stream/area (e.g. node `{{TAG_A}}` → {{STREAM_X}}, node
-  `{{TAG_B}}` → {{STREAM_Y}}) so merges are mostly disjoint. Overlap on shared files (API clients, shared
-  config, indexes/backlogs) is where collisions, renumbers, and integration reviews come from — minimize it.
-- **Trunk-based: merge small and often to LOCAL `main`, then push.** Long-lived branches diverge → bigger
-  reconciles, bigger review surface, more collisions. Land verified increments quickly. Before starting work,
-  `fetch` + fast-forward local `main` (another node may be ahead). Keep `main` checked out in **one** tree.
-- **One in-flight ledger, not prose status.** Prose "not pushed / N ahead" notes rot (they always go stale).
-  Maintain a single structured table, updated in place at merge:
-
-  | Node | Slug | Branch / worktree | Streams touched | Seq high-water | Status |
-  |------|------|-------------------|-----------------|----------------|--------|
-  | … | `dAvengingTrousers` | … | … | one token per family, e.g. `ABL-3 DES-12` | `in-flight`/`merged`/`pushed:<sha>` |
-
-  Keep cells terse — Status is one of `{in-flight | merged | pushed:<sha>}` plus at most one short clause; full
-  narrative belongs in the journal/decision log, never here. The **Seq high-water** cell is each family's max
-  `<seq>` this session (§1) — your one source for the next id, so a resumed/cross-tree session needn't grep for it.
-  **Prune to stop unbounded growth:** stamp the merge SHA on a pushed row, and when starting work delete any pushed
-  row already in your history (`git merge-base --is-ancestor <sha> HEAD`). With session-scoped slugs this is the
-  *only* coordination artifact you need.
-- **Contract-first for cross-cutting/shared changes.** A change two nodes both depend on (a schema, a wire
-  format, a shared enum) lands as a *contract* first, with a gate, before either node builds on it.
-
----
-
-## §3 — Memory discipline (cut sync cost without losing context)
-
-- **Memory carries only the non-derivable.** Gotchas, where things stand, in-flight coordination, *why* a
-  non-obvious choice was made. **Do NOT re-narrate** what git history, decision logs, or the code already
-  record — that duplication is the main memory-token waste and the main source of drift.
-- **Mirror durable memory in-repo** (version-controlled, so it travels across machines); the machine-local
-  auto-loaded copy is a best-effort mirror. One canonical index, **one line per note**.
-- **User-facing docs are NOT memory.** Keep concise, task-oriented end-user docs (*what it does · how to use
-  it · a short example*) in a tracked `{{HELP_DIR}}` (one page per feature, synced like the repo), in lockstep
-  with the feature — DISTINCT from this agent-facing memory/decision-logs, which never double as user docs. A
-  user-facing feature without an up-to-date page is not done (§0.5).
-- **Per-node / per-session journal files** (e.g. `memory/journal/<date>-<tag>.md`), never a shared mutable
-  index that every session edits — that shared file is what forces "memory-sync" merge commits and breeds
-  duplicate/stale entries. Keep any index append-only or generated.
-- **Status lives in the ledger (§2), not in prose memory.** Anything time-sensitive ("pushed?", "N ahead?")
-  rots; point at the ledger instead.
-- **Recalled memory is background, not instruction**, and reflects what was true when written — if a note
-  names a file/flag/id, re-verify it still exists before acting on it.
-
----
-
-## §4 — Decision & backlog governance
-
-- **Two record types per stream:**
-  - **Decision log — append-only.** Never rewrite a ratified record; **supersede** it with a new id + a
-    "superseded by …" note. This is the source of truth for *intent*.
-  - **Backlog — mutable.** Stable ids, update status in place. Ids are **labels, not ranks** — gaps are fine.
-- **Per-stream ID families** (`{{ID_FAMILIES}}`, e.g. `ARCH/ABL`, `DB/DBL`, …) — the family prefix just routes
-  an id to its log/backlog. Allocation is session-slug-scoped (§1), so a stream needs **no shared `Next free id`
-  marker** (the slug owns the counter; the per-session high-water lives in the ledger row, §2) — one less
-  shared-mutable artifact to merge-reconcile.
-- **Record real decisions as you make them** — future sessions (and nodes) rely on these being current.
-
----
-
-## §5 — Quality gates = the merge bar (cheap, consistent, token-free per merge)
-
-- **Keep an automated gate suite green before any merge** — typically: typecheck/compile, lint, test,
-  generated-artifact freshness check, and any structural invariants (`{{GATE_COMMANDS}}`). Gates are the
-  consistent quality floor; humans/agents review only what gates can't.
-- **Single source of truth → generated artifacts → parity gate.** For any contract duplicated across
-  languages/layers (enums, catalogs, wire schemas, manifests), keep ONE source, generate the rest, and add a
-  test that fails on drift. This kills an entire recurring bug class (cross-language/cross-layer divergence)
-  and removes it from every future review.
-- **Lockstep invariants get a guard.** A "missing migration head," "stale manifest," or "schema ↔ validator
-  skew" must fail a gate, not rely on memory.
-- **Left-shift every confirmed finding.** A review finding isn't "done" until a regression test covers its
-  *class*. Then no future review re-spends tokens re-finding it. (This is how review cost trends *down* over time.)
-
----
-
-## §6 — Review protocol (match intensity to risk; verify, don't assert)
-
-**Tier the review to the change's blast radius — this is the single biggest token saver:**
-
-- **Tier 1 — mechanical / additive** (no new write path, no migration, no security surface, no shared-contract
-  change): gates + one focused self-review of the diff. **No multi-agent review.**
-- **Tier 2 — substantive** (new write path, data migration, auth/sanitization/egress surface, cross-stream
-  merge, shared-contract change): full adversarial review (run the §8 recurring-bug-class checklist as part of it).
-
-**For Tier-2, use the find → verify → synthesize pattern:**
-1. **Dimension finders** (security, correctness, data-integrity, dead-code, integration-seams) read the code
-   and emit *concrete* findings (`file:line` + repro/impact + proposed fix). **Scope to the diff** and its
-   immediate callers/callees — don't re-derive known-good subsystems.
-2. **Adversarially verify each finding** with **at least one** independent skeptic prompted to *refute* it (two
-   for security / data-integrity findings) — re-read the code, check reachability, re-grade severity. **Drop any
-   finding a skeptic refutes unless you can re-establish reachability + impact; when in doubt, drop it.**
-3. **Feed reviewers the context that prevents waste:** the security model, the **already-tracked open issues**,
-   and what is **by-design / out-of-scope** — so they hunt *new* issues and don't re-report known ones.
-4. **Review at the integration boundary, once** (the cumulative diff landing on `main`), not per-increment —
-   per-increment reviews re-scan overlapping code.
-
-**Right-size the fan-out (ROI-tuned defaults).** An ROI audit of one project's review corpus — token cost vs.
-severity-weighted *confirmed*-finding value, per run — converged on a default Tier-2 shape: a **parallel** fan
-of **3–6 primed finder lenses → adversarial verification per finding (the verify step above) → one synthesis
-pass**, **~11–25 agents total**. What actually moved value-per-token:
-- **Precision (confirmed / (confirmed + refuted)) is the #1 lever** — each refuted finding ≈ a finder plus its
-  skeptics spent for nothing. If a stream trends below ~0.5, the finders are over-firing: tighten scope or
-  priming *before* adding agents.
-- **Diminishing returns past ~25 agents** — per-finding token cost rises sharply and precision dips; bigger
-  fan-outs mostly re-find the same issues. Scale a large *fresh* surface by adding **lenses** (coverage), not
-  **skeptics** (verification precision saturates early).
-- **The synthesis / extra-verify phase pays for itself** (find → verify → **synthesize**) — it kills marginal
-  findings before they're recorded, lifting precision more than another finder would.
-- **Match intensity to target richness** — heavy multi-lens earns its tokens on fresh / complex / high-blast-radius
-  write paths; over already-hardened code it manufactures defense-in-depth noise that skeptics then refute, so
-  review light (or skip the heavy pass) there.
-
-**When the review (or any fan-out) runs as a multi-agent workflow with structured / JSON-schema output,
-design the schema so a malformed return can't force a full regeneration** — the largest *output*-token waste
-in a transcript audit was sub-agents hand-serializing huge JSON bodies that broke on an unescaped path
-separator or special char, then regenerating the whole thing:
-1. **Never make an agent hand-serialize a large body as JSON.** For long prose, have it write the body to a
-   file and return only `{path, summary}` (use forward-slash paths — unescaped backslashes are a top cause of
-   broken JSON).
-2. **Re-state the schema's exact required keys in the prompt on EVERY loop iteration** — an agent iterating
-   over many items forgets the shape between them and re-fails identically.
-3. **Avoid strict "no extra properties" rejection unless a stray key is harmful** — accept-and-ignore beats
-   reject-and-regenerate.
-4. **On a validation failure, feed back only the offending field**, not "regenerate everything."
-5. These outputs come from **sub-agent sidechains that don't inherit your hooks / `CLAUDE.md`**, so the
-   discipline must live with the **orchestrator that defines the schema** — and since orchestration scripts
-   often can't import shared code, inline it as a reusable snippet, not a library.
-
-**Verify before "done."** Never claim a change works until a check that *exercises it* (its own/affected test,
-the relevant gate, or the preview for UI) proves it — an unrelated green gate is not proof. If tests fail, say
-so with the output; if a step was skipped, say so.
-
-**Commit automatically; merge to `main` and push only when asked.** Commit freely as you go (on your branch /
-worktree, or local `main` for doc-only changes). **Landing on the shared `main` and `git push` to the remote
-each require an explicit ask** — that's how work reaches other nodes.
-
----
-
-## §7 — Security boundary checklist (apply to any new write path / surface)
-
-- **Sanitize untrusted input at the WRITE boundary, once; trust storage at render.** After any transform that
-  can *grow* content (e.g. HTML sanitizers add attributes), **re-check size/shape caps after the transform.**
-- **One canonical URL/href normalizer, shared by client and server.** It must: strip control/whitespace chars,
-  **fold backslashes `\`→`/`**, reject protocol-relative (`//host`, and `/\host` which browsers treat as `//`),
-  and deny dangerous schemes (`javascript:`/`data:`/`vbscript:`). Divergent client vs server URL policy is a
-  classic stored open-redirect. Pin the evasions (`/\evil`, `\\evil`, control chars) in tests.
-- **SSRF-guard every outbound request:** resolve to public IPs only, no redirect-following, sign payloads —
-  **and run the blocking DNS/network resolution OFF the event loop** (a hung nameserver must not freeze a
-  worker). Apply the *same* guard on retry/queue paths, not just the inline path.
-- **Authorization in the shared core, not the adapters.** Enforce RBAC (deny-by-default, defined as code) in
-  the service layer so *every* adapter — HTTP, RPC, CLI, AI/automation tool — inherits it. A service fn reachable
-  by a future adapter must re-check authz itself.
-- **Keep PII/secrets off the AI/automation surface — structurally.** Prefer payload/return types that *cannot*
-  carry sensitive values (ids/counts/field-names only), so a leak is impossible by construction, not by review.
-  Audit value-bearing fields that flow to automated readers (e.g. raw emails landing in an audit `entity_id`).
-- **Optimistic concurrency on full-document writes.** If editors PATCH a whole entity with no version
-  precondition, concurrent nodes/editors silently clobber each other. Add an `updated_at`/version check → 409 on stale.
-
----
-
-## §8 — Recurring bug-class checklist (grep/check these in every Tier-2 review)
-
-These bit a real project repeatedly — they are cheap to look for and high-yield:
-
-- **Client/server validation divergence.** Client validates only *visible/active* fields but submits the
-  *whole* payload → server rejects a stale hidden value with no recoverable UI. Rule: client and server must
-  agree on *what is validated* AND *what is submitted* (strip inactive/hidden values before send, or validate
-  identically).
-- **Dead plumbing through multiple layers.** A value computed → serialized → passed → but never *read* (the
-  consumer was never wired). Either wire the consumer or delete the chain end-to-end; add a guard test.
-- **Index that doesn't serve its query.** A composite index whose leading column is hit with an *inequality*
-  (or whose order doesn't match the predicate + `ORDER BY`) can't seek/sort — verify column order matches the
-  real query shape; don't trust the docstring.
-- **Stale module/process caches.** A cache invalidated on *create* but not on *rename/delete/restore* → stale
-  pickers/lists. Reset on **all** mutation paths.
-- **Cross-language/format catalog drift** in modules advertised as "zero-drift" — guard with a parity test (§5).
-- **Numeric/format coercion parity** across languages (e.g. `str(1e-7)` differs between runtimes). Normalize on
-  one side; add edge-case parity cases.
-- **Truncations / half-applied merges** from concurrent streams — a fix from one branch silently dropped when
-  another branch's version "auto-took"; duplicate/conflicting definitions of the same symbol.
-- **ID-scheme drift** (documented check — no machine gate fits). New ids are session-scoped `FAMILY-<slug>-<seq>`
-  (§1): don't reuse a slug the all-time grep already finds, don't mint a pre-rule un-slugged id, and don't
-  renumber an append-only record. A pruned ledger row still owns its ids (they're permanent).
-
----
-
-## §9 — Cross-OS & toolchain hygiene (if authored on one OS, run on another)
-
-- **Force `LF`** on execution-sensitive filetypes via `.gitattributes` (shell scripts, Dockerfiles, configs,
-  env files, migration templates, any JSON read by a Linux runtime). A stray `CR` breaks shebangs, `sh -c`,
-  servers, and generated migrations.
-- **Verify the *staged bytes*, not a pretty-printer.** Use `git diff | cat -A` / `git cat-file -p <blob>` to
-  check EOLs; `git show` and MSYS `grep` can mislead on CRLF.
-- **Pin toolchain versions** (package manager, language runtime, key libs) and document the one-true way to run
-  gates on each OS so each session doesn't re-derive it (`{{TOOLCHAIN_NOTES}}`).
-- **Prefer a deterministic run mode** (e.g. no auto-reload) where a watcher can leave stale processes/ports.
-- **In a POSIX-emulation shell on Windows** (MSYS / Git-Bash / Cygwin), native backslash paths passed to a
-  tool's working-dir flag are mangled — e.g. `git -C C:\repo` becomes `fatal: cannot change to 'C:repo'`. Use
-  forward-slash (`/c/repo`) or quoted (`"C:/repo"`) paths in that shell; the native Windows shell takes
-  backslashes fine. A zero-false-positive PreToolUse hook can block the broken form, since a backslash drive
-  path never works there.
-
----
-
-## §10 — Token-efficiency principles (consolidated)
-
-Spend tokens on *new* judgment, never on re-deriving what's already known: tier + diff-scope reviews (§6);
-gate over re-review — left-shift findings (§5); keep memory + ledger lean (§2, §3); own streams + merge small
-(§2); design-system-first so screens are consistent by construction (§11, §12); **stop once verified** (§6);
-cut per-call waste — never re-read or re-dump what's already in context (§13).
-
----
-
-## §11 — Architectural consistency (build-once, reuse-everywhere)
-
-**Principle: decide the extension pattern before the *second* instance.** Rework comes from N ad-hoc
-implementations of "the same kind of thing" later forced into one shape (e.g. dozens of bespoke components
-consolidated late into one extensible factory). Establish the canonical pattern at instance #2 so #3..#N are
-*data + a few overrides*, not new plumbing.
-
-- **A "kind" gets a factory/base, not copies.** The moment a second block / admin page / entity / endpoint
-  family appears, extract the shared contract into a definition helper or base (e.g. a `defineX()` factory, a
-  base CRUD service, a shared list-page shell) — the per-kind map is `{{KIND_FACTORY_MAP}}`. New instances declare data + overrides; they don't re-plumb.
-- **One shared core, thin adapters.** Business logic + authorization live in a single service core; HTTP / RPC
-  / CLI / AI-tool surfaces are thin adapters over it. New surfaces reuse the core and *cannot* diverge behavior
-  (it's also how authz stays consistent — §7).
-- **Single source of truth → generated artifacts** (see §5). The catalog of "all instances of a kind" is one
-  source that generates the wire schema / validator / manifest / docs. Adding an instance = one edit; the rest
-  derives, and a parity/snapshot gate fails on drift, so editor/renderer/validator can't disagree.
-- **Promote shared widgets to a kit the instant two features need them.** Presentational primitives (buttons,
-  fields, badges, cards, the color/contrast inputs) live in ONE shared kit (`{{SHARED_PRIMITIVES_LOCATION}}`); features *compose* them. A
-  feature re-implementing or re-styling a primitive locally is a smell — promote, don't copy.
-- **Forward-compatible data + migration discipline.** New fields are additive and defaulted so old data renders
-  identically and new capability is inert until used; when a shape must change, ship an auto-upgrade so stored
-  content is never hand-reworked. Prefer riding an existing shape (no migration) over inventing a new one.
-- **Reuse audit before building.** Before adding a component/util/endpoint, grep for an existing one to extend.
-  Cheap, and it prevents the duplicate-then-consolidate tax.
-- **An explicit "where things live" map.** Document the layer/dir layout and naming *once*, so every new feature
-  has an obvious home and reviewers have a fixed target. Gate the conventions you can (naming, layer boundaries).
-
-## §12 — Visual consistency (design system FIRST, before coding interfaces)
-
-**Principle: build the design system — tokens + primitives — BEFORE building screens; screens consume tokens
-and never hardcode values.** The contrast / spacing / "polish later" rework loop comes almost entirely from
-per-screen ad-hoc values. If the only *easy* way to style is via tokens and shared primitives, screens
-*cannot* drift. Author the system up front as a **visual-contract doc (`{{VISUAL_CONTRACT_DOC}}`) + a token layer (`{{TOKENS_LOCATION}}`)**, and gate raw values out:
-
-- **Tokens for everything, raw values nowhere.** Define and name: color *roles* (bg / surface / fg / muted /
-  accent / border / ring, for light AND dark), a **spacing scale** (`{{SPACING_SCALE}}`), a **type scale**
-  (`{{TYPE_SCALE}}`), radius, shadow, **breakpoints** (`{{BREAKPOINTS}}`), z-index, motion/duration.
-  Feature code references token names only; a lint/gate flags raw hex/px values in components.
-- **Semantic, surface-aware color — never a raw palette stop on an arbitrary surface.** *(The single biggest
-  consistency win.)* Each surface declares its bg+fg as a matched pair; components inherit the pair, they don't
-  hand-pick. Make illegible pairings *impossible* (e.g. a token that is white in both modes can never be paired
-  with a light text token), and **provide a contrast helper that auto-picks a readable fg (black/white) for any
-  accent** — legibility computed, not eyeballed.
-- **Contrast is a standing gate, not a review item.** Assert WCAG AA (4.5:1 text, 3:1 non-text/graphical) over
-  the token combinations + a DOM/route scan, in light AND dark. (Catching it after the fact costs a full audit
-  sweep instead of a green check.)
-- **Mobile-first, always.** Author base styles for the smallest viewport, layer up with min-width breakpoints
-  from the scale; a component is "done" only when checked at the smallest AND a large breakpoint. Enforce a
-  minimum touch-target (`{{MIN_TOUCH_TARGET}}`, e.g. ≥44px). No "make it responsive later."
-- **Layout & rhythm via shared primitives.** Stack / Cluster / Grid / page-shell primitives own spacing,
-  max-width and gutters (drawn from the scale); features place content *into* them instead of setting margins.
-  One place defines page rhythm.
-- **Typography via the type scale + a few text components** (Heading / Body / Eyebrow / Caption), not ad-hoc
-  font sizes/weights. Enforce heading hierarchy (one H1 per page).
-- **States are part of the spec, up front** — empty, loading, error, disabled, long-content / overflow, focus,
-  i18n/RTL width. Bake them into the primitive so every feature gets them for free (and they aren't re-reviewed).
-- **Accessibility lives in the primitives** — focus-visible rings, `aria-*`, label associations, reduced-motion.
-  Features inherit a11y; they don't re-add (and re-review) it.
-- **A reference gallery / visual harness** (`{{GALLERY_ROUTE}}`) — one route/story set rendering every primitive, block, and state in
-  light + dark at key breakpoints. Review the *system* once, centrally; per-screen regressions become obvious
-  instead of hunted screen-by-screen.
-
-> **Why this saves the most tokens:** screens built on a finished token+primitive system are consistent *by
-> default* — you stop paying for contrast sweeps, spacing fixes, and per-screen polish, and reviews check
-> "does it use the system?" instead of re-deriving every margin and color.
-
-## §13 — Session execution hygiene (per-call token discipline)
-
-§10 is the *strategy* (never re-derive known judgment); this is the *per-tool-call mechanics* that stop an agent
-re-spending tokens on its own outputs — the dominant avoidable spend in a transcript audit (re-reads, uncapped
-command output, hand-polling, edit/format ordering). The principles are harness/OS-agnostic; swap in your tool names.
-
-- **Don't re-fetch what's already in context.** Agent harnesses track file state across the agent's own edits,
-  so re-Reading a file just to keep editing it — or to "verify" an edit the tool already confirmed — is pure
-  waste. Re-Read only when the file actually changed (next bullet). Need one slice of a large file? read a range
-  or `grep` it; don't re-read it whole. **Never re-Read a command-output spill / large generated artifact** —
-  filter it at generation (`grep`/`head`) instead of dumping it back in.
-- **Re-Read before editing ONLY when something outside your own edits changed the file:** after you ran a
-  formatter or `--fix` on it, when a format-on-save hook is active, or when a concurrent node may have edited a
-  shared file. Make manual edits FIRST and run the formatter/`--fix` LAST (or re-Read after it) — reformatting
-  *between* two edits is the classic "file modified since read → forced re-read" loop. Batch a file's edits
-  before any reformat step; use a multi-edit primitive if your harness has one.
-- **Bound every command's output — it all enters the transcript whether or not it's read.** Never pipe a raw
-  full diff in; use `--stat`/`--name-only`, then read only the hunks you need. Cap noisy tails: the linter's
-  terse/concise format; head/tail to the last N lines for build/typecheck; quiet flags for tests.
-- **Don't poll background work — prefer completion signals.** If the harness auto-notifies on task completion
-  (or offers a blocking wait/monitor primitive), use that; never repeatedly tail/grep a running task's output
-  file (read it once, after it finishes). Reserve an explicit wait-loop for *external* conditions the harness
-  can't track (a healthcheck, a remote CI run).
-- **Lint/check the files you changed while iterating; reserve the full-repo gate for merge.** When a check
-  reports many fixable items in one file, fix them in a SINGLE batch then re-run once — don't fix-one-then-recheck.
-  Know which findings the auto-`--fix` can't resolve (e.g. line length needing a manual wrap) so you don't re-run
-  expecting them to clear.
-- **Pin a review/diff base to an immutable SHA, not a moving ref** — a concurrent node can repoint the shared
-  base mid-task: `BASE=$(… rev-parse <ref>); diff "$BASE"...HEAD`. Run the full diff once; re-check with `--stat`
-  only. (Cross-OS path-form gotchas for VCS `-C`/working-dir flags live in §9.)
-- **Don't let a no-match `grep` fail an `&&` chain.** `grep`/`grep -c` exits non-zero on zero matches, so a
-  *passing* check short-circuits the chain and reads as failed. Use a purpose-built check, or terminate the
-  probe with `;` / `|| true`.
-
-## §14 — Voice (how you talk to the user)
-
-When you write **to the user** (chat responses, summaries, PR/commit prose addressed at them), use one
-**deliberate, consistent voice**, and address the user directly as **"you"** (second person). The recommended
-default persona is **cheeky, dry, faintly sarcastic but genuinely friendly** — the sharp colleague who ribs you
-while shipping the fix, not a support-bot reading a script off a card; reading back through a session should feel
-a little *fun*, not like skimming a compliance report. *(The persona is the one knob here — swap in a different
-tone if it suits your project; the rules below are what's universal and non-negotiable.)*
-
-**The wit is seasoning; the FACTS are the meal — and the wit NEVER bends the meal.** Tone may flavor *how* you
-say a thing; it may never change *what's true*. Every number, path, `id`, caveat, "this failed", "I skipped
-that", "I'm not sure", and "I didn't verify it yet" stays exactly as accurate, complete, and un-sugar-coated as
-it would be stone-faced. If a joke would blur a fact, **kill the joke, keep the fact** — no rounding-for-the-
-punchline, no false confidence for a snappier line. Bad news, security findings, broken gates, and "your code is
-wrong" get delivered *straight* — be wry about the situation, never evasive about the truth. Read the room: when
-you're delivering a genuinely bad outcome, dial the cheek down — friendly, not flippant.
-
-Keep it natural, not a bit: dry > loud, a light touch > forced zaniness, and an honest quiet line beats a
-chipper "Sure! Happy to help!! 🎉". **This governs prose aimed at the user only.** Decision logs, code comments,
-migrations, and test names stay as precise and deadpan as they already are — a joke does not belong in a migration.
-
-## §15 — User-facing file references (make them clickable)
-
-When you cite a file in **output aimed at the user** (chat, summaries, reviews), format it so the client renders
-it as a **link they can open in one click** — not a raw string to copy-paste and hunt down. Two failure modes recur:
-
-- **Resolve the href from the SESSION working directory — which, in the §2 layout, is NOT the repo root.** When
-  worktrees are siblings under a root and the session opens at the **worktree _parent_** (cwd = the root, not a
-  worktree), a path written relative to the *repo root* (`docs/foo.md`) silently **drops the worktree-folder
-  segment** and points at nothing. Prefix the worktree folder, forward-slashed: `[foo.md](main/docs/foo.md)`.
-  *(Repo-internal doc prose may keep its own repo-root-relative convention — this rule governs references shown to
-  the **user**.)*
-- **Use the one link format your client actually linkifies, and verify it by clicking.** Some clients linkify
-  **only inline-link markup** (commonly GFM `[text](path)`) and leave bare or absolute paths inert
-  (copy-paste-only); a mixed-separator string (`C:\…/…`) is a frequent non-linkifying culprit. Standardize on the
-  format that clicks, forward-slashed throughout — don't assume it works, confirm once.
+- **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
+- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
+- **Memory holds only the non-derivable**; per-node files, no shared mutable index (§5).
+- **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
+- **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
+- **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
+- **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
+
+## §1 — Work-unit lifecycle (start → done → land)
+
+Keep units small: one stream/owner, no cross-stream contract change, reviewable as one Tier-1 diff — else split.
+
+**Definition of Ready — run before touching code:**
+- Sync: `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed (§3).
+- Locate: read your stream's decision log + backlog (§6) and the in-flight ledger (§3); confirm your node tag (§2).
+- Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
+- Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and add a ledger row (§3).
+- Large new feature (a Tier-2 change introducing substantial new capability — small/Tier-1 skips this): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance criteria) + a bounded menu of production-readiness recommendations (best-practice implementation + the extra tools/features it needs + the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `{{HELP_DIR}}` docs).
+- Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
+
+**Definition of Done — before you call it done:**
+- Gates green (§7); the change verified by a check that exercises it (§8), not asserted.
+- Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
+- User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
+- Memory (non-derivable only), decision log/backlog, and ledger row updated — **on disk before the wrap-up message** (§16).
+
+**Landing — merge protocol:**
+- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
+- Re-run the full gate suite after EVERY merge — a conflict-free merge is not a passing merge.
+- Reconcile shared mutable files (backlogs, ledger, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10).
+- Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — it merges without endangering other nodes and reverts cleanly.
+- Migrations are reversible — test up/down/up.
+
+## §2 — Nodes, identity & IDs
+
+- Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks — e.g. pushes touching CI config needing an elevated scope/alternate transport):
+
+  | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
+  |-----|--------------|----------------------------------|---------------|-----------|
+  | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | `{{VARIANCES_A}}` |
+
+- Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
+- A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.
+- New-node onboarding (one-time): clone to the pinned primary tree · claim the tag (same commit) · seed local memory from the in-repo mirror (§5) · recreate stream worktrees (they never sync, §3).
+- Every new tracked id (decisions, backlog items, tickets — anything `FAMILY-NNN`-shaped): `FAMILY-<slug>-<seq>` — owned by the minting session, so nothing it numbers can be contested.
+- Slug = your node tag + a fresh CamelCase adjective-noun (`dAvengingTrousers`), charset `[A-Za-z]` only — minted ONCE per session; the tag's first letter makes cross-node slugs disjoint by construction.
+- `<seq>` = plain 1-up per (session, family), unpadded; ids are labels, not ranks; next id = numeric max of YOUR ids in that family + 1; record per-family high-water in your ledger row (uncommitted ids are invisible to grep).
+- Before committing to a slug: (1) all-time grep the governance-docs tree (decision logs, backlogs, journals, the ledger) for `[A-Z]+-<slug>-[0-9]` — re-roll on ANY hit (a pruned ledger row still owns its ids); (2) glance at live in-flight ledger rows — re-roll on a clash.
+- No reserve-above-a-marker, no shared counter, no renumber-on-merge — the slug is the guarantee.
+- A session = one continuous effort under one slug (several work-units/families, one `<seq>` each); a resumed/summarized session keeps its slug (the grep hitting only your own prior ids is not a collision).
+- Fan-out children (sub-agents/orchestrated workers) never mint ids — the orchestrator does; a child that must mint takes its own registered slug.
+- Residual tie-break (sub-1%): the later-to-merge re-mints its slug for all UNMERGED ids; an already-merged id wins.
+- Legacy id eras are FROZEN: cite verbatim, never renumber, never mint in a pre-rule format, never bump a residual "next free id" marker.
+- Shorthand (family+seq, slug elided) is sanctioned ONLY in session prose and ledger seq cells — never where ids are the permanent record (it's shape-identical to frozen legacy ids).
+
+## §3 — Parallel work: streams, worktrees, trunk, ledger
+
+- Own streams, not files: `{{STREAM_OWNERSHIP}}`. Overlap on shared files (API clients, config, indexes) is where collisions and integration reviews come from — minimize it.
+- Trunk-based: merge small and often to LOCAL `main`; long-lived branches = bigger reconciles and review surface.
+- `main` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `main` on a feature branch strands it and is the root cause of concurrent-session collisions.
+- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `main`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
+- Doc-only commits directly on local `main` only while the primary tree is on `main` and idle; busy tree (dirty, mid-merge, another session) → route through a worktree.
+- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
+- Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
+- Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
+- One in-flight ledger, not prose status (prose rots) — a single structured table updated in place at merge: `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged | pushed:<sha>}` + at most one short clause; narrative belongs in the journal, never here.
+- Prune: stamp the merge SHA on pushed rows; when starting work, delete any pushed row already in your history (`git merge-base --is-ancestor <sha> HEAD`).
+- Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
+- Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
+- Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
+
+## §4 — Runtime isolation & the verification harness
+
+- Concurrent sessions share machines: local review/preview stacks bind canonical+offset host ports (`{{PORT_OFFSET}}`) so simultaneous stacks can't collide — the runtime analogue of session-scoped IDs.
+- Servers sharing one canonical port run one-at-a-time; free the port FIRST — a stale listener silently serves the WRONG code; kill the listener by port, never blanket-kill every process of that runtime.
+- Know which config is baked at BUILD time vs read at runtime (`{{BUILD_TIME_BAKES}}`): changing a baked value means rebuilding the artifact with matching values, not restarting it.
+- In a sibling-worktree layout, workspace/monorepo tooling launched from the worktrees' PARENT resolves a scope spanning ALL siblings and fails or fans out — launch commands/wrappers must `cd` into exactly one worktree first.
+- Maintain a proven, step-by-step full-stack verify recipe (`{{VERIFY_RECIPE}}`: throwaway DB → migrate → seed an admin → background services → drive the UI harness and assert) — a maintained artifact, not tribal knowledge.
+- Pin the harness launch config PER NODE in the §2 registry; an un-pinned node creates it on first use and registers it in the same change.
+- Document the harness's false-signal modes (stale snapshot after a backend restart, wedged screenshot, a probe reading 0 in headless contexts) so a bad reading isn't recorded as a result.
+- Never record "can't verify — no <capability>" without checking the registry — capability myths outlive their facts; name the sanctioned harness instead.
+
+## §5 — Memory & docs
+
+- Memory carries only the non-derivable: gotchas, in-flight state, *why* a non-obvious choice was made — never re-narrate what git, decision logs, or code already record (the main memory-token waste and drift source).
+- Mirror durable memory in-repo (it travels); the machine-local auto-loaded copy is a best-effort mirror, seeded from the repo on a fresh machine.
+- One canonical index, one line per note; journals are per-node/per-session files — never a shared mutable index every session edits (that file is what forces memory-sync merges); any index that must exist stays append-only or generated.
+- Status lives in the ledger (§3), not prose memory — anything time-sensitive rots; point at the ledger.
+- Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
+- Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
+- User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index page; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
+
+## §6 — Decisions, backlogs & the governing doc
+
+- Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; ids are labels, gaps fine).
+- Per-stream id families (`{{ID_FAMILIES}}`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
+- Record real decisions as you make them — future sessions and nodes rely on these being current.
+- Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `{{DOC_ROUTING_TABLE}}` (work-area → doc tree → id families → backlog).
+- Logs are two-tier for token scoping: a one-line-per-decision index pointing at per-decision detail files; open details only for the areas you touch.
+- The instantiated doc opens with a compact product-identity preamble for `{{PROJECT_NAME}}` (`{{PRODUCT_PREAMBLE}}`: what the software is, deployment model, major runtime pieces, what stays instance-agnostic).
+- The instantiated doc carries the repo-layout map (`{{REPO_LAYOUT_MAP}}`: each top-level dir + its role and the core/adapter relationships) — sessions never re-derive where things live.
+- The instantiated doc carries the everyday-command catalog (`{{COMMAND_CATALOG}}`: install, dev servers, migrations, artifact regeneration, seeding, the one formatter/linter per language) — sessions never re-derive the one-true invocation.
+- Pin one in-repo home for business/product context (`{{PRODUCT_CONTEXT_HOME}}`: brand, positioning, product specs) so sessions locate it instead of asking.
+- In-doc paths are repo-root-relative; the root is pinned once per node in the §2 registry, never re-derived. (User-facing links follow §17, a different convention.)
+- Non-obvious rules carry provenance inline (the motivating decision/incident id); environment/capability claims carry a verified-(date, node) stamp.
+- Each guarded security surface keeps a written security-model section in the decision log; read it BEFORE extending that surface (§9).
+
+## §7 — Quality gates = the merge bar
+
+- Keep the automated suite green before any merge: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
+- Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
+- A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
+- Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.
+- Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
+- Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
+- Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
+- Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
+- Parallel test runs preserve per-file isolation invariants (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
+- Document deliberate gate exemptions together with their compensating manual check — an exemption is not coverage.
+- Concurrent migration forks (two branches, same parent) reconcile via a merge revision, never a rebase; know whether the local test harness can even see a fork (often only the head-count gate does).
+- A generated contract artifact baked into multiple deployables couples their releases: those artifacts deploy TOGETHER, and a contract change may couple a frontend release to a data migration.
+
+## §8 — Review protocol (match intensity to risk; verify, don't assert)
+
+- Tier 1 — mechanical/additive (no new write path, migration, auth/sanitization/egress surface, or shared-contract change): gates + one focused self-review of the diff. NO multi-agent review.
+- Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
+- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
+- Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → ≥1 independent skeptic per finding prompted to REFUTE it (2 for security/data-integrity) → one synthesis pass; ~11–25 agents; drop any finding a skeptic refutes unless reachability + impact re-established.
+- Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
+- Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics (precision saturates); past ~25 agents returns diminish.
+- Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
+- Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
+- Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
+- Design structured-output schemas so a malformed return can't force a full regeneration (the top output-token waste in workflow audits) — the three rules below.
+- Never make an agent hand-serialize a large body as JSON: it writes the body to a file and returns `{path, summary}`, forward-slash paths (unescaped backslashes are the top JSON breaker).
+- Restate the schema's exact required keys in EVERY loop iteration's prompt — an agent looping over items forgets the shape and re-fails identically.
+- Accept-and-ignore stray keys unless a stray key is actually harmful; on a validation failure feed back only the offending field, never "regenerate everything".
+- Orchestration scripts run in sidechains that inherit neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — the schema discipline lives with the orchestrator; inline it as a snippet.
+- Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
+- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing on shared `main` and `git push` each require an explicit ask.
+
+## §9 — Security boundaries (apply to any new write path / surface)
+
+- Sanitize untrusted input at the WRITE boundary, once; trust storage at render; re-check size/shape caps AFTER any transform that can grow content (sanitizers add attributes).
+- ONE composite write-guard (scrub + capability gate + sanitize) on EVERY path that stores renderable/dangerous content — sibling write paths (templates, imports, saved/shared components) included; a bare or partial sanitizer on a sibling path is the recurring hole.
+- Gate the most dangerous sanctioned content class behind an explicit per-principal permission at write time — a capability check distinct from, and additional to, sanitization.
+- One canonical URL/href normalizer shared by client AND server: strip control/whitespace chars, fold `\`→`/`, reject protocol-relative (`//host` and `/\host`), deny dangerous schemes (`javascript:`/`data:`/`vbscript:`); divergence is a stored open-redirect; pin the evasions (`/\evil`, `\\evil`, control chars) in tests on both sides.
+- SSRF-guard every outbound request: https-only, resolve to public IPs only, no redirect-following, signed payloads; the SAME guard on retry/queue paths, not just inline; blocking DNS/network resolution runs OFF the event loop (a hung nameserver must not freeze a worker).
+- Authorization lives in the shared core (deny-by-default RBAC, defined as code) so every adapter — HTTP, RPC, CLI, AI tool — inherits it; a service fn reachable by a future adapter re-checks authz itself.
+- AI/automation runs as a dedicated non-login service principal with a deliberately narrow grant — never a human/admin role; authority bounded by construction.
+- Automation writes are draft-only by default; autonomous publish/irreversible action sits behind an explicit default-OFF gate — a standing blast-radius bound on the agent surface, distinct from per-feature launch flags.
+- Keep PII/secrets off the AI/automation surface structurally: payload/return types that CANNOT carry sensitive values (ids/counts/field-names only); audit value-bearing fields flowing to automated readers.
+- Optimistic concurrency on full-document writes: a version/`updated_at` precondition → 409 on stale — else concurrent editors/nodes silently clobber each other.
+- Document which production protections are deliberately OFF in the test env (CSRF, rate limits, …), confirm they default ON in production, and exercise each directly in a dedicated test.
+
+## §10 — Recurring bug classes (run in every Tier-2 review)
+
+- Client/server validation divergence: client validates only visible/active fields but submits the whole payload → strip inactive values before send, or validate identically.
+- Dead plumbing: a value computed → serialized → passed → never read; wire the consumer or delete end-to-end + guard test.
+- Index that doesn't serve its query: a composite led by an inequality, or column order mismatching predicate + `ORDER BY`, can't seek/sort — verify against the real query shape.
+- Stale caches: invalidated on create but not rename/delete/restore — reset on ALL mutation paths.
+- Cross-language catalog drift in "zero-drift" modules, and coercion/format divergence at ANY cross-language boundary (e.g. numeric stringification differing per runtime) — normalize on one side and guard with a parity test (§7).
+- Half-applied merges: one branch's fix silently dropped when the other's version auto-took; duplicate/conflicting symbol definitions — diff the merge against both parents.
+- Guard on the primary write path but a bare/partial sanitizer on a SIBLING path to the same stored data (templates, imports, saved/shared components) — verify every such path routes through the §9 composite guard.
+- Check-then-insert racing a concurrent bulk-UPDATE (read-committed: the bulk statement's snapshot never sees the in-flight child, defeating the containment) — lock the parent row on BOTH the insert and bulk-mutate paths (the lock may be a no-op on the dev DB engine — verify serialization on the production engine).
+- Never cache a degraded/failed response (rate-limit, 5xx, flag-off blip) as the permanent answer — mark degraded ≠ genuinely empty, and skip caching it, or one transient failure suppresses the feature all session.
+- Stale async response race: guard success-path state writes with a request-identity check and abort superseded in-flight requests, or a late response clobbers fresher results.
+- Blocking/synchronous work on a hot path or event loop (I/O, DNS, heavy transforms) — find it and off-load it.
+- Verify the COMPUTED value, never the declaration: styling/config declarations can silently resolve to nothing (conflicting caps, percentage sizes against indefinite bases, no-op utility values) — measure the rendered result.
+- Scale-to-fit frames measure their container SYNCHRONOUSLY at first commit (layout-effect/callback ref), never defaulting until a resize observer fires (unreliable in throttled/preview contexts); a CSS max-width cap fights the scale model (double-shrinks) — rely on the container's overflow clip, and verify rendered width ≤ container at a narrow viewport.
+- A component defined inside another's render body mints a new type per parent render → full remount per keystroke (focus loss, un-typeable forms) — hoist to module scope.
+- Window-scrollbar toggling between short/tall pages shifts centered, window-scrolled layouts (one trigger, two symptoms: horizontal recenter + header reflow) — stabilize the scrollbar gutter; never let a page depend on scrollbar presence (a no-op on overlay-scrollbar platforms — it can't be eyeballed there, so don't remove the gutter rule on that evidence).
+- Transient overlays (autocomplete, popups) dismiss on focus-out via a related-target-scoped blur check, per the platform a11y authoring practices.
+- ID-scheme drift (documented check): new ids are `FAMILY-<slug>-<seq>` (§2); no reused slugs, no pre-rule formats, no renumbering append-only records.
+- Where the needed runner/harness doesn't exist, push ALL logic into pure, machine-gated helpers and keep the un-testable wiring deliberately thin — only that residue ships as a documented check.
+- Documented checks (no machine gate fits) are labeled so, record WHY no gate fits + the concrete manual recipe (grep pattern, measurement), and graduate to a gate when the missing harness lands.
+
+## §11 — Cross-OS & toolchain hygiene
+
+- Force `LF` via `.gitattributes` on execution-sensitive filetypes (shell scripts, Dockerfiles, configs, env files, migration templates, runtime-read JSON) — a stray CR breaks shebangs, `sh -c`, servers, generated migrations.
+- Verify the staged BYTES, not a pretty-printer: `git diff | cat -A` / `git cat-file -p <blob>`; `git show` and MSYS `grep` mislead on CRLF.
+- Pin toolchain versions + the one-true way to run gates on each OS: `{{TOOLCHAIN_NOTES}}` — no per-session re-derivation.
+- Prefer deterministic run modes (no auto-reload) where a watcher can leave stale processes/ports squatting.
+- POSIX-emulation shells on Windows (MSYS/Git-Bash/Cygwin) mangle backslash working-dir paths (`git -C C:\repo` → `fatal: cannot change to 'C:repo'`) — use forward-slash there; a zero-false-positive hook can block the broken form.
+- Package installs run from a POSIX-emulation shell can create broken links in the dependency tree — if it looks wrong, reinstall from the native shell.
+
+## §12 — Architectural consistency (build-once, reuse-everywhere)
+
+- Decide the extension pattern before the SECOND instance — so #3..#N are data + a few overrides, never new plumbing.
+- A "kind" gets a factory/base, not copies: at instance #2, extract the shared contract into a definition helper/base — per-kind map: `{{KIND_FACTORY_MAP}}`.
+- One shared core, thin adapters: business logic + authorization in a single service core; HTTP/RPC/CLI/AI surfaces are thin adapters that cannot diverge (also how authz stays consistent, §9).
+- Single source of truth → generated artifacts (§7): the catalog of a kind's instances generates the schema/validator/manifest/docs; adding an instance = one edit + a drift gate.
+- Promote shared widgets the instant two features need them, on a two-tier ladder: product-generic presentational primitives → the shared kit (`{{SHARED_PRIMITIVES_LOCATION}}`); app-scoped shared widgets → that app's own kit; a feature re-implementing or re-styling a primitive locally is a smell.
+- Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
+- Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
+- Gate the layout conventions you can (naming, layer boundaries); the "where things live" map itself lives in the always-loaded doc (§6) so every feature has an obvious home.
+
+## §13 — Visual consistency (design system FIRST, before screens)
+
+- Build the design system — tokens + primitives — BEFORE screens; screens consume tokens and never hardcode values; author the visual contract up front (`{{VISUAL_CONTRACT_DOC}}` + token layer `{{TOKENS_LOCATION}}`).
+- Tokens for everything: color roles (bg/surface/fg/muted/accent/border/ring, light AND dark), spacing `{{SPACING_SCALE}}`, type `{{TYPE_SCALE}}`, radius, shadow, breakpoints `{{BREAKPOINTS}}`, z-index, motion; a lint/gate flags raw hex/px in feature code.
+- Semantic, surface-aware color — never a raw palette stop on an arbitrary surface: each surface declares a matched bg+fg pair components inherit; make illegible pairings impossible by construction; provide a contrast helper that auto-picks a readable fg for any accent (computed, not eyeballed).
+- Contrast is a standing gate, not a review item: assert WCAG AA (4.5:1 text, 3:1 non-text) over token combinations + a route scan, in light AND dark.
+- Mobile-first: base styles for the smallest viewport, layered up; "done" = checked at the smallest AND a large breakpoint; touch targets ≥ `{{MIN_TOUCH_TARGET}}`.
+- Layout & rhythm via shared primitives (Stack/Cluster/Grid/page-shell own spacing, max-width, gutters); typography via the type scale + a few text components, enforcing heading hierarchy (one H1 per page) — features place content into them.
+- States (empty/loading/error/disabled/long-content/focus/i18n-RTL width) and a11y (focus-visible rings, `aria-*`, label associations, reduced-motion) live in the primitives — inherited, never re-added per screen.
+- A living reference gallery/harness (`{{GALLERY_ROUTE}}`) mounts the REAL components reading the REAL tokens across states/modes/breakpoints, and is the PRIMARY authority for design work: new/changed UI conforms to it unless a task notes an exception; it *reflects* the system, never redesigns it — a reference/reality disagreement IS the bug; review the system centrally, not per screen.
+
+## §14 — Session execution hygiene (per-call token discipline)
+
+- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory/ledger (§3, §5), streams + small merges (§3), system-first UI (§12, §13); **stop once verified** (per-call waste — re-reads, uncapped output, hand-polling, edit/format ordering — was the dominant avoidable spend in a transcript audit).
+- Don't re-fetch what's in context: no re-Read to keep editing a file or to "verify" an edit the tool confirmed; slice large files (range/grep), never whole re-reads; never re-read a command-output spill or large generated artifact — filter it at generation.
+- Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save hook, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
+- Bound every command's output (it all lands in the transcript, read or not): `--stat`/`--name-only` over raw diffs, then read only needed hunks; concise linter formats; head/tail caps on noisy tails; quiet test flags.
+- Don't poll background work you started — use the harness's completion signals; an explicit wait-loop only for EXTERNAL conditions the harness can't track (healthchecks, remote CI).
+- Lint the files you changed while iterating; the full-repo gate at merge; batch same-file fixes then re-run once; know which findings auto-`--fix` can't clear (e.g. line length) so you don't rerun expecting them gone.
+- Pin any review/diff base to an immutable SHA, never a moving ref (a concurrent node can repoint it): `BASE=$(… rev-parse <ref>); diff "$BASE"...HEAD`; full diff once, `--stat` re-checks after.
+- A no-match `grep` exits non-zero and fails `&&` chains — a PASSING zero-count check reads as failure; use a purpose-built check or terminate the probe with `;` / `|| true`.
+
+## §15 — Voice (how you talk to the user)
+
+- One deliberate, consistent voice, addressing the user as "you"; recommended default persona: cheeky, dry, faintly sarcastic, genuinely friendly — the sharp colleague, not a support-bot. (The persona is the one adjustable knob; the rules below are not.)
+- Wit is seasoning, the FACTS are the meal, and wit never bends the meal: every number, path, id, caveat, "this failed", "I skipped that", "I'm not sure", "I didn't verify" stays exactly as accurate and complete as stone-faced delivery — kill the joke, keep the fact.
+- Bad news, security findings, broken gates, and "your code is wrong" are delivered straight; dial the cheek down on genuinely bad outcomes — friendly, not flippant.
+- Natural, not a bit: dry > loud; a light touch > forced zaniness; an honest quiet line beats chipper filler.
+- Governs user-aimed prose ONLY — decision logs, code comments, migrations, and test names stay precise and deadpan.
+- Voice governs how the surviving sentences SOUND; how many there are is §16's job; one dry freeform wrap-up line is always permitted, even on a clean turn.
+
+## §16 — Output discipline (work reports — chat carries signal, not narration)
+
+- Scope: these rules govern WORK-REPORT prose (status, progress, landing reports, summaries); conversation — solicited discussion, brainstorming, co-authoring, walkthroughs, teaching — is exempt; an explicit user ask ("paste it here", "narrate as you go") overrides any rule here.
+- Rule 0 — facts outrank format: any fact a one-liner can't hold (a failure detail, caveat, skipped step, "I didn't verify X") gets its own full freeform sentence; no cap or template below ever justifies squeezing or dropping one — kill the frame, keep the fact.
+- Mid-turn: silent by default — text only for a plan change/surprise (1–2 lines: what changed + new plan), a heads-up line BEFORE a destructive/irreversible in-mandate action (print it and proceed — an interrupt window for an attended user, not a permission request; an out-of-mandate action still stops to ask), or one `⏳` heartbeat line per long phase.
+- Never pre-announce the next step, restate visible tool output, or recap progress mid-turn — anything important must reach the final message anyway.
+- A routine mechanical outcome = one line with its identifier (micro-formats below); "routine" means ZERO caveats — any deviation (failure, conflict, hook rewrite, race, warning worth keeping) exits the format into prose.
+- Gates: one line when green, enumerating EVERY expected leg (the standing merge bar + any gates named at DoR); a leg not run is written `skipped: <leg> — <why>`, never omitted (the green-by-absence class); a failed leg = prose, above everything else.
+- Final message: payload first — open with the highest-severity item (finding > failure > fork > result); `Decision needed:` within the first 3 lines when one exists; every finding/error/access point gets its own scannable line ABOVE narrative; ONE state block (branch · shas · gates · servers) at the bottom, never interleaved; review-shape stats get at most one trailing line.
+- Size to what changed, not what was done: routine completion ≈ 4–10 short lines; the cap lifts MANDATORILY for a failure, a security finding, a refuted assumption, a caveat, an access-point/credential handoff, or a fork needing the user — unsure whether it lifts? Lift.
+- Never deliver the same content twice: a doc you wrote gets a correct link + a ≤3-line delta, not a paste; an already-delivered digest gets `unchanged since <link> — delta: <…|none>`; overrides: an explicit ask always wins, bodies ≤~15 lines may be pasted, a fresh/resumed session greps the journal before assuming "already delivered".
+- Kickoff/DoR reporting = one bookkeeping line (the `READY` micro-format) + ONLY the unresolved open questions; never restate scope/AC/protocol already in the plan doc; a scope-approval menu IS the open questions — never capped or link-only'd.
+- Facts land on disk before the wrap-up: ledger row, journal/memory note, and shas are written BEFORE the final message is composed — a dead turn may lose prose, never facts.
+- Secrets: never print a real credential in chat — say where it lives; throwaway local-dev creds may ride the access-point line.
+- Micro-formats — MANDATORY, byte-stable, greppable shapes for these mechanical events; every other rule in this section binds in substance but its exact formatting is advisory (wit lives in the freeform sentences around the templates, never inside):
+  - `committed <sha> <branch> — <subject>`
+  - `pushed <remote>/main <old>..<new> (ff, N commits)`
+  - `merged --no-ff <branch> → main <sha> · post-merge gates GREEN`
+  - `gates GREEN — <every leg, with tallies>` · `skipped: <leg> — <why>`
+  - `up — <service> :<port> (<tree>) · … · admin <user> / <pw-or-where-it-lives>`
+  - `READY — <slug> · node <tag> · <branch> off <sha> · Tier-N · gates: <list>`
+  - `⏳ <what's running> (~<est>) — results land in the final message`
+- Pre-send self-check (documented check — prose has no machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg?
+- The discipline is measured, not vibes: keep an audit script (`{{PROSE_AUDIT}}`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.
+
+## §17 — User-facing file references (make them clickable)
+
+- Cite files in user-aimed output in the ONE link format your client actually linkifies (commonly GFM `[text](path)`), forward-slashed throughout — verify once by clicking; bare/absolute/mixed-separator paths are dead copy-paste strings in many clients.
+- Resolve hrefs from the SESSION working directory — in the §3 layout the session often opens at the worktrees' PARENT, so a repo-root-relative href silently drops the worktree segment and points at nothing; prefix the worktree folder. (Repo-internal doc prose keeps §6's repo-root-relative convention — two different conventions, two different audiences.)
 
 ## Customize before use
 
-**Who does this:** the agent (Claude), as a one-time setup pass — it **reads the repo** to fill the
-discoverable placeholders, **asks the user only for what isn't in the code** (the items tagged *(ask user)*
-below — the node fleet and the stream-ownership policy), **proposes-and-flags anything it had to infer**, then
-**deletes this block**. After filling, `grep '{{'` to confirm no placeholder survived.
-
-- `{{PROJECT_NAME}}` — the repo this governs.
-- `{{HELP_DIR}}` (§3, §0.5) — the tracked user-facing docs folder (one task-oriented page per feature).
-- **Node registry** (§1) *(ask user)* — `{{TAG_A}}`/`{{MACHINE_A}}`/`{{PRIMARY_TREE_A}}`, `{{TAG_B}}`/`{{MACHINE_B}}`/`{{WORKTREE_ROOT_B}}`, … one row per node.
-- `{{ID_FAMILIES}}` (§4) — the stream → id-family map (e.g. `ARCH/ABL`, `DB/DBL`, `UI/UBL`).
-- `{{STREAM_X}}` / `{{STREAM_Y}}` (§2) *(ask user)* — the stream-ownership assignment per node.
-- `{{GATE_COMMANDS}}` (§5) — the exact commands that form the merge bar (typecheck/lint/test/freshness/migration-head).
-- `{{TOOLCHAIN_NOTES}}` (§9) — pinned versions + the one-true way to run gates per OS.
-- **Architecture map** (§11): `{{KIND_FACTORY_MAP}}` — for each "kind" (block / page / entity / endpoint), its
-  canonical factory/base + where instances live; `{{SHARED_PRIMITIVES_LOCATION}}` (the one kit features compose).
-- **Design system** (§12): `{{TOKENS_LOCATION}}` + the `{{SPACING_SCALE}}` / `{{TYPE_SCALE}}` / `{{BREAKPOINTS}}`
-  / `{{MIN_TOUCH_TARGET}}`; `{{GALLERY_ROUTE}}` (the visual harness); `{{VISUAL_CONTRACT_DOC}}` (the design rules /
-  which-token-on-which-surface / do's-and-don'ts, authored *before* screens).
-
-Drop §7 (no outbound calls / HTML authoring) or §9 (single-OS) when they don't apply; everything else —
-§0, §0.5, §1–§6, §8, §10–§15 — is universal core: keep it verbatim (§8's cross-refs in the lifecycle and §6
-assume it's present). The one exception is **§14's persona** — the cheeky-dry default is adjustable per project,
-but its facts-over-wit / bad-news-straight / user-facing-prose-only rules are not.
+- Who: the agent, one-time — read the repo to fill discoverable placeholders; ask the user ONLY for what isn't in the code (the *(ask user)* items); propose-and-flag anything inferred; delete this block; then `grep '{{'` to confirm none survived.
+- `{{PROJECT_NAME}}` — the repo this governs (discoverable, not an ask).
+- Fleet *(ask user)*: node registry rows `{{TAG_A}}`/`{{MACHINE_A}}`/`{{PRIMARY_TREE_A}}`/`{{WORKTREE_ROOT_A}}`/`{{VARIANCES_A}}` (… one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).
+- Records & docs: `{{ID_FAMILIES}}` · `{{DOC_ROUTING_TABLE}}` · `{{PRODUCT_PREAMBLE}}` · `{{REPO_LAYOUT_MAP}}` · `{{COMMAND_CATALOG}}` · `{{PRODUCT_CONTEXT_HOME}}` · `{{HELP_DIR}}` · `{{REVIEW_DIR}}`.
+- Gates & git: `{{GATE_COMMANDS}}` · `{{CI_FILE}}` · `{{GATE_RUNNER}}` · `{{COMMIT_TRAILER}}` · `{{WORKTREE_SCRIPT}}` · `{{TOOLCHAIN_NOTES}}`.
+- Runtime & verification: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
+- Architecture & design system: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}` · `{{TOKENS_LOCATION}}` · `{{SPACING_SCALE}}` · `{{TYPE_SCALE}}` · `{{BREAKPOINTS}}` · `{{MIN_TOUCH_TARGET}}` · `{{GALLERY_ROUTE}}` · `{{VISUAL_CONTRACT_DOC}}`.
+- Output discipline: `{{PROSE_AUDIT}}` (the audit script location, or "none yet — thresholds still bind").
+- Droppable when inapplicable: §9 lines about outbound calls / stored HTML (no such surface) · §11 (single-OS teams) · §4's harness lines (no UI) · §13 (no UI at all); §15's persona is adjustable per project — its facts-over-wit rules are not. Everything else is universal core: keep it verbatim.
