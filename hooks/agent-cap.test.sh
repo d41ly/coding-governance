@@ -16,5 +16,7 @@ check "non-Workflow tool → allow" 0 '{"tool_name":"Bash","tool_input":{"comman
 check "scriptPath run (no inline) → allow" 0 '{"tool_name":"Workflow","tool_input":{"scriptPath":"/x/tier2-review.js"}}'
 check "member .parallel( → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"queue.parallel(2); log(1)"}}'
 check "comment mentioning parallel() → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"// use boundedParallel(), never raw parallel()\nconst r = await boundedParallel(t,4)"}}'
+check "parallel() only inside a string → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const meta = { description: \"finders run, never raw parallel()\" }\nconst r = await boundedParallel(t, 4)"}}'
+check "string mentions parallel() + a real raw parallel( → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = \"we avoid parallel() normally\"\nconst r = await parallel(items.map(f))"}}'
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

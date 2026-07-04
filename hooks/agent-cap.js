@@ -27,8 +27,9 @@
  *
  * ponytail: a static scan can't prove a dynamically-built array is ≤CAP — this
  * enforces "use the helper", killing the exact `parallel(items.map(...))`
- * pattern that causes the bursts. Ceiling: only line comments are stripped
- * before the scan, not block comments that mention the primitive.
+ * pattern that causes the bursts. Ceiling: line comments AND quoted-string
+ * literals are stripped before the scan; block comments naming the primitive
+ * are NOT — still trips the guard (benign, fail-closed).
  */
 'use strict'
 
@@ -42,6 +43,15 @@ function readStdin() {
   }
 }
 
+// Blank the CONTENTS of single/double-quoted string literals so a `parallel(`
+// mentioned in prose (a meta.description, a log message) isn't read as a call.
+// Template literals (backticks) are left ALONE — they can hold real ${code}.
+// Escapes handled; an unbalanced quote (e.g. inside a comment) is left as-is.
+// Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
+function stripStrings(line) {
+  return line.replace(/'(?:\\.|[^'\\])*'/g, "''").replace(/"(?:\\.|[^"\\])*"/g, '""')
+}
+
 function offendingLines(script) {
   // Case-sensitive: primitives are lowercase `parallel`/`pipeline`; the helpers
   // are `boundedParallel`/`boundedPipeline` (capital P) so they never match.
@@ -52,7 +62,7 @@ function offendingLines(script) {
     .map((line, i) => ({ line, n: i + 1 }))
     .filter(({ line }) => {
       if (line.includes('gov:bounded-fanout')) return false // sanctioned helper line
-      const code = line.split('//')[0] // drop line-comments
+      const code = stripStrings(line).split('//')[0] // strings blanked, then line-comments
       return raw.test(code)
     })
 }
