@@ -70,7 +70,7 @@ for disc in $DISCIPLINES; do
 done
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
-  F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt|D:journal) ;;
+  F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt|D:journal|D:in-flight) ;;
   F:*.md) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bad3=$(printf '%s\n%s\n' "$bad3" "$bp" | grep . || true)
@@ -117,6 +117,7 @@ $bad5"
 # index set for checks 6/7
 index_set() {
   { echo "$M/README.md"; echo "$M/TREE.md"; echo "$M/project/MEMORY.md"; echo "$M/project/IN-FLIGHT.md"
+    printf '%s\n' "$FILES" | grep -E "^$M/project/in-flight/[^/]+\.md$"   # per-node ledger files: 20KB cap, entry-budget exempt
     for d in $DISCIPLINES; do for x in README DECISIONS BACKLOG TREE; do echo "$M/$d/$x.md"; done; done
     printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/STATUS\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
@@ -131,8 +132,8 @@ done)
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md):
 $bad6"
 
-# 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md).
-bad7=$(index_set | grep -vE '(/TREE\.md$|/IN-FLIGHT\.md$)' | while IFS= read -r f; do
+# 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md).
+bad7=$(index_set | grep -vE '(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)' | while IFS= read -r f; do
   in_debt "$f" && continue; in_scope "$f" || continue
   _unfenced "$f" | awk -v F="$f" 'length($0)>300 && $0 !~ /^#/ && $0 !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/ { print F":"FNR" ("length($0)" chars)" }'
 done)

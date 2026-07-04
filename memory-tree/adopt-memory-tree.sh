@@ -25,15 +25,16 @@ mkdir -p "$M/project/journal"
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md). Generated tree: [TREE.md](TREE.md)."; echo
   echo "## Disciplines"; echo
   for d in $DISCIPLINES; do echo "- [$d/]($d/) — decisions \`$(FAMILY_of "$d")-<slug>-<seq>\`, per-feature builds/."; done
-  echo; echo "## Cross-discipline"; echo; echo "- [project/](project/) — session machinery: MEMORY.md, IN-FLIGHT.md, journal/, notes."
+  echo; echo "## Cross-discipline"; echo; echo "- [project/](project/) — session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes."
 } > "$M/README.md"
 # project/
-printf '# %s/project/ — session machinery\n\n- MEMORY.md — memory-note index (one line per note).\n- IN-FLIGHT.md — session ledger.\n- journal/ — per-session journals.\n' "$M" > "$M/project/README.md"
+printf '# %s/project/ — session machinery\n\n- MEMORY.md — memory-note index (one line per note).\n- IN-FLIGHT.md — ledger pointer; in-flight/<tag>.md — per-node ledger files (write only your own).\n- journal/ — per-session journals.\n' "$M" > "$M/project/README.md"
 printf '# Memory Index\n\n> One line per durable note.\n' > "$M/project/MEMORY.md"
-printf '# In-flight ledger\n\nOne row per in-flight session — node · slug · branch · streams · status.\n\n| Node | Branch | Streams | Slug · ids | Status |\n|------|--------|---------|------------|--------|\n' > "$M/project/IN-FLIGHT.md"
+printf '# In-flight ledger — sharded per node\n\nOne file per node under `in-flight/`. **Write ONLY your own node file** (`in-flight/<tag>.md`) so the ledger never conflicts on merge; **read all** of them for the who-is-touching-what / slug-collision scan. Row: node · slug · branch · streams · status; status in {in-flight | merged | pushed:<sha>}. Self-prune your own pushed/merged rows once the sha is an ancestor of `main`.\n' > "$M/project/IN-FLIGHT.md"
 printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.\n' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.\n' > "$M/project/curation-debt.txt"
 touch "$M/project/journal/.gitkeep"
+mkdir -p "$M/project/in-flight"; touch "$M/project/in-flight/.gitkeep"
 # disciplines
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

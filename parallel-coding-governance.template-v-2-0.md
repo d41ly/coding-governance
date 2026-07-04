@@ -1,14 +1,14 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.1** · last updated 2026-07-04. One line per directive — every bullet is one imperative,
+*Template **v2.0** · last updated 2026-07-03. One line per directive — every bullet is one imperative,
 binding rule; a wrapped line is still one rule. v2.0 is a full rework (one-line format + new §4/§16 and
 additions throughout — see `template-v2-rework-spec.md`): instantiated v1.x copies re-adopt
 section-by-section (the format change defeats §-body diffing once); from v2.0 on, pull future improvements
 by diffing your copy against this source per §-body again (ignore filled placeholders + the deleted
 Customize block). Record your adopted version in your copy. History: the `…-v-N-N.md` snapshots alongside
-+ this repo's git history. **v2.1 (2026-07-04):** the in-flight ledger is now sharded per node — one file per node tag behind a pointer (§3), consistent with §5's per-node-files rule; re-pull §3 + §5 and the `memory-tree` kit's ledger handling.*
++ this repo's git history.*
 
-<!-- governance-template: v2.1 -->
+<!-- governance-template: v2.0 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo — fewer syncs and reviews, lower token spend, consistent output.
@@ -46,7 +46,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
 - Re-run the full gate suite after EVERY merge — a conflict-free merge is not a passing merge.
-- Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). The per-node ledger needs no reconcile — each file has a single writer (§3).
+- Reconcile shared mutable files (backlogs, ledger, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — it merges without endangering other nodes and reverts cleanly.
 - Migrations are reversible — test up/down/up.
 
@@ -64,7 +64,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Every new tracked id (decisions, backlog items, tickets — anything `FAMILY-NNN`-shaped): `FAMILY-<slug>-<seq>` — owned by the minting session, so nothing it numbers can be contested.
 - Slug = your node tag + a fresh CamelCase adjective-noun (`dAvengingTrousers`), charset `[A-Za-z]` only — minted ONCE per session; the tag's first letter makes cross-node slugs disjoint by construction.
 - `<seq>` = plain 1-up per (session, family), unpadded; ids are labels, not ranks; next id = numeric max of YOUR ids in that family + 1; record per-family high-water in your ledger row (uncommitted ids are invisible to grep).
-- Before committing to a slug: (1) all-time grep the governance-docs tree (decision logs, backlogs, journals, the ledger) for `[A-Z]+-<slug>-[0-9]` — re-roll on ANY hit (a pruned ledger row still owns its ids); (2) glance at live rows across all node ledger files — re-roll on a clash.
+- Before committing to a slug: (1) all-time grep the governance-docs tree (decision logs, backlogs, journals, the ledger) for `[A-Z]+-<slug>-[0-9]` — re-roll on ANY hit (a pruned ledger row still owns its ids); (2) glance at live in-flight ledger rows — re-roll on a clash.
 - No reserve-above-a-marker, no shared counter, no renumber-on-merge — the slug is the guarantee.
 - A session = one continuous effort under one slug (several work-units/families, one `<seq>` each); a resumed/summarized session keeps its slug (the grep hitting only your own prior ids is not a collision).
 - Fan-out children (sub-agents/orchestrated workers) never mint ids — the orchestrator does; a child that must mint takes its own registered slug.
@@ -82,9 +82,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
 - Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
-- Shard the in-flight ledger per node — one file per node tag behind a thin pointer (exactly like the per-node journals, §5), NEVER one shared table: each node writes ONLY its own file, so the ledger is conflict-free by construction (the same disjoint-by-tag property as the session slug) and no merge ever touches it. A single shared ledger is the shared-mutable index §5 forbids — it forces a conflict on every land, and additive resolution silently leaves stale rows.
-- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged | pushed:<sha>}` + at most one short clause; narrative belongs in the journal, never here. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
-- Self-prune on session start: after fast-forwarding `main`, delete your OWN `pushed:/merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
+- One in-flight ledger, not prose status (prose rots) — a single structured table updated in place at merge: `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged | pushed:<sha>}` + at most one short clause; narrative belongs in the journal, never here.
+- Prune: stamp the merge SHA on pushed rows; when starting work, delete any pushed row already in your history (`git merge-base --is-ancestor <sha> HEAD`).
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
@@ -104,7 +103,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 - Memory carries only the non-derivable: gotchas, in-flight state, *why* a non-obvious choice was made — never re-narrate what git, decision logs, or code already record (the main memory-token waste and drift source).
 - Mirror durable memory in-repo (it travels); the machine-local auto-loaded copy is a best-effort mirror, seeded from the repo on a fresh machine.
-- One canonical index, one line per note; journals AND the in-flight ledger (§3) are per-node files — never a shared mutable index every session edits (that file is what forces memory-sync merges); any index that must exist stays append-only or generated.
+- One canonical index, one line per note; journals are per-node/per-session files — never a shared mutable index every session edits (that file is what forces memory-sync merges); any index that must exist stays append-only or generated.
 - Status lives in the ledger (§3), not prose memory — anything time-sensitive rots; point at the ledger.
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.

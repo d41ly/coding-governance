@@ -14,7 +14,7 @@ memory/
 ├── README.md              root index (one-liners)
 ├── TREE.md                generated directory tree (memory-tree/gen-memory-tree.sh)
 ├── HYGIENE.md             this file
-├── project/               session machinery: MEMORY.md, IN-FLIGHT.md, journal/, note bodies, the 2 ratchet manifests
+├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes, 2 ratchet manifests
 └── <discipline>/          one per DISCIPLINES entry
     ├── README.md          structure explainer (+ an optional SWEBOK KA tag)
     ├── TREE.md            generated index
@@ -47,8 +47,9 @@ row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only 
 
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `BACKLOG.md`, `MEMORY.md`, `STATUS.md`,
   root/discipline `README.md` lists) is ONE physical line, ≤ 300 chars. Detail lives in the build folder
-  or decision file the line points at. `TREE.md` (generated) and `IN-FLIGHT.md` (a ledger row is a session
-  dossier) are exempt from the entry budget.
+  or decision file the line points at. `TREE.md` (generated), `IN-FLIGHT.md`, and the per-node ledger
+  files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry budget; the per-node
+  files still carry the 20 KB file cap.
 - **File caps:** index + tree files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
@@ -77,7 +78,7 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
    `TREE.md`, and `legacy-files.txt`-listed recordings).
 3. **structure lint** — the `memory/` root and each discipline root hold only the sanctioned set;
-   `decisions/ guides/ archive/ journal/` contents are unconstrained; `builds/` shape is check 4.
+   `decisions/ guides/ archive/ journal/ in-flight/` contents are unconstrained; `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` matches `YYYY-MM-DD-<FAMILY>-<slug>` with FAMILY paired to its
    discipline; inside a build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose
    recording-named `.md`; non-md only in `build/`.
