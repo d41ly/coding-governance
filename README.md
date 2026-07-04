@@ -3,6 +3,9 @@
 Project-agnostic governance + tooling for running Claude Code (or any agent) across several
 machines/sessions on the same repo.
 
+**Wiring the whole chain into a new project?** Follow the agent runbook
+[WIRE-INTO-PROJECT.md](WIRE-INTO-PROJECT.md) (skill → playbook → memory-tree → manifest → verify).
+
 ## Contents
 
 - **`parallel-coding-governance.template.md`** — the governance playbook template (current
