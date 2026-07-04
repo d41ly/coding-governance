@@ -151,6 +151,19 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   per-node install script.
 - Optionally a SessionStart hook that nudges `/session-kickoff` and reports `git worktree list` state.
 
+**Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
+- Copy `hooks/agent-cap.js` (+ `hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
+- Wire a `PreToolUse` hook into the discovered `settings.json` (the `.claude/` in the session cwd):
+  ```json
+  "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
+    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
+  ```
+  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-4
+  `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
+  mechanical enforcement of the ≤4-concurrent rule — a wide fan-out trips the server rate limiter.
+- Copy `workflows/tier2-review.js` for a ready consolidated review harness (~7–9 agents, ≤4 concurrent).
+- Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0.
+
 ## 6 — Verify the whole chain, then commit
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
