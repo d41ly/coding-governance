@@ -67,6 +67,9 @@ inventories is a healthy set; 2 is better than 0.
   features touch are documented in dossiers' `## Shared seams` prose, never glob-claimed —
   exclusive glob ownership of a shared file is impossible, and the keyed plane already carries
   that ownership through the keys each feature registers.
+- Know the glob dialect: matching is `fnmatchcase` — `*` crosses `/` (so `**` and `*` are
+  identical), and `[` opens a character class (a literal Next-style `[id]` segment must be
+  escaped `[[]id[]]`; the dossier parser rejects unescaped brackets loudly).
 - Add `KEYED_ATTRIBUTORS` for path families whose filename embeds a claim key (migrations:
   `db/migrations/<rev>_*.sql` -> the `migrations` inventory) — keyed attribution beats globs.
 

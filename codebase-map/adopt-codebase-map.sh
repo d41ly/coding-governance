@@ -25,6 +25,9 @@ if [ ! -f "$ROOT/.codebase-map.conf" ]; then
   exit 1
 fi
 . "$ROOT/.codebase-map.conf"
+# CR-strip: a CRLF-committed conf on Linux keeps \r in sourced values (MSYS masks this)
+MAP_ROOT="$(printf '%s' "${MAP_ROOT:-}" | tr -d '\r')"
+GATE_FILE="$(printf '%s' "${GATE_FILE:-}" | tr -d '\r')"
 
 [ -f "$HERE/map_extractors.py" ] || {
   cp "$HERE/map_extractors.template.py" "$HERE/map_extractors.py"

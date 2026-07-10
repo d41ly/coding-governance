@@ -63,11 +63,13 @@ class MapError(RuntimeError):
 def repo_root() -> Path:
     """The adopting repo's root. Convention: this kit dir lives AT the repo root as
     ``codebase-map/`` — so root is this file's grandparent. ``CODEBASE_MAP_ROOT`` overrides
-    (tests, exotic layouts)."""
+    (tests, exotic layouts). ``abspath``, NOT ``resolve()``: a symlinked/junctioned kit dir
+    must anchor to the ADOPTING repo, not to the link target's parent (the gate's walk-up and
+    the adopter's ``-ef`` check both accept that layout — this must agree with them)."""
     override = os.environ.get("CODEBASE_MAP_ROOT")
     if override:
         return Path(override)
-    return Path(__file__).resolve().parents[1]
+    return Path(os.path.abspath(__file__)).parents[1]
 
 
 def load_conf(root: Path | None = None) -> dict[str, str]:
@@ -82,7 +84,16 @@ def load_conf(root: Path | None = None) -> dict[str, str]:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        conf[key.strip()] = value.strip().strip("\"'")
+        key = key.strip().removeprefix("export ").strip()
+        value = value.strip()
+        # match bash sourcing semantics for the restricted grammar the conf documents:
+        # quoted values keep everything inside the quotes; unquoted values end at whitespace
+        # (so an inline " # comment" can't leak into the value and diverge from bash)
+        if value[:1] in {'"', "'"} and value[-1:] == value[:1] and len(value) >= 2:
+            value = value[1:-1]
+        else:
+            value = value.split()[0] if value.split() else ""
+        conf[key] = value
     return conf
 
 
@@ -253,6 +264,14 @@ def parse_dossier(
     with_backslash = [g for g in globs if "\\" in g]
     if with_backslash:
         raise MapError(f"{source}: globs must be forward-slash only: {with_backslash}")
+    # fnmatch treats [] as a character class, so a literal Next-style segment like [id] NEVER
+    # matches its own path — require the [[] escape (which fnmatch reads as a literal '[').
+    bracketed = [g for g in globs if "[" in g.replace("[[]", "").replace("[]]", "")]
+    if bracketed:
+        raise MapError(
+            f"{source}: '[' in a glob is an fnmatch character class, not a literal — escape "
+            f"as [[]id[]] (or drop the segment for a broader glob): {bracketed}"
+        )
 
     return Dossier(
         feature=data["feature"],

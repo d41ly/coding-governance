@@ -77,3 +77,9 @@ pattern:
   Windows autocrlf checkout can't spuriously fail check 9.
 - The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
+
+## Codebase-map interop
+
+Adopting the sibling `codebase-map/` kit with `MAP_ROOT` under this tree (e.g. `memory/map`)?
+The hygiene + TREE scripts read `.codebase-map.conf` and carve that subtree in automatically —
+see the "Codebase-map interop" section the HYGIENE template ships. No conf keys here change.

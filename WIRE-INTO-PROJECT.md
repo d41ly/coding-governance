@@ -41,7 +41,7 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
     MAP_ROOT (under the memory tree when memory-tree is adopted, e.g. `memory/map`; else `docs/map`),
     GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
     (walk `codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
-    §5 codebase-map line + the two map DoR/DoD lines from the playbook.
+    FOUR codebase-map lines from the playbook (§1 DoR + §1 DoD + §5 kit bullet + §7 gates line).
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
 
@@ -214,7 +214,15 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ~/.claude/skills/session-kickoff # the engine (per-MACHINE junction/symlink — not in the repo)
 ```
 
+- Codebase-map (only if §3b adopted): `codebase-map/` kit dir + project-owned
+  `codebase-map/map_extractors.py` · `.codebase-map.conf` · the gate at GATE_FILE ·
+  `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, features/, generated/).
+
 ## Maintenance
+
+- Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, the two templates,
+  `selftest.py`) are identical across repos — update by overwriting from `<gov-repo>` wholesale;
+  NEVER overwrite the project-owned `codebase-map/map_extractors.py` or `.codebase-map.conf`.
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your

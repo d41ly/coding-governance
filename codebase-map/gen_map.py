@@ -67,7 +67,7 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
 3. Shared substrate -> claim in `FOUNDATION.md` instead.
 4. Claim edits stale `generated/MAP.md` -> run `python codebase-map/gen_map.py --write`
    in the same commit (`--check` to verify).
-5. Digest any range: `python codebase-map/map_diff.py <base>..<head>` (`--verbose` for files).
+5. Digest any range: `{diff_cmd} <base>..<head>` (`--verbose` for files).
 
 ## Rules
 - Claims are exact keys, gate-enforced BOTH directions (a claim naming a dead key fails too).
@@ -112,11 +112,27 @@ def main() -> int:
     if args.scaffold:
         map_dir = m.map_root()
         if (map_dir / "FOUNDATION.md").is_file():
-            print(f"{map_dir} already scaffolded — refusing to overwrite")
+            print(
+                f"{map_dir} already scaffolded — refusing to overwrite FOUNDATION.md.\n"
+                "Resume a partial scaffold with: gen_map.py --seed-baseline && gen_map.py "
+                "--write, then copy the gate template to GATE_FILE (or delete the map tree "
+                "and re-run --scaffold)."
+            )
             return 1
+        # Run every extractor BEFORE the first write: the most likely first-run error is an
+        # extractor raising on a wrong path, and it must leave ZERO state behind (a half
+        # tree wedges the re-run on the refusal above).
+        ext.all_inventories()
         claims = "\n".join(f"{inv_id} = []" for inv_id in IDS)
+        conf = m.load_conf()
         _write(map_dir / "FOUNDATION.md", _FOUNDATION_SKELETON.format(claims=claims))
-        _write(map_dir / "README.md", _README.format(map_root=m.load_conf()["MAP_ROOT"]))
+        _write(
+            map_dir / "README.md",
+            _README.format(
+                map_root=conf["MAP_ROOT"],
+                diff_cmd=conf.get("MAP_DIFF_CMD") or "python codebase-map/map_diff.py",
+            ),
+        )
         (map_dir / "features").mkdir(parents=True, exist_ok=True)
         _seed_baseline()
         for path, content in _artifacts().items():

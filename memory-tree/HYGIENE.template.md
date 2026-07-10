@@ -91,3 +91,14 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
+
+## Codebase-map interop
+
+If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
+`<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
+`.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
+`features/`, `generated/`; the map dir appears in the root TREE.md render; `README.md`,
+`FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
+entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
+dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's
+coverage/freshness enforcement is its own test file, not this script.

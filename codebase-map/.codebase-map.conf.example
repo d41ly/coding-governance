@@ -1,6 +1,9 @@
 # .codebase-map.conf — per-repo config for the codebase-map kit.
-# Copy to your repo ROOT as `.codebase-map.conf` and edit. Plain KEY=VALUE shell assignments
-# only — the same file is sourced by adopt-codebase-map.sh AND parsed by map_lib.load_conf().
+# Copy to your repo ROOT as `.codebase-map.conf` and edit. RESTRICTED grammar — the same file
+# is sourced by bash AND parsed by map_lib.load_conf(): plain KEY=VALUE assignments; a value
+# with spaces MUST be double-quoted; no inline comments after a value; no `export`. Commit it
+# LF (add `.codebase-map.conf text eol=lf` to .gitattributes) — a CRLF-checked-out conf
+# leaves stray carriage returns in bash-sourced values on Linux.
 # The kit dir itself is copied into the repo root as `codebase-map/` (a fixed convention the
 # gate template relies on — do not rename it).
 
@@ -14,6 +17,7 @@ MAP_ROOT=memory/map
 # design: the gate rides the suite that already gates your merge bar.
 GATE_FILE=tests/test_codebase_map.py
 
-# The digest command, verbatim, for docs + the kickoff manifest (adjust only if your python
-# launcher differs — e.g. `uv run python …` or `python3 …`).
-MAP_DIFF_CMD=python codebase-map/map_diff.py
+# The digest command, verbatim — consumed by the scaffolded map README and the kickoff
+# manifest (humans/docs; gate remedy messages print the plain `python` spelling). Adjust if
+# your launcher differs — e.g. `uv run python …` or `python3 …`.
+MAP_DIFF_CMD="python codebase-map/map_diff.py"

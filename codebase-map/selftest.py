@@ -122,12 +122,44 @@ def t_renders_round_trip_and_determinism():
     text = m.render_baseline({"flags": ["b", "a"]}, IDS)
     parsed = m.parse_baseline(text, IDS)
     assert parsed["flags"] == ("a", "b") and parsed["routes"] == ()
-    owners = {"x": claims(flags=("a_flag",))}
+    owners = {"x": claims(flags=("a_flag",)), "y": claims(flags=("b_flag",))}
     one = m.render_map_md(INV, IDS, owners, EMPTY_BASE)
-    two = m.render_map_md({k: list(v) for k, v in INV.items()}, IDS, owners, EMPTY_BASE)
+    # a PERMUTED view must render byte-identically — reversed key lists AND reversed owner
+    # insertion order, so this assert actually pins the renderer's own sorting
+    permuted_inv = {k: list(reversed(v)) for k, v in INV.items()}
+    permuted_owners = dict(reversed(list(owners.items())))
+    two = m.render_map_md(permuted_inv, IDS, permuted_owners, EMPTY_BASE)
     assert one == two and "UNCLAIMED" in one and one.endswith("\n")
-    j = m.render_inventories_json(INV, IDS)
+    j = m.render_inventories_json(permuted_inv, IDS)
+    assert j == m.render_inventories_json(INV, IDS)
     assert '"a_flag"' in j and "claimant" not in j  # keys-only artifact
+
+
+def t_conf_grammar(tmp: Path):
+    (tmp / ".codebase-map.conf").write_text(
+        '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
+        "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n",
+        encoding="utf-8",
+    )
+    conf = m.load_conf(tmp)
+    assert conf["MAP_ROOT"] == "docs/map"
+    assert conf["GATE_FILE"] == "tests/test map.py"  # quoted value keeps its space
+    assert conf["MAP_DIFF_CMD"] == "python"  # export prefix normalized
+    assert conf["BAD"] == "docs/map"  # unquoted value ends at whitespace, comment can't leak
+
+
+def t_glob_brackets_fail_loud_and_escape_works():
+    bad = DOSSIER.replace("src/x/**", "src/app/[id]/**")
+    try:
+        m.parse_dossier(bad, IDS, source="t")
+        raise AssertionError("unescaped [ in a glob must fail")
+    except m.MapError as exc:
+        assert "character class" in str(exc)
+    d = m.parse_dossier(DOSSIER.replace("src/x/**", "src/app/[[]id[]]/*"), IDS, source="t")
+    f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
+    tree = m.MapTree(foundation=f, dossiers=(d,), baseline=EMPTY_BASE)
+    out = m.attribute_paths(["src/app/[id]/page.tsx"], tree)
+    assert out["x"] == ["src/app/[id]/page.tsx"]  # the escape matches the literal segment
 
 
 def t_extractor_helpers_fail_closed(tmp: Path):
@@ -165,10 +197,13 @@ def main() -> int:
     failures += check("dossier contract fails loud", t_parse_contract)
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)
     failures += check("renders deterministic + keys-only + round-trip", t_renders_round_trip_and_determinism)
+    failures += check("glob brackets fail loud; [[]-escape matches", t_glob_brackets_fail_loud_and_escape_works)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "extractor helpers fail closed", lambda: t_extractor_helpers_fail_closed(Path(td))
         )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("conf restricted grammar", lambda: t_conf_grammar(Path(td)))
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

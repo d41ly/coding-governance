@@ -288,6 +288,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## Customize before use
 
+- Codebase-map lines (§1 DoR, §1 DoD, §5 kit bullet, §7 gates line): keep only if adopting the
+  `codebase-map/` kit — else delete all four.
 - Who: the agent, one-time — read the repo to fill discoverable placeholders; ask the user ONLY for what isn't in the code (the *(ask user)* items); propose-and-flag anything inferred; delete this block; then `grep '{{'` to confirm none survived.
 - `{{PROJECT_NAME}}` — the repo this governs (discoverable, not an ask).
 - Fleet *(ask user)*: node registry rows `{{TAG_A}}`/`{{MACHINE_A}}`/`{{PRIMARY_TREE_A}}`/`{{WORKTREE_ROOT_A}}`/`{{VARIANCES_A}}` (… one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).

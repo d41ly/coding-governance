@@ -23,7 +23,8 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # coverage/freshness gates are its own test file, not this script).
 MAP_SUB=""
 if [ -f "$ROOT/.codebase-map.conf" ]; then
-  _cbm_root=$(. "$ROOT/.codebase-map.conf" 2>/dev/null; printf '%s' "${MAP_ROOT:-}")
+  _cbm_root=$(. "$ROOT/.codebase-map.conf" 2>/dev/null; printf '%s' "${MAP_ROOT:-}" | tr -d '\r')
+  _cbm_root="${_cbm_root%/}"   # trailing slash would mis-read a direct child as nested
   case "$_cbm_root" in "$M"/*) _s="${_cbm_root#"$M"/}"; case "$_s" in */*) ;; *) MAP_SUB="$_s";; esac;; esac
 fi
 STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
@@ -148,7 +149,7 @@ bad6=$(index_set | while IFS= read -r f; do
   b=$(wc -c <"$f"); l=$(wc -l <"$f")
   { [ "$b" -gt 20480 ] || [ "$l" -gt 250 ]; } && echo "$f (${b}B ${l}L > 20480B/250L)"
 done)
-[ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md):
+[ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
 
 # 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md,
