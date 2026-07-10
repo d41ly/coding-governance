@@ -37,11 +37,13 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and add a ledger row (§3).
 - Large new feature (a Tier-2 change introducing substantial new capability — small/Tier-1 skips this): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance criteria) + a bounded menu of production-readiness recommendations (best-practice implementation + the extra tools/features it needs + the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `{{HELP_DIR}}` docs).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
+- Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that feature's dossier as a DoR item — the pass is already reading everything the dossier needs (marginal cost ≈ 0); this is the map's convergence forcing function.
 
 **Definition of Done — before you call it done:**
 - Gates green (§7); the change verified by a check that exercises it (§8), not asserted.
 - Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
 - User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
+- Codebase map adopted (§5)? New inventory keys claimed in the map tree — machine-enforced by its ratchet gate; dossier prose refreshed on touch — documented check; claim edits regen the generated artifacts in the same commit.
 - Memory (non-derivable only), decision log/backlog, and ledger row updated — **on disk before the wrap-up message** (§16).
 
 **Landing — merge protocol:**
@@ -112,6 +114,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index page; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
 - **Optional but recommended: a structured, machine-linted memory tree** (the `memory-tree/` kit alongside this playbook). Operationalizes everything above into one `{{MEMORY_ROOT}}/` tree organised by discipline (`{{MEMORY_DISCIPLINES}}`) with `project/` for session machinery, per-feature `builds/YYYY-MM-DD-<FAMILY>-<slug>/` folders (`spec/ build/ reviews/ prompts/`), index caps (≤20 KB / 250 lines) + a ≤300-char one-line entry budget with archive rotation, a status vocabulary (`OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`), and an **11-check hygiene gate** wired into CI + the pre-commit hook + `{{GATE_RUNNER}}`. Project specifics (root · disciplines · discipline→id-family map · migrated-from tombstone) live in one repo-root `.memory-tree.conf`; the rules live in `{{MEMORY_ROOT}}/HYGIENE.md`; adopt by scaffolding a fresh tree or migrating an existing one in a single landing.
 - Two ratchet manifests keep that gate honest without a flag-day: `legacy-files.txt` (migrated recordings keep historical names) + `curation-debt.txt` (fat legacy indexes exempt from the caps until slimmed) — both shrink-only, CI-guarded against a stale line.
+- **Optional but recommended: a self-verifying codebase map** (the `codebase-map/` kit alongside this playbook). Per-feature dossiers claim EXACT KEYS from machine-enumerated inventories (flags · routes · CLI · migrations · jobs · docs pages · …, declared once per project in `map_extractors.py`); a test-suite ratchet fails on any unclaimed NEW key AND on any claim naming a dead key (the map cannot rot into fiction); a shrink-only `baseline.toml` makes adoption non-blocking; generated artifacts are freshness-gated; `map_diff` renders any git range as a feature-level changelog (the "what did the parallel sessions land" answer). Path globs are digest-only — never gated. Zero CI changes: the gate rides the suite that already gates the merge bar. Adopt per `codebase-map/README.md`; derive inventories per `codebase-map/INVENTORY-DERIVATION.md`.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -138,6 +141,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
 - Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
 - Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
+- Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — they ride the existing suite; never exempt them to "unblock" a landing (claiming the key IS the unblock).
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation invariants (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
 - Document deliberate gate exemptions together with their compensating manual check — an exemption is not coverage.

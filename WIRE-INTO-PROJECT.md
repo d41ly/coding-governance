@@ -37,6 +37,11 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
     auth/sanitization/egress surface · shared-contract change · cross-stream merge).
   - **Adopt memory-tree?** yes (recommended) / no. If no: skip §3 and delete the two `{{MEMORY_*}}`
     placeholders + the two §5 memory-tree lines from the playbook.
+  - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
+    MAP_ROOT (under the memory tree when memory-tree is adopted, e.g. `memory/map`; else `docs/map`),
+    GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
+    (walk `codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
+    §5 codebase-map line + the two map DoR/DoD lines from the playbook.
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
 
@@ -121,6 +126,23 @@ memory-tree `FAMILIES` (§3) — the ledger and the decision logs share one id s
 slug-collision scan; self-prune your own `pushed:/merged:<sha>` rows on session start
 (`git merge-base --is-ancestor <sha> main`). One writer per file → the ledger never conflicts on merge.
 
+## 3b — Adopt the codebase-map kit (if chosen in §0)
+
+1. Copy the kit dir into the project root **as `codebase-map/`** (the fixed name the gate template
+   resolves — don't rename): `cp -r <gov-repo>/codebase-map <project>/codebase-map`.
+2. `cp codebase-map/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
+   MAP_DIFF_CMD (per the §0 decisions).
+3. `cp codebase-map/map_extractors.template.py codebase-map/map_extractors.py` and declare the
+   project's inventories — this is the real work; follow `codebase-map/INVENTORY-DERIVATION.md`
+   (prefer registry imports; fail-closed helpers; full extension sets; POSIX keys).
+4. `codebase-map/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
+   baseline from live inventories, installs the gate at GATE_FILE and runs it once (green on a
+   fresh seed, by construction). `MAP_PY=python3` overrides the launcher.
+5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
+   that is the entire CI wiring: zero pipeline changes by design.
+6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
+7. Commit `codebase-map/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
@@ -165,6 +187,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0.
 
 ## 6 — Verify the whole chain, then commit
+
+- Codebase-map (if adopted): `python codebase-map/selftest.py` (kit contract) · run the gate file
+  directly (`python <GATE_FILE>`) · `python codebase-map/gen_map.py --check` (freshness) · make one
+  throwaway inventory addition and watch the gate go red with the claim remedy, then revert.
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
    and surface the playbook + gate + ledger protocol. If it can't, re-check the §4 search paths.

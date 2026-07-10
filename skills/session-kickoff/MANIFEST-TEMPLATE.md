@@ -67,6 +67,14 @@ if single-tier.}}
 {{ID_PROTOCOL — either "none — no tracked id scheme" or, per governance §1–§2: the id format
 (e.g. FAMILY-<slug>-<seq>), the slug rules + collision grep target, and the ledger file path.}}
 
+### Codebase map
+
+{{MAP — either "not adopted" or: MAP_ROOT (e.g. `memory/map`), the digest command verbatim
+(e.g. `python codebase-map/map_diff.py <base>..<head>`), and the two standing rules: the
+ratchet gate rides the test suite (claim new inventory keys in a dossier / FOUNDATION.md —
+never baseline.toml); a high-risk unit touching an undossiered feature creates its dossier at
+design time. Delete this section if the codebase-map kit is not adopted.}}
+
 ### Environment traps worth front-loading
 
 {{TRAPS — the 3–8 machine/toolchain gotchas every session otherwise re-derives (stale-port

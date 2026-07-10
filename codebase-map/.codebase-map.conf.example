@@ -1,0 +1,19 @@
+# .codebase-map.conf — per-repo config for the codebase-map kit.
+# Copy to your repo ROOT as `.codebase-map.conf` and edit. Plain KEY=VALUE shell assignments
+# only — the same file is sourced by adopt-codebase-map.sh AND parsed by map_lib.load_conf().
+# The kit dir itself is copied into the repo root as `codebase-map/` (a fixed convention the
+# gate template relies on — do not rename it).
+
+# Root of the map tree, relative to the repo root. If the memory-tree kit is adopted, put it
+# under that tree (e.g. memory/map) so its hygiene gate covers the prose files; otherwise
+# docs/map works fine.
+MAP_ROOT=memory/map
+
+# Where adopt-codebase-map.sh copies the gate template — a path INSIDE the directory your
+# project's existing test suite collects (pytest/vitest-adjacent/…). Zero CI changes by
+# design: the gate rides the suite that already gates your merge bar.
+GATE_FILE=tests/test_codebase_map.py
+
+# The digest command, verbatim, for docs + the kickoff manifest (adjust only if your python
+# launcher differs — e.g. `uv run python …` or `python3 …`).
+MAP_DIFF_CMD=python codebase-map/map_diff.py

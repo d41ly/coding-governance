@@ -18,6 +18,14 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# codebase-map kit interop: when its MAP_ROOT is a DIRECT child of this tree (e.g. memory/map),
+# carve that subtree into the structure lint + index caps below (prose files only; the map's
+# coverage/freshness gates are its own test file, not this script).
+MAP_SUB=""
+if [ -f "$ROOT/.codebase-map.conf" ]; then
+  _cbm_root=$(. "$ROOT/.codebase-map.conf" 2>/dev/null; printf '%s' "${MAP_ROOT:-}")
+  case "$_cbm_root" in "$M"/*) _s="${_cbm_root#"$M"/}"; case "$_s" in */*) ;; *) MAP_SUB="$_s";; esac;; esac
+fi
 STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
 
 status=0
@@ -59,7 +67,7 @@ disc_re=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)
 root1=$(printf '%s\n' "$FILES" | awk -F/ '{ if (NF==2) print "F:"$2; else print "D:"$2 }' | LC_ALL=C sort -u)
 bad3=$(printf '%s\n' "$root1" | grep . | while IFS= read -r e; do case "$e" in
   F:README.md|F:TREE.md|F:HYGIENE.md|D:project) ;;
-  D:*) d="${e#D:}"; printf '%s\n' $DISCIPLINES | grep -qxF "$d" || echo "$M/$d";;
+  D:*) d="${e#D:}"; { printf '%s\n' $DISCIPLINES | grep -qxF "$d" || [ "$d" = "$MAP_SUB" ]; } || echo "$M/$d";;
   *) echo "$M/${e#*:}";; esac; done)
 for disc in $DISCIPLINES; do
   d1=$(printf '%s\n' "$FILES" | grep "^$M/$disc/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
@@ -73,7 +81,14 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt|D:journal|D:in-flight) ;;
   F:*.md) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
-bad3=$(printf '%s\n%s\n' "$bad3" "$bp" | grep . || true)
+bm=""
+if [ -n "$MAP_SUB" ]; then
+  m1=$(printf '%s\n' "$FILES" | grep "^$M/$MAP_SUB/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
+  bm=$(printf '%s\n' "$m1" | grep . | while IFS= read -r e; do case "$e" in
+    F:README.md|F:FOUNDATION.md|F:baseline.toml|D:features|D:generated) ;;
+    *) echo "$M/$MAP_SUB/${e#*:}";; esac; done)
+fi
+bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
 [ -n "$bad3" ] && fail 3 "unexpected entries (structure):
 $bad3"
 
@@ -118,6 +133,10 @@ $bad5"
 index_set() {
   { echo "$M/README.md"; echo "$M/TREE.md"; echo "$M/project/MEMORY.md"; echo "$M/project/IN-FLIGHT.md"
     printf '%s\n' "$FILES" | grep -E "^$M/project/in-flight/[^/]+\.md$"   # per-node ledger files: 20KB cap, entry-budget exempt
+    if [ -n "$MAP_SUB" ]; then
+      echo "$M/$MAP_SUB/README.md"; echo "$M/$MAP_SUB/FOUNDATION.md"
+      printf '%s\n' "$FILES" | grep -E "^$M/$MAP_SUB/features/[^/]+\.md$"   # dossiers: size caps, entry-budget exempt
+    fi
     for d in $DISCIPLINES; do for x in README DECISIONS BACKLOG TREE; do echo "$M/$d/$x.md"; done; done
     printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/STATUS\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
@@ -132,8 +151,11 @@ done)
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md):
 $bad6"
 
-# 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md).
-bad7=$(index_set | grep -vE '(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)' | while IFS= read -r f; do
+# 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md,
+#     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
+ex7='(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
+[ -n "$MAP_SUB" ] && ex7="(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
+bad7=$(index_set | grep -vE "$ex7" | while IFS= read -r f; do
   in_debt "$f" && continue; in_scope "$f" || continue
   _unfenced "$f" | awk -v F="$f" 'length($0)>300 && $0 !~ /^#/ && $0 !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/ { print F":"FNR" ("length($0)" chars)" }'
 done)

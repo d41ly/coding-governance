@@ -25,6 +25,14 @@ machines/sessions on the same repo.
   helpers, so a wide agent burst can't trip the server rate limiter. Cap overridable via env
   `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule.
+- **`codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers
+  whose machine claims are CI-verified against live code inventories (a both-directions ratchet —
+  new moving parts fail until claimed; claims naming dead keys fail too), a shrink-only baseline,
+  freshness-gated generated artifacts, and a `map_diff` git-range digest. Project specifics live in
+  `.codebase-map.conf` + `codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only
+  py≥3.11) is identical across repos. Adopt with `adopt-codebase-map.sh --scaffold`; see
+  `codebase-map/README.md` + `INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
+  documentation-currency goals with machine enforcement.
 - **`workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth; ~7–9 agents, never >4 concurrent). Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction.

@@ -52,6 +52,12 @@ report if it moved) · `rev-parse HEAD` → report as **BASE** (pin the immutabl
 diff-scoping, never a moving ref) · `git worktree list` when the layout is multi-tree AND no
 hook already reported it.
 
+If the ff moved the default branch AND the project has a codebase map (the manifest declares
+one, or `.codebase-map.conf` exists at the repo root): render the feature-level digest of what
+came in — the manifest's map-diff command over `<old-sha>..<new-sha>` (default:
+`python codebase-map/map_diff.py <old>..<new>`) — and report it (rollup + coverage line;
+`--verbose` only if asked).
+
 **STOP and tell the user first** (before any further step) when: a foreign `MERGE_HEAD` or
 `UU` conflict entries exist; the ff-merge fails (local diverged from remote); or the
 checked-out branch violates the project's stated conventions. A clean tree is NOT proof
@@ -104,6 +110,12 @@ From the manifest's pointer map (else a quick grep of the project's docs): the g
 docs to load, prior decisions/records matching the feature's keywords, and the first code
 entrypoints — don't make the user hunt. Flag doc claims that tend to drift as "verify against
 source".
+
+**Codebase map as the first probe** (when the project has one): read the feature's dossier
+(`<MAP_ROOT>/features/<feature>.md`) before grepping decision logs — its keyed claims are
+CI-verified, so trust them over prose notes; the generated map is the system inventory. A
+high-risk unit touching an UNDOSSIERED feature creates/refreshes that dossier as part of its
+design pass (the map's convergence rule).
 
 **Only if the manifest defines an id/ledger protocol:** mint + collision-check the session
 slug per its rules and draft the ledger row for the user. No id scheme → skip (one clause).
