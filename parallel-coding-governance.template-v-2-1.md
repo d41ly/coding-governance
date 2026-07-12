@@ -1,14 +1,14 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.2** · last updated 2026-07-12. One line per directive — every bullet is one imperative,
+*Template **v2.1** · last updated 2026-07-04. One line per directive — every bullet is one imperative,
 binding rule; a wrapped line is still one rule. v2.0 is a full rework (one-line format + new §4/§16 and
 additions throughout — see `template-v2-rework-spec.md`): instantiated v1.x copies re-adopt
 section-by-section (the format change defeats §-body diffing once); from v2.0 on, pull future improvements
 by diffing your copy against this source per §-body again (ignore filled placeholders + the deleted
 Customize block). Record your adopted version in your copy. History: the `…-v-N-N.md` snapshots alongside
-+ this repo's git history. **v2.1 (2026-07-04):** the in-flight ledger is now sharded per node — one file per node tag behind a pointer (§3), consistent with §5's per-node-files rule; re-pull §3 + §5 and the `memory-tree` kit's ledger handling. **v2.2 (2026-07-12):** kickoff-manifest ratchet — a DoD write-back line + a Landing reconcile exception for the manifest's `last-audit` stamp (§1, per `manifest-ratchet-spec.md`); re-pull §1.*
++ this repo's git history. **v2.1 (2026-07-04):** the in-flight ledger is now sharded per node — one file per node tag behind a pointer (§3), consistent with §5's per-node-files rule; re-pull §3 + §5 and the `memory-tree` kit's ledger handling.*
 
-<!-- governance-template: v2.2 -->
+<!-- governance-template: v2.1 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo — fewer syncs and reviews, lower token spend, consistent output.
@@ -45,13 +45,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
 - Codebase map adopted (§5)? New inventory keys claimed in the map tree — machine-enforced by its ratchet gate; dossier prose refreshed on touch — documented check; claim edits regen the generated artifacts in the same commit.
 - Memory (non-derivable only), decision log/backlog, and ledger row updated — **on disk before the wrap-up message** (§16).
-- Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit`, delta line in the write-back commit message; no delta → no touch.
 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
 - Re-run the full gate suite after EVERY merge — a conflict-free merge is not a passing merge.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). The per-node ledger needs no reconcile — each file has a single writer (§3).
-- Kickoff-manifest exception: the manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict to either side provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in an immediate follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit cannot embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits, conflict or not.
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — it merges without endangering other nodes and reverts cleanly.
 - Migrations are reversible — test up/down/up.
 
