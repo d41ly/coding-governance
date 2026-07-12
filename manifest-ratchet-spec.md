@@ -128,10 +128,11 @@ supplementary pointer to the gov repo's WIRE doc is permitted; a load-bearing on
   expressions, Go-template `{{.State.Status}}` format strings, Helm snippets. (v1.1 normalizes all
   template placeholders to UPPERCASE-keyed form so the pattern is complete — §5.)
 - **C2 — audit block present + parseable:** all of `last-audit`/`watch`/`verify-paths` found with
-  **non-empty** values after the empty-element drop. Missing block on a `kickoff-manifest: v1.0`
-  manifest → fail, message inlining the retrofit short form and stating that the FULL recipe —
-  including the body-delta step and the lever-2 playbook re-pull step, which the short form omits —
-  lives in `coding-governance/WIRE-INTO-PROJECT.md §4`.
+  **non-empty** values after the empty-element drop, and `last-audit` well-formed — ISO-8601
+  datetime with offset `@` full 40-hex sha (a garbage datetime destroys the recency evidence; an
+  abbreviated sha can go ambiguous). Missing block → fail, message inlining all six retrofit steps
+  (they are short — a self-contained remedy beats a short form that omits the body-delta and
+  lever-2 steps) plus the `coding-governance/WIRE-INTO-PROJECT.md §4` pointer to the long form.
 - **C3 — anchor sha is real and ours:** `git cat-file -e <sha>^{commit}` and
   `git merge-base --is-ancestor <sha> HEAD`, with DISTINCT remedies: unknown sha → "stamp is foreign
   or predates a history rewrite"; known-but-non-ancestor → "history was rewritten or the stamp was
@@ -144,10 +145,18 @@ supplementary pointer to the gov repo's WIRE doc is permitted; a load-bearing on
 - **C4 — every `verify-paths` entry is tracked:** files via `git ls-files --error-unmatch`, dirs via
   `git ls-files -- <path>/ | grep -q .` — tracked-ness, not `-e` (an untracked leftover at a dead
   path must not green the local leg while fresh-clone CI reds).
-- **C5 — no unaudited drift (topological, not textual).**
+- **C5 — no unaudited drift (topological + structural).**
   `W = git rev-list -1 <sha>..HEAD -- <watch…>` (newest watch-touching commit; empty → green).
-  `S = git log -1 --format=%H -G'^last-audit:' <sha>..HEAD -- <manifest>` (newest commit that changed
-  the stamp line; `git log`, not `rev-list` — rev-list rejects `-G`).
+  S = the newest commit in the range that actually CHANGED the audit block's `last-audit` VALUE,
+  found in two stages: candidates from a **pathspec-free** `git log --format=%H -G'^last-audit:'
+  <sha>..HEAD` (`git log`, not `rev-list` — rev-list rejects `-G`; pathspec-free because with the
+  rename source in the diff, git's rename detection collapses a pure `git mv` of the manifest,
+  which a pathspec-scoped search mistakes for a stamp and thereby launders all drift predating the
+  rename — demonstrated in the build review); each candidate is validated by comparing the block's
+  stamp value at the commit vs its parent (`git show <cand>:<mf>` / `<cand>^:<mf>` through the
+  block extractor), so body decoy lines and block reorders never count. Documented residual: a
+  decoy edit predating the manifest's current path is accepted unvalidated — narrow, and it fails
+  toward green only when combined with a later rename.
   **Green iff S is non-empty AND `git merge-base --is-ancestor W S`.** W==S (reflexive) is the
   one-commit bundle — a commit carrying the watched change plus the §B re-verify + re-stamp is green
   by construction; S a proper descendant is the follow-up re-stamp; and a stamp that does NOT descend
@@ -161,13 +170,14 @@ supplementary pointer to the gov repo's WIRE doc is permitted; a load-bearing on
   watched change or as a follow-up in the same PR; after a merge that brought in watch-touching
   commits, the fresh post-merge audit + re-stamp IS the close."
 - **C5s (`--staged` leg):** staged watch changes (`git diff --cached --name-only -- <watch…>`
-  non-empty) require the STAGED manifest hunk to touch the `last-audit:` line
-  (`git diff --cached -U0 -- <manifest> | grep -q '^+last-audit:'`) — co-staging an unrelated
-  manifest edit does not count. **Deliberate narrowing (stated, not accidental):** a blocking staged
-  leg cannot see a future follow-up commit, so its fail message says "bundle the re-verify +
-  re-stamp into THIS commit" — the bundle form only. The guarantee is one-directional and that is
-  the intended direction: every C5s-green commit is C5-green (verified); C5's follow-up remedy
-  additionally exists for adopters without the pre-commit leg. C1/C2/C4/C6 run always (cheap).
+  non-empty) require the STAGED blob's block stamp to differ from HEAD's (`git show :<mf>` vs
+  `git show HEAD:<mf>`, both through the block extractor — structural, so co-staging an unrelated
+  manifest edit or a body decoy line does not count). **Deliberate narrowing (stated, not
+  accidental):** a blocking staged leg cannot see a future follow-up commit, so its fail message
+  says "bundle the re-verify + re-stamp into THIS commit" — the bundle form only. The guarantee is
+  one-directional and that is the intended direction: every C5s-green commit is C5-green
+  (verified); C5's follow-up remedy additionally exists for adopters without the pre-commit leg.
+  C1/C2/C4/C6 run always (cheap).
 - **C6 — watch list is alive:** every watch pathspec matches ≥1 tracked file
   (`git ls-files -- <spec> | grep -q .`) — a typo'd or restructure-orphaned pathspec is a silent
   permanent false-green on the only drift check we have (the freeze bug reintroduced one level up).
@@ -190,8 +200,15 @@ monotonicity) · no-remote squash-merge with the §2 fallback stamp → C3 holds
 orphan-root watch history → clean fail-or-green, never a raw git fatal · staged watch without staged
 stamp → C5s · staged watch with unrelated manifest edit → C5s · trailing `;` in watch → parsed
 clean · dead watch pathspec → C6 · single pathspec matching >100 tracked files → breadth WARN + 0 ·
-unmanaged manifest (no marker) → 0 + NOTE · v1.0 marker → C2 with retrofit message · shallow sim
-(`git clone --depth 1`) → WARN + 0.
+unmanaged manifest (no marker) → 0 + NOTE · v1.0 marker, no block → C2 with retrofit · v1.0 marker
+WITH valid block → version WARN + 0 · shallow sim (`git clone --depth 1`) → WARN + 0 · non-repo and
+no-manifest → exit 2 · manifest renamed after unaudited drift → C5 red (no laundering) · body decoy
+`last-audit:` edit after drift → C5 red · block reorder after drift → C5 red · staged body decoy →
+C5s red · repo-escaping watch pathspec → C6 red, no fatal · unborn HEAD → guided C3, no fatal ·
+malformed datetime → C2 · relative path arg from a subdirectory resolves · unit branch: merge-base
+bundle + second same-anchor re-stamp both commit and green. The harness pins the output contract on
+every scenario: no raw `fatal:` anywhere, and green runs emit nothing but WARN:/NOTE: lines; the
+suite isolates itself from the runner's global/system git config (`GIT_CONFIG_GLOBAL=/dev/null`).
 
 ## 4 · Engine changes (`skills/session-kickoff/SKILL.md`)
 
