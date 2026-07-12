@@ -10,7 +10,7 @@ derive-vs-ask calls.
    streams, sharded ledger, gates, reviews, memory, output discipline). Lives in the project as one doc.
 2. **`/session-kickoff` skill** (`skills/session-kickoff/`) — the project-agnostic kickoff *engine*,
    installed ONCE per machine; it reads a per-project **kickoff manifest** to learn project specifics.
-3. **memory-tree kit** (`memory-tree/`) — the gated `memory/` structure that operationalizes the
+3. **memory-tree kit** (`tools/memory-tree/`) — the gated `memory/` structure that operationalizes the
    playbook's §5/§6. Optional but recommended.
 
 **Precedence (never violate):** project `CLAUDE.md` > kickoff manifest > the skill. The playbook is the
@@ -40,7 +40,7 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
   - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
     MAP_ROOT (under the memory tree when memory-tree is adopted, e.g. `memory/map`; else `docs/map`),
     GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
-    (walk `codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
+    (walk `tools/codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
     FOUR codebase-map lines from the playbook (§1 DoR + §1 DoD + §5 kit bullet + §7 gates line).
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
@@ -89,7 +89,7 @@ memory-tree `FAMILIES` (§3) — the ledger and the decision logs share one id s
 
 1. Copy the kit in and configure:
    ```bash
-   cp -r <gov>/memory-tree <project>/memory-tree
+   cp -r <gov>/tools/memory-tree <project>/memory-tree
    cp <project>/memory-tree/.memory-tree.conf.example <project>/.memory-tree.conf   # then edit
    ```
    Edit `.memory-tree.conf`: `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
@@ -129,7 +129,7 @@ slug-collision scan; self-prune your own `pushed:/merged:<sha>` rows on session 
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
 
 1. Copy the kit dir into the project root **as `codebase-map/`** (the fixed name the gate template
-   resolves — don't rename): `cp -r <gov-repo>/codebase-map <project>/codebase-map`.
+   resolves — don't rename): `cp -r <gov-repo>/tools/codebase-map <project>/codebase-map`.
 2. `cp codebase-map/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
    MAP_DIFF_CMD (per the §0 decisions).
 3. `cp codebase-map/map_extractors.template.py codebase-map/map_extractors.py` and declare the
@@ -217,7 +217,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - Optionally a SessionStart hook that nudges `/session-kickoff` and reports `git worktree list` state.
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
-- Copy `hooks/agent-cap.js` (+ `hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
+- Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
 - Wire a `PreToolUse` hook into the discovered `settings.json` (the `.claude/` in the session cwd):
   ```json
   "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
@@ -226,7 +226,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-4
   `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
   mechanical enforcement of the ≤4-concurrent rule — a wide fan-out trips the server rate limiter.
-- Copy `workflows/tier2-review.js` for a ready consolidated review harness (~7–9 agents, ≤4 concurrent).
+- Copy `tools/workflows/tier2-review.js` for a ready consolidated review harness (~7–9 agents, ≤4 concurrent).
 - Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0.
 
 ## 6 — Verify the whole chain, then commit

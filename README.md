@@ -21,25 +21,25 @@ machines/sessions on the same repo.
   topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
   read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
   history: `manifest-ratchet-spec.md`.
-- **`memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
+- **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
   per-feature `builds/` folders, index budgets + rotation, status vocabulary, an 11-check hygiene
   gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
   across repos. Scaffold a fresh tree with `adopt-memory-tree.sh --scaffold`, or migrate an existing
-  one in a single landing. See `memory-tree/README.md`. Operationalizes the playbook's §5/§6.
-- **`hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
+  one in a single landing. See `tools/memory-tree/README.md`. Operationalizes the playbook's §5/§6.
+- **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
   script calling raw `parallel(`/`pipeline(` instead of the cap-4 `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. Cap overridable via env
-  `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `hooks/agent-cap.test.sh`.
+  `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule.
-- **`codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers
+- **`tools/codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers
   whose machine claims are CI-verified against live code inventories (a both-directions ratchet —
   new moving parts fail until claimed; claims naming dead keys fail too), a shrink-only baseline,
   freshness-gated generated artifacts, and a `map_diff` git-range digest. Project specifics live in
-  `.codebase-map.conf` + `codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only
+  `.codebase-map.conf` + `tools/codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only
   py≥3.11) is identical across repos. Adopt with `adopt-codebase-map.sh --scaffold`; see
-  `codebase-map/README.md` + `INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
+  `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
   documentation-currency goals with machine enforcement.
-- **`workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
+- **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth; ~7–9 agents, never >4 concurrent). Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction.
 
