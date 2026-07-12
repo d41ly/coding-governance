@@ -188,7 +188,7 @@ if [ "$BLOCK_OK" = 1 ]; then
           cur=$(git show "$cand:$MF" 2>/dev/null | blockstamp)
           prev=$(git show "$cand^:$MF" 2>/dev/null | blockstamp)
           if [ -z "$cur" ] || [ -z "$prev" ] || [ "$cur" != "$prev" ]; then S="$cand"; break; fi
-        done < <(git log --format=%H -G'^last-audit:' "$LA_SHA..HEAD" 2>/dev/null | head -10)
+        done < <(git log --format=%H -G'^last-audit:' "$LA_SHA..HEAD" 2>/dev/null)
         if [ -z "$S" ] || ! git merge-base --is-ancestor "$W" "$S" 2>/dev/null; then
           files=$(git diff --name-only "$LA_SHA..HEAD" -- "${WATCH[@]}" 2>/dev/null | sed 's/^/  /')
           fail 5 "watched files changed since last-audit with no re-stamp at/after the change:

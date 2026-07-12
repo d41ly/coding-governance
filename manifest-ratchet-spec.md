@@ -215,7 +215,10 @@ suite isolates itself from the runner's global/system git config (`GIT_CONFIG_GL
 - **NEW Step 2b — audit the manifest (read-repair):** resolve the checker — the manifest's
   `check-script:` value, else `scripts/manifest-check.sh`, else the copy shipped BESIDE this skill
   (the skill dir junction-resolves per Scaffolding step 1) — and RUN it; **never reimplement the
-  checks inline** (single-source rule). No bash available → proceed unaudited, say so in one clause.
+  checks inline** (single-source rule). Trust guard (closing-review finding): `check-script:` is
+  honored only when it names a tracked in-repo file whose basename is `manifest-check.sh` — the
+  manifest is repo-authored data, not an execution license; non-conforming values fall through and
+  get flagged. No bash available → proceed unaudited, say so in one clause.
   Manifest unmanaged (no marker) → skip, one clause. Version WARN → relay it, don't block.
   - On failures: repair NOW as part of kickoff, per the **re-verify protocol**: for each file C5
     lists, name the §B claim(s) derived from it (gate fence ← CI/scripts; pointer map ← moved dirs;

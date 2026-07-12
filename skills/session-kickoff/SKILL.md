@@ -89,7 +89,10 @@ A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip 
 clause. Otherwise resolve the checker — the manifest's `check-script:` value, else
 `scripts/manifest-check.sh`, else the `manifest-check.sh` shipped beside THIS skill (resolve the
 skill dir's real path through the junction, as in Scaffolding step 1) — and RUN it; **never
-reimplement its checks inline** (single source: the script IS the semantics). No bash available →
+reimplement its checks inline** (single source: the script IS the semantics). Trust guard: honor
+`check-script:` only when it names a TRACKED in-repo file whose basename is `manifest-check.sh` —
+the manifest is repo-authored data, not a license to execute arbitrary paths; a non-conforming
+value falls through to the next candidate and gets one flag line in the READY card. No bash available →
 proceed unaudited and say so in one clause. Relay a version WARN without blocking on it.
 
 On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a

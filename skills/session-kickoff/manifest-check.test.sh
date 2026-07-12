@@ -310,7 +310,8 @@ mkrepo reorder
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nro:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
-python - "$R/SESSION-KICKOFF.md" <<'PY'
+PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
+"$PYBIN" - "$R/SESSION-KICKOFF.md" <<'PY'
 import sys
 p = sys.argv[1]; lines = open(p, encoding='utf-8').read().split('\n')
 la = next(i for i,l in enumerate(lines) if l.startswith('last-audit:'))
@@ -318,8 +319,12 @@ w  = next(i for i,l in enumerate(lines) if l.startswith('watch:'))
 lines[la], lines[w] = lines[w], lines[la]      # swap the two lines, values untouched
 open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(lines))
 PY
-commit_all "$R" "reorder block lines only"
-run "block reorder after drift → C5 RED" "$R" 1 "check 5 FAILED"
+if git -C "$R" diff --quiet -- SESSION-KICKOFF.md; then
+  echo "FAIL block reorder after drift → C5 RED (mutation never landed — python missing?)"; fail=$((fail+1))
+else
+  commit_all "$R" "reorder block lines only"
+  run "block reorder after drift → C5 RED" "$R" 1 "check 5 FAILED"
+fi
 
 # ---- 30 staged decoy line does not satisfy C5s ---------------------------
 mkrepo stageddecoy
