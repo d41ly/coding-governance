@@ -5,7 +5,7 @@
 #   C3 anchor sha real + ancestor        C4 verify-paths tracked
 #   C5 no unaudited watch drift          C6 watch list alive
 # Single source: CI, pre-commit, the manifest's gate fence, and the kickoff engine all invoke THIS
-# script — never hand-copy the checks. Spec: coding-governance/manifest-ratchet-spec.md §3.
+# script — never hand-copy the checks. Spec: the manifest-ratchet design record in coding-governance.
 #
 #   manifest-check.sh [<manifest-path>]   # full check (discovers the manifest when no path given;
 #                                         # a relative path resolves from the repo root, then from

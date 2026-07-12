@@ -1,0 +1,6 @@
+# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
+memory/kickoff/builds/2026-07-12-KICK-aRatchetForge/spec/manifest-ratchet-spec.md
+memory/kickoff/builds/2026-07-12-KICK-aRatchetForge/build/manifest-ratchet-build-report.md
+memory/kickoff/builds/2026-07-12-KICK-aRatchetForge/reviews/2026-07-12-tier2-cumulative-main.md
+memory/deployer/builds/2026-07-12-DEPL-aDeployScout/spec/governance-deployer-research.md
+memory/playbook/builds/2026-07-03-PLAY-aLeanRework/spec/template-v2-rework-spec.md

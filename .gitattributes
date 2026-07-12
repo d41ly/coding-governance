@@ -1,7 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# memory-tree kit scripts must be LF (run in bash/CI). Target repos also pin their generated TREE.md +
-# the two ratchet manifests to LF (see memory-tree/README.md); do the same in the adopting repo.
+# Execution-sensitive scripts must be LF (run in bash/CI). Covers the relocated tools/ kits.
 *.sh text eol=lf
-memory-tree/*.sh text eol=lf
+
+# memory-tree determinism (this repo dogfoods the kit): its generated TREE.md + the two ratchet
+# manifests are LF-pinned so a Windows autocrlf checkout can't spuriously fail hygiene check 9.
+memory/**/TREE.md text eol=lf
+memory/project/legacy-files.txt text eol=lf
+memory/project/curation-debt.txt text eol=lf

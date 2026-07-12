@@ -20,7 +20,7 @@ machines/sessions on the same repo.
   `manifest-check.sh` gate (placeholders · block parse · anchor sha · tracked anchors ·
   topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
   read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
-  history: `manifest-ratchet-spec.md`.
+  history: `memory/kickoff/builds/2026-07-12-KICK-aRatchetForge/`.
 - **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
   per-feature `builds/` folders, index budgets + rotation, status vocabulary, an 11-check hygiene
   gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical

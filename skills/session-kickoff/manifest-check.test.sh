@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runnable scenario suite for manifest-check.sh (spec: manifest-ratchet-spec.md §3).
+# Runnable scenario suite for manifest-check.sh (spec: the manifest-ratchet design record, coding-governance §3).
 # Run: bash skills/session-kickoff/manifest-check.test.sh    (exit 0 = all pass)
 set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null   # a runner's core.hooksPath/init.templateDir must not reach the throwaway repos
