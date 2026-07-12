@@ -157,12 +157,55 @@ from §2). Write the manifest to one of those paths so it resolves.
 2. Fill **§B (orientation)** from the repo: repo layout · remote + default branch · branch conventions ·
    governing docs · the **path to the playbook from §2** · the pointer map (area → doc → entrypoints) ·
    the gate commands · the tier rule · the **ID + ledger protocol** (id format + slug rules + collision
-   grep + the sharded ledger path `memory/project/in-flight/<tag>.md`) · the environment traps. Keep it
-   SHORT — only what the engine can't derive from git/`CLAUDE.md`; reference the playbook, never duplicate it.
-   (§A is derived by the agent per kickoff — leave it as the shape, don't fill it.)
+   grep + the sharded ledger path `memory/project/in-flight/<tag>.md`) · the environment traps. Fill the
+   **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
+   claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
+   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
+   default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
+   `git merge-base <local-default> HEAD`); tag claims whose truth lives in another repo
+   `(cross-repo — verify at use)`. Keep it SHORT — only what the engine can't derive from
+   git/`CLAUDE.md`; reference the playbook, never duplicate it. (§A is derived by the agent per
+   kickoff — leave it as the shape, don't fill it.)
 3. Delete the "Customize before use" block.
+4. **Wire the ratchet gate:**
+   ```bash
+   mkdir -p <project>/scripts && cp <gov>/skills/session-kickoff/manifest-check.sh <project>/scripts/
+   ```
+   (Non-default home → record it in the block's `check-script:` and adjust every path below.) Append
+   `scripts/manifest-check.sh text eol=lf` (or a repo-wide `*.sh text eol=lf`) to the project's
+   `.gitattributes` — the gov repo's EOL rules don't travel with `cp`, and a CRLF checkout kills bash
+   silently. Keep the template's standing gate-fence line pointing at the checker. Then `git add` the
+   manifest, the checker, and `.gitattributes` — the checker tests TRACKED-ness; an unstaged fresh
+   adoption cannot pass.
+5. **Offered hardening (each optional, separately):**
+   - pre-commit leg, guarded like the memory-tree hook so a scripts-less checkout stays green — note
+     it deliberately narrows the drift remedy to "bundle the re-stamp into THIS commit":
+     ```sh
+     top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+     if [ -f "$top/scripts/manifest-check.sh" ]; then bash "$top/scripts/manifest-check.sh" --staged || exit 1; fi
+     ```
+   - CI leg: run `bash scripts/manifest-check.sh` in a job whose checkout uses **`fetch-depth: 0`** —
+     MANDATORY, not advisory: the actions/checkout default (depth 1) makes the drift check
+     WARN-and-skip on every run, so a shallow CI leg never enforces the one check that matters.
 
-**Verify:** `grep -n '{{' <project>/docs/SESSION-KICKOFF.md` prints nothing.
+**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` prints nothing, and
+`cd <project> && bash scripts/manifest-check.sh; echo $?` → `0` (the checker resolves the repo from
+the INVOKING directory, not from its own location — run it with the cwd inside `<project>`).
+
+**Retrofit an existing v1.0 manifest** *(the durable recipe — the checker's C2 failure points here)*:
+1. **Body deltas first:** rewrite the §B intro/heading to the v1.1 wording ("derived at
+   instantiation; re-audited every kickoff; accretes"); insert the template's ratchet section; insert
+   the dated-corrections section (empty — prunable per-entry, never deleted); add the traps-accrete
+   note. Without this the file keeps its standing freeze directive and the older in-file contract wins.
+2. Insert the `manifest-audit` block (derive `watch`/`verify-paths` as in step 2 above; tag cross-repo
+   claims; stamp only AFTER actually re-verifying §B).
+3. Copy the checker + `.gitattributes` line + gate-fence line; `git add` everything (step 4 above).
+4. `bash scripts/manifest-check.sh` → 0.
+5. Re-pull the playbook's v2.2 §1 lines (manifest DoD write-back + Landing reconcile exception) into
+   the project's instantiated playbook and bump its `governance-template:` marker to v2.2 — without
+   this, the write-back lever never activates for retrofitted projects.
+6. Bump the manifest marker to `kickoff-manifest: v1.1` **LAST** — the bump silences the kit's
+   version WARN, the only standing signal that the body still predates the ratchet.
 
 ## 5 — Optional: worktree tooling + SessionStart nudge
 
@@ -195,10 +238,21 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
    and surface the playbook + gate + ledger protocol. If it can't, re-check the §4 search paths.
 2. **Gate green** (if memory-tree adopted): `bash memory-tree/check-memory-hygiene.sh ; echo $?` → 0.
-3. **No stray placeholders:** `grep -rn '{{' <project>/docs/PARALLEL.md <project>/docs/SESSION-KICKOFF.md` → empty.
-4. **Ledger sharded:** `ls <project>/memory/project/in-flight/` exists; `IN-FLIGHT.md` is the pointer stub.
-5. **Commit the chain:** `cd <project> && git add -A && git commit` (do NOT commit the per-machine skill
-   junction — it lives under `~/.claude`, not the repo).
+3. **No stray placeholders:** `grep -rn '{{' <project>/docs/PARALLEL.md` → empty, and
+   `grep -rnE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` → empty (the manifest check is
+   shape-scoped: its gate fence may legitimately hold `${{ … }}` / Go-template braces).
+4. **Commit the chain FIRST:** `cd <project> && git add -A && git commit` (do NOT commit the
+   per-machine skill junction — it lives under `~/.claude`, not the repo). The probe below needs the
+   chain COMMITTED — §4 leaves it only staged, and a probe commit that sweeps the still-staged
+   manifest in would introduce the stamp and stay green instead of demonstrating red.
+5. **Ratchet red/green probe** (the drift check reads COMMITTED ranges — an uncommitted touch is
+   invisible; use a throwaway branch off the chain commit): *commit* a throwaway change to a watched
+   file → `bash scripts/manifest-check.sh` goes red (check 5) → re-stamp `last-audit` (bundled or
+   follow-up commit) → green → **revert the throwaway AND the probe re-stamp together in ONE
+   commit** → still green (a bare revert touches the watched file again and would end the wiring
+   session red). If a CI leg was wired: push the probe branch and confirm the CI job actually reds —
+   proof it isn't WARN-skipping on a shallow checkout. Then delete the probe branch.
+6. **Ledger sharded:** `ls <project>/memory/project/in-flight/` exists; `IN-FLIGHT.md` is the pointer stub.
 
 ## Result — what the project now has
 
@@ -206,11 +260,12 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 <project>/
 ├── CLAUDE.md                    # (optional) project charter — outranks the manifest + skill
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
-├── docs/SESSION-KICKOFF.md      # kickoff manifest — the engine reads this
+├── docs/SESSION-KICKOFF.md      # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
+├── scripts/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
+├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐
 ├── memory-tree/                 # the hygiene kit (copied in)  │ only if §3 adopted
-├── memory/                      # scaffolded tree; project/in-flight/<tag>.md = sharded ledger  │
-└── .gitattributes               # EOL rules for the tree       ┘
+└── memory/                      # scaffolded tree; project/in-flight/<tag>.md = sharded ledger ┘
 ~/.claude/skills/session-kickoff # the engine (per-MACHINE junction/symlink — not in the repo)
 ```
 
@@ -227,7 +282,18 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your
   filled copy against `<gov>/parallel-coding-governance.template.md` per §-body (ignore filled
-  placeholders + the deleted Customize block). The manifest carries its own `kickoff-manifest: vN.N`. The
-  `memory-tree/` scripts are identical across repos — copy the newer versions in wholesale.
+  placeholders + the deleted Customize block) — a re-pull carries the v2.2 §1 manifest lines (DoD
+  write-back + Landing reconcile exception) into instantiated playbooks. The manifest carries its own
+  `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos — copy the newer
+  versions in wholesale.
+- **`manifest-check.sh` is engine-identical** across repos — overwrite wholesale from `<gov>` (this also
+  delivers the version-WARN constant that flags out-of-date manifest bodies). The `manifest-audit`
+  block and the manifest BODY are project-owned — never overwritten by kit updates.
+- **Stall review (rides this same Maintenance cadence):** at each kit re-pull, the owner compares the
+  manifest's BODY-change commits (diffs touching more than the `last-audit` line) against watch-commit
+  volume and elapsed time — **≥10 watch-pathspec commits or ≥3 months with zero body growth = the
+  manifest is stalling**; that is the trigger for reconsidering heavier accretion tooling (journal
+  mining). Kickoff delta lines are supporting color, not the data source — squash merges and chat
+  don't preserve them.
 - **memory-tree kit updates** never carry project data (no brand gate, no migrations) — those stay in the
   project. Safe to overwrite `memory-tree/*.sh` + `HYGIENE.template.md` from `<gov>`.

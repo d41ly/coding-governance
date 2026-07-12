@@ -14,7 +14,13 @@ machines/sessions on the same repo.
 - **`skills/session-kickoff/`** — the generic `/session-kickoff` skill: the project-agnostic
   *engine* (git-state guards, closed-scope collection, READY card). Project specifics come
   from a per-repo **kickoff manifest** the skill discovers (see its Step 2 search list);
-  `MANIFEST-TEMPLATE.md` is the starter it scaffolds into manifest-less projects.
+  `MANIFEST-TEMPLATE.md` (v1.1) is the starter it scaffolds into manifest-less projects. The
+  **manifest ratchet** keeps instantiated manifests alive: a machine-readable `manifest-audit`
+  block (`last-audit` stamp · `watch` pathspecs · `verify-paths` anchors), the
+  `manifest-check.sh` gate (placeholders · block parse · anchor sha · tracked anchors ·
+  topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
+  read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
+  history: `manifest-ratchet-spec.md`.
 - **`memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
   per-feature `builds/` folders, index budgets + rotation, status vocabulary, an 11-check hygiene
   gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
