@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# coding-governance pre-commit fast leg. Install once per clone: git config core.hooksPath .githooks
+# Runs only the cheap staged-scoped gates so a scripts-less checkout stays green.
+set -u
+top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+cd "$top" || exit 0
+rc=0
+
+# memory-tree hygiene, staged leg — only when memory/ is touched
+if [ -f tools/memory-tree/check-memory-hygiene.sh ] &&
+   git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
+  bash tools/memory-tree/check-memory-hygiene.sh --staged || rc=1
+fi
+
+# kickoff-manifest ratchet, staged leg — only when a watched file is staged
+if [ -f skills/session-kickoff/manifest-check.sh ]; then
+  bash skills/session-kickoff/manifest-check.sh --staged || rc=1
+fi
+
+# template size — only when the template is staged
+if [ -f tools/check-template-size.sh ] &&
+   git diff --cached --name-only -- parallel-coding-governance.template.md | grep -q .; then
+  bash tools/check-template-size.sh || rc=1
+fi
+
+[ "$rc" = 0 ] || echo "pre-commit: a gate failed — fix or 'git commit --no-verify' to override deliberately."
+exit "$rc"
