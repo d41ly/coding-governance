@@ -64,13 +64,18 @@ alongside — both then appear; pick by description.) Skip this step on a machin
 
 ## 2 — Install the governance playbook (per project)
 
-1. Copy the playbook in as one governing doc (follow the project's convention):
+1. Copy the playbook **and its two companions** in (the template's §4/§9/§10/§11/§12/§13 are §-stubs
+   that reference `parallel-coding-governance.domain-rules.md` by name — it MUST travel alongside):
    ```bash
-   cp <gov>/parallel-coding-governance.template.md <project>/docs/PARALLEL.md
+   cp <gov>/parallel-coding-governance.template.md    <project>/docs/PARALLEL.md
+   cp <gov>/parallel-coding-governance.domain-rules.md <project>/docs/parallel-coding-governance.domain-rules.md
+   # the customize companion is deploy-time only — read it, don't ship it
    ```
-   (or paste its body into `<project>/CLAUDE.md`). **Keep the `<!-- governance-template: vN.N -->` marker
-   verbatim** — the kickoff engine's Step-2 fallback and the upstream-re-pull mechanism both read it.
-2. Fill every `{{PLACEHOLDER}}` per the doc's own **"Customize before use"** block (at the bottom). The groups:
+   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit — §5.)
+   **Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
+   fallback and the upstream-re-pull mechanism both read it.
+2. Fill every `{{PLACEHOLDER}}` per **`<gov>/parallel-coding-governance.customize.md`** (the deploy-time
+   placeholder catalog — externalized from the template as of v2.3). The groups:
    - **Fleet** (ask): node-registry rows + stream ownership.
    - **Records & docs** (derive/ask): id families, doc-routing table, product preamble, repo-layout map,
      command catalog, product-context home, help dir, review dir.
@@ -79,11 +84,12 @@ alongside — both then appear; pick by description.) Skip this step on a machin
    - **Gates & git** (derive): gate commands, CI file, gate runner, commit trailer, worktree script,
      toolchain notes.
    - **Runtime/verification · architecture/design-system · output-discipline** — fill what applies, delete
-     what doesn't.
-3. Delete the "Customize before use" block once filled.
+     what doesn't per the customize companion's conditional-sections list.
+3. The customize companion lists the conditional sections to delete when they don't apply; apply that.
 
-**Verify:** `grep -n '{{' <project>/docs/PARALLEL.md` prints nothing. `{{ID_FAMILIES}}` must match the
-memory-tree `FAMILIES` (§3) — the ledger and the decision logs share one id scheme.
+**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md` prints nothing (the template legitimately
+holds `${{ }}` / Go-template braces in gate commands — shape-scope the grep). `{{ID_FAMILIES}}` must
+match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs share one id scheme.
 
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 
@@ -258,8 +264,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 ```
 <project>/
-├── CLAUDE.md                    # (optional) project charter — outranks the manifest + skill
+├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
+├── docs/parallel-coding-governance.domain-rules.md  # the §4/§9–§13 domain checklists (travels with the template)
 ├── docs/SESSION-KICKOFF.md      # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
 ├── scripts/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)

@@ -45,4 +45,5 @@ write the filled result to the project's governing doc (its agent-instruction fi
 The template carries `<!-- governance-template: vN.N -->`. Pull improvements by diffing your filled
 copy against the current source per §-body (ignore filled placeholders). The v2.0 format rework
 defeats §-body diffing against pre-2.0 copies (re-adopt section-by-section once); v2.0+ diffs cleanly.
-Version history lives in the `…-v-N-N.md` snapshots alongside the template and in git history.
+Version history lives in the `…-v-N-N.md` snapshots (under `memory/playbook/archive/` in this repo)
+and in git history.

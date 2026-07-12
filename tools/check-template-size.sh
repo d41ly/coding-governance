@@ -14,7 +14,9 @@ FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
 MAX_BYTES=${MAX_BYTES:-32768}     # 32 KiB — the STRICT ceiling; never raise to fit new prose, externalize instead
 
 [ -f "$FILE" ] || { echo "TEMPLATE-SIZE env ERROR — file not found: $FILE"; exit 2; }
-bytes=$(wc -c < "$FILE" | tr -d '[:space:]')
+# Measure LF-NORMALIZED bytes (strip CR) so the gate is checkout-independent — a Windows autocrlf
+# smudge to CRLF must not inflate the count and spuriously fail the limit.
+bytes=$(tr -d '\r' < "$FILE" | wc -c | tr -d '[:space:]')
 name=$(basename "$FILE")
 
 if [ "$bytes" -gt "$MAX_BYTES" ]; then

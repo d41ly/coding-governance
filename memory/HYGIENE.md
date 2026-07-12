@@ -3,7 +3,7 @@
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
 It holds append-only decision logs, per-build folders, session machinery, and long-lived guides —
 organised by development discipline (the disciplines your repo-root `.memory-tree.conf` declares).
-This file is the rule set; the single mechanical enforcement is `memory-tree/check-memory-hygiene.sh`
+This file is the rule set; the single mechanical enforcement is `tools/memory-tree/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
 script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
 
@@ -12,7 +12,7 @@ script is the law, this doc explains it. (Replace `memory/` throughout with your
 ```
 memory/
 ├── README.md              root index (one-liners)
-├── TREE.md                generated directory tree (memory-tree/gen-memory-tree.sh)
+├── TREE.md                generated directory tree (tools/memory-tree/gen-memory-tree.sh)
 ├── HYGIENE.md             this file
 ├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes, 2 ratchet manifests
 └── <discipline>/          one per DISCIPLINES entry
@@ -72,7 +72,7 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
   checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone.
 
-## The check catalog (all in `memory-tree/check-memory-hygiene.sh`; this file is the prose home)
+## The check catalog (all in `tools/memory-tree/check-memory-hygiene.sh`; this file is the prose home)
 
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
@@ -87,7 +87,7 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — BACKLOG/STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
-9. **tree drift** — `memory-tree/gen-memory-tree.sh --check` must be clean.
+9. **tree drift** — `tools/memory-tree/gen-memory-tree.sh --check` must be clean.
 10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).

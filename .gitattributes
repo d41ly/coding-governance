@@ -9,3 +9,7 @@
 memory/**/TREE.md text eol=lf
 memory/project/legacy-files.txt text eol=lf
 memory/project/curation-debt.txt text eol=lf
+
+# The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
+# checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
+parallel-coding-governance*.md text eol=lf

@@ -8,9 +8,15 @@ machines/sessions on the same repo.
 
 ## Contents
 
-- **`parallel-coding-governance.template.md`** — the governance playbook template (current
-  version; `…-v-N-N.md` files alongside are historical snapshots). Copy into a repo and fill
-  its `{{PLACEHOLDERS}}` per its own "Customize before use" block.
+- **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
+  ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
+  snapshots live under `memory/playbook/archive/`. Two companions ship with it:
+  **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and
+  **`.domain-rules.md`** (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references
+  by §-stub — copy it alongside the template into a target repo).
+- **`tools/agent-instructions/`** — install a canonical `AGENTS.md` in a target repo and wire every AI
+  tool's file to it (`CLAUDE.md` `@AGENTS.md` import, Gemini config, symlink/copy), with a `--check`
+  drift gate. Use it to deploy the filled playbook as a project's agent-instruction file.
 - **`skills/session-kickoff/`** — the generic `/session-kickoff` skill: the project-agnostic
   *engine* (git-state guards, closed-scope collection, READY card). Project specifics come
   from a per-repo **kickoff manifest** the skill discovers (see its Step 2 search list);
