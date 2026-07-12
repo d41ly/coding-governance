@@ -72,7 +72,9 @@ Search `<repo>` in order — **first hit wins, read it once**:
 3. `.claude/SESSION-KICKOFF.md`
 4. `SESSION-KICKOFF.md`
 5. else an instantiated governance doc: grep `docs/` + the repo root for the
-   `governance-template:` marker (e.g. `docs/PARALLEL.md`).
+   `governance-template:` marker (e.g. `docs/PARALLEL.md`) — skipping files whose name contains
+   `.template` or whose body still holds `{{`-shaped placeholders: a template is not an
+   instantiated governance doc.
 
 The manifest is **authoritative for everything project-specific**: branch/layout conventions,
 id + ledger protocol, stream/pointer maps, tier rules, gate commands, environment traps. Where
@@ -80,6 +82,27 @@ it defines a step, its version replaces the generic default below.
 
 **No manifest found** → say so plainly and offer (one `AskUserQuestion`) to scaffold one — see
 **Scaffolding** at the bottom. Whether or not they accept, continue with the generic Steps 3–5.
+
+## Step 2b — Audit the manifest (read-repair; managed manifests only)
+
+A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip this step, one
+clause. Otherwise resolve the checker — the manifest's `check-script:` value, else
+`scripts/manifest-check.sh`, else the `manifest-check.sh` shipped beside THIS skill (resolve the
+skill dir's real path through the junction, as in Scaffolding step 1) — and RUN it; **never
+reimplement its checks inline** (single source: the script IS the semantics). No bash available →
+proceed unaudited and say so in one clause. Relay a version WARN without blocking on it.
+
+On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a
+flagged §A task instead): for each file the drift check lists, re-check the §B claim(s) derived
+from it (gate fence ← CI/scripts · pointer map ← moved dirs · traps/corrections ← toolchain
+files), fix or DELETE stale rows, and delete dated entries whose prune-when condition now holds.
+Re-stamp `last-audit` (ISO datetime with offset · sha = `HEAD` on the default branch, else
+`git merge-base <remote>/<default> HEAD`; no remote → `git merge-base <local-default> HEAD` —
+Step 0 already resolved the local default), and record
+`manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
+(n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
+repair commit message AND the READY card. The repair rides the session's unit branch/worktree — never a direct
+primary-tree commit where project conventions forbid one.
 
 ## Step 3 — Derive a CLOSED task scope (from the message + memory; ask only for gaps)
 
@@ -123,7 +146,8 @@ slug per its rules and draft the ledger row for the user. No id scheme → skip 
 ## Step 5 — READY card, then stop
 
 Echo a compact **READY card**: repo · branch + BASE sha · remote/default branch · scope
-in/out · acceptance · gates · governing docs + prior records · slug (or "none"). Then hand
+in/out · acceptance · gates · governing docs + prior records · slug (or "none") · the
+manifest-audit delta line (when Step 2b ran a repair). Then hand
 control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building
 until the user confirms.
 
@@ -136,10 +160,19 @@ until the user confirms.
    `(Get-Item <skill-dir>).Target`; POSIX: `readlink -f`). If resolution fails, ask the user
    where their `coding-governance` checkout lives.
 2. **Fill `MANIFEST-TEMPLATE.md` from the repo** — gate commands from `package.json` /
-   `Makefile` / CI config, docs layout from the tree, remote + default branch from Step 0.
-   Ask only for the non-derivable (multi-node? stream ownership? tier policy?). Write the
-   result to `docs/SESSION-KICKOFF.md` (create `docs/` if needed, or follow the project's
-   docs convention), then `grep '{{'` to confirm no placeholder survived.
+   `Makefile` / CI config, docs layout from the tree, remote + default branch from Step 0, and
+   the `manifest-audit` block per the template's Customize notes (`watch` = what the gate/layout
+   claims derive FROM; `verify-paths` = 2–3 tracked anchors; stamp = ISO datetime `@` sha per the
+   stamp rule — a repo with no commits yet gets its initial commit first). Ask only for the
+   non-derivable (multi-node? stream ownership? tier policy?). Write the result to
+   `docs/SESSION-KICKOFF.md` (create `docs/` if needed, or follow the project's docs convention).
+   Copy `manifest-check.sh` (it ships beside this file) into the project — default `scripts/`,
+   any other home recorded in `check-script:` — keep the template's standing gate-fence line
+   pointing at it, add the adopting repo's `.gitattributes` LF rule for it, and `git add`
+   everything copied/edited (the checker tests tracked-ness). Verify: `bash <check-script>` →
+   exit 0, and `grep -nE '\{\{[A-Z]'` over the written manifest → empty. Offer separately —
+   don't bundle — the pre-commit `--staged` leg (stated plainly: it narrows the drift remedy to
+   the bundle-into-this-commit form) and a CI leg with `fetch-depth: 0` on the checkout step.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
    (`parallel-coding-governance.template.md`, per its own "Customize before use" block) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.
