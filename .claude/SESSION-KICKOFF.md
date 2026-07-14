@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-07-13T00:15:53+03:00 @ 51ca9b8a3401b81384b64cd442537a332d094a43
+last-audit: 2026-07-14T23:08:25+03:00 @ c78958c78aa44d128207179e2bb5ef161d0e46bc
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -76,3 +76,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The `agent-cap` PreToolUse hook caps Workflow fan-out at 4 concurrent — route fan-out through the cap-4 helpers.
+- Node `a` currently has **no Python interpreter** — the `codebase-map kit selftest` + `settings-merge selftest`
+  gate legs (and the `manifest-check` python mutation subcase) show RED as `exit 127`, not logic failures.
+  Verify Python-touching changes on a Python host / CI before merge. Prune when python lands on node `a`.

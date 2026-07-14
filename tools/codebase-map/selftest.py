@@ -133,6 +133,9 @@ def t_renders_round_trip_and_determinism():
     j = m.render_inventories_json(permuted_inv, IDS)
     assert j == m.render_inventories_json(INV, IDS)
     assert '"a_flag"' in j and "claimant" not in j  # keys-only artifact
+    # the version marker rides both generated artifacts so the deployer can grep the installed version
+    marker = "codebase-map@" + m.KIT_CODEBASE_MAP_VERSION
+    assert marker in one and marker in j
 
 
 def t_conf_grammar(tmp: Path):

@@ -8,3 +8,4 @@ memory/deployer/
   BACKLOG.md
   builds/
     2026-07-12-DEPL-aDeployScout/
+    2026-07-14-DEPL-aKitHardener/

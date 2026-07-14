@@ -145,7 +145,11 @@ slug-collision scan; self-prune your own `pushed:/merged:<sha>` rows on session 
    baseline from live inventories, installs the gate at GATE_FILE and runs it once (green on a
    fresh seed, by construction). `MAP_PY=python3` overrides the launcher.
 5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
-   that is the entire CI wiring: zero pipeline changes by design.
+   for a Python repo that is the entire CI wiring: zero pipeline changes by design.
+   **Non-Python repo** (no pytest/py collector to discover the `.py` gate): wire it as an explicit
+   leg instead — add `python <GATE_FILE>` (the gate's `__main__` runner; `${MAP_PY:-python}` if the
+   launcher differs) to BOTH your CI config and your local gate runner, grep-guarded so a re-run
+   doesn't duplicate the leg. Without this the freshness/coverage ratchet silently never runs.
 6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
 7. Commit `codebase-map/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
 
@@ -224,7 +228,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
 - Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
-- Wire a `PreToolUse` hook into the discovered `settings.json` (the `.claude/` in the session cwd):
+- Wire the `PreToolUse` hook into `.claude/settings.json` idempotently (from the project root):
+  ```bash
+  python <gov>/tools/settings-merge.py    # merges/creates .claude/settings.json; re-run = no-op; `--check` verifies; backs up to settings.json.bak on change
+  ```
+  It inserts the block below (a hand-merge works too):
   ```json
   "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
@@ -239,7 +247,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 - Codebase-map (if adopted): `python codebase-map/selftest.py` (kit contract) · run the gate file
   directly (`python <GATE_FILE>`) · `python codebase-map/gen_map.py --check` (freshness) · make one
-  throwaway inventory addition and watch the gate go red with the claim remedy, then revert.
+  throwaway inventory addition and watch the gate go red with the claim remedy, then revert. On a
+  **non-Python repo**, also confirm the explicit `python <GATE_FILE>` leg is actually standing in
+  your CI config + gate runner (§3b step 5) — not merely runnable by hand.
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
    and surface the playbook + gate + ledger protocol. If it can't, re-check the §4 search paths.

@@ -35,7 +35,13 @@ GATE_FILE="$(printf '%s' "${GATE_FILE:-}" | tr -d '\r')"
   echo "(see codebase-map/INVENTORY-DERIVATION.md), then re-run."
   exit 1; }
 
-"$PY" "$HERE/gen_map.py" --scaffold || exit 1
+# Idempotent: an already-scaffolded map reconverges via --write (re-renders generated/ so a bumped
+# version marker lands) instead of the gen_map.py --scaffold refuse-if-present wedge on re-run.
+if [ -f "${MAP_ROOT:-memory/map}/FOUNDATION.md" ]; then
+  "$PY" "$HERE/gen_map.py" --write || exit 1
+else
+  "$PY" "$HERE/gen_map.py" --scaffold || exit 1
+fi
 
 GATE="${GATE_FILE:-tests/test_codebase_map.py}"
 if [ -f "$GATE" ]; then

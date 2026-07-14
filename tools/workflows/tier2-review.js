@@ -1,5 +1,6 @@
 export const meta = {
   name: 'tier2-review',
+  version: '1.0', // gov:kit tier2-review@1.0 — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤4) Tier-2 adversarial review: find → batched-verify → synth. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [

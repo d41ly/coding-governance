@@ -9,6 +9,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
+KIT_MEMORY_TREE_VERSION=1.0   # gov:kit memory-tree@1.0 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory

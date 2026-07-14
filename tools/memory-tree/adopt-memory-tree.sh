@@ -4,23 +4,39 @@
 # see README.md "Adopting into an existing tree"; the tree shape below is the target either way.)
 #
 #   memory-tree/adopt-memory-tree.sh --scaffold
-set -u
+set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-MEMORY_ROOT=memory
-DISCIPLINES="architecture deployment blocks design performance"
-FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
-[ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
-M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+MEMORY_ROOT=memory
+DISCIPLINES="architecture deployment blocks design performance"   # demo defaults; a real .memory-tree.conf overrides these
+FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 
 [ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold"; exit 2; }
-[ -e "$M" ] && { echo "$M/ already exists — refusing to overwrite. Remove it or migrate manually."; exit 1; }
+
+# .memory-tree.conf is REQUIRED — never silently scaffold the built-in DEMO disciplines into a real repo.
+if [ ! -f "$ROOT/.memory-tree.conf" ]; then
+  cp "$HERE/.memory-tree.conf.example" "$ROOT/.memory-tree.conf"
+  echo "created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES), then re-run." >&2
+  exit 1
+fi
+. "$ROOT/.memory-tree.conf"
+M="$MEMORY_ROOT"
+
+# Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
+# foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
+if [ -d "$M" ]; then
+  if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
+    echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
+  fi
+  echo "$M/ exists without a memory-tree marker — refusing to overwrite. If a prior scaffold crashed, 'rm -rf $M' and re-run; otherwise migrate manually (README: Adopting into an existing tree)." >&2
+  exit 1
+fi
 
 mkdir -p "$M/project/journal"
 # root index + rules
-[ -f "$HERE/HYGIENE.template.md" ] && cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md" || echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"
+if [ -f "$HERE/HYGIENE.template.md" ]; then cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md). Generated tree: [TREE.md](TREE.md)."; echo
   echo "## Disciplines"; echo
@@ -50,8 +66,7 @@ git add "$M" >/dev/null 2>&1 || true
 
 echo "Scaffolded $M/ ($(echo $DISCIPLINES | wc -w) disciplines) — staged."
 echo "Next:"
-echo "  1. git add $M/ && commit."
-echo "  2. Copy .memory-tree.conf.example to the repo root as .memory-tree.conf (already read if present)."
-echo "  3. Wire the gate: add 'bash memory-tree/check-memory-hygiene.sh' to CI + your local gate runner;"
+echo "  1. git add $M/ .memory-tree.conf && commit."
+echo "  2. Wire the gate: add 'bash memory-tree/check-memory-hygiene.sh' to CI + your local gate runner;"
 echo "     add a pre-commit fast leg calling it with --staged on staged $M/** paths."
-echo "  4. Verify: bash memory-tree/check-memory-hygiene.sh ; echo \$?   (expect 0)"
+echo "  3. Verify: bash memory-tree/check-memory-hygiene.sh ; echo \$?   (expect 0)"

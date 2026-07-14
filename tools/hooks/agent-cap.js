@@ -19,7 +19,8 @@
  * CAP: default 4 (override with env AGENT_CAP). This guard doesn't verify the
  * numeric arg — it enforces "use the helper"; the helper is where CAP lives.
  *
- * Wiring (per project): merge into the discovered settings.json —
+ * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
+ * below into .claude/settings.json; or merge it by hand:
  *   "hooks": { "PreToolUse": [ { "matcher": "Workflow",
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
@@ -33,6 +34,7 @@
  */
 'use strict'
 
+const KIT_AGENT_CAP_VERSION = '1.0' // gov:kit agent-cap@1.0 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 const CAP = Number(process.env.AGENT_CAP) || 4
 
 function readStdin() {
