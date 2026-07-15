@@ -41,15 +41,18 @@ minted once per session. Decisions/backlogs live per discipline under `memory/<d
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 All green before any merge; each rides the runner:
-- `memory/` hygiene (11 checks) — `tools/memory-tree/check-memory-hygiene.sh`
+- `memory/` hygiene (12 checks) — `tools/memory-tree/check-memory-hygiene.sh`
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
+- branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
 
 Wire into CI by running `tools/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a
-follow-up). A tracked pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`).
+follow-up). A tracked pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`) — it
+also enforces the §3 branch guard (refuses a primary-tree commit off the default branch; pin with
+`GOV_DEFAULT_BRANCH`, override with `--no-verify`).
 
 ## Conventions
 

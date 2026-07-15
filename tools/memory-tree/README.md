@@ -2,7 +2,7 @@
 
 A project-agnostic kit that turns the governance playbook's §5/§6 memory-and-decisions *principles*
 into a concrete, gated folder structure: one `memory/` tree organised by development discipline, with
-per-feature `builds/` folders, index budgets + rotation, a status vocabulary, and an 11-check hygiene
+per-feature `builds/` folders, index budgets + rotation, a status vocabulary, and a 12-check hygiene
 gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
 re-deriving what memory already records.
 

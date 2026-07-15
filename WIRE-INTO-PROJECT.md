@@ -224,8 +224,13 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 Only if the project runs multiple nodes/worktrees (playbook §3):
 - A `new-stream` script (sibling worktree on a fresh branch off fast-forwarded `main` + dependency
   install) → fill `{{WORKTREE_SCRIPT}}`.
-- The tracked pre-commit **branch guard** (refuse a primary-tree commit while off the default branch) + its
-  per-node install script.
+- The tracked pre-commit **branch guard** (refuse a primary-tree commit while off the default branch).
+  coding-governance ships a portable reference block in its own `.githooks/pre-commit` (default branch
+  derived from `origin/HEAD`, else `main`; pin via `GOV_DEFAULT_BRANCH`; only fires in the primary tree,
+  not linked worktrees; red/green self-test `.githooks/pre-commit.test.sh`) — copy that block into the
+  project's pre-commit. For a multi-worktree project, also add a per-machine install that points
+  `core.hooksPath` at an **out-of-tree copy** under `$(git rev-parse --git-common-dir)`, so a branch that
+  lacks `.githooks/` can't render the guard inert.
 - Optionally a SessionStart hook that nudges `/session-kickoff` and reports `git worktree list` state.
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
