@@ -16,7 +16,8 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
 - **`tools/`** — the copy-in kits: `memory-tree/`, `codebase-map/`, `hooks/agent-cap.js`,
-  `workflows/tier2-review.js`, `agent-instructions/`, and the `check-template-size.sh` gate.
+  `workflows/tier2-review.js`, `agent-instructions/`, the `check-template-size.sh` gate, and
+  `check-wiring.sh` (detects/auto-wires installed-but-unwired tools; SessionStart-driven).
 - **`WIRE-INTO-PROJECT.md`** — the agent runbook for wiring the whole chain into a target repo.
 
 ## Layout
@@ -47,12 +48,15 @@ All green before any merge; each rides the runner:
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
+- wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
 
 Wire into CI by running `tools/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a
 follow-up). A tracked pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`) — it
 also enforces the §3 branch guard (refuses a primary-tree commit off the default branch; pin with
-`GOV_DEFAULT_BRANCH`, override with `--no-verify`).
+`GOV_DEFAULT_BRANCH`, override with `--no-verify`). A SessionStart hook in `.claude/settings.json`
+runs `tools/check-wiring.sh --session`, which auto-sets an unset `core.hooksPath` (never clobbers a
+set value) so a fresh clone self-heals instead of running with dormant gates.
 
 ## Conventions
 

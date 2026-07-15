@@ -25,6 +25,7 @@ leg "agent-cap self-test"             bash tools/hooks/agent-cap.test.sh
 leg "agent-instructions self-test"    bash tools/agent-instructions/adopt-agent-instructions.test.sh
 leg "memory-hygiene self-test"        bash tools/memory-tree/check-memory-hygiene.test.sh
 leg "branch-guard self-test"          bash .githooks/pre-commit.test.sh
+leg "check-wiring self-test"          bash tools/check-wiring.test.sh
 leg "codebase-map kit selftest"       "$PYBIN" tools/codebase-map/selftest.py
 leg "settings-merge selftest"         "$PYBIN" tools/settings-merge.py --selftest
 

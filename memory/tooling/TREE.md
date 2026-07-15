@@ -8,3 +8,4 @@ memory/tooling/
   BACKLOG.md
   builds/
     2026-07-15-TOOL-aRuledParchment/
+    2026-07-15-TOOL-aWireWarden/
