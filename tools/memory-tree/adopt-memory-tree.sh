@@ -37,6 +37,7 @@ fi
 mkdir -p "$M/project/journal"
 # root index + rules
 if [ -f "$HERE/HYGIENE.template.md" ]; then cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
+if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.template.md" "$M/TEMPLATE-SPEC.md"; fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md). Generated tree: [TREE.md](TREE.md)."; echo
   echo "## Disciplines"; echo
@@ -70,3 +71,5 @@ echo "  1. git add $M/ .memory-tree.conf && commit."
 echo "  2. Wire the gate: add 'bash memory-tree/check-memory-hygiene.sh' to CI + your local gate runner;"
 echo "     add a pre-commit fast leg calling it with --staged on staged $M/** paths."
 echo "  3. Verify: bash memory-tree/check-memory-hygiene.sh ; echo \$?   (expect 0)"
+echo "  4. Arm the spec-format ratchet: set SPEC_FORMAT_CUTOFF=<today> in .memory-tree.conf"
+echo "     (every spec dated >= it must follow $M/TEMPLATE-SPEC.md — hygiene check 12)."

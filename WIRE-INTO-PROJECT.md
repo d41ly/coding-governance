@@ -101,6 +101,8 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
    Edit `.memory-tree.conf`: `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
    (`discipline:FAMILY`, MUST match the playbook's `{{ID_FAMILIES}}`) · `TOMBSTONE_ROOTS` (blank for a
    fresh tree; set to the old root only when migrating an existing docs tree — see `memory-tree/README.md`).
+   Arm the spec-format ratchet: `SPEC_FORMAT_CUTOFF=<adoption date>` — specs dated ≥ it must follow
+   `memory/TEMPLATE-SPEC.md` (hygiene check 12); older specs stay grandfathered by filename date.
 2. Scaffold + verify:
    ```bash
    cd <project>

@@ -124,7 +124,9 @@ on the three that prevent mid-build churn:
 - **Risk tier**, if the project defines tiers. Generic heuristic when it doesn't: a new write
   path / data migration / auth·sanitization·egress surface / shared-contract change is
   high-risk → the DoR is a **design pass**: written spec (goal · scope · non-goals ·
-  acceptance) approved BEFORE building, recorded per the project's plan convention.
+  acceptance) approved BEFORE building, recorded per the project's plan convention. When the
+  project's memory kit ships `TEMPLATE-SPEC.md`, the spec follows it (status header + nine
+  canonical sections; hygiene check 12).
 
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify

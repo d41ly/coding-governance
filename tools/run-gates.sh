@@ -15,7 +15,7 @@ leg() { # name · command...
   else fails=$((fails+1)); printf 'GATE FAIL  %s (exit %d)\n' "$name" "$rc"; printf '%s\n' "$out" | sed 's/^/    /'; fi
 }
 
-leg "memory hygiene (11 checks)"      bash tools/memory-tree/check-memory-hygiene.sh
+leg "memory hygiene (12 checks)"      bash tools/memory-tree/check-memory-hygiene.sh
 leg "kickoff-manifest ratchet"        bash skills/session-kickoff/manifest-check.sh
 leg "template size <=32KiB"           bash tools/check-template-size.sh
 leg "kit version markers"             bash tools/check-kit-versions.sh
@@ -23,6 +23,7 @@ leg "agent-instructions wiring"       bash tools/agent-instructions/adopt-agent-
 leg "manifest-check self-test"        bash skills/session-kickoff/manifest-check.test.sh
 leg "agent-cap self-test"             bash tools/hooks/agent-cap.test.sh
 leg "agent-instructions self-test"    bash tools/agent-instructions/adopt-agent-instructions.test.sh
+leg "memory-hygiene self-test"        bash tools/memory-tree/check-memory-hygiene.test.sh
 leg "codebase-map kit selftest"       "$PYBIN" tools/codebase-map/selftest.py
 leg "settings-merge selftest"         "$PYBIN" tools/settings-merge.py --selftest
 

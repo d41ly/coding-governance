@@ -59,7 +59,7 @@ _render_root() {
   printf '%s\n' "$HEADER"
   printf '# %s/ — generated root tree index\n\n' "$M"
   printf '%s/\n' "$M"
-  for f in README.md TREE.md HYGIENE.md; do [ -f "$M/$f" ] && printf '  %s\n' "$f"; done
+  for f in README.md TREE.md HYGIENE.md TEMPLATE-SPEC.md; do [ -f "$M/$f" ] && printf '  %s\n' "$f"; done
   for d in project ${MAP_SUB:+$MAP_SUB} $DISCIPLINES; do
     git ls-files "$M/$d/*" | grep -q . && printf '  %s/\n' "$d"
   done

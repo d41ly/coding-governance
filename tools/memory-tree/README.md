@@ -15,10 +15,12 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 11 checks, grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 12 checks, grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `gen-memory-tree.sh` | deterministic `TREE.md` generator (`--write` / `--check`); check 9 calls it. |
 | `adopt-memory-tree.sh` | `--scaffold` an empty, passing tree from the config (new projects). |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
+| `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
+| `check-memory-hygiene.test.sh` | fixture self-test for check 12 (red + green classes in a scratch repo). |
 
 ## Configure
 
@@ -27,6 +29,7 @@ Copy `.memory-tree.conf.example` to your repo root as `.memory-tree.conf` and ed
 - `DISCIPLINES` — your development streams (add one only when content exists — no empty folders).
 - `FAMILIES` — `discipline:FAMILY` pairs; FAMILY is the id-family prefix and the required build-folder FAMILY.
 - `TOMBSTONE_ROOTS` — set to the old tree you migrated FROM (e.g. `docs`) so it can't resurrect; blank otherwise.
+- `SPEC_FORMAT_CUTOFF` — the date you adopt the kit; specs dated ≥ it must follow `TEMPLATE-SPEC.md` (check 12). Blank disables the check; older specs are grandfathered by filename date either way.
 
 Disciplines are yours to name. A SWEBOK v4 mapping is a reasonable default lens (Software Architecture,
 Construction, Testing, Security, Operations, …), but product streams (as inCMS uses) work equally well —

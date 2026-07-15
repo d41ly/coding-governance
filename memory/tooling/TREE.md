@@ -6,3 +6,5 @@ memory/tooling/
   TREE.md
   DECISIONS.md
   BACKLOG.md
+  builds/
+    2026-07-15-TOOL-aRuledParchment/

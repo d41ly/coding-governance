@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@1.0 -->
+<!-- gov:kit memory-tree@1.1 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -15,6 +15,7 @@ memory/
 ├── README.md              root index (one-liners)
 ├── TREE.md                generated directory tree (tools/memory-tree/gen-memory-tree.sh)
 ├── HYGIENE.md             this file
+├── TEMPLATE-SPEC.md       the canonical spec/design-pass format (check 12; ships with the kit)
 ├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes, 2 ratchet manifests
 └── <discipline>/          one per DISCIPLINES entry
     ├── README.md          structure explainer (+ an optional SWEBOK KA tag)
@@ -64,6 +65,8 @@ Every backlog / STATUS row leads with exactly one token of
 (a prose mention of one of these words elsewhere on the line does not count). Distinct from the
 session-ledger vocabulary (`in-flight | merged | pushed:<sha>`, IN-FLIGHT.md). New-entry dash form:
 `- <id> · <STATUS> · <one-liner>[ → <pointer>]`.
+Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle meanings — see
+`TEMPLATE-SPEC.md`.
 
 ## The grandfather ratchet
 
@@ -92,6 +95,11 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
+12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
+    (any depth under `spec/`) carry the `**Status:**` header (token · rev · date · node · tier ·
+    base sha); Tier-2 adds exactly the nine canonical `##` sections, non-empty bodies,
+    header-rev-in-§9 parity, and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
+    placeholders and a bare WONTDO tail (`TEMPLATE-SPEC.md`). Older specs grandfathered by filename date.
 
 ## Codebase-map interop
 

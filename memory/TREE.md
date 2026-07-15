@@ -5,6 +5,7 @@ memory/
   README.md
   TREE.md
   HYGIENE.md
+  TEMPLATE-SPEC.md
   project/
   playbook/
   kickoff/

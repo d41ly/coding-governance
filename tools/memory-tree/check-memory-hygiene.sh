@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Structured-memory-tree hygiene gate — the mechanized form of <MEMORY_ROOT>/HYGIENE.md.
-# Config-driven (.memory-tree.conf: MEMORY_ROOT, DISCIPLINES, FAMILIES, TOMBSTONE_ROOTS). Single source
+# Config-driven (.memory-tree.conf: MEMORY_ROOT, DISCIPLINES, FAMILIES, TOMBSTONE_ROOTS,
+# SPEC_FORMAT_CUTOFF). Single source
 # of truth: HYGIENE.md's "Check" section, CI, the pre-commit hook, and the local gate runner all invoke
 # THIS script — never hand-copy the checks. Part of the coding-governance memory-tree kit.
 #
@@ -9,13 +10,14 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=1.0   # gov:kit memory-tree@1.0 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=1.1   # gov:kit memory-tree@1.1 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
 DISCIPLINES="architecture deployment blocks design performance"
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.g. "docs"); blank = skip check 11
+SPEC_FORMAT_CUTOFF=""  # YYYY-MM-DD; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -39,7 +41,17 @@ in_debt()   { printf '%s\n' "$DEBT"   | grep -qxF "$1"; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
-_unfenced() { awk '/^[[:space:]]*(```|~~~)/ { f=!f; next } !f' "$1"; }
+# CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
+# inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
+# smudge read by WSL/Linux bash) compare equal to LF sources.
+_unfenced() { awk '
+  { sub(/\r$/, "") }
+  /^[[:space:]]*(```|~~~)/ {
+    m = ($0 ~ /^[[:space:]]*```/) ? "```" : "~~~"
+    if (f == "") { f = m; next }
+    if (m == f) { f = ""; next }
+  }
+  f == ""' "$1"; }
 
 if [ "$STAGED" = 1 ]; then STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR -- "$M/**" | LC_ALL=C sort); fi
 in_scope() { [ "$STAGED" = 0 ] && return 0; printf '%s\n' "$STAGED_MD" | grep -qxF "$1"; }
@@ -57,7 +69,7 @@ scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|de
 broken=$(printf '%s\n' "$scan2" | grep . | while IFS= read -r f; do
   in_legacy "$f" && continue
   d=$(dirname "$f")
-  awk '/^[[:space:]]*(```|~~~)/ { fence=!fence; next } !fence' "$f" \
+  _unfenced "$f" \
     | grep -oE '\]\([^)]+\.md[^)]*\)' | sed -E 's/^\]\(([^)#]+).*/\1/' \
     | while IFS= read -r t; do case "$t" in http*|/*) continue;; esac; [ -f "$d/$t" ] || echo "$f -> $t (MISSING)"; done
 done)
@@ -68,7 +80,7 @@ $broken"
 disc_re=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)
 root1=$(printf '%s\n' "$FILES" | awk -F/ '{ if (NF==2) print "F:"$2; else print "D:"$2 }' | LC_ALL=C sort -u)
 bad3=$(printf '%s\n' "$root1" | grep . | while IFS= read -r e; do case "$e" in
-  F:README.md|F:TREE.md|F:HYGIENE.md|D:project) ;;
+  F:README.md|F:TREE.md|F:HYGIENE.md|F:TEMPLATE-SPEC.md|D:project) ;;
   D:*) d="${e#D:}"; { printf '%s\n' $DISCIPLINES | grep -qxF "$d" || [ "$d" = "$MAP_SUB" ]; } || echo "$M/$d";;
   *) echo "$M/${e#*:}";; esac; done)
 for disc in $DISCIPLINES; do
@@ -199,6 +211,65 @@ for old in $TOMBSTONE_ROOTS; do
 $(git ls-files "$old/" | head)"
   fi
 done
+
+# 12 — spec format ($M/TEMPLATE-SPEC.md; runs only when SPEC_FORMAT_CUTOFF is set in the conf).
+# Status header (first 5 unfenced lines) for every spec incl. nested spec/<sub>/ files. Tier-2 adds:
+# the canonical nine ## sections (exact, in order) · no empty section bodies (write "N/A — <why>") ·
+# header rev logged in §9 · terminal Status (CLOSED/WONTDO) needs a resolved §8. Both tiers: no
+# skeleton placeholders; WONTDO needs a successor/reason in the header tail. Tier-1 skips the
+# section canon ("ceremony is conditional"). Pre-cutoff specs are grandfathered by FILENAME date;
+# legacy-named files never match the glob. NOTE (shared idiom with checks 6/7/8): reads WORKTREE
+# content in --staged mode, not the staged blob — CI's full run is the tree-wide truth.
+if [ -n "$SPEC_FORMAT_CUTOFF" ]; then
+SPEC_CANON='## 1. Goal
+## 2. Scope (IN)
+## 3. Non-goals (OUT)
+## 4. Design
+## 5. Production-readiness checklist
+## 6. Acceptance criteria
+## 7. Gates
+## 8. Open questions
+## 9. Revision log'
+bad12=$(printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$" | while IFS= read -r f; do
+  base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
+  [ "$d" \< "$SPEC_FORMAT_CUTOFF" ] && continue
+  in_scope "$f" || continue
+  [ -f "$f" ] || { echo "$f (tracked but missing from worktree)"; continue; }
+  body=$(_unfenced "$f")
+  hdr=$(printf '%s\n' "$body" | head -5 | grep -E '^\*\*Status:\*\* ' | head -1)
+  if ! printf '%s' "$hdr" | grep -qE '^\*\*Status:\*\* (OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO) · rev-[0-9]+ · [0-9]{4}-[0-9]{2}-[0-9]{2} · node [a-z] · Tier-[12] · base [0-9a-f]{8}'; then
+    echo "$f (missing/invalid **Status:** header in lines 1-5)"
+    continue      # header unparseable — the per-field assertions below have no anchor
+  fi
+  printf '%s\n' "$body" | grep -qE '<FAMILY-slug-seq>|YYYY-MM-DD' && echo "$f (unfilled skeleton placeholder)"
+  case "$hdr" in
+    '**Status:** WONTDO'*) printf '%s' "$hdr" | grep -qE 'base [0-9a-f]{8,} · .' \
+      || echo "$f (WONTDO needs a successor id or reason pointer in the header tail)";;
+  esac
+  case "$hdr" in *'Tier-1'*) continue;; esac
+  # ---- Tier-2 body assertions ----
+  got=$(printf '%s\n' "$body" | grep -E '^## ' || true)
+  if [ "$got" != "$SPEC_CANON" ]; then
+    echo "$f (## sections differ from the canonical nine of $M/TEMPLATE-SPEC.md):"
+    diff <(printf '%s\n' "$SPEC_CANON") <(printf '%s\n' "$got") | head -6 | sed 's/^/    /'
+  fi
+  empty=$(printf '%s\n' "$body" | awk '/^## /{ if (s != "" && n == 0) print "    " s; s = $0; n = 0; next } s != "" && NF > 0 { n++ } END { if (s != "" && n == 0) print "    " s }')
+  [ -n "$empty" ] && echo "$f (section with an empty body — write N/A — <why>):
+$empty"
+  hrev=${hdr#*· rev-}; hrev=${hrev%% *}
+  lrev=$(printf '%s\n' "$body" | sed -n '/^## 9\. Revision log/,$p' | grep -oE 'rev-[0-9]+' | sed 's/rev-//' | sort -n | tail -1)
+  if [ -z "$lrev" ] || [ "$hrev" -gt "$lrev" ] 2>/dev/null; then
+    echo "$f (header rev-$hrev not logged in the §9 Revision log)"
+  fi
+  case "$hdr" in
+    '**Status:** CLOSED'*|'**Status:** WONTDO'*)
+      q8=$(printf '%s\n' "$body" | sed -n '/^## 8\. Open questions/,/^## 9\. /p' | sed '1d;$d' | grep -vE '^[[:space:]]*$' | head -1)
+      case "$q8" in none*|N/A*|'') ;; *) echo "$f (terminal Status with unresolved §8 Open questions)";; esac;;
+  esac
+done)
+[ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
+$bad12"
+fi
 
 # grandfather stale-line guards (a listed path that no longer exists fails).
 badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do git ls-files --error-unmatch "$p" >/dev/null 2>&1 || echo "$p"; done)

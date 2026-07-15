@@ -14,3 +14,9 @@ DISCIPLINES="architecture deployment blocks design performance"
 # (e.g. ARCH-<slug>-<seq>) AND the FAMILY a build folder under that discipline must carry
 # (builds/YYYY-MM-DD-<FAMILY>-<slug>/). Space-separated, FAMILY uppercase [A-Z].
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
+
+# Spec-format ratchet (hygiene check 12). Set to the date you adopt the kit (YYYY-MM-DD): every
+# spec file whose FILENAME date is >= this must follow <MEMORY_ROOT>/TEMPLATE-SPEC.md (status
+# header; nine canonical sections + body assertions for Tier-2). Older specs are grandfathered by
+# filename date — never retrofit them. Blank = check 12 disabled.
+SPEC_FORMAT_CUTOFF=""
