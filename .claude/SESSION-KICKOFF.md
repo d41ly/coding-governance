@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-07-15T15:18:43+03:00 @ 06f5632fb52607c2b0d07711cc40dc367cd768df
+last-audit: 2026-07-16T05:12:30+03:00 @ 78b23be6c01d9e00f5ba27dcedf624e783edd133
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -46,7 +46,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates.sh    # runs all legs: hygiene · manifest ratchet · template-size · kit self-tests · agent-instructions wiring
+bash tools/run-gates.sh    # runs all legs: hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring
 ```
 
 ### Tier rule
@@ -76,3 +76,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The `agent-cap` PreToolUse hook caps Workflow fan-out at 4 concurrent — route fan-out through the cap-4 helpers.
+- Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
+  NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
+  decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides
+  normalized through the same `cd … && pwd` chain.

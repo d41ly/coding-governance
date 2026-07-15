@@ -30,26 +30,26 @@ for a in "$@"; do
   esac
 done
 
-# Resolve a path argument: repo-root-relative first, then caller-cwd-relative; never outside the repo.
+# Resolve a path argument: repo-root-relative first, then caller-cwd-relative; never outside the
+# repo. Membership is decided by git identity (file's toplevel == this ROOT, both normalized the
+# same way), never by path-string comparison — under MSYS one directory has two spellings
+# (/tmp/x vs /c/.../Temp/x) and realpath can't unify them (mount points aren't symlinks).
 if [ -n "$MF" ]; then
-  abs=""
   case "$MF" in
     /*|[A-Za-z]:*) abs="$MF" ;;
-    *) if [ -f "$ROOT/$MF" ]; then abs=""; else abs="$CALLER_PWD/$MF"; fi ;;
+    *) if [ -f "$ROOT/$MF" ]; then abs="$ROOT/$MF"; else abs="$CALLER_PWD/$MF"; fi ;;
   esac
-  if [ -n "$abs" ]; then
-    [ -f "$abs" ] || { echo "MANIFEST env ERROR — '$MF' not found (tried the repo root, then $CALLER_PWD)"; exit 2; }
-    rel=$(realpath --relative-to="$ROOT" "$abs" 2>/dev/null) || rel=""
-    if [ -n "$rel" ] && [ -f "$ROOT/$rel" ]; then
-      case "$rel" in ..|../*) echo "MANIFEST env ERROR — '$MF' resolves outside this repository"; exit 2 ;; esac
-      MF="$rel"
-    else
-      case "$abs" in
-        "$ROOT"/*) MF="${abs#"$ROOT"/}" ;;
-        *) echo "MANIFEST env ERROR — '$MF' resolves outside this repository"; exit 2 ;;
-      esac
-    fi
+  [ -f "$abs" ] || { echo "MANIFEST env ERROR — '$MF' not found (tried the repo root, then $CALLER_PWD)"; exit 2; }
+  dir=$(cd "$(dirname -- "$abs")" 2>/dev/null && pwd) || dir=""
+  froot=""
+  if [ -n "$dir" ]; then
+    froot=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || froot=""
+    [ -n "$froot" ] && { froot=$(cd "$froot" 2>/dev/null && pwd) || froot=""; }
   fi
+  if [ -z "$froot" ] || [ "$froot" != "$ROOT" ]; then
+    echo "MANIFEST env ERROR — '$MF' resolves outside this repository"; exit 2
+  fi
+  MF="$(git -C "$dir" rev-parse --show-prefix 2>/dev/null)$(basename -- "$abs")"
 else
   for p in docs/claude/SESSION-KICKOFF.md docs/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md SESSION-KICKOFF.md; do
     [ -f "$p" ] && { MF="$p"; break; }

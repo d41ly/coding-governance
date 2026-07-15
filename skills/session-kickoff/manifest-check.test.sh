@@ -363,6 +363,13 @@ mv "$R/SESSION-KICKOFF.md" "$R/docs/SESSION-KICKOFF.md"
 commit_all "$R" manifest
 run "relative arg from subdir resolves" "$R/docs" 0 - "SESSION-KICKOFF.md"
 
+# ---- 34b outside-repo path argument → env error 2 (relative ../ and absolute)
+mkrepo escapearg
+echo x > "$TMP/SESSION-KICKOFF.md"          # sibling of the repo, outside it
+run "relative ../ arg escaping repo → 2" "$R" 2 "resolves outside" "../SESSION-KICKOFF.md"
+run "absolute arg outside repo → 2" "$R" 2 "resolves outside" "$TMP/SESSION-KICKOFF.md"
+rm -f "$TMP/SESSION-KICKOFF.md"
+
 # ---- 35 unit-branch: bundle at merge-base anchor, then same-anchor re-stamp
 mkrepo branchunit
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
