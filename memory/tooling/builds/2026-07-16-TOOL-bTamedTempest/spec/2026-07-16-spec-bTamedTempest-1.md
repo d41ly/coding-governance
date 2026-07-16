@@ -1,6 +1,6 @@
 # TOOL-bTamedTempest-1 — pytest-parallel-guardrails kit: bounded, attributable parallel test runs
 
-**Status:** INPROGRESS · rev-2 · 2026-07-16 · node b · Tier-2 · base 770a1aa3 · review wf_d878c8a9-bb3
+**Status:** CLOSED · rev-2 · 2026-07-16 · node b · Tier-2 · base 770a1aa3 · review wf_d878c8a9-bb3 · landed c2f608e7
 
 ## 1. Goal
 
@@ -213,15 +213,10 @@ the record, not a byte-for-byte source.
 
 ## 8. Open questions
 
-- Q1 — aiosqlite version guard in the seam snippet: fail-closed or warn?
-  Options: (a) raise at import outside `0.22.x` — safest but breaks adopter suites on any future
-  patch release; (b) `warnings.warn` once and proceed — visible, never breaks a green suite whose
-  own forced-race gate still passes. Recommendation: (b); the adopter-run gate is the real check.
-  RESOLVED (owner-delegated flow, 2026-07-16): (b) warn.
-- Q2 — mention the kit in `WIRE-INTO-PROJECT.md` now, or on first external adoption?
-  Options: (a) one optional-step line now — runbook stays complete; (b) defer — runbook only
-  documents the mandatory chain. Recommendation: (a); one line, no ordering impact.
-  RESOLVED (owner-delegated flow, 2026-07-16): (a) one optional-step line now.
+none — both forks resolved before landing (owner-delegated flow, 2026-07-16): Q1 aiosqlite
+version guard → warn-only (`warnings.warn`, never a failure; the adopter-run forced-race gate is
+the real check on a new release); Q2 WIRE-INTO-PROJECT mention → one optional-step line now.
+Full option text in rev-1 (git history) and the §9 rev-2 line.
 
 ## 9. Revision log
 
