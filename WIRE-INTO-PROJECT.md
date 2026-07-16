@@ -221,6 +221,10 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 
 ## 5 — Optional: worktree tooling + SessionStart nudge
 
+Optional for any pytest project: adopt `tools/pytest-parallel-guardrails/` (bounded + attributable
+`pytest-xdist` runs; aiosqlite suites also get the closed-loop seam patch + its regression gate) —
+adoption steps in that kit's README; no wiring beyond the adopter's own `pyproject.toml`/conftest.
+
 Only if the project runs multiple nodes/worktrees (playbook §3):
 - A `new-stream` script (sibling worktree on a fresh branch off fast-forwarded `main` + dependency
   install) → fill `{{WORKTREE_SCRIPT}}`.

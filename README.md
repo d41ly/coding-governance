@@ -32,6 +32,12 @@ machines/sessions on the same repo.
   gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
   across repos. Scaffold a fresh tree with `adopt-memory-tree.sh --scaffold`, or migrate an existing
   one in a single landing. See `tools/memory-tree/README.md`. Operationalizes the playbook's §5/§6.
+- **`tools/pytest-parallel-guardrails/`** — bounded, attributable pytest-xdist runs: the four-knob
+  ini recipe (`timeout` / `session_timeout` / `--max-worker-restart=0` / `faulthandler_timeout`,
+  each documented by what it mechanically does), the `crashprobe.py` worker-death attribution
+  plugin (a dead worker names its victim test and death mode — timeout-kill vs native crash),
+  and the aiosqlite closed-loop seam patch + deterministic forced-race regression gate. See
+  `tools/pytest-parallel-guardrails/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
   script calling raw `parallel(`/`pipeline(` instead of the cap-4 `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. Cap overridable via env

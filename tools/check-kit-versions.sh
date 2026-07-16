@@ -33,6 +33,19 @@ if [ -z "$c" ] || ! grep -qE "gov:kit memory-tree@$c([^0-9.]|\$)" tools/memory-t
   fails=$((fails+1))
 fi
 
+need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
+
+# pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
+# hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each
+# artifact adopters KEEP. Assert the constant and every marker agree (memory-tree-pair style).
+g=$(tr -d '\r' < tools/pytest-parallel-guardrails/crashprobe.py | grep -oE "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\"" | head -1 | grep -oE "$V")
+for kept in README.md pyproject-snippet.toml aiosqlite-seam-conftest.py aiosqlite_worker_resilience.test-template.py; do
+  if [ -z "$g" ] || ! grep -qE "gov:kit pytest-parallel-guardrails@$g([^0-9.]|\$)" "tools/pytest-parallel-guardrails/$kept"; then
+    echo "kit-versions: pytest-parallel-guardrails marker in $kept != constant (${g:-unreadable})"
+    fails=$((fails+1))
+  fi
+done
+
 [ "$fails" = 0 ] && exit 0
 echo "kit-versions: $fails problem(s)"
 exit 1
