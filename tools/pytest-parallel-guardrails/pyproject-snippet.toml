@@ -1,0 +1,33 @@
+# gov:kit pytest-parallel-guardrails@1.0
+#
+# The four-knob parallel-suite guardrail recipe — merge into your [tool.pytest.ini_options].
+# Requires: pytest-timeout, pytest-xdist. Full rationale + diagnosis playbook: the kit README.
+#
+# SIZING (do this, don't cargo-cult): measure your slowest legitimate test (`--durations=10`) and
+# set `timeout` to roughly 7-10x it. The values below fit a suite whose slowest test is ~40 s.
+# `faulthandler_timeout` must stay BELOW `timeout` so the stack dump lands before the kill.
+
+[tool.pytest.ini_options]
+# Per-test bound — the ONLY hang bound in this recipe. On any platform without SIGALRM (Windows
+# always; `thread` method everywhere) expiry ends the PROCESS via os._exit(1), which xdist
+# reports as "worker 'gwN' crashed while running '<test>'". That kill is accepted and bounded;
+# what must never happen is an unbounded wedge.
+timeout = 300
+timeout_method = "thread"
+
+# Between-tests budget ONLY — NOT a hang bound of any kind. pytest-timeout arms no timer for it;
+# expiry is compared only AFTER a test's runtest protocol completes, so a wedged test (or a
+# wedged xdist distribution layer) never reaches the check. All this does is turn a
+# slow-but-COMPLETING run red at the budget instead of letting it run away.
+session_timeout = 1800
+
+# The actual distribution-deadlock breaker: a dead worker FAILS THE RUN FAST instead of
+# respawning into an IPC state the controller may never recover (observed: an hour at 0 CPU
+# across 14 processes). Trade-off: also disables xdist's retry, so a transient worker death
+# reds the run with no auto-retry.
+addopts = "--max-worker-restart=0"
+
+# Below `timeout` so every hang dumps all thread stacks BEFORE the kill, through pytest's saved
+# stderr dup — a channel that survives execnet's worker fd redirection. The victim test names
+# itself instead of vanishing.
+faulthandler_timeout = 240

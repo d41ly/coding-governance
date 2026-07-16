@@ -9,3 +9,4 @@ memory/tooling/
   builds/
     2026-07-15-TOOL-aRuledParchment/
     2026-07-15-TOOL-aWireWarden/
+    2026-07-16-TOOL-bTamedTempest/

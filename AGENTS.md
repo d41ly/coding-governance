@@ -16,8 +16,11 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
 - **`tools/`** — the copy-in kits: `memory-tree/`, `codebase-map/`, `hooks/agent-cap.js`,
-  `workflows/tier2-review.js`, `agent-instructions/`, the `check-template-size.sh` gate, and
-  `check-wiring.sh` (detects/auto-wires installed-but-unwired tools; SessionStart-driven).
+  `workflows/tier2-review.js`, `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
+  attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
+  attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
+  `check-template-size.sh` gate, and `check-wiring.sh` (detects/auto-wires
+  installed-but-unwired tools; SessionStart-driven).
 - **`WIRE-INTO-PROJECT.md`** — the agent runbook for wiring the whole chain into a target repo.
 
 ## Layout
@@ -47,7 +50,7 @@ All green before any merge; each rides the runner:
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
-- kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
+- kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`

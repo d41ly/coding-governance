@@ -42,6 +42,8 @@ risky surface or runs a Tier-2 review). Deploy this file alongside the playbook;
 - Never cache a degraded/failed response (rate-limit, 5xx, flag-off blip) as the permanent answer — mark degraded ≠ genuinely empty and skip caching it, or one transient failure suppresses the feature all session.
 - Stale async response race: guard success-path state writes with a request-identity check and abort superseded in-flight requests, or a late response clobbers fresher results.
 - Blocking/synchronous work on a hot path or event loop (I/O, DNS, heavy transforms) — find it and off-load it.
+- A parallel test runner can deadlock in its OWN distribution/IPC layer after a worker crash — a mode no per-test timeout can reach (it only arms while a test executes). Any `-n auto` suite needs a per-test timeout AND fail-fast on worker death (`--max-worker-restart=0`) AND a pre-kill stack dump (`faulthandler_timeout` below the per-test bound); on Windows a "worker crashed" is your own timeout's `os._exit` until proven otherwise, and a session budget only reds a slow-but-COMPLETING run — it bounds no hang.
+- A helper THREAD posting a result to a per-test event loop that already closed must not die trying (the aiosqlite class: a double `call_soon_threadsafe` raise escapes the worker loop, the thread dies, every later op on that connection hangs forever) — loop-side drains cannot win the race, so guard the post at the seam (drop the undeliverable delivery, keep the thread alive) and gate it with a test that FORCES the race deterministically.
 - Verify the COMPUTED value, never the declaration: styling/config declarations can silently resolve to nothing (conflicting caps, percentage sizes against indefinite bases, no-op utility values) — measure the rendered result.
 - Scale-to-fit frames measure their container SYNCHRONOUSLY at first commit (layout-effect/callback ref), never defaulting until a resize observer fires (unreliable in throttled/preview contexts); a CSS max-width cap fights the scale model (double-shrinks) — rely on the container's overflow clip, verify rendered width ≤ container at a narrow viewport.
 - A component defined inside another's render body mints a new type per parent render → full remount per keystroke (focus loss, un-typeable forms) — hoist to module scope.
@@ -59,6 +61,7 @@ risky surface or runs a Tier-2 review). Deploy this file alongside the playbook;
 - Prefer deterministic run modes (no auto-reload) where a watcher can leave stale processes/ports squatting.
 - POSIX-emulation shells on Windows (MSYS/Git-Bash/Cygwin) mangle backslash working-dir paths (`git -C C:\repo` → `fatal: cannot change to 'C:repo'`) — use forward-slash there; a zero-false-positive hook can block the broken form.
 - Package installs run from a POSIX-emulation shell can create broken links in the dependency tree — if it looks wrong, reinstall from the native shell.
+- Absence of crash evidence is only evidence where the reporter is on: parallel-test workers get fd 0/1 (Windows: fd 2 too) redirected to devnull, so banners and native tracebacks vanish; Windows Event Viewer records nothing when WER is disabled (`Disabled=1`), and an `os._exit` is not a fault so WER never records it anywhere — instrument the process itself (a probe log) before concluding "no crash".
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 
