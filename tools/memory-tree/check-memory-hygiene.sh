@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=1.1   # gov:kit memory-tree@1.1 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=1.2   # gov:kit memory-tree@1.2 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -36,8 +36,15 @@ status=0
 FILES=$(git ls-files "$M/")
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
-in_legacy() { printf '%s\n' "$LEGACY" | grep -qxF "$1"; }
-in_debt()   { printf '%s\n' "$DEBT"   | grep -qxF "$1"; }
+# Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
+# call, and these run once per scanned file (minutes on a large adopter tree; a fork is ~50-100ms
+# under MSYS/Windows). Exact-key lookup is semantically identical (fixed string, whole line) and
+# costs zero processes. (Upstream: inCMS ARCH-aFencedNamespace-3.)
+declare -A LEGACY_SET DEBT_SET
+while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
+while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
+in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
+in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
@@ -53,8 +60,12 @@ _unfenced() { awk '
   }
   f == ""' "$1"; }
 
-if [ "$STAGED" = 1 ]; then STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR -- "$M/**" | LC_ALL=C sort); fi
-in_scope() { [ "$STAGED" = 0 ] && return 0; printf '%s\n' "$STAGED_MD" | grep -qxF "$1"; }
+declare -A STAGED_SET
+if [ "$STAGED" = 1 ]; then
+  STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR -- "$M/**" | LC_ALL=C sort)
+  while IFS= read -r _l; do [ -n "$_l" ] && STAGED_SET["$_l"]=1; done <<<"$STAGED_MD"
+fi
+in_scope() { [ "$STAGED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
 
 # 1 — prompt placement: prompt-kind files only under builds/*/prompts/ or archive/.
 c1=$(printf '%s\n' "$FILES" \
@@ -66,13 +77,43 @@ $c1"
 # 2 — link integrity (exempt DECISIONS.md / decisions/ / archive/ / TREE.md and legacy-listed recording files).
 scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|decisions/|archive/|TREE\.md$)')
 [ "$STAGED" = 1 ] && scan2=$(printf '%s\n' "$scan2" | { grep -xF -f <(printf '%s\n' "$STAGED_MD") || true; })
-broken=$(printf '%s\n' "$scan2" | grep . | while IFS= read -r f; do
+# Drop grandfathered files first (fork-free), then extract every candidate link in ONE awk pass over
+# all remaining files — was `_unfenced | grep -oE | sed -E` PER FILE (3 forks × N files; the single
+# biggest cost on a large adopter tree — upstream inCMS ARCH-aFencedNamespace-3). The awk inlines
+# _unfenced's exact semantics (CR strip + marker-matched fences, state reset per file) and the
+# grep+sed link shape INCLUDING the sed fall-through (an anchor-only `](#x.md)` stays as-is).
+scan2f=""
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
   in_legacy "$f" && continue
-  d=$(dirname "$f")
-  _unfenced "$f" \
-    | grep -oE '\]\([^)]+\.md[^)]*\)' | sed -E 's/^\]\(([^)#]+).*/\1/' \
-    | while IFS= read -r t; do case "$t" in http*|/*) continue;; esac; [ -f "$d/$t" ] || echo "$f -> $t (MISSING)"; done
-done)
+  scan2f+="$f"$'\n'
+done <<<"$scan2"
+broken=$(awk '
+  { f = $0; if (f == "") next
+    fence = ""
+    while ((getline line < f) > 0) {
+      sub(/\r$/, "", line)
+      if (line ~ /^[[:space:]]*(```|~~~)/) {
+        m = (line ~ /^[[:space:]]*```/) ? "```" : "~~~"
+        if (fence == "") { fence = m; continue }
+        if (m == fence) { fence = ""; continue }
+      }
+      if (fence != "") continue
+      while (match(line, /\]\([^)]+\.md[^)]*\)/)) {
+        mm   = substr(line, RSTART, RLENGTH)
+        rest = substr(line, RSTART + RLENGTH)
+        t = mm
+        if (match(t, /^\]\([^)#]+/)) t = substr(t, 3, RLENGTH - 2)
+        print f "\t" t
+        line = rest
+      }
+    }
+    close(f)
+  }' <<<"$scan2f" | while IFS=$'\t' read -r f t; do
+    case "$t" in http*|/*) continue;; esac
+    d=${f%/*}                   # fork-free dirname — every path here starts "$M/", so it has a /
+    [ -f "$d/$t" ] || echo "$f -> $t (MISSING)"
+  done)
 [ -n "$broken" ] && fail 2 "broken relative .md links:
 $broken"
 
@@ -107,27 +148,42 @@ bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
 $bad3"
 
 # 4 — build-folder naming + FAMILY↔discipline pairing + internal shape.
+# One grep+awk PER DISCIPLINE — was a per-folder full-$FILES rescan + a per-entry grep, i.e.
+# O(build-folders × files): 82.5s of a 138s run on the upstream inCMS tree (137 folders / 1152 files;
+# PERF-eThriftyBellows-1 there). The awk groups build files by folder (git-ls-files input is
+# path-sorted, so folders and entries arrive in order), validates folder-name + FAMILY↔discipline +
+# entry-shape in-process, and insertion-sorts each folder's entry set so output byte-matches the old
+# `sort -u` (D: before F:, C byte order — hence LC_ALL=C). famalt/m come from the conf; the folder
+# field index derives from MEMORY_ROOT's segment count (the old hardcoded NF==5 mis-parsed a
+# multi-segment root). The `→` is the literal arrow byte, identical to the old message.
 bad4=""
 for disc in $DISCIPLINES; do
   fam=$(FAMILY_of "$disc")
-  folders=$(printf '%s\n' "$FILES" | grep -E "^$M/$disc/builds/[^/]+/" | sed -E "s#^$M/$disc/builds/([^/]+)/.*#\\1#" | LC_ALL=C sort -u)
-  for fld in $folders; do
-    [ -z "$fld" ] && continue
-    if ! printf '%s' "$fld" | grep -qE "^[0-9]{4}-[0-9]{2}-[0-9]{2}-($FAM_ALT)-[A-Za-z0-9][A-Za-z0-9-]*$"; then
-      bad4="$bad4
-$M/$disc/builds/$fld (bad folder name)"; continue
-    fi
-    ffam=$(printf '%s' "$fld" | sed -E "s/^[0-9-]+-($FAM_ALT)-.*/\\1/")
-    [ "$ffam" = "$fam" ] || bad4="$bad4
-$M/$disc/builds/$fld (FAMILY $ffam != $disc→$fam)"
-    ents=$(printf '%s\n' "$FILES" | grep -E "^$M/$disc/builds/$fld/" | awk -F/ '{ if (NF==5) print "F:"$5; else print "D:"$5 }' | LC_ALL=C sort -u)
-    b=$(printf '%s\n' "$ents" | grep . | while IFS= read -r e; do case "$e" in
-      F:README.md|F:STATUS.md|D:prompts|D:spec|D:build|D:reviews) ;;
-      F:*) n="${e#F:}"; printf '%s' "$n" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}-(prompt|spec|build|review)-[A-Za-z0-9]+-[0-9]+\.md$' || echo "$M/$disc/builds/$fld/$n";;
-      *) echo "$M/$disc/builds/$fld/${e#*:}";; esac; done)
-    bad4="$bad4
+  b=$(printf '%s\n' "$FILES" | grep -E "^$M/$disc/builds/[^/]+/" \
+    | LC_ALL=C awk -F/ -v m="$M" -v disc="$disc" -v fam="$fam" -v famalt="$FAM_ALT" '
+      BEGIN {
+        n_m = split(m, _seg, "/"); fidx = n_m + 3    # <m>/<disc>/builds/<folder>
+        vre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(" famalt ")-[A-Za-z0-9][A-Za-z0-9-]*$"
+      }
+      function flush(   n,i,j,k,keys,tmp,type,name,ffam) {
+        if (folder=="") return
+        if (folder !~ vre) {
+          print m "/" disc "/builds/" folder " (bad folder name)"; folder=""; delete ent; return }
+        ffam=folder; sub(/^[0-9-]+-/,"",ffam); sub(/-.*$/,"",ffam)   # a FAMILY token has no dash (id grammar)
+        if (ffam!=fam) print m "/" disc "/builds/" folder " (FAMILY " ffam " != " disc "→" fam ")"
+        n=0; for (k in ent) keys[++n]=k
+        for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
+        for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
+          if (k=="F:README.md"||k=="F:STATUS.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (type=="F"){ if (name !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-[A-Za-z0-9]+-[0-9]+\.md$/) print m "/" disc "/builds/" folder "/" name }
+          else print m "/" disc "/builds/" folder "/" name }
+        folder=""; delete ent
+      }
+      { if ($fidx!=folder){ flush(); folder=$fidx }
+        if (NF==fidx+1) ent["F:" $(fidx+1)]=1; else ent["D:" $(fidx+1)]=1 }
+      END { flush() }')
+  bad4="$bad4
 $b"
-  done
 done
 bad4=$(printf '%s\n' "$bad4" | grep . || true)
 [ -n "$bad4" ] && fail 4 "build-folder naming/shape:
@@ -136,9 +192,10 @@ $bad4"
 # 5 — recording-file naming (grandfather: legacy-files.txt).
 bad5=$(printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/(prompts|spec|build|reviews)/[^/]+\.md$" | while IFS= read -r f; do
   in_legacy "$f" && continue
-  base=$(basename "$f"); sub=$(printf '%s' "$f" | awk -F/ '{print $(NF-1)}')
+  # Fork-free basename/parent-dir + bash ERE (was basename + awk + grep = 3 forks per recording file).
+  base=${f##*/}; sub=${f%/*}; sub=${sub##*/}
   case "$sub" in prompts) kind=prompt;; spec) kind=spec;; build) kind=build;; reviews) kind=review;; esac
-  printf '%s' "$base" | grep -qE "^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-[A-Za-z0-9]+-[0-9]+\.md$" || echo "$f"
+  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-[A-Za-z0-9]+-[0-9]+\.md$ ]] || echo "$f"
 done)
 [ -n "$bad5" ] && fail 5 "recording-file names not matching YYYY-MM-DD-<kind>-<slug>-<seq>.md (and not grandfathered):
 $bad5"
@@ -155,13 +212,24 @@ index_set() {
     printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/STATUS\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
+INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
 
 # 6 — index size caps (grandfather: curation-debt.txt).
-bad6=$(index_set | while IFS= read -r f; do
-  in_debt "$f" && continue; in_scope "$f" || continue
-  b=$(wc -c <"$f"); l=$(wc -l <"$f")
-  { [ "$b" -gt 20480 ] || [ "$l" -gt 250 ]; } && echo "$f (${b}B ${l}L > 20480B/250L)"
-done)
+# Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
+# Findings emit in index_set order (the -l stream's arg order); multi-file wc `total` lines are
+# skipped by name; `+0` coerces the counts.
+sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+bad6=""
+if [ -n "$sel6" ]; then
+  cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
+  clines=$(printf '%s\n' "$sel6" | xargs -r wc -l)
+  bad6=$(awk '
+    FNR==NR { if ($NF!="total") b[$NF]=$1; next }
+    $NF=="total" { next }
+    { l[$NF]=$1; ord[++n]=$NF }
+    END { for(i=1;i<=n;i++){ f=ord[i]; if (b[f]+0>20480 || l[f]+0>250) printf "%s (%dB %dL > 20480B/250L)\n", f, b[f]+0, l[f]+0 } }
+  ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
+fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
 
@@ -169,7 +237,7 @@ $bad6"
 #     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
 ex7='(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
 [ -n "$MAP_SUB" ] && ex7="(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
-bad7=$(index_set | grep -vE "$ex7" | while IFS= read -r f; do
+bad7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
   in_debt "$f" && continue; in_scope "$f" || continue
   _unfenced "$f" | awk -v F="$f" 'length($0)>300 && $0 !~ /^#/ && $0 !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/ { print F":"FNR" ("length($0)" chars)" }'
 done)
@@ -177,13 +245,37 @@ done)
 $bad7"
 
 # 8 — status vocabulary on BACKLOG.md / STATUS.md (grandfather: curation-debt.txt).
-bad8=$( { for d in $DISCIPLINES; do echo "$M/$d/BACKLOG.md"; done; printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
-  [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue
-  _unfenced "$f" | grep -nE '^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]' | while IFS= read -r ln; do
-    n=$(printf '%s' "${ln#*:}" | grep -oE '([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)\b' | wc -l)
-    [ "$n" -ne 1 ] && echo "$f:${ln%%:*}"
-  done
-done)
+# One awk over the whole filtered file set (was _unfenced + grep -n PER file and a 3-fork
+# printf|grep -oE|wc -l PER row). nmatch() reproduces `grep -oE '…\b' | wc -l` EXACTLY: the
+# `^[[:space:]]*-` slot can only anchor once (caret pattern on the first match, no-caret thereafter),
+# and the trailing `\b` is checked ZERO-WIDTH (next char is end/non-word) so it never consumes a
+# following delimiter. uln counts the UNFENCED stream (== the old grep -n numbering). The two `·` in
+# the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
+# tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
+files8=$( { for d in $DISCIPLINES; do echo "$M/$d/BACKLOG.md"; done; printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
+  [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+bad8=""
+if [ -n "$files8" ]; then
+  bad8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
+    function nmatch(s,   c,first,nc,ok) { c=0; first=1
+      while (length(s)>0) {
+        if (first) ok=match(s,/([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
+        else       ok=match(s,/[·|][[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
+        if (!ok) break
+        nc=substr(s,RSTART+RLENGTH,1)
+        if (nc=="" || nc !~ /[A-Za-z0-9_]/) { c++; s=substr(s,RSTART+RLENGTH); first=0 }
+        else { s=substr(s,RSTART+1); first=0 }
+      } return c }
+    FNR==1 { uln=0; fence="" }
+    { line=$0; sub(/\r$/,"",line)
+      if (line ~ /^[[:space:]]*(```|~~~)/) { m=(line ~ /^[[:space:]]*```/)?"```":"~~~"
+        if (fence=="") { fence=m; next }
+        if (m==fence) { fence=""; next } }
+      if (fence!="") next
+      uln++
+      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/ && nmatch(line)!=1) print FILENAME ":" uln
+    }')
+fi
 [ -n "$bad8" ] && fail 8 "backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
 
@@ -257,7 +349,7 @@ bad12=$(printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/spec/(.+/)?[0-9
   [ -n "$empty" ] && echo "$f (section with an empty body — write N/A — <why>):
 $empty"
   hrev=${hdr#*· rev-}; hrev=${hrev%% *}
-  lrev=$(printf '%s\n' "$body" | sed -n '/^## 9\. Revision log/,$p' | grep -oE 'rev-[0-9]+' | sed 's/rev-//' | sort -n | tail -1)
+  lrev=$(printf '%s\n' "$body" | awk '/^## 9\. Revision log/{f=1} f{ while(match($0,/rev-[0-9]+/)){ v=substr($0,RSTART+4,RLENGTH-4)+0; if(!seen||v>mx){mx=v} seen=1; $0=substr($0,RSTART+RLENGTH) } } END{ if(seen) print mx }')   # was a 5-fork sed|grep|sed|sort|tail chain; numeric max, lrev only feeds a numeric test
   if [ -z "$lrev" ] || [ "$hrev" -gt "$lrev" ] 2>/dev/null; then
     echo "$f (header rev-$hrev not logged in the §9 Revision log)"
   fi
@@ -272,11 +364,18 @@ $bad12"
 fi
 
 # grandfather stale-line guards (a listed path that no longer exists fails).
-badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do git ls-files --error-unmatch "$p" >/dev/null 2>&1 || echo "$p"; done)
-[ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
+# One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
+# fork, so a long grandfather list was one spawn per line (~80s at inCMS's 522 lines). Entries are
+# literal paths, never globs, so exact membership in the tracked set is equivalent.
+if [ -n "$LEGACY$DEBT" ]; then
+  declare -A TRACKED_SET
+  while IFS= read -r _l; do [ -n "$_l" ] && TRACKED_SET["$_l"]=1; done < <(git ls-files)
+  badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+  [ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
 $badL"
-badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do git ls-files --error-unmatch "$p" >/dev/null 2>&1 || echo "$p"; done)
-[ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
+  badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+  [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+fi
 
 exit "$status"
