@@ -30,14 +30,17 @@ run() {
   echo "ok   $name"; pass=$((pass+1))
 }
 
-mkrepo() { # $1=name → sets R; repo with tracked Makefile (watch) + docs/GOV.md (anchor)
-  R="$TMP/$1"; mkdir -p "$R/docs"
-  git -C "$R" init -q -b main
-  git -C "$R" config user.email t@test; git -C "$R" config user.name t; git -C "$R" config commit.gpgsign false
-  git -C "$R" config core.autocrlf false
-  printf 'all:\n\ttrue\n' > "$R/Makefile"; echo gov > "$R/docs/GOV.md"
-  git -C "$R" add -A; git -C "$R" commit -qm base
-}
+# Every mkrepo starts from a byte-identical base repo — so build it ONCE and copy per case,
+# turning 36 `git init`+config+commit chains into 1. The suite's whole cost was repo
+# construction (~3m of git process spawns on Windows); cp -r of a single-commit repo with no
+# remotes/worktrees/alternates carries no absolute paths, so the copies are fully independent.
+TEMPLATE="$TMP/.template"; mkdir -p "$TEMPLATE/docs"
+git -C "$TEMPLATE" init -q -b main
+git -C "$TEMPLATE" config user.email t@test; git -C "$TEMPLATE" config user.name t; git -C "$TEMPLATE" config commit.gpgsign false
+git -C "$TEMPLATE" config core.autocrlf false
+printf 'all:\n\ttrue\n' > "$TEMPLATE/Makefile"; echo gov > "$TEMPLATE/docs/GOV.md"
+git -C "$TEMPLATE" add -A; git -C "$TEMPLATE" commit -qm base
+mkrepo() { R="$TMP/$1"; cp -r "$TEMPLATE" "$R"; }   # $1=name → sets R; a copy of the base repo (Makefile watch + docs/GOV.md anchor)
 
 stamp_line() {
   local n; n=$(( $(cat "$TMP/.now") + 1 )); echo "$n" > "$TMP/.now"
