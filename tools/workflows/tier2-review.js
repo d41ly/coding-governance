@@ -2,17 +2,17 @@ export const meta = {
   name: 'tier2-review',
   version: '1.0', // gov:kit tier2-review@1.0 — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
-    'Consolidated, concurrency-capped (≤4) Tier-2 adversarial review: find → batched-verify → synth. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
+    'Consolidated, concurrency-capped (≤6) Tier-2 adversarial review: find → batched-verify → synth. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
-    { title: 'Find', detail: '4 finder lenses, one wave, ≤4 concurrent' },
-    { title: 'Verify', detail: 'skeptics refute findings in BATCHES, ≤4 concurrent' },
+    { title: 'Find', detail: '4 finder lenses, one wave, ≤6 concurrent' },
+    { title: 'Verify', detail: 'skeptics refute findings in BATCHES, ≤6 concurrent' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
 }
 
-// --- cap-4 fan-out (inlined; workflow scripts can't import) --------------
+// --- cap-6 fan-out (inlined; workflow scripts can't import) --------------
 // Passes agent-cap: the only raw primitive call is the marked helper line.
-async function boundedParallel(thunks, cap = 4) {
+async function boundedParallel(thunks, cap = 6) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
     out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
@@ -80,7 +80,7 @@ const VERDICT_SCHEMA = {
   },
 }
 
-// --- Phase 1: FIND — 4 consolidated lenses, ONE ≤4-wide wave ------------
+// --- Phase 1: FIND — 4 consolidated lenses, ONE ≤6-wide wave ------------
 phase('Find')
 const LENSES = [
   {

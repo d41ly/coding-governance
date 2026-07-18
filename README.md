@@ -39,7 +39,7 @@ machines/sessions on the same repo.
   and the aiosqlite closed-loop seam patch + deterministic forced-race regression gate. See
   `tools/pytest-parallel-guardrails/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
-  script calling raw `parallel(`/`pipeline(` instead of the cap-4 `boundedParallel`/`boundedPipeline`
+  script calling raw `parallel(`/`pipeline(` instead of the cap-6 `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. Cap overridable via env
   `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule.
@@ -52,7 +52,7 @@ machines/sessions on the same repo.
   `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
-  verify → synth; ~7–9 agents, never >4 concurrent). Run via `Workflow({scriptPath})`, parameterized
+  verify → synth; ~7–9 agents, never >6 concurrent). Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction.
 
 ## Install the skill (once per machine)

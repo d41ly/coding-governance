@@ -16,7 +16,7 @@
  * ONLY place a raw `parallel(`/`pipeline(` may appear, and each such line
  * carries a `gov:bounded-fanout` marker. Any other raw primitive call = deny.
  *
- * CAP: default 4 (override with env AGENT_CAP). This guard doesn't verify the
+ * CAP: default 6 (override with env AGENT_CAP). This guard doesn't verify the
  * numeric arg — it enforces "use the helper"; the helper is where CAP lives.
  *
  * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
@@ -35,7 +35,7 @@
 'use strict'
 
 const KIT_AGENT_CAP_VERSION = '1.0' // gov:kit agent-cap@1.0 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
-const CAP = Number(process.env.AGENT_CAP) || 4
+const CAP = Number(process.env.AGENT_CAP) || 6
 
 function readStdin() {
   try {

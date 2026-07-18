@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-07-17T00:34:09+03:00 @ 7ebf9b6447866c629bb1cd54528d00462610c88f
+last-audit: 2026-07-18T14:53:34+03:00 @ de06f85bb46b610a0836294f21eeb7b00934a0c2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -75,7 +75,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook caps Workflow fan-out at 4 concurrent — route fan-out through the cap-4 helpers.
+- The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides
