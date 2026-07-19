@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`
 
-**Status:** INPROGRESS · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
+**Status:** CLOSED · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -129,6 +129,8 @@ after S4.
 `tools/check-kit-versions.sh` (must stay green after the 1.2→1.3 bump). No new gate.
 
 ## 8. Open questions
+
+none — both forks below are RESOLVED (owner, 2026-07-19); kept for the record.
 
 - **Fork A — DoD line vs a Landing clause.** RESOLVED (owner, 2026-07-19): the DoD line is the single
   home; no separate Landing bullet.

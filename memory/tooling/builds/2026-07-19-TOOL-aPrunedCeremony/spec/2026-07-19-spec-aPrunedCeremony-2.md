@@ -1,6 +1,6 @@
 # TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)
 
-**Status:** INPROGRESS · rev-3 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
+**Status:** CLOSED · rev-3 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -142,14 +142,16 @@ references.
 
 ## 8. Open questions
 
+none — all forks below are RESOLVED (owner-ratified 2026-07-19); kept for the record.
+
 - **Fork A — adopt the pre-push hook (owner menu 2).** RESOLVED (owner, 2026-07-19): yes — build it;
   it makes PLAY-aPrunedCeremony-1's boundary machine-enforced rather than honor-system.
 - **Fork B — the drift signal for the copy-install path (rev-2).** `WIRE-INTO-PROJECT.md`'s
-  copy-to-out-of-tree install re-creates the inCMS staleness class. RECOMMEND: file it as a separate
+  copy-to-out-of-tree install re-creates the inCMS staleness class. RESOLVED (2026-07-19): built as recommended — file it as a separate
   follow-up scoped to that install path (a hash-of-tracked-vs-installed check in `check-wiring.sh`),
   NOT in this build — this repo's own dogfood does not need it, and bundling it would ship a check
   that is inert here.
-- **Fork C — uncommitted-change protection.** RECOMMEND: reuse the branch guard's actual predicate
+- **Fork C — uncommitted-change protection.** RESOLVED (2026-07-19): built as recommended — reuse the branch guard's actual predicate
   (primary tree, default branch) rather than invent a clean-tree notion; add an explicit
   dirty-tree-blocks-push check only if the owner wants it, named as new behavior.
 

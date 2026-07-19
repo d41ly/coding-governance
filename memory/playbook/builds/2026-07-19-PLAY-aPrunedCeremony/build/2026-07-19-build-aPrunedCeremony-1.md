@@ -36,3 +36,17 @@ full gate suite before merge.
 
 - 2026-07-19 · BU-0 · specs ratified to rev-3 (PLAY-4, TOOL-1) / INPROGRESS (others); STATUS + this
   log created; watchdog cron d1961337 scheduled. Pre-code adversarial review next.
+- 2026-07-19 · BU-0 · pre-code review wf_539c5419 (7 confirmed, 2 build-breaking HIGHs) folded before
+  code: PLAY-4 rev-4 (IN-FLIGHT.md generator + kit bump + bare-merged migration), TOOL-1 rev-4
+  ($PYBIN substitution + canary grep + AC5), TOOL-2 rev-3 (GOV_GATE_CMD seam + 3rd-field classify).
+- 2026-07-19 · BU-P1..P4 built: template rewords (full-run-at-push-boundary, byte-neutral, 32735/32768),
+  domain-rules §10 (fail-closed scoping + vacuous-ratchet), pushed:<sha> retired at all live sites +
+  kit 1.2→1.3. Node-b rows left for node b (PLAY-aPrunedCeremony-5).
+- 2026-07-19 · BU-T1 built: gate-legs.json (15 legs) + run-gates.sh manifest iterator (PYBIN
+  substitution, \x1e field sep, exit-propagating parse, startup probe) + run-gates.test.sh canary.
+  Full run 15 GREEN; canary catches injected path; AC5 verified.
+- 2026-07-19 · BU-T2 built: .githooks/pre-push (remote-ref classify, pushed-tip precondition,
+  GOV_GATE_CMD seam) + pre-push.test.sh (5 cases pass) + hook LF pins + AGENTS boundary note. 16 GREEN.
+- 2026-07-19 · Closing review wf_3c0f6fa3 (5 confirmed, 0 HIGH) folded: canary rejects malformed legs;
+  gate-legs.json added to watch list; node-b backlog row; comment fix; default-branch LOW accepted.
+  6 specs → CLOSED. Full suite GREEN. Merging + pushing next.

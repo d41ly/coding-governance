@@ -1,6 +1,6 @@
 # TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary
 
-**Status:** INPROGRESS · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
+**Status:** CLOSED · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -133,6 +133,8 @@ The existing gate suite (`run-gates.sh` self-hosts), plus the new `run-gates.tes
 `.gitattributes` LF verification on `tools/gate-legs.json`.
 
 ## 8. Open questions
+
+none — both forks below are RESOLVED (owner, 2026-07-19); kept for the record.
 
 - **Fork A — build-both or defer-both.** RESOLVED (owner, 2026-07-19): BUILD the manifest+canary
   pair, overriding the defer recommendation.

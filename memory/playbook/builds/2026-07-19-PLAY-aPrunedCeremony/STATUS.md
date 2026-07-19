@@ -22,9 +22,9 @@ manifest+canary** (TOOL-1 Fork A → build). Worktree `C:\projects\coding-govern
 
 ## Closing
 
-- PENDING · closing adversarial review of the whole diff
-- PENDING · merge --no-ff to local main + push (owner pre-authorized on completion)
-- PENDING · final overview; delete watchdog cron
+- CLOSED · closing adversarial review wf_3c0f6fa3 (5 confirmed, 0 HIGH) folded; full suite 16 legs GREEN; 6 specs → CLOSED
+- INPROGRESS · merge --no-ff to local main + push (owner pre-authorized on completion)
+- OPEN · final overview; delete watchdog cron
 
 ## Constraints
 

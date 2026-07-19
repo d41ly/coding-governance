@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-3 — recurring bug class: a ratchet that never exercises its target is vacuous
 
-**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
+**Status:** CLOSED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -65,8 +65,10 @@ Proposed entry (house style — one dense sentence + the fix):
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (owner-ratified 2026-07-19); kept for the record.
+
 - **Fork — one combined entry or two (matcher-never-matches vs `--check`-always-unchanged)?**
-  RECOMMEND: one entry with both as sub-forms — they share the fix (inject a violation, require a
+  RESOLVED (2026-07-19): built as recommended — one entry with both as sub-forms — they share the fix (inject a violation, require a
   red), and §10 favors dense combined entries over proliferation.
 
 ## 9. Revision log

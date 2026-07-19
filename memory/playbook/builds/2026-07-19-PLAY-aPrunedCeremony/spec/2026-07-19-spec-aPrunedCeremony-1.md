@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-1 — the full merge bar runs once, at the push boundary
 
-**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
+**Status:** CLOSED · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -133,15 +133,17 @@ gate for this spec), the memory-tree hygiene gate (this spec + README conform to
 
 ## 8. Open questions
 
-- **Fork A — enforcement conditional wording (owner menu 1).** RECOMMEND: adopt S1's conditional —
+none — all forks below are RESOLVED (owner-ratified 2026-07-19); kept for the record.
+
+- **Fork A — enforcement conditional wording (owner menu 1).** RESOLVED (2026-07-19): built as recommended — adopt S1's conditional —
   "where the project enforces a push boundary … otherwise scoped-at-merge + full before push". The
   post-merge scoped step is itself conditional on the runner supporting whole-run diff-scoping
   (which the kit's own `run-gates.sh` does NOT — it scopes only self-test legs), so the wording must
   not presume a mechanism the kit lacks (review R-PLAY-1-MED).
-- **Fork B — reconcile AGENTS.md + run-gates.sh header in this build (owner menu 2).** RECOMMEND:
+- **Fork B — reconcile AGENTS.md + run-gates.sh header in this build (owner menu 2).** RESOLVED (2026-07-19): built as recommended —
   yes (S4) — a reference dogfood that contradicts its own template is exactly the drift this kit
   exists to catch.
-- **Fork C — keep or cut "a conflict-free merge is not a passing merge".** RECOMMEND: keep — it now
+- **Fork C — keep or cut "a conflict-free merge is not a passing merge".** RESOLVED (2026-07-19): built as recommended — keep — it now
   motivates the scoped post-merge run.
 
 ## 9. Revision log
