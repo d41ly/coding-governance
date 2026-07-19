@@ -9,6 +9,15 @@ the sibling build `memory/tooling/builds/2026-07-19-TOOL-aPrunedCeremony/`.
 These are **specs awaiting owner build-approval** — nothing here edits the template yet. Each was
 adversarially reviewed (reviews land in `reviews/`); fold-ins bump the spec rev and are logged in §9.
 
+**Review outcome (wf_2f11fd07, 16 confirmed → folded to rev-2).** The load-bearing finding: the
+template has **86 bytes of headroom** under the hard `≤32 KiB` gate, so the rev-1 "add a bullet"
+approach busted a mandatory merge-bar leg (3 HIGHs). rev-2 restructures accordingly — **new prose
+lands in `parallel-coding-governance.domain-rules.md` (the uncapped overflow companion); template
+edits are byte-neutral in-place rewords only**, and every spec's size-AC now MEASURES rather than
+asserts. Other folds: PLAY-1 gained the missed edit sites (§7 L126, §14 L185, run-gates.sh L3) and
+dropped a false "contradicts run-gates.sh" claim; PLAY-2 stopped banning the kit's own
+`leg_if_changed` (discriminate on indirection, not map shape) and fixed a wrong §10 citation.
+
 ## The specs
 
 | Spec | Item | Tier | Edit site | One-liner |

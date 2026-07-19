@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-3 — recurring bug class: a ratchet that never exercises its target is vacuous
 
-**Status:** OPEN · rev-1 · 2026-07-19 · node a · Tier-1 · base bf7f2c22
+**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07
 
 ## 1. Goal
 
@@ -19,9 +19,11 @@ never trust that it is green.
 
 ## 3. Non-goals (OUT)
 
-- Not adding a machine gate — this is a review-checklist class (a "vacuous gate" cannot, in general,
-  be detected by another gate without the same regress; the mitigation is the review habit of
-  injecting a violation).
+- Not adding a machine gate at the kit level — coding-governance ships docs, not the downstream
+  project's CI, so no single kit gate covers the general class; it lands as a review-checklist class
+  here. Note the class is only PARTLY ungateable: the "gate a non-empty selection" sub-form IS
+  cheaply machine-checkable in a concrete project (assert the selection the ratchet iterates is
+  non-empty), which is the fix the entry itself prescribes (review R-PLAY-3-LOW).
 - Not restating §10's existing "verify the COMPUTED value" (L47) or "documented checks" (L53-54)
   entries — this class is distinct: the GATE ITSELF is inert, not the value under test.
 
@@ -55,8 +57,11 @@ Proposed entry (house style — one dense sentence + the fix):
 - AC1 — When `.domain-rules.md` §10 is read, it contains a class covering both the never-matching
   matcher and the always-"unchanged" `--check` gate, with the "prove it catches an injected
   regression" fix.
-- AC2 — When the memory-tree hygiene gate runs, `.domain-rules.md` stays within its size caps and
-  the file passes.
+- AC2 — `.domain-rules.md` has NO machine size cap and is not scanned by the memory-tree hygiene
+  gate (which scans only `memory/**`) nor by `check-template-size.sh` (which caps only the template);
+  it is the template's designated overflow companion. Acceptance is therefore a read confirming the
+  new class is present, distinct from the L47 "verify the COMPUTED value" entry, and fits the §10
+  house style — not a gate pass (review R-PLAY-3-MED).
 
 ## 8. Open questions
 
@@ -67,3 +72,7 @@ Proposed entry (house style — one dense sentence + the fix):
 ## 9. Revision log
 
 - rev-1 · 2026-07-19 · initial draft (node a, aPrunedCeremony).
+- rev-2 · 2026-07-19 · folded review wf_2f11fd07: corrected AC2 (domain-rules has no machine size cap
+  and the memory-tree gate does not scan it; acceptance is a manual read); softened the §3
+  "cannot be detected by another gate" over-claim (the non-empty-selection sub-form is gateable);
+  status → SPECCED.

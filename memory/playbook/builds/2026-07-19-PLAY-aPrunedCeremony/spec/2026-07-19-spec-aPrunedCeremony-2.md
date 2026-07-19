@@ -1,33 +1,38 @@
 # PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse
 
-**Status:** OPEN · rev-1 · 2026-07-19 · node a · Tier-1 · base bf7f2c22
+**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07
 
 ## 1. Goal
 
-Capture the most expensive lesson of inCMS `ARCH-aTrimmedGauntlet-2` (its RD15 reversal) as a §7
+Capture the most expensive lesson of inCMS `ARCH-aTrimmedGauntlet-2` (its RD15 reversal) as a
 gate-discipline rule: diff-scoping which legs run is safe ONLY when it is fail-closed and coarse. An
-unclassified path runs the full bar; precise per-path "this file → exactly these tests" targeting is
-a trap, because tests read a path INDIRECTLY (through an app module) and a narrow bucket silently
-skips the guard that would have caught the break. Two tiers (full-by-default + a proven-safe skip
-set), never N clever buckets.
+unclassified path runs the full bar; a leg must not be guarded on a path set NARROWER than the
+complete input whose change can flip its verdict — because a test reads its real inputs INDIRECTLY
+(through a shared module), and a too-narrow guard silently skips the leg the diff needed. The trap is
+indirection, not the guard mechanism itself.
 
 ## 2. Scope (IN)
 
-- S1 — Add one §7 bullet stating the fail-closed-and-coarse scoping discipline, near the
-  `{{GATE_RUNNER}}` definition (template §7, around L128).
-- S2 — Name the failure mode it prevents (a scoped run green-by-absence on the very gate the diff
-  needed) and tie it to §10's green-by-absence family and PLAY-aPrunedCeremony-3.
-- S3 — State the safe shape: an unrecognized path selects the full bar (fail-closed); the skip set
-  is an allowlist of paths PROVEN to trigger no full-suite gate, not a denylist.
+- S1 — Add the fail-closed-and-coarse scoping rule to `parallel-coding-governance.domain-rules.md`
+  §10 (the uncapped overflow companion), NOT the template — the template has 86 bytes of headroom
+  under a hard gate (review R-PLAY-2-HIGH). It sits alongside PLAY-aPrunedCeremony-3's vacuous-gate
+  entry as a green-by-absence discipline.
+- S2 — If the template §7 needs a pointer at all, add at most a byte-neutral half-clause folded onto
+  an existing §7 line (e.g. PLAY-aPrunedCeremony-1's reworded gate line), never a new bullet;
+  re-measure `check-template-size.sh` after.
+- S3 — Name the real failure the rule prevents (a scoped run skipping the leg the diff needed) and
+  cite its ACTUAL home in the kit: the green-by-absence family at template §7 L133 (glob/collection)
+  and §16 L205 (skipped-leg reporting) — NOT "§10", which had no such phrase before this build
+  (review R-PLAY-2-MED).
 
 ## 3. Non-goals (OUT)
 
-- Not shipping a scope-surface artifact (inCMS's `gate-scope.json`) into the kit — `run-gates.sh`
-  already scopes per-leg via `leg_if_changed` and fails safe to "run" when the base is unresolvable.
-  This spec is the guardrail WORDING that the runner's behavior already embodies but the charter
-  does not state.
-- Not forbidding future per-tier surfaces — only forbidding the precise per-path targeting that
-  RD15 proved unsafe.
+- Not shipping a scope-surface artifact (inCMS's `gate-scope.json`) into the kit — `run-gates.sh`'s
+  `leg_if_changed` scopes only its own self-test legs on their own source; this spec is the guardrail
+  WORDING, not an artifact.
+- Not banning the kit's own `leg_if_changed` — it guards a self-test on the exact source that flips
+  its verdict, which is the SAFE case (guard = full input set, no indirection). Only NARROWER-than-
+  inputs guards are the trap (review R-PLAY-2-MED, §4).
 
 ## 4. Design
 
@@ -35,37 +40,49 @@ set), never N clever buckets.
 
 | Edit site | Change |
 |-----------|--------|
-| template §7 (~L128, after the `{{GATE_RUNNER}}` bullet) | Add the fail-closed-coarse scoping bullet (S1-S3). |
+| `.domain-rules.md` §10 | Add the fail-closed-coarse scoping rule (S1). |
+| template §7 (optional, byte-neutral) | At most a half-clause pointer folded onto an existing line (S2). |
 
-Proposed bullet:
+Proposed `.domain-rules.md` §10 entry (house style — one dense sentence + fix):
 
 ```
-- Scoping which legs run to the diff is legitimate economy, but ONLY fail-closed and coarse: an
-  unclassified/unrecognized path runs the FULL bar, and the skip set is an allowlist of paths proven
-  to trigger no whole-suite gate — never a per-path "this file → these tests" map. Tests read a path
-  indirectly (through a shared module), so a narrow bucket skips the guard the diff needed and the
-  scoped run passes green-by-absence (§10). Two tiers — full default + proven-safe skip — is the
-  ceiling; when in doubt, run the bar.
+- Diff-scoping which gate legs run is legitimate economy but ONLY fail-closed and coarse: an
+  unclassified/unrecognized path runs the FULL bar, and never guard a leg on a path set NARROWER than
+  the complete input whose change can flip its verdict — a test reads its inputs INDIRECTLY (through a
+  shared module), so a too-narrow guard skips the leg the diff needed and the scoped run passes
+  green-by-absence (template §7/§16). Guarding a self-test on its OWN source is safe (guard = full
+  input); a per-file "this file → these tests" map that omits the indirect readers is the trap.
 ```
 
 ### Alternatives rejected
 
-- **Ship `gate-scope.json` as kit doctrine.** Rejected here: it is a tooling artifact
-  (TOOL-aPrunedCeremony-1 territory), and the *lesson* — fail closed, stay coarse — is what
-  generalizes. A project can encode tiers however it likes; the rule is the invariant.
+- **Put the rule in the template §7.** Rejected: 86-byte headroom under a hard gate (wf_2f11fd07);
+  domain-rules is the kit's designated overflow companion (`check-template-size.sh` L25-26).
+- **Ban per-path guards outright (rev-1 wording).** Rejected: that bans the kit's own
+  `leg_if_changed`, which §3 praises. Discriminate on indirection (guard narrower than the verdict's
+  full input set), not on the map shape.
+- **"Two tiers is the ceiling" (rev-1).** Softened: two tiers is the recommended default, not a hard
+  ceiling for a project-agnostic playbook — the invariant is fail-closed + no-narrower-than-inputs.
 
 ## 6. Acceptance criteria
 
-- AC1 — When template §7 is read, it contains a rule that an unclassified path runs the full bar and
-  bans precise per-path test targeting, citing the green-by-absence risk.
-- AC2 — When `check-template-size.sh` runs after the edit, it stays green (≤32 KiB).
+- AC1 — When `.domain-rules.md` §10 is read, it contains a rule that an unclassified path runs the
+  full bar and that a leg is never guarded on paths narrower than its verdict's full input set,
+  citing the green-by-absence family at template §7/§16.
+- AC2 — When `bash tools/check-template-size.sh` runs after any (byte-neutral) template pointer edit,
+  it exits 0. The `.domain-rules.md` addition has no machine size cap (it is the overflow companion),
+  so its acceptance is a read confirming the rule is present and fits §10.
 
 ## 8. Open questions
 
-- **Fork — wording-only, or also a `.domain-rules.md` §7 cross-link?** RECOMMEND: wording-only in
-  the template §7, with a half-clause pointing at §10's green-by-absence family — no new companion
-  section. The rule is short enough to live inline.
+- **Fork — domain-rules §10 vs a new gate-discipline sub-head?** RECOMMEND: §10 (recurring bug
+  classes) — the rule prevents the green-by-absence bug class and sits next to PLAY-3's vacuous-gate
+  entry; a new sub-head is more ceremony than a one-liner warrants.
 
 ## 9. Revision log
 
 - rev-1 · 2026-07-19 · initial draft (node a, aPrunedCeremony).
+- rev-2 · 2026-07-19 · folded review wf_2f11fd07: externalize to `.domain-rules.md` §10 (template
+  budget, R-PLAY-2-HIGH); corrected the green-by-absence citation to template §7 L133 / §16 L205 (not
+  §10); reworded "never a per-path map" to discriminate on indirection so the kit's own
+  `leg_if_changed` is not banned; softened "two tiers is the ceiling"; status → SPECCED.

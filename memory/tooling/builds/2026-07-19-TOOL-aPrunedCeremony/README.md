@@ -9,6 +9,15 @@ Both carry a genuine "should we build this at all?" fork — the honest output o
 that neither is an obvious yes for THIS repo's shape (a single bash runner, hooks wired as a tracked
 dir). Specs awaiting owner build-approval; reviews land in `reviews/`.
 
+**Review outcome (wf_2f11fd07, folded to rev-2).** TOOL-1: the rev-1 "defer the manifest, keep the
+canary" fallback was incoherent — the canary asserts the runner sources the manifest, so it cannot
+exist without it; the real fork is now **build-both or defer-both** (recommend defer, no second
+runner justifies it). Also corrected a false "Python is already a hard requirement" claim (it is
+soft today; the manifest makes it hard → a startup probe is added). TOOL-2: the `.gitattributes`
+change is **ADD, not verify** (extensionless hook files were unpinned), and the drift-signal is
+**N/A only for this repo's direct-wire model** — the `WIRE-INTO-PROJECT.md` copy-install path DOES
+reintroduce the staleness, so it is a scoped follow-up rather than universally moot.
+
 ## The specs
 
 | Spec | Item | Tier | Target | One-liner |
