@@ -1,6 +1,6 @@
 # TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** INPROGRESS · rev-3 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -129,18 +129,19 @@ The existing gate suite (`run-gates.sh` self-hosts), plus the new `run-gates.tes
 
 ## 8. Open questions
 
-- **Fork A — build-both or defer-both (owner menu 1; rev-2 reframe).** The manifest and canary are
-  coupled, so this is NOT "manifest vs canary" — it is build the pair or build nothing. RECOMMEND:
-  DEFER the pair. The manifest's only payoff is a second runner staying in lockstep, and there is
-  none; the CI-wiring follow-up (AGENTS.md L58) runs the SAME `run-gates.sh`, so it is not a second
-  consumer. Building now is speculative generality — the exact call inCMS's own closing review would
-  flag. Revisit the day a PowerShell runner or an independent CI runner is added.
+- **Fork A — build-both or defer-both (owner menu 1; rev-2 reframe).** RESOLVED (owner, 2026-07-19):
+  BUILD the pair (manifest + canary), overriding the defer recommendation. The recorded rationale for
+  the record: the owner wants the single-source leg manifest in place now (the canary rides it), and
+  a future PowerShell/CI runner then inherits a ready contract. The defer case is preserved above for
+  history; the build proceeds.
 - **Fork B — if built, JSON or a line-based manifest?** RECOMMEND: JSON via the required Python
   (CRLF-immune, structured), not line-oriented `sh` extraction (a stray CR breaks it, §11).
 
 ## 9. Revision log
 
 - rev-1 · 2026-07-19 · initial draft (node a, aPrunedCeremony).
+- rev-3 · 2026-07-19 · owner ratified Fork A → BUILD the manifest+canary pair (overriding the defer
+  recommendation); status → INPROGRESS.
 - rev-2 · 2026-07-19 · folded review wf_2f11fd07: withdrew the incoherent "canary-only" fallback (the
   canary is manifest-dependent) and reframed Fork A as build-both vs defer-both; corrected the PYBIN
   citation (L8, not L7) and the false "Python already a hard requirement" claim — it is soft today,

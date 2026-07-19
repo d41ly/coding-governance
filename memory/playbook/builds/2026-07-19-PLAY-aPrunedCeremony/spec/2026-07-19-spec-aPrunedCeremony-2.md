@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 

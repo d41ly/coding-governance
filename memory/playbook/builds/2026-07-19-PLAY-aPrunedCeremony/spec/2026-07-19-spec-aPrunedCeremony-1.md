@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-1 — the full merge bar runs once, at the push boundary
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 

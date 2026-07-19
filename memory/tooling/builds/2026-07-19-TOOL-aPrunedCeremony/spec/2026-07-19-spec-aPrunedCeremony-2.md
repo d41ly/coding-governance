@@ -1,6 +1,6 @@
 # TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 
