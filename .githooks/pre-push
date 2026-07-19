@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
+# FULL gate (tools/run-gates.sh) once and BLOCKS the push if it reds. Other pushes do nothing.
+# Install once per clone: git config core.hooksPath .githooks. Override: git push --no-verify.
+#
+# Drift note: the ACTIVE hook here is the TRACKED .githooks/ dir (core.hooksPath), not an out-of-tree
+# copy, so tracked == active by construction — no staleness class for THIS repo, and check-wiring.sh
+# auto-wires an unset core.hooksPath. (The WIRE-INTO-PROJECT.md copy-install path DOES reintroduce the
+# drift; a hash-of-tracked-vs-installed signal there is a scoped follow-up, not handled here.)
+set -u
+top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+cd "$top" || exit 0
+
+def=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); def=${def#origin/}
+def=${GOV_DEFAULT_BRANCH:-${def:-main}}
+
+# git feeds one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
+# Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
+# branch from a differently-named local ref. Read ALL lines here; run the gate ONCE after the loop.
+main_local=""
+while read -r _localref localsha remoteref _remotesha; do
+  [ "$remoteref" = "refs/heads/$def" ] && main_local=$localsha
+done
+
+[ -z "$main_local" ] && exit 0                       # no push to the default branch → nothing to gate
+[ -z "${main_local//0/}" ] && exit 0                 # all-zero local sha = a delete → nothing to gate
+
+# The tree the hook validates must BE the pushed default-branch tip, else the gate certifies content
+# that isn't what lands (a push issued from a feature worktree, or `git push <sha>:main`).
+head=$(git rev-parse HEAD 2>/dev/null || true)
+if [ "$main_local" != "$head" ]; then
+  echo "pre-push: refusing — pushing $def @ ${main_local:0:8} but this working tree is at ${head:0:8}."
+  echo "  Push $def from the primary tree checked out at the pushed tip (playbook §3), or --no-verify."
+  exit 1
+fi
+
+# Run the full bar once, stdin denied so the gate can't consume any remaining ref lines. The gate
+# command is overridable (GOV_GATE_CMD) so the hook's own test can stub it.
+echo "pre-push: full gate on $def push (${main_local:0:8})..."
+gate=${GOV_GATE_CMD:-bash tools/run-gates.sh}
+$gate </dev/null
+rc=$?
+[ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
+exit "$rc"

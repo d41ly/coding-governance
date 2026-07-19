@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
-# All green before any merge. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
+# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
 #   bash tools/run-gates.sh
+# Legs live in tools/gate-legs.json (single source); this runner is a thin iterator over it.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
+command -v "$PYBIN" >/dev/null 2>&1 || { echo "run-gates: python ($PYBIN) not found — required to parse tools/gate-legs.json"; exit 2; }
 fails=0; n=0; skips=0
 
 # Baseline for conditional legs: the mainline tip we gate against. Override with GATE_BASE.
@@ -28,21 +30,28 @@ leg_if_changed() { # guard-path[,guard-path...] · name · command...  (leg() co
   else n=$((n+1)); skips=$((skips+1)); printf 'GATE skip  %s (unchanged vs %s)\n' "$name" "${DEFBR:-baseline}"; fi
 }
 
-leg "memory hygiene (12 checks)"      bash tools/memory-tree/check-memory-hygiene.sh
-leg "kickoff-manifest ratchet"        bash skills/session-kickoff/manifest-check.sh
-leg "template size <=32KiB"           bash tools/check-template-size.sh
-leg "kit version markers"             bash tools/check-kit-versions.sh
-leg "agent-instructions wiring"       bash tools/agent-instructions/adopt-agent-instructions.sh --check --aliases claude
-leg_if_changed "skills/session-kickoff/manifest-check.sh,skills/session-kickoff/manifest-check.test.sh" \
-      "manifest-check self-test"        bash skills/session-kickoff/manifest-check.test.sh
-leg "agent-cap self-test"             bash tools/hooks/agent-cap.test.sh
-leg "agent-instructions self-test"    bash tools/agent-instructions/adopt-agent-instructions.test.sh
-leg "memory-hygiene self-test"        bash tools/memory-tree/check-memory-hygiene.test.sh
-leg "branch-guard self-test"          bash .githooks/pre-commit.test.sh
-leg "check-wiring self-test"          bash tools/check-wiring.test.sh
-leg "pytest-guardrails self-test"     bash tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh
-leg "codebase-map kit selftest"       "$PYBIN" tools/codebase-map/selftest.py
-leg "settings-merge selftest"         "$PYBIN" tools/settings-merge.py --selftest
+# Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
+# RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
+# Command-substitution surfaces a parse failure (a `< <()` process-sub would swallow it).
+legs=$("$PYBIN" -c '
+import json, sys
+try:
+    data = json.load(open("tools/gate-legs.json"))
+except Exception as e:
+    sys.stderr.write("parse error: %s\n" % e); sys.exit(3)
+if not isinstance(data, list) or not data:
+    sys.stderr.write("gate-legs.json empty or not a list\n"); sys.exit(3)
+rows = [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"]) for l in data]
+sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
+') || { echo "run-gates: cannot parse tools/gate-legs.json"; exit 2; }
+
+while IFS=$'\x1e' read -r name guard argvraw; do
+  [ -z "$name" ] && continue
+  IFS=$'\x1f' read -ra argv <<<"$argvraw"
+  case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
+  if [ -n "$guard" ]; then leg_if_changed "$guard" "$name" "${argv[@]}"
+  else leg "$name" "${argv[@]}"; fi
+done <<<"$legs"
 
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"

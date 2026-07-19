@@ -131,7 +131,7 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
 
 **The ledger rule to carry into the manifest/playbook:** each node writes ONLY its own
 `memory/project/in-flight/<tag>.md`; read ALL of `in-flight/*.md` for the who's-touching-what /
-slug-collision scan; self-prune your own `pushed:/merged:<sha>` rows on session start
+slug-collision scan; self-prune your own `merged:<sha>` rows on session start
 (`git merge-base --is-ancestor <sha> main`). One writer per file → the ledger never conflicts on merge.
 
 ## 3b — Adopt the codebase-map kit (if chosen in §0)

@@ -1,82 +1,149 @@
-# PLAY-aPrunedCeremony-4 — bookkeeping lands before the push, not after
+# PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** CLOSED · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
 ## 1. Goal
 
-Add the inCMS `ARCH-aTrimmedGauntlet-2` R3 rule to the playbook's Landing protocol: ledger rows,
-decision/backlog updates, and spec-status flips are committed BEFORE `git push`, so the pushed range
-carries its own bookkeeping — no trailing doc-only commit after a push. The template's DoD already
-says bookkeeping lands "before the wrap-up message" (§1 L43); this closes the remaining gap — the
-ordering relative to the PUSH.
+Two coupled ledger-hygiene changes from inCMS `ARCH-aTrimmedGauntlet-2`. (1) R3: bookkeeping (ledger
+rows, decision/backlog, spec-status flips) is committed BEFORE `git push`, so the pushed range
+carries its own record — no trailing doc-only commit after a push. (2) Retire the `pushed:<sha>`
+ledger status (owner-ratified Fork B option a): push-state is derivable from git ancestry, so the
+vocab collapses to `{in-flight | merged:<sha>}` and the self-prune keys on `merged:<sha>`. Retiring
+`pushed:<sha>` also removes the only post-push write the R3 rule would otherwise contradict, so the
+two changes are one coherent unit.
 
 ## 2. Scope (IN)
 
-- S1 — Extend the existing template §1 DoD line 43 (`… on disk before the wrap-up message (§16).`)
-  IN PLACE with the push ordering — "committed before the push AND the wrap-up message" — a
-  byte-neutral extension of an existing line, NOT a new bullet (the template has 86 bytes of headroom
-  under a hard gate; review R-PLAY-4-HIGH).
-- S2 — If a Landing-section statement is also wanted, fold a ≤~40-byte clause onto the existing
-  Landing line 47, dropping any parenthetical; re-measure `check-template-size.sh` after. Any fuller
-  rationale goes to `.domain-rules.md`, never as net template bytes.
+- S1 — Extend template §1 DoD line 43 (`… on disk before the wrap-up message (§16).`) IN PLACE:
+  "committed before the push AND the wrap-up message". The template has 86 bytes headroom; retiring
+  `pushed:<sha>` in S2 frees bytes to offset it — net must stay ≤ 32768, re-measured.
+- S2 — Retire `pushed:<sha>` from the ledger status vocabulary at EVERY live site, INCLUDING the
+  generators (archive snapshots under `memory/playbook/archive/**` and the two aPrunedCeremony build
+  folders are excluded — frozen / self-referential):
+  - `parallel-coding-governance.template.md` §3 L87 (`{in-flight | merged | pushed:<sha>}` →
+    `{in-flight | merged:<sha>}`) and L88 (self-prune `pushed:/merged:<sha>` → `merged:<sha>`).
+  - `memory/HYGIENE.md` L66 AND its generator source `tools/memory-tree/HYGIENE.template.md` L66.
+  - `memory/project/IN-FLIGHT.md` L3 (vocab + self-prune) AND its GENERATOR
+    `tools/memory-tree/adopt-memory-tree.sh` L50 — the printf that scaffolds IN-FLIGHT.md into every
+    new adopter (review wf_539c5419 PLAY-4-HIGH; omitting it resurrects the retired vocab on the next
+    `--scaffold`, the same generator→artifact drift the spec rejects for HYGIENE).
+  - `WIRE-INTO-PROJECT.md` L134 (self-prune wording).
+- S3 — Migrate node `a`'s OWN ledger rows (`memory/project/in-flight/a.md`) to the new vocab. The
+  live rows use a BARE `merged` token (no sha, e.g. `**merged** (direct commit on main, NOT
+  pushed)`), which the new `{in-flight | merged:<sha>}` vocab makes non-conforming — so migrate bare
+  `merged` → `merged:<sha>` citing the landing/commit sha (so the self-prune's `git merge-base
+  --is-ancestor <sha> main` works). Do NOT edit `memory/project/in-flight/b.md` (write-only-your-own,
+  template §3 L86) — node b migrates its own bare-`merged` rows; record a backlog follow-up so it is
+  tracked (inCMS RD19).
+- S4 — Because S2 edits kit-shipped content (`adopt-memory-tree.sh`, `HYGIENE.template.md`), bump the
+  memory-tree kit version: `KIT_MEMORY_TREE_VERSION` in `tools/memory-tree/check-memory-hygiene.sh`
+  L13 (1.2 → 1.3) AND the `gov:kit memory-tree@` marker in `HYGIENE.template.md` L1, which
+  `check-kit-versions.sh` L31 asserts must agree.
 
 ## 3. Non-goals (OUT)
 
-- Not changing WHAT bookkeeping is required (that is the DoD, §1 L38-44) — only its ordering vs the
-  push.
-- Not adding net template bytes — S1/S2 are in-place extensions of existing lines (§4 Rollout).
-- Not unilaterally retiring `pushed:<sha>` — but the interaction with it is no longer ignored; it is
-  raised as a coupled fork (§8 Fork B, review R-PLAY-4-LOW).
+- Not changing WHAT bookkeeping is required (DoD §1 L38-44) — only its ordering vs the push.
+- Not editing archive snapshots (`memory/playbook/archive/*.md`) — frozen version records.
+- Not editing node b's ledger file — its bare-`merged` rows are node b's to migrate (S3); leaving
+  them transiently is the disjoint-ledger pattern the kit already relies on.
 
 ## 4. Design
 
+### Data model
+
+Ledger status vocabulary: `{in-flight | merged | pushed:<sha>}` → `{in-flight | merged:<sha>}`. Both
+the bare `merged` and `pushed:<sha>` tokens are retired in favor of `merged:<sha>`, which carries the
+sha the self-prune (`git merge-base --is-ancestor <sha> main`) needs. `pushed:<sha>` added nothing
+derivable — push-state is `<sha> ancestor of the pushed default branch`.
+
 ### Inventory
 
-| Edit site | Current text (verified live) | Change | Byte effect |
-|-----------|------------------------------|--------|-------------|
-| template §1 DoD L43 | "… updated — **on disk before the wrap-up message** (§16)." | Extend: "on disk and committed before the push and the wrap-up message" (S1). | small; re-measure |
-| template §1 Landing L47 (optional) | existing Landing bullet | Fold a ≤40-byte "bookkeeping before the push" clause (S2). | ≈0 |
+| Edit site | Change | Byte effect |
+|-----------|--------|-------------|
+| template §1 DoD L43 | extend: "committed before the push and the wrap-up message" | +~25 |
+| template §3 L87 | drop `\| pushed:<sha>`, `merged` → `merged:<sha>` | −~6 |
+| template §3 L88 | self-prune `pushed:/merged:<sha>` → `merged:<sha>` | −~10 |
+| `memory/HYGIENE.md` L66 + `tools/memory-tree/HYGIENE.template.md` L66 | vocab drop | uncapped |
+| `memory/project/IN-FLIGHT.md` L3 + `tools/memory-tree/adopt-memory-tree.sh` L50 (generator) | vocab + self-prune drop | uncapped |
+| `WIRE-INTO-PROJECT.md` L134 | self-prune wording | uncapped |
+| `memory/project/in-flight/a.md` | bare `merged` → `merged:<sha>` (node-a rows) | uncapped |
+| `check-memory-hygiene.sh` L13 + `HYGIENE.template.md` L1 marker | kit version 1.2 → 1.3 | uncapped |
 
-The rev-1 spec proposed a NEW 289-byte Landing bullet, which busts the ≤32 KiB gate (wf_2f11fd07).
-rev-2 extends existing lines in place instead.
+Net template bytes: +25 (DoD) −16 (vocab) = ~+9; re-measure `check-template-size.sh` and, if over,
+compress the DoD clause.
+
+### Migration
+
+The vocab change is backward-tolerant for the self-prune (a stale `pushed:<sha>` or bare `merged`
+row still resolves an ancestor sha where one is cited), so node b's un-migrated rows are harmless
+until node b's next session.
+
+### Rollout
+
+Doc-only; lands on `main`. Re-measure the template gate after S1+S2; run `check-kit-versions.sh`
+after S4.
+
+### Files touched (estimate)
+
+9 files. Template net ~+9 bytes (verify ≤ 32768).
 
 ### Alternatives rejected
 
-- **Add a new Landing bullet (rev-1).** Rejected: +289 bytes over an 86-byte headroom busts the hard
-  size gate. Extend the existing DoD line in place.
-- **Rely on the DoD "before the wrap-up message" line alone.** Rejected: it bounds bookkeeping
-  against the CHAT turn, not the push — a session can push, then write the ledger before its final
-  message, which is exactly the push-then-doc-commit the rule forbids. The push is the boundary that
-  matters.
+- **Keep `pushed:<sha>` as a sanctioned post-push write (Fork B option b).** Rejected by owner
+  ratification: option a removes derivable state AND the R3 contradiction in one move.
+- **Edit each artifact but not its generator.** Rejected: `HYGIENE.template.md` and
+  `adopt-memory-tree.sh` are the generator sources; editing the artifact alone is the
+  hand-kept-copy-drift class the kit gates elsewhere — and the next `--scaffold` overwrites the fix.
+
+## 5. Production-readiness checklist
+
+- security — N/A.
+- perf / scale — N/A.
+- a11y / i18n — N/A.
+- error / empty / loading states — N/A.
+- observability — N/A.
+- risks — node b's un-migrated bare-`merged` rows are a transient cosmetic mismatch, self-healing via
+  prune; write-only-your-own forbids fixing them here (S3).
+- testing + left-shift gates — no machine gate asserts the in-flight ledger vocab (the memory-tree
+  hygiene check 8 governs BACKLOG/STATUS rows, not the in-flight ledger prose — verify at build); the
+  gates to re-run are `check-template-size.sh` (≤32 KiB) and `check-kit-versions.sh` (after S4).
+- migration / rollback — revert the edits; vocab is backward-tolerant.
+- user docs — `WIRE-INTO-PROJECT.md` is the adopter doc, updated in S2.
 
 ## 6. Acceptance criteria
 
-- AC1 — When template §1 DoD L43 is read after this change, it states bookkeeping is committed before
-  the push (and the wrap-up message), and no separate Landing rule contradicts it.
-- AC2 — When `bash tools/check-template-size.sh` runs after the edit, it exits 0 (≤ 32768) — proven
-  by measurement; the in-place extensions keep the file within budget.
-- AC3 — When the DoD line and any Landing clause are read together, they name ONE coherent rule (no
-  two competing deadlines).
+- AC1 — When template §1 DoD L43 is read, it states bookkeeping is committed before the push and the
+  wrap-up message.
+- AC2 — When `grep -rIn "pushed" .` runs (excluding `memory/playbook/archive/**` and the two
+  `*/builds/2026-07-19-*-aPrunedCeremony/` folders), it returns nothing — catching the generator
+  (`adopt-memory-tree.sh`) AND every self-prune span (`pushed:/merged:<sha>`, prose `pushed/merged`),
+  not just the literal `pushed:<sha>` token.
+- AC3 — When `bash tools/check-template-size.sh` runs after the edits, it exits 0 (≤ 32768) — proven
+  by measurement.
+- AC4 — When `bash tools/run-gates.sh` runs, the memory-tree hygiene gate and `check-kit-versions.sh`
+  both stay green (the kit-version marker/constant agree after S4).
+
+## 7. Gates
+
+`tools/check-template-size.sh` (re-run, ≤32 KiB), the memory-tree hygiene gate (verify unaffected),
+`tools/check-kit-versions.sh` (must stay green after the 1.2→1.3 bump). No new gate.
 
 ## 8. Open questions
 
-- **Fork A — DoD line vs a Landing clause.** RECOMMEND: extend the DoD line (S1) as the single home,
-  since it already owns bookkeeping timing; add a Landing clause only if a lander would miss the DoD
-  line. Avoid stating the rule in two places (the two-copies-drift class).
-- **Fork B — the coupled `pushed:<sha>` interaction (review R-PLAY-4-LOW).** The template §3 keeps
-  `pushed:<sha>` in the ledger vocab (L87) and a self-prune keyed on it (L88); a `pushed:<sha>` row
-  requires a write AFTER the push, which tensions with "no trailing doc-only commit after `git
-  push`". Two coherent resolutions: (a) retire `pushed:<sha>` here — vocab → `{in-flight |
-  merged:<sha>}`, self-prune on `merged:<sha>` ancestry — matching the inCMS Q4 change and deriving
-  push-state from git; or (b) keep `pushed:<sha>` and define the row as riding at `merged` in the
-  pushed range, flipping to `pushed:<sha>` only as sanctioned next-push bookkeeping (never a
-  standalone post-push commit). RECOMMEND (a) — it removes derivable state and the contradiction in
-  one move — but it edits template §3, which was out of the original six, so it needs owner sign-off
-  before folding into this spec's scope.
+none — both forks below are RESOLVED (owner, 2026-07-19); kept for the record.
+
+- **Fork A — DoD line vs a Landing clause.** RESOLVED (owner, 2026-07-19): the DoD line is the single
+  home; no separate Landing bullet.
+- **Fork B — retire `pushed:<sha>` or keep it.** RESOLVED (owner, 2026-07-19): option a — RETIRE it
+  (vocab → `{in-flight | merged:<sha>}`).
 
 ## 9. Revision log
 
-- rev-1 · 2026-07-19 · initial draft (node a, aPrunedCeremony).
-- rev-2 · 2026-07-19 · folded review wf_2f11fd07: template ≤32 KiB budget (extend DoD L43 in place,
-  not a new bullet; AC2 now measures); raised the coupled `pushed:<sha>` interaction as §8 Fork B
-  rather than leaving the contradiction; status → SPECCED.
+- rev-1 · 2026-07-19 · initial draft.
+- rev-2 · 2026-07-19 · folded wf_2f11fd07: in-place DoD extension; raised `pushed:<sha>` as Fork B.
+- rev-3 · 2026-07-19 · owner ratified Fork B option a; expanded S2 to the live-site inventory; status
+  → INPROGRESS.
+- rev-4 · 2026-07-19 · folded pre-code review wf_539c5419: added the IN-FLIGHT.md generator
+  `adopt-memory-tree.sh` L50 to S2 (+ kit-version bump S4) — omitting it resurrected the vocab in
+  every adopter; corrected S3 (live rows are bare `merged`, migrate to `merged:<sha>`, not a
+  nonexistent `pushed:<sha>`); broadened AC2 to `grep -rIn "pushed"` over the whole tree.

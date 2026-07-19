@@ -1,6 +1,6 @@
 # PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse
 
-**Status:** SPECCED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07
+**Status:** CLOSED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -75,7 +75,9 @@ Proposed `.domain-rules.md` §10 entry (house style — one dense sentence + fix
 
 ## 8. Open questions
 
-- **Fork — domain-rules §10 vs a new gate-discipline sub-head?** RECOMMEND: §10 (recurring bug
+none — the fork below is RESOLVED (owner-ratified 2026-07-19); kept for the record.
+
+- **Fork — domain-rules §10 vs a new gate-discipline sub-head?** RESOLVED (2026-07-19): built as recommended — §10 (recurring bug
   classes) — the rule prevents the green-by-absence bug class and sits next to PLAY-3's vacuous-gate
   entry; a new sub-head is more ceremony than a one-liner warrants.
 

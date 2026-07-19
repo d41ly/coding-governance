@@ -40,12 +40,12 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
 - User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
 - Codebase map adopted (§5)? New inventory keys claimed in the map tree (machine-enforced); dossier prose refreshed on touch; claim edits regen the generated artifacts in the same commit.
-- Memory (non-derivable only), decision log/backlog, and ledger row updated — **on disk before the wrap-up message** (§16).
+- Memory (non-derivable only), decision log/backlog, and ledger row updated — **committed before the push and the wrap-up message** (§16).
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
-- Re-run the full gate suite after EVERY merge — a conflict-free merge is not a passing merge.
+- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). The per-node ledger needs no reconcile — single writer (§3).
 - Kickoff-manifest exception: it reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
@@ -84,8 +84,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
 - Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
 - Shard the in-flight ledger per node — one file per node tag behind a thin pointer (like the per-node journals, §5), NEVER one shared table: each node writes ONLY its own file, so the ledger is conflict-free by construction (disjoint-by-tag, like the slug) and no merge touches it. A shared ledger is the shared-mutable index §5 forbids — it forces a conflict on every land and additive resolution leaves stale rows.
-- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged | pushed:<sha>}` + at most one short clause; narrative belongs in the journal. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
-- Self-prune on session start: after fast-forwarding `main`, delete your OWN `pushed:/merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
+- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged:<sha>}` + at most one short clause; narrative belongs in the journal. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
+- Self-prune on session start: after fast-forwarding `main`, delete your OWN `merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
@@ -123,7 +123,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §7 — Quality gates = the merge bar
 
-- Keep the automated suite green before any merge: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
 - Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
@@ -182,7 +182,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
 - Bound every command's output (it all lands in the transcript): `--stat`/`--name-only` over raw diffs; concise linter formats; head/tail caps on noisy tails; quiet test flags.
 - Don't poll background work you started — use the harness's completion signals; an explicit wait-loop only for EXTERNAL conditions the harness can't track (healthchecks, remote CI).
-- Lint the files you changed while iterating; the full-repo gate at merge; batch same-file fixes then re-run once; know which findings auto-`--fix` can't clear (e.g. line length) so you don't rerun expecting them gone.
+- Lint the files you changed while iterating; the full-repo gate at the push boundary; batch same-file fixes then re-run once; know which findings auto-`--fix` can't clear (e.g. line length) so you don't rerun expecting them gone.
 - Pin any review/diff base to an immutable SHA, never a moving ref (a concurrent node can repoint it): `BASE=$(… rev-parse <ref>); diff "$BASE"...HEAD`; full diff once, `--stat` re-checks after.
 - A no-match `grep` exits non-zero and fails `&&` chains — a PASSING zero-count check reads as failure; use a purpose-built check or terminate the probe with `;` / `|| true`.
 
