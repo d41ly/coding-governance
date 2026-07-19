@@ -14,7 +14,7 @@ manifest+canary** (TOOL-1 Fork A → build). Worktree `C:\projects\coding-govern
 
 - BU-0 · CLOSED · ratified specs (PLAY-4/TOOL-1 rev-4, TOOL-2 rev-3); pre-code review wf_539c5419 (7 confirmed, 2 build-breaking HIGHs) folded before code
 - BU-P1 · CLOSED · PLAY-1 full-run-at-push-boundary: reworded template L48/L126/L185 + AGENTS.md gate-suite + run-gates.sh L3 header; template 32737/32768 (31 under)
-- BU-P2 · OPEN · PLAY-2 fail-closed coarse scoping: add rule to .domain-rules.md §10
+- BU-P2 · CLOSED · PLAY-2 fail-closed coarse scoping rule added to .domain-rules.md §10 (+ the enforcement-conditional detail cut from the capped template L48)
 - BU-P3 · OPEN · PLAY-3 vacuous-ratchet bug class: add entry to .domain-rules.md §10
 - BU-P4 · OPEN · PLAY-4 bookkeeping-before-push (extend DoD L43) + retire pushed:<sha> across template §3 L87-88, HYGIENE.md:66 (+ HYGIENE.template.md source), IN-FLIGHT.md:3, WIRE-INTO-PROJECT.md:134, migrate node-a ledger rows (b.md left per write-only-your-own → backlog follow-up)
 - BU-T1 · OPEN · TOOL-1 manifest+canary: gate-legs.json + run-gates.sh rewrite + run-gates.test.sh + .gitattributes + AGENTS.md + PYBIN startup probe
