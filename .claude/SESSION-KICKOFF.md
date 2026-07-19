@@ -2,8 +2,8 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-07-19T22:54:23+03:00 @ bf7f2c227b93f7e465fd7f44678efb4257f1b64d
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
+last-audit: 2026-07-19T23:17:23+03:00 @ bf7f2c227b93f7e465fd7f44678efb4257f1b64d
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
 -->

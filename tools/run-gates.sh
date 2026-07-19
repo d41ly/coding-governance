@@ -30,7 +30,8 @@ leg_if_changed() { # guard-path[,guard-path...] · name · command...  (leg() co
   else n=$((n+1)); skips=$((skips+1)); printf 'GATE skip  %s (unchanged vs %s)\n' "$name" "${DEFBR:-baseline}"; fi
 }
 
-# Read the leg manifest as name<TAB>guard(comma-joined)<TAB>argv(joined by \x1f) per line.
+# Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
+# RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
 # Command-substitution surfaces a parse failure (a `< <()` process-sub would swallow it).
 legs=$("$PYBIN" -c '
 import json, sys

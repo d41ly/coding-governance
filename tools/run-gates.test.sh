@@ -8,7 +8,10 @@ PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
 command -v "$PYBIN" >/dev/null 2>&1 || { echo "canary: python ($PYBIN) not found"; exit 2; }
 fail=0
 
-# 1. manifest well-formed, non-empty, every argv[0] an allowed launcher.
+# 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
+#    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
+#    drop-sentinel (run-gates.sh skips it), and a launcher-only argv runs `bash </dev/null` = a silent
+#    no-op GATE ok — both are green-by-absence shapes this canary exists to forbid.
 "$PYBIN" -c '
 import json, sys
 try:
@@ -18,9 +21,10 @@ except Exception as e:
 if not isinstance(legs, list) or not legs:
     print("canary: gate-legs.json is empty or not a list"); sys.exit(1)
 ok = {"bash", "python", "python3"}
-bad = [l.get("name", "?") for l in legs if not l.get("argv") or l["argv"][0] not in ok]
+bad = [l.get("name", "?") for l in legs
+       if not str(l.get("name", "")).strip() or not l.get("argv") or len(l["argv"]) < 2 or l["argv"][0] not in ok]
 if bad:
-    print("canary: leg(s) whose argv[0] is not in {bash,python,python3}: " + ", ".join(bad)); sys.exit(1)
+    print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3}): " + ", ".join(bad)); sys.exit(1)
 ' || fail=1
 
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —
