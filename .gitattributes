@@ -4,6 +4,9 @@
 # Execution-sensitive scripts must be LF (run in bash/CI). Covers the relocated tools/ kits.
 *.sh text eol=lf
 
+# The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
+tools/gate-legs.json text eol=lf
+
 # memory-tree determinism (this repo dogfoods the kit): its generated TREE.md + the two ratchet
 # manifests are LF-pinned so a Windows autocrlf checkout can't spuriously fail hygiene check 9.
 memory/**/TREE.md text eol=lf

@@ -1,0 +1,18 @@
+[
+  { "name": "memory hygiene (12 checks)", "argv": ["bash", "tools/memory-tree/check-memory-hygiene.sh"] },
+  { "name": "kickoff-manifest ratchet", "argv": ["bash", "skills/session-kickoff/manifest-check.sh"] },
+  { "name": "template size <=32KiB", "argv": ["bash", "tools/check-template-size.sh"] },
+  { "name": "kit version markers", "argv": ["bash", "tools/check-kit-versions.sh"] },
+  { "name": "agent-instructions wiring", "argv": ["bash", "tools/agent-instructions/adopt-agent-instructions.sh", "--check", "--aliases", "claude"] },
+  { "name": "manifest-check self-test", "argv": ["bash", "skills/session-kickoff/manifest-check.test.sh"],
+    "guard": ["skills/session-kickoff/manifest-check.sh", "skills/session-kickoff/manifest-check.test.sh"] },
+  { "name": "agent-cap self-test", "argv": ["bash", "tools/hooks/agent-cap.test.sh"] },
+  { "name": "agent-instructions self-test", "argv": ["bash", "tools/agent-instructions/adopt-agent-instructions.test.sh"] },
+  { "name": "memory-hygiene self-test", "argv": ["bash", "tools/memory-tree/check-memory-hygiene.test.sh"] },
+  { "name": "branch-guard self-test", "argv": ["bash", ".githooks/pre-commit.test.sh"] },
+  { "name": "check-wiring self-test", "argv": ["bash", "tools/check-wiring.test.sh"] },
+  { "name": "pytest-guardrails self-test", "argv": ["bash", "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"] },
+  { "name": "codebase-map kit selftest", "argv": ["python3", "tools/codebase-map/selftest.py"] },
+  { "name": "settings-merge selftest", "argv": ["python3", "tools/settings-merge.py", "--selftest"] },
+  { "name": "run-gates canary", "argv": ["bash", "tools/run-gates.test.sh"] }
+]

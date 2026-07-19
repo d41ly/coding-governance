@@ -17,7 +17,7 @@ manifest+canary** (TOOL-1 Fork A → build). Worktree `C:\projects\coding-govern
 - BU-P2 · CLOSED · PLAY-2 fail-closed coarse scoping rule added to .domain-rules.md §10 (+ the enforcement-conditional detail cut from the capped template L48)
 - BU-P3 · CLOSED · PLAY-3 vacuous-ratchet bug class added to .domain-rules.md §10
 - BU-P4 · CLOSED · PLAY-4 DoD extended (bookkeeping before push) + pushed:<sha> retired at all 8 live sites incl. the adopt-memory-tree.sh + HYGIENE generators; kit 1.2→1.3; node-a rows migrated to merged:<sha>; template 32735/32768; kit-versions + AC2 grep clean
-- BU-T1 · OPEN · TOOL-1 manifest+canary: gate-legs.json + run-gates.sh rewrite + run-gates.test.sh + .gitattributes + AGENTS.md + PYBIN startup probe
+- BU-T1 · CLOSED · TOOL-1 manifest+canary BUILT: gate-legs.json (15 legs) + run-gates.sh iterator (PYBIN substitution, startup probe, \x1e field sep) + run-gates.test.sh + .gitattributes + AGENTS.md. Full run 15 legs GREEN; canary catches an injected path; AC5 verified
 - BU-T2 · OPEN · TOOL-2 pre-push enforcement: .githooks/pre-push + pre-push.test.sh + .gitattributes hook pins + AGENTS.md + drift-note
 
 ## Closing
