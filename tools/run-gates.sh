@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
-# All green before any merge. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
+# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
 #   bash tools/run-gates.sh
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }

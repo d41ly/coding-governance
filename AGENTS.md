@@ -45,7 +45,7 @@ minted once per session. Decisions/backlogs live per discipline under `memory/<d
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
-All green before any merge; each rides the runner:
+The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
 - `memory/` hygiene (12 checks) — `tools/memory-tree/check-memory-hygiene.sh`
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`

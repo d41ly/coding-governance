@@ -45,7 +45,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
-- Re-run the full gate suite after EVERY merge — a conflict-free merge is not a passing merge.
+- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). The per-node ledger needs no reconcile — single writer (§3).
 - Kickoff-manifest exception: it reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
@@ -123,7 +123,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §7 — Quality gates = the merge bar
 
-- Keep the automated suite green before any merge: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
 - Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
@@ -182,7 +182,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
 - Bound every command's output (it all lands in the transcript): `--stat`/`--name-only` over raw diffs; concise linter formats; head/tail caps on noisy tails; quiet test flags.
 - Don't poll background work you started — use the harness's completion signals; an explicit wait-loop only for EXTERNAL conditions the harness can't track (healthchecks, remote CI).
-- Lint the files you changed while iterating; the full-repo gate at merge; batch same-file fixes then re-run once; know which findings auto-`--fix` can't clear (e.g. line length) so you don't rerun expecting them gone.
+- Lint the files you changed while iterating; the full-repo gate at the push boundary; batch same-file fixes then re-run once; know which findings auto-`--fix` can't clear (e.g. line length) so you don't rerun expecting them gone.
 - Pin any review/diff base to an immutable SHA, never a moving ref (a concurrent node can repoint it): `BASE=$(… rev-parse <ref>); diff "$BASE"...HEAD`; full diff once, `--stat` re-checks after.
 - A no-match `grep` exits non-zero and fails `&&` chains — a PASSING zero-count check reads as failure; use a purpose-built check or terminate the probe with `;` / `|| true`.
 
