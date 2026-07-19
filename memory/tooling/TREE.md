@@ -10,3 +10,4 @@ memory/tooling/
     2026-07-15-TOOL-aRuledParchment/
     2026-07-15-TOOL-aWireWarden/
     2026-07-16-TOOL-bTamedTempest/
+    2026-07-19-TOOL-aPrunedCeremony/

@@ -12,3 +12,4 @@ memory/playbook/
     parallel-coding-governance.template-v-2-2.md
   builds/
     2026-07-03-PLAY-aLeanRework/
+    2026-07-19-PLAY-aPrunedCeremony/
