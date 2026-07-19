@@ -53,12 +53,19 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
+- pre-push self-test — `.githooks/pre-push.test.sh` (the pre-push runs the full bar on a default-branch push, blocks a red one)
 - wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
 
-Wire into CI by running `tools/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a
-follow-up). A tracked pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`) — it
-also enforces the §3 branch guard (refuses a primary-tree commit off the default branch; pin with
+The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
+branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated
+tree must be the pushed tip; `GOV_GATE_CMD` overrides the gate for testing; `--no-verify` bypasses).
+Earlier runs (DoR, post-merge) are diff-scoped. The active hooks are the tracked `.githooks/` dir via
+`core.hooksPath`, NOT an out-of-tree copy, so there is no staleness-drift class here (the
+`WIRE-INTO-PROJECT.md` copy-install path would reintroduce it — a scoped follow-up). Wire into CI by
+running `tools/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a follow-up). A tracked
+pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`) — it also
+enforces the §3 branch guard (refuses a primary-tree commit off the default branch; pin with
 `GOV_DEFAULT_BRANCH`, override with `--no-verify`). A SessionStart hook in `.claude/settings.json`
 runs `tools/check-wiring.sh --session`, which auto-sets an unset `core.hooksPath` (never clobbers a
 set value) so a fresh clone self-heals instead of running with dormant gates.
