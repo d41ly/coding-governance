@@ -1,6 +1,6 @@
 # TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)
 
-**Status:** INPROGRESS · rev-2 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
+**Status:** INPROGRESS · rev-3 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
 ## 1. Goal
 
@@ -15,20 +15,31 @@ scoped follow-up for that path, not universally moot (review R-TOOL-2-MED).
 
 ## 2. Scope (IN)
 
-- S1 — `.githooks/pre-push`: on a push whose ref set includes `refs/heads/main`, run
-  `bash tools/run-gates.sh` (full) and exit non-zero (blocking the push) if it reds; on any other
-  ref, do nothing. Classify by reading stdin ref lines; run the gate ONCE after the classify loop
-  with the gate's stdin redirected (`</dev/null`) so it cannot consume remaining ref lines.
+- S1 — `.githooks/pre-push`: on a push whose ref set includes `refs/heads/main`, run the gate (full)
+  and exit non-zero (blocking the push) if it reds; on any other ref, do nothing. Classify by reading
+  the stdin ref lines — git feeds `<local ref> <local sha> <remote ref> <remote sha>` per line, so
+  classify on the **3rd field** (`remote_ref == refs/heads/main`), NOT the local ref name, since
+  `git push origin feature/x:refs/heads/main` updates main from a differently-named local ref (review
+  wf_539c5419 TOOL-2-MED). Run the gate ONCE after the classify loop with its stdin redirected
+  (`</dev/null`) so it cannot consume remaining ref lines.
+- S1b — **Gate-invocation seam (review wf_539c5419 TOOL-2-MED).** The hook invokes the gate through
+  a named override so the test can stub it: `gate=${GOV_GATE_CMD:-bash tools/run-gates.sh}; $gate
+  </dev/null; rc=$?; [ "$rc" -eq 0 ] || exit "$rc"`. The fixture sets `GOV_GATE_CMD` to a throwaway
+  script (exit 1 = red case naming a fake leg for AC1; exit 0 = green main-push proceeds), so the
+  test NEVER runs the real bar and cannot recurse (the stub does no `git push`).
 - S2 — Precondition: the hook fires in the tree the push originates from, which may not be the pushed
   tip. Gate on what the existing branch guard actually provides — on the default branch in the
   primary tree (`git-common-dir == git-dir`, `branch == default`) — NOT on a "clean tree" notion the
   branch guard does not have (review R-TOOL-2-LOW). If uncommitted-change protection is genuinely
   wanted, state it as a NEW check, don't attribute it to the guard.
-- S3 — `.githooks/pre-push.test.sh`: a scratch-repo fixture that installs `core.hooksPath` in the
-  clone and drives a real `git push` against a local bare remote through the hook — covering
-  blocked-if-red on a `main` push, non-`main` ref skips, a multi-ref push, and a stubbed gate via an
-  env seam so the test never runs the real bar. Joins the gate suite.
-- S4 — Wire the new self-test into `tools/run-gates.sh` and `AGENTS.md`.
+- S3 — `.githooks/pre-push.test.sh`: a scratch-repo fixture that `git config core.hooksPath` in the
+  pushing clone (clone does NOT carry `core.hooksPath` — it is local config) and drives a real `git
+  push` against a local bare remote through the hook, with `GOV_GATE_CMD` set to a stub (S1b) —
+  covering: blocked-if-red on a `main` push, non-`main` ref skips, a multi-ref push, and a
+  **differently-named local ref pushed to main** (`git push origin feature/x:refs/heads/main`)
+  asserting the gate STILL fires (proves the 3rd-field classification, S1). Joins the gate suite.
+- S4 — Register the self-test as a leg in the gate suite (`AGENTS.md` gate-suite list; and, once
+  TOOL-aPrunedCeremony-1 lands the manifest, as a `gate-legs.json` entry).
 - S5 — `.gitattributes`: ADD `.githooks/pre-push text eol=lf` (and `.githooks/pre-commit text eol=lf`
   to close the same latent gap on the existing hook) — the file pins `*.sh` but NOT the extensionless
   hook files, so `* text=auto` alone can ship a CRLF hook on a Windows checkout (review
@@ -131,8 +142,8 @@ references.
 
 ## 8. Open questions
 
-- **Fork A — adopt the pre-push hook (owner menu 2).** RECOMMEND: yes — small, high-value, and it is
-  what makes PLAY-aPrunedCeremony-1's boundary machine-enforced rather than honor-system.
+- **Fork A — adopt the pre-push hook (owner menu 2).** RESOLVED (owner, 2026-07-19): yes — build it;
+  it makes PLAY-aPrunedCeremony-1's boundary machine-enforced rather than honor-system.
 - **Fork B — the drift signal for the copy-install path (rev-2).** `WIRE-INTO-PROJECT.md`'s
   copy-to-out-of-tree install re-creates the inCMS staleness class. RECOMMEND: file it as a separate
   follow-up scoped to that install path (a hash-of-tracked-vs-installed check in `check-wiring.sh`),
@@ -145,6 +156,10 @@ references.
 ## 9. Revision log
 
 - rev-1 · 2026-07-19 · initial draft (node a, aPrunedCeremony).
+- rev-3 · 2026-07-19 · folded pre-code review wf_539c5419: named the `GOV_GATE_CMD` gate-invocation
+  seam (S1b); pinned ref-classification to the 3rd field (`remote_ref`) + a differently-named-local-ref
+  fixture case; spelled out that the scratch clone must set `core.hooksPath` itself; resolved Fork A →
+  build; status stays INPROGRESS.
 - rev-2 · 2026-07-19 · folded review wf_2f11fd07: `.gitattributes` change is ADD not verify (the
   extensionless hook files were unpinned); scoped the drift-signal-N/A rationale to the direct-wire
   model and raised the copy-install drift as §8 Fork B (not universally moot); reframed the S2/Fork C

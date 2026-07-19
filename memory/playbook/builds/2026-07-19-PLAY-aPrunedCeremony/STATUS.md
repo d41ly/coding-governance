@@ -12,7 +12,7 @@ manifest+canary** (TOOL-1 Fork A → build). Worktree `C:\projects\coding-govern
 
 ## Build units
 
-- BU-0 · OPEN · ratify decisions into specs rev-3 + focused adversarial review before code
+- BU-0 · CLOSED · ratified specs (PLAY-4/TOOL-1 rev-4, TOOL-2 rev-3); pre-code review wf_539c5419 (7 confirmed, 2 build-breaking HIGHs) folded before code
 - BU-P1 · OPEN · PLAY-1 full-run-at-push-boundary: reword template §1 L48 / §7 L126 / §14 L185 / §1 L39 + AGENTS.md + run-gates.sh L3 (byte-neutral; re-measure ≤32 KiB)
 - BU-P2 · OPEN · PLAY-2 fail-closed coarse scoping: add rule to .domain-rules.md §10
 - BU-P3 · OPEN · PLAY-3 vacuous-ratchet bug class: add entry to .domain-rules.md §10
