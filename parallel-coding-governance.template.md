@@ -40,7 +40,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
 - User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
 - Codebase map adopted (§5)? New inventory keys claimed in the map tree (machine-enforced); dossier prose refreshed on touch; claim edits regen the generated artifacts in the same commit.
-- Memory (non-derivable only), decision log/backlog, and ledger row updated — **on disk before the wrap-up message** (§16).
+- Memory (non-derivable only), decision log/backlog, and ledger row updated — **committed before the push and the wrap-up message** (§16).
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
@@ -84,8 +84,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
 - Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
 - Shard the in-flight ledger per node — one file per node tag behind a thin pointer (like the per-node journals, §5), NEVER one shared table: each node writes ONLY its own file, so the ledger is conflict-free by construction (disjoint-by-tag, like the slug) and no merge touches it. A shared ledger is the shared-mutable index §5 forbids — it forces a conflict on every land and additive resolution leaves stale rows.
-- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged | pushed:<sha>}` + at most one short clause; narrative belongs in the journal. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
-- Self-prune on session start: after fast-forwarding `main`, delete your OWN `pushed:/merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
+- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged:<sha>}` + at most one short clause; narrative belongs in the journal. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
+- Self-prune on session start: after fast-forwarding `main`, delete your OWN `merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.

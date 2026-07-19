@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@1.1 -->
+<!-- gov:kit memory-tree@1.3 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -63,7 +63,7 @@ row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only 
 Every backlog / STATUS row leads with exactly one token of
 `OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`, in its `·`/`|`/leading-dash slot
 (a prose mention of one of these words elsewhere on the line does not count). Distinct from the
-session-ledger vocabulary (`in-flight | merged | pushed:<sha>`, IN-FLIGHT.md). New-entry dash form:
+session-ledger vocabulary (`in-flight | merged:<sha>`, IN-FLIGHT.md). New-entry dash form:
 `- <id> · <STATUS> · <one-liner>[ → <pointer>]`.
 Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle meanings — see
 `TEMPLATE-SPEC.md`.
