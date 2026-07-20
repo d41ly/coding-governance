@@ -1,6 +1,6 @@
 # TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit
 
-**Status:** SPECCED · rev-4 · 2026-07-20 · node a · Tier-2 · base d5ada669 · ports inCMS ARCH-aLeasedGauntlet-1 · reviewed wf_76540d9d,wf_e2be3386 · owner-ratified 2026-07-20
+**Status:** CLOSED · rev-4 · 2026-07-20 · node a · Tier-2 · base d5ada669 · ports inCMS ARCH-aLeasedGauntlet-1 · reviewed wf_76540d9d,wf_e2be3386 · owner-ratified 2026-07-20 · built+closing-reviewed (wf_2a93910e, 7 findings folded)+landed 2026-07-20
 
 ## 1. Goal
 
@@ -135,11 +135,13 @@ raw push.
 
 ## 8. Open questions
 
-- **Fork A — port timing: after inCMS proves rev-3, or in parallel?** RECOMMEND: after — let inCMS
-  prove the lander in anger, then port the settled design.
-- **Fork B — `push-main.ps1` twin in-scope?** RECOMMEND: no (bash-only).
-- **Fork C — S4 template prose vs `.domain-rules.md`.** RECOMMEND: reword §1 Landing in place
-  (byte-neutral), overflow the `push-main` flow detail to `.domain-rules.md`; re-measure the size gate.
+none — all forks resolved (built + landed 2026-07-20 alongside inCMS ARCH-aLeasedGauntlet-1).
+
+- **Fork A — port timing: after inCMS proves rev-3, or in parallel?** RESOLVED: built and landed in
+  the same session as inCMS (the settled design ported directly).
+- **Fork B — `push-main.ps1` twin in-scope?** RESOLVED: no — bash-only, as shipped.
+- **Fork C — S4 template prose vs `.domain-rules.md`.** RESOLVED: the reconcile-before-gate discipline
+  landed in `.domain-rules.md` §10 (uncapped companion); the template stayed under the 32 KiB gate.
 
 ## 9. Revision log
 
