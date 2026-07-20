@@ -11,8 +11,14 @@ set -u
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 cd "$top" || exit 0
 
-def=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); def=${def#origin/}
-def=${GOV_DEFAULT_BRANCH:-${def:-main}}
+def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)}
+def=${def#origin/}
+if [ -z "$def" ]; then
+  echo "pre-push: can't determine the default branch (origin/HEAD unset and GOV_DEFAULT_BRANCH unset)." >&2
+  echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
+  echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  exit 1
+fi
 
 # git feeds one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default

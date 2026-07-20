@@ -58,7 +58,7 @@ echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
-sfile="$(git rev-parse --git-dir 2>/dev/null)/gate-last-summary.txt"
+gd="$(git rev-parse --git-dir 2>/dev/null)"; sfile=""; [ -n "$gd" ] && sfile="$gd/gate-last-summary.txt"
 if [ "$fails" = 0 ]; then
   [ -n "$sfile" ] && printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote" >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0

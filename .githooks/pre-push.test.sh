@@ -11,6 +11,9 @@ trap 'rm -rf "$tmp"' EXIT
 fail=0
 ok() { echo "  ok   — $1"; }
 bad() { echo "  FAIL — $1"; fail=1; }
+# The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
+# fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
+export GOV_DEFAULT_BRANCH=main
 
 # Isolate ONLY the pre-push hook (a scratch hooks dir) so the repo's pre-commit branch-guard does not
 # fire on the test's own setup commits. A clone does NOT carry core.hooksPath — set it explicitly.
@@ -54,5 +57,14 @@ if GOV_GATE_CMD="bash $red" git push -q origin feature:refs/heads/main >/dev/nul
 git checkout -q main
 git commit -q --allow-empty -m m2
 if GOV_GATE_CMD="bash $red" git push -q origin main feature >/dev/null 2>&1; then bad "5 multi-ref push incl. main must be gated"; else ok "5 multi-ref push incl. main is gated"; fi
+
+# case 6 — fail CLOSED when the default branch is unresolvable (origin/HEAD unset AND GOV_DEFAULT_BRANCH
+#          unset): the hook must REFUSE, not silently assume 'main' and BYPASS the gate on a non-main default.
+git checkout -q main
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"determine the default branch"*) ok "6 unresolvable default branch → fail closed" ;;
+  *) bad "6 expected fail-closed refusal, got: ${msg:-<push SUCCEEDED>}" ;;
+esac
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

@@ -20,6 +20,9 @@ if [ -f "$tmp/race-once" ]; then rm -f "$tmp/race-once"; git -C "$tmp/racer" com
 STUB
 chmod +x "$tmp/stub.sh"
 export GOV_GATE_CMD="bash $tmp/stub.sh"
+# The scratch work repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
+# and lander's fail-CLOSED resolution doesn't refuse every case (that path is tested by cases 7-8).
+export GOV_DEFAULT_BRANCH=main
 
 setup_repo() {  # $1 = repo dir
   local r=$1
@@ -70,5 +73,15 @@ git -C "$tmp/racer" pull -q; echo racer > "$tmp/racer/CONF"; git -C "$tmp/racer"
 echo mine > CONF; git add CONF; git commit -q -m mc
 bash tools/push-main.sh >/dev/null 2>&1
 if [ -z "$(git status --porcelain)" ] && [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then ok "6 conflict aborted clean, marker gone"; else bad "6 conflict must abort clean"; fi
+
+# 7 — a DIRTY working tree is refused early (commit/stash), NOT misreported as a reconcile conflict
+echo v1 > junk; git add junk; git commit -q -m junk; echo v2 > junk
+out7=$(bash tools/push-main.sh 2>&1)
+case "$out7" in *"uncommitted changes"*) ok "7 dirty tree refused early (commit/stash)";; *) bad "7 dirty tree must be refused: $out7";; esac
+git checkout -q -- junk 2>/dev/null || true
+
+# 8 — the lander fails CLOSED when the default branch is unresolvable (origin/HEAD unset here)
+out8=$( ( unset GOV_DEFAULT_BRANCH; bash tools/push-main.sh 2>&1 ) )
+case "$out8" in *"determine the default branch"*) ok "8 unresolvable default → fail closed";; *) bad "8 expected fail-closed: $out8";; esac
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
