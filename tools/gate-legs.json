@@ -11,6 +11,7 @@
   { "name": "memory-hygiene self-test", "argv": ["bash", "tools/memory-tree/check-memory-hygiene.test.sh"] },
   { "name": "branch-guard self-test", "argv": ["bash", ".githooks/pre-commit.test.sh"] },
   { "name": "pre-push self-test", "argv": ["bash", ".githooks/pre-push.test.sh"] },
+  { "name": "push-main self-test", "argv": ["bash", "tools/push-main.test.sh"] },
   { "name": "check-wiring self-test", "argv": ["bash", "tools/check-wiring.test.sh"] },
   { "name": "pytest-guardrails self-test", "argv": ["bash", "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"] },
   { "name": "codebase-map kit selftest", "argv": ["python3", "tools/codebase-map/selftest.py"] },

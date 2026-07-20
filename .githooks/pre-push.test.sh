@@ -26,6 +26,12 @@ git commit -q --allow-empty -m init
 git branch -M main
 git remote add origin "$tmp/remote.git"
 
+# case 0 — a raw default-branch push with NO push-main marker is refused (TOOL-aLeasedGauntlet-1).
+git commit -q --allow-empty -m c0
+if git push -q origin main >/dev/null 2>&1; then bad "0 raw push (no marker) must be refused"; else ok "0 raw push (no marker) refused"; fi
+# The remaining cases exercise the GATE — set the marker push-main would set (the hook only CHECKS it).
+touch "$(git rev-parse --git-dir)/push-main-active"
+
 red="$tmp/red.sh";   printf '#!/usr/bin/env bash\necho "FAKE LEG failed"; exit 1\n' > "$red"
 green="$tmp/green.sh"; printf '#!/usr/bin/env bash\nexit 0\n' > "$green"
 

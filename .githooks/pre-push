@@ -25,6 +25,15 @@ done
 [ -z "$main_local" ] && exit 0                       # no push to the default branch → nothing to gate
 [ -z "${main_local//0/}" ] && exit 0                 # all-zero local sha = a delete → nothing to gate
 
+# TOOL-aLeasedGauntlet-1: a default-branch push must go through tools/push-main.sh, which reconciles
+# origin BEFORE this full gate so it never runs on a stale tree. The lander sets this marker; a raw
+# push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
+# unmarked default-branch push is refused.
+if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
+  echo "pre-push: refusing a raw push to $def — land via tools/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
+  exit 1
+fi
+
 # The tree the hook validates must BE the pushed default-branch tip, else the gate certifies content
 # that isn't what lands (a push issued from a feature worktree, or `git push <sha>:main`).
 head=$(git rev-parse HEAD 2>/dev/null || true)

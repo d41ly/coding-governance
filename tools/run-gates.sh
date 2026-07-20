@@ -20,7 +20,8 @@ leg() { # name · command...
   local name=$1; shift; n=$((n+1))
   local out; out=$("$@" </dev/null 2>&1); local rc=$?   # legs never read stdin — deny it so a stray reader can't hang the bar
   if [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "$name"
-  else fails=$((fails+1)); printf 'GATE FAIL  %s (exit %d)\n' "$name" "$rc"; printf '%s\n' "$out" | sed 's/^/    /'; fi
+  else fails=$((fails+1)); printf 'GATE FAIL  %s (exit %d)\n' "$name" "$rc"; printf '%s\n' "$out" | sed 's/^/    /'
+       FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  $name (exit $rc)"$'\n'; fi   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
 }
 
 leg_if_changed() { # guard-path[,guard-path...] · name · command...  (leg() counts n on run; skip counts here)
@@ -55,5 +56,15 @@ done <<<"$legs"
 
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
-if [ "$fails" = 0 ]; then echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
-else echo "gates RED — $fails/$n legs failed$skipnote"; exit 1; fi
+# TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
+# gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
+sfile="$(git rev-parse --git-dir 2>/dev/null)/gate-last-summary.txt"
+if [ "$fails" = 0 ]; then
+  [ -n "$sfile" ] && printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote" >"$sfile" 2>/dev/null || true
+  echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
+else
+  [ -n "$sfile" ] && { printf '%s' "${FAILED_LEGS:-}" >"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  echo "gates RED — $fails/$n legs failed$skipnote"
+  [ -n "$sfile" ] && echo "gate summary saved to $sfile"
+  exit 1
+fi
