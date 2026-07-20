@@ -248,6 +248,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   overwrites a deliberate value (e.g. the out-of-tree copy above), so a fresh clone self-heals.
 - Add `bash tools/check-wiring.test.sh` as a gate-runner leg. Do NOT run `check-wiring.sh --check` itself
   as a merge-bar leg — it would false-fail in CI, where `core.hooksPath` is correctly never set.
+- **Land the default branch via `tools/push-main.sh`** (TOOL-aLeasedGauntlet-1): it fetch-reconciles
+  origin BEFORE the pre-push gate so the ~min gate never runs on a stale tree, and bounds a during-gate
+  remote race at `GOV_PUSH_MAIN_MAX_RETRIES` (default 3). The `pre-push` hook refuses a raw default-branch
+  push that bypasses it (a local marker; `--no-verify` bypasses). Add `bash tools/push-main.test.sh` as a
+  gate-runner leg (the lander self-test).
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
 - Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
