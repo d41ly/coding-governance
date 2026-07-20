@@ -11,8 +11,14 @@ set -u
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 cd "$top" || exit 0
 
-def=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); def=${def#origin/}
-def=${GOV_DEFAULT_BRANCH:-${def:-main}}
+def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)}
+def=${def#origin/}
+if [ -z "$def" ]; then
+  echo "pre-push: can't determine the default branch (origin/HEAD unset and GOV_DEFAULT_BRANCH unset)." >&2
+  echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
+  echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  exit 1
+fi
 
 # git feeds one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
@@ -24,6 +30,15 @@ done
 
 [ -z "$main_local" ] && exit 0                       # no push to the default branch → nothing to gate
 [ -z "${main_local//0/}" ] && exit 0                 # all-zero local sha = a delete → nothing to gate
+
+# TOOL-aLeasedGauntlet-1: a default-branch push must go through tools/push-main.sh, which reconciles
+# origin BEFORE this full gate so it never runs on a stale tree. The lander sets this marker; a raw
+# push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
+# unmarked default-branch push is refused.
+if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
+  echo "pre-push: refusing a raw push to $def — land via tools/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
+  exit 1
+fi
 
 # The tree the hook validates must BE the pushed default-branch tip, else the gate certifies content
 # that isn't what lands (a push issued from a feature worktree, or `git push <sha>:main`).
