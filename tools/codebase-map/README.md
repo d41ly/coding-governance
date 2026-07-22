@@ -23,6 +23,10 @@ project specifics live in exactly two files the adopting repo owns.
   (zero CI changes: a test file is its own deployment). Also runs standalone (`python <file>`).
 - `gen_map.py` / `map_diff.py` — CLIs: `--scaffold · --write · --check · --seed-baseline ·
   --seed-affordance-baseline`, and the range digest.
+- `reuse_lookup.py` + `reuse-lookup.agent.md` — the behaviour→seam lookup (S3): a portable CLI that
+  ranks a reuse shortlist from the map's four recall sources (symbols · inventory keys · affordance
+  seams · shared-seams prose), plus the agent-instruction that turns it into a decision. Run it
+  BEFORE building new behaviour to wire through an existing seam instead of reinventing it.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
 - `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
 - `selftest.py` — the kit's own contract check (`python codebase-map/selftest.py`).

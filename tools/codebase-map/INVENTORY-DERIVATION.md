@@ -97,8 +97,14 @@ can discover an existing seam instead of reinventing it. It is a separate plane:
   your gate env has one.
 - **Opt out by leaving `SYMBOL_EXTRACTORS` empty** — no `symbols.json` is rendered and the gate
   demands none. A layer you deliberately do not cover is recorded recall-dark in
-  `.codebase-map.conf` so the lookup can announce the gap (rather than a falsely-confident "no
-  seam fits").
+  `.codebase-map.conf` (`RECALL_DARK_LAYERS`) so the lookup can announce the gap (rather than a
+  falsely-confident "no seam fits").
+- **Use it via `reuse_lookup.py`.** The recall tier exists to be queried: before building new
+  behaviour, run `python codebase-map/reuse_lookup.py "<behaviour>"` (see
+  `reuse-lookup.agent.md`). It assembles a ranked shortlist from the corpus (symbols + inventory
+  keys + `## Reuse affordance` seams + `## Shared seams` prose), computes fan-in on demand to mark
+  hot seams, and flags recall-dark layers. Set `SEAM_FANIN_THRESHOLD` in `.codebase-map.conf` (default
+  3) to tune what counts as "a seam". Fan-in is never committed — computed on demand, outside the gate.
 
 ## 5. Accepted residuals (know them; don't rediscover them)
 

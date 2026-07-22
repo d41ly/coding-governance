@@ -149,6 +149,10 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
    gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY=python3`
    overrides the launcher. A NEW dossier is never exempt — new work records its reuse decision
    (`seam: <id> — reuse for <need>; extend via <point>`, or `none — <why>`) or the gate reds.
+   **DoR (before building):** run `python codebase-map/reuse_lookup.py "<behaviour>"` (the
+   behaviour→seam lookup, per `codebase-map/reuse-lookup.agent.md`) to find an existing seam to
+   wire through; list any layer with no symbol extractor in `.codebase-map.conf` `RECALL_DARK_LAYERS`
+   so the lookup flags the gap instead of a falsely-confident "no seam fits".
 5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
    for a Python repo that is the entire CI wiring: zero pipeline changes by design.
    **Non-Python repo** (no pytest/py collector to discover the `.py` gate): wire it as an explicit

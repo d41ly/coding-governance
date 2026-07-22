@@ -21,3 +21,17 @@ GATE_FILE=tests/test_codebase_map.py
 # manifest (humans/docs; gate remedy messages print the plain `python` spelling). Adjust if
 # your launcher differs — e.g. `uv run python …` or `python3 …`.
 MAP_DIFF_CMD="python codebase-map/map_diff.py"
+
+# --- reuse-convergence layer (optional; only meaningful with the SYMBOL recall tier) ----------
+
+# Layers you deliberately do NOT cover with a SYMBOL_EXTRACTOR (map_extractors.py) — a
+# space/comma-separated list. reuse_lookup.py names them in its partial-recall notice so an empty
+# "no seam fits" is never falsely confident (a seam in a recall-dark layer won't be in the corpus).
+# Leave empty when every layer has an extractor. Quote it — it has spaces.
+RECALL_DARK_LAYERS=""
+
+# Fan-in at/above which a symbol counts as a reusable "seam": referenced from >= this many distinct
+# files (import/identifier positions). Used by reuse_lookup (hot-seam ranking) and map_diff
+# --converge (collision detection). Integer >= 1; default 3. Raise it in a big repo where 3 files
+# is common, lower it in a small one.
+SEAM_FANIN_THRESHOLD=3

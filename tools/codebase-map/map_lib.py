@@ -361,6 +361,143 @@ def enumerate_exports(
 
 
 # ======================================================================================
+# Reuse-convergence shared primitives (tokens · stems · fan-in)
+# ======================================================================================
+#
+# The recall/collision math, written ONCE and shared by reuse_lookup.py (S3, behaviour->seam
+# lookup) and map_diff --converge (S5, shipped-reinvention detector). If these lived in either
+# CLI the other would reinvent them — the exact drift this whole tool exists to kill. Pure,
+# stdlib, deterministic. NONE of this is committed to an artifact: fan-in restales a file on
+# nearly every commit (that is why symbols.json is {id,kind,file}-only), so it is computed on
+# demand OUTSIDE the freshness gate.
+
+#: default fan-in at/above which a symbol counts as a reusable "seam" (referenced from >= this
+#: many distinct files). Override per repo as SEAM_FANIN_THRESHOLD in .codebase-map.conf.
+SEAM_FANIN_THRESHOLD_DEFAULT = 3
+
+#: english glue dropped from a stem set so it never drives a match/collision.
+_STOPWORDS = frozenset(
+    {"a", "an", "the", "to", "of", "in", "on", "for", "and", "or", "is", "be", "as",
+     "at", "by", "from", "into", "with", "it", "this", "that"}
+)
+
+#: crude single-strip suffixes, LONGEST-first (so `slugify` -> `slug` via `ify`, never via `y`).
+#: A documented crude-stemmer ceiling: no external NLP, so it won't unify irregular plurals or
+#: synonyms — that is the agent-read's job (S3), not this lexical shortlist's.
+_STEM_SUFFIXES = tuple(
+    sorted(
+        {"ations", "ization", "isation", "ation", "izing", "ising", "ing", "ings",
+         "able", "ible", "ment", "ness", "tion", "sion", "ize", "ise", "ify",
+         "ers", "ors", "er", "or", "ed", "es", "s", "e"},
+        key=len,
+        reverse=True,
+    )
+)
+
+#: camelCase / snake / kebab / path / digit boundary splitter — `getUserID` -> [get,user,id],
+#: `api/x/route.ts` -> [api,x,route,ts], `slugify` -> [slugify]. `[A-Z]+(?![a-z])` keeps an
+#: acronym run (`HTTPServer` -> [http, server]) instead of shredding it.
+_SUBTOKEN_RE = re.compile(r"[A-Z]+(?![a-z])|[A-Z][a-z]*|[a-z]+|[0-9]+")
+
+
+def subtokens(text: str) -> list[str]:
+    """Lowercase word pieces of an identifier, key, or free-text phrase, split on camelCase,
+    snake_case, kebab, path (`/` `.`), and digit boundaries. The single tokenizer behind both
+    the recall corpus (S3) and the collision stem-compare (S5)."""
+    return [t.lower() for t in _SUBTOKEN_RE.findall(text)]
+
+
+def _stem(word: str) -> str:
+    for suf in _STEM_SUFFIXES:
+        if word.endswith(suf) and len(word) - len(suf) >= 3:
+            return word[: -len(suf)]
+    return word
+
+
+def stems(text: str) -> frozenset[str]:
+    """Stem set of any identifier, key, or behaviour query. Two strings SHARE A TOKEN STEM iff
+    their stem sets intersect — the one definition of "lexically related" used by the lookup
+    shortlist AND the --converge collision check, so a match means the same thing in both.
+    Stopwords + 1-char tokens dropped; each subtoken crudely stemmed (see _STEM_SUFFIXES)."""
+    return frozenset(
+        _stem(t) for t in subtokens(text) if t not in _STOPWORDS and len(t) >= 2
+    )
+
+
+_LINE_COMMENT_RE = re.compile(r"(?://|#).*$", re.MULTILINE)
+_STRING_RE = re.compile(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`]*`')
+_IDENT_TOKEN_RE = re.compile(r"[A-Za-z_$][\w$]*")
+
+
+def _identifier_tokens(source: str) -> set[str]:
+    """Distinct identifier tokens in a source file, with comments and string literals stripped
+    first (crudely: `/* */`, trailing `//`/`#`, then quoted spans) so fan-in is
+    import/identifier-scoped, never counting a name that only appears in a doc-comment or a
+    string. A documented heuristic (a `//` inside a string over-strips its tail); good enough
+    for ranking + a WARN, per §3."""
+    cleaned = _BLOCK_COMMENT_RE.sub(" ", source)
+    cleaned = _LINE_COMMENT_RE.sub(" ", cleaned)
+    cleaned = _STRING_RE.sub(" ", cleaned)
+    return set(_IDENT_TOKEN_RE.findall(cleaned))
+
+
+def build_reference_index(
+    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS
+) -> dict[str, set[str]]:
+    """token -> {POSIX files mentioning it as an identifier}, scanned over the covered-layer
+    source: the top-level dirs of ``files`` (a symbols.json file list), filtered to their
+    extension set. This is the on-demand scan behind fan_in — NEVER committed. Fail-open by
+    design on an unreadable file (skipped): this feeds a RANKING/WARN, not a gate, so a binary
+    blob must not abort the lookup (the opposite of the extractor law, and deliberately so)."""
+    root = root or repo_root()
+    roots = sorted({f.split("/", 1)[0] for f in files if f})
+    exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
+    index: dict[str, set[str]] = {}
+    for top in roots:
+        base = root / top
+        if not base.is_dir():
+            continue
+        for dirpath, dirnames, names in os.walk(base):
+            dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+            for name in sorted(names):
+                if exts and Path(name).suffix not in exts:
+                    continue
+                path = Path(dirpath) / name
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except (UnicodeDecodeError, OSError):
+                    continue
+                rel = path.relative_to(root).as_posix()
+                for tok in _identifier_tokens(text):
+                    index.setdefault(tok, set()).add(rel)
+    return index
+
+
+def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
+    """Distinct files referencing ``symbol_id`` as an identifier, minus its own def file (the
+    data-model definition). An import/identifier-scoped HEURISTIC, not a resolved call graph
+    (§3 non-goal): over-counts a common id (`get`), under-counts registry/dynamic dispatch — a
+    documented recall FLOOR used for ranking + a review WARN, never gated."""
+    return len(index.get(symbol_id, set()) - {def_file})
+
+
+def seam_fanin_threshold(root: Path | None = None) -> int:
+    """The configured seam fan-in threshold (SEAM_FANIN_THRESHOLD in .codebase-map.conf),
+    default SEAM_FANIN_THRESHOLD_DEFAULT. Shared by the lookup (hot-seam ranking) and --converge
+    (collision detection) so the two agree on what "a seam" is."""
+    raw = load_conf(root).get("SEAM_FANIN_THRESHOLD")
+    if not raw:
+        return SEAM_FANIN_THRESHOLD_DEFAULT
+    try:
+        n = int(raw)
+    except ValueError as exc:
+        raise MapError(f"SEAM_FANIN_THRESHOLD must be an integer, got {raw!r}") from exc
+    if n < 1:
+        raise MapError(f"SEAM_FANIN_THRESHOLD must be >= 1, got {n}")
+    return n
+
+
+# ======================================================================================
 # Dossier / baseline contract
 # ======================================================================================
 
