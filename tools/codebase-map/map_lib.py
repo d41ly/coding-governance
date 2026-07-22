@@ -308,13 +308,17 @@ _BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
 
 def _has_top_level_comma(s: str) -> bool:
     """True if ``s`` has a comma at bracket-depth 0 — for an ``export const/let/var`` line, a second
-    declarator (``a = 1, b = 2``). A comma inside ``()``/``[]``/``{}`` (an array/object/call
-    initializer) is NOT a declarator separator and must not trip this."""
+    declarator (``a = 1, b = 2``). A comma inside ``()``/``[]``/``{}``/``<>`` (an array/object/call
+    initializer, or a TS generic like ``Record<string, string>`` / ``forwardRef<A, B>``) is NOT a
+    declarator separator and must not trip this. Ceiling (documented, rare): a bare ``<``/``>``
+    comparison or bit-shift appearing before a genuine second declarator can mask it — use a real
+    parser for full fidelity. Tracking ``<>`` fixes the common false positive: a single-declarator
+    ``export const x: Generic<A, B> = …`` is overwhelmingly more common than that comparison case."""
     depth = 0
     for ch in s:
-        if ch in "([{":
+        if ch in "([{<":
             depth += 1
-        elif ch in ")]}":
+        elif ch in ")]}>":
             depth = max(0, depth - 1)
         elif ch == "," and depth == 0:
             return True

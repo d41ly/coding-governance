@@ -296,6 +296,10 @@ def t_symbol_extractors_fail_closed(tmp: Path):
     # a single declarator with a bracketed comma is NOT a multi-declarator -> no raise:
     (md / "x.ts").write_text("export const xs = [1, 2, 3];\n", encoding="utf-8")
     assert {s["id"] for s in m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp)} == {"xs"}
+    # a single declarator whose comma sits inside a TS generic is NOT multi-declarator -> no raise
+    # (the <> depth fix — the common false positive that blocked a real TS adopter):
+    (md / "x.ts").write_text("export const role: Record<string, string> = {};\n", encoding="utf-8")
+    assert {s["id"] for s in m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp)} == {"role"}
     # anonymous default class extending a base emits NO bogus id "extends":
     (md / "x.ts").write_text("export default class extends Base {}\n", encoding="utf-8")
     assert m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp) == []
