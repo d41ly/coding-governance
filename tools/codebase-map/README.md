@@ -21,8 +21,8 @@ project specifics live in exactly two files the adopting repo owns.
   `INVENTORY-DERIVATION.md`.
 - `test_codebase_map.template.py` — the gate; copied into the project's existing test dir
   (zero CI changes: a test file is its own deployment). Also runs standalone (`python <file>`).
-- `gen_map.py` / `map_diff.py` — CLIs: `--scaffold · --write · --check · --seed-baseline`,
-  and the range digest.
+- `gen_map.py` / `map_diff.py` — CLIs: `--scaffold · --write · --check · --seed-baseline ·
+  --seed-affordance-baseline`, and the range digest.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
 - `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
 - `selftest.py` — the kit's own contract check (`python codebase-map/selftest.py`).
@@ -45,6 +45,13 @@ project specifics live in exactly two files the adopting repo owns.
 Claims are exact keys, gated BOTH directions; path globs are digest-only and never gated;
 baseline additions are reserved for the initial backfill (shrink-only, socially enforced);
 dossiers carry three pinned prose sections (`## Constraints & why`, `## Shared seams`,
-`## Gaps`); generated artifacts are byte-deterministic (POSIX keys, LF compares, no
+`## Gaps`) plus a GRACED `## Reuse affordance` section (list the seams this feature is reused
+through — `seam: <id> — reuse for <need>; extend via <point>` — or `none — <why>`; presence
+gated, content not); generated artifacts are byte-deterministic (POSIX keys, LF compares, no
 timestamps) so the freshness gate cannot flap across platforms; convergence rides the
 design pass — substantial work touching an undossiered feature creates its dossier then.
+
+The affordance check is graced by a shrink-only `affordance-exempt.toml` (feature names),
+seeded from existing dossiers at adoption (`gen_map.py --seed-affordance-baseline`, wired into
+the adopter) so it never retro-reds the fleet; a NEW dossier is never exempt, so new work is
+always forced to record its reuse decision.

@@ -6,6 +6,7 @@ Run from the ADOPTING repo's root:
     python codebase-map/gen_map.py --write           # (re)render generated/ to disk
     python codebase-map/gen_map.py --check           # byte-compare (LF-normalized); exit 1
     python codebase-map/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
+    python codebase-map/gen_map.py --seed-affordance-baseline  # grace today's dossiers (adopt)
 
 Requires a filled codebase-map/map_extractors.py (the template refuses an empty EXTRACTORS).
 """
@@ -108,10 +109,23 @@ def _seed_baseline() -> None:
     print(f"baseline: {sum(len(v) for v in cov.unclaimed.values())} unclaimed keys")
 
 
+def _seed_affordance_baseline() -> None:
+    """Seed affordance-exempt.toml from the EXISTING dossiers lacking the `## Reuse affordance`
+    section — the mirror of --seed-baseline. Makes adoption/re-adoption green by construction:
+    today's dossiers are graced, new ones are not. Shrink-only thereafter (never adds a dossier
+    that has the section — it's not an offender)."""
+    tree = m.load_map_tree(IDS, decision_id_re=ID_RE)
+    features_dir = m.map_root() / "features"
+    texts = {d.feature: (features_dir / f"{d.feature}.md").read_text(encoding="utf-8") for d in tree.dossiers}
+    exempt = m.affordance_offenders(texts, frozenset())  # every dossier without a block → graced
+    _write(m.map_root() / "affordance-exempt.toml", m.render_affordance_exempt(exempt))
+    print(f"affordance-exempt: {len(exempt)} dossier(s) graced")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--scaffold", "--write", "--check", "--seed-baseline"):
+    for flag in ("--scaffold", "--write", "--check", "--seed-baseline", "--seed-affordance-baseline"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
 
@@ -148,6 +162,10 @@ def main() -> int:
 
     if args.seed_baseline:
         _seed_baseline()
+        return 0
+
+    if args.seed_affordance_baseline:
+        _seed_affordance_baseline()
         return 0
 
     stale = False

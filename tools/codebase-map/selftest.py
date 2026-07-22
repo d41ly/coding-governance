@@ -285,6 +285,62 @@ def t_symbol_extractors_fail_closed(tmp: Path):
         assert "unmodelled" in str(exc)
 
 
+def t_affordance_graced_presence(tmp: Path):
+    # --- parse_affordance: leading seam block, none decl, delimiter-agnostic, presence-only ----
+    seams = m.parse_affordance(
+        "## Reuse affordance\n"
+        "\n"
+        "seam: slugify — reuse for name→slug; extend via the transform registry\n"
+        "seam: Button - reuse for buttons; extend via the variant prop\n"  # plain hyphen delimiter
+        "\n"
+        "## Gaps\n"
+    )
+    assert seams.heading_present and seams.has_block
+    assert seams.seams == ("slugify", "Button") and not seams.is_none  # id = first token, delim free
+    none_aff = m.parse_affordance("## Reuse affordance\nnone — feature-specific glue, nothing reusable\n")
+    assert none_aff.heading_present and none_aff.is_none and none_aff.has_block and none_aff.seams == ()
+    bare = m.parse_affordance("## Reuse affordance\n\n## Gaps\n")
+    assert bare.heading_present and not bare.has_block  # a bare heading dodges the decision → fails
+    absent = m.parse_affordance("## Constraints & why\nx\n## Gaps\ny\n")
+    assert not absent.heading_present and not absent.has_block
+    # "leading CONSECUTIVE": prose ends the run — a `seam:` after prose is NOT in the block
+    broken = m.parse_affordance("## Reuse affordance\nseam: a — x\nSee the notes.\nseam: b — y\n")
+    assert broken.seams == ("a",)
+
+    # --- affordance_offenders: graced skip, block passes, missing/bare fails --------------------
+    texts = {
+        "new_feat": "## Shared seams\n(no affordance section)\n",       # offender: no heading
+        "graced_feat": "## Shared seams\n(predates the section)\n",     # exempt → not an offender
+        "has_seams": "## Reuse affordance\nseam: slugify — reuse\n",    # ok
+        "none_feat": "## Reuse affordance\nnone — nothing reusable\n",  # ok
+        "bare": "## Reuse affordance\n\n## Gaps\n",                     # offender: no block
+    }
+    assert m.affordance_offenders(texts, frozenset({"graced_feat"})) == ["bare", "new_feat"]
+    assert m.affordance_offenders(texts, frozenset()) == ["bare", "graced_feat", "new_feat"]
+
+    # --- render → load round-trip + fail-closed on a malformed exempt file ----------------------
+    map_dir = tmp / "memory" / "map"
+    map_dir.mkdir(parents=True)
+    assert m.load_affordance_exempt(tmp) == frozenset()  # absent file = no grace (fresh-repo default)
+    rendered = m.render_affordance_exempt(["b", "a", "a"])  # unsorted + dup
+    (map_dir / "affordance-exempt.toml").write_text(rendered, encoding="utf-8")
+    assert m.load_affordance_exempt(tmp) == frozenset({"a", "b"})
+    assert rendered.endswith("\n") and rendered.index('"a"') < rendered.index('"b"')  # sorted, deduped
+    for bad, needle in [
+        ("exempt = \"x\"\n", "exempt"),        # not a list
+        ("exempt = [1]\n", "exempt"),          # non-string element
+        ("exempt = [\"\"]\n", "exempt"),       # empty string
+        ("other = []\n", "exempt"),            # unknown key / no exempt
+        ("exempt = [\n", "toml parse error"),  # malformed toml
+    ]:
+        (map_dir / "affordance-exempt.toml").write_text(bad, encoding="utf-8")
+        try:
+            m.load_affordance_exempt(tmp)
+            raise AssertionError(f"load accepted a malformed exempt file (expected {needle!r})")
+        except m.MapError as exc:
+            assert needle in str(exc), f"wrong error: {exc}"
+
+
 def main() -> int:
     import tempfile
 
@@ -307,6 +363,10 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("conf restricted grammar", lambda: t_conf_grammar(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "affordance graced presence + shrink-only exempt", lambda: t_affordance_graced_presence(Path(td))
+        )
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

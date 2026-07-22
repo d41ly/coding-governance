@@ -65,6 +65,26 @@ def test_dossier_prose_headings_pinned() -> None:
             assert heading in text, f"{d.source}: required section missing: {heading}"
 
 
+def test_dossier_affordance_present_or_graced() -> None:
+    """GRACED presence of the `## Reuse affordance` section: every dossier NOT on the shrink-only
+    affordance-exempt list must carry the heading with at least one `seam:` line or a `none`
+    declaration. New dossiers are never exempt (the list only shrinks + drops on touch), so a new
+    feature is forced to record its reuse decision; the exempt baseline keeps adoption from
+    retro-redding the fleet. Content quality is the un-gatable ceiling — reported, never gated."""
+    tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
+    features_dir = m.map_root() / "features"
+    texts = {
+        d.feature: (features_dir / f"{d.feature}.md").read_text(encoding="utf-8")
+        for d in tree.dossiers
+    }
+    offenders = m.affordance_offenders(texts, m.load_affordance_exempt())
+    assert not offenders, (
+        f"dossiers missing the '{m.AFFORDANCE_HEADING}' section — add a `seam: <id> — reuse for "
+        f"<need>; extend via <point>` line per reusable seam, or `none — <why feature-specific>`: "
+        f"{offenders}"
+    )
+
+
 def test_path_derived_keys_are_posix() -> None:
     for inv_id, keys in ext.all_inventories().items():
         offenders = [k for k in keys if "\\" in k]
@@ -101,6 +121,7 @@ if __name__ == "__main__":
     for fn in (
         test_every_inventory_key_is_claimed_or_baselined,
         test_dossier_prose_headings_pinned,
+        test_dossier_affordance_present_or_graced,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
     ):

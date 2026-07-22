@@ -144,8 +144,11 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
    project's inventories — this is the real work; follow `codebase-map/INVENTORY-DERIVATION.md`
    (prefer registry imports; fail-closed helpers; full extension sets; POSIX keys).
 4. `codebase-map/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
-   baseline from live inventories, installs the gate at GATE_FILE and runs it once (green on a
-   fresh seed, by construction). `MAP_PY=python3` overrides the launcher.
+   baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing
+   dossiers (so the graced `## Reuse affordance` check never retro-reds the fleet), installs the
+   gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY=python3`
+   overrides the launcher. A NEW dossier is never exempt — new work records its reuse decision
+   (`seam: <id> — reuse for <need>; extend via <point>`, or `none — <why>`) or the gate reds.
 5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
    for a Python repo that is the entire CI wiring: zero pipeline changes by design.
    **Non-Python repo** (no pytest/py collector to discover the `.py` gate): wire it as an explicit
@@ -316,13 +319,17 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 - Codebase-map (only if §3b adopted): `codebase-map/` kit dir + project-owned
   `codebase-map/map_extractors.py` · `.codebase-map.conf` · the gate at GATE_FILE ·
-  `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, features/, generated/).
+  `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
 
 ## Maintenance
 
 - Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, the two templates,
   `selftest.py`) are identical across repos — update by overwriting from `<gov-repo>` wholesale;
   NEVER overwrite the project-owned `codebase-map/map_extractors.py` or `.codebase-map.conf`.
+  When an overwrite first introduces the graced `## Reuse affordance` check, run
+  `python codebase-map/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
+  commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing
+  dossiers so the new check does not retro-red them (it is a no-op once the file is present).
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your

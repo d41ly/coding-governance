@@ -43,6 +43,14 @@ else
   "$PY" "$HERE/gen_map.py" --scaffold || exit 1
 fi
 
+# Seed the affordance grace list ONCE (seed-if-absent): a fresh scaffold gets `exempt = []`; a repo
+# re-adopting from a pre-affordance kit version gets its existing dossiers graced — green by
+# construction either way. NOT re-seeded when present: the list is shrink-only, so re-seeding a
+# repo with a real (non-exempt) violation would mask it.
+if [ ! -f "${MAP_ROOT:-memory/map}/affordance-exempt.toml" ]; then
+  "$PY" "$HERE/gen_map.py" --seed-affordance-baseline || exit 1
+fi
+
 GATE="${GATE_FILE:-tests/test_codebase_map.py}"
 if [ -f "$GATE" ]; then
   echo "gate already present at $GATE — left untouched"

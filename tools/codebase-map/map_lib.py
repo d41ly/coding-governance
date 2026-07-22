@@ -48,6 +48,12 @@ STATUS_VALUES = frozenset({"shipped", "shipped-dark", "building", "deferred"})
 #: Required prose sections in every feature dossier (headings pinned; content free).
 REQUIRED_HEADINGS = ("## Constraints & why", "## Shared seams", "## Gaps")
 
+#: The forward reuse-menu heading. DELIBERATELY NOT in REQUIRED_HEADINGS: that tuple is looped
+#: over every dossier with no exemption, so adding it there would retro-red the whole fleet.
+#: Enforced instead by a GRACED check (affordance_offenders) that skips dossiers on a shrink-only
+#: affordance-exempt list. Under it: leading `seam:` lines, or a single `none` line (parse_affordance).
+AFFORDANCE_HEADING = "## Reuse affordance"
+
 #: Permissive default: PREFIX-anything id (override with a project grammar in map_extractors —
 #: and if the project documents an id era as forward-only, keep the regex open there; a
 #: validator hardcoding today's enum of node letters/prefixes blocks tomorrow's valid id.
@@ -519,6 +525,118 @@ def load_map_tree(
         else {k: () for k in inventory_ids}
     )
     return MapTree(foundation=foundation, dossiers=tuple(dossiers), baseline=baseline)
+
+
+# ======================================================================================
+# Affordance — the forward reuse menu (graced presence check, NOT a keyed inventory)
+# ======================================================================================
+#
+# Every non-exempt dossier must carry a `## Reuse affordance` section that forces the reuse
+# decision: list the seams this feature is reused THROUGH, or state `none — <why>`. PRESENCE is
+# gated here; content QUALITY (does the id resolve? is the reason sound?) is the un-gatable
+# ceiling — reported later as affordance_coverage_% (S5), never a merge blocker. The delimiter
+# (-/–/—) and every clause after the id are free: only the `seam:` prefix + first id token are
+# load-bearing, so a graced dossier can't be gamed by a formatting nit yet a bare heading with no
+# block still fails (a decision was dodged).
+
+
+@dataclass(frozen=True)
+class Affordance:
+    seams: tuple[str, ...]      # seam ids, in document order (first token after `seam:`)
+    is_none: bool               # an explicit `none — <why feature-specific>` declaration
+    heading_present: bool       # the `## Reuse affordance` heading exists
+
+    @property
+    def has_block(self) -> bool:
+        """A decision was recorded: at least one `seam:` line, or the `none` declaration."""
+        return bool(self.seams) or self.is_none
+
+
+_SEAM_RE = re.compile(r"^seam:\s*(?P<id>\S+)")
+_NONE_RE = re.compile(r"^none\b")
+
+
+def parse_affordance(text: str) -> Affordance:
+    """Parse a dossier's `## Reuse affordance` section: ALL leading consecutive `seam:` lines
+    (`seam: <id> — reuse for <need>; extend via <point>`) or the single `none — <why>` line. The
+    block ends at the first blank/non-matching line (so trailing prose or the next heading stops
+    it). Keys on the `seam:` prefix + first id token ONLY — delimiter and trailing clauses are
+    free (review #20). A malformed block is still a block (a presence-pass, an
+    affordance_coverage_% miss) — content is judged elsewhere, never here."""
+    lines = text.splitlines()
+    try:
+        i = next(k for k, ln in enumerate(lines) if ln.strip() == AFFORDANCE_HEADING)
+    except StopIteration:
+        return Affordance(seams=(), is_none=False, heading_present=False)
+    j = i + 1
+    while j < len(lines) and not lines[j].strip():  # skip the blank line(s) after the heading
+        j += 1
+    seams: list[str] = []
+    is_none = False
+    while j < len(lines):
+        s = lines[j].strip()
+        if not s:
+            break  # a blank line ends the leading run
+        if m := _SEAM_RE.match(s):
+            seams.append(m.group("id"))
+        elif _NONE_RE.match(s):
+            is_none = True
+            break
+        else:
+            break  # any other prose ends the block
+        j += 1
+    return Affordance(seams=tuple(seams), is_none=is_none, heading_present=True)
+
+
+def load_affordance_exempt(root: Path | None = None, *, source: str = "affordance-exempt.toml") -> frozenset[str]:
+    """The shrink-only affordance grace list — feature names that predate the `## Reuse
+    affordance` section and are skipped by the graced presence check. Absent file = no grace
+    (every dossier must carry the section — the fresh-repo default). Fail-closed on a malformed
+    file: a wrong shape must break the gate, never silently un-exempt (or over-exempt) the fleet."""
+    path = map_root(root) / "affordance-exempt.toml"
+    if not path.is_file():
+        return frozenset()
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as exc:
+        raise MapError(f"{source}: toml parse error: {exc}") from exc
+    names = data.get("exempt")
+    if set(data) - {"exempt"} or not isinstance(names, list) or not all(isinstance(n, str) and n for n in names):
+        raise MapError(f"{source}: expected exactly `exempt = [<feature>...]` of non-empty strings")
+    return frozenset(names)
+
+
+def render_affordance_exempt(names) -> str:
+    """Hand-rendered TOML for the shrink-only affordance grace list (sorted, deduped) — the same
+    stdlib-has-no-writer pattern as render_baseline. Seeded from existing dossiers at adoption
+    (`gen_map.py --seed-affordance-baseline`); only shrinks thereafter."""
+    lines = [
+        "# affordance-exempt.toml — the shrink-only affordance grace list (codebase-map kit).",
+        "# Dossiers here predate the '## Reuse affordance' section; the graced presence check skips",
+        "# them. SHRINK-ONLY: a new dossier is NEVER added, a touch drops entries (map_diff",
+        "# attribution), and a dossier that gains the section is removed. Seeded at adoption.",
+        "",
+    ]
+    uniq = sorted(set(names))
+    if not uniq:
+        lines.append("exempt = []")
+    else:
+        lines.append("exempt = [")
+        lines.extend(f"  {json.dumps(n, ensure_ascii=False)}," for n in uniq)
+        lines.append("]")
+    return "\n".join(lines) + "\n"
+
+
+def affordance_offenders(dossier_texts: dict[str, str], exempt) -> list[str]:
+    """Feature names whose dossier lacks a required affordance block. A dossier in the
+    (shrink-only) exempt set is skipped; every other must carry AFFORDANCE_HEADING with at least
+    one `seam:` line or a `none` declaration under it. Pure over {feature: text} so the gate and
+    selftest drive it identically — the gate reads the tree off disk, this judges the texts."""
+    return [
+        feature
+        for feature in sorted(dossier_texts)
+        if feature not in exempt and not parse_affordance(dossier_texts[feature]).has_block
+    ]
 
 
 # ======================================================================================
