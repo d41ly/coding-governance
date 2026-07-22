@@ -1,12 +1,17 @@
 """Feature-level digest of a git range via the codebase map (codebase-map kit).
 
-    python codebase-map/map_diff.py <base>..<head> [--verbose]
+    python codebase-map/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
     python codebase-map/map_diff.py <base> <head>  [--verbose]
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
 up the rest as UNMAPPED (per-top-level-dir counts by default; full list behind --verbose).
 The coverage line is the map's convergence-visibility metric.
+
+--drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.toml,
+dropping every feature the range TOUCHED (shrink-only). Touching a graced feature's files
+mechanically removes its grace, so the next gate run demands its `## Reuse affordance` block —
+no human remembering. Commit the rewritten file with the change.
 """
 
 from __future__ import annotations
@@ -35,10 +40,34 @@ def _changed_files(base: str, head: str) -> list[str]:
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
 
 
+def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
+    """S4a: rewrite affordance-exempt.toml, dropping every feature the range touched (shrink-only).
+    Writes only when the set actually shrinks; the dropped dossiers must carry a `## Reuse
+    affordance` block on the next gate run. LF write, matching gen_map's artifact writer."""
+    exempt = m.load_affordance_exempt()
+    kept = m.drop_touched_exemptions(exempt, touched)
+    dropped = sorted(exempt - kept)
+    if not dropped:
+        print("\n# affordance-exempt: no touched feature was graced - unchanged")
+        return
+    path = m.map_root() / "affordance-exempt.toml"
+    path.write_text(m.render_affordance_exempt(kept), encoding="utf-8", newline="\n")
+    print(
+        f"\n# affordance-exempt: dropped {dropped} (touched) - {len(kept)} still graced. "
+        "They must now carry a '## Reuse affordance' block (commit the rewritten file)."
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("range", nargs="+", help="<base>..<head> or <base> <head>")
     parser.add_argument("--verbose", action="store_true", help="full unmapped file list")
+    parser.add_argument(
+        "--drop-affordance-exempt",
+        action="store_true",
+        help="S4a: after attribution, drop every touched feature from the affordance-exempt list "
+        "(shrink-only) so the next gate run demands its '## Reuse affordance' block",
+    )
     args = parser.parse_args()
 
     if len(args.range) == 1 and ".." in args.range[0]:
@@ -84,6 +113,8 @@ def main() -> int:
             for top, n in sorted(tops.items()):
                 print(f"- {top}: {n} file(s)")
             print("(full list: --verbose)")
+    if args.drop_affordance_exempt:
+        _drop_affordance_exempt(attributed)
     return 0
 
 

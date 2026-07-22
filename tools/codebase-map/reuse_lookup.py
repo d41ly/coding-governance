@@ -243,6 +243,27 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
 
 
+def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -> list[tuple[Candidate, int]]:
+    """S4b — the bounded big-bang worklist: the ``top`` highest-fan-in seams (fan-in >= the seam
+    threshold) that NO dossier yet declares as a `## Reuse affordance` seam, so the
+    reinvention-prone active surface converges first. A symbol already carrying an affordance seam
+    line has BOTH 'symbol' and 'affordance-seam' in its merged sources and is DONE (excluded);
+    a symbol below the threshold is not a seam and is not worklist-worthy. Pure + deterministic:
+    ranked by fan-in desc then id. Fan-in is on demand (never committed) — same math as the lookup
+    and --converge so 'a seam' means one thing everywhere."""
+    scored: list[tuple[Candidate, int]] = []
+    for cand in corpus.candidates.values():
+        if "symbol" not in cand.sources or not cand.file:
+            continue  # only indexable symbols can have a fan-in / def file to point at
+        if "affordance-seam" in cand.sources:
+            continue  # already declared — off the worklist
+        fanin = m.fan_in(ref_index, cand.name, cand.file)
+        if fanin >= corpus.threshold:
+            scored.append((cand, fanin))
+    scored.sort(key=lambda cf: (-cf[1], cf[0].name))
+    return scored[:top]
+
+
 def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
           name: str, is_seed: bool, reason: str) -> Ranked:
     cand = pool[name]

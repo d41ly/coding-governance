@@ -776,6 +776,18 @@ def affordance_offenders(dossier_texts: dict[str, str], exempt) -> list[str]:
     ]
 
 
+def drop_touched_exemptions(exempt, touched) -> frozenset[str]:
+    """S4a — the touch-triggered backfill rule: shrink the affordance-exempt set by every feature
+    a `map_diff` range TOUCHED (i.e. every attribution owner). Touching a feature's files drops
+    its grace MECHANICALLY, so the next gate run demands its `## Reuse affordance` block with no
+    human remembering (review #5/#32). ``touched`` is a map_diff attribution result (owner ->
+    paths) or any iterable of feature names; ``foundation``/``UNMAPPED`` are never in the exempt
+    list, so passing the whole attribution dict is safe.
+
+    ponytail: the S4a rule is exactly this set difference — the machinery is attribute_paths."""
+    return frozenset(exempt) - set(touched)
+
+
 # ======================================================================================
 # Coverage (pure)
 # ======================================================================================

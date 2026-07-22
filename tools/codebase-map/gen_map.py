@@ -7,6 +7,7 @@ Run from the ADOPTING repo's root:
     python codebase-map/gen_map.py --check           # byte-compare (LF-normalized); exit 1
     python codebase-map/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
     python codebase-map/gen_map.py --seed-affordance-baseline  # grace today's dossiers (adopt)
+    python codebase-map/gen_map.py --seed-affordances --top 10 # worklist: undeclared hot seams
 
 Requires a filled codebase-map/map_extractors.py (the template refuses an empty EXTRACTORS).
 """
@@ -21,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import map_extractors as ext  # noqa: E402
 import map_lib as m  # noqa: E402
+import reuse_lookup as rl  # noqa: E402
 
 IDS = ext.inventory_ids()
 ID_RE = getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE)
@@ -122,11 +124,34 @@ def _seed_affordance_baseline() -> None:
     print(f"affordance-exempt: {len(exempt)} dossier(s) graced")
 
 
+def _seed_affordances(top: int) -> None:
+    """S4b: list the ``top`` highest-fan-in seams no dossier yet declares — the convergence
+    worklist. Reads the committed recall corpus (symbols.json + dossiers) via reuse_lookup, so it
+    needs no live re-extraction; fan-in is computed on demand over the covered-layer source."""
+    corpus = rl.load_corpus()
+    if not corpus.has_symbols:
+        print("no generated/symbols.json — the SYMBOL recall tier is not adopted; nothing to seed.")
+        return
+    ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
+    worklist = rl.seed_affordances(corpus, ref_index, top)
+    print(f"# seed-affordances: top {top} undeclared seams (fan-in >= {corpus.threshold})")
+    if not worklist:
+        print("(none — every seam at/above the threshold already declares a ## Reuse affordance)")
+        return
+    for cand, fanin in worklist:
+        print(
+            f"- {cand.name}  [fan-in {fanin} | {cand.kind} | {cand.file}]  "
+            f"-> add `seam: {cand.name} - reuse for <need>; extend via <point>` to its dossier"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--scaffold", "--write", "--check", "--seed-baseline", "--seed-affordance-baseline"):
+    for flag in ("--scaffold", "--write", "--check", "--seed-baseline",
+                 "--seed-affordance-baseline", "--seed-affordances"):
         mode.add_argument(flag, action="store_true")
+    parser.add_argument("--top", type=int, default=10, help="--seed-affordances: worklist size (default 10)")
     args = parser.parse_args()
 
     if args.scaffold:
@@ -166,6 +191,10 @@ def main() -> int:
 
     if args.seed_affordance_baseline:
         _seed_affordance_baseline()
+        return 0
+
+    if args.seed_affordances:
+        _seed_affordances(args.top)
         return 0
 
     stale = False

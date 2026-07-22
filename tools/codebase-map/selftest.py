@@ -342,6 +342,106 @@ def t_affordance_graced_presence(tmp: Path):
             assert needle in str(exc), f"wrong error: {exc}"
 
 
+def t_affordance_exemption_drop():
+    """AC1 (U4 half): a dossier's affordance grace is dropped MECHANICALLY when a map_diff range
+    touches its files (attribution owner), and it then fails the graced check until it carries a
+    `seam:`/`none` block. An untouched graced dossier keeps its grace — no retro-red."""
+    dx = m.parse_dossier(
+        DOSSIER.replace('feature = "x"', 'feature = "touched"').replace("src/x/**", "src/touched/**"),
+        IDS, source="touched",
+    )
+    dy = m.parse_dossier(
+        DOSSIER.replace('feature = "x"', 'feature = "untouched"').replace("src/x/**", "src/untouched/**"),
+        IDS, source="untouched",
+    )
+    f = m.parse_dossier(
+        DOSSIER.replace('feature = "x"', 'feature = "foundation"').replace("src/x/**", "lib/**"),
+        IDS, source="f",
+    )
+    tree = m.MapTree(foundation=f, dossiers=(dx, dy), baseline=EMPTY_BASE)
+
+    attributed = m.attribute_paths(["src/touched/a.py"], tree)
+    assert set(attributed) == {"touched"}, attributed  # only 'touched' was in the range
+    exempt = frozenset({"touched", "untouched"})
+    kept = m.drop_touched_exemptions(exempt, attributed)
+    assert kept == frozenset({"untouched"}), kept  # touched loses grace, untouched keeps it
+    # a range that hits nothing graced (foundation/UNMAPPED are never in the exempt list) is a no-op
+    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["lib/b.py"]}) == exempt
+
+    # gate consequence: the un-graced 'touched' dossier (no affordance block yet) is now an offender
+    texts = {
+        "touched": "## Shared seams\n(no affordance yet)\n",
+        "untouched": "## Shared seams\n(still graced)\n",
+    }
+    assert m.affordance_offenders(texts, exempt) == []          # both graced BEFORE the touch (no retro-red)
+    assert m.affordance_offenders(texts, kept) == ["touched"]   # touch dropped grace -> must carry a block
+    texts["touched"] = "## Reuse affordance\nseam: foo — reuse for bar; extend via baz\n"
+    assert m.affordance_offenders(texts, kept) == []            # clears once it carries a seam:/none block
+
+
+def t_seed_affordances(tmp: Path):
+    """AC5: gen_map --seed-affordances --top N lists the N highest-fan-in seams no dossier yet
+    declares, and NOTHING already declared. Pure core tested on a fixture repo (the CLI is thin
+    glue over this + build_reference_index); ordering by fan-in desc and the --top cap verified."""
+    import os
+
+    (tmp / ".codebase-map.conf").write_text("MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+    syms = [
+        {"id": "slugify", "kind": "function", "file": "src/text.py"},
+        {"id": "titlecase", "kind": "function", "file": "src/text.py"},
+        {"id": "truncate", "kind": "function", "file": "src/text.py"},
+        {"id": "Cache", "kind": "class", "file": "src/cache.py"},
+    ]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    feats = tmp / "memory" / "map" / "features"
+    feats.mkdir(parents=True)
+    (feats / "text.md").write_text(  # slugify is ALREADY declared -> off the worklist despite top fan-in
+        "## Reuse affordance\nseam: slugify — reuse for name→slug; extend via the registry\n",
+        encoding="utf-8",
+    )
+    src = tmp / "src"
+    src.mkdir()
+    (src / "text.py").write_text(
+        "def slugify(s):\n    return s\n"
+        "def titlecase(s):\n    return s\n"
+        "def truncate(s, n):\n    return s[:n]\n",
+        encoding="utf-8",
+    )
+    (src / "cache.py").write_text("class Cache:\n    pass\n", encoding="utf-8")
+    # reference files planting a known fan-in: slugify 5, titlecase 4, truncate 3, Cache 1
+    refs = {
+        "a": "from text import slugify, titlecase, truncate\nfrom cache import Cache\nslugify(1); titlecase(2); truncate(3, 4); Cache()\n",
+        "b": "from text import slugify, titlecase, truncate\nslugify(1); titlecase(2); truncate(3, 4)\n",
+        "c": "from text import slugify, titlecase, truncate\nslugify(1); titlecase(2); truncate(3, 4)\n",
+        "d": "from text import slugify, titlecase\nslugify(1); titlecase(2)\n",
+        "e": "from text import slugify\nslugify(1)\n",
+    }
+    for name, body in refs.items():
+        (src / f"{name}.py").write_text(body, encoding="utf-8")
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        assert m.fan_in(ref, "slugify", "src/text.py") == 5
+        assert m.fan_in(ref, "titlecase", "src/text.py") == 4
+        assert m.fan_in(ref, "truncate", "src/text.py") == 3
+        assert m.fan_in(ref, "Cache", "src/cache.py") == 1  # below the threshold -> not a seam
+
+        worklist = rl.seed_affordances(corpus, ref, 10)
+        # slugify EXCLUDED (already declares a seam) despite fan-in 5; Cache EXCLUDED (fan-in 1 < 3);
+        # ranked by fan-in desc.
+        assert [c.name for c, _ in worklist] == ["titlecase", "truncate"], worklist
+        assert [fi for _, fi in worklist] == [4, 3]
+        assert all(c.name != "slugify" for c, _ in worklist)  # nothing already declared
+        # --top cap: only the single highest-fan-in undeclared seam
+        assert [c.name for c, _ in rl.seed_affordances(corpus, ref, 1)] == ["titlecase"]
+    finally:
+        del os.environ["CODEBASE_MAP_ROOT"]
+
+
 def t_reuse_shared_primitives(tmp: Path):
     # --- tokenizer + crude stemmer: the one "shares a token stem" definition (S3 recall / S5 collision)
     assert m.subtokens("getUserID") == ["get", "user", "id"]
@@ -486,6 +586,9 @@ def main() -> int:
         failures += check(
             "affordance graced presence + shrink-only exempt", lambda: t_affordance_graced_presence(Path(td))
         )
+    failures += check("affordance exemption drop on touch (S4a / AC1)", t_affordance_exemption_drop)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("seed-affordances worklist (S4b / AC5)", lambda: t_seed_affordances(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "reuse-lookup shared primitives (stems + fan-in + threshold)", lambda: t_reuse_shared_primitives(Path(td))
