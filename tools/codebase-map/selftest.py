@@ -560,6 +560,79 @@ def t_reuse_lookup(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
+def t_detect_collisions_and_backlog(tmp: Path):
+    """AC4: on a range that adds `slugify2` (stem-colliding with the high-fan-in `slugify` seam,
+    no new edge to it) the closing loop emits ONE collision_flag; a symbol that WIRES THROUGH its
+    seam, one whose seam is below threshold, one of a different kind, and one unrelated do NOT
+    flag; the backlog dedupes by (new, resembles); and new_clones is a clone-ratchet count, NOT
+    dead_exports/affordance_coverage_%. Pure core — the git-range extraction is thin glue tested
+    by the scratchpad fixture in the build report."""
+    # base seams (present at range base). Constructed reference index -> exact fan-in per seam
+    # (the fan_in math itself is proven in t_reuse_shared_primitives; this pins collision logic).
+    base = [
+        {"id": "slugify", "kind": "function", "file": "src/text.py"},        # reinvented (fan-in 3)
+        {"id": "fetchGateway", "kind": "function", "file": "src/gw.py"},     # wired-through (fan-in 3)
+        {"id": "parseThing", "kind": "function", "file": "src/parse.py"},    # below threshold (fan-in 1)
+        {"id": "Money", "kind": "class", "file": "src/money.py"},            # a class (kind mismatch)
+    ]
+    ref = {
+        "slugify": {"src/a.py", "src/b.py", "src/c.py", "src/text.py"},      # fan-in 3
+        "fetchGateway": {"src/d.py", "src/e.py", "src/f.py", "src/gw.py"},   # fan-in 3
+        "parseThing": {"src/g.py", "src/parse.py"},                          # fan-in 1 < threshold
+        "Money": {"src/money.py"},                                           # fan-in 0
+    }
+    new = [
+        {"id": "slugify2", "kind": "function", "file": "src/new1.py"},       # collides slugify, NOT wired -> FLAG
+        {"id": "retryGateway", "kind": "function", "file": "src/new2.py"},   # collides fetchGateway, WIRES through
+        {"id": "parseWidget", "kind": "function", "file": "src/new3.py"},    # collides parseThing, but it's < threshold
+        {"id": "moneyBag", "kind": "function", "file": "src/new4.py"},       # stem 'money' but Money is a CLASS
+        {"id": "helper", "kind": "function", "file": "src/new5.py"},         # unrelated -> no shared stem
+    ]
+    # the range wires through fetchGateway (new2 references it) — an edge added -> not reinvention;
+    # slugify has NO edge added in the range -> slugify2 is reinvention.
+    range_index = {"fetchGateway": {"src/new2.py"}}
+    flags = m.detect_collisions(new, base, ref, range_index, threshold=3)
+    assert [f.new for f in flags] == ["slugify2"], flags               # exactly one collision
+    only = flags[0]
+    assert only.resembles == "slugify" and only.file == "src/new1.py" and only.fanin == 3
+    assert only.kind == "function" and only.confidence == "medium"     # no affordance declared -> medium
+    # F8c: when the seam DECLARES an affordance, confidence rises to high.
+    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, affordance_seams=frozenset({"slugify"}))
+    assert hi[0].confidence == "high"
+    # retryGateway stays clean ONLY because the range wired through fetchGateway — drop that edge and
+    # it flags, proving the reference-edge check is load-bearing (not dead code). parseWidget/moneyBag
+    # stay clean regardless (below-threshold seam / kind mismatch).
+    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3)}
+    assert flagged_names == {"slugify2", "retryGateway"}, flagged_names
+
+    # --- backlog: seeded header, append, dedup by (new, resembles) --------------------------------
+    text0, added0 = m.append_backlog("", flags)
+    assert added0 and "| slugify2 | slugify |" in text0 and text0.startswith("# Reinvention backlog")
+    assert m.backlog_keys(text0) == {("slugify2", "slugify")}
+    text1, added1 = m.append_backlog(text0, flags)          # re-run same range -> nothing new
+    assert added1 == [] and text1 == text0
+    more = [m.CollisionFlag("slugify3", "slugify", "src/t3.py", 3, "function", "medium")]
+    text2, added2 = m.append_backlog(text0, more)           # a different `new` -> a new row
+    assert [a.new for a in added2] == ["slugify3"]
+    assert m.backlog_keys(text2) == {("slugify2", "slugify"), ("slugify3", "slugify")}
+
+
+def t_new_clones_reader(tmp: Path):
+    """new_clones is the adopted clone-ratchet's count (int), null when no clone kit is wired, and
+    folding a duplicate drops it — NEVER dead_exports/affordance_coverage_% (the demoted hints)."""
+    import map_diff as md
+
+    assert md._new_clones(tmp, {}) is None                                  # no CLONE_COUNT_FILE -> null
+    conf = {"CLONE_COUNT_FILE": "clones.txt"}
+    assert md._new_clones(tmp, conf) is None                                # configured but absent -> null
+    (tmp / "clones.txt").write_text("7\n", encoding="utf-8")
+    assert md._new_clones(tmp, conf) == 7
+    (tmp / "clones.txt").write_text("4\n", encoding="utf-8")                # a fold drops the count
+    assert md._new_clones(tmp, conf) == 4
+    (tmp / "clones.txt").write_text("not-a-number\n", encoding="utf-8")     # garbage -> null, never a crash
+    assert md._new_clones(tmp, conf) is None
+
+
 def main() -> int:
     import tempfile
 
@@ -595,6 +668,12 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("reuse-lookup shortlist (AC3 fixture)", lambda: t_reuse_lookup(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: t_detect_collisions_and_backlog(Path(td))
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("new_clones reader (S5 / AC4)", lambda: t_new_clones_reader(Path(td)))
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

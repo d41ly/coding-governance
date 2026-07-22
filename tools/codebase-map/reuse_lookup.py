@@ -146,7 +146,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
                 merge(key, "inventory", detail=inv_id)
 
     shared_seams: dict[str, str] = {}
-    for feature, text in _dossier_texts(map_dir).items():
+    for feature, text in m.load_dossier_texts(map_dir).items():
         for seam in m.parse_affordance(text).seams:
             merge(seam, "affordance-seam", detail=feature)
         prose = _section_body(text, "## Shared seams")
@@ -162,18 +162,6 @@ def load_corpus(root: Path | None = None) -> Corpus:
         threshold=m.seam_fanin_threshold(root),
         has_symbols=has_symbols,
     )
-
-
-def _dossier_texts(map_dir: Path) -> dict[str, str]:
-    texts: dict[str, str] = {}
-    foundation = map_dir / "FOUNDATION.md"
-    if foundation.is_file():
-        texts["foundation"] = foundation.read_text(encoding="utf-8")
-    features = map_dir / "features"
-    if features.is_dir():
-        for path in sorted(features.glob("*.md")):
-            texts[path.stem] = path.read_text(encoding="utf-8")
-    return texts
 
 
 # ======================================================================================

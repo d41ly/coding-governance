@@ -21,8 +21,13 @@ project specifics live in exactly two files the adopting repo owns.
   `INVENTORY-DERIVATION.md`.
 - `test_codebase_map.template.py` — the gate; copied into the project's existing test dir
   (zero CI changes: a test file is its own deployment). Also runs standalone (`python <file>`).
-- `gen_map.py` / `map_diff.py` — CLIs: `--scaffold · --write · --check · --seed-baseline ·
-  --seed-affordance-baseline`, and the range digest.
+- `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
+  · --seed-affordances --top N`.
+- `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a
+  touch-drop) and `--converge` (S5 closing loop): WARNs on each NEW export that resembles an existing
+  high-fan-in seam of the same kind it did not wire through — shipped reinvention, over ALL new code —
+  and routes each to `<MAP_ROOT>/reinvention-backlog.md` (deduped by `{new, resembles}`), alongside
+  `new_clones` and the demoted hygiene hints. A report + WARN at review, never a merge gate.
 - `reuse_lookup.py` + `reuse-lookup.agent.md` — the behaviour→seam lookup (S3): a portable CLI that
   ranks a reuse shortlist from the map's four recall sources (symbols · inventory keys · affordance
   seams · shared-seams prose), plus the agent-instruction that turns it into a decision. Run it

@@ -35,3 +35,9 @@ RECALL_DARK_LAYERS=""
 # --converge (collision detection). Integer >= 1; default 3. Raise it in a big repo where 3 files
 # is common, lower it in a small one.
 SEAM_FANIN_THRESHOLD=3
+
+# Optional: a file (relative to the repo root) holding a single integer — the verbatim-clone count
+# from an adopted clone-ratchet kit (e.g. jscpd baseline). map_diff --converge reports it as
+# `new_clones`; folding a duplicate drops the count. Leave unset when no clone kit is adopted
+# (--converge then reports `new_clones: null`). It is NOT a codebase-map artifact and is never gated here.
+CLONE_COUNT_FILE=""

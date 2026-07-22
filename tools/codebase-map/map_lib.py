@@ -481,6 +481,28 @@ def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
     return len(index.get(symbol_id, set()) - {def_file})
 
 
+def reference_index_for(
+    files: list[str], *, root: Path | None = None
+) -> dict[str, set[str]]:
+    """Reference index (token -> {POSIX files}) over an EXACT file list, NOT their whole dirs.
+    build_reference_index walks a whole layer for corpus-wide fan-in; this indexes only the
+    files given — the range-scoped scan behind --converge's "did the range wire through this
+    seam?" test (fan_in over THIS index > 0 = an edge was added by the range). Same fail-open
+    law: an unreadable/absent file (a deletion in the range) is skipped, never a crash — it
+    feeds a WARN, not a gate."""
+    root = root or repo_root()
+    index: dict[str, set[str]] = {}
+    for raw in files:
+        rel = raw.replace("\\", "/")
+        try:
+            text = (root / rel).read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        for tok in _identifier_tokens(text):
+            index.setdefault(tok, set()).add(rel)
+    return index
+
+
 def seam_fanin_threshold(root: Path | None = None) -> int:
     """The configured seam fan-in threshold (SEAM_FANIN_THRESHOLD in .codebase-map.conf),
     default SEAM_FANIN_THRESHOLD_DEFAULT. Shared by the lookup (hot-seam ranking) and --converge
@@ -664,6 +686,22 @@ def load_map_tree(
     return MapTree(foundation=foundation, dossiers=tuple(dossiers), baseline=baseline)
 
 
+def load_dossier_texts(map_dir: Path) -> dict[str, str]:
+    """{feature -> raw dossier markdown} for FOUNDATION.md + every features/*.md — the prose half,
+    read WITHOUT parsing the toml claims (so it needs no inventory_ids and survives a claim-shape
+    error). The shared reader for the recall corpus (reuse_lookup S3) and the closing loop's
+    affordance cross-check + coverage hint (map_diff --converge S5) — one loader, not two."""
+    texts: dict[str, str] = {}
+    foundation = map_dir / "FOUNDATION.md"
+    if foundation.is_file():
+        texts["foundation"] = foundation.read_text(encoding="utf-8")
+    features = map_dir / "features"
+    if features.is_dir():
+        for path in sorted(features.glob("*.md")):
+            texts[path.stem] = path.read_text(encoding="utf-8")
+    return texts
+
+
 # ======================================================================================
 # Affordance — the forward reuse menu (graced presence check, NOT a keyed inventory)
 # ======================================================================================
@@ -786,6 +824,141 @@ def drop_touched_exemptions(exempt, touched) -> frozenset[str]:
 
     ponytail: the S4a rule is exactly this set difference — the machinery is attribute_paths."""
     return frozenset(exempt) - set(touched)
+
+
+# ======================================================================================
+# Closing loop — shipped-reinvention detector + backlog routing (S5, pure)
+# ======================================================================================
+#
+# The other half of convergence: S1–S4 help new work FIND a seam; this catches reinvention that
+# shipped anyway. A collision = a NEW exported symbol whose id shares a token stem with an
+# EXISTING high-fan-in seam of the SAME kind that the range did NOT wire through (no reference
+# edge added to it) — a machine proxy for "built new instead of reusing", computed over ALL new
+# code so skipping the S3 lookup can't hide it. A soft force: a review WARN routed to the
+# reinvention backlog, NEVER a hard gate (a token-stem collision has real false positives — a
+# legitimately-new same-named symbol — and a hard gate on it trains --no-verify, §3).
+
+
+@dataclass(frozen=True)
+class CollisionFlag:
+    new: str          # the new symbol id (S) — the shipped reinvention
+    resembles: str    # the existing seam id (E) it collides with and did not wire through
+    file: str         # S's def file — where the parallel implementation landed
+    fanin: int        # E's fan-in — how reused the seam S ignored is
+    kind: str         # the shared symbol kind (the F8b structural signal: same kind required)
+    confidence: str   # "high" if E DECLARES a ## Reuse affordance seam (F8c), else "medium"
+
+
+def detect_collisions(
+    new_symbols: list[dict[str, str]],
+    base_symbols: list[dict[str, str]],
+    ref_index: dict[str, set[str]],
+    range_index: dict[str, set[str]],
+    *,
+    threshold: int,
+    affordance_seams: frozenset[str] = frozenset(),
+) -> list[CollisionFlag]:
+    """S5 closing loop (pure, deterministic). For each NEW symbol S, flag it iff it collides with
+    some EXISTING seam E where: E is the SAME kind (F8b structural signal); stem(S) & stem(E) is
+    non-empty (the one "shares a token stem" definition, shared with the S3 lookup); E's corpus
+    fan-in >= threshold (E is a real seam — ``ref_index`` is the whole-corpus scan); and the range
+    added NO reference edge to E (``fan_in(range_index, E) == 0`` — ``range_index`` is the
+    range-scoped scan, so a range that DID wire through E is not a collision). One flag per new
+    symbol, pointing at its strongest resemblance (highest fan-in; an affordance-declaring seam
+    breaks ties and raises confidence). Sorted fan-in desc, then new/resembles id.
+
+    ``base_symbols`` (present at range base) is the seam POOL: a seam must have existed to be
+    reinvented. ``new_symbols`` = head rows absent from base (all public — the extractors already
+    drop private names, so every kind here is an export). A malformed/empty stem yields no flag."""
+    seams_by_kind: dict[str, list[dict[str, str]]] = {}
+    for e in base_symbols:
+        seams_by_kind.setdefault(e["kind"], []).append(e)
+
+    flags: list[CollisionFlag] = []
+    for s in new_symbols:
+        s_stems = stems(s["id"])
+        if not s_stems:
+            continue
+        best: tuple[int, bool, dict[str, str]] | None = None
+        for e in seams_by_kind.get(s["kind"], ()):
+            if e["id"] == s["id"] and e["file"] == s["file"]:
+                continue  # an identical row is not "new vs existing"
+            if not (s_stems & stems(e["id"])):
+                continue
+            fe = fan_in(ref_index, e["id"], e["file"])
+            if fe < threshold:
+                continue  # E is not a seam — below the reuse threshold
+            if fan_in(range_index, e["id"], e["file"]) > 0:
+                continue  # the range references E -> it wired through, not reinvented
+            declared = e["id"] in affordance_seams
+            if best is None or (fe, declared) > (best[0], best[1]):
+                best = (fe, declared, e)
+        if best is not None:
+            fe, declared, e = best
+            flags.append(
+                CollisionFlag(
+                    new=s["id"], resembles=e["id"], file=s["file"], fanin=fe,
+                    kind=s["kind"], confidence="high" if declared else "medium",
+                )
+            )
+    flags.sort(key=lambda f: (-f.fanin, f.new, f.resembles))
+    return flags
+
+
+_BACKLOG_PREAMBLE = (
+    "# Reinvention backlog — codebase-map --converge (codebase-map kit)\n"
+    "\n"
+    "Shipped-reinvention WARNs from `map_diff --converge`: a NEW exported symbol whose id shares a\n"
+    "token stem with an existing high-fan-in seam of the same kind that it did NOT wire through.\n"
+    "Each row is a consolidation CANDIDATE, not a verdict — a token-stem collision has false\n"
+    "positives (a legitimately-new same-named symbol). Burn down: fold `new` into `resembles`, or\n"
+    "delete the row if the two are genuinely distinct. Append-only + deduped by (new, resembles);\n"
+    "never a merge gate.\n"
+    "\n"
+    "| new | resembles | file | seam fan-in | kind | confidence |\n"
+    "|---|---|---|---|---|---|\n"
+)
+
+
+def backlog_keys(text: str) -> set[tuple[str, str]]:
+    """The (new, resembles) pairs already recorded in a reinvention-backlog file — its table rows,
+    for append-time dedup. Tolerant of the header/separator/prose: a data row is a `| a | b | ...`
+    line whose first cell is a real id (not `new`, not a `---` separator)."""
+    keys: set[tuple[str, str]] = set()
+    for line in text.splitlines():
+        if not line.lstrip().startswith("|"):
+            continue
+        cells = [c.strip() for c in line.split("|")][1:-1]  # drop the outer-pipe empties
+        if len(cells) < 2 or not cells[0] or cells[0] == "new" or set(cells[0]) == {"-"}:
+            continue
+        keys.add((cells[0], cells[1]))
+    return keys
+
+
+def append_backlog(text: str, flags: list[CollisionFlag]) -> tuple[str, list[CollisionFlag]]:
+    """F7: append each collision flag to the reinvention-backlog text, deduped by (new, resembles)
+    — a durable, reviewable worklist. APPEND-ONLY: an existing row is never rewritten or removed
+    (humans burn it down); a re-run of --converge on the same range adds nothing. Returns the new
+    text and the flags actually appended (empty -> caller writes nothing). Seeds the header +
+    table when the file is empty/new."""
+    seen = backlog_keys(text)
+    added: list[CollisionFlag] = []
+    for f in flags:
+        key = (f.new, f.resembles)
+        if key in seen:
+            continue
+        seen.add(key)
+        added.append(f)
+    if not added:
+        return text, []
+    body = text if text.strip() else _BACKLOG_PREAMBLE
+    if not body.endswith("\n"):
+        body += "\n"
+    rows = "".join(
+        f"| {f.new} | {f.resembles} | {f.file} | {f.fanin} | {f.kind} | {f.confidence} |\n"
+        for f in added
+    )
+    return body + rows, added
 
 
 # ======================================================================================

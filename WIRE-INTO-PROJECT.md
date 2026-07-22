@@ -155,9 +155,13 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
    **DoD (at review):** run `python codebase-map/map_diff.py <base>..<head> --drop-affordance-exempt`
    — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
-   gate then demands its `## Reuse affordance` block (no human remembering). To converge the active
-   surface up front, `python codebase-map/gen_map.py --seed-affordances --top <N>` lists the N
-   highest-fan-in seams no dossier yet declares as the backfill worklist.
+   gate then demands its `## Reuse affordance` block (no human remembering). Also run
+   `python codebase-map/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
+   NEW export that resembles an existing high-fan-in seam of the same kind it did not wire through
+   (shipped reinvention, over ALL new code) and routes each to `<MAP_ROOT>/reinvention-backlog.md`
+   (deduped); it is a report + WARN, never a merge gate (a token-stem collision has false positives).
+   To converge the active surface up front, `python codebase-map/gen_map.py --seed-affordances --top
+   <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
 5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
    for a Python repo that is the entire CI wiring: zero pipeline changes by design.
    **Non-Python repo** (no pytest/py collector to discover the `.py` gate): wire it as an explicit
