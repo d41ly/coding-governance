@@ -39,6 +39,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 |-----|--------------|--------------|--------|
 | `a` | daily-agent | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 | `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
+| `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
 minted once per session. Decisions/backlogs live per discipline under `memory/<discipline>/`.
