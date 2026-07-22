@@ -82,10 +82,16 @@ def _artifacts() -> dict[Path, str]:
     tree = m.load_map_tree(IDS, decision_id_re=ID_RE)
     owners = m.owners_of(tree)
     gen_dir = m.map_root() / "generated"
-    return {
+    arts = {
         gen_dir / "inventories.json": m.render_inventories_json(inventories, IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, IDS, owners, tree.baseline),
     }
+    # SYMBOL recall tier (optional): render symbols.json only when the project declares symbol
+    # extractors and they yield symbols — an opted-out repo gets no artifact and no gate demand.
+    symbols = getattr(ext, "all_symbols", list)()
+    if symbols:
+        arts[gen_dir / "symbols.json"] = m.render_symbols_json(symbols)
+    return arts
 
 
 def _write(path: Path, content: str) -> None:

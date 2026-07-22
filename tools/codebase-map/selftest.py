@@ -192,6 +192,99 @@ def t_extractor_helpers_fail_closed(tmp: Path):
         assert "\\" not in key  # POSIX keys on every platform
 
 
+def t_symbols_render_deterministic_and_fail_closed():
+    syms = [
+        {"id": "slugify", "kind": "function", "file": "src/text.ts"},
+        {"id": "Button", "kind": "component", "file": "web/Button.tsx"},
+        {"id": "Cache", "kind": "class", "file": "src/cache.py"},
+    ]
+    one = m.render_symbols_json(syms)
+    two = m.render_symbols_json(list(reversed(syms)))  # input order must not matter
+    assert one == two, "symbols render depends on input order (not deterministic)"
+    assert one.endswith("\n") and "\\" not in one  # LF-terminated, POSIX paths only
+    marker = "codebase-map@" + m.KIT_CODEBASE_MAP_VERSION
+    assert marker in one  # version marker rides the artifact
+    # ids sorted (ascii: uppercase before lowercase) — the cross-platform byte-match guarantee
+    assert one.index('"Button"') < one.index('"Cache"') < one.index('"slugify"')
+    # fail-closed shape guards: the freshness gate runs the SAME renderer twice, so it cannot
+    # see a fail-open producer — the shape is validated HERE, and every bad row must RAISE.
+    for bad, needle in [
+        ([{"id": "x", "kind": "widget", "file": "a.ts"}], "unknown kind"),
+        ([{"id": "x", "kind": "function"}], "exactly id/kind/file"),
+        ([{"id": "", "kind": "function", "file": "a.ts"}], "non-empty"),
+        ([{"id": "x", "kind": "function", "file": "a\\b.ts"}], "POSIX"),
+    ]:
+        try:
+            m.render_symbols_json(bad)
+            raise AssertionError(f"render accepted a bad row (expected {needle!r})")
+        except m.MapError as exc:
+            assert needle in str(exc), f"wrong error: {exc}"
+
+
+def t_symbol_extractors_fail_closed(tmp: Path):
+    # --- python_symbols: real parser captures def/class/async/decorated + __all__ ----------
+    pkg = tmp / "pkg"
+    (pkg / "sub").mkdir(parents=True)
+    (pkg / "mod.py").write_text(
+        "import functools\n"
+        "__all__ = ['slugify', 'CONST']\n"
+        "CONST = 1\n"
+        "def slugify(s):\n    return s\n"
+        "async def fetch():\n    pass\n"
+        "def _private():\n    pass\n"
+        "@functools.total_ordering\n"
+        "class Cache:\n    def method(self):\n        pass\n",
+        encoding="utf-8",
+    )
+    (pkg / "sub" / "deep.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
+    syms = m.python_symbols(pkg, "py", root=tmp)
+    got = {(s["id"], s["kind"], s["file"]) for s in syms}
+    assert ("slugify", "function", "pkg/mod.py") in got
+    assert ("fetch", "function", "pkg/mod.py") in got          # async def captured
+    assert ("Cache", "class", "pkg/mod.py") in got             # decorated class captured (regex-hard)
+    assert ("CONST", "const-export", "pkg/mod.py") in got      # __all__ const, not a def/class
+    assert ("helper", "function", "pkg/sub/deep.py") in got    # nested dir walked, POSIX key
+    assert not any(s["id"] == "_private" for s in syms)        # underscore = private, skipped
+    assert not any(s["id"] == "method" for s in syms)          # a class method is not top-level
+    assert all("\\" not in s["file"] for s in syms)            # POSIX keys on every platform
+    (pkg / "broken.py").write_text("def broken(\n", encoding="utf-8")  # SyntaxError
+    try:
+        m.python_symbols(pkg, "py", root=tmp)
+        raise AssertionError("python_symbols swallowed a parse error (fail-open)")
+    except m.MapError as exc:
+        assert "parse error" in str(exc)
+
+    # --- enumerate_exports: the fail-closed JS/TS floor ------------------------------------
+    web = tmp / "web"
+    web.mkdir()
+    (web / "ok.ts").write_text(
+        "export function slugify(s) {}\n"
+        "export async function load() {}\n"
+        "export default class Panel {}\n"
+        "export const RATE = 3;\n"
+        "export type Foo = string;\n"            # recognized, not indexed (no runtime kind)
+        "export interface Bar {}\n"              # recognized, not indexed
+        "export { a, b as c } from './x';\n"     # recognized, not indexed (indexed at def site)
+        "export * from './y';\n"                 # recognized, not indexed
+        "// export function commented() {}\n"    # line comment ignored
+        "/* export class Blocked {} */\n",       # block comment ignored
+        encoding="utf-8",
+    )
+    jget = {(s["id"], s["kind"]) for s in m.enumerate_exports(web, "web", extensions=frozenset({".ts"}), root=tmp)}
+    assert jget == {
+        ("slugify", "function"),
+        ("load", "function"),
+        ("Panel", "class"),
+        ("RATE", "const-export"),
+    }, jget
+    (web / "bad.ts").write_text("export abstract class Widget {}\n", encoding="utf-8")
+    try:
+        m.enumerate_exports(web, "web", extensions=frozenset({".ts"}), root=tmp)
+        raise AssertionError("enumerate_exports silently skipped an unmodelled export form")
+    except m.MapError as exc:
+        assert "unmodelled" in str(exc)
+
+
 def main() -> int:
     import tempfile
 
@@ -201,9 +294,16 @@ def main() -> int:
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)
     failures += check("renders deterministic + keys-only + round-trip", t_renders_round_trip_and_determinism)
     failures += check("glob brackets fail loud; [[]-escape matches", t_glob_brackets_fail_loud_and_escape_works)
+    failures += check(
+        "symbols.json deterministic + fail-closed render", t_symbols_render_deterministic_and_fail_closed
+    )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "extractor helpers fail closed", lambda: t_extractor_helpers_fail_closed(Path(td))
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "symbol extractors fail closed (ast + enum floor)", lambda: t_symbol_extractors_fail_closed(Path(td))
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("conf restricted grammar", lambda: t_conf_grammar(Path(td)))

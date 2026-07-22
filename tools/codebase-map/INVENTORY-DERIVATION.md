@@ -73,6 +73,33 @@ inventories is a healthy set; 2 is better than 0.
 - Add `KEYED_ATTRIBUTORS` for path families whose filename embeds a claim key (migrations:
   `db/migrations/<rev>_*.sql` -> the `migrations` inventory) — keyed attribution beats globs.
 
+## 4b. The SYMBOL recall tier (optional — reuse convergence)
+
+The keyed inventories above prove COVERAGE (what exists, who owns it). The SYMBOL tier adds
+RECALL: every reusable symbol as `{id, kind, file}` in `generated/symbols.json`, so new work
+can discover an existing seam instead of reinventing it. It is a separate plane:
+
+- **Never a ratchet.** Symbols feed `symbols.json` ONLY — a new symbol needs a regen (like any
+  generated artifact), never a dossier claim. Coverage never sees it, so it cannot fail CI as an
+  unclaimed key. `kind` is one of `map_lib.SYMBOL_KINDS` (`function`/`class`/`component`/`const-export`).
+- **id/kind/file ONLY — no fan-in.** Fan-in restales the artifact on nearly every commit; it is
+  computed on demand later (the lookup / `--converge`), never committed. `symbols.json` churns
+  exactly like `inventories.json` (on a symbol add/remove), and is byte-deterministic (sorted
+  ids, POSIX paths, LF).
+- **Real parser, or the fail-closed floor — never a leaky regex.** Declare each covered layer in
+  `SYMBOL_EXTRACTORS` (its keys ARE your explicit covered-layers list). Use `m.python_symbols`
+  (backed by `ast` — captures async/decorated defs a regex drops; a `SyntaxError` raises
+  `MapError`). Where no parser is available, `m.enumerate_exports` walks the files and RAISES on
+  any statement-leading `export` form its rule set does not model — that raise is the
+  completeness guarantee, replacing a silent skip of `export default`/re-exports/`type`/decorated
+  classes (the green-by-absence hole). Extend `m.JS_EXPORT_RULES` (or map a PascalCase const to
+  `component`) rather than loosening it; prefer `tsc`/tree-sitter in the project extractor if
+  your gate env has one.
+- **Opt out by leaving `SYMBOL_EXTRACTORS` empty** — no `symbols.json` is rendered and the gate
+  demands none. A layer you deliberately do not cover is recorded recall-dark in
+  `.codebase-map.conf` so the lookup can announce the gap (rather than a falsely-confident "no
+  seam fits").
+
 ## 5. Accepted residuals (know them; don't rediscover them)
 
 - Baseline additions are socially enforced — stateless CI can't tell backfill from evasion;

@@ -30,6 +30,7 @@ Portability rules baked in (each was a review finding once — do not relax):
 
 from __future__ import annotations
 
+import ast
 import json
 import os
 import re
@@ -186,6 +187,171 @@ def json_artifact_inventory(path: Path, inventory: str, extract) -> list[str]:
     if not keys:
         raise MapError(f"{inventory}: empty inventory from {path}")
     return sorted(keys)
+
+
+# ======================================================================================
+# Symbol-tier extractors (the SYMBOL recall tier — feed render_symbols_json only)
+# ======================================================================================
+#
+# These build the reuse recall index: every reusable symbol as {id, kind, file}. Unlike the
+# keyed inventories they are NEVER a ratchet (a new symbol must never fail CI), so they render
+# to symbols.json only. Same fail-closed law as every extractor: a real parser where one is
+# available (python_symbols uses ast), and a raise-on-unmatched enumeration floor elsewhere
+# (enumerate_exports) — NEVER a regex that silently skips export forms it forgot (the
+# green-by-absence hole: export default / re-exports / type / decorated classes).
+
+#: kind vocabulary for a symbol row. Frozen — render_symbols_json rejects any other kind.
+SYMBOL_KINDS = frozenset({"function", "class", "component", "const-export"})
+
+_SKIP_DIRS = frozenset({"__pycache__", "node_modules", ".git", ".venv"})
+
+
+def python_symbols(
+    base: Path,
+    layer: str,
+    *,
+    root: Path | None = None,
+    skip_dirs: frozenset[str] = _SKIP_DIRS,
+) -> list[dict[str, str]]:
+    """SYMBOL extractor for a Python layer, real-parser-backed (the F1a case). Every PUBLIC
+    module-level ``def``/``async def`` -> function and ``class`` -> class under ``base``, plus
+    statically-listed ``__all__`` names not already captured -> const-export. ``file`` is
+    POSIX-relative to ``root`` (repo root by default) so a reference scan can open it.
+
+    Fail-closed: an ``ast`` SyntaxError raises MapError (never a smaller index). Decorated and
+    async defs are captured natively — the case a hand-rolled regex drops, and the whole reason
+    to prefer a real parser. Leading-underscore names are private by Python convention (skipped)
+    and only module-body nodes count (a def nested in a class/try is not a top-level seam)."""
+    root = root or repo_root()
+    if not base.is_dir():
+        raise MapError(f"{layer}: expected directory missing: {base}")
+    out: list[dict[str, str]] = []
+    for dirpath, dirnames, files in os.walk(base):
+        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+        for name in sorted(files):
+            if not name.endswith(".py"):
+                continue
+            path = Path(dirpath) / name
+            rel = path.relative_to(root).as_posix()
+            try:
+                mod = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            except SyntaxError as exc:
+                raise MapError(f"{layer}: python parse error in {rel}: {exc}") from exc
+            captured: set[str] = set()
+            for node in mod.body:
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and not node.name.startswith("_"):
+                    out.append({"id": node.name, "kind": "function", "file": rel})
+                    captured.add(node.name)
+                elif isinstance(node, ast.ClassDef) and not node.name.startswith("_"):
+                    out.append({"id": node.name, "kind": "class", "file": rel})
+                    captured.add(node.name)
+            for exported in _static_all(mod):
+                if exported not in captured and not exported.startswith("_"):
+                    out.append({"id": exported, "kind": "const-export", "file": rel})
+    return out
+
+
+def _static_all(mod: ast.Module) -> list[str]:
+    """``__all__`` entries when it is a plain list/tuple of string literals; [] otherwise.
+    A dynamically-built ``__all__`` (concatenation, star-unpack) augments nothing — the
+    def/class capture still stands (a documented recall floor, never a silent shrink)."""
+    for node in mod.body:
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        else:
+            continue
+        if not any(isinstance(t, ast.Name) and t.id == "__all__" for t in targets):
+            continue
+        value = node.value
+        if isinstance(value, (ast.List, ast.Tuple)):
+            names = [e.value for e in value.elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+            if len(names) == len(value.elts):  # every element a string literal, else give up
+                return names
+        return []
+    return []
+
+
+#: Default JS/TS ``export`` rule set for enumerate_exports — the common floor. (regex, kind);
+#: kind None = a recognized form with no runtime seam to index (types) or no name to recall by
+#: (barrel re-exports, anonymous default). Order matters: default/async forms precede the bare
+#: forms. Deliberately does NOT cover every TS form (e.g. `export abstract class`, `export
+#: declare …`): an uncovered `export` RAISES, forcing the adopter to add a rule or use tsc,
+#: rather than silently dropping the symbol. Extend it, or map a PascalCase const to
+#: "component", in the project's map_extractors.py.
+_JS_ID = r"(?P<id>[A-Za-z_$][\w$]*)"
+JS_EXPORT_RULES: tuple[tuple[re.Pattern[str], str | None], ...] = (
+    (re.compile(rf"export\s+default\s+async\s+function\s*\*?\s*{_JS_ID}"), "function"),
+    (re.compile(rf"export\s+default\s+function\s*\*?\s*{_JS_ID}"), "function"),
+    (re.compile(rf"export\s+default\s+class\s+{_JS_ID}"), "class"),
+    (re.compile(rf"export\s+async\s+function\s*\*?\s*{_JS_ID}"), "function"),
+    (re.compile(rf"export\s+function\s*\*?\s*{_JS_ID}"), "function"),
+    (re.compile(rf"export\s+class\s+{_JS_ID}"), "class"),
+    (re.compile(rf"export\s+(?:const|let|var)\s+{_JS_ID}"), "const-export"),
+    (re.compile(r"export\s+type\s*\{"), None),               # type-only re-export
+    (re.compile(rf"export\s+(?:type|interface|enum|namespace)\s+{_JS_ID}"), None),
+    (re.compile(r"export\s*\{"), None),                       # named re-export (indexed at def site)
+    (re.compile(r"export\s+\*"), None),                       # star re-export
+    (re.compile(r"export\s+default\b"), None),                # anonymous default / default <expr>
+)
+
+_BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
+
+
+def enumerate_exports(
+    base: Path,
+    layer: str,
+    *,
+    extensions: frozenset[str],
+    rules: tuple[tuple[re.Pattern[str], str | None], ...] = JS_EXPORT_RULES,
+    marker: str = "export",
+    root: Path | None = None,
+    skip_dirs: frozenset[str] = _SKIP_DIRS,
+) -> list[dict[str, str]]:
+    """SYMBOL extractor floor for a layer with no available parser (the F1b case). Walks
+    ``extensions`` files under ``base``; for each statement-leading ``marker`` line the FIRST
+    matching (regex, kind) rule emits {id: group('id'), kind, file}. kind None = recognized but
+    not indexed. A ``marker`` line matching NO rule RAISES MapError — that raise IS the
+    completeness guarantee: a form the rule set forgot fails the gate loudly instead of
+    vanishing (stronger than a parsed-vs-keyword count check, which cannot name the offender).
+
+    ``file`` is POSIX-relative to ``root``. Ceilings (documented, not silent): comments are
+    stripped naively (``/* */`` spans and trailing ``//``), and only statement-leading markers
+    are scanned — a ``marker`` inside a multi-line template literal would false-positive RAISE
+    (fail-closed direction) and a multi-name ``export { a, b }`` is recognized-not-indexed
+    (the names are indexed at their def sites). Use a real parser (tsc/tree-sitter) for full
+    fidelity; this is the stdlib floor."""
+    root = root or repo_root()
+    if not base.is_dir():
+        raise MapError(f"{layer}: expected directory missing: {base}")
+    marker_re = re.compile(rf"^\s*{re.escape(marker)}\b")
+    out: list[dict[str, str]] = []
+    for dirpath, dirnames, files in os.walk(base):
+        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+        for name in sorted(files):
+            if not any(name.endswith(ext) for ext in extensions):
+                continue
+            path = Path(dirpath) / name
+            rel = path.relative_to(root).as_posix()
+            text = _BLOCK_COMMENT_RE.sub("", path.read_text(encoding="utf-8"))
+            for raw in text.splitlines():
+                line = raw.split("//", 1)[0]
+                if not marker_re.match(line):
+                    continue
+                stripped = line.strip()
+                for pattern, kind in rules:
+                    match = pattern.match(stripped)
+                    if match:
+                        if kind is not None:
+                            out.append({"id": match.group("id"), "kind": kind, "file": rel})
+                        break
+                else:
+                    raise MapError(
+                        f"{layer}: {rel}: unmodelled '{marker}' form (add a rule or use a real "
+                        f"parser — a silent skip is the green-by-absence hole): {stripped!r}"
+                    )
+    return out
 
 
 # ======================================================================================
@@ -424,6 +590,34 @@ def render_inventories_json(inventories: dict[str, list[str]], inventory_ids: tu
         "$generator": f"codebase-map@{KIT_CODEBASE_MAP_VERSION}",
         "$comment": f"generated by codebase-map/gen_map.py — do not hand-edit; regen: {REGEN_CMD}",
         "inventories": {k: sorted(inventories[k]) for k in inventory_ids},
+    }
+    return json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
+
+
+def render_symbols_json(symbols: list[dict[str, str]]) -> str:
+    """The SYMBOL recall index: {id, kind, file} rows, ids sorted, POSIX paths, LF — so it is
+    byte-deterministic across a Windows and a Linux run, exactly like inventories.json, and the
+    freshness gate can byte-compare two renders. id/kind/file ONLY: NO fan-in (that would
+    restale the artifact on nearly every commit — fan-in is computed on demand in the lookup /
+    --converge). Fail-closed: a wrong-shape row, an unknown kind, or a backslash path RAISES —
+    the byte-compare gate runs the SAME renderer twice so it cannot catch a fail-open producer;
+    the shape is validated HERE."""
+    rows: list[dict[str, str]] = []
+    for s in symbols:
+        if not isinstance(s, dict) or set(s) != {"id", "kind", "file"}:
+            raise MapError(f"symbols.json: each symbol needs exactly id/kind/file: {s!r}")
+        if not all(isinstance(s[k], str) and s[k] for k in ("id", "kind", "file")):
+            raise MapError(f"symbols.json: id/kind/file must be non-empty strings: {s!r}")
+        if s["kind"] not in SYMBOL_KINDS:
+            raise MapError(f"symbols.json: unknown kind {s['kind']!r} (want {sorted(SYMBOL_KINDS)}): {s!r}")
+        if "\\" in s["file"]:
+            raise MapError(f"symbols.json: file must be POSIX (forward-slash): {s['file']!r}")
+        rows.append({"id": s["id"], "kind": s["kind"], "file": s["file"]})
+    rows.sort(key=lambda r: (r["id"], r["file"], r["kind"]))
+    doc = {
+        "$generator": f"codebase-map@{KIT_CODEBASE_MAP_VERSION}",
+        "$comment": f"generated by codebase-map/gen_map.py — do not hand-edit; regen: {REGEN_CMD}",
+        "symbols": rows,
     }
     return json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
 

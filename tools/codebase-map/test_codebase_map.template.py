@@ -80,6 +80,12 @@ def test_generated_artifacts_are_fresh() -> None:
         gen_dir / "inventories.json": m.render_inventories_json(inventories, INVENTORY_IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, INVENTORY_IDS, owners, tree.baseline),
     }
+    # SYMBOL recall tier (optional): only gated when the project declares symbol extractors.
+    # render_symbols_json is byte-deterministic (sorted ids, POSIX, LF), so this byte-compare
+    # holds identically on Windows and Linux — the AC2 cross-platform claim.
+    symbols = getattr(ext, "all_symbols", list)()
+    if symbols:
+        fresh[gen_dir / "symbols.json"] = m.render_symbols_json(symbols)
     for path, expected in fresh.items():
         assert path.is_file(), f"missing generated artifact {path} — regen: {m.REGEN_CMD}"
         committed = m.lf(path.read_text(encoding="utf-8"))

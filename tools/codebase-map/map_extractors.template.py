@@ -61,6 +61,43 @@ EXTRACTORS: dict[str, object] = {
 #     return sorted(names)
 
 
+# --------------------------------------------------------------------------------------
+# SYMBOL_EXTRACTORS — the reuse RECALL tier: layer name -> zero-arg callable returning a list
+# of {id, kind, file} dicts (kind in map_lib.SYMBOL_KINDS). These feed generated/symbols.json
+# ONLY — never the ratchet, so a new symbol NEVER fails CI (recall data, not a coverage gate).
+# The dict's KEYS are this repo's explicitly-covered layers; a layer you deliberately do NOT
+# cover is declared recall-dark in .codebase-map.conf so the lookup can announce the gap.
+#
+# Each extractor is real-parser-backed OR the fail-closed enumeration floor — NEVER a regex
+# that silently skips export forms it forgot (that green-by-absence hole is the bug this tier
+# exists to close). Leave the dict EMPTY to opt out of the recall tier: no symbols.json is
+# rendered and the freshness gate does not demand one.
+# --------------------------------------------------------------------------------------
+
+SYMBOL_EXTRACTORS: dict[str, object] = {
+    # --- Python layer: real parser (ast), fail-closed on a SyntaxError --------------------
+    # "core-py": lambda: m.python_symbols(ROOT / "src" / "mypkg", "core-py"),
+    #
+    # --- TS/JS layer: the stdlib enumeration floor (RAISES on an export form no rule models).
+    #     Prefer a real parser (tsc/tree-sitter) if one is available in your gate env; extend
+    #     m.JS_EXPORT_RULES (e.g. map a PascalCase const to "component") rather than loosening.
+    # "web-ts": lambda: m.enumerate_exports(
+    #     ROOT / "web" / "src",
+    #     "web-ts",
+    #     extensions=frozenset({".ts", ".tsx", ".js", ".jsx", ".mjs"}),
+    # ),
+}
+
+
+def all_symbols() -> list[dict[str, str]]:
+    """Every covered layer's symbols, concatenated (recall index source). Empty when the
+    recall tier is opted out — gen_map then renders no symbols.json."""
+    out: list[dict[str, str]] = []
+    for layer, fn in SYMBOL_EXTRACTORS.items():
+        out.extend(fn())  # type: ignore[operator]
+    return out
+
+
 #: Optional: the project's decision/record id grammar (dossier `decisions` entries are
 #: validated against it). Keep FORWARD-ONLY id schemes open — don't hardcode today's enum.
 DECISION_ID_RE = m.DEFAULT_DECISION_ID_RE
