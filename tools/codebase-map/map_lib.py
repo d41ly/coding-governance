@@ -290,6 +290,7 @@ _JS_ID = r"(?P<id>[A-Za-z_$][\w$]*)"
 JS_EXPORT_RULES: tuple[tuple[re.Pattern[str], str | None], ...] = (
     (re.compile(rf"export\s+default\s+async\s+function\s*\*?\s*{_JS_ID}"), "function"),
     (re.compile(rf"export\s+default\s+function\s*\*?\s*{_JS_ID}"), "function"),
+    (re.compile(r"export\s+default\s+class\s+extends\b"), None),   # anonymous default class extending
     (re.compile(rf"export\s+default\s+class\s+{_JS_ID}"), "class"),
     (re.compile(rf"export\s+async\s+function\s*\*?\s*{_JS_ID}"), "function"),
     (re.compile(rf"export\s+function\s*\*?\s*{_JS_ID}"), "function"),
@@ -303,6 +304,21 @@ JS_EXPORT_RULES: tuple[tuple[re.Pattern[str], str | None], ...] = (
 )
 
 _BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
+
+
+def _has_top_level_comma(s: str) -> bool:
+    """True if ``s`` has a comma at bracket-depth 0 — for an ``export const/let/var`` line, a second
+    declarator (``a = 1, b = 2``). A comma inside ``()``/``[]``/``{}`` (an array/object/call
+    initializer) is NOT a declarator separator and must not trip this."""
+    depth = 0
+    for ch in s:
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth = max(0, depth - 1)
+        elif ch == "," and depth == 0:
+            return True
+    return False
 
 
 def enumerate_exports(
@@ -340,7 +356,12 @@ def enumerate_exports(
                 continue
             path = Path(dirpath) / name
             rel = path.relative_to(root).as_posix()
-            text = _BLOCK_COMMENT_RE.sub("", path.read_text(encoding="utf-8"))
+            # Replace each block-comment span with as many newlines as it spanned, so removing a
+            # multi-line /* */ never MERGES two statements onto one line (which would push a then-
+            # non-leading export out of the statement-leading scan silently).
+            text = _BLOCK_COMMENT_RE.sub(
+                lambda mm: "\n" * mm.group(0).count("\n"), path.read_text(encoding="utf-8")
+            )
             for raw in text.splitlines():
                 line = raw.split("//", 1)[0]
                 if not marker_re.match(line):
@@ -349,6 +370,12 @@ def enumerate_exports(
                 for pattern, kind in rules:
                     match = pattern.match(stripped)
                     if match:
+                        if kind == "const-export" and _has_top_level_comma(stripped):
+                            raise MapError(
+                                f"{layer}: {rel}: unmodelled multi-declarator export (capturing only "
+                                f"the first name is the green-by-absence hole — split it or use a real "
+                                f"parser): {stripped!r}"
+                            )
                         if kind is not None:
                             out.append({"id": match.group("id"), "kind": kind, "file": rel})
                         break
@@ -482,9 +509,12 @@ def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
 
 
 def reference_index_for(
-    files: list[str], *, root: Path | None = None
+    files: list[str], *, root: Path | None = None, extensions: frozenset[str] | None = None
 ) -> dict[str, set[str]]:
     """Reference index (token -> {POSIX files}) over an EXACT file list, NOT their whole dirs.
+    When ``extensions`` is given, only files with those suffixes are scanned (the covered code
+    layers) — so a non-code file in the range (a .md that merely names a symbol) cannot register a
+    spurious edge, mirroring build_reference_index's extension filter.
     build_reference_index walks a whole layer for corpus-wide fan-in; this indexes only the
     files given — the range-scoped scan behind --converge's "did the range wire through this
     seam?" test (fan_in over THIS index > 0 = an edge was added by the range). Same fail-open
@@ -494,6 +524,8 @@ def reference_index_for(
     index: dict[str, set[str]] = {}
     for raw in files:
         rel = raw.replace("\\", "/")
+        if extensions is not None and Path(rel).suffix not in extensions:
+            continue
         try:
             text = (root / rel).read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
@@ -888,8 +920,13 @@ def detect_collisions(
             fe = fan_in(ref_index, e["id"], e["file"])
             if fe < threshold:
                 continue  # E is not a seam — below the reuse threshold
-            if fan_in(range_index, e["id"], e["file"]) > 0:
-                continue  # the range references E -> it wired through, not reinvented
+            # "Wired through" = the NEW symbol's OWN file references E — scoped to s["file"], not
+            # the whole range (an unrelated changed file's edge to E must not mask S's reinvention),
+            # and ONLY when the ids differ: a same-id row's occurrence in its own file is its
+            # definition, never an edge to the same-named seam (else a verbatim same-name duplicate,
+            # the most blatant reinvention, is silently not flagged).
+            if s["id"] != e["id"] and s["file"] in range_index.get(e["id"], ()):
+                continue  # S's file genuinely references E -> extension/wrap, not reinvention
             declared = e["id"] in affordance_seams
             if best is None or (fe, declared) > (best[0], best[1]):
                 best = (fe, declared, e)

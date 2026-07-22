@@ -34,6 +34,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
+    sys.stdout.reconfigure(errors="replace")
+except (AttributeError, ValueError):
+    pass
+
 import map_lib as m  # noqa: E402
 
 # map_extractors (the project layer) is imported LAZILY inside the attribution path only — the
@@ -43,14 +48,16 @@ import map_lib as m  # noqa: E402
 
 
 def _changed_files(base: str, head: str) -> list[str]:
+    """Changed files in base..head. Fails SOFT (a notice + []) when git cannot resolve the range —
+    a first commit's parent, a typo'd ref, a shallow clone missing the base — so --converge and the
+    digest degrade to 'nothing to diff' and honor their advisory intent, never a raw traceback."""
     out = subprocess.run(
         ["git", "-C", str(m.repo_root()), "diff", "--name-only", f"{base}..{head}"],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
+    if out.returncode != 0:
+        print(f"# map-diff: cannot resolve range {base}..{head} (bad ref / shallow clone?) - nothing to diff")
+        return []
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
 
 
@@ -88,18 +95,20 @@ def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict]:
     if out.returncode != 0 or not out.stdout.strip():
         return []
     try:
-        return json.loads(out.stdout).get("symbols", [])
+        data = json.loads(out.stdout)
     except json.JSONDecodeError:
         return []
+    return data.get("symbols", []) if isinstance(data, dict) else []
 
 
 def _read_symbols(path: Path) -> list[dict]:
     if not path.is_file():
         return []
     try:
-        return json.loads(path.read_text(encoding="utf-8")).get("symbols", [])
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return []
+    return data.get("symbols", []) if isinstance(data, dict) else []
 
 
 def _new_clones(root: Path, conf: dict[str, str]) -> int | None:
@@ -133,8 +142,9 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     new_rows = [r for r in head_rows if (r["id"], r["kind"], r["file"]) not in base_key]
 
     symbol_files = sorted({r["file"] for r in head_rows})
+    sym_exts = frozenset(Path(r["file"]).suffix for r in head_rows if Path(r["file"]).suffix)
     ref_index = m.build_reference_index(symbol_files, root=root) if symbol_files else {}
-    range_index = m.reference_index_for(files, root=root)
+    range_index = m.reference_index_for(files, root=root, extensions=sym_exts or None)
 
     texts = m.load_dossier_texts(map_dir)
     affordance_seams = frozenset(

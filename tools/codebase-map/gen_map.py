@@ -20,6 +20,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
+    sys.stdout.reconfigure(errors="replace")
+except (AttributeError, ValueError):
+    pass
+
 import map_extractors as ext  # noqa: E402
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
@@ -124,6 +129,14 @@ def _seed_affordance_baseline() -> None:
     section — the mirror of --seed-baseline. Makes adoption/re-adoption green by construction:
     today's dossiers are graced, new ones are not. Shrink-only thereafter (never adds a dossier
     that has the section — it's not an offender)."""
+    exempt_path = m.map_root() / "affordance-exempt.toml"
+    if exempt_path.exists():
+        print(
+            f"affordance-exempt.toml already seeded ({exempt_path}) - refusing to re-seed. "
+            "Re-seeding would re-grace section-less dossiers added since adoption (masking real "
+            "offenders); the list is shrink-only - hand-remove entries, never regenerate."
+        )
+        return
     tree = m.load_map_tree(IDS, decision_id_re=ID_RE)
     features_dir = m.map_root() / "features"
     texts = {d.feature: (features_dir / f"{d.feature}.md").read_text(encoding="utf-8") for d in tree.dossiers}

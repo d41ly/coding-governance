@@ -284,6 +284,21 @@ def t_symbol_extractors_fail_closed(tmp: Path):
         raise AssertionError("enumerate_exports silently skipped an unmodelled export form")
     except m.MapError as exc:
         assert "unmodelled" in str(exc)
+    # multi-declarator export must RAISE (capturing only the first name is the fail-open hole):
+    md = tmp / "md"
+    md.mkdir()
+    (md / "x.ts").write_text("export const a = 1, b = 2;\n", encoding="utf-8")
+    try:
+        m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp)
+        raise AssertionError("multi-declarator export was silently under-captured")
+    except m.MapError as exc:
+        assert "multi-declarator" in str(exc)
+    # a single declarator with a bracketed comma is NOT a multi-declarator -> no raise:
+    (md / "x.ts").write_text("export const xs = [1, 2, 3];\n", encoding="utf-8")
+    assert {s["id"] for s in m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp)} == {"xs"}
+    # anonymous default class extending a base emits NO bogus id "extends":
+    (md / "x.ts").write_text("export default class extends Base {}\n", encoding="utf-8")
+    assert m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp) == []
 
 
 def t_affordance_graced_presence(tmp: Path):
@@ -604,6 +619,28 @@ def t_detect_collisions_and_backlog(tmp: Path):
     # stay clean regardless (below-threshold seam / kind mismatch).
     flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3)}
     assert flagged_names == {"slugify2", "retryGateway"}, flagged_names
+    # KEYSTONE regression: a SAME-NAME reinvention (new `slugify` in another file) whose only
+    # occurrence of the id in the range is its OWN definition must FLAG — a same-id row's
+    # self-mention is never a wire-through edge to the same-named seam (else the most blatant
+    # duplicate passes clean).
+    dup = m.detect_collisions(
+        [{"id": "slugify", "kind": "function", "file": "src/dup.py"}],
+        base, ref, {"slugify": {"src/dup.py"}}, threshold=3,
+    )
+    assert [f.new for f in dup] == ["slugify"], dup
+    # control: a RENAMED symbol whose own file genuinely references the seam is a wire-through -> clean.
+    wired = m.detect_collisions(
+        [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
+        base, ref, {"slugify": {"src/new1.py"}}, threshold=3,
+    )
+    assert wired == [], wired
+    # control: the SAME rename with an edge from an UNRELATED file (not new1.py) still FLAGS —
+    # the wire-through is scoped to the new symbol's own file, not the whole range.
+    masked = m.detect_collisions(
+        [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
+        base, ref, {"slugify": {"src/z.py"}}, threshold=3,
+    )
+    assert [f.new for f in masked] == ["slugify2"], masked
 
     # --- backlog: seeded header, append, dedup by (new, resembles) --------------------------------
     text0, added0 = m.append_backlog("", flags)

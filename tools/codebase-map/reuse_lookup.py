@@ -31,6 +31,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII query echo, not crash it
+    sys.stdout.reconfigure(errors="replace")
+except (AttributeError, ValueError):
+    pass
+
 import map_lib as m  # noqa: E402
 
 #: cap on the structural-neighbour set (seeds are NEVER capped — the whole point is that the
@@ -342,7 +347,12 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
     its OWN source: a symbol -> its def file; a declared/prose seam -> its dossier; an inventory
     key -> the inventory (via the generated MAP). `detail` is overloaded per source, so branch
     on which source the candidate came from, not on kind."""
-    root_name = m.map_root().name
+    # Repo-RELATIVE map root (e.g. "memory/map"), not its leaf name — the default MAP_ROOT is
+    # nested, and printing "map/features/…" would send the reader to a path that does not exist.
+    try:
+        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        root_name = m.map_root().name
     lines: list[str] = []
     seen: set[str] = set()
 
