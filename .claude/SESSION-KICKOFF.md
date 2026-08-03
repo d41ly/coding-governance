@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-03T11:18:57+03:00 @ 4d3eba56ea551d00decaf39da594b851698bd7ac
+last-audit: 2026-08-03T15:36:44+03:00 @ e8d046cc76f268aa1525028f0b12705540fa3e7b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -78,6 +78,11 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
+- A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added
+  in `TOOL-aBatchedLintel-1` were wrong on their first run — the interval ban matched the `) {`
+  opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban.
+- A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
+  byte, through a filename argument, through `getline` AND through a pipe. Assert at source level.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

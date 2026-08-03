@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=1.3   # gov:kit memory-tree@1.3 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=1.4   # gov:kit memory-tree@1.4 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -237,10 +237,39 @@ $bad6"
 #     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
 ex7='(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
 [ -n "$MAP_SUB" ] && ex7="(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
-bad7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
-  in_debt "$f" && continue; in_scope "$f" || continue
-  _unfenced "$f" | awk -v F="$f" 'length($0)>300 && $0 !~ /^#/ && $0 !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/ { print F":"FNR" ("length($0)" chars)" }'
+# ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
+# TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
+# piped `_unfenced` output WAS the record source, so the reported line number was never the file line
+# number and must not become one.
+#
+# NO `LC_ALL=` prefix and no `xargs` wrapper that sets one, deliberately. `length()` decides this
+# verdict and its character-versus-byte meaning is a property of the awk build and the ambient
+# locale; pinning it would silently re-decide the cap on any adopter whose awk counts characters
+# today. Check 8 at the batched `LC_ALL=C xargs -r awk` seventeen lines below is NOT the pattern to
+# copy here — it sorts, it does not measure.
+sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
+  in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"
 done)
+bad7=""
+if [ -n "$sel7" ]; then
+  bad7=$(awk '
+    { f = $0; if (f == "") next
+      fence = ""; uln = 0
+      while ((getline line < f) > 0) {
+        sub(/\r$/, "", line)
+        if (line ~ /^[[:space:]]*(```|~~~)/) {
+          mk = (line ~ /^[[:space:]]*```/) ? "```" : "~~~"
+          if (fence == "") { fence = mk; continue }
+          if (mk == fence) { fence = ""; continue }
+        }
+        if (fence != "") continue
+        uln++
+        if (length(line) > 300 && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
+          print f ":" uln " (" length(line) " chars)"
+      }
+      close(f)
+    }' <<<"$sel7")
+fi
 [ -n "$bad7" ] && fail 7 "index entry lines over 300 chars:
 $bad7"
 
@@ -322,43 +351,134 @@ SPEC_CANON='## 1. Goal
 ## 7. Gates
 ## 8. Open questions
 ## 9. Revision log'
-bad12=$(printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$" | while IFS= read -r f; do
+# ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run
+# here; upstream inCMS measured the same shape at 257.8s of 311s over 356 specs —
+# TOOL-aBatchedLintel-1 ports PERF-aSlothfulCapstan-1). The driver is a tagged path stream built in
+# the SHELL rather than an `ARGIND` switch: ARGIND is gawk-only, and upstream had a byte cap silently
+# not exist under mawk because of it. `M` = tracked and in scope but absent from the worktree,
+# `P` = analyse. `[ -f ]` stays a bash builtin so the absent-file finding keeps its position in the
+# stream. The canon rides in on `-v canon=`: this kit has ONE nine-line canon and one equality, so it
+# needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
+c12_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/[^/]+/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$" | while IFS= read -r f; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
   [ "$d" \< "$SPEC_FORMAT_CUTOFF" ] && continue
-  in_scope "$f" || continue
-  [ -f "$f" ] || { echo "$f (tracked but missing from worktree)"; continue; }
-  body=$(_unfenced "$f")
-  hdr=$(printf '%s\n' "$body" | head -5 | grep -E '^\*\*Status:\*\* ' | head -1)
-  if ! printf '%s' "$hdr" | grep -qE '^\*\*Status:\*\* (OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO) · rev-[0-9]+ · [0-9]{4}-[0-9]{2}-[0-9]{2} · node [a-z] · Tier-[12] · base [0-9a-f]{8}'; then
-    echo "$f (missing/invalid **Status:** header in lines 1-5)"
-    continue      # header unparseable — the per-field assertions below have no anchor
-  fi
-  printf '%s\n' "$body" | grep -qE '<FAMILY-slug-seq>|YYYY-MM-DD' && echo "$f (unfilled skeleton placeholder)"
-  case "$hdr" in
-    '**Status:** WONTDO'*) printf '%s' "$hdr" | grep -qE 'base [0-9a-f]{8,} · .' \
-      || echo "$f (WONTDO needs a successor id or reason pointer in the header tail)";;
-  esac
-  case "$hdr" in *'Tier-1'*) continue;; esac
-  # ---- Tier-2 body assertions ----
-  got=$(printf '%s\n' "$body" | grep -E '^## ' || true)
-  if [ "$got" != "$SPEC_CANON" ]; then
-    echo "$f (## sections differ from the canonical nine of $M/TEMPLATE-SPEC.md):"
-    diff <(printf '%s\n' "$SPEC_CANON") <(printf '%s\n' "$got") | head -6 | sed 's/^/    /'
-  fi
-  empty=$(printf '%s\n' "$body" | awk '/^## /{ if (s != "" && n == 0) print "    " s; s = $0; n = 0; next } s != "" && NF > 0 { n++ } END { if (s != "" && n == 0) print "    " s }')
-  [ -n "$empty" ] && echo "$f (section with an empty body — write N/A — <why>):
-$empty"
-  hrev=${hdr#*· rev-}; hrev=${hrev%% *}
-  lrev=$(printf '%s\n' "$body" | awk '/^## 9\. Revision log/{f=1} f{ while(match($0,/rev-[0-9]+/)){ v=substr($0,RSTART+4,RLENGTH-4)+0; if(!seen||v>mx){mx=v} seen=1; $0=substr($0,RSTART+RLENGTH) } } END{ if(seen) print mx }')   # was a 5-fork sed|grep|sed|sort|tail chain; numeric max, lrev only feeds a numeric test
-  if [ -z "$lrev" ] || [ "$hrev" -gt "$lrev" ] 2>/dev/null; then
-    echo "$f (header rev-$hrev not logged in the §9 Revision log)"
-  fi
-  case "$hdr" in
-    '**Status:** CLOSED'*|'**Status:** WONTDO'*)
-      q8=$(printf '%s\n' "$body" | sed -n '/^## 8\. Open questions/,/^## 9\. /p' | sed '1d;$d' | grep -vE '^[[:space:]]*$' | head -1)
-      case "$q8" in none*|N/A*|'') ;; *) echo "$f (terminal Status with unresolved §8 Open questions)";; esac;;
-  esac
+  in_scope "$f" || continue          # no-op in full mode; decides the WHOLE selection under --staged
+  if [ -f "$f" ]; then printf 'P\t%s\n' "$f"; else printf 'M\t%s\n' "$f"; fi
 done)
+bad12_raw=""
+if [ -n "$c12_sel" ]; then
+# Every array below is read only up to its own counter (n, ng, q), so entries left from a previous
+# file are unreachable and no `delete array` is needed — which also keeps this off a construct whose
+# portability would have to be argued rather than read. Interval expressions are spelled out
+# character by character for the same reason: on a build that does not honour `{8}` the header regex
+# would demand those literal bytes and never match, redding every post-cutoff spec.
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v mroot="$M" '
+  $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
+  $1 != "P" { next }
+  {
+    f = $2
+    # ---- the _unfenced fence machine, verbatim: CR strip, marker-matched fences ----
+    n = 0; fence = ""
+    while ((getline line < f) > 0) {
+      sub(/\r$/, "", line)
+      if (line ~ /^[[:space:]]*(```|~~~)/) {
+        mk = (line ~ /^[[:space:]]*```/) ? "```" : "~~~"
+        if (fence == "") { fence = mk; continue }
+        if (mk == fence) { fence = ""; continue }
+      }
+      if (fence != "") continue
+      body[++n] = line
+    }
+    close(f)
+    # `body=$(_unfenced "$f")` held this text, and command substitution DROPS trailing newlines, so
+    # the old body ended at its last non-empty line. That is load-bearing: the §8 extraction below
+    # reproduces `sed "1d;$d"`, whose two deletes act on the CONCATENATED range output, and a body
+    # that keeps its trailing blanks moves which line the last delete removes — inventing a finding
+    # on a terminal spec whose §8 is the last section.
+    while (n > 0 && body[n] == "") n--
+    # ---- hdr: head -5 | grep -E "^\*\*Status:\*\* " | head -1, over the UNFENCED body ----
+    hdr = ""; lim = (n < 5) ? n : 5
+    for (i = 1; i <= lim; i++) if (body[i] ~ /^\*\*Status:\*\* /) { hdr = body[i]; break }
+    if (hdr !~ /^\*\*Status:\*\* (OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO) · rev-[0-9]+ · [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] · node [a-z] · Tier-[12] · base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/) {
+      print f " (missing/invalid **Status:** header in lines 1-5)"
+      next      # header unparseable — the per-field assertions below have no anchor
+    }
+    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD/) { print f " (unfilled skeleton placeholder)"; break }
+    if (hdr ~ /^\*\*Status:\*\* WONTDO/ && hdr !~ /base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]* · ./)
+      print f " (WONTDO needs a successor id or reason pointer in the header tail)"
+    if (hdr ~ /Tier-1/) next
+    # ---- Tier-2 body assertions ----
+    ng = 0; got = ""
+    for (i = 1; i <= n; i++) if (body[i] ~ /^## /) { got = (++ng == 1) ? body[i] : got "\n" body[i] }
+    if (got != canon) {
+      print f " (## sections differ from the canonical nine of " mroot "/TEMPLATE-SPEC.md):"
+      print "\001\t" f      # the excerpt is a real diff — rebuilt by the post-pass below
+    }
+    # ---- empty section bodies. The old test was `NF > 0` on a split record; the line is read into a
+    # ---- variable here, so NF does not exist and /[^ \t]/ stands in. The two agree on every
+    # ---- plain-text line; they part only on an invalid multibyte byte under gawk in a UTF-8 locale.
+    ne = 0; emp = ""; s = ""; cnt = 0
+    for (i = 1; i <= n; i++) {
+      L = body[i]
+      if (L ~ /^## /) {
+        if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
+        s = L; cnt = 0; continue
+      }
+      if (s != "" && L ~ /[^ \t]/) cnt++
+    }
+    if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
+    if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
+    # ---- header rev vs the §9 high-water. NO `/^## /{f=0}` reset, deliberately: that is this kit
+    # ---- engine s existing behaviour, and adding one can only SHRINK the scanned range and so
+    # ---- produce MORE findings on a non-conforming spec, which is a verdict change this unit
+    # ---- forbids. Tracked as its own backlog row instead.
+    k = "· rev-"; p = index(hdr, k); hrev = ""
+    if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
+    in9 = 0; seen = 0; mx = 0
+    for (i = 1; i <= n; i++) {
+      L = body[i]
+      if (L ~ /^## 9\. Revision log/) in9 = 1
+      if (in9) while (match(L, /rev-[0-9]+/)) {
+        v = substr(L, RSTART + 4, RLENGTH - 4) + 0
+        if (!seen || v > mx) mx = v
+        seen = 1; L = substr(L, RSTART + RLENGTH)
+      }
+    }
+    if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
+    # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
+    # ---- when shorter than three lines because both deletes land inside it.
+    if (hdr ~ /^\*\*Status:\*\* CLOSED/ || hdr ~ /^\*\*Status:\*\* WONTDO/) {
+      q = 0; inr = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (!inr) { if (L ~ /^## 8\. Open questions/) { inr = 1; rng[++q] = L } }
+        else { rng[++q] = L; if (L ~ /^## 9\. /) inr = 0 }
+      }
+      q8 = ""
+      for (i = 2; i <= q - 1; i++) if (rng[i] !~ /^[[:space:]]*$/) { q8 = rng[i]; break }
+      if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/) print f " (terminal Status with unresolved §8 Open questions)"
+    }
+  }')
+fi
+# The section-canon excerpt keeps a REAL `diff`: reproducing its normal-format output inside awk
+# would need a longest-common-subsequence implementation, and the mismatch path fires zero times on a
+# clean tree. awk emits a sentinel record and the excerpt is rebuilt here by the ORIGINAL commands
+# over the ORIGINAL inputs, so the bytes cannot drift from a second implementation. The `case` guard
+# means a clean run never enters the loop.
+case "$bad12_raw" in
+  *$'\001'*)
+    bad12=$(printf '%s\n' "$bad12_raw" | while IFS= read -r _ln; do
+      case "$_ln" in
+        $'\001'*)
+          _f=${_ln#$'\001'$'\t'}
+          _g=$(_unfenced "$_f" | grep -E '^## ' || true)
+          diff <(printf '%s\n' "$SPEC_CANON") <(printf '%s\n' "$_g") | head -6 | sed 's/^/    /' ;;
+        *) printf '%s\n' "$_ln" ;;
+      esac
+    done) ;;
+  *) bad12=$bad12_raw ;;
+esac
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
 fi
