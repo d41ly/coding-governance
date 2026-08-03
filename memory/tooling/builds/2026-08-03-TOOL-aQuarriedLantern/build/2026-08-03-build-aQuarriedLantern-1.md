@@ -136,3 +136,99 @@ skip past it.
 - The adopt script does **not** carry codebase-map's `-ef` fixed-kit-name check: this repo keeps its
   kits under `tools/`, and `--check` is a gate leg here, so a fixed `<root>/memory-recall` assertion
   would red the leg in the reference adopter.
+
+## U2 — the invocation surfaces: the rendered Skill, the outcome hook, settings-merge
+
+**Landed** 2026-08-03 · node `a` · base `3e427de`
+
+### Shipped — 4 new files in `tools/memory-recall/`, 3 files extended
+
+| File | Category | Bytes |
+|---|---|---|
+| `SKILL.template.md` | new — the trigger surface, rendered from the conf | 4 853 |
+| `recall-opened.js` | forked from inCMS `fd6274d` | 9 234 |
+| `recall-opened.test.sh` | new — 8 cases | 7 874 |
+| `recall-opened.fragment.json` | new — event, matcher, marker, hook path | 158 |
+| `tools/settings-merge.py` | `--fragment FILE` + 4 selftest cases | +154 / -31 |
+| `tools/check-wiring.sh` | the three-state `recall` arm | +36 |
+| `tools/memory-recall/selftest.py` | 4 new arms (14 -> 18 checks) | +141 |
+| `.claude/skills/memory-recall/SKILL.md` | this repo's dogfood render | 4 903 |
+
+### Measured
+
+| Fact | Value |
+|---|---|
+| kit selftest | **18/18 checks**, 2 m 06 s wall (was 14/14 at 24 s — the 4 new arms spawn bash+git+node) |
+| hook test | **8/8 cases**, 21.6 s wall (5 `git init` = 4.9 s, 9 `node` spawns = 3.4 s, measured) |
+| settings-merge selftest | PASS, 10 cases (6 pre-existing + 4 `--fragment`) |
+| hook fork divergence | 26 code lines, all in ONE construct (comments stripped before diffing) |
+| rendered description | 1 322 B, 1 `/session-kickoff` clause, 0 flags `query.py` cannot parse |
+| mutations | **9 killed / 10**, each asserted applied on disk and reverted byte-identically |
+
+### AC10's first half, measured rather than argued
+
+`settings-merge.py` with no `--fragment` was run head-to-head against `git show HEAD:` of itself,
+on a settings file already carrying a foreign `PreToolUse` group: the written file is
+**byte-identical** (`cmp`) and so is stdout, on the create path, the already-wired re-run, and the
+`--check`-on-absent-file path. The fragment is the ONLY behaviour change.
+
+### The three things that had to be right
+
+1. **The hook works on any corpus root (F13).** Upstream tests a literal `memory/` prefix and then
+   scans for a literal `/memory/` boundary; on any other `MEMORY_ROOT` both return null and `main()`
+   bails, indistinguishable from "no read matched". The root now comes from the log's `shown_paths`,
+   which is corpus-relative by construction — **not** from parsing `.memory-tree.conf`, which would
+   be a third copy of that grammar in a third language, gated by nothing. Two cases pin it: a
+   `docs/`-rooted corpus, and a `docs/`-rooted read from a SIBLING WORKTREE.
+2. **No hook without `--with-hook` (R4/F10).** Absence is a true signal, so `check-wiring.sh` reports
+   three states instead of a permanent false UNWIRED in the repo that runs it as its own SessionStart
+   hook. All four states verified end to end: kit absent -> `skip` exit 0 · opt-in not taken ->
+   `skip` exit 0 · present-but-unmerged -> `UNWIRED` exit 1 · merged -> `ok` exit 0, with `--session`
+   exit 0 throughout.
+3. **The description claims nothing this engine lacks (R2/F4).** Upstream's clause — "that skill's
+   Step 3 issues this query itself" — is true in inCMS and false here, and ported verbatim it
+   suppresses the tool at the exact moment the Goal targets. The template defers to whatever probes
+   the kickoff skill asks for and names no step number; the selftest rejects any `/session-kickoff`
+   sentence carrying `Step` or a digit.
+
+### Three things found by running, not reading
+
+- **A sentence split on `;` let upstream's own clause through.** The first cut of the AC18 check
+  split on `[.;]`, which cuts "…is running; that skill's Step 3 issues this query itself." in half:
+  the half naming `/session-kickoff` has no digit and the half with the digit has no
+  `/session-kickoff`. Split on the sentence terminator only. Caught by mutation M5, which is exactly
+  the upstream text.
+- **The hook's own-tree fast path is not independently observable.** Restoring only its `memory/`
+  literal leaves every case green, because the boundary scan is a strict superset for a read inside
+  the hook's own checkout. Kept anyway (upstream parity, one fewer `statSync` on the hottest tool in
+  the session) and scored honestly: M1 SURVIVED, M1b (the scan's literal, killed by the sibling
+  case) and M1c (both literals — the real upstream state) both KILLED.
+- **`cygpath -m` hands back the 8.3 name.** `C:/Users/DAILY-~1/...` while git writes the long form
+  into a linked worktree's `gitdir:` pointer, and `path.resolve` does not unify them — so the
+  sibling-worktree case recorded nothing, for a FIXTURE reason that looks exactly like the hook
+  defect it exists to catch. `cygpath -ml`. The hook itself is upstream-identical here: it does not
+  canonicalise 8.3 names, and neither does upstream.
+- Bonus, from the harness: a bare `bash` under Python's `subprocess` is the **WSL** shim — exit 127,
+  script never read, `chdir(/mnt/c/...) failed 5`. Scoring on exit status alone would have called
+  every bash mutation a kill. The harness probes `uname -o` for `Msys` and demands a named token in
+  the red output.
+
+### Deviations from the rev-2 spec
+
+- **The `skills/session-kickoff/SKILL.md` Step 4 probe paragraph is NOT in this unit.** F4's fix has
+  two halves; this unit closed the template half (the clause claims nothing the engine lacks) and
+  left the positive-wiring half to the unit that owns registrations — it is the kickoff engine's own
+  doc, and touching it re-opens the manifest ratchet. **If no later unit takes it, F4 is half-folded.**
+- **`tools/check-wiring.test.sh` gains no cases here** — per the build plan U3 pins both hook states.
+  The expectations they must pin are the four verified above, and the mutation that must red them is
+  `if [ ! -f .claude/hooks/recall-opened.js ]; then` -> `if false; then` (M4, killed against a
+  scratch oracle). Until then the arm is verified but ungated.
+- **No new gate leg for `recall-opened.test.sh`.** Spec §7 names two legs and both already exist;
+  the hook test runs as a kit-selftest arm instead, so `tools/gate-legs.json` is untouched and the
+  kickoff-manifest ratchet is not re-opened.
+- **No `gov:kit` marker in `SKILL.template.md`.** The spec's wiring table pairs the constant with a
+  marker there; U1 paired it with `README.md` and that pair is gated. A second hand-kept marker with
+  no second gate line would be a marker that can drift silently, which is worse than none.
+- **`--stats` and `--export`** — no sentence anywhere in the kit claims `--stats` reads the query
+  log. The rendered Skill states it prints the cache manifest, and that `--export` writes beside the
+  log under the common git dir with `--tag` required.

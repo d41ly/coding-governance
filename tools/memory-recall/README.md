@@ -23,8 +23,12 @@ Ported from the inCMS `scripts/recall/` implementation at `5318064`.
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
 | `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Verbatim** upstream. |
 | `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
-| `selftest.py` | the kit's contract gate — 14 checks, every arm inside a throwaway repo. |
+| `selftest.py` | the kit's contract gate — 18 checks, every arm inside a throwaway repo. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
+| `SKILL.template.md` | the agent-facing Skill, with the project values as placeholders. Rendered, never copied. |
+| `recall-opened.js` | **optional** PostToolUse hook that infers which hit was read. **Forked**. |
+| `recall-opened.fragment.json` | the settings block that wires that hook: event, matcher, dedup marker, hook path. |
+| `recall-opened.test.sh` | the hook's own check — 8 cases, including a non-`memory` corpus root and a sibling worktree. |
 | `verbatim.json` | LF-normalised digests of the two verbatim files, so a silent edit to one reds the selftest. |
 
 ## Configure
@@ -78,7 +82,9 @@ per-worktree size cap.
    exists (the memory-tree kit owns it — this one refuses rather than creating it).
 2. `bash memory-recall/adopt-memory-recall.sh --scaffold` renders the Skill from the conf into
    `.claude/skills/memory-recall/SKILL.md`. Add `--with-hook` only if you want the `recall-opened`
-   PostToolUse hook; skipping it is a supported end state.
+   PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
+   the wiring:
+   `python settings-merge.py --fragment memory-recall/recall-opened.fragment.json`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
    `python3 memory-recall/selftest.py` and `bash memory-recall/adopt-memory-recall.sh --check`.
@@ -86,6 +92,29 @@ per-worktree size cap.
    override), so a `python3`-only adopter needs no extra step — a gate runner's argv rewrite cannot
    reach a `bash` leg.
 4. Re-run `--scaffold` after any `FAMILIES` or `MEMORY_ROOT` edit. `--check` reds until you do.
+
+## The Skill, and the optional hook
+
+The Skill is **rendered from the conf, not copied**. Its `description` is the entire trigger
+mechanism and it names project values — the id families, the query-script path, the corpus root —
+and a description is matched *before* the skill runs, so those values have to be in the file. That
+is also why it is project-local rather than a per-machine junction: one machine working on two
+projects needs two descriptions. `--check` re-renders and diffs, so a `FAMILIES` edit nobody
+re-rendered is a red leg instead of a silently stale trigger.
+
+Three things about that description are pinned by `selftest.py`, because breaking any of them is
+silent. It **augments** Grep and Glob rather than replacing them, so ordinary code search still
+goes where it already worked. Every flag it prints is one `query.py` actually parses (the flag set
+is imported from `query.py`, not restated). And it claims nothing about a numbered `/session-kickoff`
+step — upstream's clause named a step that issues this query in *its* repo, which ported verbatim
+would suppress the tool at the exact moment it exists for.
+
+The `recall-opened` hook is **opt-in**. It appends one `opened` row per query saying which rank the
+caller actually read, stamped `inferred: true`, and it is the only instrument that can answer
+"did the answer get shown". It ships dark: no `--with-hook`, no file — so `check-wiring.sh` reports
+three honest states (kit not adopted · opt-in not taken · present but unmerged = UNWIRED) instead of
+a permanent false alarm. Membership is decided by the log's `shown_paths` array rather than a
+`memory/` literal, so it works on any `MEMORY_ROOT`.
 
 ## Maintenance — three categories, three different stories
 
@@ -95,10 +124,11 @@ per-worktree size cap.
   script path (`scripts/recall/bench.py`), and `bench.main()` / `union.main()` are the upstream
   benchmark harnesses, which are **inert here** — they need a graded `fixture.json` that this kit
   deliberately does not ship. `selftest.py` pins both files' digests, so an edit reds.
-- **Forked** — `extract.py`, `query.py`. Each carries a header naming the upstream path and the sha
-  it was taken from, and enumerates its edits, so a re-pull is a three-way merge rather than
-  archaeology.
-- **New** — `recall_conf.py`, `selftest.py`, `adopt-memory-recall.sh`, this README.
+- **Forked** — `extract.py`, `query.py`, `recall-opened.js`. Each carries a header naming the
+  upstream path and the sha it was taken from, and enumerates its edits, so a re-pull is a
+  three-way merge rather than archaeology.
+- **New** — `recall_conf.py`, `selftest.py`, `adopt-memory-recall.sh`, `SKILL.template.md`,
+  `recall-opened.fragment.json`, `recall-opened.test.sh`, this README.
 
 ## Notes
 

@@ -456,6 +456,146 @@ def t_python3_only():
         cleanup(shimdir)
 
 
+def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
+    """The Skill/hook surface, which make_repo leaves out because the query arms do not need it."""
+    for n in names:
+        shutil.copyfile(KIT / n, kitdir / n)
+
+
+def adopt(root: pathlib.Path, kitdir: pathlib.Path, *args: str):
+    bash = shutil.which("bash")
+    if not bash:
+        raise _Skip("no bash on PATH")
+    return subprocess.run(
+        [bash, str(kitdir / "adopt-memory-recall.sh"), *args],
+        cwd=str(root), capture_output=True, text=True,
+    )
+
+
+SKILL_REL = pathlib.Path(".claude/skills/memory-recall/SKILL.md")
+SURFACE = ("adopt-memory-recall.sh", "SKILL.template.md", "recall-opened.js",
+           "recall-opened.fragment.json")
+
+
+@check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
+def t_scaffold_converges():
+    """AC8 and the opt-in half of AC13.
+
+    A hook file copied in but never merged into settings.json reads as UNWIRED forever, in the repo
+    that runs the wiring verifier as its own SessionStart hook. So absence has to be a TRUE signal:
+    no `--with-hook`, no file, nothing to report.
+    """
+    root, kitdir = make_repo()
+    try:
+        copy_extra(kitdir, *SURFACE)
+        first = adopt(root, kitdir, "--scaffold")
+        assert first.returncode == 0, f"{first.stdout}{first.stderr}"
+        skill = root / SKILL_REL
+        assert skill.is_file(), "--scaffold rendered no SKILL.md"
+        b1 = skill.read_bytes()
+        again = adopt(root, kitdir, "--scaffold")
+        assert again.returncode == 0, f"{again.stdout}{again.stderr}"
+        assert skill.read_bytes() == b1, "a second --scaffold changed the rendered skill"
+        chk = adopt(root, kitdir, "--check")
+        assert chk.returncode == 0, f"--check reds on a freshly rendered skill: {chk.stdout}"
+        assert not (root / ".claude" / "hooks").exists(), "a hook was installed without --with-hook"
+        with_hook = adopt(root, kitdir, "--scaffold", "--with-hook")
+        assert with_hook.returncode == 0, f"{with_hook.stdout}{with_hook.stderr}"
+        hook = root / ".claude" / "hooks" / "recall-opened.js"
+        assert hook.read_bytes() == (KIT / "recall-opened.js").read_bytes(), "hook copy differs"
+        assert "settings-merge.py --fragment" in with_hook.stdout, "no wiring instruction printed"
+        return f"{len(b1)} B skill, idempotent; hook absent until --with-hook"
+    finally:
+        cleanup(root)
+
+
+@check("a FAMILIES edit nobody re-rendered reds --check and shows the stale description")
+def t_skill_drift_reds():
+    root, kitdir = make_repo()
+    try:
+        copy_extra(kitdir, *SURFACE)
+        assert adopt(root, kitdir, "--scaffold").returncode == 0
+        (root / ".memory-tree.conf").write_text(
+            'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL playbook:PLAY"\n',
+            encoding="utf-8", newline="\n",
+        )
+        proc = adopt(root, kitdir, "--check")
+        out = proc.stdout + proc.stderr
+        assert proc.returncode != 0, f"--check stayed green on a stale skill:\n{out}"
+        assert "DRIFTED" in out, out
+        # The value the conf now carries and the rendered file does not — derived from the edit.
+        assert "PLAY" in out, f"the diff does not show what drifted:\n{out}"
+        assert adopt(root, kitdir, "--scaffold").returncode == 0
+        assert adopt(root, kitdir, "--check").returncode == 0, "re-rendering did not clear the drift"
+        return "stale -> exit 1 naming PLAY, re-render -> exit 0"
+    finally:
+        cleanup(root)
+
+
+@check("the rendered Skill augments grep, prints only real flags, and claims no kickoff step")
+def t_skill_description_invariants():
+    """AC18's three invariants, all of one class: the description is the whole trigger mechanism.
+
+    The flag set is imported from query.py rather than restated here — a second copy of that tuple
+    would be an assertion whose two operands share a generator.
+    """
+    try:
+        import query  # noqa: PLC0415 — a no-conf repo makes this a SystemExit, hence the guard
+    except SystemExit as exc:
+        raise _Skip(f"query.py refused to import here (exit {exc.code})") from None
+    root, kitdir = make_repo()
+    try:
+        copy_extra(kitdir, *SURFACE)
+        assert adopt(root, kitdir, "--scaffold").returncode == 0
+        text = (root / SKILL_REL).read_text(encoding="utf-8")
+        parts = text.split("---")
+        assert len(parts) >= 3, "no YAML frontmatter in the rendered skill"
+        desc = parts[1]
+
+        # 1. AUGMENTS grep, never replaces it. Not editorial: this is what keeps the skill from
+        #    intercepting ordinary code search, which Grep and Glob already do correctly.
+        for token in ("Grep", "Glob", "ordinary code search", "ADDS retrieval"):
+            assert token in desc, f"the description dropped {token!r}"
+
+        # 2. Every flag printed beside an invocation is one query.py parses.
+        bad = sorted({
+            f
+            for line in text.splitlines() if "query.py" in line
+            for f in re.findall(r"--[a-z][a-z-]*", line)
+            if f not in query.KNOWN_FLAGS
+        })
+        assert not bad, f"the skill prints flags query.py does not parse: {bad}"
+
+        # 3. No claim about a numbered kickoff step. The kit ships to projects whose kickoff engine
+        #    this file cannot read, and upstream's "that skill's Step 3 issues this query itself"
+        #    was true there and false here — it suppressed the tool at the one moment it is for.
+        # Split on the SENTENCE terminator only. Splitting on `;` too would cut upstream's exact
+        # clause ("...is running; that skill's Step 3 issues this query itself.") in half and let
+        # the numbered half through with no /session-kickoff token to catch it on — measured.
+        sentences = [s for s in re.split(r"(?<=\.)\s+", desc) if "/session-kickoff" in s]
+        assert sentences, "the description says nothing about /session-kickoff at all"
+        numbered = [s for s in sentences if re.search(r"\bStep\b|\d", s)]
+        assert not numbered, f"the description names a kickoff step it cannot verify: {numbered}"
+        return f"{len(desc)} B description, {len(sentences)} kickoff clause(s), 0 unknown flags"
+    finally:
+        cleanup(root)
+
+
+@check("recall-opened.test.sh: the hook records a rank on ANY corpus root")
+def t_hook_test():
+    bash = shutil.which("bash")
+    if not bash:
+        raise _Skip("no bash on PATH")
+    proc = subprocess.run(
+        [bash, str(KIT / "recall-opened.test.sh")], capture_output=True, text=True,
+    )
+    if proc.returncode == 3:
+        raise _Skip(proc.stdout.strip() or "recall-opened.test.sh skipped itself")
+    assert proc.returncode == 0, f"{proc.stdout}{proc.stderr}"
+    tally = [ln for ln in proc.stdout.splitlines() if ln.startswith("----")]
+    return (tally[-1].strip("- ") if tally else "passed")
+
+
 @check("kit version constant and the gov:kit marker agree")
 def t_version_marker():
     v = recall_conf.KIT_MEMORY_RECALL_VERSION
@@ -505,6 +645,7 @@ def main() -> int:
         t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
         t_zero_records_is_loud, t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_eviction, t_printed_invocations_resolve, t_python3_only,
+        t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"

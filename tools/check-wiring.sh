@@ -79,8 +79,44 @@ check_agentcap() {
   fi
 }
 
+# --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
+# THREE states, not two. `adopt-memory-recall.sh` copies the hook only under `--with-hook`, so an
+# absent hook file is a TRUE signal ("opt-in not taken"), never UNWIRED. Mirroring the agent-cap arm
+# literally would print a permanent false alarm in the repo that runs THIS script as its own
+# SessionStart hook, which is the fastest way to train every node to ignore the wiring verifier.
+# Detection delegates to the fragment's own `marker` via settings-merge.py, so the wired-signal is
+# defined in exactly one place. Advisory like every other arm: no mode rewrites settings.json.
+first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
+check_recall_opened() {
+  local frag smerge py
+  # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
+  # <root>/tools/memory-recall/ in this repo.
+  frag=$(first_of memory-recall/recall-opened.fragment.json tools/memory-recall/recall-opened.fragment.json)
+  if [ -z "$frag" ]; then
+    echo "skip     recall    — memory-recall kit not adopted (no recall-opened.fragment.json)"
+    return
+  fi
+  if [ ! -f .claude/hooks/recall-opened.js ]; then
+    echo "skip     recall    — recall-opened hook opt-in not taken (adopt-memory-recall.sh --with-hook)"
+    return
+  fi
+  smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  if [ -z "$smerge" ]; then
+    echo "skip     recall    — settings-merge.py absent, cannot verify"
+    return
+  fi
+  py=python3; command -v python3 >/dev/null 2>&1 || py=python
+  if "$py" "$smerge" --check --fragment "$frag" >/dev/null 2>&1; then
+    echo "ok       recall    — recall-opened PostToolUse hook wired in .claude/settings.json"
+  else
+    echo "UNWIRED  recall    — recall-opened.js present but hook not in settings.json. Fix: $py $smerge --fragment $frag"
+    unwired=$((unwired+1))
+  fi
+}
+
 check_hooks
 check_agentcap
+check_recall_opened
 
 [ "$MODE" = session ] && exit 0
 [ "$unwired" = 0 ] && exit 0 || exit 1
