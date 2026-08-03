@@ -14,4 +14,5 @@ memory/tooling/
     2026-07-20-TOOL-aLeasedGauntlet/
     2026-07-22-TOOL-bConvergentLodestar/
     2026-08-03-TOOL-aBatchedLintel/
+    2026-08-03-TOOL-aGuardedTally/
     2026-08-03-TOOL-aQuarriedLantern/
