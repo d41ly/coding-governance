@@ -13,3 +13,4 @@ memory/tooling/
     2026-07-19-TOOL-aPrunedCeremony/
     2026-07-20-TOOL-aLeasedGauntlet/
     2026-07-22-TOOL-bConvergentLodestar/
+    2026-08-03-TOOL-aQuarriedLantern/
