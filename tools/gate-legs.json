@@ -16,5 +16,7 @@
   { "name": "pytest-guardrails self-test", "argv": ["bash", "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"] },
   { "name": "codebase-map kit selftest", "argv": ["python3", "tools/codebase-map/selftest.py"] },
   { "name": "settings-merge selftest", "argv": ["python3", "tools/settings-merge.py", "--selftest"] },
+  { "name": "memory-recall kit selftest", "argv": ["python3", "tools/memory-recall/selftest.py"] },
+  { "name": "memory-recall skill wiring", "argv": ["bash", "tools/memory-recall/adopt-memory-recall.sh", "--check"] },
   { "name": "run-gates canary", "argv": ["bash", "tools/run-gates.test.sh"] }
 ]

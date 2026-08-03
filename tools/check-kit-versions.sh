@@ -33,6 +33,16 @@ if [ -z "$c" ] || ! grep -qE "gov:kit memory-tree@$c([^0-9.]|\$)" tools/memory-t
   fails=$((fails+1))
 fi
 
+need "KIT_MEMORY_RECALL_VERSION"  tools/memory-recall/recall_conf.py         "^KIT_MEMORY_RECALL_VERSION = \"$V\""
+
+# memory-recall: constant in recall_conf.py, marker in the README the adopter keeps. Same pair
+# assertion as memory-tree — a stale marker makes the deployer read the wrong installed version.
+r=$(grep -oE "^KIT_MEMORY_RECALL_VERSION = \"$V\"" tools/memory-recall/recall_conf.py | head -1 | grep -oE "$V")
+if [ -z "$r" ] || ! grep -qE "gov:kit memory-recall@$r([^0-9.]|\$)" tools/memory-recall/README.md; then
+  echo "kit-versions: memory-recall README marker != KIT_MEMORY_RECALL_VERSION (${r:-unreadable})"
+  fails=$((fails+1))
+fi
+
 need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
