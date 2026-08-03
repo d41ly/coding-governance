@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-07-20T16:53:41+03:00 @ d5ada669486c15fcee63154aaa4ac03b5d3b9f83
+last-audit: 2026-08-03T10:09:02+03:00 @ aedf8e3f44dbe10f299b93566297e2bc816cc850
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -46,7 +46,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · run-gates canary
+bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · memory-recall skill wiring · run-gates canary
 ```
 
 ### Tier rule

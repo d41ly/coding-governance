@@ -106,6 +106,17 @@ absent-after) and each revert asserted byte-identical; a crash scores as a kill.
 | M7 stop trimming unquoted conf values at whitespace | recall_conf.py | conf parser == bash |
 | M8 edit a verbatim file | bench.py | byte-identical to upstream |
 
+### One follow-up commit, and why the next unit will hit it too
+
+Registering the two legs changed `tools/gate-legs.json`, which the kickoff-manifest ratchet watches.
+The ratchet only sees COMMITTED state, so it was green before the commit and red after: check 5 wants
+a `last-audit` re-stamp at or after the watched change. It also surfaced pre-existing debt —
+`tools/run-gates.sh` had changed since the 2026-07-20 stamp with no re-stamp. §B was re-verified
+(the leg list is still single-sourced from `gate-legs.json`; the gate-command line gained the
+skill-wiring category it lacked) and `last-audit` was re-stamped at the kit commit. **Any later unit
+that touches `tools/gate-legs.json` will red the same leg** — re-verify §B and re-stamp, do not
+skip past it.
+
 ### Deviations from the rev-2 spec
 
 - **`union.py` ships.** Spec §3 lists it under Non-goals; the orchestrator's ratified shipping set
