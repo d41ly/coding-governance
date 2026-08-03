@@ -31,6 +31,21 @@ unwired=0
 # Absolute path of an existing directory ("" if it does not resolve).
 abspath() { ( cd "$1" 2>/dev/null && pwd ); }
 
+# First of the candidates that is a file ("" if none).
+first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
+
+# THE wired signal, for every arm: the hook's marker substring present in .claude/settings.json.
+# settings-merge.py documents that same substring as the deployer's is-it-wired test (its module
+# docstring), so this is the one predicate stated once — not a second spelling of it. Grepping it
+# directly also removes the "settings-merge.py absent, cannot verify" skip, which was a false
+# all-clear in every adopter (the tool is copied in per WIRE §3c step 4 / §5, so an arm that
+# REQUIRED it to answer reported `skip … exit 0` on the state the runbook calls the one bad state).
+wired() { [ -f .claude/settings.json ] && grep -qF "$1" .claude/settings.json; }
+
+# The launcher named in a remedy string — printed, never run, so a python3-only host gets a
+# copy-pasteable line (the python3-first resolution this file already used per-arm).
+PY=python3; command -v python3 >/dev/null 2>&1 || PY=python
+
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
   if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
@@ -59,36 +74,37 @@ check_hooks() {
 }
 
 # --- Check A: agent-cap PreToolUse hook in .claude/settings.json ----------------------------------
-# Delegates the wired-signal to settings-merge.py --check (a structural JSON test), so detection lives
-# in one place. Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
+# Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
 check_agentcap() {
+  local smerge; smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  # Left as a plain skip on purpose: agent-cap's hook path is not declared anywhere this script can
+  # read (settings-merge.py hardcodes it), so "settings wired, script missing" cannot be told from a
+  # deliberate out-of-tree copy. The recall arm below CAN — its fragment declares `hook_path`.
   if [ ! -f .claude/hooks/agent-cap.js ]; then
     echo "skip     agent-cap — not adopted (.claude/hooks/agent-cap.js absent)"
     return
   fi
-  local py=python3; command -v python3 >/dev/null 2>&1 || py=python
-  if [ ! -f tools/settings-merge.py ]; then
-    echo "skip     agent-cap — tools/settings-merge.py absent, cannot verify"
-    return
-  fi
-  if "$py" tools/settings-merge.py --check >/dev/null 2>&1; then
+  if wired "agent-cap.js"; then
     echo "ok       agent-cap — PreToolUse hook wired in .claude/settings.json"
   else
-    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: python tools/settings-merge.py"
+    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
     unwired=$((unwired+1))
   fi
 }
 
 # --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
-# THREE states, not two. `adopt-memory-recall.sh` copies the hook only under `--with-hook`, so an
-# absent hook file is a TRUE signal ("opt-in not taken"), never UNWIRED. Mirroring the agent-cap arm
-# literally would print a permanent false alarm in the repo that runs THIS script as its own
-# SessionStart hook, which is the fastest way to train every node to ignore the wiring verifier.
-# Detection delegates to the fragment's own `marker` via settings-merge.py, so the wired-signal is
-# defined in exactly one place. Advisory like every other arm: no mode rewrites settings.json.
-first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
+# FIVE states, not two. `adopt-memory-recall.sh` copies the hook only under `--with-hook`, so an
+# absent hook file with nothing in settings.json is a TRUE signal ("opt-in not taken"), never
+# UNWIRED. Mirroring the agent-cap arm literally would print a permanent false alarm in the repo
+# that runs THIS script as its own SessionStart hook, which is the fastest way to train every node
+# to ignore the wiring verifier. Both halves — the marker and the script path — are read from the
+# fragment, so this arm asserts nothing the shipped kit does not itself declare.
+# Advisory like every other arm: no mode rewrites settings.json.
+json_str() {  # value of a top-level "key": "..." in a small flat JSON file
+  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
+}
 check_recall_opened() {
-  local frag smerge py
+  local frag smerge marker hookjs
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/tools/memory-recall/ in this repo.
   frag=$(first_of memory-recall/recall-opened.fragment.json tools/memory-recall/recall-opened.fragment.json)
@@ -96,20 +112,27 @@ check_recall_opened() {
     echo "skip     recall    — memory-recall kit not adopted (no recall-opened.fragment.json)"
     return
   fi
-  if [ ! -f .claude/hooks/recall-opened.js ]; then
-    echo "skip     recall    — recall-opened hook opt-in not taken (adopt-memory-recall.sh --with-hook)"
-    return
-  fi
   smerge=$(first_of tools/settings-merge.py settings-merge.py)
-  if [ -z "$smerge" ]; then
-    echo "skip     recall    — settings-merge.py absent, cannot verify"
+  marker=$(json_str "$frag" marker)
+  hookjs=$(json_str "$frag" hook_path)
+  if [ -z "$marker" ] || [ -z "$hookjs" ]; then
+    echo "UNWIRED  recall    — $frag declares no marker/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+    unwired=$((unwired+1))
     return
   fi
-  py=python3; command -v python3 >/dev/null 2>&1 || py=python
-  if "$py" "$smerge" --check --fragment "$frag" >/dev/null 2>&1; then
+  if [ ! -f "$hookjs" ]; then
+    if wired "$marker"; then
+      echo "UNWIRED  recall    — settings.json dispatches the hook but $hookjs is missing; every Read runs node against nothing. Fix: bash $(dirname "$frag")/adopt-memory-recall.sh --scaffold --with-hook"
+      unwired=$((unwired+1))
+    else
+      echo "skip     recall    — recall-opened hook opt-in not taken (adopt-memory-recall.sh --with-hook)"
+    fi
+    return
+  fi
+  if wired "$marker"; then
     echo "ok       recall    — recall-opened PostToolUse hook wired in .claude/settings.json"
   else
-    echo "UNWIRED  recall    — recall-opened.js present but hook not in settings.json. Fix: $py $smerge --fragment $frag"
+    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
     unwired=$((unwired+1))
   fi
 }

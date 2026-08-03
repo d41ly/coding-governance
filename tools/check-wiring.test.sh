@@ -75,7 +75,7 @@ else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
 fi
 
-# AC8 — the memory-recall recall-opened arm, all FOUR states in one repo. The hook is copied only
+# AC8 — the memory-recall recall-opened arm, all SIX states in one repo. The hook is copied only
 # under `adopt-memory-recall.sh --with-hook`, so an ABSENT hook file is a TRUE signal and must print
 # a skip: mirroring the agent-cap arm literally would print a permanent false UNWIRED in the repo
 # that runs check-wiring.sh as its own SessionStart hook. The fragment is resolved the way the arm
@@ -107,11 +107,28 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
   chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite recall unwired" 1 || ck "AC6 --session exit 0 despite recall unwired" 0
 
+  # state 3b — the SAME state with NO settings-merge.py anywhere: still UNWIRED, still exit 1.
+  # This is the adopter layout the runbook produced before the delivery step existed, where the arm
+  # used to print `skip … cannot verify` and exit 0 on the state the doc calls the one bad state.
+  rm -f tools/settings-merge.py
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
+    && ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 1 || ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 0
+  cp "$SMERGE" tools/settings-merge.py
+
   # state 4 — merged into settings.json -> ok, exit 0
   "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
+
+  # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
+  # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
+  # untracked hook file; Claude Code then runs `node` against nothing on every Read.
+  rm -f .claude/hooks/recall-opened.js
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
+    && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
   cleanup
 else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"

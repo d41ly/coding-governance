@@ -212,14 +212,19 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 4. **Optional, and separately: the `recall-opened` hook.** It records which hit actually answered a
    query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:
    ```bash
+   mkdir -p tools && cp <gov>/tools/settings-merge.py tools/    # the merge tool — skip if §5 did it
    bash memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
-   python <gov>/tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json
+   python3 tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json
    ```
-   Declining is a supported end state, not a gap: with no hook file, `check-wiring.sh` prints a
-   `skip … opt-in not taken` line. Copying the hook and skipping the merge is the one bad state — it
-   prints UNWIRED at every session start until you merge it.
-5. Commit `memory-recall/` + `.claude/skills/memory-recall/SKILL.md` (+ the hook and the settings
-   block if step 4 was taken) as one landing.
+   The copy is not optional plumbing: nothing else delivers that tool, so without it the merge dies
+   with errno 2. Run the two in this order — `settings-merge.py` refuses to wire a hook whose script
+   is not there, because settings would then dispatch `node` against nothing on every `Read`.
+   Declining the hook is a supported end state, not a gap: with no hook file and no settings block,
+   `check-wiring.sh` prints a `skip … opt-in not taken` line. Copying the hook and skipping the merge
+   is the one bad state — it prints UNWIRED at every session start until you merge it, and so does
+   the reverse (a settings block whose script has gone missing).
+5. Commit `memory-recall/` + `.claude/skills/memory-recall/SKILL.md` (+ the hook, `tools/settings-merge.py`
+   and the settings block if step 4 was taken) as one landing.
 
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
@@ -389,9 +394,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `codebase-map/map_extractors.py` · `.codebase-map.conf` · the gate at GATE_FILE ·
   `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
-  `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js` and its settings block
-  only if the step-4 opt-in was taken). The index and query log live under the common git dir, never
-  in the worktree — nothing to ignore, nothing to commit.
+  `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js`, `tools/settings-merge.py`
+  and the settings block only if the step-4 opt-in was taken). The index and query log live under the
+  common git dir, never in the worktree — nothing to ignore, nothing to commit.
 
 ## Maintenance
 

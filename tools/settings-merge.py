@@ -238,6 +238,15 @@ def _selftest() -> int:
                 pass
         assert main([str(root / "s8.json"), "--fragment", str(root / "nope.json")]) == 2
 
+        # 11) the MERGE is refused when the hook script it would dispatch does not exist. The
+        #     wired-but-script-missing state is reachable from two separate WIRE commands run out of
+        #     order, and it makes Claude Code run `node` against nothing on every matching call.
+        sf9, gone, there = root / "s9.json", root / "gone.js", root / "here.js"
+        assert main([str(sf9), "--hook-path", str(gone)]) == 2 and not sf9.exists()
+        assert main([str(sf9), "--hook-path", str(gone), "--check"]) == 1, "--check is a report, not a merge"
+        there.write_text("// stub\n", encoding="utf-8")
+        assert main([str(sf9), "--hook-path", str(there)]) == 0 and sf9.exists()
+
         # 10) the SHIPPED fragment beside this script parses and declares the schema check-wiring
         #     joins on. Skipped, not failed, in a project that did not adopt memory-recall.
         shipped = Path(__file__).resolve().parent / "memory-recall" / "recall-opened.fragment.json"
@@ -267,7 +276,18 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as e:
             print(f"settings-merge: {e}", file=sys.stderr)
             return 2
-    return run(a.settings_file, a.hook_path or frag["hook_path"], a.check, frag)
+    hook_path = a.hook_path or frag["hook_path"]
+    # Refuse to wire a script that is not there: settings would dispatch `node <missing>` on every
+    # matching tool call, and check-wiring can only NAME that state, not prevent it. Resolved from
+    # the cwd, which the runbook fixes at the target repo root. --check is exempt — it writes
+    # nothing, it reports drift, and the hook file is not what it is reporting on.
+    if not a.check and not Path(hook_path).exists():
+        print(f"settings-merge: refusing to wire {frag['name']} — {hook_path} does not exist "
+              f"(from {Path.cwd()}). Copy the hook there first (or pass --hook-path); wiring a "
+              "missing script makes every matching tool call run `node` against nothing.",
+              file=sys.stderr)
+        return 2
+    return run(a.settings_file, hook_path, a.check, frag)
 
 
 if __name__ == "__main__":

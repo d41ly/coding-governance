@@ -47,7 +47,10 @@ CORPUS = """# Tooling decisions
 Q = ("why was the frobnicator chosen", "--terms", "frobnicator quibbler leaks snark boojum")
 
 INDEX_RE = re.compile(r"index (\d+) records \+ (\d+) chunks \((rebuilt|cached)")
-INVOKE_RE = re.compile(r"python ([A-Za-z0-9_./-]+\.py)")
+# `python3?` on purpose: every launcher this kit prints is resolved python3-first, so a pattern
+# anchored on bare `python ` silently matched nothing on a python3 host — the arm below would then
+# have folded an empty set and passed vacuously.
+INVOKE_RE = re.compile(r"python3? ([A-Za-z0-9_./-]+\.py)")
 
 _checks: list[tuple[str, str, str]] = []  # (state, name, detail)
 
@@ -384,24 +387,73 @@ def t_eviction():
         cleanup(root)
 
 
-@check("every invocation the CLI prints resolves to a file that exists in the adopter")
+def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
+    """The Skill/hook surface, which make_repo leaves out because the query arms do not need it."""
+    for n in names:
+        shutil.copyfile(KIT / n, kitdir / n)
+
+
+def adopt(root: pathlib.Path, kitdir: pathlib.Path, *args: str):
+    bash = shutil.which("bash")
+    if not bash:
+        raise _Skip("no bash on PATH")
+    return subprocess.run(
+        [bash, str(kitdir / "adopt-memory-recall.sh"), *args],
+        cwd=str(root), capture_output=True, text=True,
+    )
+
+
+SKILL_REL = pathlib.Path(".claude/skills/memory-recall/SKILL.md")
+SURFACE = ("adopt-memory-recall.sh", "SKILL.template.md", "recall-opened.js",
+           "recall-opened.fragment.json")
+
+
+def settings_merge_src() -> pathlib.Path | None:
+    """The wiring tool, wherever THIS repo keeps it: beside the kit here, under tools/ in an adopter."""
+    for c in (KIT.parent / "settings-merge.py", recall_conf.repo_root() / "tools" / "settings-merge.py"):
+        if c.is_file():
+            return c
+    return None
+
+
+@check("every invocation the CLI and the --with-hook remedy print resolves to a real file")
 def t_printed_invocations_resolve():
-    """The kit dir is named differently from this repo's, so a baked-in path cannot pass by luck."""
-    root, kitdir = make_repo(kitname="memory-recall")
+    """The fixture kit dir is spelled like NEITHER layout, so a baked-in path cannot pass by luck.
+
+    Not `memory-recall`: WIRE §3c step 1 mandates exactly that name in an adopter, so a fixture
+    spelled that way made the `here != kitdir.name` guard below trip in every conformant adopter —
+    the kit's own mandated gate leg, red on arrival. The guard still holds against both spellings.
+    """
+    smerge = settings_merge_src()
+    if smerge is None:
+        raise _Skip("settings-merge.py not found beside the kit — cannot build the post-WIRE state")
+    root, kitdir = make_repo(kitname="mrecall-fixture-kit")
     try:
         here = KIT.relative_to(recall_conf.repo_root()).as_posix()
         assert here != kitdir.name, f"fixture kit dir must not spell like this repo's ({here})"
+        assert kitdir.name != "memory-recall", "fixture kit dir spells the ADOPTER's mandated name"
         seen: set[str] = set()
         helped = run(root, kitdir, "--help")
         refused = run(root, kitdir, "why was the frobnicator chosen")
         answered = run(root, kitdir, *Q)
         assert refused.returncode == 2 and "--terms" in refused.stderr
-        for proc in (helped, refused, answered):
+        # The hook opt-in's remedy is the kit's OTHER printed invocation, and it was the one naming
+        # a path no runbook step created (errno 2 when run verbatim). The fixture is built to the
+        # post-WIRE state — §3c step 4 copies the wiring tool into <project>/tools/ — so the remedy
+        # is checked against the tree the runbook actually produces.
+        copy_extra(kitdir, *SURFACE)
+        (root / "tools").mkdir()
+        shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+        hooked = adopt(root, kitdir, "--scaffold", "--with-hook")
+        assert hooked.returncode == 0, f"{hooked.stdout}{hooked.stderr}"
+        for proc in (helped, refused, answered, hooked):
             seen |= set(INVOKE_RE.findall(proc.stdout + proc.stderr))
         assert seen, "the CLI printed no invocation at all"
         missing = sorted(p for p in seen if not (root / p).is_file())
         assert not missing, f"printed invocations naming files that do not exist: {missing}"
         assert any("query.py" in p for p in seen)
+        # Non-vacuity: the fold above is worthless if the remedy line never reaches `seen`.
+        assert any("settings-merge.py" in p for p in seen), "the --with-hook remedy printed no invocation"
         return f"{len(seen)} distinct printed path(s), all resolve: {sorted(seen)}"
     finally:
         cleanup(root)
@@ -454,27 +506,6 @@ def t_python3_only():
     finally:
         cleanup(root)
         cleanup(shimdir)
-
-
-def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
-    """The Skill/hook surface, which make_repo leaves out because the query arms do not need it."""
-    for n in names:
-        shutil.copyfile(KIT / n, kitdir / n)
-
-
-def adopt(root: pathlib.Path, kitdir: pathlib.Path, *args: str):
-    bash = shutil.which("bash")
-    if not bash:
-        raise _Skip("no bash on PATH")
-    return subprocess.run(
-        [bash, str(kitdir / "adopt-memory-recall.sh"), *args],
-        cwd=str(root), capture_output=True, text=True,
-    )
-
-
-SKILL_REL = pathlib.Path(".claude/skills/memory-recall/SKILL.md")
-SURFACE = ("adopt-memory-recall.sh", "SKILL.template.md", "recall-opened.js",
-           "recall-opened.fragment.json")
 
 
 @check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
@@ -629,6 +660,42 @@ def t_verbatim_files():
     return f"{len(pins)} file(s) unmodified: {', '.join(sorted(pins))}"
 
 
+@check("the whole selftest passes from the ADOPTER layout (kit at <root>/memory-recall/)")
+def t_adopter_layout():
+    """The layout the runbook ships, on the merge bar — because a gate green only in the repo that
+    authored it is the third-shape defect this kit exists to prevent.
+
+    WIRE §3c step 1 fixes the adopter's kit dir at `memory-recall/` and §3c step 3 makes this file a
+    standing gate leg there, so every arm has to hold in that spelling; one fixture named for it was
+    enough to red the adopter's merge bar on arrival. Nested exactly one level: the child sees
+    MRECALL_NESTED and skips this arm, so the recursion terminates.
+    """
+    if os.environ.get("MRECALL_NESTED"):
+        raise _Skip("nested run — the outer selftest owns this arm")
+    root, kitdir = make_repo(kitname="memory-recall")
+    try:
+        # The WHOLE kit, not just SHIPPED: the surface arms read README.md, verbatim.json, the
+        # template and the hook test from their own kit dir.
+        shutil.copytree(KIT, kitdir, ignore=shutil.ignore_patterns("__pycache__"), dirs_exist_ok=True)
+        (root / "tools").mkdir(exist_ok=True)
+        smerge = settings_merge_src()
+        if smerge is not None:
+            shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+        proc = subprocess.run(
+            [sys.executable, str(kitdir / "selftest.py")], cwd=str(root),
+            env=dict(os.environ, MRECALL_NESTED="1"), capture_output=True, text=True,
+        )
+        tally = [ln for ln in proc.stdout.splitlines() if ln.startswith("----")]
+        bad = [ln for ln in proc.stdout.splitlines() if ln.startswith("FAIL")]
+        assert proc.returncode == 0, (
+            f"exit {proc.returncode} from {kitdir.name}/selftest.py:\n"
+            + "\n".join(bad or proc.stdout.splitlines()[-5:]) + proc.stderr[-500:]
+        )
+        return (tally[-1].split(":", 1)[-1].strip() if tally else "exit 0") + " in the adopter layout"
+    finally:
+        cleanup(root)
+
+
 # ------------------------------------------------------------------------------------ the runner
 
 
@@ -646,7 +713,7 @@ def main() -> int:
         t_zero_records_is_loud, t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_eviction, t_printed_invocations_resolve, t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
-        t_version_marker, t_verbatim_files,
+        t_version_marker, t_verbatim_files, t_adopter_layout,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
 

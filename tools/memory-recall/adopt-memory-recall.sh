@@ -106,7 +106,17 @@ if [ "$with_hook" = 1 ]; then
   mkdir -p "$ROOT/.claude/hooks"
   cp "$HERE/recall-opened.js" "$ROOT/.claude/hooks/recall-opened.js"
   echo "installed .claude/hooks/recall-opened.js — now merge it into settings.json:"
-  echo "  $PY tools/settings-merge.py --fragment $REL/recall-opened.fragment.json"
+  # RESOLVED, not hardcoded — this is the last instruction an adopter sees at the moment they take
+  # the opt-in, and the step whose omission leaves the hook inert. A hardcoded tools/ path printed
+  # here died with errno 2 in an adopter, because no runbook step delivered the tool. WIRE §3c
+  # step 4 now copies it to tools/; when it still is not there, say so instead of pretending.
+  smerge=""
+  for c in tools/settings-merge.py settings-merge.py; do [ -f "$ROOT/$c" ] && { smerge="$c"; break; }; done
+  if [ -z "$smerge" ]; then
+    echo "  cp <gov>/tools/settings-merge.py tools/     # not installed here yet (WIRE §3c step 4)"
+    smerge=tools/settings-merge.py
+  fi
+  echo "  $PY $smerge --fragment $REL/recall-opened.fragment.json"
 fi
 
 echo "Adopted. Next:"
