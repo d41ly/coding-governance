@@ -42,6 +42,11 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
     GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
     (walk `tools/codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
     FOUR codebase-map lines from the playbook (§1 DoR + §1 DoD + §5 kit bullet + §7 gates line).
+  - **Adopt memory-recall?** yes / no — retrieval over the memory tree (ask the decision corpus a
+    question in English, get the records that answer it, ranked). **Requires memory-tree**: the kit
+    reads `.memory-tree.conf` and refuses without it, so a "no" above forces a "no" here. Also lock
+    whether to take the optional `recall-opened` PostToolUse hook (§3c step 4 — declining is a
+    supported end state). If no: skip §3c and delete the ONE memory-recall §5 kit bullet.
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
 
@@ -171,6 +176,51 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
 6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
 7. Commit `codebase-map/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
 
+## 3c — Adopt the memory-recall kit (if chosen in §0)
+
+Retrieval over the §3 tree: `query.py` indexes the corpus offline (stdlib only, no network, nothing
+written inside the worktree) and answers a plain-English question with the records that bind it. It
+declares no config of its own — it reads `.memory-tree.conf` for the corpus root and the id families,
+and **refuses** when that file is absent, printing a two-key stub to paste. It never creates one;
+memory-tree owns that file, which is why §0 makes this decision depend on §3.
+
+1. Copy the kit dir into the project root **as `memory-recall/`** (the fixed name the gate legs and
+   the wiring check resolve — don't rename):
+   `cp -r <gov>/tools/memory-recall <project>/memory-recall`.
+2. Render the Skill from the conf and prove the index sees your ids. The Skill's `description` is the
+   whole trigger mechanism and it names project values (id families, query path, corpus root), so it
+   is GENERATED, never shipped:
+   ```bash
+   cd <project>
+   bash memory-recall/adopt-memory-recall.sh --scaffold   # -> .claude/skills/memory-recall/SKILL.md
+   python3 memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
+   ```
+   The header must report a **non-zero record count**. `index 0 records + N chunks` plus a
+   `ZERO RECORDS` block on stderr means `FAMILIES` matches no id in the corpus — fix the conf and
+   re-run (the cache keys on the resolved conf, so the repair is not silently served from cache).
+3. **Wire both gates — without this the skill-drift check silently never runs.** Add them to the
+   project's local gate runner **AND** its CI config, grep-guarded so a re-run doesn't duplicate the
+   leg:
+   ```bash
+   python3 memory-recall/selftest.py                   # kit contract: conf-vs-bash parity, the refusals,
+                                                       # cache freshness + eviction, writes-nothing-by-path
+   bash memory-recall/adopt-memory-recall.sh --check    # the rendered SKILL.md still matches the conf
+   ```
+   The `--check` leg resolves its own interpreter (`python3` first, `python` fallback, `RECALL_PY`
+   override), so a `python3`-only adopter needs no extra step — a gate runner that rewrites `python`
+   in a leg's argv provably cannot reach this leg, whose first token is `bash`.
+4. **Optional, and separately: the `recall-opened` hook.** It records which hit actually answered a
+   query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:
+   ```bash
+   bash memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
+   python <gov>/tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json
+   ```
+   Declining is a supported end state, not a gap: with no hook file, `check-wiring.sh` prints a
+   `skip … opt-in not taken` line. Copying the hook and skipping the merge is the one bad state — it
+   prints UNWIRED at every session start until you merge it.
+5. Commit `memory-recall/` + `.claude/skills/memory-recall/SKILL.md` (+ the hook and the settings
+   block if step 4 was taken) as one landing.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
@@ -294,6 +344,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   throwaway inventory addition and watch the gate go red with the claim remedy, then revert. On a
   **non-Python repo**, also confirm the explicit `python <GATE_FILE>` leg is actually standing in
   your CI config + gate runner (§3b step 5) — not merely runnable by hand.
+- Memory-recall (if adopted): `python3 memory-recall/selftest.py` (kit contract) · one real query
+  returning a non-zero record count (§3c step 2) · `bash memory-recall/adopt-memory-recall.sh --check`
+  → 0 · then edit `FAMILIES` in `.memory-tree.conf`, re-run `--check`, watch it go RED naming the
+  drift, and revert. Confirm **both** legs are actually standing in your CI config + gate runner
+  (§3c step 3) — a kit copied in beside a skill nobody rendered otherwise reads as fully wired.
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
    and surface the playbook + gate + ledger protocol. If it can't, re-check the §4 search paths.
@@ -333,6 +388,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - Codebase-map (only if §3b adopted): `codebase-map/` kit dir + project-owned
   `codebase-map/map_extractors.py` · `.codebase-map.conf` · the gate at GATE_FILE ·
   `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
+- Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
+  `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js` and its settings block
+  only if the step-4 opt-in was taken). The index and query log live under the common git dir, never
+  in the worktree — nothing to ignore, nothing to commit.
 
 ## Maintenance
 
@@ -343,6 +402,15 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `python codebase-map/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
   commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing
   dossiers so the new check does not retro-red them (it is a no-op once the file is present).
+
+- **memory-recall is three maintenance classes, not one** — `bench.py` and `union.py` are byte-identical
+  upstream copies (their sha prefixes are pinned in `verbatim.json` and gated by the kit selftest):
+  overwrite them wholesale. `extract.py`, `query.py` and `recall-opened.js` are FORKS — each carries a
+  header naming the upstream path and sha it was taken from, so a re-pull is a three-way merge, not
+  archaeology. `recall_conf.py`, `selftest.py`, `SKILL.template.md`, `adopt-memory-recall.sh` and the
+  fragment are this kit's own. Never overwrite the RENDERED `.claude/skills/memory-recall/SKILL.md` by
+  hand — re-run `--scaffold`, which is what `--check` grades. After any `FAMILIES`/`MEMORY_ROOT` edit,
+  re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your

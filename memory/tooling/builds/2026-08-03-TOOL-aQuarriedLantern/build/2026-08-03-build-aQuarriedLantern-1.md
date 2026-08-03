@@ -232,3 +232,89 @@ on a settings file already carrying a foreign `PreToolUse` group: the written fi
 - **`--stats` and `--export`** — no sentence anywhere in the kit claims `--stats` reads the query
   log. The rendered Skill states it prints the cache manifest, and that `--export` writes beside the
   log under the common git dir with `--tag` required.
+
+## U3 — every registration surface: the wiring that makes the kit actually run
+
+**Landed** 2026-08-03 · node `a` · base `4d3eba5`
+
+### Shipped — 11 files touched, 0 new files (+142 / -8)
+
+| File | Change |
+|---|---|
+| `WIRE-INTO-PROJECT.md` | §0 adopt row · **new §3c** with the numbered adopter gate-wiring step · §6 verify bullet · Result-tree entry · a Maintenance paragraph splitting the kit into its three maintenance classes (+68 lines) |
+| `tools/check-wiring.test.sh` | the recall arm's **four** states as cases (+42 lines) |
+| `skills/session-kickoff/SKILL.md` | the Step 4 memory-recall probe paragraph (R2/F4's second half) |
+| `parallel-coding-governance.template.md` | the §5 optional-kit bullet, funded by moving the §8 structured-output bullet out |
+| `parallel-coding-governance.domain-rules.md` | receives that bullet **verbatim** under a new `## §8` |
+| `parallel-coding-governance.customize.md` | the conditional-section line so a "no" knows what to delete |
+| `AGENTS.md` | the kit in the `tools/` list, both legs in the gate-suite list, the recall arm in the wiring self-test line |
+| `.claude/SESSION-KICKOFF.md` | §B re-verified: `tools/` entrypoints row + a measured template-headroom trap; `last-audit` re-stamped |
+| `memory/tooling/DECISIONS.md` · `BACKLOG.md` · `project/in-flight/a.md` | one decision row (290 B), two backlog rows, one ledger row |
+
+### Measured
+
+| Fact | Value |
+|---|---|
+| `tools/check-wiring.test.sh` | **16 cases**, 0 failed, 32.0 s wall (was 11) |
+| mutations against the new cases | **3 killed / 3**, green baseline asserted first, post-revert 16/16 |
+| full gate suite | **18/18 legs green**, 1 skipped (`manifest-check self-test`, guard: unchanged vs main), 2 m 52 s |
+| `tools/check-wiring.sh` | exit 0 — `ok hooks` · `ok agent-cap` · `skip recall — opt-in not taken` |
+| template | 32 735 → **32 758 / 32 768 B** (10 free) |
+| bullet moved out | 470 B (+1 newline) · new §5 kit bullet **348 B** · §8 pointer **144 B** |
+| domain-rules | 17 681 → 18 218 B |
+| corpus after the registrations | `index 12 records + 1071 chunks` (U1 measured 9 + 1033 — the three new ids are three new records) |
+
+### The two claims the doc makes that were run, not asserted
+
+- **§3c step 2's "the header must report a non-zero record count".** A real query in this repo:
+  `index 12 records + 1071 chunks (rebuilt 0.1s)`, 31 hits, and the top three hits are the review,
+  the DECISIONS row and the spec section that discuss the conf refusal — the thing asked about.
+- **§6's drift probe.** `FAMILIES` was mutated to add `extra:XTRA` (mutation asserted applied),
+  `adopt-memory-recall.sh --check` went **red naming the drifted line**
+  (`-(PLAY KICK TOOL DEPL)` / `+(PLAY KICK TOOL DEPL XTRA)`), and the restored conf was `cmp`-clean
+  with `--check` green again. The instruction printed to adopters is one that works here.
+
+### Mutation verification — 3/3 killed
+
+Green baseline demanded before any scoring (`uname -o` = `Msys`; a bare `bash` here can be the WSL
+shim, which exits 127 with no stdout and would score every mutation a fake kill). Each mutation was
+asserted APPLIED on disk (old string gone AND new string present) and each revert asserted
+sha256-identical. A kill required exit != 0 **and** a `FAIL AC8` line — an exit code alone would
+accept a crash for the wrong reason.
+
+| Mutation (`tools/check-wiring.sh`) | Arm that reddened |
+|---|---|
+| M1 `if [ ! -f .claude/hooks/recall-opened.js ]` → `if false` | `AC8 recall opt-in not taken -> skip, exit 0` |
+| M2 `if [ -z "$frag" ]` → `if false` | `AC8 recall kit absent -> skip, exit 0` |
+| M3 the `settings-merge --check` delegation → `if true` | `AC8 recall hook present, unmerged -> UNWIRED, exit 1` |
+
+M1 is the mutation U2's ledger named as the one that must red these cases; it does.
+
+### The byte budget, spent where the spec said
+
+`check-template-size.sh` reported 33 B free before this unit, and the two existing optional-kit
+bullets are 419 B and 435 B, so a third could not fit. The §8 structured-output-schemas bullet
+(470 B) moved **verbatim** into `parallel-coding-governance.domain-rules.md` under a new `## §8`,
+leaving a 144 B stub pointer in the shape the §4/§9–§13 stubs already use. That funded a 348 B kit
+bullet with 10 B to spare — well under the spec's ≤440 B budget, because the pointer had to come out
+of the same 504 B. The companion's intro now says seven sections and lists §8.
+
+### Deviations from the rev-2 spec
+
+- **The "§0 adopt row" landed in `WIRE-INTO-PROJECT.md` §0, not in the template's §0 (TL;DR).** The
+  spec's own byte budget forces it: 504 B available against a bullet + the pointer it displaces
+  leaves nothing for a TL;DR line, and F11's wording for that row — "what to delete on a no" — is
+  the shape `WIRE-INTO-PROJECT.md` §0 uses for the memory-tree and codebase-map decisions. The row
+  states the memory-tree dependency and names the one playbook line to delete on a "no", which is
+  the incoherence F11 flagged.
+- **`.gitattributes` is unchanged.** The spec's wiring inventory asks for "an LF rule for the kit's
+  shell scripts"; the repo-wide `*.sh text eol=lf` rule already covers both of the kit's shell
+  scripts — verified with `git check-attr text eol` (`eol: lf` on `adopt-memory-recall.sh` and
+  `recall-opened.test.sh`). Adding a second rule for the same files would be a hand-kept duplicate.
+  `recall-opened.js` resolves to `text: auto` with no eol pin, matching every other `.js` in this
+  repo (node runs CRLF fine; the shell scripts are the execution-sensitive class).
+- **No `tools/check-wiring.sh` SKILL arm.** The spec's rev-2 log records this as the one optional
+  sub-leg of F2 not taken, on the review's own reasoning; nothing here changes that.
+- **The kickoff-manifest re-stamp is bundled into this unit's commit**, not a follow-up — C5's
+  candidate set is commits that changed `last-audit:`, so one commit that both touches a watched
+  file and re-stamps satisfies it. U1 needed a follow-up because its stamp landed after the fact.

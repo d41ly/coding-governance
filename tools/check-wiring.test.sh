@@ -75,5 +75,47 @@ else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
 fi
 
+# AC8 — the memory-recall recall-opened arm, all FOUR states in one repo. The hook is copied only
+# under `adopt-memory-recall.sh --with-hook`, so an ABSENT hook file is a TRUE signal and must print
+# a skip: mirroring the agent-cap arm literally would print a permanent false UNWIRED in the repo
+# that runs check-wiring.sh as its own SessionStart hook. The fragment is resolved the way the arm
+# itself resolves it, so this test works in both layouts (adopter: <root>/memory-recall/).
+FRAG=""; for c in "$REPO/memory-recall/recall-opened.fragment.json" "$REPO/tools/memory-recall/recall-opened.fragment.json"; do
+  [ -f "$c" ] && { FRAG="$c"; break; }
+done
+if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
+  py=python3; command -v python3 >/dev/null 2>&1 || py=python
+  newrepo
+  git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
+  mkdir -p tools memory-recall .claude/hooks; cp "$SMERGE" tools/settings-merge.py
+
+  # state 1 — kit not adopted (no fragment anywhere) -> skip, exit 0
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'kit not adopted'; } \
+    && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
+
+  # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
+  cp "$FRAG" memory-recall/recall-opened.fragment.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
+    && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
+
+  # state 3 — hook file present but no settings block -> UNWIRED, exit 1; --session still exits 0
+  printf '// stub\n' > .claude/hooks/recall-opened.js
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
+    && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
+  chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite recall unwired" 1 || ck "AC6 --session exit 0 despite recall unwired" 0
+
+  # state 4 — merged into settings.json -> ok, exit 0
+  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
+    && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
+  cleanup
+else
+  echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"
+fi
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

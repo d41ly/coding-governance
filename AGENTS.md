@@ -15,7 +15,9 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references by §-stub).
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
-- **`tools/`** — the copy-in kits: `memory-tree/`, `codebase-map/`, `hooks/agent-cap.js`,
+- **`tools/`** — the copy-in kits: `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
+  over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
+  `codebase-map/`, `hooks/agent-cap.js`,
   `workflows/tier2-review.js`, `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
   attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
@@ -51,13 +53,14 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
-- kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`
+- kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`, `python tools/memory-recall/selftest.py`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - pre-push self-test — `.githooks/pre-push.test.sh` (the pre-push runs the full bar on a default-branch push, blocks a red one)
 - push-main self-test — `tools/push-main.test.sh` (the lander reconciles origin before the gate, retries a mid-gate race capped, aborts a conflict; the hook refuses a raw default-branch push)
-- wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap)
+- wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap, and the three-state `recall-opened` opt-in)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
+- memory-recall skill wiring — `tools/memory-recall/adopt-memory-recall.sh --check` (the rendered `.claude/skills/memory-recall/SKILL.md` still matches `.memory-tree.conf`)
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

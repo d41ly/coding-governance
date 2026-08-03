@@ -1,8 +1,8 @@
 # Governance domain rules — runtime, cross-OS, architecture, security, recurring bugs & design system
 
-Companion to `parallel-coding-governance.template.md`, holding six activity-scoped domain sections the
+Companion to `parallel-coding-governance.template.md`, holding seven activity-scoped domain sections the
 template references by section number rather than inlining (they apply only when a unit touches a
-risky surface or runs a Tier-2 review). Deploy this file alongside the playbook; the template's §4, §9, §10, §11, §12 and §13 stubs point here. All are droppable-per-project (see the customize companion).
+risky surface or runs a Tier-2 review). Deploy this file alongside the playbook; the template's §4, §8, §9, §10, §11, §12 and §13 stubs point here. All are droppable-per-project (see the customize companion).
 
 ## §4 — Runtime isolation & the verification harness
 
@@ -14,6 +14,10 @@ risky surface or runs a Tier-2 review). Deploy this file alongside the playbook;
 - Pin the harness launch config PER NODE in the §2 registry; an un-pinned node creates it on first use and registers it in the same change.
 - Document the harness's false-signal modes (stale snapshot after a backend restart, wedged screenshot, a probe reading 0 in headless contexts) so a bad reading isn't recorded as a result.
 - Never record "can't verify — no <capability>" without checking the registry — capability myths outlive their facts; name the sanctioned harness instead.
+
+## §8 — Structured returns from orchestration scripts
+
+- Structured-output schemas so a malformed return can't force full regeneration (top output-token waste): write a large body to a file and return `{path, summary}`, forward-slash paths (never hand-serialize JSON — unescaped backslashes are the top breaker); restate the required keys in EVERY loop iteration; accept-and-ignore stray keys unless a stray key is actually harmful; on a validation failure feed back only the offending field, never "regenerate everything".
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 

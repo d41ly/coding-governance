@@ -34,6 +34,8 @@ write the filled result to the project's governing doc (its agent-instruction fi
 
 - **Codebase-map lines** (§1 DoR, §1 DoD, §5 kit bullet, §7 gates line): keep only if adopting the
   `tools/codebase-map/` kit — else delete all four.
+- **Memory-recall line** (the §5 kit bullet): keep only if adopting the `tools/memory-recall/` kit —
+  which needs the memory tree above, since the kit refuses without `.memory-tree.conf`.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
 - **§11** — drop for single-OS teams.
 - **§4** harness lines and **§13** entirely — drop if the project has no UI.

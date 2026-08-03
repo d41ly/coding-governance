@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-03T10:09:02+03:00 @ aedf8e3f44dbe10f299b93566297e2bc816cc850
+last-audit: 2026-08-03T11:18:57+03:00 @ 4d3eba56ea551d00decaf39da594b851698bd7ac
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -40,7 +40,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 |---|---|---|
 | playbook (`PLAY-`) | `memory/playbook/` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
 | kickoff (`KICK-`) | `memory/kickoff/` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/tooling/` | `tools/` (memory-tree · codebase-map · hooks · workflows · agent-instructions) |
+| tooling (`TOOL-`) | `memory/tooling/` | `tools/` (memory-tree · memory-recall · codebase-map · hooks · workflows · agent-instructions) |
 | deployer (`DEPL-`) | `memory/deployer/` | `WIRE-INTO-PROJECT.md` · `memory/deployer/builds/2026-07-12-DEPL-aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
@@ -73,6 +73,8 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
+  It now sits at 32758/32768 (**10 bytes free**, measured 2026-08-03), so the next line added to it must
+  fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
