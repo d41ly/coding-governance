@@ -318,3 +318,12 @@ of the same 504 B. The companion's intro now says seven sections and lists §8.
 - **The kickoff-manifest re-stamp is bundled into this unit's commit**, not a follow-up — C5's
   candidate set is commits that changed `last-audit:`, so one commit that both touches a watched
   file and re-stamps satisfies it. U1 needed a follow-up because its stamp landed after the fact.
+
+### Post-commit verification (the leg U1 warned about)
+
+Re-run at `f140b19`, AFTER the commit, because the kickoff ratchet reads COMMITTED state and U1's
+identical change went green-before / red-after: `bash tools/run-gates.sh` **18/18 green** (1 skipped
+guard) in 2 m 14.9 s with `kickoff-manifest ratchet` **ok** — the bundled re-stamp satisfied C5, no
+follow-up commit needed. `bash tools/check-wiring.sh` exit 0 (`ok hooks` · `ok agent-cap` ·
+`skip recall — opt-in not taken`), `check-kit-versions.sh` 0, hygiene 12 checks 0, and the kit
+selftest **18/18 in 26.0 s** standalone (U2 measured 2 m 06 s cold; this run was warm).
