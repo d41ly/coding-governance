@@ -38,3 +38,22 @@ Cite findings by spec section (`S1`..`S4`, `AC1`..`AC5`, `§4`, `§5`, `§8`) or
 default to refute. Rank confirmed findings by severity, name the section each folds into, and state
 explicitly whether every lens actually ran — a prior run of this harness family reported a hard zero
 because all its agents had died.
+
+## TARGETING — read this before anything else
+
+The rev-1 run of this review audited the WRONG REPOSITORY. It was briefed on this repo and instead
+reviewed the inCMS worktree its process happened to be launched from, because the harness derives
+its diff from the process cwd. Do not repeat that.
+
+- The ONLY repository under review is `C:/projects/coding-governance`, at commit `2f2d122`.
+- Every path you read must begin `C:/projects/coding-governance/`. Read files by absolute path.
+- Do NOT run `git diff`, `git status` or `git log` without `-C C:/projects/coding-governance`.
+- `C:/projects/incms` is OUT OF SCOPE entirely. If a finding cites a path under it, discard the
+  finding — it is evidence you drifted, not a defect.
+- Begin your report with the resolved root and the sha you actually read, and state how you verified
+  it. A report that cannot name its root is not trustworthy, which is the very defect S5 fixes.
+
+The spec under review is
+`C:/projects/coding-governance/memory/tooling/builds/2026-08-03-TOOL-aGuardedTally/spec/2026-08-03-spec-aGuardedTally-1.md`
+at **rev-2** (five scope items S1-S5, six acceptance criteria AC1-AC6, nine canonical sections).
+The code it changes is `C:/projects/coding-governance/tools/workflows/tier2-review.js`.
