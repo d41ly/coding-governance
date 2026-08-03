@@ -1,6 +1,6 @@
 # TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one
 
-**Status:** SPECCED · rev-1 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
+**Status:** SPECCED · rev-2 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
 
 ## 1. Goal
 
@@ -24,6 +24,15 @@ project-agnostic gate lessons the same session produced.
 - **S4** — Add `tools/gate-lint/` carrying two drop-in scans for any repo with `.ps1` files: a
   case-only identifier collision scan and a BOM check for non-ASCII scripts. Both mutation-verified
   upstream.
+
+- **S5** — The harness must resolve, state and verify its review ROOT. Today it derives the diff
+  from the process cwd and never reports which tree it read, so a run given one target can audit a
+  different one and return confident, well-evidenced findings about code nobody asked about.
+  Observed live 2026-08-03: a run briefed on `C:/projects/coding-governance` at `c47b5d2` reviewed
+  the inCMS worktree it happened to be launched from and wrote its report there. The run was only
+  salvageable because the wrong target happened to contain a real blocker. The resolved root goes in
+  the returned object and in the report header, and when an explicit target is supplied and
+  disagrees with the resolved root, the run refuses rather than silently preferring its default.
 
 ## 3. Non-goals (OUT)
 
@@ -98,7 +107,10 @@ harness's own summary field asserts a conclusion it has not earned. Fixing the l
   `lensesDead: 0`, so the fix does not manufacture false alarms.
 - **AC4** — When a finding reaches the verify stage and no verdict comes back, it is recorded
   UNVERIFIED, not refuted.
-- **AC5** — The case-collision scan reds against a file with two identifiers differing only by case
+- **AC5** — When the harness is given an explicit review root that differs from its resolved cwd
+  root, it refuses and names both. When they agree, the report header states the resolved root and
+  the sha it read.
+- **AC6** — The case-collision scan reds against a file with two identifiers differing only by case
   and passes on a clean one; the BOM scan reds on a BOM-less non-ASCII `.ps1`. Both proven by
   injecting the defect, not by asserting on already-clean input.
 
@@ -117,5 +129,8 @@ counts.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-03 · added S5 and AC5 after the rev-1 review audited the WRONG REPOSITORY: same
+  family as the false-all-clear, a tool doing something other than what it was told and reporting
+  success. Prior AC5 renumbered to AC6.
 - rev-1 · 2026-08-03 · initial draft, from the live false-all-clear observed during
   `PERF-aCurbedStampede-1` on the inCMS repo.
