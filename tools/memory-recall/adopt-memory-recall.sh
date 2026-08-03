@@ -25,11 +25,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 # Re-read it through `pwd`: git spells the root `C:/x` under MSYS while `pwd` spells it `/c/x`, and
-# the prefix-strip below silently no-ops when the two disagree (measured: REL came out absolute).
+# every path this script joins against ROOT should be in the shell's own spelling.
 ROOT="$(pwd)"
-# Pure shell, no python: the kit dir spelled the way the adopting repo spells it. Works whether the
-# kit sits at <root>/memory-recall/ (an adopter) or <root>/tools/memory-recall/ (this repo).
-REL="${HERE#"$ROOT"/}"
+# The kit dir as the adopting repo spells it, RELATIVE. git computes it, so the two operands
+# cannot be two spellings of one directory: stripping a `pwd`-derived ROOT off a `pwd`-derived
+# HERE still no-ops under an MSYS mount alias, and REL then comes out ABSOLUTE and machine-local
+# — measured, the same tree at the same commit gave --check EXIT 0 from one spelling and a
+# three-hunk DRIFTED diff from the other, and --scaffold writes that into a COMMITTED artifact
+# silently. Works whether the kit sits at <root>/memory-recall/ or <root>/tools/memory-recall/.
+REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
+REL="${REL%/}"
 
 PY="${RECALL_PY:-}"
 if [ -z "$PY" ]; then PY=python3; command -v python3 >/dev/null 2>&1 || PY=python; fi
@@ -70,10 +75,14 @@ if [ ! -f "$TEMPLATE" ]; then
   exit 1
 fi
 
+# `python3` LITERAL, not the resolved $PY: this render is a COMMITTED artifact shared across a
+# fleet, so baking one node's answer reds --check on every node that resolves differently. Bare
+# `python` is not an option either — a stock Debian/Ubuntu adopter without python-is-python3 has
+# only python3, and every command in the kit's primary agent-facing surface would exit 127.
 render() { # -> stdout
   sed -e "s|{{FAMILIES}}|$families|g" \
       -e "s|{{MEMORY_ROOT}}|$memory_root|g" \
-      -e "s|{{QUERY_CLI}}|python $REL/query.py|g" "$TEMPLATE"
+      -e "s|{{QUERY_CLI}}|python3 $REL/query.py|g" "$TEMPLATE"
 }
 
 # An unsubstituted placeholder is a template that grew a value this script does not know how to

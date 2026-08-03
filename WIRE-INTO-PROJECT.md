@@ -193,11 +193,19 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    ```bash
    cd <project>
    bash memory-recall/adopt-memory-recall.sh --scaffold   # -> .claude/skills/memory-recall/SKILL.md
+   # One throwaway record first: §3 step 2 scaffolds DECISIONS.md files that are header-only,
+   # so a fresh tree has NO id for the record arm to anchor and this step cannot pass without
+   # one. `<FAM>` is one of YOUR families; the corpus is tracked-only, hence the `git add`.
+   echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/<discipline>/DECISIONS.md
+   git add memory/<discipline>/DECISIONS.md
    python3 memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
    ```
-   The header must report a **non-zero record count**. `index 0 records + N chunks` plus a
-   `ZERO RECORDS` block on stderr means `FAMILIES` matches no id in the corpus — fix the conf and
-   re-run (the cache keys on the resolved conf, so the repair is not silently served from cache).
+   The header must now report **at least one record** — the seed. `index 0 records + N chunks`
+   plus a `ZERO RECORDS` block on stderr has TWO causes and the block names both: no decision
+   has been written yet, or `FAMILIES` matches no id in the corpus. On a freshly scaffolded tree
+   the first is the expected state and not a bug — the seed record is what tells the two apart.
+   With it staged, zero records means `FAMILIES` — fix the conf and re-run (the cache keys on the
+   resolved conf, so the repair is not silently served from cache). Delete the seed when green.
 3. **Wire both gates — without this the skill-drift check silently never runs.** Add them to the
    project's local gate runner **AND** its CI config, grep-guarded so a re-run doesn't duplicate the
    leg:
@@ -350,7 +358,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   **non-Python repo**, also confirm the explicit `python <GATE_FILE>` leg is actually standing in
   your CI config + gate runner (§3b step 5) — not merely runnable by hand.
 - Memory-recall (if adopted): `python3 memory-recall/selftest.py` (kit contract) · one real query
-  returning a non-zero record count (§3c step 2) · `bash memory-recall/adopt-memory-recall.sh --check`
+  whose record arm anchors the §3c step-2 seed record (zero records with no decision written yet
+  is the expected state, not a `FAMILIES` bug) · `bash memory-recall/adopt-memory-recall.sh --check`
   → 0 · then edit `FAMILIES` in `.memory-tree.conf`, re-run `--check`, watch it go RED naming the
   drift, and revert. Confirm **both** legs are actually standing in your CI config + gate runner
   (§3c step 3) — a kit copied in beside a skill nobody rendered otherwise reads as fully wired.

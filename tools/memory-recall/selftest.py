@@ -274,9 +274,39 @@ def t_zero_records_is_loud():
         try:
             ex = run(root, kitdir, str(root), str(out), script="extract.py")
             assert "ZERO RECORDS" in ex.stderr, "extract.py reports the silent zero as success"
+            # extract.py is the one entry point the query path does not go through, so its own
+            # `sys.dont_write_bytecode` is the whole of "writes nothing in your worktree" here —
+            # and deleting that line SURVIVED the entire suite until this assertion existed. Not
+            # a `git status` check: `__pycache__/` is a near-universal ignore rule, so a status
+            # is clean whether nothing was written or the write was merely hidden.
+            pyc = sorted(p for p in tree(root) if "__pycache__" in p)
+            assert not pyc, f"extract.py wrote bytecode into the worktree: {pyc}"
         finally:
             cleanup(out)
-        return "diagnosed on both the query and the extract path"
+        return "diagnosed on both paths, and extract.py wrote no bytecode"
+    finally:
+        cleanup(root)
+
+
+@check("an EMPTY corpus is diagnosed too, and names MEMORY_ROOT — FAMILIES cannot cause it")
+def t_empty_corpus_names_memory_root():
+    """A one-character MEMORY_ROOT typo produced 0 records + 0 chunks, 0 hits and exit 0.
+
+    The old guard read `if n_records or not n_chunks: return None`, so the one state the record
+    diagnosis could NOT describe was the one where the chunk arm is empty too — and the chunk arm
+    is the family-blind half, so its emptiness is never a FAMILIES problem. MEMORY_ROOT is one of
+    the three keys the adopter hand-edits.
+    """
+    root, kitdir = make_repo(conf='MEMORY_ROOT=no-such-corpus\nFAMILIES="tooling:TOOL"\n')
+    try:
+        proc = run(root, kitdir, *Q)
+        n_rec, n_chunk, _ = index_of(proc)
+        assert (n_rec, n_chunk) == (0, 0), f"{n_rec} records / {n_chunk} chunks — wrong fixture"
+        err = proc.stderr
+        assert "EMPTY CORPUS" in err, f"0 records + 0 chunks was reported as success:\n{err}"
+        assert "MEMORY_ROOT" in err, "the diagnosis does not name the suspect key"
+        assert "no-such-corpus" in err, "the diagnosis does not name the resolved value"
+        return "0 records + 0 chunks -> EMPTY CORPUS naming MEMORY_ROOT"
     finally:
         cleanup(root)
 
@@ -449,8 +479,24 @@ def t_printed_invocations_resolve():
         for proc in (helped, refused, answered, hooked):
             seen |= set(INVOKE_RE.findall(proc.stdout + proc.stderr))
         assert seen, "the CLI printed no invocation at all"
+        # RELATIVE first, because it is the specific diagnosis: `root / p` DISCARDS root when p is
+        # absolute, so an absolute REL — what a no-op prefix strip produces when two spellings of
+        # one directory disagree — resolves happily against the check below on a POSIX node and
+        # then ships a machine-local path in a COMMITTED artifact. Asserted directly because the
+        # fixture cannot make the two spellings disagree.
+        absolute = sorted(p for p in seen if p.startswith("/") or re.match(r"^[A-Za-z]:", p))
+        assert not absolute, f"printed invocations carry an absolute path: {absolute}"
         missing = sorted(p for p in seen if not (root / p).is_file())
         assert not missing, f"printed invocations naming files that do not exist: {missing}"
+        # The CLI's OWN launcher, which is a literal and must be `python3` — a stock Debian/Ubuntu
+        # adopter has no `python`. The adopt script's lines are deliberately NOT scanned: those carry
+        # the RESOLVED $PY, and on a node with no python3 `python` is the correct answer there.
+        cli_lines = [ln.strip() for p in (helped, refused, answered)
+                     for ln in (p.stdout + p.stderr).splitlines() if ".py" in ln]
+        bare = [ln for ln in cli_lines if re.search(r"\bpython(?!3)\s+\S*\.py", ln)]
+        assert not bare, f"the CLI prints a bare-`python` launcher: {bare}"
+        py3 = [ln for ln in cli_lines if re.search(r"\bpython3\s+\S*\.py", ln)]
+        assert py3, "the CLI printed no python3 launcher at all — the scan above is vacuous"
         assert any("query.py" in p for p in seen)
         # Non-vacuity: the fold above is worthless if the remedy line never reaches `seen`.
         assert any("settings-merge.py" in p for p in seen), "the --with-hook remedy printed no invocation"
@@ -607,7 +653,18 @@ def t_skill_description_invariants():
         assert sentences, "the description says nothing about /session-kickoff at all"
         numbered = [s for s in sentences if re.search(r"\bStep\b|\d", s)]
         assert not numbered, f"the description names a kickoff step it cannot verify: {numbered}"
-        return f"{len(desc)} B description, {len(sentences)} kickoff clause(s), 0 unknown flags"
+
+        # 4. No BARE `python` launcher. A stock Debian/Ubuntu adopter without python-is-python3
+        #    has python3 and no `python`, so such a line exits 127 — quietly, because this
+        #    skill's own guidance says a miss is ordinary and to fall back to Grep. The whole
+        #    trigger surface is this file, so one launcher is enough to make the kit look dead.
+        bare = [ln.strip() for ln in text.splitlines()
+                if re.search(r"\bpython(?!3)\s+\S*query\.py", ln)]
+        assert not bare, f"the rendered skill launches query.py with a bare `python`: {bare}"
+        launchers = len([ln for ln in text.splitlines() if "query.py" in ln])
+        assert launchers >= 2, f"only {launchers} query.py line(s) — the scan is near-vacuous"
+        return (f"{len(desc)} B description, {len(sentences)} kickoff clause(s), 0 unknown flags, "
+                f"{launchers} python3 launcher(s)")
     finally:
         cleanup(root)
 
@@ -710,7 +767,8 @@ def main() -> int:
 
     order = [
         t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
-        t_zero_records_is_loud, t_conf_digest_both_directions, t_writes_nothing_in_worktree,
+        t_zero_records_is_loud, t_empty_corpus_names_memory_root,
+        t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_eviction, t_printed_invocations_resolve, t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,

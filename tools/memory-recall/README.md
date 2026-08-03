@@ -46,11 +46,11 @@ The node-tag character class is **not** a conf key: it is `a-z`, matching the me
 ## Use
 
 ```bash
-python tools/memory-recall/query.py "why did the gate start refusing my push" \
+python3 tools/memory-recall/query.py "why did the gate start refusing my push" \
     --terms "pre-push dirty tree porcelain untracked submodule refusal predicate gatepost"
-python tools/memory-recall/query.py --opened <rank> --qid <N>   # record which hit answered it
-python tools/memory-recall/query.py "<question>" --rebuild      # force a cache rebuild
-python tools/memory-recall/query.py --export --tag a            # aggregate the log, outside the tree
+python3 tools/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
+python3 tools/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
+python3 tools/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
 ```
 
 `--terms` is **required**. Rewriting is the measured half of the retrieval gain upstream (records
@@ -84,7 +84,7 @@ per-worktree size cap.
    `.claude/skills/memory-recall/SKILL.md`. Add `--with-hook` only if you want the `recall-opened`
    PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
    the wiring:
-   `python settings-merge.py --fragment memory-recall/recall-opened.fragment.json`.
+   `python3 settings-merge.py --fragment memory-recall/recall-opened.fragment.json`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
    `python3 memory-recall/selftest.py` and `bash memory-recall/adopt-memory-recall.sh --check`.

@@ -5,9 +5,11 @@ FORKED from inCMS ``scripts/recall/query.py`` at 5318064 (file last changed fd62
 constructs are edited and the rest is upstream's byte for byte, so a re-pull is a three-way merge:
 (1) ``corpus_files()`` and the id grammar derive from ``.memory-tree.conf`` via ``recall_conf``;
 (2) ``sys.dont_write_bytecode`` above the ``sys.path`` insert; (3) every printed invocation derives
-from ``__file__``; (4) ``--export`` writes beside the log under the common git dir and requires
-``--tag``; (5) the cache manifest carries ``conf_digest`` and ``worktree``, which drive freshness
-and eviction; (6) an empty record arm is diagnosed out loud.
+from ``__file__`` and launches ``python3``, and the ``--terms`` refusal's worked example is a
+generic one rather than the source project's domain vocabulary; (4) ``--export`` writes beside the
+log under the common git dir and requires ``--tag``; (5) the cache manifest carries ``conf_digest``
+and ``worktree``, which drive freshness and eviction; (6) an empty record arm -- or an empty corpus
+-- is diagnosed out loud.
 
 Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
 heading-bounded chunk -- cached under the COMMON git directory and rebuilt when the corpus moves.
@@ -97,7 +99,10 @@ def _self_path() -> str:
 # ONE expression, reused by the docstring usage block, the REFUSAL and the qid hand-back. Ported
 # unedited from upstream, all three named a path that does not exist in an adopter repo -- so the
 # instruction printed after every successful query told the caller to run a missing file (spec F7).
-CLI = "python " + _self_path()
+# `python3`, not bare `python`: a stock Debian/Ubuntu host without python-is-python3 has no such
+# binary, so every instruction this CLI prints would be an exit-127 dead end there. The rendered
+# Skill says python3 for the same reason -- these two surfaces must agree or one of them lies.
+CLI = "python3 " + _self_path()
 # The usage block above is a plain literal so it stays a real docstring; the substitution happens
 # once, here, after CLI exists.
 __doc__ = (__doc__ or "").replace("{cli}", CLI)
@@ -160,9 +165,12 @@ moves records recall@20 from 0.71 to 0.84 and MRR from 0.389 to 0.530, for zero 
 bytes. You are asking in plain English; the corpus answers in its own jargon. Supply the
 jargon and the plain question together -- both go into one query.
 
-  {cli} "why did the editor stop saving my page" \\
-      --terms "optimistic concurrency expected_version 409 stale precondition puck_data \\
-               document_guard last-writer-wins conflict banner"
+  {cli} "why does the gate refuse this push" \\
+      --terms "pre-push hook gate leg refusal exit-1 bypass no-verify merge bar \\
+               single-head parity"
+
+Terms are what THIS corpus calls your symptom -- one of its id families, a module name, an
+error code, a flag key, a file name -- not synonyms of the words you just typed.
 
 To run the un-rewritten baseline deliberately -- a measurement, or checking whether your own
 record is findable without help -- pass --no-terms. It is logged as such.""".replace("{cli}", CLI)

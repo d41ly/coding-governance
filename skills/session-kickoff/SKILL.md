@@ -145,9 +145,10 @@ CI-verified, so trust them over prose notes; the generated map is the system inv
 high-risk unit touching an UNDOSSIERED feature creates/refreshes that dossier as part of its
 design pass (the map's convergence rule).
 
-**Memory-recall for the prior records** (when the project has the kit — a `memory-recall/`
-directory with `query.py`): issue ONE query for the unit's question instead of guessing which
-decision log binds it — `python3 memory-recall/query.py "<the question>" --terms "<8-14 words in
+**Memory-recall for the prior records** (when the project has the kit — `<KIT>` is whichever of
+`memory-recall/` or `tools/memory-recall/` holds `query.py`; both spellings ship, so resolve it
+rather than assuming): issue ONE query for the unit's question instead of guessing which
+decision log binds it — `python3 <KIT>/query.py "<the question>" --terms "<8-14 words in
 THIS corpus's own jargon>"`. The terms are yours to write: the CLI is offline and cannot coin
 them, and they are what makes the ranking land. Report the ids it returns as the prior records
 above. It ADDS to grep rather than replacing it — a symbol, caller or filename is still a grep.

@@ -8,7 +8,7 @@ description: >-
   this constraint", "which decision covers <area>", "did we already try this" — any question
   whose answer is a rationale, a trade-off, a prior id in one of this repo's families
   (PLAY KICK TOOL DEPL), or a backlog row. Also use before touching an unfamiliar area, to find the
-  records that bind the change. Routes through the shipped CLI, python tools/memory-recall/query.py, which needs the
+  records that bind the change. Routes through the shipped CLI, python3 tools/memory-recall/query.py, which needs the
   question in plain English AND 8-14 --terms in this corpus's own jargon (you write the terms;
   the CLI is offline and stdlib-only, so it cannot).
   Do NOT use for ordinary code search — finding a symbol, a caller, a definition, a config key,
@@ -24,7 +24,7 @@ You ask in English, the corpus answers in jargon, so `--terms` is REQUIRED and *
 them.
 
 ```bash
-python tools/memory-recall/query.py "<the question, in plain English>" --terms "<8-14 coined words>"
+python3 tools/memory-recall/query.py "<the question, in plain English>" --terms "<8-14 coined words>"
 ```
 
 Run it from the root of the tree you are **working in** — your worktree, not the primary tree.
@@ -54,7 +54,7 @@ back to `Grep` over `memory/`. That is not a failure mode, it is the other tool
 ## Record which hit you opened — one flag, and it is the point
 
 ```bash
-python tools/memory-recall/query.py --opened <rank> --qid <qid>
+python3 tools/memory-recall/query.py --opened <rank> --qid <qid>
 ```
 
 The query prints the qid it logged — pass that back. Without `--qid` the record attaches to the

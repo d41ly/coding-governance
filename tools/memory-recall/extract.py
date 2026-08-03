@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """Build the retrieval document sets from the tracked corpus under ``$MEMORY_ROOT``.
 
-FORKED from inCMS ``scripts/recall/extract.py`` at 5318064 (file last changed fd6274d). The fork is
-five constructs wide -- ``FAMILIES``, the node-tag class inside ``ERAS``, ``DURABLE``,
-``corpus_files()`` and the zero-record diagnosis -- so a future re-pull is a three-way merge rather
-than archaeology. Everything else is upstream's, byte for byte.
+FORKED from inCMS ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
+is that revision's tip and never touched this file). The fork is SIX constructs wide, so a future
+re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) the node-tag class
+inside ``ERAS``; (3) ``DURABLE``; (4) ``corpus_files()``; (5) the zero-record diagnosis, now two
+branches; (6) ``sys.dont_write_bytecode`` above the ``recall_conf`` import plus
+``CONF = recall_conf.resolve()`` -- upstream's blob has zero occurrences of either name. Count the
+sixth: two of its three lines are load-bearing (without ``CONF``, ``FAMILIES = CONF.families`` is a
+NameError, so a re-pull that drops them fails loudly), but ``dont_write_bytecode`` is the whole of
+the kit's "writes nothing inside your worktree" property on this file and a re-pull can drop it in
+silence -- the .pyc lands next to the source, inside the adopter's tree, and ``git status`` is
+clean anyway because ``__pycache__/`` is a near-universal ignore rule. Everything else is
+upstream's, byte for byte.
 
 Rebuilt instrument for the upstream recall measurement. The original harness lived in a session
 scratchpad and was lost with the session, which made every number it produced unfalsifiable. This
@@ -251,16 +259,34 @@ def zero_record_diagnosis(
     records is ALSO the honest state of a tree that has not written a decision yet, so this is a
     loud printed diagnosis rather than a refusal: it names the key, the conf, the families it
     resolved, and the escape hatch for a cache built before the conf was repaired.
+
+    TWO branches, because 0 records + 0 chunks has a DIFFERENT cause and a single guard reading
+    ``n_records or not n_chunks`` excluded it from every diagnosis. The chunk arm needs no id
+    grammar, so an empty chunk arm cannot be FAMILIES -- it is MEMORY_ROOT, which is one of the
+    three keys the adopter hand-edits and where a one-character typo produces exactly this.
     """
-    if n_records or not n_chunks:
+    if n_records:
         return None
-    return (
-        f"ZERO RECORDS — the corpus produced {n_chunks} chunks and not one anchored record.\n"
+    resolved = (
         f"  FAMILIES in {CONF.path.as_posix()} resolved to: {' '.join(CONF.families)}\n"
         f"  MEMORY_ROOT resolved to: {CONF.memory_root}\n"
-        "  Either no decision has been written yet, or FAMILIES does not describe this corpus's\n"
-        "  ids. The chunk arm works without the grammar, so this is the only signal you get.\n"
-        f"  After fixing the conf, re-run with {rebuild_hint} if the cache predates the fix."
+    )
+    if not n_chunks:
+        return (
+            "EMPTY CORPUS — no records AND no chunks: nothing reached the index at all.\n"
+            + resolved
+            + "  MEMORY_ROOT is the prime suspect: the chunk arm needs no id grammar, so FAMILIES\n"
+              "  cannot cause this. Check it names a directory that exists, and that the files in\n"
+              "  it are TRACKED — the corpus is read from the git index, so anything nobody\n"
+              "  `git add`ed reads as absent.\n"
+            + f"  After fixing the conf, re-run with {rebuild_hint} if the cache predates the fix."
+        )
+    return (
+        f"ZERO RECORDS — the corpus produced {n_chunks} chunks and not one anchored record.\n"
+        + resolved
+        + "  Either no decision has been written yet, or FAMILIES does not describe this corpus's\n"
+          "  ids. The chunk arm works without the grammar, so this is the only signal you get.\n"
+        + f"  After fixing the conf, re-run with {rebuild_hint} if the cache predates the fix."
     )
 
 
