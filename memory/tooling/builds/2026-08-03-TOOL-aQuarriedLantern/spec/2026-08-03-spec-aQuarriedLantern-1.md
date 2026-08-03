@@ -1,6 +1,6 @@
 # TOOL-aQuarriedLantern-1 — memory-recall: the retrieval CLI as a project-agnostic kit
 
-**Status:** SPECCED · rev-2 · 2026-08-03 · node a · Tier-2 · base 9368d1e8 · ratified 2026-08-03
+**Status:** INPROGRESS · rev-2 · 2026-08-03 · node a · Tier-2 · base 9368d1e8 · ratified 2026-08-03 · U1-U3 built, closing review folded; NOT CLOSED — §8 Q6 is deliberately open
 
 ## 1. Goal
 

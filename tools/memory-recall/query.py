@@ -8,8 +8,9 @@ constructs are edited and the rest is upstream's byte for byte, so a re-pull is 
 from ``__file__`` and launches ``python3``, and the ``--terms`` refusal's worked example is a
 generic one rather than the source project's domain vocabulary; (4) ``--export`` writes beside the
 log under the common git dir and requires ``--tag``; (5) the cache manifest carries ``conf_digest``
-and ``worktree``, which drive freshness and eviction; (6) an empty record arm -- or an empty corpus
--- is diagnosed out loud.
+and ``worktree``, which drive freshness and eviction; (6) an empty record arm, an empty corpus,
+or an alias layer that joins to nothing is diagnosed out loud, and the manifest carries the join
+counts the third one reads.
 
 Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
 heading-bounded chunk -- cached under the COMMON git directory and rebuilt when the corpus moves.
@@ -108,9 +109,12 @@ CLI = "python3 " + _self_path()
 __doc__ = (__doc__ or "").replace("{cli}", CLI)
 
 CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
-CACHE_VERSION = 2  # bump when extraction or schema changes, so an old cache is never queried
+CACHE_VERSION = 3  # bump when extraction or schema changes, so an old cache is never queried
 # 1 -> 2 on 2026-08-02 (ARCH-aGrittedFlagstone-3): records now carry the committed alias layer, so
 # every cache built before the join must rebuild rather than keep serving an alias-free index.
+# 2 -> 3 on 2026-08-03: the manifest carries the alias JOIN counts. A pre-bump manifest has no
+# such key, and the dead-alias diagnosis reads the manifest -- without the bump a warm cache
+# would keep the very silence this fix removes.
 WINDOW = 400  # chars of the head fallback, matching union.py's SNIPPET accounting
 SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently clamped
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
@@ -252,7 +256,29 @@ def alias_digest() -> str:
     return E.load_aliases()[2]
 
 
-def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict]]:
+def dead_alias_diagnosis(man: dict) -> str | None:
+    """An alias layer that loaded ids and joined to NOT ONE of them, named out loud.
+
+    The zero-record class one layer in. The alias column is a down-weighted ranking aid, so an
+    alias file authored against another id family is 100% dead with no symptom beyond slightly
+    worse ranking -- `--stats` carried only `alias_digest`, which is a content hash and says
+    nothing about coverage. Counts come from the MANIFEST, so this fires identically on a fresh
+    build and on a cache hit. Silent on a partial join: some ids resolving is the normal state of
+    an alias file written ahead of the records it names.
+    """
+    a = man.get("aliases") or {}
+    if not a.get("ids") or a.get("joined"):
+        return None
+    return (
+        f"DEAD ALIAS LAYER — {a['ids']} alias ids loaded and not one joined to a record.\n"
+        f"  alias source: {a.get('src', '?')}\n"
+        f"  FAMILIES in {CONF.path.as_posix()} resolved to: {' '.join(CONF.families)}\n"
+        "  Not one of those ids names a record in this corpus, so the alias column is empty and\n"
+        "  the only symptom is slightly worse ranking. Check the ids are this corpus's own."
+    )
+
+
+def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict], dict]:
     records, chunks = [], []
     for path in files:
         try:
@@ -269,8 +295,13 @@ def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict]]
     # the result. A join written only there ships a query index with an empty alias column while
     # every recall floor stays green, which is the dead-plumbing class arriving through the door
     # marked "the gate already covers it".
-    E.join_aliases(records, E.load_aliases()[0])
-    return records, chunks
+    #
+    # The int return is CARRIED, not discarded (closing review F7): join_aliases documents it as
+    # `how many were augmented`, extract.py's own path prints it, and the CLI -- the path every
+    # session actually uses -- reported it nowhere. Same class again, one layer in.
+    by_id, alias_src, _ = E.load_aliases()
+    joined = E.join_aliases(records, by_id)
+    return records, chunks, {"ids": len(by_id), "joined": joined, "src": alias_src}
 
 
 def _write_set(dirp: pathlib.Path, name: str, docs: list[dict]) -> None:
@@ -289,7 +320,7 @@ def _write_set(dirp: pathlib.Path, name: str, docs: list[dict]) -> None:
 
 def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dict:
     t0 = time.time()
-    records, chunks = _docs(repo, files)
+    records, chunks, aliases = _docs(repo, files)
     dirp.mkdir(parents=True, exist_ok=True)
     _write_set(dirp, "records", records)
     _write_set(dirp, "chunks", chunks)
@@ -300,6 +331,9 @@ def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dic
         "counts": {"records": len(records), "chunks": len(chunks)},
         "digest": corpus_digest(repo, files),
         "alias_digest": alias_digest(),
+        # The join COUNTS beside the source digest: the digest keys freshness and cannot tell a
+        # joined alias layer from a dead one. Here so the diagnosis fires on a cache hit too.
+        "aliases": aliases,
         # FORKED. The port moves the id grammar and the corpus root OUT of source and into a
         # conf at the repo root -- which makes an adopter-editable value a COLD input to a HOT
         # cache. The corpus digest is mtime+size over the tree's .md files, so a FAMILIES edit
@@ -968,6 +1002,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     if diag:
         print(diag, file=sys.stderr)
+    dead = dead_alias_diagnosis(man)
+    if dead:
+        print(dead, file=sys.stderr)
     print(f"{len(hits)} hits for: {question}\n")
 
     out, shown, spent, overflow = emit(hits, question + " " + " ".join(terms), budget)

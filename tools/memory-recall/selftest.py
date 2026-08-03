@@ -252,6 +252,7 @@ def t_empty_alias():
         man = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
         assert man["alias_digest"] == "", f"alias digest {man['alias_digest']!r} with no alias file"
         assert "ZERO RECORDS" not in proc.stderr, "false diagnosis on a healthy corpus"
+        assert "DEAD ALIAS LAYER" not in proc.stderr, "dead-alias fired with NO alias file"
         return f"{n_rec} records + {n_chunk} chunks, alias digest empty, ranked list non-empty"
     finally:
         cleanup(root)
@@ -379,7 +380,60 @@ def t_alias_rebuild():
         after = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
         assert after["alias_digest"], "the manifest did not record the new alias digest"
         assert n_rec == 2, n_rec
-        return f"alias digest '' -> {after['alias_digest']}, no config edit"
+        # The join that WORKS: counted in the manifest, and silent. A diagnosis that also
+        # fires here would be a gate that reds the terminal success state.
+        assert after["aliases"]["joined"] == 1, after["aliases"]
+        assert "DEAD ALIAS LAYER" not in proc.stderr, "dead-alias fired on a LIVE alias layer"
+        return (
+            f"alias digest '' -> {after['alias_digest']}, "
+            f"{after['aliases']['joined']}/{after['aliases']['ids']} joined, silent"
+        )
+    finally:
+        cleanup(root)
+
+
+@check("an alias layer that joins to ZERO records is diagnosed, not silently dead")
+def t_dead_alias_is_loud():
+    """`query.py` discarded `join_aliases`' return, so a 100%-dead alias column was reported
+    NOWHERE — the dead-plumbing class one layer inside the tool built to close it. An adopter
+    authoring aliases against the wrong id family gets a silently empty third FTS5 column whose
+    only symptom is slightly worse ranking, and `--stats` carried a content hash that says nothing
+    about coverage. The record and chunk arms are unaffected, which is why nothing else can see it.
+    """
+    root, kitdir = make_repo()
+    try:
+        (kitdir / "aliases.json").write_text(
+            json.dumps([{"id": "ZZZZ-aFoo-1", "questions": ["how do I pick a frobnicator"]}]),
+            encoding="utf-8", newline="\n",
+        )
+        proc = run(root, kitdir, *Q)
+        assert proc.returncode == 0, proc.stderr
+        n_rec, n_chunk, _ = index_of(proc)
+        assert (n_rec, n_chunk > 0) == (2, True), f"{n_rec} records / {n_chunk} chunks — wrong fixture"
+        err = proc.stderr
+        assert "DEAD ALIAS LAYER" in err, f"a 100%-dead alias column stayed silent:\n{err}"
+        assert "aliases.json" in err, "the diagnosis does not name the alias source"
+        assert "TOOL" in err, "the diagnosis does not name the resolved families"
+        man = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
+        assert (man["aliases"]["ids"], man["aliases"]["joined"]) == (1, 0), man["aliases"]
+        # ...and on a CACHE HIT, which is the state a session is actually in: the counts come from
+        # the manifest for exactly this reason, and a re-run must not go quiet.
+        again = run(root, kitdir, *Q)
+        assert index_of(again)[2] == "cached", "fixture did not reach the cached path"
+        assert "DEAD ALIAS LAYER" in again.stderr, "the diagnosis is fresh-build-only"
+        # ...and a cache built BEFORE this fix carries no alias counts at all, so the manifest the
+        # diagnosis reads is empty of them. The CACHE_VERSION bump is the whole of what stops such
+        # a cache from keeping the very silence this fix removes: doctor a manifest into that shape
+        # and the next query must REBUILD and diagnose, not serve the pre-fix index.
+        mf = cache_of(root) / "manifest.json"
+        stale = json.loads(mf.read_text(encoding="utf-8"))
+        stale.pop("aliases")
+        stale["version"] = 2
+        mf.write_text(json.dumps(stale, indent=1), encoding="utf-8", newline="\n")
+        third = run(root, kitdir, *Q)
+        assert index_of(third)[2] == "rebuilt", "a pre-fix manifest was served from cache"
+        assert "DEAD ALIAS LAYER" in third.stderr, "a pre-fix cache kept the silence"
+        return "1 alias id, 0 joined -> diagnosed on rebuild, on cache hit, and past a pre-fix cache"
     finally:
         cleanup(root)
 
@@ -769,7 +823,8 @@ def main() -> int:
         t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
         t_conf_digest_both_directions, t_writes_nothing_in_worktree,
-        t_alias_rebuild, t_eviction, t_printed_invocations_resolve, t_python3_only,
+        t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
+        t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
     ]
