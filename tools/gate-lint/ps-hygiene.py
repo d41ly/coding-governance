@@ -32,8 +32,19 @@ _IDENT = re.compile(r"\$([A-Za-z_][A-Za-z0-9_]*)")
 
 
 def _code(text: str) -> str:
-    """Source with comments stripped — a collision in prose is not a collision."""
-    return "\n".join(l for l in _BLOCK.sub("", text).splitlines() if not _COMMENT.match(l))
+    """Source with comments stripped — a collision in prose is not a collision.
+
+    Strips block comments, whole-line comments AND trailing inline comments. The first cut kept
+    trailing comments, so `$Foo = 1  # see $foo` reported a collision that does not exist. Naive on
+    a `#` inside a string literal, which over-strips rather than over-reports — the safe direction
+    for a gate: a missed collision surfaces on the next run, a false one blocks an innocent commit.
+    """
+    out = []
+    for line in _BLOCK.sub("", text).splitlines():
+        if _COMMENT.match(line):
+            continue
+        out.append(line.split("#", 1)[0] if "#" in line else line)
+    return chr(10).join(out)
 
 
 def case_collisions(text: str) -> dict[str, list[str]]:

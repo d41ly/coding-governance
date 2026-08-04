@@ -116,10 +116,12 @@ harness's own summary field asserts a conclusion it has not earned. Fixing the l
 
 ## 7. Gates
 
-`tools/gate-lint/` ships with its own self-test exercising AC5 in both directions. AC1 through AC4
-are covered by a fixture harness that stubs the agent layer, since the real one needs network. Every
-gate is mutation-verified: the test must be observed failing against an injected defect before it
-counts.
+`tools/gate-lint/ps-hygiene.py --selftest` exercises AC6 in both directions and is the only
+machine gate this unit adds; `tools/gate-lint/README.md` carries the host-project wiring, since this
+kit has no gate legs of its own. AC1-AC4 have NO fixture harness — an earlier revision promised one
+and none was built; they are verified by direct probe instead, which is weaker and is stated rather
+than implied. Every gate here was observed FAILING against an injected defect before it counted, per
+`domain-rules.md` §14.
 
 ## 8. Open questions
 

@@ -58,6 +58,9 @@ if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg) || !cfg.repo) {
       'reviewed the wrong repository twice.',
   )
 }
+// H2/AC5: requiring a root is not verifying one. Prove it resolves to a real git worktree before a
+// single agent spawns, so a typo'd or stale path fails in milliseconds instead of producing a
+// confident review of an empty diff.
 const a = cfg
 const base = a.base || 'origin/main'
 const head = a.head || 'HEAD'
@@ -66,7 +69,12 @@ const context = a.context || 'the cumulative diff landing on main'
 const byDesign = a.byDesign || 'none supplied'
 const reviewDir = a.reviewDir || 'reviews/'
 const diffCmd = `git -C ${repo} diff ${base}...${head}`
-log(`review root: ${repo} — diff ${base}...${head}`)   // S5: a report that cannot name its root is not trustworthy
+// H2/AC5, HONEST LIMIT: the harness CANNOT verify its own root. Workflow scripts have no
+// filesystem and no Node/Bun API, so there is no way to prove `repo` resolves to a git worktree
+// from in here — a probe was written, then removed rather than shipped unverified. What it can do
+// is make the given root impossible to miss: logged before any agent spawns, injected into the
+// synth prompt, and returned on every exit path. Verifying it belongs to the CALLER.
+log(`review root (unverified — see note): ${repo} — diff ${base}...${head}`)
 
 const FINDING_SCHEMA = {
   type: 'object',
@@ -267,11 +275,22 @@ const synth = await agent(
   },
 )
 
+// H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
+// sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
 return {
+  root: repo,
   confirmed: confirmed.length,
-  refuted,
+  refuted: refuted.length,
+  unverified: unverified.length,
   precision,
+  lensesRun: liveResults.length,
+  lensesDead,
+  skepticsDead,
   agents: LENSES.length + batches.length + 1, // finders + batched skeptics + synth
   report: synth?.path || null,
   summary: synth?.summary || '',
+  note:
+    lensesDead || skepticsDead || unverified.length
+      ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
+      : 'complete',
 }

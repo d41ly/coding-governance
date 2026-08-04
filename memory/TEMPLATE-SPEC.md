@@ -9,6 +9,15 @@ empty section bodies, its header `rev-N` logged in §9, and a resolved §8 befor
 both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
 by filename date — never retrofit them.
 
+## SPEC10_CUTOFF — how §10 is phased in
+
+`§10 Reuse audit` is required only for specs whose FILENAME date is on or after `SPEC10_CUTOFF`
+(default `2026-08-04`, set in `tools/memory-tree/check-memory-hygiene.sh`). Specs dated before it
+keep the nine-section canon, so adopting the reuse audit never retroactively reds landed work. It is
+env-overridable for adoption in a repo with a different history — raising it grandfathers more, and
+lowering it is how you'd ratchet an existing corpus forward. It is a merge-bar knob: changing it
+changes what the gate demands, so change it in a commit that says why.
+
 ## The status header (required, within the first 5 unfenced lines)
 
 ```
