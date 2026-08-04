@@ -51,6 +51,11 @@ done
 
 # The conf refusal lives in ONE place — recall_conf.py prints it, this script just forwards it.
 conf="$("$PY" "$HERE/recall_conf.py")" || exit 1
+# Belt-and-braces against a CR-bearing producer. recall_conf.py now pins LF on its KEY=VALUE
+# protocol, but `read` would otherwise hand every value a trailing CR on Windows, and those CRs
+# rendered straight into SKILL.md (`memory<CR>/`) and broke its YAML frontmatter. Stripping here
+# keeps the consumer correct even against an older or third-party producer.
+conf="${conf//$'\r'/}"
 memory_root=""; families=""
 while IFS='=' read -r k v; do
   case "$k" in MEMORY_ROOT) memory_root="$v" ;; FAMILIES) families="$v" ;; esac

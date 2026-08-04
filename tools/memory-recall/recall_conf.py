@@ -172,7 +172,17 @@ def main() -> int:
 
     ONE home for the refusal text: adopt-memory-recall.sh shells out to this rather than restating
     it, so the CLI and the adopt script cannot drift on what a missing conf says (AC3).
+
+    The KEY=VALUE lines are a MACHINE-READABLE protocol (adopt-memory-recall.sh parses them with
+    `read`), so the newline is part of the contract. On Windows, text-mode stdout translated every
+    \\n to \\r\\n and each value reached the shell carrying a trailing CR — which rendered into
+    SKILL.md as `memory\\r/` and `(PLAY KICK TOOL DEPL\\r)`, breaking its YAML frontmatter outright.
+    Pin LF so the protocol is byte-identical on every OS.
     """
+    try:
+        sys.stdout.reconfigure(newline="\n")
+    except (AttributeError, ValueError):  # a replaced or non-TextIOWrapper stdout
+        pass
     try:
         c = resolve()
     except ConfError as e:

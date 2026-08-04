@@ -7,7 +7,7 @@ description: >-
   for Z", "what binds this change", "was this considered before", "what's the rationale for
   this constraint", "which decision covers <area>", "did we already try this" — any question
   whose answer is a rationale, a trade-off, a prior id in one of this repo's families
-  (PLAY KICK TOOL DEPL), or a backlog row. Also use before touching an unfamiliar area, to find the
+  (PLAY KICK TOOL DEPL), or a backlog row. Also use before touching an unfamiliar area, to find the
   records that bind the change. Routes through the shipped CLI, python3 tools/memory-recall/query.py, which needs the
   question in plain English AND 8-14 --terms in this corpus's own jargon (you write the terms;
   the CLI is offline and stdlib-only, so it cannot).
@@ -28,7 +28,7 @@ python3 tools/memory-recall/query.py "<the question, in plain English>" --terms 
 ```
 
 Run it from the root of the tree you are **working in** — your worktree, not the primary tree.
-The corpus is the tracked `memory/` of `git rev-parse --show-toplevel` from the cwd, so
+The corpus is the tracked `memory/` of `git rev-parse --show-toplevel` from the cwd, so
 it includes notes you have staged but not committed, and the cache is keyed per worktree. It
 writes nothing inside the worktree: the index, the query log and every aggregate live under the
 common git dir.
@@ -49,7 +49,7 @@ Open the records it names, not the streams they live in. Output is sized by a by
 
 **A miss is ordinary.** On a small corpus retrieval buys precision, not speed — a full-corpus
 `grep` is faster and returns half the tree. So when the hits are thin or wrong, fall straight
-back to `Grep` over `memory/`. That is not a failure mode, it is the other tool.
+back to `Grep` over `memory/`. That is not a failure mode, it is the other tool.
 
 ## Record which hit you opened — one flag, and it is the point
 
@@ -85,5 +85,5 @@ does write, so a hand record is never lost or double-counted.
 
 ## When the CLI cannot run
 
-Fall back to reading the stream's `DECISIONS.md` / `BACKLOG.md` index under `memory/`
+Fall back to reading the stream's `DECISIONS.md` / `BACKLOG.md` index under `memory/`
 directly. That is the exception, not the norm.
