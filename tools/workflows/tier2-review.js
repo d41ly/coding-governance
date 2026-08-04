@@ -30,6 +30,18 @@ function chunk(a, n) {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)" }
 const a = args || {}
+// S5 (TOOL-aGuardedTally-1): args MUST be a structured object. Passing a prose string used to
+// degrade silently to `repo = '.'`, i.e. "review whatever directory this process happens to be
+// standing in" -- which twice made this harness audit a DIFFERENT repository than the one it was
+// briefed on, and return confident, well-evidenced findings about code nobody asked about. A dead
+// review returns nothing; a misdirected one returns something worse. Refuse instead of guessing.
+if (typeof a !== 'object' || Array.isArray(a) || !a.repo) {
+  throw new Error(
+    'tier2-review: args must be an object carrying an explicit `repo`. ' +
+      'Got ' + (typeof args) + '. Refusing to default the review root to the process cwd — ' +
+      'that is how this harness reviewed the wrong repository twice.',
+  )
+}
 const base = a.base || 'origin/main'
 const head = a.head || 'HEAD'
 const repo = a.repo || '.'
@@ -37,6 +49,7 @@ const context = a.context || 'the cumulative diff landing on main'
 const byDesign = a.byDesign || 'none supplied'
 const reviewDir = a.reviewDir || 'reviews/'
 const diffCmd = `git -C ${repo} diff ${base}...${head}`
+log(`review root: ${repo} — diff ${base}...${head}`)   // S5: a report that cannot name its root is not trustworthy
 
 const FINDING_SCHEMA = {
   type: 'object',
@@ -119,13 +132,28 @@ const finderResults = await boundedParallel(
   ),
 )
 
-const allFindings = finderResults
-  .filter(Boolean)
+// S1 (TOOL-aGuardedTally-1): a dead lens returns null and filter(Boolean) drops it silently, so an
+// all-dead run used to be indistinguishable from an all-clean one. Observed live: a review returned
+// `clean: 0 findings` with agents_done 0, four ENOTFOUND errors, and a journal of four `started`
+// lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
+const liveResults = finderResults.filter(Boolean)
+const lensesDead = LENSES.length - liveResults.length
+const allFindings = liveResults
   .flatMap((r) => (r.findings || []).map((f) => ({ ...f, ref: `${f.file}:${f.line}` })))
 
+if (lensesDead === LENSES.length) {
+  log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed.`)
+  return {
+    confirmed: [], report: null, root: repo, lensesRun: 0, lensesDead,
+    note: `UNVERIFIED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed`,
+  }
+}
 if (allFindings.length === 0) {
-  log('No findings from any lens — nothing to verify.')
-  return { confirmed: [], report: null, note: 'clean: 0 findings' }
+  const note = lensesDead > 0
+    ? `partial: ${lensesDead}/${LENSES.length} lenses died, survivors found nothing`
+    : 'clean: 0 findings'
+  log(note)
+  return { confirmed: [], report: null, root: repo, lensesRun: liveResults.length, lensesDead, note }
 }
 log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verifying in batches.`)
 
@@ -160,8 +188,16 @@ log(
     (precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
+// S2: a refutation reached with dead skeptics is not a refutation. Carry the lens counts so a
+// caller can tell "every finding was refuted" from "the verify stage was degraded".
 if (confirmed.length === 0)
-  return { confirmed: [], report: null, precision, note: 'all findings refuted' }
+  return {
+    confirmed: [], report: null, precision, root: repo,
+    lensesRun: liveResults.length, lensesDead,
+    note: lensesDead > 0
+      ? `all findings refuted, but ${lensesDead}/${LENSES.length} lenses died — treat as partial`
+      : 'all findings refuted',
+  }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
 phase('Synthesize')

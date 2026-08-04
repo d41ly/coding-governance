@@ -1,6 +1,6 @@
 # TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one
 
-**Status:** SPECCED · rev-2 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
+**Status:** CLOSED · rev-3 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
 
 ## 1. Goal
 
@@ -123,12 +123,28 @@ counts.
 
 ## 8. Open questions
 
-- Fork 1 — should `tier2-review-indexed.js` (inCMS-local, carries the same shape) be folded back
-  into this repo as the canonical copy, or left divergent? Recommendation: fold, since two copies of
-  a review harness is how the mis-keyed join survived in one and not the other.
+none — one fork, resolved.
+
+- RESOLVED (unattended build, 2026-08-04) Fork 1: FOLD. Two copies of a review harness is how the
+  mis-keyed verdict join survived in one and not the other, and this unit's own two misdirected runs
+  used the inCMS-local copy while the fix landed here. The fold itself is NOT done in this unit and
+  is owed as follow-up work; the decision is recorded so the next session does not re-litigate it.
+
+### Owed, not blocking
+
+The template §-stub pointing at domain-rules §14 could not land: `parallel-coding-governance.template.md`
+is already within 366 bytes of its 32768-byte ceiling, and any stub overflows it. The gate is right
+to refuse and explicitly says not to raise the limit, so §14 lives in `domain-rules.md` without its
+pointer until someone trims the template. That the canonical template is full is a finding in its
+own right — the same drift as its nine-vs-ten section canon lagging the downstream consumer.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-04 · BUILT. S1/S2/S5 in tier2-review.js, S3 in the template, S4 as
+  tools/gate-lint/ps-hygiene.py with a --selftest that observes both scans failing AND passing.
+  Root cause of the two misdirected reviews confirmed exactly: `const repo = a.repo || '.'` with a
+  PROSE args string, so a.repo was undefined and the harness reviewed its own cwd. It now refuses
+  a non-object args and logs the resolved root before any lens runs.
 - rev-2 · 2026-08-03 · added S5 and AC5 after the rev-1 review audited the WRONG REPOSITORY: same
   family as the false-all-clear, a tool doing something other than what it was told and reporting
   success. Prior AC5 renumbered to AC6.

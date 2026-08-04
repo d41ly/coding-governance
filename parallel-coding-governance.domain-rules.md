@@ -92,3 +92,21 @@ risky surface or runs a Tier-2 review). Deploy this file alongside the playbook;
 - Layout & rhythm via shared primitives (Stack/Cluster/Grid/page-shell own spacing, max-width, gutters); typography via the type scale + a few text components enforcing heading hierarchy (one H1 per page) — features place content into them.
 - States (empty/loading/error/disabled/long-content/focus/i18n-RTL width) and a11y (focus-visible rings, `aria-*`, label associations, reduced-motion) live in the primitives — inherited, never re-added per screen.
 - A living reference gallery (`{{GALLERY_ROUTE}}`) mounts the REAL components reading the REAL tokens across states/modes/breakpoints, and is the PRIMARY authority for design work: new/changed UI conforms to it unless a task notes an exception; it *reflects* the system, never redesigns it — a reference/reality disagreement IS the bug; review the system centrally, not per screen.
+
+## §14 — Gate discipline: a check that cannot fail is not a check
+
+Ported from a session where six of seventeen review findings were the same defect: a gate satisfied
+by its own comment prose, an arm reporting `ok` on a path it never took, a predicate that never
+matched its target population.
+
+- **A new gate is not landed until its failing case has been observed.** Stage the break, confirm
+  RED, unstage. A gate you have only ever seen pass is an assertion about nothing.
+- **A guard that shares a variable with the thing it guards is not a guard.** A backstop that reads
+  the same state the bug corrupts is disabled by the bug it exists to catch.
+- **Run a candidate gate predicate over the real tree before wiring it**, and print hits AND
+  near-misses. Doing so routinely surfaces live instances the original symptom never reached — and
+  catches a predicate that would red innocent files.
+- **A skip must announce itself.** A skip that looks like a pass is indistinguishable from coverage.
+  State which arm went unexercised and why, so a green row is never misread as a verified one.
+- **Gate the CLASS, not the instance.** Fixing one file and scanning only that file certifies
+  coverage you do not have — the same could-not-fail shape, one level up.
