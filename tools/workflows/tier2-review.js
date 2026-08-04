@@ -193,15 +193,35 @@ const verdictResults = await boundedParallel(
   ),
 )
 
+// S2/AC4 (TOOL-aGuardedTally-1): count the verdicts back. `refuted = total - confirmed` scored a
+// finding with NO verdict as refuted, and a dead skeptic batch was dropped by filter(Boolean)
+// uncounted -- so an all-skeptics-dead run returned `all findings refuted` at precision 0.00 with
+// lensesDead 0. That is the same false-all-clear S1 fixes at the FINDER stage, one stage downstream:
+// absence scored as a negative result. A finding nobody judged is UNVERIFIED, never refuted.
+const liveVerdicts = verdictResults.filter(Boolean)
+const skepticsDead = verdictResults.length - liveVerdicts.length
 const verdictByRef = {}
-for (const r of verdictResults.filter(Boolean))
-  for (const v of r.verdicts || []) verdictByRef[v.ref] = v
+for (const r of liveVerdicts) for (const v of r.verdicts || []) verdictByRef[v.ref] = v
 
 const confirmed = allFindings.filter((f) => verdictByRef[f.ref]?.verdict === 'confirmed')
-const refuted = allFindings.length - confirmed.length
-const precision = allFindings.length ? confirmed.length / allFindings.length : 0
+const refuted = allFindings.filter((f) => verdictByRef[f.ref]?.verdict === 'refuted')
+const unverified = allFindings.filter((f) => !verdictByRef[f.ref])
+// precision is confirmed/(confirmed+refuted): an unjudged finding is not evidence either way.
+const judged = confirmed.length + refuted.length
+const precision = judged ? confirmed.length / judged : 0
+if (unverified.length)
+  log(`WARNING: ${unverified.length} finding(s) came back with NO verdict — counted UNVERIFIED, not refuted.`)
+if (skepticsDead)
+  log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
+if (judged === 0)
+  return {
+    confirmed: [], report: null, precision: null, root: repo,
+    lensesRun: liveResults.length, lensesDead, skepticsDead,
+    unverified: unverified.length,
+    note: `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died)`,
+  }
 log(
-  `confirmed ${confirmed.length} / refuted ${refuted} — precision ${precision.toFixed(2)}` +
+  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} — precision ${precision.toFixed(2)}` +
     (precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
@@ -210,10 +230,12 @@ log(
 if (confirmed.length === 0)
   return {
     confirmed: [], report: null, precision, root: repo,
-    lensesRun: liveResults.length, lensesDead,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: unverified.length,
     note: lensesDead > 0
       ? `all findings refuted, but ${lensesDead}/${LENSES.length} lenses died — treat as partial`
-      : 'all findings refuted',
+      : (unverified.length
+          ? `all judged findings refuted, ${unverified.length} UNVERIFIED — treat as partial`
+          : 'all findings refuted'),
   }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------

@@ -126,3 +126,9 @@ when clear.
 - rev-1 · YYYY-MM-DD · initial draft.
 - rev-2 · YYYY-MM-DD · folded review wf_<id> corrections.   <!-- example shape -->
 ```
+
+## 10. Reuse audit
+
+The reuse-discovery result: the existing seam this unit wires through (from a
+`tools/codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the
+evidence. Date-gated by `SPEC10_CUTOFF` — specs dated before it keep the nine-section canon.

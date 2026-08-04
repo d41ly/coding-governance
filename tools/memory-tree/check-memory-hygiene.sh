@@ -488,7 +488,13 @@ case "$bad12_raw" in
         $'\001'*)
           _f=${_ln#$'\001'$'\t'}
           _g=$(_unfenced "$_f" | grep -E '^## ' || true)
-          diff <(printf '%s\n' "$SPEC_CANON") <(printf '%s\n' "$_g") | head -6 | sed 's/^/    /' ;;
+          # Diff the canon AWK CHOSE, by the same basename-date rule. Diffing the nine-canon
+          # when awk wanted ten printed a BLANK excerpt for the primary new failure mode — a
+          # diagnostic that cannot describe its own finding.
+          _b=${_f##*/}
+          _d=$(printf %s "$_b" | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}" | head -1)
+          if [ -n "$_d" ] && ! [ "$_d" \< "$SPEC10_CUTOFF" ]; then _want=$SPEC_CANON10; else _want=$SPEC_CANON; fi
+          diff <(printf '%s\n' "$_want") <(printf '%s\n' "$_g") | head -6 | sed 's/^/    /' ;;
         *) printf '%s\n' "$_ln" ;;
       esac
     done) ;;

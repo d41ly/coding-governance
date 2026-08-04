@@ -4,7 +4,7 @@ Every spec file under `<MEMORY_ROOT>/*/builds/*/spec/` (at any depth — sub-spe
 too) whose filename date is on or after this repo's `SPEC_FORMAT_CUTOFF` (`.memory-tree.conf`)
 follows this shape. Machine-enforced by check 12 of `check-memory-hygiene.sh`: the status header
 must parse; a Tier-2 spec must carry exactly the ten canonical `##` sections in order (§10 is
-date-gated by `SPEC10_CUTOFF` — specs dated before it keep the nine-section canon), with no
+date-gated by `SPEC10_CUTOFF` — specs dated before it keep the ten-section canon), with no
 empty section bodies, its header `rev-N` logged in §9, and a resolved §8 before a terminal status;
 both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
 by filename date — never retrofit them.
@@ -45,12 +45,12 @@ by filename date — never retrofit them.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
   Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
   indistinguishable from a forgotten one.
-- Sub-structure nests as `###` under the nine sections; no additional `##` headings, and no
+- Sub-structure nests as `###` under the ten sections; no additional `##` headings, and no
   annotations on a `##` line (`## 4. Design (rev-2 …)` fails the gate — rev notes live in §9).
 
 ## Tier profiles, sub-specs, and where recurring content lives
 
-- **Tier-2** uses the full nine-section skeleton below.
+- **Tier-2** uses the full ten-section skeleton below (§10 date-gated by `SPEC10_CUTOFF`).
 - **Tier-1** (light profile): the status header + placeholder rules are enforced; the nine-section
   canon is not — keep it anyway when it helps, or write the few sections that matter. This is
   HYGIENE.md's "ceremony is conditional" applied to specs.
