@@ -29,19 +29,36 @@ function chunk(a, n) {
 //   context: "what this diff does + the security model + what's by-design",
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)" }
-const a = args || {}
 // S5 (TOOL-aGuardedTally-1): args MUST be a structured object. Passing a prose string used to
 // degrade silently to `repo = '.'`, i.e. "review whatever directory this process happens to be
 // standing in" -- which twice made this harness audit a DIFFERENT repository than the one it was
 // briefed on, and return confident, well-evidenced findings about code nobody asked about. A dead
 // review returns nothing; a misdirected one returns something worse. Refuse instead of guessing.
-if (typeof a !== 'object' || Array.isArray(a) || !a.repo) {
+// The Workflow tool delivers `args` as a STRING even when the caller hands it JSON, so parse first
+// and validate second. The first cut of this guard tested `typeof a !== 'object'` and therefore
+// refused every legitimate caller -- the same defect one level up: asserting on the shape I assumed
+// instead of the shape that actually arrives, and never observing the guard's PASSING case.
+let cfg = args
+if (typeof cfg === 'string') {
+  try {
+    cfg = JSON.parse(cfg)
+  } catch (e) {
+    throw new Error(
+      'tier2-review: args must be JSON carrying an explicit `repo`; could not parse the string ' +
+        'given (' + e.message + '). Refusing to default the review root to the process cwd — ' +
+        'that is how this harness reviewed the wrong repository twice.',
+    )
+  }
+}
+if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg) || !cfg.repo) {
   throw new Error(
-    'tier2-review: args must be an object carrying an explicit `repo`. ' +
-      'Got ' + (typeof args) + '. Refusing to default the review root to the process cwd — ' +
-      'that is how this harness reviewed the wrong repository twice.',
+    'tier2-review: args must carry an explicit `repo`. Got ' +
+      (Array.isArray(cfg) ? 'array' : typeof cfg) +
+      '. Refusing to default the review root to the process cwd — that is how this harness ' +
+      'reviewed the wrong repository twice.',
   )
 }
+const a = cfg
 const base = a.base || 'origin/main'
 const head = a.head || 'HEAD'
 const repo = a.repo || '.'

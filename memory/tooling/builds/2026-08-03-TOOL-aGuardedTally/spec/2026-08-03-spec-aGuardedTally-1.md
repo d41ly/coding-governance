@@ -1,6 +1,6 @@
 # TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one
 
-**Status:** CLOSED · rev-3 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
+**Status:** INPROGRESS · rev-4 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
 
 ## 1. Goal
 
@@ -140,7 +140,19 @@ own right — the same drift as its nine-vs-ten section canon lagging the downst
 
 ## 9. Revision log
 
-- rev-3 · 2026-08-04 · BUILT. S1/S2/S5 in tier2-review.js, S3 in the template, S4 as
+- rev-4 · 2026-08-04 · REOPENED from CLOSED. The closing review (12 agents, precision 0.79, root
+  named as C:/projects/coding-governance at 02b1af4 — S5's root-logging working) found the status
+  false. S2/AC4 is verbatim UNBUILT: tier2-review.js:197 drops dead skeptic batches uncounted and
+  :201 derives `refuted` by subtraction, so a finding with no verdict is scored refuted and an
+  all-skeptics-dead run returns `all findings refuted` with lensesDead 0 — the same false-all-clear
+  this unit fixed at the FINDER stage, still live one stage downstream. S5's verify-the-root half
+  and AC5's refuse-on-disagreement half are also unbuilt, and S4 ships inert: ps-hygiene.py is on no
+  gate leg, in no CI, no adopt script, no doc, and scans zero .ps1 files here. Also: the reuse-audit
+  adoption missed the DEPLOYED tools/memory-tree/SPEC-TEMPLATE.template.md that adopt-memory-tree.sh
+  copies, TEMPLATE-SPEC.md now contradicts itself (ten at line 6, nine at 48/53/54), and check 12's
+  excerpt post-pass diffs the nine-canon even when awk chose ten, so the primary new failure prints a
+  blank diagnostic. Report: reviews/2026-08-04-review-aGuardedTally-1-closing.md.
+- rev-3 · 2026-08-04 · partially BUILT. S1/S2/S5 in tier2-review.js, S3 in the template, S4 as
   tools/gate-lint/ps-hygiene.py with a --selftest that observes both scans failing AND passing.
   Root cause of the two misdirected reviews confirmed exactly: `const repo = a.repo || '.'` with a
   PROSE args string, so a.repo was undefined and the harness reviewed its own cwd. It now refuses
