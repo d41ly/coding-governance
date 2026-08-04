@@ -351,6 +351,12 @@ SPEC_CANON='## 1. Goal
 ## 7. Gates
 ## 8. Open questions
 ## 9. Revision log'
+# §10 is date-gated exactly as the section canon itself is: a spec dated before SPEC10_CUTOFF keeps
+# the nine-section shape, so adopting reuse-audit never retroactively reds a landed spec. The kit
+# already ships tools/codebase-map/reuse_lookup.py; this is the check that makes anyone use it.
+SPEC10_CUTOFF="${SPEC10_CUTOFF:-2026-08-04}"
+SPEC_CANON10="$SPEC_CANON
+## 10. Reuse audit"
 # ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run
 # here; upstream inCMS measured the same shape at 257.8s of 311s over 356 specs —
 # TOOL-aBatchedLintel-1 ports PERF-aSlothfulCapstan-1). The driver is a tagged path stream built in
@@ -372,7 +378,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v mroot="$M" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -410,8 +416,17 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v mroo
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""
     for (i = 1; i <= n; i++) if (body[i] ~ /^## /) { got = (++ng == 1) ? body[i] : got "\n" body[i] }
-    if (got != canon) {
-      print f " (## sections differ from the canonical nine of " mroot "/TEMPLATE-SPEC.md):"
+    # pick the canon by FILENAME date, mirroring how the whole check is grandfathered
+    # FILENAME date, not the first date in the PATH: a build folder is itself date-named
+    # (2026-08-04-TOOL-x/spec/2026-07-20-spec-x-1.md), so matching the whole path grandfathers by
+    # the wrong date and reds a legitimately old spec. Caught by the mutation probe, not by reading.
+    fbase = f; sub(/^.*\//, "", fbase)
+    fdate = ""
+    if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH)
+    want = (fdate != "" && fdate >= cut10) ? canon10 : canon
+    wantn = (want == canon10) ? "ten" : "nine"
+    if (got != want) {
+      print f " (## sections differ from the canonical " wantn " of " mroot "/TEMPLATE-SPEC.md):"
       print "\001\t" f      # the excerpt is a real diff — rebuilt by the post-pass below
     }
     # ---- empty section bodies. The old test was `NF > 0` on a split record; the line is read into a

@@ -3,7 +3,8 @@
 Every spec file under `<MEMORY_ROOT>/*/builds/*/spec/` (at any depth — sub-spec folders are scanned
 too) whose filename date is on or after this repo's `SPEC_FORMAT_CUTOFF` (`.memory-tree.conf`)
 follows this shape. Machine-enforced by check 12 of `check-memory-hygiene.sh`: the status header
-must parse; a Tier-2 spec must carry exactly the nine canonical `##` sections in order, with no
+must parse; a Tier-2 spec must carry exactly the ten canonical `##` sections in order (§10 is
+date-gated by `SPEC10_CUTOFF` — specs dated before it keep the nine-section canon), with no
 empty section bodies, its header `rev-N` logged in §9, and a resolved §8 before a terminal status;
 both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
 by filename date — never retrofit them.
@@ -125,4 +126,11 @@ when clear.
 
 - rev-1 · YYYY-MM-DD · initial draft.
 - rev-2 · YYYY-MM-DD · folded review wf_<id> corrections.   <!-- example shape -->
+
+## 10. Reuse audit
+
+The reuse-discovery result: the existing seam this unit wires through (from a
+`tools/codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the evidence.
+Records the reuse decision so an author cannot silently skip it — the machinery already ships in
+this kit, and a checklist item nobody is asked to answer is not a checklist item.
 ```
