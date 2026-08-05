@@ -43,6 +43,19 @@ if [ -z "$r" ] || ! grep -qE "gov:kit memory-recall@$r([^0-9.]|\$)" tools/memory
   fails=$((fails+1))
 fi
 
+need "KIT_DRIFT_AUDIT_VERSION"    tools/drift-audit/drift_report.py          "^KIT_DRIFT_AUDIT_VERSION = \"$V\""
+
+# drift-audit: constant in drift_report.py, marker in the README the adopter keeps. Same pair
+# assertion as memory-tree/memory-recall — a stale marker makes the deployer read the wrong version.
+da=$(grep -oE "^KIT_DRIFT_AUDIT_VERSION = \"$V\"" tools/drift-audit/drift_report.py | head -1 | grep -oE "$V")
+if [ -z "$da" ] || ! grep -qE "gov:kit drift-audit@$da([^0-9.]|\$)" tools/drift-audit/README.md; then
+  echo "kit-versions: drift-audit README marker != KIT_DRIFT_AUDIT_VERSION (${da:-unreadable})"
+  fails=$((fails+1))
+fi
+
+need "drift-audit-code meta.version"  tools/workflows/drift-audit-code.js  "version: '$V'"
+need "drift-audit-state meta.version" tools/workflows/drift-audit-state.js "version: '$V'"
+
 need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a

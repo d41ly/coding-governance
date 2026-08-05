@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-04T10:56:49+03:00 @ 2f4337d859cd7c2d7adc4552a7ad350cdba6a59e
+last-audit: 2026-08-05T02:58:30+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -40,13 +40,14 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 |---|---|---|
 | playbook (`PLAY-`) | `memory/playbook/` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
 | kickoff (`KICK-`) | `memory/kickoff/` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/tooling/` | `tools/` (memory-tree · memory-recall · codebase-map · hooks · workflows · agent-instructions) |
+| tooling (`TOOL-`) | `memory/tooling/` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/deployer/` | `WIRE-INTO-PROJECT.md` · `memory/deployer/builds/2026-07-12-DEPL-aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · memory-recall skill wiring · run-gates canary
+bash tools/run-gates.sh    # runs all legs, single-sourced from tools/gate-legs.json — read THAT for the list, not this line
+python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
 
 ### Tier rule

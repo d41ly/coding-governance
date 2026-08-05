@@ -26,3 +26,9 @@ parallel-coding-governance*.md text eol=lf
 # checkout turns the file CRLF and the leg reds on EVERY line — while passing whenever the working
 # copy happens to have just been rendered. That is green-by-accident, not a gate (§7).
 .claude/skills/memory-recall/SKILL.md text eol=lf
+
+# The rendered drift-audit Skill, same reason. Belt-and-braces rather than load-bearing here:
+# `adopt-drift-audit.sh --check` strips CR on BOTH sides before diffing, so it cannot red on a CRLF
+# checkout. The pin keeps the committed bytes deterministic anyway, and stops a future maintainer who
+# drops that `tr -d '\r'` from reintroducing memory-recall's green-by-accident failure.
+.claude/skills/drift-audit/SKILL.md text eol=lf
