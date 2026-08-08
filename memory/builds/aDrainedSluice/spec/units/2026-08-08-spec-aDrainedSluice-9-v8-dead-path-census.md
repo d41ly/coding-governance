@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -33,13 +33,19 @@ and its harvest requires a file extension.
   widened harvest newly accepts SIX tokens in the present-tense corpus. One resolves and is silent.
   Five are dead — four are the pre-flatten build paths S3 repairs, and the fifth is
   `.claude/worktrees/<name>`, a CHECKOUT LOCATION rather than repo content.
-- **S8** — that fifth token is the finding the census bought. A checkout location is not a claim
-  about repo content, and no resolution rule can tell one from a genuinely dead path: it exists on
-  THIS machine and not on another, and the ignore rule that hides it lives in `.git/info/exclude`,
-  which is machine-local and untracked. Node-dependent classification is not acceptable in a gate.
-  So the exclusion is DECLARED: `.memory-tree.conf` gains `DEAD_PATH_EXCLUDE`, a space-separated
-  prefix list defaulting to `.claude/worktrees/`, documented as "paths that are not repo CONTENT".
-  Explicit, tracked, and readable by the next person who wonders why one path is skipped.
+- **S8** — that fifth token is the finding the census bought, and the reason it needs a declared
+  exclusion is NOT node-dependence. The draft said the worktree path "exists on this machine and not
+  on another"; that is factually wrong about the code. Check 15's resolution never touches the
+  filesystem — it is membership in `git ls-files` plus a prefix scan over the same index — so
+  `.claude/worktrees/<name>` classifies as DEAD identically on every node. The real reason is that a
+  checkout LOCATION is not repo CONTENT, and no resolution rule can express that, because the
+  question is about meaning rather than existence. So the exclusion is DECLARED:
+  `.memory-tree.conf` gains `DEAD_PATH_EXCLUDE`, a space-separated prefix list defaulting to
+  `.claude/worktrees/`, documented as "paths that are not repo CONTENT".
+- **S8b** — the fixture gains a tracked `.claude/` path. The module's `_scratch()` tracks only
+  `AGENTS.md`, `.memory-tree.conf` and `memory/**`, so `_roots()` yields `{memory/}` and a
+  `.claude/worktrees/x` citation never becomes a candidate at all — both exclusion arms would pass
+  without exercising the rule.
 
 ## 3. Non-goals (OUT)
 
@@ -114,7 +120,9 @@ One commit: the harvest, the false-positive census, the four repairs, the re-mea
 - **AC1** — When the present-tense corpus cites a directory that does not resolve, check 15 fails
   naming the citing file, its line and the cited path.
 - **AC2** — When it cites a directory that DOES resolve — a prefix of a tracked path — check 15 is
-  silent.
+  silent, AND the same fixture with the directory removed reds. The silent half alone passes on the
+  un-widened code, because an unharvested token is also silent; only the pair can tell "widened" from
+  "not widened".
 - **AC3** — When the four ledger citations are repointed at the flat paths, check 15 is silent about
   them and the registry stays empty.
 - **AC4** — When the newly accepted token set is listed across the whole corpus, every member is
@@ -146,6 +154,10 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 ## 9. Revision log
 
 - rev-1 · 2026-08-08 · initial draft, written after measuring the census.
+- rev-3 · 2026-08-08 · folded review 2: N6 pairs AC2's green arm with a red one over the same
+  fixture, because the green half passes on the un-widened code; N11 corrects S8's justification,
+  which was factually wrong about the resolution rule; N12 adds a tracked `.claude/` path to the
+  fixture, without which both exclusion arms are vacuous.
 - rev-2 · 2026-08-08 · folded the false-positive census into S7 and added S8. The widened harvest
   admits `.claude/worktrees/<name>` — a checkout location, not repo content — and no resolution
   rule can classify it node-independently, so the exclusion is a declared conf prefix list rather

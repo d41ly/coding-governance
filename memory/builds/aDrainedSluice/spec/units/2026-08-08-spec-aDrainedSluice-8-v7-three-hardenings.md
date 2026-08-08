@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge
 
-**Status:** INPROGRESS · rev-1 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -20,16 +20,31 @@ that predates the change it is comparing across.
   `eol=lf` that are RENDERED and byte-compared. It reports CRLF in `--check`/`--session` and repairs
   it in `--fix`, by rewriting the file's bytes rather than by `git checkout` — the index normalises,
   so `git status` is clean and a checkout is a no-op.
-- **S4** — the repair is bounded to paths that carry an `eol=lf` attribute AND are tracked. It never
-  touches an untracked file and never touches a path without the attribute.
+- **S4** — the repair is bounded to paths that are tracked, carry an `eol=lf` attribute, AND are
+  RENDERED by a gate that byte-compares them. Measured: the attribute alone covers 43 files, which is
+  far wider than the data model's description and wider than any repair should reach on a
+  `--fix`. The rendered set is derived from the kits that declare a render target, so the bound is a
+  fact about the tree rather than a sentence in a spec.
 - **S5** — `tools/memory-tree/hygiene-parity.test.sh` REFUSES a baseline older than the kit version
   whose behaviour it is comparing. It asserts byte-identity, and the 1.5 flatten deliberately changed
   the verdicts, so a pre-flatten baseline reports every difference as a failure — true and useless.
   The refusal names the reason and the earliest usable revision.
 - **S6** — the earliest usable revision is DERIVED, not written down: the first commit in which
   `KIT_MEMORY_TREE_VERSION` reached the current major/minor. A hardcoded sha rots at the next bump.
-- **S7** — each item gets an arm: an untracked offending script caught, a CRLF pinned file reported
-  and repaired, and a too-old baseline refused with its named message.
+- **S7** — each item gets an arm that exercises the DISCOVERY path, not the explicit-file path. Both
+  JavaScript gates bypass git entirely when handed explicit paths, and every existing arm in their
+  harness is explicit-file — so an arm written the usual way would test the code this unit does not
+  change.
+- **S7b** — the landing boundary is checked, not assumed. `.githooks/pre-push` requires the validated
+  tree to BE the pushed tip and `tools/push-main.sh` gates on `git status --porcelain -uno`, which
+  deliberately PERMITS untracked files at that boundary. Widening the JavaScript gates to untracked
+  files therefore changes what a landing sees; the unit measures that before it lands, and if an
+  untracked scratch file would red a legitimate push, the widening is scoped to `--check` runs rather
+  than to the hook path.
+- **S7c** — the parity floor's EMPTY case is defined. Measured, `git log -S` for the current version
+  constant returns exactly one commit, and it is the flatten itself; when it returns none — a fresh
+  clone with a shallow history, or a squashed import — the harness refuses with that as the reason
+  rather than treating "no floor found" as "any baseline is fine".
 
 ## 3. Non-goals (OUT)
 
@@ -137,6 +152,10 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 ## 9. Revision log
 
 - rev-1 · 2026-08-08 · initial draft.
+- rev-2 · 2026-08-08 · folded review 2, four highs: N13 narrows the CRLF repair to the rendered set
+  (the attribute alone is 43 files); N14 makes the arms exercise the discovery path, since both gates
+  bypass git for explicit paths; N15 checks the widening against the landing boundary, which permits
+  untracked files on purpose; N16 defines the parity floor's empty case.
 
 ## 10. Reuse audit
 

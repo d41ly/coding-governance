@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-5 — V2: arm every pinned branch, or say why not
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -13,10 +13,14 @@ the set contains. Drive the pin to empty, or to rows that carry a reason a reade
 - **S1** — every branch in the pin gets a FIXTURE that actually trips it and an assertion naming that
   branch's OWN failure text. A fixture that does not trip the branch produces an arm that passes by
   finding nothing, which is the class this repo already catalogues.
-- **S2** — the fixtures are BATCHED into the scratch trees each harness already builds. One tree can
-  trip many branches in one invocation because `fail()` sets a status flag and never aborts;
-  measured upstream at ~8.8 s per invocation, so eleven separate runs would add ~95 s to a leg that
-  runs on every commit.
+- **S2** — the fixtures are BATCHED where batching works, which is the hygiene harness: `fail()` sets
+  a status flag and never aborts, so one tree trips many branches in one invocation, and at ~8.8 s
+  per invocation eleven separate runs would add ~95 s to a leg that runs on every commit.
+- **S2b** — batching does NOT work for the manifest-check harness, and the draft assumed it did.
+  `fail()` does not abort, but its CALLERS short-circuit: `BLOCK_OK` skips four whole checks once any
+  check-2 branch fires, and check 3 is a three-way `if`/`elif` chain whose arms are mutually
+  exclusive by construction. That harness gets several small fixtures instead, and the reason is
+  recorded here so the next person does not helpfully merge them back together.
 - **S3** — arming happens after V1 and V3, because those two change the branch set: V1 widens the
   population to a second gate, and V3 touches check 5's message. V4 does NOT change it — review 1
   measured that `check-arms` keys on shell `fail` call sites while V4's finding is an awk `print`
@@ -132,6 +136,9 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 ## 9. Revision log
 
 - rev-1 · 2026-08-08 · initial draft.
+- rev-3 · 2026-08-08 · folded review 2's N17: the batching premise is false for the manifest-check
+  harness, whose callers short-circuit. Its blocker N-equivalent — five signatures carrying shell
+  source — was already fixed in V1, which is why it does not appear here.
 - rev-2 · 2026-08-08 · folded review 1's M6 into S3: V4 does NOT change the branch set, because
   `check-arms` keys on shell `fail` call sites and V4's finding is an awk `print` inside a branch
   that is already armed. The ordering premise kept its V1 and V3 dependencies, which are real.

@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-7 — V6: the recall cache is bounded
 
-**Status:** INPROGRESS · rev-1 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -17,21 +17,38 @@ a byte budget and evict least-recently-built first.
 - **S2** — eviction runs after a successful build, never before: a cache is only replaceable once its
   replacement exists. It evicts LEAST-RECENTLY-BUILT first, reading `built_at` from each manifest.
 - **S3** — three things are NEVER evicted, and each has a reason that is not "it seemed safer":
-  the CURRENT worktree's cache (evicting it makes the budget a rebuild loop); a directory with no
-  READABLE manifest (that is the shape of a sibling mid-first-build, because the builder writes both
-  databases before the manifest, atomically); and a manifest with no `built_at` (absence of evidence
-  is not evidence of age).
+  the CURRENT worktree's cache (evicting it makes the budget a rebuild loop); a directory that looks
+  MID-BUILD; and a manifest with no `built_at` (absence of evidence is not evidence of age).
+- **S3b** — "mid-build" is NOT "no readable manifest". That predicate was reasoned from a FIRST build
+  only: on a REBUILD `_write_set` unlinks and recreates both databases while the PREVIOUS manifest
+  stays on disk, so a rebuilding sibling has a perfectly readable manifest and is exactly the
+  directory the rule meant to protect. The test is instead that either database is NEWER than the
+  manifest — which is true during any build, first or not — and an unreadable manifest keeps its own
+  separate never-evict rule.
 - **S4** — eviction is REPORTED, one line per evicted directory with its worktree and `built_at`. A
   cache that vanishes silently is indistinguishable from one that was never built, and the next
   session pays a rebuild it cannot explain.
+- **S4b** — the DELETION PRIMITIVE is not `shutil.rmtree(ignore_errors=True)`. Measured on win32, the
+  platform this repo runs on: over a directory holding an OPEN sqlite database it removes
+  `manifest.json`, KEEPS `records.db`, and leaves the directory in place — strictly worse than not
+  deleting, because a manifest-less directory is precisely what the never-evict rule protects, so the
+  tree accumulates rubble no pass will ever clear. Instead the manifest is removed LAST, the
+  directory's absence is VERIFIED afterwards, and a failure is reported rather than retried.
 - **S5** — the existing dead-worktree eviction runs FIRST and unconditionally. It is free correctness;
   the budget is the second pass over whatever survives.
 - **S6** — when the budget cannot be met without evicting a protected directory, the cap does NOT
   force it. It reports that the budget is exceeded and by how much, and leaves the tree alone. A cap
   that deletes the current worktree's cache to satisfy itself is worse than an unbounded cache.
-- **S7** — the selftest arms: eviction order by `built_at`, the current cache surviving, an
-  unreadable manifest surviving, a `built_at`-less manifest surviving, the report naming what went,
-  and the cannot-satisfy case reporting instead of over-evicting.
+- **S6b** — the pass computes the WHOLE PLAN before deleting anything. Greedy oldest-first eviction
+  and "when the budget cannot be met, nothing is deleted" are incompatible otherwise: a greedy loop
+  deletes until it runs out of candidates and only then discovers it cannot finish.
+- **S7** — the selftest arms: eviction order by `built_at`, the current cache surviving, a mid-build
+  directory surviving, a `built_at`-less manifest surviving, the report naming what went, and the
+  cannot-satisfy case reporting instead of over-evicting.
+- **S7b** — every SURVIVAL arm sets a budget BELOW the fixture's own cache size and asserts that
+  something else WAS evicted in the same run. A selftest-shaped cache is about 57 KB, so under any
+  plausible budget the pass never runs and "X survives" is true for the wrong reason — the
+  passes-by-finding-nothing class, three times over.
 
 ## 3. Non-goals (OUT)
 
@@ -134,6 +151,11 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 ## 9. Revision log
 
 - rev-1 · 2026-08-08 · initial draft.
+- rev-2 · 2026-08-08 · folded review 2, two blockers and two highs: N4 replaces the mid-build
+  predicate, which was reasoned from a first build and is false on a rebuild; N5 replaces the
+  deletion primitive, which on this platform leaves a corrupted directory behind; N9 makes every
+  survival arm run against a budget the fixture actually exceeds; N10 makes the pass plan before it
+  deletes.
 
 ## 10. Reuse audit
 

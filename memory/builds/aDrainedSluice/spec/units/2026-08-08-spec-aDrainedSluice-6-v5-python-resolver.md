@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-6 — V5: one python resolver, and it EXECUTES the candidate
 
-**Status:** INPROGRESS · rev-1 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -11,22 +11,43 @@ RUNNING the candidate, in one place.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/lib/resolve-python.sh` is the one shell resolver. It tries each candidate in order
-  and accepts the first whose `<cand> -c "import sys"` EXITS ZERO. Answering `command -v` is not
-  evidence; running is.
-- **S2** — the candidate order is `$GOV_PYTHON` (explicit override, tried first and, if set and
-  unusable, a NAMED failure rather than a silent fall-through), then `python3`, then `python`, then
-  `py -3`. A launcher that is present but broken is skipped and NAMED in the failure message when
-  nothing works.
-- **S3** — every current site sources it: `tools/run-gates.sh`, `tools/run-gates.test.sh`,
-  `tools/check-wiring.sh`, `tools/check-wiring.test.sh`, `tools/memory-recall/adopt-memory-recall.sh`,
-  `tools/memory-tree/adopt-memory-tree.sh`, plus the two `_PY=` sites inside
-  `tools/memory-tree/check-memory-hygiene.sh`. None keeps a private copy.
+- **S1** — `tools/lib/resolve-python.sh` holds the one resolver. It tries each candidate in order and
+  accepts the first whose `<cand> -c "import sys"` EXITS ZERO. Answering `command -v` is not
+  evidence; running is. It ECHOES the launcher and returns non-zero on failure, so every call site is
+  `PY=$(resolve_python) || { …; exit 2; }` — a sourced function that merely `return 1`s cannot halt
+  its caller, because six of the seven targets run `set -u` WITHOUT `set -e` (measured).
+- **S2** — the candidate order is the caller's own override if it has one, then `$GOV_PYTHON`, then
+  `python3`, `python`, `py`. Every candidate is ONE WORD. `py -3` was in the draft and cannot work:
+  measured, `"py -3" -c "import sys"` exits 127 because the probe quotes the candidate, and
+  word-splitting does not rescue it — every consumer uses `"$PY"` as one word and
+  `tools/run-gates.sh` substitutes it into `argv[0]`, so a two-word value exits 127 on all ten python
+  legs. `py` ALONE is a single word and resolves to Python 3.14 here, measured, which is what makes
+  the Windows box this row was opened from work at all. An override that is SET and unusable is a
+  NAMED failure, never a silent fall-through.
+- **S2b** — `RECALL_PY` survives. It is a PUBLISHED contract — named in the memory-recall README, in
+  `WIRE-INTO-PROJECT.md` and in the script's own usage line — so the recall site passes it as its
+  first candidate rather than having it quietly replaced by `GOV_PYTHON`.
+- **S3** — SOURCING IS ONLY FOR SCRIPTS THAT ARE NOT COPY-INSTALLED. `WIRE-INTO-PROJECT.md`
+  copy-installs each kit as a standalone directory (`cp -r <gov>/tools/memory-tree
+  <project>/memory-tree`), so a `../lib/` source resolves to nothing in an adopting repo and the kit
+  breaks for everyone who adopted it. That is the same constraint that made the drift-audit kit COPY
+  the conf parser rather than share it.
+  So: `tools/run-gates.sh`, `tools/run-gates.test.sh`, `tools/check-wiring.sh`,
+  `tools/check-wiring.test.sh` and `skills/session-kickoff/manifest-check.test.sh` SOURCE the
+  canonical file. Every copy-installed kit script carries the same function INLINE, and a PARITY gate
+  asserts each inline copy is identical to the canonical one — copy plus gate, which is this repo's
+  existing convention for exactly this situation.
 - **S4** — the resolver is sourced, not executed, so the caller gets the resolved value in a
   variable and pays one probe per script rather than one per use.
-- **S5** — a source-level gate bans the retired idiom in `tools/**/*.sh` and `.githooks/*`: a line
-  that assigns a python launcher from `command -v` without running it. Comment lines are excluded,
-  because the resolver's own file explains the idiom it replaces.
+- **S5** — a source-level gate bans the retired idiom, and its population is MEASURED rather than
+  guessed. The draft scoped it to `tools/**/*.sh` and `.githooks/*`; measured, `.githooks/` contains
+  ZERO python references — half the declared population is empty — while
+  `skills/session-kickoff/manifest-check.test.sh:316` carries the idiom verbatim and is a live
+  merge-bar leg, outside the drafted scope. `check-memory-hygiene.sh` has it at three sites and
+  `pytest-parallel-guardrails.test.sh` at another, none of them in the draft's migration list, so the
+  landing commit would have redded its own tree. The ban and the migration list are now derived from
+  ONE scan. Comment lines are excluded, because the resolver's own file explains the idiom it
+  replaces.
 - **S6** — `tools/lib/resolve-python.test.sh` proves the resolver against a FAKE stub on `PATH` that
   answers `command -v` and exits 9009 — the exact defect — plus a working candidate behind it, an
   all-broken case, and the override in both its good and bad states.
@@ -135,6 +156,12 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 ## 9. Revision log
 
 - rev-1 · 2026-08-08 · initial draft.
+- rev-2 · 2026-08-08 · folded review 2, three blockers and two highs: N1 drops `py -3` for `py`
+  (measured — the drafted probe form exits 127 and a two-word value breaks all ten python legs);
+  N2 replaces the shared-source design with source-where-not-copied plus inline-with-parity, because
+  kits are copy-installed as standalone directories and `../lib/` does not exist in an adopter;
+  N3 derives the ban population and the migration list from one measured scan; N7 makes the resolver
+  echo-and-return so a `set -u`-only caller can actually halt; N8 preserves `RECALL_PY`.
 
 ## 10. Reuse audit
 
