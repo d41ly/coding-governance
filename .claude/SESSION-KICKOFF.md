@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-04T10:56:49+03:00 @ 2f4337d859cd7c2d7adc4552a7ad350cdba6a59e
+last-audit: 2026-08-08T04:49:52+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -46,7 +46,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · memory-recall skill wiring · run-gates canary
+bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · memory-recall skill wiring · review-join ban + workflow-script syntax · run-gates canary
 ```
 
 ### Tier rule
@@ -83,6 +83,13 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban.
 - A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
   byte, through a filename argument, through `getline` AND through a pipe. Assert at source level.
+- A `git worktree` checkout can land CRLF on a path `.gitattributes` pins `eol=lf`, and `git status`
+  stays CLEAN because the index normalises on commit. Symptom: a gate that diffs a rendered file
+  against a fresh render reports EVERY line as drift on a file the session never touched. Seen on
+  `.claude/skills/memory-recall/SKILL.md` (2026-08-08); `rm` plus `git checkout --` restores LF.
+- `node --check <file>` is NOT a syntax gate on node v24: module auto-detection retries the parse and
+  swallows the failure, so it exits 0 on a file whose parse genuinely fails. Parse a workflow script
+  by constructing an `AsyncFunction` from it — `tools/workflows/check-workflow-syntax.js`.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

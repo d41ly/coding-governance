@@ -16,3 +16,4 @@ memory/tooling/
     2026-08-03-TOOL-aBatchedLintel/
     2026-08-03-TOOL-aGuardedTally/
     2026-08-03-TOOL-aQuarriedLantern/
+    2026-08-08-TOOL-aFoldedQuarry/

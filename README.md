@@ -53,7 +53,12 @@ machines/sessions on the same repo.
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth; ~7–9 agents, never >6 concurrent). Run via `Workflow({scriptPath})`, parameterized
-  by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction.
+  by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to
+  their verdicts on an INTEGER the orchestrator assigns before the skeptic sees them — a `file:line`
+  string cannot survive an echo, and two findings at one location cannot share a verdict. A finding
+  with no usable verdict is UNVERIFIED, never refuted, and rides into the report as outstanding.
+  Two gates guard it: `check-review-join.sh` (no ref-keyed join anywhere under `tools/`) and
+  `check-workflow-syntax.js` (every workflow script still parses in the dialect its runtime uses).
 
 ## Install the skill (once per machine)
 
