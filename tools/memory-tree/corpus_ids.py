@@ -75,6 +75,7 @@ def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": "AGENTS.md",
         "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_CEILING": "", "READ_PATH_WAIVER": "",
+        "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
@@ -178,6 +179,7 @@ def walk(root: str, conf: dict) -> dict:
     h1_re = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b")
 
     append_only = re.compile(ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
+    excluded = tuple(x for x in conf.get("DEAD_PATH_EXCLUDE", "").split() if x)
     present = re.compile(
         r"^" + re.escape(m) + r"/(?:DECISIONS\.md|README\.md|HYGIENE\.md|TEMPLATE-SPEC\.md"
         r"|LIVE\.md|backlog/|ledger/|project/)"
@@ -208,14 +210,27 @@ def walk(root: str, conf: dict) -> dict:
             if not present.match(p) or append_only.match(p):
                 continue
             for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
+                ended_slash = tok.endswith("/")
                 cited = tok.rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
                 if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
                     continue
+                # NOT repo CONTENT. A checkout location is not a claim about what this repo holds,
+                # and no resolution rule can express that: resolution here never touches the
+                # filesystem — it is membership in `git ls-files` plus a prefix scan over the same
+                # index — so such a path classifies as dead identically on every node. The question
+                # is about meaning, not existence, so the answer is DECLARED in the conf.
+                if any(cited.startswith(x) for x in excluded):
+                    continue
                 if cited in tracked_set or any(t.startswith(cited + "/") for t in tracked_set):
                     continue
-                if not cited.endswith(KNOWN_EXT) and "." not in os.path.basename(cited):
+                # A FILE citation names an extension or a dotted basename. A DIRECTORY citation names
+                # neither, and it is exactly as broken when it does not resolve — the flatten left
+                # four of them in the live ledger and this harvest could not see one.
+                is_file_shaped = cited.endswith(KNOWN_EXT) or "." in os.path.basename(cited)
+                is_dir_shaped = ended_slash or "." not in os.path.basename(cited)
+                if not is_file_shaped and not is_dir_shaped:
                     continue
                 key = (p, cited)
                 if key in dead:
@@ -421,6 +436,10 @@ def _scratch(tmp: str, *, pins=True, extra=None):
         conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"', 'READ_PATH_CEILING="100000"']
     _w(tmp, ".memory-tree.conf", "\n".join(conf) + "\n")
     _w(tmp, "AGENTS.md", "# charter\n\nRead `memory/README.md` before touching code.\n")
+    # A tracked `.claude/` path, so `.claude/` is a REAL top-level directory in the fixture. Without
+    # it `_roots()` yields only {memory/} and a `.claude/worktrees/x` citation is never a candidate —
+    # the exclusion arms below would pass while exercising nothing.
+    _w(tmp, ".claude/settings.json", "{}\n")
     _w(tmp, "memory/README.md", "# r\n")
     _w(tmp, "memory/HYGIENE.md", "sentinel\n")
     _w(tmp, "memory/DECISIONS.md", "# d\n\n- ARCH-tOne-1 · a decision\n")
@@ -522,6 +541,32 @@ def do_selftest() -> int:
         c6["DEAD_PATH_PIN"] = "1"
         arm("check 15 rule 1 catches a row whose citation was repaired", "the citation was repaired",
             lambda: "\n".join(checks(walk(t6, c6))))
+
+        # 15, DIRECTORY citations. The flatten moved every build folder and left four dead directory
+        # citations in the live ledger, and the harvest could not see one of them because it required
+        # a file extension. The RED and GREEN arms run over the SAME fixture, because the green half
+        # alone passes on the un-widened code too: an unharvested token is silent for the wrong
+        # reason.
+        tD = os.path.join(base, "dirs"); os.makedirs(tD)
+        cD = _scratch(tD, extra={
+            "memory/README.md": "# r\n\nSee `memory/builds/tOne/` and `memory/gone/never/`.\n"})
+        cD["DEAD_PATH_PIN"] = "0"
+        arm("check 15 catches a dead DIRECTORY citation", "memory/gone/never",
+            lambda: "\n".join(checks(walk(tD, cD))))
+        arm("...and is silent about a directory that resolves", "[nope]" if False else "",
+            lambda: "" if not [l for l in checks(walk(tD, cD)) if "memory/builds/tOne" in l] else "FOUND")
+
+        # the DECLARED exclusion. A checkout location is not repo CONTENT, and resolution here never
+        # touches the filesystem, so it would otherwise classify as dead identically on every node.
+        tX = os.path.join(base, "excl"); os.makedirs(tX)
+        cX = _scratch(tX, extra={
+            "memory/README.md": "# r\n\nThe worktree lives at `.claude/worktrees/whatever/`.\n"})
+        cX["DEAD_PATH_PIN"] = "0"
+        arm("an excluded prefix is not classified", None, lambda: checks(walk(tX, cX)))
+        cX2 = dict(cX); cX2["DEAD_PATH_EXCLUDE"] = ""
+        arm("...and removing the prefix from the conf makes it classified again",
+            ".claude/worktrees/whatever",
+            lambda: "\n".join(checks(walk(tX, cX2))))
 
         # 16 — the charter's read path.
         t7 = os.path.join(base, "readpath"); os.makedirs(t7)

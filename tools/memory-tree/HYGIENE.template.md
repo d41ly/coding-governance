@@ -128,7 +128,11 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
     `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
     stale-entry guard: a waived id that now resolves is a stale row and reds.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
-    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. Four rules:
+    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
+    citation counts: it is exactly as broken when it does not resolve, and the flatten left four of
+    them in the live ledger. `DEAD_PATH_EXCLUDE` names prefixes that are not repo CONTENT — a
+    checkout location, say — because resolution never touches the filesystem and cannot tell meaning
+    from existence. Four rules:
     (1) set equality between the registry and the measured set, keyed on `(citing-file, cited-path)`
     with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
