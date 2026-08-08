@@ -112,6 +112,18 @@ printf '# t22\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · 
 printf 'x\n' > "$D/build/2026-08-01-build-ARCH-tFixture-1.md"                    # legal qualifier -> silent
 printf 'x\n' > "$D/build/2026-08-01-build-XXXX-tFixture-2.md"                    # unknown family -> red
 
+# ---- CHECK 5 AT DEPTH. A recording one level deeper used to be governed by NOTHING: check 5 saw
+# ---- only direct children, and check 12's population is files that already match the dated name, so
+# ---- a free-named nested file was outside both by construction.
+mkdir -p "$D/spec/units"
+good > "$D/spec/units/2026-08-01-spec-tFixture-30-u1-nested-ok.md"   # conforming nested -> silent
+printf 'x\n' > "$D/spec/units/scratch-notes.md"                      # free-named nested   -> RED
+# A nested name carrying the unit tail — the shape that made the drafted grammar a red merge bar on
+# 14 real files. Silent only because check 5's name ERE and check 12's selector now share one tail.
+printf 'x\n' > "$D/spec/units/2026-08-01-spec-tFixture-31-u2-tail-ok.md"
+mkdir -p memory/project
+printf '# legacy\n' > memory/project/legacy-files.txt
+
 # ---- CHECK 4: the folder is named for its SLUG alone. A date or FAMILY prefix is the pre-flatten
 # ---- shape and must be rejected, or a half-migrated tree passes.
 mkdir -p memory/builds/2026-08-01-ARCH-tBadFolder/spec
@@ -168,6 +180,22 @@ hit  'tFixture-16.md (## sections differ'
 miss 'tFixture-16.md (terminal Status'
 # Emission ORDER inside one file: a per-file loop got it for free, one awk over a driver does not.
 before 'tFixture-14.md (unfilled skeleton placeholder' 'tFixture-14.md (section with an empty body'
+
+# ---- CHECK 5 AT DEPTH, three arms. Two of them would be satisfied by ABSENCE if the selector were
+# ---- left unwidened — a file that is never selected is also silent — so the legacy arm is TWO-STATE
+# ---- and the red arm is attributed inside check 5's OWN output slice. Check 5 prints a bare path and
+# ---- checks 2, 9 and 12 all print paths from under spec/ too, so an unattributed `hit '<path>'`
+# ---- would be satisfied by the wrong check.
+c5block() { awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$1"; }
+c5hit()  { c5block "$out" | grep -qF "$1" || { echo "FAIL check 5 did not report: $1"; st=1; }; }
+c5miss() { c5block "$out" | grep -qF "$1" && { echo "FAIL check 5 reported: $1"; st=1; }; }
+
+c5hit  "$D/spec/units/scratch-notes.md"
+c5miss "$D/spec/units/2026-08-01-spec-tFixture-30-u1-nested-ok.md"
+c5miss "$D/spec/units/2026-08-01-spec-tFixture-31-u2-tail-ok.md"
+# the conforming-nested arm is load-bearing for the KIND derivation: the kind comes from the
+# SUBFOLDER (`spec`), not from the file's immediate parent (`units`). Do not delete it as redundant.
+grep -qF 'nesting is fine' <<<"$out" || { echo "FAIL the check-5 message does not say depth is allowed"; st=1; }
 
 # ---- streams arms. Each asserts the branch's OWN text, not merely "check 12 fired": a bare
 # ---- `check 12` mention is satisfied by any other finding in the same file.
@@ -287,6 +315,21 @@ grep -qF 'tFixture-20.md (streams value(s) outside the enum' <<<"$out3" \
   || { echo "FAIL: an illegal streams value went unchecked with a blank STREAMS_CUTOFF"; st=1; }
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
+# ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
+# ---- is silent for exactly the same file. Listed -> silent; the line removed -> the same file reds.
+printf '# legacy\n%s\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
+git add -A >/dev/null 2>&1; git commit -q -m legacy --no-verify
+outl=$(bash "$SCRIPT" 2>/dev/null)
+awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$outl" \
+  | grep -qF "$D/spec/units/scratch-notes.md" \
+  && { echo "FAIL a legacy-listed nested file still reds check 5"; st=1; }
+printf '# legacy\n' > memory/project/legacy-files.txt
+git add -A >/dev/null 2>&1; git commit -q -m unlegacy --no-verify
+outu=$(bash "$SCRIPT" 2>/dev/null)
+awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$outu" \
+  | grep -qF "$D/spec/units/scratch-notes.md" \
+  || { echo "FAIL removing the legacy line did not make the nested file red again"; st=1; }
+
 # ---- the EMPTY-POPULATION guard, in two scratch trees, because it has to tell two states apart.
 #
 # (a) A HALF-MIGRATED tree: the files exist, at the PRE-flatten paths. Every flat selector matches
@@ -329,5 +372,5 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (69 assertions)"
+[ "$st" = 0 ] && echo "PASS (76 assertions)"
 exit "$st"

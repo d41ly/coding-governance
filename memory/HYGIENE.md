@@ -95,9 +95,12 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
    build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose recording-named
    `.md`; non-md only in `build/`.
-5. **recording-file naming** — files under the four subfolders match
-   `<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md`, kind matching subfolder, family from the closed
-   `FAMILIES` alternation (grandfather: `legacy-files.txt`).
+5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
+   `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
+   from the file's immediate parent — `spec/units/x.md` is a spec. The family is the closed
+   `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
+   variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
+   `legacy-files.txt`).
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).

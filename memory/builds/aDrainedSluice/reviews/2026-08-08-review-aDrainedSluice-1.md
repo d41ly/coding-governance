@@ -120,6 +120,26 @@ and had no fixture; a partial implementation would pass. Folded as a third fixtu
 M16: the comment V4 rewrites lives inside a single-quoted awk program, which is why the existing text
 reads "engine s". Folded as a constraint, not a typo to fix.
 
+## Verification
+
+Every finding was handed to an independent skeptic told to REFUTE it and to run whatever settles it.
+Nineteen raw, **six confirmed, thirteen refuted** — and the refutations are worth as much as the
+confirmations, because most of them read as `STALE — already folded`: the fold ran while the skeptics
+were still working, so they were refuting findings against a tree that had already absorbed them.
+Two refutations are substantive: one built V3's three fixtures and ran them, showing the
+absence-satisfied concern was weaker than claimed (the two-state arm shipped anyway — strictly more
+evidence for the same cost), and one showed a documentation-precision finding could not be made to
+occur.
+
+The confirmations carried detail the reviewers had not: the skeptic on M3 measured that terminating
+the capture at the first UNESCAPED closing quote changes **0 of 14** signatures in
+`check-memory-hygiene.sh` — so the nine existing pin rows stay valid — and exactly the five
+contaminated ones, and that **it must land BEFORE V1 emits the pin**, because `do_check` compares the
+pinned signature against a freshly extracted one from the same extractor, so both agree and V1 would
+land GREEN with a permanently-unarmable pin. The skeptic on M4 measured that **seven** keys are
+claimed by both gates today — (1,1) (2,1) (3,1) (4,1) (5,1) (5,2) (6,1) — not the four the reviewer
+simulated.
+
 ## Disposition
 
 All sixteen folded before any code. M1 alone would have cost a red merge bar and either fourteen

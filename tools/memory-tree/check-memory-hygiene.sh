@@ -63,6 +63,12 @@ fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
 DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
+# THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
+# `<date>-spec-<slug>-<seq>-u6-indexed-join.md`, and both check 5's name grammar and check 12's
+# selector have to admit that suffix. They were two hand-copied EREs for one grammar and they had
+# already diverged — check 12 carried the tail, check 5 did not — so widening check 5's SELECTOR
+# without this would have redded 14 conforming files. Interpolated by both; never retyped.
+REC_TAIL='(-[a-z0-9][a-z0-9-]*)?'
 
 # A selector that matches NOTHING prints nothing, and nothing is what a passing check prints. The
 # 1.5 flatten changed the segment count of several path selectors at once, so each one asserts its
@@ -234,17 +240,25 @@ $bad4"
 # 5 — recording-file naming (grandfather: legacy-files.txt).
 # The optional `-<FAMILY>-` qualifier is the CLOSED alternation from FAMILIES. A generic `[A-Z]+`
 # would admit a family that does not exist and make the rejection arm vacuous.
-c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/[^/]+\.md$" || true)
+# ANY DEPTH under the four subfolders. A file one level deeper used to be governed by nothing: check
+# 5 saw only direct children, and check 12's population is files that already match the dated name,
+# so a free-named nested file was outside both by construction.
+c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/(.+/)?[^/]+\.md$" || true)
 pop_guard 5 "no recording file under $M/builds/*/{prompts,spec,build,reviews}/" \
   "$(printf '%s\n' "$c5_sel" | grep -c . || true)" "$PRE_RECORD"
 bad5=$(printf '%s\n' "$c5_sel" | grep . | while IFS= read -r f; do
   in_legacy "$f" && continue
-  # Fork-free basename/parent-dir + bash ERE (was basename + awk + grep = 3 forks per recording file).
-  base=${f##*/}; sub=${f%/*}; sub=${sub##*/}
+  # Fork-free basename + SUBFOLDER extraction (was basename + awk + grep = 3 forks per recording file).
+  # The kind comes from the subfolder — the first segment after the build slug — NOT from the file's
+  # immediate parent: `spec/units/x.md` is a spec, and `units` is not a kind.
+  base=${f##*/}; rest=${f#"$M"/builds/}; rest=${rest#*/}; sub=${rest%%/*}
   case "$sub" in prompts) kind=prompt;; spec) kind=spec;; build) kind=build;; reviews) kind=review;; esac
-  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+\.md$ ]] || echo "$f"
+  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$ ]] || echo "$f"
 done)
+# The DEPTH is not the problem, and the message says so on a CONTINUATION line — the first line is
+# this branch's check-arms signature and its arm sits exactly at the armed floor with no slack.
 [ -n "$bad5" ] && fail 5 "recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered):
+  (nesting is fine — a sub-folder under spec/ groups a multi-unit build; the NAME is what is wrong)
 $bad5"
 
 # index set for checks 6/7
@@ -420,7 +434,7 @@ SPEC_CANON10="$SPEC_CANON
 # `P` = analyse. `[ -f ]` stays a bash builtin so the absent-file finding keeps its position in the
 # stream. The canon rides in on `-v canon=`: this kit has ONE nine-line canon and one equality, so it
 # needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
-c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$" || true)
+c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$" || true)
 pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
 c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file

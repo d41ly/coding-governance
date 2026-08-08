@@ -12,3 +12,4 @@
 - TOOL-aFoldedQuarry-6 · OPEN · six recording files in `builds/aPrunedCeremony/` gained a FAMILY qualifier and every build folder moved; citations in frozen records now point at paths that no longer resolve — the U3 dead-path registry is where they get declared -> builds/aFoldedQuarry/
 - TOOL-aFoldedQuarry-7 · OPEN · nine of fourteen hygiene `fail` branches are pinned unarmed in memory/project/unarmed-branches.txt; each needs a fixture that trips it and an arm naming its own failure text -> builds/aFoldedQuarry/
 - TOOL-aFoldedQuarry-8 · OPEN · check-arms.py covers ONE gate/test pair by name; a second gate with `fail` branches would be silently uncovered -> builds/aFoldedQuarry/
+- TOOL-aDrainedSluice-1 · OPEN · non-markdown inside builds/*/{prompts,spec,build,reviews}/ is governed by NOTHING — check 4 stops at the first segment under the build folder, so HYGIENE.md's `non-md only in build/` is unimplemented (measured) -> builds/aDrainedSluice/
