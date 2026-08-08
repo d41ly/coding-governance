@@ -104,8 +104,10 @@ c1=$(printf '%s\n' "$FILES" \
 [ -n "$c1" ] && fail 1 "prompt-kind files outside builds/*/prompts/ or archive/:
 $c1"
 
-# 2 — link integrity (exempt DECISIONS.md / decisions/ / archive/ / TREE.md and legacy-listed recording files).
-scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|decisions/|archive/|TREE\.md$)')
+# 2 — link integrity (exempt DECISIONS.md / decisions/ / archive/ and legacy-listed recording files).
+# LIVE.md and the ledger shards are NOT exempt: their rows link to build READMEs, and a link that
+# stops resolving is precisely the drift the generated index exists to prevent.
+scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|decisions/|archive/)')
 [ "$STAGED" = 1 ] && scan2=$(printf '%s\n' "$scan2" | { grep -xF -f <(printf '%s\n' "$STAGED_MD") || true; })
 # Drop grandfathered files first (fork-free), then extract every candidate link in ONE awk pass over
 # all remaining files — was `_unfenced | grep -oE | sed -E` PER FILE (3 forks × N files; the single
@@ -153,8 +155,8 @@ $broken"
 # slug and `backlog/` holds one shard per FAMILY.
 root1=$(printf '%s\n' "$FILES" | awk -F/ '{ if (NF==2) print "F:"$2; else print "D:"$2 }' | LC_ALL=C sort -u)
 bad3=$(printf '%s\n' "$root1" | grep . | while IFS= read -r e; do case "$e" in
-  F:README.md|F:TREE.md|F:HYGIENE.md|F:TEMPLATE-SPEC.md|F:DECISIONS.md) ;;
-  D:project|D:builds|D:backlog|D:decisions|D:guides|D:archive) ;;
+  F:README.md|F:HYGIENE.md|F:TEMPLATE-SPEC.md|F:DECISIONS.md|F:LIVE.md) ;;
+  D:project|D:builds|D:backlog|D:decisions|D:guides|D:archive|D:ledger) ;;
   D:*) d="${e#D:}"; [ "$d" = "$MAP_SUB" ] || echo "$M/$d";;
   *) echo "$M/${e#*:}";; esac; done)
 # backlog/ holds ONLY <FAMILY>.md, one shard per declared family — a stray name there is a backlog
@@ -236,7 +238,9 @@ $bad5"
 
 # index set for checks 6/7
 index_set() {
-  { echo "$M/README.md"; echo "$M/TREE.md"; echo "$M/DECISIONS.md"
+  { echo "$M/README.md"; echo "$M/LIVE.md"; echo "$M/DECISIONS.md"
+    printf '%s
+' "$FILES" | grep -E "^$M/ledger/[^/]+\.md$"
     echo "$M/project/MEMORY.md"; echo "$M/project/IN-FLIGHT.md"
     printf '%s\n' "$FILES" | grep -E "^$M/project/in-flight/[^/]+\.md$"   # per-node ledger files: 20KB cap, entry-budget exempt
     if [ -n "$MAP_SUB" ]; then
@@ -270,8 +274,8 @@ $bad6"
 
 # 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md,
 #     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
-ex7='(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
-[ -n "$MAP_SUB" ] && ex7="(/TREE\.md$|/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
+ex7='(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
+[ -n "$MAP_SUB" ] && ex7="(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
 # piped `_unfenced` output WAS the record source, so the reported line number was never the file line
@@ -345,9 +349,13 @@ fi
 [ -n "$bad8" ] && fail 8 "backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
 
-# 9 — TREE.md drift (delegates to the sibling generator).
+# 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
+# PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
+# DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
+# and nothing rots.
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
-  if ! drift=$(bash "$HERE/gen-memory-tree.sh" --check 2>&1); then fail 9 "TREE.md drift:
+  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "build index:
 $drift"; fi
 fi
 

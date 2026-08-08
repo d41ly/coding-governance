@@ -1,3 +1,12 @@
+---
+slug: aPrunedCeremony
+node: a
+opened: 2026-07-19
+streams: playbook+tooling
+roster: PLAY+TOOL
+ids: PLAY-aPrunedCeremony-1..-4 · TOOL-aPrunedCeremony-1/-2
+---
+
 # aPrunedCeremony — gate-economy uplift (playbook + tooling)
 
 **streams playbook+tooling.** One session, two id families, two halves of the same port of inCMS
@@ -101,3 +110,16 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
    to an out-of-tree dir; coding-governance points `core.hooksPath` at the tracked `.githooks/`
    directly and `check-wiring.sh` already auto-wires an unset path. **Recommend: record N/A**, do not
    port the signal. Detail in TOOL-2 §4/§8.
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-07-19 · streams playbook+tooling · ids PLAY-aPrunedCeremony-1..-4 · TOOL-aPrunedCeremony-1/-2
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [PLAY-aPrunedCeremony-1 — the full merge bar runs once, at the push boundary](spec/2026-07-19-spec-PLAY-aPrunedCeremony-1.md) | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse](spec/2026-07-19-spec-PLAY-aPrunedCeremony-2.md) | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-3 — recurring bug class: a ratchet that never exercises its target is vacuous](spec/2026-07-19-spec-PLAY-aPrunedCeremony-3.md) | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`](spec/2026-07-19-spec-PLAY-aPrunedCeremony-4.md) | CLOSED | rev-4 | 2026-07-19 |
+| [TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md) | CLOSED | rev-4 | 2026-07-19 |
+| [TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md) | CLOSED | rev-3 | 2026-07-19 |
+<!-- /gen:build-index -->

@@ -136,3 +136,61 @@ spec, which proves the check sits above the Tier-1 exit), the FAMILY-qualifier p
 folder-name rejection, the backlog shard-name rejection, and the two empty-population arms.
 
 `bash tools/run-gates.sh` — 22/22 legs green, 1 skipped. The bar grew the kit/dogfood parity leg.
+
+## U2 — the generated build index (spec `TOOL-aFoldedQuarry-4`, CLOSED)
+
+### What landed
+
+`gen-memory-tree.sh` and `memory/TREE.md` are gone. `tools/memory-tree/gen_build_index.py` replaces
+them and carries something the listing could not: STATUS. It reads exactly two sources — each build's
+README front matter and every `**Status:**` header under that build's `spec/` — and renders three
+artifacts: the generated region inside each build README, `memory/LIVE.md`, and
+`memory/ledger/<month>.md` shards. A build's status is a pure function of its units', so a build
+leaves `LIVE.md` when its last unit goes terminal and nobody edits anything.
+
+Fourteen build READMEs gained front matter; seven of them did not exist and were authored. Check 9
+now delegates to this generator's `--check`, and a new leg runs its `--selftest`.
+
+### One source of truth per build, and the four builds that forced the rule
+
+The design said the status is derived from unit statuses. Counting the corpus rather than reading it
+found four builds — `aDeployScout`, `aKitHardener`, `aLeanRework`, `aRatchetForge` — whose only specs
+are grandfathered recordings with no status header at all. Every default was wrong: CLOSED contradicts
+the memory index for one of them, live parks three finished builds in `LIVE.md` forever, and dropping
+them is the silent-departure blind spot this unit exists to close, arriving through a different door.
+
+So the rule is explicit in both directions. A build with any parseable header has its status DERIVED,
+and an authored `status:` key there is an ERROR — two answers to one question is the drift being
+removed. A build with none REQUIRES `status:`, and its absence is a named error. Four builds author
+one line each, once. Both arms are armed in the selftest.
+
+The review that produced this rule said "three builds" and listed three. The fourth was found by
+counting. That is the second time in this build a claim about the corpus survived reading and died on
+measurement; the review record carries the correction rather than hiding it.
+
+### The three upstream blind spots, closed and armed
+
+A README with an unpaired marker used to leave the index silently — it is now a named error quoting
+the counts found. An absent README used to kill both modes with a traceback — it is now a named error
+that says why an unindexed build is a problem. An orphaned generated file used to be permanent and
+invisible — `--check` reports it and `--write` deletes it, BOUNDED to a `ledger/<YYYY-MM>.md` name;
+anything else under `ledger/` is reported and left alone, because a generator that deletes inside the
+memory tree on its own authority is a data-loss path.
+
+### Two hazards the corpus surfaced
+
+`---` opens front matter AND is a markdown horizontal rule, and one already separates the two merged
+halves of `builds/aPrunedCeremony/README.md` from U1. A parser scanning for the first two `---`
+anywhere would have swallowed that whole half. Front matter therefore opens at LINE 1 and nowhere
+else.
+
+The gate byte-compares, so the generated files are pinned `eol=lf` in `.gitattributes` AND the
+comparison normalises CR. Either alone leaves the failure mode this repo has now hit twice: a
+generated file that reds on every line on a Windows checkout, and passes only right after a render.
+
+### Verification
+
+`python tools/memory-tree/gen_build_index.py --selftest` — 15 arms including a write-then-check
+fixed-point arm, without which a renderer that emits CRLF is green on the run that wrote it and red
+forever after. `bash tools/run-gates.sh` — 23/23 green. A fresh `adopt-memory-tree.sh --scaffold`
+into an empty repo produces a hygiene-clean tree, verified by running it.

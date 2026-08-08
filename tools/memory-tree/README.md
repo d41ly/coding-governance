@@ -16,7 +16,8 @@ ARCH-bOrderlyAtlas-1.)
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
 | `check-memory-hygiene.sh` | the gate — 12 checks, grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
-| `gen-memory-tree.sh` | deterministic `TREE.md` generator (`--write` / `--check`); check 9 calls it. |
+| `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
+| `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty, passing tree from the config (new projects). |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
@@ -39,7 +40,7 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 
 ```bash
 cp memory-tree/.memory-tree.conf.example .memory-tree.conf   # then edit
-bash memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + disciplines + TREE.md
+bash memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
 bash memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit
 ```
@@ -75,9 +76,12 @@ pattern:
 
 ## Notes
 
-- Determinism: the scripts export `LC_ALL=C`, emit LF, and `--strip-trailing-cr` on the drift diff — stable
-  across Windows/Linux. Add `memory/**/TREE.md text eol=lf` (+ the two manifests) to `.gitattributes` so a
-  Windows autocrlf checkout can't spuriously fail check 9.
+- Determinism: the scripts export `LC_ALL=C` and emit LF, and the build index normalises CR before it
+  compares — stable across Windows/Linux. Add `memory/LIVE.md text eol=lf` and
+  `memory/ledger/*.md text eol=lf` (+ the two manifests) to `.gitattributes` anyway: check 9
+  BYTE-COMPARES the generated index against an LF render, so an unpinned generated file on a Windows
+  checkout is CRLF in the tracked copy — the normalisation keeps the gate honest, the pin keeps the
+  committed bytes right, and you want both.
 - The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
 

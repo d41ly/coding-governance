@@ -16,7 +16,8 @@ script is the law, this doc explains it. (Replace `memory/` throughout with your
 ```
 memory/
 ├── README.md              root index (one-liners)
-├── TREE.md                generated directory tree (memory-tree/gen-memory-tree.sh)
+├── LIVE.md                GENERATED — builds with a non-terminal unit (memory-tree/gen_build_index.py)
+├── ledger/<YYYY-MM>.md    GENERATED — one row per build opened that month; freezes when the month passes
 ├── HYGIENE.md             this file
 ├── TEMPLATE-SPEC.md       the canonical spec/design-pass format (check 12; ships with the kit)
 ├── DECISIONS.md           append-only decision index, EVERY family, grouped for reading
@@ -45,7 +46,9 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 3. **Archive-or-file on landing.** DECISIONS.md is the durable home. Delete cold journals; file a
    feature's plan/review writeups into its `builds/` folder; a file's own "NOT merged" status prose rots.
 4. **No broken relative links** outside the append-only log (`DECISIONS.md`, `decisions/`), `archive/`
-   (dead pointers allowed by design), generated `TREE.md`, and migrated recording files listed in `legacy-files.txt`.
+   (dead pointers allowed by design), and migrated recording files listed in `legacy-files.txt`. The
+   generated index files are NOT exempt: their rows link to build READMEs, and a link that stops
+   resolving is exactly the drift they exist to prevent.
 5. **A check never selects an empty population.** A path selector that matches nothing prints nothing,
    and nothing is what a passing check prints. Every selector over a population a real tree has
    asserts it is non-empty, so a mis-segmented path fails loudly instead of disarming its check.
@@ -53,11 +56,11 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 ## Index budgets, caps, rotation
 
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `MEMORY.md`,
-  `STATUS.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail lives in the build folder
-  or decision file the line points at. `TREE.md` (generated), `IN-FLIGHT.md`, and the per-node ledger
-  files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry budget; the per-node
-  files still carry the 20 KB file cap.
-- **File caps:** index + tree files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
+  `STATUS.md`, `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300
+  chars. Detail lives in the build folder or decision file the line points at. `IN-FLIGHT.md` and the
+  per-node ledger files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry
+  budget; the per-node files still carry the 20 KB file cap.
+- **File caps:** index + generated files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
@@ -85,7 +88,7 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
-   `TREE.md`, and `legacy-files.txt`-listed recordings).
+   and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
 3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
    `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/ journal/ in-flight/`
    contents are unconstrained; `builds/` shape is check 4.
@@ -98,7 +101,11 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
-9. **tree drift** — `memory-tree/gen-memory-tree.sh --check` must be clean.
+9. **build-index drift** — `memory-tree/gen_build_index.py --check` must be clean. The index is
+   DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
+   column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
+   README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
+   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
 10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
@@ -115,7 +122,7 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
 `<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
 `.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
-`features/`, `generated/`; the map dir appears in the root TREE.md render; `README.md`,
+`features/`, `generated/`; `README.md`,
 `FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
 entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
 dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's

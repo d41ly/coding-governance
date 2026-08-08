@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T05:11:52+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
+last-audit: 2026-08-08T05:27:42+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -78,6 +78,9 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   It now sits at 32758/32768 (**10 bytes free**, measured 2026-08-03), so the next line added to it must
   fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
+- A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
+  bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
+  line. Either alone leaves the file green only right after a render.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
 - A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added

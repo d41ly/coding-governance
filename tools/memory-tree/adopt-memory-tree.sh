@@ -40,7 +40,8 @@ mkdir -p "$M/project/journal" "$M/builds" "$M/backlog"
 if [ -f "$HERE/HYGIENE.template.md" ]; then cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.template.md" "$M/TEMPLATE-SPEC.md"; fi
 { echo "# $M/ — project memory index"; echo
-  echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md). Generated tree: [TREE.md](TREE.md)."; echo
+  echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
+  echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards (memory-tree/gen_build_index.py)."; echo
   echo "The discipline is a SIGNAL, not a directory. A build folder is named for its slug alone; which"
   echo "discipline it served is declared in each spec's status header as \`streams <value>[+<value>]\`,"
   echo "over the closed enum \`.memory-tree.conf\` declares."; echo
@@ -101,9 +102,10 @@ for d in $DISCIPLINES; do
 done
 # builds/ starts empty; a .gitkeep would be an unsanctioned entry under check 3, so the first build
 # is what makes the directory tracked. The empty-population guard says so out loud on the first run.
-# Stage the tree FIRST so the generator (git ls-files) sees the files, then generate + re-stage TREE.md.
+# Stage the tree FIRST so the generator (git ls-files) sees the files, then render + re-stage.
 git add "$M" >/dev/null 2>&1 || true
-bash "$HERE/gen-memory-tree.sh" --write
+_PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
+"$_PY" "$HERE/gen_build_index.py" --write
 git add "$M" >/dev/null 2>&1 || true
 
 echo "Scaffolded $M/ ($(echo $DISCIPLINES | wc -w) disciplines) — staged."

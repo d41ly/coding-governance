@@ -1,3 +1,12 @@
+---
+slug: bConvergentLodestar
+node: b
+opened: 2026-07-22
+streams: tooling
+roster: TOOL
+ids: TOOL-bConvergentLodestar-1
+---
+
 # TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map
 
 **Status:** SPECCED · rev-2 · awaiting owner scope approval · node b · 2026-07-22 · base 7b01979ad7 · adversarial review `wf_69de6d2e-926` folded
@@ -30,3 +39,11 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 - **F6** reuse-decision record: (a) DoD line + optional per-repo spec section *(rec)* · (b) force `## 10` into the shared TEMPLATE-SPEC.
 - **F7** collision-WARN / backlog home: (a) append to the reinvention backlog file, dedup by {new,resembles} *(rec)* · (b) stdout-only · (c) per-node sharded log.
 - **F8** collision precision knobs: (a) token stem + fan-in threshold · (b) + structural signal *(rec)* · (c) + affordance cross-check; threshold in `.codebase-map.conf`.
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling · ids TOOL-bConvergentLodestar-1
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
+<!-- /gen:build-index -->

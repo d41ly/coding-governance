@@ -309,7 +309,7 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   # the generator reads `git ls-files`, so stage first, render, then stage the render — the same
   # order `adopt-memory-tree.sh --scaffold` uses, because this arm is standing in for its output
-  git add -A && bash "$HERE/gen-memory-tree.sh" --write && git add -A
+  git add -A && python3 "$HERE/gen_build_index.py" --write >/dev/null && git add -A
   git commit -q -m young --no-verify )
 outy=$(cd "$Y" && bash "$SCRIPT" 2>/dev/null); rcy=$?
 grep -qF 'selected an EMPTY population' <<<"$outy" \
