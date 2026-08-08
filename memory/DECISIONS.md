@@ -64,6 +64,13 @@
 - TOOL-aBatchedTribunal-6h · that arm immediately found two MORE unreached branches (the append-only skip, the elision skip). A reachability check pays for itself the first time it runs
 - TOOL-aBatchedTribunal-6i · the launcher ban keyed on the retired IDIOM, so a bare `python -c` carried nothing to match. A second ban keys on the INVOCATION SHAPE; one true positive migrated, three deliberate literals marked `gov:literal-python` with their reason
 - TOOL-aBatchedTribunal-6j · the bare-launcher ban does NOT ship: tools/lib/ is gov-repo-internal, so it protects the kits before they ship and not an adopter's fork. Making it travel means putting it in a kit — a bigger change, and a separate row if anyone wants it
+- TOOL-aBatchedTribunal-6k · W5: the closing review of W4 found the NEW self-test failing open — arm() captured the exit code and never asserted it, so mutating the gate's FAILED branch to exit 0 left 10/10 green while run-gates judges a leg purely by its status
+- TOOL-aBatchedTribunal-6l · a consumer can be armed while its PRODUCER is not: every marker arm planted the file by hand, so replacing `marker.write_text` with `pass` left the recall suite 28/28. One arm now watches a real build write it and remove it
+- TOOL-aBatchedTribunal-6m · the deletion-time re-check arm never reached the branch it named: a marker planted before the run excludes the directory at the CANDIDATE filter. Driven in-process now, with a _mid_build that answers False at plan time and True at delete time
+- TOOL-aBatchedTribunal-6n · the marker is removed only by the pid that wrote it. An unconditional unlink means the first of two builders to finish releases the SECOND one's protection, and the eviction pass then sees an unprotected directory still being written
+- TOOL-aBatchedTribunal-6o · the epoch gate's ENGINE is not one file: checks 9 and 13-19 delegate to three Python modules, so 8 of 19 verdicts lived outside the diffed file. A no-base run now FAILS rather than exiting 0 — run-gates cannot tell a zero-status skip from a pass
+- TOOL-aBatchedTribunal-6p · the launcher ban only read column one, so `PY=$(resolve_python) || PY=python3`, `export PY=python3` and `PY="python3"` all passed — one of them two lines above a site the same commit had marked. Assignments are matched anywhere on the line now
+- TOOL-aBatchedTribunal-6q · an exemption arm must plant a line the rule DOES match, or `exempt` and `never matched` are the same observation. The resolver-block fixture used a `for c in python3 …` the predicate never matched; it uses a real assignment now, verified outside the block
 
 ## DEPL — deployer
 

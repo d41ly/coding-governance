@@ -1,6 +1,6 @@
 # TOOL-aBatchedTribunal-6 — W4: the four rows the closing review left open
 
-**Status:** CLOSED · rev-1 · 2026-08-09 · node a · Tier-2 · base 58c0a583 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-09 · node a · Tier-2 · base 58c0a583 · streams tooling
 
 ## 1. Goal
 
@@ -141,6 +141,19 @@ bare launcher : an invocation of python3/python/py NOT through a resolved variab
 none.
 
 ## 9. Revision log
+
+- rev-2 · 2026-08-09 · folded the closing review of W4: 31 raw, 24 confirmed, 7 refuted, precision
+  0.77. One BLOCKER of my own making — the new self-test's `arm()` captured the gate's exit code and
+  never asserted it, so the gate could be mutated into a printer with all ten arms green. Four highs,
+  all the same family: an arm that names a branch it does not reach. The marker PRODUCER was unarmed
+  (every arm planted the file by hand); the deletion-time re-check arm was excluded at the candidate
+  filter and so never reached the loop it was written for; the live-tree epoch arm asserted the prefix
+  every message carries; and the launcher ban read only column one, so three live bare assignments
+  passed — one of them two lines above a site this same commit had marked. Plus: the engine is not one
+  file (8 of 19 verdicts delegate to three Python modules), a no-base run exited 0 where run-gates
+  cannot tell a skip from a pass, an unreadable old constant failed open, the marker was unlinked
+  unconditionally so one builder released another's protection, and two arms held by construction.
+  All fixed, each mutation-verified. One narrowing stays OPEN as `TOOL-aBatchedTribunal-7`.
 
 - rev-1 · 2026-08-09 · written after diagnosing all four rows against the tree; three were worse than
   their row said, and one — the mid-build predicate — was live data loss rather than a documentation

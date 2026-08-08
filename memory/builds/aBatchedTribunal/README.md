@@ -34,5 +34,5 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note](spec/2026-08-09-spec-aBatchedTribunal-1.md) | CLOSED | rev-3 | 2026-08-09 |
-| [TOOL-aBatchedTribunal-6 — W4: the four rows the closing review left open](spec/2026-08-09-spec-aBatchedTribunal-6.md) | CLOSED | rev-1 | 2026-08-09 |
+| [TOOL-aBatchedTribunal-6 — W4: the four rows the closing review left open](spec/2026-08-09-spec-aBatchedTribunal-6.md) | CLOSED | rev-2 | 2026-08-09 |
 <!-- /gen:build-index -->

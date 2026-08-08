@@ -121,6 +121,13 @@ awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)
 # TWO EXEMPTIONS, both narrow and both visible in the source being scanned:
 #   * the resolver BLOCK itself — the one place the candidate names must appear, delimited by its own
 #     markers, so the exemption cannot spread past them;
+# THE ASSIGNMENT HALF IS NOT ANCHORED TO THE LINE START. `PY=$(resolve_python) || PY=python3` puts
+# the bare fallback MID-LINE, `export PY=python3` puts a keyword in front of it, and `PY="python3"`
+# quotes it — all three passed the first cut, and one of them was two lines above a site this very
+# commit had marked `gov:literal-python`. A predicate that only reads column one is a predicate that
+# reads the tidiest third of the population.
+#
+# TWO EXEMPTIONS, both narrow and both visible in the source being scanned:
 #   * a line marked `gov:literal-python — <reason>`, which is an author's claim with the reason
 #     attached. Measured today: three such lines, each a launcher NAME printed or rendered rather
 #     than executed (a remedy string, a committed Skill render, an adopter-layout fallback).
@@ -134,7 +141,7 @@ bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
     /^[[:space:]]*#/ { next }
     /gov:literal-python/ { next }
     /(^|[;&|(){}`!]|&&|\|\||\$\(|(^|[^A-Za-z0-9_])(if|elif|then|else|while|until|do|exec|env|time|nohup|xargs|sudo|command))[[:space:]]*(python3|python|py)([[:space:]]|$)/ ||
-    /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=(python3|python|py)([[:space:]]|;|$)/ \
+    /(^|[^A-Za-z0-9_$])(export[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=["'"'"']?(python3|python|py)["'"'"']?([[:space:]]|;|\)|$)/ \
       { printf "%s:%d:%s\n", F, NR, $0 }
   ' "$1"
 }
@@ -163,10 +170,21 @@ printf '#!/usr/bin/env bash\nPY=python3   # gov:literal-python — printed, neve
 [ -z "$(bare_scan "$plant")" ] || bad "a marked literal is not exempt"; ok
 printf '#!/usr/bin/env bash\nPY=python3\n' > "$plant"
 [ -n "$(bare_scan "$plant")" ] || bad "the SAME line without the marker is exempt — the marker is doing nothing"; ok
-{ printf '# >>> resolve_python\n'; printf '  for c in python3 python py; do :; done\n'; printf '# <<< resolve_python\n'; } > "$plant"
+# The block fixture must plant a line the ban DOES match, or "exempt" and "never matched" are the
+# same observation. `PY=python3` inside the block is exactly such a line — verified below, outside it.
+{ printf '# >>> resolve_python\n'; printf '  PY=python3\n'; printf '# <<< resolve_python\n'; } > "$plant"
 [ -z "$(bare_scan "$plant")" ] || bad "the resolver block is not exempt from its own ban"; ok
+printf '#!/usr/bin/env bash\n  PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "the block fixture plants a line the ban never matches — the exemption arm proves nothing"; ok
 { printf '# >>> resolve_python\n'; printf '# <<< resolve_python\n'; printf 'python x.py\n'; } > "$plant"
 [ -n "$(bare_scan "$plant")" ] || bad "the block exemption leaks past its closing marker"; ok
+# ...the three shapes the first cut let through, each measured live on this tree before the fix.
+printf '#!/usr/bin/env bash\nPY=$(resolve_python) || PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a MID-LINE bare fallback is not caught"; ok
+printf '#!/usr/bin/env bash\nexport PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "an EXPORTED bare assignment is not caught"; ok
+printf '#!/usr/bin/env bash\nPY="python3"\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a QUOTED bare assignment is not caught"; ok
 # ...and the ban's own population is real, or it is a gate over nothing.
 nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^tools/lib/resolve-python' || true)
 [ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok

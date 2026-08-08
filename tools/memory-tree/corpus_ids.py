@@ -689,12 +689,17 @@ def do_selftest() -> int:
     arm("every `continue` in walk() is reached by a fixture", None,
         lambda: "" if not missed else
         "; ".join(f"corpus_ids.py:{n} is a `continue` no fixture reaches" for n in missed))
-    # ...and the checker's own red half: it must be able to NAME an unreached line, or "none missed"
-    # is indistinguishable from "the tracer never ran".
+    # ...and the checker's own red half. The first cut re-typed the message over `want | {-1}` and so
+    # held by construction — it asserted a formatting expression, not the checker. This runs the SAME
+    # expression the arm above runs, against a population with one line the fixtures provably never
+    # executed (line 0 does not exist), so a tracer that recorded nothing and a tracer that recorded
+    # everything give different answers.
+    def _missed(pop):
+        return "; ".join(f"corpus_ids.py:{n} is a `continue` no fixture reaches"
+                         for n in sorted(pop - _hit))
     arm("...and the reachability checker can name an unreached branch",
-        "is a `continue` no fixture reaches",
-        lambda: "; ".join(f"corpus_ids.py:{n} is a `continue` no fixture reaches"
-                          for n in sorted((want | {-1}) - _hit)))
+        "corpus_ids.py:0 is a `continue` no fixture reaches", lambda: _missed(want | {0}))
+    arm("...and it is silent when every member was reached", None, lambda: _missed(want))
     arm("...and the population is derived, not listed", "True", lambda: str(len(want) >= 4))
 
     if fails:

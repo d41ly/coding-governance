@@ -50,7 +50,7 @@ resolve_python() {
 # weakest of the three detectors: on a python3-only host it named a launcher that does not exist.
 PY=$(resolve_python "${MAP_PY:-}") || exit 2
 
-[ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold   (MAP_PY=python3 to override the launcher)"; exit 2; }
+[ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold   (MAP_PY=python3 to override the launcher)"; exit 2; }   # gov:literal-python — inside a usage string
 
 # -ef (same device+inode), not a string compare: MSYS/symlinks spell the same dir differently
 [ "$HERE" -ef "$ROOT/codebase-map" ] || {

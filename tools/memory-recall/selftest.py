@@ -557,6 +557,42 @@ def t_budget_protections():
         cleanup(root)
 
 
+@check("a real build WRITES the marker and removes it when it finishes")
+def t_build_marker_lifecycle():
+    """THE PRODUCER, armed. Every other marker arm plants the file by hand, so replacing
+    `marker.write_text(...)` with `pass` left the whole suite green — the consumer was covered and the
+    thing that feeds it was not. Both halves are asserted from ONE real build: the marker exists while
+    `_docs` is running, and it is gone once the build returns.
+    """
+    root, kitdir = make_repo()
+    try:
+        probe = kitdir / "_markerprobe.py"
+        probe.write_text(
+            "import pathlib, sys\n"
+            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
+            "import query\n"
+            "seen = {}\n"
+            "orig = query._docs\n"
+            "def spy(repo, files):\n"
+            "    seen['during'] = (query.cache_dir(repo) / query.BUILD_MARKER).exists()\n"
+            "    return orig(repo, files)\n"
+            "query._docs = spy\n"
+            "repo = pathlib.Path('.').resolve()\n"
+            "d = query.cache_dir(repo)\n"
+            "query.build_cache(repo, d, query.corpus_files(repo))\n"
+            "print('during=%s after=%s' % (seen.get('during'), (d / query.BUILD_MARKER).exists()))\n",
+            encoding="utf-8", newline="\n")
+        proc = run(root, kitdir, script="_markerprobe.py")
+        assert proc.returncode == 0, proc.stderr
+        assert "during=True" in proc.stdout, \
+            "no marker while the build was READING — the unprotected phase is back: " + proc.stdout
+        assert "after=False" in proc.stdout, \
+            "the marker outlived the build; every later eviction pass would skip this cache: " + proc.stdout
+        return proc.stdout.strip()
+    finally:
+        cleanup(root)
+
+
 @check("a build in flight survives, in every phase the mtime test cannot see")
 def t_budget_build_in_flight():
     """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
@@ -632,21 +668,50 @@ def t_budget_cannot_satisfy():
 
 @check("a build that starts AFTER the plan is made is not deleted by it")
 def t_budget_recheck_before_delete():
-    """The plan is a proposal made from a snapshot. A sibling can start building between the snapshot
-    and the deletion loop, and a plan is not a licence to delete what has become live since. The
-    marker is planted directly, which is the same state a real racing builder would be in."""
+    """THE DELETION-TIME RE-CHECK, actually reached.
+
+    The first cut planted the marker before the run, which excludes the directory at the CANDIDATE
+    FILTER — so it never entered the plan, the deletion loop never saw it, and deleting the re-check
+    entirely left the arm green. That is the branch this arm exists for, covering nothing.
+
+    The race cannot be produced from a fixture (it needs a sibling to start building between the
+    snapshot and the loop, sub-millisecond apart), so this drives `evict_over_budget` IN PROCESS with
+    a `_mid_build` that answers the way a real racer would: False when the plan is made, True by the
+    time the deletion loop asks.
+    """
     root, kitdir = make_repo(conf=_budget_conf("0.4"))
     try:
         run(root, kitdir, *Q)
         caches = cache_of(root).parent
-        target = _sib(caches, "racer", kb=400, built_at="2020-01-01T00:00:00+00:00",
-                      worktree=str(root), marker_age=0.0)
-        proc = run(root, kitdir, *Q, "--rebuild")
+        _sib(caches, "racer", kb=400, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        probe = kitdir / "_raceprobe.py"
+        probe.write_text(
+            "import pathlib, sys\n"
+            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
+            "import query\n"
+            "repo = pathlib.Path('.').resolve()\n"
+            "keep = query.cache_dir(repo)\n"
+            "target = keep.parent / 'racer'\n"
+            "calls = {}\n"
+            "def racing(d):\n"
+            "    if d != target:\n"
+            "        return False\n"
+            "    calls[d] = calls.get(d, 0) + 1\n"
+            "    return calls[d] > 1   # not building when the plan is made; building when it is deleted\n"
+            "query._mid_build = racing\n"
+            "for line in query.evict_over_budget(keep, 0.4):\n"
+            "    print(line)\n"
+            "print('survived=%s calls=%s' % (target.exists(), calls.get(target, 0)))\n",
+            encoding="utf-8", newline="\n")
+        proc = run(root, kitdir, script="_raceprobe.py")
         assert proc.returncode == 0, proc.stderr
-        assert target.exists(), "a cache that was building at deletion time was deleted anyway"
-        assert "cannot be brought under it" in proc.stderr or "did NOT evict" in proc.stderr, \
-            "the run neither evicted it nor said why it did not: " + proc.stderr
-        return "a racing build survives and the run says so"
+        assert "calls=2" in proc.stdout, \
+            "_mid_build was asked once, not twice — the deletion loop does not re-check: " + proc.stdout
+        assert "survived=True" in proc.stdout, \
+            "a cache that started building after the plan was made was deleted anyway: " + proc.stdout
+        assert "did NOT evict" in proc.stdout, \
+            "the skip was silent; a cache that survives for a reason must say the reason: " + proc.stdout
+        return proc.stdout.strip().splitlines()[-1]
     finally:
         cleanup(root)
 
@@ -1026,7 +1091,8 @@ def main() -> int:
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
         t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
-        t_budget_lru, t_budget_protections, t_budget_build_in_flight, t_budget_marker_ttl,
+        t_budget_lru, t_budget_protections, t_build_marker_lifecycle,
+        t_budget_build_in_flight, t_budget_marker_ttl,
         t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
         t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,

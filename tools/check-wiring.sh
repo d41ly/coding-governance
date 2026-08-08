@@ -53,7 +53,7 @@ wired() { [ -f .claude/settings.json ] && grep -qF "$1" .claude/settings.json; }
 _CW_HERE="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$_CW_HERE/lib/resolve-python.sh" ]; then
   . "$_CW_HERE/lib/resolve-python.sh"
-  PY=$(resolve_python) || PY=python3
+  PY=$(resolve_python) || PY=python3   # gov:literal-python — a NAME for a remedy string; nothing here is executed
 else
   PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
 fi

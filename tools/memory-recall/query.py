@@ -343,8 +343,14 @@ def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dic
     try:
         return _build_cache(repo, dirp, files, t0)
     finally:
+        # ONLY IF IT IS STILL OURS. Two builders can target one cache directory — last writer wins,
+        # which the atomic manifest makes survivable — but an unconditional unlink means the first to
+        # finish releases the SECOND one's protection, and the eviction pass then sees an unprotected
+        # directory that is still being written. The pid is written for this reason; a marker that is
+        # no longer ours is somebody else's to remove.
         try:
-            marker.unlink()
+            if marker.read_text(encoding="utf-8").strip() == str(os.getpid()):
+                marker.unlink()
         except OSError:
             pass
 
