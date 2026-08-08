@@ -12,9 +12,21 @@
 # check-memory-hygiene.test.sh, which needs no baseline. Keep this committed so the NEXT collapse
 # pass can re-point it at its own base.
 #
-# The BASELINE MUST BE >= the 1.5 flatten. This harness asserts byte-identity, and the flatten
-# deliberately CHANGED what the engine says: comparing across it reports every difference as a
-# failure, which is true and useless. It is for behaviour-preserving rewrites only.
+# THE BASELINE MUST BE >= THE CURRENT VERDICT EPOCH. This harness asserts byte-identity, and a kit
+# version bump is exactly where the engine deliberately CHANGES what it says: comparing across one
+# reports every difference as a failure, which is true and useless. It is for behaviour-preserving
+# rewrites only.
+#
+# The floor below derives that epoch from KIT_MEMORY_TREE_VERSION, and that only works if the
+# constant is honest. It was not: the 1.5 engine changed check 5's selector, the §9 rev range and the
+# index set while the constant sat still, so the floor pointed before those changes and this harness
+# accepted a baseline it could not legally compare. `tools/memory-tree/check-verdict-epoch.sh` is
+# now a merge-bar leg that reds when the engine's non-comment lines move and the constant does not.
+#
+# EXPECT A GAP AFTER A BUMP. Immediately after the bump commit C the only baseline at-or-after the
+# floor is C itself, and passing C trips the same-bytes guard below. That is correct fork-collapse
+# order — bump the epoch, then rewrite, then compare against C — but it reads as a break if nobody
+# says so, so this says so.
 #
 # Kit-versus-dogfood DOC parity is a different question with a different harness —
 # kit-dogfood-parity.test.sh, which IS a gate leg.

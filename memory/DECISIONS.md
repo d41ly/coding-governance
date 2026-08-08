@@ -54,6 +54,16 @@
 - TOOL-aBatchedTribunal-1h · `xargs` word-splits, so a Skill folder with a SPACE in its name collapsed the eol population to zero and printed a green skip. Per-path `git check-attr` instead — two forks are cheaper than a silent collapse
 - TOOL-aBatchedTribunal-1i · ARMS_FLOORS is now checked in BOTH directions: a floor naming a gate outside the discovered population is a failure. Reformatting `fail() {` to `fail () {` dropped a whole gate — 14 branches, 14 arms — and every floor stayed green
 - TOOL-aBatchedTribunal-1j · measured, same review, same spec: 47 agents / 3.65 M subagent tokens unbatched against 9-10 agents / 0.81-1.25 M batched. Precision (confirmed / raw) was 18/20 on the spec and 28/28 on the diff
+- TOOL-aBatchedTribunal-6 · W4 closes the four rows the closing review left open. Three were WORSE than their row: the mid-build predicate was live data loss, the parity floor's constant had stopped being true, and the dead filter had hidden two more unreached branches behind it
+- TOOL-aBatchedTribunal-6b · a build now ANNOUNCES itself: a `building` marker written before the first read and removed in a finally, with a TTL so an abandoned build stops protecting its directory. The mtime test stays beneath it — an older kit's cache has no marker
+- TOOL-aBatchedTribunal-6c · measured phase by phase: the mtime test was False for the 31% extraction phase, False between unlink and recreate, and False for a WHOLE build on a 1 s-granularity filesystem. A concurrent repro killed a sibling with `unable to open database file`
+- TOOL-aBatchedTribunal-6d · the eviction plan is a proposal, not a licence: `evict_over_budget` re-checks at the moment of deletion, because a sibling can start building between the snapshot and the loop
+- TOOL-aBatchedTribunal-6e · KIT_MEMORY_TREE_VERSION 1.5 -> 1.6, and `check-verdict-epoch.sh` reds when a non-comment line of the engine moves and the constant does not. The floor was right about where to look; the constant was wrong about when
+- TOOL-aBatchedTribunal-6f · the epoch gate OVER-COUNTS on purpose — a rename demands a bump it does not need. The cost is three lines and a --render; the alternative is deciding from a diff whether a verdict moved, which is the judgement that produced the stale constant
+- TOOL-aBatchedTribunal-6g · corpus_ids' shape filter was `not (B or not B)` — identically False, 0 of 1550 token shapes reached it. Deleted. No behavioural arm could discriminate, so the arm is STRUCTURAL: every `continue` in walk() must be reached, population from the AST
+- TOOL-aBatchedTribunal-6h · that arm immediately found two MORE unreached branches (the append-only skip, the elision skip). A reachability check pays for itself the first time it runs
+- TOOL-aBatchedTribunal-6i · the launcher ban keyed on the retired IDIOM, so a bare `python -c` carried nothing to match. A second ban keys on the INVOCATION SHAPE; one true positive migrated, three deliberate literals marked `gov:literal-python` with their reason
+- TOOL-aBatchedTribunal-6j · the bare-launcher ban does NOT ship: tools/lib/ is gov-repo-internal, so it protects the kits before they ship and not an adopter's fork. Making it travel means putting it in a kit — a bigger change, and a separate row if anyone wants it
 
 ## DEPL — deployer
 

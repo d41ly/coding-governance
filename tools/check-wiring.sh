@@ -55,7 +55,7 @@ if [ -f "$_CW_HERE/lib/resolve-python.sh" ]; then
   . "$_CW_HERE/lib/resolve-python.sh"
   PY=$(resolve_python) || PY=python3
 else
-  PY=python3   # the resolver is not installed beside this script; the launcher is only ever PRINTED
+  PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
 fi
 
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------

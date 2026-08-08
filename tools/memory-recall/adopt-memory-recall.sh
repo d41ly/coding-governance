@@ -123,7 +123,7 @@ fi
 render() { # -> stdout
   sed -e "s|{{FAMILIES}}|$families|g" \
       -e "s|{{MEMORY_ROOT}}|$memory_root|g" \
-      -e "s|{{QUERY_CLI}}|python3 $REL/query.py|g" "$TEMPLATE"
+      -e "s|{{QUERY_CLI}}|python3 $REL/query.py|g" "$TEMPLATE"   # gov:literal-python — a COMMITTED render shared across the fleet; see the note above
 }
 
 # An unsubstituted placeholder is a template that grew a value this script does not know how to

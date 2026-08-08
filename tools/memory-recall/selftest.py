@@ -480,8 +480,14 @@ def t_eviction():
 # and each survival is asserted alongside an eviction that did happen.
 
 
-def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False):
-    """A sibling cache of a known size, with a manifest this pass will actually read."""
+def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False,
+         marker_age=None, db_absent=False):
+    """A sibling cache of a known size, with a manifest this pass will actually read.
+
+    `marker_age` plants a `building` marker aged that many seconds; `db_absent` removes records.db.
+    Both exist because the mtime test alone could not see the states they produce — see the state
+    table arm below, where three of them were judged evictable by the shipped predicate.
+    """
     d = caches / name
     d.mkdir(parents=True, exist_ok=True)
     (d / "records.db").write_bytes(b"\0" * (kb * 1024))
@@ -490,6 +496,13 @@ def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False):
     if built_at is not None:
         man["built_at"] = built_at
     (d / "manifest.json").write_text(json.dumps(man), encoding="utf-8")
+    if db_absent:
+        (d / "records.db").unlink()
+    if marker_age is not None:
+        m = d / "building"
+        m.write_text("12345", encoding="utf-8")
+        t = os.path.getmtime(m) - marker_age
+        os.utime(m, (t, t))
     if mid:
         # MID-BUILD is "a database is NEWER than the manifest", which is true during any build —
         # including a REBUILD, where the previous manifest sits on disk perfectly readable. That is
@@ -544,6 +557,60 @@ def t_budget_protections():
         cleanup(root)
 
 
+@check("a build in flight survives, in every phase the mtime test cannot see")
+def t_budget_build_in_flight():
+    """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
+    manifest is replaced. Measured phase-by-phase against a real rebuild, it is FALSE during
+    extraction (31% of the build), FALSE in the window where _write_set has unlinked a database and
+    not yet recreated it, and FALSE for the whole build on a filesystem whose mtime granularity puts
+    the rebuild inside the previous manifest's tick. A concurrent reproduction killed a sibling's
+    build with `unable to open database file`.
+
+    Each survivor is asserted ALONGSIDE an eviction that DID happen, so none of them is true merely
+    because the tree was under budget.
+    """
+    root, kitdir = make_repo(conf=_budget_conf("0.3"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        # extraction: dbs are the PREVIOUS build's, older than the manifest, marker fresh
+        extracting = _sib(caches, "extracting", kb=100, built_at="2019-01-01T00:00:00+00:00",
+                          worktree=str(root), marker_age=0.0)
+        # the unlink window: a manifest certifying record counts for a database that is not there
+        unlinked = _sib(caches, "unlinked", kb=100, built_at="2019-02-01T00:00:00+00:00",
+                        worktree=str(root), marker_age=0.0, db_absent=True)
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not old.exists(), "the pass did not run: nothing was evicted on an over-budget tree"
+        assert extracting.exists(), "a cache MID-EXTRACTION was evicted (the mtime test cannot see it)"
+        assert unlinked.exists(), "a cache with its database unlinked mid-write was evicted"
+        return "extraction and unlink windows both survive while the oldest evictable cache goes"
+    finally:
+        cleanup(root)
+
+
+@check("an ABANDONED build stops protecting its directory")
+def t_budget_marker_ttl():
+    """Without a TTL a killed builder's marker would protect that directory forever, and the budget
+    would quietly stop being a budget. The two siblings differ ONLY in marker age."""
+    root, kitdir = make_repo(conf=_budget_conf("0.3"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        stale = _sib(caches, "abandoned", kb=300, built_at="2020-01-01T00:00:00+00:00",
+                     worktree=str(root), marker_age=100000.0)
+        live = _sib(caches, "live", kb=100, built_at="2019-01-01T00:00:00+00:00",
+                    worktree=str(root), marker_age=0.0)
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not stale.exists(), "a marker past its TTL still protected an abandoned build"
+        assert live.exists(), "a FRESH marker did not protect a live build"
+        return "expired marker evicted, fresh marker kept — the TTL is the only difference"
+    finally:
+        cleanup(root)
+
+
 @check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
 def t_budget_cannot_satisfy():
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
@@ -559,6 +626,27 @@ def t_budget_cannot_satisfy():
         assert "cannot be brought under it" in proc.stderr, "the shortfall was not reported"
         assert "Nothing was deleted" in proc.stderr, "the report does not say the tree was left alone"
         return "shortfall reported, tree untouched"
+    finally:
+        cleanup(root)
+
+
+@check("a build that starts AFTER the plan is made is not deleted by it")
+def t_budget_recheck_before_delete():
+    """The plan is a proposal made from a snapshot. A sibling can start building between the snapshot
+    and the deletion loop, and a plan is not a licence to delete what has become live since. The
+    marker is planted directly, which is the same state a real racing builder would be in."""
+    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        target = _sib(caches, "racer", kb=400, built_at="2020-01-01T00:00:00+00:00",
+                      worktree=str(root), marker_age=0.0)
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert target.exists(), "a cache that was building at deletion time was deleted anyway"
+        assert "cannot be brought under it" in proc.stderr or "did NOT evict" in proc.stderr, \
+            "the run neither evicted it nor said why it did not: " + proc.stderr
+        return "a racing build survives and the run says so"
     finally:
         cleanup(root)
 
@@ -938,7 +1026,8 @@ def main() -> int:
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
         t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
-        t_budget_lru, t_budget_protections, t_budget_cannot_satisfy, t_budget_blank,
+        t_budget_lru, t_budget_protections, t_budget_build_in_flight, t_budget_marker_ttl,
+        t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
         t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
