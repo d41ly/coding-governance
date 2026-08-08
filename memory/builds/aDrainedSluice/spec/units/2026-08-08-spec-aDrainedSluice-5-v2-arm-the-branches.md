@@ -1,12 +1,13 @@
 # TOOL-aDrainedSluice-5 — V2: arm every pinned branch, or say why not
 
-**Status:** INPROGRESS · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
 The pin exists so an unarmed branch is visible, not so it can stay unarmed. Nine hygiene branches are
-pinned today, V1 adds the manifest-check gate's branches to the population, and V3 and V4 change what
-the set contains. Drive the pin to empty, or to rows that carry a reason a reader accepts.
+pinned before V1; V1 widens the population to the manifest-check gate and the pin becomes **25** rows
+(16 + 9), which is the number this unit drains. Drive the pin to empty, or to rows that carry a
+reason a reader accepts.
 
 ## 2. Scope (IN)
 
@@ -14,13 +15,22 @@ the set contains. Drive the pin to empty, or to rows that carry a reason a reade
   branch's OWN failure text. A fixture that does not trip the branch produces an arm that passes by
   finding nothing, which is the class this repo already catalogues.
 - **S2** — the fixtures are BATCHED where batching works, which is the hygiene harness: `fail()` sets
-  a status flag and never aborts, so one tree trips many branches in one invocation, and at ~8.8 s
-  per invocation eleven separate runs would add ~95 s to a leg that runs on every commit.
+  a status flag and never aborts AND nothing downstream of it short-circuits, so one scratch tree
+  trips many branches in one invocation. Measured on THIS tree, not inherited: the gate is 3.5 s on
+  the real repo and the whole self-test — seven gate invocations plus the git setup — is 25 s, so
+  nine extra scratch-tree runs would roughly double a leg that runs on every commit. (The drafted
+  "~8.8 s per invocation, ~95 s for eleven" was an upstream figure for an upstream tree, and both
+  halves were wrong here: the invocation is cheaper and the population is 25, not eleven.)
 - **S2b** — batching does NOT work for the manifest-check harness, and the draft assumed it did.
   `fail()` does not abort, but its CALLERS short-circuit: `BLOCK_OK` skips four whole checks once any
   check-2 branch fires, and check 3 is a three-way `if`/`elif` chain whose arms are mutually
   exclusive by construction. That harness gets several small fixtures instead, and the reason is
-  recorded here so the next person does not helpfully merge them back together.
+  recorded here so the next person does not helpfully merge them back together. Measured further:
+  `SKIP_RANGE` makes a check-3 branch and check 5's full-mode branch mutually exclusive, and check
+  5's two branches live in opposite invocation MODES (full vs `--staged`) — so the minimum for 16
+  branches is ten invocations, not one. The harness is also not a scratch tree: it copies a template
+  repo per scenario, ~0.95 s each over 40 scenarios (37.7 s measured), so five new scenarios cost
+  ~5 s rather than the ~95 s the drafted argument feared.
 - **S3** — arming happens after V1 and V3, because those two change the branch set: V1 widens the
   population to a second gate, and V3 touches check 5's message. V4 does NOT change it — review 1
   measured that `check-arms` keys on shell `fail` call sites while V4's finding is an awk `print`
@@ -37,6 +47,16 @@ the set contains. Drive the pin to empty, or to rows that carry a reason a reade
   exercising nothing.
 - **S7** — the manifest-check harness gains whatever fixtures its own branches need, in its own file,
   in its own shape. It is a shipped kit file, so its test grows the same way the hygiene test does.
+- **S8** — most of the manifest work is an ASSERTION-TEXT swap, not a fixture. Measured by
+  instrumenting `fail()` and running the untouched suite: 11 of the 16 branches already fire in an
+  existing scenario and assert only `check N FAILED`, which names the CHECK and not the BRANCH —
+  precisely the distinction this meta-gate exists to make. Exactly five branches (check 2, ordinals
+  2, 3, 4, 5 and 7) have no scenario at all, and three of those five co-fire on one fixture.
+- **S9** — the one piece of mechanism this unit does add is named rather than smuggled: `run` takes a
+  single pattern, and check 2's three missing-key branches are independent `||` statements that all
+  fire on one invocation. A `runm` that asserts many signatures over ONE run is what keeps that from
+  becoming three identical repo builds. Nothing else is added, and the `grep -q` in `run` becomes
+  `grep -qF` because every signature in this gate carries braces, quotes, parentheses or an em-dash.
 
 ## 3. Non-goals (OUT)
 
@@ -62,9 +82,17 @@ The population is measured at the start of the unit, after V1/V3/V4. For each br
 | Column | Meaning |
 |---|---|
 | gate · check · ordinal | the key |
-| fixture | the tree state that trips it |
+| covering scenario | the EXISTING fixture that already trips it, where there is one |
+| fixture | the tree state that trips it, where there is not |
 | assertion | the text asserted, copied from the gate's real output |
 | outcome | ARMED, or PINNED with a written reason |
+
+Measured after V1/V3/V8, and this is the whole population:
+
+| Gate | Branches | Already fired by a scenario | Needed a new fixture |
+|---|---|---|---|
+| `manifest-check.sh` | 16 | 11 (assertion-text swap only) | 5 — check 2 ordinals 2, 3, 4, 5, 7 |
+| `check-memory-hygiene.sh` | 14 | 5 (armed before this unit) | 9 — checks 1, 2, 6, 8, 9, 10, 11 + two stale-line guards |
 
 ### Migration
 
@@ -116,6 +144,8 @@ One commit per harness — the hygiene test and the manifest-check test — so a
 - **AC5** — When the hygiene and manifest-check harnesses run, each prints its pass line last and
   each names its assertion count.
 - **AC6** — When the full bar runs, it is green.
+- **AC7** — When a green half exists for a branch, it is asserted too: a selector that matches
+  nothing is silent for the wrong reason, and a red-only arm cannot tell the two apart.
 
 ## 7. Gates
 
@@ -135,6 +165,11 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-08 · CLOSED. Landed: 30/30 branches armed, the pin emptied, `ARMS_FLOORS` raised to
+  `16:16` and `14:14`. Folded the wave-2 verification's remaining two findings: S2's perf figures and
+  population count were upstream numbers (re-measured here — 3.5 s gate, 25 s hygiene self-test,
+  37.7 s manifest suite, 25 pinned rows), and §10's "no mechanism at all" was false once the
+  manifest harness needed a multi-assert helper, so `runm` is declared in S9 instead of denied.
 - rev-1 · 2026-08-08 · initial draft.
 - rev-3 · 2026-08-08 · folded review 2's N17: the batching premise is false for the manifest-check
   harness, whose callers short-circuit. Its blocker N-equivalent — five signatures carrying shell
@@ -145,8 +180,12 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 10. Reuse audit
 
-This unit writes no mechanism at all. The fixtures go into the two scratch trees the two harnesses
-already build, in their existing batched shape; the assertions use each harness's existing helper
-(`hit`/`hitl` in the hygiene test, whatever the manifest-check test already uses); the judge is
-`check-arms.py`, unchanged from V1; the pin and the floors are the existing ones. The only thing
-added is coverage, which is what the backlog row asked for.
+This unit writes almost no mechanism, and the exception is declared rather than hidden. The hygiene
+fixtures go into the scratch tree that harness already builds, in its existing batched shape, and use
+its existing `hit`/`hitl`/`c5block` helpers — `cblock`/`chit`/`cnot` are `c5block` generalised to any
+check number, because five checks print bare paths and an unattributed assertion is satisfied by the
+wrong one. The manifest fixtures use the harness's existing `mkrepo`/`write_manifest`/`run` shape;
+`runm` is the one addition (S9), and it exists because `run` asserts a single pattern while three
+branches fire on one invocation. The judge is `check-arms.py`, unchanged from V1; the pin and the
+floors are the existing ones. Everything else added is coverage, which is what the backlog row asked
+for.

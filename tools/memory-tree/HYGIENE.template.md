@@ -192,6 +192,16 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
 
+The pin is EMPTY today — 30 of 30 branches across both gates are armed — and an empty pin is the
+file's working state, not its retirement. A row appears when a new branch lands that no fixture can
+reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
+from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
+property of the harness, not a preference: the hygiene gate's `fail` never aborts, so one scratch
+tree trips many branches in one ~9 s invocation and the fixtures batch; the manifest gate's CALLERS
+short-circuit — `BLOCK_OK` skips four whole checks after any check-2 branch fires, and check 3 is a
+mutually-exclusive `if`/`elif` chain — so its branches need separate small repos and must not be
+helpfully merged back together.
+
 ## The bug-class catalogue
 
 One authored record per class under `gotchas/`, front matter `name` + `description` (+ optional
