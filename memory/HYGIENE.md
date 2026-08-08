@@ -140,6 +140,32 @@ copied from a larger tree is either vacuous or permanently red. The id grammar c
 memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
 imported, and with a pin set and the kit absent the failure is NAMED, not a traceback.
 
+17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
+18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
+    words that it has none. Silence is not acceptable: "no gate named" and "gate not yet written" are
+    indistinguishable from outside, and the second one quietly never happens.
+19. **the record can actually fire** — a class record derives at least one anchor or is marked
+    `universal`, and a record whose anchors reach ONLY the append-only tree is reported as INERT:
+    reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
+    because every universal record is emitted on EVERY reviewer's checklist.
+
+## The bug-class catalogue
+
+One authored record per class under `gotchas/`, front matter `name` + `description` (+ optional
+`kind` and `universal`) at COLUMN 0 — an indented key is dropped without a word by any simple parser,
+so it is a named error here. ANCHORS ARE DERIVED, not declared: a record's anchors are the
+backtick-quoted path-like tokens in its body, because an authored list is a second copy of what the
+body already says. Derivation over-selects rather than under-selects, and a record naming no path is
+REPORTED as unanchored rather than silently never firing.
+
+Hand a reviewer the classes their diff can hit:
+
+```bash
+python tools/memory-tree/gotchas.py --for-diff <base>..<head>
+```
+
+Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
+
 ## Codebase-map interop
 
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.

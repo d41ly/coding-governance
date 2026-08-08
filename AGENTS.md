@@ -52,7 +52,8 @@ value in each spec's status header, not a directory, so a build spanning two dis
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (16 checks, kit 1.5 flat tree) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9 and 13-16 delegate to `gen_build_index.py` and `corpus_ids.py`
+- `memory/` hygiene (19 checks, kit 1.5 flat tree) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+- recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)

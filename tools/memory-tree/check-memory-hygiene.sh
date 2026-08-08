@@ -165,7 +165,7 @@ $broken"
 root1=$(printf '%s\n' "$FILES" | awk -F/ '{ if (NF==2) print "F:"$2; else print "D:"$2 }' | LC_ALL=C sort -u)
 bad3=$(printf '%s\n' "$root1" | grep . | while IFS= read -r e; do case "$e" in
   F:README.md|F:HYGIENE.md|F:TEMPLATE-SPEC.md|F:DECISIONS.md|F:LIVE.md) ;;
-  D:project|D:builds|D:backlog|D:decisions|D:guides|D:archive|D:ledger) ;;
+  D:project|D:builds|D:backlog|D:decisions|D:guides|D:archive|D:ledger|D:gotchas) ;;
   D:*) d="${e#D:}"; [ "$d" = "$MAP_SUB" ] || echo "$M/$d";;
   *) echo "$M/${e#*:}";; esac; done)
 # backlog/ holds ONLY <FAMILY>.md, one shard per declared family — a stray name there is a backlog
@@ -585,6 +585,17 @@ if [ "$STAGED" = 0 ]; then
   if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
     printf '%s
 ' "$ids"; status=1
+  fi
+fi
+
+# 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
+# generated, every class record declares a gate or says it has none, and a record whose anchors reach
+# only the append-only tree is reachable on paper and dead in practice.
+if [ "$STAGED" = 0 ]; then
+  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
+  if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
+    printf '%s
+' "$got"; status=1
   fi
 fi
 

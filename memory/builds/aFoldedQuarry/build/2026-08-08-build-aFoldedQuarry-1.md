@@ -266,3 +266,63 @@ is still one grammar and it can now be bound to an explicit root.
 `python tools/memory-tree/corpus_ids.py --selftest` — 16 arms: every rule of checks 13-16 with a red
 and a green side, both directions of rule 1, the shrink-only pins, the stale waiver row, the missing
 charter, and the blank-pin off switch. `bash tools/run-gates.sh` — 24/24 green.
+
+## U4 — the bug-class catalogue and its per-diff checklist (spec `TOOL-aFoldedQuarry-6`, CLOSED)
+
+### What landed
+
+`tools/memory-tree/gotchas.py` plus eight authored records under `memory/gotchas/`, a generated
+`INDEX.md`, and three checks. `--for-diff <base>..<head>` prints the classes a diff can actually hit;
+its stdout IS the checklist. Run against this build's own last commit it selected five anchored
+classes plus the two universal ones out of eight — which is the shape the unit is for.
+
+| Check | What it catches |
+|---|---|
+| 17 | a stale `gotchas/INDEX.md` |
+| 18 | a class record that neither names a gate nor says it has none |
+| 19 | a record that can never fire: no anchor and not universal, or anchors reaching only append-only paths |
+
+### The corpus is this repo's failure history, not inCMS's
+
+inCMS's 178 records are its own history; here they would be 178 anchors matching nothing. The eight
+records are the classes THIS build paid for, each citing the measurement that produced it: the
+vacuous selector, the absence assertion that reds on its own documentation, the byte-compare gate
+that needs both an eol pin and a normalising comparison, the subprocess that resolves a different
+shell, the grammar bound to the wrong root, the fixture that passes by finding nothing, the pin
+copied from another corpus, and two answers to one question.
+
+Two are `universal: true` against a budget of 3. Upstream designed for 10 and measured 40, and 40 of
+a 68-entry checklist are the always-emitted core — so the budget is a conf value with a measurement
+behind it rather than a number that drifts.
+
+### One carried defect turned out not to apply
+
+The handoff listed three upstream harvest defects to carry. Two hold here: a token containing `::`
+inside backticks harvests to nothing, and an anchor's basename matches tree-wide however much path
+precedes it (kept — it is what makes short-form anchors usable). The third does not: upstream's token
+pattern required a non-empty tail after the slash, so a directory anchor written with a trailing
+slash harvested to nothing and its record was silently unanchored. This pattern allows an empty tail,
+so the directory token IS harvested and selects everything beneath it.
+
+The arm asserts the DIFFERENCE rather than upstream's behaviour, with the reason written next to it.
+Carrying a defect that is not present would have been deference to a document over a measurement, and
+pinning the actual behaviour means a future tightening of the pattern reintroduces the upstream
+defect loudly instead of quietly.
+
+### The catalogue does not select itself
+
+Every record cites paths under `gotchas/` while describing its own class, and selection matches on
+basename — so without an exclusion a diff touching the catalogue would emit most of the catalogue.
+Noise on a checklist is how reviewers learn to skip it, so `selectable()` never returns a path inside
+the catalogue.
+
+### Verification
+
+`python tools/memory-tree/gotchas.py --selftest` — 19 arms: every check with a red and a green side,
+both `--declares` directions (a body that says it has no gate declares; a `description` carrying the
+word "gated" does not), the indented-front-matter error, all three harvest behaviours, the
+self-exclusion, the universal budget, and four `--for-diff` arms proving it emits anchored hits and
+universals and omits misses and non-class records. Check 19's fixture carries a POPULATED append-only
+area, without which the inert arm can never fire and the rule ships green forever.
+
+`bash tools/run-gates.sh` — 25/25 green.
