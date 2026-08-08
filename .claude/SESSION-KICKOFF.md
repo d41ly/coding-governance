@@ -102,7 +102,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   a relative path resolves under `/mnt/c/`. Name the executable — see `resolve_bash()` in
   `tools/memory-tree/corpus_ids.py`; `GOV_BASH` overrides.
 - Generating source through a shell heredoc into a NON-raw Python string turns an escape into a
-  CONTROL BYTE in the written file. A `` becomes a backspace, the compiled regex silently stops
+  CONTROL BYTE in the written file. A ``\b`` becomes a backspace, the compiled regex silently stops
   matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
   2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
   and sweep TRACKED AND UNTRACKED files when repairing.
