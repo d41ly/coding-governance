@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -163,8 +164,15 @@ _REFERENCE_SHA = re.compile(
 _SHA = re.compile(r"`([0-9a-f]{7,40})`")
 
 
+# A row that has REACHED its terminal state still makes a claim about git: the ledger's own prune
+# trigger says "prune once ancestor", so `merged:<sha>` for a sha that IS an ancestor is a row whose
+# own written rule has fired and been ignored. Left unoracled, cleaning up the open-claim rows simply
+# converts them into this blind class — which is what a hand cleanup would have done here.
+_TERMINAL_SHA = re.compile(r"merged\s*:?\s*`?([0-9a-f]{7,40})`?", re.I)
+
+
 def signal_ledger(ctx) -> dict:
-    rows, contradicting = 0, []
+    rows, contradicting, judgeable, unjudgeable = 0, [], 0, 0
     for f in sorted(ctx.ledger_dir.glob("*.md")) if ctx.ledger_dir.is_dir() else []:
         rel = str(f.relative_to(ctx.root)).replace("\\", "/")
         for i, line in enumerate(f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
@@ -175,21 +183,39 @@ def signal_ledger(ctx) -> dict:
                 continue  # header row
             rows += 1
             if not _OPEN_CLAIM.search(line):
+                # TERMINAL rows are judged too — see _TERMINAL_SHA. A `merged:<sha>` row whose sha is
+                # an ancestor is past the prune trigger the ledger index states in its own words.
+                for s in _TERMINAL_SHA.findall(line):
+                    if ctx.git.is_commit(s) and ctx.git.is_ancestor(s):
+                        judgeable += 1
+                        contradicting.append({"file": rel, "line": i, "shas": [s],
+                                              "why": "terminal and landed — past its own prune trigger"})
+                        break
                 continue
             refs = set(_REFERENCE_SHA.findall(line))
             work = [s for s in _SHA.findall(line) if s not in refs]
+            if not work:
+                # An open claim naming no sha OF ITS OWN cannot be judged from git. Counted, never
+                # scored clean — the same distinction `signal_spec_status` draws with `unkeyed`.
+                unjudgeable += 1
+                continue
+            judgeable += 1
             landed = [s for s in work if ctx.git.is_commit(s) and ctx.git.is_ancestor(s)]
             if landed:
-                contradicting.append({"file": rel, "line": i, "shas": landed[:4]})
+                contradicting.append({"file": rel, "line": i, "shas": landed[:4],
+                                      "why": "open claim, but its own sha has landed"})
     return {
         "signal": "ledger_rows_contradicting_git",
         "value": len(contradicting),
         "of": rows,
         "tolerance": 0,
         "gateable": True,
-        # Live iff there are rows to judge at all. A ledger with none would report a meaningless 0,
-        # which is exactly the collision_flags failure mode this kit exists to refuse.
-        "live": rows > 0,
+        # LIVE IFF THE JUDGEABLE POPULATION IS NON-EMPTY — not iff rows exist. `live` used to be
+        # asserted over the ambient population while `value` was drawn from a narrower one, so a
+        # ledger of rows this probe cannot judge reported a confident 0. One prune away from
+        # reachable, and `--check` scored it ok either way.
+        "live": judgeable > 0,
+        "unjudgeable": unjudgeable,
         "detail": contradicting,
     }
 
@@ -208,7 +234,11 @@ NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 def signal_spec_status(ctx) -> dict:
     suspect, checked, unkeyed = [], 0, 0
-    for p in sorted(ctx.root.glob(f"{ctx.memory_root}/*/builds/*/spec/**/*.md")):
+    # FLAT (memory-tree 1.5): `<memory_root>/builds/<slug>/spec/…`. This read
+    # `{memory_root}/*/builds/…` — the discipline directory the flatten retired — and so matched 0
+    # files while the flat form matched 39. The probe reported 0-of-0 DEAD PROBE, `--check` skipped
+    # it for being dead, and the leg stayed green over a blind oracle for the whole of that session.
+    for p in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = p.read_text(encoding="utf-8", errors="replace")[:4000]
         m = _STATUS.search(head)
         if not m or m.group(1).upper() not in NON_TERMINAL:
@@ -297,13 +327,27 @@ def signal_handkept(ctx) -> dict:
             continue
         rows.append({"record": spec["record"], "source": spec.get("source", "?"),
                      "claims": claims, "actual": actual, "agrees": claims == actual})
+    # A MAGNITUDE, not a per-row boolean. Scored as a boolean over a one-row population the value
+    # lived in {0, 1} against a pin of 1, so `value > pin` needed 2 and the ceiling was 1: gateable
+    # in name, unsatisfiable in fact. Counting the items that disagree gives a number that can DRAIN
+    # — one charter bullet at a time — and a pin that means something.
+    gap = 0
+    pop = 0
+    for r in rows:
+        if isinstance(r.get("claims"), int) and isinstance(r.get("actual"), int) and r["claims"] >= 0:
+            gap += max(0, r["actual"] - r["claims"])
+            pop += r["actual"]
+        elif not r["agrees"]:
+            gap += 1          # a probe that raised, or one that cannot count: one offender
+            pop += 1
     return {
         "signal": "handkept_inventories_disagreeing_with_source",
-        "value": sum(0 if r["agrees"] else 1 for r in rows),
-        "of": len(rows),
+        "value": gap,
+        "of": pop,
         "tolerance": 0,
         "gateable": True,
-        "live": len(rows) > 0,
+        # Judgeable population, not row count: an inventory with nothing IN it proves nothing.
+        "live": pop > 0,
         "detail": rows,
     }
 
@@ -365,6 +409,9 @@ class Ctx:
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)
+        # The project layer itself, so a signal can ask for a declaration the kit does
+        # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
+        self.proj = proj
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
         self.node_tag = self._resolve_node_tag()
 
@@ -408,7 +455,26 @@ def main(argv: list[str] | None = None) -> int:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
 
-    base_ref = args.base_ref or conf.get("DEFAULT_BRANCH") or "main"
+    # THE LADDER THIS REPO ALREADY SHARES — `push-main.sh`, `.githooks/pre-push` and
+    # `check-verdict-epoch.sh` all resolve the default branch this way. The old line was
+    # `args.base_ref or conf["DEFAULT_BRANCH"] or "main"`: a fourth spelling, keyed on a conf key no
+    # kit declares and no doc mentions, falling back to a literal that may not exist. On a repo whose
+    # default is not `main`, every ancestry answer was silently wrong rather than refused.
+    base_ref = args.base_ref or os.environ.get("GOV_DEFAULT_BRANCH") or ""
+    if not base_ref:
+        head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
+                               "refs/remotes/origin/HEAD"], capture_output=True, text=True)
+        base_ref = head.stdout.strip().rpartition("/")[2] if head.returncode == 0 else ""
+    if not base_ref:
+        print("drift-report: cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "
+              "--base-ref, or `git remote set-head origin -a`. Refusing to guess: every ancestry "
+              "answer in this report is measured against it.", file=sys.stderr)
+        return 2
+    if subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", base_ref],
+                      capture_output=True).returncode != 0:
+        print(f"drift-report: base ref '{base_ref}' does not resolve in this clone — this report "
+              f"cannot judge ancestry against it.", file=sys.stderr)
+        return 2
     ctx = Ctx(root, conf, proj, base_ref)
     out = [s(ctx) for s in SIGNALS]
     for s in out:
@@ -422,7 +488,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
             if not s["live"]:
-                status = "DEAD PROBE — signal cannot move, ignore its value"
+                status = ("empty by declaration — nothing to measure here yet"
+                          if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+                          else "DEAD PROBE — signal cannot move, ignore its value")
             elif s["value"] < 0:
                 status = "n/a"
             elif s["gateable"] and s["value"] > s["pin"]:
@@ -437,13 +505,28 @@ def main(argv: list[str] | None = None) -> int:
         print("\n# detail: rerun with --json")
 
     if args.check:
-        bad = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
-        for s in bad:
+        # A DEAD GATEABLE SIGNAL IS A FAILURE, not a skip. The old predicate required `live`, so a
+        # probe that had gone blind scored exactly like a probe that had found nothing — which is how
+        # a pre-flatten glob stayed green on the merge bar. This is the generic fix: it catches the
+        # next blind probe without anyone having to notice the next layout change.
+        #
+        # Except when a signal is EMPTY BY DECLARATION. `SHRINK_ONLY` ships empty on purpose, and a
+        # rule with no exception here would red every fresh adopter on their first run. The exception
+        # is enumerated in the project layer, never inferred.
+        declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+        over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
+        dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
+        for s in over:
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)
             for d in s["detail"][:10]:
                 print(f"  {d}", file=sys.stderr)
-        return 1 if bad else 0
+        for s in dead:
+            print(f"\ndrift-report: {s['signal']} is DEAD — gateable, but its judgeable population is "
+                  f"empty, so its value ({s['value']}) means nothing. Either its selector no longer "
+                  f"matches this tree, or the signal is empty on purpose and belongs in "
+                  f"DECLARED_EMPTY with the reason.", file=sys.stderr)
+        return 1 if (over or dead) else 0
     return 0
 
 

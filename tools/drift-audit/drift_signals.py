@@ -28,15 +28,33 @@ PRODUCT_GLOBS: list[str] = [
 ]
 
 # --------------------------------------------------------------------------------------------
-# SHRINK_ONLY — nothing here yet. This repo ships no waiver/baseline/grace list of its own; the ones
-# the kits CREATE live in adopting repos, not here.
+# SHRINK_ONLY — the lists this repo promises will only ever get shorter, with the seed each was
+# measured at. The previous comment here claimed "this repo ships no waiver list of its own", which
+# was false when written and falser since: four such lists are live in `memory/project/`, every one
+# of them load-bearing for a gate.
 #
-# Declared empty rather than omitted so the signal reports `live: False` (DEAD PROBE) instead of a
-# clean 0. An empty population scoring "ok" is precisely the green-by-absence reading this kit exists
-# to refuse — and the kit holds itself to that rule too.
+# `legacy-files.txt` is EXCLUDED, deliberately and in writing rather than by omission: it is the
+# memory-tree kit's permanent grandfather list, not a debt being drained, so a shrink-only assertion
+# over it would be a ratchet nobody intends to turn.
 # --------------------------------------------------------------------------------------------
 
-SHRINK_ONLY: dict[str, str] = {}
+SHRINK_ONLY: dict[str, str] = {
+    "memory/project/id-orphan-waiver.txt": "the orphan-id waiver — one row per id cited but not defined",
+    "memory/project/curation-debt.txt": "files exempted from the index caps until they are curated",
+    "memory/project/corpus-path-unresolved.txt": "citations that cannot legally be repaired",
+    "memory/project/unarmed-branches.txt": "fail branches with no arm; empty today and meant to stay so",
+}
+
+# --------------------------------------------------------------------------------------------
+# DECLARED_EMPTY — signals whose population is empty ON PURPOSE, so `--check` must not red them for
+# being dead. Every other gateable signal that goes dead is a blind instrument and IS a failure.
+#
+# The exception exists because the SHIPPED template declares no shrink-only lists at all, so without
+# it a fresh adopter reds on their first run for doing exactly what the template told them to. An
+# exemption that is not enumerated is not an exemption — this list is the enumeration.
+# --------------------------------------------------------------------------------------------
+
+DECLARED_EMPTY: set[str] = set()
 
 # --------------------------------------------------------------------------------------------
 # HANDKEPT — hand-maintained inventories mirroring an authoritative source.
@@ -57,16 +75,24 @@ def _charter_mentions_every_leg(ctx) -> tuple[int, int]:
     """
     legs = json.loads((ctx.root / "tools/gate-legs.json").read_text(encoding="utf-8"))
     legs = legs if isinstance(legs, list) else legs.get("legs", legs)
-    names = [str(l.get("name") or l.get("id") or "") for l in legs]
-    names = [n for n in names if n]
-    total = len(names)
-
+    # MATCHED ON THE LEG'S ARGV SCRIPT PATH, not its display name. The display name is a label
+    # somebody types twice; the script path is the identifier every charter bullet already cites, and
+    # it does not move when a leg is renamed. Measured at 647bfd9: by display name 11 of 37 legs read
+    # as named, by script path 30 — the name predicate was over-counting in one direction (crediting
+    # a self-test leg when only its gate's path is cited) and under-counting in the other (missing
+    # every bullet that groups legs in prose). The real gap is 7, and every one of the 7 is a
+    # self-test whose parent gate IS named — a number that drains one bullet at a time.
+    total = len(legs)
     charter = (ctx.root / (ctx.charter or "AGENTS.md")).read_text(encoding="utf-8", errors="replace")
     m = re.search(r"^##\s+The gate suite.*?$(.*?)^##\s", charter, re.M | re.S)
     section = m.group(1) if m else ""
     if not section:
         return -1, total
-    mentioned = sum(1 for n in names if n in section)
+    mentioned = 0
+    for leg in legs:
+        paths = [a for a in leg.get("argv", []) if "/" in str(a)]
+        if any(str(p) in section for p in paths):
+            mentioned += 1
     return mentioned, total
 
 
@@ -84,18 +110,30 @@ HANDKEPT: list[dict] = [
 # --------------------------------------------------------------------------------------------
 
 PINS: dict[str, int] = {
-    # 1 — `in-flight/b.md:5` says "merged ... NOT pushed" while `c2f608e7` IS an ancestor of
-    # origin/main. Verified by hand. Node `b` owns that file, so node `c` does not edit it; the pin
-    # holds the line until b prunes its own row, and drops to 0 when it does.
-    "ledger_rows_contradicting_git": 1,
+    # 4 — re-measured at 647bfd9 with `python tools/drift-audit/drift_report.py`, after the probe
+    # gained its terminal-class oracle. The old seed of 1 was measured when the probe judged only
+    # OPEN-claim rows; it now also judges `merged:<sha>` rows whose sha is an ancestor, because the
+    # ledger's own prune trigger is a claim about git and a row past it is stale by its own rule.
+    # Three of the four are node `a`'s and drain in the very next unit; the fourth is node `b`'s
+    # (`in-flight/b.md:5`), which node `a` does not edit — see the cross-node row in the backlog.
+    "ledger_rows_contradicting_git": 4,
     # 2 — TOOL-aBatchedLintel-1 and TOOL-aGuardedTally-1, both INPROGRESS with their ids in tracked
     # kit source. INPROGRESS means "approved, build underway", which is arguably TRUE for a
     # built-but-unmerged unit, so this is the oracle's known residual ambiguity rather than proven
     # rot. Pinned, not gated to zero, for exactly that reason — read them before lowering it.
+    #
+    # UNCHANGED by the glob repair, which is the point: the pre-flatten glob matched 0 files and the
+    # signal read 0-of-0 DEAD; the flat glob reads 2-of-9, exactly this pin. The seed was right all
+    # along and the instrument was not.
     "non_terminal_specs_cited_by_product_source": 2,
-    # 1 — the charter's gate-suite section names 7 of the manifest's 19 legs. A real gap: a session
-    # obeying "enumerate exhaustively" from the charter under-reports its own coverage by 12 legs.
-    "handkept_inventories_disagreeing_with_source": 1,
+    # 7 — the number of legs in `tools/gate-legs.json` whose script path the charter's gate-suite
+    # section does not cite, measured at 647bfd9. The old seed of 1 was a per-row boolean against a
+    # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not
+    # fire at all. Its comment claimed "7 of 19" against a manifest that holds 37.
+    #
+    # All 7 are SELF-TESTS whose parent gate is cited — so this drains one charter bullet at a time,
+    # which is what a pin is for.
+    "handkept_inventories_disagreeing_with_source": 7,
 }
 
 CHARTER = "AGENTS.md"

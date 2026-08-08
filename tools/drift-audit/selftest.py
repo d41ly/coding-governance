@@ -18,6 +18,7 @@ Everything runs in a throwaway git repo under tempfile. Nothing is written into 
 
 from __future__ import annotations
 
+import os
 import pathlib
 import subprocess
 import sys
@@ -72,9 +73,17 @@ def resolve_posix_shell(probe_dir: pathlib.Path) -> str | None:
         marker.unlink(missing_ok=True)
 
 
-def run(cmd: list[str], cwd: pathlib.Path) -> subprocess.CompletedProcess:
+def run(cmd: list[str], cwd: pathlib.Path, env: dict | None = None) -> subprocess.CompletedProcess:
+    # GOV_DEFAULT_BRANCH is declared for every fixture: these repos have no remote, and the report's
+    # default-branch ladder now REFUSES to guess rather than falling back to a literal `main` that
+    # may not exist. That refusal is the point of the change, so the fixtures state their default the
+    # way an adopter without a remote has to. The arm that proves the refusal passes NO env.
+    e = dict(os.environ)
+    e.setdefault("GOV_DEFAULT_BRANCH", "main")
+    if env is not None:
+        e.update(env)
     return subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True,
-                          encoding="utf-8", errors="replace")
+                          encoding="utf-8", errors="replace", env=e)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -117,9 +126,36 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
 # ---------------------------------------------------------------------------------------------
 
 
+# The build-spec path the fixture creates, expressed the way drift_report.py globs for it. Both
+# sides read MEMORY_ROOT from the same conf, so changing the conf moves BOTH — which the arm at the
+# bottom of this file proves rather than assumes.
+FIXTURE_MEMORY_ROOT = "memory"
+SPEC_DIR_FOR_FIXTURE = f"{FIXTURE_MEMORY_ROOT}/builds/2026-01-01-TOOL-x/spec"
+
+
+def _side_branch_commit(r: pathlib.Path) -> str:
+    """A commit that EXISTS but is not an ancestor of the default branch.
+
+    The clean ledger fixture needs one: every commit reachable from `main` is an ancestor of `main`,
+    so a row citing any of them is a row the probe must flag. Only a side branch gives "this sha is
+    real, and this work has genuinely not landed" — which is what a correct open row looks like.
+    """
+    run(["git", "checkout", "-q", "-b", "sidework"], r)
+    (r / "src" / "side.txt").write_text("side\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-qm", "side work, not merged", "--no-verify"], r)
+    sha = run(["git", "rev-parse", "--short", "HEAD"], r).stdout.strip()
+    run(["git", "checkout", "-q", "main"], r)
+    return sha
+
+
 def make_repo(tmp: pathlib.Path) -> pathlib.Path:
     r = tmp / "repo"
-    (r / "memory" / "tooling" / "builds" / "2026-01-01-TOOL-x" / "spec").mkdir(parents=True)
+    # DERIVED from the conf this fixture is about to write, never a literal layout. The previous
+    # line spelled `memory/tooling/builds/<x>/spec` — the pre-flatten shape — so an arm named
+    # "violated: spec signal fires" was green while the dogfood's own signal printed DEAD PROBE. A
+    # fixture that encodes a layout is a fixture that certifies the layout it encodes.
+    (r / SPEC_DIR_FOR_FIXTURE).mkdir(parents=True)
     (r / "memory" / "project" / "in-flight").mkdir(parents=True)
     (r / "src").mkdir(parents=True)
     (r / "drift-audit").mkdir(parents=True)
@@ -130,14 +166,21 @@ def make_repo(tmp: pathlib.Path) -> pathlib.Path:
     (r / "src" / "app.py").write_text("# nothing cited here\n", encoding="utf-8", newline="\n")
     (r / "shrinkme.txt").write_text("# header\nentry-one\nentry-two\n", encoding="utf-8", newline="\n")
 
-    # a CLEAN ledger row: claims in-flight, names only a base sha
+    # A CLEAN ledger row must be JUDGEABLE and clean — not merely unjudgeable. The previous fixture
+    # named only a BASE sha, so the probe had nothing of its own to judge; once `live` became the
+    # judgeable population rather than the row count, that fixture made the signal correctly DEAD and
+    # the "clean" arm was asserting over a probe that could not answer. A row that cites its own work
+    # on a side branch is the real clean case: built, genuinely not merged.
+    # The sha is filled in AFTER `git init`, below — a side branch cannot be cut before the repo
+    # exists, and a fixture that silently wrote an empty sha would leave the probe unjudgeable again,
+    # which is the state this fixture was changed to escape.
     (r / "memory" / "project" / "in-flight" / "a.md").write_text(
         "| slug | branch | status |\n|---|---|---|\n"
-        "| `aThing` | `feature/x` off `BASESHA` | in-flight — nothing landed |\n",
+        "| `aThing` | `feature/x` off `BASESHA` | in-flight — NOT merged, work at `PENDING` |\n",
         encoding="utf-8", newline="\n")
 
     # a CLEAN spec: non-terminal, and its id appears nowhere in product source
-    (r / "memory" / "tooling" / "builds" / "2026-01-01-TOOL-x" / "spec" / "2026-01-01-spec-aThing-1.md").write_text(
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aThing-1.md").write_text(
         "# TOOL-aThing-1 — a thing\n\n**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
         encoding="utf-8", newline="\n")
 
@@ -147,7 +190,12 @@ def make_repo(tmp: pathlib.Path) -> pathlib.Path:
         "PRODUCT_GLOBS = ['src']\n"
         "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
         "HANDKEPT = []\n"
-        "PINS = {}\n",
+        "PINS = {}\n"
+        # HANDKEPT is empty here, as it is in the shipped template — so the signal it feeds is empty
+        # BY DECLARATION, not blind, and must be named as such or `--check` reds this fixture for
+        # modelling the adopter default faithfully. SHRINK_ONLY is populated above, so it is NOT
+        # declared: leaving it in this set after populating it is how an exemption becomes a hole.
+        "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}\n",
         encoding="utf-8", newline="\n")
 
     run(["git", "init", "-q", "-b", "main"], r)
@@ -155,6 +203,16 @@ def make_repo(tmp: pathlib.Path) -> pathlib.Path:
     run(["git", "config", "user.name", "selftest"], r)
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed"], r)
+
+    # Now the side-branch sha exists, so the clean row can cite work that is REAL and genuinely not
+    # merged. Asserted, not assumed: an empty sha here puts the probe back in the unjudgeable state.
+    side = _side_branch_commit(r)
+    assert len(side) >= 7, f"side-branch sha not produced: {side!r}"
+    led = r / "memory" / "project" / "in-flight" / "a.md"
+    led.write_text(led.read_text(encoding="utf-8").replace("`PENDING`", "`" + side + "`"),
+                   encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "clean ledger row cites unmerged side work"], r)
     return r
 
 
@@ -188,9 +246,13 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     # --- violate signal 1: a row claiming in-flight while naming a LANDED work sha ---------
     sha = run(["git", "rev-parse", "--short", "HEAD"], r).stdout.strip()
     led = r / "memory" / "project" / "in-flight" / "a.md"
-    led.write_text(led.read_text(encoding="utf-8").replace(
-        "in-flight — nothing landed", f"in-flight — NOT merged, work at `{sha}`"),
-        encoding="utf-8", newline="\n")
+    clean_row = led.read_text(encoding="utf-8")   # restored after the base-sha arm, which unjudges the row
+    # Swap the side-branch sha for one that IS an ancestor of the default branch. Same row, same
+    # claim, one fact changed — so the arm isolates the oracle rather than the row's wording.
+    import re as _re
+    led.write_text(_re.sub(r"work at `[0-9a-f]+`", f"work at `{sha}`",
+                           led.read_text(encoding="utf-8")),
+                   encoding="utf-8", newline="\n")
     v1 = report(r)
     check("violated: ledger signal fires on a landed work sha",
           v1["ledger_rows_contradicting_git"]["value"] == 1,
@@ -204,6 +266,17 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("base sha alone does NOT fire the ledger signal",
           v1b["ledger_rows_contradicting_git"]["value"] == 0,
           f"got {v1b['ledger_rows_contradicting_git']['value']} — base-sha exclusion is broken")
+    # ...and it reports UNJUDGEABLE rather than a clean 0. This is the sharper half: "the base sha was
+    # excluded" and "there was nothing left to judge" produce the same value, and only the second is
+    # true here. Before `live` became the judgeable population, this arm could not tell them apart.
+    check("...and says so: the row is unjudgeable, not clean",
+          v1b["ledger_rows_contradicting_git"]["live"] is False
+          and v1b["ledger_rows_contradicting_git"].get("unjudgeable") == 1,
+          f"live={v1b['ledger_rows_contradicting_git']['live']} "
+          f"unjudgeable={v1b['ledger_rows_contradicting_git'].get('unjudgeable')}")
+    # Restore the judgeable clean row: every arm below judges a repo whose ledger can be judged, and
+    # leaving it unjudgeable would make them assert over a DEAD probe.
+    led.write_text(clean_row, encoding="utf-8", newline="\n")
 
     # --- violate signal 2: the spec's own id now appears in product source -----------------
     (r / "src" / "app.py").write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
@@ -215,7 +288,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           f"got {v2['non_terminal_specs_cited_by_product_source']['value']}")
 
     # --- a TERMINAL status must not fire, or the signal is just counting specs -------------
-    spec = r / "memory" / "tooling" / "builds" / "2026-01-01-TOOL-x" / "spec" / "2026-01-01-spec-aThing-1.md"
+    spec = r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aThing-1.md"
     spec.write_text(spec.read_text(encoding="utf-8").replace("SPECCED", "CLOSED"),
                     encoding="utf-8", newline="\n")
     v2b = report(r)

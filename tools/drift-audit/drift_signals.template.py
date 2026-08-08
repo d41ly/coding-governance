@@ -91,3 +91,18 @@ PINS: dict[str, int] = {
 # --------------------------------------------------------------------------------------------
 
 # CHARTER = "AGENTS.md"
+
+# --------------------------------------------------------------------------------------------
+# DECLARED_EMPTY — signals whose population is empty ON PURPOSE. `--check` reds a gateable signal
+# that has gone DEAD, because a blind instrument reporting 0 is the failure this kit exists to
+# refuse; a signal you have deliberately not populated yet is not blind, and belongs here.
+#
+# `shrink_only_lists_not_shrinking` starts here because SHRINK_ONLY above ships empty. Remove it the
+# moment you declare your first list — leaving it here after that is how the exemption becomes the
+# hole.
+# --------------------------------------------------------------------------------------------
+
+DECLARED_EMPTY: set[str] = {
+    "shrink_only_lists_not_shrinking",   # SHRINK_ONLY above ships empty
+    "handkept_inventories_disagreeing_with_source",   # HANDKEPT above ships empty
+}
