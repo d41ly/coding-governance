@@ -8,6 +8,14 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/agent-cap.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
+# The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
+# ban could not see here, because it matches only `command -v`.
+if [ -f "$HERE/../lib/resolve-python.sh" ]; then
+  . "$HERE/../lib/resolve-python.sh"
+  TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
+else
+  TESTPY=python3
+fi
 check() { # name expected_exit json
   printf '%s' "$3" | node "$HOOK" >/dev/null 2>"$TMP/err"; local got=$?
   if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
@@ -19,8 +27,10 @@ check() { # name expected_exit json
 js() { # name expected_exit  (script on stdin)
   local name=$1 want=$2
   local payload
-  payload=$(python3 -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))' 2>/dev/null) \
-    || payload=$(python -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  # An EMPTY payload makes every ALLOW arm pass for the wrong reason — the hook exits 0 on
+  # unparseable input by design. A fixture that produced nothing is a failure, not a silent green.
+  case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
   check "$name" "$want" "$payload"
 }
 
@@ -95,6 +105,50 @@ const b = splitInto(all, 9) // gov:fixed-verifiers
 const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
 EOF
 
+# THE BYPASSES. Every one of these was ALLOWED by the first cut of rule 2 and reported "clean" by the
+# merge-bar leg that delegates to it — found by an adversarial review of the commit that introduced
+# the rule, each reproduced against this tree before it was fixed. They are here because a whitelist
+# is only as good as the spellings it refuses, and the ones it has never seen are the ones that get
+# written. The root cause was a single line: an unrecognised receiver fell through to ALLOW.
+js "bypass: the marker on the agent() line itself → deny" 2 <<'EOF'
+const r = await boundedParallel(allFindings.map((f) => () => agent(f.claim)), 5) // gov:fixed-verifiers
+EOF
+js "bypass: a .filter().map() chain → deny" 2 <<'EOF'
+const r = await boundedParallel(allFindings.filter(Boolean).map((f) => () => agent(f.claim)), 5)
+EOF
+js "bypass: a call-result receiver → deny" 2 <<'EOF'
+const r = await boundedParallel(Object.values(byId).map((f) => () => agent(f.claim)), 5)
+EOF
+js "bypass: a spread literal → deny" 2 <<'EOF'
+const items = [...allFindings]
+const r = await boundedParallel(items.map((f) => () => agent(f.claim)), 5)
+EOF
+js "bypass: [].concat(x) → deny" 2 <<'EOF'
+const items = [].concat(allFindings)
+const r = await boundedParallel(items.map((f) => () => agent(f.claim)), 5)
+EOF
+js "bypass: a reassigned receiver → deny" 2 <<'EOF'
+let items = [1, 2]
+items = allFindings
+const r = await boundedParallel(items.map((f) => () => agent(f.claim)), 5)
+EOF
+js "bypass: a braceless for-of body → deny" 2 <<'EOF'
+const out = []
+for (const f of allFindings) out.push(await agent(f.claim))
+EOF
+js "bypass: a braceless while body → deny" 2 <<'EOF'
+let i = 0
+while (i < all.length) out.push(await agent(all[i++].claim))
+EOF
+js "bypass: a marked .concat() derivation → deny" 2 <<'EOF'
+const LENSES = [{ k: 1 }, { k: 2 }]
+const more = LENSES.concat(allFindings) // gov:fixed-verifiers
+const r = await boundedParallel(more.map((f) => () => agent(f.k)), 5)
+EOF
+js "bypass: .reduce() instead of .map() → deny" 2 <<'EOF'
+const r = await boundedParallel(allFindings.reduce((a, f) => a.concat([() => agent(f.claim)]), []), 5)
+EOF
+
 # ---- rule 2: the shapes that MUST pass ----------------------------------------------------------
 # Without these the rule could be satisfied by denying everything, which is a gate that stops work
 # rather than stopping a defect.
@@ -155,15 +209,23 @@ else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `tools/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A
 # stale wired copy enforces yesterday's rules while the kit documents today's.
+# The arm used to sit inside `if BOTH files exist`, so a DELETED wired copy satisfied it by absence —
+# the parity assertion's own failure mode. Inside the governance repo the pair is REQUIRED; in an
+# adopting tree with no tools/hooks/ the arm skips loudly instead of vanishing.
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
-if [ -n "$ROOT" ] && [ -f "$ROOT/.claude/hooks/agent-cap.js" ] && [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
-  if diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$ROOT/tools/hooks/agent-cap.js") >/dev/null; then
+if [ -n "$ROOT" ] && [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
+  if [ ! -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
+    echo "FAIL the wired copy .claude/hooks/agent-cap.js is MISSING (parity must not be satisfiable by absence)"
+    fail=$((fail+1))
+  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$ROOT/tools/hooks/agent-cap.js") >/dev/null; then
     echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
   else
     echo "FAIL .claude/hooks/agent-cap.js has drifted from tools/hooks/agent-cap.js"
     echo "     fix: cp tools/hooks/agent-cap.js .claude/hooks/agent-cap.js"
     fail=$((fail+1))
   fi
+else
+  echo "skip the two-copy parity arm — no tools/hooks/agent-cap.js in this tree"
 fi
 
 echo "---- $pass passed, $fail failed ----"

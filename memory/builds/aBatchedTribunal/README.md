@@ -24,9 +24,9 @@ port the protocol, and make its central number mechanical.
 | W3 | `spec-aBatchedTribunal-4-w3-dogfood` — pending | the closing review of `aDrainedSluice` re-run through the batched harness |
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aBatchedTribunal-1..-4
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aBatchedTribunal-1..-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note](spec/2026-08-09-spec-aBatchedTribunal-1.md) | SPECCED | rev-2 | 2026-08-09 |
+| [TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note](spec/2026-08-09-spec-aBatchedTribunal-1.md) | CLOSED | rev-3 | 2026-08-09 |
 <!-- /gen:build-index -->

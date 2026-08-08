@@ -342,7 +342,7 @@ $bad6"
 
 # 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md,
 #     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
-ex7='(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
+ex7='(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/guides/[^/]+\.md$)'
 [ -n "$MAP_SUB" ] && ex7="(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the

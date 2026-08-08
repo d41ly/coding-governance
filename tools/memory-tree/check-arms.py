@@ -257,6 +257,19 @@ def do_check(root: str, conf: dict) -> int:
                        f"no longer exists — {why}")
     # PER-GATE floors. An aggregate would let one gate's deletion be masked by another's addition.
     floors = parse_floors(conf)
+    # A FLOOR NAMING A GATE THAT IS NOT IN THE POPULATION IS A FAILURE, not a skip. The loop below
+    # walks the DISCOVERED gates and looks each floor up by key, so a floor whose gate vanished was
+    # simply never consulted: `do_check` returned 0 with no output. Measured — reformatting one gate's
+    # helper from `fail() {` to `fail () {` drops it out of discovery entirely, taking 14 branches and
+    # 14 arms with it, and every floor stayed green. The pin has this guard already (above); the
+    # floors did not, and with the pin empty by design the floors are the only backstop left.
+    for gate_rel in sorted(floors):
+        if gate_rel not in scanned:
+            bad.append(f"check-arms: ARMS_FLOORS names {gate_rel}, which is NOT in the discovered "
+                       f"population — the gate was renamed, moved, or stopped matching the "
+                       f"`fail() {{` + call-site predicate. Its branches and arms are no longer "
+                       f"counted by anything; fix the gate or remove the floor in a commit that "
+                       f"says why")
     for gate_rel in sorted({b["gate"] for b in brs}):
         gb = [b for b in brs if b["gate"] == gate_rel]
         want = floors.get(gate_rel)
@@ -431,6 +444,18 @@ def do_selftest() -> int:
         arm("a per-gate floor is not satisfied by another gate's growth",
             "tools/gate-a.sh has 3 fail branch(es)",
             lambda: do_check(root, confc))
+
+        # A FLOOR whose gate is gone. The floors loop walks the DISCOVERED gates and looks each floor
+        # up by key, so before this guard a floor for a vanished gate was never consulted at all:
+        # rc=0, no output, and a whole gate's branches and arms silently uncounted. The escape is not
+        # hypothetical — reformatting `fail() {` to `fail () {` drops a gate out of discovery.
+        confz = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-gone.sh:9:9")
+        arm("a floor naming a gate outside the population is a failure",
+            "which is NOT in the discovered population", lambda: do_check(root, confz))
+        # ...and the same floor set with the gate PRESENT is silent, so the arm above is not passing
+        # because do_check reds on everything.
+        arm("...and a floor whose gate IS discovered stays silent", "[rc=0]",
+            lambda: do_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
 
         # a pin whose GATE is gone names that, not "the guard was deleted"
         _w(pin, "tools/gate-z.sh\t1\t1\tvanished gate message here\n"

@@ -136,14 +136,18 @@ else
 fi
 
 # AC9 — the eol arm: detect in --check, repair in --fix, and never reach past its bound.
-# The BOUND is the point. The eol=lf attribute alone covers 46 files in the governance repo, which is
-# far more than anything this arm should rewrite, so the population is tracked `.claude/` paths that
-# carry the pin — check-wiring.sh's own domain intersected with the pin, both read from the tree.
+# THE BOUND IS THE POINT, and this fixture uses the BROADEST attribute spelling an adopter might
+# reasonably write. An earlier cut pinned only `.claude/**/*.md`, which pre-narrowed the population
+# and made "stays inside its bound" green for the fixture's reasons rather than the gate's. Under
+# `* text=auto eol=lf` the first implementation rewrote `.claude/settings.json` and stripped CR bytes
+# out of the middle of a PNG — md5 changed, reported as "fixed".
 newrepo
 mkdir -p .claude/skills/x memory
-printf '.claude/**/*.md text eol=lf\n' > .gitattributes
-printf 'a\nb\n' > .claude/skills/x/SKILL.md              # pinned, inside the domain
-printf 'a\nb\n' > memory/NOTES.md                        # NOT pinned, outside the domain
+printf '* text=auto eol=lf\n' > .gitattributes
+printf 'a\nb\n' > .claude/skills/x/SKILL.md              # a rendered Skill: the whole population
+printf 'a\nb\n' > memory/NOTES.md                        # outside .claude/ entirely
+printf '{\n  "hooks": {}\n}\n' > .claude/settings.json    # under .claude/, pinned, NOT a Skill
+printf 'PNG\r\n\032\r\nIDAT\n' > .claude/skills/x/logo.png   # binary bytes a `tr -d` would eat
 git add -A; git commit -q -m eolbase
 git config core.hooksPath .githooks                      # isolate: only the eol arm can be unwired
 out=$(chk --check); rc=$?
@@ -153,6 +157,9 @@ out=$(chk --check); rc=$?
 # `git status` is CLEAN and only a byte-comparing gate ever notices.
 printf 'a\r\nb\r\n' > .claude/skills/x/SKILL.md
 printf 'a\r\nb\r\n' > memory/NOTES.md
+printf '{\r\n  "hooks": {}\r\n}\r\n' > .claude/settings.json
+cp .claude/skills/x/logo.png "$D/logo.before"
+
 # THE INVISIBILITY, measured rather than asserted from the trap note. `git diff` reports NO content
 # difference on the pinned file — the clean filter normalises, so there is nothing to commit — while
 # the bytes on disk are CRLF. (`git status --porcelain` does list it: that is the stat cache, not a
@@ -172,16 +179,38 @@ out=$(chk --check); rc=$?
   && ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 1 || ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 0
 printf '%s' "$out" | grep -q 'memory/NOTES.md' \
   && ck "AC9 --check stays inside its bound" 0 || ck "AC9 --check stays inside its bound" 1
+# --session REPORTS; only --fix rewrites. A SessionStart hook editing file bytes unattended is a far
+# bigger act than setting an unset git config, which is all --session was ever allowed to do.
+chk --session >/dev/null
+LC_ALL=C grep -qU $'\r' .claude/skills/x/SKILL.md \
+  && ck "AC9 --session reports without rewriting" 1 || ck "AC9 --session reports without rewriting" 0
 chk --fix >/dev/null
 LC_ALL=C grep -qU $'\r' .claude/skills/x/SKILL.md \
   && ck "AC9 --fix rewrote the pinned file to LF" 0 || ck "AC9 --fix rewrote the pinned file to LF" 1
-# ...and the file OUTSIDE the bound is untouched. A repair that reaches past its population is worse
-# than one that never ran: it rewrites bytes nobody asked it to.
+# ...and everything OUTSIDE the bound is untouched, under the broadest attribute spelling there is.
+# A repair that reaches past its population is worse than one that never ran: it rewrites bytes
+# nobody asked it to.
 LC_ALL=C grep -qU $'\r' memory/NOTES.md \
-  && ck "AC9 --fix left the unpinned file alone" 1 || ck "AC9 --fix left the unpinned file alone" 0
+  && ck "AC9 --fix left the file outside .claude/ alone" 1 || ck "AC9 --fix left the file outside .claude/ alone" 0
+LC_ALL=C grep -qU $'\r' .claude/settings.json \
+  && ck "AC9 --fix left .claude/settings.json alone" 1 || ck "AC9 --fix left .claude/settings.json alone" 0
+cmp -s .claude/skills/x/logo.png "$D/logo.before" \
+  && ck "AC9 --fix did not corrupt a binary in the domain" 1 || ck "AC9 --fix did not corrupt a binary in the domain" 0
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       eol'; } \
   && ck "AC9 re-check after --fix -> ok, exit 0" 1 || ck "AC9 re-check after --fix -> ok, exit 0" 0
+# A Skill directory whose name carries a SPACE. `xargs` word-split it into two nonexistent paths, the
+# population came back empty, and the arm printed a green `skip` over a file with real CRLF in it.
+mkdir -p ".claude/skills/my skill"
+printf 'a\nb\n' > ".claude/skills/my skill/SKILL.md"
+git add -A; git commit -q -m spaced
+printf 'a\r\nb\r\n' > ".claude/skills/my skill/SKILL.md"
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'my skill/SKILL.md'; } \
+  && ck "AC9 a Skill path with a space is still seen" 1 || ck "AC9 a Skill path with a space is still seen" 0
+chk --fix >/dev/null
+LC_ALL=C grep -qU $'\r' ".claude/skills/my skill/SKILL.md" \
+  && ck "AC9 --fix repairs a spaced path" 0 || ck "AC9 --fix repairs a spaced path" 1
 cleanup
 
 # AC9b — no pinned .claude/ path at all: the arm SKIPS rather than reporting a clean bill over an

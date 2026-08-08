@@ -349,7 +349,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
   ```
-  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-6
+  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
   `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
   mechanical enforcement of the ≤6-concurrent rule — a wide fan-out trips the server rate limiter.
 - Copy `tools/workflows/tier2-review.js` for a ready consolidated review harness (~7–9 agents, ≤6 concurrent).

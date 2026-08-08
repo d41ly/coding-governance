@@ -1,6 +1,6 @@
 # TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note
 
-**Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base a938fb0c · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-09 · node a · Tier-2 · base a938fb0c · streams tooling
 
 ## 1. Goal
 
@@ -245,6 +245,18 @@ none — the two forks below are RESOLVED; kept for the record.
   JavaScript gates V7 already widened.
 
 ## 9. Revision log
+
+- rev-3 · 2026-08-09 · CLOSED. W1 and W2 landed, then the batched closing review of the whole
+  session diff found the shipped rule FAILING OPEN: an unrecognised fan-out receiver fell through to
+  ALLOW, and five bypasses followed from it — a marker on the agent() line, a `.filter().map()`
+  chain, a call-result receiver, a spread literal, `[].concat(x)`, a reassigned receiver, a braceless
+  loop body, a marked `.concat()` derivation, and `.reduce()`. All ten are now fixtures, and the
+  decision is fail-closed. The same review found `--session` rewriting file bytes unattended over a
+  population bounded only by an adopter's `.gitattributes` — settings.json rewritten, a PNG corrupted
+  — plus a NUL guard written with a byte bash cannot hold (so it skipped everything), an `xargs`
+  word-split that collapsed the population on a spaced path, and floors that never checked whether
+  their gate still existed. All fixed here. Four findings stay OPEN as backlog rows rather than being
+  fixed under time pressure: they are named in `memory/backlog/TOOL.md`.
 
 - rev-2 · 2026-08-09 · folded the rev-1 review: 20 raw findings, 18 confirmed by 5 batched skeptics,
   0 unverified. Four changes of substance. (1) The enforcement point MOVES to `agent-cap.js` —

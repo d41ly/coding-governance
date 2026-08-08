@@ -54,7 +54,48 @@ TEMPLATE="$KIT_DIR/SKILL.template.md"
 [ -f "$TEMPLATE" ] || { echo "drift-audit: SKILL.template.md missing from the kit"; exit 1; }
 
 # The kit dir's name as the adopter sees it, so the rendered Skill's commands are copy-pasteable.
-KIT_REL="$(python -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]).replace(os.sep,'/'))" "$KIT_DIR" "$ROOT")"
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+#
+# This site spelled `python` BARE, which is why V5's migration missed it: the idiom ban matches
+# `command -v`, and a bare launcher name carries no such marker. On a python3-only host — or one
+# where the MS-Store stub answers for python3 — this line produced an empty KIT_REL and the
+# `--check` leg then reported drift on a Skill that had never changed.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+DA_PY=$(resolve_python) || exit 2
+KIT_REL="$("$DA_PY" -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]).replace(os.sep,'/'))" "$KIT_DIR" "$ROOT")"
+[ -n "$KIT_REL" ] || { echo "drift-audit: could not derive the kit path — refusing to render a Skill with an empty command prefix"; exit 2; }
 
 render() { # -> stdout; LF only (the rendered Skill is pinned LF in .gitattributes)
   sed -e "s|{{KIT_DIR}}|$KIT_REL|g" -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" "$TEMPLATE" | tr -d '\r'

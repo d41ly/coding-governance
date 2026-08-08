@@ -1,6 +1,6 @@
 [
   {
-    "name": "memory hygiene (12 checks)",
+    "name": "memory hygiene (19 checks)",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"

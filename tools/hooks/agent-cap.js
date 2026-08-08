@@ -16,7 +16,7 @@
  * ONLY place a raw `parallel(`/`pipeline(` may appear, and each such line
  * carries a `gov:bounded-fanout` marker. Any other raw primitive call = deny.
  *
- * CAP: default 6 (override with env AGENT_CAP). This guard doesn't verify the
+ * CAP: default 5 (override with env AGENT_CAP). This guard doesn't verify the
  * numeric arg — it enforces "use the helper"; the helper is where CAP lives.
  *
  * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
@@ -95,6 +95,9 @@ function offendingLines(script) {
 const FIXED_MARK = 'gov:fixed-verifiers'
 const MAX_VERIFIERS = 5
 const MAX_LENSES = 6
+// Every array method that can carry an agent() call once per element. The list is closed and
+// generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
+const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
 
 // `K` resolved against this file: an integer literal, or an identifier bound to one.
 function boundedK(tok, consts) {
@@ -137,8 +140,15 @@ function fanoutFindings(script) {
       // `.slice()`, a ternary between two bounded sources. Neither filter nor slice can GROW an
       // array, so the bound is inherited. Only accepted WITH the marker, so it stays a deliberate
       // claim rather than something inferred from a name.
-      const refs = l.match(/[A-Za-z_$][\w$]*/g) || []
-      if (refs.some((r) => r !== name && ok.has(r))) ok.add(name)
+      //
+      // The operations are a CLOSED list, and mentioning a bounded name is not enough: the first cut
+      // accepted any line referencing one, which blessed `ALL_LENSES.concat(allFindings)` — a
+      // derivation that grows without limit — on the strength of the word ALL_LENSES appearing.
+      const rhs = l.slice(l.indexOf('=') + 1)
+      const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
+      const shrinks = /\.\s*(filter|slice)\s*\(/.test(rhs) || /\?[^?]*:/.test(rhs)
+      const refs = rhs.match(/[A-Za-z_$][\w$]*/g) || []
+      if (!grows && shrinks && refs.some((r) => r !== name && ok.has(r))) ok.add(name)
       return
     }
     // an array literal whose element count is visible here. Counted on the FULL statement, which may
@@ -158,7 +168,15 @@ function fanoutFindings(script) {
       j++
     }
     if (!closed) return
+    // The RHS must be the literal and NOTHING ELSE. `[].concat(allFindings)` starts with `[`, has an
+    // empty inner, counted 0 elements and was blessed as bounded — an unbounded array wearing an
+    // empty literal's clothes, and it needed no marker to do it.
+    const tail = buf.slice(buf.lastIndexOf(']') + 1).replace(/[\s;]/g, '')
+    if (tail !== '') return
     const inner = buf.slice(buf.indexOf('[') + 1, buf.lastIndexOf(']'))
+    // A SPREAD makes the count invisible: `[...allFindings]` is one top-level element and any number
+    // of agents.
+    if (inner.includes('...')) return
     // top-level commas only
     let d = 0
     let n = inner.trim() ? 1 : 0
@@ -171,12 +189,25 @@ function fanoutFindings(script) {
   }
   lines.forEach(scan)
   lines.forEach(scan)
+  // A BARE REASSIGNMENT invalidates the bound. `let items = [1, 2]` then `items = allFindings` was a
+  // measured bypass: the whitelist was keyed on a name and nothing ever took the name back. The
+  // protocol publishes "assigned exactly once", so anything assigned twice loses the claim.
+  code.forEach((l) => {
+    const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
+    if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
+      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) ok.delete(m[1])
+    }
+  })
 
   const bad = []
   lines.forEach((raw, i) => {
     const l = code[i]
     if (!/\bagent\s*\(/.test(l)) return
-    if (raw.includes(FIXED_MARK)) return
+    // NO MARKER ESCAPE ON THE agent() LINE. The first cut returned early here, so putting the marker
+    // on the fan-out line itself blessed it with no shape check at all — the whole whitelist behind
+    // one comment. Verified non-load-bearing before removal: all three shipped harnesses still pass
+    // without it. The marker means something only on the ASSIGNMENT it annotates, where its shape IS
+    // checked.
     // WHAT ENCLOSES THIS agent() CALL. Scanning the window right-to-left, a `)` is pending and a `(`
     // either matches a pending one or is an ENCLOSING opener — a call this agent() sits inside. Only
     // enclosing openers are judged, which is the difference between "the fan-out is a map" and "the
@@ -208,22 +239,42 @@ function fanoutFindings(script) {
     let win = l.slice(0, l.search(/\bagent\s*\(/))
     for (let k = i - 1; k >= 0 && k > i - 60 && openersOf(win).length < 2; k--) win = code[k] + '\n' + win
 
+    // FAIL CLOSED. The first cut classified only three tidy spellings and fell through to ALLOW for
+    // everything else, which meant a receiver it did not recognise was a receiver it blessed — five
+    // independent bypasses, each one agent per finding, each reported clean. An iteration construct
+    // this rule cannot PROVE bounded is denied; the burden is on the fan-out, not on the gate.
     let hit = null
     for (const pos of openersOf(win)) {
       const before = win.slice(0, pos)
-      const m = /([A-Za-z_$][\w$]*)\s*\.\s*(map|flatMap|forEach)\s*$/.exec(before)
-      if (m) { hit = { kind: 'map', name: m[1] }; break }
+      const m = ITER_CALL.exec(before)
+      if (m) {
+        // The receiver must be a BARE IDENTIFIER that this file shows to be bounded. A chain
+        // (`x.filter(...).map`), a call result (`Object.values(b).map`) or a member expression is not
+        // something this scan can size, and "cannot size" is a denial, not a pass.
+        const recv = /([A-Za-z_$][\w$]*)\s*\.\s*[A-Za-z_$][\w$]*\s*$/.exec(before)
+        const plain = recv && /(^|[^.\w$)\]])[A-Za-z_$][\w$]*\s*\.\s*[A-Za-z_$][\w$]*\s*$/.test(before)
+        hit = { kind: 'iter', method: m[1], name: plain ? recv[1] : null, expr: before.slice(-60).trim() }
+        break
+      }
       if (/\bArray\s*\.\s*from\s*$/.test(before)) { hit = { kind: 'from' }; break }
       if (/\b(for|while)\s*$/.test(before)) { hit = { kind: 'loop' }; break }
     }
-    if (hit && hit.kind === 'map') {
-      if (!ok.has(hit.name)) {
+    if (hit && hit.kind === 'iter') {
+      if (hit.name === null) {
+        bad.push({ n: i + 1, line: raw, why: `agent() fanned through .${hit.method}() over an expression this file cannot size (\`${hit.expr}\`) — only a bare identifier proven bounded is accepted` })
+      } else if (!ok.has(hit.name)) {
         bad.push({ n: i + 1, line: raw, why: `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
       }
       return
     }
     if (hit && hit.kind === 'from') {
       bad.push({ n: i + 1, line: raw, why: 'agent() fanned through Array.from() — the count is not visible here' })
+      return
+    }
+    // A BRACELESS loop body: `for (const f of all) out.push(await agent(f))`. The brace walk below
+    // cannot see it — there is no brace — and it was one of the measured bypasses.
+    if (/\b(for|while)\s*\(/.test(l.slice(0, l.search(/\bagent\s*\(/)))) {
+      bad.push({ n: i + 1, line: raw, why: 'agent() in a braceless loop body — a loop-built fan-out is the evasion this rule exists for' })
       return
     }
     // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener. Judged
