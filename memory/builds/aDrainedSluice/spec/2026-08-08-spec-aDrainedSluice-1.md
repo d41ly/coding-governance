@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-1 — drain the tooling backlog to zero
 
-**Status:** INPROGRESS · rev-1 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -145,6 +145,15 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-08 · CLOSED. All nine units landed, `memory/backlog/TOOL.md` holds no OPEN or
+  DEFERRED row, and the bar went 30 -> 32 legs (the python resolver's self-test is new; the gotchas
+  leg stopped skipping). Nothing was re-scoped to make it close: eleven rows CLOSED against a landed
+  change and one — the single-pass generator — WONTDO because U2 had already deleted its subject.
+  Four drafted premises did not survive measurement and are corrected in their own units rather than
+  quietly dropped: V2's batching rule and perf figures (an upstream tree's numbers), V5's inventory
+  (three idiom sites in one file, not two) and its sourcing list, V7's CRLF bound and its
+  `git checkout` claim, V8's registry-versus-repair choice. Each correction is written where the
+  claim was, so the next reader meets the fix and not the draft.
 - rev-1 · 2026-08-08 · initial draft, written after measuring every row.
 
 ## 10. Reuse audit

@@ -1,15 +1,15 @@
 # tooling backlog
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
-- TOOL-aRuledParchment-2 · OPEN · check 5 does not govern nested spec/<sub>/ free-named files (check 12 scans nested DATED names only) — widening needs a grandfather story → builds/2026-07-15-TOOL-aRuledParchment/
-- TOOL-bThriftyBellows-2 · DEFERRED · gen-memory-tree.sh single-pass generator (one git ls-files -> all TREE files in one awk) is the only remaining big-tree win for check 9; cache-and-grep measured SLOWER than per-call git ls-files (mmap index reads win) — do not retry that shape.
-- TOOL-aQuarriedLantern-2 · OPEN · converge the three divergent python-launcher detectors (run-gates.sh, check-wiring.sh, codebase-map/adopt-codebase-map.sh) onto one resolver that EXECUTES the candidate — none catches the MS-Store python3 stub (answers command -v, exits 9009)
-- TOOL-aQuarriedLantern-3 · OPEN · memory-recall ships no per-worktree cache cap and no LRU on built_at; measured upstream ~115 MiB per LIVE worktree (552.6 MiB over 5 dirs, only 37.9% evictable) — revisit if an adopter git dir grows
-- TOOL-aBatchedLintel-2 · OPEN · the §9 rev-scan awk has no /^## /{f=0} reset, so a heading after §9 on a NON-conforming spec inflates the high-water (reproduced 99 vs 1); adding it is a VERDICT change so it needs its own unit + fixture -> builds/2026-08-03-TOOL-aBatchedLintel/
-- TOOL-aFoldedQuarry-3 · OPEN · the review-join ban and the workflow-syntax gate derive their population from `git ls-files`, so an untracked workflow script is invisible until staged; fine at the pre-commit boundary, revisit if CI ever runs pre-add -> builds/2026-08-08-TOOL-aFoldedQuarry/
-- TOOL-aFoldedQuarry-4 · OPEN · a worktree checkout can land CRLF on the rendered recall Skill despite the `eol=lf` pin, and `git status` stays clean because the index normalises; `check-wiring.sh` could self-heal it -> builds/2026-08-08-TOOL-aFoldedQuarry/
-- TOOL-aFoldedQuarry-5 · OPEN · `hygiene-parity.test.sh` cannot span the 1.5 flatten (it asserts byte-identity and the flatten changed the verdicts); its baseline must be >= the flatten commit -> builds/aFoldedQuarry/
-- TOOL-aFoldedQuarry-6 · OPEN · six recording files in `builds/aPrunedCeremony/` gained a FAMILY qualifier and every build folder moved; citations in frozen records now point at paths that no longer resolve — the U3 dead-path registry is where they get declared -> builds/aFoldedQuarry/
-- TOOL-aFoldedQuarry-7 · OPEN · nine of fourteen hygiene `fail` branches are pinned unarmed in memory/project/unarmed-branches.txt; each needs a fixture that trips it and an arm naming its own failure text -> builds/aFoldedQuarry/
-- TOOL-aFoldedQuarry-8 · OPEN · check-arms.py covers ONE gate/test pair by name; a second gate with `fail` branches would be silently uncovered -> builds/aFoldedQuarry/
-- TOOL-aDrainedSluice-1 · OPEN · non-markdown inside builds/*/{prompts,spec,build,reviews}/ is governed by NOTHING — check 4 stops at the first segment under the build folder, so HYGIENE.md's `non-md only in build/` is unimplemented (measured) -> builds/aDrainedSluice/
+- TOOL-aRuledParchment-2 · CLOSED · check 5 did not govern a nested free-named recording file — closed by TOOL-aDrainedSluice-3 (V3); the record is in DECISIONS.md
+- TOOL-bThriftyBellows-2 · WONTDO · a single-pass gen-memory-tree.sh generator for check 9 — closed by TOOL-aDrainedSluice-9 (V9) — the subject was deleted in U2; the measurement it preserved lives in the bug-class catalogue; the record is in DECISIONS.md
+- TOOL-aQuarriedLantern-2 · CLOSED · three divergent python-launcher detectors, none of which ran the candidate — closed by TOOL-aDrainedSluice-6 (V5); the record is in DECISIONS.md
+- TOOL-aQuarriedLantern-3 · CLOSED · the recall cache had no per-worktree cap and no LRU — closed by TOOL-aDrainedSluice-7 (V6); the record is in DECISIONS.md
+- TOOL-aBatchedLintel-2 · CLOSED · the §9 rev-scan ran past §9, so a later heading inflated the high-water — closed by TOOL-aDrainedSluice-4 (V4); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-3 · CLOSED · the two JavaScript gates could not see an untracked file — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-4 · CLOSED · a checkout can land CRLF on an eol=lf-pinned render and git stays quiet — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-5 · CLOSED · hygiene-parity.test.sh accepted a baseline it cannot legally compare across — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-6 · CLOSED · the flatten left dead path citations the census could not see — closed by TOOL-aDrainedSluice-9 (V8); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-7 · CLOSED · nine hygiene fail branches were pinned unarmed — closed by TOOL-aDrainedSluice-5 (V2); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-8 · CLOSED · check-arms covered ONE gate/test pair by name — closed by TOOL-aDrainedSluice-2 (V1); the record is in DECISIONS.md
+- TOOL-aDrainedSluice-1 · CLOSED · non-markdown inside a build's kind folders was governed by nothing — closed by TOOL-aDrainedSluice-3 (V3); the record is in DECISIONS.md

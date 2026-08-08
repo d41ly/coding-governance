@@ -42,7 +42,7 @@ branch work and of each other.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aDrainedSluice-1 — drain the tooling backlog to zero](spec/2026-08-08-spec-aDrainedSluice-1.md) | INPROGRESS | rev-1 | 2026-08-08 |
+| [TOOL-aDrainedSluice-1 — drain the tooling backlog to zero](spec/2026-08-08-spec-aDrainedSluice-1.md) | CLOSED | rev-2 | 2026-08-08 |
 | [TOOL-aDrainedSluice-2 — V1: the harness meta-gate discovers its gates](spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md) | INPROGRESS | rev-2 | 2026-08-08 |
 | [TOOL-aDrainedSluice-3 — V3: check 5 governs a recording at any depth](spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md) | INPROGRESS | rev-2 | 2026-08-08 |
 | [TOOL-aDrainedSluice-4 — V4: the §9 rev high-water stops at §9](spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md) | INPROGRESS | rev-3 | 2026-08-08 |
