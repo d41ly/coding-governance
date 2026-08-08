@@ -13,6 +13,8 @@
   { "name": "build-index selftest", "argv": ["python3", "tools/memory-tree/gen_build_index.py", "--selftest"] },
   { "name": "corpus-ids selftest", "argv": ["python3", "tools/memory-tree/corpus_ids.py", "--selftest"] },
   { "name": "gotchas selftest", "argv": ["python3", "tools/memory-tree/gotchas.py", "--selftest"] },
+  { "name": "harness arms (fail branches armed or pinned)", "argv": ["python3", "tools/memory-tree/check-arms.py", "--check"] },
+  { "name": "check-arms selftest", "argv": ["python3", "tools/memory-tree/check-arms.py", "--selftest"] },
   { "name": "branch-guard self-test", "argv": ["bash", ".githooks/pre-commit.test.sh"] },
   { "name": "pre-push self-test", "argv": ["bash", ".githooks/pre-push.test.sh"] },
   { "name": "push-main self-test", "argv": ["bash", "tools/push-main.test.sh"] },

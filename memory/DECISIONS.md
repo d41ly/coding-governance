@@ -26,6 +26,7 @@
 - TOOL-aFoldedQuarry-4 · U2 retires gen-memory-tree.sh/TREE.md for gen_build_index.py: build status DERIVED from spec headers, rendered into each build README, LIVE.md and ledger/<month>.md; one source of truth per build (a `status:` key is legal ONLY when nothing is derivable)
 - TOOL-aFoldedQuarry-5 · U3 corpus_ids.py adds checks 13-16 (id collision, orphan waiver, 4-rule dead-path registry, read-path accounting); declares no grammar or set it does not own — grammar from memory-recall, the two sets asked of the shell; pins measured
 - TOOL-aFoldedQuarry-6 · U4 gotchas.py + an 8-record bug-class corpus grown from THIS build's failures (not inCMS's 178); anchors DERIVED from the record body, --for-diff stdout IS the reviewer checklist, universal set budgeted at 3
+- TOOL-aFoldedQuarry-7 · U5 check-arms.py makes the harness disciplines mechanical: every `fail` BRANCH armed or pinned, keyed on the CALL SITE (14 branches behind 12 numbers), pinned in BOTH directions, excluded from its own scan; measured 14 branches / 5 armed
 
 ## DEPL — deployer
 

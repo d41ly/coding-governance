@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T06:05:51+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
+last-audit: 2026-08-08T06:18:56+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -100,6 +100,11 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   git-bash. WSL sees a different filesystem: an existing path reports `No such file or directory` and
   a relative path resolves under `/mnt/c/`. Name the executable — see `resolve_bash()` in
   `tools/memory-tree/corpus_ids.py`; `GOV_BASH` overrides.
+- Generating source through a shell heredoc into a NON-raw Python string turns an escape into a
+  CONTROL BYTE in the written file. A `` becomes a backspace, the compiled regex silently stops
+  matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
+  2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
+  and sweep TRACKED AND UNTRACKED files when repairing.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

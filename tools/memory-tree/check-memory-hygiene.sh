@@ -180,7 +180,8 @@ bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$b3b" "$b3c")
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt) ;;
-  F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|D:journal|D:in-flight) ;;
+  F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
+  D:journal|D:in-flight) ;;
   F:*.md) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
@@ -366,7 +367,7 @@ $bad8"
 # and nothing rots.
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
   _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
-  if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "build index:
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
 fi
 

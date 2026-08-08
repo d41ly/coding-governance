@@ -54,6 +54,7 @@ value in each spec's status header, not a directory, so a build spanning two dis
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
 - `memory/` hygiene (19 checks, kit 1.5 flat tree) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
+- harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)

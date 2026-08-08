@@ -149,6 +149,26 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
     because every universal record is emitted on EVERY reviewer's checklist.
 
+## The harness meta-gate
+
+Every `fail` BRANCH in the gate is either ARMED — a POSITIVE assertion in the test file naming a
+literal slice of that branch's OWN failure text — or listed in `project/unarmed-branches.txt`. The
+key is the CALL SITE `(check number, ordinal)`, never the check number, because one number can carry
+several branches and a number-keyed pin lets the cheapest arm hide the valuable one.
+
+Three things do NOT arm a branch: a bare `check N` mention, an ABSENCE assertion, and a COMMENT. All
+three are "something in the file mentions it", which is not "something exercises it".
+
+The pin is shrink-only and reds three ways: a pinned branch that is now armed, a pinned branch that
+no longer exists, and a signature the message was reworded out from under. It is EXCLUDED from its
+own scan — it holds each signature verbatim in order to name it.
+
+BOTH directions are pinned. `ARMS_BRANCH_FLOOR` catches a deleted guard; `ARMS_ARMED_FLOOR` catches
+an assertion dropped by WIDENING the pin, which a branch count alone cannot see because the count
+falls and the pin still holds.
+
+`memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
+
 ## The bug-class catalogue
 
 One authored record per class under `gotchas/`, front matter `name` + `description` (+ optional

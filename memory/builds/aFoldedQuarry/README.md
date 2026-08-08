@@ -24,7 +24,7 @@ once as a tool, once as its first customer.
 | U2 | [spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md](spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md) | Generated build index replaces the authored tree |
 | U3 | [spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md](spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md) | One id grammar, one walk, every consumer |
 | U4 | [spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md](spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md) | Bug-class corpus + the reviewer checklist generator |
-| U5 | `spec-aFoldedQuarry-7-u5-harness` — pending | Harness disciplines: derived pins, armed branches, batched fixtures |
+| U5 | [spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md) | Harness disciplines: derived pins, armed branches, batched fixtures |
 
 A row becomes a link when its sub-spec lands. A link to an unwritten file is a broken link, and
 hygiene check 2 is right to say so.
@@ -38,7 +38,7 @@ U1 (it changes every path the rest operate on), U2, then U3 and U4 (independent 
 then U5.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aFoldedQuarry-1..-6
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aFoldedQuarry-1..-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -48,4 +48,5 @@ then U5.
 | [TOOL-aFoldedQuarry-4 — U2: the generated build index replaces the authored tree](spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md) | CLOSED | rev-2 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-5 — U3: one id grammar, one walk, every consumer](spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-6 — U4: the bug-class corpus and its per-diff checklist](spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md) | CLOSED | rev-3 | 2026-08-08 |
+| [TOOL-aFoldedQuarry-7 — U5: the harness disciplines, made mechanical](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md) | CLOSED | rev-1 | 2026-08-08 |
 <!-- /gen:build-index -->

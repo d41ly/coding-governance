@@ -326,3 +326,69 @@ universals and omits misses and non-class records. Check 19's fixture carries a 
 area, without which the inert arm can never fire and the rule ships green forever.
 
 `bash tools/run-gates.sh` — 25/25 green.
+
+## U5 — the harness disciplines, made mechanical (spec `TOOL-aFoldedQuarry-7`, CLOSED)
+
+### What landed
+
+`tools/memory-tree/check-arms.py` turns the transferable harness disciplines into a gate. Every
+`fail` branch in the hygiene gate is either ARMED — a POSITIVE assertion in the test file naming a
+literal slice of that branch's own failure text — or listed in
+`memory/project/unarmed-branches.txt`, shrink-only.
+
+| Discipline | How it is mechanical here |
+|---|---|
+| key on the CALL SITE | `(check number, ordinal)`; this gate has 14 branches behind 12 numbers |
+| pin BOTH directions | `ARMS_BRANCH_FLOOR=14` and `ARMS_ARMED_FLOOR=5` |
+| an arm is POSITIVE | a bare `check N`, an absence assertion and a comment all fail to arm |
+| exclude the pin from its own scan | the scan reads the test file and nothing else |
+| batch the fixtures | the existing self-tests keep their one-scratch-repo shape |
+| PASS after the LAST arm | every self-test in this build prints its verdict last |
+
+Measured: 14 branches, 0 armed. Five gained real arms in this unit and nine are pinned, so the gap is
+visible and shrinks instead of being assumed away.
+
+### Why the key is the call site
+
+Checks 5 and 6 each fail for two different reasons. A pin keyed on the NUMBER would let the cheapest
+arm empty a number while its sibling branch stayed unwritten AND invisible — which is what upstream
+hit at 41 branches behind 25 numbers.
+
+### Why both floors
+
+A branch count catches a DELETED guard. It does not catch an assertion dropped by WIDENING the pin:
+the branch count falls, the pin still holds, and the gate is quieter than it was with nothing to say
+so. The armed floor is the second direction.
+
+### Three findings from the closing pass
+
+The first `fail` pattern was start-anchored and missed check 9 entirely, whose call sits inside an
+`if ! drift=$(…); then`. Thirteen of fourteen, silently — the exact failure this meta-check exists to
+prevent, inside the meta-check. Finding it also surfaced a message (`build index:`) too short to
+assert on, so check 9's message was reworded.
+
+A COMMENT naming a branch's message armed it. The test file's own prose quotes the messages it
+covers, so a comment-blind scan let a sentence describing an arm count as the arm — the same shape as
+the two cases the function already refused.
+
+And the same environment defect landed THREE times in one session: source written through a shell
+heredoc into a non-raw Python string turned `\b` into a literal backspace byte, which reached the
+compiled regex. The symptoms were all silent and all different — a citation scan returning zero ids
+while anchors kept working, anchors matching without boundaries, and a branch parser finding zero
+branches in a file with fourteen. Each looked like a logic bug. A sweep repaired the last one, and
+the first sweep found nothing because it scanned TRACKED files only while the offending module was
+still unstaged — the population-selected-too-narrowly class this build already catalogued. It is now
+`memory/gotchas/heredoc-escape-reaches-the-regex.md` and a kickoff-manifest trap.
+
+### Order note
+
+This unit was built before its spec was written, because the design is a function of a measurement
+and the measurement needed the parser that became the module. The adversarial pass therefore ran
+against the IMPLEMENTATION rather than a draft, which is stronger evidence. The deviation is recorded
+in the sub-spec's §8 Fork B rather than tidied away.
+
+### Verification
+
+`python tools/memory-tree/check-arms.py --selftest` — 12 arms covering every red and green path,
+including a signature present only in the PIN arming nothing. `bash tools/run-gates.sh` — 27/27
+green.

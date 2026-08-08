@@ -186,6 +186,17 @@ miss '2026-08-01-build-ARCH-tFixture-1.md'
 hit  'memory/builds/2026-08-01-ARCH-tBadFolder (bad folder name'
 hit  'memory/backlog/notes.md'
 
+# ---- BRANCH ARMS. Each of these names its branch's OWN failure text, which is what
+# ---- `check-arms.py` reads to decide a branch is armed. A bare `check N` mention is not an arm:
+# ---- a substring test is satisfied by any other finding that happens to carry the same number, and
+# ---- an ABSENCE assertion satisfies it too. Every unarmed branch is listed in
+# ---- memory/project/unarmed-branches.txt and that pin is shrink-only.
+hit  'unexpected entries (structure)'
+hit  'build-folder naming/shape'
+hit  'recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered)'
+hit  'index entry lines over 300 chars'
+hit  'spec files dated >='
+
 # ---- the section-canon DIFF EXCERPT. The batched check 12 emits a sentinel record and rebuilds the
 # ---- excerpt afterwards with the original `diff | head -6 | sed`, so BOTH halves need pinning: it
 # ---- is a real diff, indented four spaces, capped at six lines, and the sentinel byte itself never
@@ -318,5 +329,5 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (64 assertions)"
+[ "$st" = 0 ] && echo "PASS (69 assertions)"
 exit "$st"

@@ -10,3 +10,5 @@
 - TOOL-aFoldedQuarry-4 · OPEN · a worktree checkout can land CRLF on the rendered recall Skill despite the `eol=lf` pin, and `git status` stays clean because the index normalises; `check-wiring.sh` could self-heal it -> builds/2026-08-08-TOOL-aFoldedQuarry/
 - TOOL-aFoldedQuarry-5 · OPEN · `hygiene-parity.test.sh` cannot span the 1.5 flatten (it asserts byte-identity and the flatten changed the verdicts); its baseline must be >= the flatten commit -> builds/aFoldedQuarry/
 - TOOL-aFoldedQuarry-6 · OPEN · six recording files in `builds/aPrunedCeremony/` gained a FAMILY qualifier and every build folder moved; citations in frozen records now point at paths that no longer resolve — the U3 dead-path registry is where they get declared -> builds/aFoldedQuarry/
+- TOOL-aFoldedQuarry-7 · OPEN · nine of fourteen hygiene `fail` branches are pinned unarmed in memory/project/unarmed-branches.txt; each needs a fixture that trips it and an arm naming its own failure text -> builds/aFoldedQuarry/
+- TOOL-aFoldedQuarry-8 · OPEN · check-arms.py covers ONE gate/test pair by name; a second gate with `fail` branches would be silently uncovered -> builds/aFoldedQuarry/
