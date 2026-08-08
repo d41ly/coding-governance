@@ -49,10 +49,6 @@ WAIVER = "project/id-orphan-waiver.txt"
 # What counts as a repo PATH: rooted at a real top-level directory. That is the only class where
 # "does it exist" is a well-posed question. A loose "backticked token with a slash" measures package
 # specifiers, git refs and bare fragments as dead citations — upstream counted 13 085 of them.
-KNOWN_EXT = (
-    ".md", ".py", ".ts", ".tsx", ".js", ".jsx", ".json", ".sh", ".ps1", ".yml", ".yaml",
-    ".toml", ".txt", ".css", ".sql", ".cmd", ".conf", ".cfg", ".ini", ".mjs", ".cjs", ".example",
-)
 BACKTICKED = re.compile(r"`([^`\s]+)`")
 MD_LINK_TARGET = re.compile(r"\]\(([^)\s]+)\)")
 ELISION = ("...", "…", "<", ">", "*", "{{")
@@ -229,7 +225,6 @@ def walk(root: str, conf: dict) -> dict:
             if not present.match(p) or append_only.match(p):
                 continue
             for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
-                ended_slash = tok.endswith("/")
                 cited = tok.rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
@@ -244,13 +239,17 @@ def walk(root: str, conf: dict) -> dict:
                     continue
                 if cited in tracked_set or any(t.startswith(cited + "/") for t in tracked_set):
                     continue
-                # A FILE citation names an extension or a dotted basename. A DIRECTORY citation names
-                # neither, and it is exactly as broken when it does not resolve — the flatten left
-                # four of them in the live ledger and this harvest could not see one.
-                is_file_shaped = cited.endswith(KNOWN_EXT) or "." in os.path.basename(cited)
-                is_dir_shaped = ended_slash or "." not in os.path.basename(cited)
-                if not is_file_shaped and not is_dir_shaped:
-                    continue
+                # NO SHAPE TEST. Every rooted, non-elided, unresolved token is a finding, file-shaped
+                # or not: a citation naming a DIRECTORY is exactly as broken as one naming a file when
+                # neither resolves — the flatten left four in the live ledger and the pre-V8 harvest
+                # could not see one. What stood here was
+                #     is_file_shaped = <B or something>;  is_dir_shaped = <not B or something>
+                #     if not is_file_shaped and not is_dir_shaped: continue
+                # with B = `"." in basename`, i.e. ¬(B ∨ ¬B) — identically False, filtering nothing.
+                # Measured: 0 of 1550 exhaustively-generated token shapes reached the `continue`.
+                # Deleted rather than kept as documentation, because executable dead code is plumbing
+                # a later edit will trust; the reachability arm in the selftest is what stops it
+                # coming back.
                 key = (p, cited)
                 if key in dead:
                     dead[key][0] += 1
@@ -479,8 +478,40 @@ def _w(root, rel, text):
         fh.write(text.encode("utf-8"))
 
 
+def _walk_continues() -> set:
+    """Every `continue` statement inside walk(), by line, DERIVED from its own source.
+
+    A written-down line list would rot at the first edit and then vouch for the wrong lines. The AST
+    is asked instead, so adding a branch to walk() automatically adds an obligation to reach it.
+    """
+    import ast
+    import inspect
+
+    src, first = inspect.getsourcelines(walk)
+    tree = ast.parse("".join(src).lstrip() if src[0][:1].isspace() else "".join(src))
+    off = first - 1
+    return {n.lineno + off for n in ast.walk(tree) if isinstance(n, ast.Continue)}
+
+
 def do_selftest() -> int:
     fails = []
+    # EVERY `continue` IN walk() MUST BE REACHED BY A FIXTURE. This is the one arm that could catch
+    # the tautological shape filter deleted in TOOL-aBatchedTribunal-4: that branch was
+    # `not (B or not B)`, identically False, so no INPUT/OUTPUT arm could ever discriminate — a
+    # behavioural fixture is green against the dead code and against its removal alike. A branch no
+    # fixture reaches is a branch no arm covers, and the next person to edit around it will trust it.
+    _hit = set()
+    _walk_file = walk.__code__.co_filename
+
+    def _tracer(frame, event, _arg):
+        if frame.f_code is walk.__code__:
+            return _liner
+        return None
+
+    def _liner(frame, event, _arg):
+        if event == "line" and frame.f_code.co_filename == _walk_file:
+            _hit.add(frame.f_lineno)
+        return _liner
 
     def arm(label, want, fn):
         try:
@@ -494,6 +525,7 @@ def do_selftest() -> int:
         if not ok:
             fails.append(label)
 
+    sys.settrace(_tracer)
     with tempfile.TemporaryDirectory() as base:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
@@ -568,7 +600,26 @@ def do_selftest() -> int:
         # reason.
         tD = os.path.join(base, "dirs"); os.makedirs(tD)
         cD = _scratch(tD, extra={
-            "memory/README.md": "# r\n\nSee `memory/builds/tOne/` and `memory/gone/never/`.\n"})
+            # The four EXCLUSION branches of the harvest, each with a token that takes it. The
+            # reachability arm at the end of this file is what demanded them: before it, three of
+            # walk()'s `continue`s had never been executed by any fixture, so a change to the
+            # append-only skip, the elision list or the top-level-root test could not have redded
+            # anything. A branch no fixture reaches is a branch no arm covers.
+            #   * `memory/DECISIONS.md` is APPEND-ONLY: a dead citation there is a historical
+            #     record, not a repair, so the harvest must skip the file entirely.
+            #   * `memory/builds/tOne/spec/…` is not in the PRESENT-tense corpus regex — same skip,
+            #     the other half of the same `if`.
+            #   * an ELIDED token (`<slug>`) and a slashless one (`README.md`) are not repo paths.
+            #   * `nosuchroot/x.md` is rooted at no real top-level directory, so "does it exist" is
+            #     not a well-posed question about this repo.
+            "memory/DECISIONS.md": "# d\n\n- a decision citing `memory/gone/appendonly/`\n",
+            "memory/builds/tOne/spec/2026-08-01-spec-tOne-9.md":
+                "x\n\nnot present-tense: `memory/gone/notpresent/`\n",
+            "memory/README.md": (
+                "# r\n\nSee `memory/builds/tOne/` and `memory/gone/never/`.\n"
+                "Elided: `memory/builds/<slug>/spec/`. Slashless: `README.md`.\n"
+                "Unrooted: `nosuchroot/x.md`.\n"),
+        })
         cD["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a dead DIRECTORY citation", "memory/gone/never",
             lambda: "\n".join(checks(walk(tD, cD))))
@@ -631,6 +682,25 @@ def do_selftest() -> int:
         # the arm above is not passing because resolve_bash rejects everything.
         arm("a working GOV_BASH is returned unchanged", "OK",
             lambda: "OK" if _with_gov_bash(resolve_bash()) else "")
+
+    sys.settrace(None)
+    want = _walk_continues()
+    missed = sorted(want - _hit)
+    arm("every `continue` in walk() is reached by a fixture", None,
+        lambda: "" if not missed else
+        "; ".join(f"corpus_ids.py:{n} is a `continue` no fixture reaches" for n in missed))
+    # ...and the checker's own red half. The first cut re-typed the message over `want | {-1}` and so
+    # held by construction — it asserted a formatting expression, not the checker. This runs the SAME
+    # expression the arm above runs, against a population with one line the fixtures provably never
+    # executed (line 0 does not exist), so a tracer that recorded nothing and a tracer that recorded
+    # everything give different answers.
+    def _missed(pop):
+        return "; ".join(f"corpus_ids.py:{n} is a `continue` no fixture reaches"
+                         for n in sorted(pop - _hit))
+    arm("...and the reachability checker can name an unreached branch",
+        "corpus_ids.py:0 is a `continue` no fixture reaches", lambda: _missed(want | {0}))
+    arm("...and it is silent when every member was reached", None, lambda: _missed(want))
+    arm("...and the population is derived, not listed", "True", lambda: str(len(want) >= 4))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

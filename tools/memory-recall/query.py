@@ -116,6 +116,16 @@ CACHE_VERSION = 3  # bump when extraction or schema changes, so an old cache is 
 # such key, and the dead-alias diagnosis reads the manifest -- without the bump a warm cache
 # would keep the very silence this fix removes.
 WINDOW = 400  # chars of the head fallback, matching union.py's SNIPPET accounting
+# A build in flight announces itself. The mtime-based test below it can only see the WRITE half of a
+# build — measured, 31% of a build of this repo's corpus is extraction, during which both databases
+# are the PREVIOUS build's and older than the previous manifest. The marker covers the whole window,
+# including the sub-second gap where `_write_set` has unlinked a database and not yet recreated it,
+# which is the single most inconsistent instant a build has.
+BUILD_MARKER = "building"
+# Bounds an ABANDONED build: a crashed process leaves the marker behind, and without a TTL that
+# directory would be protected from eviction forever. 900 s is ~7700x the 0.117 s measured for this
+# repo's corpus, so it cannot expire under a slow-but-live build on a far larger one.
+BUILD_TTL_S = 900.0
 SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently clamped
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
@@ -319,9 +329,34 @@ def _write_set(dirp: pathlib.Path, name: str, docs: list[dict]) -> None:
 
 
 def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dict:
+    """Build the cache, announcing the build FIRST so a sibling's eviction pass can see it.
+
+    The mkdir moved ABOVE `_docs` and the marker is written before the first read: the extraction
+    phase is part of the build, and a rule that starts watching only when bytes hit the databases
+    leaves the longest phase unprotected. The marker comes off in a `finally`, so a raised build
+    releases it and the TTL is only needed for a killed process.
+    """
     t0 = time.time()
-    records, chunks, aliases = _docs(repo, files)
     dirp.mkdir(parents=True, exist_ok=True)
+    marker = dirp / BUILD_MARKER
+    marker.write_text(str(os.getpid()), encoding="utf-8")
+    try:
+        return _build_cache(repo, dirp, files, t0)
+    finally:
+        # ONLY IF IT IS STILL OURS. Two builders can target one cache directory — last writer wins,
+        # which the atomic manifest makes survivable — but an unconditional unlink means the first to
+        # finish releases the SECOND one's protection, and the eviction pass then sees an unprotected
+        # directory that is still being written. The pid is written for this reason; a marker that is
+        # no longer ours is somebody else's to remove.
+        try:
+            if marker.read_text(encoding="utf-8").strip() == str(os.getpid()):
+                marker.unlink()
+        except OSError:
+            pass
+
+
+def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], t0: float) -> dict:
+    records, chunks, aliases = _docs(repo, files)
     _write_set(dirp, "records", records)
     _write_set(dirp, "chunks", chunks)
     man = {
@@ -395,7 +430,23 @@ def _dir_bytes(d: pathlib.Path) -> int:
 
 
 def _mid_build(d: pathlib.Path) -> bool:
-    """Either database NEWER than the manifest — which is true during ANY build, not just the first.
+    """Is a build in flight in this directory?
+
+    TWO tests, because the second one alone was measurably wrong for most of a rebuild.
+
+    (1) THE MARKER. `build_cache` writes `building` before it reads a single file and removes it in a
+    `finally`. This is the test that actually covers the build: measured phase-by-phase against a
+    real rebuild, the mtime test below is False during extraction (31% of the build), False in the
+    window where `_write_set` has unlinked a database and not yet recreated it, and False for the
+    ENTIRE build on a filesystem with 1 s or 2 s mtime granularity when the build starts in the same
+    tick the previous manifest was written. A concurrent run reproduced the consequence: a sibling's
+    rebuild was evicted mid-write and died with `unable to open database file`.
+
+    A marker older than BUILD_TTL_S is an ABANDONED build — a killed process cannot run its
+    `finally` — and stops protecting the directory. Absence of a marker is not evidence of absence
+    of a build: a cache written by an older kit has none, which is why (2) stays.
+
+    (2) EITHER DATABASE NEWER THAN THE MANIFEST — the original test, kept verbatim.
 
     The obvious predicate, "no readable manifest", is reasoned from a FIRST build only. On a REBUILD
     `_write_set` unlinks and recreates both databases while the PREVIOUS manifest sits on disk
@@ -403,6 +454,13 @@ def _mid_build(d: pathlib.Path) -> bool:
     directory this rule means to protect. Absence of a manifest keeps its own separate never-evict
     rule (`evict_dead_siblings`); this one is about a build in flight.
     """
+    try:
+        age = time.time() - (d / BUILD_MARKER).stat().st_mtime
+    except OSError:
+        pass
+    else:
+        if age < BUILD_TTL_S:
+            return True
     try:
         mt = (d / "manifest.json").stat().st_mtime
     except OSError:
@@ -504,6 +562,12 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
         )
         return out
     for built_at, d, wt in plan:
+        # RE-CHECK AT THE MOMENT OF DELETION. The plan is a proposal made from a snapshot; a sibling
+        # can start a build between the snapshot and this loop, and a plan is not a licence to delete
+        # something that has become live since it was made.
+        if _mid_build(d):
+            out.append("did NOT evict %s: a build started in it after the plan was made" % wt)
+            continue
         if _remove_cache_dir(d):
             out.append("evicted the least-recently-built cache: %s (built %s, %.1f MB)"
                        % (wt, built_at, sizes[d] / 1048576))

@@ -14,7 +14,7 @@ if [ -f "$HERE/../lib/resolve-python.sh" ]; then
   . "$HERE/../lib/resolve-python.sh"
   TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
 else
-  TESTPY=python3
+  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
 fi
 check() { # name expected_exit json
   printf '%s' "$3" | node "$HOOK" >/dev/null 2>"$TMP/err"; local got=$?

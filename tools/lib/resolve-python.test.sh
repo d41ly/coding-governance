@@ -111,5 +111,83 @@ printf '#!/usr/bin/env bash\n# command -v python3 is the retired idiom\n' > "$pl
 awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)\b' \
   && bad "the ban fires on a COMMENT explaining the idiom"; ok
 
+# ---- 3b. THE INVOCATION-SHAPE BAN ---------------------------------------------------------------
+# The §3 ban above matches the retired IDIOM (`command -v python3 …`). A launcher invoked BARE —
+# `python -c "…"`, `PYBIN=python3`, `$(python …)` — carries no idiom to match, so §3 could not see
+# it. Measured: exactly that shape shipped in tools/drift-audit/adopt-drift-audit.sh and was found by
+# an adversarial review, not by this gate. This ban keys on the INVOCATION instead, so the thing it
+# catches is "a python was run without being resolved" rather than "someone wrote the old sentence".
+#
+# TWO EXEMPTIONS, both narrow and both visible in the source being scanned:
+#   * the resolver BLOCK itself — the one place the candidate names must appear, delimited by its own
+#     markers, so the exemption cannot spread past them;
+# THE ASSIGNMENT HALF IS NOT ANCHORED TO THE LINE START. `PY=$(resolve_python) || PY=python3` puts
+# the bare fallback MID-LINE, `export PY=python3` puts a keyword in front of it, and `PY="python3"`
+# quotes it — all three passed the first cut, and one of them was two lines above a site this very
+# commit had marked `gov:literal-python`. A predicate that only reads column one is a predicate that
+# reads the tidiest third of the population.
+#
+# TWO EXEMPTIONS, both narrow and both visible in the source being scanned:
+#   * a line marked `gov:literal-python — <reason>`, which is an author's claim with the reason
+#     attached. Measured today: three such lines, each a launcher NAME printed or rendered rather
+#     than executed (a remedy string, a committed Skill render, an adopter-layout fallback).
+# Scope is `*.sh`. Widening to .githooks/, *.json and *.md was measured and rejected: 46 further hits
+# across 15 files, every one operator prose, which would need a 46-entry allowlist on day one — an
+# allowlist that size is a second source of truth, not a gate.
+bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
+  awk -v F="$1" '
+    /^# >>> resolve_python/ { b = 1 }
+    b { if (/^# <<< resolve_python/) b = 0; next }
+    /^[[:space:]]*#/ { next }
+    /gov:literal-python/ { next }
+    /(^|[;&|(){}`!]|&&|\|\||\$\(|(^|[^A-Za-z0-9_])(if|elif|then|else|while|until|do|exec|env|time|nohup|xargs|sudo|command))[[:space:]]*(python3|python|py)([[:space:]]|$)/ ||
+    /(^|[^A-Za-z0-9_$])(export[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=["'"'"']?(python3|python|py)["'"'"']?([[:space:]]|;|\)|$)/ \
+      { printf "%s:%d:%s\n", F, NR, $0 }
+  ' "$1"
+}
+
+bare=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -v '^tools/lib/resolve-python' | while IFS= read -r f; do
+         [ -n "$f" ] && [ -f "$f" ] && bare_scan "$f"
+       done)
+[ -z "$bare" ] || { echo "FAIL a python launcher is invoked without being resolved:"; printf '%s\n' "$bare" | sed 's/^/    /'; st=1; }
+ok
+
+# ...and the ban FIRES on the exact line that got past §3. Kept verbatim, with its provenance: this
+# shipped, ran, and was caught by a person.
+plant="$TMP/bare.sh"
+{ printf '#!/usr/bin/env bash\n'
+  printf 'KIT_REL="$(python -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]))" "$A" "$B")"\n'
+} > "$plant"
+[ "$(bare_scan "$plant" | wc -l)" = 1 ] || bad "the ban does not fire on the site that got past the idiom ban"; ok
+# ...the second live shape it must catch: an assignment to a bare name.
+printf '#!/usr/bin/env bash\nPYBIN=python3\n' > "$plant"
+[ "$(bare_scan "$plant" | wc -l)" = 1 ] || bad "the ban does not fire on a bare launcher ASSIGNMENT"; ok
+# ...and the resolved shape it must NOT catch, or every migrated site reds.
+printf '#!/usr/bin/env bash\nPY=$(resolve_python) || exit 2\n"$PY" x.py\n' > "$plant"
+[ -z "$(bare_scan "$plant")" ] || bad "the ban fires on a correctly resolved invocation"; ok
+# ...the two exemptions, each with its own red half so neither is a blanket hole.
+printf '#!/usr/bin/env bash\nPY=python3   # gov:literal-python — printed, never run\n' > "$plant"
+[ -z "$(bare_scan "$plant")" ] || bad "a marked literal is not exempt"; ok
+printf '#!/usr/bin/env bash\nPY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "the SAME line without the marker is exempt — the marker is doing nothing"; ok
+# The block fixture must plant a line the ban DOES match, or "exempt" and "never matched" are the
+# same observation. `PY=python3` inside the block is exactly such a line — verified below, outside it.
+{ printf '# >>> resolve_python\n'; printf '  PY=python3\n'; printf '# <<< resolve_python\n'; } > "$plant"
+[ -z "$(bare_scan "$plant")" ] || bad "the resolver block is not exempt from its own ban"; ok
+printf '#!/usr/bin/env bash\n  PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "the block fixture plants a line the ban never matches — the exemption arm proves nothing"; ok
+{ printf '# >>> resolve_python\n'; printf '# <<< resolve_python\n'; printf 'python x.py\n'; } > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "the block exemption leaks past its closing marker"; ok
+# ...the three shapes the first cut let through, each measured live on this tree before the fix.
+printf '#!/usr/bin/env bash\nPY=$(resolve_python) || PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a MID-LINE bare fallback is not caught"; ok
+printf '#!/usr/bin/env bash\nexport PY=python3\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "an EXPORTED bare assignment is not caught"; ok
+printf '#!/usr/bin/env bash\nPY="python3"\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a QUOTED bare assignment is not caught"; ok
+# ...and the ban's own population is real, or it is a gate over nothing.
+nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^tools/lib/resolve-python' || true)
+[ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok
+
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"
 exit "$st"

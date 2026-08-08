@@ -12,6 +12,46 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
+# exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh and
+# tools/lib/resolve-python.test.sh reds if any copy drifts.
+#
+# This file invoked `python3` BARE — the shape a ban keyed on `command -v` cannot see, which is how
+# it survived the V5 migration. On a python3-only host it happened to work; on a host where the
+# MS-Store stub answers for python3 it renders nothing and the young-tree arm below reds for a
+# reason that has nothing to do with hygiene.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_PY=$(resolve_python) || { echo "check-memory-hygiene.test: no usable python"; exit 2; }
 cd "$TMP" || exit 2
 git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
@@ -476,7 +516,7 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   # the generator reads `git ls-files`, so stage first, render, then stage the render — the same
   # order `adopt-memory-tree.sh --scaffold` uses, because this arm is standing in for its output
-  git add -A && python3 "$HERE/gen_build_index.py" --write >/dev/null && git add -A
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && git add -A
   git commit -q -m young --no-verify )
 outy=$(cd "$Y" && bash "$SCRIPT" 2>/dev/null); rcy=$?
 grep -qF 'selected an EMPTY population' <<<"$outy" \

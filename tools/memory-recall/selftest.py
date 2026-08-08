@@ -480,8 +480,14 @@ def t_eviction():
 # and each survival is asserted alongside an eviction that did happen.
 
 
-def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False):
-    """A sibling cache of a known size, with a manifest this pass will actually read."""
+def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False,
+         marker_age=None, db_absent=False):
+    """A sibling cache of a known size, with a manifest this pass will actually read.
+
+    `marker_age` plants a `building` marker aged that many seconds; `db_absent` removes records.db.
+    Both exist because the mtime test alone could not see the states they produce — see the state
+    table arm below, where three of them were judged evictable by the shipped predicate.
+    """
     d = caches / name
     d.mkdir(parents=True, exist_ok=True)
     (d / "records.db").write_bytes(b"\0" * (kb * 1024))
@@ -490,6 +496,13 @@ def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False):
     if built_at is not None:
         man["built_at"] = built_at
     (d / "manifest.json").write_text(json.dumps(man), encoding="utf-8")
+    if db_absent:
+        (d / "records.db").unlink()
+    if marker_age is not None:
+        m = d / "building"
+        m.write_text("12345", encoding="utf-8")
+        t = os.path.getmtime(m) - marker_age
+        os.utime(m, (t, t))
     if mid:
         # MID-BUILD is "a database is NEWER than the manifest", which is true during any build —
         # including a REBUILD, where the previous manifest sits on disk perfectly readable. That is
@@ -544,6 +557,96 @@ def t_budget_protections():
         cleanup(root)
 
 
+@check("a real build WRITES the marker and removes it when it finishes")
+def t_build_marker_lifecycle():
+    """THE PRODUCER, armed. Every other marker arm plants the file by hand, so replacing
+    `marker.write_text(...)` with `pass` left the whole suite green — the consumer was covered and the
+    thing that feeds it was not. Both halves are asserted from ONE real build: the marker exists while
+    `_docs` is running, and it is gone once the build returns.
+    """
+    root, kitdir = make_repo()
+    try:
+        probe = kitdir / "_markerprobe.py"
+        probe.write_text(
+            "import pathlib, sys\n"
+            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
+            "import query\n"
+            "seen = {}\n"
+            "orig = query._docs\n"
+            "def spy(repo, files):\n"
+            "    seen['during'] = (query.cache_dir(repo) / query.BUILD_MARKER).exists()\n"
+            "    return orig(repo, files)\n"
+            "query._docs = spy\n"
+            "repo = pathlib.Path('.').resolve()\n"
+            "d = query.cache_dir(repo)\n"
+            "query.build_cache(repo, d, query.corpus_files(repo))\n"
+            "print('during=%s after=%s' % (seen.get('during'), (d / query.BUILD_MARKER).exists()))\n",
+            encoding="utf-8", newline="\n")
+        proc = run(root, kitdir, script="_markerprobe.py")
+        assert proc.returncode == 0, proc.stderr
+        assert "during=True" in proc.stdout, \
+            "no marker while the build was READING — the unprotected phase is back: " + proc.stdout
+        assert "after=False" in proc.stdout, \
+            "the marker outlived the build; every later eviction pass would skip this cache: " + proc.stdout
+        return proc.stdout.strip()
+    finally:
+        cleanup(root)
+
+
+@check("a build in flight survives, in every phase the mtime test cannot see")
+def t_budget_build_in_flight():
+    """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
+    manifest is replaced. Measured phase-by-phase against a real rebuild, it is FALSE during
+    extraction (31% of the build), FALSE in the window where _write_set has unlinked a database and
+    not yet recreated it, and FALSE for the whole build on a filesystem whose mtime granularity puts
+    the rebuild inside the previous manifest's tick. A concurrent reproduction killed a sibling's
+    build with `unable to open database file`.
+
+    Each survivor is asserted ALONGSIDE an eviction that DID happen, so none of them is true merely
+    because the tree was under budget.
+    """
+    root, kitdir = make_repo(conf=_budget_conf("0.3"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        # extraction: dbs are the PREVIOUS build's, older than the manifest, marker fresh
+        extracting = _sib(caches, "extracting", kb=100, built_at="2019-01-01T00:00:00+00:00",
+                          worktree=str(root), marker_age=0.0)
+        # the unlink window: a manifest certifying record counts for a database that is not there
+        unlinked = _sib(caches, "unlinked", kb=100, built_at="2019-02-01T00:00:00+00:00",
+                        worktree=str(root), marker_age=0.0, db_absent=True)
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not old.exists(), "the pass did not run: nothing was evicted on an over-budget tree"
+        assert extracting.exists(), "a cache MID-EXTRACTION was evicted (the mtime test cannot see it)"
+        assert unlinked.exists(), "a cache with its database unlinked mid-write was evicted"
+        return "extraction and unlink windows both survive while the oldest evictable cache goes"
+    finally:
+        cleanup(root)
+
+
+@check("an ABANDONED build stops protecting its directory")
+def t_budget_marker_ttl():
+    """Without a TTL a killed builder's marker would protect that directory forever, and the budget
+    would quietly stop being a budget. The two siblings differ ONLY in marker age."""
+    root, kitdir = make_repo(conf=_budget_conf("0.3"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        stale = _sib(caches, "abandoned", kb=300, built_at="2020-01-01T00:00:00+00:00",
+                     worktree=str(root), marker_age=100000.0)
+        live = _sib(caches, "live", kb=100, built_at="2019-01-01T00:00:00+00:00",
+                    worktree=str(root), marker_age=0.0)
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not stale.exists(), "a marker past its TTL still protected an abandoned build"
+        assert live.exists(), "a FRESH marker did not protect a live build"
+        return "expired marker evicted, fresh marker kept — the TTL is the only difference"
+    finally:
+        cleanup(root)
+
+
 @check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
 def t_budget_cannot_satisfy():
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
@@ -559,6 +662,56 @@ def t_budget_cannot_satisfy():
         assert "cannot be brought under it" in proc.stderr, "the shortfall was not reported"
         assert "Nothing was deleted" in proc.stderr, "the report does not say the tree was left alone"
         return "shortfall reported, tree untouched"
+    finally:
+        cleanup(root)
+
+
+@check("a build that starts AFTER the plan is made is not deleted by it")
+def t_budget_recheck_before_delete():
+    """THE DELETION-TIME RE-CHECK, actually reached.
+
+    The first cut planted the marker before the run, which excludes the directory at the CANDIDATE
+    FILTER — so it never entered the plan, the deletion loop never saw it, and deleting the re-check
+    entirely left the arm green. That is the branch this arm exists for, covering nothing.
+
+    The race cannot be produced from a fixture (it needs a sibling to start building between the
+    snapshot and the loop, sub-millisecond apart), so this drives `evict_over_budget` IN PROCESS with
+    a `_mid_build` that answers the way a real racer would: False when the plan is made, True by the
+    time the deletion loop asks.
+    """
+    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        _sib(caches, "racer", kb=400, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        probe = kitdir / "_raceprobe.py"
+        probe.write_text(
+            "import pathlib, sys\n"
+            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
+            "import query\n"
+            "repo = pathlib.Path('.').resolve()\n"
+            "keep = query.cache_dir(repo)\n"
+            "target = keep.parent / 'racer'\n"
+            "calls = {}\n"
+            "def racing(d):\n"
+            "    if d != target:\n"
+            "        return False\n"
+            "    calls[d] = calls.get(d, 0) + 1\n"
+            "    return calls[d] > 1   # not building when the plan is made; building when it is deleted\n"
+            "query._mid_build = racing\n"
+            "for line in query.evict_over_budget(keep, 0.4):\n"
+            "    print(line)\n"
+            "print('survived=%s calls=%s' % (target.exists(), calls.get(target, 0)))\n",
+            encoding="utf-8", newline="\n")
+        proc = run(root, kitdir, script="_raceprobe.py")
+        assert proc.returncode == 0, proc.stderr
+        assert "calls=2" in proc.stdout, \
+            "_mid_build was asked once, not twice — the deletion loop does not re-check: " + proc.stdout
+        assert "survived=True" in proc.stdout, \
+            "a cache that started building after the plan was made was deleted anyway: " + proc.stdout
+        assert "did NOT evict" in proc.stdout, \
+            "the skip was silent; a cache that survives for a reason must say the reason: " + proc.stdout
+        return proc.stdout.strip().splitlines()[-1]
     finally:
         cleanup(root)
 
@@ -938,7 +1091,9 @@ def main() -> int:
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
         t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
-        t_budget_lru, t_budget_protections, t_budget_cannot_satisfy, t_budget_blank,
+        t_budget_lru, t_budget_protections, t_build_marker_lifecycle,
+        t_budget_build_in_flight, t_budget_marker_ttl,
+        t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
         t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,

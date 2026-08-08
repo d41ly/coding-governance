@@ -28,6 +28,20 @@
     ]
   },
   {
+    "name": "verdict epoch (kit version dates the engine)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-verdict-epoch.sh"
+    ]
+  },
+  {
+    "name": "verdict-epoch self-test",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-verdict-epoch.test.sh"
+    ]
+  },
+  {
     "name": "agent-instructions wiring",
     "argv": [
       "bash",
