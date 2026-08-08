@@ -140,9 +140,63 @@ check_recall_opened() {
   fi
 }
 
+
+# --- Check E: line endings on the RENDERED wiring files -------------------------------------------
+# A `git worktree` checkout can land CRLF on a path .gitattributes pins `eol=lf`, and `git status`
+# stays CLEAN because the index normalises on commit. The symptom is a gate that diffs a rendered
+# file against a fresh render and reports EVERY line as drift on a file the session never touched.
+#
+# THE BOUND IS DERIVED, and it is deliberately not "every eol=lf path": that attribute covers 46
+# files here, which is far wider than anything this arm should rewrite. The population is the tracked
+# files under .claude/ that carry the pin — check-wiring.sh's OWN domain, intersected with the pin,
+# both read from the tree rather than listed here. Measured: exactly the two rendered Skills, which
+# are also exactly the files an adopt script byte-compares.
+#
+# The repair REWRITES THE BYTES, because a `git checkout --` remedy is state-dependent and this is
+# not. Measured: `git diff` reports NO content change on such a file (the clean filter normalises)
+# while `git status --porcelain` DOES list it — the two disagree, so a checkout-based repair restores
+# the file or silently no-ops depending on which one git consults. A previous build hit the no-op and
+# needed `rm` first. Rewriting the bytes is correct in both states.
+check_eol() {
+  local pop f bad=""
+  pop=$(git ls-files .claude/ 2>/dev/null | xargs -r git check-attr eol -- 2>/dev/null \
+        | sed -n 's/^\(.*\): eol: lf$/\1/p')
+  if [ -z "$pop" ]; then
+    echo "skip     eol       — no tracked .claude/ path carries an eol=lf pin"
+    return
+  fi
+  for f in $pop; do
+    [ -f "$f" ] || continue
+    if LC_ALL=C grep -qU $'\r' "$f" 2>/dev/null; then bad="$bad $f"; fi
+  done
+  if [ -z "$bad" ]; then
+    echo "ok       eol       — every eol=lf-pinned .claude/ file is LF in the worktree"
+    return
+  fi
+  if [ "$DO_FIX" = 1 ]; then
+    for f in $bad; do
+      # Rewrite in place, then verify: a repair that reports success without checking is the class of
+      # bug this whole arm exists to catch one level up.
+      LC_ALL=C tr -d '\r' < "$f" > "$f.eoltmp" && mv -f "$f.eoltmp" "$f"
+      if LC_ALL=C grep -qU $'\r' "$f" 2>/dev/null; then
+        echo "UNWIRED  eol       — $f still holds CRLF after the repair. Fix by hand: tr -d '\\r'"
+        unwired=$((unwired+1))
+      else
+        echo "fixed    eol       — $f rewritten to LF (the index already normalised, so git status was clean)"
+      fi
+    done
+    return
+  fi
+  for f in $bad; do
+    echo "UNWIRED  eol       — $f holds CRLF despite its eol=lf pin; a byte-comparing gate will report every line as drift. Fix: bash tools/check-wiring.sh --fix"
+    unwired=$((unwired+1))
+  done
+}
+
 check_hooks
 check_agentcap
 check_recall_opened
+check_eol
 
 [ "$MODE" = session ] && exit 0
 [ "$unwired" = 0 ] && exit 0 || exit 1

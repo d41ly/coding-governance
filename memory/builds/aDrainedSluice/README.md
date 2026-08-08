@@ -49,6 +49,6 @@ branch work and of each other.
 | [TOOL-aDrainedSluice-5 — V2: arm every pinned branch, or say why not](spec/units/2026-08-08-spec-aDrainedSluice-5-v2-arm-the-branches.md) | CLOSED | rev-4 | 2026-08-08 |
 | [TOOL-aDrainedSluice-6 — V5: one python resolver, and it EXECUTES the candidate](spec/units/2026-08-08-spec-aDrainedSluice-6-v5-python-resolver.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-7 — V6: the recall cache is bounded](spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md) | INPROGRESS | rev-2 | 2026-08-08 |
-| [TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md) | INPROGRESS | rev-2 | 2026-08-08 |
+| [TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md) | INPROGRESS | rev-3 | 2026-08-08 |
 <!-- /gen:build-index -->

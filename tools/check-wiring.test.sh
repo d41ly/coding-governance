@@ -135,5 +135,64 @@ else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"
 fi
 
+# AC9 — the eol arm: detect in --check, repair in --fix, and never reach past its bound.
+# The BOUND is the point. The eol=lf attribute alone covers 46 files in the governance repo, which is
+# far more than anything this arm should rewrite, so the population is tracked `.claude/` paths that
+# carry the pin — check-wiring.sh's own domain intersected with the pin, both read from the tree.
+newrepo
+mkdir -p .claude/skills/x memory
+printf '.claude/**/*.md text eol=lf\n' > .gitattributes
+printf 'a\nb\n' > .claude/skills/x/SKILL.md              # pinned, inside the domain
+printf 'a\nb\n' > memory/NOTES.md                        # NOT pinned, outside the domain
+git add -A; git commit -q -m eolbase
+git config core.hooksPath .githooks                      # isolate: only the eol arm can be unwired
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       eol'; } \
+  && ck "AC9 clean LF tree -> ok" 1 || ck "AC9 clean LF tree -> ok" 0
+# the checkout defect, reproduced: CRLF in the worktree while the index stays normalised, so
+# `git status` is CLEAN and only a byte-comparing gate ever notices.
+printf 'a\r\nb\r\n' > .claude/skills/x/SKILL.md
+printf 'a\r\nb\r\n' > memory/NOTES.md
+# THE INVISIBILITY, measured rather than asserted from the trap note. `git diff` reports NO content
+# difference on the pinned file — the clean filter normalises, so there is nothing to commit — while
+# the bytes on disk are CRLF. (`git status --porcelain` does list it: that is the stat cache, not a
+# content verdict, and the two disagree here. The trap note's "git status stays clean" was the
+# looser half of the observation; this is the half that actually explains the no-op below.)
+{ [ -z "$(git diff --numstat -- .claude/skills/x/SKILL.md)" ]; } \
+  && ck "AC9 git sees no content change (the defect reproduces)" 1 \
+  || ck "AC9 git sees no content change (the defect reproduces)" 0
+# A `git checkout --` remedy is NOT asserted here, and the reason is a measurement rather than a
+# preference: on this git it DOES restore the file in this fixture, because status' stat cache flags
+# it even though diff sees no content change. The two disagree, so a repair built on `git checkout`
+# works or no-ops depending on which of them git consults — the previous build hit the no-op and
+# needed `rm` first. Rewriting the bytes is correct in BOTH states, which is why it is what --fix
+# does. Do not "simplify" it back.
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  eol' && printf '%s' "$out" | grep -q 'SKILL.md'; } \
+  && ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 1 || ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 0
+printf '%s' "$out" | grep -q 'memory/NOTES.md' \
+  && ck "AC9 --check stays inside its bound" 0 || ck "AC9 --check stays inside its bound" 1
+chk --fix >/dev/null
+LC_ALL=C grep -qU $'\r' .claude/skills/x/SKILL.md \
+  && ck "AC9 --fix rewrote the pinned file to LF" 0 || ck "AC9 --fix rewrote the pinned file to LF" 1
+# ...and the file OUTSIDE the bound is untouched. A repair that reaches past its population is worse
+# than one that never ran: it rewrites bytes nobody asked it to.
+LC_ALL=C grep -qU $'\r' memory/NOTES.md \
+  && ck "AC9 --fix left the unpinned file alone" 1 || ck "AC9 --fix left the unpinned file alone" 0
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       eol'; } \
+  && ck "AC9 re-check after --fix -> ok, exit 0" 1 || ck "AC9 re-check after --fix -> ok, exit 0" 0
+cleanup
+
+# AC9b — no pinned .claude/ path at all: the arm SKIPS rather than reporting a clean bill over an
+# empty population, which is the distinction the empty-population guard exists to make.
+newrepo
+git config core.hooksPath .githooks
+out=$(chk --check)
+printf '%s' "$out" | grep -q 'skip     eol' \
+  && ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 1 \
+  || ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 0
+cleanup
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

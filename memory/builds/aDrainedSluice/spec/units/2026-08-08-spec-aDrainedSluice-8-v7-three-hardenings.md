@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -20,11 +20,13 @@ that predates the change it is comparing across.
   `eol=lf` that are RENDERED and byte-compared. It reports CRLF in `--check`/`--session` and repairs
   it in `--fix`, by rewriting the file's bytes rather than by `git checkout` — the index normalises,
   so `git status` is clean and a checkout is a no-op.
-- **S4** — the repair is bounded to paths that are tracked, carry an `eol=lf` attribute, AND are
-  RENDERED by a gate that byte-compares them. Measured: the attribute alone covers 43 files, which is
-  far wider than the data model's description and wider than any repair should reach on a
-  `--fix`. The rendered set is derived from the kits that declare a render target, so the bound is a
-  fact about the tree rather than a sentence in a spec.
+- **S4** — the repair is bounded to tracked paths UNDER `.claude/` that carry an `eol=lf` attribute:
+  `check-wiring.sh`'s own domain, intersected with the pin, both read from the tree by
+  `git ls-files` + `git check-attr` rather than listed anywhere. Measured: the attribute alone covers
+  46 files, far wider than any repair should reach on a `--fix`; the intersection is exactly the two
+  rendered Skills, which are also exactly the files an adopt script byte-compares. The drafted "the
+  kits that declare a render target" derivation was dropped — no kit declares one in a form the tree
+  can be asked about, so it would have been a list wearing a scan's clothes.
 - **S5** — `tools/memory-tree/hygiene-parity.test.sh` REFUSES a baseline older than the kit version
   whose behaviour it is comparing. It asserts byte-identity, and the 1.5 flatten deliberately changed
   the verdicts, so a pre-flatten baseline reports every difference as a failure — true and useless.
@@ -37,10 +39,12 @@ that predates the change it is comparing across.
   change.
 - **S7b** — the landing boundary is checked, not assumed. `.githooks/pre-push` requires the validated
   tree to BE the pushed tip and `tools/push-main.sh` gates on `git status --porcelain -uno`, which
-  deliberately PERMITS untracked files at that boundary. Widening the JavaScript gates to untracked
-  files therefore changes what a landing sees; the unit measures that before it lands, and if an
-  untracked scratch file would red a legitimate push, the widening is scoped to `--check` runs rather
-  than to the hook path.
+  deliberately PERMITS untracked files at that boundary. Widening the JavaScript gates therefore
+  DOES change what a landing sees, and the widening is kept whole rather than scoped to `--check`:
+  a gate that judges less on the path that matters most is the shape this build keeps deleting.
+  Measured, the repo has zero untracked `.js` under `tools/` today, and the escape hatch is the one
+  `--exclude-standard` already provides — a scratch script opts out with a `.gitignore` line, which
+  is a decision someone writes down, not an omission.
 - **S7c** — the parity floor's EMPTY case is defined. Measured, `git log -S` for the current version
   constant returns exactly one commit, and it is the flatten itself; when it returns none — a fresh
   clone with a shallow history, or a squashed import — the harness refuses with that as the reason
@@ -95,10 +99,12 @@ Four scripts, two tests.
 
 - **Leave the JS gates tracked-only and document it.** Rejected: the row already documents it, and a
   documented blind spot in a gate is the thing this repo keeps a catalogue record about.
-- **Repair CRLF with `git checkout -- <path>`.** Rejected: it is a NO-OP here. The index normalises
-  on commit, so git believes the file is unchanged and refuses to rewrite it; the bytes must be
-  rewritten directly. This was measured during the previous build, where `rm` plus `git checkout`
-  was needed precisely because the plain checkout did nothing.
+- **Repair CRLF with `git checkout -- <path>`.** Rejected because it is STATE-DEPENDENT, which is a
+  sharper reason than the drafted "it is a no-op". Measured in the fixture: `git diff` reports no
+  content change on such a file (the clean filter normalises) while `git status --porcelain` DOES
+  list it — the two disagree, so a checkout-based repair restores the file or silently does nothing
+  depending on which one git consults. The previous build hit the no-op and needed `rm` first.
+  Rewriting the bytes is correct in both states.
 - **Pin the parity floor to a sha.** Rejected by S6: it rots at the next version bump, and the thing
   that actually defines the floor is the version constant.
 
@@ -122,8 +128,9 @@ Four scripts, two tests.
 - **AC1** — When an untracked, unignored `.js` under `tools/` reintroduces the banned join, the ban
   fails naming it — before it is staged.
 - **AC2** — When a file is git-ignored, neither JavaScript gate looks at it.
-- **AC3** — When a tracked `eol=lf`-pinned rendered file holds CRLF, `check-wiring.sh --check` reports
-  it and `--fix` rewrites it to LF; a file without the attribute is untouched.
+- **AC3** — When a tracked `eol=lf`-pinned `.claude/` file holds CRLF, `check-wiring.sh --check`
+  reports it and `--fix` rewrites it to LF; a file without the attribute is untouched. When no such
+  path exists the arm SKIPS rather than printing a clean bill over an empty population.
 - **AC4** — When `check-wiring.sh --session` runs on a clean tree, it reports nothing new.
 - **AC5** — When `hygiene-parity.test.sh` is given a baseline older than the kit-version floor, it
   refuses with a message naming the floor and the reason; a baseline at or after it runs normally.
@@ -151,6 +158,11 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-08 · CLOSED. All three landed. Two drafted claims did not survive contact and are
+  corrected above rather than quietly dropped: the CRLF bound is `.claude/` ∩ `eol=lf` (no kit
+  declares a render target the tree can be asked about), and `git checkout --` is state-dependent
+  rather than a flat no-op — measured both ways in the fixture. Six discovery-path arms, six CRLF
+  arms, and the derived parity floor exercised in both directions (floor commit 93dbbac).
 - rev-1 · 2026-08-08 · initial draft.
 - rev-2 · 2026-08-08 · folded review 2, four highs: N13 narrows the CRLF repair to the rendered set
   (the attribute alone is 43 files); N14 makes the arms exercise the discovery path, since both gates
