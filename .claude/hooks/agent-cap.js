@@ -34,8 +34,8 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.0' // gov:kit agent-cap@1.0 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
-const CAP = Number(process.env.AGENT_CAP) || 6
+const KIT_AGENT_CAP_VERSION = '1.1' // gov:kit agent-cap@1.1 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const CAP = Number(process.env.AGENT_CAP) || 5
 
 function readStdin() {
   try {
@@ -69,6 +69,181 @@ function offendingLines(script) {
     })
 }
 
+// ---------------------------------------------------------------------------
+// RULE 2 — the VERIFIER ARITY rule (memory/guides/REVIEW-PROTOCOL.md).
+//
+// A review's verify stage spawns at most 5 agents WHATEVER the finding count. Rule 1 above does not
+// give that: it bounds CONCURRENCY, so N findings still spawn N agents, five at a time. Concurrency
+// is not a budget. The failure this rule exists for was written as an INLINE `script` on a Workflow
+// tool call — never a file — which is why the check lives here, at the tool call, and not only in a
+// gate over `tools/**/*.js` that structurally cannot see one.
+//
+// WHY A WHITELIST. Provenance is undecidable from a line. `batches.map((g) => () => agent(...))` is
+// the SAME TEXT whether `batches` came from a bounded split or from `chunk(all, 1)`, so a blacklist
+// of banned spellings bans a spelling and not the defect. Instead: an `agent(` reached through an
+// iteration construct must have a receiver this file can see is bounded.
+//
+// ALLOWED receivers:
+//   (a) an identifier assigned on a line marked `gov:fixed-verifiers`, where that line spells
+//       chunk(x, Math.ceil(x.length / K)) or splitInto(x, K) and K is an integer literal <= 5 or an
+//       identifier bound in this file to one. The marker is the AUTHOR'S CLAIM; the shape check is
+//       what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
+//   (b) an identifier assigned from an ARRAY LITERAL with <= 6 elements — the finder-lens case,
+//       where the agent count is a constant visible in the source.
+// Everything else is denied, including a for/while/forEach body containing `agent(`: a loop-built
+// thunk array is the evasion, not an edge case.
+const FIXED_MARK = 'gov:fixed-verifiers'
+const MAX_VERIFIERS = 5
+const MAX_LENSES = 6
+
+// `K` resolved against this file: an integer literal, or an identifier bound to one.
+function boundedK(tok, consts) {
+  const t = String(tok).trim()
+  if (/^\d+$/.test(t)) return Number(t) <= MAX_VERIFIERS
+  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= MAX_VERIFIERS
+  return false
+}
+
+function fanoutFindings(script) {
+  const lines = script.split(/\r?\n/)
+  const code = lines.map((l) => stripStrings(l).split('//')[0])
+
+  // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5` / `a.maxVerifiers || 5`
+  const consts = new Map()
+  code.forEach((l) => {
+    let m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(\d+)\s*$/.exec(l.trim())
+    if (m) consts.set(m[1], Number(m[2]))
+    m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[^=]*\|\|\s*(\d+)\s*$/.exec(l.trim())
+    if (m && !consts.has(m[1])) consts.set(m[1], Number(m[2]))
+  })
+
+  // Receivers this file can prove are bounded. TWO PASSES, because a derived lens set is written
+  // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
+  // pass would reject it on declaration order rather than on the property being checked.
+  const ok = new Set()
+  const scan = (raw, i) => {
+    const l = code[i]
+    const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
+    if (!asg) return
+    const name = asg[1]
+    if (raw.includes(FIXED_MARK)) {
+      const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(l)
+      const s = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(l)
+      if ((c && boundedK(c[1], consts)) || (s && boundedK(s[1], consts))) {
+        ok.add(name)
+        return
+      }
+      // A marked DERIVATION from an array already known bounded — `ALL_LENSES.filter(…)`, a
+      // `.slice()`, a ternary between two bounded sources. Neither filter nor slice can GROW an
+      // array, so the bound is inherited. Only accepted WITH the marker, so it stays a deliberate
+      // claim rather than something inferred from a name.
+      const refs = l.match(/[A-Za-z_$][\w$]*/g) || []
+      if (refs.some((r) => r !== name && ok.has(r))) ok.add(name)
+      return
+    }
+    // an array literal whose element count is visible here. Counted on the FULL statement, which may
+    // wrap: join forward until the brackets balance, so a multi-line LENSES array is measurable.
+    if (!/=\s*\[/.test(l)) return
+    let buf = l.slice(l.indexOf('['))
+    let j = i
+    let depth = 0
+    let closed = false
+    while (j < code.length) {
+      for (const ch of j === i ? buf : code[j]) {
+        if (ch === '[') depth++
+        else if (ch === ']') { depth--; if (depth === 0) closed = true }
+      }
+      if (j > i) buf += '\n' + code[j]
+      if (closed) break
+      j++
+    }
+    if (!closed) return
+    const inner = buf.slice(buf.indexOf('[') + 1, buf.lastIndexOf(']'))
+    // top-level commas only
+    let d = 0
+    let n = inner.trim() ? 1 : 0
+    for (const ch of inner) {
+      if ('[{('.includes(ch)) d++
+      else if (']})'.includes(ch)) d--
+      else if (ch === ',' && d === 0) n++
+    }
+    if (n <= MAX_LENSES) ok.add(name)
+  }
+  lines.forEach(scan)
+  lines.forEach(scan)
+
+  const bad = []
+  lines.forEach((raw, i) => {
+    const l = code[i]
+    if (!/\bagent\s*\(/.test(l)) return
+    if (raw.includes(FIXED_MARK)) return
+    // WHAT ENCLOSES THIS agent() CALL. Scanning the window right-to-left, a `)` is pending and a `(`
+    // either matches a pending one or is an ENCLOSING opener — a call this agent() sits inside. Only
+    // enclosing openers are judged, which is the difference between "the fan-out is a map" and "the
+    // word map appears nearby". The synthesis stage of tier2-review.js is one agent() whose PROMPT
+    // builds text with `allFindings.map(...)`; a window-wide regex read that as a fan-out and denied
+    // a single-agent call — measured, and the reason this looks at structure and not at proximity.
+    //
+    // The walk stops at two enclosing openers — enough to hold `boundedParallel( x.map( … agent(` —
+    // or 60 lines, so a pathological file cannot make this quadratic. A fixed 2-line window was the
+    // first cut and was also a measured hole: a `.map((f) => () =>` whose agent() sits ten
+    // prompt-lines below escaped it entirely, which is the commonest shape in these harnesses.
+    const openersOf = (text) => {
+      const out = []
+      let pending = 0
+      for (let k = text.length - 1; k >= 0; k--) {
+        const ch = text[k]
+        if (ch === ')') pending++
+        else if (ch === '(') {
+          if (pending > 0) pending--
+          else out.push(k)
+        }
+      }
+      return out
+    }
+    // The window is everything BEFORE the agent call, never the whole line: scanning right-to-left
+    // from the end of `boundedParallel(all.map((f) => () => agent(f.c)), 5)` lets the trailing `)`s
+    // cancel the very openers being looked for, and the one-line fan-out — the exact shape that
+    // motivated this rule — reads as enclosed by nothing. Measured, twice.
+    let win = l.slice(0, l.search(/\bagent\s*\(/))
+    for (let k = i - 1; k >= 0 && k > i - 60 && openersOf(win).length < 2; k--) win = code[k] + '\n' + win
+
+    let hit = null
+    for (const pos of openersOf(win)) {
+      const before = win.slice(0, pos)
+      const m = /([A-Za-z_$][\w$]*)\s*\.\s*(map|flatMap|forEach)\s*$/.exec(before)
+      if (m) { hit = { kind: 'map', name: m[1] }; break }
+      if (/\bArray\s*\.\s*from\s*$/.test(before)) { hit = { kind: 'from' }; break }
+      if (/\b(for|while)\s*$/.test(before)) { hit = { kind: 'loop' }; break }
+    }
+    if (hit && hit.kind === 'map') {
+      if (!ok.has(hit.name)) {
+        bad.push({ n: i + 1, line: raw, why: `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
+      }
+      return
+    }
+    if (hit && hit.kind === 'from') {
+      bad.push({ n: i + 1, line: raw, why: 'agent() fanned through Array.from() — the count is not visible here' })
+      return
+    }
+    // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener. Judged
+    // separately: an unclosed `for (`/`while (` block whose brace is still open above this line.
+    let braces = 0
+    for (let k = i; k >= 0 && k > i - 60; k--) {
+      for (const ch of code[k]) {
+        if (ch === '}') braces++
+        else if (ch === '{') braces--
+      }
+      if (braces < 0 && /\b(for|while)\s*\(/.test(code[k])) {
+        bad.push({ n: i + 1, line: raw, why: 'agent() inside a loop body — a loop-built thunk array is the evasion this rule exists for' })
+        break
+      }
+      if (braces < 0) braces = 0 // a different block opened here; keep looking outward
+    }
+  })
+  return bad
+}
+
 function main() {
   let data
   try {
@@ -78,8 +253,42 @@ function main() {
   }
   if (!data || data.tool_name !== 'Workflow') process.exit(0)
 
-  const script = (data.tool_input && data.tool_input.script) || ''
-  if (!script) process.exit(0) // scriptPath / saved-name runs: nothing to scan
+  // A saved script is a FILE, and a node hook has fs — exiting 0 here made the rules unenforceable
+  // the moment anyone wrote the offending script to disk. A `name:`-only run supplies no source and
+  // stays unscannable; that hole is covered by the merge-bar leg over tools/workflows/, and is
+  // declared in memory/guides/REVIEW-PROTOCOL.md rather than implied away.
+  let script = (data.tool_input && data.tool_input.script) || ''
+  const spath = (data.tool_input && data.tool_input.scriptPath) || ''
+  if (!script && spath) {
+    try {
+      script = require('fs').readFileSync(spath, 'utf8')
+    } catch (e) {
+      process.stderr.write(
+        `BLOCKED by agent-cap: scriptPath ${spath} could not be read (${e.code || e.message}), so ` +
+          `the fan-out rules could not be checked. A script this hook cannot read is not a script ` +
+          `this hook may approve.\n`,
+      )
+      process.exit(2)
+    }
+  }
+  if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
+
+  const fan = fanoutFindings(script)
+  if (fan.length) {
+    process.stderr.write(
+      `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
+        `caps verify-stage agents at ${MAX_VERIFIERS} TOTAL — the batch size grows with the finding ` +
+        `count, the agent count never does (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
+        fan.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${line.trim()}\n        ${why}`).join('\n') +
+        `\n\nSplit into a BOUNDED number of groups and mark the assignment:\n` +
+        `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
+        `  const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // ${FIXED_MARK}\n` +
+        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${CAP})\n\n` +
+        `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
+        `constant. Ready-made: tools/workflows/tier2-review.js.\n`,
+    )
+    process.exit(2)
+  }
 
   const bad = offendingLines(script)
   if (bad.length === 0) process.exit(0)

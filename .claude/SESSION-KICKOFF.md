@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-09T00:55:00+03:00 @ afdd660b61367ab6c0265462e2e9cd1bddf1b418
+last-audit: 2026-08-09T02:10:00+03:00 @ a938fb0cbc37296bcf199e88671deb2db4c08181
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -77,14 +77,18 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It now sits at 32758/32768 (**10 bytes free**, measured 2026-08-03), so the next line added to it must
+  It now sits at 32746/32768 (**22 bytes free**, measured 2026-08-09), so the next line added to it must
   fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
   line. Either alone leaves the file green only right after a render.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
+- The `agent-cap` PreToolUse hook enforces TWO rules: route fan-out through the cap-5 helpers, AND a
+  review's verify stage spawns at most 5 agents TOTAL. Concurrency is not a budget —
+  `boundedParallel(t, 5)` still spawns N agents for N findings, five at a time. Bound the group
+  COUNT: `chunk(x, Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`. Binding rules:
+  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`.
 - A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added
   in `TOOL-aBatchedLintel-1` were wrong on their first run — the interval ban matched the `) {`
   opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban.

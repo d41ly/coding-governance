@@ -217,9 +217,9 @@ Demonstrate, do not assert — run the tool and show the output for every claim.
   },
 ]
 
-const LENSES = a.lenses && a.lenses.length
-  ? ALL_LENSES.filter((L) => a.lenses.includes(L.slug))
-  : ALL_LENSES
+// gov:fixed-verifiers — derived from the ALL_LENSES literal above; `.filter` cannot grow it, so the
+// agent count stays the constant the source shows.
+const LENSES = a.lenses && a.lenses.length ? ALL_LENSES.filter((L) => a.lenses.includes(L.slug)) : ALL_LENSES // gov:fixed-verifiers
 
 phase('Find')
 const finderResults = await boundedParallel(
@@ -257,7 +257,7 @@ const VERDICT_SCHEMA = {
 }
 
 phase('Verify')
-const batches = indexed.length ? chunk(indexed, Math.ceil(indexed.length / MAX_VERIFIERS)) : []
+const batches = indexed.length ? chunk(indexed, Math.ceil(indexed.length / MAX_VERIFIERS)) : [] // gov:fixed-verifiers
 const verdictBatches = await boundedParallel(
   batches.map((b, bi) => () =>
     agent(

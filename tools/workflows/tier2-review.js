@@ -1,18 +1,18 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.1', // gov:kit tier2-review@1.1 — engine identity (deployed verbatim; this field is the deployer's version marker)
+  version: '1.2', // gov:kit tier2-review@1.2 — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
-    'Consolidated, concurrency-capped (≤6) Tier-2 adversarial review: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
+    'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
-    { title: 'Find', detail: '4 finder lenses, one wave, ≤6 concurrent' },
-    { title: 'Verify', detail: 'skeptics refute findings in BATCHES, ≤6 concurrent' },
+    { title: 'Find', detail: '4 finder lenses, one wave, ≤5 concurrent' },
+    { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
 }
 
-// --- cap-6 fan-out (inlined; workflow scripts can't import) --------------
+// --- cap-5 fan-out (inlined; workflow scripts can't import) --------------
 // Passes agent-cap: the only raw primitive call is the marked helper line.
-async function boundedParallel(thunks, cap = 6) {
+async function boundedParallel(thunks, cap = 5) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
     out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
@@ -194,8 +194,14 @@ log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verif
 
 // --- Phase 2: VERIFY — batched skeptics (NOT one agent per finding) -----
 phase('Verify')
-const BATCH = 5 // findings per skeptic — consolidation: ceil(N/5) agents, not 2N
-const batches = chunk(allFindings, BATCH)
+// THE VERIFIER COUNT IS A CONSTANT. `chunk(allFindings, 5)` bounded the GROUP SIZE, so 70 findings
+// bought 14 skeptics — still linear, which the protocol says is not enough. Bounding the group COUNT
+// makes the batch grow and the agent count stand still. `chunk` slices contiguously, so a batch
+// labelled `verify:ids-1-14` really does contain ids 1..14, and Math.ceil never yields an empty
+// group: at N < MAX_VERIFIERS it produces exactly N groups of one.
+const MAX_VERIFIERS = 5
+const batches = chunk(allFindings, Math.ceil(allFindings.length / MAX_VERIFIERS)) // gov:fixed-verifiers
+log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS})`)
 
 const verdictResults = await boundedParallel(
   batches.map((group, gi) => () =>

@@ -102,6 +102,9 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
+   `guides/*.md` is in that set: a guide is MANDATORY reading the charter points a session at, and
+   check 16 refuses a charter-cited file that nothing caps. Entry-budget exempt — a guide is prose,
+   not index rows.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is

@@ -105,7 +105,13 @@ arm 'harness: orchestrator assigns the id' 'id: i + 1' grep -F 'id: i + 1' "$H"
 arm 'harness: the verdict map is keyed on the integer' 'verdictById = new Map()' grep -F 'verdictById = new Map()' "$H"
 arm 'harness: the schema demands an integer id' "id: { type: 'integer' }" grep -F "id: { type: 'integer' }" "$H"
 arm 'harness: a conflicting repeat demotes to unverified' 'conflicts.add(v.id)' grep -F 'conflicts.add(v.id)' "$H"
-arm 'harness: the version marker moved' "version: '1.1'" grep -F "version: '1.1'" "$H"
+# The pin is on the marker's SHAPE, not its value: a literal pin reds on every version bump, which
+# makes the bump edit a test that is not about versions. The value lives in the file itself.
+arm 'harness: the version marker is well-formed' "version: '" grep -E "version: '[0-9]+\.[0-9]+'" "$H"
+# The bounded verifier count, asserted POSITIVELY. The absence ban proves the linear form is gone;
+# only this proves the bounded one is present. Both, or "clean" means "empty".
+arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(allFindings.length / MAX_VERIFIERS)' "$H"
+arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -F 'gov:fixed-verifiers' "$H"
 
 # ---- THE DISCOVERY PATH ---------------------------------------------------------------------------
 # Both gates take explicit paths and never touch git on that path, so every arm above exercises the

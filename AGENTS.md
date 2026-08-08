@@ -21,7 +21,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
   `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
   five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
-  that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js`,
+  that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
   `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
@@ -66,6 +66,8 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - kit/dogfood doc parity — `tools/memory-tree/kit-dogfood-parity.test.sh` (the shipped `HYGIENE.template.md`/`SPEC-TEMPLATE.template.md` equal this repo's installed copies, modulo the `tools/` install prefix)
 - python-launcher resolver — `tools/lib/resolve-python.test.sh` (one resolver that RUNS each candidate; every copy-installed kit carries it inline byte-identical, gated; the retired `command -v python3 || python` idiom is banned repo-wide)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`, `python tools/memory-recall/selftest.py`
+- **the review protocol is BINDING** — `memory/guides/REVIEW-PROTOCOL.md`: a review's verify stage spawns **at most 5 agents TOTAL** (the batch grows, the agent count never does) and **at most 5 run concurrently**. Enforced at the `Workflow` tool call by `tools/hooks/agent-cap.js` (it sees the inline `script`, which is where the rule actually gets broken) and on the bar by `tools/workflows/check-verifier-fanout.sh`, which delegates to that same hook rather than re-implementing it. Ready-made harness: `tools/workflows/tier2-review.js`.
+- verifier fan-out — `tools/workflows/check-verifier-fanout.sh` (+ `.test.sh`) and the protocol's kit/dogfood parity, `tools/workflows/check-protocol-parity.test.sh`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js` git can see — tracked OR untracked-and-unignored), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)

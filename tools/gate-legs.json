@@ -152,6 +152,27 @@
     ]
   },
   {
+    "name": "verifier fan-out (≤5 verify agents per review)",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.sh"
+    ]
+  },
+  {
+    "name": "verifier fan-out self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.test.sh"
+    ]
+  },
+  {
+    "name": "review-protocol parity (kit vs dogfood)",
+    "argv": [
+      "bash",
+      "tools/workflows/check-protocol-parity.test.sh"
+    ]
+  },
+  {
     "name": "review-join ban (no ref-keyed join)",
     "argv": [
       "bash",

@@ -312,6 +312,10 @@ index_set() {
     fi
     printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
+    # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
+    # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
+    # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
+    printf '%s\n' "$FILES" | grep -E "^$M/guides/[^/]+\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
 INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)

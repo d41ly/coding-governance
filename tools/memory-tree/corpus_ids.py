@@ -201,7 +201,7 @@ def walk(root: str, conf: dict) -> dict:
     excluded = tuple(x for x in conf.get("DEAD_PATH_EXCLUDE", "").split() if x)
     present = re.compile(
         r"^" + re.escape(m) + r"/(?:DECISIONS\.md|README\.md|HYGIENE\.md|TEMPLATE-SPEC\.md"
-        r"|LIVE\.md|backlog/|ledger/|project/)"
+        r"|LIVE\.md|backlog/|ledger/|project/|guides/)"
     )
 
     defs: dict = {}          # id -> set(paths)
