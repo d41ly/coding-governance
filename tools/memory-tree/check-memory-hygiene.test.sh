@@ -112,6 +112,19 @@ printf '# t22\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · 
 printf 'x\n' > "$D/build/2026-08-01-build-ARCH-tFixture-1.md"                    # legal qualifier -> silent
 printf 'x\n' > "$D/build/2026-08-01-build-XXXX-tFixture-2.md"                    # unknown family -> red
 
+# ---- THE §9 REV RANGE, both sub-paths. The high-water scan used to run from `## 9.` to the end of
+# ---- the body, so a rev-N in §10 satisfied the header rev. The branch has TWO conditions and the
+# ---- range change makes BOTH newly reachable, so each gets its own fixture: one where §9 logs a
+# ---- SMALLER rev, and one where §9 logs NONE at all. With only the first, an implementation that
+# ---- closes the range for the maximum but leaves `seen` set below §9 passes while the masking
+# ---- survives — which is the case the unit exists to fix.
+good10 | sed 's/base 0123abcd/base 0123abcd · streams architecture/; s/^\*\*Status:\*\* SPECCED · rev-1/**Status:** SPECCED · rev-2/; s/^## 10\. Reuse audit$/## 10. Reuse audit\n\n- rev-99 · 2026-08-10 · a later section carrying a bigger number./' \
+  > "$D/spec/2026-08-10-spec-tFixture-40.md"          # §9 logs rev-1, header rev-2, §10 has rev-99 -> RED
+good10 | sed 's/base 0123abcd/base 0123abcd · streams architecture/; s/^- rev-1 · 2026-08-10 · initial draft\.$/- initial draft, with no rev token at all./; s/^## 10\. Reuse audit$/## 10. Reuse audit\n\n- rev-99 · 2026-08-10 · a later section carrying a bigger number./' \
+  > "$D/spec/2026-08-10-spec-tFixture-41.md"          # §9 has NO rev token, §10 has rev-99 -> RED
+good10 | sed 's/base 0123abcd/base 0123abcd · streams architecture/; s/^## 10\. Reuse audit$/## 10. Reuse audit\n\n- rev-99 · 2026-08-10 · a later section carrying a bigger number./' \
+  > "$D/spec/2026-08-10-spec-tFixture-42.md"          # §9 logs rev-1, header rev-1 -> silent
+
 # ---- CHECK 5 AT DEPTH. A recording one level deeper used to be governed by NOTHING: check 5 saw
 # ---- only direct children, and check 12's population is files that already match the dated name, so
 # ---- a free-named nested file was outside both by construction.
@@ -180,6 +193,12 @@ hit  'tFixture-16.md (## sections differ'
 miss 'tFixture-16.md (terminal Status'
 # Emission ORDER inside one file: a per-file loop got it for free, one awk over a driver does not.
 before 'tFixture-14.md (unfilled skeleton placeholder' 'tFixture-14.md (section with an empty body'
+
+# ---- the §9 range, both sub-paths. tFixture-42 is the silent control; the other two are the two
+# ---- conditions of the branch. Each names the branch's OWN message.
+hit  'tFixture-40.md (header rev-2 not logged in the §9 Revision log)'
+hit  'tFixture-41.md (header rev-1 not logged in the §9 Revision log)'
+miss 'tFixture-42.md ('
 
 # ---- CHECK 5 AT DEPTH, three arms. Two of them would be satisfied by ABSENCE if the selector were
 # ---- left unwidened — a file that is never selected is also silent — so the legacy arm is TWO-STATE
@@ -294,7 +313,13 @@ ncr=$(awk '
 #    the `) {` that opens its own if-block, so a bare-brace ban flags the innocent and passes nothing.
 ivl=$(grep -nE 'hdr [!=]~ /' "$SCRIPT" | grep -E '\{[0-9]' || true)
 [ -z "$ivl" ] || { echo "FAIL an interval expression survives in a batched-awk regex: $ivl"; st=1; }
-# 3. Check 7 takes NO locale prefix. `length()` decides its verdict and its character-versus-byte
+# 3. The §9 range CLOSES. `check-arms` cannot help here: check 12's per-spec findings are awk `print`
+#    statements funnelled into one `fail 12` that is already armed, so deleting the reset moves no
+#    branch, no floor and — measured — no corpus verdict. The fixtures above and this line are the
+#    whole of the protection.
+r9=$(awk '/in9 = 1/{f=1} f&&/else if \(in9 && L ~ \/\^## \/\) in9 = 0/{ok=1} END{print ok+0}' "$SCRIPT")
+[ "$r9" = 1 ] || { echo "FAIL the §9 rev-scan range no longer closes on the next ## heading"; st=1; }
+# 4. Check 7 takes NO locale prefix. `length()` decides its verdict and its character-versus-byte
 #    meaning belongs to the awk build and the ambient locale; check 8's `LC_ALL=C xargs` seventeen
 #    lines below sorts, it does not measure, and is not the pattern to copy here.
 #    Comment lines are stripped first: the region carries prose explaining exactly this ban, and a
@@ -372,5 +397,5 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (76 assertions)"
+[ "$st" = 0 ] && echo "PASS (80 assertions)"
 exit "$st"

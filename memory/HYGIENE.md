@@ -115,7 +115,8 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
     (any depth under `spec/`) carry the `**Status:**` header (token · rev · date · node · tier ·
     base sha); Tier-2 adds exactly the canonical `##` sections, non-empty bodies,
-    header-rev-in-§9 parity, and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
+    header-rev-in-§9 parity — the §9 range CLOSES at the next `##`, so a bigger `rev-N` in §10 no
+    longer satisfies the header — and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
     placeholders and a bare WONTDO tail (`TEMPLATE-SPEC.md`). Older specs grandfathered by filename date.
     A `streams` segment is validated against the `DISCIPLINES` enum whenever present, on either tier,
     and is REQUIRED once the filename date reaches `STREAMS_CUTOFF`.

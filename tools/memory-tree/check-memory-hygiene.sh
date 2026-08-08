@@ -530,16 +530,22 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
     if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
     if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
-    # ---- header rev vs the §9 high-water. NO `/^## /{f=0}` reset, deliberately: that is this kit
-    # ---- engine s existing behaviour, and adding one can only SHRINK the scanned range and so
-    # ---- produce MORE findings on a non-conforming spec, which is a verdict change this unit
-    # ---- forbids. Tracked as its own backlog row instead.
+    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
+    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
+    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
+    # ---- anywhere further down. Reproduced at 99 against a true 1.
+    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
+    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
+    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
+    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
     k = "· rev-"; p = index(hdr, k); hrev = ""
     if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
     in9 = 0; seen = 0; mx = 0
     for (i = 1; i <= n; i++) {
       L = body[i]
       if (L ~ /^## 9\. Revision log/) in9 = 1
+      else if (in9 && L ~ /^## /) in9 = 0
       if (in9) while (match(L, /rev-[0-9]+/)) {
         v = substr(L, RSTART + 4, RLENGTH - 4) + 0
         if (!seen || v > mx) mx = v
