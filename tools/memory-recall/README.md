@@ -88,9 +88,10 @@ per-worktree size cap.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
    `python3 memory-recall/selftest.py` and `bash memory-recall/adopt-memory-recall.sh --check`.
-   The `--check` leg resolves its own interpreter (`python3` first, `python` fallback, `RECALL_PY`
-   override), so a `python3`-only adopter needs no extra step — a gate runner's argv rewrite cannot
-   reach a `bash` leg.
+   The `--check` leg resolves its own interpreter by RUNNING each candidate — `RECALL_PY` first if
+   set, then `GOV_PYTHON`, then `python3`, `python`, `py` — so a `python3`-only adopter needs no
+   extra step, and a Windows box where the Store `python3` stub answers `command -v` and exits 9009
+   still resolves. A gate runner's argv rewrite cannot reach a `bash` leg.
 4. Re-run `--scaffold` after any `FAMILIES` or `MEMORY_ROOT` edit. `--check` reds until you do.
 
 ## The Skill, and the optional hook

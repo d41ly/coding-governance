@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-6 — V5: one python resolver, and it EXECUTES the candidate
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -32,9 +32,12 @@ RUNNING the candidate, in one place.
   <project>/memory-tree`), so a `../lib/` source resolves to nothing in an adopting repo and the kit
   breaks for everyone who adopted it. That is the same constraint that made the drift-audit kit COPY
   the conf parser rather than share it.
-  So: `tools/run-gates.sh`, `tools/run-gates.test.sh`, `tools/check-wiring.sh`,
-  `tools/check-wiring.test.sh` and `skills/session-kickoff/manifest-check.test.sh` SOURCE the
-  canonical file. Every copy-installed kit script carries the same function INLINE, and a PARITY gate
+  So: `tools/run-gates.sh`, `tools/run-gates.test.sh`, `tools/check-wiring.sh` and
+  `tools/check-wiring.test.sh` SOURCE the canonical file — measured against `WIRE-INTO-PROJECT.md`,
+  those four are the only python-resolving scripts it never copies out.
+  `skills/session-kickoff/manifest-check.test.sh` moved to the INLINE side during the build: the
+  runbook copies `manifest-check.sh` ALONE into `<project>/scripts/`, and the skill directory is
+  also reached through a per-machine junction, so nothing beside it is guaranteed to be there. Every copy-installed kit script carries the same function INLINE, and a PARITY gate
   asserts each inline copy is identical to the canonical one — copy plus gate, which is this repo's
   existing convention for exactly this situation.
 - **S4** — the resolver is sourced, not executed, so the caller gets the resolved value in a
@@ -86,7 +89,10 @@ they chose, and did not.
 | `tools/check-wiring.test.sh` | `py=` idiom | sources the resolver |
 | `tools/memory-recall/adopt-memory-recall.sh` | `PY=` idiom | sources the resolver |
 | `tools/memory-tree/adopt-memory-tree.sh` | `_PY=` idiom | sources the resolver |
-| `tools/memory-tree/check-memory-hygiene.sh` | two `_PY=` sites | sources the resolver once |
+| `tools/memory-tree/check-memory-hygiene.sh` | THREE `_PY=` sites (measured, not two) | one inline copy, resolved once |
+| `tools/codebase-map/adopt-codebase-map.sh` | `PY="${MAP_PY:-python}"` — the weakest of the three | inline; `MAP_PY` is the caller override |
+| `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh` | `PYBIN=` idiom | inline |
+| `skills/session-kickoff/manifest-check.test.sh` | `PYBIN=` idiom | inline (see S3) |
 
 ### Migration
 
@@ -155,6 +161,12 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-08 · CLOSED. Landed as one commit: `tools/lib/resolve-python.sh` + its 25-assertion
+  test (behaviour against a real 9009 stub, inline-copy parity, the idiom ban), ten migrated call
+  sites, `resolve_bash()` hardened with the same run-probe, a new gate leg. Two corrections against
+  the drafted inventory, both measured: `check-memory-hygiene.sh` had THREE idiom sites rather than
+  two, and `manifest-check.test.sh` belongs on the inline side because the runbook copies its gate
+  out alone. Bar 32/32.
 - rev-1 · 2026-08-08 · initial draft.
 - rev-2 · 2026-08-08 · folded review 2, three blockers and two highs: N1 drops `py -3` for `py`
   (measured — the drafted probe form exits 127 and a two-word value breaks all ten python legs);

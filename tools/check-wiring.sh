@@ -42,9 +42,12 @@ first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 # REQUIRED it to answer reported `skip … exit 0` on the state the runbook calls the one bad state).
 wired() { [ -f .claude/settings.json ] && grep -qF "$1" .claude/settings.json; }
 
-# The launcher named in a remedy string — printed, never run, so a python3-only host gets a
-# copy-pasteable line (the python3-first resolution this file already used per-arm).
-PY=python3; command -v python3 >/dev/null 2>&1 || PY=python
+# The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
+# must be resolved by running: a remedy line naming a launcher that cannot execute is a wrong
+# answer that looks like a right one. A host with no usable python still gets a remedy — the
+# fallback name is honest about being a guess.
+. "$ROOT/tools/lib/resolve-python.sh"
+PY=$(resolve_python) || PY=python3
 
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {

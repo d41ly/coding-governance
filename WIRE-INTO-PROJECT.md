@@ -153,8 +153,10 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
 4. `codebase-map/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
    baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing
    dossiers (so the graced `## Reuse affordance` check never retro-reds the fleet), installs the
-   gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY=python3`
-   overrides the launcher. A NEW dossier is never exempt — new work records its reuse decision
+   gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY` overrides
+   the launcher; unset, the kit RUNS each candidate (`python3`, `python`, `py`) and takes the first
+   that executes, because the Microsoft Store `python3` stub answers `command -v` and then exits
+   9009 without running anything. A NEW dossier is never exempt — new work records its reuse decision
    (`seam: <id> — reuse for <need>; extend via <point>`, or `none — <why>`) or the gate reds.
    **DoR (before building):** run `python codebase-map/reuse_lookup.py "<behaviour>"` (the
    behaviour→seam lookup, per `codebase-map/reuse-lookup.agent.md`) to find an existing seam to
@@ -216,8 +218,9 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
                                                        # cache freshness + eviction, writes-nothing-by-path
    bash memory-recall/adopt-memory-recall.sh --check    # the rendered SKILL.md still matches the conf
    ```
-   The `--check` leg resolves its own interpreter (`python3` first, `python` fallback, `RECALL_PY`
-   override), so a `python3`-only adopter needs no extra step — a gate runner that rewrites `python`
+   The `--check` leg resolves its own interpreter by RUNNING each candidate (`RECALL_PY` first if
+   set, then `GOV_PYTHON`, then `python3`, `python`, `py`), so a `python3`-only adopter needs no
+   extra step — a gate runner that rewrites `python`
    in a leg's argv provably cannot reach this leg, whose first token is `bash`.
 4. **Optional, and separately: the `recall-opened` hook.** It records which hit actually answered a
    query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:

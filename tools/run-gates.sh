@@ -6,8 +6,8 @@
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
-command -v "$PYBIN" >/dev/null 2>&1 || { echo "run-gates: python ($PYBIN) not found — required to parse tools/gate-legs.json"; exit 2; }
+. "$ROOT/tools/lib/resolve-python.sh"
+PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse tools/gate-legs.json"; exit 2; }
 fails=0; n=0; skips=0
 
 # Baseline for conditional legs: the mainline tip we gate against. Override with GATE_BASE.

@@ -84,7 +84,8 @@ FRAG=""; for c in "$REPO/memory-recall/recall-opened.fragment.json" "$REPO/tools
   [ -f "$c" ] && { FRAG="$c"; break; }
 done
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
-  py=python3; command -v python3 >/dev/null 2>&1 || py=python
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
   mkdir -p tools memory-recall .claude/hooks; cp "$SMERGE" tools/settings-merge.py

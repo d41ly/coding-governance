@@ -130,10 +130,26 @@ def resolve_bash() -> str:
     for a file that plainly exists, and a relative path resolves under /mnt/c/ instead. This is the
     documented trap — Python subprocess resolving a different bash on a Windows node — and the
     remedy is to name the EXECUTABLE rather than the command. GOV_BASH overrides.
+
+    A candidate is accepted only if it RUNS. Existing on disk is not evidence — that is the same
+    mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
+    which answers `command -v` and exits 9009 without executing anything (see
+    tools/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
+    never a silent fall-through to something else.
     """
+    def runs(cand: str) -> bool:
+        try:
+            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
+        except OSError:
+            return False
+
     override = os.environ.get("GOV_BASH")
     if override:
-        return override
+        if runs(override):
+            return override
+        raise Problem("corpus_ids: GOV_BASH is set to '%s' and does not run. An override that is set "
+                      "and unusable is this failure, not a fall-through — you would believe you had "
+                      "chosen." % override)
     skipped = []
     for d in os.environ.get("PATH", "").split(os.pathsep):
         for name in ("bash.exe", "bash"):
@@ -143,6 +159,9 @@ def resolve_bash() -> str:
             low = cand.replace("\\", "/").lower()
             if "/system32/" in low or "/windowsapps/" in low:
                 skipped.append(cand)          # a launcher for a different filesystem
+                continue
+            if not runs(cand):
+                skipped.append(cand)          # on disk, cannot execute
                 continue
             return cand
     raise Problem("corpus_ids: no usable bash on PATH — set GOV_BASH to one that shares this "
@@ -585,6 +604,33 @@ def do_selftest() -> int:
         t8 = os.path.join(base, "off"); os.makedirs(t8)
         c8 = _scratch(t8, pins=False)
         arm("blank pins turn every check off", None, lambda: str(armed(c8)).replace("False", ""))
+
+        # resolve_bash accepts a candidate only if it RUNS. A launcher that exists on disk and cannot
+        # execute is the same defect one interpreter over as the Microsoft Store `python3` stub, and
+        # an override that is SET and unusable has to be a named failure rather than a fall-through
+        # to whatever is next on PATH — otherwise the operator believes they chose, and did not.
+        tB = os.path.join(base, "bashprobe"); os.makedirs(tB)
+        dead = os.path.join(tB, "not-a-bash")
+        with open(dead, "w", encoding="utf-8") as fh:
+            fh.write("this file exists and is not an executable\n")
+
+        def _with_gov_bash(value):
+            old = os.environ.get("GOV_BASH")
+            os.environ["GOV_BASH"] = value
+            try:
+                return resolve_bash()
+            finally:
+                if old is None:
+                    os.environ.pop("GOV_BASH", None)
+                else:
+                    os.environ["GOV_BASH"] = old
+
+        arm("an unusable GOV_BASH is a NAMED failure, not a fall-through",
+            "is set to", lambda: _with_gov_bash(dead))
+        # ...and the green half over the SAME mechanism: a real bash still comes back untouched, so
+        # the arm above is not passing because resolve_bash rejects everything.
+        arm("a working GOV_BASH is returned unchanged", "OK",
+            lambda: "OK" if _with_gov_bash(resolve_bash()) else "")
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

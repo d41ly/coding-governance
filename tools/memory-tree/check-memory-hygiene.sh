@@ -60,6 +60,44 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
+
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# Resolved ONCE for all three delegating checks (9, 13-16, 17-19) — the retired idiom sat at
+# three separate sites in this file, which is three chances to fix two of them.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
 DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
@@ -380,7 +418,6 @@ $bad8"
 # DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
 # and nothing rots.
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
 fi
@@ -602,7 +639,6 @@ fi
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
 # classifier reads is measured per corpus, and blank pins turn the whole unit off.
 if [ "$STAGED" = 0 ]; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
     printf '%s
 ' "$ids"; status=1
@@ -613,7 +649,6 @@ fi
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
 if [ "$STAGED" = 0 ]; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
     printf '%s
 ' "$got"; status=1

@@ -15,7 +15,9 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references by §-stub).
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
-- **`tools/`** — the copy-in kits: `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
+- **`tools/`** — `lib/resolve-python.sh` (the one python-launcher resolver: it RUNS the candidate,
+  because the MS-Store `python3` stub answers `command -v` and exits 9009) plus the copy-in kits:
+  `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
   over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
   `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
   five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
@@ -62,6 +64,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - kit/dogfood doc parity — `tools/memory-tree/kit-dogfood-parity.test.sh` (the shipped `HYGIENE.template.md`/`SPEC-TEMPLATE.template.md` equal this repo's installed copies, modulo the `tools/` install prefix)
+- python-launcher resolver — `tools/lib/resolve-python.test.sh` (one resolver that RUNS each candidate; every copy-installed kit carries it inline byte-identical, gated; the retired `command -v python3 || python` idiom is banned repo-wide)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`, `python tools/memory-recall/selftest.py`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js`), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
