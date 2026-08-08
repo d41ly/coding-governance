@@ -106,18 +106,48 @@ def refusal(root: pathlib.Path, why: str) -> str:
 
 _FAMILY_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
+# The default cache budget, MEASURED on this tree rather than inherited: one cache here is 2.4 MB,
+# and upstream measured ~110 MB per LIVE worktree on a far larger corpus. 512 sits well above any
+# plausible single-corpus cache, so the cap protects an adopter carrying many worktrees without ever
+# firing on a normal one. Blank in the conf = uncapped; absent = this.
+DEFAULT_CACHE_BUDGET_MB = 512.0
+
+
+def _budget(raw: str | None) -> float | None:
+    """`RECALL_CACHE_BUDGET_MB` -> megabytes, or None for uncapped.
+
+    A BLANK value disables the cap, matching every other knob in this tree. An unparseable one also
+    disables it rather than raising: this is a housekeeping limit, and refusing to answer a question
+    because a size limit is misspelled would be a worse failure than not evicting.
+    """
+    if raw is None:
+        return DEFAULT_CACHE_BUDGET_MB
+    raw = raw.strip()
+    if not raw:
+        return None
+    try:
+        val = float(raw)
+    except ValueError:
+        return None
+    return val if val > 0 else None
+
 
 class Conf:
-    """The three RESOLVED values every other module in the kit reads."""
+    """The RESOLVED values every other module in the kit reads."""
 
-    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class")
+    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb")
 
-    def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...]):
+    def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
+                 cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB):
         self.root = root
         self.path = root / CONF_NAME
         self.memory_root = memory_root
         self.families = families
         self.node_tag_class = NODE_TAG_CLASS
+        # None = uncapped, which is what a BLANK value means — the same convention as every other
+        # measured knob in this tree. It is deliberately NOT part of digest(): a size limit is not a
+        # corpus input, and folding it in would rebuild every cache whenever someone raised the cap.
+        self.cache_budget_mb = cache_budget_mb
 
     def digest(self) -> str:
         """A hash of the RESOLVED values, not of the conf file's bytes.
@@ -161,7 +191,7 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
         raise ConfError(
             refusal(base, f"{CONF_NAME} declares no usable FAMILIES (want `discipline:FAMILY ...`)")
         )
-    out = Conf(base, memory_root, families)
+    out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")))
     if root is None:
         _cached = out
     return out

@@ -71,10 +71,24 @@ write was merely hidden by an ignore rule. `sys.dont_write_bytecode = True` sits
 it, importing the sibling modules drops `__pycache__` next to the source, inside the adopter's tree.
 An adopter therefore needs **no** `.gitignore` entry from this kit.
 
-The cache is not small: upstream measures ~115 MiB per live worktree against a 40 MB corpus. A build
-deletes sibling caches whose recorded worktree no longer exists; a cache with **no readable
-manifest** is never evicted, because that is the shape of a sibling mid-first-build. v1.0 ships no
-per-worktree size cap.
+The cache is not small: upstream measures ~115 MiB per live worktree against a 40 MB corpus, and only
+37.9% of a 552.6 MB tree was evictable by liveness alone — which is why the budget is a size, not an
+age. Two passes run after a successful build, never before (a cache is replaceable only once its
+replacement exists):
+
+1. **dead-worktree eviction**, unconditional and free: a sibling whose recorded `worktree` no longer
+   exists goes. A cache with **no readable manifest** is never evicted — that is the shape of a
+   sibling mid-first-build.
+2. **the byte budget**, `RECALL_CACHE_BUDGET_MB` in `.memory-tree.conf`. **Absent** = the kit's
+   default, 512 MB; **blank** = uncapped. Eviction is least-recently-built first by `built_at`, and
+   it stops the moment the tree is under budget. Three directories are never candidates: the current
+   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
+   database newer than its manifest, which is true during a *re*build too, when the previous manifest
+   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
+   without reaching past them, the shortfall is reported and **nothing** is deleted.
+
+Every eviction prints one line naming the worktree and its `built_at`. A cache that vanishes silently
+is indistinguishable from one that was never built.
 
 ## Adopt (per project)
 

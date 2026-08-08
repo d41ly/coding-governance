@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-7 — V6: the recall cache is bounded
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 
@@ -150,6 +150,14 @@ none — the two forks below are RESOLVED (owner-ratified 2026-08-08); kept for 
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-08 · CLOSED. Landed: `evict_over_budget` (plan-then-delete, LRU by `built_at`),
+  `_mid_build` (a database newer than the manifest, so a REBUILD is protected too), `_remove_cache_dir`
+  (everything else first — if any of it fails the manifest STAYS, so the directory remains judgeable
+  instead of becoming permanently-protected rubble), `RECALL_CACHE_BUDGET_MB` in the conf, four
+  selftest arms, kit README. Default measured here: one cache is 2.4 MB, so 512 MB sits far above any
+  plausible single-corpus cache. `cache_budget_mb` is deliberately OUT of `Conf.digest()` — a size
+  limit is not a corpus input, and folding it in would rebuild every cache whenever someone raised
+  the cap. Selftest 21 -> 25 checks; bar 32/32.
 - rev-1 · 2026-08-08 · initial draft.
 - rev-2 · 2026-08-08 · folded review 2, two blockers and two highs: N4 replaces the mid-build
   predicate, which was reasoned from a first build and is false on a rebuild; N5 replaces the
