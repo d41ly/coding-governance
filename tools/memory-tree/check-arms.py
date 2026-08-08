@@ -88,6 +88,9 @@ def signature(message: str) -> str:
 
 def branches(gate_path: str) -> list:
     """Every `fail` call site, keyed on (number, ordinal-within-that-number)."""
+    if not os.path.isfile(gate_path):
+        raise Problem(f"check-arms: {gate_path} is missing — this meta-gate reads the gate's source, "
+                      f"so a renamed or moved gate must be repointed here, not silently uncovered")
     seen = {}
     out = []
     for lineno, line in enumerate(read(gate_path).split("\n"), 1):
@@ -116,6 +119,9 @@ def armed_signatures(test_path: str) -> set:
     assertion this function already refuses. All three are "something in the file mentions it",
     which is not "something exercises it".
     """
+    if not os.path.isfile(test_path):
+        raise Problem(f"check-arms: {test_path} is missing — with no test file EVERY branch would "
+                      f"read as unarmed, which is loud, but a missing harness is its own finding")
     out = set()
     for line in read(test_path).split("\n"):
         if line.lstrip().startswith("#"):
@@ -319,6 +325,10 @@ def do_selftest() -> int:
         conf3 = dict(conf, ARMS_ARMED_FLOOR="3")
         arm("the armed floor catches an assertion dropped by widening the pin",
             "1 armed branch(es) against a floor of 3", lambda: do_check(base, conf3, g, t))
+
+        # a missing gate or a missing test file is a NAMED error, not a traceback out of a gate.
+        arm("a missing gate file is named", "is missing", lambda: do_check(base, conf, g + ".gone", t))
+        arm("a missing test file is named", "is missing", lambda: do_check(base, conf, g, t + ".gone"))
 
         # a message with no assertable literal run is a named error, not a silent skip
         with open(g, "wb") as fh:

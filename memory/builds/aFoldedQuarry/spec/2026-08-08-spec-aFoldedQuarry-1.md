@@ -1,6 +1,6 @@
 # TOOL-aFoldedQuarry-1 — fold the upstream ledger + trove builds into the memory-tree kit
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 42c3f4dc
+**Status:** CLOSED · rev-3 · 2026-08-08 · node a · Tier-2 · base 42c3f4dc · streams tooling · ratified 2026-08-08
 
 ## 1. Goal
 
@@ -178,6 +178,11 @@ none — both forks below are RESOLVED (owner-ratified 2026-08-08); kept for the
 - rev-1 · 2026-08-08 · initial draft.
 - rev-2 · 2026-08-08 · folded review 1 finding R4: the ban's population is every JavaScript file
   under `tools/`, matching the U6 sub-spec, and the workflow syntax gate joins S1.
+- rev-3 · 2026-08-08 · all six units CLOSED; folded the closing review (review 7) over the whole
+  diff. Two scope items landed larger than drafted and are recorded here rather than in a follow-up:
+  S3's replacement generator also owns `LIVE.md` and the month shards, and the build gained a
+  kit/dogfood document-parity gate that S1-S8 did not anticipate — it was added because the shipped
+  spec template had already drifted four days behind the installed one with nothing watching.
 
 ## 10. Reuse audit
 

@@ -38,11 +38,11 @@ U1 (it changes every path the rest operate on), U2, then U3 and U4 (independent 
 then U5.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aFoldedQuarry-1..-6
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aFoldedQuarry-1..-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aFoldedQuarry-1 — fold the upstream ledger + trove builds into the memory-tree kit](spec/2026-08-08-spec-aFoldedQuarry-1.md) | INPROGRESS | rev-2 | 2026-08-08 |
+| [TOOL-aFoldedQuarry-1 — fold the upstream ledger + trove builds into the memory-tree kit](spec/2026-08-08-spec-aFoldedQuarry-1.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-2 — U6: index-keyed verdict join in the Tier-2 review harness](spec/units/2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md) | CLOSED | rev-2 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-3 — U1: retire the discipline directory axis, keep the discipline signal](spec/units/2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md) | CLOSED | rev-2 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-4 — U2: the generated build index replaces the authored tree](spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md) | CLOSED | rev-2 | 2026-08-08 |

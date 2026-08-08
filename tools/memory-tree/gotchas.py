@@ -93,13 +93,28 @@ def load_conf(root: str) -> dict:
 
 
 def append_only_re(root: str) -> re.Pattern:
-    """The append-only classification, ASKED of the script that owns it — never retyped here."""
+    """The append-only classification, ASKED of the script that owns it — never retyped here.
+
+    The sibling raises ITS OWN `Problem` class, which this module's `except Problem` cannot catch —
+    two classes with one name are two classes. Every failure crossing this boundary is re-raised as
+    ours, so a hygiene gate never emits a traceback.
+    """
     import importlib.util
 
-    spec = importlib.util.spec_from_file_location("corpus_ids", HERE / "corpus_ids.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return re.compile(mod.ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
+    src = HERE / "corpus_ids.py"
+    if not src.is_file():
+        raise Problem(f"gotchas: {src} is missing — it owns the append-only classification "
+                      f"checks 17-19 read")
+    try:
+        spec = importlib.util.spec_from_file_location("corpus_ids", src)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return re.compile(mod.ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
+    except Problem:
+        raise
+    except Exception as exc:  # noqa: BLE001 — including the sibling's own Problem, a different class
+        raise Problem(f"gotchas: could not ask corpus_ids for the append-only classification: "
+                      f"{type(exc).__name__}: {exc}") from None
 
 
 # ------------------------------------------------------------------------------------------ records
@@ -469,6 +484,24 @@ def do_selftest() -> int:
             lambda: 0 if sel == {"tools/some-gate.sh", "deep/nested/some-gate.sh"} else 1)
         arm("the catalogue never selects itself", "[rc=0]",
             lambda: 0 if selectable("INDEX.md", ["memory/gotchas/INDEX.md"], "memory") == set() else 1)
+
+        # A failure crossing the corpus_ids boundary is NAMED, not a traceback. The sibling raises
+        # its OWN Problem class, which this module's `except Problem` cannot catch — two classes
+        # with one name are two classes, and the first run of this arm printed a WinError stack out
+        # of a hygiene gate.
+        t9 = os.path.join(base, "boundary"); os.makedirs(t9)
+        c9 = _scratch(t9, {"g.md": GOOD})
+        do_write(t9, c9); run("git", "add", "-A", cwd=t9); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t9)
+        old_bash = os.environ.get("GOV_BASH")
+        os.environ["GOV_BASH"] = os.path.join(base, "no-such-bash")
+        try:
+            arm("a failure crossing the corpus_ids boundary is named, not a traceback",
+                "could not ask corpus_ids", lambda: do_check(t9, c9))
+        finally:
+            if old_bash is None:
+                del os.environ["GOV_BASH"]
+            else:
+                os.environ["GOV_BASH"] = old_bash
 
         # --for-diff: anchors that intersect, plus universal, and nothing else.
         t8 = os.path.join(base, "diff"); os.makedirs(t8)

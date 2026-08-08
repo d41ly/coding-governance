@@ -153,8 +153,14 @@ def ask_shell(flag: str, root: str) -> str:
     before check 1, so there is no recursion back into this module."""
     if not HYGIENE.is_file():
         raise Problem("corpus_ids: %s is missing — it owns the sets this module asks for" % HYGIENE)
-    out = subprocess.run([resolve_bash(), HYGIENE.as_posix(), flag], cwd=root,
-                         capture_output=True, text=True)
+    sh = resolve_bash()
+    try:
+        out = subprocess.run([sh, HYGIENE.as_posix(), flag], cwd=root, capture_output=True, text=True)
+    except OSError as exc:
+        # A bash that cannot be LAUNCHED raises before any return code exists. Left unhandled this is
+        # a traceback out of a hygiene gate — every failure here is named, including this one.
+        raise Problem(f"corpus_ids: cannot run '{sh}' ({exc.strerror or exc}); set GOV_BASH to a bash "
+                      f"that shares this filesystem") from None
     if out.returncode != 0:
         raise Problem("corpus_ids: `%s %s` failed: %s"
                       % (HYGIENE.name, flag, out.stderr.strip() or out.stdout.strip()))
