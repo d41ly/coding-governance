@@ -84,7 +84,8 @@ FRAG=""; for c in "$REPO/memory-recall/recall-opened.fragment.json" "$REPO/tools
   [ -f "$c" ] && { FRAG="$c"; break; }
 done
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
-  py=python3; command -v python3 >/dev/null 2>&1 || py=python
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
   mkdir -p tools memory-recall .claude/hooks; cp "$SMERGE" tools/settings-merge.py
@@ -133,6 +134,94 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
 else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"
 fi
+
+# AC9 — the eol arm: detect in --check, repair in --fix, and never reach past its bound.
+# THE BOUND IS THE POINT, and this fixture uses the BROADEST attribute spelling an adopter might
+# reasonably write. An earlier cut pinned only `.claude/**/*.md`, which pre-narrowed the population
+# and made "stays inside its bound" green for the fixture's reasons rather than the gate's. Under
+# `* text=auto eol=lf` the first implementation rewrote `.claude/settings.json` and stripped CR bytes
+# out of the middle of a PNG — md5 changed, reported as "fixed".
+newrepo
+mkdir -p .claude/skills/x memory
+printf '* text=auto eol=lf\n' > .gitattributes
+printf 'a\nb\n' > .claude/skills/x/SKILL.md              # a rendered Skill: the whole population
+printf 'a\nb\n' > memory/NOTES.md                        # outside .claude/ entirely
+printf '{\n  "hooks": {}\n}\n' > .claude/settings.json    # under .claude/, pinned, NOT a Skill
+printf 'PNG\r\n\032\r\nIDAT\n' > .claude/skills/x/logo.png   # binary bytes a `tr -d` would eat
+git add -A; git commit -q -m eolbase
+git config core.hooksPath .githooks                      # isolate: only the eol arm can be unwired
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       eol'; } \
+  && ck "AC9 clean LF tree -> ok" 1 || ck "AC9 clean LF tree -> ok" 0
+# the checkout defect, reproduced: CRLF in the worktree while the index stays normalised, so
+# `git status` is CLEAN and only a byte-comparing gate ever notices.
+printf 'a\r\nb\r\n' > .claude/skills/x/SKILL.md
+printf 'a\r\nb\r\n' > memory/NOTES.md
+printf '{\r\n  "hooks": {}\r\n}\r\n' > .claude/settings.json
+cp .claude/skills/x/logo.png "$D/logo.before"
+
+# THE INVISIBILITY, measured rather than asserted from the trap note. `git diff` reports NO content
+# difference on the pinned file — the clean filter normalises, so there is nothing to commit — while
+# the bytes on disk are CRLF. (`git status --porcelain` does list it: that is the stat cache, not a
+# content verdict, and the two disagree here. The trap note's "git status stays clean" was the
+# looser half of the observation; this is the half that actually explains the no-op below.)
+{ [ -z "$(git diff --numstat -- .claude/skills/x/SKILL.md)" ]; } \
+  && ck "AC9 git sees no content change (the defect reproduces)" 1 \
+  || ck "AC9 git sees no content change (the defect reproduces)" 0
+# A `git checkout --` remedy is NOT asserted here, and the reason is a measurement rather than a
+# preference: on this git it DOES restore the file in this fixture, because status' stat cache flags
+# it even though diff sees no content change. The two disagree, so a repair built on `git checkout`
+# works or no-ops depending on which of them git consults — the previous build hit the no-op and
+# needed `rm` first. Rewriting the bytes is correct in BOTH states, which is why it is what --fix
+# does. Do not "simplify" it back.
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  eol' && printf '%s' "$out" | grep -q 'SKILL.md'; } \
+  && ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 1 || ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 0
+printf '%s' "$out" | grep -q 'memory/NOTES.md' \
+  && ck "AC9 --check stays inside its bound" 0 || ck "AC9 --check stays inside its bound" 1
+# --session REPORTS; only --fix rewrites. A SessionStart hook editing file bytes unattended is a far
+# bigger act than setting an unset git config, which is all --session was ever allowed to do.
+chk --session >/dev/null
+LC_ALL=C grep -qU $'\r' .claude/skills/x/SKILL.md \
+  && ck "AC9 --session reports without rewriting" 1 || ck "AC9 --session reports without rewriting" 0
+chk --fix >/dev/null
+LC_ALL=C grep -qU $'\r' .claude/skills/x/SKILL.md \
+  && ck "AC9 --fix rewrote the pinned file to LF" 0 || ck "AC9 --fix rewrote the pinned file to LF" 1
+# ...and everything OUTSIDE the bound is untouched, under the broadest attribute spelling there is.
+# A repair that reaches past its population is worse than one that never ran: it rewrites bytes
+# nobody asked it to.
+LC_ALL=C grep -qU $'\r' memory/NOTES.md \
+  && ck "AC9 --fix left the file outside .claude/ alone" 1 || ck "AC9 --fix left the file outside .claude/ alone" 0
+LC_ALL=C grep -qU $'\r' .claude/settings.json \
+  && ck "AC9 --fix left .claude/settings.json alone" 1 || ck "AC9 --fix left .claude/settings.json alone" 0
+cmp -s .claude/skills/x/logo.png "$D/logo.before" \
+  && ck "AC9 --fix did not corrupt a binary in the domain" 1 || ck "AC9 --fix did not corrupt a binary in the domain" 0
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       eol'; } \
+  && ck "AC9 re-check after --fix -> ok, exit 0" 1 || ck "AC9 re-check after --fix -> ok, exit 0" 0
+# A Skill directory whose name carries a SPACE. `xargs` word-split it into two nonexistent paths, the
+# population came back empty, and the arm printed a green `skip` over a file with real CRLF in it.
+mkdir -p ".claude/skills/my skill"
+printf 'a\nb\n' > ".claude/skills/my skill/SKILL.md"
+git add -A; git commit -q -m spaced
+printf 'a\r\nb\r\n' > ".claude/skills/my skill/SKILL.md"
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'my skill/SKILL.md'; } \
+  && ck "AC9 a Skill path with a space is still seen" 1 || ck "AC9 a Skill path with a space is still seen" 0
+chk --fix >/dev/null
+LC_ALL=C grep -qU $'\r' ".claude/skills/my skill/SKILL.md" \
+  && ck "AC9 --fix repairs a spaced path" 0 || ck "AC9 --fix repairs a spaced path" 1
+cleanup
+
+# AC9b — no pinned .claude/ path at all: the arm SKIPS rather than reporting a clean bill over an
+# empty population, which is the distinction the empty-population guard exists to make.
+newrepo
+git config core.hooksPath .githooks
+out=$(chk --check)
+printf '%s' "$out" | grep -q 'skip     eol' \
+  && ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 1 \
+  || ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 0
+cleanup
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // check-workflow-syntax.js — parse every workflow script in the dialect its RUNTIME evaluates.
 //
-//   node tools/workflows/check-workflow-syntax.js            # every tracked workflow script
+//   node tools/workflows/check-workflow-syntax.js            # every workflow script git can see
 //   node tools/workflows/check-workflow-syntax.js <file>...   # explicit files (used by the self-test)
 //
 // Exit 0 = every file parsed · 1 = at least one SyntaxError (printed with its file) · 2 = bad usage.
@@ -29,16 +29,21 @@ const HOOKS = ['args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget'
 // that happens to live in the same directory is not mis-parsed as one.
 const MARKER = /^\s*export\s+const\s+meta\s*=/m
 
-function tracked() {
-  const out = execFileSync('git', ['ls-files', '--', '*.js'], { encoding: 'utf8' })
-  return out.split('\n').filter((p) => p.startsWith('tools/') && p.endsWith('.js'))
+// --cached AND --others: a workflow script is parsed the moment it exists rather than the moment it
+// is staged, which is when its syntax actually matters — the runtime will happily be handed an
+// unstaged file. --exclude-standard keeps ignored files out, so a scratch script opts out with a
+// .gitignore line.
+function discovered() {
+  const out = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--', '*.js'], { encoding: 'utf8' })
+  const seen = new Set(out.split('\n').filter((p) => p.startsWith('tools/') && p.endsWith('.js')))
+  return [...seen].sort()
 }
 
 let files = process.argv.slice(2)
 let explicit = files.length > 0
 if (!explicit) {
   try {
-    files = tracked()
+    files = discovered()
   } catch (e) {
     console.error(`workflow-syntax: cannot list tracked files (${e.message})`)
     process.exit(2)

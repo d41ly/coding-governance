@@ -4,8 +4,8 @@
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
-command -v "$PYBIN" >/dev/null 2>&1 || { echo "canary: python ($PYBIN) not found"; exit 2; }
+. "$ROOT/tools/lib/resolve-python.sh"
+PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher

@@ -75,6 +75,7 @@ def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": "AGENTS.md",
         "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_CEILING": "", "READ_PATH_WAIVER": "",
+        "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
@@ -129,10 +130,26 @@ def resolve_bash() -> str:
     for a file that plainly exists, and a relative path resolves under /mnt/c/ instead. This is the
     documented trap — Python subprocess resolving a different bash on a Windows node — and the
     remedy is to name the EXECUTABLE rather than the command. GOV_BASH overrides.
+
+    A candidate is accepted only if it RUNS. Existing on disk is not evidence — that is the same
+    mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
+    which answers `command -v` and exits 9009 without executing anything (see
+    tools/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
+    never a silent fall-through to something else.
     """
+    def runs(cand: str) -> bool:
+        try:
+            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
+        except OSError:
+            return False
+
     override = os.environ.get("GOV_BASH")
     if override:
-        return override
+        if runs(override):
+            return override
+        raise Problem("corpus_ids: GOV_BASH is set to '%s' and does not run. An override that is set "
+                      "and unusable is this failure, not a fall-through — you would believe you had "
+                      "chosen." % override)
     skipped = []
     for d in os.environ.get("PATH", "").split(os.pathsep):
         for name in ("bash.exe", "bash"):
@@ -142,6 +159,9 @@ def resolve_bash() -> str:
             low = cand.replace("\\", "/").lower()
             if "/system32/" in low or "/windowsapps/" in low:
                 skipped.append(cand)          # a launcher for a different filesystem
+                continue
+            if not runs(cand):
+                skipped.append(cand)          # on disk, cannot execute
                 continue
             return cand
     raise Problem("corpus_ids: no usable bash on PATH — set GOV_BASH to one that shares this "
@@ -178,9 +198,10 @@ def walk(root: str, conf: dict) -> dict:
     h1_re = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b")
 
     append_only = re.compile(ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
+    excluded = tuple(x for x in conf.get("DEAD_PATH_EXCLUDE", "").split() if x)
     present = re.compile(
         r"^" + re.escape(m) + r"/(?:DECISIONS\.md|README\.md|HYGIENE\.md|TEMPLATE-SPEC\.md"
-        r"|LIVE\.md|backlog/|ledger/|project/)"
+        r"|LIVE\.md|backlog/|ledger/|project/|guides/)"
     )
 
     defs: dict = {}          # id -> set(paths)
@@ -208,14 +229,27 @@ def walk(root: str, conf: dict) -> dict:
             if not present.match(p) or append_only.match(p):
                 continue
             for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
+                ended_slash = tok.endswith("/")
                 cited = tok.rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
                 if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
                     continue
+                # NOT repo CONTENT. A checkout location is not a claim about what this repo holds,
+                # and no resolution rule can express that: resolution here never touches the
+                # filesystem — it is membership in `git ls-files` plus a prefix scan over the same
+                # index — so such a path classifies as dead identically on every node. The question
+                # is about meaning, not existence, so the answer is DECLARED in the conf.
+                if any(cited.startswith(x) for x in excluded):
+                    continue
                 if cited in tracked_set or any(t.startswith(cited + "/") for t in tracked_set):
                     continue
-                if not cited.endswith(KNOWN_EXT) and "." not in os.path.basename(cited):
+                # A FILE citation names an extension or a dotted basename. A DIRECTORY citation names
+                # neither, and it is exactly as broken when it does not resolve — the flatten left
+                # four of them in the live ledger and this harvest could not see one.
+                is_file_shaped = cited.endswith(KNOWN_EXT) or "." in os.path.basename(cited)
+                is_dir_shaped = ended_slash or "." not in os.path.basename(cited)
+                if not is_file_shaped and not is_dir_shaped:
                     continue
                 key = (p, cited)
                 if key in dead:
@@ -421,6 +455,10 @@ def _scratch(tmp: str, *, pins=True, extra=None):
         conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"', 'READ_PATH_CEILING="100000"']
     _w(tmp, ".memory-tree.conf", "\n".join(conf) + "\n")
     _w(tmp, "AGENTS.md", "# charter\n\nRead `memory/README.md` before touching code.\n")
+    # A tracked `.claude/` path, so `.claude/` is a REAL top-level directory in the fixture. Without
+    # it `_roots()` yields only {memory/} and a `.claude/worktrees/x` citation is never a candidate —
+    # the exclusion arms below would pass while exercising nothing.
+    _w(tmp, ".claude/settings.json", "{}\n")
     _w(tmp, "memory/README.md", "# r\n")
     _w(tmp, "memory/HYGIENE.md", "sentinel\n")
     _w(tmp, "memory/DECISIONS.md", "# d\n\n- ARCH-tOne-1 · a decision\n")
@@ -523,6 +561,32 @@ def do_selftest() -> int:
         arm("check 15 rule 1 catches a row whose citation was repaired", "the citation was repaired",
             lambda: "\n".join(checks(walk(t6, c6))))
 
+        # 15, DIRECTORY citations. The flatten moved every build folder and left four dead directory
+        # citations in the live ledger, and the harvest could not see one of them because it required
+        # a file extension. The RED and GREEN arms run over the SAME fixture, because the green half
+        # alone passes on the un-widened code too: an unharvested token is silent for the wrong
+        # reason.
+        tD = os.path.join(base, "dirs"); os.makedirs(tD)
+        cD = _scratch(tD, extra={
+            "memory/README.md": "# r\n\nSee `memory/builds/tOne/` and `memory/gone/never/`.\n"})
+        cD["DEAD_PATH_PIN"] = "0"
+        arm("check 15 catches a dead DIRECTORY citation", "memory/gone/never",
+            lambda: "\n".join(checks(walk(tD, cD))))
+        arm("...and is silent about a directory that resolves", "[nope]" if False else "",
+            lambda: "" if not [l for l in checks(walk(tD, cD)) if "memory/builds/tOne" in l] else "FOUND")
+
+        # the DECLARED exclusion. A checkout location is not repo CONTENT, and resolution here never
+        # touches the filesystem, so it would otherwise classify as dead identically on every node.
+        tX = os.path.join(base, "excl"); os.makedirs(tX)
+        cX = _scratch(tX, extra={
+            "memory/README.md": "# r\n\nThe worktree lives at `.claude/worktrees/whatever/`.\n"})
+        cX["DEAD_PATH_PIN"] = "0"
+        arm("an excluded prefix is not classified", None, lambda: checks(walk(tX, cX)))
+        cX2 = dict(cX); cX2["DEAD_PATH_EXCLUDE"] = ""
+        arm("...and removing the prefix from the conf makes it classified again",
+            ".claude/worktrees/whatever",
+            lambda: "\n".join(checks(walk(tX, cX2))))
+
         # 16 — the charter's read path.
         t7 = os.path.join(base, "readpath"); os.makedirs(t7)
         c7 = _scratch(t7, extra={
@@ -540,6 +604,33 @@ def do_selftest() -> int:
         t8 = os.path.join(base, "off"); os.makedirs(t8)
         c8 = _scratch(t8, pins=False)
         arm("blank pins turn every check off", None, lambda: str(armed(c8)).replace("False", ""))
+
+        # resolve_bash accepts a candidate only if it RUNS. A launcher that exists on disk and cannot
+        # execute is the same defect one interpreter over as the Microsoft Store `python3` stub, and
+        # an override that is SET and unusable has to be a named failure rather than a fall-through
+        # to whatever is next on PATH — otherwise the operator believes they chose, and did not.
+        tB = os.path.join(base, "bashprobe"); os.makedirs(tB)
+        dead = os.path.join(tB, "not-a-bash")
+        with open(dead, "w", encoding="utf-8") as fh:
+            fh.write("this file exists and is not an executable\n")
+
+        def _with_gov_bash(value):
+            old = os.environ.get("GOV_BASH")
+            os.environ["GOV_BASH"] = value
+            try:
+                return resolve_bash()
+            finally:
+                if old is None:
+                    os.environ.pop("GOV_BASH", None)
+                else:
+                    os.environ["GOV_BASH"] = old
+
+        arm("an unusable GOV_BASH is a NAMED failure, not a fall-through",
+            "is set to", lambda: _with_gov_bash(dead))
+        # ...and the green half over the SAME mechanism: a real bash still comes back untouched, so
+        # the arm above is not passing because resolve_bash rejects everything.
+        arm("a working GOV_BASH is returned unchanged", "OK",
+            lambda: "OK" if _with_gov_bash(resolve_bash()) else "")
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

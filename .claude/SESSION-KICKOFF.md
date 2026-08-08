@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T06:49:18+03:00 @ 45a82bb7aab953051ceb9a9b2dc2c4654c011fcf
+last-audit: 2026-08-09T03:40:00+03:00 @ 3c794dcd364fe1486d4b0ed8b3e295586b45cc6d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -77,14 +77,18 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It now sits at 32758/32768 (**10 bytes free**, measured 2026-08-03), so the next line added to it must
+  It now sits at 32746/32768 (**22 bytes free**, measured 2026-08-09), so the next line added to it must
   fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
   line. Either alone leaves the file green only right after a render.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook caps Workflow fan-out at 6 concurrent — route fan-out through the cap-6 helpers.
+- The `agent-cap` PreToolUse hook enforces TWO rules: route fan-out through the cap-5 helpers, AND a
+  review's verify stage spawns at most 5 agents TOTAL. Concurrency is not a budget —
+  `boundedParallel(t, 5)` still spawns N agents for N findings, five at a time. Bound the group
+  COUNT: `chunk(x, Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`. Binding rules:
+  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`.
 - A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added
   in `TOOL-aBatchedLintel-1` were wrong on their first run — the interval ban matched the `) {`
   opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban.
@@ -102,7 +106,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   a relative path resolves under `/mnt/c/`. Name the executable — see `resolve_bash()` in
   `tools/memory-tree/corpus_ids.py`; `GOV_BASH` overrides.
 - Generating source through a shell heredoc into a NON-raw Python string turns an escape into a
-  CONTROL BYTE in the written file. A `` becomes a backspace, the compiled regex silently stops
+  CONTROL BYTE in the written file. A ``\b`` becomes a backspace, the compiled regex silently stops
   matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
   2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
   and sweep TRACKED AND UNTRACKED files when repairing.

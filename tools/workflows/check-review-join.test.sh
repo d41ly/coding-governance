@@ -105,7 +105,64 @@ arm 'harness: orchestrator assigns the id' 'id: i + 1' grep -F 'id: i + 1' "$H"
 arm 'harness: the verdict map is keyed on the integer' 'verdictById = new Map()' grep -F 'verdictById = new Map()' "$H"
 arm 'harness: the schema demands an integer id' "id: { type: 'integer' }" grep -F "id: { type: 'integer' }" "$H"
 arm 'harness: a conflicting repeat demotes to unverified' 'conflicts.add(v.id)' grep -F 'conflicts.add(v.id)' "$H"
-arm 'harness: the version marker moved' "version: '1.1'" grep -F "version: '1.1'" "$H"
+# The pin is on the marker's SHAPE, not its value: a literal pin reds on every version bump, which
+# makes the bump edit a test that is not about versions. The value lives in the file itself.
+arm 'harness: the version marker is well-formed' "version: '" grep -E "version: '[0-9]+\.[0-9]+'" "$H"
+# The bounded verifier count, asserted POSITIVELY. The absence ban proves the linear form is gone;
+# only this proves the bounded one is present. Both, or "clean" means "empty".
+arm 'harness: the verifier count is bounded' 'MAX_VERIFIERS' grep -F 'Math.ceil(allFindings.length / MAX_VERIFIERS)' "$H"
+arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -F 'gov:fixed-verifiers' "$H"
+
+# ---- THE DISCOVERY PATH ---------------------------------------------------------------------------
+# Both gates take explicit paths and never touch git on that path, so every arm above exercises the
+# scanner and none of them exercises the POPULATION. These four run each gate with NO arguments in a
+# throwaway repo where the offending file is UNTRACKED — which is exactly the state the widening is
+# about, and the state both gates were blind to.
+D="$TMP/discover"
+mkdir -p "$D/tools/workflows"
+( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git config core.autocrlf false && git config commit.gpgsign false
+  # Two seeds, because the two gates have DIFFERENT populations: review-join scans every .js under
+  # tools/, while the syntax gate scans only files carrying the `export const meta` marker. With one
+  # plain seed the ignored-file arm below would empty the syntax gate's population and red for the
+  # opposite reason to the one it is testing — measured, not guessed.
+  printf 'const x = 1\n' > tools/workflows/seed.js
+  printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
+    > tools/workflows/seed-workflow.js
+  git add -A && git commit -qm seed --no-verify )
+cp "$GATE" "$D/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+
+# never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
+cat >"$D/tools/workflows/scratch-join.js" <<'EOF'
+const verdicts = {}
+for (const v of all) verdicts[v.ref] = v
+EOF
+arm 'discovery: an UNTRACKED banned join is caught' 'scratch-join.js' \
+  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+cat >"$D/tools/workflows/scratch-workflow.js" <<'EOF'
+export const meta = { name: 'x', description: 'y' }
+const a = (
+EOF
+arm 'discovery: an UNTRACKED workflow script is parsed' 'SyntaxError' \
+  bash -c 'cd "$1" && node ./syntax.js' _ "$D"
+
+# ...and IGNORED stays ignored, which is the escape hatch the widening leans on. Same two files, one
+# .gitignore line: both gates must go quiet, or "untracked" would mean "unignorable".
+printf 'tools/workflows/scratch-*.js\n' > "$D/.gitignore"
+arm 'discovery: a git-ignored file is not judged (review-join)' 'clean — no ref-keyed verdict join' \
+  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
+  bash -c 'cd "$1" && node ./syntax.js' _ "$D"
+
+# ...and the widened population still FAILS on an empty selection. A gate that greens over nothing is
+# the class this repo keeps a catalogue record about, and widening a selector is exactly when that
+# protection is easiest to drop.
+E="$TMP/emptyrepo"; mkdir -p "$E"
+( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
+cp "$GATE" "$E/gate.sh"
+arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
+  bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
 
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi

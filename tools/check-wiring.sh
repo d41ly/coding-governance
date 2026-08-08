@@ -42,9 +42,21 @@ first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 # REQUIRED it to answer reported `skip … exit 0` on the state the runbook calls the one bad state).
 wired() { [ -f .claude/settings.json ] && grep -qF "$1" .claude/settings.json; }
 
-# The launcher named in a remedy string — printed, never run, so a python3-only host gets a
-# copy-pasteable line (the python3-first resolution this file already used per-arm).
-PY=python3; command -v python3 >/dev/null 2>&1 || PY=python
+# The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
+# must be resolved by running: a remedy line naming a launcher that cannot execute is a wrong
+# answer that looks like a right one. A host with no usable python still gets a remedy — the
+# fallback name is honest about being a guess.
+# Resolved relative to THIS SCRIPT, never to the repo being checked. `$ROOT` is the tree under
+# inspection, which in the self-test is a throwaway repo with no kits in it at all — sourcing from
+# there printed "No such file or directory" and then "resolve_python: command not found" on every
+# scratch run, and the arms downstream went green anyway.
+_CW_HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$_CW_HERE/lib/resolve-python.sh" ]; then
+  . "$_CW_HERE/lib/resolve-python.sh"
+  PY=$(resolve_python) || PY=python3
+else
+  PY=python3   # the resolver is not installed beside this script; the launcher is only ever PRINTED
+fi
 
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
@@ -137,9 +149,102 @@ check_recall_opened() {
   fi
 }
 
+
+# --- Check E: line endings on the RENDERED wiring files -------------------------------------------
+# A `git worktree` checkout can land CRLF on a path .gitattributes pins `eol=lf`, and `git status`
+# stays CLEAN because the index normalises on commit. The symptom is a gate that diffs a rendered
+# file against a fresh render and reports EVERY line as drift on a file the session never touched.
+#
+# THE BOUND IS DERIVED, and it is deliberately not "every eol=lf path": that attribute covers 46
+# files here, which is far wider than anything this arm should rewrite. The population is the tracked
+# files under .claude/ that carry the pin — check-wiring.sh's OWN domain, intersected with the pin,
+# both read from the tree rather than listed here. Measured: exactly the two rendered Skills, which
+# are also exactly the files an adopt script byte-compares.
+#
+# The repair REWRITES THE BYTES, because a `git checkout --` remedy is state-dependent and this is
+# not. Measured: `git diff` reports NO content change on such a file (the clean filter normalises)
+# while `git status --porcelain` DOES list it — the two disagree, so a checkout-based repair restores
+# the file or silently no-ops depending on which one git consults. A previous build hit the no-op and
+# needed `rm` first. Rewriting the bytes is correct in both states.
+check_eol() {
+  local pop f bad=""
+  # THE POPULATION IS THE RENDERED SKILL MARKDOWN, not "every eol=lf path under .claude/". Measured
+  # in a scratch repo with a `* text=auto eol=lf` .gitattributes — an ordinary thing to write — the
+  # wider selector pulled in `.claude/settings.json` and a PNG, and `--fix` rewrote both: three CR
+  # bytes stripped out of the middle of the image, md5 changed, reported as "fixed". A repair whose
+  # bound depends on how an adopter spelled their attributes has no bound.
+  #
+  # NUL-byte guard as well, because a bound stated in a glob is still a claim: a binary that lands
+  # under .claude/skills/ with a .md name is skipped rather than rewritten.
+  # PER-PATH, not `xargs`: xargs word-splits on whitespace, so `.claude/skills/my skill/SKILL.md`
+  # reached `git check-attr` as two nonexistent paths, the population came back empty, and the arm
+  # printed a green `skip`. Reproduced — a folder name with a space is an ordinary thing to type. The
+  # population is two files; a fork each is not a cost worth a silent collapse.
+  pop=$(git ls-files .claude/skills/ 2>/dev/null | grep -E '\.md$' | while IFS= read -r _p; do
+          [ -n "$_p" ] || continue
+          git check-attr eol -- "$_p" 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p'
+        done)
+  if [ -z "$pop" ]; then
+    echo "skip     eol       — no tracked .claude/skills/**.md carries an eol=lf pin"
+    return
+  fi
+  # `while read`, not `for f in $pop`: a Skill directory with a space in its name — ordinary on a
+  # machine where someone typed the folder name — word-split into fragments that matched no file, and
+  # the arm reported "ok" over a population of zero.
+  while IFS= read -r f; do
+    [ -n "$f" ] && [ -f "$f" ] || continue
+    # NUL test WITHOUT a NUL in the pattern. Bash cannot hold a NUL byte in a string, so `$'\000'`
+    # is the EMPTY string and `grep -q ''` matches EVERY file — the first cut skipped the whole
+    # population and then reported "ok", a guard that could not fire protecting a check that could
+    # not fire. Compare byte counts instead.
+    if [ "$(LC_ALL=C tr -d '\000' < "$f" | wc -c)" != "$(wc -c < "$f")" ]; then
+      echo "skip     eol       — $f holds NUL bytes; not text, not repaired"
+      continue
+    fi
+    if LC_ALL=C grep -qU $'\r' "$f" 2>/dev/null; then bad="$bad
+$f"; fi
+  done <<EOF
+$pop
+EOF
+  bad=$(printf '%s\n' "$bad" | grep . || true)
+  if [ -z "$bad" ]; then
+    echo "ok       eol       — every eol=lf-pinned .claude/ file is LF in the worktree"
+    return
+  fi
+  # `--session` REPORTS; only `--fix` rewrites. The unit's own ratified fork said exactly this and the
+  # first cut implemented DO_FIX=1 for both — so a SessionStart hook rewrote file bytes unattended,
+  # which is a far bigger act than setting an unset git config, the only thing --session was ever
+  # allowed to do.
+  if [ "$DO_FIX" = 1 ] && [ "$MODE" != session ]; then
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      # Rewrite in place, then verify: a repair that reports success without checking is the class of
+      # bug this whole arm exists to catch one level up.
+      LC_ALL=C tr -d '\r' < "$f" > "$f.eoltmp" && mv -f "$f.eoltmp" "$f"
+      if LC_ALL=C grep -qU $'\r' "$f" 2>/dev/null; then
+        echo "UNWIRED  eol       — $f still holds CRLF after the repair. Fix by hand: tr -d '\\r'"
+        unwired=$((unwired+1))
+      else
+        echo "fixed    eol       — $f rewritten to LF (the index already normalised, so git status was clean)"
+      fi
+    done <<EOF
+$bad
+EOF
+    return
+  fi
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    echo "UNWIRED  eol       — $f holds CRLF despite its eol=lf pin; a byte-comparing gate will report every line as drift. Fix: bash tools/check-wiring.sh --fix"
+    unwired=$((unwired+1))
+  done <<EOF
+$bad
+EOF
+}
+
 check_hooks
 check_agentcap
 check_recall_opened
+check_eol
 
 [ "$MODE" = session ] && exit 0
 [ "$unwired" = 0 ] && exit 0 || exit 1

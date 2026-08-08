@@ -60,9 +60,53 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
+
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# Resolved ONCE for all three delegating checks (9, 13-16, 17-19) — the retired idiom sat at
+# three separate sites in this file, which is three chances to fix two of them.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
 DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
+# THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
+# `<date>-spec-<slug>-<seq>-u6-indexed-join.md`, and both check 5's name grammar and check 12's
+# selector have to admit that suffix. They were two hand-copied EREs for one grammar and they had
+# already diverged — check 12 carried the tail, check 5 did not — so widening check 5's SELECTOR
+# without this would have redded 14 conforming files. Interpolated by both; never retyped.
+REC_TAIL='(-[a-z0-9][a-z0-9-]*)?'
 
 # A selector that matches NOTHING prints nothing, and nothing is what a passing check prints. The
 # 1.5 flatten changed the segment count of several path selectors at once, so each one asserts its
@@ -234,17 +278,25 @@ $bad4"
 # 5 — recording-file naming (grandfather: legacy-files.txt).
 # The optional `-<FAMILY>-` qualifier is the CLOSED alternation from FAMILIES. A generic `[A-Z]+`
 # would admit a family that does not exist and make the rejection arm vacuous.
-c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/[^/]+\.md$" || true)
+# ANY DEPTH under the four subfolders. A file one level deeper used to be governed by nothing: check
+# 5 saw only direct children, and check 12's population is files that already match the dated name,
+# so a free-named nested file was outside both by construction.
+c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/(.+/)?[^/]+\.md$" || true)
 pop_guard 5 "no recording file under $M/builds/*/{prompts,spec,build,reviews}/" \
   "$(printf '%s\n' "$c5_sel" | grep -c . || true)" "$PRE_RECORD"
 bad5=$(printf '%s\n' "$c5_sel" | grep . | while IFS= read -r f; do
   in_legacy "$f" && continue
-  # Fork-free basename/parent-dir + bash ERE (was basename + awk + grep = 3 forks per recording file).
-  base=${f##*/}; sub=${f%/*}; sub=${sub##*/}
+  # Fork-free basename + SUBFOLDER extraction (was basename + awk + grep = 3 forks per recording file).
+  # The kind comes from the subfolder — the first segment after the build slug — NOT from the file's
+  # immediate parent: `spec/units/x.md` is a spec, and `units` is not a kind.
+  base=${f##*/}; rest=${f#"$M"/builds/}; rest=${rest#*/}; sub=${rest%%/*}
   case "$sub" in prompts) kind=prompt;; spec) kind=spec;; build) kind=build;; reviews) kind=review;; esac
-  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+\.md$ ]] || echo "$f"
+  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$ ]] || echo "$f"
 done)
+# The DEPTH is not the problem, and the message says so on a CONTINUATION line — the first line is
+# this branch's check-arms signature and its arm sits exactly at the armed floor with no slack.
 [ -n "$bad5" ] && fail 5 "recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered):
+  (nesting is fine — a sub-folder under spec/ groups a multi-unit build; the NAME is what is wrong)
 $bad5"
 
 # index set for checks 6/7
@@ -260,6 +312,10 @@ index_set() {
     fi
     printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
+    # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
+    # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
+    # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
+    printf '%s\n' "$FILES" | grep -E "^$M/guides/[^/]+\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
 INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
@@ -286,7 +342,7 @@ $bad6"
 
 # 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt TREE.md, IN-FLIGHT.md, in-flight/*.md,
 #     and — when the codebase-map kit is adopted under this tree — its dossiers/FOUNDATION (detail files).
-ex7='(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$)'
+ex7='(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/guides/[^/]+\.md$)'
 [ -n "$MAP_SUB" ] && ex7="(/IN-FLIGHT\.md$|/in-flight/[^/]+\.md$|/$MAP_SUB/FOUNDATION\.md$|/$MAP_SUB/features/[^/]+\.md$)"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
@@ -366,7 +422,6 @@ $bad8"
 # DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
 # and nothing rots.
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
 fi
@@ -420,7 +475,7 @@ SPEC_CANON10="$SPEC_CANON
 # `P` = analyse. `[ -f ]` stays a bash builtin so the absent-file finding keeps its position in the
 # stream. The canon rides in on `-v canon=`: this kit has ONE nine-line canon and one equality, so it
 # needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
-c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$" || true)
+c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$" || true)
 pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
 c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
@@ -516,16 +571,22 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
     if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
     if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
-    # ---- header rev vs the §9 high-water. NO `/^## /{f=0}` reset, deliberately: that is this kit
-    # ---- engine s existing behaviour, and adding one can only SHRINK the scanned range and so
-    # ---- produce MORE findings on a non-conforming spec, which is a verdict change this unit
-    # ---- forbids. Tracked as its own backlog row instead.
+    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
+    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
+    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
+    # ---- anywhere further down. Reproduced at 99 against a true 1.
+    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
+    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
+    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
+    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
     k = "· rev-"; p = index(hdr, k); hrev = ""
     if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
     in9 = 0; seen = 0; mx = 0
     for (i = 1; i <= n; i++) {
       L = body[i]
       if (L ~ /^## 9\. Revision log/) in9 = 1
+      else if (in9 && L ~ /^## /) in9 = 0
       if (in9) while (match(L, /rev-[0-9]+/)) {
         v = substr(L, RSTART + 4, RLENGTH - 4) + 0
         if (!seen || v > mx) mx = v
@@ -582,7 +643,6 @@ fi
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
 # classifier reads is measured per corpus, and blank pins turn the whole unit off.
 if [ "$STAGED" = 0 ]; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
     printf '%s
 ' "$ids"; status=1
@@ -593,7 +653,6 @@ fi
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
 if [ "$STAGED" = 0 ]; then
-  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
   if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
     printf '%s
 ' "$got"; status=1

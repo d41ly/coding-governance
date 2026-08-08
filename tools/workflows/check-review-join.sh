@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-review-join.sh — the retirement gate for the ref-keyed verdict join.
 #
-#   bash tools/workflows/check-review-join.sh          # every tracked *.js under tools/
+#   bash tools/workflows/check-review-join.sh          # every *.js under tools/ that git can see
 #   bash tools/workflows/check-review-join.sh <file>…  # explicit files (the self-test's fixtures)
 #
 # Exit 0 = clean · 1 = a ref-keyed join reappeared · 2 = not a git repo.
@@ -34,7 +34,14 @@ if [ "$#" -gt 0 ]; then
   FILES=$(printf '%s\n' "$@")
   EXPLICIT=1
 else
-  FILES=$(git ls-files -- '*.js' | grep -E '^tools/.*\.js$' | grep -vE "$SELF_EXCLUDE" || true)
+  # --cached AND --others: a NEW workflow script is judged the moment it exists, not the moment
+  # someone remembers to stage it. --exclude-standard keeps ignored files ignored, and that is the
+  # escape hatch: a scratch .js you do not want judged is a .gitignore line, not an unstaged file.
+  # This DOES change the landing boundary — tools/push-main.sh gates on `git status --porcelain -uno`
+  # and so deliberately permits untracked files at a push — which is the point: a banned join sitting
+  # unstaged in the tree was previously invisible to the gate that exists to ban it.
+  FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
+    | grep -E '^tools/.*\.js$' | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 

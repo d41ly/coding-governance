@@ -95,10 +95,16 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
    build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose recording-named
    `.md`; non-md only in `build/`.
-5. **recording-file naming** — files under the four subfolders match
-   `<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md`, kind matching subfolder, family from the closed
-   `FAMILIES` alternation (grandfather: `legacy-files.txt`).
+5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
+   `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
+   from the file's immediate parent — `spec/units/x.md` is a spec. The family is the closed
+   `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
+   variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
+   `legacy-files.txt`).
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
+   `guides/*.md` is in that set: a guide is MANDATORY reading the charter points a session at, and
+   check 16 refuses a charter-cited file that nothing caps. Entry-budget exempt (check 7's `ex7`) —
+   a guide is prose, not index rows.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `memory-tree/gen_build_index.py --check` must be clean. The index is
@@ -112,7 +118,8 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
     (any depth under `spec/`) carry the `**Status:**` header (token · rev · date · node · tier ·
     base sha); Tier-2 adds exactly the canonical `##` sections, non-empty bodies,
-    header-rev-in-§9 parity, and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
+    header-rev-in-§9 parity — the §9 range CLOSES at the next `##`, so a bigger `rev-N` in §10 no
+    longer satisfies the header — and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
     placeholders and a bare WONTDO tail (`TEMPLATE-SPEC.md`). Older specs grandfathered by filename date.
     A `streams` segment is validated against the `DISCIPLINES` enum whenever present, on either tier,
     and is REQUIRED once the filename date reaches `STREAMS_CUTOFF`.
@@ -124,7 +131,11 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
     `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
     stale-entry guard: a waived id that now resolves is a stale row and reds.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
-    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. Four rules:
+    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
+    citation counts: it is exactly as broken when it does not resolve, and the flatten left four of
+    them in the live ledger. `DEAD_PATH_EXCLUDE` names prefixes that are not repo CONTENT — a
+    checkout location, say — because resolution never touches the filesystem and cannot tell meaning
+    from existence. Four rules:
     (1) set equality between the registry and the measured set, keyed on `(citing-file, cited-path)`
     with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
@@ -151,10 +162,22 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 
 ## The harness meta-gate
 
-Every `fail` BRANCH in the gate is either ARMED — a POSITIVE assertion in the test file naming a
-literal slice of that branch's OWN failure text — or listed in `project/unarmed-branches.txt`. The
-key is the CALL SITE `(check number, ordinal)`, never the check number, because one number can carry
-several branches and a number-keyed pin lets the cheapest arm hide the valuable one.
+Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
+test naming a literal slice of the branch's OWN failure text — or listed in
+`project/unarmed-branches.txt`. The POPULATION IS DISCOVERED: a tracked `*.sh` that DEFINES `fail()`
+and has `fail <n> "` call sites is a gate, and `<stem>.test.sh` beside it is its test; a missing
+sibling test is a named failure. `*.test.sh` is excluded, because a fixture that QUOTES a fail line
+would otherwise demand a `<stem>.test.test.sh` that will never exist.
+
+The key is `(gate, check number, ordinal)`. The gate is in the key because the PIN's keys are global
+and two gates both number their checks from 1 — measured, seven keys are claimed by both of this
+repo's gates. The ordinal is in the key because one number can carry several branches and a
+number-keyed pin lets the cheapest arm hide the valuable one.
+
+A branch's signature ends at the first UNESCAPED closing quote of its message. Capturing to end of
+line puts shell source into the signature for any branch written inline as `{ fail 2 "…"; ok=0; }`,
+and no assertion can ever emit that — the row becomes permanently unarmable inside a shrink-only
+pin.
 
 Three things do NOT arm a branch: a bare `check N` mention, an ABSENCE assertion, and a COMMENT. All
 three are "something in the file mentions it", which is not "something exercises it".
@@ -163,11 +186,24 @@ The pin is shrink-only and reds three ways: a pinned branch that is now armed, a
 no longer exists, and a signature the message was reworded out from under. It is EXCLUDED from its
 own scan — it holds each signature verbatim in order to name it.
 
-BOTH directions are pinned. `ARMS_BRANCH_FLOOR` catches a deleted guard; `ARMS_ARMED_FLOOR` catches
-an assertion dropped by WIDENING the pin, which a branch count alone cannot see because the count
-falls and the pin still holds.
+BOTH directions are pinned, PER GATE — `ARMS_FLOORS="<gate>:<branches>:<armed> …"`. The branch floor
+catches a deleted guard; the armed floor catches an assertion dropped by WIDENING the pin, which a
+branch count alone cannot see because the count falls and the pin still holds. Per-gate rather than
+aggregate: a total lets one gate's deletion be masked by another gate's addition, and goes slack by a
+whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
+the walk, so one bad gate cannot hide every other gate's findings.
 
 `memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
+
+The pin is EMPTY today — 30 of 30 branches across both gates are armed — and an empty pin is the
+file's working state, not its retirement. A row appears when a new branch lands that no fixture can
+reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
+from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
+property of the harness, not a preference: the hygiene gate's `fail` never aborts, so one scratch
+tree trips many branches in one ~9 s invocation and the fixtures batch; the manifest gate's CALLERS
+short-circuit — `BLOCK_OK` skips four whole checks after any check-2 branch fires, and check 3 is a
+mutually-exclusive `if`/`elif` chain — so its branches need separate small repos and must not be
+helpfully merged back together.
 
 ## The bug-class catalogue
 

@@ -36,8 +36,44 @@ ROOT="$(pwd)"
 REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
 REL="${REL%/}"
 
-PY="${RECALL_PY:-}"
-if [ -z "$PY" ]; then PY=python3; command -v python3 >/dev/null 2>&1 || PY=python; fi
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# RECALL_PY is a PUBLISHED contract — the kit README, WIRE-INTO-PROJECT.md and this script's own
+# usage line all name it — so it goes in as the caller override rather than being quietly
+# replaced by GOV_PYTHON.
+PY=$(resolve_python "${RECALL_PY:-}") || exit 2
 
 mode=""; with_hook=0
 for a in "$@"; do

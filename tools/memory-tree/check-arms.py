@@ -2,28 +2,40 @@
 """check-arms.py — the harness meta-gate: every `fail` BRANCH is armed, or explicitly pinned.
 
     python tools/memory-tree/check-arms.py --check      # the gate
-    python tools/memory-tree/check-arms.py --report     # what is armed, what is pinned
+    python tools/memory-tree/check-arms.py --report     # what is armed, what is pinned, per gate
+    python tools/memory-tree/check-arms.py --emit-pin   # the pin file for the CURRENT unarmed set
     python tools/memory-tree/check-arms.py --selftest
 
-WHY A BRANCH AND NOT A CHECK NUMBER. This kit's gate has 14 `fail` call sites behind 12 numbers:
-checks 5 and 6 each fail for two different reasons. A pin keyed on the NUMBER lets the cheapest arm
-empty a number while its second, more valuable branch stays unwritten AND invisible. Upstream counted
-41 branches behind 25 numbers and hit exactly that. So the key is the CALL SITE — `(number, ordinal)`
-— never the label prose, which gets reworded, and never the number, which is not unique.
+THE POPULATION IS DISCOVERED, never named. A gate is a tracked `*.sh` that DEFINES the helper
+(`fail() {`) and has `fail <n> "` call sites; its test is the sibling `<stem>.test.sh`. A named pair
+went stale the day a second gate landed — `manifest-check.sh` carried 16 branches behind six numbers
+with no arm requirement at all — and that is the row this file drains.
+
+WHY THE HELPER DEFINITION IS PART OF THE PREDICATE. With a call-site test alone, any `*.test.sh` that
+QUOTES a fail line becomes a "gate" demanding a `<stem>.test.test.sh` that will never exist, and the
+whole suite goes permanently red. `*.test.sh` is excluded outright as well: the fixture shape is one
+heredoc away, and this module's own selftest already writes one.
+
+WHY THE KEY CARRIES THE GATE. Not because one gate's arm could silence another's — it could not, the
+arm scan reads each gate's own sibling test. Because the PIN's keys are global: measured, seven keys
+are claimed by both of this repo's gates — (1,1) (2,1) (3,1) (4,1) (5,1) (5,2) (6,1) — so a two-field
+pin row raises false stale-signature reds against the other gate, or falsely EXEMPTS it.
+
+WHY THE CAPTURE STOPS AT THE CLOSING QUOTE. `manifest-check.sh` writes five branches inline as
+`{ fail 2 "…"; BLOCK_OK=0; }`. Capturing to end of line puts `"; BLOCK_OK=0; }` into the signature —
+the gate's SOURCE, which no assertion can ever emit — so those rows would be permanently unarmable
+inside a shrink-only pin, and `--check` would still pass because it compares the pin against a
+signature from the same extractor. Measured: terminating at the first UNESCAPED closing quote changes
+0 of 14 signatures in `check-memory-hygiene.sh` and exactly the 5 contaminated ones. A message with
+no closing quote on its line is a run-on; it falls back to end-of-line.
 
 WHAT COUNTS AS AN ARM. A POSITIVE assertion naming the branch's OWN failure text. A bare `check N`
-mention satisfies a substring test, and so does an ABSENCE assertion (`miss 'check 7'`) — both would
-let a branch count as armed while nothing exercises it. So the signature is a literal slice of the
-branch's own message, and a line that is a negative assertion does not arm anything.
+mention, an ABSENCE assertion and a COMMENT all fail to arm: each is "something in the file mentions
+it", which is not "something exercises it".
 
-PINNED IN BOTH DIRECTIONS. A derived count catches a DELETED guard. It does not catch an assertion
-dropped by WIDENING the exemption list — the branch count falls, the pin still holds, and the gate is
-quieter than it was. So there are two floors: `ARMS_BRANCH_FLOOR` (how many `fail` branches exist)
-and `ARMS_ARMED_FLOOR` (how many are armed). Both are measured, both are one-sided upward.
-
-THE PIN IS EXCLUDED FROM ITS OWN SCAN. The pin file holds each pinned signature verbatim in order to
-name it, so a scan that included the pin would find every signature there and report every branch as
-armed. Upstream shipped this meta-check vacuous for exactly that reason.
+FLOORS ARE PER-GATE. An aggregate total lets one gate's DELETED guard be masked by another gate's
+added one, and it goes slack by a whole gate's branch count the day a third gate lands — a guard that
+gets quieter as the population grows.
 """
 from __future__ import annotations
 
@@ -36,13 +48,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 PIN = "project/unarmed-branches.txt"
 
-# `fail <n> "<message …>` — the message opens on the same line and may run on. The signature is the
-# first line of it, with every shell interpolation dropped: `$SPEC_FORMAT_CUTOFF` is a value, not
-# text a test can assert on.
-# ANYWHERE on the line, not just at its start. Check 9's call sits inside an `if ! drift=$(…); then`
-# and a start-anchored pattern missed it entirely — a branch invisible to this meta-check is exactly
-# what the meta-check exists to prevent, and it would have been invisible SILENTLY.
 FAIL_RE = re.compile(r'\bfail (\d+) "(.*)$')
+HELPER_RE = re.compile(r"^\s*fail\(\)\s*\{")
 INTERP_RE = re.compile(r'\$\{?[A-Za-z_][A-Za-z0-9_]*\}?')
 # A NEGATIVE assertion. `miss` is this kit's absence helper; the `&&` form is the inline one.
 NEGATIVE_RE = re.compile(r"^\s*(miss\b|.*grep -qF .* <<<.*\s&&\s)")
@@ -62,7 +69,7 @@ def read(p):
 
 
 def load_conf(root):
-    conf = {"MEMORY_ROOT": "memory", "ARMS_BRANCH_FLOOR": "", "ARMS_ARMED_FLOOR": ""}
+    conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
         for line in read(p).split("\n"):
@@ -72,6 +79,24 @@ def load_conf(root):
             k, _, v = line.partition("=")
             conf[k.strip()] = v.strip().strip('"').strip("'")
     return conf
+
+
+def message_of(tail: str) -> str:
+    """The message text, ending at the first UNESCAPED closing quote.
+
+    Everything after that quote is shell, not output. A line with no closing quote is a run-on
+    message that continues on the next line; the whole tail is the best available approximation and
+    the signature is taken from it.
+    """
+    i = 0
+    while i < len(tail):
+        if tail[i] == "\\":
+            i += 2
+            continue
+        if tail[i] == '"':
+            return tail[:i]
+        i += 1
+    return tail
 
 
 def signature(message: str) -> str:
@@ -86,44 +111,66 @@ def signature(message: str) -> str:
     return best
 
 
-def branches(gate_path: str) -> list:
-    """Every `fail` call site, keyed on (number, ordinal-within-that-number)."""
-    if not os.path.isfile(gate_path):
-        raise Problem(f"check-arms: {gate_path} is missing — this meta-gate reads the gate's source, "
+def discover(root: str) -> list:
+    """Every (gate, test) pair in the tree. Derived, never listed."""
+    tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p.endswith(".sh")]
+    pairs = []
+    for rel in tracked:
+        if rel.endswith(".test.sh"):
+            continue                          # a fixture that quotes a fail line is not a gate
+        try:
+            text = read(os.path.join(root, rel))
+        except OSError:
+            continue
+        if not any(HELPER_RE.match(l) for l in text.split("\n")):
+            continue                          # quotes a fail line but does not own the protocol
+        if not any(FAIL_RE.search(l) for l in text.split("\n")
+                   if not l.lstrip().startswith("#") and "fail() {" not in l):
+            continue
+        pairs.append((rel, rel[:-3] + ".test.sh"))
+    return sorted(pairs)
+
+
+def branches(root: str, gate_rel: str) -> list:
+    """Every `fail` call site in one gate, keyed on (number, ordinal-within-that-number)."""
+    path = os.path.join(root, gate_rel)
+    if not os.path.isfile(path):
+        raise Problem(f"check-arms: {gate_rel} is missing — this meta-gate reads the gate's source, "
                       f"so a renamed or moved gate must be repointed here, not silently uncovered")
     seen = {}
     out = []
-    for lineno, line in enumerate(read(gate_path).split("\n"), 1):
+    for lineno, line in enumerate(read(path).split("\n"), 1):
         if line.lstrip().startswith("#") or "fail() {" in line:
-            continue                      # a comment about a branch, and the helper's definition
+            continue                          # a comment about a branch, and the helper's definition
         m = FAIL_RE.search(line)
         if not m:
             continue
         num = int(m.group(1))
         seen[num] = seen.get(num, 0) + 1
-        sig = signature(m.group(2))
+        sig = signature(message_of(m.group(2)))
         if len(sig) < 12:
-            raise Problem(f"{gate_path}:{lineno}: check {num} branch {seen[num]} has no literal run "
+            raise Problem(f"{gate_rel}:{lineno}: check {num} branch {seen[num]} has no literal run "
                           f"long enough to assert on ({sig!r}) — reword the message or the arm cannot "
                           f"name it")
-        out.append({"num": num, "ord": seen[num], "line": lineno, "sig": sig})
+        out.append({"gate": gate_rel, "num": num, "ord": seen[num], "line": lineno, "sig": sig})
     return out
 
 
-def armed_signatures(test_path: str) -> set:
+def armed_signatures(root: str, test_rel: str) -> set:
     """Lines of the test file that could carry a POSITIVE assertion.
 
-    A COMMENT is not an arm. The test file's prose explains what each arm covers and naturally
-    quotes the messages, so a comment-blind scan would let a branch read as armed on the strength of
-    a sentence describing it — the same shape as the bare-`check N` mention and the absence
-    assertion this function already refuses. All three are "something in the file mentions it",
-    which is not "something exercises it".
+    A COMMENT is not an arm. The test file's prose explains what each arm covers and naturally quotes
+    the messages, so a comment-blind scan would let a branch read as armed on the strength of a
+    sentence describing it — the same shape as the bare-`check N` mention and the absence assertion
+    this function already refuses. All three are "something mentions it", not "something exercises
+    it".
     """
-    if not os.path.isfile(test_path):
-        raise Problem(f"check-arms: {test_path} is missing — with no test file EVERY branch would "
-                      f"read as unarmed, which is loud, but a missing harness is its own finding")
+    path = os.path.join(root, test_rel)
+    if not os.path.isfile(path):
+        raise Problem(f"check-arms: {test_rel} is missing, but its gate has `fail` branches — with no "
+                      f"test file EVERY branch is unarmed and there is nothing to arm them with")
     out = set()
-    for line in read(test_path).split("\n"):
+    for line in read(path).split("\n"):
         if line.lstrip().startswith("#"):
             continue
         if NEGATIVE_RE.match(line):
@@ -141,87 +188,145 @@ def parse_pin(root: str, m: str) -> list:
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         parts = line.split("\t")
-        if len(parts) != 3:
-            raise Problem(f"{m}/{PIN}:{i}: expected 3 tab-separated fields "
-                          f"(check<TAB>ordinal<TAB>signature), got {len(parts)}")
-        rows.append((parts[0].strip(), parts[1].strip(), parts[2].strip(), i))
+        if len(parts) != 4:
+            raise Problem(f"{m}/{PIN}:{i}: expected 4 tab-separated fields "
+                          f"(gate<TAB>check<TAB>ordinal<TAB>signature), got {len(parts)}")
+        rows.append((parts[0].strip(), parts[1].strip(), parts[2].strip(), parts[3].strip(), i))
     return rows
 
 
-def classify(root: str, conf: dict, gate: str, test: str) -> dict:
+def parse_floors(conf: dict) -> dict:
+    """`ARMS_FLOORS="<gate>:<branches>:<armed> …"` — per gate, both one-sided upward."""
+    out = {}
+    for tok in conf.get("ARMS_FLOORS", "").split():
+        parts = tok.rsplit(":", 2)
+        if len(parts) != 3 or not parts[1].isdigit() or not parts[2].isdigit():
+            raise Problem(f"check-arms: ARMS_FLOORS entry {tok!r} is not <gate>:<branches>:<armed>")
+        out[parts[0]] = (int(parts[1]), int(parts[2]))
+    return out
+
+
+def classify(root: str, conf: dict, pairs=None) -> dict:
     m = conf["MEMORY_ROOT"]
-    brs = branches(gate)
-    lines = armed_signatures(test)
-    for b in brs:
-        b["armed"] = any(b["sig"] in l for l in lines)
-    pinned = parse_pin(root, m)
-    return {"branches": brs, "pinned": pinned, "m": m}
+    pairs = discover(root) if pairs is None else pairs
+    brs, errors = [], []
+    for gate_rel, test_rel in pairs:
+        # A gate that raises does NOT abort the walk: for the duration of that red the gate would
+        # otherwise enforce nothing else — every other gate's unarmed branches, every stale pin row
+        # and both floors would go unchecked, and a second regression could land under cover.
+        try:
+            gb = branches(root, gate_rel)
+            lines = armed_signatures(root, test_rel)
+        except Problem as exc:
+            errors.append(str(exc))
+            continue
+        for b in gb:
+            b["armed"] = any(b["sig"] in l for l in lines)
+        brs.extend(gb)
+    return {"branches": brs, "pinned": parse_pin(root, m), "errors": errors,
+            "pairs": pairs, "m": m}
 
 
-def do_check(root: str, conf: dict, gate: str, test: str) -> int:
-    st = classify(root, conf, gate, test)
+def do_check(root: str, conf: dict) -> int:
+    st = classify(root, conf)
     brs, pinned, m = st["branches"], st["pinned"], st["m"]
-    bad = []
-    pin_keys = {(r[0], r[1]): r for r in pinned}
+    bad = list(st["errors"])
+    pin_keys = {(r[0], r[1], r[2]): r for r in pinned}
     for b in brs:
-        key = (str(b["num"]), str(b["ord"]))
+        key = (b["gate"], str(b["num"]), str(b["ord"]))
         if b["armed"]:
             if key in pin_keys:
-                bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][3]} pins check {b['num']} branch "
-                           f"{b['ord']}, which IS armed now — delete the row (the pin is shrink-only)")
+                bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check "
+                           f"{b['num']} branch {b['ord']}, which IS armed now — delete the row "
+                           f"(the pin is shrink-only)")
             continue
         if key not in pin_keys:
-            bad.append(f"check-arms: {os.path.basename(gate)}:{b['line']} check {b['num']} branch "
-                       f"{b['ord']} has no POSITIVE assertion naming its own failure text "
-                       f"({b['sig']!r}) and is not pinned in {m}/{PIN}")
-        elif pin_keys[key][2] != b["sig"]:
-            bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][3]} pins check {b['num']} branch "
-                       f"{b['ord']} with a stale signature — the message was reworded")
-    live = {(str(b["num"]), str(b["ord"])) for b in brs}
+            bad.append(f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
+                       f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
+                       f"pinned in {m}/{PIN}")
+        elif pin_keys[key][3] != b["sig"]:
+            bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check {b['num']} "
+                       f"branch {b['ord']} with a stale signature — the message was reworded")
+    live = {(b["gate"], str(b["num"]), str(b["ord"])) for b in brs}
+    scanned = {g for g, _ in st["pairs"]}
     for r in pinned:
-        if (r[0], r[1]) not in live:
-            bad.append(f"check-arms: {m}/{PIN}:{r[3]} pins check {r[0]} branch {r[1]}, which no longer "
-                       f"exists — the guard was deleted or renumbered")
-    # BOTH FLOORS. A deleted guard shrinks the branch count; an assertion dropped by widening the
-    # exemption list shrinks the armed count while the branch count and the pin both hold.
-    n_br, n_armed = len(brs), sum(1 for b in brs if b["armed"])
-    for key, got, label in (("ARMS_BRANCH_FLOOR", n_br, "fail branch(es)"),
-                            ("ARMS_ARMED_FLOOR", n_armed, "armed branch(es)")):
-        floor = conf.get(key, "")
-        if floor and got < int(floor):
-            bad.append(f"check-arms: {got} {label} against a floor of {floor} ({key}) — a guard or an "
-                       f"assertion was removed; lower the floor in a commit that says why")
+        if (r[0], r[1], r[2]) not in live:
+            why = ("the gate is no longer in the population" if r[0] not in scanned
+                   else "the guard was deleted or renumbered")
+            bad.append(f"check-arms: {m}/{PIN}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
+                       f"no longer exists — {why}")
+    # PER-GATE floors. An aggregate would let one gate's deletion be masked by another's addition.
+    floors = parse_floors(conf)
+    # A FLOOR NAMING A GATE THAT IS NOT IN THE POPULATION IS A FAILURE, not a skip. The loop below
+    # walks the DISCOVERED gates and looks each floor up by key, so a floor whose gate vanished was
+    # simply never consulted: `do_check` returned 0 with no output. Measured — reformatting one gate's
+    # helper from `fail() {` to `fail () {` drops it out of discovery entirely, taking 14 branches and
+    # 14 arms with it, and every floor stayed green. The pin has this guard already (above); the
+    # floors did not, and with the pin empty by design the floors are the only backstop left.
+    for gate_rel in sorted(floors):
+        if gate_rel not in scanned:
+            bad.append(f"check-arms: ARMS_FLOORS names {gate_rel}, which is NOT in the discovered "
+                       f"population — the gate was renamed, moved, or stopped matching the "
+                       f"`fail() {{` + call-site predicate. Its branches and arms are no longer "
+                       f"counted by anything; fix the gate or remove the floor in a commit that "
+                       f"says why")
+    for gate_rel in sorted({b["gate"] for b in brs}):
+        gb = [b for b in brs if b["gate"] == gate_rel]
+        want = floors.get(gate_rel)
+        if not want:
+            continue
+        got = (len(gb), sum(1 for b in gb if b["armed"]))
+        for i, label in ((0, "fail branch(es)"), (1, "armed branch(es)")):
+            if got[i] < want[i]:
+                bad.append(f"check-arms: {gate_rel} has {got[i]} {label} against a floor of "
+                           f"{want[i]} (ARMS_FLOORS) — a guard or an assertion was removed; lower "
+                           f"the floor in a commit that says why")
     for line in bad:
         print("HYGIENE " + line)
     return 1 if bad else 0
 
 
-def do_report(root: str, conf: dict, gate: str, test: str) -> int:
-    st = classify(root, conf, gate, test)
-    brs = st["branches"]
-    print(f"fail branches : {len(brs)}   (ARMS_BRANCH_FLOOR={conf.get('ARMS_BRANCH_FLOOR') or 'unset'})")
-    print(f"armed         : {sum(1 for b in brs if b['armed'])}   (ARMS_ARMED_FLOOR={conf.get('ARMS_ARMED_FLOOR') or 'unset'})")
+def do_report(root: str, conf: dict) -> int:
+    st = classify(root, conf)
+    floors = parse_floors(conf)
+    for gate_rel, test_rel in st["pairs"]:
+        gb = [b for b in st["branches"] if b["gate"] == gate_rel]
+        want = floors.get(gate_rel, ("unset", "unset"))
+        print(f"{gate_rel}  ->  {test_rel}")
+        print(f"    branches {len(gb):>3} (floor {want[0]})   armed "
+              f"{sum(1 for b in gb if b['armed']):>3} (floor {want[1]})")
+        for b in gb:
+            print(f"      check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
+                  f"{'ARMED ' if b['armed'] else '      '} {b['sig'][:72]}")
     print(f"pinned rows   : {len(st['pinned'])}")
-    for b in brs:
-        print(f"    check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
-              f"{'ARMED ' if b['armed'] else '      '} {b['sig'][:78]}")
+    for e in st["errors"]:
+        print("ERROR " + e)
     return 0
 
 
-def do_emit_pin(root: str, conf: dict, gate: str, test: str) -> int:
+def do_emit_pin(root: str, conf: dict) -> int:
     """Print the pin file for the CURRENT unarmed set — the measurement, not a guess."""
-    st = classify(root, conf, gate, test)
+    st = classify(root, conf)
     print("# unarmed-branches.txt — `fail` branches with no positive assertion naming their own")
     print("# failure text. SHRINK-ONLY: a row leaves when its branch gains an arm, and check-arms")
-    print("# reds if a pinned branch is armed, if a pinned branch disappears, or if a message is")
-    print("# reworded out from under its signature. Fields: check<TAB>ordinal<TAB>signature.")
+    print("# reds if a pinned branch is armed, if a pinned branch or its gate disappears, or if a")
+    print("# message is reworded out from under its signature.")
+    print("# Fields: gate<TAB>check<TAB>ordinal<TAB>signature.")
     for b in st["branches"]:
         if not b["armed"]:
-            print(f"{b['num']}\t{b['ord']}\t{b['sig']}")
+            print(f"{b['gate']}\t{b['num']}\t{b['ord']}\t{b['sig']}")
     return 0
 
 
 # ----------------------------------------------------------------------------------------- selftest
+def _w(path, text):
+    d = os.path.dirname(path)
+    if d:
+        os.makedirs(d, exist_ok=True)
+    with open(path, "wb") as fh:
+        fh.write(text.encode("utf-8"))
+
+
 def do_selftest() -> int:
     fails = []
 
@@ -239,108 +344,171 @@ def do_selftest() -> int:
         except Exception as exc:  # noqa: BLE001
             got = f"UNEXPECTED {type(exc).__name__}: {exc}"
         ok = (want in got) if want else ("[rc=0]" in got)
-        print(("arm ok    " if ok else "arm FAIL  ") + label + ("" if ok else f" — expected {want!r}, got: {got.strip()}"))
+        print(("arm ok    " if ok else "arm FAIL  ") + label
+              + ("" if ok else f" — expected {want!r}, got: {got.strip()}"))
         if not ok:
             fails.append(label)
 
-    GATE = (
-        'fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }\n'
-        '[ -n "$a" ] && fail 1 "alpha branch message here:\n"\n'
-        '[ -n "$b" ] && fail 1 "beta branch message here:\n"\n'
+    HELPER = 'fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }\n'
+    GATE_A = HELPER + \
+        '[ -n "$a" ] && fail 1 "alpha branch message here:\n"\n' \
+        '[ -n "$b" ] && fail 1 "beta branch message here:\n"\n' \
         '[ -n "$c" ] && fail 2 "gamma branch message here:\n"\n'
-    )
+    # The INLINE form: a message followed by more shell on the same line. Capturing to end of line
+    # would put `"; BLOCK_OK=0; }` into the signature, which no assertion can ever emit.
+    GATE_B = HELPER + '[ -n "$d" ] && { fail 1 "delta branch message here"; BLOCK_OK=0; }\n'
+
     with tempfile.TemporaryDirectory() as base:
-        os.makedirs(os.path.join(base, "memory", "project"))
-        g = os.path.join(base, "gate.sh")
-        t = os.path.join(base, "gate.test.sh")
-        with open(g, "wb") as fh:
-            fh.write(GATE.encode())
-        conf = {"MEMORY_ROOT": "memory", "ARMS_BRANCH_FLOOR": "3", "ARMS_ARMED_FLOOR": "1"}
+        root = os.path.join(base, "repo")
+        os.makedirs(root)
+        run("git", "init", "-q", ".", cwd=root)
+        run("git", "config", "user.email", "t@t.test", cwd=root)
+        run("git", "config", "user.name", "t", cwd=root)
+        _w(os.path.join(root, ".memory-tree.conf"),
+           'MEMORY_ROOT=memory\nARMS_FLOORS="tools/gate-a.sh:3:1"\n')
+        _w(os.path.join(root, "tools", "gate-a.sh"), GATE_A)
+        _w(os.path.join(root, "tools", "gate-a.test.sh"), "hit 'alpha branch message here'\n")
+        _w(os.path.join(root, "tools", "gate-b.sh"), GATE_B)
+        _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
+        # A *.test.sh that QUOTES a fail line AND defines the helper — the shape that would make the
+        # whole suite permanently red by demanding a <stem>.test.test.sh.
+        _w(os.path.join(root, "tools", "decoy.test.sh"), HELPER + 'fail 1 "decoy message here"\n')
+        _w(os.path.join(root, "memory", "project", ".keep"), "")
+        run("git", "add", "-A", cwd=root)
+        run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=root)
+        conf = load_conf(root)
+        pin = os.path.join(root, "memory", "project", "unarmed-branches.txt")
 
-        # TWO branches behind ONE number — the whole reason the key is (number, ordinal).
+        arm("two gates are discovered, the decoy test is not",
+            "[rc=0]",
+            lambda: 0 if [g for g, _ in discover(root)] == ["tools/gate-a.sh", "tools/gate-b.sh"] else 1)
         arm("branches are keyed on the call site, not the check number", "[rc=0]",
-            lambda: 0 if [(b["num"], b["ord"]) for b in branches(g)] == [(1, 1), (1, 2), (2, 1)] else 1)
+            lambda: 0 if [(b["num"], b["ord"]) for b in branches(root, "tools/gate-a.sh")]
+            == [(1, 1), (1, 2), (2, 1)] else 1)
+        arm("the capture stops at the closing quote, not end of line", "[rc=0]",
+            lambda: 0 if branches(root, "tools/gate-b.sh")[0]["sig"] == "delta branch message here" else 1)
 
-        # an unarmed, unpinned branch reds
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\n")
-        arm("an unarmed branch with no pin reds", "branch 2 has no POSITIVE assertion",
-            lambda: do_check(base, conf, g, t))
+        # the PIN key carries the gate: both gates have a (1,1)
+        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
+                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p", "--no-verify", cwd=root)
+        arm("a fully pinned + armed population passes", None, lambda: do_check(root, conf))
+        # gate A's (1,1) pinned must NOT exempt gate B's (1,1)
+        _w(os.path.join(root, "tools", "gate-b.test.sh"), "# no arm here\n")
+        _w(pin, "tools/gate-a.sh\t1\t1\talpha branch message here\n"
+                "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
+                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p2", "--no-verify", cwd=root)
+        out = []
+        arm("a pin for gate A does not exempt gate B's same key",
+            "tools/gate-b.sh:2 check 1 branch 1 has no POSITIVE",
+            lambda: _capture(do_check, root, conf, out))
+        arm("...and raises no stale-signature line against gate B", "[rc=0]",
+            lambda: 0 if not any("gate-b" in l and "stale signature" in l for l in out) else 1)
+        arm("...and gate A's own armed branch is reported as wrongly pinned",
+            "pins tools/gate-a.sh check 1 branch 1, which IS armed now",
+            lambda: _capture(do_check, root, conf, []))
 
-        # a bare `check N` mention does NOT arm
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\nhit 'HYGIENE check 1 FAILED'\nhit 'check 2'\n")
-        arm("a bare check-number mention does not arm a branch", "check 2 branch 1 has no POSITIVE",
-            lambda: do_check(base, conf, g, t))
+        # a missing sibling test is a NAMED failure, and it does not abort the other gate
+        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
+                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        os.remove(os.path.join(root, "tools", "gate-b.test.sh"))
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "rm", "--no-verify", cwd=root)
+        arm("a gate with no sibling test is named", "gate-b.test.sh is missing, but its gate has",
+            lambda: do_check(root, conf))
+        out2 = []
+        _w(pin, "")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "e", "--no-verify", cwd=root)
+        # line-agnostic on purpose: the assertion is about WHICH gate still gets scanned, not about
+        # where in that gate the branch happens to sit.
+        arm("one gate's error does not hide the other gate's branches",
+            "tools/gate-a.sh:4 check 1 branch 2 has no POSITIVE",
+            lambda: _capture(do_check, root, conf, out2))
 
-        # a COMMENT naming the message does NOT arm — the test file's own prose quotes these.
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\n"
-                     b"# this arm would cover: gamma branch message here\n")
-        arm("a comment naming the message does not arm a branch", "check 2 branch 1 has no POSITIVE",
-            lambda: do_check(base, conf, g, t))
+        # restore gate B, then the per-gate floors
+        _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
+        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
+                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=root)
+        arm("restored population passes", None, lambda: do_check(root, conf))
+        confh = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1")
+        arm("a per-gate branch floor catches a deleted guard",
+            "tools/gate-a.sh has 3 fail branch(es) against a floor of 4",
+            lambda: do_check(root, confh))
+        confa = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:2")
+        arm("a per-gate armed floor catches a dropped assertion",
+            "tools/gate-a.sh has 1 armed branch(es) against a floor of 2",
+            lambda: do_check(root, confa))
+        # CROSS-GATE COMPENSATION: an aggregate floor would be satisfied here; a per-gate one is not.
+        confc = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1 tools/gate-b.sh:0:0")
+        arm("a per-gate floor is not satisfied by another gate's growth",
+            "tools/gate-a.sh has 3 fail branch(es)",
+            lambda: do_check(root, confc))
 
-        # an ABSENCE assertion does not arm
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\nmiss 'beta branch message here'\n"
-                     b"hit 'gamma branch message here'\n")
-        arm("an absence assertion does not arm a branch", "check 1 branch 2 has no POSITIVE",
-            lambda: do_check(base, conf, g, t))
+        # A FLOOR whose gate is gone. The floors loop walks the DISCOVERED gates and looks each floor
+        # up by key, so before this guard a floor for a vanished gate was never consulted at all:
+        # rc=0, no output, and a whole gate's branches and arms silently uncounted. The escape is not
+        # hypothetical — reformatting `fail() {` to `fail () {` drops a gate out of discovery.
+        confz = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-gone.sh:9:9")
+        arm("a floor naming a gate outside the population is a failure",
+            "which is NOT in the discovered population", lambda: do_check(root, confz))
+        # ...and the same floor set with the gate PRESENT is silent, so the arm above is not passing
+        # because do_check reds on everything.
+        arm("...and a floor whose gate IS discovered stays silent", "[rc=0]",
+            lambda: do_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
 
-        # pinned -> passes; and the pin is EXCLUDED from its own scan
-        pin = os.path.join(base, "memory", "project", "unarmed-branches.txt")
-        with open(pin, "wb") as fh:
-            fh.write(b"1\t2\tbeta branch message here\n")
-        arm("a pinned unarmed branch passes", None, lambda: do_check(base, conf, g, t))
-        # THE PIN IS EXCLUDED FROM ITS OWN SCAN. The pin now holds `beta branch message here`
-        # verbatim, because that is how it names the branch it exempts. If the arm scan reached the
-        # pin, that branch would read as ARMED — every pinned branch would, and the meta-check would
-        # ship vacuous, which is exactly what upstream did. The scan reads the TEST file and nothing
-        # else, so a signature present only in the pin arms nothing.
+        # a pin whose GATE is gone names that, not "the guard was deleted"
+        _w(pin, "tools/gate-z.sh\t1\t1\tvanished gate message here\n"
+                "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
+                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "z", "--no-verify", cwd=root)
+        arm("a pin for a gate outside the population says so",
+            "the gate is no longer in the population", lambda: do_check(root, conf))
+
+        # a signature present only in the PIN arms nothing
         arm("a signature present only in the PIN arms nothing", "[rc=0]",
-            lambda: 0 if not [b for b in classify(base, conf, g, t)["branches"]
+            lambda: 0 if not [b for b in classify(root, conf)["branches"]
                               if (b["num"], b["ord"]) == (1, 2) and b["armed"]] else 1)
 
-        # a pinned branch that becomes armed reds (shrink-only)
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\nhit 'beta branch message here'\n"
-                     b"hit 'gamma branch message here'\n")
-        arm("a pin that is now armed reds", "which IS armed now", lambda: do_check(base, conf, g, t))
-
-        # a pinned branch that no longer exists reds
-        with open(pin, "wb") as fh:
-            fh.write(b"9\t1\tvanished branch message\n")
-        arm("a pin for a deleted branch reds", "which no longer exists",
-            lambda: do_check(base, conf, g, t))
-
-        # BOTH floors
-        os.remove(pin)
-        conf2 = dict(conf, ARMS_BRANCH_FLOOR="4")
-        arm("the branch floor catches a deleted guard", "3 fail branch(es) against a floor of 4",
-            lambda: do_check(base, conf2, g, t))
-        with open(t, "wb") as fh:
-            fh.write(b"hit 'alpha branch message here'\n")
-        with open(pin, "wb") as fh:
-            fh.write(b"1\t2\tbeta branch message here\n2\t1\tgamma branch message here\n")
-        conf3 = dict(conf, ARMS_ARMED_FLOOR="3")
-        arm("the armed floor catches an assertion dropped by widening the pin",
-            "1 armed branch(es) against a floor of 3", lambda: do_check(base, conf3, g, t))
-
-        # a missing gate or a missing test file is a NAMED error, not a traceback out of a gate.
-        arm("a missing gate file is named", "is missing", lambda: do_check(base, conf, g + ".gone", t))
-        arm("a missing test file is named", "is missing", lambda: do_check(base, conf, g, t + ".gone"))
+        # a comment and an absence assertion do not arm
+        _w(os.path.join(root, "tools", "gate-a.test.sh"),
+           "hit 'alpha branch message here'\n"
+           "# this arm would cover: gamma branch message here\n"
+           "miss 'beta branch message here'\n")
+        _w(pin, "")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "c", "--no-verify", cwd=root)
+        outc = []
+        _capture(do_check, root, conf, outc)
+        arm("a comment naming the message does not arm", "[rc=0]",
+            lambda: 0 if any("check 2 branch 1 has no POSITIVE" in l for l in outc) else 1)
+        arm("an absence assertion does not arm", "[rc=0]",
+            lambda: 0 if any("check 1 branch 2 has no POSITIVE" in l for l in outc) else 1)
 
         # a message with no assertable literal run is a named error, not a silent skip
-        with open(g, "wb") as fh:
-            fh.write(b'[ -n "$a" ] && fail 1 "$X:\n"\n')
+        _w(os.path.join(root, "tools", "gate-a.sh"), HELPER + '[ -n "$a" ] && fail 1 "$X:\n"\n')
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "x", "--no-verify", cwd=root)
         arm("a message with no literal run is named", "no literal run long enough",
-            lambda: do_check(base, conf, g, t))
+            lambda: do_check(root, conf))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
     print("PASS — check-arms: all arms held")
     return 0
+
+
+def _capture(fn, root, conf, sink):
+    """Run a check, echo its output (so `arm` can match), and keep the lines for a second assertion."""
+    import contextlib
+    import io
+
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = fn(root, conf)
+    text = buf.getvalue()
+    sink.extend(text.split("\n"))
+    print(text, end="")
+    return rc
 
 
 def main(argv):
@@ -353,15 +521,13 @@ def main(argv):
         print("check-arms: not a git repo")
         return 2
     conf = load_conf(root)
-    gate = os.path.join(HERE, "check-memory-hygiene.sh")
-    test = os.path.join(HERE, "check-memory-hygiene.test.sh")
     try:
         if mode == "--check":
-            return do_check(root, conf, gate, test)
+            return do_check(root, conf)
         if mode == "--report":
-            return do_report(root, conf, gate, test)
+            return do_report(root, conf)
         if mode == "--emit-pin":
-            return do_emit_pin(root, conf, gate, test)
+            return do_emit_pin(root, conf)
         print("usage: check-arms.py [--check|--report|--emit-pin|--selftest]")
         return 2
     except Problem as exc:

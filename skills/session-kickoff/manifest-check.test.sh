@@ -21,12 +21,33 @@ run() {
   if printf '%s' "$out" | grep -q 'fatal:'; then   # the no-raw-fatal contract holds on EVERY path
     echo "FAIL $name (raw git fatal leaked)"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return
   fi
-  if [ "$pat" != "-" ] && ! printf '%s' "$out" | grep -q "$pat"; then
+  if [ "$pat" != "-" ] && ! printf '%s' "$out" | grep -qF "$pat"; then
     echo "FAIL $name (output lacks '$pat')"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return
   fi
   if [ "$pat" = "-" ] && printf '%s' "$out" | grep -vE '^(WARN:|NOTE:)' | grep -q .; then
     echo "FAIL $name (green run not silent-clean)"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return
   fi
+  echo "ok   $name"; pass=$((pass+1))
+}
+
+# runm <name> <repo> <want_exit> <pat>... — one invocation, many signatures. `run` takes a single
+# pattern, and check 2's missing-key branches are three independent `||` statements over one block:
+# they all fire on the same fixture, so re-running it once per pattern would triple the git work to
+# assert what one run already emitted.
+runm() {
+  local name=$1 repo=$2 want=$3; shift 3
+  local out got pt bad=0
+  out=$(cd "$repo" && bash "$CHECK" 2>&1); got=$?
+  if [ "$got" != "$want" ]; then
+    echo "FAIL $name (exit $got, want $want)"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return
+  fi
+  if printf '%s' "$out" | grep -q 'fatal:'; then
+    echo "FAIL $name (raw git fatal leaked)"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return
+  fi
+  for pt in "$@"; do
+    printf '%s' "$out" | grep -qF "$pt" || { echo "FAIL $name (output lacks '$pt')"; bad=1; }
+  done
+  if [ "$bad" = 1 ]; then printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); return; fi
   echo "ok   $name"; pass=$((pass+1))
 }
 
@@ -84,7 +105,7 @@ run "clean pass → 0, silent" "$R" 0 -
 mkrepo c1
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "{{GATE_COMMANDS}}"
 commit_all "$R" manifest
-run "surviving {{PLACEHOLDER}} → C1" "$R" 1 "check 1 FAILED"
+run "surviving {{PLACEHOLDER}} → C1" "$R" 1 "unfilled {{PLACEHOLDER}} survives in"
 
 # ---- 3 Actions/Go-template braces are NOT placeholders ------------------
 mkrepo c1ok
@@ -100,19 +121,19 @@ cat > "$R/SESSION-KICKOFF.md" <<'EOF'
 body only
 EOF
 commit_all "$R" manifest
-run "missing audit block → C2" "$R" 1 "check 2 FAILED"
+run "missing audit block → C2" "$R" 1 "no manifest-audit block in"
 
 # ---- 5 empty watch value → C2 -------------------------------------------
 mkrepo emptywatch
 write_manifest "$R" "$(head_sha "$R")" " ; " "docs/GOV.md"
 commit_all "$R" manifest
-run "empty watch value → C2" "$R" 1 "check 2 FAILED"
+run "empty watch value → C2" "$R" 1 "watch: holds no usable pathspec after splitting — list the gate-defining pathspecs (a missing watch silently disables the drift check)."
 
 # ---- 6 bogus sha → C3 unknown -------------------------------------------
 mkrepo bogus
 write_manifest "$R" "0123456789abcdef0123456789abcdef01234567" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
-run "bogus sha → C3 unknown" "$R" 1 "unknown to this repo"
+run "bogus sha → C3 unknown" "$R" 1 "is unknown to this repo — the stamp is foreign or predates a history rewrite; re-verify §B, then re-stamp last-audit '<ISO datetime> @ <sha>' with"
 
 # ---- 7 valid-but-non-ancestor sha → C3 second remedy --------------------
 mkrepo nonanc
@@ -120,27 +141,27 @@ git -C "$R" checkout -qb side; echo s > "$R/side.txt"; commit_all "$R" side; SID
 git -C "$R" checkout -q main
 write_manifest "$R" "$SIDE" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
-run "non-ancestor sha → C3 rewrite remedy" "$R" 1 "not an ancestor"
+run "non-ancestor sha → C3 rewrite remedy" "$R" 1 "is not an ancestor of HEAD — history was rewritten or the stamp was squash-merged; re-verify §B, then re-stamp last-audit '<ISO datetime> @ <sha>' with"
 
 # ---- 8 dead verify-path → C4 --------------------------------------------
 mkrepo deadvp
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GONE.md"
 commit_all "$R" manifest
-run "dead verify-path → C4" "$R" 1 "check 4 FAILED"
+run "dead verify-path → C4" "$R" 1 "' is not tracked content — the tree restructured or the anchor is dead; fix the path (or the §B pointer it anchors)."
 
 # ---- 9 untracked file at verify-path → C4 -------------------------------
 mkrepo untrackvp
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/LOCAL.md"
 commit_all "$R" manifest
 echo local > "$R/docs/LOCAL.md"   # exists on disk, never tracked
-run "untracked verify-path → C4" "$R" 1 "check 4 FAILED"
+run "untracked verify-path → C4" "$R" 1 "is not tracked content"
 
 # ---- 10 watch commit without re-stamp → C5 ------------------------------
 mkrepo drift
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nx:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "watch drift"
-run "watch commit, no re-stamp → C5" "$R" 1 "check 5 FAILED"
+run "watch commit, no re-stamp → C5" "$R" 1 "watched files changed since last-audit with no re-stamp at/after the change"
 
 # ---- 11 bundled watch+re-stamp commit → 0 (W==S reflexive) --------------
 mkrepo bundle
@@ -219,7 +240,7 @@ mkrepo stagedbad
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nsb:\n\ttrue\n' > "$R/Makefile"; git -C "$R" add Makefile
-run "staged watch, no staged stamp → C5s" "$R" 1 "THIS commit" --staged
+run "staged watch, no staged stamp → C5s" "$R" 1 "staged changes touch watched files" --staged
 
 # ---- 18 staged watch + unrelated manifest edit → C5s --------------------
 mkrepo stagedside
@@ -240,7 +261,7 @@ run "trailing ';' → parsed clean, 0" "$R" 0 -
 mkrepo deadwatch
 write_manifest "$R" "$(head_sha "$R")" "gone-dir/" "docs/GOV.md"
 commit_all "$R" manifest
-run "dead watch pathspec → C6" "$R" 1 "check 6 FAILED"
+run "dead watch pathspec → C6" "$R" 1 "' matches no tracked file — update the watch list to the restructured paths."
 
 # ---- 21 broad watch pathspec → breadth WARN, still 0 --------------------
 mkrepo broad
@@ -313,7 +334,41 @@ mkrepo reorder
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nro:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
-PYBIN=python3; command -v python3 >/dev/null 2>&1 || PYBIN=python
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PYBIN=$(resolve_python) || { echo "manifest-check.test: no usable python"; exit 2; }
 "$PYBIN" - "$R/SESSION-KICKOFF.md" <<'PY'
 import sys
 p = sys.argv[1]; lines = open(p, encoding='utf-8').read().split('\n')
@@ -349,14 +404,14 @@ mkrepo unborn
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 git -C "$R" checkout -q --orphan void
-run "unborn HEAD → C3 'no commits', no fatal" "$R" 1 "no commits on this branch"
+run "unborn HEAD → C3 'no commits', no fatal" "$R" 1 "HEAD has no commits on this branch — make the first commit, then re-verify §B and re-stamp last-audit at it."
 
 # ---- 33 malformed datetime → C2 ------------------------------------------
 mkrepo baddate
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 sed -i 's/^last-audit: [^@]*@/last-audit: banana breakfast @/' "$R/SESSION-KICKOFF.md"
 commit_all "$R" manifest
-run "malformed datetime → C2" "$R" 1 "malformed"
+run "malformed datetime → C2" "$R" 1 "') — want '<ISO-8601 datetime with offset> @ <full 40-hex sha>'."
 
 # ---- 34 relative path arg from a subdirectory ----------------------------
 mkrepo subdir
@@ -372,6 +427,52 @@ echo x > "$TMP/SESSION-KICKOFF.md"          # sibling of the repo, outside it
 run "relative ../ arg escaping repo → 2" "$R" 2 "resolves outside" "../SESSION-KICKOFF.md"
 run "absolute arg outside repo → 2" "$R" 2 "resolves outside" "$TMP/SESSION-KICKOFF.md"
 rm -f "$TMP/SESSION-KICKOFF.md"
+
+# ---- 36 two audit blocks → C2 'exactly one' ------------------------------
+# The block is found by a `grep -c` and read by an awk that STOPS at the first `-->`. With two
+# blocks the second one is unreachable — every value silently comes from the first — so a manifest
+# that grew a second block during a merge would enforce against half of itself.
+mkrepo twoblocks
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+cat >> "$R/SESSION-KICKOFF.md" <<'EOF'
+<!-- manifest-audit
+last-audit: 2026-07-12T13:00:00+00:00 @ 0000000000000000000000000000000000000000
+watch: Makefile
+verify-paths: docs/GOV.md
+-->
+EOF
+commit_all "$R" manifest
+run "two audit blocks → C2 'exactly one'" "$R" 1 "— exactly one is allowed; merge them."
+
+# ---- 37 block present, all three keys absent → C2 x3 ---------------------
+# The three key checks are independent `||` statements, so ONE fixture fires all three. A block with
+# no keys is the shape a hand-written retrofit produces, and each missing key disables a different
+# part of the gate: no watch is a silent false-green on drift, no verify-paths is a dead anchor set,
+# no last-audit is no anchor at all.
+mkrepo nokeys
+cat > "$R/SESSION-KICKOFF.md" <<'EOF'
+# manifest
+<!-- kickoff-manifest: v1.1 · test -->
+<!-- manifest-audit
+(the retrofit added the fences and forgot every key)
+-->
+## §B
+EOF
+commit_all "$R" manifest
+runm "audit block with no keys → C2 names all three" "$R" 1 \
+  "manifest-audit block lacks a last-audit value — stamp '<ISO datetime> @ <full sha>' after verifying §B." \
+  "manifest-audit block lacks a watch value — list the gate-defining pathspecs (a missing watch silently disables the drift check)." \
+  "manifest-audit block lacks a verify-paths value — list the 2-3 anchor paths."
+
+# ---- 38 verify-paths that splits to nothing → C2 ------------------------
+# The watch twin of this is scenario 5. Both matter: the split DROPS empty elements, so a value that
+# is nothing but separators is non-empty as a string and empty as a list — two different branches,
+# and the array one is the branch that stops `git ls-files` from being handed ''.
+mkrepo emptyvp
+write_manifest "$R" "$(head_sha "$R")" "Makefile" " ; "
+commit_all "$R" manifest
+run "verify-paths splits to nothing → C2" "$R" 1 \
+  "verify-paths: holds no usable path after splitting — list the 2-3 anchor paths."
 
 # ---- 35 unit-branch: bundle at merge-base anchor, then same-anchor re-stamp
 mkrepo branchunit

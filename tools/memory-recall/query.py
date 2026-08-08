@@ -383,6 +383,136 @@ def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
     return gone
 
 
+def _dir_bytes(d: pathlib.Path) -> int:
+    total = 0
+    for f in d.rglob("*"):
+        try:
+            if f.is_file():
+                total += f.stat().st_size
+        except OSError:
+            pass
+    return total
+
+
+def _mid_build(d: pathlib.Path) -> bool:
+    """Either database NEWER than the manifest — which is true during ANY build, not just the first.
+
+    The obvious predicate, "no readable manifest", is reasoned from a FIRST build only. On a REBUILD
+    `_write_set` unlinks and recreates both databases while the PREVIOUS manifest sits on disk
+    untouched, so a rebuilding sibling has a perfectly readable manifest and is precisely the
+    directory this rule means to protect. Absence of a manifest keeps its own separate never-evict
+    rule (`evict_dead_siblings`); this one is about a build in flight.
+    """
+    try:
+        mt = (d / "manifest.json").stat().st_mtime
+    except OSError:
+        return True
+    for name in ("records.db", "chunks.db"):
+        try:
+            if (d / name).stat().st_mtime > mt:
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def _remove_cache_dir(d: pathlib.Path) -> bool:
+    """Delete a cache directory, MANIFEST LAST, and verify it is gone.
+
+    NOT `shutil.rmtree(ignore_errors=True)`. Measured on win32, the platform this repo runs on: over
+    a directory holding an OPEN sqlite database it removes `manifest.json`, KEEPS `records.db`, and
+    leaves the directory in place — strictly worse than not deleting at all, because a manifest-less
+    directory is exactly what the never-evict rule protects, so the tree accumulates rubble no later
+    pass will ever clear.
+
+    So: everything else first, and if ANY of it fails the manifest STAYS, leaving the directory in a
+    state a later pass can still read, judge and retry. A failure is reported, never retried here.
+    """
+    man = d / "manifest.json"
+    entries = sorted((p for p in d.rglob("*") if p != man), key=lambda p: -len(p.parts))
+    for p in entries:
+        try:
+            if p.is_dir():
+                p.rmdir()
+            else:
+                p.unlink()
+        except OSError:
+            return False                      # manifest untouched: the directory stays judgeable
+    try:
+        man.unlink()
+    except FileNotFoundError:
+        pass
+    except OSError:
+        return False
+    try:
+        d.rmdir()
+    except OSError:
+        return False
+    return not d.exists()
+
+
+def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
+    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-BUILT first.
+
+    THE WHOLE PLAN IS COMPUTED BEFORE ANYTHING IS DELETED. Greedy oldest-first eviction and "when
+    the budget cannot be met, delete nothing" are incompatible otherwise: a greedy loop deletes until
+    it runs out of candidates and only THEN discovers it cannot finish, having already destroyed
+    work for no benefit.
+
+    Three directories are never candidates, each for its own reason: the CURRENT one (evicting it
+    makes the budget a rebuild loop), one that is MID-BUILD, and one whose manifest carries no
+    `built_at` (absence of evidence is not evidence of age). When the budget cannot be met without
+    reaching past them, the shortfall is REPORTED and the tree is left alone — a cap that deletes the
+    running session's own cache to satisfy itself turns a size problem into a rebuild loop.
+    """
+    out: list[str] = []
+    if not budget_mb:
+        return out                            # blank/absent/0 = uncapped, the kit's usual convention
+    budget = int(budget_mb * 1024 * 1024)
+    parent = keep.parent
+    try:
+        dirs = sorted(p for p in parent.iterdir() if p.is_dir())
+    except OSError:
+        return out
+    sizes = {d: _dir_bytes(d) for d in dirs}
+    total = sum(sizes.values())
+    if total <= budget:
+        return out
+
+    candidates = []
+    for d in dirs:
+        if d == keep or _mid_build(d):
+            continue
+        man = read_manifest(d)
+        if man is None or not man.get("built_at"):
+            continue
+        candidates.append((man["built_at"], d, man.get("worktree") or "?"))
+    candidates.sort(key=lambda t: t[0])       # oldest built_at first
+
+    plan, projected = [], total
+    for built_at, d, wt in candidates:
+        if projected <= budget:
+            break
+        plan.append((built_at, d, wt))
+        projected -= sizes[d]
+    if projected > budget:
+        out.append(
+            "recall cache is %.1f MB over its %.0f MB budget and cannot be brought under it without "
+            "evicting a protected cache (the current one, one mid-build, or one with no built_at). "
+            "Nothing was deleted. Raise RECALL_CACHE_BUDGET_MB, or remove a stale worktree."
+            % ((total - budget) / 1048576, budget_mb)
+        )
+        return out
+    for built_at, d, wt in plan:
+        if _remove_cache_dir(d):
+            out.append("evicted the least-recently-built cache: %s (built %s, %.1f MB)"
+                       % (wt, built_at, sizes[d] / 1048576))
+        else:
+            out.append("could NOT evict %s (built %s) — something in it is still open; its manifest "
+                       "was left in place so a later pass can retry" % (wt, built_at))
+    return out
+
+
 def read_manifest(dirp: pathlib.Path) -> dict | None:
     try:
         return json.loads((dirp / "manifest.json").read_text(encoding="utf-8"))
@@ -408,8 +538,13 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
     if fresh:
         return dirp, man, False
     built = build_cache(repo, dirp, files)
+    # Dead-worktree eviction FIRST and unconditionally — it is free correctness. The budget is a
+    # second pass over whatever survives, and both run only AFTER a successful build: a cache is
+    # replaceable only once its replacement exists.
     for wt in evict_dead_siblings(dirp):
         print(f"evicted the cache of a worktree that no longer exists: {wt}", file=sys.stderr)
+    for line in evict_over_budget(dirp, CONF.cache_budget_mb):
+        print(line, file=sys.stderr)
     return dirp, built, True
 
 

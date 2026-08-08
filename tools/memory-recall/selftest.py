@@ -471,6 +471,120 @@ def t_eviction():
         cleanup(root)
 
 
+# ---------------------------------------------------------------- the cache byte budget (V6)
+#
+# EVERY ARM BELOW RUNS AGAINST A BUDGET THE FIXTURE ACTUALLY EXCEEDS. A selftest-shaped cache is
+# ~57 KB, so under any plausible megabyte budget the pass never runs at all and "X survives" is true
+# for the wrong reason — three survival arms passing by finding nothing. The siblings are therefore
+# PADDED to known sizes and the budget is set between them, so each run has a real decision to make
+# and each survival is asserted alongside an eviction that did happen.
+
+
+def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False):
+    """A sibling cache of a known size, with a manifest this pass will actually read."""
+    d = caches / name
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "records.db").write_bytes(b"\0" * (kb * 1024))
+    (d / "chunks.db").write_bytes(b"")
+    man = {"worktree": worktree}
+    if built_at is not None:
+        man["built_at"] = built_at
+    (d / "manifest.json").write_text(json.dumps(man), encoding="utf-8")
+    if mid:
+        # MID-BUILD is "a database is NEWER than the manifest", which is true during any build —
+        # including a REBUILD, where the previous manifest sits on disk perfectly readable. That is
+        # the case the obvious "no readable manifest" predicate gets wrong.
+        later = os.path.getmtime(d / "manifest.json") + 60
+        os.utime(d / "records.db", (later, later))
+    return d
+
+
+def _budget_conf(mb: str) -> str:
+    return CONF + f'RECALL_CACHE_BUDGET_MB="{mb}"\n'
+
+
+@check("the cache budget evicts least-recently-built first and stops at the budget")
+def t_budget_lru():
+    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=400, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        new = _sib(caches, "newer", kb=100, built_at="2021-01-01T00:00:00+00:00", worktree=str(root))
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not old.exists(), "the oldest cache survived an over-budget run"
+        assert new.exists(), "eviction did not STOP once the tree was under budget"
+        assert cache_of(root).exists(), "the CURRENT worktree's cache was evicted"
+        assert "evicted the least-recently-built cache" in proc.stderr, "the eviction was silent"
+        assert "2020-01-01" in proc.stderr, "the report does not name what went"
+        return "oldest gone, newer kept, current kept, reported"
+    finally:
+        cleanup(root)
+
+
+@check("a mid-build and a built_at-less cache survive a run that DID evict something")
+def t_budget_protections():
+    root, kitdir = make_repo(conf=_budget_conf("0.5"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        mid = _sib(caches, "midbuild", kb=100, built_at="2019-01-01T00:00:00+00:00",
+                   worktree=str(root), mid=True)
+        ageless = _sib(caches, "ageless", kb=100, worktree=str(root))
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        # the eviction that proves the pass RAN — without it the three survivals below are vacuous
+        assert not old.exists(), "the pass did not run: nothing was evicted on an over-budget tree"
+        assert mid.exists(), "a MID-BUILD cache was evicted (and it was the oldest by built_at)"
+        assert ageless.exists(), "a cache with no built_at was evicted"
+        return "mid-build and ageless kept while the oldest evictable one went"
+    finally:
+        cleanup(root)
+
+
+@check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
+def t_budget_cannot_satisfy():
+    root, kitdir = make_repo(conf=_budget_conf("0.3"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=100, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        huge = _sib(caches, "ageless-huge", kb=800, worktree=str(root))   # protected, and the bulk
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert old.exists(), "an unsatisfiable budget still deleted an evictable cache"
+        assert huge.exists(), "an unsatisfiable budget reached past a protected cache"
+        assert "cannot be brought under it" in proc.stderr, "the shortfall was not reported"
+        assert "Nothing was deleted" in proc.stderr, "the report does not say the tree was left alone"
+        return "shortfall reported, tree untouched"
+    finally:
+        cleanup(root)
+
+
+@check("a blank RECALL_CACHE_BUDGET_MB runs no size-based eviction at all")
+def t_budget_blank():
+    root, kitdir = make_repo(conf=_budget_conf(""))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        old = _sib(caches, "oldest", kb=900, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert old.exists(), "a blank budget still evicted by size"
+        assert "least-recently-built" not in proc.stderr, "the size pass ran with a blank budget"
+        # ...and the SAME tree under a real budget does evict it, so the arm above is not passing
+        # because the fixture is under budget anyway.
+        (root / ".memory-tree.conf").write_text(_budget_conf("0.4"), encoding="utf-8", newline="\n")
+        proc2 = run(root, kitdir, *Q, "--rebuild")
+        assert not old.exists(), "the same tree under a real budget did not evict — the blank arm is vacuous"
+        assert "least-recently-built" in proc2.stderr
+        return "blank = uncapped, and the same tree evicts once a budget is set"
+    finally:
+        cleanup(root)
+
+
 def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
     """The Skill/hook surface, which make_repo leaves out because the query arms do not need it."""
     for n in names:
@@ -824,6 +938,7 @@ def main() -> int:
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
         t_conf_digest_both_directions, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
+        t_budget_lru, t_budget_protections, t_budget_cannot_satisfy, t_budget_blank,
         t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,

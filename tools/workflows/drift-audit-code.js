@@ -246,7 +246,7 @@ const VERDICT_SCHEMA = {
 
 phase('Verify')
 // <= MAX_VERIFIERS agents TOTAL. Batch size grows with the finding count; agent count never does.
-const batches = indexed.length ? chunk(indexed, Math.ceil(indexed.length / MAX_VERIFIERS)) : []
+const batches = indexed.length ? chunk(indexed, Math.ceil(indexed.length / MAX_VERIFIERS)) : [] // gov:fixed-verifiers
 const verdictBatches = await boundedParallel(
   batches.map((b, bi) => () =>
     agent(
