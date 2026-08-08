@@ -13,8 +13,27 @@
 # a commit from before those changes and the parity harness accepted a baseline it could not legally
 # compare against. The floor was not wrong about WHERE to look; the constant was wrong about WHEN.
 #
-# THE RULE. Over `<base>..HEAD`, if any added or removed line in the engine is not a comment and not
-# blank, `KIT_MEMORY_TREE_VERSION` must differ between the two ends.
+# THE RULE IS TOPOLOGICAL, not an endpoint comparison. Let W be the NEWEST commit in `<base>..HEAD`
+# that moves a behaviour-bearing line of the engine, and S the NEWEST commit in that range that
+# actually CHANGES the value of `KIT_MEMORY_TREE_VERSION`. Then W must be an ancestor of, or equal
+# to, S: the bump has to come at or after the last change it claims to date.
+#
+# WHY NOT THE ENDPOINTS. The first cut compared the constant at the two ends of the range, and that
+# is satisfied by a bump ANYWHERE in it — so a bump in commit 2 excused every verdict change in
+# commits 3..n. Reproduced: base(1.5) -> "bump + change"(1.6) -> "later change, no bump" read clean.
+#
+# WHY NOT PER-COMMIT. Measured on this repo's own history: 129 commits, 22 of which move a
+# behaviour-bearing line of the engine or its delegates, against 7 bumps that actually happened. A
+# per-commit rule would demand 22 — three times the churn — and a constant that increments on a fifth
+# of all commits stops meaning "the verdict epoch" and starts meaning "someone edited the file".
+# The topological rule asks for ONE bump per range, correctly placed. That is the same shape
+# `skills/session-kickoff/manifest-check.sh` check 5 already uses for its `last-audit` re-stamp, and
+# it is here because that rule is proven rather than because it is new.
+#
+# S IS VALIDATED, NOT MATCHED. A commit that touches the constant's LINE without changing its VALUE —
+# a comment reflow, a marker edit — is not a bump. Each candidate is confirmed by parsing the value
+# at the commit and at its parent, which is the same structural check manifest-check applies to its
+# own stamp, and for the same reason: a decoy edit must not be able to launder a change.
 #
 # IT OVER-COUNTS, DELIBERATELY. A rename or a whitespace-only refactor changes no verdict and still
 # demands a bump. That is the safe direction: the cost is three lines and a `--render`, and the
@@ -52,15 +71,21 @@ if [ -z "$BASE" ]; then
 fi
 git cat-file -e "$BASE^{commit}" 2>/dev/null || { echo "verdict-epoch: base '$BASE' is not a commit in this repo"; exit 2; }
 
-# Non-comment, non-blank added/removed lines in the engine. `git diff -U0` so context lines cannot be
-# mistaken for changes; the `+++`/`---` file headers are excluded by requiring a second character.
-moved=$(git diff -U0 "$BASE"..HEAD -- $SCAN \
-  | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | sed 's/^.//' \
-  | grep -vE '^[[:space:]]*(#|$)' | grep -c . || true)
+# Behaviour-bearing added/removed lines in ONE commit. `-U0` so context lines cannot be mistaken for
+# changes; the `+++`/`---` headers are dropped. A merge commit prints nothing here, which is right:
+# a merge introduces no line its parents did not already carry.
+behav_in() {  # $1=commit -> count
+  git diff-tree -U0 --no-commit-id -r -p "$1" -- $SCAN 2>/dev/null \
+    | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | sed 's/^.//' \
+    | grep -vE '^[[:space:]]*(#|$)' | grep -c . || true
+}
+verat() {  # $1=rev -> the constant's value at that rev ("" if absent/unparseable)
+  git show "$1:$ENGINE" 2>/dev/null | sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' | head -1
+}
 
-now=$(sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' "$ENGINE" | head -1)
-was=$(git show "$BASE:$ENGINE" 2>/dev/null | sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' | head -1)
-[ -n "$now" ] || { echo "verdict-epoch: cannot read KIT_MEMORY_TREE_VERSION from $ENGINE"; exit 2; }
+now=$(verat HEAD)
+was=$(verat "$BASE")
+[ -n "$now" ] || { echo "verdict-epoch: cannot read KIT_MEMORY_TREE_VERSION from $ENGINE at HEAD"; exit 2; }
 # An UNREADABLE old constant is not "it changed". The comparison below only fires when `was` is
 # non-empty, so a reader that stopped matching would silently excuse every future change — the
 # fail-open direction, in the gate whose whole job is to notice a constant that stopped being true.
@@ -72,20 +97,66 @@ if [ -z "$was" ] && git show "$BASE:$ENGINE" 2>/dev/null | grep -q 'KIT_MEMORY_T
   exit 2
 fi
 
-if [ "$moved" = 0 ]; then
-  echo "verdict-epoch: clean — the engine's behaviour-bearing lines are unchanged since ${BASE} (version $now; scanned $SCAN)"
+# W — the NEWEST commit in the range that moves a behaviour-bearing line. Walked newest-first rather
+# than taken from `rev-list -1`, because the newest commit TOUCHING the engine may have moved only
+# comments, and a comment is not a verdict.
+W=""; moved=0
+while IFS= read -r c; do
+  [ -n "$c" ] || continue
+  n=$(behav_in "$c")
+  if [ "$n" -gt 0 ]; then W="$c"; moved=$n; break; fi
+done <<EOF
+$(git rev-list "$BASE"..HEAD -- $SCAN 2>/dev/null)
+EOF
+
+if [ -z "$W" ]; then
+  echo "verdict-epoch: clean — no behaviour-bearing engine line moved since ${BASE} (version $now; scanned $SCAN)"
   exit 0
 fi
-# A base that predates the constant reads as empty; treat that as "it changed", since it did.
-if [ -n "$was" ] && [ "$was" = "$now" ]; then
-  echo "verdict-epoch: FAILED — $moved non-comment line(s) of the engine changed since $BASE, but"
-  echo "verdict-epoch: KIT_MEMORY_TREE_VERSION is $now at BOTH ends. The constant is what dates the"
-  echo "verdict-epoch: engine's verdicts — hygiene-parity.test.sh derives its baseline floor from it —"
-  echo "verdict-epoch: so leaving it still makes the floor point at a commit from before this change."
-  echo "verdict-epoch: Bump it in ALL THREE places, which must move together:"
+
+# S — the NEWEST commit in the range that actually CHANGES the constant's value. Candidates come from
+# a `-G` search: `-S` counts OCCURRENCES of a string, and `KIT_MEMORY_TREE_VERSION=` occurs exactly
+# once before and once after a bump, so the count never moves and the bump is never reported —
+# measured, the first cut found no bump at all. `-G` matches changed LINES, which is what a bump is;
+# manifest-check.sh uses -G on its own stamp for exactly this reason. Each candidate is then
+# VALIDATED against its parent: a commit that reflows the
+# comment on that line, or re-types the same number, touches it without dating anything.
+S=""
+while IFS= read -r cand; do
+  [ -n "$cand" ] || continue
+  cur=$(verat "$cand")
+  prev=$(verat "$cand^")
+  if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then S="$cand"; break; fi
+done <<EOF
+$(git log --format=%H -G'^KIT_MEMORY_TREE_VERSION=' "$BASE"..HEAD -- "$ENGINE" 2>/dev/null)
+EOF
+
+remedy() {
+  echo "verdict-epoch: Bump it in ALL THREE places, which must move together, in a commit at or after"
+  echo "verdict-epoch: ${W}:"
   echo "verdict-epoch:   $ENGINE (the constant AND the gov:kit marker on that same line)"
   echo "verdict-epoch:   tools/memory-tree/HYGIENE.template.md (line 1)"
   echo "verdict-epoch:   memory/HYGIENE.md (line 1) — then: bash tools/memory-tree/kit-dogfood-parity.test.sh --render"
+}
+
+if [ -z "$S" ]; then
+  echo "verdict-epoch: FAILED — $moved behaviour-bearing line(s) of the engine moved in $W, and NO"
+  echo "verdict-epoch: commit in ${BASE}..HEAD changes KIT_MEMORY_TREE_VERSION (still $now)."
+  echo "verdict-epoch: The constant is what dates the engine's verdicts — hygiene-parity.test.sh"
+  echo "verdict-epoch: derives its baseline floor from it — so leaving it makes that floor point at a"
+  echo "verdict-epoch: commit from before this change."
+  remedy
   exit 1
 fi
-echo "verdict-epoch: clean — $moved non-comment line(s) changed and the version moved ${was:-<absent>} -> $now"
+
+if ! git merge-base --is-ancestor "$W" "$S" 2>/dev/null; then
+  echo "verdict-epoch: FAILED — the bump is OLDER than the change it claims to date."
+  echo "verdict-epoch:   last behaviour-bearing engine change: $W ($moved line(s))"
+  echo "verdict-epoch:   last KIT_MEMORY_TREE_VERSION change:  $S"
+  echo "verdict-epoch: A bump anywhere in the range used to satisfy this gate, so one early bump"
+  echo "verdict-epoch: excused every verdict change after it. The bump has to come at or after the"
+  echo "verdict-epoch: last change, or the floor it feeds still points before that change."
+  remedy
+  exit 1
+fi
+echo "verdict-epoch: clean — $moved line(s) moved in $W and the version moved ${was:-<absent>} -> $now in $S"
