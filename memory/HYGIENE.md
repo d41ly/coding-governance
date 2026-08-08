@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@1.6 -->
+<!-- gov:kit memory-tree@1.7 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -227,6 +227,8 @@ Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
 `<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
 `.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
+`affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
+freshly-adopted map),
 `features/`, `generated/`; `README.md`,
 `FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
 entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two

@@ -222,6 +222,13 @@
     ]
   },
   {
+    "name": "codebase-map coverage + freshness",
+    "argv": [
+      "python3",
+      "tools/codebase-map/test_codebase_map.py"
+    ]
+  },
+  {
     "name": "settings-merge selftest",
     "argv": [
       "python3",

@@ -35,3 +35,13 @@ parallel-coding-governance*.md text eol=lf
 # checkout. The pin keeps the committed bytes deterministic anyway, and stops a future maintainer who
 # drops that `tr -d '\r'` from reintroducing memory-recall's green-by-accident failure.
 .claude/skills/drift-audit/SKILL.md text eol=lf
+
+# codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
+# generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
+# differs on EVERY line — the same green-only-right-after-a-render failure the memory-tree pins above
+# exist for. The conf is pinned because it is SOURCED BY BASH: a CRLF checkout leaves stray carriage
+# returns in every value on Linux.
+.codebase-map.conf text eol=lf
+memory/map/generated/* text eol=lf
+memory/map/baseline.toml text eol=lf
+memory/map/affordance-exempt.toml text eol=lf

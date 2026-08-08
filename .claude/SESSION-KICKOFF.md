@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-09T08:10:00+03:00 @ 3ed99a3369ad440a55bef430d6c21c73835b97d8
+last-audit: 2026-08-09T02:32:25+03:00 @ 647bfd9e6c774ba7475c57dbc0b6bb2cb1af87e8
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -29,7 +29,9 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
-- **Repo layout:** single checkout at the repo root (`C:/projects/coding-governance`); no worktree fan.
+- **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
+  worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
+  branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit ask.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
@@ -52,6 +54,16 @@ python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
 
+The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. Both CLIs
+below need `CODEBASE_MAP_ROOT` — without it they answer from an EMPTY corpus and say so in a way
+that reads like a real answer:
+
+```bash
+export CODEBASE_MAP_ROOT="$(git rev-parse --show-toplevel)"
+python tools/codebase-map/map_diff.py <old>..<new>          # Step 1: what a fast-forward brought in
+python tools/codebase-map/reuse_lookup.py "<behaviour>"     # Step 4 / §10: the seam to wire through
+```
+
 ### Tier rule
 
 Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
@@ -70,7 +82,10 @@ spec header's `streams` value (`STREAMS_CUTOFF` in `.memory-tree.conf` arms it).
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- *(none yet)*
+- *2026-08-09 · this file's own `last-audit` · the stamp read `2026-08-09T08:10:00+03:00` while the
+  node clock and every commit timestamp that day were ~6.5 h earlier, so it was hand-written ahead
+  rather than read. Re-stamped from `date`. A stamp whose rule is "always advances" enforces nothing
+  if it is typed; take it from the clock. Prune when a second audit has stamped from `date` cleanly.*
 
 ### Environment traps worth front-loading
 
@@ -110,6 +125,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
   2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
   and sweep TRACKED AND UNTRACKED files when repairing.
+- Every kit here installs under `tools/`, but the codebase-map kit resolves the repo root as its own
+  dir's GRANDPARENT — which is `tools/`, not the root. `adopt-codebase-map.sh` refuses to run at all
+  (it guards on `$ROOT/codebase-map`), and `reuse_lookup.py` / `map_diff.py` answer from an EMPTY
+  corpus while printing "no seam fits" and "mapped 0/N" — a confident answer with nothing behind it.
+  `tools/codebase-map/map_extractors.py` sets `CODEBASE_MAP_ROOT` for the entrypoints that import it
+  (gen_map + the gate); the other two need it exported. See `memory/map/features/codebase-map.md`.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=1.6   # gov:kit memory-tree@1.6 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=1.7   # gov:kit memory-tree@1.7 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -232,7 +232,7 @@ bm=""
 if [ -n "$MAP_SUB" ]; then
   m1=$(printf '%s\n' "$FILES" | grep "^$M/$MAP_SUB/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
   bm=$(printf '%s\n' "$m1" | grep . | while IFS= read -r e; do case "$e" in
-    F:README.md|F:FOUNDATION.md|F:baseline.toml|D:features|D:generated) ;;
+    F:README.md|F:FOUNDATION.md|F:baseline.toml|F:affordance-exempt.toml|D:features|D:generated) ;;
     *) echo "$M/$MAP_SUB/${e#*:}";; esac; done)
 fi
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
