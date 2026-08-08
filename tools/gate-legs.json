@@ -27,5 +27,8 @@
   { "name": "settings-merge selftest", "argv": ["python3", "tools/settings-merge.py", "--selftest"] },
   { "name": "memory-recall kit selftest", "argv": ["python3", "tools/memory-recall/selftest.py"] },
   { "name": "memory-recall skill wiring", "argv": ["bash", "tools/memory-recall/adopt-memory-recall.sh", "--check"] },
+  { "name": "drift-audit selftest", "argv": ["python", "tools/drift-audit/selftest.py"] },
+  { "name": "drift-audit wiring", "argv": ["bash", "tools/drift-audit/adopt-drift-audit.sh", "--check"] },
+  { "name": "drift-audit records", "argv": ["python", "tools/drift-audit/drift_report.py", "--check"] },
   { "name": "run-gates canary", "argv": ["bash", "tools/run-gates.test.sh"] }
 ]

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T06:18:56+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
+last-audit: 2026-08-08T06:35:56+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -41,14 +41,15 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 |---|---|---|
 | playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` (memory-tree · memory-recall · codebase-map · hooks · workflows · agent-instructions) |
+| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
 
 ```bash
+bash tools/run-gates.sh    # runs all legs, single-sourced from tools/gate-legs.json — read THAT for the list, not this line
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
-bash tools/run-gates.sh    # runs all legs (single-sourced from tools/gate-legs.json): hygiene · manifest ratchet · template-size · kit version markers · kit self-tests · agent-instructions wiring · memory-recall skill wiring · review-join ban + workflow-script syntax · run-gates canary
+python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
 
 ### Tier rule
