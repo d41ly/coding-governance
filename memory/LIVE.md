@@ -9,6 +9,7 @@ terminal status. Nothing here is edited by hand.
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aBatchedLintel-1/-2 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | DEPL-aDeployScout-1 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aGuardedTally-1 |
+| [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | TOOL-aPortableWarden-1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aQuarriedLantern-1..-3 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | TOOL-aWireWarden-1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | TOOL-bConvergentLodestar-1 |
