@@ -17,6 +17,7 @@ ARCH-bOrderlyAtlas-1.)
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
 | `check-memory-hygiene.sh` | the gate — 12 checks, grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
+| `corpus_ids.py` | the id + path classifier behind checks 13-16 (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; blank pins turn the unit off. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty, passing tree from the config (new projects). |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |

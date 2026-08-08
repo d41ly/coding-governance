@@ -24,6 +24,7 @@
 - TOOL-aFoldedQuarry-2 · U6 tier2-review.js joins findings to verdicts on an orchestrator-assigned INTEGER (Map), not an echoed file:line; agreeing repeat idempotent, disagreeing repeat -> UNVERIFIED; kept the kit's unverified/PARTIAL reporting; 2 new gates + 16-arm self-test
 - TOOL-aFoldedQuarry-3 · U1 flatten: builds/<slug>/ (no date/FAMILY), one append-only DECISIONS.md, backlog/<FAMILY>.md; discipline becomes the spec header's `streams` enum gated by STREAMS_CUTOFF; every retargeted selector asserts a NON-EMPTY population; kit 1.4->1.5
 - TOOL-aFoldedQuarry-4 · U2 retires gen-memory-tree.sh/TREE.md for gen_build_index.py: build status DERIVED from spec headers, rendered into each build README, LIVE.md and ledger/<month>.md; one source of truth per build (a `status:` key is legal ONLY when nothing is derivable)
+- TOOL-aFoldedQuarry-5 · U3 corpus_ids.py adds checks 13-16 (id collision, orphan waiver, 4-rule dead-path registry, read-path accounting); declares no grammar or set it does not own — grammar from memory-recall, the two sets asked of the shell; pins measured
 
 ## DEPL — deployer
 

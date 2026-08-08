@@ -1,0 +1,7 @@
+# id-orphan-waiver.txt — ids cited but never defined, deliberately. Shrink-only (ORPHAN_ID_PIN).
+# The four below are grandfathered builds whose only spec is a legacy-named recording with no
+# anchor line; each leaves this file when its build gains a conforming spec.
+DEPL-aDeployScout-1
+DEPL-aKitHardener-1
+KICK-aRatchetForge-1
+PLAY-aLeanRework-1

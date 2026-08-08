@@ -39,6 +39,15 @@ STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
 
 status=0
 FILES=$(git ls-files "$M/")
+
+# --- PRINT MODES: this script OWNS two sets that a sibling gate needs, and a transcription of
+# --- either is the drift class the kit exists to remove. `corpus_ids.py` ASKS instead of copying.
+# --- The dependency runs ONE WAY: these return before check 1, so nothing recurses back here.
+# --- The append-only set is check 2's exemption; the index set is check 6's byte-capped population.
+APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
+case "${1:-}" in
+  --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
+esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
 # Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
@@ -170,7 +179,8 @@ b3c=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/" | awk -F/ -v m="$M" '
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$b3b" "$b3c")
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
-  F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt|D:journal|D:in-flight) ;;
+  F:README.md|F:MEMORY.md|F:IN-FLIGHT.md|F:legacy-files.txt|F:curation-debt.txt) ;;
+  F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|D:journal|D:in-flight) ;;
   F:*.md) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
@@ -252,6 +262,7 @@ index_set() {
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
 INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
+case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
 
 # 6 — index size caps (grandfather: curation-debt.txt).
 # Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
@@ -563,6 +574,18 @@ case "$bad12_raw" in
 esac
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
+fi
+
+# 13-16 — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
+# walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
+# owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
+# classifier reads is measured per corpus, and blank pins turn the whole unit off.
+if [ "$STAGED" = 0 ]; then
+  _PY=python3; command -v python3 >/dev/null 2>&1 || _PY=python
+  if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
+    printf '%s
+' "$ids"; status=1
+  fi
 fi
 
 # grandfather stale-line guards (a listed path that no longer exists fails).

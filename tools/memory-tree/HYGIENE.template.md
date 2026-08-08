@@ -117,6 +117,29 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
     A `streams` segment is validated against the `DISCIPLINES` enum whenever present, on either tier,
     and is REQUIRED once the filename date reaches `STREAMS_CUTOFF`.
 
+13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
+    and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
+    "defined twice" is not the test; "claimed by two builds" is.
+14. **orphan ids** — an id cited but never defined fails unless listed in
+    `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
+    stale-entry guard: a waived id that now resolves is a stale row and reds.
+15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
+    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. Four rules:
+    (1) set equality between the registry and the measured set, keyed on `(citing-file, cited-path)`
+    with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
+    a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
+    (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
+16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
+    from the charter's own text through three token arms. The total stays under `READ_PATH_CEILING`
+    (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
+    `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
+
+Checks 13-16 live in `memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
+Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
+copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
+memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
+imported, and with a pin set and the kit absent the failure is NAMED, not a traceback.
+
 ## Codebase-map interop
 
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.

@@ -194,3 +194,75 @@ generated file that reds on every line on a Windows checkout, and passes only ri
 fixed-point arm, without which a renderer that emits CRLF is green on the run that wrote it and red
 forever after. `bash tools/run-gates.sh` — 23/23 green. A fresh `adopt-memory-tree.sh --scaffold`
 into an empty repo produces a hygiene-clean tree, verified by running it.
+
+## U3 — one id grammar, one walk, every consumer (spec `TOOL-aFoldedQuarry-5`, CLOSED)
+
+### What landed
+
+`tools/memory-tree/corpus_ids.py` classifies the corpus's ids and repo-path citations in one walk and
+adds four checks to the hygiene gate.
+
+| Check | What it catches |
+|---|---|
+| 13 | one id claimed by two different build folders |
+| 14 | an id cited but never defined — waiver, shrink-only pin, stale-entry guard |
+| 15 | a rooted repo-path citation that resolves to nothing — registry, four rules |
+| 16 | the charter's read path: total under a ceiling, every member under a byte cap or waived |
+
+It declares no grammar and no set it does not own. The id grammar comes from the memory-recall kit;
+the append-only areas and the byte-capped index set are ASKED of `check-memory-hygiene.sh`, which
+gained two print modes for the purpose. Upstream transcribed the index set into Python and had to
+guard the transcription in both directions; asking removes the class instead of guarding it.
+
+### The measurement, which is a deliverable and not a by-product
+
+| Quantity | Measured |
+|---|---|
+| ids defined | 29 |
+| ids cited | 33 |
+| orphan ids | 4 |
+| ids claimed by two build folders | 0 |
+| dead repo-path citations | 0 |
+| charter read path under `memory/` | 1 file, 3670 B |
+
+Pins: `ORPHAN_ID_PIN=4`, `DEAD_PATH_PIN=0`, `READ_PATH_CEILING=24150` (3670 + 20480 headroom). The
+four orphans are exactly the four grandfathered builds U2 also had to declare a status for, so the
+waiver shrinks as those gain conforming specs rather than sitting as permanent debt. A zero pin on an
+empty registry is not a vacuous check: the selector covers the whole present-tense corpus and finds
+nothing, so the next unresolving citation reds until it is registered or repaired.
+
+### Three findings that only measurement produced
+
+**Check 13 is not "defined twice".** The first reading made any id with two defining anchors a
+collision. Measured: ten ids in this corpus are anchored by a `DECISIONS.md` row AND by their spec's
+H1, which is the index pointing at the record and entirely correct. The test is "claimed by two BUILD
+FOLDERS", which is 0 here and fires the day two builds share an id.
+
+**Check 16's read path is scoped to the memory root.** Deriving it from every path the charter names
+produced 32 files and 308 KB — mostly gate scripts. Thirty of them would have needed waiving, and a
+rule whose population is almost entirely waived has no signal. Scoped to `MEMORY_ROOT` it is one file
+and 3670 B, and the byte caps it cross-references govern exactly that tree.
+
+**The orphan fixture was passing by finding nothing.** Its first cut put the orphan id in a backlog
+row — but `- <id> ·` IS an anchor, so the row DEFINED the id and the corpus had no orphan at all. The
+arm asserted a message that never appeared for a reason that had nothing to do with the rule.
+
+### Two environment traps paid for here
+
+`subprocess.run(["bash", …])` on this node resolves the System32 WSL launcher, not git-bash. WSL sees
+a different filesystem, so a path that plainly exists reports `No such file or directory` and a
+relative path resolves under `/mnt/c/`. `resolve_bash()` names the executable and skips the two known
+launchers by path; `GOV_BASH` overrides.
+
+`extract.repo_root()` anchors on the KIT's own file, deliberately, so no `chdir` can point its
+grammar at another tree. A caller classifying a different root got this repo's family alternation and
+therefore matched NOTHING — and a grammar that recognises nothing yields an empty classification,
+which is exactly what a clean corpus yields. The first selftest run reported a clean scratch corpus
+while using the wrong grammar. `extract.grammar_for(root)` is the accessor added for this, so there
+is still one grammar and it can now be bound to an explicit root.
+
+### Verification
+
+`python tools/memory-tree/corpus_ids.py --selftest` — 16 arms: every rule of checks 13-16 with a red
+and a green side, both directions of rule 1, the shrink-only pins, the stale waiver row, the missing
+charter, and the blank-pin off switch. `bash tools/run-gates.sh` — 24/24 green.

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T05:27:42+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
+last-audit: 2026-08-08T05:49:20+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -95,6 +95,10 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - `node --check <file>` is NOT a syntax gate on node v24: module auto-detection retries the parse and
   swallows the failure, so it exits 0 on a file whose parse genuinely fails. Parse a workflow script
   by constructing an `AsyncFunction` from it — `tools/workflows/check-workflow-syntax.js`.
+- `subprocess.run(["bash", …])` from Python resolves the SYSTEM32 WSL launcher on this node, not
+  git-bash. WSL sees a different filesystem: an existing path reports `No such file or directory` and
+  a relative path resolves under `/mnt/c/`. Name the executable — see `resolve_bash()` in
+  `tools/memory-tree/corpus_ids.py`; `GOV_BASH` overrides.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

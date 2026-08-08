@@ -40,6 +40,7 @@ import hashlib
 import json
 import pathlib
 import re
+import types
 import subprocess
 import sys
 from collections import defaultdict
@@ -290,15 +291,57 @@ def zero_record_diagnosis(
     )
 
 
-def anchor_at(line: str) -> str | None:
-    """Return the record id this line DEFINES, or None if it merely cites one."""
-    for pat in (A_HEADING, A_BOLD_LI, A_TABLE, A_DASH):
+def anchor_at(line: str, g=None) -> str | None:
+    """Return the record id this line DEFINES, or None if it merely cites one.
+
+    `g` is a grammar bundle from `grammar_for(root)`; omitted, it is this module's own, bound at
+    import to the repo the KIT lives in.
+    """
+    pats = (A_HEADING, A_BOLD_LI, A_TABLE, A_DASH) if g is None else g.anchors
+    id_re = ID_RE if g is None else g.ID_RE
+    for pat in pats:
         m = pat.match(line)
         if m:
-            found = ID_RE.search(m.group(0))
+            found = id_re.search(m.group(0))
             if found:
                 return found.group(0)
     return None
+
+
+class Grammar(types.SimpleNamespace):
+    """The id + anchor grammar bound to ONE resolved conf."""
+
+
+def grammar_for(root=None) -> Grammar:
+    """The same grammar, bound to an EXPLICIT repo root.
+
+    `repo_root()` deliberately anchors on THIS FILE, so the module-level constants above describe
+    the repo the kit is installed in and no `chdir` can move them. That is right for this module's
+    own CLI and wrong for a caller classifying a DIFFERENT tree — the id alternation would come from
+    the wrong repo and every id in the target would fail to match, silently, because a grammar that
+    recognises nothing yields an empty classification and an empty classification is what a clean
+    corpus yields. Measured: `corpus_ids.py`'s first selftest run reported a CLEAN scratch corpus
+    while using this repo's family list. One accessor, no second grammar.
+    """
+    if root is None:
+        return Grammar(ID=ID, ID_RE=ID_RE, anchors=(A_HEADING, A_BOLD_LI, A_TABLE, A_DASH),
+                       families=FAMILIES, memory_root=CONF.memory_root)
+    conf = recall_conf.resolve(pathlib.Path(root))
+    node = conf.node_tag_class
+    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+")
+    ident = r"(?:" + "|".join(conf.families) + r")-(?:" + "|".join(eras) + r")"
+    return Grammar(
+        ID=ident,
+        ID_RE=re.compile(r"\b" + ident + r"\b"),
+        anchors=(
+            re.compile(r"^#{2,6}\s+[`*]*(" + ident + r")\b"),
+            re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[-—:·]"),
+            re.compile(r"^\|\s*[`*]*(" + ident + r")\b[^|]*\|"),
+            re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[·|]"),
+        ),
+        families=conf.families,
+        memory_root=conf.memory_root,
+    )
 
 
 def heading_level(line: str) -> int | None:
