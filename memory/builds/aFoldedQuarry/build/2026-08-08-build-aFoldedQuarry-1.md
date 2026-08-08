@@ -71,3 +71,68 @@ join is gone.
 `bash tools/run-gates.sh` — 21/21 legs green, 1 skipped as unchanged. Three legs are new:
 the ban, the syntax gate, and the self-test. `tools/run-gates.test.sh` needed `node` added to its
 allowed launcher set, which is a deliberate widening recorded here rather than a quiet edit.
+
+## U1 — the flatten (spec `TOOL-aFoldedQuarry-3`, CLOSED)
+
+### What landed
+
+The discipline directory axis is gone from the kit and from this repo's tree. `memory/` now holds one
+append-only `DECISIONS.md`, per-family backlog shards under `backlog/`, and every build at
+`builds/<slug>/` — no date prefix, no family prefix. Which discipline a spec served is a `streams`
+value in its status header, validated against the closed `DISCIPLINES` enum whenever present and
+required once the filename date reaches `STREAMS_CUTOFF`.
+
+Tracked files under `memory/`: 86 before, 76 after. The delta is exactly the four discipline
+`README.md`, the four discipline `TREE.md`, three of the four `DECISIONS.md` (merged into one), one
+of the two `aPrunedCeremony` build READMEs (merged), and the two new records this unit wrote. No file
+was dropped.
+
+### One slug, two families
+
+`playbook/builds/2026-07-19-PLAY-aPrunedCeremony` and `tooling/builds/2026-07-19-TOOL-aPrunedCeremony`
+were ONE session under two disciplines. Flattening made that visible as a collision: two `README.md`
+and two pairs of `spec-…-1.md` / `spec-…-2.md` wanting the same names. They merged into
+`builds/aPrunedCeremony/`, which is the case the flatten exists for, and the recording grammar gained
+an OPTIONAL FAMILY qualifier — `<date>-<kind>-<FAMILY>-<slug>-<seq>.md` — over the CLOSED alternation
+from `FAMILIES`. A generic `[A-Z]+` there would have admitted a family that does not exist and made
+the rejection arm vacuous.
+
+### The finding that shaped the unit
+
+Six path selectors changed segment count at once. A selector left at the old count matches nothing,
+`grep … || true` yields empty, `[ -n "$bad" ]` is false, and the check prints nothing — which is
+exactly what a passing check prints. The gate would have gone green over an unlinted tree with no
+symptom at all.
+
+So every retargeted selector now asserts a NON-EMPTY population. The first draft of that guard was
+wrong in the opposite direction: it redded a freshly scaffolded tree, because a repo with no builds
+yet legitimately has an empty build population. Measured by running `adopt-memory-tree.sh --scaffold`
+into a scratch repo, not by reading the code. The guard therefore compares TWO granularities — a
+PRECONDITION that asks whether a file of that KIND exists anywhere under the memory root, and the
+POPULATION at the exact path the check expects. Equal-and-zero is a young tree. Precondition non-zero
+with an empty population is a mis-segmented selector, and only that reds. Both states are armed in
+the self-test, the half-migrated one built from the actual pre-flatten paths.
+
+### The kit/dogfood divergence nobody was watching
+
+`SPEC-TEMPLATE.template.md` — the file an adopter copies — still described a NINE-section canon and
+carried no `SPEC10_CUTOFF` section, while this repo's installed `memory/TEMPLATE-SPEC.md` and the
+gate had required TEN sections since 2026-08-04. An adopter would have installed a template the gate
+rejects. Nothing connected the two files, so nothing caught it.
+
+`tools/memory-tree/kit-dogfood-parity.test.sh` now does, as a gate leg: the shipped copies must equal
+the installed ones modulo one declared substitution — the `tools/` install prefix, since the kit
+ships tool-root-relative and an adopter chooses where the kits live. `--render` rewrites the shipped
+copies from the live ones. Its first run reported the whole tree as drift because it derived the
+prefix by string-stripping `git rev-parse --show-toplevel` (`C:/projects/…`) from `pwd`
+(`/c/projects/…`) — the two-spellings trap already recorded in the kickoff manifest, arriving in new
+code the same day it was read. Both sides now go through the same `cd … && pwd` chain.
+
+### Verification
+
+`bash tools/memory-tree/check-memory-hygiene.test.sh` — 64 assertions, up from 37. New arms: four
+streams arms (post-cutoff with and without the field, an illegal value, and a TIER-1 post-cutoff
+spec, which proves the check sits above the Tier-1 exit), the FAMILY-qualifier pair, the flat
+folder-name rejection, the backlog shard-name rejection, and the two empty-population arms.
+
+`bash tools/run-gates.sh` — 22/22 legs green, 1 skipped. The bar grew the kit/dogfood parity leg.

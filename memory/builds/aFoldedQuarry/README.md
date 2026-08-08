@@ -11,7 +11,7 @@ once as a tool, once as its first customer.
 | Unit | Sub-spec | What it does |
 |---|---|---|
 | U6 | [spec/units/2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md](spec/units/2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md) | Index-keyed verdict join in the Tier-2 review harness |
-| U1 | `spec-aFoldedQuarry-3-u1-flatten` — pending | Retire the discipline directory axis; keep the discipline signal |
+| U1 | [spec/units/2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md](spec/units/2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md) | Retire the discipline directory axis; keep the discipline signal |
 | U2 | `spec-aFoldedQuarry-4-u2-build-index` — pending | Generated build index replaces the authored tree |
 | U3 | `spec-aFoldedQuarry-5-u3-corpus-ids` — pending | One id grammar, one walk, every consumer |
 | U4 | `spec-aFoldedQuarry-6-u4-gotchas` — pending | Bug-class corpus + the reviewer checklist generator |

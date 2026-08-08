@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-08T04:49:52+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
+last-audit: 2026-08-08T05:11:52+03:00 @ 42c3f4dcc80631407440ae9d9858d4033e93c453
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -24,7 +24,8 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
 
 > - **Title / Goal / IN scope / OUT / Acceptance / Gates it must pass / Risk tier** — derived from
->   the `/session-kickoff` message + the adjacent memory (`memory/<discipline>/`) and the code.
+>   the `/session-kickoff` message + the adjacent memory (`memory/DECISIONS.md`, `memory/backlog/`,
+>   `memory/builds/<slug>/`) and the code.
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
@@ -32,16 +33,16 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit ask.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
-  (the playbook this repo follows + ships) · `memory/<discipline>/DECISIONS.md` + `BACKLOG.md`.
+  (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
 
 ### Pointer map (load the row(s) the task touches)
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/playbook/` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
-| kickoff (`KICK-`) | `memory/kickoff/` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/tooling/` | `tools/` (memory-tree · memory-recall · codebase-map · hooks · workflows · agent-instructions) |
-| deployer (`DEPL-`) | `memory/deployer/` | `WIRE-INTO-PROJECT.md` · `memory/deployer/builds/2026-07-12-DEPL-aDeployScout/` (research) |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
+| kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
+| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` (memory-tree · memory-recall · codebase-map · hooks · workflows · agent-instructions) |
+| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
 
@@ -59,7 +60,8 @@ Tier 1 (gates + one focused self-review).
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = node tag
 (`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Ledger:
-`memory/project/in-flight/<tag>.md`.
+`memory/project/in-flight/<tag>.md`. Build folders are `memory/builds/<slug>/`; the discipline is the
+spec header's `streams` value (`STREAMS_CUTOFF` in `.memory-tree.conf` arms it).
 
 ### Current posture — dated corrections
 

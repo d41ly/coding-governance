@@ -12,6 +12,13 @@
 # check-memory-hygiene.test.sh, which needs no baseline. Keep this committed so the NEXT collapse
 # pass can re-point it at its own base.
 #
+# The BASELINE MUST BE >= the 1.5 flatten. This harness asserts byte-identity, and the flatten
+# deliberately CHANGED what the engine says: comparing across it reports every difference as a
+# failure, which is true and useless. It is for behaviour-preserving rewrites only.
+#
+# Kit-versus-dogfood DOC parity is a different question with a different harness —
+# kit-dogfood-parity.test.sh, which IS a gate leg.
+#
 # Two corpora, because either alone is blind:
 #   arm 1  the REAL tracked memory tree with violations injected — real ordering, real population
 #   arm 2  pathological SHAPES no committed file has — where the subtle divergences actually live
@@ -105,7 +112,7 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
 specs=()
 while IFS= read -r f; do
   b=${f##*/}
-  [[ $b =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$ ]] || continue
+  [[ $b =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-([A-Z]+-)?[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md$ ]] || continue
   [ "${b:0:10}" \< "2026-07-15" ] && continue
   specs+=("$f")
 done < <(find memory -path '*/builds/*/spec/*' -name '*.md' | tr '\\' '/' | LC_ALL=C sort)
@@ -152,8 +159,8 @@ fi
 # §9 never follows. Shape 08 is the divergence upstream actually shipped a bug for.
 # =====================================================================================================
 say "-- arm 2: pathological shapes"
-R2="$TMP/shapes"; D=memory/tooling/builds/2026-08-01-TOOL-tShape/spec
-mkdir -p "$R2/$D/subspecs" "$R2/memory/project"
+R2="$TMP/shapes"; D=memory/builds/tShape/spec
+mkdir -p "$R2/$D/subspecs" "$R2/memory/project" "$R2/memory/backlog"
 cp "$CONF" "$R2/.memory-tree.conf"
 cd "$R2" || exit 2
 printf 'sentinel\n' > memory/HYGIENE.md
@@ -209,7 +216,7 @@ L=$(printf 'y%.0s' $(seq 1 320))
   # sides of the cap under the two readings of length(). Both engines must agree either way — this is
   # the only shape that catches an LC_ALL= prefix being added to the check-7 awk.
   printf -- '- TOOL-tShape-4 · OPEN · %s\n' "$(printf '·%.0s' $(seq 1 160))"
-} > memory/tooling/BACKLOG.md
+} > memory/backlog/TOOL.md
 git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
 git add -A && git commit -q -m shapes --no-verify
 

@@ -30,9 +30,10 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template + its two companions.
 - `tools/` — the deployable kits (copied into target repos).
 - `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
-- `memory/` — this repo's dogfooded memory tree (disciplines `playbook · kickoff · tooling · deployer`
-  + `project/`). Specs, reports, research, and reviews live under each discipline's `builds/`, NOT the
-  root. Version snapshots live in `memory/playbook/archive/`.
+- `memory/` — this repo's dogfooded memory tree, FLAT: `DECISIONS.md` · `backlog/<FAMILY>.md` ·
+  `builds/<slug>/` · `archive/` · `project/`. Specs, reports, research and reviews live under a
+  build's own folder, NOT the root. The `streams` enum is `playbook kickoff tooling deployer`.
+  Version snapshots live in `memory/archive/`.
 - `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
@@ -44,15 +45,18 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 | `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
-minted once per session. Decisions/backlogs live per discipline under `memory/<discipline>/`.
+minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
+`memory/backlog/<FAMILY>.md`. Builds live at `memory/builds/<slug>/` — the discipline is a `streams`
+value in each spec's status header, not a directory, so a build spanning two disciplines is one build.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (12 checks) — `tools/memory-tree/check-memory-hygiene.sh`
+- `memory/` hygiene (12 checks, kit 1.5 flat tree) — `tools/memory-tree/check-memory-hygiene.sh`
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
+- kit/dogfood doc parity — `tools/memory-tree/kit-dogfood-parity.test.sh` (the shipped `HYGIENE.template.md`/`SPEC-TEMPLATE.template.md` equal this repo's installed copies, modulo the `tools/` install prefix)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`, `python tools/memory-recall/selftest.py`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js`), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)

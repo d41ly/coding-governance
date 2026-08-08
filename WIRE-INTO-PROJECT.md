@@ -196,8 +196,8 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    # One throwaway record first: §3 step 2 scaffolds DECISIONS.md files that are header-only,
    # so a fresh tree has NO id for the record arm to anchor and this step cannot pass without
    # one. `<FAM>` is one of YOUR families; the corpus is tracked-only, hence the `git add`.
-   echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/<discipline>/DECISIONS.md
-   git add memory/<discipline>/DECISIONS.md
+   echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/DECISIONS.md
+   git add memory/DECISIONS.md
    python3 memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
    ```
    The header must now report **at least one record** — the seed. `index 0 records + N chunks`

@@ -55,21 +55,31 @@ _render_discipline() {  # $1 = discipline
 }
 
 _render_root() {
-  local f d
+  local f d n
   printf '%s\n' "$HEADER"
   printf '# %s/ — generated root tree index\n\n' "$M"
   printf '%s/\n' "$M"
-  for f in README.md TREE.md HYGIENE.md TEMPLATE-SPEC.md; do [ -f "$M/$f" ] && printf '  %s\n' "$f"; done
-  for d in project ${MAP_SUB:+$MAP_SUB} $DISCIPLINES; do
-    git ls-files "$M/$d/*" | grep -q . && printf '  %s/\n' "$d"
+  for f in README.md TREE.md HYGIENE.md TEMPLATE-SPEC.md DECISIONS.md; do [ -f "$M/$f" ] && printf '  %s\n' "$f"; done
+  for d in backlog builds decisions guides archive project ${MAP_SUB:+$MAP_SUB}; do
+    git ls-files "$M/$d/*" | grep -q . || continue
+    printf '  %s/\n' "$d"
+    # builds/ is depth-capped to the folder names; the rest list their direct children.
+    if [ "$d" = builds ]; then
+      _children "$M/builds" | while IFS= read -r n; do printf '    %s\n' "$n"; done
+    elif [ "$d" = backlog ]; then
+      _children "$M/backlog" | while IFS= read -r n; do printf '    %s\n' "$n"; done
+    fi
   done
 }
 
 _target() { [ "$1" = root ] && echo "$M/TREE.md" || echo "$M/$1/TREE.md"; }
 _render() { [ "$1" = root ] && _render_root || _render_discipline "$1"; }
 
+# FLAT (1.5): one generated index at the memory root. The per-discipline trees went away with the
+# discipline directories; leaving them in UNITS would make --check report four permanently missing
+# targets as drift, i.e. a red gate on every run.
 status=0
-UNITS="root $DISCIPLINES"
+UNITS="root"
 case "$MODE" in
   --write) for u in $UNITS; do _render "$u" > "$(_target "$u")"; done ;;
   --check)

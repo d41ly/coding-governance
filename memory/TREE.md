@@ -6,8 +6,26 @@ memory/
   TREE.md
   HYGIENE.md
   TEMPLATE-SPEC.md
+  DECISIONS.md
+  backlog/
+    DEPL.md
+    KICK.md
+    PLAY.md
+    TOOL.md
+  builds/
+    aBatchedLintel/
+    aDeployScout/
+    aFoldedQuarry/
+    aGuardedTally/
+    aKitHardener/
+    aLeanRework/
+    aLeasedGauntlet/
+    aPrunedCeremony/
+    aQuarriedLantern/
+    aRatchetForge/
+    aRuledParchment/
+    aWireWarden/
+    bConvergentLodestar/
+    bTamedTempest/
+  archive/
   project/
-  playbook/
-  kickoff/
-  tooling/
-  deployer/
