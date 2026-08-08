@@ -155,10 +155,22 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 
 ## The harness meta-gate
 
-Every `fail` BRANCH in the gate is either ARMED — a POSITIVE assertion in the test file naming a
-literal slice of that branch's OWN failure text — or listed in `project/unarmed-branches.txt`. The
-key is the CALL SITE `(check number, ordinal)`, never the check number, because one number can carry
-several branches and a number-keyed pin lets the cheapest arm hide the valuable one.
+Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
+test naming a literal slice of the branch's OWN failure text — or listed in
+`project/unarmed-branches.txt`. The POPULATION IS DISCOVERED: a tracked `*.sh` that DEFINES `fail()`
+and has `fail <n> "` call sites is a gate, and `<stem>.test.sh` beside it is its test; a missing
+sibling test is a named failure. `*.test.sh` is excluded, because a fixture that QUOTES a fail line
+would otherwise demand a `<stem>.test.test.sh` that will never exist.
+
+The key is `(gate, check number, ordinal)`. The gate is in the key because the PIN's keys are global
+and two gates both number their checks from 1 — measured, seven keys are claimed by both of this
+repo's gates. The ordinal is in the key because one number can carry several branches and a
+number-keyed pin lets the cheapest arm hide the valuable one.
+
+A branch's signature ends at the first UNESCAPED closing quote of its message. Capturing to end of
+line puts shell source into the signature for any branch written inline as `{ fail 2 "…"; ok=0; }`,
+and no assertion can ever emit that — the row becomes permanently unarmable inside a shrink-only
+pin.
 
 Three things do NOT arm a branch: a bare `check N` mention, an ABSENCE assertion, and a COMMENT. All
 three are "something in the file mentions it", which is not "something exercises it".
@@ -167,9 +179,12 @@ The pin is shrink-only and reds three ways: a pinned branch that is now armed, a
 no longer exists, and a signature the message was reworded out from under. It is EXCLUDED from its
 own scan — it holds each signature verbatim in order to name it.
 
-BOTH directions are pinned. `ARMS_BRANCH_FLOOR` catches a deleted guard; `ARMS_ARMED_FLOOR` catches
-an assertion dropped by WIDENING the pin, which a branch count alone cannot see because the count
-falls and the pin still holds.
+BOTH directions are pinned, PER GATE — `ARMS_FLOORS="<gate>:<branches>:<armed> …"`. The branch floor
+catches a deleted guard; the armed floor catches an assertion dropped by WIDENING the pin, which a
+branch count alone cannot see because the count falls and the pin still holds. Per-gate rather than
+aggregate: a total lets one gate's deletion be masked by another gate's addition, and goes slack by a
+whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
+the walk, so one bad gate cannot hide every other gate's findings.
 
 `tools/memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
 
