@@ -71,6 +71,12 @@
 - TOOL-aBatchedTribunal-6o · the epoch gate's ENGINE is not one file: checks 9 and 13-19 delegate to three Python modules, so 8 of 19 verdicts lived outside the diffed file. A no-base run now FAILS rather than exiting 0 — run-gates cannot tell a zero-status skip from a pass
 - TOOL-aBatchedTribunal-6p · the launcher ban only read column one, so `PY=$(resolve_python) || PY=python3`, `export PY=python3` and `PY="python3"` all passed — one of them two lines above a site the same commit had marked. Assignments are matched anywhere on the line now
 - TOOL-aBatchedTribunal-6q · an exemption arm must plant a line the rule DOES match, or `exempt` and `never matched` are the same observation. The resolver-block fixture used a `for c in python3 …` the predicate never matched; it uses a real assignment now, verified outside the block
+- TOOL-aBatchedTribunal-8 · W6 replaces the epoch gate's ENDPOINT comparison with the manifest ratchet's TOPOLOGICAL rule: the last behaviour-bearing engine commit W must be an ancestor of (or equal to) the last commit S that actually changes the constant's value
+- TOOL-aBatchedTribunal-8b · the trade the row called unmeasured, measured: over 129 commits, 22 move a behaviour-bearing engine or delegate line against 7 bumps that happened. Per-commit demands 22 — 3x the churn, and a constant moving that often stops meaning `epoch`
+- TOOL-aBatchedTribunal-8c · so the answer is ONE bump per range, correctly PLACED, not one per commit. That is `manifest-check.sh` check 5's shape verbatim, chosen because it is proven here rather than because it is new
+- TOOL-aBatchedTribunal-8d · `git log -S` counts OCCURRENCES, and `KIT_MEMORY_TREE_VERSION=` occurs once before and once after any bump — the count never moves, so the first cut found NO bump at all and reported the wrong failure. `-G` matches changed LINES, which is what a bump is
+- TOOL-aBatchedTribunal-8e · S is VALIDATED against its parent, not merely matched: rewording the comment ON the constant's line moves that line without dating anything, and an unvalidated candidate would let a reflow launder every later verdict change
+- TOOL-aBatchedTribunal-8f · W is the newest BEHAVIOUR-bearing commit, not the newest touching one — otherwise a trailing comment-only commit re-opens a range that was correctly dated
 
 ## DEPL — deployer
 

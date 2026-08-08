@@ -17,4 +17,4 @@
 - TOOL-aBatchedTribunal-3 · CLOSED · the parity floor tracked a constant that had stopped being true; the constant was wrong, not the floor — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-4 · CLOSED · `corpus_ids.py`'s shape filter was a tautology and could not be covered by any behavioural arm — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-5 · CLOSED · the launcher ban keyed on the retired idiom, so a BARE invocation carried nothing to match — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
-- TOOL-aBatchedTribunal-7 · OPEN · `check-verdict-epoch.sh` compares the constant at the two ENDPOINTS of a range, so once a bump lands every later engine change in that same range goes unchallenged; per-commit would be stricter but noisier, and the trade is unmeasured
+- TOOL-aBatchedTribunal-7 · CLOSED · the epoch gate's endpoint comparison let one early bump excuse every later change in the range — closed by TOOL-aBatchedTribunal-8 (W6); the record is in DECISIONS.md
