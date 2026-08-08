@@ -1,0 +1,4 @@
+# corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that
+# resolve to nothing. One row per (citing-file, cited-path), TAB-separated:
+#   <citing-file>	<cited-path>	<occurrences>	<absent|moved:DEST>
+# Measured 0 at DEAD_PATH_PIN=0, so this file is empty and the pin is a ratchet.

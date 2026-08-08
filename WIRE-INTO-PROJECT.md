@@ -114,7 +114,8 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
    bash memory-tree/adopt-memory-tree.sh --scaffold
    bash memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
    ```
-   The scaffold writes `memory/` with the discipline folders, `TREE.md`, and `project/` — including the
+   The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, the generated `LIVE.md`, and
+   `project/` — including the
    **sharded in-flight ledger**: `project/IN-FLIGHT.md` (a pointer stub) + `project/in-flight/` (per-node files).
 3. Wire the gate in all three places:
    - **CI:** a job running `bash memory-tree/check-memory-hygiene.sh` (no args = full check, incl. TREE drift).
@@ -129,7 +130,8 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
      ```
    - **`.gitattributes`** (Windows-determinism for check 9) — add:
      ```
-     memory/**/TREE.md text eol=lf
+     memory/LIVE.md text eol=lf
+     memory/ledger/*.md text eol=lf
      memory/project/legacy-files.txt text eol=lf
      memory/project/curation-debt.txt text eol=lf
      ```
@@ -196,8 +198,8 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    # One throwaway record first: §3 step 2 scaffolds DECISIONS.md files that are header-only,
    # so a fresh tree has NO id for the record arm to anchor and this step cannot pass without
    # one. `<FAM>` is one of YOUR families; the corpus is tracked-only, hence the `git add`.
-   echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/<discipline>/DECISIONS.md
-   git add memory/<discipline>/DECISIONS.md
+   echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/DECISIONS.md
+   git add memory/DECISIONS.md
    python3 memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
    ```
    The header must now report **at least one record** — the seed. `index 0 records + N chunks`

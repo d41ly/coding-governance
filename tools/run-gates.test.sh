@@ -20,11 +20,11 @@ except Exception as e:
     print("canary: gate-legs.json does not parse: %s" % e); sys.exit(1)
 if not isinstance(legs, list) or not legs:
     print("canary: gate-legs.json is empty or not a list"); sys.exit(1)
-ok = {"bash", "python", "python3"}
+ok = {"bash", "python", "python3", "node"}   # node joined with the workflow-script gates (U6)
 bad = [l.get("name", "?") for l in legs
        if not str(l.get("name", "")).strip() or not l.get("argv") or len(l["argv"]) < 2 or l["argv"][0] not in ok]
 if bad:
-    print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3}): " + ", ".join(bad)); sys.exit(1)
+    print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' || fail=1
 
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —

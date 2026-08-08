@@ -10,7 +10,7 @@ machines/sessions on the same repo.
 
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
   ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
-  snapshots live under `memory/playbook/archive/`. Two companions ship with it:
+  snapshots live under `memory/archive/`. Two companions ship with it:
   **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and
   **`.domain-rules.md`** (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references
   by §-stub — copy it alongside the template into a target repo).
@@ -26,10 +26,13 @@ machines/sessions on the same repo.
   `manifest-check.sh` gate (placeholders · block parse · anchor sha · tracked anchors ·
   topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
   read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
-  history: `memory/kickoff/builds/2026-07-12-KICK-aRatchetForge/`.
-- **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree (disciplines,
-  per-feature `builds/` folders, index budgets + rotation, status vocabulary, a 12-check hygiene
-  gate). Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
+  history: `memory/builds/aRatchetForge/`.
+- **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree: a FLAT
+  `builds/<slug>/` per unit of work, one append-only `DECISIONS.md`, per-family backlog shards, index
+  budgets + rotation, status vocabulary, and a 12-check hygiene gate. The discipline is a `streams`
+  value in each spec's status header, not a directory, so a build spanning two disciplines is one
+  build. Every check that has a population asserts that population is NON-EMPTY, because a
+  mis-segmented path selector prints nothing and nothing is what a passing check prints. Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
   across repos. Scaffold a fresh tree with `adopt-memory-tree.sh --scaffold`, or migrate an existing
   one in a single landing. See `tools/memory-tree/README.md`. Operationalizes the playbook's §5/§6.
 - **`tools/pytest-parallel-guardrails/`** — bounded, attributable pytest-xdist runs: the four-knob
@@ -53,7 +56,12 @@ machines/sessions on the same repo.
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth; ~7–9 agents, never >6 concurrent). Run via `Workflow({scriptPath})`, parameterized
-  by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction.
+  by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to
+  their verdicts on an INTEGER the orchestrator assigns before the skeptic sees them — a `file:line`
+  string cannot survive an echo, and two findings at one location cannot share a verdict. A finding
+  with no usable verdict is UNVERIFIED, never refuted, and rides into the report as outstanding.
+  Two gates guard it: `check-review-join.sh` (no ref-keyed join anywhere under `tools/`) and
+  `check-workflow-syntax.js` (every workflow script still parses in the dialect its runtime uses).
 
 ## Install the skill (once per machine)
 

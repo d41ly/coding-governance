@@ -11,9 +11,11 @@ tools/gate-legs.json text eol=lf
 .githooks/pre-commit text eol=lf
 .githooks/pre-push text eol=lf
 
-# memory-tree determinism (this repo dogfoods the kit): its generated TREE.md + the two ratchet
-# manifests are LF-pinned so a Windows autocrlf checkout can't spuriously fail hygiene check 9.
-memory/**/TREE.md text eol=lf
+# memory-tree determinism (this repo dogfoods the kit). Hygiene check 9 byte-compares the generated
+# build index against a fresh LF render, so an unpinned generated file on a Windows checkout differs
+# on EVERY line — red on a file nobody touched, and green only right after a render. Pin them.
+memory/LIVE.md text eol=lf
+memory/ledger/*.md text eol=lf
 memory/project/legacy-files.txt text eol=lf
 memory/project/curation-debt.txt text eol=lf
 

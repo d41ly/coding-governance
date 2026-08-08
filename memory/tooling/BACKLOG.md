@@ -1,8 +1,0 @@
-# tooling backlog
-
-> Mutable. Each row leads with one status token (OPEN…WONTDO).
-- TOOL-aRuledParchment-2 · OPEN · check 5 does not govern nested spec/<sub>/ free-named files (check 12 scans nested DATED names only) — widening needs a grandfather story → builds/2026-07-15-TOOL-aRuledParchment/
-- TOOL-bThriftyBellows-2 · DEFERRED · gen-memory-tree.sh single-pass generator (one git ls-files -> all TREE files in one awk) is the only remaining big-tree win for check 9; cache-and-grep measured SLOWER than per-call git ls-files (mmap index reads win) — do not retry that shape.
-- TOOL-aQuarriedLantern-2 · OPEN · converge the three divergent python-launcher detectors (run-gates.sh, check-wiring.sh, codebase-map/adopt-codebase-map.sh) onto one resolver that EXECUTES the candidate — none catches the MS-Store python3 stub (answers command -v, exits 9009)
-- TOOL-aQuarriedLantern-3 · OPEN · memory-recall ships no per-worktree cache cap and no LRU on built_at; measured upstream ~115 MiB per LIVE worktree (552.6 MiB over 5 dirs, only 37.9% evictable) — revisit if an adopter git dir grows
-- TOOL-aBatchedLintel-2 · OPEN · the §9 rev-scan awk has no /^## /{f=0} reset, so a heading after §9 on a NON-conforming spec inflates the high-water (reproduced 99 vs 1); adding it is a VERDICT change so it needs its own unit + fixture -> builds/2026-08-03-TOOL-aBatchedLintel/

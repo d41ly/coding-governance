@@ -1,9 +1,12 @@
-<!-- gov:kit memory-tree@1.4 -->
+<!-- gov:kit memory-tree@1.5 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
-It holds append-only decision logs, per-build folders, session machinery, and long-lived guides —
-organised by development discipline (the disciplines your repo-root `.memory-tree.conf` declares).
+It holds one append-only decision log, per-build folders, session machinery, and long-lived guides.
+The tree is FLAT: the discipline is a SIGNAL, not a directory. Which discipline a build served is
+declared in each spec's status header as `streams <value>[+<value>]`, over the closed enum your
+repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two disciplines is one
+build, in one folder.
 This file is the rule set; the single mechanical enforcement is `tools/memory-tree/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
 script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
@@ -13,27 +16,27 @@ script is the law, this doc explains it. (Replace `memory/` throughout with your
 ```
 memory/
 ├── README.md              root index (one-liners)
-├── TREE.md                generated directory tree (tools/memory-tree/gen-memory-tree.sh)
+├── LIVE.md                GENERATED — builds with a non-terminal unit (tools/memory-tree/gen_build_index.py)
+├── ledger/<YYYY-MM>.md    GENERATED — one row per build opened that month; freezes when the month passes
 ├── HYGIENE.md             this file
 ├── TEMPLATE-SPEC.md       the canonical spec/design-pass format (check 12; ships with the kit)
-├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes, 2 ratchet manifests
-└── <discipline>/          one per DISCIPLINES entry
-    ├── README.md          structure explainer (+ an optional SWEBOK KA tag)
-    ├── TREE.md            generated index
-    ├── DECISIONS.md       append-only decision index
-    ├── BACKLOG.md         mutable backlog (status-vocabulary rows)
-    ├── decisions/         decision detail (append-only area files)
-    ├── guides/            long-lived reference guides
-    ├── archive/           rotated indexes + legacy material a build can't claim
-    └── builds/YYYY-MM-DD-<FAMILY>-<slug>/
-        ├── README.md · STATUS.md       (required only when >3 files / multi-item)
-        ├── prompts/ · spec/ · build/ · reviews/   (YYYY-MM-DD-<kind>-<slug>-<seq>.md)
+├── DECISIONS.md           append-only decision index, EVERY family, grouped for reading
+├── backlog/<FAMILY>.md    mutable backlog, one shard per id family (status-vocabulary rows)
+├── decisions/             decision detail (append-only area files)
+├── guides/                long-lived reference guides
+├── archive/               rotated indexes + legacy material a build can't claim
+├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes
+└── builds/<slug>/
+    ├── README.md · STATUS.md       (required only when >3 files / multi-item)
+    └── prompts/ · spec/ · build/ · reviews/   (<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md)
 ```
 
-`<FAMILY>` is the discipline's id family from `.memory-tree.conf` (`architecture:ARCH …`). Ceremony is
-conditional: subfolders exist only when non-empty; a single-file build is one spec file plus its backlog
-row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only inside `builds/*/build/`,
-`guides/`, and `archive/`.
+`<FAMILY>` is a stream's id family from `.memory-tree.conf` (`architecture:ARCH …`). A build folder is
+named for its SLUG alone — no date, no family. A recording filename MAY carry the family as an
+optional qualifier, which is how one slug shared by two families survives in a single folder.
+Ceremony is conditional: subfolders exist only when non-empty; a single-file build is one spec file
+plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only inside
+`builds/*/build/`, `guides/`, and `archive/`.
 
 ## Rules
 
@@ -42,17 +45,22 @@ row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only 
 2. **No instance-specific / secret content** in core memory — scrub throwaway dev creds before mirroring a note.
 3. **Archive-or-file on landing.** DECISIONS.md is the durable home. Delete cold journals; file a
    feature's plan/review writeups into its `builds/` folder; a file's own "NOT merged" status prose rots.
-4. **No broken relative links** outside the append-only logs (`*/DECISIONS.md`, `decisions/`), `archive/`
-   (dead pointers allowed by design), generated `TREE.md`, and migrated recording files listed in `legacy-files.txt`.
+4. **No broken relative links** outside the append-only log (`DECISIONS.md`, `decisions/`), `archive/`
+   (dead pointers allowed by design), and migrated recording files listed in `legacy-files.txt`. The
+   generated index files are NOT exempt: their rows link to build READMEs, and a link that stops
+   resolving is exactly the drift they exist to prevent.
+5. **A check never selects an empty population.** A path selector that matches nothing prints nothing,
+   and nothing is what a passing check prints. Every selector over a population a real tree has
+   asserts it is non-empty, so a mis-segmented path fails loudly instead of disarming its check.
 
 ## Index budgets, caps, rotation
 
-- **Entry budget:** every entry in an index (`DECISIONS.md`, `BACKLOG.md`, `MEMORY.md`, `STATUS.md`,
-  root/discipline `README.md` lists) is ONE physical line, ≤ 300 chars. Detail lives in the build folder
-  or decision file the line points at. `TREE.md` (generated), `IN-FLIGHT.md`, and the per-node ledger
-  files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry budget; the per-node
-  files still carry the 20 KB file cap.
-- **File caps:** index + tree files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
+- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `MEMORY.md`,
+  `STATUS.md`, `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300
+  chars. Detail lives in the build folder or decision file the line points at. `IN-FLIGHT.md` and the
+  per-node ledger files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry
+  budget; the per-node files still carry the 20 KB file cap.
+- **File caps:** index + generated files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
@@ -80,33 +88,110 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
-   `TREE.md`, and `legacy-files.txt`-listed recordings).
-3. **structure lint** — the `memory/` root and each discipline root hold only the sanctioned set;
-   `decisions/ guides/ archive/ journal/ in-flight/` contents are unconstrained; `builds/` shape is check 4.
-4. **build-folder naming** — `builds/*` matches `YYYY-MM-DD-<FAMILY>-<slug>` with FAMILY paired to its
-   discipline; inside a build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose
-   recording-named `.md`; non-md only in `build/`.
-5. **recording-file naming** — files under the four subfolders match `YYYY-MM-DD-<kind>-<slug>-<seq>.md`,
-   kind matching subfolder (grandfather: `legacy-files.txt`).
+   and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
+3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
+   `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/ journal/ in-flight/`
+   contents are unconstrained; `builds/` shape is check 4.
+4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
+   build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose recording-named
+   `.md`; non-md only in `build/`.
+5. **recording-file naming** — files under the four subfolders match
+   `<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md`, kind matching subfolder, family from the closed
+   `FAMILIES` alternation (grandfather: `legacy-files.txt`).
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
-8. **status vocabulary** — BACKLOG/STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
-9. **tree drift** — `tools/memory-tree/gen-memory-tree.sh --check` must be clean.
+8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
+9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
+   DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
+   column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
+   README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
+   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
 10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
     (any depth under `spec/`) carry the `**Status:**` header (token · rev · date · node · tier ·
-    base sha); Tier-2 adds exactly the nine canonical `##` sections, non-empty bodies,
+    base sha); Tier-2 adds exactly the canonical `##` sections, non-empty bodies,
     header-rev-in-§9 parity, and a resolved §8 before CLOSED/WONTDO; both tiers reject skeleton
     placeholders and a bare WONTDO tail (`TEMPLATE-SPEC.md`). Older specs grandfathered by filename date.
+    A `streams` segment is validated against the `DISCIPLINES` enum whenever present, on either tier,
+    and is REQUIRED once the filename date reaches `STREAMS_CUTOFF`.
+
+13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
+    and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
+    "defined twice" is not the test; "claimed by two builds" is.
+14. **orphan ids** — an id cited but never defined fails unless listed in
+    `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
+    stale-entry guard: a waived id that now resolves is a stale row and reds.
+15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
+    resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. Four rules:
+    (1) set equality between the registry and the measured set, keyed on `(citing-file, cited-path)`
+    with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
+    a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
+    (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
+16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
+    from the charter's own text through three token arms. The total stays under `READ_PATH_CEILING`
+    (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
+    `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
+
+Checks 13-16 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
+Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
+copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
+memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
+imported, and with a pin set and the kit absent the failure is NAMED, not a traceback.
+
+17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
+18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
+    words that it has none. Silence is not acceptable: "no gate named" and "gate not yet written" are
+    indistinguishable from outside, and the second one quietly never happens.
+19. **the record can actually fire** — a class record derives at least one anchor or is marked
+    `universal`, and a record whose anchors reach ONLY the append-only tree is reported as INERT:
+    reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
+    because every universal record is emitted on EVERY reviewer's checklist.
+
+## The harness meta-gate
+
+Every `fail` BRANCH in the gate is either ARMED — a POSITIVE assertion in the test file naming a
+literal slice of that branch's OWN failure text — or listed in `project/unarmed-branches.txt`. The
+key is the CALL SITE `(check number, ordinal)`, never the check number, because one number can carry
+several branches and a number-keyed pin lets the cheapest arm hide the valuable one.
+
+Three things do NOT arm a branch: a bare `check N` mention, an ABSENCE assertion, and a COMMENT. All
+three are "something in the file mentions it", which is not "something exercises it".
+
+The pin is shrink-only and reds three ways: a pinned branch that is now armed, a pinned branch that
+no longer exists, and a signature the message was reworded out from under. It is EXCLUDED from its
+own scan — it holds each signature verbatim in order to name it.
+
+BOTH directions are pinned. `ARMS_BRANCH_FLOOR` catches a deleted guard; `ARMS_ARMED_FLOOR` catches
+an assertion dropped by WIDENING the pin, which a branch count alone cannot see because the count
+falls and the pin still holds.
+
+`tools/memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
+
+## The bug-class catalogue
+
+One authored record per class under `gotchas/`, front matter `name` + `description` (+ optional
+`kind` and `universal`) at COLUMN 0 — an indented key is dropped without a word by any simple parser,
+so it is a named error here. ANCHORS ARE DERIVED, not declared: a record's anchors are the
+backtick-quoted path-like tokens in its body, because an authored list is a second copy of what the
+body already says. Derivation over-selects rather than under-selects, and a record naming no path is
+REPORTED as unanchored rather than silently never firing.
+
+Hand a reviewer the classes their diff can hit:
+
+```bash
+python tools/memory-tree/gotchas.py --for-diff <base>..<head>
+```
+
+Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
 
 ## Codebase-map interop
 
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
 `<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
 `.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
-`features/`, `generated/`; the map dir appears in the root TREE.md render; `README.md`,
+`features/`, `generated/`; `README.md`,
 `FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
 entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
 dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's

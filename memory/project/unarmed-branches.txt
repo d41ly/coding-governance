@@ -1,0 +1,13 @@
+# unarmed-branches.txt — `fail` branches with no positive assertion naming their own
+# failure text. SHRINK-ONLY: a row leaves when its branch gains an arm, and check-arms
+# reds if a pinned branch is armed, if a pinned branch disappears, or if a message is
+# reworded out from under its signature. Fields: check<TAB>ordinal<TAB>signature.
+1	1	prompt-kind files outside builds/*/prompts/ or archive/
+2	1	broken relative .md links
+6	1	index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it)
+8	1	backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)
+9	1	generated build index differs from a fresh render
+10	1	rotated archives not referenced from their live index (lines 1-3)
+11	1	/ is the only sanctioned memory root
+5	2	legacy-files.txt lists paths that no longer exist (stale-line guard)
+6	2	curation-debt.txt lists paths that no longer exist (stale-line guard)

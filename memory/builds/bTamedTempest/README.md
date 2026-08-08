@@ -1,0 +1,23 @@
+---
+slug: bTamedTempest
+node: b
+opened: 2026-07-16
+streams: tooling
+roster: TOOL
+ids: TOOL-bTamedTempest-1
+---
+
+# bTamedTempest — pytest-parallel-guardrails kit 1.0 — bounded, attributable xdist runs
+
+Node `b` · opened 2026-07-16 · streams tooling.
+
+Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+GENERATED from the status header of every spec in this folder — do not hand-edit it.
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 1 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bTamedTempest-1
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-bTamedTempest-1 — pytest-parallel-guardrails kit: bounded, attributable parallel test runs](spec/2026-07-16-spec-bTamedTempest-1.md) | CLOSED | rev-2 | 2026-07-16 |
+<!-- /gen:build-index -->

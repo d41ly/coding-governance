@@ -1,8 +1,8 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.0', // gov:kit tier2-review@1.0 — engine identity (deployed verbatim; this field is the deployer's version marker)
+  version: '1.1', // gov:kit tier2-review@1.1 — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
-    'Consolidated, concurrency-capped (≤6) Tier-2 adversarial review: find → batched-verify → synth. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
+    'Consolidated, concurrency-capped (≤6) Tier-2 adversarial review: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Find', detail: '4 finder lenses, one wave, ≤6 concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in BATCHES, ≤6 concurrent' },
@@ -99,6 +99,13 @@ const FINDING_SCHEMA = {
   },
 }
 
+// U6 (TOOL-aFoldedQuarry-2): the join key is an INTEGER the ORCHESTRATOR assigns, never a string the
+// skeptic reproduces. Two defects died with the old `ref` key. (a) Echo drift — a re-wrapped path, a
+// re-derived line number or a trailing space missed the join, and the finding fell out of the count.
+// (b) COLLISION — two findings at one file:line are entirely normal when two lenses read the same
+// function, and a plain `map[v.ref] = v` collapsed them so BOTH inherited whichever verdict landed
+// last. A model can echo a small integer reliably; it cannot re-type a path byte-identically, and an
+// integer cannot collide with another finding's.
 const VERDICT_SCHEMA = {
   type: 'object',
   required: ['verdicts'],
@@ -107,9 +114,9 @@ const VERDICT_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['ref', 'verdict', 'reason'],
+        required: ['id', 'verdict', 'reason'],
         properties: {
-          ref: { type: 'string' }, // "file:line"
+          id: { type: 'integer' }, // the orchestrator-assigned finding id, echoed back
           verdict: { type: 'string', enum: ['confirmed', 'refuted'] },
           reason: { type: 'string' },
         },
@@ -163,8 +170,11 @@ const finderResults = await boundedParallel(
 // lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
 const liveResults = finderResults.filter(Boolean)
 const lensesDead = LENSES.length - liveResults.length
+// `ref` is DISPLAY ONLY from here on — it rides the prompts and the report lines and is never a map
+// key. `id` is assigned once, after every lens has returned, and is the only join key.
 const allFindings = liveResults
   .flatMap((r) => (r.findings || []).map((f) => ({ ...f, ref: `${f.file}:${f.line}` })))
+  .map((f, i) => ({ ...f, id: i + 1 }))
 
 if (lensesDead === LENSES.length) {
   log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed.`)
@@ -193,10 +203,12 @@ const verdictResults = await boundedParallel(
       `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n` +
         `Findings to judge:\n` +
         group
-          .map((f, i) => `${i + 1}. [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact}`)
+          .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact}`)
           .join('\n') +
-        `\n\nReturn JSON {verdicts:[{ref:"file:line", verdict:"confirmed"|"refuted", reason}]} — one verdict per finding above, ref copied EXACTLY.`,
-      { label: `verify:batch${gi + 1}`, phase: 'Verify', schema: VERDICT_SCHEMA },
+        `\n\nReturn JSON {verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason}]}. ` +
+        `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
+        `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
+      { label: `verify:ids-${group[0].id}-${group[group.length - 1].id}`, phase: 'Verify', schema: VERDICT_SCHEMA },
     ),
   ),
 )
@@ -208,56 +220,86 @@ const verdictResults = await boundedParallel(
 // absence scored as a negative result. A finding nobody judged is UNVERIFIED, never refuted.
 const liveVerdicts = verdictResults.filter(Boolean)
 const skepticsDead = verdictResults.length - liveVerdicts.length
-const verdictByRef = {}
-for (const r of liveVerdicts) for (const v of r.verdicts || []) verdictByRef[v.ref] = v
+// U6: a Map keyed on the assigned integer, populated ONLY for an id this run actually handed out.
+// Three degraded shapes get their own counter instead of silently rewriting a verdict:
+//   spurious   — an id nobody assigned (a hallucinated or renumbered verdict); ignored, counted.
+//   duplicate  — a repeat that AGREES with the standing verdict; idempotent, counted.
+//   conflict   — a repeat that DISAGREES; the finding is demoted to UNVERIFIED, because "two
+//                skeptics said opposite things" is precisely the state where this harness does not
+//                know. Last-write-wins here is the collision class this unit exists to kill.
+const assignedIds = new Set(allFindings.map((f) => f.id))
+const verdictById = new Map()
+const conflicts = new Set()
+let duplicates = 0
+let spurious = 0
+for (const r of liveVerdicts)
+  for (const v of r.verdicts || []) {
+    if (!Number.isInteger(v.id) || !assignedIds.has(v.id)) { spurious++; continue }
+    const prev = verdictById.get(v.id)
+    if (!prev) { verdictById.set(v.id, v); continue }
+    if (prev.verdict === v.verdict) duplicates++
+    else conflicts.add(v.id)
+  }
+for (const id of conflicts) verdictById.delete(id)
 
-const confirmed = allFindings.filter((f) => verdictByRef[f.ref]?.verdict === 'confirmed')
-const refuted = allFindings.filter((f) => verdictByRef[f.ref]?.verdict === 'refuted')
-const unverified = allFindings.filter((f) => !verdictByRef[f.ref])
+const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
+const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted')
+const unverified = allFindings.filter((f) => !verdictById.has(f.id))
 // precision is confirmed/(confirmed+refuted): an unjudged finding is not evidence either way.
 const judged = confirmed.length + refuted.length
 const precision = judged ? confirmed.length / judged : 0
 if (unverified.length)
-  log(`WARNING: ${unverified.length} finding(s) came back with NO verdict — counted UNVERIFIED, not refuted.`)
+  log(`WARNING: ${unverified.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${unverified.map((f) => f.id).join(', ')}`)
+if (conflicts.size)
+  log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
+if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
+if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
 if (skepticsDead)
   log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
-if (judged === 0)
-  return {
-    confirmed: [], report: null, precision: null, root: repo,
-    lensesRun: liveResults.length, lensesDead, skepticsDead,
-    unverified: unverified.length,
-    note: `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died)`,
-  }
 log(
   `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} — precision ${precision.toFixed(2)}` +
-    (precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
+    (judged === 0
+      ? ' (NOTHING was judged — the number is a placeholder, not a result)'
+      : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
+// U6/S7: the run that most needs a written report is the one where findings were raised and nothing
+// came back to judge them. The old `judged === 0` early return returned WITHOUT a report in exactly
+// that case. One test governs now: anything still outstanding — confirmed or unverified — is
+// synthesized. Only a fully-adjudicated, fully-refuted run exits here.
 // S2: a refutation reached with dead skeptics is not a refutation. Carry the lens counts so a
 // caller can tell "every finding was refuted" from "the verify stage was degraded".
-if (confirmed.length === 0)
+if (confirmed.length + unverified.length === 0)
   return {
     confirmed: [], report: null, precision, root: repo,
-    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: unverified.length,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0,
+    conflicts: conflicts.size, duplicates, spurious,
     note: lensesDead > 0
       ? `all findings refuted, but ${lensesDead}/${LENSES.length} lenses died — treat as partial`
-      : (unverified.length
-          ? `all judged findings refuted, ${unverified.length} UNVERIFIED — treat as partial`
-          : 'all findings refuted'),
+      : 'all findings adjudicated and refuted',
   }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
-    `Confirmed findings (skeptic-survived):\n` +
-    confirmed
-      .map(
-        (f) =>
-          `- [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  why-real: ${verdictByRef[f.ref]?.reason || ''}`,
-      )
-      .join('\n') +
+    `CONFIRMED findings (survived an adversarial skeptic):\n` +
+    (confirmed.length
+      ? confirmed
+          .map(
+            (f) =>
+              `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`,
+          )
+          .join('\n')
+      : '  (none)') +
+    `\n\nUNVERIFIED findings (no usable skeptic verdict came back — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
+    (unverified.length
+      ? unverified
+          .map((f) => `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}`)
+          .join('\n')
+      : '  (none)') +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with file:line + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
+    `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
     `Return JSON {path, blockers, highs, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
@@ -279,9 +321,13 @@ const synth = await agent(
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
 return {
   root: repo,
+  raw: allFindings.length,
   confirmed: confirmed.length,
   refuted: refuted.length,
   unverified: unverified.length,
+  conflicts: conflicts.size,
+  duplicates,
+  spurious,
   precision,
   lensesRun: liveResults.length,
   lensesDead,
@@ -290,7 +336,9 @@ return {
   report: synth?.path || null,
   summary: synth?.summary || '',
   note:
-    lensesDead || skepticsDead || unverified.length
-      ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-      : 'complete',
+    judged === 0
+      ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
+      : lensesDead || skepticsDead || unverified.length
+        ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
+        : 'complete',
 }
