@@ -149,8 +149,11 @@ def _side_branch_commit(r: pathlib.Path) -> str:
     return sha
 
 
-def make_repo(tmp: pathlib.Path) -> pathlib.Path:
-    r = tmp / "repo"
+def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
+    # `name` exists so a second arm can build a SECOND fixture rather than thread itself through
+    # `test_signals_can_move`'s eight mutations — that sequence ends by unlinking the project layer,
+    # so anything appended to it would run against a repo that refuses to report at all.
+    r = tmp / name
     # DERIVED from the conf this fixture is about to write, never a literal layout. The previous
     # line spelled `memory/tooling/builds/<x>/spec` — the pre-flatten shape — so an arm named
     # "violated: spec signal fires" was green while the dogfood's own signal printed DEAD PROBE. A
@@ -326,11 +329,90 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("a missing project layer refuses with rc 2", gone.returncode == 2, f"rc={gone.returncode}")
 
 
+# ---------------------------------------------------------------------------------------------
+# 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (both directions)
+# ---------------------------------------------------------------------------------------------
+
+
+def test_declared_empty(tmp: pathlib.Path) -> None:
+    """A declaration must stay LIFTABLE, or it is the DEAD PROBE defect wearing a nicer label.
+
+    Direction one on its own — drain the population, declare it, watch `--check` go quiet — is
+    indistinguishable from a probe that has simply gone blind, because that is exactly what a blind
+    probe looks like too. Only direction two, putting one row back and watching the same signal score
+    again, separates "empty on purpose" from "cannot see". Both directions run over ONE fixture, so
+    the ledger row and the declaration are the only variables between them.
+    """
+    print("DECLARED_EMPTY (a drained probe reports declared, and still LIFTS)")
+    r = make_repo(tmp, name="declared")
+    sig = r / "drift-audit" / "drift_signals.py"
+    ledger_dir = r / "memory" / "project" / "in-flight"
+
+    # --- direction one: the population is drained and the emptiness is declared ----------------
+    for f in sorted(ledger_dir.glob("*.md")):
+        f.unlink()
+    ledger_dir.rmdir()
+    sig.write_text(sig.read_text(encoding="utf-8").replace(
+        "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}",
+        "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source',"
+        " 'ledger_rows_contradicting_git'}"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "retire the ledger", "--no-verify"], r)
+
+    drained = report(r)["ledger_rows_contradicting_git"]
+    check("drained: the ledger probe is no longer live", drained["live"] is False,
+          f"live={drained['live']}")
+    check("drained: it reports 0 rather than a stale count", drained["value"] == 0,
+          f"got {drained['value']}")
+    quiet = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    check("drained + declared: --check stays green", quiet.returncode == 0,
+          f"rc={quiet.returncode} stderr={quiet.stderr.strip()[:200]}")
+
+    # THE DISCRIMINATING ASSERTION of direction one. The three above hold just as well for a signal
+    # `--check` is merely ignoring; only the PRINTED status tells a reader "empty on purpose" from
+    # "blind", and that line is the one a human acts on.
+    human = run([sys.executable, "drift-audit/drift_report.py"], r)
+    row = next((ln for ln in human.stdout.splitlines()
+                if "ledger_rows_contradicting_git" in ln), "")
+    check("drained + declared: the printed row reads 'empty by declaration'",
+          "empty by declaration" in row, f"row={row.strip()!r}")
+    check("drained + declared: and NOT 'DEAD PROBE'",
+          bool(row) and "DEAD PROBE" not in row, f"row={row.strip()!r}")
+
+    # --- direction two: one row returns, the declaration is dropped, the probe must SCORE ------
+    sha = run(["git", "rev-parse", "--short", "HEAD"], r).stdout.strip()
+    assert len(sha) >= 7, f"fixture HEAD sha not produced: {sha!r}"
+    ledger_dir.mkdir(parents=True)
+    # The row shape `make_repo` already writes. `BASESHA` is deliberately NOT hex, so `_SHA` finds
+    # exactly one sha in the line and the arm isolates the oracle rather than the row's wording.
+    (ledger_dir / "a.md").write_text(
+        "| slug | branch | status |\n|---|---|---|\n"
+        f"| `aThing` | `feature/x` off `BASESHA` | in-flight — NOT merged, work at `{sha}` |\n",
+        encoding="utf-8", newline="\n")
+    sig.write_text(sig.read_text(encoding="utf-8").replace(
+        ", 'ledger_rows_contradicting_git'", ""), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a ledger row returns", "--no-verify"], r)
+
+    back = report(r)["ledger_rows_contradicting_git"]
+    check("a row returns: the probe is LIVE again — the declaration was not a muzzle",
+          back["live"] is True, f"live={back['live']}")
+    check("a row returns: and it scores the contradiction", back["value"] == 1,
+          f"got {back['value']}")
+    fires = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    check("a row returns: --check reds again", fires.returncode == 1, f"rc={fires.returncode}")
+    check("a row returns: ...and names the signal on stderr",
+          "ledger_rows_contradicting_git" in fires.stderr,
+          f"stderr={fires.stderr.strip()[:200]}")
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
+        test_declared_empty(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

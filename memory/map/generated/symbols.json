@@ -1433,6 +1433,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_declared_empty",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_dossier_affordance_present_or_graced",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"

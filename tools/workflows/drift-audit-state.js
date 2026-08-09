@@ -6,7 +6,7 @@ export const meta = {
   whenToUse:
     'Tier 1: narrow LENSES to the one Tier-0 signal that moved, plus the standing record-gate lens. Tier 2: run all five, sequentially after drift-audit-code (the concurrency cap is fleet-wide).',
   phases: [
-    { title: 'Find', detail: 'primed lenses over the memory tree, charter and ledger' },
+    { title: 'Find', detail: 'primed lenses over the memory tree, charter and generated build index' },
     { title: 'Verify', detail: 'batched default-refute skeptics, keyed by integer index' },
     { title: 'Synthesize', detail: 'one pass -> report file' },
   ],
@@ -35,7 +35,6 @@ function chunk(a, n) {
 //   repo, base, outDir,                      // as in drift-audit-code
 //   memoryRoot: "memory",                    // from .memory-tree.conf
 //   charter: "AGENTS.md",                    // the file holding the binding rules + node registry
-//   ledgerGlob: "memory/project/in-flight/*.md",
 //   gateManifest: "tools/gate-legs.json",    // the generated/authoritative leg list, if any
 //   measured: "Tier-0 numbers, to interrogate not re-derive",
 //   heuristics: "any orchestrator heuristic handed over, WITH its known failure mode",
@@ -49,7 +48,6 @@ const BASE = a.base || 'HEAD'
 const OUT = a.outDir || `${REPO}/memory`
 const MEM = a.memoryRoot || 'memory'
 const CHARTER = a.charter || 'AGENTS.md'
-const LEDGER = a.ledgerGlob || `${MEM}/project/in-flight/*.md`
 const MAX_VERIFIERS = a.maxVerifiers || 5
 
 const COMMON = `
@@ -57,9 +55,9 @@ You are auditing the RECORDS of the repo at ${REPO}. Treat ${BASE} as "what ship
 
 THE COMMISSIONING QUESTION: the owner reports that the build FEELS like it is drifting and its state
 is UNCERTAIN. This wave audits the repo's SELF-KNOWLEDGE: its memory tree at \`${MEM}/\`, its charter
-\`${CHARTER}\`, its per-node in-flight ledger \`${LEDGER}\`, and the gates that police them. A repo
-whose own records are wrong cannot tell its owner what state it is in — that IS the reported symptom,
-so treat every record-vs-reality gap as a first-class finding.
+\`${CHARTER}\`, and the gates that police them. A repo whose own records are wrong cannot tell its
+owner what state it is in — that IS the reported symptom, so treat every record-vs-reality gap as a
+first-class finding.
 
 MEASURED BASELINES (already established; do not re-derive, DO interrogate/extend):
 ${a.measured || '(none supplied — establish your own and show the command behind each number)'}
@@ -141,10 +139,11 @@ note. Audit it:
     label: 'find:memory-rot',
     brief: `LENS — IS THE MEMORY TREE STILL TRUE, AND IS IT AFFORDABLE?
  - THE SPEC STATUS QUESTION (highest value). For each non-terminal spec (OPEN/SPECCED/BLOCKED/
-   INPROGRESS), determine whether its unit actually landed — cross-reference the ledger, the decision
-   indexes, the backlog rows, and git (\`git log --grep=<id>\`, and whether a named merge sha is an
-   ancestor of ${BASE}). Report the REAL count whose header contradicts reality, with the list. A spec
-   frozen mid-build is a named rot class; a spec that shipped and still says SPECCED is the same class.
+   INPROGRESS), determine whether its unit actually landed — cross-reference the generated build
+   index, the decision indexes, the backlog rows, and git (\`git log --grep=<id>\`, and whether a
+   named merge sha is an ancestor of ${BASE}). Report the REAL count whose header contradicts
+   reality, with the list. A spec frozen mid-build is a named rot class; a spec that shipped and
+   still says SPECCED is the same class.
  - Which memory documents make claims now FALSE about the code at ${BASE}? Sample the
    highest-traffic notes and verify their concrete claims — paths, flags, commands, ports.
  - Does any CURRENT (non-archive) doc still instruct a session to use a RETIRED mechanism? That
@@ -175,20 +174,21 @@ Read ALL of it and verify every checkable factual assertion against the tree at 
     slug: 'work-state',
     label: 'find:work-state',
     brief: `LENS — WHAT STATE IS THE WORK ACTUALLY IN? (the owner's literal question)
-The in-flight ledger (\`${LEDGER}\`) is declared canonical for who-is-touching-what. Test it against git.
- - For each row: separate the BASE sha ("off \`X\`") from the WORK shas. The base is an ancestor by
-   construction and proves nothing — conflating them makes every row a false positive. Then report the
-   real count of rows whose claimed state contradicts git.
+The GENERATED build index (\`${MEM}/LIVE.md\` and \`${MEM}/ledger/<month>.md\`) is the record of who
+touched what. It is DERIVED from build front matter, so test it against git rather than trusting it.
+ - For each build the index calls non-terminal: does git agree? Separate a record's BASE sha ("off
+   \`X\`") from its WORK shas — the base is an ancestor by construction and proves nothing, and
+   conflating them makes every record a false positive. Report the real count that contradicts git.
  - The inverse and more dangerous direction: work claimed as LANDED that is NOT an ancestor of
    ${BASE}, and work sitting on branches nobody tracks.
  - Say explicitly what is STRUCTURALLY UNKNOWABLE from this clone. Other nodes are other machines;
    their landed work is visible, their working trees are not. An audit that pretends to see them is
    worse than one that names the blind spot. Name the unknowables.
- - Do ledger-named branches and worktrees still resolve? A row pointing at a deleted worktree is a row
-   nobody can resume. Be careful to judge only THIS node's paths.
- - Compliance with the ledger's own format rules, and each file's size against its declared cap.
+ - Do the branches and worktrees any record names still resolve? A pointer at a deleted worktree is
+   work nobody can resume. Be careful to judge only THIS node's paths.
+ - Is the index still a byte-identical render of its source, or has someone hand-edited it?
  - The bottom line the owner needs: is there work that is BUILT, GATED, REVIEWED and simply LOST —
-   nobody merged it and no row accurately says so? Name it, or state plainly that there is none.`,
+   nobody merged it and no record accurately says so? Name it, or state plainly that there is none.`,
   },
   {
     slug: 'record-gate-integrity',
@@ -336,7 +336,7 @@ The commissioning question was: are the records stale, and why does the project'
 Write it so a tired reader has the answer in the first ten lines. Structure:
 1. Verdict up front: are the records trustworthy, and what is the single worst instance.
 2. THE STATE ANSWER — a plain-language statement of what state the work is actually in: how many
-   ledger rows contradict git, what is built-but-unlanded, and what is structurally UNKNOWABLE from
+   build records contradict git, what is built-but-unlanded, and what is structurally UNKNOWABLE from
    this clone. The owner asked this directly; answer it directly and do not bury it.
 3. Severity-ordered table of CONFIRMED findings (id, severity, file:line, one-line claim).
 4. PARTIAL findings with the corrected severity beside the original.

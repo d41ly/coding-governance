@@ -54,7 +54,15 @@ SHRINK_ONLY: dict[str, str] = {
 # exemption that is not enumerated is not an exemption — this list is the enumeration.
 # --------------------------------------------------------------------------------------------
 
-DECLARED_EMPTY: set[str] = set()
+DECLARED_EMPTY: set[str] = {
+    # The authored per-node session ledger was RETIRED by the aMendedLedger U2 unit: its three shards
+    # moved to memory/archive/ledger/ and memory/project/in-flight/ no longer exists, so this
+    # probe's population is empty BY DESIGN rather than blind. The kit ENGINE is untouched —
+    # drift_report.py still reads <memory_root>/project/in-flight/*.md for adopters who keep a
+    # ledger — and the declaration is not a muzzle: put one row back and the probe goes live and
+    # scores again. selftest.py asserts both directions over one fixture.
+    "ledger_rows_contradicting_git",
+}
 
 # --------------------------------------------------------------------------------------------
 # HANDKEPT — hand-maintained inventories mirroring an authoritative source.
@@ -110,13 +118,10 @@ HANDKEPT: list[dict] = [
 # --------------------------------------------------------------------------------------------
 
 PINS: dict[str, int] = {
-    # 4 — re-measured at 647bfd9 with `python tools/drift-audit/drift_report.py`, after the probe
-    # gained its terminal-class oracle. The old seed of 1 was measured when the probe judged only
-    # OPEN-claim rows; it now also judges `merged:<sha>` rows whose sha is an ancestor, because the
-    # ledger's own prune trigger is a claim about git and a row past it is stale by its own rule.
-    # Three of the four are node `a`'s and drain in the very next unit; the fourth is node `b`'s
-    # (`in-flight/b.md:5`), which node `a` does not edit — see the cross-node row in the backlog.
-    "ledger_rows_contradicting_git": 4,
+    # ledger_rows_contradicting_git carries NO pin. Its population is empty by declaration (above),
+    # and a pin of 4 over an empty population is a ratchet that can never turn. If a ledger ever
+    # returns, the default tolerance of 0 is the right bar — not a number measured against rows that
+    # no longer exist.
     # 2 — TOOL-aBatchedLintel-1 and TOOL-aGuardedTally-1, both INPROGRESS with their ids in tracked
     # kit source. INPROGRESS means "approved, build underway", which is arguably TRUE for a
     # built-but-unmerged unit, so this is the oracle's known residual ambiguity rather than proven
