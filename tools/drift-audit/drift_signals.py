@@ -110,13 +110,13 @@ HANDKEPT: list[dict] = [
 # --------------------------------------------------------------------------------------------
 
 PINS: dict[str, int] = {
-    # 4 — re-measured at 647bfd9 with `python tools/drift-audit/drift_report.py`, after the probe
-    # gained its terminal-class oracle. The old seed of 1 was measured when the probe judged only
-    # OPEN-claim rows; it now also judges `merged:<sha>` rows whose sha is an ancestor, because the
-    # ledger's own prune trigger is a claim about git and a row past it is stale by its own rule.
-    # Three of the four are node `a`'s and drain in the very next unit; the fourth is node `b`'s
-    # (`in-flight/b.md:5`), which node `a` does not edit — see the cross-node row in the backlog.
-    "ledger_rows_contradicting_git": 4,
+    # 1 — the drain the 4-seed predicted, done. Node `a` self-pruned its three stale `merged:<sha>`
+    # rows (each verified an ancestor of `main` with `git merge-base --is-ancestor`, which is the
+    # ledger's own prune trigger) plus `aFoldedQuarry`, whose row still said "Awaiting merge to
+    # `main`" while its spec read CLOSED and its branch merge sat in `main`'s history.
+    # The 1 that remains is node `b`'s (`in-flight/b.md:5`), which node `a` does not edit — see the
+    # cross-node row in the backlog. Lowered because slack left in a shrink-only pin silently refills.
+    "ledger_rows_contradicting_git": 1,
     # 2 — TOOL-aBatchedLintel-1 and TOOL-aGuardedTally-1, both INPROGRESS with their ids in tracked
     # kit source. INPROGRESS means "approved, build underway", which is arguably TRUE for a
     # built-but-unmerged unit, so this is the oracle's known residual ambiguity rather than proven
