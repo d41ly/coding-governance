@@ -197,8 +197,8 @@ the real file — ours inserts a TOOL row inside `## TOOL`, theirs inserts a PLA
 ```
 merge-rows: 36 row(s) from ours, 1 new from theirs, 0 dropped (delete honoured), clean   rc=0
  13:## TOOL — tooling
- 88:- TOOL-aNewOurs-1 …
- 90:- PLAY-bNewTheirs-1 · theirs appended inside the PLAY section   ← filed under ## TOOL
+ 88:- TOOL-aNewOurs-<n> …
+ 90:- PLAY-bNewTheirs-<n> · theirs appended inside the PLAY section   ← filed under ## TOOL
  91:## DEPL — deployer
 ```
 
