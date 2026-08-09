@@ -9,10 +9,16 @@ backslash normalization must behave identically on every platform.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
@@ -253,6 +259,81 @@ def t_gate_template_finds_the_kit(tmp: Path):
     assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
 
 
+def t_kit_commits_to_abspath():
+    """B2: the kit has committed IN PROSE, three times, to `abspath` and never `resolve()` — a
+    junctioned kit dir must anchor to the ADOPTING repo, not the link target. Since the renderers
+    embed kit_rel()/regen_cmd() into the BYTE-COMPARED artifacts, one entrypoint resolving the other
+    way makes the freshness gate permanently STALE with a printed remedy that re-writes the other
+    spelling: the loop never converges. Prose cannot hold that; enforce it mechanically."""
+    import os
+
+    kit = Path(os.path.abspath(__file__)).parent
+    offenders = []
+    for py in sorted(kit.glob("*.py")):
+        for n, line in enumerate(py.read_text(encoding="utf-8").splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue  # a comment EXPLAINING the ban is not a violation of it
+            if "gov:literal-resolve" in line:
+                continue  # this detector's own two lines, which must spell what they hunt
+            if "__file__" in line and ".resolve()" in line:  # gov:literal-resolve — the detector
+                offenders.append(f"{py.name}:{n}: {line.strip()}")
+    assert not offenders, (
+        "`Path(__file__).resolve()` in the kit — use os.path.abspath. resolve() follows a junction "  # gov:literal-resolve
+        "to the link target, so this entrypoint would disagree with map_lib.kit_dir() and the gate "
+        "about the install prefix they stamp into the byte-compared artifacts:\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def t_gate_template_boundary(tmp: Path):
+    """M1: the gate's kit search must not leave the PROJECT, and `.git` alone is not the project
+    boundary — a `git archive` tarball, a docker build whose `.dockerignore` drops `.git`, a vendored
+    source drop all have none. The `*/codebase-map` glob then reaches every immediate subdirectory
+    of every ancestor up to the filesystem root. Measured with only the `.git` test: the gate found
+    an unrelated kit copy OUTSIDE the tree and the module-level import loaded and executed it, so
+    the gate would byte-compare this project's artifacts against a foreign engine at a foreign kit
+    version — a green or a red that says nothing. `.codebase-map.conf` is committed, so it is the
+    boundary that survives the export."""
+    import os
+    import subprocess
+    import sys as _sys
+
+    # the PLANT: a valid-looking kit one level ABOVE the project, reachable only past the boundary
+    plant = tmp / "outside" / "codebase-map"
+    plant.mkdir(parents=True)
+    (plant / "map_lib.py").write_text(
+        "import re\nDEFAULT_DECISION_ID_RE = re.compile(r'.')\nPLANT = True\n", encoding="utf-8"
+    )
+    (plant / "map_extractors.py").write_text("def inventory_ids():\n    return ()\n", encoding="utf-8")
+
+    # the PROJECT: an export with NO .git anywhere, its committed conf at the root, and no kit
+    export = tmp / "export"
+    (export / "tests").mkdir(parents=True)
+    (export / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    template = (Path(os.path.abspath(__file__)).parent / "test_codebase_map.template.py").read_text(
+        encoding="utf-8"
+    )
+    gate = export / "tests" / "test_codebase_map.py"
+    gate.write_text(template, encoding="utf-8")
+    driver = export / "drive.py"
+    driver.write_text(
+        "import importlib.util, sys\n"
+        "spec = importlib.util.spec_from_file_location('gate_under_test', sys.argv[1])\n"
+        "mod = importlib.util.module_from_spec(spec)\n"
+        "spec.loader.exec_module(mod)\n"
+        "print(mod._kit_dir())\n",
+        encoding="utf-8",
+    )
+    got = subprocess.run(
+        [_sys.executable, str(driver), str(gate)], capture_output=True, text=True
+    )
+    assert got.returncode != 0, (
+        f"the gate resolved a kit from OUTSIDE the project: {got.stdout.strip()}"
+    )
+    assert str(plant) not in got.stdout, got.stdout
+    assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
+
+
 def t_remedy_paths_are_real(tmp: Path):
     """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
     naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the
@@ -287,7 +368,12 @@ def t_remedy_paths_are_real(tmp: Path):
     kit.parent.mkdir(parents=True)
     shutil.copytree(Path(os.path.abspath(__file__)).parent, kit)
     (repo / ".git").mkdir()
-    (repo / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    # H2: the conf carries the EXAMPLE's stale MAP_DIFF_CMD, which is what the documented adoption
+    # path leaves behind (`cp` the example, THEN run the adopter — so the adopter's create-branch
+    # stamp never fires). A truthy-but-dead value must not beat the prefix-correct fallback.
+    (repo / m.CONF_NAME).write_text(
+        'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python codebase-map/map_diff.py"\n', encoding="utf-8"
+    )
     (repo / "src").mkdir()
     (repo / "src" / "mod.py").write_text("def hello():\n    return 1\n", encoding="utf-8")
     (kit / "map_extractors.py").write_text(
@@ -311,6 +397,23 @@ def t_remedy_paths_are_real(tmp: Path):
     readme = (repo / "memory" / "map" / "README.md").read_text(encoding="utf-8")
     assert "tools/codebase-map/gen_map.py" in readme, readme[:400]
     assert "`codebase-map/`" not in readme, "the scaffolded README still names the bare convention"
+
+    # H2: EVERY path the kit printed must resolve — not just the regen command. Sweep every
+    # `<something>.py` token out of the scaffolded README and the two generated artifacts and
+    # require each to be a real file under the root. The digest command is the one that regressed:
+    # a stale conf value beat the prefix-correct fallback and shipped a dead path into the README.
+    printed = []
+    for rel in ("memory/map/README.md", "memory/map/generated/inventories.json",
+                "memory/map/generated/MAP.md"):
+        for tok in re.findall(r"[A-Za-z0-9_./-]+\.py", (repo / rel).read_text(encoding="utf-8")):
+            if "/" in tok:  # a PATH claim; a bare `map_extractors.py` in prose names no location
+                printed.append((rel, tok))
+    assert printed, "no paths were printed at all — this arm would pass by finding nothing"
+    dead = [f"{src} -> {tok}" for src, tok in printed if not (repo / tok).is_file()]
+    assert not dead, "the kit printed paths that do not exist:\n  " + "\n  ".join(dead)
+    assert any(tok.endswith("map_diff.py") for _, tok in printed), (
+        "the digest command vanished from the README — this arm no longer covers H2"
+    )
 
     # stale an artifact, then take the remedy from the gate's OWN output and run it
     art = repo / "memory" / "map" / "generated" / "MAP.md"
@@ -966,6 +1069,12 @@ def main() -> int:
         failures += check(
             "gate template finds the kit at any prefix (S5/AC5)",
             lambda: t_gate_template_finds_the_kit(Path(td)),
+        )
+    failures += check("kit commits to abspath, never resolve() (review B2)", t_kit_commits_to_abspath)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "gate kit-search stops at the project boundary (review M1)",
+            lambda: t_gate_template_boundary(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

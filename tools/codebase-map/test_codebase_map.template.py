@@ -30,7 +30,15 @@ def _kit_dir() -> Path:
     PREFIX under the repo root. So each ancestor of this file is probed in order: the ancestor
     itself (gate installed inside the kit dir), `<ancestor>/codebase-map` (the root convention),
     then `<ancestor>/*/codebase-map` (a one-segment prefix such as `tools/`). The walk stops after
-    the ancestor holding `.git`, so it can never leave the repo into a neighbouring checkout.
+    the ancestor holding `.codebase-map.conf` OR `.git`, so it can never leave the project.
+
+    The conf is in that boundary, not just `.git`, because `.git` is absent from perfectly ordinary
+    trees — a `git archive` tarball, a docker build whose `.dockerignore` drops it, a vendored
+    source drop. Measured with only the `.git` test: in such a tree the walk ran to the filesystem
+    root and the `*/codebase-map` glob matched an UNRELATED kit copy outside the project, which the
+    module-level import below then loaded and executed — the gate byte-comparing this repo's
+    artifacts against a foreign engine at a foreign KIT version. The conf is committed, so it
+    survives every export that drops `.git`.
 
     The kit dir's NAME is still the fixed convention — only its prefix is free. A prefix deeper
     than one segment is deliberately not searched: walking a whole repo downward is slow and
@@ -46,7 +54,7 @@ def _kit_dir() -> Path:
             if (candidate / "map_lib.py").is_file():
                 return candidate
             probed.append(str(candidate))
-        if (parent / ".git").exists():
+        if (parent / ".codebase-map.conf").is_file() or (parent / ".git").exists():
             break
     raise RuntimeError(
         f"codebase-map kit dir (the directory holding map_lib.py) not found above {here}.\n"

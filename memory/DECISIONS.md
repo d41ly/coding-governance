@@ -85,6 +85,8 @@
 - TOOL-aRootedPrefix-1f · each new selftest case was verified to RED under a targeted mutation: the grandparent revert, the dropped boundary, the reordered conf/`.git` test, a never-refusing helper, each CLI guard alone, and the old kit-dir walk
 - TOOL-aRootedPrefix-1g · S9: every path the kit PRINTS now resolves — `kit_rel()`/`regen_cmd()` feed the three renderers, both gates, the scaffolded map README and the three `--help` texts, and the adopter stamps `MAP_DIFF_CMD` at conf-creation time
 - TOOL-aRootedPrefix-1h · the arm EXECUTES the remedy the gate printed and requires it to clear the staleness, so it asserts no expected string; `REGEN_CMD` survives only for pre-1.1 gate files and is pinned equal to the accessor's root-install answer
+- TOOL-aRootedPrefix-1i · the review's SHAPE was the finding: 4 of 7 defects, one a blocker, in `adopt-codebase-map.sh` — the one changed file no leg ran — and zero in the engine beside it, which 20+ arms carry. It is a leg now
+- TOOL-aRootedPrefix-1j · that blocker was self-inflicted: the adopter shipped `git rev-parse --show-toplevel`, the physical-path rule §4 rejects for map_lib, so a junctioned kit adopted the LINK TARGET's repo and printed `Adopted.`
 
 ## DEPL — deployer
 

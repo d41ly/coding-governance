@@ -1,25 +1,55 @@
 #!/usr/bin/env bash
-# Adopt the codebase-map kit into a project. Run it BY PATH from anywhere, after copying this kit
-# dir into the target repo and filling map_extractors.py:
+# Adopt the codebase-map kit into a project. Run from anywhere INSIDE the target repo, after
+# copying this kit dir into it and filling map_extractors.py:
 #
 #   <kit-dir>/adopt-codebase-map.sh --scaffold
 #
 # The kit dir's NAME is fixed (`codebase-map` — the gate template resolves the kit by it), but its
 # PREFIX under the repo root is free: `<root>/codebase-map/` and `<root>/tools/codebase-map/` are
-# both supported, matching map_lib.resolve_root.
+# both supported, matching map_lib.resolve_root. One segment, though — see the depth check below.
 #
 # Steps: conf (copy example if absent) -> extractors sanity -> python scaffold (map tree +
 # FOUNDATION skeleton + seeded baseline + generated artifacts) -> gate template copied to
 # GATE_FILE -> gate executed once (expect PASS on the freshly seeded tree).
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
-# ROOT is the repo containing the KIT, not the repo containing the cwd. Anchoring on the script's
-# own location is what lets it be run by path from anywhere, and is the same anchor map_lib uses.
-ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
-# The kit's path under that root, asked of git rather than derived by trimming "$ROOT" off "$HERE":
-# MSYS and symlinks spell the same directory two ways, which is why the old check used `-ef`.
-KIT_REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
-KIT_REL="${KIT_REL%/}"
+# ROOT + KIT_REL, resolved LOGICALLY from the kit dir by walking up for `.codebase-map.conf` (an
+# already-adopted root) or `.git` (the repo root this run will CREATE the conf at). This is
+# deliberately NOT `git rev-parse --show-toplevel`: git answers with the PHYSICAL path, so a
+# junctioned/symlinked kit dir resolves to the LINK TARGET's repo — and this script WRITES a conf, a
+# whole map tree and a gate file. Measured before this was fixed: adoption landed in the kit's own
+# source repository and still printed `Adopted.`. map_lib.resolve_root rejects git for the same
+# reason and says so in its docstring; the two must agree, and both spellings here come from the one
+# logical `pwd` above, which is also what the MSYS two-spellings problem actually needs.
+#
+# The conf-or-.git boundary is one step wider than resolve_root's, on purpose: before adoption there
+# is no conf, so resolve_root would still answer `kit_dir.parent`. The adopter must reach the .git
+# root because it is CREATING the marker resolve_root will find from then on.
+ROOT=""; KIT_REL=""; _p="$HERE"
+while : ; do
+  _parent="$(dirname "$_p")"
+  [ "$_parent" = "$_p" ] && break                       # filesystem root; no boundary found
+  KIT_REL="$(basename "$_p")${KIT_REL:+/$KIT_REL}"
+  if [ -f "$_parent/.codebase-map.conf" ] || [ -e "$_parent/.git" ]; then ROOT="$_parent"; break; fi
+  _p="$_parent"
+done
+[ -n "$ROOT" ] || {
+  echo "no repo root above $HERE — expected a .git or a .codebase-map.conf in some ancestor"; exit 2; }
+# The operator's tree must BE the tree being adopted. Without this, running the adopter by path from
+# another repo silently adopts the KIT's repo (measured: conf + map tree + gate written to a
+# repository nobody named, exit 0). The pre-1.1 `-ef` check bound these together; it is restored
+# here as an inode compare, because MSYS and symlinks spell one directory two ways.
+_CWD_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -n "$_CWD_ROOT" ] || {
+  echo "not inside a git repository — cd into the repo you mean to adopt, then re-run"; exit 2; }
+[ "$_CWD_ROOT" -ef "$ROOT" ] || {
+  echo "refusing: this kit dir belongs to the repo at"
+  echo "    $ROOT"
+  echo "but you are standing in"
+  echo "    $_CWD_ROOT"
+  echo "This script WRITES (.codebase-map.conf, the map tree, the gate). Copy the kit INTO the repo"
+  echo "you mean to adopt and run that copy, or cd into $ROOT first."
+  exit 1; }
 cd "$ROOT" || exit 2
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
@@ -68,28 +98,81 @@ PY=$(resolve_python "${MAP_PY:-}") || exit 2
   echo "the kit dir is the repo root itself ($ROOT) — copy the kit in as a directory named codebase-map/"; exit 1; }
 case "$KIT_REL" in
   codebase-map|*/codebase-map) ;;
-  *) echo "the kit dir must be NAMED codebase-map (found: $KIT_REL) — the gate template resolves it by that name; any prefix above it is fine"; exit 1;;
+  *) echo "the kit dir must be NAMED codebase-map (found: $KIT_REL) — the gate template resolves it by that name; a one-segment prefix above it is fine"; exit 1;;
 esac
+# Depth check, BEFORE anything is written. `*/codebase-map` matches slashes, so the name check alone
+# accepted <root>/a/b/codebase-map — which the gate template cannot resolve (it probes <ancestor>,
+# <ancestor>/codebase-map and <ancestor>/*/codebase-map). Discovering that AFTER the conf, the whole
+# map tree and the gate are on disk leaves a half-adopted repo and reports it as a gate failure,
+# sending the operator hunting a coverage violation that does not exist. Advertise the real limit.
+case "$KIT_REL" in
+  */*/codebase-map)
+    echo "install prefix is deeper than one segment: $KIT_REL"
+    echo "the gate template resolves only <root>/codebase-map or <root>/<one-segment>/codebase-map."
+    echo "Move the kit up, or keep it here and point GATE_FILE INSIDE the kit dir."
+    exit 1;;
+esac
+
+# Stamp MAP_DIFF_CMD with THIS install's prefix so the value is right by construction rather than
+# right if the operator remembers. NO `sed`: `&` in a replacement means "the whole match" and `\`
+# starts an escape, so a kit under `R&D/` silently produced a mangled line that sed still exited 0
+# on — and this script SOURCES that file below, so the corruption became executable. A `case`
+# rewrite has no replacement grammar at all, keeps the line in place beside its comment, and drops
+# sed's BSD/GNU `-i` divergence with it. The charset guard is belt-and-braces: a prefix that cannot
+# be expressed in the conf's restricted grammar is declined, never half-written.
+stamp_map_diff_cmd() {  # $1 = conf path; echoes nothing, returns 1 if it did not land
+  case "$KIT_REL" in
+    *[!A-Za-z0-9._/-]*) return 1;;
+  esac
+  _want="MAP_DIFF_CMD=\"python $KIT_REL/map_diff.py\""
+  _hit=0
+  while IFS= read -r _line || [ -n "$_line" ]; do
+    case "$_line" in
+      MAP_DIFF_CMD=*) printf '%s\n' "$_want"; _hit=1;;
+      *) printf '%s\n' "$_line";;
+    esac
+  done < "$1" > "$1.new" || { rm -f "$1.new"; return 1; }
+  [ "$_hit" = 1 ] || { rm -f "$1.new"; return 1; }
+  mv "$1.new" "$1" || { rm -f "$1.new"; return 1; }
+  # Claim nothing until it is READ BACK: a success message printed from the write path is exactly
+  # the fail-open the DEAD PROBE doctrine bans.
+  grep -qxF "$_want" "$1"
+}
 
 if [ ! -f "$ROOT/.codebase-map.conf" ]; then
   cp "$HERE/.codebase-map.conf.example" "$ROOT/.codebase-map.conf"
-  # Stamp the digest command with THIS install's prefix, so the created conf is right by
-  # construction rather than right if the adopter remembers. Keyed on the KEY name, never on the
-  # example's value, so the two cannot drift. Temp-file rewrite, not `sed -i`: BSD sed (macOS)
-  # needs an argument to -i and GNU sed refuses one. Only ever touches a file just copied from the
-  # example, so there is no user edit to clobber.
-  if sed "s|^MAP_DIFF_CMD=.*|MAP_DIFF_CMD=\"python $KIT_REL/map_diff.py\"|" \
-       "$ROOT/.codebase-map.conf" > "$ROOT/.codebase-map.conf.new"; then
-    mv "$ROOT/.codebase-map.conf.new" "$ROOT/.codebase-map.conf"
+  if stamp_map_diff_cmd "$ROOT/.codebase-map.conf"; then
+    echo "MAP_DIFF_CMD stamped for this install prefix: python $KIT_REL/map_diff.py"
   else
-    rm -f "$ROOT/.codebase-map.conf.new"
-    echo "note: could not stamp MAP_DIFF_CMD — set it to \"python $KIT_REL/map_diff.py\" by hand."
+    echo "note: could NOT stamp MAP_DIFF_CMD — set it to \"python $KIT_REL/map_diff.py\" by hand."
   fi
   echo "created .codebase-map.conf from the example — EDIT IT (MAP_ROOT, GATE_FILE), then re-run."
-  echo "MAP_DIFF_CMD was stamped for this install prefix: python $KIT_REL/map_diff.py"
   exit 1
 fi
 . "$ROOT/.codebase-map.conf"
+# The stamp above only fires on the branch that CREATES the conf — but the kit README and
+# WIRE-INTO-PROJECT both tell the operator to `cp` the example first, so on the DOCUMENTED path that
+# branch never runs and the example's `codebase-map/map_diff.py` survives at a prefixed install.
+# Measured: adoption reached `Adopted.` at exit 0 and the scaffolded map README shipped a digest
+# command naming a file that does not exist. Validate the configured value on EVERY run: pull the
+# `…/map_diff.py` token out of it and re-stamp when it does not resolve from the root. A value that
+# resolves is left exactly as the operator wrote it (`uv run python …` and friends still work).
+_MDC="$(printf '%s' "${MAP_DIFF_CMD:-}" | tr -d '\r')"
+_MDC_PATH=""
+for _tok in $_MDC; do
+  case "$_tok" in *map_diff.py) _MDC_PATH="$_tok";; esac
+done
+if [ -z "$_MDC_PATH" ] || [ ! -f "$ROOT/$_MDC_PATH" ]; then
+  if stamp_map_diff_cmd "$ROOT/.codebase-map.conf"; then
+    echo "MAP_DIFF_CMD named ${_MDC_PATH:-no map_diff.py}, which does not resolve from $ROOT —"
+    echo "  re-stamped for this install prefix: python $KIT_REL/map_diff.py"
+    . "$ROOT/.codebase-map.conf"
+  else
+    echo "WARNING: MAP_DIFF_CMD names ${_MDC_PATH:-no map_diff.py}, which does not resolve from"
+    echo "  $ROOT — the scaffolded map README will carry a dead path. Set it to"
+    echo "  \"python $KIT_REL/map_diff.py\" by hand."
+  fi
+fi
 # CR-strip: a CRLF-committed conf on Linux keeps \r in sourced values (MSYS masks this)
 MAP_ROOT="$(printf '%s' "${MAP_ROOT:-}" | tr -d '\r')"
 GATE_FILE="$(printf '%s' "${GATE_FILE:-}" | tr -d '\r')"

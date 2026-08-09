@@ -1,6 +1,6 @@
 # TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix
 
-**Status:** INPROGRESS · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
 
 ## 1. Goal
 
@@ -33,6 +33,11 @@ repo's own `vacuous-selector-empty-population` class shipped inside the tool tha
   the two gates, `gen_map.py` parameterizes the scaffolded map `README.md`, the three CLIs resolve
   `<kit>` in their `--help` text, and the adopter stamps `MAP_DIFF_CMD` with the real prefix when it
   creates the conf.
+- **S10** (folded in at rev-3, from the Tier-2 review) the adopter resolves its root LOGICALLY and
+  refuses before writing when the operator's tree is not the tree the kit resolves to; the stamp
+  cannot corrupt the conf it later sources; every entrypoint uses `abspath`, never `resolve()`; the
+  gate's kit search stops at the conf as well as `.git`; and `tools/codebase-map/adopt-codebase-map.test.sh`
+  becomes a gate leg, because 4 of 7 review defects lived in the one changed file no leg ran.
 
 ## 3. Non-goals (OUT)
 
@@ -185,10 +190,17 @@ the same one line — does the path the kit printed exist.
 - **AC7** When `bash tools/run-gates.sh` runs, every leg is green.
 - **AC8** When an artifact is staled in a prefixed install, the regen command the gate PRINTS names
   a path that exists, and running that command verbatim clears the staleness.
+- **AC9** When the adopter is run by path from a repo other than the kit's, it refuses naming both
+  roots and writes nothing; when the kit dir is a symlink or junction, adoption lands in the
+  ADOPTING repo, never the link target's.
+- **AC10** When the install prefix cannot be expressed in the conf grammar, the conf holds the
+  example's untouched default — never a half-written value — and sourcing it executes nothing.
+- **AC11** When `bash tools/codebase-map/adopt-codebase-map.test.sh` runs, every arm passes, and
+  each arm reds under a mutation that reintroduces the defect it names.
 
 ## 7. Gates
 
-No new leg. Existing legs this unit must keep green: `codebase-map kit selftest` (the leg that grows)
+One new leg at rev-3: `codebase-map adopter e2e` (`tools/codebase-map/adopt-codebase-map.test.sh`). Existing legs this unit must keep green: `codebase-map kit selftest` (the leg that grows)
 · `kit version markers` · `python resolver (behaviour + inline parity + idiom ban)`, because
 `adopt-codebase-map.sh` carries the inline resolver block byte-identically and S4 edits that file ·
 `memory hygiene (19 checks)` for this build folder · `run-gates canary`.
@@ -205,6 +217,12 @@ with a backlog row rather than being an open question: it is a wrong command, no
 - rev-1 · 2026-08-09 · initial spec. Written after reproducing both CLI failures on paired fixture
   repos and after a reuse-lookup pass over this repo's real corpus, run from the adoption branch's
   tree with the `CODEBASE_MAP_ROOT` workaround this unit removes.
+- rev-3 · 2026-08-09 · folded the Tier-2 review (2 blockers, 2 high, 2 medium, 1 low; raw 18,
+  confirmed 11, precision 0.61) as S10 + AC9-AC11. The engine was clean; every defect but one was
+  in `adopt-codebase-map.sh`, which no gate leg executed — so the fix is a new leg as much as it is
+  new code. The blocker was self-inflicted: S4 shipped `git rev-parse --show-toplevel`, the exact
+  physical-path mechanism §4 rejects for `map_lib` two paragraphs above, into the one file that
+  writes to disk.
 - rev-2 · 2026-08-09 · folded `TOOL-aRootedPrefix-2` in as S9 at the owner's ask, so the deferred
   remedy-path work lands in the same version rather than as a second 1.x bump against the same
   artifacts. rev-1's §3 deferral is replaced by the narrower non-goal that survives it (retiring

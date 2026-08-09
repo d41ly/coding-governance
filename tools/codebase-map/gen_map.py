@@ -15,10 +15,16 @@ Requires a filled <kit>/map_extractors.py (the template refuses an empty EXTRACT
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
     sys.stdout.reconfigure(errors="replace")
@@ -31,6 +37,28 @@ import reuse_lookup as rl  # noqa: E402
 
 IDS = ext.inventory_ids()
 ID_RE = getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE)
+
+
+def _diff_cmd(conf: dict[str, str]) -> str:
+    """The digest command for the scaffolded map README. A CONFIGURED value wins — an adopter may
+    legitimately spell it `uv run python …` — but only when the `…/map_diff.py` it names actually
+    resolves from the repo root. A truthy-but-stale value used to beat the prefix-correct fallback,
+    and the documented adoption path (`cp` the example, THEN run the adopter) is exactly the path
+    that leaves the example's `codebase-map/map_diff.py` in place: measured at a `tools/`-prefixed
+    install, the scaffolded README shipped a digest command naming a file that does not exist. A
+    path the kit prints must resolve, so an unresolvable one is treated as absent."""
+    configured = (conf.get("MAP_DIFF_CMD") or "").strip()
+    root = m.repo_root()
+    named = [tok for tok in configured.split() if tok.endswith("map_diff.py")]
+    if configured and named and (root / named[-1]).is_file():
+        return configured
+    fallback = f"python {m.kit_rel()}/map_diff.py"
+    if configured:
+        print(
+            f"note: MAP_DIFF_CMD names {named[-1] if named else 'no map_diff.py'}, which does not "
+            f"resolve from {root} — the map README will use {fallback!r} instead. Fix the conf."
+        )
+    return fallback
 
 
 def _usage() -> str:
@@ -204,7 +232,7 @@ def main() -> int:
                 map_root=conf["MAP_ROOT"],
                 kit=m.kit_rel(),
                 regen=m.regen_cmd(),
-                diff_cmd=conf.get("MAP_DIFF_CMD") or f"python {m.kit_rel()}/map_diff.py",
+                diff_cmd=_diff_cmd(conf),
             ),
         )
         (map_dir / "features").mkdir(parents=True, exist_ok=True)
