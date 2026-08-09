@@ -15,17 +15,42 @@ Remedies when this gate fails on your change:
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 
 def _kit_dir() -> Path:
-    """Walk up from this file to the repo root holding codebase-map/ (the kit dir name is a
-    kit convention, so the gate needs no per-project placeholders)."""
-    for parent in Path(__file__).resolve().parents:
-        if (parent / "codebase-map" / "map_lib.py").is_file():
-            return parent / "codebase-map"
-    raise RuntimeError("codebase-map/ kit dir not found above the gate file")
+    """The kit dir — the directory holding map_lib.py — found from this gate file's own location,
+    so the gate still needs no per-project placeholders.
+
+    Two things vary independently. GATE_FILE points at whatever directory the project's test suite
+    collects, which may be inside the kit dir or nowhere near it; and the kit dir may sit at any
+    PREFIX under the repo root. So each ancestor of this file is probed in order: the ancestor
+    itself (gate installed inside the kit dir), `<ancestor>/codebase-map` (the root convention),
+    then `<ancestor>/*/codebase-map` (a one-segment prefix such as `tools/`). The walk stops after
+    the ancestor holding `.git`, so it can never leave the repo into a neighbouring checkout.
+
+    The kit dir's NAME is still the fixed convention — only its prefix is free. A prefix deeper
+    than one segment is deliberately not searched: walking a whole repo downward is slow and
+    ambiguous. The failure below names every path it probed, so a deeper install is TOLD what the
+    gate looked for instead of being guessed at. `abspath`, not `resolve()`: a junctioned kit dir
+    must anchor to the adopting repo, matching map_lib.resolve_root."""
+    probed: list[str] = []
+    here = Path(os.path.abspath(__file__))
+    for parent in here.parents:
+        candidates = [parent, parent / "codebase-map"]
+        candidates += sorted(p for p in parent.glob("*/codebase-map") if p.is_dir())
+        for candidate in candidates:
+            if (candidate / "map_lib.py").is_file():
+                return candidate
+            probed.append(str(candidate))
+        if (parent / ".git").exists():
+            break
+    raise RuntimeError(
+        f"codebase-map kit dir (the directory holding map_lib.py) not found above {here}.\n"
+        "Probed:\n  " + "\n  ".join(probed)
+    )
 
 
 sys.path.insert(0, str(_kit_dir()))

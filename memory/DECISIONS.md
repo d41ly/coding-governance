@@ -77,7 +77,12 @@
 - TOOL-aBatchedTribunal-8d · `git log -S` counts OCCURRENCES, and `KIT_MEMORY_TREE_VERSION=` occurs once before and once after any bump — the count never moves, so the first cut found NO bump at all and reported the wrong failure. `-G` matches changed LINES, which is what a bump is
 - TOOL-aBatchedTribunal-8e · S is VALIDATED against its parent, not merely matched: rewording the comment ON the constant's line moves that line without dating anything, and an unvalidated candidate would let a reflow launder every later verdict change
 - TOOL-aBatchedTribunal-8f · W is the newest BEHAVIOUR-bearing commit, not the newest touching one — otherwise a trailing comment-only commit re-opens a range that was correctly dated
-
+- TOOL-aRootedPrefix-1 · codebase-map resolved the repo root as the kit dir's GRANDPARENT, which encodes its own `<root>/codebase-map/` convention. At any other prefix every derived path was one segment short — `resolve_root` now walks up for `.codebase-map.conf`, bounded by `.git`
+- TOOL-aRootedPrefix-1b · measured on two fixtures identical but for the prefix: one range carrying a real reinvention gave `collision_flags: 1` against `0`, both at exit 0. Mis-rooted, `--converge` CANNOT flag: its reference index has no source under it, so no seam reaches the threshold
+- TOOL-aRootedPrefix-1c · the `.git` stop is load-bearing, not defensive. Worktrees live inside the primary tree here (`.claude/worktrees/`), so an unbounded walk finds the PRIMARY tree's conf and resolves a worktree's map into a different checkout
+- TOOL-aRootedPrefix-1d · resolution answers WHERE, `require_adopted_root` answers WHETHER. Split so the library layer stays fail-open (a thin corpus is a thin shortlist, by design) while the two CLIs that import no project layer refuse at exit 2
+- TOOL-aRootedPrefix-1e · NOT `git rev-parse --show-toplevel` — the seam `memory-recall/recall_conf.py` ships at fan-in 7 and the reuse pass ranked it third. It resolves junctions, and anchoring a junctioned kit dir to the ADOPTING repo is an explicit guarantee of the docstring it replaced
+- TOOL-aRootedPrefix-1f · each new selftest case was verified to RED under a targeted mutation: the grandparent revert, the dropped boundary, the reordered conf/`.git` test, a never-refusing helper, each CLI guard alone, and the old kit-dir walk
 ## DEPL — deployer
 
 *(none yet)*

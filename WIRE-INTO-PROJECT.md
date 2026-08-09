@@ -143,14 +143,17 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
 
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
 
-1. Copy the kit dir into the project root **as `codebase-map/`** (the fixed name the gate template
-   resolves — don't rename): `cp -r <gov-repo>/tools/codebase-map <project>/codebase-map`.
-2. `cp codebase-map/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
-   MAP_DIFF_CMD (per the §0 decisions).
-3. `cp codebase-map/map_extractors.template.py codebase-map/map_extractors.py` and declare the
-   project's inventories — this is the real work; follow `codebase-map/INVENTORY-DERIVATION.md`
+1. Copy the kit dir into the project as a directory **named `codebase-map`** (the fixed name the
+   gate template resolves — don't rename): `cp -r <gov-repo>/tools/codebase-map <project>/codebase-map`.
+   The NAME is fixed; the **prefix is free** — a repo that keeps its kits under one directory uses
+   `<project>/tools/codebase-map` and needs no exception. Below, `<kit>` is whichever you chose.
+2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
+   MAP_DIFF_CMD (per the §0 decisions). It lives at the project **root** whatever the kit's prefix:
+   the kit walks up from its own directory looking for this file, and that is how it finds the root.
+3. `cp <kit>/map_extractors.template.py <kit>/map_extractors.py` and declare the
+   project's inventories — this is the real work; follow `<kit>/INVENTORY-DERIVATION.md`
    (prefer registry imports; fail-closed helpers; full extension sets; POSIX keys).
-4. `codebase-map/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
+4. `<kit>/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
    baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing
    dossiers (so the graced `## Reuse affordance` check never retro-reds the fleet), installs the
    gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY` overrides
@@ -158,19 +161,22 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
    that executes, because the Microsoft Store `python3` stub answers `command -v` and then exits
    9009 without running anything. A NEW dossier is never exempt — new work records its reuse decision
    (`seam: <id> — reuse for <need>; extend via <point>`, or `none — <why>`) or the gate reds.
-   **DoR (before building):** run `python codebase-map/reuse_lookup.py "<behaviour>"` (the
-   behaviour→seam lookup, per `codebase-map/reuse-lookup.agent.md`) to find an existing seam to
+   **DoR (before building):** run `python <kit>/reuse_lookup.py "<behaviour>"` (the
+   behaviour→seam lookup, per `<kit>/reuse-lookup.agent.md`) to find an existing seam to
    wire through; list any layer with no symbol extractor in `.codebase-map.conf` `RECALL_DARK_LAYERS`
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
-   **DoD (at review):** run `python codebase-map/map_diff.py <base>..<head> --drop-affordance-exempt`
+   **DoD (at review):** run `python <kit>/map_diff.py <base>..<head> --drop-affordance-exempt`
    — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
    gate then demands its `## Reuse affordance` block (no human remembering). Also run
-   `python codebase-map/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
+   `python <kit>/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
    NEW export that resembles an existing high-fan-in seam of the same kind it did not wire through
    (shipped reinvention, over ALL new code) and routes each to `<MAP_ROOT>/reinvention-backlog.md`
    (deduped); it is a report + WARN, never a merge gate (a token-stem collision has false positives).
-   To converge the active surface up front, `python codebase-map/gen_map.py --seed-affordances --top
+   To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
+   Both CLIs read only committed artifacts, so nothing fails closed for them: each exits **2** with
+   a refusal when the resolved root carries no `.codebase-map.conf`. Treat that as "not adopted /
+   wrong tree", never as "no seam fits" — the refusal names the root it resolved and the kit dir.
 5. Verify the project's test suite COLLECTS the gate (run the suite; the map tests must appear) —
    for a Python repo that is the entire CI wiring: zero pipeline changes by design.
    **Non-Python repo** (no pytest/py collector to discover the `.py` gate): wire it as an explicit
@@ -178,7 +184,7 @@ slug-collision scan; self-prune your own `merged:<sha>` rows on session start
    launcher differs) to BOTH your CI config and your local gate runner, grep-guarded so a re-run
    doesn't duplicate the leg. Without this the freshness/coverage ratchet silently never runs.
 6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
-7. Commit `codebase-map/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
+7. Commit `<kit>/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
 
 ## 3c — Adopt the memory-recall kit (if chosen in §0)
 
@@ -357,11 +363,14 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 ## 6 — Verify the whole chain, then commit
 
-- Codebase-map (if adopted): `python codebase-map/selftest.py` (kit contract) · run the gate file
-  directly (`python <GATE_FILE>`) · `python codebase-map/gen_map.py --check` (freshness) · make one
+- Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file
+  directly (`python <GATE_FILE>`) · `python <kit>/gen_map.py --check` (freshness) · make one
   throwaway inventory addition and watch the gate go red with the claim remedy, then revert. On a
   **non-Python repo**, also confirm the explicit `python <GATE_FILE>` leg is actually standing in
-  your CI config + gate runner (§3b step 5) — not merely runnable by hand.
+  your CI config + gate runner (§3b step 5) — not merely runnable by hand. Last, run
+  `python <kit>/reuse_lookup.py "<any behaviour>"` and confirm the corpus line reports a NON-ZERO
+  symbol/inventory count: a `corpus: 0 symbols` there means the root resolved somewhere unadopted,
+  and every later "no seam fits" would be an answer from an empty population.
 - Memory-recall (if adopted): `python3 memory-recall/selftest.py` (kit contract) · one real query
   whose record arm anchors the §3c step-2 seed record (zero records with no decision written yet
   is the expected state, not a `FAMILIES` bug) · `bash memory-recall/adopt-memory-recall.sh --check`
@@ -404,8 +413,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ~/.claude/skills/session-kickoff # the engine (per-MACHINE junction/symlink — not in the repo)
 ```
 
-- Codebase-map (only if §3b adopted): `codebase-map/` kit dir + project-owned
-  `codebase-map/map_extractors.py` · `.codebase-map.conf` · the gate at GATE_FILE ·
+- Codebase-map (only if §3b adopted): the `codebase-map` kit dir at whatever prefix you chose +
+  project-owned `<kit>/map_extractors.py` · `.codebase-map.conf` at the ROOT · the gate at GATE_FILE ·
   `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
   `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js`, `tools/settings-merge.py`
@@ -414,13 +423,23 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 ## Maintenance
 
-- Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, the two templates,
-  `selftest.py`) are identical across repos — update by overwriting from `<gov-repo>` wholesale;
-  NEVER overwrite the project-owned `codebase-map/map_extractors.py` or `.codebase-map.conf`.
+- Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, `reuse_lookup.py`, the two
+  templates, `selftest.py`, `adopt-codebase-map.sh`) are identical across repos — update by
+  overwriting from `<gov-repo>` wholesale; NEVER overwrite the project-owned
+  `<kit>/map_extractors.py` or `.codebase-map.conf`.
   When an overwrite first introduces the graced `## Reuse affordance` check, run
-  `python codebase-map/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
+  `python <kit>/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
   commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing
   dossiers so the new check does not retro-red them (it is a no-op once the file is present).
+  Any overwrite that moves `KIT_CODEBASE_MAP_VERSION` also owes one `python <kit>/gen_map.py
+  --write` in the same landing: the version rides `inventories.json`, `MAP.md` and `symbols.json`
+  as `codebase-map@<v>`, and the freshness gate byte-compares them. **1.0 → 1.1** is such a bump.
+  It also frees a prefixed install: if the repo carried a `CODEBASE_MAP_ROOT` workaround (an env
+  export, or an `os.environ.setdefault` in `map_extractors.py`) to correct the old grandparent
+  rule, delete it — the resolver now agrees with it, and a stale override outlives the tree it
+  named. An installed `<GATE_FILE>` is project-owned and is NOT overwritten by this rule, so it
+  keeps its old kit-dir walk until you re-copy the template; that is safe at a root install and
+  required before moving the kit under a prefix.
 
 - **memory-recall is three maintenance classes, not one** — `bench.py` and `union.py` are byte-identical
   upstream copies (their sha prefixes are pinned in `verbatim.json` and gated by the kit selftest):

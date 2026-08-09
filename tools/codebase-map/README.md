@@ -15,7 +15,7 @@ project specifics live in exactly two files the adopting repo owns.
 
 - `map_lib.py` — the engine: dossier/baseline contract (first ```` ```toml ```` fence), pure
   both-direction coverage, deterministic renderers, digest attribution, fail-closed extractor
-  helpers. Stdlib-only, Python ≥ 3.11.
+  helpers, and the one root resolver (`resolve_root`/`repo_root`). Stdlib-only, Python ≥ 3.11.
 - `map_extractors.template.py` — the PROJECT layer: the `EXTRACTORS` dict declaring what is
   enumerable in this repo. Filling it well is the whole adoption job — see
   `INVENTORY-DERIVATION.md`.
@@ -38,16 +38,24 @@ project specifics live in exactly two files the adopting repo owns.
 
 ## Adopt (per project)
 
-1. Copy this directory into the target repo root as `codebase-map/` (the fixed name the gate
-   resolves — don't rename).
-2. `cp codebase-map/.codebase-map.conf.example .codebase-map.conf` and edit (map root, gate path).
-3. `cp codebase-map/map_extractors.template.py codebase-map/map_extractors.py` and declare the
+1. Copy this directory into the target repo as a directory NAMED `codebase-map` (the fixed name
+   the gate resolves — don't rename). Its PREFIX is free: `<root>/codebase-map/` and
+   `<root>/tools/codebase-map/` both work, so a repo that keeps its kits under one directory
+   needs no exception. Below, `<kit>` is wherever you put it.
+2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and edit (map root, gate path). It
+   goes at the repo ROOT whatever the kit's prefix — it is the marker the kit walks up to find.
+3. `cp <kit>/map_extractors.template.py <kit>/map_extractors.py` and declare the
    project's inventories per `INVENTORY-DERIVATION.md` (the adopter scaffolds both files for you
    and stops until they're filled).
-4. `codebase-map/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the baseline
+4. `<kit>/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the baseline
    from live inventories, installs + runs the gate (green on a fresh seed, by construction).
 5. Commit; add the map section to the kickoff manifest and the DoD line to the governance doc
    (WIRE-INTO-PROJECT §3b).
+
+`reuse_lookup.py` and `map_diff.py` read only committed artifacts, so no project layer fails
+closed for them. Both REFUSE (exit 2) when the resolved root carries no `.codebase-map.conf`,
+rather than reporting `corpus: 0 symbols` / `collision_flags: 0` at exit 0 — a confident answer
+over a population that was never read is the failure this kit exists to prevent.
 
 ## The contract in one paragraph
 

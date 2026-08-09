@@ -62,6 +62,197 @@ def expect_maperror(text_mutation, needle):
     raise AssertionError(f"parsed but should have failed ({needle!r})")
 
 
+def t_install_prefix_resolution(tmp: Path):
+    """S1/AC1: the root is resolved from the KIT DIR, so both install shapes work. resolve_root is
+    a pure function of that dir precisely so this can drive every shape without relocating map_lib.
+
+    The old rule was `the kit dir's parent`, which encodes the `<repo-root>/codebase-map/`
+    convention. Under a prefix it lands one segment short and every derived path — MAP_ROOT, the
+    dossiers, the reference scan — points at a tree with nothing in it."""
+    import os
+
+    def tree(name: str, prefix: str, *, conf: bool, git: str | None = "dir") -> Path:
+        root = tmp / name
+        kit = root / prefix / "codebase-map" if prefix else root / "codebase-map"
+        kit.mkdir(parents=True)
+        if git == "dir":
+            (root / ".git").mkdir()
+        elif git == "file":  # a worktree's .git is a FILE, not a directory
+            (root / ".git").write_text("gitdir: ../../.git/worktrees/w\n", encoding="utf-8")
+        if conf:
+            (root / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        return kit
+
+    # --- the kit's own convention: <root>/codebase-map/ ---------------------------------------
+    assert m.resolve_root(tree("a", "", conf=True)) == tmp / "a"
+    # --- a PREFIXED install: <root>/tools/codebase-map/ (the defect this closes) ---------------
+    kit_b = tree("b", "tools", conf=True)
+    assert m.resolve_root(kit_b) == tmp / "b"
+    assert m.resolve_root(kit_b) != tmp / "b" / "tools", "resolved to the OLD grandparent answer"
+    # both roots hold the conf AND .git, so this also pins the ORDER: the conf is tested first,
+    # else the boundary would break the walk at the root and hand back the kit dir's parent.
+    # --- the walk is not capped at one segment ------------------------------------------------
+    assert m.resolve_root(tree("c", "x/y", conf=True)) == tmp / "c"
+    # --- no conf anywhere -> the grandparent convention, unchanged from the old rule -----------
+    assert m.resolve_root(tree("d", "tools", conf=False)) == tmp / "d" / "tools"
+    assert m.resolve_root(tree("e", "", conf=False)) == tmp / "e"  # a root install is unaffected
+
+    # --- the .git boundary: a conf in a PARENT tree is a DIFFERENT checkout --------------------
+    # Worktrees are commonly kept inside the primary tree (this repo uses .claude/worktrees/<n>/),
+    # so an unbounded walk would resolve a worktree's map into the primary tree's MAP_ROOT.
+    primary = tmp / "primary"
+    (primary / ".git").mkdir(parents=True)
+    (primary / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    wt_kit = tree("primary/.claude/worktrees/w", "tools", conf=False, git="file")
+    wt = primary / ".claude" / "worktrees" / "w"
+    assert m.resolve_root(wt_kit) == wt / "tools", "the walk escaped the worktree into the primary tree"
+    (wt / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    assert m.resolve_root(wt_kit) == wt  # the worktree's OWN conf resolves it
+
+    # --- nearest conf wins (a repo vendored inside another adopting repo) ----------------------
+    inner = tmp / "nest" / "inner"
+    (inner / "tools" / "codebase-map").mkdir(parents=True)
+    (tmp / "nest" / m.CONF_NAME).write_text("MAP_ROOT=outer\n", encoding="utf-8")
+    (inner / m.CONF_NAME).write_text("MAP_ROOT=inner\n", encoding="utf-8")
+    assert m.resolve_root(inner / "tools" / "codebase-map") == inner
+
+    # --- repo_root: the override wins, otherwise resolve_root of the kit's OWN dir -------------
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp / "a")
+    try:
+        assert m.repo_root() == tmp / "a"
+    finally:
+        del os.environ["CODEBASE_MAP_ROOT"]
+    assert m.repo_root() == m.resolve_root(Path(os.path.abspath(m.__file__)).parent)
+
+
+def t_require_adopted_root_refuses(tmp: Path):
+    """AC2 (helper half): resolution answers WHERE the root is; this answers WHETHER anything was
+    adopted there. The refusal must name the resolved root, the kit dir and where the root came
+    from — 'wrong install prefix' and 'not adopted yet' are otherwise the same message."""
+    import os
+
+    bare = tmp / "bare"
+    bare.mkdir()
+    os.environ["CODEBASE_MAP_ROOT"] = str(bare)
+    try:
+        try:
+            m.require_adopted_root()
+            raise AssertionError("an unadopted root did not refuse")
+        except m.MapError as exc:
+            msg = str(exc)
+            assert m.CONF_NAME in msg, msg
+            assert "empty corpus" in msg, msg
+            assert str(bare) in msg, msg              # the resolved root, by name
+            assert "CODEBASE_MAP_ROOT" in msg, msg    # where that root came from
+        (bare / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        assert m.require_adopted_root() == bare       # adopted -> the root, no refusal
+    finally:
+        del os.environ["CODEBASE_MAP_ROOT"]
+
+
+def t_clis_refuse_an_unadopted_root(tmp: Path):
+    """AC2: BOTH CLIs refuse through their OWN main(). The helper being correct is not the same
+    claim as the CLIs calling it — that gap is the whole defect, since neither imports the project
+    layer that would otherwise fail closed for them. Each must exit 2 AND print no result: a
+    `no seam fits` or a `collision_flags: 0` on stdout is the confident-empty-answer this closes."""
+    import contextlib
+    import io
+    import os
+    import sys as _sys
+
+    import map_diff as md
+
+    bare = tmp / "bare"
+    bare.mkdir()
+    os.environ["CODEBASE_MAP_ROOT"] = str(bare)
+    saved_argv = _sys.argv
+    try:
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = rl.main(["normalise a display name into a url slug"])
+        assert rc == 2, f"reuse_lookup exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert out.getvalue() == "", f"a shortlist was printed anyway: {out.getvalue()!r}"
+
+        _sys.argv = ["map_diff.py", "HEAD~1..HEAD", "--converge"]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        assert rc == 2, f"map_diff exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert "collision_flags" not in out.getvalue(), out.getvalue()
+    finally:
+        _sys.argv = saved_argv
+        del os.environ["CODEBASE_MAP_ROOT"]
+
+
+def t_gate_template_finds_the_kit(tmp: Path):
+    """S5/AC5: GATE_FILE points wherever the project's suite collects, which is independent of the
+    kit's install prefix, so the gate's own walk must handle both. Driven in a SUBPROCESS: importing
+    the template in-process would leave stub `map_lib`/`map_extractors` entries in sys.modules and
+    shadow the real ones for every case after this one."""
+    import os
+    import subprocess
+    import sys as _sys
+
+    template = (Path(os.path.abspath(__file__)).parent / "test_codebase_map.template.py").read_text(
+        encoding="utf-8"
+    )
+    driver_src = (
+        "import importlib.util, sys\n"
+        "spec = importlib.util.spec_from_file_location('gate_under_test', sys.argv[1])\n"
+        "mod = importlib.util.module_from_spec(spec)\n"
+        "spec.loader.exec_module(mod)\n"
+        "print(mod._kit_dir())\n"
+    )
+
+    def probe(root: Path, kit: Path | None, gate_dir: Path) -> subprocess.CompletedProcess:
+        root.mkdir(parents=True, exist_ok=True)
+        (root / ".git").mkdir(exist_ok=True)
+        if kit is not None:
+            kit.mkdir(parents=True, exist_ok=True)
+            # stubs: _kit_dir only tests for map_lib.py, but the template imports both at module
+            # level once it has found the dir, so both must exist for exec_module to complete.
+            (kit / "map_lib.py").write_text(
+                "import re\nDEFAULT_DECISION_ID_RE = re.compile(r'.')\n", encoding="utf-8"
+            )
+            (kit / "map_extractors.py").write_text(
+                "def inventory_ids():\n    return ()\n", encoding="utf-8"
+            )
+        gate_dir.mkdir(parents=True, exist_ok=True)
+        (gate_dir / "test_codebase_map.py").write_text(template, encoding="utf-8")
+        driver = root / "drive.py"
+        driver.write_text(driver_src, encoding="utf-8")
+        return subprocess.run(
+            [_sys.executable, str(driver), str(gate_dir / "test_codebase_map.py")],
+            capture_output=True, text=True,
+        )
+
+    # (a) PREFIXED kit, gate collected somewhere else entirely — the shape the old walk missed
+    r1 = tmp / "g1"
+    got = probe(r1, r1 / "tools" / "codebase-map", r1 / "tests")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r1 / "tools" / "codebase-map", got.stdout
+
+    # (b) gate installed INSIDE the kit dir (a repo with no test collector wires it as a leg)
+    r2 = tmp / "g2"
+    got = probe(r2, r2 / "tools" / "codebase-map", r2 / "tools" / "codebase-map")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r2 / "tools" / "codebase-map", got.stdout
+
+    # (c) root install — the original convention, unchanged
+    r3 = tmp / "g3"
+    got = probe(r3, r3 / "codebase-map", r3 / "tests")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r3 / "codebase-map", got.stdout
+
+    # (d) no kit at all: a NAMED failure listing what was probed, never a silent wrong dir
+    r4 = tmp / "g4"
+    got = probe(r4, None, r4 / "tests")
+    assert got.returncode != 0, got.stdout
+    assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
+
+
 def t_coverage_directions():
     cov = m.compute_coverage(INV, {"x": claims(flags=("a_flag",))}, EMPTY_BASE)
     assert cov.unclaimed == {"flags": ["b_flag"], "routes": ["api/x/route.ts"]}
@@ -678,6 +869,26 @@ def main() -> int:
     import tempfile
 
     failures = 0
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "root resolution: both install shapes + git boundary (S1/AC1)",
+            lambda: t_install_prefix_resolution(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "unadopted root refuses, naming root + kit dir (AC2)",
+            lambda: t_require_adopted_root_refuses(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "both CLIs refuse through main(), printing no result (AC2)",
+            lambda: t_clis_refuse_an_unadopted_root(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "gate template finds the kit at any prefix (S5/AC5)",
+            lambda: t_gate_template_finds_the_kit(Path(td)),
+        )
     failures += check("coverage both directions + ratchet guards", t_coverage_directions)
     failures += check("dossier contract fails loud", t_parse_contract)
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)

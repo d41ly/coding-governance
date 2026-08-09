@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
-# Adopt the codebase-map kit into a project. Run from anywhere INSIDE the target repo AFTER
-# copying this kit dir to the repo root as `codebase-map/` and filling map_extractors.py:
+# Adopt the codebase-map kit into a project. Run it BY PATH from anywhere, after copying this kit
+# dir into the target repo and filling map_extractors.py:
 #
-#   codebase-map/adopt-codebase-map.sh --scaffold
+#   <kit-dir>/adopt-codebase-map.sh --scaffold
+#
+# The kit dir's NAME is fixed (`codebase-map` — the gate template resolves the kit by it), but its
+# PREFIX under the repo root is free: `<root>/codebase-map/` and `<root>/tools/codebase-map/` are
+# both supported, matching map_lib.resolve_root.
 #
 # Steps: conf (copy example if absent) -> extractors sanity -> python scaffold (map tree +
 # FOUNDATION skeleton + seeded baseline + generated artifacts) -> gate template copied to
 # GATE_FILE -> gate executed once (expect PASS on the freshly seeded tree).
 set -u
-ROOT="$(git rev-parse --show-toplevel)" || exit 2
+HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
+# ROOT is the repo containing the KIT, not the repo containing the cwd. Anchoring on the script's
+# own location is what lets it be run by path from anywhere, and is the same anchor map_lib uses.
+ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
+# The kit's path under that root, asked of git rather than derived by trimming "$ROOT" off "$HERE":
+# MSYS and symlinks spell the same directory two ways, which is why the old check used `-ef`.
+KIT_REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
+KIT_REL="${KIT_REL%/}"
 cd "$ROOT" || exit 2
-HERE="$(cd "$(dirname "$0")" && pwd)"
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
 # and tools/lib/resolve-python.test.sh reds if any copy drifts.
@@ -52,9 +62,14 @@ PY=$(resolve_python "${MAP_PY:-}") || exit 2
 
 [ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold   (MAP_PY=python3 to override the launcher)"; exit 2; }   # gov:literal-python — inside a usage string
 
-# -ef (same device+inode), not a string compare: MSYS/symlinks spell the same dir differently
-[ "$HERE" -ef "$ROOT/codebase-map" ] || {
-  echo "kit dir must live at <repo-root>/codebase-map/ (found: $HERE) — the gate template resolves it by that name"; exit 1; }
+# Only the kit dir's NAME is load-bearing (the gate template resolves the kit by it); the prefix is
+# free. The kit must also be INSIDE the repo, not be the repo root itself.
+[ -n "$KIT_REL" ] || {
+  echo "the kit dir is the repo root itself ($ROOT) — copy the kit in as a directory named codebase-map/"; exit 1; }
+case "$KIT_REL" in
+  codebase-map|*/codebase-map) ;;
+  *) echo "the kit dir must be NAMED codebase-map (found: $KIT_REL) — the gate template resolves it by that name; any prefix above it is fine"; exit 1;;
+esac
 
 if [ ! -f "$ROOT/.codebase-map.conf" ]; then
   cp "$HERE/.codebase-map.conf.example" "$ROOT/.codebase-map.conf"
@@ -68,8 +83,8 @@ GATE_FILE="$(printf '%s' "${GATE_FILE:-}" | tr -d '\r')"
 
 [ -f "$HERE/map_extractors.py" ] || {
   cp "$HERE/map_extractors.template.py" "$HERE/map_extractors.py"
-  echo "created codebase-map/map_extractors.py from the template — declare your inventories"
-  echo "(see codebase-map/INVENTORY-DERIVATION.md), then re-run."
+  echo "created $KIT_REL/map_extractors.py from the template — declare your inventories"
+  echo "(see $KIT_REL/INVENTORY-DERIVATION.md), then re-run."
   exit 1; }
 
 # Idempotent: an already-scaffolded map reconverges via --write (re-renders generated/ so a bumped
@@ -101,7 +116,7 @@ echo "--- running the gate once (standalone mode) ---"
 "$PY" "$GATE" || { echo "gate FAILED on the freshly seeded tree — fix before committing"; exit 1; }
 
 echo "Adopted. Next:"
-echo "  1. git add codebase-map/ .codebase-map.conf $GATE ${MAP_ROOT:-memory/map}/ && commit."
+echo "  1. git add $KIT_REL/ .codebase-map.conf $GATE ${MAP_ROOT:-memory/map}/ && commit."
 echo "  2. Verify your test suite collects the gate (it now enforces on every run/CI)."
 echo "  3. Add the map section to your kickoff manifest (see MANIFEST-TEMPLATE.md) and the"
 echo "     DoD line to your governance doc/CLAUDE.md."

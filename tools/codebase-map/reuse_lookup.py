@@ -14,7 +14,11 @@ so an empty result is never a falsely-confident "no seam fits".
 
 Portable: reads only committed artifacts + dossiers + the conf via the repo root
 (CODEBASE_MAP_ROOT overrides), so it needs NO project map_extractors.py — it runs the same in
-any adopting repo. This is bThriftyCompass S1's portable re-implementation; an adopting repo
+any adopting repo, at any kit install prefix. Having no project layer also means nothing here
+fails closed on a mis-rooted run, so the CLI asserts the resolved root is ADOPTED (it carries
+.codebase-map.conf) and exits 2 if not: `corpus: 0 symbols` + `no seam fits` at exit 0 is a
+confident answer from an empty population, which is worse than no answer.
+This is bThriftyCompass S1's portable re-implementation; an adopting repo
 retires any bespoke reuse-audit script and repoints its "reuse before building" step here. The
 CLI produces the shortlist; the agent-instruction reuse-lookup.agent.md turns it into a
 decision (wire through seam X, or "no seam fits").
@@ -384,11 +388,19 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     query = " ".join(args.query)
 
+    # Refuse BEFORE loading: an unadopted/mis-rooted root yields an empty corpus, and every line
+    # below would then render a confident "no seam fits" over a population that was never read.
+    try:
+        m.require_adopted_root()
+    except m.MapError as exc:
+        print(f"reuse-lookup refused: {exc}", file=sys.stderr)
+        return 2
+
     corpus = load_corpus()
     ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
     shortlist = assemble_shortlist(query, corpus, ref_index)
     print(render(shortlist, corpus), end="")
-    return 0  # advisory: always succeeds (never a gate)
+    return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 
 if __name__ == "__main__":

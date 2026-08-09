@@ -12,9 +12,13 @@ Two claim planes (the load-bearing design decision, learned the hard way):
   in an explicit UNMAPPED bucket, NEVER gated.
 
 This module is identical across repos. Project specifics live in TWO sibling files the adopting
-repo owns: `.codebase-map.conf` at the repo root (paths) and `codebase-map/map_extractors.py`
+repo owns: `.codebase-map.conf` at the repo root (paths) and `<kit-dir>/map_extractors.py`
 (the EXTRACTORS dict — what is enumerable in THIS project). Everything here is stdlib-only,
 Python >= 3.11 (tomllib).
+
+The kit DIRECTORY is named `codebase-map` by convention (the gate resolves it by that name), but
+its PREFIX under the repo root is free: `<repo-root>/codebase-map/` and
+`<repo-root>/tools/codebase-map/` are both supported — see repo_root/resolve_root.
 
 Portability rules baked in (each was a review finding once — do not relax):
 - every extractor FAILS CLOSED: a missing artifact or unexpected tree shape raises MapError,
@@ -41,7 +45,12 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.0"
+KIT_CODEBASE_MAP_VERSION = "1.1"
+
+#: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
+#: repo that has adopted the kit has this file, and the kit needs no other declaration of where
+#: the root is (a KIT_DIR key would be a second copy of what the filesystem already answers).
+CONF_NAME = ".codebase-map.conf"
 
 STATUS_VALUES = frozenset({"shipped", "shipped-dark", "building", "deferred"})
 
@@ -71,22 +80,74 @@ class MapError(RuntimeError):
 # ======================================================================================
 
 
+def resolve_root(kit_dir: Path) -> Path:
+    """The adopting repo's root, as a PURE function of where the kit dir sits — so the selftest
+    can drive both install shapes without copying this module around.
+
+    Walk UP from ``kit_dir`` and return the nearest ancestor holding ``CONF_NAME``; stop after the
+    ancestor holding ``.git``; otherwise fall back to ``kit_dir``'s parent. That fallback IS the
+    kit's original convention (a kit dir at ``<repo-root>/codebase-map/`` makes the parent the
+    root), so a root-installed adopter with a conf and one without both resolve exactly as before.
+    The walk is what makes a PREFIXED install work: at ``<repo-root>/tools/codebase-map/`` the
+    parent is ``tools/`` and every derived path was wrong by one segment.
+
+    The ``.git`` stop is not decoration. Worktrees are commonly kept INSIDE the primary tree (this
+    repo puts them under ``.claude/worktrees/``), so an unbounded walk from a worktree's kit dir
+    reaches the PRIMARY tree's conf and resolves MAP_ROOT into a different checkout. ``.git`` is a
+    FILE in a worktree and a directory in a primary tree, so one ``exists()`` covers both, and the
+    conf is tested BEFORE it so an adopted root that also holds ``.git`` still wins.
+
+    Pure path math on ``abspath``, never ``resolve()``: a symlinked/junctioned kit dir must anchor
+    to the ADOPTING repo, not to the link target's parent (the gate's walk-up and the adopter both
+    accept that layout — this must agree with them). That guarantee is also why the root is not
+    taken from ``git rev-parse --show-toplevel``, which resolves the junction away."""
+    kit_dir = Path(os.path.abspath(kit_dir))
+    for ancestor in kit_dir.parents:
+        if (ancestor / CONF_NAME).is_file():
+            return ancestor
+        if (ancestor / ".git").exists():
+            break
+    return kit_dir.parent
+
+
 def repo_root() -> Path:
-    """The adopting repo's root. Convention: this kit dir lives AT the repo root as
-    ``codebase-map/`` — so root is this file's grandparent. ``CODEBASE_MAP_ROOT`` overrides
-    (tests, exotic layouts). ``abspath``, NOT ``resolve()``: a symlinked/junctioned kit dir
-    must anchor to the ADOPTING repo, not to the link target's parent (the gate's walk-up and
-    the adopter's ``-ef`` check both accept that layout — this must agree with them)."""
+    """The adopting repo's root for THIS installed copy of the kit. ``CODEBASE_MAP_ROOT``
+    overrides (tests, exotic layouts); otherwise ``resolve_root`` of this file's own directory."""
     override = os.environ.get("CODEBASE_MAP_ROOT")
     if override:
         return Path(override)
-    return Path(os.path.abspath(__file__)).parents[1]
+    return resolve_root(Path(os.path.abspath(__file__)).parent)
+
+
+def require_adopted_root() -> Path:
+    """The repo root, ASSERTED to carry the conf — for the entrypoints that read only committed
+    artifacts and therefore have no project layer to fail closed for them (reuse_lookup, map_diff).
+
+    Resolution answers WHERE the root is; this answers WHETHER anything was adopted there. They are
+    deliberately separate: the library layer stays fail-open (a thin corpus is a thin shortlist, by
+    design), while a CLI refuses. Without this, a mis-rooted lookup prints `corpus: 0 symbols` and
+    `no seam fits`, and a mis-rooted `--converge` prints `collision_flags: 0` — both exit 0, and
+    both read as real answers derived from a real population. That is the green-by-absence class
+    the whole kit exists to prevent, so the kit must not ship it."""
+    root = repo_root()
+    if (root / CONF_NAME).is_file():
+        return root
+    override = os.environ.get("CODEBASE_MAP_ROOT")
+    kit_dir = Path(os.path.abspath(__file__)).parent
+    raise MapError(
+        f"no {CONF_NAME} at the resolved repo root — refusing to answer from an empty corpus.\n"
+        f"  resolved root: {root}\n"
+        f"  kit dir:       {kit_dir}\n"
+        f"  root came from: {'CODEBASE_MAP_ROOT=' + override if override else 'the walk up from the kit dir'}\n"
+        f"If this repo has adopted the kit, {CONF_NAME} belongs at its ROOT (the kit dir may live at\n"
+        f"any prefix under it). If it has not, run the adopter: <kit-dir>/adopt-codebase-map.sh --scaffold."
+    )
 
 
 def load_conf(root: Path | None = None) -> dict[str, str]:
     """Parse ``.codebase-map.conf`` (plain KEY=VALUE shell assignments, ``#`` comments) —
     the same one-conf-both-worlds format the memory-tree kit uses, readable by bash AND here."""
-    path = (root or repo_root()) / ".codebase-map.conf"
+    path = (root or repo_root()) / CONF_NAME
     conf: dict[str, str] = {"MAP_ROOT": "memory/map"}
     if not path.is_file():
         return conf

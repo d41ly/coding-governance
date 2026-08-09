@@ -21,6 +21,12 @@ WARN to <MAP_ROOT>/reinvention-backlog.md (deduped), plus `new_clones` (the adop
 clone-ratchet's count, or null) — and the demoted hygiene hints affordance_coverage_% /
 dead_exports (explicitly NOT the convergence signal). A REPORT + WARN, never a gate (F5): a
 convergence metric that hard-fails false-fails on legitimate feature churn. Always exits 0.
+
+Exit 2 is the one exception, and it is a REFUSAL rather than a result: the resolved repo root
+carries no .codebase-map.conf. --converge reads only committed artifacts, so it has no project
+layer to fail closed for it, and a mis-rooted run builds its reference index over a root with no
+source under it — no seam then reaches the fan-in threshold, so `collision_flags: 0` is
+structurally guaranteed at exit 0 no matter what the range actually shipped.
 """
 
 from __future__ import annotations
@@ -221,6 +227,14 @@ def main() -> int:
         base, head = args.range
     else:
         parser.error("pass <base>..<head> or two refs")
+        return 2
+
+    # Refuse BEFORE any git call or artifact read: at a root that was never adopted the digest
+    # reports every file UNMAPPED and --converge reports a clean all-clear, both at exit 0.
+    try:
+        m.require_adopted_root()
+    except m.MapError as exc:
+        print(f"map-diff refused: {exc}", file=sys.stderr)
         return 2
 
     files = _changed_files(base, head)
