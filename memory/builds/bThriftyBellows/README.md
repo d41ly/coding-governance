@@ -1,0 +1,26 @@
+---
+slug: bThriftyBellows
+node: b
+opened: 2026-07-16
+streams: tooling
+roster: TOOL
+ids: TOOL-bThriftyBellows-1/-2
+status: CLOSED
+---
+
+# bThriftyBellows — memory-tree kit 1.2 — the hygiene-gate fork-collapse port
+
+Node `b` · opened 2026-07-16 · streams tooling.
+
+Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+GENERATED from the status header of every spec in this folder — do not hand-edit it.
+
+This build shipped on 2026-07-16 without a spec, before the spec-format ratchet reached it, so its
+only record is the recording under `build/`. That recording carries no status header, which is why
+the front matter above declares `status:` outright instead of leaving it to be derived.
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bThriftyBellows-1/-2
+
+*No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-index -->
