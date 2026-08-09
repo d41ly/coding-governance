@@ -1,24 +1,30 @@
 """Generate / check / seed / scaffold the codebase-map artifacts (codebase-map kit).
 
-Run from the ADOPTING repo's root:
+Run from the ADOPTING repo's root (`<kit>` is this kit's install prefix; --help prints it resolved):
 
-    python codebase-map/gen_map.py --scaffold        # one-time: map tree + seeded baseline
-    python codebase-map/gen_map.py --write           # (re)render generated/ to disk
-    python codebase-map/gen_map.py --check           # byte-compare (LF-normalized); exit 1
-    python codebase-map/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
-    python codebase-map/gen_map.py --seed-affordance-baseline  # grace today's dossiers (adopt)
-    python codebase-map/gen_map.py --seed-affordances --top 10 # worklist: undeclared hot seams
+    python <kit>/gen_map.py --scaffold        # one-time: map tree + seeded baseline
+    python <kit>/gen_map.py --write           # (re)render generated/ to disk
+    python <kit>/gen_map.py --check           # byte-compare (LF-normalized); exit 1
+    python <kit>/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
+    python <kit>/gen_map.py --seed-affordance-baseline  # grace today's dossiers (adopt)
+    python <kit>/gen_map.py --seed-affordances --top 10 # worklist: undeclared hot seams
 
-Requires a filled codebase-map/map_extractors.py (the template refuses an empty EXTRACTORS).
+Requires a filled <kit>/map_extractors.py (the template refuses an empty EXTRACTORS).
 """
 
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
     sys.stdout.reconfigure(errors="replace")
@@ -31,6 +37,34 @@ import reuse_lookup as rl  # noqa: E402
 
 IDS = ext.inventory_ids()
 ID_RE = getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE)
+
+
+def _diff_cmd(conf: dict[str, str]) -> str:
+    """The digest command for the scaffolded map README. A CONFIGURED value wins — an adopter may
+    legitimately spell it `uv run python …` — but only when the `…/map_diff.py` it names actually
+    resolves from the repo root. A truthy-but-stale value used to beat the prefix-correct fallback,
+    and the documented adoption path (`cp` the example, THEN run the adopter) is exactly the path
+    that leaves the example's `codebase-map/map_diff.py` in place: measured at a `tools/`-prefixed
+    install, the scaffolded README shipped a digest command naming a file that does not exist. A
+    path the kit prints must resolve, so an unresolvable one is treated as absent."""
+    configured = (conf.get("MAP_DIFF_CMD") or "").strip()
+    root = m.repo_root()
+    named = [tok for tok in configured.split() if tok.endswith("map_diff.py")]
+    if configured and named and (root / named[-1]).is_file():
+        return configured
+    fallback = f"python {m.kit_rel()}/map_diff.py"
+    if configured:
+        print(
+            f"note: MAP_DIFF_CMD names {named[-1] if named else 'no map_diff.py'}, which does not "
+            f"resolve from {root} — the map README will use {fallback!r} instead. Fix the conf."
+        )
+    return fallback
+
+
+def _usage() -> str:
+    """This module's docstring with `<kit>` resolved to the real install prefix, so every command
+    argparse prints is copy-pasteable from the repo root rather than only true at a root install."""
+    return __doc__.replace("<kit>", m.kit_rel())
 
 _FOUNDATION_SKELETON = """# foundation — the shared substrate (not a feature)
 
@@ -58,8 +92,8 @@ seams, ops tooling, the registries themselves). Feature-shaped items belong in
 _README = """# {map_root} — the self-verifying codebase map
 
 Feature dossiers whose machine claims are CI-verified against live code inventories, a
-generated system map, and a git-range digest. Kit: `codebase-map/` (coding-governance);
-inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE.
+generated system map, and a git-range digest. Kit: `{kit}/` (coding-governance);
+inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE.
 
 ## Layout
 - `FOUNDATION.md` — shared-substrate claims (same contract as a dossier).
@@ -70,13 +104,13 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
 - `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `symbols.json`
   (reuse-recall index — only when the SYMBOL tier is declared in map_extractors.py); regenerate
-  with `python codebase-map/gen_map.py --write`, never hand-edit.
+  with `{regen}`, never hand-edit.
 
 ## How to claim (quickstart)
 1. You add an inventoried moving part -> the gate fails naming the key.
 2. Claim it in the owning dossier's toml fence (create the dossier from any existing one).
 3. Shared substrate -> claim in `FOUNDATION.md` instead.
-4. Claim edits stale `generated/MAP.md` -> run `python codebase-map/gen_map.py --write`
+4. Claim edits stale `generated/MAP.md` -> run `{regen}`
    in the same commit (`--check` to verify).
 5. Digest any range: `{diff_cmd} <base>..<head>` (`--verbose` for files).
 
@@ -88,8 +122,8 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
 - New dossiers must record a reuse decision in `## Reuse affordance`: one
   `seam: <id> — reuse for <need>; extend via <point>` line per seam this feature is reused through,
   or `none — <why feature-specific>` (presence gated, content not). BEFORE building, run
-  `python codebase-map/reuse_lookup.py "<behaviour>"` to find an existing seam to wire through
-  instead of reinventing it (see `codebase-map/reuse-lookup.agent.md`).
+  `python {kit}/reuse_lookup.py "<behaviour>"` to find an existing seam to wire through
+  instead of reinventing it (see `{kit}/reuse-lookup.agent.md`).
 """
 
 
@@ -167,7 +201,7 @@ def _seed_affordances(top: int) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_usage())
     mode = parser.add_mutually_exclusive_group(required=True)
     for flag in ("--scaffold", "--write", "--check", "--seed-baseline",
                  "--seed-affordance-baseline", "--seed-affordances"):
@@ -196,7 +230,9 @@ def main() -> int:
             map_dir / "README.md",
             _README.format(
                 map_root=conf["MAP_ROOT"],
-                diff_cmd=conf.get("MAP_DIFF_CMD") or "python codebase-map/map_diff.py",
+                kit=m.kit_rel(),
+                regen=m.regen_cmd(),
+                diff_cmd=_diff_cmd(conf),
             ),
         )
         (map_dir / "features").mkdir(parents=True, exist_ok=True)
@@ -225,7 +261,7 @@ def main() -> int:
         else:
             committed = m.lf(path.read_text(encoding="utf-8")) if path.is_file() else ""
             if committed != fresh:
-                print(f"STALE: {path} — regen: {m.REGEN_CMD}")
+                print(f"STALE: {path} — regen: {m.regen_cmd()}")
                 stale = True
     return 1 if stale else 0
 

@@ -1,6 +1,6 @@
 """reuse-lookup — the behaviour->seam discovery entrypoint (codebase-map kit, S3).
 
-    python codebase-map/reuse_lookup.py "normalise a display name into a url slug"
+    python <kit>/reuse_lookup.py "normalise a display name into a url slug"
 
 Assembles a candidate corpus from the map's four recall sources — generated/symbols.json
 ids/kinds, generated/inventories.json keys, every dossier's `## Reuse affordance` seam line,
@@ -14,7 +14,11 @@ so an empty result is never a falsely-confident "no seam fits".
 
 Portable: reads only committed artifacts + dossiers + the conf via the repo root
 (CODEBASE_MAP_ROOT overrides), so it needs NO project map_extractors.py — it runs the same in
-any adopting repo. This is bThriftyCompass S1's portable re-implementation; an adopting repo
+any adopting repo, at any kit install prefix. Having no project layer also means nothing here
+fails closed on a mis-rooted run, so the CLI asserts the resolved root is ADOPTED (it carries
+.codebase-map.conf) and exits 2 if not: `corpus: 0 symbols` + `no seam fits` at exit 0 is a
+confident answer from an empty population, which is worse than no answer.
+This is bThriftyCompass S1's portable re-implementation; an adopting repo
 retires any bespoke reuse-audit script and repoints its "reuse before building" step here. The
 CLI produces the shortlist; the agent-instruction reuse-lookup.agent.md turns it into a
 decision (wire through seam X, or "no seam fits").
@@ -24,12 +28,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII query echo, not crash it
     sys.stdout.reconfigure(errors="replace")
@@ -379,16 +389,25 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    # `<kit>` resolved, so the usage line --help prints names this install's real prefix.
+    parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("query", nargs="+", help="a behaviour description, e.g. 'send a templated email'")
     args = parser.parse_args(argv)
     query = " ".join(args.query)
+
+    # Refuse BEFORE loading: an unadopted/mis-rooted root yields an empty corpus, and every line
+    # below would then render a confident "no seam fits" over a population that was never read.
+    try:
+        m.require_adopted_root()
+    except m.MapError as exc:
+        print(f"reuse-lookup refused: {exc}", file=sys.stderr)
+        return 2
 
     corpus = load_corpus()
     ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
     shortlist = assemble_shortlist(query, corpus, ref_index)
     print(render(shortlist, corpus), end="")
-    return 0  # advisory: always succeeds (never a gate)
+    return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 """Feature-level digest of a git range via the codebase map (codebase-map kit).
 
-    python codebase-map/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
-    python codebase-map/map_diff.py <base>..<head> --converge
-    python codebase-map/map_diff.py <base> <head>  [--verbose]
+    python <kit>/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
+    python <kit>/map_diff.py <base>..<head> --converge
+    python <kit>/map_diff.py <base> <head>  [--verbose]
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
@@ -21,18 +21,30 @@ WARN to <MAP_ROOT>/reinvention-backlog.md (deduped), plus `new_clones` (the adop
 clone-ratchet's count, or null) — and the demoted hygiene hints affordance_coverage_% /
 dead_exports (explicitly NOT the convergence signal). A REPORT + WARN, never a gate (F5): a
 convergence metric that hard-fails false-fails on legitimate feature churn. Always exits 0.
+
+Exit 2 is the one exception, and it is a REFUSAL rather than a result: the resolved repo root
+carries no .codebase-map.conf. --converge reads only committed artifacts, so it has no project
+layer to fail closed for it, and a mis-rooted run builds its reference index over a root with no
+source under it — no seam then reaches the fan-in threshold, so `collision_flags: 0` is
+structurally guaranteed at exit 0 no matter what the range actually shipped.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
     sys.stdout.reconfigure(errors="replace")
@@ -197,7 +209,9 @@ def _converge(base: str, head: str, files: list[str]) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    # `<kit>` resolved, so every command --help prints is copy-pasteable from the repo root at
+    # whatever prefix this kit is installed at, not only at the default one.
+    parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("range", nargs="+", help="<base>..<head> or <base> <head>")
     parser.add_argument("--verbose", action="store_true", help="full unmapped file list")
     parser.add_argument(
@@ -221,6 +235,14 @@ def main() -> int:
         base, head = args.range
     else:
         parser.error("pass <base>..<head> or two refs")
+        return 2
+
+    # Refuse BEFORE any git call or artifact read: at a root that was never adopted the digest
+    # reports every file UNMAPPED and --converge reports a clean all-clear, both at exit 0.
+    try:
+        m.require_adopted_root()
+    except m.MapError as exc:
+        print(f"map-diff refused: {exc}", file=sys.stderr)
         return 2
 
     files = _changed_files(base, head)

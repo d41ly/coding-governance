@@ -7,8 +7,8 @@ surfaces where "somebody added one and nobody recorded it" actually hurts are th
 kits, the hooks and the catalogues — not routes or screens. Every inventory below is a NAMED,
 ADDABLE moving part of that product.
 
-ROOT RESOLUTION. m.repo_root() is the kit dir's grandparent, which is `tools/` in this repo, so
-every invocation must set CODEBASE_MAP_ROOT to the repo root. See .codebase-map.conf.
+ROOT RESOLUTION. Handled by the engine since the aRootedPrefix unit: map_lib walks up for
+`.codebase-map.conf` bounded by `.git`, so this repo's `tools/` install prefix needs nothing here.
 
 Rules honoured (each was a shipped bug once, per the derivation checklist):
 - Fail CLOSED. Every extractor raises MapError rather than returning fewer keys; an extractor that
@@ -26,17 +26,13 @@ from pathlib import Path
 
 import map_lib as m
 
-# THE INSTALL PREFIX, declared once, here. map_lib.repo_root() resolves the root as the kit dir's
-# GRANDPARENT because the kit's convention is <repo-root>/codebase-map/; this repo installs every
-# kit under tools/, so that convention lands on `tools/` and every path below would be wrong.
-#
-# This file is THIS repo's project layer and is never shipped, so parents[2] of
-# tools/codebase-map/map_extractors.py is permanently the repo root — no env var, no git call, and
-# no shell wrapper on the gate leg (which would dodge the runner's python resolution in argv[0]).
-# Set before the first repo_root() call: map_lib reads the variable at call time, and gen_map.py
-# imports this module at module level, ahead of any load_conf().
-os.environ.setdefault("CODEBASE_MAP_ROOT", str(Path(__file__).resolve().parents[2]))
-
+# THE INSTALL PREFIX is no longer this file's problem. It used to set CODEBASE_MAP_ROOT from
+# `Path(__file__).resolve().parents[2]`, because map_lib resolved the root as the kit dir's
+# GRANDPARENT and this repo installs kits under `tools/`. the aRootedPrefix unit fixed that in the
+# ENGINE — `map_lib.resolve_root()` walks up for `.codebase-map.conf`, bounded by `.git` — so the
+# workaround is obsolete. It is also now BANNED: the kit's selftest rejects `resolve()` in kit code,
+# since it follows a junction to the link target and would disagree with `map_lib.kit_dir()` about
+# the prefix stamped into byte-compared artifacts.
 ROOT = m.repo_root()
 
 
@@ -49,7 +45,7 @@ def _tool_kits() -> list[str]:
     """
     base = ROOT / "tools"
     if not base.is_dir():
-        raise m.MapError("kits: tools/ is missing — the extractor is mis-rooted (set CODEBASE_MAP_ROOT)")
+        raise m.MapError("kits: tools/ is missing — the extractor is mis-rooted")
     names = sorted(p.name for p in base.iterdir() if p.is_dir() and p.name != "__pycache__")
     if not names:
         raise m.MapError("kits: no kit directories under tools/ — the extractor is mis-rooted")

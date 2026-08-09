@@ -1,6 +1,6 @@
 """codebase-map kit self-test — exercises the pure engine with fixtures (stdlib only).
 
-    python codebase-map/selftest.py        # exit 0 = the kit's contract holds
+    python <kit>/selftest.py        # exit 0 = the kit's contract holds
 
 These are the red-path proofs: an unclaimed key, a stale claim, a stale/lazy baseline line,
 and every malformed-dossier class must FAIL LOUD; multi-claim, case-sensitivity, and
@@ -9,10 +9,16 @@ backslash normalization must behave identically on every platform.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
+# and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
+# yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
+# artifacts while the gate re-renders another — a permanently STALE gate whose own printed
+# remedy re-writes the wrong spelling and never converges (measured).
+sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
@@ -60,6 +66,372 @@ def expect_maperror(text_mutation, needle):
         assert needle in str(exc), f"wrong error: {exc}"
         return
     raise AssertionError(f"parsed but should have failed ({needle!r})")
+
+
+def t_install_prefix_resolution(tmp: Path):
+    """S1/AC1: the root is resolved from the KIT DIR, so both install shapes work. resolve_root is
+    a pure function of that dir precisely so this can drive every shape without relocating map_lib.
+
+    The old rule was `the kit dir's parent`, which encodes the `<repo-root>/codebase-map/`
+    convention. Under a prefix it lands one segment short and every derived path — MAP_ROOT, the
+    dossiers, the reference scan — points at a tree with nothing in it."""
+    import os
+
+    def tree(name: str, prefix: str, *, conf: bool, git: str | None = "dir") -> Path:
+        root = tmp / name
+        kit = root / prefix / "codebase-map" if prefix else root / "codebase-map"
+        kit.mkdir(parents=True)
+        if git == "dir":
+            (root / ".git").mkdir()
+        elif git == "file":  # a worktree's .git is a FILE, not a directory
+            (root / ".git").write_text("gitdir: ../../.git/worktrees/w\n", encoding="utf-8")
+        if conf:
+            (root / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        return kit
+
+    # --- the kit's own convention: <root>/codebase-map/ ---------------------------------------
+    assert m.resolve_root(tree("a", "", conf=True)) == tmp / "a"
+    # --- a PREFIXED install: <root>/tools/codebase-map/ (the defect this closes) ---------------
+    kit_b = tree("b", "tools", conf=True)
+    assert m.resolve_root(kit_b) == tmp / "b"
+    assert m.resolve_root(kit_b) != tmp / "b" / "tools", "resolved to the OLD grandparent answer"
+    # both roots hold the conf AND .git, so this also pins the ORDER: the conf is tested first,
+    # else the boundary would break the walk at the root and hand back the kit dir's parent.
+    # --- the walk is not capped at one segment ------------------------------------------------
+    assert m.resolve_root(tree("c", "x/y", conf=True)) == tmp / "c"
+    # --- no conf anywhere -> the grandparent convention, unchanged from the old rule -----------
+    assert m.resolve_root(tree("d", "tools", conf=False)) == tmp / "d" / "tools"
+    assert m.resolve_root(tree("e", "", conf=False)) == tmp / "e"  # a root install is unaffected
+
+    # --- the .git boundary: a conf in a PARENT tree is a DIFFERENT checkout --------------------
+    # Worktrees are commonly kept inside the primary tree (this repo uses .claude/worktrees/<n>/),
+    # so an unbounded walk would resolve a worktree's map into the primary tree's MAP_ROOT.
+    primary = tmp / "primary"
+    (primary / ".git").mkdir(parents=True)
+    (primary / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    wt_kit = tree("primary/.claude/worktrees/w", "tools", conf=False, git="file")
+    wt = primary / ".claude" / "worktrees" / "w"
+    assert m.resolve_root(wt_kit) == wt / "tools", "the walk escaped the worktree into the primary tree"
+    (wt / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    assert m.resolve_root(wt_kit) == wt  # the worktree's OWN conf resolves it
+
+    # --- nearest conf wins (a repo vendored inside another adopting repo) ----------------------
+    inner = tmp / "nest" / "inner"
+    (inner / "tools" / "codebase-map").mkdir(parents=True)
+    (tmp / "nest" / m.CONF_NAME).write_text("MAP_ROOT=outer\n", encoding="utf-8")
+    (inner / m.CONF_NAME).write_text("MAP_ROOT=inner\n", encoding="utf-8")
+    assert m.resolve_root(inner / "tools" / "codebase-map") == inner
+
+    # --- repo_root: the override wins, otherwise resolve_root of the kit's OWN dir -------------
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp / "a")
+    try:
+        assert m.repo_root() == tmp / "a"
+    finally:
+        del os.environ["CODEBASE_MAP_ROOT"]
+    assert m.repo_root() == m.resolve_root(Path(os.path.abspath(m.__file__)).parent)
+
+
+def t_require_adopted_root_refuses(tmp: Path):
+    """AC2 (helper half): resolution answers WHERE the root is; this answers WHETHER anything was
+    adopted there. The refusal must name the resolved root, the kit dir and where the root came
+    from — 'wrong install prefix' and 'not adopted yet' are otherwise the same message."""
+    import os
+
+    bare = tmp / "bare"
+    bare.mkdir()
+    os.environ["CODEBASE_MAP_ROOT"] = str(bare)
+    try:
+        try:
+            m.require_adopted_root()
+            raise AssertionError("an unadopted root did not refuse")
+        except m.MapError as exc:
+            msg = str(exc)
+            assert m.CONF_NAME in msg, msg
+            assert "empty corpus" in msg, msg
+            assert str(bare) in msg, msg              # the resolved root, by name
+            assert "CODEBASE_MAP_ROOT" in msg, msg    # where that root came from
+        (bare / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        assert m.require_adopted_root() == bare       # adopted -> the root, no refusal
+    finally:
+        del os.environ["CODEBASE_MAP_ROOT"]
+
+
+def t_clis_refuse_an_unadopted_root(tmp: Path):
+    """AC2: BOTH CLIs refuse through their OWN main(). The helper being correct is not the same
+    claim as the CLIs calling it — that gap is the whole defect, since neither imports the project
+    layer that would otherwise fail closed for them. Each must exit 2 AND print no result: a
+    `no seam fits` or a `collision_flags: 0` on stdout is the confident-empty-answer this closes."""
+    import contextlib
+    import io
+    import os
+    import sys as _sys
+
+    import map_diff as md
+
+    bare = tmp / "bare"
+    bare.mkdir()
+    os.environ["CODEBASE_MAP_ROOT"] = str(bare)
+    saved_argv = _sys.argv
+    try:
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = rl.main(["normalise a display name into a url slug"])
+        assert rc == 2, f"reuse_lookup exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert out.getvalue() == "", f"a shortlist was printed anyway: {out.getvalue()!r}"
+
+        _sys.argv = ["map_diff.py", "HEAD~1..HEAD", "--converge"]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        assert rc == 2, f"map_diff exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert "collision_flags" not in out.getvalue(), out.getvalue()
+    finally:
+        _sys.argv = saved_argv
+        del os.environ["CODEBASE_MAP_ROOT"]
+
+
+def t_gate_template_finds_the_kit(tmp: Path):
+    """S5/AC5: GATE_FILE points wherever the project's suite collects, which is independent of the
+    kit's install prefix, so the gate's own walk must handle both. Driven in a SUBPROCESS: importing
+    the template in-process would leave stub `map_lib`/`map_extractors` entries in sys.modules and
+    shadow the real ones for every case after this one."""
+    import os
+    import subprocess
+    import sys as _sys
+
+    template = (Path(os.path.abspath(__file__)).parent / "test_codebase_map.template.py").read_text(
+        encoding="utf-8"
+    )
+    driver_src = (
+        "import importlib.util, sys\n"
+        "spec = importlib.util.spec_from_file_location('gate_under_test', sys.argv[1])\n"
+        "mod = importlib.util.module_from_spec(spec)\n"
+        "spec.loader.exec_module(mod)\n"
+        "print(mod._kit_dir())\n"
+    )
+
+    def probe(root: Path, kit: Path | None, gate_dir: Path) -> subprocess.CompletedProcess:
+        root.mkdir(parents=True, exist_ok=True)
+        (root / ".git").mkdir(exist_ok=True)
+        if kit is not None:
+            kit.mkdir(parents=True, exist_ok=True)
+            # stubs: _kit_dir only tests for map_lib.py, but the template imports both at module
+            # level once it has found the dir, so both must exist for exec_module to complete.
+            (kit / "map_lib.py").write_text(
+                "import re\nDEFAULT_DECISION_ID_RE = re.compile(r'.')\n", encoding="utf-8"
+            )
+            (kit / "map_extractors.py").write_text(
+                "def inventory_ids():\n    return ()\n", encoding="utf-8"
+            )
+        gate_dir.mkdir(parents=True, exist_ok=True)
+        (gate_dir / "test_codebase_map.py").write_text(template, encoding="utf-8")
+        driver = root / "drive.py"
+        driver.write_text(driver_src, encoding="utf-8")
+        return subprocess.run(
+            [_sys.executable, str(driver), str(gate_dir / "test_codebase_map.py")],
+            capture_output=True, text=True,
+        )
+
+    # (a) PREFIXED kit, gate collected somewhere else entirely — the shape the old walk missed
+    r1 = tmp / "g1"
+    got = probe(r1, r1 / "tools" / "codebase-map", r1 / "tests")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r1 / "tools" / "codebase-map", got.stdout
+
+    # (b) gate installed INSIDE the kit dir (a repo with no test collector wires it as a leg)
+    r2 = tmp / "g2"
+    got = probe(r2, r2 / "tools" / "codebase-map", r2 / "tools" / "codebase-map")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r2 / "tools" / "codebase-map", got.stdout
+
+    # (c) root install — the original convention, unchanged
+    r3 = tmp / "g3"
+    got = probe(r3, r3 / "codebase-map", r3 / "tests")
+    assert got.returncode == 0, got.stderr
+    assert Path(got.stdout.strip()) == r3 / "codebase-map", got.stdout
+
+    # (d) no kit at all: a NAMED failure listing what was probed, never a silent wrong dir
+    r4 = tmp / "g4"
+    got = probe(r4, None, r4 / "tests")
+    assert got.returncode != 0, got.stdout
+    assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
+
+
+def t_kit_commits_to_abspath():
+    """B2: the kit has committed IN PROSE, three times, to `abspath` and never `resolve()` — a
+    junctioned kit dir must anchor to the ADOPTING repo, not the link target. Since the renderers
+    embed kit_rel()/regen_cmd() into the BYTE-COMPARED artifacts, one entrypoint resolving the other
+    way makes the freshness gate permanently STALE with a printed remedy that re-writes the other
+    spelling: the loop never converges. Prose cannot hold that; enforce it mechanically."""
+    import os
+
+    kit = Path(os.path.abspath(__file__)).parent
+    offenders = []
+    for py in sorted(kit.glob("*.py")):
+        for n, line in enumerate(py.read_text(encoding="utf-8").splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue  # a comment EXPLAINING the ban is not a violation of it
+            if "gov:literal-resolve" in line:
+                continue  # this detector's own two lines, which must spell what they hunt
+            if "__file__" in line and ".resolve()" in line:  # gov:literal-resolve — the detector
+                offenders.append(f"{py.name}:{n}: {line.strip()}")
+    assert not offenders, (
+        "`Path(__file__).resolve()` in the kit — use os.path.abspath. resolve() follows a junction "  # gov:literal-resolve
+        "to the link target, so this entrypoint would disagree with map_lib.kit_dir() and the gate "
+        "about the install prefix they stamp into the byte-compared artifacts:\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def t_gate_template_boundary(tmp: Path):
+    """M1: the gate's kit search must not leave the PROJECT, and `.git` alone is not the project
+    boundary — a `git archive` tarball, a docker build whose `.dockerignore` drops `.git`, a vendored
+    source drop all have none. The `*/codebase-map` glob then reaches every immediate subdirectory
+    of every ancestor up to the filesystem root. Measured with only the `.git` test: the gate found
+    an unrelated kit copy OUTSIDE the tree and the module-level import loaded and executed it, so
+    the gate would byte-compare this project's artifacts against a foreign engine at a foreign kit
+    version — a green or a red that says nothing. `.codebase-map.conf` is committed, so it is the
+    boundary that survives the export."""
+    import os
+    import subprocess
+    import sys as _sys
+
+    # the PLANT: a valid-looking kit one level ABOVE the project, reachable only past the boundary
+    plant = tmp / "outside" / "codebase-map"
+    plant.mkdir(parents=True)
+    (plant / "map_lib.py").write_text(
+        "import re\nDEFAULT_DECISION_ID_RE = re.compile(r'.')\nPLANT = True\n", encoding="utf-8"
+    )
+    (plant / "map_extractors.py").write_text("def inventory_ids():\n    return ()\n", encoding="utf-8")
+
+    # the PROJECT: an export with NO .git anywhere, its committed conf at the root, and no kit
+    export = tmp / "export"
+    (export / "tests").mkdir(parents=True)
+    (export / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    template = (Path(os.path.abspath(__file__)).parent / "test_codebase_map.template.py").read_text(
+        encoding="utf-8"
+    )
+    gate = export / "tests" / "test_codebase_map.py"
+    gate.write_text(template, encoding="utf-8")
+    driver = export / "drive.py"
+    driver.write_text(
+        "import importlib.util, sys\n"
+        "spec = importlib.util.spec_from_file_location('gate_under_test', sys.argv[1])\n"
+        "mod = importlib.util.module_from_spec(spec)\n"
+        "spec.loader.exec_module(mod)\n"
+        "print(mod._kit_dir())\n",
+        encoding="utf-8",
+    )
+    got = subprocess.run(
+        [_sys.executable, str(driver), str(gate)], capture_output=True, text=True
+    )
+    assert got.returncode != 0, (
+        f"the gate resolved a kit from OUTSIDE the project: {got.stdout.strip()}"
+    )
+    assert str(plant) not in got.stdout, got.stdout
+    assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
+
+
+def t_remedy_paths_are_real(tmp: Path):
+    """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
+    naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the
+    moment someone is stuck.
+
+    Two halves. The pure half pins `relative_kit` across install shapes and pins the legacy
+    `REGEN_CMD` constant EQUAL to the accessor's root-install answer, so the last hardcoded
+    spelling cannot drift from the computed one. The end-to-end half is the real acceptance: build
+    a prefixed install, stale an artifact, then RUN THE COMMAND THE GATE PRINTED, verbatim, and
+    require that it fixes the staleness — no hardcoded expectation of what the remedy should say."""
+    import os
+    import re
+    import shutil
+    import subprocess
+    import sys as _sys
+
+    # --- pure: the kit dir as a human must spell it from the repo root -------------------------
+    root = tmp / "r"
+    assert m.relative_kit(root / "codebase-map", root) == "codebase-map"
+    assert m.relative_kit(root / "tools" / "codebase-map", root) == "tools/codebase-map"
+    assert m.relative_kit(root / "a" / "b" / "codebase-map", root) == "a/b/codebase-map"
+    assert "\\" not in m.relative_kit(root / "tools" / "codebase-map", root)  # POSIX on Windows too
+    # not under the root (a CODEBASE_MAP_ROOT pointed at a fixture): the bare NAME, so a render
+    # never embeds an absolute temp path and fixture bytes stay deterministic.
+    assert m.relative_kit(tmp / "elsewhere" / "codebase-map", root) == "codebase-map"
+    # the legacy constant IS the accessor's root-install answer — one fact, not two.
+    assert m.REGEN_CMD == f"python {m.relative_kit(root / 'codebase-map', root)}/gen_map.py --write"
+
+    # --- end-to-end: the printed remedy, executed --------------------------------------------
+    repo = tmp / "e2e"
+    kit = repo / "tools" / "codebase-map"
+    kit.parent.mkdir(parents=True)
+    shutil.copytree(Path(os.path.abspath(__file__)).parent, kit)
+    (repo / ".git").mkdir()
+    # H2: the conf carries the EXAMPLE's stale MAP_DIFF_CMD, which is what the documented adoption
+    # path leaves behind (`cp` the example, THEN run the adopter — so the adopter's create-branch
+    # stamp never fires). A truthy-but-dead value must not beat the prefix-correct fallback.
+    (repo / m.CONF_NAME).write_text(
+        'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python codebase-map/map_diff.py"\n', encoding="utf-8"
+    )
+    (repo / "src").mkdir()
+    (repo / "src" / "mod.py").write_text("def hello():\n    return 1\n", encoding="utf-8")
+    (kit / "map_extractors.py").write_text(
+        "import map_lib as m\n"
+        "def inventory_ids():\n    return ('mods',)\n"
+        "def all_inventories():\n    return {'mods': m.module_inventory(m.repo_root() / 'src', 'mods')}\n",
+        encoding="utf-8",
+    )
+
+    def run(*args: str) -> subprocess.CompletedProcess:
+        # cwd = the repo root, and NO CODEBASE_MAP_ROOT: the resolver must do the work here.
+        env = {k: v for k, v in os.environ.items() if k != "CODEBASE_MAP_ROOT"}
+        return subprocess.run(
+            [_sys.executable, *args], cwd=str(repo), env=env, capture_output=True, text=True
+        )
+
+    got = run("tools/codebase-map/gen_map.py", "--scaffold")
+    assert got.returncode == 0, got.stdout + got.stderr
+
+    # the scaffolded map README must name the real kit dir, not the convention
+    readme = (repo / "memory" / "map" / "README.md").read_text(encoding="utf-8")
+    assert "tools/codebase-map/gen_map.py" in readme, readme[:400]
+    assert "`codebase-map/`" not in readme, "the scaffolded README still names the bare convention"
+
+    # H2: EVERY path the kit printed must resolve — not just the regen command. Sweep every
+    # `<something>.py` token out of the scaffolded README and the two generated artifacts and
+    # require each to be a real file under the root. The digest command is the one that regressed:
+    # a stale conf value beat the prefix-correct fallback and shipped a dead path into the README.
+    printed = []
+    for rel in ("memory/map/README.md", "memory/map/generated/inventories.json",
+                "memory/map/generated/MAP.md"):
+        for tok in re.findall(r"[A-Za-z0-9_./-]+\.py", (repo / rel).read_text(encoding="utf-8")):
+            if "/" in tok:  # a PATH claim; a bare `map_extractors.py` in prose names no location
+                printed.append((rel, tok))
+    assert printed, "no paths were printed at all — this arm would pass by finding nothing"
+    dead = [f"{src} -> {tok}" for src, tok in printed if not (repo / tok).is_file()]
+    assert not dead, "the kit printed paths that do not exist:\n  " + "\n  ".join(dead)
+    assert any(tok.endswith("map_diff.py") for _, tok in printed), (
+        "the digest command vanished from the README — this arm no longer covers H2"
+    )
+
+    # stale an artifact, then take the remedy from the gate's OWN output and run it
+    art = repo / "memory" / "map" / "generated" / "MAP.md"
+    art.write_text(art.read_text(encoding="utf-8") + "\nhand-edited\n", encoding="utf-8")
+    got = run("tools/codebase-map/gen_map.py", "--check")
+    assert got.returncode == 1, f"--check did not detect the stale artifact: {got.stdout}"
+    printed = re.search(r"regen:\s*python\s+(\S+)\s+--write", got.stdout)
+    assert printed, f"no regen remedy printed: {got.stdout}"
+    remedy_path = printed.group(1)
+    assert (repo / remedy_path).is_file(), f"the remedy names a path that does not exist: {remedy_path}"
+    fixed = run(remedy_path, "--write")
+    assert fixed.returncode == 0, fixed.stdout + fixed.stderr
+    again = run("tools/codebase-map/gen_map.py", "--check")
+    assert again.returncode == 0, f"the printed remedy did not fix the staleness: {again.stdout}"
+
+    # the generated artifacts carry the same real prefix (they are the remedy's other home)
+    inv = (repo / "memory" / "map" / "generated" / "inventories.json").read_text(encoding="utf-8")
+    assert "tools/codebase-map/gen_map.py" in inv, inv[:400]
 
 
 def t_coverage_directions():
@@ -678,6 +1050,37 @@ def main() -> int:
     import tempfile
 
     failures = 0
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "root resolution: both install shapes + git boundary (S1/AC1)",
+            lambda: t_install_prefix_resolution(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "unadopted root refuses, naming root + kit dir (AC2)",
+            lambda: t_require_adopted_root_refuses(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "both CLIs refuse through main(), printing no result (AC2)",
+            lambda: t_clis_refuse_an_unadopted_root(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "gate template finds the kit at any prefix (S5/AC5)",
+            lambda: t_gate_template_finds_the_kit(Path(td)),
+        )
+    failures += check("kit commits to abspath, never resolve() (review B2)", t_kit_commits_to_abspath)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "gate kit-search stops at the project boundary (review M1)",
+            lambda: t_gate_template_boundary(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "printed remedies name real paths; the remedy runs (TOOL-aRootedPrefix-2)",
+            lambda: t_remedy_paths_are_real(Path(td)),
+        )
     failures += check("coverage both directions + ratchet guards", t_coverage_directions)
     failures += check("dossier contract fails loud", t_parse_contract)
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)

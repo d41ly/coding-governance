@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["codebase-map coverage + freshness", "codebase-map kit selftest"]
+gate-legs = ["codebase-map coverage + freshness", "codebase-map kit selftest", "codebase-map adopter e2e"]
 kits = ["codebase-map"]
 git-hooks = []
 workflow-scripts = []
@@ -27,22 +27,23 @@ globs = [
 
 ## Constraints & why
 
-The map is adopted here at a NON-CANONICAL install prefix. The kit's own convention is
-`<repo-root>/codebase-map/`, and `map_lib.repo_root()` implements that convention by taking the kit
-dir's grandparent. This repo puts every kit under `tools/`, so that grandparent is `tools/` and every
-derived path is wrong by one segment. Two consequences are load-bearing:
+The map is adopted at a NON-CANONICAL install prefix — every kit here lives under `tools/`, not at
+the repo root the kit's convention assumed. That USED to be this feature's defining constraint: the
+engine resolved the root as the kit dir's grandparent, so at this prefix every derived path was one
+segment short, `adopt-codebase-map.sh` refused to run, and `reuse_lookup.py` and `map_diff.py`
+answered confidently from an empty corpus.
 
-- `tools/codebase-map/adopt-codebase-map.sh` cannot run here at all. It guards on
-  `[ "$HERE" -ef "$ROOT/codebase-map" ]` and refuses. The adoption was therefore done by hand:
-  conf, extractors, `gen_map.py --scaffold`, `--seed-affordance-baseline`, gate template copied to
-  `GATE_FILE`.
-- `tools/codebase-map/map_extractors.py` sets `CODEBASE_MAP_ROOT` from its own path at import, so
-  every entrypoint that imports the project layer is correct with no environment set. That is
-  `gen_map.py` and the gate; it is NOT `reuse_lookup.py` or `map_diff.py`. See `## Gaps`.
+The engine fixed it (the aRootedPrefix unit): `map_lib.resolve_root()` walks up for
+`.codebase-map.conf`, bounded by `.git`. Every entrypoint is now correct here with no environment
+set, the adopter runs, and its own e2e leg is on the bar. The former `CODEBASE_MAP_ROOT` workaround
+in `map_extractors.py` is gone and must not be reintroduced — the kit's selftest now bans
+`Path.resolve()` in kit code, because it follows a junction to the link target and would disagree
+with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
 
 `baseline.toml` holds the initial backfill of 71 keys and is shrink-only: a new key must be claimed
 in a dossier, never appended to the baseline. The gate proved this on its own first run — adding the
-`codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it.
+`codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
+again when `codebase-map adopter e2e` arrived from main.
 
 ## Shared seams
 
@@ -56,13 +57,6 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Gaps
 
-- **`reuse_lookup.py` and `map_diff.py` are silently dark at this install prefix.** Neither imports
-  the project layer, so both resolve the root to `tools/`, find no `.codebase-map.conf`, and return
-  `corpus: 0 symbols | 0 inventory keys` then `no seam fits` — and `mapped 0/N` — with no notice that
-  the corpus is empty rather than unmatched. Measured on this tree. This is the
-  `vacuous-selector-empty-population` and `fixture-passes-by-finding-nothing` classes: a confident
-  answer derived from an empty population. Workaround until the kit resolves a prefixed install:
-  export `CODEBASE_MAP_ROOT` (the invocation is written out in `.codebase-map.conf`).
 - **No feature dossiers beyond this one.** 69 of 71 keys sit in `baseline.toml`, so coverage is
   ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
   answer "what is this repo made of".

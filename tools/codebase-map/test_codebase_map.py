@@ -1,31 +1,65 @@
 """The codebase-map coverage + freshness gate (codebase-map kit).
 
-Copied from codebase-map/test_codebase_map.template.py at adoption into the directory named by
+Copied from `<kit>/test_codebase_map.template.py` at adoption into the directory named by
 `.codebase-map.conf` GATE_FILE — it must live where the project's EXISTING test suite collects
 it (zero CI changes: a test file is its own deployment). Also runnable standalone in projects
-without a test framework: `python <this file>`.
+without a test framework: `python <this file>`. `<kit>` is wherever the kit is installed; the
+gate finds it by walking up from itself, and every remedy it PRINTS spells the real prefix.
 
 Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
 - `baseline.toml` additions are reserved for the initial backfill — do not add new keys;
-- claim edits: regen artifacts via `python codebase-map/gen_map.py --write`.
+- claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 """
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 
 def _kit_dir() -> Path:
-    """Walk up from this file to the repo root holding codebase-map/ (the kit dir name is a
-    kit convention, so the gate needs no per-project placeholders)."""
-    for parent in Path(__file__).resolve().parents:
-        if (parent / "codebase-map" / "map_lib.py").is_file():
-            return parent / "codebase-map"
-    raise RuntimeError("codebase-map/ kit dir not found above the gate file")
+    """The kit dir — the directory holding map_lib.py — found from this gate file's own location,
+    so the gate still needs no per-project placeholders.
+
+    Two things vary independently. GATE_FILE points at whatever directory the project's test suite
+    collects, which may be inside the kit dir or nowhere near it; and the kit dir may sit at any
+    PREFIX under the repo root. So each ancestor of this file is probed in order: the ancestor
+    itself (gate installed inside the kit dir), `<ancestor>/codebase-map` (the root convention),
+    then `<ancestor>/*/codebase-map` (a one-segment prefix such as `tools/`). The walk stops after
+    the ancestor holding `.codebase-map.conf` OR `.git`, so it can never leave the project.
+
+    The conf is in that boundary, not just `.git`, because `.git` is absent from perfectly ordinary
+    trees — a `git archive` tarball, a docker build whose `.dockerignore` drops it, a vendored
+    source drop. Measured with only the `.git` test: in such a tree the walk ran to the filesystem
+    root and the `*/codebase-map` glob matched an UNRELATED kit copy outside the project, which the
+    module-level import below then loaded and executed — the gate byte-comparing this repo's
+    artifacts against a foreign engine at a foreign KIT version. The conf is committed, so it
+    survives every export that drops `.git`.
+
+    The kit dir's NAME is still the fixed convention — only its prefix is free. A prefix deeper
+    than one segment is deliberately not searched: walking a whole repo downward is slow and
+    ambiguous. The failure below names every path it probed, so a deeper install is TOLD what the
+    gate looked for instead of being guessed at. `abspath`, not `resolve()`: a junctioned kit dir
+    must anchor to the adopting repo, matching map_lib.resolve_root."""
+    probed: list[str] = []
+    here = Path(os.path.abspath(__file__))
+    for parent in here.parents:
+        candidates = [parent, parent / "codebase-map"]
+        candidates += sorted(p for p in parent.glob("*/codebase-map") if p.is_dir())
+        for candidate in candidates:
+            if (candidate / "map_lib.py").is_file():
+                return candidate
+            probed.append(str(candidate))
+        if (parent / ".codebase-map.conf").is_file() or (parent / ".git").exists():
+            break
+    raise RuntimeError(
+        f"codebase-map kit dir (the directory holding map_lib.py) not found above {here}.\n"
+        "Probed:\n  " + "\n  ".join(probed)
+    )
 
 
 sys.path.insert(0, str(_kit_dir()))
@@ -106,10 +140,11 @@ def test_generated_artifacts_are_fresh() -> None:
     symbols = getattr(ext, "all_symbols", list)()
     if symbols:
         fresh[gen_dir / "symbols.json"] = m.render_symbols_json(symbols)
+    regen = m.regen_cmd()  # spelled for THIS install's prefix — a remedy must name a real path
     for path, expected in fresh.items():
-        assert path.is_file(), f"missing generated artifact {path} — regen: {m.REGEN_CMD}"
+        assert path.is_file(), f"missing generated artifact {path} — regen: {regen}"
         committed = m.lf(path.read_text(encoding="utf-8"))
-        assert committed == expected, f"STALE {path.name} — regen: {m.REGEN_CMD}"
+        assert committed == expected, f"STALE {path.name} — regen: {regen}"
 
 
 # ======================================================================================

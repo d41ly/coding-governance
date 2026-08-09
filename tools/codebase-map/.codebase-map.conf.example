@@ -4,8 +4,11 @@
 # with spaces MUST be double-quoted; no inline comments after a value; no `export`. Commit it
 # LF (add `.codebase-map.conf text eol=lf` to .gitattributes) — a CRLF-checked-out conf
 # leaves stray carriage returns in bash-sourced values on Linux.
-# The kit dir itself is copied into the repo root as `codebase-map/` (a fixed convention the
-# gate template relies on — do not rename it).
+# The kit dir itself is copied in as a directory NAMED `codebase-map` (a fixed convention the
+# gate template resolves the kit by — do not rename it). Its PREFIX under the repo root is free:
+# `<root>/codebase-map/` and `<root>/tools/codebase-map/` both work. THIS FILE is the marker that
+# says where the root is — the kit walks up from its own directory looking for it — so it belongs
+# at the repo ROOT and nowhere else, whatever prefix the kit sits at.
 
 # Root of the map tree, relative to the repo root. If the memory-tree kit is adopted, put it
 # under that tree (e.g. memory/map) so its hygiene gate covers the prose files; otherwise
@@ -18,8 +21,10 @@ MAP_ROOT=memory/map
 GATE_FILE=tests/test_codebase_map.py
 
 # The digest command, verbatim — consumed by the scaffolded map README and the kickoff
-# manifest (humans/docs; gate remedy messages print the plain `python` spelling). Adjust if
-# your launcher differs — e.g. `uv run python …` or `python3 …`.
+# manifest (humans/docs; gate remedy messages derive their own spelling from the install prefix).
+# adopt-codebase-map.sh STAMPS this line with the kit's real prefix when it creates the conf, so
+# the value below is only the shape. Adjust if your launcher differs — `uv run python …`,
+# `python3 …` — and keep the path pointing at the kit dir you actually installed.
 MAP_DIFF_CMD="python codebase-map/map_diff.py"
 
 # --- reuse-convergence layer (optional; only meaningful with the SYMBOL recall tier) ----------

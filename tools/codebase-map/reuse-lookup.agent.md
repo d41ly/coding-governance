@@ -8,7 +8,7 @@ assembles a candidate shortlist, and YOU decide from it.
 ## Run it
 
 ```
-python codebase-map/reuse_lookup.py "<one sentence describing the BEHAVIOUR you are about to build>"
+python <kit>/reuse_lookup.py "<one sentence describing the BEHAVIOUR you are about to build>"
 ```
 
 Describe the behaviour, not a name you already picked — say "turn a display name into a url-safe
