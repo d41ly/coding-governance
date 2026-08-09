@@ -58,6 +58,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "DuplicatedContent",
+      "kind": "class",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "Git",
       "kind": "class",
       "file": "tools/drift-audit/drift_report.py"
@@ -236,6 +241,11 @@
       "id": "case_collisions",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
+    },
+    {
+      "id": "census",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "check",
@@ -801,6 +811,11 @@
       "id": "module_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "no_new_duplicates",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "no_subdirs",

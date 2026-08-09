@@ -24,7 +24,7 @@ ARCH-bOrderlyAtlas-1.)
 | `adopt-memory-tree.sh` | `--scaffold` an empty, passing tree from the config (new projects). |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
-| `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`): it key-merges by record id, so an append-collision between two nodes auto-resolves without duplicating or dropping a row, and any failure becomes a conflict rather than a silent take-ours. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored. Wire it with the two `.gitattributes` lines plus `git config merge.rows.driver 'bash tools/lib/pyrun.sh memory-tree/merge-rows.py %O %A %B %P'` — `check-wiring.sh` reports and sets that config per node. NOT scaffolded by `adopt-memory-tree.sh`: a copy-installed kit lands at `<root>/memory-tree/` with no `lib/pyrun.sh` beside it, so packaging the driver for adopters is its own change. |
+| `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`): it key-merges by record id, so an append-collision between two nodes auto-resolves without duplicating or dropping a row, and any failure becomes a conflict rather than a silent take-ours. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored. Wiring is two facts in two places and the driver command carries the install prefix — see [Wire the row-keyed merge driver](#wire-the-row-keyed-merge-driver); do not hand-type it. NOT scaffolded by `adopt-memory-tree.sh`: a copy-installed kit lands at `<root>/memory-tree/` with no `lib/pyrun.sh` beside it, so packaging the driver for adopters is its own change. |
 | `merge-rows.test.sh` | the driver's replay fixtures: id-set equality on every clean case against a grammar-independent oracle, audit counts reconciled against the written file, the four newline sites, the three fail-closed grammar failures, and an end-to-end two-branch `git merge` through the real attribute + config. |
 | `check-memory-hygiene.test.sh` | fixture self-test for check 12 (red + green classes in a scratch repo). |
 
@@ -78,6 +78,42 @@ pattern:
     bash "$top/memory-tree/check-memory-hygiene.sh" --staged || exit 1
   fi
   ```
+
+## Wire the row-keyed merge driver
+
+TWO facts, wired in two different places. The attribute is COMMITTED, so it lands once for every node:
+
+```gitattributes
+memory/DECISIONS.md merge=rows
+memory/backlog/*.md merge=rows
+```
+
+The driver COMMAND is git config, so it is per node — and both of its path arguments carry the
+install prefix, so there is no single literal that starts in both layouts. Do not hand-type it; this
+one spelling is correct in both, because the runbook installs `check-wiring.sh` at `<root>/tools/`
+either way:
+
+```bash
+bash tools/check-wiring.sh --fix     # resolves both prefixes, then sets ONE string
+```
+
+`check-wiring.sh` probes for `pyrun.sh` and `merge-rows.py` at each prefix and sets exactly one of
+the two commands below. They are quoted here so you can VERIFY what it set — not so you can retype
+one of them:
+
+- kit under a `tools/` prefix (what this repo dogfoods):
+  `bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P`
+- kit copy-installed at the repo root:
+  `bash lib/pyrun.sh memory-tree/merge-rows.py %O %A %B %P`
+
+A command that MIXES the two prefixes names a driver that exists in neither layout, and that failure
+is not loud. Git prints `CONFLICT (content)`, but a driver that never starts never writes `%A`, so
+the path is left holding OURS-ONLY content with ZERO conflict markers and status `UU`: an author who
+sees "conflict", opens a marker-free file and `git add`s it has silently dropped every incoming row.
+Measured — that is what the previously published mixed-prefix literal did. Two guards keep this
+section honest rather than merely correct today: `check-wiring.sh` RUNS the configured command on a
+scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
+running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
 
 ## Notes
 

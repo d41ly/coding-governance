@@ -250,7 +250,13 @@ EOF
 # Setting it under `--session` as well as `--fix` mirrors check_hooks, which already sets a git config
 # in both. The eol arm's session exemption is deliberately NOT copied: that arm rewrites file BYTES,
 # and this one sets a repo-local config, which is the class of act `--session` exists for.
-# (aMendedLedger U5)
+#
+# The arm RUNS the command it is about to bless — see the smoke block below. It runs the command this
+# script BUILDS, never the arbitrary string a node may have put in `merge.rows.driver`: a foreign
+# value is reported and refused a few lines further down without being executed, so the only command
+# that ever reaches a subprocess here is the one shipped in this repo. Whenever the arm can print
+# `ok`, the built command and the configured one are the same string, which is the case that had to
+# be covered. (aMendedLedger U5)
 check_merge_rows() {
   local drv shim want cur declared
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
@@ -277,6 +283,47 @@ check_merge_rows() {
     echo "skip     merge     — no tracked path declares merge=rows"
     return
   fi
+  # RUN THE COMMAND, do not pattern-match its parts. "Wired" is "the command git will exec actually
+  # merges", and the three tests above — driver exists, shim exists, config string matches — are all
+  # path-and-string. They cannot see the two runtime dependencies the driver reaches for at merge
+  # time: `lib/resolve-python.sh`, which `pyrun.sh` sources, and the sibling memory-recall kit that
+  # owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
+  # here while the very next merge left `memory/DECISIONS.md` holding OURS-only content with zero
+  # conflict markers and status `UU` — the silent take-ours the driver's own fail-closed wrapper
+  # exists to prevent, arriving one level up where that wrapper never gets to run.
+  #
+  # A no-op THREE-WAY rather than the cheaper usage/arity call. `merge-rows.py` defers its grammar
+  # import into `merge()`, so an argument-less invocation exits 2 with its usage text even when the
+  # memory-recall kit is missing outright — it would prove the interpreter starts and nothing else.
+  # Three one-line scratch inputs that merge CLEANLY exercise the whole chain in one python start:
+  # launcher resolution, the driver's own syntax, the `.memory-tree.conf` walk-up, the deferred
+  # grammar import, and the `%A` write. That is one process per session-start, which is what a
+  # verifier that verifies costs.
+  local smoke rc_smoke=0
+  smoke=$(mktemp -d 2>/dev/null) || smoke=""
+  # "Could not verify" is NOT a clean bill, and this file already made that call once: the recall arm
+  # above deleted its `settings-merge.py absent, cannot verify` skip precisely because it reported
+  # exit 0 on the one state the runbook calls bad. Same rule here — an unrunnable check reports
+  # UNWIRED, never `ok`.
+  if [ -z "$smoke" ]; then
+    echo "UNWIRED  merge     — cannot verify the driver: 'mktemp -d' failed, so the no-op three-way never ran and this arm has nothing to report. Fix: make a temp dir writable (TMPDIR), then re-run"
+    unwired=$((unwired+1))
+    return
+  fi
+  printf 'x\n'    > "$smoke/o"
+  printf 'a\nx\n' > "$smoke/a"
+  printf 'x\nb\n' > "$smoke/b"
+  bash "$shim" "$drv" "$smoke/o" "$smoke/a" "$smoke/b" merge-rows-smoke \
+    >/dev/null 2>"$smoke/err" || rc_smoke=$?
+  # rc alone is not enough: assert the driver WROTE theirs' line into %A. A driver that exits 0
+  # without touching %A is the same silent take-ours by another route.
+  if [ "$rc_smoke" != 0 ] || ! grep -q '^b$' "$smoke/a"; then
+    echo "UNWIRED  merge     — the configured driver cannot merge: 'bash $shim $drv' exited $rc_smoke on a no-op three-way ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore $(dirname "$shim")/resolve-python.sh and the sibling memory-recall kit, then re-run"
+    unwired=$((unwired+1))
+    rm -rf "$smoke"
+    return
+  fi
+  rm -rf "$smoke"
   cur=$(git config merge.rows.driver 2>/dev/null || true)
   if [ -z "$cur" ]; then
     if [ "$DO_FIX" = 1 ]; then

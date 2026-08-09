@@ -19,6 +19,36 @@ newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pr
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
 
+# A kit file in THIS repo, resolved across both install prefixes the way every arm resolves them
+# (`tools/<rel>` here, `<rel>` in a copy-installed adopter). Nothing below hard-codes `$HERE/…`:
+# this test file itself ships to `<project>/tools/`, where the kits it copies from do NOT.
+src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
+
+# Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("tools/" here, "" for
+# the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
+# its shim, imports its anchor grammar from the sibling memory-recall kit, and walks up for
+# `.memory-tree.conf`. A fixture missing any of those holds a driver that CANNOT START — which is
+# exactly the state the arm under test has to report, so it must be reachable on purpose and never
+# by accident.
+install_driver() {
+  local p="$1" rel src
+  mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
+  for rel in memory-tree/merge-rows.py lib/pyrun.sh lib/resolve-python.sh \
+             memory-recall/extract.py memory-recall/recall_conf.py; do
+    src=$(src_of "$rel")
+    # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
+    # of the driver — the shim's resolver, the memory-recall kit the anchor grammar is imported
+    # from — so a repo carrying `merge-rows.py` without one of them carries a driver that cannot
+    # start. That is a defect in the repo, not a gap in the fixture, and it reds rather than skips.
+    [ -n "$src" ] || { ck "install_driver: $rel is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
+    cp "$src" "${p}${rel}"
+  done
+  printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
+  printf '# tooling backlog\n' > memory/backlog/TOOL.md
+  printf 'memory/backlog/*.md merge=rows\n' > .gitattributes
+  git add -A; git commit -q -m driver
+}
+
 # AC1 — unset core.hooksPath -> UNWIRED + exit 1
 newrepo
 out=$(chk --check); rc=$?
@@ -223,11 +253,16 @@ printf '%s' "$out" | grep -q 'skip     eol' \
   || ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 0
 cleanup
 
-# AC10 — the row-keyed merge driver arm, all SEVEN states in one repo. A merge DRIVER is per-node
+# AC10 — the row-keyed merge driver arm, all NINE states in one repo. A merge DRIVER is per-node
 # config while `.gitattributes` is committed, so "declared" and "wired" are different facts and the
-# gap between them is silent: git falls back to a line merge, with a warning nobody reads, and that
-# line merge is the one that duplicates a row. The remedy string is BUILT from the two resolved
-# paths, so this asserts the string the arm PRINTS is the string `--fix` SETS — one truth, not two.
+# gap between them is silent: git falls back to a line merge, and that line merge is the one that
+# duplicates a row. The remedy string is BUILT from the two resolved paths, so this asserts the
+# string the arm PRINTS is the string `--fix` SETS — one truth, not two.
+#
+# The fixture lays a COMPLETE install (driver + shim + resolver + the memory-recall kit the anchor
+# grammar is imported from + the conf naming the families), because the arm now RUNS the configured
+# command before it says `ok`. A fixture that could not start the driver would turn every green
+# below into a green for the fixture's reasons instead of the tool's.
 newrepo
 git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
 mkdir -p tools/memory-tree tools/lib memory/backlog
@@ -240,22 +275,23 @@ out=$(chk --check); rc=$?
 
 # state 2 — the driver is present but the shim its command names is missing. git would exec a command
 # that cannot start, and a merge driver that cannot start exits non-zero without writing %A.
-cp "$HERE/memory-tree/merge-rows.py" tools/memory-tree/merge-rows.py
+cp "$(src_of memory-tree/merge-rows.py)" tools/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'shim it names is missing'; } \
   && ck "AC10 shim missing -> UNWIRED, exit 1" 1 || ck "AC10 shim missing -> UNWIRED, exit 1" 0
 
-# state 3 — both present, but no tracked path declares merge=rows: nothing to wire, so a SKIP rather
-# than a permanent false UNWIRED in every repo that carries the kit without the attribute.
-cp "$HERE/lib/pyrun.sh" tools/lib/pyrun.sh
-git add -A; git commit -q -m kit
+# state 3 — the whole kit is present, but no tracked path declares merge=rows: nothing to wire, so a
+# SKIP rather than a permanent false UNWIRED in every repo that carries the kit without the
+# attribute. `install_driver` writes the attribute, so it is stripped again for this one state.
+install_driver "tools/"
+printf '# nothing declared here\n' > .gitattributes
+git add -A; git commit -q -m nodeclare
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     merge' && printf '%s' "$out" | grep -q 'no tracked path declares'; } \
   && ck "AC10 no merge=rows attribute -> skip, exit 0" 1 || ck "AC10 no merge=rows attribute -> skip, exit 0" 0
 
 # state 4 — declared, config unset -> UNWIRED, exit 1, and the remedy carries the BUILT command
 printf 'memory/backlog/*.md merge=rows\n' > .gitattributes
-printf '# tooling backlog\n' > memory/backlog/TOOL.md
 git add -A; git commit -q -m attrs
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -qF "$WANT"; } \
@@ -265,6 +301,47 @@ out=$(chk --check); rc=$?
 chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); rc=$?
 { [ "$got" = "$WANT" ] && [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 --fix sets the driver, re-check ok" 1 || ck "AC10 --fix sets the driver, re-check ok" 0
+
+# state 5b — the config is UNCHANGED and correct, and the driver still cannot START: the resolver
+# `pyrun.sh` sources is gone. MEASURED before this arm existed: `ok  merge  — merge.rows.driver
+# wired`, and the very next `git merge` printed CONFLICT and left memory/DECISIONS.md holding
+# OURS-only content with `grep -c '<<<<<<<'` = 0 and status UU — the incoming row simply absent.
+# "Wired" has to mean the command RUNS, so this state must not be green.
+mv tools/lib/resolve-python.sh tools/lib/resolve-python.sh.away
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
+  && ck "AC10 driver cannot start (no resolver) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot start (no resolver) -> UNWIRED, exit 1" 0
+# ...and --fix must not DECLARE a broken driver wired either. Wiring a command that cannot run is
+# strictly worse than leaving it unset: unset falls back to git's line merge, wired-and-broken is
+# the silent take-ours above.
+git config --unset merge.rows.driver
+chk --fix >/dev/null; got=$(git config merge.rows.driver 2>/dev/null || true)
+[ -z "$got" ] && ck "AC10 --fix refuses to wire a driver that cannot run" 1 || ck "AC10 --fix refuses to wire a driver that cannot run" 0
+mv tools/lib/resolve-python.sh.away tools/lib/resolve-python.sh
+chk --fix >/dev/null; out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
+  && ck "AC10 restoring the resolver goes green again" 1 || ck "AC10 restoring the resolver goes green again" 0
+
+# state 5b2 — the smoke run itself cannot run. A verifier that could not verify must not print the
+# same `ok` as one that did: this file already deleted a `cannot verify` skip from the recall arm for
+# reporting exit 0 on the one state the runbook calls bad, and the new dependency on a temp dir is a
+# second way into that state. TMPDIR points somewhere that does not exist, so mktemp -d fails.
+out=$(TMPDIR=/nonexistent-check-wiring-tmp bash "$SCRIPT" --check 2>/dev/null); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot verify'; } \
+  && ck "AC10 unverifiable (no temp dir) -> UNWIRED, not a silent ok" 1 || ck "AC10 unverifiable (no temp dir) -> UNWIRED, not a silent ok" 0
+
+# state 5c — the driver STARTS but cannot key a row: the sibling memory-recall kit that owns the
+# anchor grammar is gone, so the deferred import raises and the fail-closed wrapper writes a conflict
+# on every governed-index merge, forever. Loud rather than destructive, but the arm's own header
+# claims it turns "declared" into "wired"; a driver that conflicts unconditionally is not wired.
+mv tools/memory-recall tools/memory-recall.away
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
+  && ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 0
+mv tools/memory-recall.away tools/memory-recall
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
+  && ck "AC10 restoring the grammar kit goes green again" 1 || ck "AC10 restoring the grammar kit goes green again" 0
 
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
@@ -283,6 +360,92 @@ chk --session >/dev/null; rc=$?; got=$(git config merge.rows.driver)
 { [ "$rc" = 0 ] && [ "$got" = "$WANT" ]; } \
   && ck "AC10 --session wires the driver + exit 0" 1 || ck "AC10 --session wires the driver + exit 0" 0
 cleanup
+
+# AC11 — the `merge=rows` ATTRIBUTE, asserted against THIS repo's REAL tree.
+# The attribute is what actually ROUTES a conflict through the driver. Without it git falls back to
+# its built-in line merge — the one measured introducing a duplicate id in 147 of 151 historical
+# DECISIONS.md conflicts — and nothing said so: deleting both `.gitattributes` lines left every leg
+# on the bar green, the driver's own replay test included, because that test writes its OWN
+# `.gitattributes` inside a scratch repo and therefore proves the driver works against an attribute
+# it invented rather than against this repo's.
+#
+# WHY THIS FILE and not the driver's replay test: that file owns the driver's BEHAVIOUR over fixtures
+# it controls, and every fixture it merges is one it wrote. This file owns whether the wiring in the
+# real tree is real — the question every arm above asks — and it already holds `$REPO` for exactly
+# that reason. It is also already a gate leg, so the attribute becomes gated without a new leg.
+#
+# Read through `git check-attr`, never by grepping `.gitattributes`: attributes come from several
+# files and git is the only authority on the answer. That is the same rule check_eol and
+# check_merge_rows already follow, and the rule the end-to-end merge fixture applies to its own tree.
+cd "$REPO"
+ATTR_DRV=""; for c in "$REPO/tools/memory-tree/merge-rows.py" "$REPO/memory-tree/merge-rows.py"; do
+  [ -f "$c" ] && { ATTR_DRV="$c"; break; }
+done
+if [ -z "$ATTR_DRV" ]; then
+  echo "skip merge-attribute case — the row-keyed driver is not installed in this repo"
+else
+  MROOT=$(sed -n 's/^[[:space:]]*MEMORY_ROOT=//p' "$REPO/.memory-tree.conf" 2>/dev/null \
+          | head -1 | tr -d '"'"'"'\r')
+  [ -n "$MROOT" ] || MROOT=memory
+  POP=$(git ls-files -- "$MROOT/DECISIONS.md" "$MROOT/backlog/*.md" | grep . || true)
+  # POP GUARD. "Every governed index declares merge=rows" is vacuously true over zero of them, and a
+  # gate that passes by finding nothing is the failure class this repo catalogues. The population is
+  # asserted non-empty FIRST, and it is derived from the conf rather than listed here, so a
+  # MEMORY_ROOT rename reds instead of quietly emptying the set.
+  n=$(printf '%s\n' "$POP" | grep -c . || true)
+  [ "${n:-0}" -ge 2 ] && ck "AC11 the governed indexes exist ($n tracked)" 1 \
+                      || ck "AC11 the governed indexes exist ($n tracked)" 0
+  BAD=$(printf '%s\n' "$POP" | grep . | git check-attr --stdin merge | grep -v ': merge: rows$' || true)
+  if [ -z "$BAD" ]; then
+    ck "AC11 every governed index declares merge=rows" 1
+  else
+    ck "AC11 every governed index declares merge=rows" 0
+    printf '     %s\n' "$BAD"
+  fi
+fi
+
+# AC12 — the PUBLISHED wiring command, DERIVED rather than proof-read.
+# The kit README used to publish ONE literal that mixed the two install prefixes, naming a driver
+# that exists in NEITHER layout. Configuring it verbatim reproduced the whole failure end to end:
+# `can't open file '…/memory-tree/merge-rows.py'`, git printing `CONFLICT (content)`, and the path
+# left holding ours-only content with `grep -c '<<<<<<<'` = 0 and status UU. Nothing gated the
+# string, because the only other places the command appears either hand-type the correct one inside a
+# fixture or BUILD it at runtime.
+#
+# So this arm does not proof-read the README. It DERIVES both spellings by running `--fix` in a
+# complete fixture of each layout, then requires the README to publish exactly those two and no
+# third one. A future prefix change moves the derived strings and reds the doc automatically.
+newrepo; git config core.hooksPath .githooks; install_driver "tools/"
+chk --fix >/dev/null; S_TOOLS=$(git config merge.rows.driver 2>/dev/null || true); cleanup
+newrepo; git config core.hooksPath .githooks; install_driver ""
+chk --fix >/dev/null; S_ROOT=$(git config merge.rows.driver 2>/dev/null || true); cleanup
+cd "$REPO"
+# LIVENESS, before anything is compared against the doc: two layouts that produced the SAME string,
+# or no string at all, would turn the two greps below into one assertion wearing two hats.
+{ [ -n "$S_TOOLS" ] && [ -n "$S_ROOT" ] && [ "$S_TOOLS" != "$S_ROOT" ]; } \
+  && ck "AC12 the two layouts yield two distinct commands" 1 \
+  || ck "AC12 the two layouts yield two distinct commands" 0
+RDM=""; for c in "$REPO/tools/memory-tree/README.md" "$REPO/memory-tree/README.md"; do
+  [ -f "$c" ] && { RDM="$c"; break; }
+done
+if [ -z "$RDM" ]; then
+  echo "skip README-command case — the memory-tree kit README is not installed in this repo"
+else
+  grep -qF "$S_TOOLS" "$RDM" && ck "AC12 README publishes the tools/-prefix command" 1 \
+                             || ck "AC12 README publishes the tools/-prefix command" 0
+  grep -qF "$S_ROOT"  "$RDM" && ck "AC12 README publishes the root-prefix command" 1 \
+                             || ck "AC12 README publishes the root-prefix command" 0
+  # ...and NO third spelling. This is the half that fires on a mixed-prefix literal, which is a
+  # command both greps above are perfectly happy to coexist with.
+  STRAY=$(grep -oE 'bash [A-Za-z0-9_./-]*pyrun\.sh [A-Za-z0-9_./-]*merge-rows\.py %O %A %B %P' "$RDM" \
+          | grep -vxF "$S_TOOLS" | grep -vxF "$S_ROOT" || true)
+  if [ -z "$STRAY" ]; then
+    ck "AC12 README publishes no third, unstartable spelling" 1
+  else
+    ck "AC12 README publishes no third, unstartable spelling" 0
+    printf '     stray: %s\n' "$STRAY"
+  fi
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

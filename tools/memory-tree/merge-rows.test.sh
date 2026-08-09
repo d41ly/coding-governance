@@ -14,9 +14,17 @@
 # duplicate in 147 of 151 historical DECISIONS.md conflicts upstream; this is where that claim is
 # falsified or confirmed.
 #
+# AN ID-SET ORACLE CANNOT SEE A DUPLICATE, and three separate corruptions arrived through that hole:
+# a section heading copied onto two new ids (case 10), an incoming row filed under the wrong
+# `## FAMILY` (case 11), and an unkeyable row written twice (case 12) — all three at exit 0, no
+# markers, audit line `clean`. So every rc-0 arm now also asserts NO id occurs twice in the written
+# file, the oracle is widened to the suffixed id form the driver's own grammar cannot key, and both
+# halves of that oracle are proved live in case 0d before anything leans on them.
+#
 #   bash tools/memory-tree/merge-rows.test.sh
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+SELF="$HERE/$(basename "$0")"
 ROOT="$(cd "$HERE/../.." && pwd)"
 cd "$ROOT" || exit 2
 st=0
@@ -36,8 +44,16 @@ bad() { echo "FAIL $1"; st=1; }
 # THE ORACLE — a family-agnostic id shape, deliberately NOT the driver's grammar. Keying the
 # assertion on the same regex the driver keys the merge on would make every arm self-consistent and
 # blind: a grammar that stopped recognising a row would remove it from BOTH sides of the comparison.
-ORACLE='\b[A-Z]+-[A-Za-z0-9]+-[0-9]+\b'
+# THE `[a-z]*` TAIL IS THE POINT, not a tidy-up. Without it the oracle shared the driver grammar's
+# trailing `\b`, so this corpus's ratified correction-id form (`…-1b`) fell out of BOTH sides of
+# every comparison here — measured on the real memory/DECISIONS.md at 38 of 73 rows unkeyed, the two
+# newest of them minted by the build that shipped this driver. The remedy for a blind spot the
+# oracle shares with the subject is to WIDEN the oracle, never to point it at the driver's regex.
+ORACLE='\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b'
 ids() { grep -ohE "$ORACLE" "$@" 2>/dev/null | LC_ALL=C sort -u | tr '\n' ' '; }
+# ...and the same oracle asked the other question. `sort -u` above makes `ids` structurally unable to
+# report a duplicate, which is exactly how a doubled row passed an id-SET comparison.
+dups() { grep -ohE "$ORACLE" "$@" 2>/dev/null | LC_ALL=C sort | uniq -d | tr '\n' ' '; }
 minus() {  # $1 = a space-separated set · rest = members the honoured deletes removed
   local all=$1 t d keep out=""; shift
   for t in $all; do
@@ -48,10 +64,17 @@ minus() {  # $1 = a space-separated set · rest = members the honoured deletes r
 }
 row() { printf -- '- %s · OPEN · %s\n' "$1" "$2"; }
 pre() { printf '# Index\n\nRouting prose, unkeyable by design.\n\n'; }
+# The line number of the FIRST match, or 0. Both halves matter: the placement arms below compare two
+# line numbers, and the defect they were written for DUPLICATES a heading — so an un-headed
+# `grep -n | cut` hands `[` two numbers on two lines and bash aborts the comparison with
+# `integer expected` instead of the arm reporting anything. A missing match answers 0, and every
+# caller tests for that EXPLICITLY — 0 wins a `-lt` against any real line number, so a vanished row
+# would otherwise satisfy the placement it was supposed to prove.
+at_line() { local n; n=$(grep -n -- "$1" "$2" 2>/dev/null | head -1 | cut -d: -f1); printf '%s' "${n:-0}"; }
 
 # $1 label · $2 expected rc · $3 expected id set · rest: ids an honoured delete removed
 run() {
-  local label=$1 want_rc=$2 want_ids=$3 rc u expect got; shift 3
+  local label=$1 want_rc=$2 want_ids=$3 rc u expect got d; shift 3
   u=$(ids "$TMP/o" "$TMP/a" "$TMP/b")            # BEFORE the driver overwrites %A
   expect=$(minus "$u" "$@")
   [ "$expect" = "$want_ids" ] \
@@ -60,6 +83,16 @@ run() {
   [ "$rc" = "$want_rc" ] || bad "$label: rc=$rc, expected $want_rc"
   got=$(ids "$TMP/a")
   [ "$got" = "$want_ids" ] || bad "$label: ids [$got], expected [$want_ids]"
+  # THE SECOND ORACLE, and it runs on the OBSERVED rc, never the expected one. A conflict legitimately
+  # writes one id twice (case 2 is built on exactly that), so a blanket no-duplicate rule would red
+  # the arm that proves the driver conflicts instead of duplicating. But keying on `want_rc` would
+  # exempt precisely the regression this exists to catch — a driver that was SUPPOSED to conflict and
+  # exited 0 instead would have its duplicate skipped along with its rc. rc 0 is the regime where a
+  # duplicate is invisible: no markers, nothing unmerged, `clean` printed, the file quietly wrong.
+  if [ "$rc" = 0 ]; then
+    d=$(dups "$TMP/a")
+    [ -z "$d" ] || bad "$label: rc 0 and the written file carries a DUPLICATE id [$d]"
+  fi
 }
 
 # --- 0. the ORACLE is live, on a named population -------------------------------------------------
@@ -155,6 +188,28 @@ failclosed "missing grammar module" "$S"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
 cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$S/tools/memory-recall/"
 failclosed "missing .memory-tree.conf" "$S"
+
+# --- 0d. the oracle is strictly WIDER than the driver's grammar, and `dups` fires -----------------
+# The oracle earns its keep only if it can see something the subject cannot; otherwise "independent"
+# is a comment, not a property. Both halves are proved here, in both directions, before any arm below
+# leans on them: the widened oracle KEYS a suffixed id, the driver's own `key()` returns None for the
+# identical line, `dups` REPORTS a repeat, and `dups` stays silent on a singleton.
+SUFFIXED='- TOOL-zFixture-9b · a suffixed id the driver grammar cannot key'
+printf '%s\n' "$SUFFIXED" > "$TMP/suffixed"
+[ "$(ids "$TMP/suffixed")" = "TOOL-zFixture-9b " ] \
+  || bad "oracle: the widened oracle does not see a suffixed id — case 12 would assert nothing"
+"$PY" - "$SUFFIXED" <<'PYEOF' || bad "oracle: the DRIVER keys the suffixed id, so the oracle is no wider than the subject — pick a shape the grammar really misses"
+import importlib.util, sys
+sys.dont_write_bytecode = True   # a test that leaves __pycache__ in tools/ dirties the tree it gates
+spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+mr = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mr)
+sys.exit(0 if mr.key(sys.argv[1] + "\n") is None else 1)
+PYEOF
+{ printf '%s\n' "$SUFFIXED"; printf '%s\n' "$SUFFIXED"; } > "$TMP/twice"
+[ "$(dups "$TMP/twice")" = "TOOL-zFixture-9b " ] \
+  || bad "dups: a doubled id was not reported — every rc-0 arm's duplicate half is vacuous"
+[ -z "$(dups "$TMP/suffixed")" ] || bad "dups: a singleton id was reported as a duplicate"
 
 # --- 1. disjoint appends — the case the unit is FOR -----------------------------------------------
 { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
@@ -375,5 +430,85 @@ cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$E/tools/lib/"
   exit 0
 ) || st=1
 
-[ "$st" = 0 ] && echo "PASS — merge-rows: 14 fixture groups held"
+# --- 10. BOTH NODES OPEN THE SAME EMPTY SECTION — the shared lead-in is emitted ONCE ---------------
+# A row is its lead-in plus its anchor, so when both sides add the FIRST row of the same section the
+# two rows are id-disjoint and each carries its own copy of the SAME base furniture: the `## FAMILY`
+# heading and the `*(none yet)*` placeholder. Both copies were emitted. Reproduced on the real
+# memory/DECISIONS.md with two nodes opening `## DEPL`: rc 0, zero markers, audit line
+# `1 new from theirs … clean`, and the heading present TWICE in an append-only file. The CONTROL is
+# what makes it decisive — `git merge-file` on the identical three inputs returns rc 1 with one
+# conflict hunk and one heading, so the driver was strictly WORSE than no driver on this input.
+# `## KICK` and `## DEPL` are both empty in this corpus today, so the trigger is the next session in
+# which two nodes each land a first decision in the same family.
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n*(none yet)*\n'; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 ours; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+want_h=$(grep -h '^## ' "$TMP/o" "$TMP/a" "$TMP/b" | LC_ALL=C sort -u | grep -c .)   # BEFORE %A moves
+[ "$want_h" = 1 ] || bad "shared lead-in: the fixture declares $want_h distinct headings, expected 1"
+run "both nodes open the same empty section" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+got_h=$(grep -c '^## ' "$TMP/a")
+[ "$got_h" = "$want_h" ] \
+  || bad "shared lead-in: the result carries $got_h '## ' heading line(s) against $want_h distinct across the three inputs"
+[ "$(grep -c 'none yet' "$TMP/a")" = 0 ] \
+  || bad "shared lead-in: the placeholder BOTH sides replaced is back in the merged file"
+h=$(at_line '^## Section two$' "$TMP/a"); r=$(at_line '^- TOOL-zFixture-2 ' "$TMP/a")
+{ [ "$h" -gt 0 ] && [ "$r" -gt 0 ] && [ "$h" -lt "$r" ]; } \
+  || bad "shared lead-in: heading at line $h, ours' row at line $r (0 = absent) — the heading must open its section"
+
+# --- 11. a %B-only row in a NON-FINAL section stays inside its section -----------------------------
+# The mirror of case 5, which only ever covers a heading whose position must be PRESERVED — it adds
+# the extra row on ONE side and never asks where an incoming row lands. Emitting every theirs-only
+# row after ALL of ours' rows files an incoming decision under whatever `## FAMILY` heading happens
+# to be last; position survived only when the incoming row was the FIRST of its section and so
+# carried its own heading. Reproduced on the real file: an incoming `## PLAY` row landed under
+# `## TOOL`, rc 0 clean. The CONTROL again decides it — the identical two inserts through git's
+# built-in three-way merge resolve rc 0 with that row correctly under `## PLAY`, so this was a
+# REGRESSION against the merge being replaced, not a design trade.
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; row TOOL-zFixture-4 ours; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-5 theirs; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/b"
+run "b-only row in a non-final section" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-4 TOOL-zFixture-5 "
+h=$(at_line '^## Section two$' "$TMP/a")
+r=$(at_line '^- TOOL-zFixture-5 ' "$TMP/a"); m=$(at_line '^- TOOL-zFixture-4 ' "$TMP/a")
+{ [ "$h" -gt 0 ] && [ "$r" -gt 0 ] && [ "$r" -lt "$h" ]; } \
+  || bad "b-only placement: the incoming row is at line $r against the next heading at line $h (0 = absent) — it was filed into the wrong section"
+{ [ "$m" -gt 0 ] && [ "$m" -gt "$h" ]; } \
+  || bad "b-only placement: ours' own row is at line $m against the heading at line $h (0 = absent) — it left the section it was added to"
+
+# --- 12. an UNKEYABLE row minted on both nodes, in different regions -------------------------------
+# The keyed path guarantees uniqueness only for the rows the grammar KEYS, and it keys 35 of this
+# corpus's 73 — the session era is bounded by `\b`, so the ratified `…-1b` correction form does not
+# key at all. The other 38 are content: they reach the output down two independent paths (a row's
+# lead-in, and the preamble/trailer text merges), so the same unkeyable row filed in different
+# regions was written TWICE at rc 0 with the audit line reading `clean`, under a docstring claiming a
+# row appears at most once BY CONSTRUCTION. It does not; the postcondition is what makes it true, and
+# the driver must refuse rather than auto-resolve. Note git's own merge duplicates this input too —
+# the bar here is not "no worse than git", it is "never a silent duplicate in an append-only record".
+mk12() {
+  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
+  { pre; row TOOL-zFixture-1 base; printf '%s\n' "$SUFFIXED"; row TOOL-zFixture-2 base; } > "$TMP/a"
+  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf '%s\n' "$SUFFIXED"; } > "$TMP/b"
+}
+mk12
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
+  || bad "unkeyable duplicate: the refusal does not name the postcondition — stderr was [$err]"
+printf '%s\n' "$err" | grep -qF 'TOOL-zFixture-9b' \
+  || bad "unkeyable duplicate: the refusal does not name the line it refused over"
+mk12
+run "unkeyable row minted on both nodes" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-9b "
+grep -q '^<<<<<<< ours$' "$TMP/a" \
+  || bad "unkeyable duplicate: rc 1 with NO markers is the marker-free-UU trap — write the conflict"
+# ...and the postcondition does NOT fire on the same row arriving from one side only, or every clean
+# append below it is one refusal away from unusable.
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$SUFFIXED"; row TOOL-zFixture-2 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/b"
+run "unkeyable row from one side only" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-9b "
+
+# The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
+# coverage and goes stale the first time a group is added without touching it.
+ngroups=$(grep -c '^# --- ' "$SELF")
+[ "$ngroups" -ge 20 ] || bad "the fixture-group scan found $ngroups groups — the count is mis-selecting"
+[ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups fixture groups held"
 exit "$st"
