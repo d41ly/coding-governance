@@ -100,7 +100,7 @@ can discover an existing seam instead of reinventing it. It is a separate plane:
   `.codebase-map.conf` (`RECALL_DARK_LAYERS`) so the lookup can announce the gap (rather than a
   falsely-confident "no seam fits").
 - **Use it via `reuse_lookup.py`.** The recall tier exists to be queried: before building new
-  behaviour, run `python codebase-map/reuse_lookup.py "<behaviour>"` (see
+  behaviour, run `python <kit>/reuse_lookup.py "<behaviour>"` (see
   `reuse-lookup.agent.md`). It assembles a ranked shortlist from the corpus (symbols + inventory
   keys + `## Reuse affordance` seams + `## Shared seams` prose), computes fan-in on demand to mark
   hot seams, and flags recall-dark layers. Set `SEAM_FANIN_THRESHOLD` in `.codebase-map.conf` (default

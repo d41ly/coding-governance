@@ -222,6 +222,13 @@
     ]
   },
   {
+    "name": "codebase-map adopter e2e",
+    "argv": [
+      "bash",
+      "tools/codebase-map/adopt-codebase-map.test.sh"
+    ]
+  },
+  {
     "name": "settings-merge selftest",
     "argv": [
       "python3",

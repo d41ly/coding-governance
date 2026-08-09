@@ -1,7 +1,8 @@
 """map_extractors.py — THIS PROJECT's inventory declarations (the only project-owned code).
 
-Copied from codebase-map/map_extractors.template.py at adoption; fill it per
-codebase-map/INVENTORY-DERIVATION.md, then run `python codebase-map/gen_map.py --scaffold`.
+Copied from `<kit>/map_extractors.template.py` at adoption; fill it per
+`<kit>/INVENTORY-DERIVATION.md`, then run `python <kit>/gen_map.py --scaffold`.
+(`<kit>` is this kit's install prefix — `codebase-map/`, or e.g. `tools/codebase-map/`.)
 
 Rules (from the derivation checklist — each was a shipped bug once):
 - Prefer IMPORT/REGISTRY reads over file globs where the code already exposes a registry
@@ -112,7 +113,7 @@ def inventory_ids() -> tuple[str, ...]:
     if not EXTRACTORS:
         raise m.MapError(
             "map_extractors.EXTRACTORS is empty — declare this project's inventories "
-            "(see codebase-map/INVENTORY-DERIVATION.md); an inventory-less map enforces nothing"
+            "(see INVENTORY-DERIVATION.md beside this file); an inventory-less map enforces nothing"
         )
     return tuple(EXTRACTORS)
 

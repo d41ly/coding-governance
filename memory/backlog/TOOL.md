@@ -18,3 +18,5 @@
 - TOOL-aBatchedTribunal-4 · CLOSED · `corpus_ids.py`'s shape filter was a tautology and could not be covered by any behavioural arm — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-5 · CLOSED · the launcher ban keyed on the retired idiom, so a BARE invocation carried nothing to match — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-7 · CLOSED · the epoch gate's endpoint comparison let one early bump excuse every later change in the range — closed by TOOL-aBatchedTribunal-8 (W6); the record is in DECISIONS.md
+- TOOL-aRootedPrefix-1 · INPROGRESS · codebase-map hardcoded its `<root>/codebase-map/` install convention and answered from an empty corpus at any other prefix — built on branch/wizardly-einstein-46d4cc, unmerged; the record is in DECISIONS.md
+- TOOL-aRootedPrefix-2 · CLOSED · `REGEN_CMD` and the scaffolded map README spelled a kit path that does not exist at a prefixed install — closed by TOOL-aRootedPrefix-1 at rev-2 (S9); the record is in DECISIONS.md
