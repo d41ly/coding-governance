@@ -1,6 +1,6 @@
 # TOOL-aMendedLedger-1 — finish the memory rework: drain the ledger, drive the merge, re-true the docs
 
-**Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook
+**Status:** SPECCED · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook · ratified 2026-08-09
 
 ## 1. Goal
 
@@ -20,8 +20,10 @@ declared draining `<MEMORY_ROOT>/project/` out of scope in writing, and nothing 
 - **S5** Port upstream U9: a row-keyed merge driver for `memory/DECISIONS.md` and
   `memory/backlog/*.md`, its launcher shim, its `.gitattributes` entries, its per-node `git config`
   wiring, and its replay test.
-- **S6** Re-true every governing doc this work falsifies, splitting this repo's own docs from the
-  adopter-facing product docs, which F2 and F5 gate.
+- **S6** Re-true every governing doc this work falsifies, in both layers: this repo's own docs, and
+  the adopter-facing product docs, which the owner ratified as **retire everywhere** (F2, F5).
+- **S6b** Ship the adopter upgrade note that retirement obliges. Retiring the ledger in the product
+  is a breaking change for an adopter still carrying one, and it must not land silently.
 - **S7** Close `PLAY-aPrunedCeremony-5`, whose subject retires with the ledger, and repair its dead
   build pointer in the same change.
 - **S8** Record the decisions in `memory/DECISIONS.md`, including a row that supersedes the now-dead
@@ -171,13 +173,15 @@ Order is a dependency chain. **U2 and U4 must be one commit**: draining `in-flig
 |---|---|---|
 | U1 | journals relocate; stub build folder; the three `.md` stubs deleted; build index regenerated | no |
 | U2+U4 | ledger to `archive/ledger/` + its README; `signal_ledger` resolved per F3; the ledger lens deleted from `drift-audit-state.js`; drift selftest fixtures | no |
-| U3 | hygiene gate matches the drained tree; the `pop_guard` call above; check 6's arm re-fixtured; kit 1.7 → 1.8; `HYGIENE.md` + template parity; `adopt-memory-tree.sh` per F2; hygiene test fixtures | **yes** — `check-memory-hygiene.sh` |
+| U3 | hygiene gate matches the drained tree; the `pop_guard` call above; check 6's arm re-fixtured; kit 1.7 → 1.8; `HYGIENE.md` + template parity; `adopt-memory-tree.sh` stops scaffolding the ledger AND check 3 stops admitting it; hygiene test fixtures | **yes** — `check-memory-hygiene.sh` |
 | U5 | `pyrun.sh`; the merge driver; `.gitattributes`; `check-wiring.sh` case; replay test; gate leg | **yes** — `tools/gate-legs.json` |
-| U6 | doc truth; the template edit per F5 | **yes** — `parallel-coding-governance.template.md` |
+| U6 | doc truth; the template edit above; the S6b upgrade note | **yes** — `parallel-coding-governance.template.md` |
 | U7 | `PLAY-aPrunedCeremony-5` → WONTDO + pointer repair; `memory/DECISIONS.md` rows | no |
 
-U3 and U6 both depend on F2 and F5 being answered. U3's `adopt-memory-tree.sh` line and U6's template
-edit are the two places where an unanswered fork becomes an unbuildable step.
+Both forks that gated U3 and U6 are resolved (§8 F2, F5: retire everywhere), so no step now waits on
+an answer. U3 carries the whole retirement in the kit layer — scaffolder and gate together — because
+scaffolding a shape the gate rejects, or rejecting a shape the scaffolder writes, is a red bar in
+either direction.
 
 ### Files touched (estimate)
 
@@ -195,8 +199,33 @@ Docs: `AGENTS.md`, `.claude/SESSION-KICKOFF.md`, `parallel-coding-governance.tem
 `memory/HYGIENE.md:81` carries a separate defect worth landing with F4: "Two plain sorted path lists
 in `memory/project/`" is stale at five registries.
 
-Three budgets constrain the doc work, each one-sided: the template's **22 free bytes** of its 32 768
-gate (measured), the read-path ceiling, and the kit/dogfood parity pair that forces every
+**The template edit, stated line by line** (F5 resolved: retire). Byte counts measured on the
+LF-normalised file, which is 32 746 of 32 768 with **22 free**:
+
+| lines | action | bytes |
+|---|---|---|
+| `:86-88` | **delete** — the shard rule, the row shape, and the `{in-flight \| merged:<sha>}` vocabulary | −954 |
+| `:31` | rewrite: the Locate step reads the decision log + backlog and the GENERATED build index, not the ledger | ~−40 |
+| `:68` | rewrite: the slug-collision scan keeps its all-time grep and its live-row scan, now over the generated index | ~−60 |
+| `:101` | rewrite: keep "never a shared mutable index every session edits… append-only or generated", drop the per-node-ledger clause | ~−120 |
+| `:102` | rewrite: status lives in the generated build index, not the ledger | ~−60 |
+| `:211` | rewrite: the wrap-up writes build front matter and shas, not a ledger row | ~−30 |
+
+The deletion at `:86-88` is what makes the rest affordable: it frees roughly a kilobyte against a
+22-byte margin, so U6's other corrections fund themselves. **`:101`'s surviving clause is the point
+of the change** — a shared mutable index is still forbidden; the answer is now a generated index plus
+S5's row-keyed driver for the two indexes that must stay authored, rather than sharding by node.
+
+**S6b, the upgrade note.** `WIRE-INTO-PROJECT.md` gains a short migration section: the sharded
+authored ledger is retired at kit 1.8; an adopter carrying one moves its shards to
+`<MEMORY_ROOT>/archive/ledger/` and gets its work state from `gen_build_index.py` instead, which
+requires build README front matter. Measured on the one adopter found on this node (`swydee`): it
+runs kit **1.4** on a pre-flatten tree with three live rows, no `LIVE.md`, no `ledger/` and zero
+build READMEs carrying front matter — so for that repo the note is a prerequisite list, not a
+one-liner, and the migration itself is its own unit in its own repo.
+
+Three budgets constrain the doc work, each one-sided: the template's 22 free bytes (relieved by the
+deletion above), the read-path ceiling, and the kit/dogfood parity pair that forces every
 `memory/HYGIENE.md` edit into `HYGIENE.template.md` in the same commit via `--render`.
 
 ### Alternatives rejected
@@ -276,8 +305,17 @@ U7 records them as "RELOCATED, not deleted".
   baseline at `f9cf666`: 0 · 1 · 0 · 1 · 6 · 6 · 0. A zero-hit result on a file whose baseline is 0
   proves nothing and is not evidence of work.
 - **AC10b** When the same grep is run over `parallel-coding-governance.template.md` (baseline 8) and
-  `WIRE-INTO-PROJECT.md` (baseline 6), the surviving set matches whatever F2 and F5 decide, enumerated
-  line by line in §4 at rev-3 once the owner answers.
+  `WIRE-INTO-PROJECT.md` (baseline 6) after U6, the only surviving hits are in the S6b upgrade section
+  of `WIRE-INTO-PROJECT.md`, and each one describes the ledger as RETIRED and names the migration.
+  Template hits go to 0: `:86-88` are deleted and `:31`, `:68`, `:101`, `:102`, `:211` are rewritten.
+- **AC10c** When `bash tools/check-template-size.sh` is run after U6 it exits 0, and the reported byte
+  count is **lower** than the 32 746 measured at `f9cf666` — the `:86-88` deletion must land, not be
+  traded away for additions elsewhere.
+- **AC10d** When a fresh scaffold is run in a throwaway repo after U3
+  (`bash tools/memory-tree/adopt-memory-tree.sh`), the resulting tree contains no `IN-FLIGHT.md`, no
+  `in-flight/` and no `journal/`, and `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 over
+  it. Scaffolder and gate are asserted together because a shape one writes and the other rejects is a
+  red bar in either direction.
 - **AC11** When `bash tools/run-gates.sh` is run at the end of every unit's commit, it is green.
 - **AC12** When `memory/backlog/PLAY.md` is read after U7, `PLAY-aPrunedCeremony-5` leads with
   `WONTDO` and its pointer resolves to `memory/builds/aPrunedCeremony/`.
@@ -325,9 +363,12 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
 - **F2 — does the kit keep scaffolding a session ledger for ADOPTERS?** Dropping it from
   `adopt-memory-tree.sh` while check 3 stops admitting `IN-FLIGHT.md` / `in-flight/` / `journal/` makes
   an adopter who kept the sharded ledger go red on their next hygiene run, and that contract is stated
-  to them at `WIRE-INTO-PROJECT.md:119` and `:389`. **Recommendation: retire it for adopters too in
-  the same version bump and say so in the runbook.** Owner decision — it is a breaking kit change, and
-  U3's scope line and AC10b both depend on the answer.
+  to them at `WIRE-INTO-PROJECT.md:119` and `:389`.
+  **RESOLVED (owner, 2026-08-09): retire it for adopters too, in the same version bump.** Taken with
+  the measured break in front of us: the one adopter found on this node (`swydee`) runs kit 1.4 on a
+  pre-flatten tree with three live rows and no generated index to fall back on, so retirement obliges
+  the S6b upgrade note rather than a silent break. A migration of that repo is its own unit in its own
+  repo and is not this unit's work.
 - **F3 — `signal_ledger`'s fate.** Three exits: delete it (upstream did, but 17 selftest references
   ride it); add it to `DECLARED_EMPTY` and retire its pin of 4; or repoint it at
   `memory/archive/ledger/` (where the pin reads 4 forever and the ratchet becomes permanent).
@@ -342,8 +383,10 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
   wrap-up, and `:31` and `:68` reference it. Whether adopters keep that ruleset is a product decision,
   not a builder's. Byte direction matters: the gate reports **32 746 / 32 768, 22 free**, so deleting
   `:86-88` frees roughly a kilobyte while any added clause fails outright.
-  **Recommendation: retire it in lockstep with F2** — one answer for the kit and the playbook, since
-  two shapes for one question is the defect this unit exists to close.
+  **RESOLVED (owner, 2026-08-09): retire it, in lockstep with F2.** The rule's own justification is
+  that a shared mutable index "forces a conflict on every land" — which is the question S5's row-keyed
+  driver and the generated build index now answer two other ways. Carrying all three would be three
+  answers to one question. The line-by-line edit and its byte deltas are in §4 Files touched.
 - **F6 — `check-memory-hygiene.sh:346`.** The `MAP_SUB` branch rewrites `ex7` wholesale and drops the
   `guides/` alternative. Dormant until 2026-08-09; this repo now has `.codebase-map.conf` with
   `MAP_ROOT=memory/map`, so it is live, and F1's recommendation puts a `guides/` fixture straight into
@@ -371,6 +414,16 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
   citation in §4 Alternatives rejected, which was a tree-diagram line carrying no instruction — the
   decision now rests on the bullet that carries it. F6 added: the `MAP_SUB` `ex7` defect went live
   when this repo adopted codebase-map earlier today.
+- rev-3 · 2026-08-09 · owner ratified F2 and F5 as **retire everywhere**, both marked RESOLVED in
+  place and the header tail stamped `ratified 2026-08-09`. The template edit is now stated line by
+  line with measured byte deltas rather than named as an intention — `:86-88` deleted (−954 B), five
+  lines rewritten — which was the last of the review's three invent-it-yourself defects. S6b added:
+  retirement in the product is a breaking change for an adopter still carrying a ledger, so the
+  runbook gains a migration section. Measured the blast radius rather than assuming it: one adopter
+  on this node (`swydee`), kit 1.4, pre-flatten tree, three live rows, no generated index to fall
+  back on. AC10b became determinate and AC10c/AC10d were added, so the deletion cannot be traded away
+  for additions elsewhere and the scaffolder and gate are asserted together. Migrating `swydee` is
+  its own unit in its own repo.
 
 ## 10. Reuse audit
 
