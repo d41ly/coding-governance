@@ -91,6 +91,13 @@
     ]
   },
   {
+    "name": "row-keyed merge driver replay",
+    "argv": [
+      "bash",
+      "tools/memory-tree/merge-rows.test.sh"
+    ]
+  },
+  {
     "name": "kit/dogfood doc parity",
     "argv": [
       "bash",
@@ -219,6 +226,13 @@
     "argv": [
       "python3",
       "tools/codebase-map/selftest.py"
+    ]
+  },
+  {
+    "name": "codebase-map coverage + freshness",
+    "argv": [
+      "python3",
+      "tools/codebase-map/test_codebase_map.py"
     ]
   },
   {

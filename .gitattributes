@@ -31,6 +31,19 @@ memory/**/*.md text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
 
+# The two AUTHORED indexes every node appends to. `merge=rows` routes a conflict through the
+# row-keyed driver (tools/memory-tree/merge-rows.py), which merges by record id: an append-collision
+# between two nodes auto-resolves with both rows present and no duplicate id. Deliberately NOT
+# `merge=union` — union never loses an id but introduced a duplicate in 147 of 151 historical
+# DECISIONS.md conflicts upstream, and these files hold zero duplicate ids.
+# No `eol=lf` pin here on purpose: `* text=auto` above already normalises the committed blobs, the
+# driver is newline-preserving by construction, and a pin would rewrite every node's worktree bytes
+# on its next checkout for nothing. A node with no `merge.rows.driver` configured falls back to git's
+# built-in three-way text merge with a warning — the pre-change behaviour, which is why the attribute
+# and the per-node config can land in one commit. `bash tools/check-wiring.sh --fix` configures it.
+memory/DECISIONS.md merge=rows
+memory/backlog/*.md merge=rows
+
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
 parallel-coding-governance*.md text eol=lf
@@ -46,3 +59,13 @@ parallel-coding-governance*.md text eol=lf
 # checkout. The pin keeps the committed bytes deterministic anyway, and stops a future maintainer who
 # drops that `tr -d '\r'` from reintroducing memory-recall's green-by-accident failure.
 .claude/skills/drift-audit/SKILL.md text eol=lf
+
+# codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
+# generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
+# differs on EVERY line — the same green-only-right-after-a-render failure the memory-tree pins above
+# exist for. The conf is pinned because it is SOURCED BY BASH: a CRLF checkout leaves stray carriage
+# returns in every value on Linux.
+.codebase-map.conf text eol=lf
+memory/map/generated/* text eol=lf
+memory/map/baseline.toml text eol=lf
+memory/map/affordance-exempt.toml text eol=lf

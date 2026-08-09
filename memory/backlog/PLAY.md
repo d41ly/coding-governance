@@ -2,4 +2,4 @@
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
 
-- PLAY-aPrunedCeremony-5 · OPEN · `in-flight/b.md` rows are bare `merged` under the retired vocab (aPrunedCeremony → `{in-flight | merged:<sha>}`); node b migrates its own rows to `merged:<sha>` next session (write-only-your-own) → `builds/2026-07-19-PLAY-aPrunedCeremony/`
+- PLAY-aPrunedCeremony-5 · WONTDO · subject retired with the authored ledger (aMendedLedger U2): the shards moved to `memory/archive/ledger/` and work state is the GENERATED build index, so node b has no rows to migrate → `builds/aPrunedCeremony/`

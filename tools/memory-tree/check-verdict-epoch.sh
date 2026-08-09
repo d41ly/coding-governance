@@ -44,12 +44,20 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verdict-epoch: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-# THE ENGINE IS NOT ONE FILE. Checks 9 and 13-19 delegate to three sibling Python modules, so 8 of
-# the 19 verdicts live outside the shell script — a change to `gotchas.py`'s classifier moves what the
-# gate SAYS exactly as surely as a change to check 5's selector. The first cut diffed only the shell
-# file and would have let all three drift under a still constant.
+# THE ENGINE IS NOT ONE FILE. Checks 9 and 13-19 delegate to sibling Python modules, so 8 of the 19
+# verdicts live outside the shell script — a change to `gotchas.py`'s classifier moves what the gate
+# SAYS exactly as surely as a change to check 5's selector. The first cut diffed only the shell file
+# and would have let all of them drift under a still constant.
+#
+# AND THE CHAIN IS TWO HOPS, not one. `corpus_ids.py` is listed, but it deliberately declares no
+# grammar of its own (`corpus_ids.py:12`): `grammar()` returns `extract.grammar_for(root)`, so the
+# regex that decides checks 13-16's verdicts lives one file further out, in the memory-recall kit.
+# Measured on the commit that widened it: the session era went `\d+` to `\d+[a-z]*`, check 14's
+# answer went 5 orphans to 9, and this gate printed `clean` with the constant untouched — the same
+# defect TOOL-aBatchedTribunal-6o closed for the three modules below, one hop short. A kit an adopter
+# has not installed is skipped by the `[ -f ]` guard, so listing it costs a non-adopter nothing.
 ENGINE=tools/memory-tree/check-memory-hygiene.sh
-DELEGATES="tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py"
+DELEGATES="tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done
@@ -74,10 +82,19 @@ git cat-file -e "$BASE^{commit}" 2>/dev/null || { echo "verdict-epoch: base '$BA
 # Behaviour-bearing added/removed lines in ONE commit. `-U0` so context lines cannot be mistaken for
 # changes; the `+++`/`---` headers are dropped. A merge commit prints nothing here, which is right:
 # a merge introduces no line its parents did not already carry.
-behav_in() {  # $1=commit -> count
-  git diff-tree -U0 --no-commit-id -r -p "$1" -- $SCAN 2>/dev/null \
+behav_in() {  # $1=commit · $2=pathspec (default: the whole scan set) -> count
+  git diff-tree -U0 --no-commit-id -r -p "$1" -- ${2:-$SCAN} 2>/dev/null \
     | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | sed 's/^.//' \
     | grep -vE '^[[:space:]]*(#|$)' | grep -c . || true
+}
+# WHICH of the scanned files moved. The failure used to name only a sha, and the scan set is now four
+# files across TWO kits: "$W moved 3 lines" leaves the reader to diff the commit themselves to learn
+# whether the engine, a delegate or the shared grammar was what moved. One `behav_in` per scanned
+# file, and only on the failure path, so the clean path costs nothing.
+moved_files() {  # $1=commit -> space-separated paths
+  local f out=""
+  for f in $SCAN; do [ "$(behav_in "$1" "$f")" -gt 0 ] && out="$out $f"; done
+  printf '%s' "${out# }"
 }
 verat() {  # $1=rev -> the constant's value at that rev ("" if absent/unparseable)
   git show "$1:$ENGINE" 2>/dev/null | sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' | head -1
@@ -142,6 +159,7 @@ remedy() {
 if [ -z "$S" ]; then
   echo "verdict-epoch: FAILED — $moved behaviour-bearing line(s) of the engine moved in $W, and NO"
   echo "verdict-epoch: commit in ${BASE}..HEAD changes KIT_MEMORY_TREE_VERSION (still $now)."
+  echo "verdict-epoch:   moved: $(moved_files "$W")"
   echo "verdict-epoch: The constant is what dates the engine's verdicts — hygiene-parity.test.sh"
   echo "verdict-epoch: derives its baseline floor from it — so leaving it makes that floor point at a"
   echo "verdict-epoch: commit from before this change."
@@ -152,6 +170,7 @@ fi
 if ! git merge-base --is-ancestor "$W" "$S" 2>/dev/null; then
   echo "verdict-epoch: FAILED — the bump is OLDER than the change it claims to date."
   echo "verdict-epoch:   last behaviour-bearing engine change: $W ($moved line(s))"
+  echo "verdict-epoch:   moved: $(moved_files "$W")"
   echo "verdict-epoch:   last KIT_MEMORY_TREE_VERSION change:  $S"
   echo "verdict-epoch: A bump anywhere in the range used to satisfy this gate, so one early bump"
   echo "verdict-epoch: excused every verdict change after it. The bump has to come at or after the"

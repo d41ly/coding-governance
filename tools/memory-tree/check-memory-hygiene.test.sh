@@ -3,6 +3,10 @@
 # guard. Builds a scratch git repo with conforming + violating fixtures and asserts each class fires
 # (red) or stays silent (green), plus the disabled-when-blank conf contracts. Only the asserted
 # checks' lines are read — the scratch repo intentionally reds others and that noise is ignored.
+# Four more scratch trees at the bottom: half-migrated and young (the empty-population guard's two
+# states), one carrying a .codebase-map.conf (the only place check 7's MAP_SUB branch is reachable),
+# and one built by adopt-memory-tree.sh --scaffold itself, so the scaffolder is asserted against the
+# GATE rather than against a second description of the scaffolder.
 #   bash memory-tree/check-memory-hygiene.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
@@ -174,8 +178,18 @@ printf 'x\n' > "$D/spec/units/scratch-notes.md"                      # free-name
 # A nested name carrying the unit tail — the shape that made the drafted grammar a red merge bar on
 # 14 real files. Silent only because check 5's name ERE and check 12's selector now share one tail.
 printf 'x\n' > "$D/spec/units/2026-08-01-spec-tFixture-31-u2-tail-ok.md"
-mkdir -p memory/project
+mkdir -p memory/project memory/guides
+# ---- CHECK 3: `project/` holds the five waiver registries and NOTHING else — no catch-all. The
+# ---- `.md` on the stray is load-bearing rather than decoration: a stray `.txt`, an extensionless
+# ---- file or a subdirectory already fell through to the reporting `*)` arm on the PRE-tightening
+# ---- engine, so only a `.md` tells the two engines apart. These five are also the population the
+# ---- selector-integrity guard measures — the half-migrated tree below is the same guard's red half.
 printf '# legacy\n' > memory/project/legacy-files.txt
+printf '# debt\n' > memory/project/curation-debt.txt
+printf '# orphan waiver\n' > memory/project/id-orphan-waiver.txt
+printf '# unresolved repo-path citations\n' > memory/project/corpus-path-unresolved.txt
+printf '# unarmed branches\n' > memory/project/unarmed-branches.txt
+printf '# stray\n' > memory/project/tstray.md          # a .md under project/ -> RED
 
 # ---- CHECK 4: the folder is named for its SLUG alone. A date or FAMILY prefix is the pre-flatten
 # ---- shape and must be rejected, or a half-migrated tree passes.
@@ -196,11 +210,17 @@ printf '# stray\n' > memory/backlog/notes.md
 # ---- unless something asserts that a correctly-placed prompt stays OUT of the report.
 mkdir -p "$D/prompts"
 printf 'x\n' > "$D/prompts/2026-08-01-prompt-tFixture-1.md"      # correctly placed -> silent
-printf 'x\n' > memory/project/kickoff-prompt.md                  # loose in the tree -> RED
+printf 'x\n' > memory/guides/kickoff-prompt.md                   # loose in the tree -> RED
+# `guides/` because check 3 no longer admits a stray `.md` under `project/` — parking it there would
+# make this fixture satisfy check 3 as well, and check 1's arm would no longer be its own evidence.
+# `guides/` contents are unconstrained by check 3, and check 1 exempts only builds/*/prompts/ and
+# archive/, so the arm still fires.
 
 # ---- CHECK 2: link integrity, both states in ONE file. A resolver that stopped resolving anything
 # ---- would still satisfy a red-only arm, so the live link is asserted absent from check 2's slice.
-printf '# links\n\n[alive](kickoff-prompt.md)\n[dead](no-such-file.md)\n' > memory/project/links.md
+# ---- It moves WITH its live target: the resolving half is relative, so splitting the pair across
+# ---- two directories would break the green arm for a reason that has nothing to do with check 2.
+printf '# links\n\n[alive](kickoff-prompt.md)\n[dead](no-such-file.md)\n' > memory/guides/links.md
 
 # ---- CHECK 10: a rotated archive is announced in lines 1-3 of the index it was cut from. Two
 # ---- archives, one index, one mention — the referenced one is the control.
@@ -209,11 +229,13 @@ printf '# Decisions\n\nRotated: DECISIONS.2026-08-02.md\n\n- ARCH-tFixture-1 · 
 printf '# rotated\n' > memory/archive/DECISIONS.2026-08-01.md    # unreferenced   -> RED
 printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the head -> silent
 
-# ---- CHECK 6: the index byte/line cap. A per-node ledger shard is in INDEX_SET and carries no
-# ---- other assertion, so growing it past 250 lines trips exactly one branch and nothing else.
-mkdir -p memory/project/in-flight
-{ printf '# tnode ledger\n'; i=1; while [ "$i" -le 260 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
-  > memory/project/in-flight/tnode.md
+# ---- CHECK 6: the index byte/line cap. `guides/*.md` is in INDEX_SET — a guide is mandatory reading
+# ---- the charter points a session at, and check 16 refuses a charter-cited file nothing caps — and
+# ---- this file carries no other assertion, so growing it past 250 lines trips exactly one branch and
+# ---- nothing else. It is entry-budget exempt (check 7), which the codebase-map tree below pins from
+# ---- the other side: that exemption is the alternative the MAP_SUB branch used to overwrite.
+{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 260 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+  > memory/guides/tfixture.md
 
 # ---- CHECK 11: the tombstone root, set in the conf above and BLANK in the two disabled-when-blank
 # ---- runs further down — which is this branch's green half.
@@ -319,15 +341,24 @@ hit  'memory/backlog/notes.md'
 # ---- an ABSENCE assertion satisfies it too. Every unarmed branch is listed in
 # ---- memory/project/unarmed-branches.txt and that pin is shrink-only.
 hit  'unexpected entries (structure)'
+# `project/` is defined as five named registries, so a stray `.md` there is check 3's finding and
+# nobody else's — attributed through the slice, because checks 1, 2, 5, 9 and 12 also print bare paths.
+chit 3 'memory/project/tstray.md'
+# ...and the selector-integrity guard's GREEN half, on this tree: the five registries sit at exactly
+# the depth the path expression expects, so check 3's population is non-empty and the
+# empty-population report must NOT name it. Silence from check 3 itself would prove nothing — a
+# mis-segmented selector is silent for the same reason a clean one is.
+grep -qE '^    check 3: ' <<<"$out" \
+  && { echo "FAIL check 3 tripped the empty-population guard on a tree whose registries sit at the expected depth"; st=1; }
 hit  'build-folder naming/shape'
 hit  'prompt-kind files outside builds/*/prompts/ or archive/'
-chit 1 'memory/project/kickoff-prompt.md'
+chit 1 'memory/guides/kickoff-prompt.md'
 cnot 1 "$D/prompts/2026-08-01-prompt-tFixture-1.md"
 hit  'broken relative .md links'
-chit 2 'memory/project/links.md -> no-such-file.md (MISSING)'
+chit 2 'memory/guides/links.md -> no-such-file.md (MISSING)'
 cnot 2 'links.md -> kickoff-prompt.md'
 hit  'index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it)'
-chit 6 'memory/project/in-flight/tnode.md'
+chit 6 'memory/guides/tfixture.md'
 cnot 6 'memory/backlog/ARCH.md'
 hit  'backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)'
 chit 8 'memory/backlog/ARCH.md:8'
@@ -426,6 +457,16 @@ r9=$(awk '/in9 = 1/{f=1} f&&/else if \(in9 && L ~ \/\^## \/\) in9 = 0/{ok=1} END
 #    predicate that fires on the comment documenting the fix is the classic self-inflicted red.
 lc7=$(awk '/^# 7 — /{f=1} /^# 8 — /{f=0} f && $0 !~ /^[[:space:]]*#/ && /LC_ALL/{print NR ": " $0}' "$SCRIPT")
 [ -z "$lc7" ] || { echo "FAIL check 7 carries a locale prefix — length() must stay locale-dependent: $lc7"; st=1; }
+# 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
+#    used to REBUILD the whole expression, and the rebuild silently omitted `guides/` — so on any repo
+#    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
+#    moved. The fixture below catches today's shape; this catches the RESHAPE that would lose it
+#    again, which no fixture can, because the second spelling would still be a valid expression.
+ex7asg=$(grep -nE 'ex7=' "$SCRIPT")
+ex7g=$(printf '%s\n' "$ex7asg" | grep -cF '/guides/')
+[ "$ex7g" = 1 ] || { echo "FAIL the ex7 exemption carries $ex7g spellings of the guides/ alternative, expected exactly 1"; st=1; }
+ex7bad=$(printf '%s\n' "$ex7asg" | tail -n +2 | grep -vF '$ex7' || true)
+[ -z "$ex7bad" ] || { echo "FAIL an ex7 re-assignment rebuilds the expression instead of appending to \$ex7: $ex7bad"; st=1; }
 
 # disabled-when-blank contracts: same tree, each cutoff removed in turn.
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
@@ -489,17 +530,22 @@ git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
 #     nothing, prints nothing, and is indistinguishable from a passing check. This is the state the
 #     guard exists for, and the state a mis-segmented selector would produce on a correct tree.
 H=$TMP/halfmigrated
-mkdir -p "$H/memory/project" "$H/memory/architecture/builds/2026-08-01-ARCH-tOld/spec"
+mkdir -p "$H/memory/project" "$H/memory/architecture/project" "$H/memory/architecture/builds/2026-08-01-ARCH-tOld/spec"
 ( cd "$H" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# old\n' > memory/architecture/builds/2026-08-01-ARCH-tOld/spec/2026-08-01-spec-tOld-1.md
   printf '# b\n' > memory/architecture/BACKLOG.md
+  # A registry at the PRE-flatten path. It is the PRECONDITION for check 3's guard and nothing else:
+  # the un-segmented count asks "does a registry exist anywhere under the memory root?" and answers
+  # yes, while the flat selector `memory/project/*.txt` matches none — which is exactly the
+  # mis-segmented shape the guard exists to catch, and is silent without it.
+  printf '# legacy\n' > memory/architecture/project/legacy-files.txt
   git add -A && git commit -q -m half --no-verify )
 outh=$(cd "$H" && bash "$SCRIPT" 2>/dev/null); rch=$?
 [ "$rch" = 0 ] && { echo "FAIL a half-migrated tree exited 0 — every flat selector matched nothing and the gate was green"; st=1; }
 grep -qF 'selected an EMPTY population' <<<"$outh" || { echo "FAIL no empty-population report on a half-migrated tree"; st=1; }
-for c in 4 5 8 12; do
+for c in 3 4 5 8 12; do
   grep -qE "^    check $c: " <<<"$outh" || { echo "FAIL check $c did not report its empty population on a half-migrated tree"; st=1; }
 done
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
@@ -523,7 +569,66 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
   && { echo "FAIL a freshly scaffolded tree tripped the empty-population guard"; st=1; }
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
 
+# ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
+# ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the
+# ----     branch that rebuilt the exemption expression was dormant in this whole file. It went live
+# ----     the day this repo adopted codebase-map, and the rebuild had dropped the `guides/`
+# ----     alternative — a LOOSENING, which nothing here could have seen: every guide silently
+# ----     entered the entry-budget population and the gate stayed green. Three over-cap rows, one
+# ----     per exemption state, so the arm cannot be satisfied by a check 7 that reports nothing.
+G=$TMP/mapped
+mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/memory/backlog"
+( cd "$G" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  printf 'MAP_ROOT=memory/map\n' > .codebase-map.conf
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# legacy\n' > memory/project/legacy-files.txt
+  L=$(printf 'x%.0s' $(seq 1 340))
+  printf '# map index\n\n- %s\n' "$L" > memory/map/README.md          # NOT exempt      -> RED
+  printf '# a guide\n\n- %s\n' "$L"  > memory/guides/tguide.md        # exempt (guides) -> silent
+  printf '# a dossier\n\n- %s\n' "$L" > memory/map/features/tdoss.md  # exempt (map)    -> silent
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && git add -A
+  git commit -q -m mapped --no-verify )
+outm=$(cd "$G" && bash "$SCRIPT" 2>/dev/null)
+cblock "$outm" 7 | grep -qF 'memory/map/README.md:' \
+  || { echo "FAIL check 7 did not report the over-cap row in the map index, which carries no exemption"; st=1; }
+cblock "$outm" 7 | grep -qF 'memory/guides/tguide.md' \
+  && { echo "FAIL check 7 reported a guide's over-cap row — the MAP_SUB branch dropped the guides/ exemption again"; st=1; }
+cblock "$outm" 7 | grep -qF 'memory/map/features/tdoss.md' \
+  && { echo "FAIL check 7 reported a codebase-map dossier's over-cap row — dossiers are detail files"; st=1; }
+
+# ---- THE SCAFFOLDER, asserted against the GATE rather than against a second description of itself.
+# ---- A hand-built imitation asserts what this file BELIEVES adopt-memory-tree.sh emits, and that
+# ---- belief is the copy that drifts; the young-tree arm above is exactly that, and stays as the
+# ---- control. Here the real script builds the fixture. Scaffolding a shape the gate rejects and
+# ---- rejecting a shape the scaffolder writes are both red bars, and only running both catches either.
+# ---- Three preconditions, because the scaffolder refuses three ways before it writes anything: a
+# ---- git repo, a .memory-tree.conf (absent -> it copies the example and exits 1), and NO existing
+# ---- memory/ (present -> exit 0 "already scaffolded" over an unwritten tree, which would be a green
+# ---- rc proving nothing).
+A=$TMP/scaffolded
+mkdir -p "$A"
+( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  bash "$HERE/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1
+  git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL adopt-memory-tree.sh --scaffold did not complete"; st=1; }
+# The retired session machinery: five names under project/ the gate no longer admits, so writing any
+# of them would hand every new adopter a red tree on their first run. The prefix is interpolated
+# rather than spelled into each entry, so this arm cannot itself be mistaken for a surviving fixture
+# by a sweep looking for the old paths.
+for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do
+  [ -e "$A/memory/project/$p" ] && { echo "FAIL adopt-memory-tree.sh still scaffolds memory/project/$p, which check 3 now rejects"; st=1; }
+done
+# ...and all FIVE registries, not two. Three of them are NAMED by gates and were created by nothing;
+# "absent" and "present and empty" read identically to every consumer, which is what hid it.
+for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt; do
+  [ -f "$A/memory/project/$r" ] || { echo "FAIL adopt-memory-tree.sh did not scaffold memory/project/$r"; st=1; }
+done
+outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
+[ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (101 assertions)"
+[ "$st" = 0 ] && echo "PASS (120 assertions)"
 exit "$st"

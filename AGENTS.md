@@ -2,7 +2,9 @@
 
 Project-agnostic governance + tooling for running Claude Code (or any agent) across several
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
-gate, the kickoff-manifest ratchet, and the template size gate on itself.
+gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
+itself. The map lives at `memory/map/`; its first dossier is `memory/map/features/codebase-map.md`
+and the other 69 inventory keys are still in the shrink-only `baseline.toml`.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
 doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
@@ -35,10 +37,13 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template + its two companions.
 - `tools/` — the deployable kits (copied into target repos).
 - `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
-- `memory/` — this repo's dogfooded memory tree, FLAT: `DECISIONS.md` · `backlog/<FAMILY>.md` ·
-  `builds/<slug>/` · `archive/` · `project/`. Specs, reports, research and reviews live under a
-  build's own folder, NOT the root. The `streams` enum is `playbook kickoff tooling deployer`.
-  Version snapshots live in `memory/archive/`.
+- `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
+  `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
+  `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
+  `project/` (the gate's five `*.txt` waiver registries and nothing else). Specs, reports, research
+  and reviews live under a build's own folder, NOT the root. The `streams` enum is
+  `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
+  `memory/archive/`.
 - `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
@@ -53,17 +58,22 @@ IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + C
 minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
 `memory/backlog/<FAMILY>.md`. Builds live at `memory/builds/<slug>/` — the discipline is a `streams`
 value in each spec's status header, not a directory, so a build spanning two disciplines is one build.
+Live work state is READ from the generated `memory/LIVE.md` (plus the `ledger/<month>.md` shards),
+rendered by `gen_build_index.py` from build front matter and every spec's status header. There is no
+authored session ledger: the sharded per-node one retired at playbook v2.4 / memory-tree kit 1.8 and
+its shards sit frozen under `memory/archive/`.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (19 checks, kit 1.5 flat tree) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 1.8) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
 - template size ≤32 KiB — `tools/check-template-size.sh`
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - verdict epoch — `tools/memory-tree/check-verdict-epoch.sh` (+ self-test): the kit version DATES the engine's verdicts, so a diff that moves a non-comment line of `check-memory-hygiene.sh` must move `KIT_MEMORY_TREE_VERSION` too — `hygiene-parity.test.sh` derives its baseline floor from that constant, and a stale one made the floor point before the change
+- row-keyed merge driver replay — `tools/memory-tree/merge-rows.test.sh` (the driver `tools/memory-tree/merge-rows.py`, launched through `tools/lib/pyrun.sh`, key-merges `memory/DECISIONS.md` and `memory/backlog/*.md` by record id so an append-collision auto-resolves without duplicating or dropping a row; every rc-0 case asserts id-set equality against a grammar-independent oracle, the audit counts reconcile against the file on disk, and an unresolvable anchor grammar becomes a conflict rather than a silent take-ours). Per-node: `bash tools/check-wiring.sh --fix` sets `merge.rows.driver`
 - kit/dogfood doc parity — `tools/memory-tree/kit-dogfood-parity.test.sh` (the shipped `HYGIENE.template.md`/`SPEC-TEMPLATE.template.md` equal this repo's installed copies, modulo the `tools/` install prefix)
 - python-launcher resolver — `tools/lib/resolve-python.test.sh` (one resolver that RUNS each candidate; every copy-installed kit carries it inline byte-identical, gated; the retired `command -v python3 || python` idiom is banned repo-wide)
 - kit self-tests — `tools/hooks/agent-cap.test.sh`, `tools/agent-instructions/adopt-agent-instructions.test.sh`, `tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh`, `python tools/codebase-map/selftest.py`, `python tools/settings-merge.py --selftest`, `python tools/memory-recall/selftest.py`
@@ -81,6 +91,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

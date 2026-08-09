@@ -1,0 +1,6 @@
+# affordance-exempt.toml — the shrink-only affordance grace list (codebase-map kit).
+# Dossiers here predate the '## Reuse affordance' section; the graced presence check skips
+# them. SHRINK-ONLY: a new dossier is NEVER added, a touch drops entries (map_diff
+# attribution), and a dossier that gains the section is removed. Seeded at adoption.
+
+exempt = []

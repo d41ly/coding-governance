@@ -1,8 +1,9 @@
-<!-- gov:kit memory-tree@1.6 -->
+<!-- gov:kit memory-tree@1.9 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
-It holds one append-only decision log, per-build folders, session machinery, and long-lived guides.
+It holds one append-only decision log, per-build folders, the gate's own waiver registries, and
+long-lived guides.
 The tree is FLAT: the discipline is a SIGNAL, not a directory. Which discipline a build served is
 declared in each spec's status header as `streams <value>[+<value>]`, over the closed enum your
 repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two disciplines is one
@@ -25,7 +26,7 @@ memory/
 ├── decisions/             decision detail (append-only area files)
 ├── guides/                long-lived reference guides
 ├── archive/               rotated indexes + legacy material a build can't claim
-├── project/               session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes
+├── project/               the gate's own waiver registries (`*.txt`, five of them) and nothing else
 └── builds/<slug>/
     ├── README.md · STATUS.md       (required only when >3 files / multi-item)
     └── prompts/ · spec/ · build/ · reviews/   (<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md)
@@ -43,7 +44,7 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 1. **Prompt placement (structural).** Prompt-kind files are sanctioned ONLY under `builds/*/prompts/`
    or `archive/`. A scratch planning-prompt committed elsewhere is a regression.
 2. **No instance-specific / secret content** in core memory — scrub throwaway dev creds before mirroring a note.
-3. **Archive-or-file on landing.** DECISIONS.md is the durable home. Delete cold journals; file a
+3. **Archive-or-file on landing.** DECISIONS.md is the durable home. Delete cold scratch notes; file a
    feature's plan/review writeups into its `builds/` folder; a file's own "NOT merged" status prose rots.
 4. **No broken relative links** outside the append-only log (`DECISIONS.md`, `decisions/`), `archive/`
    (dead pointers allowed by design), and migrated recording files listed in `legacy-files.txt`. The
@@ -55,11 +56,12 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 
 ## Index budgets, caps, rotation
 
-- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `MEMORY.md`,
-  `STATUS.md`, `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300
-  chars. Detail lives in the build folder or decision file the line points at. `IN-FLIGHT.md` and the
-  per-node ledger files `in-flight/*.md` (a ledger row is a session dossier) are exempt from the entry
-  budget; the per-node files still carry the 20 KB file cap.
+- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `STATUS.md`,
+  `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail
+  lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
+  entry budget — a guide is prose, not index rows — and still carries the file caps below. That
+  exemption is ONE expression with one base and one optional append for the codebase-map detail
+  files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index + generated files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
@@ -70,19 +72,28 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 
 Every backlog / STATUS row leads with exactly one token of
 `OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`, in its `·`/`|`/leading-dash slot
-(a prose mention of one of these words elsewhere on the line does not count). Distinct from the
-session-ledger vocabulary (`in-flight | merged:<sha>`, IN-FLIGHT.md). New-entry dash form:
+(a prose mention of one of these words elsewhere on the line does not count). New-entry dash form:
 `- <id> · <STATUS> · <one-liner>[ → <pointer>]`.
 Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle meanings — see
 `TEMPLATE-SPEC.md`.
 
 ## The grandfather ratchet
 
-Two plain sorted path lists in `memory/project/`, read with exact-match `grep -qxF`:
+Five plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check. Should not grow after the initial adoption.
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
   checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone.
+- **`id-orphan-waiver.txt`** — ids cited but never defined, deliberately (check 14). Shrink-only
+  against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that now resolves reds.
+- **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
+  one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
+- **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
+  Shrink-only, and EMPTY is its working state rather than its retirement.
+
+All five are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
+to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
 ## The check catalog (all in `tools/memory-tree/check-memory-hygiene.sh`; this file is the prose home)
 
@@ -90,8 +101,10 @@ Two plain sorted path lists in `memory/project/`, read with exact-match `grep -q
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
    and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
 3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
-   `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/ journal/ in-flight/`
-   contents are unconstrained; `builds/` shape is check 4.
+   `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/` contents are
+   unconstrained; `project/` holds ONLY the five waiver registries — no catch-all — and its selector
+   carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
+   `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
    build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose recording-named
    `.md`; non-md only in `build/`.
@@ -227,6 +240,8 @@ Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
 `<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
 `.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
+`affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
+freshly-adopted map),
 `features/`, `generated/`; `README.md`,
 `FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
 entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two

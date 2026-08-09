@@ -10,6 +10,7 @@ terminal status. Nothing here is edited by hand.
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | DEPL-aDeployScout-1 |
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | TOOL-aDrainedSluice-1..-9 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aGuardedTally-1 |
+| [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | TOOL-aMendedLedger-1..-8 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | TOOL-aPortableWarden-1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aQuarriedLantern-1..-3 |
 | [aRootedPrefix](builds/aRootedPrefix/README.md) | INPROGRESS | a | 2026-08-09 | tooling | TOOL-aRootedPrefix-1 |

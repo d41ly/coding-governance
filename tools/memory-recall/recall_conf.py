@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.0
+gov:kit memory-recall@1.1
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.0"
+KIT_MEMORY_RECALL_VERSION = "1.1"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
@@ -155,8 +155,22 @@ class Conf:
         The manifest keys freshness on this (query.ensure_cache), so an id-grammar or corpus-root
         edit invalidates a warm cache the way an alias edit already does. Hashing the file's bytes
         instead would force a full rebuild for a comment edit, for no semantic change.
+
+        THE KIT VERSION IS IN THE BLOB, and it is here because the sentence above was half false. The
+        eras are the other half of the id grammar and they live in `extract.py`, so a widening of the
+        session era reached none of the three project values below. Measured on the commit that
+        widened it: `records` went 53 documents to 91 and every already-built cache stayed warm and
+        stayed blind to the 38 new ones. `corpus_digest` cannot cover it either — that is mtime+size
+        over the tree's `.md` files, and a regex edit moves no `.md` byte.
+
+        The VERSION rather than the era tuple, on two grounds. It is already this kit's declared
+        epoch for its own behaviour and `check-kit-versions.sh` plus the selftest's marker arm force
+        it to move when the kit's behaviour does. And passing the resolved eras down would invert the
+        layering: `extract` imports `recall_conf`, not the other way round. The cost is one rebuild
+        per kit bump, which is the same order as the alias-edit rebuild already accepted above.
         """
-        blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class))
+        blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
+                          KIT_MEMORY_RECALL_VERSION))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 

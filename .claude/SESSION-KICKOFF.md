@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-09T14:20:00+03:00 @ 647bfd9e6c774ba7475c57dbc0b6bb2cb1af87e8
+last-audit: 2026-08-10T01:31:49+03:00 @ 663ca42734023b8890ec3dbbd694a67b64d86c07
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -29,7 +29,9 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
-- **Repo layout:** single checkout at the repo root (`C:/projects/coding-governance`); no worktree fan.
+- **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
+  worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
+  branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit ask.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
@@ -52,33 +54,44 @@ python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
 
+The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. Both CLIs
+below need `CODEBASE_MAP_ROOT` — without it they answer from an EMPTY corpus and say so in a way
+that reads like a real answer:
+
+```bash
+export CODEBASE_MAP_ROOT="$(git rev-parse --show-toplevel)"
+python tools/codebase-map/map_diff.py <old>..<new>          # Step 1: what a fast-forward brought in
+python tools/codebase-map/reuse_lookup.py "<behaviour>"     # Step 4 / §10: the seam to wire through
+```
+
 ### Tier rule
 
 Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
 the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
-### ID + ledger protocol
+### ID + work-state protocol
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = node tag
-(`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Ledger:
-`memory/project/in-flight/<tag>.md`. Build folders are `memory/builds/<slug>/`; the discipline is the
-spec header's `streams` value (`STREAMS_CUTOFF` in `.memory-tree.conf` arms it).
+(`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
+re-renders them from build front matter); there is no authored ledger to update. Build folders are
+`memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
+`.memory-tree.conf` arms it).
 
 ### Current posture — dated corrections
 
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- *(none yet)*
-
 ### Environment traps worth front-loading
 
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It now sits at 32746/32768 (**22 bytes free**, measured 2026-08-09), so the next line added to it must
-  fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
+  It sits at 32083/32768 (**685 bytes free**, measured 2026-08-09 by `bash tools/check-template-size.sh`
+  — read that number FROM the gate, never from here), so a line added to it either fits that margin or
+  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
@@ -110,6 +123,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
   2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
   and sweep TRACKED AND UNTRACKED files when repairing.
+- Every kit here installs under `tools/`, but the codebase-map kit resolves the repo root as its own
+  dir's GRANDPARENT — which is `tools/`, not the root. `adopt-codebase-map.sh` refuses to run at all
+  (it guards on `$ROOT/codebase-map`), and `reuse_lookup.py` / `map_diff.py` answer from an EMPTY
+  corpus while printing "no seam fits" and "mapped 0/N" — a confident answer with nothing behind it.
+  `tools/codebase-map/map_extractors.py` sets `CODEBASE_MAP_ROOT` for the entrypoints that import it
+  (gen_map + the gate); the other two need it exported. See `memory/map/features/codebase-map.md`.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

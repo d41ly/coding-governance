@@ -1,0 +1,75 @@
+# codebase-map — the self-verifying feature/inventory map
+
+```toml
+feature = "codebase-map"
+title = "Codebase map — CI-verified inventory claims + the reuse recall index"
+status = "shipped"
+streams = ["tooling"]
+decisions = []
+
+[claims]
+gate-legs = ["codebase-map coverage + freshness", "codebase-map kit selftest", "codebase-map adopter e2e"]
+kits = ["codebase-map"]
+git-hooks = []
+workflow-scripts = []
+skill-engines = []
+rendered-skills = []
+gotcha-classes = []
+guides = []
+backlog-shards = []
+[paths]
+globs = [
+  "tools/codebase-map/*",
+  "memory/map/*",
+  ".codebase-map.conf",
+]
+```
+
+## Constraints & why
+
+The map is adopted at a NON-CANONICAL install prefix — every kit here lives under `tools/`, not at
+the repo root the kit's convention assumed. That USED to be this feature's defining constraint: the
+engine resolved the root as the kit dir's grandparent, so at this prefix every derived path was one
+segment short, `adopt-codebase-map.sh` refused to run, and `reuse_lookup.py` and `map_diff.py`
+answered confidently from an empty corpus.
+
+The engine fixed it (the aRootedPrefix unit): `map_lib.resolve_root()` walks up for
+`.codebase-map.conf`, bounded by `.git`. Every entrypoint is now correct here with no environment
+set, the adopter runs, and its own e2e leg is on the bar. The former `CODEBASE_MAP_ROOT` workaround
+in `map_extractors.py` is gone and must not be reintroduced — the kit's selftest now bans
+`Path.resolve()` in kit code, because it follows a junction to the link target and would disagree
+with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
+
+`baseline.toml` holds the initial backfill of 71 keys and is shrink-only: a new key must be claimed
+in a dossier, never appended to the baseline. The gate proved this on its own first run — adding the
+`codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
+again when `codebase-map adopter e2e` arrived from main.
+
+## Shared seams
+
+`map_lib.py` is the portable engine and is shared substrate rather than this feature's private code:
+`gen_map.py`, `map_diff.py`, `reuse_lookup.py`, the gate and `map_extractors.py` all read it. It is
+not glob-claimed by any other dossier, because exclusive glob ownership of a shared module is
+impossible and the keyed plane already carries ownership through the keys each feature registers.
+
+`tools/lib/resolve-python.sh` is inlined byte-identically into `adopt-codebase-map.sh`, which is the
+repo-wide python-launcher seam rather than anything this feature owns.
+
+## Gaps
+
+- **No feature dossiers beyond this one.** 69 of 71 keys sit in `baseline.toml`, so coverage is
+  ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
+  answer "what is this repo made of".
+- **bash is recall-dark.** It carries the product here — the gates, adopters and hooks — and
+  `map_lib` ships no shell symbol extractor. Declared in `.codebase-map.conf` `RECALL_DARK_LAYERS`
+  so `reuse_lookup.py` prints a partial-recall notice rather than a falsely confident miss.
+- **`*.template.py` is excluded from the symbol layer** because a template and its instantiated twin
+  define the same names in two files, and `fan_in()` counts the twin as a reference. Measured: with
+  the templates indexed, two `test_*` functions outranked `walk_dir_keys` in the reuse shortlist.
+
+## Reuse affordance
+
+seam: map_lib — reuse for dossier/baseline parsing, deterministic rendering, coverage asserts and
+fan-in ranking; extend via a new helper in `map_lib.py` plus its case in `selftest.py`.
+seam: map_extractors.EXTRACTORS — reuse for declaring a new enumerable surface of this repo; extend
+via a new key whose callable fails closed, then claim its keys in a dossier.

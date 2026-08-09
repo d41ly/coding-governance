@@ -1,5 +1,7 @@
 # 2026-07-16 — `bThriftyBellows` (node b): memory-tree kit 1.2 — hygiene-gate fork-collapse port
 
+Index digest, folded here when memory/project/MEMORY.md was retired: memory-tree kit 1.2 fork-collapse — hygiene gate 2647s → 34s on a 1487-file tree, byte-identical (golden diff ×3 targets); gen-memory-tree cache-and-grep is SLOWER, don't retry (TOOL-bThriftyBellows-2).
+
 Port of BOTH upstream inCMS optimization rounds (ARCH-aFencedNamespace-3 + PERF-eThriftyBellows-1)
 into `tools/memory-tree/check-memory-hygiene.sh`. The 1.1 kit still had every slow pattern; the gate
 is process-creation-bound on Windows/MSYS, so fork COUNT is the cost, not compute.

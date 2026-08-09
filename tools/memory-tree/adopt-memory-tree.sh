@@ -35,7 +35,9 @@ if [ -d "$M" ]; then
   exit 1
 fi
 
-mkdir -p "$M/project/journal" "$M/builds" "$M/backlog"
+# `project/` still needs creating even though it now holds only files: the registry printf
+# redirects below cannot create their own directory.
+mkdir -p "$M/project" "$M/builds" "$M/backlog"
 # root index + rules
 if [ -f "$HERE/HYGIENE.template.md" ]; then cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.template.md" "$M/TEMPLATE-SPEC.md"; fi
@@ -52,7 +54,7 @@ if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.templa
   echo "## Directories"; echo
   echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
-  echo "- [project/](project/) — session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes."; echo
+  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches."; echo
   echo "## Streams (the closed enum)"; echo
   echo "| Value | Family |"; echo "|---|---|"
   for d in $DISCIPLINES; do echo "| \`$d\` | \`$(FAMILY_of "$d")\` |"; done
@@ -71,27 +73,28 @@ if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.templa
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/
-printf '# %s/project/ — session machinery
-
-- MEMORY.md — memory-note index (one line per note).
-- IN-FLIGHT.md — ledger pointer; in-flight/<tag>.md — per-node ledger files (write only your own).
-- journal/ — per-session journals.
-' "$M" > "$M/project/README.md"
-printf '# Memory Index
-
-> One line per durable note.
-' > "$M/project/MEMORY.md"
-printf '# In-flight ledger — sharded per node
-
-One file per node under `in-flight/`. **Write ONLY your own node file** (`in-flight/<tag>.md`) so the ledger never conflicts on merge; **read all** of them for the who-is-touching-what / slug-collision scan. Row: node · slug · branch · streams · status; status in {in-flight | merged:<sha>}. Self-prune your own merged rows once the sha is an ancestor of `main`.
-' > "$M/project/IN-FLIGHT.md"
+# project/ — the gate's OWN waiver registries and nothing else. ALL FIVE are written here, not two:
+# three of them are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py) and were created
+# by nothing, so an adopter met them as a missing file rather than as an empty ratchet. The gate reads
+# "absent" and "present and empty" identically, which is exactly what makes the omission invisible.
 printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
 ' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
 ' > "$M/project/curation-debt.txt"
-touch "$M/project/journal/.gitkeep"
-mkdir -p "$M/project/in-flight"; touch "$M/project/in-flight/.gitkeep"
+printf '# id-orphan-waiver.txt — ids cited but never defined, deliberately (check 14). One id per line.
+# Shrink-only against ORPHAN_ID_PIN; a waived id that now resolves is a stale row and reds.
+' > "$M/project/id-orphan-waiver.txt"
+printf '# corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that
+# resolve to nothing (check 15). One row per (citing-file, cited-path), TAB-separated:
+#   <citing-file>\t<cited-path>\t<occurrences>\t<absent|moved:DEST>
+# Shrink-only against DEAD_PATH_PIN. Empty = every citation resolves.
+' > "$M/project/corpus-path-unresolved.txt"
+printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
+# text (check-arms.py). Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
+# SHRINK-ONLY, and EMPTY is the working state: a row appears only when a new branch lands that no
+# fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
+# are indistinguishable in a bare pin and only one of them is acceptable.
+' > "$M/project/unarmed-branches.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

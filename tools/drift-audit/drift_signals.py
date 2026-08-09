@@ -54,7 +54,15 @@ SHRINK_ONLY: dict[str, str] = {
 # exemption that is not enumerated is not an exemption — this list is the enumeration.
 # --------------------------------------------------------------------------------------------
 
-DECLARED_EMPTY: set[str] = set()
+DECLARED_EMPTY: set[str] = {
+    # The authored per-node session ledger was RETIRED by the aMendedLedger U2 unit: its three shards
+    # moved to memory/archive/ledger/ and memory/project/in-flight/ no longer exists, so this
+    # probe's population is empty BY DESIGN rather than blind. The kit ENGINE is untouched —
+    # drift_report.py still reads <memory_root>/project/in-flight/*.md for adopters who keep a
+    # ledger — and the declaration is not a muzzle: put one row back and the probe goes live and
+    # scores again. selftest.py asserts both directions over one fixture.
+    "ledger_rows_contradicting_git",
+}
 
 # --------------------------------------------------------------------------------------------
 # HANDKEPT — hand-maintained inventories mirroring an authoritative source.
@@ -110,13 +118,14 @@ HANDKEPT: list[dict] = [
 # --------------------------------------------------------------------------------------------
 
 PINS: dict[str, int] = {
-    # 1 — the drain the 4-seed predicted, done. Node `a` self-pruned its three stale `merged:<sha>`
-    # rows (each verified an ancestor of `main` with `git merge-base --is-ancestor`, which is the
-    # ledger's own prune trigger) plus `aFoldedQuarry`, whose row still said "Awaiting merge to
-    # `main`" while its spec read CLOSED and its branch merge sat in `main`'s history.
-    # The 1 that remains is node `b`'s (`in-flight/b.md:5`), which node `a` does not edit — see the
-    # cross-node row in the backlog. Lowered because slack left in a shrink-only pin silently refills.
-    "ledger_rows_contradicting_git": 1,
+    # ledger_rows_contradicting_git carries NO pin. Its population is empty by declaration (above),
+    # and a pin of 4 over an empty population is a ratchet that can never turn. If a ledger ever
+    # returns, the default tolerance of 0 is the right bar — not a number measured against rows that
+    # no longer exist.
+    # Main reached the same place from the other side while this branch was building: node `a`
+    # self-pruned its three landed rows and lowered the pin 4 -> 1, leaving node `b`'s single row.
+    # That drain is subsumed — the shards are now frozen under `archive/ledger/` and the signal is
+    # declared empty, so there is no population left for a pin of 1 to ratchet against.
     # 2 — TOOL-aBatchedLintel-1 and TOOL-aGuardedTally-1, both INPROGRESS with their ids in tracked
     # kit source. INPROGRESS means "approved, build underway", which is arguably TRUE for a
     # built-but-unmerged unit, so this is the oracle's known residual ambiguity rather than proven

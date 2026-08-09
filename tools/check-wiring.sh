@@ -241,9 +241,159 @@ $bad
 EOF
 }
 
+# --- Check M: the row-keyed merge driver (memory-tree kit) ----------------------------------------
+# `.gitattributes` declares `merge=rows` on the authored indexes, but a merge DRIVER is per-node
+# config: git falls back to its built-in three-way text merge, with a warning, on any node that never
+# ran this. That fallback is the pre-change behaviour, so the attribute and the config can land in one
+# commit — and this arm is what turns "declared" into "wired" on each node.
+#
+# Setting it under `--session` as well as `--fix` mirrors check_hooks, which already sets a git config
+# in both. The eol arm's session exemption is deliberately NOT copied: that arm rewrites file BYTES,
+# and this one sets a repo-local config, which is the class of act `--session` exists for.
+#
+# The arm RUNS the command it is about to bless — see the smoke block below. It runs the command this
+# script BUILDS, never the arbitrary string a node may have put in `merge.rows.driver`: a foreign
+# value is reported and refused a few lines further down without being executed, so the only command
+# that ever reaches a subprocess here is the one shipped in this repo. Whenever the arm can print
+# `ok`, the built command and the configured one are the same string, which is the case that had to
+# be covered. (aMendedLedger U5)
+check_merge_rows() {
+  local drv shim want cur declared
+  # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
+  # <root>/tools/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
+  # than hand-kept, so it cannot drift from the layout it is describing.
+  drv=$(first_of tools/memory-tree/merge-rows.py memory-tree/merge-rows.py)
+  if [ -z "$drv" ]; then
+    echo "skip     merge     — memory-tree merge driver not adopted (no merge-rows.py)"
+    return
+  fi
+  shim=$(first_of tools/lib/pyrun.sh lib/pyrun.sh)
+  if [ -z "$shim" ]; then
+    echo "UNWIRED  merge     — $drv is present but the shim it names is missing (tools/lib/pyrun.sh); git would exec a command that cannot start. Fix: copy tools/lib/pyrun.sh + tools/lib/resolve-python.sh in"
+    unwired=$((unwired+1))
+    return
+  fi
+  want="bash $shim $drv %O %A %B %P"
+  # ONE call over every tracked path, and it reads what GIT judges rather than grepping
+  # `.gitattributes` — attributes come from several files, the same rule check_eol follows. Looping
+  # per file would be ~500 process spawns inside a SessionStart hook; `--stdin` is one process
+  # regardless of tree size.
+  declared=$(git ls-files 2>/dev/null | git check-attr --stdin merge 2>/dev/null | sed -n 's/: merge: rows$//p')
+  if [ -z "$declared" ]; then
+    echo "skip     merge     — no tracked path declares merge=rows"
+    return
+  fi
+  # RUN THE COMMAND, do not pattern-match its parts. "Wired" is "the command git will exec actually
+  # merges", and the three tests above — driver exists, shim exists, config string matches — are all
+  # path-and-string. They cannot see the two runtime dependencies the driver reaches for at merge
+  # time: `lib/resolve-python.sh`, which `pyrun.sh` sources, and the sibling memory-recall kit that
+  # owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
+  # here while the very next merge left `memory/DECISIONS.md` holding OURS-only content with zero
+  # conflict markers and status `UU` — the silent take-ours the driver's own fail-closed wrapper
+  # exists to prevent, arriving one level up where that wrapper never gets to run.
+  #
+  # A no-op THREE-WAY rather than the cheaper usage/arity call. `merge-rows.py` defers its grammar
+  # import into `merge()`, so an argument-less invocation exits 2 with its usage text even when the
+  # memory-recall kit is missing outright — it would prove the interpreter starts and nothing else.
+  # Three scratch inputs that merge CLEANLY exercise the whole chain in one python start: launcher
+  # resolution, the driver's own syntax, the `.memory-tree.conf` walk-up, the deferred grammar
+  # import, the KEYED path, and the `%A` write. That is one process per session-start, which is what
+  # a verifier that verifies costs.
+  #
+  # AND THE FIXTURE CARRIES ANCHORED ROWS, one APPEND COLLISION PER DECLARED FAMILY. The first cut
+  # used three unkeyable lines (`x` / `a\nx` / `x\nb`): `split_regions` found no anchor, so the whole
+  # file was preamble and the run was a plain `git merge-file` — `rows()`, `merge()`, `lead()`, the
+  # splice and both postconditions were never entered. MEASURED: one token of drift in
+  # `.memory-tree.conf` FAMILIES (`tooling:TOOL` -> `tooling:TOOLS`) makes the driver key ZERO rows,
+  # every governed-index append-collision then conflicts forever, the driver is completely inert —
+  # and the arm still printed `ok  merge  — merge.rows.driver wired`.
+  #
+  # An append collision is the ONE shape that discriminates: git's built-in three-way CONFLICTS on it
+  # (both sides add a different line after the same predecessor), so a clean rc 0 is only reachable
+  # through the keyed path. Per family, because a fixture built on one family goes green on drift in
+  # any other. The ids use the FLAT era (`\d{3}`), which is in the grammar's `ERAS` unconditionally
+  # and needs no node tag; the `- <id> | <text>` form is the shipped dash-anchor shape in ASCII.
+  local smoke rc_smoke=0 fams f n miss=""
+  # Sourced in a SUBSHELL so a project conf cannot redefine this script's own variables. Absent conf
+  # -> a placeholder family: the driver then cannot resolve a grammar either, raises, and this arm
+  # reports UNWIRED with a real reason rather than being special-cased into silence here.
+  fams=$( . ./.memory-tree.conf >/dev/null 2>&1; for f in ${FAMILIES:-}; do printf '%s ' "${f##*:}"; done )
+  [ -n "$fams" ] || fams="ROWS"
+  smoke=$(mktemp -d 2>/dev/null) || smoke=""
+  # "Could not verify" is NOT a clean bill, and this file already made that call once: the recall arm
+  # above deleted its `settings-merge.py absent, cannot verify` skip precisely because it reported
+  # exit 0 on the one state the runbook calls bad. Same rule here — an unrunnable check reports
+  # UNWIRED, never `ok`.
+  if [ -z "$smoke" ]; then
+    echo "UNWIRED  merge     — cannot verify the driver: 'mktemp -d' failed, so the no-op three-way never ran and this arm has nothing to report. Fix: make a temp dir writable (TMPDIR), then re-run"
+    unwired=$((unwired+1))
+    return
+  fi
+  : > "$smoke/o"; : > "$smoke/a"; : > "$smoke/b"
+  for f in $fams; do
+    printf -- '- %s-001 | base\n'                     "$f"      >> "$smoke/o"
+    printf -- '- %s-001 | base\n- %s-002 | ours\n'    "$f" "$f" >> "$smoke/a"
+    printf -- '- %s-001 | base\n- %s-003 | theirs\n'  "$f" "$f" >> "$smoke/b"
+  done
+  bash "$shim" "$drv" "$smoke/o" "$smoke/a" "$smoke/b" merge-rows-smoke \
+    >/dev/null 2>"$smoke/err" || rc_smoke=$?
+  # rc alone is not enough: assert every row of all three inputs is in %A exactly once. A driver that
+  # exits 0 without touching %A is the same silent take-ours by another route, and one that keys only
+  # SOME families resolves the rest by line merge — which is the state this arm exists to name.
+  for f in $fams; do
+    for n in 001 002 003; do
+      [ "$(grep -c -- "^- $f-$n |" "$smoke/a" 2>/dev/null)" = 1 ] || miss="$miss $f-$n"
+    done
+  done
+  if [ "$rc_smoke" != 0 ] || [ -n "$miss" ]; then
+    echo "UNWIRED  merge     — the configured driver cannot merge: 'bash $shim $drv' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore $(dirname "$shim")/resolve-python.sh and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
+    unwired=$((unwired+1))
+    rm -rf "$smoke"
+    return
+  fi
+  rm -rf "$smoke"
+  # ...AND THE DECLARED FAMILIES ARE THE ONES THE INDEXES ACTUALLY USE. The fixture above is built
+  # FROM the conf, so it stays self-consistent under a family RENAME: one token of drift
+  # (`tooling:TOOL` -> `tooling:TOOLS`) leaves the smoke green while every real `- TOOL-…` row stops
+  # keying, every governed append-collision conflicts forever, and the driver is inert on the only
+  # files it is wired to. MEASURED: the arm printed `ok  merge  — merge.rows.driver wired`. So the
+  # declared indexes are asked directly — harvest the family prefix each ROW LEADS with, and require
+  # every harvested prefix to be declared. A prefix nothing declares is drift by definition; the
+  # reverse (a declared family with no rows yet) is the ordinary empty-section state and is not.
+  local seen undeclared=""
+  seen=$(printf '%s\n' "$declared" | grep . | while IFS= read -r p; do
+           [ -f "$p" ] && sed -n 's/^[[:space:]]*[-*][[:space:]]\{1,\}[`*]*\([A-Z][A-Z0-9]\{1,\}\)-[A-Za-z0-9].*/\1/p' "$p"
+         done | LC_ALL=C sort -u)
+  for f in $seen; do
+    case " $fams " in *" $f "*) ;; *) undeclared="$undeclared $f" ;; esac
+  done
+  if [ -n "$undeclared" ]; then
+    echo "UNWIRED  merge     — the driver runs, but .memory-tree.conf FAMILIES does not declare$undeclared, which rows in the merge=rows indexes LEAD with; those rows key as unstructured content, so every append-collision on them conflicts forever and the driver is inert on the files it is wired to. Fix: add the family to FAMILIES in .memory-tree.conf (declared:${fams:+ }${fams% })"
+    unwired=$((unwired+1))
+    return
+  fi
+  cur=$(git config merge.rows.driver 2>/dev/null || true)
+  if [ -z "$cur" ]; then
+    if [ "$DO_FIX" = 1 ]; then
+      git config merge.rows.driver "$want" && echo "FIXED    merge     — set merge.rows.driver"
+    else
+      echo "UNWIRED  merge     — paths declare merge=rows but merge.rows.driver is unset; git falls back to a line merge that can duplicate a row. Fix: git config merge.rows.driver '$want'"
+      unwired=$((unwired+1))
+    fi
+    return
+  fi
+  if [ "$cur" = "$want" ]; then
+    echo "ok       merge     — merge.rows.driver wired"
+  else
+    echo "UNWIRED  merge     — merge.rows.driver='$cur', not '$want'; NOT overwriting (deliberate?)"
+    unwired=$((unwired+1))
+  fi
+}
+
 check_hooks
 check_agentcap
 check_recall_opened
+check_merge_rows
 check_eol
 
 [ "$MODE" = session ] && exit 0

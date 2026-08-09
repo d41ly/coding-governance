@@ -3,9 +3,11 @@
 
 FORKED from inCMS ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
 is that revision's tip and never touched this file). The fork is SIX constructs wide, so a future
-re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) the node-tag class
-inside ``ERAS``; (3) ``DURABLE``; (4) ``corpus_files()``; (5) the zero-record diagnosis, now two
-branches; (6) ``sys.dont_write_bytecode`` above the ``recall_conf`` import plus
+re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) BOTH halves of the
+session era inside ``ERAS`` -- the node-tag class, and the trailing ``[a-z]*`` that keys this
+corpus's ratified correction-id form (``TOOL-aDrainedSluice-<n>b``), which upstream never mints and
+so never had a reason to admit; (3) ``DURABLE``; (4) ``corpus_files()``; (5) the zero-record
+diagnosis, now two branches; (6) ``sys.dont_write_bytecode`` above the ``recall_conf`` import plus
 ``CONF = recall_conf.resolve()`` -- upstream's blob has zero occurrences of either name. Count the
 sixth: two of its three lines are load-bearing (without ``CONF``, ``FAMILIES = CONF.families`` is a
 NameError, so a re-pull that drops them fails loudly), but ``dont_write_bytecode`` is the whole of
@@ -57,21 +59,46 @@ CONF = recall_conf.resolve()
 # The three id eras of the memory-tree kit's id grammar, in one pattern:
 #   flat          ARCH-001              (family, "001",            None)
 #   node-scoped   ABL-d119              (family, "d119",           None)
-#   session       ABL-bSiftedArchive-3  (family, "bSiftedArchive", "3")
+#   session       ABL-bSiftedArchive-3  (family, "bSiftedArchive", "3")   ...and its -3b correction
 # The family list is an allowlist on purpose: a bare \b[A-Z]{2,8}- pattern also matches WU, AC, SS,
 # JSON, PII and a dozen other non-id tokens that outnumber several real families. FORKED: the
 # allowlist is the conf's FAMILIES rather than eleven baked-in inCMS tokens.
 FAMILIES = CONF.families
 _NODE = CONF.node_tag_class
-# The three eras, spelled out rather than approximated. A loose `[A-Za-z0-9]+` tail also swallows
-# `ARCH-codebase`, `DES-admin`, `BLOCK-arm`, a charter's own `BBL-NNN` placeholder, and bare
-# session slugs like `ARCH-dLayeredKeystone` (which is a prefix of the record `-1`, not an id) --
-# measured upstream at +348 phantom ids and a 27% orphan rate against a true 9-10%.
-ERAS = (
-    r"\d{3}",  # flat            ARCH-001
-    rf"[{_NODE}]\d{{2,3}}",  # node-scoped     ABL-d119
-    rf"[{_NODE}][A-Za-z]{{2,}}-\d+",  # session-scoped  ABL-bSiftedArchive-3
-)
+
+
+def _eras(node: str) -> tuple[str, ...]:
+    """The three id eras, from ONE construction. A second copy is the catalogue-drift class.
+
+    The eras were spelled out TWICE in this file -- here and re-typed inside `grammar_for` -- and
+    every consumer outside this kit runs the `grammar_for` copy, so a widening applied to one and
+    not the other ships a grammar no gate exercises. That is `two-answers-to-one-question` verbatim,
+    and `corpus_ids.py:15-19` already names its shape: "upstream re-typed one alternation with its
+    branches reordered and would never have noticed". Collapsed before the era was touched.
+
+    The eras are spelled out rather than approximated. A loose `[A-Za-z0-9]+` tail also swallows
+    `ARCH-codebase`, `DES-admin`, `BLOCK-arm`, a charter's own `BBL-NNN` placeholder, and bare
+    session slugs like `ARCH-dLayeredKeystone` (which is a prefix of the record `-1`, not an id) --
+    measured upstream at +348 phantom ids and a 27% orphan rate against a true 9-10%.
+
+    THE SESSION ERA'S `[a-z]*` TAIL IS THIS FORK'S, and it is the narrowest widening that admits the
+    one extra form this corpus actually mints: the ratified correction id, `TOOL-aDrainedSluice-<n>b`.
+    The era is bounded by `\\b` on both sides, so before this the `-9` matched, the following `b`
+    killed the word boundary, and the WHOLE id failed to match rather than matching a prefix.
+    Measured on this repo at the widening: `memory/DECISIONS.md` went 35 of 73 rows keyed to 73 of
+    73, and the `records` document set went 53 documents to 91 -- the 38 correction rows were each
+    being swallowed into the body of the row above them, so a question about any of them answered
+    with its neighbour. `[a-z]*` adds those 38 and no phantom; `[A-Za-z0-9]*` or `\\w*` is the loose
+    tail measured above and stays rejected.
+    """
+    return (
+        r"\d{3}",  # flat            ARCH-001
+        rf"[{node}]\d{{2,3}}",  # node-scoped     ABL-d119
+        rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*",  # session  ABL-bSiftedArchive-3, and its -3b
+    )
+
+
+ERAS = _eras(_NODE)
 # Built by concatenation, not % or .format(): a regex is full of `{2,6}` quantifiers that .format()
 # reads as replacement fields.
 ID = r"(?:" + "|".join(FAMILIES) + r")-(?:" + "|".join(ERAS) + r")"
@@ -327,8 +354,7 @@ def grammar_for(root=None) -> Grammar:
         return Grammar(ID=ID, ID_RE=ID_RE, anchors=(A_HEADING, A_BOLD_LI, A_TABLE, A_DASH),
                        families=FAMILIES, memory_root=CONF.memory_root)
     conf = recall_conf.resolve(pathlib.Path(root))
-    node = conf.node_tag_class
-    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+")
+    eras = _eras(conf.node_tag_class)
     ident = r"(?:" + "|".join(conf.families) + r")-(?:" + "|".join(eras) + r")"
     return Grammar(
         ID=ident,
