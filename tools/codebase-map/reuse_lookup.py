@@ -1,6 +1,6 @@
 """reuse-lookup — the behaviour->seam discovery entrypoint (codebase-map kit, S3).
 
-    python codebase-map/reuse_lookup.py "normalise a display name into a url slug"
+    python <kit>/reuse_lookup.py "normalise a display name into a url slug"
 
 Assembles a candidate corpus from the map's four recall sources — generated/symbols.json
 ids/kinds, generated/inventories.json keys, every dossier's `## Reuse affordance` seam line,
@@ -383,7 +383,8 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    # `<kit>` resolved, so the usage line --help prints names this install's real prefix.
+    parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("query", nargs="+", help="a behaviour description, e.g. 'send a templated email'")
     args = parser.parse_args(argv)
     query = " ".join(args.query)

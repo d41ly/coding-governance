@@ -83,6 +83,9 @@
 - TOOL-aRootedPrefix-1d · resolution answers WHERE, `require_adopted_root` answers WHETHER. Split so the library layer stays fail-open (a thin corpus is a thin shortlist, by design) while the two CLIs that import no project layer refuse at exit 2
 - TOOL-aRootedPrefix-1e · NOT `git rev-parse --show-toplevel` — the seam `memory-recall/recall_conf.py` ships at fan-in 7 and the reuse pass ranked it third. It resolves junctions, and anchoring a junctioned kit dir to the ADOPTING repo is an explicit guarantee of the docstring it replaced
 - TOOL-aRootedPrefix-1f · each new selftest case was verified to RED under a targeted mutation: the grandparent revert, the dropped boundary, the reordered conf/`.git` test, a never-refusing helper, each CLI guard alone, and the old kit-dir walk
+- TOOL-aRootedPrefix-1g · S9: every path the kit PRINTS now resolves — `kit_rel()`/`regen_cmd()` feed the three renderers, both gates, the scaffolded map README and the three `--help` texts, and the adopter stamps `MAP_DIFF_CMD` at conf-creation time
+- TOOL-aRootedPrefix-1h · the arm EXECUTES the remedy the gate printed and requires it to clear the staleness, so it asserts no expected string; `REGEN_CMD` survives only for pre-1.1 gate files and is pinned equal to the accessor's root-install answer
+
 ## DEPL — deployer
 
 *(none yet)*

@@ -1,16 +1,17 @@
 """The codebase-map coverage + freshness gate (codebase-map kit).
 
-Copied from codebase-map/test_codebase_map.template.py at adoption into the directory named by
+Copied from `<kit>/test_codebase_map.template.py` at adoption into the directory named by
 `.codebase-map.conf` GATE_FILE — it must live where the project's EXISTING test suite collects
 it (zero CI changes: a test file is its own deployment). Also runnable standalone in projects
-without a test framework: `python <this file>`.
+without a test framework: `python <this file>`. `<kit>` is wherever the kit is installed; the
+gate finds it by walking up from itself, and every remedy it PRINTS spells the real prefix.
 
 Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
 - `baseline.toml` additions are reserved for the initial backfill — do not add new keys;
-- claim edits: regen artifacts via `python codebase-map/gen_map.py --write`.
+- claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 """
 
 from __future__ import annotations
@@ -131,10 +132,11 @@ def test_generated_artifacts_are_fresh() -> None:
     symbols = getattr(ext, "all_symbols", list)()
     if symbols:
         fresh[gen_dir / "symbols.json"] = m.render_symbols_json(symbols)
+    regen = m.regen_cmd()  # spelled for THIS install's prefix — a remedy must name a real path
     for path, expected in fresh.items():
-        assert path.is_file(), f"missing generated artifact {path} — regen: {m.REGEN_CMD}"
+        assert path.is_file(), f"missing generated artifact {path} — regen: {regen}"
         committed = m.lf(path.read_text(encoding="utf-8"))
-        assert committed == expected, f"STALE {path.name} — regen: {m.REGEN_CMD}"
+        assert committed == expected, f"STALE {path.name} — regen: {regen}"
 
 
 # ======================================================================================

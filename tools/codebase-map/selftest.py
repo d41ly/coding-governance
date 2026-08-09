@@ -1,6 +1,6 @@
 """codebase-map kit self-test — exercises the pure engine with fixtures (stdlib only).
 
-    python codebase-map/selftest.py        # exit 0 = the kit's contract holds
+    python <kit>/selftest.py        # exit 0 = the kit's contract holds
 
 These are the red-path proofs: an unclaimed key, a stale claim, a stale/lazy baseline line,
 and every malformed-dossier class must FAIL LOUD; multi-claim, case-sensitivity, and
@@ -251,6 +251,84 @@ def t_gate_template_finds_the_kit(tmp: Path):
     got = probe(r4, None, r4 / "tests")
     assert got.returncode != 0, got.stdout
     assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
+
+
+def t_remedy_paths_are_real(tmp: Path):
+    """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
+    naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the
+    moment someone is stuck.
+
+    Two halves. The pure half pins `relative_kit` across install shapes and pins the legacy
+    `REGEN_CMD` constant EQUAL to the accessor's root-install answer, so the last hardcoded
+    spelling cannot drift from the computed one. The end-to-end half is the real acceptance: build
+    a prefixed install, stale an artifact, then RUN THE COMMAND THE GATE PRINTED, verbatim, and
+    require that it fixes the staleness — no hardcoded expectation of what the remedy should say."""
+    import os
+    import re
+    import shutil
+    import subprocess
+    import sys as _sys
+
+    # --- pure: the kit dir as a human must spell it from the repo root -------------------------
+    root = tmp / "r"
+    assert m.relative_kit(root / "codebase-map", root) == "codebase-map"
+    assert m.relative_kit(root / "tools" / "codebase-map", root) == "tools/codebase-map"
+    assert m.relative_kit(root / "a" / "b" / "codebase-map", root) == "a/b/codebase-map"
+    assert "\\" not in m.relative_kit(root / "tools" / "codebase-map", root)  # POSIX on Windows too
+    # not under the root (a CODEBASE_MAP_ROOT pointed at a fixture): the bare NAME, so a render
+    # never embeds an absolute temp path and fixture bytes stay deterministic.
+    assert m.relative_kit(tmp / "elsewhere" / "codebase-map", root) == "codebase-map"
+    # the legacy constant IS the accessor's root-install answer — one fact, not two.
+    assert m.REGEN_CMD == f"python {m.relative_kit(root / 'codebase-map', root)}/gen_map.py --write"
+
+    # --- end-to-end: the printed remedy, executed --------------------------------------------
+    repo = tmp / "e2e"
+    kit = repo / "tools" / "codebase-map"
+    kit.parent.mkdir(parents=True)
+    shutil.copytree(Path(os.path.abspath(__file__)).parent, kit)
+    (repo / ".git").mkdir()
+    (repo / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    (repo / "src").mkdir()
+    (repo / "src" / "mod.py").write_text("def hello():\n    return 1\n", encoding="utf-8")
+    (kit / "map_extractors.py").write_text(
+        "import map_lib as m\n"
+        "def inventory_ids():\n    return ('mods',)\n"
+        "def all_inventories():\n    return {'mods': m.module_inventory(m.repo_root() / 'src', 'mods')}\n",
+        encoding="utf-8",
+    )
+
+    def run(*args: str) -> subprocess.CompletedProcess:
+        # cwd = the repo root, and NO CODEBASE_MAP_ROOT: the resolver must do the work here.
+        env = {k: v for k, v in os.environ.items() if k != "CODEBASE_MAP_ROOT"}
+        return subprocess.run(
+            [_sys.executable, *args], cwd=str(repo), env=env, capture_output=True, text=True
+        )
+
+    got = run("tools/codebase-map/gen_map.py", "--scaffold")
+    assert got.returncode == 0, got.stdout + got.stderr
+
+    # the scaffolded map README must name the real kit dir, not the convention
+    readme = (repo / "memory" / "map" / "README.md").read_text(encoding="utf-8")
+    assert "tools/codebase-map/gen_map.py" in readme, readme[:400]
+    assert "`codebase-map/`" not in readme, "the scaffolded README still names the bare convention"
+
+    # stale an artifact, then take the remedy from the gate's OWN output and run it
+    art = repo / "memory" / "map" / "generated" / "MAP.md"
+    art.write_text(art.read_text(encoding="utf-8") + "\nhand-edited\n", encoding="utf-8")
+    got = run("tools/codebase-map/gen_map.py", "--check")
+    assert got.returncode == 1, f"--check did not detect the stale artifact: {got.stdout}"
+    printed = re.search(r"regen:\s*python\s+(\S+)\s+--write", got.stdout)
+    assert printed, f"no regen remedy printed: {got.stdout}"
+    remedy_path = printed.group(1)
+    assert (repo / remedy_path).is_file(), f"the remedy names a path that does not exist: {remedy_path}"
+    fixed = run(remedy_path, "--write")
+    assert fixed.returncode == 0, fixed.stdout + fixed.stderr
+    again = run("tools/codebase-map/gen_map.py", "--check")
+    assert again.returncode == 0, f"the printed remedy did not fix the staleness: {again.stdout}"
+
+    # the generated artifacts carry the same real prefix (they are the remedy's other home)
+    inv = (repo / "memory" / "map" / "generated" / "inventories.json").read_text(encoding="utf-8")
+    assert "tools/codebase-map/gen_map.py" in inv, inv[:400]
 
 
 def t_coverage_directions():
@@ -888,6 +966,11 @@ def main() -> int:
         failures += check(
             "gate template finds the kit at any prefix (S5/AC5)",
             lambda: t_gate_template_finds_the_kit(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "printed remedies name real paths; the remedy runs (TOOL-aRootedPrefix-2)",
+            lambda: t_remedy_paths_are_real(Path(td)),
         )
     failures += check("coverage both directions + ratchet guards", t_coverage_directions)
     failures += check("dossier contract fails loud", t_parse_contract)

@@ -34,7 +34,7 @@ project specifics live in exactly two files the adopting repo owns.
   BEFORE building new behaviour to wire through an existing seam instead of reinventing it.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
 - `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
-- `selftest.py` — the kit's own contract check (`python codebase-map/selftest.py`).
+- `selftest.py` — the kit's own contract check (`python <kit>/selftest.py`).
 
 ## Adopt (per project)
 

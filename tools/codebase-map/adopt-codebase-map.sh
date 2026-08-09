@@ -73,7 +73,20 @@ esac
 
 if [ ! -f "$ROOT/.codebase-map.conf" ]; then
   cp "$HERE/.codebase-map.conf.example" "$ROOT/.codebase-map.conf"
+  # Stamp the digest command with THIS install's prefix, so the created conf is right by
+  # construction rather than right if the adopter remembers. Keyed on the KEY name, never on the
+  # example's value, so the two cannot drift. Temp-file rewrite, not `sed -i`: BSD sed (macOS)
+  # needs an argument to -i and GNU sed refuses one. Only ever touches a file just copied from the
+  # example, so there is no user edit to clobber.
+  if sed "s|^MAP_DIFF_CMD=.*|MAP_DIFF_CMD=\"python $KIT_REL/map_diff.py\"|" \
+       "$ROOT/.codebase-map.conf" > "$ROOT/.codebase-map.conf.new"; then
+    mv "$ROOT/.codebase-map.conf.new" "$ROOT/.codebase-map.conf"
+  else
+    rm -f "$ROOT/.codebase-map.conf.new"
+    echo "note: could not stamp MAP_DIFF_CMD — set it to \"python $KIT_REL/map_diff.py\" by hand."
+  fi
   echo "created .codebase-map.conf from the example — EDIT IT (MAP_ROOT, GATE_FILE), then re-run."
+  echo "MAP_DIFF_CMD was stamped for this install prefix: python $KIT_REL/map_diff.py"
   exit 1
 fi
 . "$ROOT/.codebase-map.conf"

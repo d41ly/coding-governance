@@ -21,8 +21,10 @@ MAP_ROOT=memory/map
 GATE_FILE=tests/test_codebase_map.py
 
 # The digest command, verbatim — consumed by the scaffolded map README and the kickoff
-# manifest (humans/docs; gate remedy messages print the plain `python` spelling). Adjust if
-# your launcher differs — e.g. `uv run python …` or `python3 …`.
+# manifest (humans/docs; gate remedy messages derive their own spelling from the install prefix).
+# adopt-codebase-map.sh STAMPS this line with the kit's real prefix when it creates the conf, so
+# the value below is only the shape. Adjust if your launcher differs — `uv run python …`,
+# `python3 …` — and keep the path pointing at the kit dir you actually installed.
 MAP_DIFF_CMD="python codebase-map/map_diff.py"
 
 # --- reuse-convergence layer (optional; only meaningful with the SYMBOL recall tier) ----------

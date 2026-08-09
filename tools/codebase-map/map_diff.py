@@ -1,8 +1,8 @@
 """Feature-level digest of a git range via the codebase map (codebase-map kit).
 
-    python codebase-map/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
-    python codebase-map/map_diff.py <base>..<head> --converge
-    python codebase-map/map_diff.py <base> <head>  [--verbose]
+    python <kit>/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
+    python <kit>/map_diff.py <base>..<head> --converge
+    python <kit>/map_diff.py <base> <head>  [--verbose]
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
@@ -203,7 +203,9 @@ def _converge(base: str, head: str, files: list[str]) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    # `<kit>` resolved, so every command --help prints is copy-pasteable from the repo root at
+    # whatever prefix this kit is installed at, not only at the default one.
+    parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("range", nargs="+", help="<base>..<head> or <base> <head>")
     parser.add_argument("--verbose", action="store_true", help="full unmapped file list")
     parser.add_argument(

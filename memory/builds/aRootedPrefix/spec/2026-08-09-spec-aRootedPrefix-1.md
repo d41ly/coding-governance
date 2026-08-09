@@ -1,6 +1,6 @@
 # TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix
 
-**Status:** INPROGRESS · rev-1 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
 
 ## 1. Goal
 
@@ -28,17 +28,22 @@ repo's own `vacuous-selector-empty-population` class shipped inside the tool tha
   `.codebase-map.conf.example` prose that today states the convention as fixed.
 - **S8** `WIRE-INTO-PROJECT.md` §3b and its Maintenance section: the prefixed-install path and the
   regeneration an adopter owes after the version bump.
+- **S9** (`TOOL-aRootedPrefix-2`, folded in at rev-2) every path the kit PRINTS resolves from the
+  repo root: `kit_rel()`/`regen_cmd()` replace the hardcoded `REGEN_CMD` in the three renderers and
+  the two gates, `gen_map.py` parameterizes the scaffolded map `README.md`, the three CLIs resolve
+  `<kit>` in their `--help` text, and the adopter stamps `MAP_DIFF_CMD` with the real prefix when it
+  creates the conf.
 
 ## 3. Non-goals (OUT)
 
 - **Adopting the map in this repo.** The adoption lives on `branch/cd-memory-rework-alignment-005661`
   at `f9cf666` and is not merged here. This unit changes the KIT so that adoption can drop its
   `CODEBASE_MAP_ROOT` workaround; it does not merge or edit that branch.
-- **`REGEN_CMD` and the scaffolded map `README.md`.** Both still spell `codebase-map/gen_map.py`, so
-  at a prefixed install a remedy line names a path that does not exist. It is a wrong COMMAND, not a
-  wrong ANSWER: it errors the moment it is run, which is the opposite of the class this unit closes.
-  Making it prefix-aware would also put the install prefix inside the byte-compared generated
-  artifacts. Deferred to `TOOL-aRootedPrefix-2`.
+- **Retiring `map_lib.REGEN_CMD`.** S9 stops the kit reading it, but the constant stays: a
+  `GATE_FILE` installed before 1.1 references `m.REGEN_CMD`, and the maintenance rule overwrites
+  ENGINE files, never `GATE_FILE`. Deleting it would break those gates on an ordinary engine
+  update. It is pinned EQUAL to the accessor's root-install answer instead, so one fact stays one
+  fact. Retire it when no pre-1.1 gate remains.
 - **Install prefixes deeper than one segment** for the GATE FILE's kit search (S5). `resolve_root`
   itself is depth-unbounded; only the gate template's downward probe is capped, and it names every
   path it probed when it fails.
@@ -133,6 +138,17 @@ against this very branch, the walk would leave the worktree.
 workaround. Rejected: it is set by the project layer, which the two failing CLIs do not import, so
 the entrypoints that need it most are exactly the ones that cannot get it.
 
+**Passing the regen string into the renderers as a parameter** (S9), to keep them pure. Rejected:
+it changes three signatures across `gen_map.py`, the gate template and the selftest to remove an
+environment dependence that is not one. The install prefix is a property of the repo being
+rendered — identical on every machine, POSIX-joined so it is identical on both platforms — and a
+`CODEBASE_MAP_ROOT` pointed outside the kit falls back to the bare dir name, so fixture renders
+stay byte-stable too. The freshness gate renders twice in one process against one repo.
+
+**Leaving `--help` and the scaffolded README on the bare convention** while fixing only the gate
+remedy. Rejected: they are the same defect wearing different clothes, and the acceptance test is
+the same one line — does the path the kit printed exist.
+
 ## 5. Production-readiness checklist
 
 - **security** — N/A — path resolution over the adopter's own tree; no new input, no network.
@@ -167,6 +183,8 @@ the entrypoints that need it most are exactly the ones that cannot get it.
 - **AC6** When `bash tools/check-kit-versions.sh` runs, `KIT_CODEBASE_MAP_VERSION` is present and
   well-formed at 1.1.
 - **AC7** When `bash tools/run-gates.sh` runs, every leg is green.
+- **AC8** When an artifact is staled in a prefixed install, the regen command the gate PRINTS names
+  a path that exists, and running that command verbatim clears the staleness.
 
 ## 7. Gates
 
@@ -187,6 +205,11 @@ with a backlog row rather than being an open question: it is a wrong command, no
 - rev-1 · 2026-08-09 · initial spec. Written after reproducing both CLI failures on paired fixture
   repos and after a reuse-lookup pass over this repo's real corpus, run from the adoption branch's
   tree with the `CODEBASE_MAP_ROOT` workaround this unit removes.
+- rev-2 · 2026-08-09 · folded `TOOL-aRootedPrefix-2` in as S9 at the owner's ask, so the deferred
+  remedy-path work lands in the same version rather than as a second 1.x bump against the same
+  artifacts. rev-1's §3 deferral is replaced by the narrower non-goal that survives it (retiring
+  the `REGEN_CMD` constant, which pre-1.1 gate files still reference). AC8 added; its arm executes
+  the remedy the gate printed rather than asserting an expected string.
 
 ## 10. Reuse audit
 
