@@ -1,6 +1,6 @@
 # TOOL-aMendedLedger-1 — finish the memory rework: drain the ledger, drive the merge, re-true the docs
 
-**Status:** SPECCED · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook · ratified 2026-08-09
+**Status:** SPECCED · rev-4 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook · ratified 2026-08-09
 
 ## 1. Goal
 
@@ -44,9 +44,8 @@ declared draining `<MEMORY_ROOT>/project/` out of scope in writing, and nothing 
   `tools/memory-recall/extract.py:104-108` `DURABLE` is separately vacuous today — its regex requires
   a pre-flatten `memory/<x>/…` shape and matches 0 of 131 tracked files. Named here so it is not
   re-discovered, and left to its own unit.
-- **Rewriting `check-memory-hygiene.sh:346`.** The `MAP_SUB` branch rewrites `ex7` wholesale and drops
-  the `guides/` alternative; now live, since this repo adopted codebase-map at `memory/map`. U3 must
-  not silently inherit it — see F6.
+- **Any fix outside the units below.** `check-memory-hygiene.sh:346`'s `ex7` rewrite was OUT at rev-2
+  pending F6; F6 is now resolved and the fix is IN, in U3.
 
 ## 4. Design
 
@@ -172,7 +171,7 @@ Order is a dependency chain. **U2 and U4 must be one commit**: draining `in-flig
 | unit | work | stages a WATCHED path? |
 |---|---|---|
 | U1 | journals relocate; stub build folder; the three `.md` stubs deleted; build index regenerated | no |
-| U2+U4 | ledger to `archive/ledger/` + its README; `signal_ledger` resolved per F3; the ledger lens deleted from `drift-audit-state.js`; drift selftest fixtures | no |
+| U2+U4 | ledger to `archive/ledger/` (its README is created in U1, per the Migration table — U2 must not re-create it); `signal_ledger` resolved per F3; the ledger lens deleted from `drift-audit-state.js`; drift selftest fixtures | no |
 | U3 | hygiene gate matches the drained tree; the `pop_guard` call above; check 6's arm re-fixtured; kit 1.7 → 1.8; `HYGIENE.md` + template parity; `adopt-memory-tree.sh` stops scaffolding the ledger AND check 3 stops admitting it; hygiene test fixtures | **yes** — `check-memory-hygiene.sh` |
 | U5 | `pyrun.sh`; the merge driver; `.gitattributes`; `check-wiring.sh` case; replay test; gate leg | **yes** — `tools/gate-legs.json` |
 | U6 | doc truth; the template edit above; the S6b upgrade note | **yes** — `parallel-coding-governance.template.md` |
@@ -271,8 +270,9 @@ U7 records them as "RELOCATED, not deleted".
 
 - **AC1** When `git ls-files memory/project` is run after U3, it lists exactly the five `*.txt`
   registries and nothing else.
-- **AC2** When `git log --follow --find-renames` is run over each of `memory/archive/ledger/{a,b,c}.md`,
-  each shows the rename with a 100% similarity index and no content change.
+- **AC2** When `git log --follow -p --find-renames -- <path> | grep -m1 'similarity index'` is run over
+  each relocated file, it prints `similarity index 100%`. `git log` alone prints commit subjects and
+  cannot distinguish a rename from a delete-plus-add, so the `-p` is the criterion, not decoration.
 - **AC3** When `python tools/memory-tree/gen_build_index.py --check` is run after U1, it exits 0,
   `memory/builds/bThriftyBellows/README.md` carries `status: CLOSED` in front matter, and no spec
   exists under that folder.
@@ -357,8 +357,8 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
   third fixture is affected: `memory/project/in-flight/tnode.md` is check 6's SOLE arm, so dropping
   `in-flight/*.md` from `index_set()` unarms it and drops the gate below its 14/14 floor. Pinning
   instead reds the drift leg, because `unarmed-branches.txt` is a `SHRINK_ONLY` member.
-  **Recommendation: tighten the catch-all to the five registry names, repoint the two fixtures, and
-  replace check 6's arm with a >250-line `memory/guides/tfixture.md`** — `index_set()` already selects
+  **RESOLVED (build, 2026-08-09): tighten the catch-all to the five registry names, repoint the two
+  fixtures, and replace check 6's arm with a >250-line `memory/guides/tfixture.md`** — `index_set()` already selects
   `guides/*.md`, so the arm keeps firing without touching the pin.
 - **F2 — does the kit keep scaffolding a session ledger for ADOPTERS?** Dropping it from
   `adopt-memory-tree.sh` while check 3 stops admitting `IN-FLIGHT.md` / `in-flight/` / `journal/` makes
@@ -372,11 +372,11 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
 - **F3 — `signal_ledger`'s fate.** Three exits: delete it (upstream did, but 17 selftest references
   ride it); add it to `DECLARED_EMPTY` and retire its pin of 4; or repoint it at
   `memory/archive/ledger/` (where the pin reads 4 forever and the ratchet becomes permanent).
-  **Recommendation: `DECLARED_EMPTY` + retire the pin**, with AC5's two-direction selftest arm as the
+  **RESOLVED (build, 2026-08-09): `DECLARED_EMPTY` + retire the pin**, with AC5's two-direction selftest arm as the
   control, because `DECLARED_EMPTY` alone only relabels the printed line.
 - **F4 — `adopt-memory-tree.sh` scaffolds 2 of the 5 registries.** `id-orphan-waiver.txt`,
   `corpus-path-unresolved.txt` and `unarmed-branches.txt` are named by three gates and created by
-  none. **Recommendation: close it in U3**, landing the `memory/HYGIENE.md:81` correction with it.
+  none. **RESOLVED (build, 2026-08-09): close it in U3**, landing the `memory/HYGIENE.md:81` correction with it.
 - **F5 — does the PLAYBOOK keep mandating a sharded per-node in-flight ledger?** The template is the
   product ruleset: `:86-88` mandates "Shard the in-flight ledger per node … NEVER one shared table",
   `:101-102` says journals and the ledger are per-node files, `:211` requires a ledger row before
@@ -390,7 +390,7 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
 - **F6 — `check-memory-hygiene.sh:346`.** The `MAP_SUB` branch rewrites `ex7` wholesale and drops the
   `guides/` alternative. Dormant until 2026-08-09; this repo now has `.codebase-map.conf` with
   `MAP_ROOT=memory/map`, so it is live, and F1's recommendation puts a `guides/` fixture straight into
-  its path. **Recommendation: fix it in U3** — append rather than replace — since U3 edits that
+  its path. **RESOLVED (build, 2026-08-09): fix it in U3** — append rather than replace — since U3 edits that
   expression anyway and the two spellings of `ex7` are already a two-answers-to-one-question site.
 
 ## 9. Revision log
@@ -424,6 +424,17 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
   back on. AC10b became determinate and AC10c/AC10d were added, so the deletion cannot be traded away
   for additions elsewhere and the scaffolder and gate are asserted together. Migrating `swydee` is
   its own unit in its own repo.
+- rev-4 · 2026-08-09 · folded the sub-spec review (11 agents, 47 verdicts, 8 blocking). Ratified the
+  four forks the owner did not rule on — F1, F3, F4 and F6 — each to its recommended, most
+  feature-rich option, marked `RESOLVED (build, …)` to keep them distinguishable from the owner's F2
+  and F5. F6's fix moved from §3 Non-goals into U3, where it belongs now that it is ratified. AC2 was
+  unfalsifiable as written: `git log --follow` prints commit subjects, and `similarity index 100%`
+  only appears under `-p`/`--summary`, so a builder could not have told a rename from a
+  delete-plus-add — the one thing that AC exists to prove. The Rollout row for U2+U4 claimed
+  `memory/archive/ledger/README.md`, which the Migration table assigns to U1; U1 creates it and U2
+  must not re-create it. Unit ids are per-file (`-2`..`-6`) rather than six specs sharing `-1`:
+  `gen_build_index.py:54` requires the id to be followed immediately by the em-dash, and one id
+  across six specs reproduces the over-flagging shape `drift_report.py:228-231` records at 107/126.
 
 ## 10. Reuse audit
 
