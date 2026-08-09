@@ -1,6 +1,15 @@
 # TOOL-aMendedLedger-1 — finish the memory rework: drain the ledger, drive the merge, re-true the docs
 
-**Status:** SPECCED · rev-4 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook · ratified 2026-08-09
+**Status:** SPECCED · rev-5 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook · ratified 2026-08-09
+
+> **rev-5** — §4's U5 decision table is amended from the shipped code, in both places it appears
+> (here and in the U5 sub-spec). `| id in %B only | append |` was ratified and is WRONG: measured
+> against git's own three-way merge, appending an incoming row past the row block files it under
+> whatever `## FAMILY` heading happens to be last. Two review rounds reproduced silent corruption of
+> `memory/DECISIONS.md` at rc 0 through that rule and the first two repairs of it. The table below
+> now states the splice, its `%A`-only skip, and the two POSTCONDITIONS that judge what a splice
+> cannot decide. A ratified table that no longer describes the code is the exact drift class this
+> repo gates for, so the rule change is recorded here and not only in a commit message.
 
 ## 1. Goal
 
@@ -79,19 +88,31 @@ which is what makes the driver work in an adopting repo with different families.
 
 | case | result |
 |---|---|
-| id in `%B` only | append |
-| id in `%A` only | keep |
+| id in `%B` only | SPLICE after the last surviving key preceding it in `%B`, and after the `%A`-only keys already following that key — never append past the block |
+| id in `%A` only | keep, in the position `%A` gave it |
 | id in both, text identical | keep once |
 | id in both, one side equals `%O` | take the side that changed |
 | id in both, both changed | CONFLICT with markers |
-| id in `%O` and one side, other side untouched | honour the delete |
-| id deleted one side, MODIFIED the other | CONFLICT, both directions |
+| id in `%O` and one side, other side untouched — *row* untouched, i.e. lead-in AND anchor | honour the delete |
+| id deleted one side, MODIFIED the other — including content filed ADJACENT to it | CONFLICT, both directions |
 | a line the grammar cannot key, inside the row block | attaches to the FOLLOWING anchor, rc 0 |
 | preamble / trailer | ordinary three-way text merge |
+| **postcondition** — a row line, or the id a row LEADS with, written more often than any one input carries it | REFUSE (whole-file conflict) |
+| **postcondition** — a row filed under a `#` heading no input filed it under | REFUSE (whole-file conflict) |
 
-The last two rows correct the upstream *spec* from the shipped upstream *code*: the delete case splits
+The last four rows correct the upstream *spec* from the shipped upstream *code*: the delete case splits
 five ways rather than two, and the specced "unkeyable line → CONFLICT" is not implemented — upstream's
 own fixture asserts rc 0 with position preserved. **The code is the authority.**
+
+**Why the `%B`-only rule is a splice and not an append (rev-5).** Appending was ratified from
+upstream and is a REGRESSION against the merge it replaces: `memory/DECISIONS.md` says of itself
+"Grouped by family for reading", and git's own three-way merge places the same incoming row in the
+right section on inputs where the append rule does not. The `%A`-only skip is the second half of the
+same defect — without it, ours' newly appended row lands under the `## FAMILY` heading theirs' new row
+carries as its lead-in. And because no splice rule can be right in every shape, the two postconditions
+are the terms that make the table SAFE rather than merely better: whatever the placement rule cannot
+decide, the driver refuses instead of guessing. A conflict is an acceptable outcome for an
+append-only record; silently wrong content never is.
 
 Failure is closed: any exception becomes a whole-file conflict rather than a silent take-ours, the
 grammar import is deferred into the anchor call so an unreadable `extract.py` lands in that handler
@@ -435,6 +456,18 @@ Run `python tools/memory-tree/gotchas.py --for-diff 663ca427..HEAD` before the r
   must not re-create it. Unit ids are per-file (`-2`..`-6`) rather than six specs sharing `-1`:
   `gen_build_index.py:54` requires the id to be followed immediately by the em-dash, and one id
   across six specs reproduces the over-flagging shape `drift_report.py:228-231` records at 107/126.
+- rev-5 · 2026-08-09 · §4 Data model's U5 decision table amended from the shipped code, in both
+  places it is stated (here and the U5 sub-spec, which moves to rev-3 in the same edit). The ratified
+  row `| id in %B only | append |` was WRONG and stayed wrong through two repairs: measured against
+  `git merge-file` — the merge this driver replaces — appending an incoming row past the row block
+  files it under whatever `## FAMILY` heading is last, and a third review round reproduced a `PLAY`
+  decision auto-committed under `## KICK` through this repo's own wiring at rc 0. The table now
+  carries the splice, its `%A`-only skip, the ROW-scoped (lead-in + anchor) delete comparison whose
+  anchor-only form silently discarded a correction row filed above a deleted one, and the two
+  POSTCONDITIONS — no row line or leading id written more often than any one input carries it, and no
+  row filed under a heading no input filed it under — that refuse what no placement rule can decide.
+  A ratified table that no longer describes the code is the drift class this repo gates for, so the
+  rule change is recorded here rather than only in a commit message.
 
 ## 10. Reuse audit
 

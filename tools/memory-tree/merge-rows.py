@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""A row-keyed three-way merge driver for the id-anchored index files (upstream ARCH-dQuarriedLedger-1 U9).
+# RAW docstring, and not a style choice: the text below quotes regex fragments, and in a cooked
+# string `\b` is the BACKSPACE escape (it reached `main()`'s usage output as a control character) and
+# `\s` is an invalid escape that CPython warns about on every single merge — a driver that prints a
+# SyntaxWarning to stderr during `git merge` reads as a broken driver.
+r"""A row-keyed three-way merge driver for the id-anchored index files (upstream ARCH-dQuarriedLedger-1 U9).
 
     git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'
 
@@ -44,13 +48,27 @@ the row block is keyed. THE REGION RULE WINS AT THE BLOCK BOUNDARY: the block is
 `lines[first_anchor:last_anchor+1]`, so a section heading that sits BEFORE the first anchor is
 preamble, and one INSIDE the block attaches to the following anchor (see `rows`).
 
-Row ORDER comes from `%A`, with each `%B`-only row SPLICED IN immediately after the last key that
-precedes it in `%B` and is itself emitted — before all of them when there is none. The first cut
-appended those rows past the whole row block instead, which files an incoming decision under
-whatever `## FAMILY` heading happens to be last: `memory/DECISIONS.md` says of itself "Grouped by
-family for reading". That is not a design trade, it is a REGRESSION — measured against the merge
-this driver replaces, git's own three-way merge places the same row correctly. Order among siblings
-is not semantic (ids are labels, not ranks); SECTION MEMBERSHIP is, and splicing is what keeps it.
+Row ORDER comes from `%A`, with each `%B`-only row SPLICED IN after the last key that precedes it in
+`%B` and is itself emitted, AND after the `%A`-only keys that already follow that key — before all
+of them when there is none. The first cut appended those rows past the whole row block instead,
+which files an incoming decision under whatever `## FAMILY` heading happens to be last:
+`memory/DECISIONS.md` says of itself "Grouped by family for reading". That is not a design trade, it
+is a REGRESSION — measured against the merge this driver replaces, git's own three-way merge places
+the same row correctly. Order among siblings is not semantic (ids are labels, not ranks); SECTION
+MEMBERSHIP is, and splicing is what keeps it.
+
+THE `%A`-ONLY SKIP IS NOT A TIE-BREAK, it is the second half of the same defect. Seating the cursor
+on the shared predecessor alone put ours' newly appended `## PLAY` row UNDER theirs' newly opened
+`## KICK` heading, at exit 0, through a real `git merge` on the real index — because theirs' row was
+the first of its section and so carried that heading as its lead-in. Git's own merge files both rows
+correctly on the same two commits. Ours' own new rows belong where ours put them, so the incoming row
+splices in after them.
+
+A splice cannot be right in every shape, and the ones it cannot decide MUST NOT be guessed. So
+placement is also a POSTCONDITION (`no_misfiled_rows`): every id in the written file must sit under
+the same `#`-heading it sat under in an input that carries it. That is what catches the residue —
+e.g. a row ours RELOCATED across a heading, which drags the row theirs filed behind it into the
+section ours moved to (reproduced: `- TOOL-…` committed under `## closed`, rc 0, `clean`).
 
 WHY A KEYED ROW CANNOT DUPLICATE — AND WHY THAT IS NOT THE WHOLE FILE. Union duplicates because it
 is a LINE merge, and a row edited on both sides is two different lines. Keying by id removes that
@@ -64,21 +82,41 @@ in `…-1b` — does not key at all. To this driver those 38 lines are CONTENT: 
 lead-in or as trailer, and content is exactly what a line merge can copy. Two nodes minting the same
 unkeyable row in different regions emitted it TWICE at exit 0 before this was written down.
 
-So the no-duplicate property is ENFORCED, not asserted. Two mechanisms, and neither is the grammar:
+So the no-duplicate property is ENFORCED, not asserted. Three mechanisms, and none is the grammar:
 
   * LEAD-IN DEDUP (`merge`'s `lead`). A row is its lead-in plus its anchor (see `rows`), so when two
     nodes each land the FIRST row of the same currently-empty section, the same base furniture — the
     `## FAMILY` heading, the `*(none yet)*` placeholder — rides in on two different new ids and is
-    emitted twice. Furniture is not a record. The lead-in of an id that is new to the merge is
-    emitted once; a later new id carrying an identical lead-in contributes only its anchor.
-  * A POSTCONDITION on every CLEAN verdict (`no_new_duplicates`): no non-blank line may be written
-    more times than the most any ONE input carried it. A violation raises and `main()`'s fail-closed
-    handler turns it into a real conflict, because a driver that cannot answer must say so. Scoped
-    to clean verdicts deliberately — a conflict hunk legitimately repeats context lines from both
-    sides, and rc 0 is the only regime in which a duplicate is invisible.
+    emitted twice. Furniture is not a record. The dedup is ADJACENCY-scoped, not file-wide: it
+    suppresses a repeated lead-in only when the previous emitted row was itself new to the merge and
+    carried the identical lead-in. File-wide it deleted furniture that legitimately repeats — two
+    nodes each opening a `### 2026-08` sub-heading in DIFFERENT sections lost theirs entirely, at
+    exit 0, where `git merge-file` produces the fully correct file.
+  * A LINE POSTCONDITION (`no_new_duplicates`, line half): no ROW-SHAPED line — `^\s*[-*]\s` — may be
+    written more times than the most any ONE input carried it. Row-shaped and not "any non-blank
+    line", because the two shapes are indistinguishable at the line level and their correct answers
+    are OPPOSITE: a record written twice is corruption, a heading written twice in two sections is
+    the merge git itself performs. A record is a row; furniture is governed by the dedup above and
+    by `no_misfiled_rows`.
+  * AN ID POSTCONDITION (`no_new_duplicates`, id half). The line half compares EXACT text, so the
+    same unkeyable correction id minted on two nodes with different WORDING is two different lines
+    and lands twice at exit 0 — measured. So each row-shaped line is also keyed on the FIRST id it
+    carries, under a grammar deliberately WIDER than the driver's own (`…-9b` keys here and does not
+    key there), and the same cap applies. First id, not every id: rows cite other records constantly,
+    and counting citations makes two nodes each citing one base row look like a duplicate. Measured
+    over this corpus: 73 rows, 73 distinct leading ids, zero repeats — a live invariant, not a hope.
 
-Both claims are falsifiable and `merge-rows.test.sh` falsifies them: with the shape that broke union,
-with two nodes opening the same empty section, and with an unkeyable row minted on both nodes.
+All three postconditions run on EVERY verdict, over the merged lines with conflict regions excised.
+Scoping them to rc 0 was wrong: an author resolves the marked hunks and reads everything outside them
+as settled, so a duplicate emitted OUTSIDE the markers of an unrelated conflict is exactly as
+invisible at rc 1 as at rc 0 — reproduced. Excising the regions is what keeps that honest, since a
+conflict hunk repeats content from both sides by construction. A violation raises, and `main()`'s
+fail-closed handler turns it into a real conflict, because a driver that cannot answer must say so.
+
+Every claim above is falsifiable and `merge-rows.test.sh` falsifies each: the shape that broke union,
+two nodes opening the same empty section, an unkeyable row minted on both nodes, the same id minted
+on both with different wording, a repeated lead-in in two sections, a duplicate hiding beside an
+unrelated conflict, and both directions of a delete against adjacent incoming content.
 
 Exit 0 = merged clean. Exit 1 = conflict markers written to %A; git leaves the path unmerged.
 Exit 2 = called with fewer than the three input paths (usage).
@@ -90,6 +128,7 @@ Exit 2 = called with fewer than the three input paths (usage).
 from __future__ import annotations
 
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -212,32 +251,106 @@ def rows(block: list[str]) -> tuple[dict[str, str], dict[str, list[str]], list[s
 
 
 class DuplicatedContent(RuntimeError):
-    """The clean-verdict postcondition refused the result. Raised, never printed-and-continued."""
+    """A duplicate postcondition refused the result. Raised, never printed-and-continued."""
+
+
+class Misfiled(RuntimeError):
+    """The placement postcondition refused the result. Raised, never printed-and-continued."""
+
+
+# A RECORD is a row. Every governed index writes one record per `- `/`* ` line, and this predicate is
+# the whole reason the duplicate postconditions can be strict without redding a legitimate merge: a
+# repeated ROW is corruption, a repeated HEADING is two sections that happen to share a name. Both are
+# "a line written twice" and nothing at the line level tells them apart, so the population is named
+# here instead of guessed there.
+_ROW_RE = re.compile(r"^\s*[-*]\s")
+# Deliberately WIDER than the driver's own anchor grammar, and not imported from it. The keyed path
+# already guarantees uniqueness for what `key()` keys; this exists for the population it does NOT key
+# — the ratified `…-9b` correction form, which the shared session era's trailing `\b` rejects. Keying
+# the postcondition on the same regex as the merge would make it self-consistent and blind: an id the
+# grammar stopped recognising would drop out of BOTH the merge and the check on the merge.
+_ID_RE = re.compile(r"\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b")
+# A marker line is INVENTED by the merge, so it has no input count to be measured against, and the
+# same three markers legitimately repeat once per conflicting region. `|||||||` is here because
+# `git merge-file` writes it under `diff3` style, which is a per-node config this driver does not set.
+# One pair, not three tokens: `settled` drops everything BETWEEN them, which covers `=======` and the
+# `|||||||` base section `git merge-file` writes under diff3 style without naming either.
+_OPEN, _CLOSE = "<<<<<<<", ">>>>>>>"
+_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s")
+
+
+def settled(lines: list[str]) -> list[str]:
+    """`lines` with every conflict region dropped — the part of the file an author reads as decided.
+
+    The postconditions below run on THIS, never on the raw output, and they run on every verdict. The
+    first cut ran them only when the verdict was clean, reasoning that a conflict hunk repeats context
+    from both sides by construction. True, and it argues for excising the REGIONS, not for switching
+    the check off: one unrelated both-sides row edit anywhere in the file turned the detector off for
+    the whole file, and the duplicate was then written OUTSIDE the markers — reproduced. An author
+    resolves the marked hunks and commits everything else unread, so rc 1 hides a duplicate exactly as
+    well as rc 0 does.
+    """
+    out, inside = [], False
+    for ln in lines:
+        s = ln.lstrip()
+        if not inside and s.startswith(_OPEN):
+            inside = True
+            continue
+        if inside:
+            if s.startswith(_CLOSE):
+                inside = False
+            continue
+        out.append(ln)
+    return out
 
 
 def census(lines: list[str]) -> dict[str, int]:
-    """How many times each NON-BLANK line occurs, keyed on the stripped text.
+    """How many times each ROW-SHAPED line occurs, keyed on the stripped text.
 
     Stripped because the question is about content, not endings: this driver's whole newline contract
     exists so a CRLF region survives as CRLF, and a census that compared raw bytes would answer "not
-    a duplicate" for the same line arriving from a CRLF side and an LF side.
+    a duplicate" for the same line arriving from a CRLF side and an LF side — or for one side's copy
+    of a row landing as the file's final line with no terminator, which is the reachable shape.
     """
     out: dict[str, int] = {}
     for ln in lines:
+        if not _ROW_RE.match(ln):
+            continue
         s = ln.strip()
         if s:
             out[s] = out.get(s, 0) + 1
     return out
 
 
-# A marker line is INVENTED by the merge, so it has no input count to be measured against, and the
-# same three markers legitimately repeat once per conflicting region. `|||||||` is here because
-# `git merge-file` writes it under `diff3` style, which is a per-node config this driver does not set.
-_MARKERS = ("<<<<<<<", "=======", ">>>>>>>", "|||||||")
+def row_ids(lines: list[str]) -> dict[str, int]:
+    """How many rows LEAD with each id — the record-level census the line-level one cannot do."""
+    out: dict[str, int] = {}
+    for ln in lines:
+        if not _ROW_RE.match(ln):
+            continue
+        m = _ID_RE.search(ln)
+        if m:
+            out[m.group(0)] = out.get(m.group(0), 0) + 1
+    return out
+
+
+def _over(merged: dict[str, int], inputs: list[dict[str, int]]) -> list[tuple]:
+    """Everything written more often than the most any ONE input carried it.
+
+    The cap is a MAXIMUM over the inputs rather than a sum: an index that legitimately repeats a
+    placeholder twice at base must still be allowed to carry it twice, while two sides that each
+    carry a line once may not become two. (A sum would pass the exact shape this exists to refuse.)
+    """
+    cap: dict[str, int] = {}
+    for side in inputs:
+        for s, n in side.items():
+            if n > cap.get(s, 0):
+                cap[s] = n
+    return sorted((s, n, cap.get(s, 0)) for s, n in merged.items() if n > 1 and n > cap.get(s, 0))
 
 
 def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
-    """Refuse to write a line more times than the most any ONE input carried it.
+    """Refuse to write a row, or an id, more times than the most any ONE input carried it.
 
     The backstop for everything the anchor grammar cannot key. `merge()` guarantees uniqueness for
     KEYED rows by construction; unkeyed lines are content and reach the output through two
@@ -245,23 +358,74 @@ def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
     stops the same line arriving down both. Measured on the real index: the same unkeyable row minted
     on two nodes and filed in different regions was written twice, exit 0, audit line "clean".
 
-    The cap is a MAXIMUM over the inputs rather than a sum: an index that legitimately repeats a
-    placeholder twice at base must still be allowed to carry it twice, while two sides that each
-    carry a line once may not become two.
+    TWO HALVES, because the line half alone is blind to the corpus's own correction form. Two nodes
+    each minting `…-9b` with different prose produce two DIFFERENT lines, so the line census sees each
+    once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured, and the
+    suite's own oracle sees it. So the same rule is lifted from line to record.
     """
-    cap: dict[str, int] = {}
-    for side in inputs:
-        for s, n in census(side).items():
-            if n > cap.get(s, 0):
-                cap[s] = n
-    over = [(s, n, cap.get(s, 0)) for s, n in census(merged).items()
-            if n > 1 and n > cap.get(s, 0) and not s.startswith(_MARKERS)]
-    if not over:
+    clean = settled(merged)
+    sides = [settled(side) for side in inputs]
+    over = _over(census(clean), [census(s) for s in sides])
+    if over:
+        s, n, was = over[0]
+        raise DuplicatedContent(
+            f"{len(over)} row line(s) would be written more often than any single input carries "
+            f"them, e.g. {s[:72]!r} x{n} against x{was}"
+        )
+    over = _over(row_ids(clean), [row_ids(s) for s in sides])
+    if over:
+        s, n, was = over[0]
+        raise DuplicatedContent(
+            f"{len(over)} id(s) would lead more rows than in any single input, e.g. {s!r} x{n} "
+            f"against x{was} — the same id minted on two nodes with different wording"
+        )
+
+
+def sections(lines: list[str]) -> dict[str, str]:
+    """id -> the `#` heading it sits under, over a WHOLE file (preamble included).
+
+    Whole file on purpose: `memory/DECISIONS.md` opens `## PLAY — playbook` BEFORE its first anchored
+    row, so that heading is preamble by the region rule and a block-scoped walk would report `None`
+    for every PLAY row and see no misfiling when one moved out.
+    """
+    out: dict[str, str] = {}
+    cur = ""
+    for ln in lines:
+        if _HEADING_RE.match(ln):
+            cur = ln.strip()
+            continue
+        k = key(ln)
+        if k is not None and k not in out:
+            out[k] = cur
+    return out
+
+
+def no_misfiled_rows(merged: list[str], *inputs: list[str]) -> None:
+    """Refuse to file a row under a heading no input filed it under.
+
+    The splice places a `%B`-only row after the neighbour it arrived behind; that is right for the
+    shapes it was measured on and cannot be right for all of them. Where it is wrong the damage is
+    silent — a `PLAY` decision auto-committed under `## KICK`, a row filed under `## closed` because
+    ours relocated the neighbour it arrived behind — so placement gets a postcondition rather than a
+    cleverer heuristic. `git merge-file` REFUSES the relocation input; being quietly worse than the
+    merge this replaces is the bar this driver has to clear.
+
+    "An input that carries it", not "%A", deliberately: a row whose section is unchanged on both
+    sides has one answer, and a row only one side carries has exactly one input to answer for it.
+    """
+    clean = sections(settled(merged))
+    per_side = [sections(side) for side in inputs]
+    bad = []
+    for k, sect in sorted(clean.items()):
+        was = [s[k] for s in per_side if k in s]
+        if was and sect not in was:
+            bad.append((k, sect, sorted(set(was))))
+    if not bad:
         return
-    s, n, was = sorted(over)[0]
-    raise DuplicatedContent(
-        f"{len(over)} line(s) would be written more often than any single input carries them, e.g. "
-        f"{s[:72]!r} x{n} against x{was}"
+    k, sect, was = bad[0]
+    raise Misfiled(
+        f"{len(bad)} row(s) would be filed under a heading no input filed them under, e.g. {k!r} "
+        f"under {sect[:48]!r} against {[w[:48] for w in was]}"
     )
 
 
@@ -313,12 +477,23 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
     # through git's built-in merge land correctly, so the append rule was a regression against the
     # thing being replaced. The cursor is re-seated on every SHARED key, so consecutive `%B`-only
     # rows keep their own relative order behind the neighbour they arrived after.
+    #
+    # ...AND THEN PAST THE `%A`-ONLY KEYS THAT FOLLOW IT. Seating on the shared predecessor alone put
+    # ours' new row UNDER theirs' new `## FAMILY` heading whenever theirs' row opened the next
+    # section: theirs' row carries that heading as its lead-in, so anything spliced BEFORE it lands
+    # in the wrong section. Reproduced through a real `git merge` on the real `memory/DECISIONS.md`
+    # — a PLAY decision auto-committed under `## KICK`, rc 0, `clean`, zero markers, where git's own
+    # merge on the same two commits files both rows correctly. Ours' new rows sit where ours put
+    # them; the incoming row goes after them. `no_misfiled_rows` judges whatever this cannot.
     a_set = set(a_order)
+    a_only = a_set - set(b_order)
     order = list(a_order)
     at = None
     for k in b_order:
         if k in a_set:
             at = order.index(k)
+            while at + 1 < len(order) and order[at + 1] in a_only:
+                at += 1
             continue
         at = 0 if at is None else at + 1
         order.insert(at, k)
@@ -331,7 +506,7 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
     # `3 row(s) from ours, 0 new from theirs, clean`. `dropped` is the term that was missing outright:
     # honouring a delete removes a row and nothing else says so.
     kept = took_b = dropped = 0
-    out, conflicted, seen_leads = [], False, set()
+    out, conflicted, prev_new_sig = [], False, None
 
     def lead(k: str) -> list[str]:
         """The lines to emit BEFORE k's anchor.
@@ -347,14 +522,25 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
         it (both, merged, when both minted the same id). DEDUP APPLIES HERE AND ONLY HERE. Two nodes
         each landing the first row of the same empty section arrive with the SAME base furniture
         attached to two different new ids; emitting both is how `## DEPL — deployer` appeared twice
-        in an append-only file at exit 0. A lead-in whose non-blank lines have already been emitted
-        for another new id contributes nothing. Blank-only lead-ins are exempt: a repeated blank line
-        is spacing, not furniture, and suppressing it would run rows together.
+        in an append-only file at exit 0.
+
+        THE DEDUP IS ADJACENCY-SCOPED, and that is the second defect in as many cuts. Keyed
+        file-wide, it dropped every LATER copy of a lead-in anywhere in the file — so two nodes each
+        opening a `### 2026-08` sub-heading in DIFFERENT sections lost theirs outright, at exit 0,
+        on an input where `git merge-file` produces the fully correct file. A repeat is furniture
+        only when it is the SAME piece of furniture, which is to say when the two new ids land next
+        to each other. So the suppression asks about the previous EMITTED row and nothing else: it
+        fires when that row was itself new to the merge and carried this exact lead-in.
+
+        Blank-only lead-ins are exempt and do NOT break the adjacency chain: a repeated blank line is
+        spacing, not furniture, so suppressing it would run rows together — and a furniture-less row
+        landing between two that share furniture has not moved them apart.
         """
-        nonlocal conflicted
+        nonlocal conflicted, prev_new_sig
         if k in O:
             got, c = text_merge(o_lead[k], a_lead.get(k, o_lead[k]), b_lead.get(k, o_lead[k]))
             conflicted = conflicted or c
+            prev_new_sig = None
             return got
         if k in A and k in B:
             got, c = text_merge([], a_lead[k], b_lead[k])
@@ -364,11 +550,21 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
         sig = tuple(s for s in (ln.strip() for ln in got) if s)
         if not sig:
             return list(got)
-        if sig in seen_leads:
+        if sig == prev_new_sig:
             return []
-        seen_leads.add(sig)
+        prev_new_sig = sig
         return list(got)
 
+    # BOTH DELETE TESTS COMPARE THE ROW, WHICH IS THE LEAD-IN PLUS THE ANCHOR — never the anchor
+    # alone. Splitting the two apart (the fix for the doubled heading) narrowed these two comparisons
+    # to the anchor line, so a side that left the ROW untouched but filed something immediately ABOVE
+    # it read as "untouched", and the `continue` past `lead(k)` then DISCARDED what it filed. Measured
+    # in both directions: base 3 rows, one side deletes row 2, the other files an unkeyable `…-7b`
+    # correction row above row 2 — driver rc 0 `1 dropped … clean`, the incoming row GONE, zero
+    # markers; `git merge-file` AND the pre-split driver both rc 1 with the row intact. Losing a row
+    # from an append-only record is worse than every other way this can be wrong, and a delete against
+    # adjacent new content is a delete/modify by any other name: it falls to the CONFLICT branch
+    # below, where the adjacent content is emitted and the disputed row is marked.
     for k in order:
         a_txt, b_txt, o_txt = A.get(k), B.get(k), O.get(k)
         if a_txt is not None:
@@ -377,8 +573,8 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
                     out.extend(lead(k))    # ours added it; theirs never saw it
                     out.append(a_txt)
                     kept += 1
-                elif o_txt == a_txt:
-                    dropped += 1           # theirs deleted what ours left untouched — honour it
+                elif o_txt == a_txt and a_lead[k] == o_lead[k]:
+                    dropped += 1           # theirs deleted what ours left UNTOUCHED — honour it
                     continue
                 else:
                     # DELETE/MODIFY: ours edited it, theirs deleted it. Git conflicts here and so do
@@ -413,8 +609,8 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
                 out.append(">>>>>>> theirs\n")
                 kept += 1
         elif k in O:
-            if O[k] == B[k]:
-                dropped += 1               # ours deleted what theirs left untouched — honour it
+            if O[k] == B[k] and b_lead[k] == o_lead[k]:
+                dropped += 1               # ours deleted what theirs left UNTOUCHED — honour it
                 continue
             # The MIRROR of the case above, and the one that actually lost data upstream: ours
             # deleted it, theirs EDITED it. The first draft dropped theirs' edit here and exited 0
@@ -445,11 +641,13 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
     # silent-take-ours shape main()'s wrapper below exists to prevent.
     verdict = "CONFLICT" if conflicted or c1 or c2 else "clean"
     merged = pre + out + tr
-    # THE POSTCONDITION, checked BEFORE the audit line is printed — a run that is about to refuse
-    # must not first announce "clean". Clean verdicts only: a conflict hunk repeats context lines
-    # from both sides by construction, and rc 0 is the regime where a duplicate is invisible.
-    if verdict == "clean":
-        no_new_duplicates(merged, o_lines, a_lines, b_lines)
+    # THE POSTCONDITIONS, checked BEFORE the audit line is printed — a run that is about to refuse
+    # must not first announce "clean". EVERY verdict, not clean ones only: the region excision inside
+    # `settled()` is what handles a conflict hunk's by-construction repetition, and a duplicate
+    # written OUTSIDE the markers of an unrelated conflict is invisible at rc 1 exactly as it is at
+    # rc 0, because an author resolves the hunks and reads the rest as settled. Reproduced.
+    no_new_duplicates(merged, o_lines, a_lines, b_lines)
+    no_misfiled_rows(merged, o_lines, a_lines, b_lines)
     # `kept + took_b` is the anchored-row count of the file just written, which is what makes this
     # line auditable: an operator can `grep -c` the result and reconcile. `dropped` is stated even
     # when it is 0, because an omitted term reads as "no deletes" exactly like a zero does.

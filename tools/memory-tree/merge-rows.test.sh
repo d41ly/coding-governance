@@ -506,9 +506,189 @@ grep -q '^<<<<<<< ours$' "$TMP/a" \
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/b"
 run "unkeyable row from one side only" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-9b "
 
+# --- 13. AN HONOURED DELETE MUST NOT SWALLOW WHAT THE OTHER SIDE FILED NEXT TO IT ------------------
+# A ROW IS ITS LEAD-IN PLUS ITS ANCHOR, and the delete tests are the two places that rule was dropped.
+# Splitting lead-in from anchor narrowed both comparisons to the anchor LINE, so a side that left the
+# row itself alone but filed an unkeyable correction row immediately ABOVE it read as "untouched" —
+# and the `continue` past `lead(k)` then discarded what it filed. Measured, both directions: driver
+# rc 0 `1 dropped … clean`, incoming row GONE, zero markers, while `git merge-file` AND the driver
+# one commit earlier both returned rc 1 with the row intact. THE CONTROLS ARE THE POINT — losing a
+# row out of an append-only record while being quieter than the merge you replace is the whole
+# failure this unit exists to prevent, and no id-set oracle can see it (the lost line is unkeyed, so
+# it is in neither `kept` nor `took_b` and the audit line reads `0 new from theirs`).
+ADJ='- TOOL-zFixture-7b · OPEN · an unkeyable correction row filed against the deleted row'
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$ADJ"; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/b"
+run "ours deleted, theirs filed above it" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 TOOL-zFixture-7b "
+[ "$(grep -cF -- "$ADJ" "$TMP/a")" = 1 ] \
+  || bad "delete/adjacent: theirs' correction row is not present exactly once — an honoured delete swallowed it"
+grep -q '^<<<<<<<' "$TMP/a" || bad "delete/adjacent: rc 1 with no markers is the marker-free-UU trap"
+
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$ADJ"; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/b"
+run "theirs deleted, ours filed above it" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 TOOL-zFixture-7b "
+[ "$(grep -cF -- "$ADJ" "$TMP/a")" = 1 ] \
+  || bad "delete/adjacent mirror: ours' correction row is not present exactly once"
+
+# --- 14. A %B-ONLY ROW THAT OPENS THE NEXT SECTION MUST NOT SWALLOW OURS' OWN NEW ROW --------------
+# THE CONTROL: `git merge-file` resolves this input rc 0 and CORRECTLY, so the driver is compared to
+# git's answer BYTE FOR BYTE rather than to a hand-typed expectation. Seating the splice cursor on
+# the shared predecessor alone put ours' new row UNDER the heading theirs' new row carries as its
+# lead-in. Reproduced through a real `git merge` on the real memory/DECISIONS.md: a PLAY decision
+# auto-committed under `## KICK`, rc 0, `clean`, zero markers. Case 11 cannot see it — its %B-only
+# row is a pure insert and ours adds nothing after the shared predecessor.
+control() {   # run BEFORE the driver overwrites %A · $1 label
+  cp "$TMP/a" "$TMP/actl"
+  git merge-file -p -L ours -L base -L theirs "$TMP/actl" "$TMP/o" "$TMP/b" > "$TMP/ctl" 2>/dev/null \
+    || bad "$1: the CONTROL (git merge-file) did not resolve this input cleanly — the arm's premise is that git gets it RIGHT"
+}
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 ours; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-9 theirs; row TOOL-zFixture-2 base; } > "$TMP/b"
+control "b-only opens the next section"
+run "b-only row opening the next section" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 TOOL-zFixture-9 "
+h=$(at_line '^## Section two$' "$TMP/a")
+m=$(at_line '^- TOOL-zFixture-3 ' "$TMP/a"); r=$(at_line '^- TOOL-zFixture-9 ' "$TMP/a")
+{ [ "$h" -gt 0 ] && [ "$m" -gt 0 ] && [ "$m" -lt "$h" ]; } \
+  || bad "b-only opens next section: OURS' new row is at line $m against the heading at $h (0 = absent) — it was pushed under theirs' new heading"
+{ [ "$r" -gt 0 ] && [ "$r" -gt "$h" ]; } \
+  || bad "b-only opens next section: theirs' row is at line $r against the heading at $h (0 = absent)"
+cmp -s "$TMP/a" "$TMP/ctl" \
+  || bad "b-only opens next section: the driver's file differs from git merge-file's, which is CORRECT here — the driver is worse than no driver"
+
+# --- 15. PLACEMENT THE SPLICE CANNOT DECIDE IS A CONFLICT, NEVER A GUESS ---------------------------
+# A splice cannot be right in every shape. Here ours RELOCATES a row across a `## ` boundary and
+# theirs appends behind that row's old position: the cursor sits at ours' new position, so theirs'
+# row is dragged into the section ours moved to. Reproduced through a real `git merge`: rc 0,
+# `clean`, zero markers, `- TOOL-…` committed under `## closed`. `git merge-file` REFUSES the same
+# input. So placement is a POSTCONDITION (`no_misfiled_rows`) and this is its arm: the file the
+# driver writes must never file a row under a heading no input filed it under.
+{ pre; printf '## open\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; } > "$TMP/o"
+{ pre; printf '## open\n\n'; row TOOL-zFixture-1 base; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; row TOOL-zFixture-2 base; } > "$TMP/a"
+{ pre; printf '## open\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-9 theirs; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
+[ "$rc" = 1 ] || bad "misfiled row: rc=$rc, expected 1 — a row was filed under a heading no input filed it under and the driver did not say so"
+printf '%s\n' "$err" | grep -q 'Misfiled' \
+  || bad "misfiled row: the refusal does not name the placement postcondition — stderr was [$err]"
+printf '%s\n' "$err" | grep -qF 'TOOL-zFixture-9' || bad "misfiled row: the refusal does not name the row it refused over"
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "misfiled row: rc 1 with NO markers is the marker-free-UU trap"
+
+# --- 16. THE SAME SUFFIXED ID MINTED ON BOTH NODES, WITH DIFFERENT WORDING -------------------------
+# The line-level postcondition compares EXACT text, so two nodes each minting the ratified `…-9b`
+# correction form with their own prose produce two DIFFERENT lines: each is seen once, the cap holds,
+# and the id lands TWICE in an append-only record at rc 0, no markers, `clean`. Measured — and the
+# suite's own `dups()` oracle sees it, which is what makes this a coverage hole rather than an
+# invisible one. Case 12 only ever uses byte-identical text, the one shape the line census catches.
+mk16() {
+  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
+  { pre; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-9b · CORRECTS TOOL-zFixture-1: the ours-side wording\n'; row TOOL-zFixture-2 base; } > "$TMP/a"
+  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf -- '- TOOL-zFixture-9b · CORRECTS TOOL-zFixture-1: the theirs-side wording\n'; } > "$TMP/b"
+}
+mk16
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
+[ "$rc" = 1 ] || bad "divergent-text duplicate id: rc=$rc, expected 1 — the id was written twice at exit $rc"
+printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
+  || bad "divergent-text duplicate id: the refusal does not name the postcondition — stderr was [$err]"
+printf '%s\n' "$err" | grep -qF 'TOOL-zFixture-9b' || bad "divergent-text duplicate id: the refusal does not name the id"
+# ...and the id half must NOT fire on a row that merely CITES an id two nodes both cite. Counting
+# every id on a line rather than the LEADING one reds this, and it is the ordinary shape of this
+# corpus: 73 of 73 rows carry a leading id and rows cite each other constantly. Driven by hand rather
+# than through `run`, because `dups()` reports every repeated id INCLUDING a cited one — which is the
+# right answer to `run`'s question and the wrong one to this arm's.
+{ pre; row TOOL-zFixture-1 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-4 · OPEN · supersedes TOOL-zFixture-1 (ours)\n'; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-5 · OPEN · supersedes TOOL-zFixture-1 (theirs)\n'; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null) && rc=0 || rc=$?
+[ "$rc" = 0 ] \
+  || bad "citing rows: rc=$rc, expected 0 — two nodes each citing one base row is not a duplicate [$err]"
+for want in TOOL-zFixture-1 TOOL-zFixture-4 TOOL-zFixture-5; do
+  [ "$(grep -c "^- $want " "$TMP/a")" = 1 ] || bad "citing rows: $want is not present exactly once"
+done
+
+# --- 17. A LEAD-IN THAT LEGITIMATELY REPEATS IN TWO SECTIONS MUST SURVIVE TWICE --------------------
+# THE CONTROL IS RIGHT HERE TOO. Keyed file-wide, the lead-in dedup dropped every later copy of a
+# lead-in anywhere in the file — correct for the case it was written for (two nodes opening the SAME
+# empty section, case 10) and wrong the moment the same text is two different pieces of furniture.
+# Measured: ours opens `### 2026-08` in one section, theirs opens `### 2026-08` in another, driver
+# rc 0 with THEIRS' sub-heading deleted, `git merge-file` rc 0 and fully correct. The dedup is
+# adjacency-scoped for exactly this, and case 10 is the other half of the pair.
+{ pre; printf '## Section one\n\n'; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; printf '## Section one\n\n'; row TOOL-zFixture-1 base; printf '\n### 2026-08\n\n'; row TOOL-zFixture-3 ours; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; } > "$TMP/a"
+{ pre; printf '## Section one\n\n'; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 base; printf '\n### 2026-08\n\n'; row TOOL-zFixture-4 theirs; } > "$TMP/b"
+control "repeated lead-in"
+run "the same lead-in in two sections" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 TOOL-zFixture-4 "
+[ "$(grep -c '^### 2026-08$' "$TMP/a")" = 2 ] \
+  || bad "repeated lead-in: the result carries $(grep -c '^### 2026-08$' "$TMP/a") copies of a sub-heading that legitimately belongs to two rows in two places, expected 2"
+cmp -s "$TMP/a" "$TMP/ctl" \
+  || bad "repeated lead-in: the driver's file differs from git merge-file's, which is CORRECT here"
+
+# --- 18. AN UNRELATED CONFLICT MUST NOT SWITCH THE DUPLICATE DETECTOR OFF --------------------------
+# Scoped to clean verdicts, the postcondition was disabled for the WHOLE FILE by one unrelated
+# both-sides row edit — and the duplicate was then written OUTSIDE the markers, in text the author
+# reads as already settled. Reproduced: rc 1, the duplicated row at two line numbers, no
+# `DuplicatedContent` on stderr. rc 1 hides a duplicate exactly as well as rc 0 does, because an
+# author resolves the hunks and commits the rest unread. So the census runs on every verdict, over
+# the merged lines with the conflict REGIONS excised — which is what the clean-verdict scoping was
+# reaching for and did not do.
+DUP18='- TOOL-zFixture-77b · an unkeyable correction row minted on BOTH nodes'
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$DUP18"; row TOOL-zFixture-3 OURSEDIT; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 THEIRSEDIT; printf '%s\n' "$DUP18"; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
+[ "$rc" = 1 ] || bad "duplicate beside a conflict: rc=$rc, expected 1"
+printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
+  || bad "duplicate beside a conflict: an unrelated conflict switched the census off — stderr was [$err]"
+# ...and the excision is what makes that possible: case 2's conflict repeats one id inside the
+# markers by construction, and the census must NOT read that as a duplicate. Without the excision
+# this arm reds instead of case 2's.
+{ pre; row TOOL-zFixture-1 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 ours; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 theirs; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
+  && bad "conflict excision: a row repeated INSIDE its own conflict markers was counted as a duplicate"
+
+# --- 19. A HEADING RENAMED ON %B SURVIVES A ROW EDITED ON %A ---------------------------------------
+# `rows()`'s docstring leads with this — "an edit to the heading on one side and to the row on the
+# other could not both survive" — and it is the reason the lead-in is returned SEPARATELY from the
+# anchor. Nothing tested it: replacing `lead()`'s `k in O` three-way with a plain take-ours discards
+# theirs' rename at rc 0, with the whole suite green and `check-arms.py` rc 0.
+{ pre; row TOOL-zFixture-1 base; printf '\n## OLD HEADING\n\n'; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '\n## OLD HEADING\n\n'; row TOOL-zFixture-2 OURS-EDIT; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf '\n## RENAMED HEADING\n\n'; row TOOL-zFixture-2 base; } > "$TMP/b"
+run "heading renamed on theirs, row edited on ours" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
+grep -q '^## RENAMED HEADING$' "$TMP/a" || bad "lead three-way: theirs' heading rename was DISCARDED"
+grep -q '^- TOOL-zFixture-2 · OPEN · OURS-EDIT$' "$TMP/a" || bad "lead three-way: ours' row edit was DISCARDED"
+grep -q '^## OLD HEADING$' "$TMP/a" && bad "lead three-way: the pre-rename heading is still in the file"
+
+# --- 20. THE CENSUS KEYS ON THE STRIPPED LINE, SO LINE FORM CANNOT SMUGGLE A DUPLICATE IN ----------
+# `census()`'s `strip()` is deliberate, documented and was untested: keying on the raw line leaves
+# the whole suite at PASS while a reachable input corrupts. The reachable channel is LINE FORM, not
+# the encoding the comment used to claim — git hands the driver uniformly-terminated %O/%A/%B under
+# either `core.autocrlf`, but a side whose copy of the row is the file's FINAL line carries no
+# terminator at all. The fixture row is deliberately ID-LESS: the id half of the postcondition
+# ignores terminators by construction, so a row it can key would keep this arm green under the
+# sabotage it exists to catch.
+BARE='- a bare correction note with no id at all, minted on both nodes'
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$BARE"; row TOOL-zFixture-2 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf '%s' "$BARE"; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
+[ "$rc" = 1 ] || bad "line-form duplicate: rc=$rc, expected 1 — the same row in two line forms was written twice"
+printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
+  || bad "line-form duplicate: the census did not see it — stderr was [$err]"
+# ...and the fixture really is id-less, or the arm proves the id half rather than the strip.
+[ -z "$(ids "$TMP/b")" ] && bad "line-form duplicate: %B yielded no ids at all — the fixture collapsed"
+printf '%s\n' "$BARE" > "$TMP/bare"
+[ -z "$(ids "$TMP/bare")" ] \
+  || bad "line-form duplicate: the fixture row carries an id, so the id half can catch it and the strip is still untested"
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
-# coverage and goes stale the first time a group is added without touching it.
+# coverage and goes stale the first time a group is added without touching it. The floor is a
+# RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
 ngroups=$(grep -c '^# --- ' "$SELF")
-[ "$ngroups" -ge 20 ] || bad "the fixture-group scan found $ngroups groups — the count is mis-selecting"
+[ "$ngroups" -ge 28 ] || bad "the fixture-group scan found $ngroups groups, expected at least 28 — a group was deleted or the count is mis-selecting"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups fixture groups held"
 exit "$st"

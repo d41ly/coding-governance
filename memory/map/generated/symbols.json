@@ -83,6 +83,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "Misfiled",
+      "kind": "class",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "Problem",
       "kind": "class",
       "file": "tools/memory-tree/check-arms.py"
@@ -813,6 +818,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "no_misfiled_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "no_new_duplicates",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -1088,6 +1098,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "row_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -1183,6 +1198,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "sections",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -1196,6 +1216,11 @@
       "id": "settings_merge_src",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "settled",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "signal_dangling_pointers",

@@ -295,11 +295,30 @@ check_merge_rows() {
   # A no-op THREE-WAY rather than the cheaper usage/arity call. `merge-rows.py` defers its grammar
   # import into `merge()`, so an argument-less invocation exits 2 with its usage text even when the
   # memory-recall kit is missing outright — it would prove the interpreter starts and nothing else.
-  # Three one-line scratch inputs that merge CLEANLY exercise the whole chain in one python start:
-  # launcher resolution, the driver's own syntax, the `.memory-tree.conf` walk-up, the deferred
-  # grammar import, and the `%A` write. That is one process per session-start, which is what a
-  # verifier that verifies costs.
-  local smoke rc_smoke=0
+  # Three scratch inputs that merge CLEANLY exercise the whole chain in one python start: launcher
+  # resolution, the driver's own syntax, the `.memory-tree.conf` walk-up, the deferred grammar
+  # import, the KEYED path, and the `%A` write. That is one process per session-start, which is what
+  # a verifier that verifies costs.
+  #
+  # AND THE FIXTURE CARRIES ANCHORED ROWS, one APPEND COLLISION PER DECLARED FAMILY. The first cut
+  # used three unkeyable lines (`x` / `a\nx` / `x\nb`): `split_regions` found no anchor, so the whole
+  # file was preamble and the run was a plain `git merge-file` — `rows()`, `merge()`, `lead()`, the
+  # splice and both postconditions were never entered. MEASURED: one token of drift in
+  # `.memory-tree.conf` FAMILIES (`tooling:TOOL` -> `tooling:TOOLS`) makes the driver key ZERO rows,
+  # every governed-index append-collision then conflicts forever, the driver is completely inert —
+  # and the arm still printed `ok  merge  — merge.rows.driver wired`.
+  #
+  # An append collision is the ONE shape that discriminates: git's built-in three-way CONFLICTS on it
+  # (both sides add a different line after the same predecessor), so a clean rc 0 is only reachable
+  # through the keyed path. Per family, because a fixture built on one family goes green on drift in
+  # any other. The ids use the FLAT era (`\d{3}`), which is in the grammar's `ERAS` unconditionally
+  # and needs no node tag; the `- <id> | <text>` form is the shipped dash-anchor shape in ASCII.
+  local smoke rc_smoke=0 fams f n miss=""
+  # Sourced in a SUBSHELL so a project conf cannot redefine this script's own variables. Absent conf
+  # -> a placeholder family: the driver then cannot resolve a grammar either, raises, and this arm
+  # reports UNWIRED with a real reason rather than being special-cased into silence here.
+  fams=$( . ./.memory-tree.conf >/dev/null 2>&1; for f in ${FAMILIES:-}; do printf '%s ' "${f##*:}"; done )
+  [ -n "$fams" ] || fams="ROWS"
   smoke=$(mktemp -d 2>/dev/null) || smoke=""
   # "Could not verify" is NOT a clean bill, and this file already made that call once: the recall arm
   # above deleted its `settings-merge.py absent, cannot verify` skip precisely because it reported
@@ -310,20 +329,49 @@ check_merge_rows() {
     unwired=$((unwired+1))
     return
   fi
-  printf 'x\n'    > "$smoke/o"
-  printf 'a\nx\n' > "$smoke/a"
-  printf 'x\nb\n' > "$smoke/b"
+  : > "$smoke/o"; : > "$smoke/a"; : > "$smoke/b"
+  for f in $fams; do
+    printf -- '- %s-001 | base\n'                     "$f"      >> "$smoke/o"
+    printf -- '- %s-001 | base\n- %s-002 | ours\n'    "$f" "$f" >> "$smoke/a"
+    printf -- '- %s-001 | base\n- %s-003 | theirs\n'  "$f" "$f" >> "$smoke/b"
+  done
   bash "$shim" "$drv" "$smoke/o" "$smoke/a" "$smoke/b" merge-rows-smoke \
     >/dev/null 2>"$smoke/err" || rc_smoke=$?
-  # rc alone is not enough: assert the driver WROTE theirs' line into %A. A driver that exits 0
-  # without touching %A is the same silent take-ours by another route.
-  if [ "$rc_smoke" != 0 ] || ! grep -q '^b$' "$smoke/a"; then
-    echo "UNWIRED  merge     — the configured driver cannot merge: 'bash $shim $drv' exited $rc_smoke on a no-op three-way ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore $(dirname "$shim")/resolve-python.sh and the sibling memory-recall kit, then re-run"
+  # rc alone is not enough: assert every row of all three inputs is in %A exactly once. A driver that
+  # exits 0 without touching %A is the same silent take-ours by another route, and one that keys only
+  # SOME families resolves the rest by line merge — which is the state this arm exists to name.
+  for f in $fams; do
+    for n in 001 002 003; do
+      [ "$(grep -c -- "^- $f-$n |" "$smoke/a" 2>/dev/null)" = 1 ] || miss="$miss $f-$n"
+    done
+  done
+  if [ "$rc_smoke" != 0 ] || [ -n "$miss" ]; then
+    echo "UNWIRED  merge     — the configured driver cannot merge: 'bash $shim $drv' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore $(dirname "$shim")/resolve-python.sh and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
     unwired=$((unwired+1))
     rm -rf "$smoke"
     return
   fi
   rm -rf "$smoke"
+  # ...AND THE DECLARED FAMILIES ARE THE ONES THE INDEXES ACTUALLY USE. The fixture above is built
+  # FROM the conf, so it stays self-consistent under a family RENAME: one token of drift
+  # (`tooling:TOOL` -> `tooling:TOOLS`) leaves the smoke green while every real `- TOOL-…` row stops
+  # keying, every governed append-collision conflicts forever, and the driver is inert on the only
+  # files it is wired to. MEASURED: the arm printed `ok  merge  — merge.rows.driver wired`. So the
+  # declared indexes are asked directly — harvest the family prefix each ROW LEADS with, and require
+  # every harvested prefix to be declared. A prefix nothing declares is drift by definition; the
+  # reverse (a declared family with no rows yet) is the ordinary empty-section state and is not.
+  local seen undeclared=""
+  seen=$(printf '%s\n' "$declared" | grep . | while IFS= read -r p; do
+           [ -f "$p" ] && sed -n 's/^[[:space:]]*[-*][[:space:]]\{1,\}[`*]*\([A-Z][A-Z0-9]\{1,\}\)-[A-Za-z0-9].*/\1/p' "$p"
+         done | LC_ALL=C sort -u)
+  for f in $seen; do
+    case " $fams " in *" $f "*) ;; *) undeclared="$undeclared $f" ;; esac
+  done
+  if [ -n "$undeclared" ]; then
+    echo "UNWIRED  merge     — the driver runs, but .memory-tree.conf FAMILIES does not declare$undeclared, which rows in the merge=rows indexes LEAD with; those rows key as unstructured content, so every append-collision on them conflicts forever and the driver is inert on the files it is wired to. Fix: add the family to FAMILIES in .memory-tree.conf (declared:${fams:+ }${fams% })"
+    unwired=$((unwired+1))
+    return
+  fi
   cur=$(git config merge.rows.driver 2>/dev/null || true)
   if [ -z "$cur" ]; then
     if [ "$DO_FIX" = 1 ]; then

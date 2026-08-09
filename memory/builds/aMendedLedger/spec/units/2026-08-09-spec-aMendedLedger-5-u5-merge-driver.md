@@ -1,6 +1,11 @@
 # TOOL-aMendedLedger-5 — U5: the row-keyed merge driver, its launcher shim and its wiring
 
-**Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+
+> **rev-3** — the decision table below is amended in lockstep with the master's rev-5: `%B`-only
+> rows SPLICE (they did already; the table said `append`), the two delete cases compare the ROW
+> rather than the anchor line, and two postconditions are added. Three review-reproduced silent
+> corruptions of `memory/DECISIONS.md` at rc 0 sit behind those four edits.
 
 ## 1. Goal
 
@@ -107,24 +112,38 @@ which is what makes the attach-to-FOLLOWING-anchor rule load-bearing. A driver t
 lines in a side list and re-emitted them at the end would move those headings to the bottom of the
 file while exiting 0.
 
-The decision table, implemented exactly as the master ratified it:
+The decision table, as amended by the master at rev-5 (this copy and the master's must agree; they
+are the same table stated twice, and the previous revision of BOTH said `append` while the code
+spliced):
 
 | case | result |
 |---|---|
-| id in `%B` only | append |
-| id in `%A` only | keep |
+| id in `%B` only | SPLICE after the last surviving key preceding it in `%B`, and after the `%A`-only keys already following that key — never append past the block |
+| id in `%A` only | keep, in the position `%A` gave it |
 | id in both, text identical | keep once |
 | id in both, one side equals `%O` | take the side that changed |
 | id in both, both changed | CONFLICT with markers |
-| id in `%O` and one side, other side untouched | honour the delete |
-| id deleted one side, MODIFIED the other | CONFLICT, both directions |
+| id in `%O` and one side, other side untouched — *row* untouched, i.e. lead-in AND anchor | honour the delete |
+| id deleted one side, MODIFIED the other — including content filed ADJACENT to it | CONFLICT, both directions |
 | a line the grammar cannot key, inside the row block | attaches to the FOLLOWING anchor, rc 0 |
 | preamble / trailer | ordinary three-way text merge |
+| **postcondition** — a row line, or the id a row LEADS with, written more often than any one input carries it | REFUSE (whole-file conflict) |
+| **postcondition** — a row filed under a `#` heading no input filed it under | REFUSE (whole-file conflict) |
 
-The last two rows correct the upstream SPEC from the shipped upstream CODE, and the code is the
-authority. `C:/projects/incms/main/scripts/merge-rows.py:173-228` splits the delete case five ways,
-not two, and `:99-126` shows the unkeyable line attaching to the next anchor with rc 0 rather than
-conflicting. Both are ported as written there.
+Rows 8-9 correct the upstream SPEC from the shipped upstream CODE, and the code is the authority.
+`C:/projects/incms/main/scripts/merge-rows.py:173-228` splits the delete case five ways, not two, and
+`:99-126` shows the unkeyable line attaching to the next anchor with rc 0 rather than conflicting.
+Both are ported as written there.
+
+**Rows 1, 6, 7 and the two postconditions DIVERGE from upstream, and each one is a measurement.**
+Row 1: appending a `%B`-only row past the row block files an incoming decision under whatever
+`## FAMILY` heading is last — git's own merge places it correctly, so the append rule is a
+regression against the merge being replaced, and the `%A`-only skip is what stops ours' new row
+landing under the heading theirs' new row carries in. Rows 6-7: comparing the ANCHOR LINE alone
+read "untouched" for a side that had filed an unkeyable correction row immediately above the deleted
+row, and then discarded it at rc 0 — a row is its lead-in plus its anchor everywhere or nowhere. The
+postconditions exist because no placement or keying rule can be right on every input, and the honest
+answer to an input the driver cannot resolve is a conflict, never a guess.
 
 **Audit counters are incremented at the EMIT sites**, never derived from the input lists. Upstream's
 first cut printed `sum(1 for k in a_order if k in A)`, which `rows()` makes a tautology, and it
@@ -569,6 +588,13 @@ matching `check_hooks` rather than the byte-rewriting `eol` arm.
   corrected beyond the review: the C5s leg is `manifest-check.sh:204-219`, not `:213-228` (the file
   is 223 lines), and the verdict-epoch scan is declared at `check-verdict-epoch.sh:51-52`, not
   `:50-52` (`:50` is a comment). Every file:line in this spec was re-opened at HEAD.
+- rev-3 · 2026-08-09 · the decision table re-stated in lockstep with master rev-5. Four rows change
+  and two are added: `%B`-only rows SPLICE and skip the `%A`-only keys already following the shared
+  predecessor; `%A`-only rows keep the position `%A` gave them; both delete cases compare the ROW
+  (lead-in AND anchor), because comparing the anchor line alone read "untouched" for a side that had
+  filed an unkeyable correction row immediately above the deleted row and then discarded it at rc 0;
+  and two postconditions are added, on duplication (row line AND leading id) and on placement. Every
+  one of those is a reproduction from review round 2 or 3, each with `git merge-file` as the control.
 
 ## 10. Reuse audit
 

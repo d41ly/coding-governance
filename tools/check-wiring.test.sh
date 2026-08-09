@@ -44,7 +44,11 @@ install_driver() {
     cp "$src" "${p}${rel}"
   done
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
-  printf '# tooling backlog\n' > memory/backlog/TOOL.md
+  # A REAL ANCHORED ROW, not an empty index. The merge arm harvests the family prefix each row LEADS
+  # with and requires the conf to declare it — over an index with no rows that harvest is empty and
+  # state 5d below would pass by finding nothing, which is the vacuity this repo's pop_guard idiom
+  # exists to refuse. State 5d IS the liveness proof: it only reds if this row is here and harvested.
+  printf '# tooling backlog\n\n- TOOL-001 | a landed row, so the family harvest has a population\n' > memory/backlog/TOOL.md
   printf 'memory/backlog/*.md merge=rows\n' > .gitattributes
   git add -A; git commit -q -m driver
 }
@@ -342,6 +346,24 @@ mv tools/memory-recall.away tools/memory-recall
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the grammar kit goes green again" 1 || ck "AC10 restoring the grammar kit goes green again" 0
+
+# state 5d — the driver STARTS, the smoke fixture merges CLEANLY, and the driver is still inert on
+# the only files it is wired to: one token of drift in `.memory-tree.conf` FAMILIES
+# (`tooling:TOOL` -> `tooling:TOOLS`) renames the family every landed row LEADS with. The smoke
+# fixture is BUILT from the conf, so it renames with it and stays green — MEASURED: the arm printed
+# `ok  merge  — merge.rows.driver wired` while the driver keyed ZERO rows and every governed
+# append-collision conflicted forever. So the arm asks the declared indexes directly. This state is
+# also the liveness proof for that harvest: it can only red if `install_driver`'s landed row is there
+# and really is being read.
+sed -i.bak 's/tooling:TOOL"/tooling:TOOLS"/' .memory-tree.conf && rm -f .memory-tree.conf.bak
+grep -q 'tooling:TOOLS' .memory-tree.conf || ck "AC10 family-drift fixture: the conf edit did not apply" 0
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'does not declare TOOL'; } \
+  && ck "AC10 conf renames the family the indexes use -> UNWIRED, exit 1" 1 || ck "AC10 conf renames the family the indexes use -> UNWIRED, exit 1" 0
+sed -i.bak 's/tooling:TOOLS"/tooling:TOOL"/' .memory-tree.conf && rm -f .memory-tree.conf.bak
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
+  && ck "AC10 restoring the declared family goes green again" 1 || ck "AC10 restoring the declared family goes green again" 0
 
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
