@@ -18,4 +18,4 @@
 - TOOL-aBatchedTribunal-4 · CLOSED · `corpus_ids.py`'s shape filter was a tautology and could not be covered by any behavioural arm — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-5 · CLOSED · the launcher ban keyed on the retired idiom, so a BARE invocation carried nothing to match — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-7 · CLOSED · the epoch gate's endpoint comparison let one early bump excuse every later change in the range — closed by TOOL-aBatchedTribunal-8 (W6); the record is in DECISIONS.md
-- TOOL-aMendedLedger-8 · OPEN · the driver's FOURTH repair is owed: the blank-lead-in exemption (`merge-rows.py:551-552`) returns without updating `prev_new_sig`, so a furniture-less row between two furniture-carrying ones keeps the chain and the later lead-in is lost. Reproduced post-U8 at rc 0
+- TOOL-aMendedLedger-8 · CLOSED · scoped as the driver's FOURTH repair; closed instead by U9, which replaces the algorithm — the record is in DECISIONS.md

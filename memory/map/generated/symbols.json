@@ -113,9 +113,19 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "RowLoss",
+      "kind": "class",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "Shortlist",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "StructureDrift",
+      "kind": "class",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "adopt",
@@ -828,6 +838,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "no_row_loss",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "no_subdirs",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -988,6 +1003,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "reconcile",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "records",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -1098,12 +1118,12 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
-      "id": "row_ids",
+      "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
-      "id": "rows",
+      "id": "row_ids",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
     },
@@ -1253,6 +1273,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "skeleton",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "skip",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1263,14 +1288,14 @@
       "file": "tools/memory-recall/union.py"
     },
     {
-      "id": "split_regions",
-      "kind": "function",
-      "file": "tools/memory-tree/merge-rows.py"
-    },
-    {
       "id": "stems",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "structure_identity",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "subtokens",

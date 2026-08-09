@@ -86,6 +86,7 @@
 - TOOL-aMendedLedger-5 · backlog conflicts are answered by a ROW-KEYED merge driver, not by sharding per node. `merge=union` is rejected on measurement: it loses no id but duplicates one in 147 of 151 conflicts. The anchor grammar is IMPORTED, never vendored
 - TOOL-aMendedLedger-6 · the playbook justified sharding because a shared mutable index "forces a conflict on every land" — the question the generated index and the driver now answer two other ways. Three answers to one question, so the rule goes at v2.4
 - TOOL-aMendedLedger-7 · U8 widens the shared session era to `\d+[a-z]*`, so this repo's own record is fully keyed: `DECISIONS.md` 35/73 rows -> 73/73, recall 53 -> 91 records. Two gates were blind — verdict-epoch's DELEGATES stopped a hop short of the grammar, `Conf.digest()` omitted the eras
+- TOOL-aMendedLedger-8 · U9 REPLACES the merge driver: two planes split by row SHAPE, never worse than git
 
 ## DEPL — deployer
 

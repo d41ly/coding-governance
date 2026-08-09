@@ -3,14 +3,13 @@
 # string `\b` is the BACKSPACE escape (it reached `main()`'s usage output as a control character) and
 # `\s` is an invalid escape that CPython warns about on every single merge — a driver that prints a
 # SyntaxWarning to stderr during `git merge` reads as a broken driver.
-r"""A row-keyed three-way merge driver for the id-anchored index files (upstream ARCH-dQuarriedLedger-1 U9).
+r"""A row-keyed three-way merge driver for the id-anchored index files (aMendedLedger U9).
 
     git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'
 
 Auto-resolves the index conflicts that are pure append-collisions — two nodes each appending a row to
-`memory/DECISIONS.md` or `memory/backlog/<FAMILY>.md` — without duplicating a record, ENFORCED by a
-postcondition rather than assumed from the keying (see below). Upstream replayed 765 merges: a
-row-keyed merge auto-resolved 133 of 312 historical index conflicts with zero dropped ids.
+`memory/DECISIONS.md` or `memory/backlog/<FAMILY>.md` — without duplicating a record, ENFORCED by
+postconditions on the written bytes rather than assumed from the keying.
 
 WHY NOT `merge=union`, which is one line of config and no code. Tested with git's own driver over
 every historical conflict upstream: union never LOSES an id (0 of 441) but INTRODUCES a duplicate in
@@ -22,111 +21,103 @@ WHY THIS IS NOT THE WITHDRAWN `regenerate` DRIVER. That one was withdrawn for a 
 `ort` checks the merge result out only AFTER the per-path merges run, so a generator invoked from
 inside a driver renders from the PRE-merge tree and commits a stale artifact.
 
-This driver is a pure function of `%O %A %B` **plus the anchor grammar it reads from the worktree's
-memory-recall kit** — it is NOT worktree-free, and claiming otherwise is what the next author would
-have reasoned from. The exposure is real but bounded, and different in kind from regenerate's:
-regenerate wrote a whole artifact from the stale tree, whereas a merge that CHANGES the anchor
-grammar keys its index merge on the pre-merge grammar. A row is still never INVENTED; at worst a row
-whose anchor only the NEW grammar recognises is treated as unkeyed content — and unkeyed content is
-precisely the population the postcondition below exists for, because it is the population the keying
-cannot speak for. The grammar is deliberately not vendored — a second copy of a regex is this repo's
-catalogued drift class, and a stale-but-single grammar beats two that disagree.
+TWO PLANES, AND THE PARTITION IS THE ROW SHAPE. Every line is classified by ONE stateless predicate
+applied to that line alone — `_ROW_RE`, `^\s*[-*]\s` — into ROW or STRUCTURE. Structure is merged by
+`git merge-file`, positionally, byte for byte. Only the row set is key-merged here. The partition is
+the SHAPE and never the anchor grammar: measured, `git merge-file` is correct on every class of
+non-row content this corpus produced (a heading, a placeholder, a repeated lead-in note, a
+sub-heading in two sections) and its ONE observed corruption is a row line duplicated at rc 0 —
+which is exactly the population keying owns. Partitioning by the grammar would hand git the row
+lines it duplicates and rebuild the defect on the other side of the split.
 
-The import is DEFERRED into `anchors()` rather than run at module scope, so an unreadable or broken
-`extract.py`, a missing kit directory or a missing `.memory-tree.conf` all raise inside `merge()` and
-are caught by `main()`'s fail-closed handler. At module scope they produce the silent-take-ours
-shape: the driver exits non-zero without writing `%A`, and git leaves the path holding OURS-only
-content with no markers and the incoming rows simply absent.
+THE SKELETON is how the two planes recombine in ORDER rather than by guess. Each of `%O %A %B` is
+projected to a line list of the same length in which every ROW line becomes a single token line and
+every STRUCTURE line passes through unchanged. The token is the row's id when the grammar keys it
+(`\x01row:<id>\x01`) and a digest of its STRIPPED text when it does not (`\x01raw:<hex>\x01`).
+Hashing the stripped text is what stops line form smuggling a duplicate: a final copy with no
+newline and an interior copy with one produce the same token. The three skeletons are merged by
+`git merge-file`, the row set is key-merged separately, and the merged skeleton is then walked and
+its tokens substituted.
 
-THREE REGIONS, and the split is the difference between working and not. A file is a preamble
-(everything before the first anchored row), the row block, and a trailer. Every governed index here
-opens with unkeyable prose — `memory/DECISIONS.md` is a title, two blockquote routing lines and a
-section heading before its first anchored row; `memory/backlog/TOOL.md` is a title and a mutability
-note — so an unconditional "a line the grammar cannot key -> CONFLICT" rule conflicts on EVERY merge
-and the auto-resolve is unreachable. Preamble and trailer take an ordinary three-way text merge; only
-the row block is keyed. THE REGION RULE WINS AT THE BLOCK BOUNDARY: the block is
-`lines[first_anchor:last_anchor+1]`, so a section heading that sits BEFORE the first anchor is
-preamble, and one INSIDE the block attaches to the following anchor (see `rows`).
+Keying a row's token on its ID and not its text is what keeps a row EDIT invisible to the structure
+plane. Otherwise every row edit is a structural change and git starts arbitrating record text, which
+is where duplication comes from — measured: a heading renamed on theirs against the row under it
+edited on ours is rc 1 through raw `git merge-file` and rc 0 here, because ours' skeleton is
+byte-identical to base's.
 
-Row ORDER comes from `%A`, with each `%B`-only row SPLICED IN after the last key that precedes it in
-`%B` and is itself emitted, AND after the `%A`-only keys that already follow that key — before all
-of them when there is none. The first cut appended those rows past the whole row block instead,
-which files an incoming decision under whatever `## FAMILY` heading happens to be last:
-`memory/DECISIONS.md` says of itself "Grouped by family for reading". That is not a design trade, it
-is a REGRESSION — measured against the merge this driver replaces, git's own three-way merge places
-the same row correctly. Order among siblings is not semantic (ids are labels, not ranks); SECTION
-MEMBERSHIP is, and splicing is what keeps it.
+THE ROW PLANE IS `key -> LIST`, NEVER `key -> line`. A markdown file may legitimately carry the same
+row-shaped line twice (two identical `  - notes` sub-bullets under two different rows is ordinary),
+and collapsing those to one made a file FAIL ITS OWN IDENTITY MERGE — a permanent whole-file
+conflict no author can clear. So a key resolves to a list of row lines, and `no_row_loss` below is a
+CONSERVATION check and explicitly not a uniqueness check.
 
-THE `%A`-ONLY SKIP IS NOT A TIE-BREAK, it is the second half of the same defect. Seating the cursor
-on the shared predecessor alone put ours' newly appended `## PLAY` row UNDER theirs' newly opened
-`## KICK` heading, at exit 0, through a real `git merge` on the real index — because theirs' row was
-the first of its section and so carried that heading as its lead-in. Git's own merge files both rows
-correctly on the same two commits. Ours' own new rows belong where ours put them, so the incoming row
-splices in after them.
+RECONCILIATION IS FOUR RULES, in order, over the merged skeleton:
 
-A splice cannot be right in every shape, and the ones it cannot decide MUST NOT be guessed. So
-placement is also a POSTCONDITION (`no_misfiled_rows`): every id in the written file must sit under
-the same `#`-heading it sat under in an input that carries it. That is what catches the residue —
-e.g. a row ours RELOCATED across a heading, which drags the row theirs filed behind it into the
-section ours moved to (reproduced: `- TOOL-…` committed under `## closed`, rc 0, `clean`).
+  1. A structure line outside a conflict region is emitted byte for byte.
+  2. A token outside a region is replaced by the NEXT UNCONSUMED entry of `resolved[key]` — one
+     line, or nothing when a delete was honoured, or a marker block. Each occurrence consumes one
+     entry; a token that occurs more often than the row plane resolved it is a conservation failure
+     and refused by name.
+  3. A region whose ours-side and theirs-side consist ENTIRELY of tokens is resolved by POSITIONAL
+     CONCATENATION: ours' tokens in order, then theirs'. A theirs-side token is suppressed only when
+     the same key also occurs on OURS' side. DEDUP HAPPENS ACROSS SIDES AND NEVER WITHIN A SIDE —
+     the within-side form deletes a legitimately repeated note out of an append-only record at rc 0,
+     measured, and it is a REGRESSION against the driver this replaces. An empty side counts as
+     token-only.
+  4. Any other region is emitted as a conflict, and each token inside it is replaced by the row line
+     from the SIDE OF THE REGION IT APPEARS ON — never by `resolved[key]`, whose value can itself be
+     a marker block. Nested markers close the outer region early and leak unresolved lines into the
+     view all four postconditions read; per side, they cannot.
 
-WHY A KEYED ROW CANNOT DUPLICATE — AND WHY THAT IS NOT THE WHOLE FILE. Union duplicates because it
-is a LINE merge, and a row edited on both sides is two different lines. Keying by id removes that
-for every line the grammar KEYS: such a row is emitted from exactly one branch of the case analysis
-in `merge()`, so two rows with one id can only come from an explicit conflict, which is loud.
+Rule 3 is the whole design. Both sides of a diff hunk sit between the same context lines, so when
+every disputed line is a row, section membership is not in dispute — only order among siblings,
+which is not semantic, because ids are labels and not ranks. Rule 4 is its converse. Held as one
+sentence: THE DRIVER MAY AUTO-RESOLVE WHERE GIT CONFLICTS ONLY WHEN EVERY DISPUTED LINE IS A ROW
+TOKEN; A DISPUTED STRUCTURE LINE IS ALWAYS A CONFLICT.
 
-The grammar does not key every line, and this paragraph used to be written as though it did. It was
-then written as though the gap were an ERA gap, which it no longer is. Measured on this repo's own
-`memory/DECISIONS.md`: 73 `- ` rows, 35 anchored under the pre-1.9 grammar and 73 anchored under the
-current one — the shared session era gained a `[a-z]*` tail (memory-recall kit 1.1) and the ratified
-correction-id form, a trailing letter as in `…-1b`, keys now. THAT DID NOT EMPTY THE POPULATION, and
-reading it as though it did is how a fixture starts passing by finding nothing. What is left is a
-SEPARATOR gap rather than an era gap, and it does not move when the era moves: every anchor pattern
-requires a separator after the id (`[-—:·]` or `[·|]`), so `- TOOL-zFix-1b · text` keys while
-`- TOOL-zFix-1b carries an id and no separator` does not. To this driver such a line is CONTENT: it
-travels as a row's lead-in or as trailer, and content is exactly what a line merge can copy. Two
-nodes minting the same unkeyable row in different regions emitted it TWICE at exit 0 before this was
-written down, and the arms that prove it still fire are pointed at the separator shape.
+THE CONFLICT STYLE IS PINNED AT THE CALL SITE and that is load-bearing, not tidiness. `git
+merge-file` honours the invoking repo's `merge.conflictStyle`, and git runs a merge driver from the
+top of the worktree, so a node-local `diff3`/`zdiff3` reaches this process. Under three sections
+rules 3 and 4 are undefined: the region stops being token-only, rule 3 evaporates, and the same
+driver returns different verdicts per node on identical blobs. `-c merge.conflictStyle=merge`
+overrides a configured style — measured on git 2.54 — and buys determinism at the cost of the base
+section in the driver's own conflict output. The three-section shape is still handled defensively
+below, and it falls to rule 4.
 
-So the no-duplicate property is ENFORCED, not asserted. Three mechanisms, and none is the grammar:
+FOUR POSTCONDITIONS, all over the WRITTEN BYTES and on EVERY verdict, over `settled()` — the merged
+lines with conflict regions excised. Bytes and not the in-memory emit list: a terminator defect is
+invisible in a list where two glued records are still two elements.
 
-  * LEAD-IN DEDUP (`merge`'s `lead`). A row is its lead-in plus its anchor (see `rows`), so when two
-    nodes each land the FIRST row of the same currently-empty section, the same base furniture — the
-    `## FAMILY` heading, the `*(none yet)*` placeholder — rides in on two different new ids and is
-    emitted twice. Furniture is not a record. The dedup is ADJACENCY-scoped, not file-wide: it
-    suppresses a repeated lead-in only when the previous emitted row was itself new to the merge and
-    carried the identical lead-in. File-wide it deleted furniture that legitimately repeats — two
-    nodes each opening a `### 2026-08` sub-heading in DIFFERENT sections lost theirs entirely, at
-    exit 0, where `git merge-file` produces the fully correct file.
-  * A LINE POSTCONDITION (`no_new_duplicates`, line half): no ROW-SHAPED line — `^\s*[-*]\s` — may be
-    written more times than the most any ONE input carried it. Row-shaped and not "any non-blank
-    line", because the two shapes are indistinguishable at the line level and their correct answers
-    are OPPOSITE: a record written twice is corruption, a heading written twice in two sections is
-    the merge git itself performs. A record is a row; furniture is governed by the dedup above and
-    by `no_misfiled_rows`.
-  * AN ID POSTCONDITION (`no_new_duplicates`, id half). The line half compares EXACT text, so the
-    same unkeyable correction id minted on two nodes with different WORDING is two different lines
-    and lands twice at exit 0 — measured. So each row-shaped line is also keyed on the FIRST id it
-    carries, under a grammar deliberately INDEPENDENT of the driver's own, and the same cap applies.
-    Independent, not "wider in the era": until kit 1.9 the two differed on the `…-9b` form and the
-    comment named that example; the era widened and the example died while the property did not. The
-    live difference is structural — `_ID_RE` needs no anchor separator and every anchor pattern does
-    — and it is the more durable of the two, because a separator is not something an era widening can
-    grant. First id, not every id: rows cite other records constantly, and counting citations makes
-    two nodes each citing one base row look like a duplicate. Measured over this corpus: 73 rows, 73
-    distinct leading ids, zero repeats — a live invariant, not a hope.
+  * `no_new_duplicates` line half — no row-shaped line written more often than the most any ONE
+    input carried it. This is what refuses the one shape `git merge-file` itself corrupts.
+  * `no_new_duplicates` id half — no id leading more rows than in any one input, under a grammar
+    deliberately INDEPENDENT of the driver's own. This is what refuses a re-worded duplicate of an
+    unkeyable row, and the redesign makes it MORE load-bearing: with the partition on the row shape,
+    an inert anchor grammar no longer conflicts loudly, it quietly hashes.
+  * `no_misfiled_rows` — no keyed row under a heading no input filed it under. Rule 3 makes
+    misfiling structurally unreachable, so this is a backstop; it stays because it is the one
+    postcondition that has already caught real damage and it costs a single pass.
+  * `no_row_loss` — CONSERVATION. For every key, the count of that key's row lines in the settled
+    output equals the number of entries the row plane resolved it to. Keys resolved to a conflict
+    block, and keys inside a rule-4 region, are excluded because `settled()` excises their lines by
+    design. "That row appears exactly once" is the BANNED wording: it is false for a file carrying a
+    legitimately repeated row line, and stating it that way turns an identity merge into a permanent
+    whole-file conflict.
+  * `structure_identity` — the output's non-row, NON-MARKER lines equal the merged skeleton's
+    non-token, NON-MARKER lines, in order, byte for byte. Markers are excluded on BOTH sides and
+    that word is load-bearing: the skeleton carries git's markers and the output does not carry the
+    same ones, so an asymmetric form is unequal by construction on every conflicted merge AND on
+    every rule-3 auto-resolve — it would break the headline case this unit exists for.
 
-All three postconditions run on EVERY verdict, over the merged lines with conflict regions excised.
-Scoping them to rc 0 was wrong: an author resolves the marked hunks and reads everything outside them
-as settled, so a duplicate emitted OUTSIDE the markers of an unrelated conflict is exactly as
-invisible at rc 1 as at rc 0 — reproduced. Excising the regions is what keeps that honest, since a
-conflict hunk repeats content from both sides by construction. A violation raises, and `main()`'s
-fail-closed handler turns it into a real conflict, because a driver that cannot answer must say so.
-
-Every claim above is falsifiable and `merge-rows.test.sh` falsifies each: the shape that broke union,
-two nodes opening the same empty section, an unkeyable row minted on both nodes, the same id minted
-on both with different wording, a repeated lead-in in two sections, a duplicate hiding beside an
-unrelated conflict, and both directions of a delete against adjacent incoming content.
+THE NEWLINE CONTRACT, seven sites. `read`'s `newline=""`; `text_merge`'s `newline=""` write, its
+byte capture and manual decode; `main`'s `write_bytes`. Then: (5) a token carries the terminator of
+the row it replaces, so the skeleton is not a mixed-terminator file; (6) every marker line the
+DRIVER synthesizes carries the file's dominant terminator, computed over `%A`; (7) a row line
+substituted for a token carries the terminator of the TOKEN's position in the merged skeleton, never
+the one it carried in its source blob. Site 7 is not a refinement. Measured: ours appending an
+unterminated final row while theirs appends a terminated one made rule 3 emit ours' token first, the
+empty terminator rode along, and `"".join` FUSED TWO RECORDS ONTO ONE LINE at rc 0 with no markers
+and a `clean` audit line, where the `git merge-file` control returns rc 1 with both rows intact.
 
 Exit 0 = merged clean. Exit 1 = conflict markers written to %A; git leaves the path unmerged.
 Exit 2 = called with fewer than the three input paths (usage).
@@ -137,6 +128,10 @@ Exit 2 = called with fewer than the three input paths (usage).
 # evaluated at def time without this line.
 from __future__ import annotations
 
+# Module scope, unlike `extract` and `tempfile` below: this import runs BEFORE `anchors()` appends
+# the memory-recall kit to `sys.path`, so the shadowing the deferred imports guard against cannot
+# reach it.
+import hashlib
 import pathlib
 import re
 import subprocess
@@ -197,6 +192,10 @@ def anchors() -> tuple:
     alternation plus the four anchor regexes built from THAT repo's `FAMILIES`, so an adopting repo
     with different families keys on its own ids. `anchor_at(line, g)` is the "which id does this line
     DEFINE" predicate, as opposed to one that merely cites it.
+
+    THERE IS NO DEGRADED MODE. Falling back to hashing every row would still beat `git merge-file`,
+    and that is exactly the trap: the file would merge under a different rule than the one
+    configured, silently, on the path where the kit is already broken.
     """
     global _ANCHOR_AT, _GRAMMAR
     if _ANCHOR_AT is None:
@@ -217,49 +216,6 @@ def key(line: str) -> str | None:
     return anchor_at(line, grammar)
 
 
-def split_regions(lines: list[str]) -> tuple[list[str], list[str], list[str]]:
-    """(preamble, row block, trailer) — the row block spans first..last anchored line inclusive."""
-    idx = [i for i, ln in enumerate(lines) if key(ln)]
-    if not idx:
-        return lines, [], []
-    return lines[:idx[0]], lines[idx[0]:idx[-1] + 1], lines[idx[-1] + 1:]
-
-
-def rows(block: list[str]) -> tuple[dict[str, str], dict[str, list[str]], list[str], list[str]]:
-    """(id -> its anchor LINE, id -> the lines leading it, id order, unkeyed lines after the last).
-
-    A ROW IS ITS LEAD-IN PLUS ITS ANCHOR LINE, and that is a measurement, not a preference. The naive
-    model is "a row is one line, unkeyed lines are carried separately". Measured on this corpus's
-    `memory/DECISIONS.md`, the section headings `## KICK — kickoff` and `## TOOL — tooling` and the
-    `*(none yet)*` placeholder under KICK sit INSIDE the row block, interleaved between anchored
-    rows. Carrying those in a side list and re-emitting them at the end would move every section
-    heading to the bottom of the file — a driver that corrupts the thing it merges, exiting 0.
-
-    So unkeyed lines attach to the FOLLOWING anchor, not the preceding one. A section heading belongs
-    with the first row of its section, so when a `%B`-only row arrives it brings its heading with it.
-
-    THE LEAD-IN IS RETURNED SEPARATELY FROM THE ANCHOR, not glued to it, and that split is the whole
-    of two defects. Glued, the lead-in is picked wholesale by whichever branch of the case analysis
-    wins the ANCHOR, so (i) an edit to the heading on one side and to the row on the other could not
-    both survive, and (ii) two ids that are each new to the merge each carried their own copy of the
-    same base heading, which is how a section heading got emitted twice at exit 0. Split, the lead-in
-    gets its own three-way merge against `%O` and its own dedup — see `merge`.
-    """
-    anchor, lead_of, order, lead = {}, {}, [], []
-    for ln in block:
-        k = key(ln)
-        if k is None or k in anchor:
-            # `k in anchor` is a duplicate id within ONE input: pre-existing damage this driver must
-            # not launder into a merge. Kept as ordinary content attached to the next anchor.
-            lead.append(ln)
-            continue
-        anchor[k] = ln
-        lead_of[k] = lead
-        order.append(k)
-        lead = []
-    return anchor, lead_of, order, lead
-
-
 class DuplicatedContent(RuntimeError):
     """A duplicate postcondition refused the result. Raised, never printed-and-continued."""
 
@@ -268,11 +224,31 @@ class Misfiled(RuntimeError):
     """The placement postcondition refused the result. Raised, never printed-and-continued."""
 
 
+class RowLoss(RuntimeError):
+    """The CONSERVATION postcondition refused the result: a key's row count does not match.
+
+    Not a uniqueness failure. The question is whether the number of lines written for a key equals
+    the number the row plane resolved it to — in BOTH directions, so a loss and a duplication are
+    the same refusal seen from two sides.
+    """
+
+
+class StructureDrift(RuntimeError):
+    """The structure plane and the written file disagree, or the reconstruction is unsound.
+
+    Every member is a should-never-fire invariant on the driver's own construction — a sentinel that
+    survived into the output, an unterminated interior line, a region shape git cannot have written.
+    Raising lands in `main()`'s fail-closed handler, which is the right direction: a whole-file
+    conflict the author resolves by hand beats a file whose bytes the driver cannot account for.
+    """
+
+
 # A RECORD is a row. Every governed index writes one record per `- `/`* ` line, and this predicate is
 # the whole reason the duplicate postconditions can be strict without redding a legitimate merge: a
 # repeated ROW is corruption, a repeated HEADING is two sections that happen to share a name. Both are
 # "a line written twice" and nothing at the line level tells them apart, so the population is named
-# here instead of guessed there.
+# here instead of guessed there. It is also the ONLY partition predicate — stateless, one line at a
+# time, no parser state, because state is where all three rounds of defects lived.
 _ROW_RE = re.compile(r"^\s*[-*]\s")
 # Deliberately INDEPENDENT of the driver's own anchor grammar, and not imported from it. The keyed
 # path already guarantees uniqueness for what `key()` keys; this exists for the population it does
@@ -294,12 +270,17 @@ _ROW_RE = re.compile(r"^\s*[-*]\s")
 # 0d asserts both halves live before any arm leans on them.
 _ID_RE = re.compile(r"\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b")
 # A marker line is INVENTED by the merge, so it has no input count to be measured against, and the
-# same three markers legitimately repeat once per conflicting region. `|||||||` is here because
-# `git merge-file` writes it under `diff3` style, which is a per-node config this driver does not set.
-# One pair, not three tokens: `settled` drops everything BETWEEN them, which covers `=======` and the
-# `|||||||` base section `git merge-file` writes under diff3 style without naming either.
-_OPEN, _CLOSE = "<<<<<<<", ">>>>>>>"
+# same three markers legitimately repeat once per conflicting region. `|||||||` is written under
+# diff3 style, which `text_merge` now overrides at the call site — it is still recognised here
+# because recognising a shape the driver refuses to request costs nothing and mis-reading one is how
+# a base section leaks into the ours side.
+_OPEN, _CLOSE, _SEP, _BASE = "<<<<<<<", ">>>>>>>", "=======", "|||||||"
+_MARKER_RE = re.compile(r"^(?:<<<<<<<|>>>>>>>|=======|\|\|\|\|\|\|\|)")
 _HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s")
+# The token delimiter. Fail-closed in both directions: no INPUT line may contain it (so tokenization
+# is unambiguous) and no OUTPUT line may (so a reconstruction bug is caught before it reaches the
+# worktree).
+_SENT = "\x01"
 
 
 def settled(lines: list[str]) -> list[str]:
@@ -375,20 +356,16 @@ def _over(merged: dict[str, int], inputs: list[dict[str, int]]) -> list[tuple]:
 def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
     """Refuse to write a row, or an id, more times than the most any ONE input carried it.
 
-    The backstop for everything the anchor grammar cannot key. `merge()` guarantees uniqueness for
-    KEYED rows by construction; unkeyed lines are content and reach the output through two
-    independent paths (a row's lead-in, and the preamble/trailer text merges), so nothing structural
-    stops the same line arriving down both. Measured on the real index: the same unkeyable row minted
-    on two nodes and filed in different regions was written twice, exit 0, audit line "clean".
+    The backstop for everything the anchor grammar cannot key. The row plane guarantees conservation
+    for every key; this is the check that the KEYS themselves did not launder a duplicate — two
+    nodes minting the same unkeyable row in different regions produce two distinct `raw:` keys with
+    identical text, and nothing in the row plane can see that they are the same record.
 
     TWO HALVES, because the line half alone is blind to a re-worded duplicate. Two nodes each minting
     the same unkeyable id with different prose produce two DIFFERENT lines, so the line census sees
-    each once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured,
-    and the suite's own oracle sees it. So the same rule is lifted from line to record. The example
-    this paragraph used to give was `…-9b`, which the shared session era rejected until memory-recall
-    kit 1.1; that form keys now and its duplicates conflict through the ordinary keyed path. The
-    population is unchanged in kind and named at `_ID_RE`: a row-shaped line carrying an id and no
-    anchor separator.
+    each once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured.
+    So the same rule is lifted from line to record. The population is named at `_ID_RE`: a row-shaped
+    line carrying an id and no anchor separator.
     """
     clean = settled(merged)
     sides = [settled(side) for side in inputs]
@@ -412,8 +389,8 @@ def sections(lines: list[str]) -> dict[str, str]:
     """id -> the `#` heading it sits under, over a WHOLE file (preamble included).
 
     Whole file on purpose: `memory/DECISIONS.md` opens `## PLAY — playbook` BEFORE its first anchored
-    row, so that heading is preamble by the region rule and a block-scoped walk would report `None`
-    for every PLAY row and see no misfiling when one moved out.
+    row, so a scan scoped to the rows would report `None` for every PLAY row and see no misfiling
+    when one moved out.
     """
     out: dict[str, str] = {}
     cur = ""
@@ -427,20 +404,36 @@ def sections(lines: list[str]) -> dict[str, str]:
     return out
 
 
+def _unmarked(lines: list[str]) -> list[str]:
+    """`lines` with the MARKER lines dropped and every content line kept.
+
+    The placement view, and deliberately not `settled()`. Excision is right for the duplicate
+    question — a conflict hunk repeats content from both sides by construction — and WRONG for the
+    section question, because a hunk's headings still bound the sections around it. Measured: two
+    nodes renaming the same heading differently puts that heading inside a region, `settled()` drops
+    both versions, and every row below it reads as having moved to whatever heading precedes the
+    region. `no_misfiled_rows` then refuses a correct, scoped, one-hunk conflict and `main()`'s
+    fail-closed handler converts it into a whole-file marker sandwich — the ergonomics complaint,
+    manufactured by the check rather than found by it.
+    """
+    return [ln for ln in lines if not _MARKER_RE.match(ln.lstrip())]
+
+
 def no_misfiled_rows(merged: list[str], *inputs: list[str]) -> None:
     """Refuse to file a row under a heading no input filed it under.
 
-    The splice places a `%B`-only row after the neighbour it arrived behind; that is right for the
-    shapes it was measured on and cannot be right for all of them. Where it is wrong the damage is
-    silent — a `PLAY` decision auto-committed under `## KICK`, a row filed under `## closed` because
-    ours relocated the neighbour it arrived behind — so placement gets a postcondition rather than a
-    cleverer heuristic. `git merge-file` REFUSES the relocation input; being quietly worse than the
-    merge this replaces is the bar this driver has to clear.
+    A BACKSTOP now rather than the primary mechanism. Placement no longer comes from a splice this
+    driver computes; it comes from git's own diff of the skeleton, and rule 3 only ever concatenates
+    within a region whose context lines both sides share. So misfiling is structurally unreachable —
+    which is an argument for keeping the check cheap, not for deleting it. It is the one
+    postcondition that has already caught real damage (a `PLAY` decision auto-committed under
+    `## KICK`; a row filed under `## closed` because ours relocated the neighbour it arrived behind)
+    and it costs a single pass.
 
     "An input that carries it", not "%A", deliberately: a row whose section is unchanged on both
     sides has one answer, and a row only one side carries has exactly one input to answer for it.
     """
-    clean = sections(settled(merged))
+    clean = sections(_unmarked(merged))
     per_side = [sections(side) for side in inputs]
     bad = []
     for k, sect in sorted(clean.items()):
@@ -457,7 +450,18 @@ def no_misfiled_rows(merged: list[str], *inputs: list[str]) -> None:
 
 
 def text_merge(o: list[str], a: list[str], b: list[str]) -> tuple[list[str], bool]:
-    """Ordinary three-way text merge for the prose regions, via `git merge-file`."""
+    """Ordinary three-way text merge, via `git merge-file`. The single call site, for the skeleton.
+
+    THE CONFLICT STYLE IS PINNED, and that is the one contract change this redesign makes to a
+    retained function. `git merge-file` honours the invoking repo's `merge.conflictStyle`, and git
+    runs a merge driver from the top of the worktree, so a node that set `diff3` or `zdiff3` gets a
+    third `||||||| base` section here. Reconciliation rules 3 and 4 are defined over an ours side and
+    a theirs side; under three sections rule 3 evaporates and every auto-resolve this unit exists for
+    vanishes on that node only — the same driver answering two ways on identical blobs. `-c` wins
+    over a configured value (measured, git 2.54), so the region shape reaching the rules cannot be
+    changed by an adopter's config. The cost is that the driver's own conflict output carries no base
+    section even where the adopter asked for one.
+    """
     if a == b:
         return a, False
     if o == a:
@@ -475,212 +479,464 @@ def text_merge(o: list[str], a: list[str], b: list[str]) -> tuple[list[str], boo
         # -L labels the markers `ours`/`base`/`theirs`. Without them git labels a conflict with the
         # temp FILENAMES, so a real conflict reads `<<<<<<< C:\\Users\\…\\tmpqm5j4r78\\a` — an
         # absolute scratch path in the file the author now has to resolve by hand.
-        r = subprocess.run(["git", "merge-file", "-p", "-L", "ours", "-L", "base", "-L", "theirs",
+        r = subprocess.run(["git", "-c", "merge.conflictStyle=merge",
+                            "merge-file", "-p", "-L", "ours", "-L", "base", "-L", "theirs",
                             str(p / "a"), str(p / "o"), str(p / "b")],
                            capture_output=True)
         # SITE 3 of the newline contract, and the one upstream does not solve: it passes
-        # `text=True`, which is universal-newline mode, so a CRLF preamble comes back as LF and the
+        # `text=True`, which is universal-newline mode, so a CRLF region comes back as LF and the
         # careful `newline=""` two lines up is undone. Capture BYTES and decode by hand instead —
         # this repo's nodes run `core.autocrlf=true` and the governed indexes are CRLF in the
         # worktree, which is exactly the format git hands a merge driver.
         return r.stdout.decode("utf-8", "replace").splitlines(keepends=True), r.returncode != 0
 
 
-def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
-    o_pre, o_blk, o_tr = split_regions(o_lines)
-    a_pre, a_blk, a_tr = split_regions(a_lines)
-    b_pre, b_blk, b_tr = split_regions(b_lines)
+# --------------------------------------------------------------------------------------------
+# The skeleton
+# --------------------------------------------------------------------------------------------
 
-    pre, c1 = text_merge(o_pre, a_pre, b_pre)
-    tr, c2 = text_merge(o_tr, a_tr, b_tr)
+def _split_term(line: str) -> tuple[str, str]:
+    """(body, terminator). The empty terminator of an unterminated final line is a real answer."""
+    for t in ("\r\n", "\n", "\r"):
+        if line.endswith(t):
+            return line[:-len(t)], t
+    return line, ""
 
-    O, o_lead, _, o_tail = rows(o_blk)
-    A, a_lead, a_order, a_tail = rows(a_blk)
-    B, b_lead, b_order, b_tail = rows(b_blk)
 
-    # THE EMIT ORDER: `%A`'s, with each `%B`-only key SPLICED after the last key preceding it in
-    # `%B` that survives into the output, and before everything when there is none. Appending them
-    # past the block instead put an incoming `## PLAY` row under `## TOOL` — the same two inserts
-    # through git's built-in merge land correctly, so the append rule was a regression against the
-    # thing being replaced. The cursor is re-seated on every SHARED key, so consecutive `%B`-only
-    # rows keep their own relative order behind the neighbour they arrived after.
-    #
-    # ...AND THEN PAST THE `%A`-ONLY KEYS THAT FOLLOW IT. Seating on the shared predecessor alone put
-    # ours' new row UNDER theirs' new `## FAMILY` heading whenever theirs' row opened the next
-    # section: theirs' row carries that heading as its lead-in, so anything spliced BEFORE it lands
-    # in the wrong section. Reproduced through a real `git merge` on the real `memory/DECISIONS.md`
-    # — a PLAY decision auto-committed under `## KICK`, rc 0, `clean`, zero markers, where git's own
-    # merge on the same two commits files both rows correctly. Ours' new rows sit where ours put
-    # them; the incoming row goes after them. `no_misfiled_rows` judges whatever this cannot.
-    a_set = set(a_order)
-    a_only = a_set - set(b_order)
-    order = list(a_order)
-    at = None
-    for k in b_order:
-        if k in a_set:
-            at = order.index(k)
-            while at + 1 < len(order) and order[at + 1] in a_only:
-                at += 1
+def _dominant(lines: list[str]) -> str:
+    """The file's dominant line terminator — site 6, computed over `%A`, LF when empty or tied."""
+    n = {"\r\n": 0, "\n": 0, "\r": 0}
+    for ln in lines:
+        t = _split_term(ln)[1]
+        if t:
+            n[t] += 1
+    top = max(n.values())
+    winners = [t for t, c in n.items() if c == top]
+    return "\n" if top == 0 or len(winners) != 1 else winners[0]
+
+
+def _row_key(line: str) -> str:
+    """The row plane's key for a row-shaped line: its id when the grammar keys it, else a digest.
+
+    The digest is over the STRIPPED text, which is what makes line form unable to smuggle a
+    duplicate past the plane: a final copy with no newline and an interior copy with one hash the
+    same. `row:`/`raw:` prefixes keep the two namespaces from colliding and make the audit line's
+    keyed/hashed split derivable from the keys themselves.
+    """
+    k = key(line)
+    if k is not None:
+        return "row:" + k
+    return "raw:" + hashlib.sha1(line.strip().encode("utf-8", "replace")).hexdigest()[:16]
+
+
+def _token_of(body: str) -> str | None:
+    """The key a token line names, or None when the line is structure."""
+    if len(body) > 2 and body.startswith(_SENT) and body.endswith(_SENT):
+        return body[1:-1]
+    return None
+
+
+def skeleton(lines: list[str]) -> tuple[list[str], dict[str, list[str]]]:
+    """(the line list with every ROW replaced by its token, key -> the BODIES of its row lines).
+
+    Bodies and not lines: the terminator a row carried in its source blob is used HERE, on the
+    token, and nowhere else. On the way back a substituted row takes the terminator of the TOKEN's
+    position in the merged skeleton (site 7), so carrying the source terminator any further is what
+    fuses two records onto one line when the merge relocates a formerly-final row.
+    """
+    skel: list[str] = []
+    rows: dict[str, list[str]] = {}
+    for ln in lines:
+        body, term = _split_term(ln)
+        if not _ROW_RE.match(ln):
+            skel.append(ln)
             continue
-        at = 0 if at is None else at + 1
-        order.insert(at, k)
+        k = _row_key(ln)
+        rows.setdefault(k, []).append(body)
+        skel.append(_SENT + k + _SENT + term)
+    return skel, rows
 
-    # AUDIT COUNTERS, incremented at the EMIT sites and never derived from the input lists. Upstream's
-    # first cut printed `sum(1 for k in a_order if k in A)`, which `rows()` makes a TAUTOLOGY — it
-    # appends to `order` on exactly the branch that assigns `out[k]`, so the sum equals `len(a_order)`
-    # no matter what the driver wrote. Reproduced there: base and ours 3 rows, theirs 1, both deletes
-    # honoured; the driver wrote a 1-ROW file, exited 0, and the only print in the module announced
-    # `3 row(s) from ours, 0 new from theirs, clean`. `dropped` is the term that was missing outright:
-    # honouring a delete removes a row and nothing else says so.
-    kept = took_b = dropped = 0
-    out, conflicted, prev_new_sig = [], False, None
 
-    def lead(k: str) -> list[str]:
-        """The lines to emit BEFORE k's anchor.
+# --------------------------------------------------------------------------------------------
+# The row plane
+# --------------------------------------------------------------------------------------------
 
-        Two regimes, because a lead-in has a base counterpart only when its id does.
+def _quote(entries: list[tuple]) -> str:
+    """The row TEXT behind a key, for a refusal message.
 
-        k IS IN `%O`: an ordinary three-way merge of the three lead-ins. That is what lets a heading
-        edited on one side survive alongside a row edited on the other, and it is also what stops a
-        heading being emitted twice when one side MOVED it onto a row it inserted above — the side
-        that moved it away contributes an empty lead-in, and `o == a -> b` takes it.
+    A `raw:` key is a digest, so a refusal that names only the key tells an author nothing about
+    which line the driver refused over — and every one of these refusals lands in front of a human
+    resolving a merge by hand. The keyed half is legible on its own and quoted the same way, because
+    two message shapes for one failure is a worse cost than one redundant id.
+    """
+    for kind, payload in entries:
+        if kind == "row":
+            return repr(payload.strip()[:72])
+    return "a conflict block"
 
-        k IS NEW: there is no base lead-in to merge against, so the side that minted the id supplies
-        it (both, merged, when both minted the same id). DEDUP APPLIES HERE AND ONLY HERE. Two nodes
-        each landing the first row of the same empty section arrive with the SAME base furniture
-        attached to two different new ids; emitting both is how `## DEPL — deployer` appeared twice
-        in an append-only file at exit 0.
 
-        THE DEDUP IS ADJACENCY-SCOPED, and that is the second defect in as many cuts. Keyed
-        file-wide, it dropped every LATER copy of a lead-in anywhere in the file — so two nodes each
-        opening a `### 2026-08` sub-heading in DIFFERENT sections lost theirs outright, at exit 0,
-        on an input where `git merge-file` produces the fully correct file. A repeat is furniture
-        only when it is the SAME piece of furniture, which is to say when the two new ids land next
-        to each other. So the suppression asks about the previous EMITTED row and nothing else: it
-        fires when that row was itself new to the merge and carried this exact lead-in.
+def _conflict(ours: list[str] | None, theirs: list[str] | None) -> tuple:
+    """A marker block, as BODIES. Site 6 attaches the dominant terminator at emit time."""
+    open_ln = _OPEN + " ours" + ("" if ours is not None else " (deleted)")
+    close_ln = _CLOSE + " theirs" + ("" if theirs is not None else " (deleted)")
+    return ("conflict", [open_ln] + list(ours or []) + [_SEP] + list(theirs or []) + [close_ln])
 
-        Blank-only lead-ins are exempt and do NOT break the adjacency chain: a repeated blank line is
-        spacing, not furniture, so suppressing it would run rows together — and a furniture-less row
-        landing between two that share furniture has not moved them apart.
-        """
-        nonlocal conflicted, prev_new_sig
-        if k in O:
-            got, c = text_merge(o_lead[k], a_lead.get(k, o_lead[k]), b_lead.get(k, o_lead[k]))
-            conflicted = conflicted or c
-            prev_new_sig = None
-            return got
-        if k in A and k in B:
-            got, c = text_merge([], a_lead[k], b_lead[k])
-            conflicted = conflicted or c
-        else:
-            got = a_lead[k] if k in A else b_lead[k]
-        sig = tuple(s for s in (ln.strip() for ln in got) if s)
-        if not sig:
-            return list(got)
-        if sig == prev_new_sig:
-            return []
-        prev_new_sig = sig
-        return list(got)
 
-    # BOTH DELETE TESTS COMPARE THE ROW, WHICH IS THE LEAD-IN PLUS THE ANCHOR — never the anchor
-    # alone. Splitting the two apart (the fix for the doubled heading) narrowed these two comparisons
-    # to the anchor line, so a side that left the ROW untouched but filed something immediately ABOVE
-    # it read as "untouched", and the `continue` past `lead(k)` then DISCARDED what it filed. Measured
-    # in both directions: base 3 rows, one side deletes row 2, the other files an unkeyable `…-7b`
-    # correction row above row 2 — driver rc 0 `1 dropped … clean`, the incoming row GONE, zero
-    # markers; `git merge-file` AND the pre-split driver both rc 1 with the row intact. Losing a row
-    # from an append-only record is worse than every other way this can be wrong, and a delete against
-    # adjacent new content is a delete/modify by any other name: it falls to the CONFLICT branch
-    # below, where the adjacent content is emitted and the disputed row is marked.
+def resolve_rows(O: dict, A: dict, B: dict) -> dict[str, list[tuple]]:
+    """key -> the LIST of entries it resolves to. An entry is one row body, or one marker block.
+
+    A pure per-key decision with NO ordering — ordering is the skeleton's job. `key -> LIST` and
+    never `key -> line`: a file may legitimately carry the same row-shaped line twice, and collapsing
+    those made it fail its own identity merge.
+
+    The resolved list is the branch's own list, which on every branch where both sides keep the
+    content is `max(len(A[k]), len(B[k]))`. It is deliberately NOT forced to that maximum on the
+    branch where one side is unchanged and the other REMOVED a copy of a repeated row: forcing the
+    max there resurrects a deletion the author made.
+
+    THE DELETE COMPARISON IS THE ROW LINE ALONE, and that is correct rather than a relapse. The
+    defect that forced a lead-in-plus-anchor comparison was that a side which filed content ABOVE a
+    deleted row read as untouched and its content was discarded. In this design there is no lead-in:
+    adjacent structure lines are on the other plane and merged by git, and an adjacent ROW is a
+    separate key with its own decision. The concept the repair repaired no longer exists.
+
+    A `raw:` key cannot be "in both sides with different text", because different text is a different
+    key. Editing an unkeyable row therefore reads as a delete of the old key plus an add of the new
+    one — right in the one-sided case, and keeping BOTH wordings in the both-sides case. That last
+    outcome is deliberate and guarded: if the row carries an id, `no_new_duplicates`' id half refuses
+    it; if it carries none, it is a note and not a record, and keeping both is what an append-only
+    record does.
+    """
+    resolved: dict[str, list[tuple]] = {}
+    order = list(O) + [k for k in A if k not in O] + [k for k in B if k not in O and k not in A]
+    rows = lambda bodies: [("row", b) for b in bodies]  # noqa: E731 — one expression, used thrice
     for k in order:
-        a_txt, b_txt, o_txt = A.get(k), B.get(k), O.get(k)
-        if a_txt is not None:
-            if b_txt is None:
-                if o_txt is None:
-                    out.extend(lead(k))    # ours added it; theirs never saw it
-                    out.append(a_txt)
-                    kept += 1
-                elif o_txt == a_txt and a_lead[k] == o_lead[k]:
-                    dropped += 1           # theirs deleted what ours left UNTOUCHED — honour it
-                    continue
-                else:
-                    # DELETE/MODIFY: ours edited it, theirs deleted it. Git conflicts here and so do
-                    # we. Silently keeping ours would discard a deliberate delete; silently dropping
-                    # ours would discard a deliberate edit. Neither is ours to choose.
-                    conflicted = True
-                    out.extend(lead(k))
-                    out.append("<<<<<<< ours\n")
-                    out.append(a_txt)
-                    out.append("=======\n")
-                    out.append(">>>>>>> theirs (deleted)\n")
-                    kept += 1
-            elif a_txt == b_txt:
-                out.extend(lead(k))
-                out.append(a_txt)
-                kept += 1
-            elif o_txt == a_txt:
-                out.extend(lead(k))
-                out.append(b_txt)
-                kept += 1
-            elif o_txt == b_txt:
-                out.extend(lead(k))
-                out.append(a_txt)
-                kept += 1
+        in_o, in_a, in_b = k in O, k in A, k in B
+        if in_a and in_b:
+            if A[k] == B[k]:
+                entries = rows(A[k])
+            elif not in_o:
+                entries = [_conflict(A[k], B[k])]     # both minted it, differently
+            elif O[k] == A[k]:
+                entries = rows(B[k])                  # only theirs changed it
+            elif O[k] == B[k]:
+                entries = rows(A[k])                  # only ours changed it
             else:
-                conflicted = True
-                out.extend(lead(k))
-                out.append("<<<<<<< ours\n")
-                out.append(a_txt)
-                out.append("=======\n")
-                out.append(b_txt)
-                out.append(">>>>>>> theirs\n")
-                kept += 1
-        elif k in O:
-            if O[k] == B[k] and b_lead[k] == o_lead[k]:
-                dropped += 1               # ours deleted what theirs left UNTOUCHED — honour it
-                continue
-            # The MIRROR of the case above, and the one that actually lost data upstream: ours
-            # deleted it, theirs EDITED it. The first draft dropped theirs' edit here and exited 0
-            # "clean" — found by probing delete-vs-edit by hand, because no fixture covered the
-            # interaction. A driver that silently discards a modification is the exact failure this
-            # unit exists to prevent, and it is unrecoverable once committed.
-            conflicted = True
-            out.extend(lead(k))
-            out.append("<<<<<<< ours (deleted)\n")
-            out.append("=======\n")
-            out.append(b_txt)
-            out.append(">>>>>>> theirs\n")
-            took_b += 1
+                entries = [_conflict(A[k], B[k])]     # all three differ
+        elif in_a:
+            if not in_o:
+                entries = rows(A[k])                  # ours added it; theirs never saw it
+            elif O[k] == A[k]:
+                entries = []                          # theirs deleted what ours left alone — honour
+            else:
+                # DELETE/MODIFY: ours edited it, theirs deleted it. Silently keeping ours would
+                # discard a deliberate delete; silently dropping ours would discard a deliberate
+                # edit. Neither is ours to choose.
+                entries = [_conflict(A[k], None)]
+        elif in_b:
+            if not in_o:
+                entries = rows(B[k])                  # theirs added it
+            elif O[k] == B[k]:
+                entries = []                          # ours deleted what theirs left alone — honour
+            else:
+                entries = [_conflict(None, B[k])]     # the mirror, and the one that lost data
         else:
-            out.extend(lead(k))
-            out.append(b_txt)
-            took_b += 1
+            entries = []                              # in %O only — both deleted it
+        resolved[k] = entries
+    return resolved
 
-    # Unkeyed lines AFTER the last anchor are an ordinary text region, like the trailer.
-    tail, c3 = text_merge(o_tail, a_tail, b_tail)
-    out = out + tail
 
-    conflicted = conflicted or c3
-    # Hoisted, NOT inlined. `f"{"CONFLICT" if … else "clean"}"` — a nested SAME-quote f-string — is
-    # PEP 701 and parses only on Python 3.12+; on 3.10/3.11, which `resolve_python` accepts (it
-    # imposes no version floor at all), it is a SyntaxError at import. That is not a style point for
-    # a merge DRIVER: a driver that fails to start exits non-zero without writing %A, which is the
-    # silent-take-ours shape main()'s wrapper below exists to prevent.
-    verdict = "CONFLICT" if conflicted or c1 or c2 else "clean"
-    merged = pre + out + tr
-    # THE POSTCONDITIONS, checked BEFORE the audit line is printed — a run that is about to refuse
-    # must not first announce "clean". EVERY verdict, not clean ones only: the region excision inside
-    # `settled()` is what handles a conflict hunk's by-construction repetition, and a duplicate
-    # written OUTSIDE the markers of an unrelated conflict is invisible at rc 1 exactly as it is at
-    # rc 0, because an author resolves the hunks and reads the rest as settled. Reproduced.
+# --------------------------------------------------------------------------------------------
+# Reconciliation
+# --------------------------------------------------------------------------------------------
+
+def _parse_region(block: list[str]) -> dict:
+    """Split one conflict region into its sections. Raises when the shape is not one git writes."""
+    open_ln, close_ln = block[0], block[-1]
+    body = block[1:-1]
+    sep = base_mark = None
+    for i, ln in enumerate(body):
+        s = ln.lstrip()
+        if base_mark is None and s.startswith(_BASE):
+            base_mark = i
+        if s.startswith(_SEP):
+            sep = i
+            break
+    if sep is None:
+        raise StructureDrift("a conflict region carries no '=======' separator — "
+                             "the merged skeleton is not a shape git merge-file writes")
+    if base_mark is None:
+        return {"open": open_ln, "ours": body[:sep], "basemark": None, "base": [],
+                "sep": body[sep], "theirs": body[sep + 1:], "close": close_ln}
+    return {"open": open_ln, "ours": body[:base_mark], "basemark": body[base_mark],
+            "base": body[base_mark + 1:sep], "sep": body[sep], "theirs": body[sep + 1:],
+            "close": close_ln}
+
+
+def _region_end(skel: list[str], i: int) -> int:
+    for j in range(i + 1, len(skel)):
+        if skel[j].lstrip().startswith(_CLOSE):
+            return j
+    raise StructureDrift("a conflict region in the merged skeleton is never closed")
+
+
+def _token_only(sec: dict) -> bool:
+    """Rule 3's predicate. An empty side counts as token-only; a base section never does."""
+    if sec["basemark"] is not None:
+        return False
+    return all(_token_of(_split_term(ln)[0]) is not None
+               for ln in sec["ours"] + sec["theirs"])
+
+
+def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: str) -> tuple:
+    """Walk the merged skeleton and apply the four rules. Returns (lines, facts)."""
+    out: list[str] = []
+    cursor: dict[str, int] = {}
+    conflict_done: set[str] = set()
+    region_keys: set[str] = set()
+    n_regions = 0
+
+    def take(k: str, t: str) -> list[str]:
+        """Rule 2. One token occurrence consumes one entry of `resolved[k]`."""
+        entries = resolved.get(k)
+        if entries is None:
+            raise RowLoss(f"the merged skeleton carries a token for {k!r} that the row plane never "
+                          f"resolved — a row would be written that no input carries")
+        if not entries:
+            # A DELETE THE ROW PLANE HONOURED. The token survives git's merge of the skeleton
+            # whenever the deletion abuts a change on the other side, and dropping it here is what
+            # turns that shape from git's refusal into an auto-resolve: the delete is honoured AND
+            # whatever the other side filed next to it is kept, because that content is a separate
+            # key with its own decision. Refusing instead would red an ordinary honoured delete.
+            return []
+        i = cursor.get(k, 0)
+        if i >= len(entries):
+            # A marker block speaks for EVERY occurrence of its key, so a second token for a
+            # conflicted key emits nothing rather than refusing.
+            if k in conflict_done:
+                return []
+            raise RowLoss(
+                f"key {k!r}: the merged skeleton carries its token {i + 1} time(s) and the row plane "
+                f"resolved it to {len(entries)} — {_quote(entries)} would be written twice or "
+                f"invented")
+        cursor[k] = i + 1
+        kind, payload = entries[i]
+        if kind == "row":
+            return [payload + t]                       # SITE 7: the TOKEN's terminator, not the row's
+        conflict_done.add(k)
+        return [b + term for b in payload]             # SITE 6: synthesized markers, dominant term
+
+    def per_side(sec_lines: list[str], side: dict, seen: dict) -> list[str]:
+        """Rule 4. A token is replaced by the row from the side of the region it appears on."""
+        got: list[str] = []
+        for ln in sec_lines:
+            body, t = _split_term(ln)
+            k = _token_of(body)
+            if k is None:
+                got.append(ln)
+                continue
+            region_keys.add(k)
+            bodies = side.get(k)
+            if bodies is None:
+                bodies = O.get(k) or A.get(k) or B.get(k)
+            i = seen.get(k, 0)
+            if not bodies or i >= len(bodies):
+                # Unreachable by construction — a region's ours side is a slice of %A's skeleton and
+                # its theirs side a slice of %B's, so the bodies are there. Refusing is the
+                # fail-closed direction if that ever stops being true.
+                raise StructureDrift(f"key {k!r} appears in a conflict region more often than the "
+                                     f"side it is on carries it")
+            seen[k] = i + 1
+            got.append(bodies[i] + t)
+        return got
+
+    i = 0
+    while i < len(skel):
+        ln = skel[i]
+        if ln.lstrip().startswith(_OPEN):
+            j = _region_end(skel, i)
+            sec = _parse_region(skel[i:j + 1])
+            if _token_only(sec):
+                # RULE 3. Positional concatenation: ours in order, then theirs. A theirs-side token
+                # is suppressed only when the same key also occurs on OURS' side — ACROSS sides and
+                # never within one. The within-side form is set union wearing a rule's clothes, and
+                # it deletes a legitimately repeated note out of an append-only record at rc 0.
+                ours_keys = {_token_of(_split_term(x)[0]) for x in sec["ours"]}
+                for x in sec["ours"]:
+                    body, t = _split_term(x)
+                    out.extend(take(_token_of(body), t))
+                for x in sec["theirs"]:
+                    body, t = _split_term(x)
+                    k = _token_of(body)
+                    if k in ours_keys:
+                        continue
+                    out.extend(take(k, t))
+            else:
+                # RULE 4. The moment a structure line is in dispute, the structure is in dispute —
+                # and structure is precisely the class git is right about and this driver has been
+                # wrong about three times.
+                n_regions += 1
+                seen: dict[str, int] = {}
+                out.append(sec["open"])
+                out.extend(per_side(sec["ours"], A, seen))
+                if sec["basemark"] is not None:
+                    out.append(sec["basemark"])
+                    out.extend(per_side(sec["base"], O, seen))
+                out.append(sec["sep"])
+                out.extend(per_side(sec["theirs"], B, seen))
+                out.append(sec["close"])
+            i = j + 1
+            continue
+        body, t = _split_term(ln)
+        k = _token_of(body)
+        if k is None:
+            out.append(ln)                             # RULE 1
+        else:
+            out.extend(take(k, t))
+        i += 1
+
+    # CONSERVATION AT THE CONSTRUCTION LEVEL, the other direction from `take`'s. Every entry the row
+    # plane resolved must have been consumed, unless the key lives inside a rule-4 region where
+    # `settled()` excises it by design.
+    for k, entries in resolved.items():
+        if k in region_keys or k in conflict_done:
+            continue
+        if cursor.get(k, 0) != len(entries):
+            raise RowLoss(
+                f"key {k!r}: the row plane resolved {len(entries)} row(s) and the merged skeleton "
+                f"carries {cursor.get(k, 0)} token(s) — a row would be lost")
+    return out, {"regions": n_regions, "conflicts": conflict_done, "region_keys": region_keys}
+
+
+# --------------------------------------------------------------------------------------------
+# The two new postconditions
+# --------------------------------------------------------------------------------------------
+
+def no_row_loss(merged: list[str], resolved: dict, facts: dict) -> None:
+    """CONSERVATION, over the written bytes: each key's row count equals what the plane resolved.
+
+    NOT a uniqueness check, and the distinction is the whole point. "That row appears exactly once"
+    is false for a file that legitimately carries the same row-shaped line twice, and asserting it
+    that way turns an IDENTITY merge of such a file into a permanent whole-file conflict no author
+    can clear — measured.
+
+    Keys resolved to a marker block, and keys inside a rule-4 region, are excluded: `settled()`
+    excises their lines by design, so their count here is zero for a reason that is not loss.
+    """
+    excluded = facts["conflicts"] | facts["region_keys"]
+    seen: dict[str, int] = {}
+    for ln in settled(merged):
+        if not _ROW_RE.match(ln):
+            continue
+        seen[_row_key(ln)] = seen.get(_row_key(ln), 0) + 1
+    bad = []
+    for k in sorted(set(seen) | set(resolved)):
+        if k in excluded:
+            continue
+        got = seen.get(k, 0)
+        want = len(resolved.get(k, []))
+        if k not in resolved:
+            bad.append((k, got, "no input carries it", "?"))
+        elif got != want:
+            bad.append((k, got, str(want), _quote(resolved[k])))
+    if bad:
+        k, got, want, txt = bad[0]
+        raise RowLoss(f"{len(bad)} key(s) written a different number of times than the row plane "
+                      f"resolved them, e.g. {k!r} ({txt}) written x{got} against {want}")
+
+
+def structure_identity(merged: list[str], skel: list[str]) -> None:
+    """The output's structure is the merged skeleton's structure, byte for byte, in order.
+
+    MARKERS ARE EXCLUDED ON BOTH SIDES and that word is load-bearing. The skeleton carries git's own
+    `<<<<<<< ours` / `=======` / `>>>>>>> theirs`; the output carries the driver's, in different
+    places and different numbers. Excluding them on the output side only makes the two lists unequal
+    BY CONSTRUCTION on every conflicted merge and on every rule-3 auto-resolve — it would refuse the
+    headline case this unit exists for.
+
+    Cheap, total, and it is the assertion that says out loud that structure correctness here is a
+    property of CONSTRUCTION rather than of a heuristic.
+    """
+    want = [ln for ln in skel
+            if not _MARKER_RE.match(ln.lstrip()) and _token_of(_split_term(ln)[0]) is None]
+    got = [ln for ln in merged
+           if not _MARKER_RE.match(ln.lstrip()) and not _ROW_RE.match(ln)]
+    if want == got:
+        return
+    for i, (w, g) in enumerate(zip(want, got)):
+        if w != g:
+            raise StructureDrift(f"structure line {i} of the output is {g!r} where the merged "
+                                 f"skeleton has {w!r}")
+    raise StructureDrift(f"the output carries {len(got)} structure line(s) where the merged "
+                         f"skeleton has {len(want)}")
+
+
+# --------------------------------------------------------------------------------------------
+
+def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
+    for name, side in (("%O", o_lines), ("%A", a_lines), ("%B", b_lines)):
+        for n, ln in enumerate(side, 1):
+            if _SENT in ln:
+                raise StructureDrift(f"{name} line {n} contains the token sentinel U+0001, so "
+                                     f"tokenization cannot be unambiguous")
+    term = _dominant(a_lines)
+    o_skel, O = skeleton(o_lines)
+    a_skel, A = skeleton(a_lines)
+    b_skel, B = skeleton(b_lines)
+    resolved = resolve_rows(O, A, B)
+    # The bool is deliberately discarded: whether the SKELETON conflicted is not the verdict. A
+    # token-only region becomes an auto-resolve (rule 3) and any other becomes a conflict (rule 4),
+    # and the verdict below is read off the bytes actually written.
+    skel, _ = text_merge(o_skel, a_skel, b_skel)
+    # Only the line that ends the file may be unterminated. Normalising the SKELETON rather than the
+    # output is what makes site 7 total: every token then carries a real terminator, so a substituted
+    # row cannot inherit an empty one from a formerly-final position and fuse with its neighbour.
+    skel = [ln if ln.endswith(("\n", "\r")) else ln + term for ln in skel[:-1]] + skel[-1:]
+
+    out, facts = reconcile(skel, resolved, O, A, B, term)
+    for n, ln in enumerate(out[:-1], 1):
+        if not ln.endswith(("\n", "\r")):
+            raise StructureDrift(f"output line {n} carries no terminator and is not the last line — "
+                                 f"joining would fuse two records onto one line")
+    merged = "".join(out).splitlines(keepends=True)
+    for n, ln in enumerate(merged, 1):
+        if _SENT in ln:
+            raise StructureDrift(f"output line {n} still carries a token sentinel — a token was not "
+                                 f"substituted")
+
+    # ALL FIVE POSTCONDITIONS, on EVERY verdict, over the WRITTEN BYTES, and BEFORE the audit line is
+    # printed — a run about to refuse must not first announce a clean result. Bytes and not the emit
+    # list: a terminator defect is invisible in a list where two glued records are still two
+    # elements, and both new postconditions passed a list-level reading of the exact corruption they
+    # exist to catch.
     no_new_duplicates(merged, o_lines, a_lines, b_lines)
     no_misfiled_rows(merged, o_lines, a_lines, b_lines)
-    # `kept + took_b` is the anchored-row count of the file just written, which is what makes this
-    # line auditable: an operator can `grep -c` the result and reconcile. `dropped` is stated even
-    # when it is 0, because an omitted term reads as "no deletes" exactly like a zero does.
-    print(f"merge-rows: {kept} row(s) from ours, {took_b} new from theirs, "
-          f"{dropped} dropped (delete honoured), {verdict}", file=sys.stderr)
-    return merged, (conflicted or c1 or c2)
+    no_row_loss(merged, resolved, facts)
+    structure_identity(merged, skel)
+
+    # THE AUDIT LINE. Every number is derived from the written bytes and the three inputs AFTER the
+    # fact — never from a counter incremented at an emit site, which is how the retired line came to
+    # print `38 row(s) from ours … clean` on a merge that had just deleted one. `k` and `h` are what
+    # make an inert grammar visible during a real merge: on the governed indexes `h` is 0 today, and
+    # a FAMILIES drift turns every row hashed without moving any other number.
+    clean = settled(merged)
+    written = [ln for ln in clean if _ROW_RE.match(ln)]
+    keyed = sum(1 for ln in written if key(ln) is not None)
+    nrow = lambda side: sum(1 for ln in side if _ROW_RE.match(ln))  # noqa: E731 — used three times
+    honoured = sum(1 for k, e in resolved.items() if not e)
+    conflicted = any(ln.lstrip().startswith(_OPEN) for ln in merged)
+    pairs = sum(1 for ln in merged if ln.lstrip().startswith(_OPEN))
+    if pairs != len(facts["conflicts"]) + facts["regions"]:
+        raise StructureDrift(
+            f"the written file holds {pairs} conflict region(s) against {len(facts['conflicts'])} "
+            f"row conflict(s) plus {facts['regions']} structure conflict(s) — the audit line would "
+            f"describe a file this is not")
+    verdict = "CONFLICT" if conflicted else "clean"
+    print(f"merge-rows: rows O/A/B {nrow(o_lines)}/{nrow(a_lines)}/{nrow(b_lines)} -> "
+          f"{len(written)} written ({keyed} keyed, {len(written) - keyed} hashed), "
+          f"{honoured} deletes honoured, {len(facts['conflicts'])} row conflicts, "
+          f"{facts['regions']} structure conflicts, {verdict}", file=sys.stderr)
+    return merged, conflicted
 
 
 def read(p: str) -> list[str]:
@@ -713,8 +969,15 @@ def main(argv: list[str]) -> int:
             ours, theirs = read(a), read(b)
         except Exception:  # noqa: BLE001 — cannot even read the inputs
             return 1  # leave %A untouched and refuse
-        body = (["<<<<<<< ours\n"] + ours + ["=======\n"] + theirs
-                + [">>>>>>> theirs (merge-rows failed; resolve by hand)\n"])
+        # SITE 6 here too: the fail-closed body's markers carry the dominant terminator, so a
+        # refusal on a CRLF worktree file does not write three LF lines into it. And ours' own final
+        # line is terminated before `=======` follows it — an unterminated last line is the ordinary
+        # shape of "one node's editor left no trailing newline", and joining it to a marker is the
+        # same record-fusing defect site 7 closes on the merge path.
+        t = _dominant(ours)
+        cap = lambda side: [ln if ln.endswith(("\n", "\r")) else ln + t for ln in side]  # noqa: E731
+        body = ([_OPEN + " ours" + t] + cap(ours) + [_SEP + t] + cap(theirs)
+                + [_CLOSE + " theirs (merge-rows failed; resolve by hand)" + t])
         pathlib.Path(a).write_bytes("".join(body).encode("utf-8"))
         return 1
     # SITE 4 of the newline contract: written as BYTES, with the newlines already carried by the
