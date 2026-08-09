@@ -46,8 +46,12 @@ a side list and re-emitted them at the end would move every section heading to t
 while exiting 0.
 
 **The properties are POSTCONDITIONS on the written file, not inferences from the keying.** The
-keying speaks only for the lines the grammar keys — measured at 35 of this corpus's 73 rows, because
-the ratified `…-9b` correction form falls outside the shared session era's trailing `\b`. So three
+keying speaks only for the lines the grammar keys, and that has never been every row-shaped line.
+Measured at 35 of this corpus's 73 rows until memory-recall kit 1.1 widened the shared session era to
+`\d+[a-z]*`, which admitted the ratified `…-9b` correction form and took the same file to 73 of 73.
+The gap did not close, it MOVED: every anchor pattern requires a separator after the id, so
+`- TOOL-zFix-<n>b · text` keys and `- TOOL-zFix-<n>b carries an id and no separator` does not, and that
+difference is structural rather than lexical — no future era widening can grant a separator. So three
 checks run on every verdict, over the merged lines with conflict REGIONS excised: no ROW-SHAPED line
 written more often than any one input carried it, no leading ID written more often (the line half
 compares exact text and two nodes minting one id with different prose are two different lines), and

@@ -339,6 +339,39 @@ def t_conf_digest_both_directions():
         cleanup(root)
 
 
+@check("the KIT VERSION is inside conf_digest, so a grammar edit cannot leave a cache warm")
+def t_digest_covers_kit_version():
+    """`digest()`'s docstring promises "an id-grammar or corpus-root edit invalidates a warm cache".
+
+    The blob hashed `memory_root`, `families` and `node_tag_class` — and the ERAS, which are half the
+    id grammar, live in `extract.py` and reached the blob through none of them. Measured on the
+    commit that widened the session era to `\\d+[a-z]*`: `records` went 53 documents to 91, and every
+    cache built before it stayed warm and stayed blind to the 38 new ones. `corpus_digest` cannot
+    cover this either — it is mtime+size over the tree's `.md` files, and a regex edit moves no `.md`
+    byte.
+
+    The kit VERSION is what goes in, not the era tuple: the version is already this kit's declared
+    epoch for its own behaviour, it is bumped by the same unit that edits the grammar, and it needs
+    no knowledge of a regex owned by a module `recall_conf` cannot import without an import cycle.
+
+    Two Confs differing in NOTHING but the constant. Equal digests here means the promise is prose.
+    """
+    conf = recall_conf.Conf(pathlib.Path("/nowhere"), "memory", ("TOOL",))
+    was = recall_conf.KIT_MEMORY_RECALL_VERSION
+    try:
+        recall_conf.KIT_MEMORY_RECALL_VERSION = "0.0"
+        lo = conf.digest()
+        recall_conf.KIT_MEMORY_RECALL_VERSION = "99.99"
+        hi = conf.digest()
+    finally:
+        recall_conf.KIT_MEMORY_RECALL_VERSION = was
+    assert lo != hi, (
+        f"digest() is {lo} at kit 0.0 and {hi} at kit 99.99 — the kit version is not in the blob, so "
+        "a grammar edit ships under a digest that says nothing moved and every warm cache survives it"
+    )
+    return f"kit 0.0 -> {lo}, kit 99.99 -> {hi}"
+
+
 @check("a query writes NOTHING in the worktree — asserted by path, with no ignore rule present")
 def t_writes_nothing_in_worktree():
     root, kitdir = make_repo()
@@ -1089,7 +1122,7 @@ def main() -> int:
     order = [
         t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
         t_zero_records_is_loud, t_empty_corpus_names_memory_root,
-        t_conf_digest_both_directions, t_writes_nothing_in_worktree,
+        t_conf_digest_both_directions, t_digest_covers_kit_version, t_writes_nothing_in_worktree,
         t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
         t_budget_lru, t_budget_protections, t_build_marker_lifecycle,
         t_budget_build_in_flight, t_budget_marker_ttl,

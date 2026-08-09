@@ -75,12 +75,18 @@ is a LINE merge, and a row edited on both sides is two different lines. Keying b
 for every line the grammar KEYS: such a row is emitted from exactly one branch of the case analysis
 in `merge()`, so two rows with one id can only come from an explicit conflict, which is loud.
 
-The grammar does not key every line, and this paragraph used to be written as though it did.
-Measured on this repo's own `memory/DECISIONS.md`: 73 `- ` rows, 35 anchored, 38 UNKEYED. The shared
-session-era pattern is bounded by `\b`, so the ratified correction-id form — a trailing letter, as
-in `…-1b` — does not key at all. To this driver those 38 lines are CONTENT: they travel as a row's
-lead-in or as trailer, and content is exactly what a line merge can copy. Two nodes minting the same
-unkeyable row in different regions emitted it TWICE at exit 0 before this was written down.
+The grammar does not key every line, and this paragraph used to be written as though it did. It was
+then written as though the gap were an ERA gap, which it no longer is. Measured on this repo's own
+`memory/DECISIONS.md`: 73 `- ` rows, 35 anchored under the pre-1.9 grammar and 73 anchored under the
+current one — the shared session era gained a `[a-z]*` tail (memory-recall kit 1.1) and the ratified
+correction-id form, a trailing letter as in `…-1b`, keys now. THAT DID NOT EMPTY THE POPULATION, and
+reading it as though it did is how a fixture starts passing by finding nothing. What is left is a
+SEPARATOR gap rather than an era gap, and it does not move when the era moves: every anchor pattern
+requires a separator after the id (`[-—:·]` or `[·|]`), so `- TOOL-zFix-1b · text` keys while
+`- TOOL-zFix-1b carries an id and no separator` does not. To this driver such a line is CONTENT: it
+travels as a row's lead-in or as trailer, and content is exactly what a line merge can copy. Two
+nodes minting the same unkeyable row in different regions emitted it TWICE at exit 0 before this was
+written down, and the arms that prove it still fire are pointed at the separator shape.
 
 So the no-duplicate property is ENFORCED, not asserted. Three mechanisms, and none is the grammar:
 
@@ -101,10 +107,14 @@ So the no-duplicate property is ENFORCED, not asserted. Three mechanisms, and no
   * AN ID POSTCONDITION (`no_new_duplicates`, id half). The line half compares EXACT text, so the
     same unkeyable correction id minted on two nodes with different WORDING is two different lines
     and lands twice at exit 0 — measured. So each row-shaped line is also keyed on the FIRST id it
-    carries, under a grammar deliberately WIDER than the driver's own (`…-9b` keys here and does not
-    key there), and the same cap applies. First id, not every id: rows cite other records constantly,
-    and counting citations makes two nodes each citing one base row look like a duplicate. Measured
-    over this corpus: 73 rows, 73 distinct leading ids, zero repeats — a live invariant, not a hope.
+    carries, under a grammar deliberately INDEPENDENT of the driver's own, and the same cap applies.
+    Independent, not "wider in the era": until kit 1.9 the two differed on the `…-9b` form and the
+    comment named that example; the era widened and the example died while the property did not. The
+    live difference is structural — `_ID_RE` needs no anchor separator and every anchor pattern does
+    — and it is the more durable of the two, because a separator is not something an era widening can
+    grant. First id, not every id: rows cite other records constantly, and counting citations makes
+    two nodes each citing one base row look like a duplicate. Measured over this corpus: 73 rows, 73
+    distinct leading ids, zero repeats — a live invariant, not a hope.
 
 All three postconditions run on EVERY verdict, over the merged lines with conflict regions excised.
 Scoping them to rc 0 was wrong: an author resolves the marked hunks and reads everything outside them
@@ -264,11 +274,24 @@ class Misfiled(RuntimeError):
 # "a line written twice" and nothing at the line level tells them apart, so the population is named
 # here instead of guessed there.
 _ROW_RE = re.compile(r"^\s*[-*]\s")
-# Deliberately WIDER than the driver's own anchor grammar, and not imported from it. The keyed path
-# already guarantees uniqueness for what `key()` keys; this exists for the population it does NOT key
-# — the ratified `…-9b` correction form, which the shared session era's trailing `\b` rejects. Keying
-# the postcondition on the same regex as the merge would make it self-consistent and blind: an id the
-# grammar stopped recognising would drop out of BOTH the merge and the check on the merge.
+# Deliberately INDEPENDENT of the driver's own anchor grammar, and not imported from it. The keyed
+# path already guarantees uniqueness for what `key()` keys; this exists for the population it does
+# NOT key. Keying the postcondition on the same regex as the merge would make it self-consistent and
+# blind: an id the grammar stopped recognising would drop out of BOTH the merge and the check on the
+# merge.
+#
+# THE POPULATION IS RE-GROUNDED, because the one this comment used to name is gone. It said "the
+# ratified `…-9b` correction form, which the shared session era's trailing `\b` rejects" — true until
+# memory-recall kit 1.1 widened that era to `\d+[a-z]*`, after which `- TOOL-zFix-9b · text` keys
+# like any other row. It was also wrong in the other direction the whole time: this pattern demands
+# `<FAMILY>-<slug>-<digits>` and so is NARROWER than the anchor grammar for both flat eras
+# (`ARCH-001`, `ABL-d119` match there and not here). Neither error emptied it. Measured under the
+# widened grammar, the live population is a ROW-SHAPED LINE CARRYING AN ID AND NO ANCHOR SEPARATOR:
+# every anchor pattern requires `[-—:·]` or `[·|]` after the id, this pattern requires nothing, so
+# `- TOOL-zFix-9b carries an id but no anchor separator` is invisible to `key()` and visible here.
+# That difference is structural rather than lexical, which is why it is the one worth standing on: an
+# era can widen again, and a separator cannot be granted by widening one. `merge-rows.test.sh` case
+# 0d asserts both halves live before any arm leans on them.
 _ID_RE = re.compile(r"\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b")
 # A marker line is INVENTED by the merge, so it has no input count to be measured against, and the
 # same three markers legitimately repeat once per conflicting region. `|||||||` is here because
@@ -358,10 +381,14 @@ def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
     stops the same line arriving down both. Measured on the real index: the same unkeyable row minted
     on two nodes and filed in different regions was written twice, exit 0, audit line "clean".
 
-    TWO HALVES, because the line half alone is blind to the corpus's own correction form. Two nodes
-    each minting `…-9b` with different prose produce two DIFFERENT lines, so the line census sees each
-    once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured, and the
-    suite's own oracle sees it. So the same rule is lifted from line to record.
+    TWO HALVES, because the line half alone is blind to a re-worded duplicate. Two nodes each minting
+    the same unkeyable id with different prose produce two DIFFERENT lines, so the line census sees
+    each once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured,
+    and the suite's own oracle sees it. So the same rule is lifted from line to record. The example
+    this paragraph used to give was `…-9b`, which the shared session era rejected until memory-recall
+    kit 1.1; that form keys now and its duplicates conflict through the ordinary keyed path. The
+    population is unchanged in kind and named at `_ID_RE`: a row-shaped line carrying an id and no
+    anchor separator.
     """
     clean = settled(merged)
     sides = [settled(side) for side in inputs]

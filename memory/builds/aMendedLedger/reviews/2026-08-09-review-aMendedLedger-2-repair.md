@@ -72,7 +72,7 @@ section, and any unkeyable `…-9b` correction row the other node filed above it
 Before the split the lead was glued to the anchor, so a changed lead-in made the comparison unequal
 and the driver conflicted.
 
-Ran, base 3 rows / ours deletes row 2 / theirs inserts `- TOOL-zFixture-7b · OPEN · correction row
+Ran, base 3 rows / ours deletes row 2 / theirs inserts `- TOOL-zFixture-<n>b · OPEN · correction row
 from node b` immediately above row 2:
 
 ```
@@ -154,10 +154,10 @@ appears twice in an append-only record at rc 0.
 
 ```
 merge-rows: 2 row(s) from ours, 0 new from theirs, 0 dropped (delete honoured), clean   rc=0
-4  - TOOL-zFix-9b · CORRECTS TOOL-zFix-<n>: the ours-side wording
-6  - TOOL-zFix-9b · CORRECTS TOOL-zFix-<n>: the theirs-side wording      9b occurrences: 2, markers: 0
+4  - TOOL-zFix-<n>b · CORRECTS TOOL-zFix-<n>: the ours-side wording
+6  - TOOL-zFix-<n>b · CORRECTS TOOL-zFix-<n>: the theirs-side wording      <n>b occurrences: 2, markers: 0
 
-the suite's own dups() oracle on that output:  TOOL-zFix-9b     ← it sees it; no fixture runs the shape
+the suite's own dups() oracle on that output:  TOOL-zFix-<n>b     ← it sees it; no fixture runs the shape
 ```
 
 This is precisely the population the docstring at `:55-78` claims the postcondition exists for
@@ -216,14 +216,14 @@ row into an append-only record.
 
 ```
 merge-rows: 3 row(s) from ours, 0 new from theirs, 0 dropped (delete honoured), CONFLICT   rc=1
- 4  - TOOL-zFix-77b · an unkeyable correction row minted on BOTH nodes
- 6  - TOOL-zFix-77b · an unkeyable correction row minted on BOTH nodes    ← duplicate, OUTSIDE the markers
+ 4  - TOOL-zFix-<n>b · an unkeyable correction row minted on BOTH nodes
+ 6  - TOOL-zFix-<n>b · an unkeyable correction row minted on BOTH nodes    ← duplicate, OUTSIDE the markers
  7  <<<<<<< ours     ... (the unrelated zFix-3 edit)
 no DuplicatedContent on stderr — the postcondition never ran
 
 same duplicate, no unrelated conflict:
 merge-rows: FAILED (DuplicatedContent: 1 line(s) would be written more often than any single input
-  carries them, e.g. '- TOOL-zFix-77b · …' x2 against x1) — writing a conflict rather than a silent take-ours
+  carries them, e.g. '- TOOL-zFix-<n>b · …' x2 against x1) — writing a conflict rather than a silent take-ours
 ```
 
 **Exact fix.** Run `no_new_duplicates` unconditionally over the merged lines with the marker regions

@@ -1368,6 +1368,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "t_digest_covers_kit_version",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "t_empty_alias",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

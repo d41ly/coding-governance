@@ -18,8 +18,8 @@
 # a section heading copied onto two new ids (case 10), an incoming row filed under the wrong
 # `## FAMILY` (case 11), and an unkeyable row written twice (case 12) — all three at exit 0, no
 # markers, audit line `clean`. So every rc-0 arm now also asserts NO id occurs twice in the written
-# file, the oracle is widened to the suffixed id form the driver's own grammar cannot key, and both
-# halves of that oracle are proved live in case 0d before anything leans on them.
+# file, the oracle is pointed at a row shape the driver's own grammar cannot key, and every half of
+# that oracle is proved live in case 0d before anything leans on it.
 #
 #   bash tools/memory-tree/merge-rows.test.sh
 set -u
@@ -46,9 +46,13 @@ bad() { echo "FAIL $1"; st=1; }
 # blind: a grammar that stopped recognising a row would remove it from BOTH sides of the comparison.
 # THE `[a-z]*` TAIL IS THE POINT, not a tidy-up. Without it the oracle shared the driver grammar's
 # trailing `\b`, so this corpus's ratified correction-id form (`…-1b`) fell out of BOTH sides of
-# every comparison here — measured on the real memory/DECISIONS.md at 38 of 73 rows unkeyed, the two
-# newest of them minted by the build that shipped this driver. The remedy for a blind spot the
-# oracle shares with the subject is to WIDEN the oracle, never to point it at the driver's regex.
+# every comparison here — measured on the real memory/DECISIONS.md at 38 of 73 rows unkeyed then. The
+# driver grammar has since caught up on that form (memory-recall kit 1.1 widened the session era, and
+# the same file now keys 73 of 73), and the tail is STILL load-bearing for a different reason: the
+# unkeyable population is now separator-shaped rather than era-shaped, and its ids carry the same
+# suffixes. An oracle that could not read `…-9b` would drop case 12, 13, 16 and 18's fixtures out of
+# both sides of every comparison exactly as before. The remedy for a blind spot the oracle shares
+# with the subject is to WIDEN the oracle, never to point it at the driver's regex.
 ORACLE='\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b'
 ids() { grep -ohE "$ORACLE" "$@" 2>/dev/null | LC_ALL=C sort -u | tr '\n' ' '; }
 # ...and the same oracle asked the other question. `sort -u` above makes `ids` structurally unable to
@@ -189,24 +193,50 @@ S=$(mkscratch)                                       # no .memory-tree.conf abov
 cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$S/tools/memory-recall/"
 failclosed "missing .memory-tree.conf" "$S"
 
-# --- 0d. the oracle is strictly WIDER than the driver's grammar, and `dups` fires -----------------
+# --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
 # The oracle earns its keep only if it can see something the subject cannot; otherwise "independent"
-# is a comment, not a property. Both halves are proved here, in both directions, before any arm below
-# leans on them: the widened oracle KEYS a suffixed id, the driver's own `key()` returns None for the
-# identical line, `dups` REPORTS a repeat, and `dups` stays silent on a singleton.
-SUFFIXED='- TOOL-zFixture-9b · a suffixed id the driver grammar cannot key'
-printf '%s\n' "$SUFFIXED" > "$TMP/suffixed"
+# is a comment, not a property. All of it is proved here, in both directions, before any arm below
+# leans on it: the oracle KEYS the unkeyable row, the driver's own `key()` returns None for the
+# identical line, a row with NO id is keyed by neither, `dups` REPORTS a repeat, and `dups` stays
+# silent on a singleton.
+#
+# THE UNKEYABLE SHAPE MOVED, and this block is where that is caught rather than assumed. It used to
+# be `- TOOL-zFixture-9b · …`: the shared session era was bounded by `\b`, so a trailing letter
+# killed the match. memory-recall kit 1.1 widened that era to `\d+[a-z]*` — 35 of this corpus's 73
+# rows keyed before, 73 of 73 after — and that line became an ordinary keyed row. The arm below is
+# what SAID SO: on the widening it failed with the message it still carries, rather than passing
+# while asserting nothing about a subject that had caught up with its oracle.
+#
+# The shape it moved TO is structural, not lexical. Every anchor pattern requires a separator after
+# the id (`[-—:·]` or `[·|]`); `$ORACLE` requires nothing after it. So a row-shaped line carrying an
+# id and no separator is unkeyable under ANY era the grammar may grow, which is the property the
+# previous fixture lacked. `NOSEP` is that line; `KEYED` is the same id WITH a separator, asserted
+# keyed, so the two halves of the difference are both live and neither can rot silently.
+NOSEP='- TOOL-zFixture-9b carries an id and no anchor separator, so no anchor pattern matches it'
+KEYED='- TOOL-zFixture-9b · the same id WITH a separator, which the widened grammar keys'
+SUFFIXED="$NOSEP"     # every arm below that needs an unkeyable row uses this name
+NOID='- a row with no id at all, which neither the oracle nor the driver can key'
+printf '%s\n' "$NOSEP" > "$TMP/suffixed"
 [ "$(ids "$TMP/suffixed")" = "TOOL-zFixture-9b " ] \
-  || bad "oracle: the widened oracle does not see a suffixed id — case 12 would assert nothing"
-"$PY" - "$SUFFIXED" <<'PYEOF' || bad "oracle: the DRIVER keys the suffixed id, so the oracle is no wider than the subject — pick a shape the grammar really misses"
+  || bad "oracle: the oracle does not see the id on an unkeyable row — case 12 would assert nothing"
+keys() {  # $1=line -> 0 if the DRIVER keys it, 1 if not
+  "$PY" - "$1" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True   # a test that leaves __pycache__ in tools/ dirties the tree it gates
 spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mr)
-sys.exit(0 if mr.key(sys.argv[1] + "\n") is None else 1)
+sys.exit(0 if mr.key(sys.argv[1] + "\n") is not None else 1)
 PYEOF
-{ printf '%s\n' "$SUFFIXED"; printf '%s\n' "$SUFFIXED"; } > "$TMP/twice"
+}
+keys "$NOSEP" \
+  && bad "oracle: the DRIVER keys the separator-less row, so the oracle is no wider than the subject — pick a shape the grammar really misses"
+keys "$KEYED" \
+  || bad "oracle: the driver does NOT key [$KEYED] — the unkeyable half of case 0d is unfalsifiable, because a grammar recognising nothing passes it too"
+printf '%s\n' "$NOID" > "$TMP/noid"
+[ -z "$(ids "$TMP/noid")" ] || bad "oracle: a row with NO id yielded an id — the oracle is matching text that is not one"
+keys "$NOID" && bad "oracle: the driver keyed a row with no id at all"
+{ printf '%s\n' "$NOSEP"; printf '%s\n' "$NOSEP"; } > "$TMP/twice"
 [ "$(dups "$TMP/twice")" = "TOOL-zFixture-9b " ] \
   || bad "dups: a doubled id was not reported — every rc-0 arm's duplicate half is vacuous"
 [ -z "$(dups "$TMP/suffixed")" ] || bad "dups: a singleton id was reported as a duplicate"
@@ -476,14 +506,17 @@ r=$(at_line '^- TOOL-zFixture-5 ' "$TMP/a"); m=$(at_line '^- TOOL-zFixture-4 ' "
   || bad "b-only placement: ours' own row is at line $m against the heading at line $h (0 = absent) — it left the section it was added to"
 
 # --- 12. an UNKEYABLE row minted on both nodes, in different regions -------------------------------
-# The keyed path guarantees uniqueness only for the rows the grammar KEYS, and it keys 35 of this
-# corpus's 73 — the session era is bounded by `\b`, so the ratified `…-1b` correction form does not
-# key at all. The other 38 are content: they reach the output down two independent paths (a row's
-# lead-in, and the preamble/trailer text merges), so the same unkeyable row filed in different
-# regions was written TWICE at rc 0 with the audit line reading `clean`, under a docstring claiming a
-# row appears at most once BY CONSTRUCTION. It does not; the postcondition is what makes it true, and
-# the driver must refuse rather than auto-resolve. Note git's own merge duplicates this input too —
-# the bar here is not "no worse than git", it is "never a silent duplicate in an append-only record".
+# The keyed path guarantees uniqueness only for the rows the grammar KEYS, and it does not key every
+# row-shaped line. It keys 73 of this corpus's 73 today — it keyed 35 before memory-recall kit 1.1
+# widened the session era, and reading that as "the population is empty now" is how this arm would
+# start passing by finding nothing. The population that remains is structural: every anchor pattern
+# demands a separator after the id, so a row-shaped line carrying an id and none is content. Content
+# reaches the output down two independent paths (a row's lead-in, and the preamble/trailer text
+# merges), so the same unkeyable row filed in different regions was written TWICE at rc 0 with the
+# audit line reading `clean`, under a docstring claiming a row appears at most once BY CONSTRUCTION.
+# It does not; the postcondition is what makes it true, and the driver must refuse rather than
+# auto-resolve. Note git's own merge duplicates this input too — the bar here is not "no worse than
+# git", it is "never a silent duplicate in an append-only record".
 mk12() {
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
   { pre; row TOOL-zFixture-1 base; printf '%s\n' "$SUFFIXED"; row TOOL-zFixture-2 base; } > "$TMP/a"
@@ -516,7 +549,14 @@ run "unkeyable row from one side only" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-z
 # row out of an append-only record while being quieter than the merge you replace is the whole
 # failure this unit exists to prevent, and no id-set oracle can see it (the lost line is unkeyed, so
 # it is in neither `kept` nor `took_b` and the audit line reads `0 new from theirs`).
-ADJ='- TOOL-zFixture-7b · OPEN · an unkeyable correction row filed against the deleted row'
+# THE ADJACENT ROW MUST BE UNKEYABLE OR THIS ARM TESTS THE WRONG PATH. The defect is in `lead(k)`,
+# which only ever carries UNKEYED lines; a KEYED neighbour is emitted by its own branch of the case
+# analysis and never travels as anyone's lead-in. So `ADJ` is a separator-less row here, for the same
+# structural reason case 0d is: it survives an era widening. It did not survive the last one — as
+# `- TOOL-zFixture-7b · OPEN · …` this fixture became keyed at memory-recall kit 1.1 and both arms
+# went rc 0 with the delete honoured, which is a correct verdict for a different question. That new
+# verdict is asserted below, in its own arm, rather than allowed to quietly replace this one.
+ADJ='- TOOL-zFixture-7b OPEN an unkeyable correction row filed against the deleted row, no separator'
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/a"
 { pre; row TOOL-zFixture-1 base; printf '%s\n' "$ADJ"; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/b"
@@ -531,6 +571,23 @@ grep -q '^<<<<<<<' "$TMP/a" || bad "delete/adjacent: rc 1 with no markers is the
 run "theirs deleted, ours filed above it" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 TOOL-zFixture-7b "
 [ "$(grep -cF -- "$ADJ" "$TMP/a")" = 1 ] \
   || bad "delete/adjacent mirror: ours' correction row is not present exactly once"
+
+# ...and the other half of the same neighbourhood, which the era widening CREATED. A correction row
+# WITH a separator now keys, so it is no longer anyone's lead-in: the delete is honoured, the
+# incoming row arrives through the keyed path, and the right verdict is rc 0 — quieter than the arm
+# above and correct, where the arm above is loud and correct. The assertion is the ROW's presence and
+# the deleted row's absence, never the rc: an rc-only arm reads identically whether the row survived
+# or was swallowed, which is the exact failure this case exists for.
+ADJK='- TOOL-zFixture-8b · OPEN · a KEYED correction row filed against the deleted row'
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; printf '%s\n' "$ADJK"; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/b"
+keys "$ADJK" || bad "delete/adjacent keyed: [$ADJK] is NOT keyed by the driver — this arm is a duplicate of the one above and proves nothing new"
+run "ours deleted, theirs filed a KEYED row above it" 0 "TOOL-zFixture-1 TOOL-zFixture-3 TOOL-zFixture-8b " TOOL-zFixture-2
+[ "$(grep -cF -- "$ADJK" "$TMP/a")" = 1 ] \
+  || bad "delete/adjacent keyed: theirs' keyed correction row is not present exactly once — the honoured delete swallowed a KEYED row"
+[ "$(grep -c '^- TOOL-zFixture-2 ' "$TMP/a")" = 0 ] \
+  || bad "delete/adjacent keyed: the deleted row came back, so the delete was not honoured and the arm's rc 0 means something else"
 
 # --- 14. A %B-ONLY ROW THAT OPENS THE NEXT SECTION MUST NOT SWALLOW OURS' OWN NEW ROW --------------
 # THE CONTROL: `git merge-file` resolves this input rc 0 and CORRECTLY, so the driver is compared to
@@ -575,16 +632,20 @@ printf '%s\n' "$err" | grep -q 'Misfiled' \
 printf '%s\n' "$err" | grep -qF 'TOOL-zFixture-9' || bad "misfiled row: the refusal does not name the row it refused over"
 grep -q '^<<<<<<< ours$' "$TMP/a" || bad "misfiled row: rc 1 with NO markers is the marker-free-UU trap"
 
-# --- 16. THE SAME SUFFIXED ID MINTED ON BOTH NODES, WITH DIFFERENT WORDING -------------------------
-# The line-level postcondition compares EXACT text, so two nodes each minting the ratified `…-9b`
-# correction form with their own prose produce two DIFFERENT lines: each is seen once, the cap holds,
-# and the id lands TWICE in an append-only record at rc 0, no markers, `clean`. Measured — and the
-# suite's own `dups()` oracle sees it, which is what makes this a coverage hole rather than an
-# invisible one. Case 12 only ever uses byte-identical text, the one shape the line census catches.
+# --- 16. THE SAME UNKEYABLE ID MINTED ON BOTH NODES, WITH DIFFERENT WORDING ------------------------
+# The line-level postcondition compares EXACT text, so two nodes each minting the same correction id
+# with their own prose produce two DIFFERENT lines: each is seen once, the cap holds, and the id
+# lands TWICE in an append-only record at rc 0, no markers, `clean`. Measured — and the suite's own
+# `dups()` oracle sees it, which is what makes this a coverage hole rather than an invisible one.
+# Case 12 only ever uses byte-identical text, the one shape the line census catches.
+# The two lines are separator-less for case 0d's reason: a KEYED id minted twice with different
+# wording is an ordinary both-sides row edit and conflicts through case 2's path, which is a
+# different arm's question. This one is about the id half of `no_new_duplicates`, whose population is
+# exactly the row-shaped lines `key()` cannot see.
 mk16() {
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; } > "$TMP/o"
-  { pre; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-9b · CORRECTS TOOL-zFixture-1: the ours-side wording\n'; row TOOL-zFixture-2 base; } > "$TMP/a"
-  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf -- '- TOOL-zFixture-9b · CORRECTS TOOL-zFixture-1: the theirs-side wording\n'; } > "$TMP/b"
+  { pre; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-9b CORRECTS TOOL-zFixture-1, the ours-side wording\n'; row TOOL-zFixture-2 base; } > "$TMP/a"
+  { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; printf -- '- TOOL-zFixture-9b CORRECTS TOOL-zFixture-1, the theirs-side wording\n'; } > "$TMP/b"
 }
 mk16
 err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
@@ -632,7 +693,7 @@ cmp -s "$TMP/a" "$TMP/ctl" \
 # author resolves the hunks and commits the rest unread. So the census runs on every verdict, over
 # the merged lines with the conflict REGIONS excised — which is what the clean-verdict scoping was
 # reaching for and did not do.
-DUP18='- TOOL-zFixture-77b · an unkeyable correction row minted on BOTH nodes'
+DUP18='- TOOL-zFixture-77b an unkeyable correction row minted on BOTH nodes, no anchor separator'
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 base; printf '%s\n' "$DUP18"; row TOOL-zFixture-3 OURSEDIT; } > "$TMP/a"
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 THEIRSEDIT; printf '%s\n' "$DUP18"; } > "$TMP/b"

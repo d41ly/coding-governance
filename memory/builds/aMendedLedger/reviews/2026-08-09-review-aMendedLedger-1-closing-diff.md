@@ -129,7 +129,7 @@ measured on the real corpus:
 - **INERT.** Two nodes appending different `-9b` rows **CONFLICT** (rc 1) where the identical appends
   with numeric `-9` auto-resolve **clean** (rc 0). The append-collision the unit exists for is
   unresolved for over half the index.
-- **DUPLICATES.** The same `TOOL-aMendedLedger-7b` row minted on both nodes and filed in different
+- **DUPLICATES.** The same `TOOL-aMendedLedger-<n>b` row minted on both nodes and filed in different
   regions is emitted **twice** (lines 88 and 93) at rc 0, with the audit line reading
   `35 row(s) from ours, 0 new from theirs, 0 dropped (delete honoured), clean`. That directly
   falsifies the module's own §`WHY THIS CANNOT DUPLICATE` (`:49-52`) and the grammar-drift
@@ -424,7 +424,7 @@ A green bar proves nothing here — the bar was green through every reproduction
   correctly under `## PLAY`. **The misfiling is a regression introduced by U5.**
 - **B3 grammar census + duplication, by me.** `extract.grammar_for('.')` + `anchor_at` over the real
   file → 91 lines, 73 rows, **35 anchored, 38 unkeyed**, the tail two being `TOOL-aMendedLedger-1b`
-  and `-1c` added by this diff. Same `TOOL-aMendedLedger-7b` row filed by both nodes in different
+  and `-1c` added by this diff. Same `TOOL-aMendedLedger-<n>b` row filed by both nodes in different
   regions → rc 0, `0 new from theirs, 0 dropped, clean`, **id present twice** (lines 88, 93).
   Verify stage additionally measured the INERT half (`-9b` appends conflict, numeric `-9` appends
   resolve clean) and the e2e conflict through real git.
