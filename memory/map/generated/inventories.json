@@ -33,6 +33,7 @@
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
+      "row-keyed merge driver replay",
       "run-gates canary",
       "settings-merge selftest",
       "template size <=32KiB",

@@ -241,9 +241,64 @@ $bad
 EOF
 }
 
+# --- Check M: the row-keyed merge driver (memory-tree kit) ----------------------------------------
+# `.gitattributes` declares `merge=rows` on the authored indexes, but a merge DRIVER is per-node
+# config: git falls back to its built-in three-way text merge, with a warning, on any node that never
+# ran this. That fallback is the pre-change behaviour, so the attribute and the config can land in one
+# commit — and this arm is what turns "declared" into "wired" on each node.
+#
+# Setting it under `--session` as well as `--fix` mirrors check_hooks, which already sets a git config
+# in both. The eol arm's session exemption is deliberately NOT copied: that arm rewrites file BYTES,
+# and this one sets a repo-local config, which is the class of act `--session` exists for.
+# (aMendedLedger U5)
+check_merge_rows() {
+  local drv shim want cur declared
+  # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
+  # <root>/tools/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
+  # than hand-kept, so it cannot drift from the layout it is describing.
+  drv=$(first_of tools/memory-tree/merge-rows.py memory-tree/merge-rows.py)
+  if [ -z "$drv" ]; then
+    echo "skip     merge     — memory-tree merge driver not adopted (no merge-rows.py)"
+    return
+  fi
+  shim=$(first_of tools/lib/pyrun.sh lib/pyrun.sh)
+  if [ -z "$shim" ]; then
+    echo "UNWIRED  merge     — $drv is present but the shim it names is missing (tools/lib/pyrun.sh); git would exec a command that cannot start. Fix: copy tools/lib/pyrun.sh + tools/lib/resolve-python.sh in"
+    unwired=$((unwired+1))
+    return
+  fi
+  want="bash $shim $drv %O %A %B %P"
+  # ONE call over every tracked path, and it reads what GIT judges rather than grepping
+  # `.gitattributes` — attributes come from several files, the same rule check_eol follows. Looping
+  # per file would be ~500 process spawns inside a SessionStart hook; `--stdin` is one process
+  # regardless of tree size.
+  declared=$(git ls-files 2>/dev/null | git check-attr --stdin merge 2>/dev/null | sed -n 's/: merge: rows$//p')
+  if [ -z "$declared" ]; then
+    echo "skip     merge     — no tracked path declares merge=rows"
+    return
+  fi
+  cur=$(git config merge.rows.driver 2>/dev/null || true)
+  if [ -z "$cur" ]; then
+    if [ "$DO_FIX" = 1 ]; then
+      git config merge.rows.driver "$want" && echo "FIXED    merge     — set merge.rows.driver"
+    else
+      echo "UNWIRED  merge     — paths declare merge=rows but merge.rows.driver is unset; git falls back to a line merge that can duplicate a row. Fix: git config merge.rows.driver '$want'"
+      unwired=$((unwired+1))
+    fi
+    return
+  fi
+  if [ "$cur" = "$want" ]; then
+    echo "ok       merge     — merge.rows.driver wired"
+  else
+    echo "UNWIRED  merge     — merge.rows.driver='$cur', not '$want'; NOT overwriting (deliberate?)"
+    unwired=$((unwired+1))
+  fi
+}
+
 check_hooks
 check_agentcap
 check_recall_opened
+check_merge_rows
 check_eol
 
 [ "$MODE" = session ] && exit 0

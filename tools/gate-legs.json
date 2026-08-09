@@ -91,6 +91,13 @@
     ]
   },
   {
+    "name": "row-keyed merge driver replay",
+    "argv": [
+      "bash",
+      "tools/memory-tree/merge-rows.test.sh"
+    ]
+  },
+  {
     "name": "kit/dogfood doc parity",
     "argv": [
       "bash",

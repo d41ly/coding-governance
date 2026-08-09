@@ -223,5 +223,66 @@ printf '%s' "$out" | grep -q 'skip     eol' \
   || ck "AC9b no eol=lf pin under .claude/ -> skip, not a silent ok" 0
 cleanup
 
+# AC10 — the row-keyed merge driver arm, all SEVEN states in one repo. A merge DRIVER is per-node
+# config while `.gitattributes` is committed, so "declared" and "wired" are different facts and the
+# gap between them is silent: git falls back to a line merge, with a warning nobody reads, and that
+# line merge is the one that duplicates a row. The remedy string is BUILT from the two resolved
+# paths, so this asserts the string the arm PRINTS is the string `--fix` SETS — one truth, not two.
+newrepo
+git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
+mkdir -p tools/memory-tree tools/lib memory/backlog
+WANT="bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P"
+
+# state 1 — kit not adopted -> skip, exit 0
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     merge' && printf '%s' "$out" | grep -q 'not adopted'; } \
+  && ck "AC10 merge driver absent -> skip, exit 0" 1 || ck "AC10 merge driver absent -> skip, exit 0" 0
+
+# state 2 — the driver is present but the shim its command names is missing. git would exec a command
+# that cannot start, and a merge driver that cannot start exits non-zero without writing %A.
+cp "$HERE/memory-tree/merge-rows.py" tools/memory-tree/merge-rows.py
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'shim it names is missing'; } \
+  && ck "AC10 shim missing -> UNWIRED, exit 1" 1 || ck "AC10 shim missing -> UNWIRED, exit 1" 0
+
+# state 3 — both present, but no tracked path declares merge=rows: nothing to wire, so a SKIP rather
+# than a permanent false UNWIRED in every repo that carries the kit without the attribute.
+cp "$HERE/lib/pyrun.sh" tools/lib/pyrun.sh
+git add -A; git commit -q -m kit
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     merge' && printf '%s' "$out" | grep -q 'no tracked path declares'; } \
+  && ck "AC10 no merge=rows attribute -> skip, exit 0" 1 || ck "AC10 no merge=rows attribute -> skip, exit 0" 0
+
+# state 4 — declared, config unset -> UNWIRED, exit 1, and the remedy carries the BUILT command
+printf 'memory/backlog/*.md merge=rows\n' > .gitattributes
+printf '# tooling backlog\n' > memory/backlog/TOOL.md
+git add -A; git commit -q -m attrs
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -qF "$WANT"; } \
+  && ck "AC10 declared but unset -> UNWIRED + built remedy, exit 1" 1 || ck "AC10 declared but unset -> UNWIRED + built remedy, exit 1" 0
+
+# state 5 — --fix sets exactly that command; the re-check is ok, exit 0
+chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); rc=$?
+{ [ "$got" = "$WANT" ] && [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
+  && ck "AC10 --fix sets the driver, re-check ok" 1 || ck "AC10 --fix sets the driver, re-check ok" 0
+
+# state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
+git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'NOT overwriting'; } \
+  && ck "AC10 a foreign driver -> UNWIRED, exit 1" 1 || ck "AC10 a foreign driver -> UNWIRED, exit 1" 0
+before=$(git config merge.rows.driver); chk --fix >/dev/null; after=$(git config merge.rows.driver)
+{ [ "$after" = "$before" ] && [ "$after" != "$WANT" ]; } \
+  && ck "AC10 --fix never clobbers a set driver" 1 || ck "AC10 --fix never clobbers a set driver" 0
+
+# state 7 — --session wires the unset case too. Setting a repo-local config is exactly the class of
+# act --session exists for; the eol arm's session exemption is not copied because that one rewrites
+# file bytes.
+git config --unset merge.rows.driver
+chk --session >/dev/null; rc=$?; got=$(git config merge.rows.driver)
+{ [ "$rc" = 0 ] && [ "$got" = "$WANT" ]; } \
+  && ck "AC10 --session wires the driver + exit 0" 1 || ck "AC10 --session wires the driver + exit 0" 0
+cleanup
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

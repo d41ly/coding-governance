@@ -24,6 +24,8 @@ ARCH-bOrderlyAtlas-1.)
 | `adopt-memory-tree.sh` | `--scaffold` an empty, passing tree from the config (new projects). |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
+| `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`): it key-merges by record id, so an append-collision between two nodes auto-resolves without duplicating or dropping a row, and any failure becomes a conflict rather than a silent take-ours. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored. Wire it with the two `.gitattributes` lines plus `git config merge.rows.driver 'bash tools/lib/pyrun.sh memory-tree/merge-rows.py %O %A %B %P'` — `check-wiring.sh` reports and sets that config per node. NOT scaffolded by `adopt-memory-tree.sh`: a copy-installed kit lands at `<root>/memory-tree/` with no `lib/pyrun.sh` beside it, so packaging the driver for adopters is its own change. |
+| `merge-rows.test.sh` | the driver's replay fixtures: id-set equality on every clean case against a grammar-independent oracle, audit counts reconciled against the written file, the four newline sites, the three fail-closed grammar failures, and an end-to-end two-branch `git merge` through the real attribute + config. |
 | `check-memory-hygiene.test.sh` | fixture self-test for check 12 (red + green classes in a scratch repo). |
 
 ## Configure

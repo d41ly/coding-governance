@@ -138,6 +138,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "anchors",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "append_backlog",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -543,6 +548,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "key",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "last_qid",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -725,6 +735,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/settings-merge.py"
     },
     {
@@ -746,6 +761,11 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "merge",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "merge",
@@ -918,6 +938,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "read",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -1046,6 +1071,11 @@
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "rows",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "rrf",
@@ -1191,6 +1221,11 @@
       "id": "snippet_bytes",
       "kind": "function",
       "file": "tools/memory-recall/union.py"
+    },
+    {
+      "id": "split_regions",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "stems",
@@ -1476,6 +1511,11 @@
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
+    },
+    {
+      "id": "text_merge",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "tree",
