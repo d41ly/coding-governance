@@ -19,7 +19,7 @@ Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook · ids TOOL-aMendedLedger-1..-8
+**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook · ids TOOL-aMendedLedger-1..-8
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -30,4 +30,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aMendedLedger-5 — U5: the row-keyed merge driver, its launcher shim and its wiring](spec/units/2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md) | SPECCED | rev-3 | 2026-08-09 |
 | [TOOL-aMendedLedger-6 — U6: doc truth, the template edit, the residual sweep and the adopter note](spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md) | SPECCED | rev-2 | 2026-08-09 |
 | [TOOL-aMendedLedger-7 — U8: a fully keyed decision corpus](spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md) | SPECCED | rev-2 | 2026-08-09 |
+| [TOOL-aMendedLedger-8 — U9: the merge driver, redesigned around what git already gets right](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md) | SPECCED | rev-2 | 2026-08-10 |
 <!-- /gen:build-index -->
