@@ -81,6 +81,7 @@
 - TOOL-aRootedPrefix-1b · measured on two fixtures differing only in prefix: one range with a real reinvention gave `collision_flags: 1` against `0`, both at exit 0. Mis-rooted, `--converge` CANNOT flag — its reference index has no source, so no seam reaches the threshold
 - TOOL-aRootedPrefix-1c · the `.git` bound is load-bearing (worktrees sit inside the primary tree here), and NOT `git rev-parse --show-toplevel`, which resolves junctions away — the anchoring the kit guarantees. Resolution answers WHERE; `require_adopted_root` answers WHETHER
 - TOOL-aRootedPrefix-1d · the review's SHAPE was the finding: 4 of 7 defects, one a blocker, in `adopt-codebase-map.sh` — the one changed file no leg ran — and zero in the engine 20+ arms carry. The blocker shipped the very mechanism 1c rejects. It is a leg now
+- TOOL-aRootedPrefix-1e · the hand-kept memory indexes were `text: auto`, so a CRLF checkout added a byte per LINE to checks 6 and 7 — the same corpus passed on Linux and blocked a push here. Pinned by EXTENSION, since the index set is derived and a pin you must remember is one you forget
 
 ## DEPL — deployer
 
