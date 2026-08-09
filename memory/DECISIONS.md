@@ -77,6 +77,14 @@
 - TOOL-aBatchedTribunal-8d · `git log -S` counts OCCURRENCES, and `KIT_MEMORY_TREE_VERSION=` occurs once before and once after any bump — the count never moves, so the first cut found NO bump at all and reported the wrong failure. `-G` matches changed LINES, which is what a bump is
 - TOOL-aBatchedTribunal-8e · S is VALIDATED against its parent, not merely matched: rewording the comment ON the constant's line moves that line without dating anything, and an unvalidated candidate would let a reflow launder every later verdict change
 - TOOL-aBatchedTribunal-8f · W is the newest BEHAVIOUR-bearing commit, not the newest touching one — otherwise a trailing comment-only commit re-opens a range that was correctly dated
+- TOOL-aMendedLedger-1 · the memory rework finishes: `memory/project/` drains to its five waiver registries, the authored per-node session ledger retires to `memory/archive/ledger/`, and work state is READ from the GENERATED `LIVE.md` + `ledger/<month>.md`
+- TOOL-aMendedLedger-1b · CORRECTS `TOOL-bThriftyBellows-2`: it claims the cache-and-grep measurement lives in the bug-class catalogue. It never did — `gotchas/` had zero hits and the journal was the ONLY copy. Relocated, not deleted; this row supersedes rather than edits
+- TOOL-aMendedLedger-1c · the journal pointer in `TOOL-bThriftyBellows-1` is dead: that path moved under `builds/bThriftyBellows/build/`. Append-only records are superseded, never edited, and check 15 cannot see it — the citation carries no `memory/` prefix
+- TOOL-aMendedLedger-2 · journals RELOCATE, never delete. HYGIENE's undefined "delete cold journals" clause is replaced by upstream's rule: a slug with a build files into it, one without gets a stub, and the stub takes an AUTHORED `status:` with NO spec
+- TOOL-aMendedLedger-3 · a GATEABLE probe whose population you drain is resolved in the SAME commit: `signal_ledger` goes to DECLARED_EMPTY and its pin of 4 retires. The selftest arm asserts BOTH directions, because a signal that cannot move is dead, not clean
+- TOOL-aMendedLedger-4 · draining a population does not disarm its check: check 3's `project/` sub-lint keeps a `pop_guard` whose PRECONDITION is an un-segmented count, the one shape that can differ from the population when the path expression is wrong. Kit 1.7 -> 1.8
+- TOOL-aMendedLedger-5 · backlog conflicts are answered by a ROW-KEYED merge driver, not by sharding per node. `merge=union` is rejected on measurement: it loses no id but duplicates one in 147 of 151 conflicts. The anchor grammar is IMPORTED, never vendored
+- TOOL-aMendedLedger-6 · the playbook justified sharding because a shared mutable index "forces a conflict on every land" — the question the generated index and the driver now answer two other ways. Three answers to one question, so the rule goes at v2.4
 
 ## DEPL — deployer
 
