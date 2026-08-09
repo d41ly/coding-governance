@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-09T15:02:42+03:00 @ 663ca42734023b8890ec3dbbd694a67b64d86c07
+last-audit: 2026-08-09T15:26:49+03:00 @ 663ca42734023b8890ec3dbbd694a67b64d86c07
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -70,30 +70,28 @@ Tier 2 (spec + adversarial review before building) for: a change to the governan
 the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
-### ID + ledger protocol
+### ID + work-state protocol
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = node tag
-(`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Ledger:
-`memory/project/in-flight/<tag>.md`. Build folders are `memory/builds/<slug>/`; the discipline is the
-spec header's `streams` value (`STREAMS_CUTOFF` in `.memory-tree.conf` arms it).
+(`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
+re-renders them from build front matter); there is no authored ledger to update. Build folders are
+`memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
+`.memory-tree.conf` arms it).
 
 ### Current posture — dated corrections
 
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- *2026-08-09 · this file's own `last-audit` · the stamp read `2026-08-09T08:10:00+03:00` while the
-  node clock and every commit timestamp that day were ~6.5 h earlier, so it was hand-written ahead
-  rather than read. Re-stamped from `date`. A stamp whose rule is "always advances" enforces nothing
-  if it is typed; take it from the clock. Prune when a second audit has stamped from `date` cleanly.*
-
 ### Environment traps worth front-loading
 
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It now sits at 32746/32768 (**22 bytes free**, measured 2026-08-09), so the next line added to it must
-  fund itself by moving prose into `parallel-coding-governance.domain-rules.md`.
+  It sits at 32083/32768 (**685 bytes free**, measured 2026-08-09 by `bash tools/check-template-size.sh`
+  — read that number FROM the gate, never from here), so a line added to it either fits that margin or
+  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every

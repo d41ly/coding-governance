@@ -18,9 +18,12 @@ closed enum `.memory-tree.conf` declares. A build that spans two disciplines is 
 
 - [builds/](builds/) — one folder per slug: `README.md` · `STATUS.md` · `prompts/` `spec/` `build/` `reviews/`.
 - [backlog/](backlog/) — one mutable shard per id family: `PLAY.md` `KICK.md` `TOOL.md` `DEPL.md`.
-- [archive/](archive/) — rotated indexes and version snapshots.
+- [gotchas/](gotchas/) — the recurring-bug-class catalogue behind hygiene checks 17-19.
+- [guides/](guides/) — binding protocols that are not rules of the tree: [REVIEW-PROTOCOL.md](guides/REVIEW-PROTOCOL.md).
+- [map/](map/) — the self-verifying codebase map: feature dossiers, the shrink-only baseline, generated artifacts.
+- [archive/](archive/) — rotated indexes, template version snapshots, and the RETIRED session ledger at [archive/ledger/](archive/ledger/).
 - [ledger/](ledger/) — GENERATED month shards, one row per build opened that month. Never hand-edited.
-- [project/](project/) — session machinery: MEMORY.md, IN-FLIGHT.md (pointer) + in-flight/<tag>.md, journal/, notes.
+- [project/](project/) — the gate's own waiver registries (`*.txt`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches.
 
 ## Streams (the closed enum)
 

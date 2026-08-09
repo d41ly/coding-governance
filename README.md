@@ -29,7 +29,9 @@ machines/sessions on the same repo.
   history: `memory/builds/aRatchetForge/`.
 - **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree: a FLAT
   `builds/<slug>/` per unit of work, one append-only `DECISIONS.md`, per-family backlog shards, index
-  budgets + rotation, status vocabulary, and a 12-check hygiene gate. The discipline is a `streams`
+  budgets + rotation, status vocabulary, a GENERATED work-state index (`LIVE.md` + `ledger/<month>.md`,
+  rendered from build front matter — nothing about status is authored), and a 19-check hygiene gate.
+  The discipline is a `streams`
   value in each spec's status header, not a directory, so a build spanning two disciplines is one
   build. Every check that has a population asserts that population is NON-EMPTY, because a
   mis-segmented path selector prints nothing and nothing is what a passing check prints. Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
@@ -42,10 +44,12 @@ machines/sessions on the same repo.
   and the aiosqlite closed-loop seam patch + deterministic forced-race regression gate. See
   `tools/pytest-parallel-guardrails/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
-  script calling raw `parallel(`/`pipeline(` instead of the cap-6 `boundedParallel`/`boundedPipeline`
-  helpers, so a wide agent burst can't trip the server rate limiter. Cap overridable via env
+  script calling raw `parallel(`/`pipeline(` instead of the cap-5 `boundedParallel`/`boundedPipeline`
+  helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
+  the rule too: a review's verify stage spawns at most 5 agents TOTAL. Cap overridable via env
   `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
-  Operationalizes the playbook's §8 concurrency rule.
+  Operationalizes the playbook's §8 concurrency rule; the binding text is
+  `memory/guides/REVIEW-PROTOCOL.md`.
 - **`tools/codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers
   whose machine claims are CI-verified against live code inventories (a both-directions ratchet —
   new moving parts fail until claimed; claims naming dead keys fail too), a shrink-only baseline,
@@ -55,7 +59,9 @@ machines/sessions on the same repo.
   `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
-  verify → synth; ~7–9 agents, never >6 concurrent). Run via `Workflow({scriptPath})`, parameterized
+  verify → synth): four finder lenses, at most five batched verifiers, one synthesis pass — 6–10
+  agents over the run, of which at most 5 are verify-stage and at most 5 concurrent, per the BINDING
+  `memory/guides/REVIEW-PROTOCOL.md`. Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to
   their verdicts on an INTEGER the orchestrator assigns before the skeptic sees them — a `file:line`
   string cannot survive an echo, and two findings at one location cannot share a verdict. A finding

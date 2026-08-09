@@ -37,10 +37,13 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template + its two companions.
 - `tools/` — the deployable kits (copied into target repos).
 - `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
-- `memory/` — this repo's dogfooded memory tree, FLAT: `DECISIONS.md` · `backlog/<FAMILY>.md` ·
-  `builds/<slug>/` · `archive/` · `project/`. Specs, reports, research and reviews live under a
-  build's own folder, NOT the root. The `streams` enum is `playbook kickoff tooling deployer`.
-  Version snapshots live in `memory/archive/`.
+- `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
+  `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
+  `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
+  `project/` (the gate's five `*.txt` waiver registries and nothing else). Specs, reports, research
+  and reviews live under a build's own folder, NOT the root. The `streams` enum is
+  `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
+  `memory/archive/`.
 - `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
@@ -55,6 +58,10 @@ IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + C
 minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
 `memory/backlog/<FAMILY>.md`. Builds live at `memory/builds/<slug>/` — the discipline is a `streams`
 value in each spec's status header, not a directory, so a build spanning two disciplines is one build.
+Live work state is READ from the generated `memory/LIVE.md` (plus the `ledger/<month>.md` shards),
+rendered by `gen_build_index.py` from build front matter and every spec's status header. There is no
+authored session ledger: the sharded per-node one retired at playbook v2.4 / memory-tree kit 1.8 and
+its shards sit frozen under `memory/archive/`.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 

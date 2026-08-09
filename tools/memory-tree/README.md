@@ -2,8 +2,8 @@
 
 A project-agnostic kit that turns the governance playbook's §5/§6 memory-and-decisions *principles*
 into a concrete, gated folder structure: one `memory/` tree organised by development discipline, with
-per-feature `builds/` folders, index budgets + rotation, a status vocabulary, and a 12-check hygiene
-gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
+per-feature `builds/` folders, index budgets + rotation, a status vocabulary, a GENERATED work-state
+index, and a 19-check hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
 re-deriving what memory already records.
 
 Opt-in. Everything project-specific lives in one repo-root `.memory-tree.conf`; the scripts and rules
@@ -15,7 +15,7 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 12 checks, grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 19 checks (1-12 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; blank pins turn the unit off. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |

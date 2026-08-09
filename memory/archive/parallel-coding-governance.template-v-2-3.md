@@ -1,12 +1,11 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.4** · 2026-08-09. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.3** · 2026-07-12. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull per `parallel-coding-governance.customize.md`; the six domain checklists (§4, §9–§13) live in
-`parallel-coding-governance.domain-rules.md`; history in the `…-v-N-N.md` snapshots + git. **v2.4
-(2026-08-09):** §3's sharded per-node session ledger is RETIRED — work state now comes from the
-generated build index; re-pull §3, §5 and the `memory-tree` kit's handling.*
+`parallel-coding-governance.domain-rules.md`; history in the `…-v-N-N.md` snapshots + git. v2.3
+tightens prose + externalizes the deploy scaffolding and those six sections — no rule changed from v2.2.*
 
-<!-- governance-template: v2.4 -->
+<!-- governance-template: v2.3 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -29,9 +28,9 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 **Definition of Ready — run before touching code:**
 - Sync: `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed (§3).
-- Locate: read your stream's decision log + backlog (§6) and the derived work-state index (§5); confirm your node tag (§2).
+- Locate: read your stream's decision log + backlog (§6) and the in-flight ledger (§3); confirm your node tag (§2).
 - Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
-- Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and open the unit's record (§6).
+- Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and add a ledger row (§3).
 - Large new feature (a Tier-2 change): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance) + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `{{HELP_DIR}}` docs). Spec shape: the memory-kit `TEMPLATE-SPEC.md` (check 12).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
 - Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that dossier as a DoR item (the pass already reads what the dossier needs) — the map's convergence forcing function.
@@ -41,13 +40,13 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
 - User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
 - Codebase map adopted (§5)? New inventory keys claimed in the map tree (machine-enforced); dossier prose refreshed on touch; claim edits regen the generated artifacts in the same commit.
-- Memory (non-derivable only), decision log/backlog, and the unit's own record updated — **committed before the push and the wrap-up message** (§16).
+- Memory (non-derivable only), decision log/backlog, and ledger row updated — **committed before the push and the wrap-up message** (§16).
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
-- Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
+- Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). The per-node ledger needs no reconcile — single writer (§3).
 - Kickoff-manifest exception: it reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
@@ -65,16 +64,16 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - New-node onboarding: clone to the pinned primary tree · claim the tag (same commit) · seed local memory from the in-repo mirror (§5) · recreate stream worktrees (they never sync, §3).
 - Every new tracked id (decisions, backlog, tickets — anything `FAMILY-NNN`-shaped): `FAMILY-<slug>-<seq>`, owned by the minting session so nothing it numbers can be contested.
 - Slug = your node tag + a fresh CamelCase adjective-noun (`dAvengingTrousers`), `[A-Za-z]` only, minted ONCE per session; the tag's first letter makes cross-node slugs disjoint by construction.
-- `<seq>` = plain 1-up per (session, family), unpadded; ids are labels, not ranks; next = numeric max of YOUR ids in that family + 1; carry your per-family high-water in session state (uncommitted ids are invisible to grep).
-- Before committing to a slug: (1) all-time grep the governance-docs tree (logs, backlogs, build records) for `[A-Z]+-<slug>-[0-9]` — re-roll on ANY hit (a rotated or archived record still owns its ids); (2) scan the live rows of the work-state index (§5) — re-roll on a clash.
+- `<seq>` = plain 1-up per (session, family), unpadded; ids are labels, not ranks; next = numeric max of YOUR ids in that family + 1; record per-family high-water in your ledger row (uncommitted ids are invisible to grep).
+- Before committing to a slug: (1) all-time grep the governance-docs tree (logs, backlogs, journals, ledger) for `[A-Z]+-<slug>-[0-9]` — re-roll on ANY hit (a pruned ledger row still owns its ids); (2) scan live rows across all node ledger files — re-roll on a clash.
 - No reserve-above-a-marker, no shared counter, no renumber-on-merge — the slug is the guarantee.
 - A session = one continuous effort under one slug (several work-units/families, one `<seq>` each); a resumed/summarized session keeps its slug (grepping only your own prior ids is not a collision).
 - Fan-out children (sub-agents/orchestrated workers) never mint ids — the orchestrator does; a child that must mint takes its own registered slug.
 - Residual tie-break (sub-1%): the later-to-merge re-mints its slug for all UNMERGED ids; an already-merged id wins.
 - Legacy id eras are FROZEN: cite verbatim, never renumber, never mint in a pre-rule format, never bump a residual "next free id" marker.
-- Shorthand (family+seq, slug elided) is sanctioned ONLY in session prose — never where ids are the permanent record (it's shape-identical to frozen legacy ids).
+- Shorthand (family+seq, slug elided) is sanctioned ONLY in session prose and ledger seq cells — never where ids are the permanent record (it's shape-identical to frozen legacy ids).
 
-## §3 — Parallel work: streams, worktrees, trunk
+## §3 — Parallel work: streams, worktrees, trunk, ledger
 
 - Own streams, not files: `{{STREAM_OWNERSHIP}}`. Overlap on shared files (API clients, config, indexes) breeds collisions and integration reviews — minimize it.
 - Trunk-based: merge small and often to LOCAL `main`; long-lived branches mean bigger reconciles and review surface.
@@ -84,6 +83,9 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
 - Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
+- Shard the in-flight ledger per node — one file per node tag behind a thin pointer (like the per-node journals, §5), NEVER one shared table: each node writes ONLY its own file, so the ledger is conflict-free by construction (disjoint-by-tag, like the slug) and no merge touches it. A shared ledger is the shared-mutable index §5 forbids — it forces a conflict on every land and additive resolution leaves stale rows.
+- Row shape `| node | slug | branch/worktree | streams | seq high-water | status |`; status ∈ `{in-flight | merged:<sha>}` + at most one short clause; narrative belongs in the journal. Read ALL node files for the who's-touching-what / slug-collision scan (§2); write only your own.
+- Self-prune on session start: after fast-forwarding `main`, delete your OWN `merged:<sha>` rows whose sha is an ancestor of `main` (`git merge-base --is-ancestor <sha> main`) — they're derivable from history; never touch another node's file.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
@@ -94,14 +96,14 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §5 — Memory & docs
 
-- Memory carries only the non-derivable: gotchas, environment traps, *why* a non-obvious choice was made — never re-narrate what git, decision logs, or code already record (the main memory-token waste and drift source).
+- Memory carries only the non-derivable: gotchas, in-flight state, *why* a non-obvious choice was made — never re-narrate what git, decision logs, or code already record (the main memory-token waste and drift source).
 - Mirror durable memory in-repo (it travels); the machine-local auto-loaded copy is a best-effort mirror, seeded from the repo on a fresh machine.
-- One canonical index, one line per note; never a shared mutable index every session edits (it forces memory-sync merges) — any index that must exist stays append-only or GENERATED, and an authored one several nodes append to takes a row-keyed merge driver, never a per-node shard.
-- Status is DERIVED, never authored: a generated work-state index over the per-unit records, not prose memory and not a table sessions edit — anything time-sensitive rots.
+- One canonical index, one line per note; journals AND the in-flight ledger (§3) are per-node files — never a shared mutable index every session edits (that file forces memory-sync merges); any index that must exist stays append-only or generated.
+- Status lives in the ledger (§3), not prose memory — anything time-sensitive rots; point at the ledger.
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
-- **Optional — a structured, machine-linted memory tree** (`tools/memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **19-check hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+- **Optional — a structured, machine-linted memory tree** (`tools/memory-tree/` kit): one `{{MEMORY_ROOT}}/` tree by discipline (`{{MEMORY_DISCIPLINES}}`) + `project/` machinery + per-feature `builds/` folders, index caps + archive rotation, a status vocabulary, and a **12-check hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
 - **Optional — a self-verifying codebase map** (`tools/codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
 - **Optional — retrieval over that tree** (`tools/memory-recall/` kit, requires it): ask the decision corpus a question and get the records that answer it, ranked; an offline stdlib CLI reading `.memory-tree.conf`, so root + id families are declared once; writes nothing in the worktree; the rendered recall Skill's drift rides `{{GATE_RUNNER}}`.
 
@@ -176,7 +178,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §14 — Session execution hygiene (per-call token discipline)
 
-- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory (§5), streams + small merges (§3), system-first UI (§12, §13); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
+- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory/ledger (§3, §5), streams + small merges (§3), system-first UI (§12, §13); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
 - Don't re-fetch what's in context: no re-Read to keep editing a file or to "verify" an edit the tool confirmed; slice large files (range/grep), never whole re-reads; never re-read a command-output spill or large artifact — filter it at generation.
 - Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
 - Bound every command's output (it all lands in the transcript): `--stat`/`--name-only` over raw diffs; concise linter formats; head/tail caps on noisy tails; quiet test flags.
@@ -204,9 +206,9 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Gates: one line when green, enumerating EVERY expected leg (the standing merge bar + any gates named at DoR); a leg not run is written `skipped: <leg> — <why>`, never omitted (the green-by-absence class); a failed leg = prose, above everything else.
 - Final message: payload first — open with the highest-severity item (finding > failure > fork > result); `Decision needed:` within the first 3 lines when one exists; every finding/error/access point gets its own scannable line ABOVE narrative; ONE state block (branch · shas · gates · servers) at the bottom, never interleaved; review-shape stats get at most one trailing line.
 - Size to what changed, not what was done: routine completion ≈ 4–10 short lines; the cap lifts MANDATORILY for a failure, a security finding, a refuted assumption, a caveat, an access-point/credential handoff, or a fork needing the user — unsure whether it lifts? Lift.
-- Never deliver the same content twice: a doc you wrote gets a correct link + a ≤3-line delta, not a paste; an already-delivered digest gets `unchanged since <link> — delta: <…|none>`; overrides: an explicit ask wins, bodies ≤~15 lines may be pasted, a fresh session greps the decision log first.
+- Never deliver the same content twice: a doc you wrote gets a correct link + a ≤3-line delta, not a paste; an already-delivered digest gets `unchanged since <link> — delta: <…|none>`; overrides: an explicit ask wins, bodies ≤~15 lines may be pasted, a fresh session greps the journal first.
 - Kickoff/DoR reporting = one bookkeeping line (the `READY` micro-format) + ONLY the unresolved open questions; never restate scope/AC/protocol already in the plan doc; a scope-approval menu IS the open questions — never capped or link-only'd.
-- Facts land on disk before the wrap-up: build front matter, the memory note, and shas are written BEFORE the final message is composed — a dead turn may lose prose, never facts.
+- Facts land on disk before the wrap-up: ledger row, journal/memory note, and shas are written BEFORE the final message is composed — a dead turn may lose prose, never facts.
 - Secrets: never print a real credential in chat — say where it lives; throwaway local-dev creds may ride the access-point line.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside):

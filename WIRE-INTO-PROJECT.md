@@ -7,7 +7,7 @@ derive-vs-ask calls.
 **The chain is three composing layers:**
 
 1. **Governance playbook** (`parallel-coding-governance.template.md`) — the multi-node ruleset (IDs,
-   streams, sharded ledger, gates, reviews, memory, output discipline). Lives in the project as one doc.
+   streams, work state, gates, reviews, memory, output discipline). Lives in the project as one doc.
 2. **`/session-kickoff` skill** (`skills/session-kickoff/`) — the project-agnostic kickoff *engine*,
    installed ONCE per machine; it reads a per-project **kickoff manifest** to learn project specifics.
 3. **memory-tree kit** (`tools/memory-tree/`) — the gated `memory/` structure that operationalizes the
@@ -94,7 +94,7 @@ alongside — both then appear; pick by description.) Skip this step on a machin
 
 **Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md` prints nothing (the template legitimately
 holds `${{ }}` / Go-template braces in gate commands — shape-scope the grep). `{{ID_FAMILIES}}` must
-match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs share one id scheme.
+match the memory-tree `FAMILIES` (§3) — the build records and the decision logs share one id scheme.
 
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 
@@ -115,8 +115,9 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
    bash memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
    ```
    The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, the generated `LIVE.md`, and
-   `project/` — including the
-   **sharded in-flight ledger**: `project/IN-FLIGHT.md` (a pointer stub) + `project/in-flight/` (per-node files).
+   `project/` — which holds the gate's own five waiver registries (`*.txt`) **and nothing else**. Work
+   state is not authored anywhere: `gen_build_index.py` renders it. See §3a if you already run a kit
+   older than 1.8.
 3. Wire the gate in all three places:
    - **CI:** a job running `bash memory-tree/check-memory-hygiene.sh` (no args = full check, incl. TREE drift).
    - **Local gate runner:** add it as a concurrent leg (cheap, parallel with test/typecheck).
@@ -136,10 +137,38 @@ match the memory-tree `FAMILIES` (§3) — the ledger and the decision logs shar
      memory/project/curation-debt.txt text eol=lf
      ```
 
-**The ledger rule to carry into the manifest/playbook:** each node writes ONLY its own
-`memory/project/in-flight/<tag>.md`; read ALL of `in-flight/*.md` for the who's-touching-what /
-slug-collision scan; self-prune your own `merged:<sha>` rows on session start
-(`git merge-base --is-ancestor <sha> main`). One writer per file → the ledger never conflicts on merge.
+### 3a — Migrating an existing repo off the sharded session ledger (BREAKING)
+
+**The sharded authored session ledger is RETIRED** at **playbook v2.4 / memory-tree kit 1.8** — two
+products, two version lines, and the ruleset change is the playbook's, not the kit's. If your repo
+carries `<MEMORY_ROOT>/project/IN-FLIGHT.md` (the pointer stub) plus `<MEMORY_ROOT>/project/in-flight/<tag>.md`
+(the per-node shards), it was scaffolded by kit ≤ 1.7 and this is a breaking upgrade: the scaffolder
+no longer writes that shape and hygiene check 3 no longer admits it, so an untouched tree goes red on
+its first run of the new gate. Skip this whole section if you are scaffolding fresh.
+
+1. **Relocate the shards — never delete them.** `git mv` each one byte-identically to
+   `<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLIGHT.md`'s protocol prose into
+   `<MEMORY_ROOT>/archive/ledger/README.md`. Status content in those rows is redundant with git, but
+   the shards are the ONLY carrier of worktree names, review ids and session narrative. Verify the
+   move was a rename, not a delete-plus-add:
+   `git log --follow -p --find-renames -- <path> | grep -m1 'similarity index'` → `similarity index 100%`.
+2. **Take work state from the generated index instead.** `python memory-tree/gen_build_index.py --write`
+   renders `LIVE.md` and the `ledger/<month>.md` shards from each build's `README.md` front matter plus
+   every spec's `**Status:**` header. Nothing about work state is authored after this, so nothing about
+   it can rot.
+3. **Front matter is the prerequisite, and it is per build.** `slug` · `node` · `opened` · `streams` ·
+   `roster` · `ids` are ALL REQUIRED on every `builds/<slug>/README.md`. `status:` is required *only*
+   when no spec under that build carries a parseable `**Status:**` header; a `status:` key alongside a
+   spec that does carry one is a HARD ERROR, because that is two answers to one question. A build with
+   no README front matter is invisible to the index — it does not fail loudly, it simply does not
+   appear.
+4. **Budget it as its own unit.** Measured on the one adopter on this node (`swydee`): kit 1.4, a
+   pre-flatten tree, three live ledger rows, no `LIVE.md`, no `ledger/`, and **zero** build READMEs
+   carrying front matter. For that repo the migration is a flatten plus a front-matter backfill across
+   every build folder, then step 1 — its own work unit in its own repo, not a step in this runbook.
+
+Then re-pull §3, §5 and this kit's handling per the playbook's v2.4 banner, and drop any ledger row,
+pointer stub or self-prune rule from your kickoff manifest (§4) and your instantiated playbook (§2).
 
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
 
@@ -252,8 +281,8 @@ from §2). Write the manifest to one of those paths so it resolves.
    ```
 2. Fill **§B (orientation)** from the repo: repo layout · remote + default branch · branch conventions ·
    governing docs · the **path to the playbook from §2** · the pointer map (area → doc → entrypoints) ·
-   the gate commands · the tier rule · the **ID + ledger protocol** (id format + slug rules + collision
-   grep + the sharded ledger path `memory/project/in-flight/<tag>.md`) · the environment traps. Fill the
+   the gate commands · the tier rule · the **ID protocol** (id format + slug rules + collision grep +
+   where work state is READ from, e.g. the generated `memory/LIVE.md`) · the environment traps. Fill the
    **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
    `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
@@ -351,9 +380,17 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ```
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
   `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
-  mechanical enforcement of the ≤6-concurrent rule — a wide fan-out trips the server rate limiter.
-- Copy `tools/workflows/tier2-review.js` for a ready consolidated review harness (~7–9 agents, ≤6 concurrent).
-- Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0.
+  mechanical enforcement of the review protocol's TWO rules: route fan-out through the cap-5 helpers,
+  AND a review's verify stage spawns at most 5 agents TOTAL. A wide fan-out trips the server rate
+  limiter. The binding rules ship as `tools/workflows/REVIEW-PROTOCOL.template.md` — install it at
+  `<MEMORY_ROOT>/guides/REVIEW-PROTOCOL.md` (the path `check-protocol-parity.test.sh` treats as LIVE)
+  and cite THAT copy from your manifest, not this runbook.
+- Copy the kit dir in as `<project>/workflows/` for a ready consolidated review harness
+  (`tier2-review.js`): four finder lenses, then at most five BATCHED verifiers, then one synthesis
+  pass — 6–10 agents over the whole run, of which at most 5 are verify-stage and at most 5 ever run
+  concurrently.
+- Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0, and
+  `bash <project>/workflows/check-protocol-parity.test.sh` → exit 0 once the protocol is installed.
 
 ## 6 — Verify the whole chain, then commit
 
@@ -370,7 +407,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   (§3c step 3) — a kit copied in beside a skill nobody rendered otherwise reads as fully wired.
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
-   and surface the playbook + gate + ledger protocol. If it can't, re-check the §4 search paths.
+   and surface the playbook + gate + ID protocol. If it can't, re-check the §4 search paths.
 2. **Gate green** (if memory-tree adopted): `bash memory-tree/check-memory-hygiene.sh ; echo $?` → 0.
 3. **No stray placeholders:** `grep -rn '{{' <project>/docs/PARALLEL.md` → empty, and
    `grep -rnE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` → empty (the manifest check is
@@ -386,7 +423,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
    commit** → still green (a bare revert touches the watched file again and would end the wiring
    session red). If a CI leg was wired: push the probe branch and confirm the CI job actually reds —
    proof it isn't WARN-skipping on a shallow checkout. Then delete the probe branch.
-6. **Ledger sharded:** `ls <project>/memory/project/in-flight/` exists; `IN-FLIGHT.md` is the pointer stub.
+6. **Work state generated, not authored:** `python memory-tree/gen_build_index.py --check` → 0, and
+   `memory/LIVE.md` exists. Nothing under `memory/project/` but the five `*.txt` waiver registries.
 
 ## Result — what the project now has
 
@@ -400,7 +438,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐
 ├── memory-tree/                 # the hygiene kit (copied in)  │ only if §3 adopted
-└── memory/                      # scaffolded tree; project/in-flight/<tag>.md = sharded ledger ┘
+└── memory/                      # scaffolded tree; LIVE.md = GENERATED work-state index      ┘
 ~/.claude/skills/session-kickoff # the engine (per-MACHINE junction/symlink — not in the repo)
 ```
 
@@ -444,8 +482,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - **Stall review (rides this same Maintenance cadence):** at each kit re-pull, the owner compares the
   manifest's BODY-change commits (diffs touching more than the `last-audit` line) against watch-commit
   volume and elapsed time — **≥10 watch-pathspec commits or ≥3 months with zero body growth = the
-  manifest is stalling**; that is the trigger for reconsidering heavier accretion tooling (journal
-  mining). Kickoff delta lines are supporting color, not the data source — squash merges and chat
-  don't preserve them.
+  manifest is stalling**; that is the trigger for reconsidering heavier accretion tooling (mining the
+  build records). Kickoff delta lines are supporting color, not the data source — squash merges and
+  chat don't preserve them.
 - **memory-tree kit updates** never carry project data (no brand gate, no migrations) — those stay in the
   project. Safe to overwrite `memory-tree/*.sh` + `HYGIENE.template.md` from `<gov>`.
