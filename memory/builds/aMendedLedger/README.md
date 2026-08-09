@@ -23,5 +23,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMendedLedger-1 — finish the memory rework: drain the ledger, drive the merge, re-true the docs](spec/2026-08-09-spec-aMendedLedger-1.md) | SPECCED | rev-1 | 2026-08-09 |
+| [TOOL-aMendedLedger-1 — finish the memory rework: drain the ledger, drive the merge, re-true the docs](spec/2026-08-09-spec-aMendedLedger-1.md) | SPECCED | rev-2 | 2026-08-09 |
 <!-- /gen:build-index -->
