@@ -3,7 +3,7 @@
 #
 #   bash tools/codebase-map/adopt-codebase-map.test.sh
 #
-# WHY THIS FILE EXISTS. A Tier-2 review of TOOL-aRootedPrefix-1 found 4 of 7 defects — including a
+# WHY THIS FILE EXISTS. A Tier-2 review of the install-prefix work found 4 of 7 defects — including a
 # blocker that wrote a conf, a whole map tree and a gate file into a repository the operator never
 # named — in `adopt-codebase-map.sh`, the ONE changed file no gate leg executed. The Python engine
 # beside it, carried by ~20 selftest arms, produced zero confirmed findings. That correlation is the
@@ -21,6 +21,42 @@ cd "$ROOT" || exit 2
 KIT="$ROOT/tools/codebase-map"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+
+# The resolver, INLINE — this file SHIPS inside the kit, so `../lib/` does not exist in an adopting
+# repo. Byte-identical to tools/lib/resolve-python.sh; resolve-python.test.sh reds if a copy drifts.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
+PY=$(resolve_python "${MAP_PY:-}") || exit 2
 
 note() { printf '%s\n' "$*"; }
 bad()  { fails=$((fails+1)); printf 'arm FAIL  %s\n' "$*"; }
@@ -94,7 +130,7 @@ fi
 # could not stamp" is not enough on its own — a mangled write plus an honest note would still leave
 # a broken conf on disk. The last two prefixes are ordinary ones the conf grammar accepts, so the
 # stamping's HAPPY path is armed too and this loop cannot pass by only ever declining.
-DEFAULT_MDC='python codebase-map/map_diff.py'
+DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run
 i=0
 for prefix in 'R&D' 'a b' "x'y" 'ok-dir' 'ok.dir'; do
   i=$((i+1))
@@ -203,7 +239,7 @@ elif ! printf '%s' "$out" | grep -q "Adopted."; then bad "6 happy-path: no Adopt
 else
   printf 'def added():\n    return 2\n' > "$TMP/a6/src/newmod.py"
   gate=$(cd "$TMP/a6" && . ./.codebase-map.conf >/dev/null 2>&1; printf '%s' "${GATE_FILE:-tests/test_codebase_map.py}")
-  if (cd "$TMP/a6" && python "$gate" >/dev/null 2>&1); then
+  if (cd "$TMP/a6" && "$PY" "$gate" >/dev/null 2>&1); then
     bad "6 happy-path: the installed gate stayed GREEN on an unclaimed new module"
   else
     good "6 happy-path adopts, and the gate it installs is live"
