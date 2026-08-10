@@ -1,6 +1,6 @@
 # TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true
 
-**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
+**Status:** INPROGRESS · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
 
 ## 1. Goal
 

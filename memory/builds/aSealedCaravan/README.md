@@ -20,13 +20,14 @@ reading the runbook.
 
 ## Start here
 
-**State.** Two units, both SPECCED at rev-4, both reviewed once (Tier-2, 5 lenses, 48 confirmed
-findings, 6 blockers — all folded). Nothing is built.
+**State.** Unit 1 is BUILT — three commits, full bar green at 41/41 — and green on
+`branch/governance-adoption-kit-9bc273`, not yet landed on `main`. Unit 2 is SPECCED at rev-4. Both
+were reviewed once (Tier-2, 5 lenses, 48 confirmed findings, 6 blockers — all folded).
 
-**Next action.** Unit 1 (`TOOL-aSealedCaravan-1`) is buildable and depends on nothing outside this
-repo. Its three-commit rollout is in section 4. Unit 2 (`DEPL-aSealedCaravan-2`) should not start
-until unit 1 lands, because govkit's install plan is written against one prefix and unit 1 is what
-makes that prefix true.
+**Next action.** Merge unit 1 to `main`, then flip its spec to CLOSED — the status is INPROGRESS
+rather than CLOSED because "built" and "landed" are different claims. Unit 2
+(`DEPL-aSealedCaravan-2`) is unblocked the moment that lands: its install plan is written against
+the prefix unit 1 just made true. Its rollout commit 1 is the registry plus `selfcheck`.
 
 **Nothing blocks either unit.** The one blocking pair — unit 1's F3 and unit 2's F5, both about
 `tools/lib/` — resolved on 2026-08-10: it is not a kit, it ships nothing, and it becomes a permanent
@@ -56,10 +57,10 @@ Records live under `spec/` and, once built, `build/` and `reviews/`. The table b
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-4 | 2026-08-10 |
-| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | SPECCED | rev-4 | 2026-08-10 |
+| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | INPROGRESS | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->
