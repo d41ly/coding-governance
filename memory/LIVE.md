@@ -7,7 +7,6 @@ terminal status. Nothing here is edited by hand.
 | Build | Status | Node | Opened | Streams | Ids |
 |---|---|---|---|---|---|
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aBatchedLintel-1/-2 |
-| [aCandidStub](builds/aCandidStub/README.md) | INPROGRESS | a | 2026-08-10 | playbook+tooling | PLAY-aCandidStub-1 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | DEPL-aDeployScout-1 |
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | TOOL-aDrainedSluice-1..-9 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aGuardedTally-1 |

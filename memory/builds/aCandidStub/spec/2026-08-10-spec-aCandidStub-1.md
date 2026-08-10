@@ -1,6 +1,6 @@
 # PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs
 
-**Status:** INPROGRESS · rev-2 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams playbook+tooling · ratified 2026-08-10
+**Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams playbook+tooling · ratified 2026-08-10
 
 ## 1. Goal
 
@@ -181,6 +181,10 @@ nothing (companion §14, the section this unit un-orphans).
 
 ## 8. Open questions
 
+none — all three forks were RESOLVED by the owner on 2026-08-10. They are kept below with their
+reasoning rather than deleted, because two of them changed the design and one of them changed it in
+a direction neither option originally offered.
+
 ### Fork 1 — the §10 retirement the unit was commissioned to design
 
 The kickoff answer was "retire the static checklist into the catalogue: the 25 rows become
@@ -218,12 +222,24 @@ breaks any adopter copy that already cites it. **Recommendation: renumber to §1
 because the companion is younger than the template and no instantiated copy is known to cite it —
 verify that before landing.
 
+**RESOLVED (owner, 2026-08-10): renumbered to §7, not §15 — a third option neither branch above
+saw.** The companion's numbering is one-to-one with the template's: companion §N extends template §N,
+and §7 was the only gap in the run §4, §8–§13. Gate discipline is template §7's subject, so §7 is
+where the section already belonged. Renumbering to §15 would have fixed the collision and left the
+orphan, since the orphan is the absent STUB, not the number. The move plus a §7 stub fixes the
+collision, the orphan and the numbering convention together, and is verified mechanically: zero
+orphaned companion sections, zero stubs to nowhere, sections in ascending order.
+
 ### Fork 3 — whether the droppable set is widened or narrowed
 
 S4 requires the two files to name one droppable set. Narrowing the companion's claim to §4, §9, §11
 and §13 matches `customize.md` as written; widening `customize.md` to admit §8, §10, §12 and §14
 matches the companion as written. **Recommendation: narrow the companion's claim.** §10 and §12
 carry rules §1 and §7 reference unconditionally, so they are not in fact droppable.
+
+**RESOLVED (owner, 2026-08-10): narrowed.** The companion now names §4, §9, §11 and §13 as the
+droppable set and §7, §8, §10 and §12 as universal core, matching `customize.md`'s list, which gained
+the rule that dropping a template stub drops its companion section too.
 
 ## 9. Revision log
 
@@ -239,6 +255,14 @@ carry rules §1 and §7 reference unconditionally, so they are not in fact dropp
   and produce the same flat tree, because the scaffolder reads `DISCIPLINES` as an enum and never
   consults the stale comments. The defect is real but it misinforms rather than breaks, and the claim
   was confirmed by a skeptic who read the comments against the checks without running the scaffolder.
+- rev-3 · 2026-08-10 · owner directed the last two confirmed findings built. S5 done: §0's TL;DR now
+  states §5's rule verbatim on both halves and no "per-node files" survives in any of the three
+  files. S4 completed: fork 2 RESOLVED by a third option — companion §14 became §7 and moved into
+  order, with a matching template §7 stub — and fork 3 RESOLVED narrow. Funded by collapsing the
+  §11 stub's inlined LF and `git -C` prose, which companion §11 already carried in full with more
+  detail; the two rules stay NAMED in the stub so a reader still knows they exist. Every §8 fork is
+  now resolved, so the status may go terminal. Template sits at 32676/32768, 92 bytes free — the
+  next unit touching it funds itself.
 
 ## 10. Reuse audit
 

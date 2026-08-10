@@ -1,10 +1,11 @@
 # Parallel Multi-Node Coding — Governance Template
 
 *Template **v2.5** · 2026-08-10. One line per directive (a wrapped line is still one rule). Deploy +
-re-pull BOTH files per `parallel-coding-governance.customize.md`; the eight domain checklists (§4, §8,
-§9–§14) live in `parallel-coding-governance.domain-rules.md`; history in the `…-v-N-N.md` snapshots +
-git. **v2.5 (2026-08-10):** the `memory-tree` kit is REQUIRED, not optional; §8 now spells the second
-fan-out marker the `agent-cap` hook demands — re-pull §5, §8 and the companion in lockstep.*
+re-pull BOTH files per `parallel-coding-governance.customize.md`; the eight domain checklists (§4,
+§7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
+`…-v-N-N.md` snapshots + git. **v2.5 (2026-08-10):** the `memory-tree` kit is REQUIRED; §8 spells the
+second fan-out marker `agent-cap` demands; the orphaned gate-discipline section is now companion §7 —
+re-pull §0, §5, §7, §8 and the companion in lockstep.*
 
 <!-- governance-template: v2.5 -->
 
@@ -16,7 +17,7 @@ fan-out marker the `agent-cap` hook demands — re-pull §5, §8 and the compani
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
 - **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
-- **Memory holds only the non-derivable**; per-node files, no shared mutable index (§5).
+- **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never run more than 5 agents concurrently** — consolidate before you fan out; a wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook).
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
@@ -130,6 +131,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
 - Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
 - Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
+- Gate-discipline rules → `parallel-coding-governance.domain-rules.md` §7 (failing case OBSERVED before a gate lands, no guard sharing state with what it guards, predicate run over the real tree first, a skip that announces itself). LOAD when adding or changing a gate.
 - Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — never exempt them to "unblock" a landing (claiming the key IS the unblock).
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
@@ -164,7 +166,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §11 — Cross-OS & toolchain hygiene
 
-- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11. The two that bite most, kept here: force `LF` via `.gitattributes` on execution-sensitive files (a stray CR breaks shebangs/servers/generated migrations), and on Windows POSIX shells give `git -C` a forward-slash path — a backslash drive path (`C:\repo`) mangles to `C:repo`. Full list (byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls) in the companion.
+- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11 (the two that bite most: force `LF` via `.gitattributes` on execution-sensitive files, and forward-slash `git -C` paths on Windows POSIX shells; plus byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls, silenced crash reporters). LOAD for cross-OS or toolchain work.
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 

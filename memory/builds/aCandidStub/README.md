@@ -24,9 +24,9 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-10 · streams playbook+tooling · ids PLAY-aCandidStub-1
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-10 · streams playbook+tooling · ids PLAY-aCandidStub-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs](spec/2026-08-10-spec-aCandidStub-1.md) | INPROGRESS | rev-2 | 2026-08-10 |
+| [PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs](spec/2026-08-10-spec-aCandidStub-1.md) | CLOSED | rev-3 | 2026-08-10 |
 <!-- /gen:build-index -->
