@@ -1,13 +1,12 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.5** · 2026-08-10. One line per directive (a wrapped line is still one rule). Deploy +
-re-pull BOTH files per `parallel-coding-governance.customize.md`; the eight domain checklists (§4,
-§7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.5 (2026-08-10):** the `memory-tree` kit is REQUIRED; §8 spells the
-second fan-out marker `agent-cap` demands; the orphaned gate-discipline section is now companion §7 —
-re-pull §0, §5, §7, §8 and the companion in lockstep.*
+*Template **v2.4** · 2026-08-09. One line per directive (a wrapped line is still one rule). Deploy +
+re-pull per `parallel-coding-governance.customize.md`; the six domain checklists (§4, §9–§13) live in
+`parallel-coding-governance.domain-rules.md`; history in the `…-v-N-N.md` snapshots + git. **v2.4
+(2026-08-09):** §3's sharded per-node session ledger is RETIRED — work state now comes from the
+generated build index; re-pull §3, §5 and the `memory-tree` kit's handling.*
 
-<!-- governance-template: v2.5 -->
+<!-- governance-template: v2.4 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -17,7 +16,7 @@ re-pull §0, §5, §7, §8 and the companion in lockstep.*
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
 - **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
-- **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
+- **Memory holds only the non-derivable**; per-node files, no shared mutable index (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never run more than 5 agents concurrently** — consolidate before you fan out; a wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook).
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
@@ -102,9 +101,9 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
-- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **19-check hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
-- **Optional — a self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
-- **Optional — retrieval over that tree** (`memory-recall/` kit, requires it): ask the decision corpus a question and get the records that answer it, ranked; an offline stdlib CLI reading `.memory-tree.conf`, so root + id families are declared once; writes nothing in the worktree; the rendered recall Skill's drift rides `{{GATE_RUNNER}}`.
+- **Optional — a structured, machine-linted memory tree** (`tools/memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **19-check hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+- **Optional — a self-verifying codebase map** (`tools/codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
+- **Optional — retrieval over that tree** (`tools/memory-recall/` kit, requires it): ask the decision corpus a question and get the records that answer it, ranked; an offline stdlib CLI reading `.memory-tree.conf`, so root + id families are declared once; writes nothing in the worktree; the rendered recall Skill's drift rides `{{GATE_RUNNER}}`.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -131,7 +130,6 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
 - Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
 - Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
-- Gate-discipline rules → `parallel-coding-governance.domain-rules.md` §7 (failing case OBSERVED before a gate lands, no guard sharing state with what it guards, a skip that announces itself). LOAD when adding or changing a gate.
 - Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — never exempt them to "unblock" a landing (claiming the key IS the unblock).
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
@@ -145,7 +143,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
 - Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
-- **CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.** A ~40-agent fan trips the SERVER rate limiter and kills whole phases for millions of tokens; the harness auto-cap (≈14) does NOT protect you. Route ALL Workflow fan-out through cap-5 helpers `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …)` — inlined (scripts can't import; the `parallel(`/`pipeline(` line carries a `gov:bounded-fanout` marker). **CONSOLIDATE before you fan out:** at most 5 verify agents TOTAL (batch grows, agent count does not). Enforce mechanically: the `agent-cap.js` PreToolUse hook (matcher `Workflow`) DENIES a raw primitive AND any `agent(` fanned over a receiver it cannot PROVE bounded — so the batching assignment carries a `gov:fixed-verifiers` marker and must spell `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)`, `K` an integer literal ≤5 or an identifier bound to one; an array LITERAL of ≤6 elements (the lens fan) passes unmarked. Run the ready `workflows/tier2-review.js` harness (install per WIRE §5).
+- **CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.** A ~40-agent fan trips the SERVER rate limiter and kills whole phases for millions of tokens; the harness auto-cap (≈14) does NOT protect you. Route ALL Workflow fan-out through cap-5 helpers `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …)` — inlined (scripts can't import; the `parallel(`/`pipeline(` line carries a `gov:bounded-fanout` marker). **CONSOLIDATE before you fan out:** at most 5 verify agents TOTAL (batch grows, agent count does not). Enforce mechanically: the `agent-cap.js` PreToolUse hook (matcher `Workflow`) DENIES raw-primitive scripts; run the ready `tools/workflows/tier2-review.js` harness (install per WIRE §5).
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
@@ -162,11 +160,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §10 — Recurring bug classes (run in every Tier-2 review)
 
-- Recurring-bug-classes checklist (25 generic classes) → `parallel-coding-governance.domain-rules.md` §10, and your own under `{{MEMORY_ROOT}}/gotchas/` (§5) — disjoint by design, run both in every Tier-2 review (§8); left-shift each confirmed class into a gate (§7).
+- Recurring-bug-classes checklist (~19 classes) → `parallel-coding-governance.domain-rules.md` §10. RUN it in every Tier-2 review (§8); left-shift each confirmed class into a gate (§7).
 
 ## §11 — Cross-OS & toolchain hygiene
 
-- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11 (force `LF` via `.gitattributes` on execution-sensitive files, forward-slash `git -C` paths on Windows POSIX shells, byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls, silenced crash reporters). LOAD for cross-OS or toolchain work.
+- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11. The two that bite most, kept here: force `LF` via `.gitattributes` on execution-sensitive files (a stray CR breaks shebangs/servers/generated migrations), and on Windows POSIX shells give `git -C` a forward-slash path — a backslash drive path (`C:\repo`) mangles to `C:repo`. Full list (byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls) in the companion.
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 

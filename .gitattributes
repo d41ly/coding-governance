@@ -66,6 +66,16 @@ parallel-coding-governance*.md text eol=lf
 # exist for. The conf is pinned because it is SOURCED BY BASH: a CRLF checkout leaves stray carriage
 # returns in every value on Linux.
 .codebase-map.conf text eol=lf
+
+# The memory-tree conf, pinned for the identical reason as `.codebase-map.conf` above: it is SOURCED
+# BY BASH (`. "$ROOT/.memory-tree.conf"`, check-memory-hygiene.sh) with no CR stripping. It was
+# unpinned and CRLF in this worktree, and the suite still passed only because MSYS/git-bash strips CR
+# on source — the same node-specific behaviour that makes a CRLF fixture untestable here. On Linux or
+# CI every value would carry a trailing CR and MEMORY_ROOT would resolve to `memory\r`. AGENTS.md
+# already claims LF for "the memory-tree data files"; this is that claim made true for the conf. The
+# shipped example is pinned too, because the adopter copies it to the sourced path verbatim.
+.memory-tree.conf text eol=lf
+tools/memory-tree/.memory-tree.conf.example text eol=lf
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf
 memory/map/affordance-exempt.toml text eol=lf
