@@ -27,3 +27,4 @@
 - TOOL-aNumeralWarden-2 · OPEN · agent-cap's enclosing-opener walk is defeated by two nested wrappers or 59 lines of distance between the `.map` and the `agent(` call; it needs a statement-level walk, not an opener count, and the 58/59 boundary is unfixtured
 - TOOL-aNumeralWarden-3 · OPEN · a drift-audit pin RAISE is indistinguishable from a population drain to every gate leg; `--check` compares only `value > pin`, so `ORPHAN_ID_PIN` 4 -> 5 and `handkept` 1 -> 7 both landed unchallenged
 - TOOL-aNumeralWarden-4 · OPEN · the codebase-map symbol corpus indexes no non-exported JavaScript function, so `reuse_lookup.py` cannot see `boundedK` or any other seam inside the kit's own hooks
+- TOOL-aUnmannedHelm-1 · SPECCED · the unattended-run protocol is retyped into chat every session and has already drifted between runs; it becomes a kit — run-state file, protocol doc, driver, gate leg — plus the kickoff hand-back, the agent-cap matcher and an adopter path
