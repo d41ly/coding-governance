@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:19:58+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T20:30:08+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -149,6 +149,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- A "core set ⊆ effective set" assertion is VACUOUS whenever the checker COMPOSES the effective set
+  from the core one. Measured 2026-08-10 in the new unattended leg: the leg built `PHASES` as
+  `$PHASES_CORE $PHASES_EXTRA` and then asserted every core member was in `PHASES` — a subset by
+  construction, unfailable, and it armed cleanly. Pin a shrink-only COUNT instead (the `ARMS_FLOORS`
+  / `baseline.toml` shape), so the names stay single-sourced and deletion still reds; and make an
+  UNDECLARED floor its own refusal, because omitting the key is the quietest way to disarm a pin.
+  The general rule: an assertion between two values the same code derives from one source is a
+  tautology — assert against something declared INDEPENDENTLY.
 - A positional in a gate's `fail` message CANNOT be armed. `check-arms.py` reads `${?[A-Za-z_]…` as
   an interpolation to drop, but a bare `$1` is literal text, so it lands INSIDE the signature and no
   assertion can ever name it — the branch reads unarmed no matter what the test says. Bind the value

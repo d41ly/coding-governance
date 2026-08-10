@@ -109,11 +109,12 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
+**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | INPROGRESS | rev-4 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-4 — the protocol document, and the authorization it rests on](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md) | INPROGRESS | rev-2 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | INPROGRESS | rev-2 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | INPROGRESS | rev-2 | 2026-08-10 |
 <!-- /gen:build-index -->

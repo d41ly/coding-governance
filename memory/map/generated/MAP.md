@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 40 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 2 · gotcha-classes: 10 · guides: 2 · backlog-shards: 4
+Inventories: gate-legs: 43 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 2 · gotcha-classes: 10 · guides: 2 · backlog-shards: 4
 
 ## gate-legs
 
@@ -45,6 +45,9 @@ Inventories: gate-legs: 40 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `run-gates canary` | baseline |
 | `settings-merge selftest` | baseline |
 | `template size <=32KiB` | baseline |
+| `unattended driver selftest` | unattended |
+| `unattended gate selftest` | unattended |
+| `unattended kit gate` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
 | `verifier fan-out (≤5 verify agents per review)` | baseline |

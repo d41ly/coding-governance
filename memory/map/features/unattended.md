@@ -8,7 +8,7 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = []
+gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
@@ -82,17 +82,15 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-The feature is mid-build. Units 1 and 2 of seven have landed on the unit branch: the run-state file
-is legal in the memory tree, and the protocol, the project declaration and the authorization
-amendment exist. Units 3 through 7 — the driver, the gate legs, the rendered skill, the
-`/session-kickoff` hand-back and the adopter path — are not built, so:
+The feature is mid-build. Units 1 through 4 of seven have landed on the unit branch: the run-state
+file is legal in the memory tree, the protocol and the project declaration exist, the authorization
+amendment reaches all four sites, the four-verb driver is built and the three gate legs are on the
+bar. Units 5 through 7 — the rendered skill, the `/session-kickoff` hand-back and the adopter path —
+are not built, so:
 
-- `gate-legs` is EMPTY in the claims above. Nothing validates the declarations yet: the phase
-  vocabulary, the DoD core set and the kit/dogfood parity of the protocol pair are all asserted by
-  prose alone until unit 4 lands. This dossier claims the kit anyway because the coverage gate is
-  right to demand a claim the moment a key appears, and an unclaimed key is a worse record than a
-  claimed one with a stated hole.
-- `rendered-skills` is EMPTY for the same reason (unit 5).
+- `rendered-skills` is EMPTY: unit 5 has not landed.
+- The adopter path does not exist (unit 7), so nothing installs this kit into another repo and the
+  two adopter legs the review budgeted are not on the bar yet.
 - No end-to-end run has been driven through this kit. Every property above is designed and
   documented; none is yet observed on a live unattended run.
 - The `governance-template` marker still reads v2.5 while the template's §1 and §8 rules have

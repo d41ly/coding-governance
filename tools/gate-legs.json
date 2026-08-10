@@ -289,6 +289,27 @@
     ]
   },
   {
+    "name": "unattended kit gate",
+    "argv": [
+      "bash",
+      "tools/unattended/check-unattended.sh"
+    ]
+  },
+  {
+    "name": "unattended gate selftest",
+    "argv": [
+      "bash",
+      "tools/unattended/check-unattended.test.sh"
+    ]
+  },
+  {
+    "name": "unattended driver selftest",
+    "argv": [
+      "bash",
+      "tools/unattended/unattended.test.sh"
+    ]
+  },
+  {
     "name": "run-gates canary",
     "argv": [
       "bash",

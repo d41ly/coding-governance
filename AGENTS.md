@@ -95,6 +95,16 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
+- **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
+  merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
+  mandate it ASSERTS and cannot have written. Three legs: `tools/unattended/check-unattended.sh`
+  (eleven checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
+  live, the run-state file's generated region still equals the build README slice it is a COPY of,
+  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, and
+  the shipped protocol equals the installed one), plus its sibling
+  `tools/unattended/check-unattended.test.sh` and the driver's
+  `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
