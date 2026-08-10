@@ -25,9 +25,13 @@
  *
  * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
- *   "hooks": { "PreToolUse": [ { "matcher": "Workflow",
+ *   "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent",
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
+ * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
+ * `Workflow` is where this file reads a script; `Agent` is the modality it was blind to, where a
+ * direct spawn met no rule at all. Widening it is inert on its own: main() exits 0 on any tool_name
+ * that is not Workflow.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
  * ponytail: a static scan can't prove a dynamically-built array is ≤CAP — this

@@ -33,6 +33,15 @@ if [ -z "$ac" ] || ! grep -qE "gov:kit agent-cap@$ac([^0-9.]|\$)" tools/hooks/ag
 fi
 need "KIT_SETTINGS_MERGE_VERSION" tools/settings-merge.py                   "KIT_SETTINGS_MERGE_VERSION = \"$V\""
 
+# settings-merge: constant plus the marker in its own module docstring, which is where a deployer
+# reads the version of a single-file kit. Presence-only left a half-bumped pair passing, same as
+# agent-cap's.
+sm=$(grep -oE "^KIT_SETTINGS_MERGE_VERSION = \"$V\"" tools/settings-merge.py | head -1 | grep -oE "$V")
+if [ -z "$sm" ] || [ "$(grep -cE "gov:kit settings-merge@$sm([^0-9.]|\$)" tools/settings-merge.py)" -lt 2 ]; then
+  echo "kit-versions: settings-merge.py gov:kit markers != KIT_SETTINGS_MERGE_VERSION (${sm:-unreadable})"
+  fails=$((fails+1))
+fi
+
 # memory-tree is the only kit whose version lives in TWO hand-kept literals (engine constant + the
 # marker in HYGIENE.template.md it ships verbatim). Assert they agree — a stale marker makes the
 # deployer read the wrong installed version. (Token is mid-line, so CRLF working trees are fine.)

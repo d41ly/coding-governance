@@ -381,9 +381,13 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ```
   It inserts the block below (a hand-merge works too):
   ```json
-  "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
+  "PreToolUse": [ { "matcher": "Workflow|Agent", "hooks": [ { "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
   ```
+  The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
+  and not two blocks. `Workflow` is where the hook reads a script; `Agent` is the direct-spawn
+  modality it was blind to. `tools/check-wiring.sh` asserts this VALUE, not merely that the file
+  mentions `agent-cap.js`: a group left at `Workflow` alone contains the string and used to report ok.
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
   `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
   site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is
