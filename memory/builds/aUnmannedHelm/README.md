@@ -32,6 +32,29 @@ count that reads no run-state file dissolved the cycle in both directions. Neith
 other now, and this build's own AC13 already required the arity guarantee not to depend on the
 hook's schedule.
 
+## Start here
+
+**State.** Unit 1 is SPECCED and has cleared a Tier-2. Units 2 through 7 have no sub-spec yet.
+Nothing here is built.
+
+**Next action, either of:** write unit 2's sub-spec (the protocol document, which the other units
+consume), or build unit 1 from `spec/2026-08-10-spec-aUnmannedHelm-1.md`, which stands alone.
+
+**Read before writing any sub-spec:** `reviews/2026-08-10-review-aUnmannedHelm-1.md`. The
+obligations column below is a one-line summary of what that review pinned on each unit, not a
+replacement for it.
+
+**Live constraints, measured 2026-08-10 and re-measurable:**
+
+- The playbook template has **80 bytes free** at v2.5, not the 685 this build was designed against.
+  A `aCandidStub` landing spent the headroom. Unit 2's playbook rules must be sized against 80, or
+  fund themselves by moving prose into the companion.
+- `non_terminal_specs_cited_by_product_source` sits AT its pin with zero headroom. No file under
+  `tools/`, `skills/`, `.claude/`, the template, its companions or `WIRE-INTO-PROJECT.md` may cite
+  this build's ids while the owning sub-spec is non-terminal. Records under `memory/` may.
+- `TOOL-aNumeralWarden-1` is NOT a blocking dependency. It owns every agent-cap edit; it does not
+  gate any unit here.
+
 ## The units
 
 | Unit | Subject | Obligations the Tier-2 review pinned |
@@ -42,7 +65,7 @@ hook's schedule.
 | **Unit 4** | the gate leg | Budget THREE `gate-legs.json` entries, not one. Witness PRESENCE is its own `fail` branch. Asserts at most one run-state file is in a non-terminal phase. Two-granularity population guard |
 | **Unit 5** | the rendered skill | `.gitattributes` pin only — `check-wiring.sh`'s eol population is derived, so the script itself needs no edit. Drift and CRLF each need an acceptance criterion |
 | **Unit 6** | the `/session-kickoff` hand-back | Enumerate all six interactive exits by line, not five. Needs the acceptance criterion it currently lacks: mandate present hands back, mandate absent still stops |
-| **Unit 7** | the adopter path | Refuses a foreign repo and an unsupported prefix; ADOPTS correctly through a junction. Bumps the `governance-template` marker to v2.5 with a v2.4 archive snapshot |
+| **Unit 7** | the adopter path | Refuses a foreign repo and an unsupported prefix; ADOPTS correctly through a junction. Bumps the `governance-template` marker to v2.6 with a v2.5 archive snapshot — v2.5 was taken by aCandidStub on 2026-08-10 |
 
 ## Ratified decisions
 
