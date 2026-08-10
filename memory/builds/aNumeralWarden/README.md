@@ -13,13 +13,19 @@ Node `a` · opened 2026-08-10 · streams tooling.
 
 ## Start here
 
-**State.** One unit, BUILT at rev-5 on `branch/anumeralwarden-build-setup-b48e83`. All three Rollout
-commits landed on the branch, each gated by the full bar: `3086cab` (S1-S13, the bound-reading
-predicate) · `fb29755` (S14, the matcher widening) · `3aec132` (S15, the runtime count). Every
-acceptance criterion AC1-AC27 is observed.
+**State.** Code is BUILT and LANDED on `origin/main` as merge `990f07b`, full bar green inside the
+lander. The three Rollout commits, each gated on the branch first: `3086cab` (S1-S13, the
+bound-reading predicate) · `fb29755` (S14, the matcher widening) · `3aec132` (S15, the runtime
+count). Every acceptance criterion AC1-AC27 is observed. What ships: `agent-cap` 1.3 resolves the
+bound at the call site, the default parameter and the `gov:bounded-fanout` width, refuses a set
+`AGENT_CAP`, and counts direct `Agent` spawns at 5 per user prompt. Also moved: `settings-merge` 1.1,
+`drift-audit` 1.1.
 
-**Next action: the merge ask.** The branch is complete and green; merging to `main` and pushing each
-need an explicit owner ask, so nothing has landed on `main`. Nothing else in this build is pending.
+**The unit is NOT closed, and one thing is why: F2 is still open.** No code is owed — F2 moves none,
+as §3 said — but a spec may not go terminal while §8 names an unresolved question, and hygiene check
+12 enforces that. So the only remaining action is the owner's decision on F2 (`MAX_LENSES` is 6 while
+`MAX_VERIFIERS` is 5); §8 carries its three options and a recommendation. Ratify it, then flip this
+unit to CLOSED.
 
 **AC22 was measured, and it answered YES.** `PreToolUse` does fire for a direct `Agent` spawn,
 `tool_name` is exactly `Agent`, and `session_id` / `prompt_id` / `tool_use_id` are all present. The

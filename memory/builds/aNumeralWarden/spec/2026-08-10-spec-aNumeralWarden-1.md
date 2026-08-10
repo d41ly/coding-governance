@@ -1,6 +1,6 @@
 # TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to
 
-**Status:** INPROGRESS · rev-5 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · built 3086cab..3aec132
+**Status:** INPROGRESS · rev-5 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · landed 990f07b
 
 ## 1. Goal
 
