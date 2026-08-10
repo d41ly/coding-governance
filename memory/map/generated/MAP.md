@@ -10,7 +10,7 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `agent-cap self-test` | baseline |
+| `agent-cap self-test` | agent-cap |
 | `agent-instructions self-test` | baseline |
 | `agent-instructions wiring` | baseline |
 | `branch-guard self-test` | baseline |
@@ -40,7 +40,7 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `review-join ban (no ref-keyed join)` | baseline |
 | `review-join self-test` | baseline |
-| `review-protocol parity (kit vs dogfood)` | baseline |
+| `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
 | `run-gates canary` | baseline |
 | `settings-merge selftest` | baseline |
@@ -52,8 +52,8 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out (≤5 verify agents per review)` | baseline |
-| `verifier fan-out self-test` | baseline |
+| `verifier fan-out (≤5 verify agents per review)` | agent-cap |
+| `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 
 ## kits
@@ -64,7 +64,7 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `codebase-map` | codebase-map |
 | `drift-audit` | baseline |
 | `gate-lint` | baseline |
-| `hooks` | baseline |
+| `hooks` | agent-cap |
 | `lib` | baseline |
 | `memory-recall` | baseline |
 | `memory-tree` | baseline |
@@ -115,7 +115,7 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `subprocess-resolves-a-different-shell.md` | baseline |
-| `trailing-comma-counted-as-an-element.md` | UNCLAIMED |
+| `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `two-answers-to-one-question.md` | baseline |
 | `vacuous-selector-empty-population.md` | baseline |
 
@@ -123,7 +123,7 @@ Inventories: gate-legs: 45 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `REVIEW-PROTOCOL.md` | baseline |
+| `REVIEW-PROTOCOL.md` | agent-cap |
 | `UNATTENDED-PROTOCOL.md` | unattended |
 
 ## backlog-shards
