@@ -61,6 +61,8 @@ READ_PATH_WAIVER=""
 # gotchas.py (checks 17-19): how many bug-class records under $MEMORY_ROOT/gotchas/ may be
 # `universal: true`. A universal record is emitted on EVERY reviewer checklist, so this is budgeted
 # rather than left to drift — a checklist nobody can finish is not a checklist. Blank = no budget.
+# Unlike the pins above this is a POLICY CEILING you choose, not a measurement of your corpus — so
+# it ships with a value rather than blank. Raise it in a commit that says why.
 UNIVERSAL_BUDGET="3"
 
 # memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole
