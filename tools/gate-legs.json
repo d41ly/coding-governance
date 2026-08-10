@@ -173,7 +173,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (≤5 verify agents per review)",
+    "name": "verifier fan-out (\u22645 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
@@ -293,6 +293,20 @@
     "argv": [
       "bash",
       "tools/run-gates.test.sh"
+    ]
+  },
+  {
+    "name": "install-prefix (shipped surface)",
+    "argv": [
+      "bash",
+      "tools/check-install-prefix.sh"
+    ]
+  },
+  {
+    "name": "install-prefix self-test",
+    "argv": [
+      "bash",
+      "tools/check-install-prefix.test.sh"
     ]
   }
 ]

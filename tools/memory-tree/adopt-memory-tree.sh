@@ -15,7 +15,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # substitutes nothing and looks like it worked.
 ROOT_N="$(cd "$ROOT" && pwd)"
 KIT_REL=${HERE#"$ROOT_N"/}
-[ "$KIT_REL" != "$HERE" ] || { echo "memory-tree: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
+if [ "$KIT_REL" = "$HERE" ]; then
+  # The kit dir is OUTSIDE the tree being scaffolded — the legitimate "run the shipped adopter from
+  # the governance checkout against a fresh repo" flow, which the runbook's copy-then-run order does
+  # not cover but people use. Scaffolding is still correct: every asset is read from $HERE and every
+  # file is written under $ROOT. Only the PRINTED and RENDERED paths have no repo-relative answer, so
+  # they name the DECLARED convention — which is where the operator is about to copy the kit anyway.
+  # Refusing here would break a working flow to protect a cosmetic string.
+  KIT_REL="tools/$(basename "$HERE")"
+  echo "memory-tree: the kit dir is outside this repo — printed paths will name the declared '$KIT_REL' prefix." >&2
+fi
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 MEMORY_ROOT=memory

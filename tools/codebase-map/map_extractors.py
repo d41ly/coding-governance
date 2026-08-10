@@ -188,7 +188,7 @@ def inventory_ids() -> tuple[str, ...]:
     if not EXTRACTORS:
         raise m.MapError(
             "map_extractors.EXTRACTORS is empty — declare this project's inventories "
-            "(see codebase-map/INVENTORY-DERIVATION.md); an inventory-less map enforces nothing"
+            "(see tools/codebase-map/INVENTORY-DERIVATION.md); an inventory-less map enforces nothing"
         )
     return tuple(EXTRACTORS)
 

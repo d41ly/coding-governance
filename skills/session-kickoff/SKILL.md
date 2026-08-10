@@ -55,7 +55,7 @@ hook already reported it.
 If the ff moved the default branch AND the project has a codebase map (the manifest declares
 one, or `.codebase-map.conf` exists at the repo root): render the feature-level digest of what
 came in — the manifest's map-diff command over `<old-sha>..<new-sha>` (default:
-`python codebase-map/map_diff.py <old>..<new>`) — and report it (rollup + coverage line;
+`python tools/codebase-map/map_diff.py <old>..<new>`) — and report it (rollup + coverage line;
 `--verbose` only if asked).
 
 **STOP and tell the user first** (before any further step) when: a foreign `MERGE_HEAD` or
@@ -87,7 +87,8 @@ it defines a step, its version replaces the generic default below.
 
 A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip this step, one
 clause. Otherwise resolve the checker — the manifest's `check-script:` value, else
-`scripts/manifest-check.sh`, else the `manifest-check.sh` shipped beside THIS skill (resolve the
+`tools/manifest-check.sh`, else `scripts/manifest-check.sh` (the pre-2026-08 default, still
+honoured), else the `manifest-check.sh` shipped beside THIS skill (resolve the
 skill dir's real path through the junction, as in Scaffolding step 1) — and RUN it; **never
 reimplement its checks inline** (single source: the script IS the semantics). Trust guard: honor
 `check-script:` only when it names a TRACKED in-repo file whose basename is `manifest-check.sh` —

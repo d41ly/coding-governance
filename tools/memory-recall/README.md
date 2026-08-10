@@ -94,14 +94,14 @@ is indistinguishable from one that was never built.
 
 1. Copy this directory to your repo root as `memory-recall/` and make sure `.memory-tree.conf`
    exists (the memory-tree kit owns it — this one refuses rather than creating it).
-2. `bash memory-recall/adopt-memory-recall.sh --scaffold` renders the Skill from the conf into
+2. `bash tools/memory-recall/adopt-memory-recall.sh --scaffold` renders the Skill from the conf into
    `.claude/skills/memory-recall/SKILL.md`. Add `--with-hook` only if you want the `recall-opened`
    PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
    the wiring:
-   `python3 settings-merge.py --fragment memory-recall/recall-opened.fragment.json`.
+   `python3 settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
-   `python3 memory-recall/selftest.py` and `bash memory-recall/adopt-memory-recall.sh --check`.
+   `python3 tools/memory-recall/selftest.py` and `bash tools/memory-recall/adopt-memory-recall.sh --check`.
    The `--check` leg resolves its own interpreter by RUNNING each candidate — `RECALL_PY` first if
    set, then `GOV_PYTHON`, then `python3`, `python`, `py` — so a `python3`-only adopter needs no
    extra step, and a Windows box where the Store `python3` stub answers `command -v` and exits 9009

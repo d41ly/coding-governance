@@ -5,7 +5,7 @@
 last-audit: {{AUDIT_DATETIME}} @ {{AUDIT_SHA}}
 watch: {{WATCH_PATHSPECS}}
 verify-paths: {{VERIFY_PATHS}}
-check-script: scripts/manifest-check.sh
+check-script: tools/manifest-check.sh
 -->
 
 The project layer read by the generic `/session-kickoff` skill (the engine). Precedence on
@@ -73,7 +73,7 @@ instantiation, each kickoff re-audits it (Step 2b) and each closing unit writes 
 
 ```bash
 {{GATE_COMMANDS}}
-bash scripts/manifest-check.sh        # manifest ratchet — standing line; path = check-script: above
+bash tools/manifest-check.sh          # manifest ratchet — standing line; path = check-script: above
 ```
 
 ### Tier rule

@@ -11,7 +11,7 @@
  * construction. No conf parse (that would be a third copy of the conf grammar, in a third language,
  * gated by nothing), no rendering step, no second place for the root to drift.
  *
- * WHY: `memory-recall/query.py` logs every query, but the log can only answer
+ * WHY: `tools/memory-recall/query.py` logs every query, but the log can only answer
  * "what was asked" unless someone records which hit they actually opened.
  * Measured upstream over the first 110 queries, `--opened` was used TWICE.
  *

@@ -38,7 +38,7 @@ The rule is mechanical, in two places, with ONE implementation:
   not re-implement the rule; it feeds each script to the hook. One predicate, two entry points.
 
 **What neither reaches:** a `Workflow({name:'…'})` run of a saved workflow supplies no source to the
-hook. Those workflows live in `tools/workflows/` and the merge-bar leg covers them there. Nothing
+hook. Those workflows live in `workflows/` and the merge-bar leg covers them there. Nothing
 counts agents at runtime — a workflow script runs in a sidechain with no hooks and no filesystem.
 
 ### The predicate

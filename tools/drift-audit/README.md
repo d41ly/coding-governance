@@ -33,7 +33,7 @@ The fourth row is real. Keep it **small and loud**, not buried in prose.
 ```bash
 cp -r <governance>/tools/drift-audit <target-repo>/drift-audit
 cd <target-repo>
-drift-audit/adopt-drift-audit.sh
+tools/drift-audit/adopt-drift-audit.sh
 ```
 
 Requires `.memory-tree.conf` (owned by the memory-tree kit). This kit reads `MEMORY_ROOT` from it and
@@ -42,8 +42,8 @@ the same value is the hand-kept-second-copy defect the kit exists to detect.
 
 Then, in order:
 
-1. Fill `drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
-2. Run `python drift-audit/drift_report.py`.
+1. Fill `tools/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
+2. Run `python tools/drift-audit/drift_report.py`.
 3. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
    a live regression on day one; a pin below it reds the bar on work nobody did.
 4. Wire `--check` into your gate manifest.

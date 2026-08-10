@@ -26,30 +26,42 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT_N="$(cd "$ROOT" && pwd)"
 KITREL=${HERE#"$ROOT_N"/}
 [ "$KITREL" = "$HERE" ] && { echo "protocol-parity: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
-TOOLROOT=${KITREL%/*}; TOOLROOT=${TOOLROOT%/}
-PREFIX=""; [ -n "$TOOLROOT" ] && [ "$TOOLROOT" != "$KITREL" ] && PREFIX="$TOOLROOT/"
+TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
+[ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "tools/" at a prefix, "" at a root install
 
 LIVE="$M/guides/REVIEW-PROTOCOL.md"
 SHIP="$KITREL/REVIEW-PROTOCOL.template.md"
 MODE="${1:---check}"
 
-norm() { if [ -n "$PREFIX" ]; then sed -e 's/\r$//' -e "s|$PREFIX||g" "$1"; else sed -e 's/\r$//' "$1"; fi; }
+# A RENDER, not a strip. The shipped template carries a brace-delimited TOOL_ROOT placeholder and
+# this substitutes it, so what the gate grades is exactly what an adopter installs. The old form was
+# an unanchored global `sed "s|tools/||g"` over the LIVE copy, which stripped every occurrence of
+# `tools/` rather than a leading kit path, and left the SHIPPED template spelling a root install — so
+# an adopter at a prefix installed a protocol document naming files they do not have.
+render() { sed -e "s|{{TOOL_ROOT}}|$TOOLROOT|g" -e 's/\r$//' "$1"; }
 
 [ -f "$LIVE" ] || { echo "protocol-parity: missing live copy $LIVE"; exit 1; }
 case "$MODE" in
-  --render) norm "$LIVE" > "$SHIP"; echo "protocol-parity: rendered $SHIP from $LIVE"; exit 0 ;;
+  --render) render "$SHIP" > "$LIVE"; echo "protocol-parity: rendered $LIVE from $SHIP"; exit 0 ;;
   --check) ;;
   *) echo "usage: $0 [--check|--render]"; exit 2 ;;
 esac
 [ -f "$SHIP" ] || { echo "protocol-parity: missing shipped copy $SHIP"; exit 1; }
-if ! diff -q <(norm "$LIVE") <(sed 's/\r$//' "$SHIP") >/dev/null; then
-  echo "protocol-parity: DRIFT — $SHIP does not match $LIVE (after stripping the '$PREFIX' install prefix)"
-  diff <(norm "$LIVE") <(sed 's/\r$//' "$SHIP") | head -30 | sed 's/^/    /'
+if ! diff -q <(sed 's/\r$//' "$LIVE") <(render "$SHIP") >/dev/null; then
+  echo "protocol-parity: DRIFT — $LIVE does not match $SHIP rendered for this install ('$KITREL')"
+  diff <(sed 's/\r$//' "$LIVE") <(render "$SHIP") | head -30 | sed 's/^/    /'
   echo "    fix: bash $KITREL/check-protocol-parity.test.sh --render"
+  exit 1
+fi
+# A surviving placeholder would ship a literal token into an adopter's protocol document, and the
+# diff above cannot see it: a live copy rendered by the same broken substitution matches perfectly.
+if render "$SHIP" | grep -q '{{[A-Z_]*}}'; then
+  echo "protocol-parity: $SHIP still holds an unsubstituted placeholder after rendering:"
+  render "$SHIP" | grep -n '{{[A-Z_]*}}' | head -5 | sed 's/^/    /'
   exit 1
 fi
 # A parity check that compares two empty files passes. Assert the population is real: the live copy
 # must carry the rule this document exists to state, or "in parity" means "both are wrong".
 grep -qF 'verify-stage agents TOTAL' "$LIVE" \
   || { echo "protocol-parity: $LIVE no longer states the hard cap — parity over the wrong content"; exit 1; }
-echo "protocol-parity: in parity — $SHIP == $LIVE (modulo the '$PREFIX' prefix)"
+echo "protocol-parity: in parity — $LIVE == $SHIP rendered for '$KITREL'"

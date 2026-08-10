@@ -23,18 +23,18 @@ Upstream's figure for the same mistake, inherited because it is the same failure
 consecutive reviews of one spec at 79 / 54 / 48 / 37 agents, ~36 M subagent tokens.
 
 When batching, keep verdicts keyed by an **orchestrator-assigned integer**, and treat a finding with
-no verdict as **unverified**, never as refuted. `workflows/tier2-review.js` does both.
+no verdict as **unverified**, never as refuted. `{{TOOL_ROOT}}workflows/tier2-review.js` does both.
 
 ## Enforcement — and where it does NOT reach
 
 The rule is mechanical, in two places, with ONE implementation:
 
-- `hooks/agent-cap.js` — a `PreToolUse` hook on the `Workflow` tool call. It sees the inline
+- `{{TOOL_ROOT}}hooks/agent-cap.js` — a `PreToolUse` hook on the `Workflow` tool call. It sees the inline
   `script` string and (when given one) reads `scriptPath` off disk. **This is the primary point**,
   because the ad-hoc review script written in a session is never a file, so no file-scoped gate can
   see it. Measured: of the `Workflow` calls in the session that motivated this document, every one
   passed `script` and none passed `scriptPath`.
-- `workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
+- `{{TOOL_ROOT}}workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
   not re-implement the rule; it feeds each script to the hook. One predicate, two entry points.
 
 **What neither reaches:** a `Workflow({name:'…'})` run of a saved workflow supplies no source to the
@@ -82,7 +82,7 @@ hunt NEW issues instead of re-reporting known ones.
 
 Default configuration: **3–6 primed finder lenses → ≤5 batched default-refute skeptics → one
 synthesis pass**; three phases, find → verify → synthesize. The ready-made harness is
-`workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
+`{{TOOL_ROOT}}workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
 the process cwd twice made it audit a repository nobody had briefed it on.
 

@@ -35,8 +35,10 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
   - **Stream ownership** — which node owns which stream (keeps merges disjoint).
   - **Tier policy** — single-tier, or Tier-1/Tier-2 and what forces Tier-2 (new write path · migration ·
     auth/sanitization/egress surface · shared-contract change · cross-stream merge).
-  - **Adopt memory-tree?** yes (recommended) / no. If no: skip §3 and delete the two `{{MEMORY_*}}`
-    placeholders + the two §5 memory-tree lines from the playbook.
+  - **memory-tree is REQUIRED** — not a question. Playbook v2.5 made it so
+    (`parallel-coding-governance.template.md` §5, and `.customize.md` says it twice): §5's work-state
+    rules and §6's record protocol both assume the tree. There is no drop path and no
+    `{{MEMORY_*}}`-deletion branch; §3 is mandatory.
   - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
     MAP_ROOT (under the memory tree when memory-tree is adopted, e.g. `memory/map`; else `docs/map`),
     GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
@@ -76,7 +78,7 @@ alongside — both then appear; pick by description.) Skip this step on a machin
    cp <gov>/parallel-coding-governance.domain-rules.md <project>/docs/parallel-coding-governance.domain-rules.md
    # the customize companion is deploy-time only — read it, don't ship it
    ```
-   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit — §5.)
+   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit — §2a.)
    **Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
    fallback and the upstream-re-pull mechanism both read it.
 2. Fill every `{{PLACEHOLDER}}` per **`<gov>/parallel-coding-governance.customize.md`** (the deploy-time
@@ -92,34 +94,41 @@ alongside — both then appear; pick by description.) Skip this step on a machin
      what doesn't per the customize companion's conditional-sections list.
 3. The customize companion lists the conditional sections to delete when they don't apply; apply that.
 
-**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md` prints nothing (the template legitimately
-holds `${{ }}` / Go-template braces in gate commands — shape-scope the grep). `{{ID_FAMILIES}}` must
+**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md <project>/docs/parallel-coding-governance.domain-rules.md`
+prints nothing. BOTH files — the companion carries 13 of the 36 placeholders, and a template-only grep
+passes green while the §-stubs point at a file the project never filled. The grep is SHAPE-scoped
+(`\{\{[A-Z]`) rather than a bare `{{`, because a filled `{{GATE_COMMANDS}}` may legitimately contain
+GitHub Actions `${{ }}` expressions; the shipped template contains none, so an unscoped grep is green
+today and false-fails the first repo whose gate commands are a workflow. `{{ID_FAMILIES}}` must
 match the memory-tree `FAMILIES` (§3) — the build records and the decision logs share one id scheme.
 
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 
 1. Copy the kit in and configure:
    ```bash
-   cp -r <gov>/tools/memory-tree <project>/memory-tree
-   cp <project>/memory-tree/.memory-tree.conf.example <project>/.memory-tree.conf   # then edit
+   cp -r <gov>/tools/memory-tree <project>/tools/memory-tree
+   cp <project>/tools/memory-tree/.memory-tree.conf.example <project>/.memory-tree.conf   # then edit
    ```
-   Edit `.memory-tree.conf`: `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
+   Edit `.memory-tree.conf`. The example ships FIFTEEN keys and this lists the ones you must decide;
+   read the file itself for the rest, and note the adopter's own closing output names two more as
+   REQUIRED arming steps (`STREAMS_CUTOFF`, and MEASURING every pin against YOUR corpus rather than
+   inheriting another repo's numbers). `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
    (`discipline:FAMILY`, MUST match the playbook's `{{ID_FAMILIES}}`) · `TOMBSTONE_ROOTS` (blank for a
-   fresh tree; set to the old root only when migrating an existing docs tree — see `memory-tree/README.md`).
+   fresh tree; set to the old root only when migrating an existing docs tree — see `tools/memory-tree/README.md`).
    Arm the spec-format ratchet: `SPEC_FORMAT_CUTOFF=<adoption date>` — specs dated ≥ it must follow
    `memory/TEMPLATE-SPEC.md` (hygiene check 12); older specs stay grandfathered by filename date.
 2. Scaffold + verify:
    ```bash
    cd <project>
-   bash memory-tree/adopt-memory-tree.sh --scaffold
-   bash memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
+   bash tools/memory-tree/adopt-memory-tree.sh --scaffold
+   bash tools/memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
    ```
    The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, the generated `LIVE.md`, and
    `project/` — which holds the gate's own five waiver registries (`*.txt`) **and nothing else**. Work
    state is not authored anywhere: `gen_build_index.py` renders it. See §3a if you already run a kit
    older than 1.8.
 3. Wire the gate in all three places:
-   - **CI:** a job running `bash memory-tree/check-memory-hygiene.sh` (no args = full check, incl. TREE drift).
+   - **CI:** a job running `bash tools/memory-tree/check-memory-hygiene.sh` (no args = full check, incl. TREE drift).
    - **Local gate runner:** add it as a concurrent leg (cheap, parallel with test/typecheck).
    - **pre-commit hook** — guarded so a scripts-less checkout stays green:
      ```sh
@@ -131,11 +140,49 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
      ```
    - **`.gitattributes`** (Windows-determinism for check 9) — add:
      ```
-     memory/LIVE.md text eol=lf
-     memory/ledger/*.md text eol=lf
-     memory/project/legacy-files.txt text eol=lf
-     memory/project/curation-debt.txt text eol=lf
+     memory/**/*.md text eol=lf
+     memory/**/*.txt text eol=lf
+     memory/**/*.toml text eol=lf
+     # The broad form on purpose: the scaffolder writes FIVE registries under project/, not two
+     # (legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches),
+     # and §6 step 6 already asserts all five exist. Naming them individually is how three of them
+     # went unpinned.
      ```
+
+4. **Wire the row-keyed merge driver** — `cp -r` delivered `merge-rows.py` and its launcher, but a
+   merge driver is a per-node git config and no scaffolder can write it. Without this, two nodes
+   appending to `DECISIONS.md` or a backlog shard get git's line merge, which duplicates or drops
+   rows on an append collision.
+   ```bash
+   git config merge.rows.driver "bash tools/memory-tree/merge-rows.sh %O %A %B %P"
+   ```
+   Add the attributes (adjust to your `MEMORY_ROOT`), then let the wiring checker verify it:
+   ```
+   memory/DECISIONS.md   merge=rows
+   memory/backlog/*.md   merge=rows
+   ```
+   `bash tools/check-wiring.sh --check` RUNS the configured command on a scratch three-way before it
+   reports `ok`, because a driver that cannot start never writes `%A`: git prints `CONFLICT` and
+   leaves the path holding OURS-ONLY content with zero conflict markers. `--fix` sets the config for
+   you and refuses to declare a driver wired when it cannot run.
+
+## 3d — Adopt the drift-audit kit (optional, recommended)
+
+Does this repo's own RECORD of its state still match reality? Five signals over stdlib + git, seconds,
+no agents. It reads `.memory-tree.conf` and **refuses** without it, so §3 comes first.
+
+1. `cp -r <gov>/tools/drift-audit <project>/tools/drift-audit`
+2. `bash tools/drift-audit/adopt-drift-audit.sh` — seeds `drift_signals.py` from the template and
+   renders `.claude/skills/drift-audit/SKILL.md`.
+3. **Fill `tools/drift-audit/drift_signals.py`** — `PRODUCT_GLOBS` at minimum. This is the real work
+   and it is NOT mechanical. The adopter seeds the file with empty globs and unmeasured pins, and its
+   own `--check` passes on that file because it tests existence only: exit 0 here means "the adopter
+   ran", never "the kit works".
+4. Run `python tools/drift-audit/drift_report.py`, then seed each PIN at the value you just MEASURED
+   — never at zero, and never inherited from another repo.
+5. Wire three legs into your gate runner and CI: `python tools/drift-audit/selftest.py`,
+   `bash tools/drift-audit/adopt-drift-audit.sh --check`, and
+   `python tools/drift-audit/drift_report.py --check`.
 
 ### 3a — Migrating an existing repo off the sharded session ledger (BREAKING)
 
@@ -152,7 +199,7 @@ its first run of the new gate. Skip this whole section if you are scaffolding fr
    the shards are the ONLY carrier of worktree names, review ids and session narrative. Verify the
    move was a rename, not a delete-plus-add:
    `git log --follow -p --find-renames -- <path> | grep -m1 'similarity index'` → `similarity index 100%`.
-2. **Take work state from the generated index instead.** `python memory-tree/gen_build_index.py --write`
+2. **Take work state from the generated index instead.** `python tools/memory-tree/gen_build_index.py --write`
    renders `LIVE.md` and the `ledger/<month>.md` shards from each build's `README.md` front matter plus
    every spec's `**Status:**` header. Nothing about work state is authored after this, so nothing about
    it can rot.
@@ -173,9 +220,10 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
 
 1. Copy the kit dir into the project as a directory **named `codebase-map`** (the fixed name the
-   gate template resolves — don't rename): `cp -r <gov-repo>/tools/codebase-map <project>/codebase-map`.
-   The NAME is fixed; the **prefix is free** — a repo that keeps its kits under one directory uses
-   `<project>/tools/codebase-map` and needs no exception. Below, `<kit>` is whichever you chose.
+   gate template resolves — don't rename): `cp -r <gov-repo>/tools/codebase-map <project>/tools/codebase-map`.
+   The NAME is fixed and the prefix is ONE segment: `test_codebase_map.template.py` resolves the kit
+   at the root, at `<x>/codebase-map`, and nowhere deeper, and `adopt-codebase-map.sh` refuses a
+   two-segment prefix before writing anything. `tools/` is the declared prefix for every kit here.
 2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
    MAP_DIFF_CMD (per the §0 decisions). It lives at the project **root** whatever the kit's prefix:
    the kit walks up from its own directory looking for this file, and that is how it finds the root.
@@ -223,21 +271,23 @@ declares no config of its own — it reads `.memory-tree.conf` for the corpus ro
 and **refuses** when that file is absent, printing a two-key stub to paste. It never creates one;
 memory-tree owns that file, which is why §0 makes this decision depend on §3.
 
-1. Copy the kit dir into the project root **as `memory-recall/`** (the fixed name the gate legs and
-   the wiring check resolve — don't rename):
-   `cp -r <gov>/tools/memory-recall <project>/memory-recall`.
+1. Copy the kit dir in **as `tools/memory-recall/`**. The kit dir's NAME is load-bearing; the prefix
+   is not — `adopt-memory-recall.sh` derives its own with `git rev-parse --show-prefix` and
+   `check-wiring.sh` probes both spellings — but `tools/` is what this runbook declares, and
+   `corpus_ids.py` needs memory-tree and memory-recall to be SIBLINGS, so they move together:
+   `cp -r <gov>/tools/memory-recall <project>/tools/memory-recall`.
 2. Render the Skill from the conf and prove the index sees your ids. The Skill's `description` is the
    whole trigger mechanism and it names project values (id families, query path, corpus root), so it
    is GENERATED, never shipped:
    ```bash
    cd <project>
-   bash memory-recall/adopt-memory-recall.sh --scaffold   # -> .claude/skills/memory-recall/SKILL.md
+   bash tools/memory-recall/adopt-memory-recall.sh --scaffold   # -> .claude/skills/memory-recall/SKILL.md
    # One throwaway record first: §3 step 2 scaffolds DECISIONS.md files that are header-only,
    # so a fresh tree has NO id for the record arm to anchor and this step cannot pass without
    # one. `<FAM>` is one of YOUR families; the corpus is tracked-only, hence the `git add`.
    echo '- <FAM>-aSeed-1 · a throwaway record, delete after this step' >> memory/DECISIONS.md
    git add memory/DECISIONS.md
-   python3 memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
+   python3 tools/memory-recall/query.py "why is <X> the way it is" --terms "8-14 words in YOUR jargon"
    ```
    The header must now report **at least one record** — the seed. `index 0 records + N chunks`
    plus a `ZERO RECORDS` block on stderr has TWO causes and the block names both: no decision
@@ -249,9 +299,9 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    project's local gate runner **AND** its CI config, grep-guarded so a re-run doesn't duplicate the
    leg:
    ```bash
-   python3 memory-recall/selftest.py                   # kit contract: conf-vs-bash parity, the refusals,
+   python3 tools/memory-recall/selftest.py                   # kit contract: conf-vs-bash parity, the refusals,
                                                        # cache freshness + eviction, writes-nothing-by-path
-   bash memory-recall/adopt-memory-recall.sh --check    # the rendered SKILL.md still matches the conf
+   bash tools/memory-recall/adopt-memory-recall.sh --check    # the rendered SKILL.md still matches the conf
    ```
    The `--check` leg resolves its own interpreter by RUNNING each candidate (`RECALL_PY` first if
    set, then `GOV_PYTHON`, then `python3`, `python`, `py`), so a `python3`-only adopter needs no
@@ -260,9 +310,9 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 4. **Optional, and separately: the `recall-opened` hook.** It records which hit actually answered a
    query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:
    ```bash
-   mkdir -p tools && cp <gov>/tools/settings-merge.py tools/    # the merge tool — skip if §5 did it
-   bash memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
-   python3 tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json
+   mkdir -p tools && cp <gov>/tools/settings-merge.py tools/    # the merge tool — nothing else copies it
+   bash tools/memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
+   python3 tools/settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json
    ```
    The copy is not optional plumbing: nothing else delivers that tool, so without it the merge dies
    with errno 2. Run the two in this order — `settings-merge.py` refuses to wire a hook whose script
@@ -300,10 +350,10 @@ from §2). Write the manifest to one of those paths so it resolves.
 3. Delete the "Customize before use" block.
 4. **Wire the ratchet gate:**
    ```bash
-   mkdir -p <project>/scripts && cp <gov>/skills/session-kickoff/manifest-check.sh <project>/scripts/
+   mkdir -p <project>/tools && cp <gov>/skills/session-kickoff/manifest-check.sh <project>/tools/
    ```
    (Non-default home → record it in the block's `check-script:` and adjust every path below.) Append
-   `scripts/manifest-check.sh text eol=lf` (or a repo-wide `*.sh text eol=lf`) to the project's
+   `tools/manifest-check.sh text eol=lf` (or a repo-wide `*.sh text eol=lf`) to the project's
    `.gitattributes` — the gov repo's EOL rules don't travel with `cp`, and a CRLF checkout kills bash
    silently. Keep the template's standing gate-fence line pointing at the checker. Then `git add` the
    manifest, the checker, and `.gitattributes` — the checker tests TRACKED-ness; an unstaged fresh
@@ -315,12 +365,12 @@ from §2). Write the manifest to one of those paths so it resolves.
      top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
      if [ -f "$top/scripts/manifest-check.sh" ]; then bash "$top/scripts/manifest-check.sh" --staged || exit 1; fi
      ```
-   - CI leg: run `bash scripts/manifest-check.sh` in a job whose checkout uses **`fetch-depth: 0`** —
+   - CI leg: run `bash tools/manifest-check.sh` in a job whose checkout uses **`fetch-depth: 0`** —
      MANDATORY, not advisory: the actions/checkout default (depth 1) makes the drift check
      WARN-and-skip on every run, so a shallow CI leg never enforces the one check that matters.
 
 **Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` prints nothing, and
-`cd <project> && bash scripts/manifest-check.sh; echo $?` → `0` (the checker resolves the repo from
+`cd <project> && bash tools/manifest-check.sh; echo $?` → `0` (the checker resolves the repo from
 the INVOKING directory, not from its own location — run it with the cwd inside `<project>`).
 
 **Retrofit an existing v1.0 manifest** *(the durable recipe — the checker's C2 failure points here)*:
@@ -331,10 +381,12 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 2. Insert the `manifest-audit` block (derive `watch`/`verify-paths` as in step 2 above; tag cross-repo
    claims; stamp only AFTER actually re-verifying §B).
 3. Copy the checker + `.gitattributes` line + gate-fence line; `git add` everything (step 4 above).
-4. `bash scripts/manifest-check.sh` → 0.
-5. Re-pull the playbook's v2.2 §1 lines (manifest DoD write-back + Landing reconcile exception) into
-   the project's instantiated playbook and bump its `governance-template:` marker to v2.2 — without
-   this, the write-back lever never activates for retrofitted projects.
+4. `bash tools/manifest-check.sh` → 0.
+5. Re-pull the playbook's §1 manifest lines (DoD write-back + Landing reconcile exception) into the
+   project's instantiated playbook, and bump its `governance-template:` marker to the version you
+   actually pulled FROM — read it out of `<gov>/parallel-coding-governance.template.md`, never from
+   this line. Stamping an older number on a newer copy makes the marker lie, and the marker is what
+   both the kickoff engine's Step-2 fallback and the re-pull mechanism read.
 6. Bump the manifest marker to `kickoff-manifest: v1.1` **LAST** — the bump silences the kit's
    version WARN, the only standing signal that the body still predates the ratchet.
 
@@ -373,6 +425,18 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   push that bypasses it (a local marker; `--no-verify` bypasses). Add `bash tools/push-main.test.sh` as a
   gate-runner leg (the lander self-test).
 
+**Also copy, if you want the gates this repo runs on itself** (each is a leg, none is wired for you):
+
+- `tools/check-kit-versions.sh` — asserts every kit's version constant and its doc marker agree, which
+  is what makes an installed kit's version detectable at all. Edit its `need` list to your kit subset;
+  it is a hardcoded list by design, not an enumeration.
+- `tools/gate-lint/` — the gate-authoring lints. It ships no legs of its own; its README hands leg
+  wiring to the consuming project.
+- `tools/push-main.sh` + `tools/push-main.test.sh` + `.githooks/pre-push` — §5 already tells you to
+  LAND through the lander, and nothing above copies it in. Do that here.
+- `tools/check-install-prefix.sh` + `tools/check-install-prefix.test.sh` — only if your project also
+  ships kits onward. It polices the SHIPPING surface, not an installed one.
+
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
 - Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
 - Wire the `PreToolUse` hook into `.claude/settings.json` idempotently (from the project root):
@@ -391,12 +455,14 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   limiter. The binding rules ship as `tools/workflows/REVIEW-PROTOCOL.template.md` — install it at
   `<MEMORY_ROOT>/guides/REVIEW-PROTOCOL.md` (the path `check-protocol-parity.test.sh` treats as LIVE)
   and cite THAT copy from your manifest, not this runbook.
-- Copy the kit dir in as `<project>/workflows/` for a ready consolidated review harness
+- Copy the kit dir in as `<project>/tools/workflows/` for a ready consolidated review harness
   (`tier2-review.js`): four finder lenses, then at most five BATCHED verifiers, then one synthesis
   pass — 6–10 agents over the whole run, of which at most 5 are verify-stage and at most 5 ever run
   concurrently.
-- Verify: `bash <project>/.claude/hooks/agent-cap.test.sh` → exit 0, and
-  `bash <project>/workflows/check-protocol-parity.test.sh` → exit 0 once the protocol is installed.
+- Verify all five workflow legs, not two — the dogfood bar runs every one of these:
+  `bash <project>/.claude/hooks/agent-cap.test.sh` · `bash <project>/tools/workflows/check-protocol-parity.test.sh` ·
+  `bash <project>/tools/workflows/check-verifier-fanout.sh` · `bash <project>/tools/workflows/check-review-join.sh` ·
+  `node <project>/tools/workflows/check-workflow-syntax.js` — each → exit 0.
 
 ## 6 — Verify the whole chain, then commit
 
@@ -408,16 +474,16 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `python <kit>/reuse_lookup.py "<any behaviour>"` and confirm the corpus line reports a NON-ZERO
   symbol/inventory count: a `corpus: 0 symbols` there means the root resolved somewhere unadopted,
   and every later "no seam fits" would be an answer from an empty population.
-- Memory-recall (if adopted): `python3 memory-recall/selftest.py` (kit contract) · one real query
+- Memory-recall (if adopted): `python3 tools/memory-recall/selftest.py` (kit contract) · one real query
   whose record arm anchors the §3c step-2 seed record (zero records with no decision written yet
-  is the expected state, not a `FAMILIES` bug) · `bash memory-recall/adopt-memory-recall.sh --check`
+  is the expected state, not a `FAMILIES` bug) · `bash tools/memory-recall/adopt-memory-recall.sh --check`
   → 0 · then edit `FAMILIES` in `.memory-tree.conf`, re-run `--check`, watch it go RED naming the
   drift, and revert. Confirm **both** legs are actually standing in your CI config + gate runner
   (§3c step 3) — a kit copied in beside a skill nobody rendered otherwise reads as fully wired.
 
 1. **Kickoff resolves:** run `/session-kickoff` in `<project>`. The engine must find your manifest (§4)
    and surface the playbook + gate + ID protocol. If it can't, re-check the §4 search paths.
-2. **Gate green** (if memory-tree adopted): `bash memory-tree/check-memory-hygiene.sh ; echo $?` → 0.
+2. **Gate green** (if memory-tree adopted): `bash tools/memory-tree/check-memory-hygiene.sh ; echo $?` → 0.
 3. **No stray placeholders:** `grep -rn '{{' <project>/docs/PARALLEL.md` → empty, and
    `grep -rnE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` → empty (the manifest check is
    shape-scoped: its gate fence may legitimately hold `${{ … }}` / Go-template braces).
@@ -427,12 +493,12 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
    manifest in would introduce the stamp and stay green instead of demonstrating red.
 5. **Ratchet red/green probe** (the drift check reads COMMITTED ranges — an uncommitted touch is
    invisible; use a throwaway branch off the chain commit): *commit* a throwaway change to a watched
-   file → `bash scripts/manifest-check.sh` goes red (check 5) → re-stamp `last-audit` (bundled or
+   file → `bash tools/manifest-check.sh` goes red (check 5) → re-stamp `last-audit` (bundled or
    follow-up commit) → green → **revert the throwaway AND the probe re-stamp together in ONE
    commit** → still green (a bare revert touches the watched file again and would end the wiring
    session red). If a CI leg was wired: push the probe branch and confirm the CI job actually reds —
    proof it isn't WARN-skipping on a shallow checkout. Then delete the probe branch.
-6. **Work state generated, not authored:** `python memory-tree/gen_build_index.py --check` → 0, and
+6. **Work state generated, not authored:** `python tools/memory-tree/gen_build_index.py --check` → 0, and
    `memory/LIVE.md` exists. Nothing under `memory/project/` but the five `*.txt` waiver registries.
 
 ## Result — what the project now has
@@ -443,7 +509,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
 ├── docs/parallel-coding-governance.domain-rules.md  # the §4/§9–§13 domain checklists (travels with the template)
 ├── docs/SESSION-KICKOFF.md      # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
-├── scripts/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
+├── tools/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐
 ├── memory-tree/                 # the hygiene kit (copied in)  │ only if §3 adopted
