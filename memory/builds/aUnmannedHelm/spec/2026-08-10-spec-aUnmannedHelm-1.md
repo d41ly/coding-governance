@@ -1,6 +1,6 @@
 # TOOL-aUnmannedHelm-1 — the unattended-run kit: a mandate on disk, not a block of chat
 
-**Status:** SPECCED · rev-1 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams tooling+kickoff+playbook+deployer
+**Status:** SPECCED · rev-2 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams tooling+kickoff+playbook+deployer · ratified 2026-08-10
 
 ## 1. Goal
 
@@ -45,11 +45,16 @@ this file is the master scope and the owner decision menu.
   string, the stop) and change only the stop: under a declared unattended mandate the engine hands
   the card to the driver instead of halting. Resolve the other five interactive exits. Place the
   unattended skill in the written precedence chain.
-- **S7 · agent-cap and the adopter path.** Widen the hook's matcher as a measured no-op commit, then
-  add a per-call modality refusal; fix the file-wide marker join in `check-wiring.sh`; add
-  `adopt-unattended.sh` with the codebase-map-grade write guards and its own e2e test; wire
-  `WIRE-INTO-PROJECT.md`, `parallel-coding-governance.customize.md` and
+- **S7 · the adopter path.** `adopt-unattended.sh` carrying the codebase-map-grade write guards (a
+  logical walk-up bounded by `.git`, the inode compare against the operator's tree, refusal before
+  any write) plus its own e2e test on the six-arm precedent; the `.gitattributes` pins; and the
+  prose wiring in `WIRE-INTO-PROJECT.md`, `parallel-coding-governance.customize.md` and
   `tools/check-kit-versions.sh`.
+
+The agent-cap work that used to sit in S7 folded into `TOOL-aNumeralWarden-1` at F2, so this build
+now DEPENDS on that spec reaching rev-3 and landing. The measurement that justifies the fold's
+design stays here (§4), because it is this build's evidence and it is what the modality refusal is
+keyed on.
 
 ## 3. Non-goals (OUT)
 
@@ -61,6 +66,10 @@ this file is the master scope and the owner decision menu.
   attempt restart.
 - **Teaching `agent-cap.js` to count agents.** Ruled out on measured evidence (§4). The arity
   guarantee moves to the record, the close assertion and the bar leg.
+- **Editing `agent-cap.js`, its test, its wired copy or the review protocol's text.** All of it is
+  `TOOL-aNumeralWarden-1`'s after the F2 fold. This build states the requirement and consumes the
+  result; it does not touch the file. Two specs claiming one edit is how a half-applied change
+  passes every gate.
 - **A fourth declaration of the gate command.** The bar is already declared in the playbook, the
   kickoff manifest and `tools/gate-legs.json`; the kit reads, never restates.
 - **Wiring `RUN.md` to the row-keyed merge driver.** The qualifying grammar is documented so the
@@ -173,6 +182,39 @@ unguarded — is declared in the protocol doc, not implied away. The real arity 
 record, the close assertion and the bar leg. Reusing today's predicate on a prompt is rejected
 outright: measured, rule 1 denies the English sentence "run these in parallel (five at a time)".
 
+Per F2 the hook edits land in `TOOL-aNumeralWarden-1`, which goes to rev-3 to carry the modality
+refusal and re-reviews before code. What this build owes that spec is the interface it keys on: the
+run-state file's phase field, its resolution rule from `__dirname` rather than cwd, and the declared
+fail-open when no run-state file exists. What this build owes itself is that S4's leg still pins the
+arity from the record, because the hook's guarantee is now someone else's schedule.
+
+### The three ratified shapes (F1, F3, F4)
+
+**F1 — the authorization amendment.** `AGENTS.md` and the playbook's §1 change from "an explicit
+ask" to "an explicit ask, OR a committed standing mandate naming this build and both actions". The
+mandate is RUN.md's authored region, so the authorization is a reviewable object in git rather than
+a sentence in a dead transcript. Deliberately narrow: an ordinary session still needs the word, and
+a mandate that does not name both actions does not grant them. The gate leg checks the SHAPE of the
+claim (a mandate block naming the build slug and both verbs), never whether the owner meant it.
+
+**F3 — the protocol travels, with config hooks.** The full judgment protocol is product and ships as
+`tools/unattended/UNATTENDED-PROTOCOL.template.md`. Two declarations become project-configurable
+rather than hard-coded: the **phase vocabulary** and the **DoD assertion set**. They follow the
+kit-local project-layer precedent (`drift_signals.py`, `map_extractors.py`) — seeded once from a
+template, project-owned, never overwritten on re-pull — because both are structured data that
+`KEY=VALUE` cannot hold. The cost, stated rather than absorbed: a configurable enum is a new input
+the gate must validate, so S4 grows an arm asserting the declared vocabulary is well-formed and that
+the driver and the skill both read it rather than restating it. A configurable enum nobody validates
+is two answers to one question with extra steps.
+
+**F4 — `--close` blocks, with a recorded override.** It refuses while any DoD item is outstanding
+(gates red, memory unwritten, manifest unstamped, map keys unclaimed, keepalive unreaped). It
+asserts and refuses; it never repairs — the `check-wiring --session` scar is about a mode that
+rewrote bytes, not about a mode that said no. The override takes a named item, never a blanket
+skip, and writes the item plus its reason into RUN.md's parked section, so an overridden DoD item
+surfaces in the wrap-up instead of vanishing. An override with no reason is refused, and the gate
+leg treats an overridden item as outstanding for the purpose of the run's own record.
+
 ### Inventory — what the bar demands of a new kit
 
 Derived from the gates, not from prose. Each is a landing requirement, not a nicety.
@@ -261,11 +303,19 @@ and its test, `tools/gate-legs.json`, `tools/check-kit-versions.sh`, `.memory-tr
 - **AC7** — When `adopt-unattended.sh` is run from a different repo, from an unsupported install
   prefix, or through a junctioned kit dir, it refuses AND writes nothing into either tree — asserted
   on the absence of the writes, not on the exit code.
-- **AC8** — When the agent-cap matcher is widened with no predicate change, a captured corpus of
-  real `Agent` payloads produces zero denies. Only then does the modality refusal land, with its own
-  distinguishable string asserted by name.
-- **AC9** — When both agent-cap fragments are wired and one is removed, `check-wiring.sh --check`
-  reports UNWIRED for the missing one (today's file-wide marker grep reports `ok`).
+- **AC8** — When a project's declared phase vocabulary or DoD assertion set holds a malformed entry,
+  the gate leg reds naming the entry; when the driver or the skill restates a phase name rather than
+  reading the declaration, the phase-set equality check reds. A second `--scaffold` never overwrites
+  a seeded declaration, asserted on the bytes.
+- **AC9** — When `--close` is overridden for a named DoD item, that item and its reason land in
+  RUN.md's parked section and in the wrap-up. When the override carries no reason, or is given as a
+  blanket skip rather than a named item, `--close` refuses.
+- **AC12** — When RUN.md's mandate block omits the build slug or either authorized verb, the gate
+  leg reds naming what is missing; when it names all three, the leg is green. Both cases are
+  observed before the leg is trusted.
+- **AC13** — When `TOOL-aNumeralWarden-1` has not yet landed, S4's leg still reds on a run-state
+  record whose verifier count exceeds the cap. The arity guarantee does not depend on the hook's
+  schedule, which is the whole reason it lives in three layers.
 - **AC10** — A full unattended run of a throwaway two-unit build completes from `--preflight` to
   `--close` with zero owner turns, survives a forced re-read of RUN.md as its only context, and
   `--close` refuses while any DoD item is outstanding.
@@ -287,6 +337,8 @@ drift-audit records leg, the resolver leg, `check-kit-versions.sh`, and the mani
 
 ### F1 — does the committed mandate satisfy the "explicit ask" for merge and push?
 
+RESOLVED (owner, 2026-08-10): amend narrowly. Design in §4, "The three ratified shapes".
+
 `AGENTS.md` and the playbook's §1 both require an explicit ask for the merge to shared `main` and
 for the push. An unattended run ends with both. The `aDeployScout` research gestures at
 "committed = the standing authorization for unattended re-runs", but that is research, not a
@@ -298,6 +350,12 @@ fork that must be ratified before any code.
 
 ### F2 — sequencing against `TOOL-aNumeralWarden-1`
 
+RESOLVED (owner, 2026-08-10): FOLD, against the recommendation. The agent-cap half of S7 moves into
+`TOOL-aNumeralWarden-1`, which goes to rev-3 and re-reviews; the adopter half stays here as S7. This
+build now depends on that spec landing, and its two open forks are on this critical path. The
+recommendation's cost stands and is accepted: one review will cover two unrelated predicates, so
+that review is scoped by predicate rather than by file.
+
 That spec is SPECCED at rev-2 and already claims `KIT_AGENT_CAP_VERSION` 1.1 → 1.2, the hook's
 header, the wired copy, the test's arms and the BINDING protocol text, with two of its own forks
 still open. Two specs must not both claim those edits. **Recommendation: land aNumeralWarden-1
@@ -306,12 +364,18 @@ predicates. S7 is then BLOCKED, not OPEN, until it lands.
 
 ### F3 — how much of the protocol is project-agnostic?
 
+RESOLVED (owner, 2026-08-10): all of it, plus config hooks — the phase vocabulary and the DoD
+assertion set become project-owned declarations. Design and its added gate obligation in §4.
+
 The domain-rules §15 form travels to adopters; the `memory/guides/` form is this repo's installed
 copy. **Recommendation: the full judgment protocol travels** (it is the product), and only the gate
 command and the id/family grammar are read from conf. The alternative — a thin travelling rule and
 a fat local one — recreates the hand-kept-second-copy defect the parity gates exist to remove.
 
 ### F4 — does `--close` block the run, or only report?
+
+RESOLVED (owner, 2026-08-10): blocks, with a named and recorded override. Design in §4; AC9 pins
+the refusal of a reasonless or blanket override.
 
 `check-wiring.sh` was narrowed to report-only in its session-scoped mode after it rewrote
 `.claude/settings.json` and stripped CR bytes out of a PNG. **Recommendation: `--close` BLOCKS**,
@@ -320,6 +384,10 @@ session hook it runs at an explicit boundary rather than on every session start.
 refuses; it does not repair.
 
 ### F5 — one build or two?
+
+RESOLVED (owner, 2026-08-10): one build, one sub-spec per unit. Seven units, not the six named when
+the fork was put — the `/session-kickoff` unit was omitted from that count in error; the answer is
+unaffected, since the choice was between one build and a split.
 
 Seven units spanning four streams is large. **Recommendation: one build, seven sub-specs**, because
 the units share one contract (RUN.md's shape) and splitting would put that contract in one build and
@@ -331,6 +399,11 @@ its three consumers in another. Named here so the owner can split it instead.
   hand-back, the agent-cap matcher, the adopter contract, the memory-tree hygiene surface and the
   gate/arms/byte budgets, plus two direct measurements on this node: the `PreToolUse` payload keys,
   and a four-call burst proving hook processes overlap and a read-then-decide counter miscounts.
+- rev-2 · 2026-08-10 · all five forks ratified by the owner. F2 went against the recommendation
+  (fold rather than sequence), so S7 splits: the agent-cap half moves to `TOOL-aNumeralWarden-1` and
+  this build gains a dependency on it. F3 and F4 each took the more feature-rich option, so §4 gains
+  the config-hook and recorded-override designs and §6 gains AC8, AC9, AC12 and AC13. F1 amends the
+  charter's explicit-ask rule narrowly. Unit count corrected 6 → 7 in F5.
 
 ## 10. Reuse audit
 
