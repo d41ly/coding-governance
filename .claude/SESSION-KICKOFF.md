@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:45:20+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T20:54:40+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -93,10 +93,13 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   It sits at 32578/32768 (**190 bytes free**, measured 2026-08-10 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here), so a line added to it either fits that margin or
   funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
-  before `TOOL-aUnmannedHelm-4` needed 114 for F1's amendment and funded them by externalizing the
-  kickoff-manifest merge exception — a ~490-byte procedure that only applies when the project keeps a
-  manifest — into companion §1. That is the sanctioned move and it is available again: the §-stub
-  parentheticals in §9/§11/§12/§13 duplicate the companion's own headings and are the next candidate.
+  before the unattended build's playbook unit needed 114 for the standing-mandate clauses and funded
+  them by externalizing the kickoff-manifest merge exception — a ~490-byte procedure that only
+  applies when the project keeps a manifest — into companion §1. That is the sanctioned move and it
+  is available again: the §-stub parentheticals in §9/§11/§12/§13 duplicate the companion's own
+  headings and are the next candidate. (Paraphrased rather than cited by id on purpose — the drift
+  signal `non_terminal_specs_cited_by_product_source` counts `.claude/` as product source and sits
+  AT its pin, so naming a non-terminal spec's id here reds the bar. It did, once.)
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
@@ -153,6 +156,11 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- A NEW record file under `memory/gotchas/` needs THREE things, and two of them are separate gates:
+  `gotchas.py --write` to re-render `INDEX.md` (hygiene check 17), and a dossier claim for its key
+  (codebase-map coverage). Adding the file and regenerating the map is not enough — the coverage
+  inventory reads TRACKED files, so a `test_codebase_map.py` run before `git add` reports ok over a
+  file it cannot see, and the gap surfaces on the full bar instead. Stage first, then measure.
 - This node's `merge.rows.driver` pointed at `tools/memory-tree/merge-rows.sh`, which does not exist
   (only the `.py` and its `.test.sh` do), so `bash tools/check-wiring.sh --check` exited 1 on a
   worktree whose SessionStart line had said `ok merge`. `--fix` correctly DECLINES to overwrite a set

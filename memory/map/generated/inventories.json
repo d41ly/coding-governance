@@ -82,6 +82,7 @@
     ],
     "gotcha-classes": [
       "absence-assertion-over-whole-file-text.md",
+      "assertion-between-two-derived-values.md",
       "concurrency-is-not-a-budget.md",
       "fixture-passes-by-finding-nothing.md",
       "gate-green-by-accident-on-generated-bytes.md",

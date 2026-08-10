@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
-gotcha-classes = []
+gotcha-classes = ["assertion-between-two-derived-values.md"]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
 [paths]
@@ -91,6 +91,10 @@ All seven units are built on the unit branch and UNMERGED. What remains is not d
   create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
   actually installs with is therefore unexercised here and needs a run on a node that can link.
 - **No adopter has installed this kit.** The path exists and is gated; nothing has travelled it.
+- **A bug class this build DISCOVERED is now catalogued but only gated in one place.**
+  `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
+  proves it is this kit's. The class is general — any checker that composes both sides of a
+  comparison has it — and nothing sweeps for it repo-wide.
 - **The keepalive half is unenforceable by construction.** Two DoD items are agent-attested because
   no script can reach the scheduling store. They are labelled everywhere they appear, and they are
   still the softest part of the contract.
