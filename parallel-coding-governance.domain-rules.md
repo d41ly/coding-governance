@@ -1,6 +1,6 @@
 # Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
-<!-- governance-template: v2.5 -->
+<!-- governance-template: v2.6 -->
 
 Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a
@@ -29,7 +29,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - Authored rows cite ids INLINE IN PROSE. A dash or pipe row leading with an id anchors it under this build folder, and a run-state file naturally wants cross-build rows — a parked dependency, a blocked unit elsewhere — which is exactly the shape that collides.
 - Phases come from a declared vocabulary with named terminal members, and each claim carries a PRESENT witness (a sha, a tag, a run id). Presence is its own refusal: an oracle that skips an unwitnessed claim as unjudgeable makes "name no witness" the cheapest way to say nothing, and the run is the sole author of that field.
 - At most ONE run-state file in the tree may be non-terminal, or "the run" is undefined and anything keyed on it must either OR the phases (a tree-wide false deny) or pick one (nondeterminism).
-- The kit owns a CORE phase vocabulary and a CORE Definition-of-Done set; the project may EXTEND both and delete from neither. Deletion is otherwise a silent, reason-free override of everything keyed on them — assert core membership against a shrink-only floor.
+- The kit owns a CORE phase vocabulary and a CORE Definition-of-Done set; the project may EXTEND both and delete from neither. Deletion is otherwise a silent, reason-free override of everything keyed on them — pin a shrink-only COUNT of the core sets, not a membership list: a checker that COMPOSES the effective set from the core one cannot fail a subset assertion, and an undeclared floor is a disarmed pin rather than a passed check.
 - The keepalive is an AGENT obligation on BOTH ends. The scheduling store is in-memory and session-scoped, so no script can create or reap the job; the driver only RECORDS the id the agent hands it and asserts a recorded reap, and labels the item agent-attested wherever it reports.
 - `--close` BLOCKS on an unmet DoD item. The override is named, recorded as a parked entry, and surfaced in the wrap-up. Agent-attested items do NOT spend the override budget — attestation is not a machine verdict, and counting it as one makes an override look like a failed check.
 - Land through the project's declared lander and NEVER with a hook-bypass flag. A mandatory lander exists because it reconciles the remote BEFORE the gate; an unattended run that meets its refusal with nobody to interpret it either stalls or learns to bypass, and bypassing discards the whole bar the mandate leaned on.

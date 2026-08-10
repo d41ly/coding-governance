@@ -109,7 +109,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -119,4 +119,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | INPROGRESS | rev-2 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | INPROGRESS | rev-2 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | INPROGRESS | rev-2 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | INPROGRESS | rev-2 | 2026-08-10 |
 <!-- /gen:build-index -->

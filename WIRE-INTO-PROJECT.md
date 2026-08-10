@@ -505,6 +505,12 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   write-back + Landing reconcile exception) into instantiated playbooks. The manifest carries its own
   `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos — copy the newer
   versions in wholesale.
+  **v2.6 (2026-08-10) moves a rule you may already hold:** §1's Landing bullet and §8's commit bullet
+  now accept a committed standing mandate in place of the explicit ask, and the kickoff-manifest
+  merge exception left §1 for the new companion §1. Re-pull §1, §8 and the companion in lockstep, and
+  read the customize companion's conditional-sections row first — the mandate clauses are keyed on
+  adopting `unattended/`, and a repo that keeps them without that kit is carrying a rule nothing can
+  make true. Snapshot of the prior release: `memory/archive/parallel-coding-governance.template-v-2-5.md`.
 - **`manifest-check.sh` is engine-identical** across repos — overwrite wholesale from `<gov>` (this also
   delivers the version-WARN constant that flags out-of-date manifest bodies). The `manifest-audit`
   block and the manifest BODY are project-owned — never overwritten by kit updates.

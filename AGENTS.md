@@ -14,7 +14,9 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
   ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh` — trim or externalize, never
   raise the limit). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
-  (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references by §-stub).
+  (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
+  holding the kickoff-manifest merge exception the byte-gated template externalized, plus the
+  kit-conditional unattended-run rules).
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
 - **`tools/`** — `lib/resolve-python.sh` (the one python-launcher resolver: it RUNS the candidate,
@@ -105,6 +107,12 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   the shipped protocol equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
+- unattended adopter e2e — `bash tools/unattended/adopt-unattended.test.sh`: the adopter WRITES, so
+  it is gated on the EFFECTS in BOTH trees, never on the exit code. It refuses a foreign repo and an
+  install prefix carrying whitespace (the kit path is interpolated into shell commands in the
+  rendered Skill) before it reads anything, and it ADOPTS through a junction inside the adopting
+  repo — the walk is logical, never physical. The junction arm skips LOUDLY where the host cannot
+  create a link, because a copy would score a refusal as success
 - unattended skill wiring — `bash tools/unattended/adopt-unattended.sh --check` (the rendered
   `.claude/skills/unattended/SKILL.md` still matches `SKILL.template.md` + `.unattended.conf`, AND
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are

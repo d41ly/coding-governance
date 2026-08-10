@@ -26,6 +26,39 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a
 ROOT="$(cd "$ROOT" && pwd)"
 cd "$ROOT" || exit 2
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# WHICH TREE AM I ALLOWED TO TOUCH — asked FIRST, before anything else is read. The ordering is
+# load-bearing: running this from a repo that does not own the kit used to reach the conf check
+# first, whose message ("no .unattended.conf at the repo root") sends the operator to create a conf
+# in the very repo the adopter must not adopt. Measured by the e2e's foreign-repo arm.
+# The kit dir AS THE ADOPTER SEES IT, so the rendered commands are copy-pasteable. Both sides go
+# through the same `cd … && pwd` chain first: under MSYS/git-bash one directory has two spellings
+# and a raw prefix strip across them silently yields an absolute path, which then renders a command
+# carrying a drive letter.
+#
+# THE WALK IS LOGICAL, NOT PHYSICAL, and that is the junction contract. `pwd` without `-P` keeps the
+# path the caller traversed, so a kit dir that is a JUNCTION inside the adopting repo anchors to the
+# ADOPTING repo — which is the install shape this fleet uses, and the codebase-map adopter's e2e
+# scores a refusal of it as a FAILURE. Resolving physically would follow the link to the target and
+# adopt the wrong tree, silently.
+KIT_REL=${KIT_DIR#"$ROOT"/}
+if [ "$KIT_REL" = "$KIT_DIR" ]; then
+  echo "unattended: the kit at $KIT_DIR is not inside $ROOT — refusing to touch either tree."
+  echo "  A kit outside the adopting repo would render a Skill whose commands point at another"
+  echo "  checkout, and would install this repo's declarations into somebody else's."
+  exit 2
+fi
+# An UNSUPPORTED PREFIX. The kit path is interpolated into shell commands in the rendered Skill, so
+# whitespace in it does not merely look wrong — it renders `bash my kit/unattended.sh --status`,
+# which runs `bash my` with three arguments. Refuse rather than emit a Skill that misfires.
+case "$KIT_REL" in
+  *[[:space:]]*)
+    echo "unattended: the kit path contains whitespace and is interpolated into shell commands: $KIT_REL"
+    echo "  The rendered Skill would emit a command that word-splits. Install the kit at a path"
+    echo "  with no spaces, or quote-harden the template first."
+    exit 2 ;;
+esac
+
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 [ -f "$TEMPLATE" ] || { echo "unattended: SKILL.template.md is missing from the kit at $KIT_DIR"; exit 1; }
 
@@ -34,13 +67,6 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""
 # shellcheck disable=SC1090
 . "$CONF"
-
-# The kit dir AS THE ADOPTER SEES IT, so the rendered commands are copy-pasteable. Both sides go
-# through the same `cd … && pwd` chain first: under MSYS/git-bash one directory has two spellings
-# and a raw prefix strip across them silently yields an absolute path, which then renders a command
-# carrying a drive letter.
-KIT_REL=${KIT_DIR#"$ROOT"/}
-[ "$KIT_REL" != "$KIT_DIR" ] || { echo "unattended: the kit at $KIT_DIR is not inside $ROOT — refusing to render a Skill whose commands point outside the adopting repo"; exit 2; }
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"

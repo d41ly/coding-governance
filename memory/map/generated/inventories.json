@@ -38,6 +38,7 @@
       "run-gates canary",
       "settings-merge selftest",
       "template size <=32KiB",
+      "unattended adopter e2e",
       "unattended driver selftest",
       "unattended gate selftest",
       "unattended kit gate",

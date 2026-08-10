@@ -318,6 +318,13 @@
     ]
   },
   {
+    "name": "unattended adopter e2e",
+    "argv": [
+      "bash",
+      "tools/unattended/adopt-unattended.test.sh"
+    ]
+  },
+  {
     "name": "run-gates canary",
     "argv": [
       "bash",

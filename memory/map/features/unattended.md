@@ -3,12 +3,12 @@
 ```toml
 feature = "unattended"
 title = "Unattended runs — a mandate on disk, not a block of chat"
-status = "building"
+status = "shipped"
 streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring"]
+gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring", "unattended adopter e2e"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
@@ -82,16 +82,15 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-The feature is mid-build. Units 1 through 6 of seven have landed on the unit branch: the run-state
-file is legal in the memory tree, the protocol and the project declaration exist, the authorization
-amendment reaches all four sites, the four-verb driver is built, the rendered Skill is installed, four gate legs are on the
-bar, and the `/session-kickoff` engine hands back on a mandate while keeping its default stop. Unit
-7 — the adopter path — is not built, so:
+All seven units are built on the unit branch and UNMERGED. What remains is not design work:
 
-- The adopter path does not exist (unit 7), so nothing installs this kit into another repo and the
-  two adopter legs the review budgeted are not on the bar yet.
-- No end-to-end run has been driven through this kit. Every property above is designed and
-  documented; none is yet observed on a live unattended run.
-- The `governance-template` marker still reads v2.5 while the template's §1 and §8 rules have
-  changed. Unit 7 bumps it to v2.6 with a v2.5 archive snapshot; until then a re-pulling adopter
-  cannot see that a §-body they hold has moved.
+- **No end-to-end run has been driven through this kit.** Every property above is designed,
+  gated and documented; none is yet observed on a live unattended run. The five legs prove the
+  pieces refuse and agree in fixtures — they do not prove a real run reaches `LANDED`.
+- **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
+  create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
+  actually installs with is therefore unexercised here and needs a run on a node that can link.
+- **No adopter has installed this kit.** The path exists and is gated; nothing has travelled it.
+- **The keepalive half is unenforceable by construction.** Two DoD items are agent-attested because
+  no script can reach the scheduling store. They are labelled everywhere they appear, and they are
+  still the softest part of the contract.
