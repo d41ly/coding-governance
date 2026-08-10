@@ -50,6 +50,11 @@ if ! diff -q <(norm "$LIVE") <(sed 's/\r$//' "$SHIP") >/dev/null; then
 fi
 # A parity check that compares two empty files passes. Assert the population is real: the live copy
 # must carry the rule this document exists to state, or "in parity" means "both are wrong".
-grep -qF 'verify-stage agents TOTAL' "$LIVE" \
-  || { echo "protocol-parity: $LIVE no longer states the hard cap — parity over the wrong content"; exit 1; }
+#
+# THE NUMBER, not the digit-free phrase. `verify-stage agents TOTAL` survives every edit that changes
+# the cap — the live copy could read "≤50 verify-stage agents TOTAL", the shipped copy could be
+# re-rendered to match, and both halves of this gate would go green over a document that no longer
+# states the rule the hook enforces. The assertion has to be able to fail on the thing that matters.
+grep -qF '≤5 verify-stage agents TOTAL' "$LIVE" \
+  || { echo "protocol-parity: $LIVE no longer states the hard cap AT ITS NUMBER (expected the literal '≤5 verify-stage agents TOTAL') — parity over the wrong content"; exit 1; }
 echo "protocol-parity: in parity — $SHIP == $LIVE (modulo the '$PREFIX' prefix)"

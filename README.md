@@ -46,8 +46,10 @@ machines/sessions on the same repo.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard that caps `Workflow` fan-out: it DENIES any
   script calling raw `parallel(`/`pipeline(` instead of the cap-5 `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
-  the rule too: a review's verify stage spawns at most 5 agents TOTAL. Cap overridable via env
-  `AGENT_CAP`. Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
+  the rule too: a review's verify stage spawns at most 5 agents TOTAL. The 5 is a FILE CONSTANT and
+  not overridable — the guard resolves the number at the call site, at the helper's default parameter
+  and at the `gov:bounded-fanout` width, and refuses a set `AGENT_CAP` rather than ignoring it.
+  Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.
 - **`tools/codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers

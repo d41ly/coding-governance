@@ -38,16 +38,18 @@ The rule is mechanical, in two places, with ONE implementation:
   not re-implement the rule; it feeds each script to the hook. One predicate, two entry points.
 
 **What neither reaches:** a `Workflow({name:'…'})` run of a saved workflow supplies no source to the
-hook. Those workflows live in `workflows/` and the merge-bar leg covers them there. Nothing
-counts agents at runtime — a workflow script runs in a sidechain with no hooks and no filesystem.
+hook. Those workflows live in `workflows/` and the merge-bar leg covers them there. And nothing
+counts the agents a workflow script spawns INSIDE itself: that script runs in a sidechain with no
+hooks, so no process observes those spawns and none ever will. That is a statement about the sidechain
+specifically, not a blanket claim that runtime counting is impossible — a `PreToolUse` hook on a
+main-loop tool call is a different case, and it is judged on its own evidence.
 
 ### The predicate
 
 An `agent(` call reached through an iteration construct is allowed only when its receiver is:
 
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers`, where that line
-  spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` is an integer
-  literal ≤ 5 or an identifier bound in the file to one; or
+  spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` resolves; or
 - an identifier assigned exactly once from an array LITERAL with ≤ 6 elements — the finder-lens case,
   where the agent count is visible in the source.
 
@@ -55,9 +57,19 @@ Everything else is denied: a `for` / `while` / `forEach` body containing `agent(
 `.flatMap` / `Array.from` over any other receiver, and a marked line whose second argument is an
 expression, a `.length`, a parameter, or a literal above 5.
 
+**`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
+or an identifier bound DIRECTLY by `const <name> = <int>` and never reassigned. An `<expr> || <int>`
+right-hand side does NOT resolve. It reads as a constant and behaves as a knob: `(args && args.cap)
+|| 5` let two shipped harnesses raise their own agent count from the caller while the guard read the
+5 and every gate stayed green. The form is still legal JavaScript and still fine for constants
+nothing here resolves — only its use as a BOUND is refused.
+
 The marker is a claim; the gate checks the claim's SHAPE. `chunk(all, 1) // gov:fixed-verifiers`
 reds, and so does `splitInto(all, all.length)` — blessing a helper by NAME would bless `chunk`
-wearing a different name.
+wearing a different name. `gov:bounded-fanout` is a claim on the same terms: the marked line must
+slice a bare identifier by a width that is either the enclosing helper's own `cap` parameter, which
+the two rules above have already bounded, or a `<K>` that resolves. It used to exempt its line
+outright, so a line slicing fifty wide passed unread.
 
 ## Concurrency — ≤5 agents at once, always
 
@@ -69,9 +81,15 @@ Inherited with its reason: a ~40-agent burst tripped the server rate limiter twi
 wasted. That is a property of the shared service, not of the tree that measured it, so the number
 travels. It moved 6 → 5 here on that basis.
 
-The hook does NOT parse the helper's numeric argument — its own header says so, and its self-test
-passes a helper call as an ALLOW case regardless of the number. The constant shapes the remediation
-text; the argument check belongs to the marker rule above, which reads the argument it is handed.
+**The hook reads the number, in all three places a bound is written** (`agent-cap` 1.2). It resolves
+the cap argument at each `boundedParallel(` / `boundedPipeline(` CALL SITE, the helper's own DEFAULT
+PARAMETER when a call passes none, and the slice width a `gov:bounded-fanout` line claims — joining
+lines forward until the parens balance, because every shipped call site spans lines. A K it cannot
+resolve to an integer ≤ 5 is denied; the burden is on the fan-out.
+
+The 5 is a FILE CONSTANT. There is no environment override, and a set `AGENT_CAP` is refused with a
+message rather than ignored — a ceiling that can be raised from the environment leaves no diff behind,
+which is the defeatable class this rule exists to stay out of.
 
 ## The Tier-2 pattern
 

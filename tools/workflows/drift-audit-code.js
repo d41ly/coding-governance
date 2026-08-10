@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.0',
+  version: '1.1',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,14 +12,16 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.0
+// gov:kit drift-audit@1.1
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
-// The concurrency cap VARIES BY ADOPTER (agent-cap.js defaults to 6 here, 5 in the repo
-// this kit was ported from). Default to the lower value and let `args.cap` raise it —
-// a kit that hardcodes one repo's number silently under- or over-runs every other one.
-const CAP = (args && args.cap) || 5
+// BOTH ARE BARE LITERALS AND NEITHER IS CALLER-SETTABLE. The retired form bound each of them from
+// an `<expr> || 5` fallback, which read as a constant to the guard and as a knob to the runtime — so
+// a caller raised this harness's own agent count past the cap with every gate green. agent-cap.js
+// now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
+// here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
+const CAP = 5
 async function boundedParallel(thunks, cap = CAP) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
@@ -42,13 +44,12 @@ function chunk(a, n) {
 //   frameworkExports: "which exports a framework references by convention, not by import",
 //   measured: "the Tier-0 numbers already established — agents must interrogate, not re-derive",
 //   byDesign: "recorded/backlogged issues reviewers must NOT re-report as new",
-//   maxVerifiers: 5,
 // }
 const a = args || {}
 const REPO = a.repo || '.'
 const BASE = a.base || 'HEAD'
 const OUT = a.outDir || `${REPO}/memory`
-const MAX_VERIFIERS = a.maxVerifiers || 5
+const MAX_VERIFIERS = 5
 
 const COMMON = `
 You are auditing the repo at ${REPO}. Treat ${BASE} as "what ships".

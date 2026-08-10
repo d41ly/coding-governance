@@ -385,7 +385,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
   ```
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
-  `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
+  `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
+  site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is
+  a file constant — there is no environment override, and a set `AGENT_CAP` is refused with a message
+  rather than silently ignored. This is the
   mechanical enforcement of the review protocol's TWO rules: route fan-out through the cap-5 helpers,
   AND a review's verify stage spawns at most 5 agents TOTAL. A wide fan-out trips the server rate
   limiter. The binding rules ship as `tools/workflows/REVIEW-PROTOCOL.template.md` — install it at
