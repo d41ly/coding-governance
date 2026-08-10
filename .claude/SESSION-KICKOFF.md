@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:04:15+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T20:19:58+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -149,6 +149,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- A positional in a gate's `fail` message CANNOT be armed. `check-arms.py` reads `${?[A-Za-z_]…` as
+  an interpolation to drop, but a bare `$1` is literal text, so it lands INSIDE the signature and no
+  assertion can ever name it — the branch reads unarmed no matter what the test says. Bind the value
+  to a name (`local slug="$1"`) and put it at the END of the message, after the literal sentence.
+  Measured 2026-08-10 on two branches of the new driver. This also means `check-arms.py` DISCOVERS
+  any tracked `*.sh` that defines `fail() {` and calls `fail <n> "` — a new script gets pulled into
+  the meta-gate's population automatically and needs a sibling `<stem>.test.sh` with a positive arm
+  per branch, plus an `ARMS_FLOORS` entry.
 - Hygiene checks 13-19 are OFF unless a pin is armed. `corpus_ids.py`'s `armed(conf)` returns early
   when every one of `ORPHAN_ID_PIN`/`DEAD_PATH_PIN`/`READ_PATH_CEILING`/`CHARTER` is blank, and
   `gotchas.py` short-circuits on an empty record set. So a fixture tree written WITHOUT pins arms
