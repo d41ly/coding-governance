@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T14:56:13+03:00 @ e7ec3365175f58f8a8c4ad7b8476d14433bba3f3
+last-audit: 2026-08-10T16:59:16+03:00 @ 16aeb5efe98083c31a927a73541644020ee6bb57
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -82,6 +82,20 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-10 · `AGENTS.md:94` · the codebase-map prefix claim is stale on all three of its assertions.
+  `adopt-codebase-map.sh` does NOT refuse at `tools/` (it accepts `*/codebase-map` and refuses only a
+  two-segment prefix), `reuse_lookup.py`/`map_diff.py` do NOT need `CODEBASE_MAP_ROOT` (measured: 277
+  symbols, 72 keys, exit 0 with nothing set), and the cited `§Gaps` section lists no such gap. The
+  repo's own `.codebase-map.conf` says the override is gone and must not be reintroduced. Fixed by
+  `TOOL-aRootedPrefix-1`; the charter never caught up · prune when `AGENTS.md:94` is rewritten.
+- 2026-08-10 · `AGENTS.md:69` · says the memory-tree engine is "at kit 1.8"; the live constant is
+  `KIT_MEMORY_TREE_VERSION=2.2` · prune when the charter line is corrected.
+- 2026-08-10 · `AGENTS.md:6-7` · says `memory/map/features/codebase-map.md` is the first and only
+  dossier; there are two (the second is `memory-tree-merge-driver.md`) · prune when corrected.
+- 2026-08-10 · `memory/backlog/TOOL.md:21` · `TOOL-aRootedPrefix-1` reads INPROGRESS and "unmerged";
+  it is landed on `main` (decision rows in `memory/archive/DECISIONS.2026-08-10.md:80-84`, engine at
+  `map_lib.py:83-119`) · prune when the row reads CLOSED.
+
 ### Environment traps worth front-loading
 
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
@@ -133,6 +147,17 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- A new tool placed at the REPO ROOT rather than under `tools/` silently leaves the enforced surface.
+  `check-arms.py`, `check-review-join.sh` and `check-workflow-syntax.js` are all scoped to `tools/**`;
+  `map_extractors._tool_kits()` enumerates `tools/*` and nothing else, so a root dir is in no
+  codebase-map inventory and demands no dossier; and it falls outside drift-audit's PRODUCT_GLOBS.
+  Nothing reds — the tool is simply ungoverned. Put new tooling under `tools/<name>/`.
+- Adding ONE gate leg trips FOUR gates at once, and they are worth doing in one pass rather than
+  serially: the codebase-map `gate-legs` coverage assert (claim the leg in a dossier), the
+  codebase-map freshness byte-compare (re-render `MAP.md` + `inventories.json`), the kickoff-manifest
+  ratchet (`tools/gate-legs.json` is a watched pathspec, so `last-audit` re-stamps), and drift-audit's
+  handkept signal (cite the leg's script path in this charter's `## The gate suite` section). That
+  last one has ZERO slack — the pin is 7 of 40 at tolerance 0, so an uncited leg 41 reds immediately.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

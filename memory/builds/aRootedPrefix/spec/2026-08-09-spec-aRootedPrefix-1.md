@@ -1,6 +1,6 @@
 # TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix
 
-**Status:** INPROGRESS · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base 663ca427 · streams tooling
 
 ## 1. Goal
 
