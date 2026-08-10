@@ -56,8 +56,17 @@ cd "$ROOT" || exit 2
 # answer went 5 orphans to 9, and this gate printed `clean` with the constant untouched — the same
 # defect TOOL-aBatchedTribunal-6o closed for the three modules below, one hop short. A kit an adopter
 # has not installed is skipped by the `[ -f ]` guard, so listing it costs a non-adopter nothing.
+#
+# AND `merge-rows.py` IS IN THE SET, which is the same one-hop-short shape found a third time. The
+# merge driver ships in this kit and the constant DATES the kit's verdicts; a redesign of what the
+# driver does with three blobs moves a kit verdict exactly as surely as a change to check 5's
+# selector, and nothing forced a bump. Measured before it was added: the driver's whole merge
+# algorithm was replaced and this gate printed `clean` with the constant untouched. The driver is
+# not a check — its "verdict" is the file it writes — and that is the reason it belongs here rather
+# than an argument against it: an adopter reading `memory-tree@2.0` is being told which merge
+# semantics their indexes were merged under.
 ENGINE=tools/memory-tree/check-memory-hygiene.sh
-DELEGATES="tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py"
+DELEGATES="tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py tools/memory-tree/merge-rows.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done

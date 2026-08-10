@@ -34,33 +34,62 @@ union never loses an id, but upstream measured it introducing a duplicate in 147
 `DECISIONS.md` conflicts, and these files hold zero duplicate ids. A design that measured only LOSS
 concluded union was safe.
 
-**Only the row block is key-merged.** A file is three regions — preamble, the first-to-last anchored
-line inclusive, trailer — and the region rule WINS at the block boundary. `memory/DECISIONS.md` opens
-with a title, two blockquote routing lines and the `## PLAY — playbook` heading before its first
-anchored row at `:8`; all of that is preamble and takes an ordinary `git merge-file` three-way merge.
-Without the split, an unconditional "a line the grammar cannot key conflicts" rule conflicts on every
-single merge and the auto-resolve is unreachable. Inside the block the opposite rule applies: an
-unkeyed line attaches to the FOLLOWING anchor, because `## KICK — kickoff`, `## TOOL — tooling` and
-the `*(none yet)*` placeholder sit interleaved BETWEEN anchored rows. A driver that collected them in
-a side list and re-emitted them at the end would move every section heading to the bottom of the file
-while exiting 0.
+**TWO PLANES, split by the ROW SHAPE and never by the anchor grammar.** One stateless predicate —
+`^\s*[-*]\s`, applied to each line in isolation, no parser state — classifies every line as ROW or
+STRUCTURE. Structure goes to `git merge-file` positionally; only the row set is key-merged here. The
+partition is the shape because the grammar has never keyed every row-shaped line, and handing git
+the lines it cannot key would hand it exactly the population git is measured to DUPLICATE at rc 0 —
+the one corruption class git commits. Everything else git was measured CORRECT on: a heading, a
+placeholder, a repeated lead-in note, a sub-heading opened in two sections.
 
-**The properties are POSTCONDITIONS on the written file, not inferences from the keying.** The
-keying speaks only for the lines the grammar keys, and that has never been every row-shaped line.
-Measured at 35 of this corpus's 73 rows until memory-recall kit 1.1 widened the shared session era to
-`\d+[a-z]*`, which admitted the ratified `…-9b` correction form and took the same file to 73 of 73.
-The gap did not close, it MOVED: every anchor pattern requires a separator after the id, so
-`- TOOL-zFix-<n>b · text` keys and `- TOOL-zFix-<n>b carries an id and no separator` does not, and that
-difference is structural rather than lexical — no future era widening can grant a separator. So three
-checks run on every verdict, over the merged lines with conflict REGIONS excised: no ROW-SHAPED line
-written more often than any one input carried it, no leading ID written more often (the line half
-compares exact text and two nodes minting one id with different prose are two different lines), and
-no row filed under a `#` heading no input filed it under. Scoping them to clean verdicts was wrong —
-an author resolves the marked hunks and reads everything outside them as settled, so a duplicate
-emitted beside an unrelated conflict is invisible at rc 1 exactly as it is at rc 0. Each of the three
-was written against a REPRODUCTION, and each reproduction's control is `git merge-file`: being
-quietly worse than the merge this driver replaces is the standard it is held to, and a conflict is an
-acceptable answer for an append-only record while silently wrong content never is.
+**The two planes recombine through a SKELETON, which is what makes the recombination ordered rather
+than guessed.** Each of `%O %A %B` is projected to a line list of the same length in which every row
+becomes one token line — its id when the grammar keys it, a digest of its text when it does
+not — and every structure line passes through byte for byte. `git merge-file` merges the three
+skeletons, and the merged skeleton is walked and its tokens substituted. Keying a token on the ID
+rather than the text is what keeps a row EDIT invisible to the structure plane; otherwise every row
+edit is a structural change and git starts arbitrating record text, which is where duplication comes
+from. The digest drops the terminator and trailing whitespace, which stops line form
+smuggling a duplicate — a final copy with no newline and an interior copy with one hash the same —
+and KEEPS leading whitespace, because indentation is nesting and nesting is content. Collapsing
+`- x` and `  - x` onto one key made rule 4 substitute one side's body for the other's and destroy a
+line no side had touched.
+
+**A conflict region that is entirely tokens on both sides resolves by CONCATENATION; any disputed
+structure line is always a conflict.** Both sides of a diff hunk sit between the same context lines,
+so when every disputed line is a row, section membership is not in dispute — only order among
+siblings, which is not semantic, because ids are labels and not ranks. Dedup happens ACROSS the two
+sides and never within one: the within-side form is set union wearing a rule's clothes, and it
+deletes a legitimately repeated note out of an append-only record at rc 0. The converse rule is the
+one the whole design rests on — structure is precisely the class git is right about and this driver
+was wrong about three times running.
+
+**The row plane is `key -> LIST`, never `key -> line`.** A markdown file may legitimately carry the
+same row-shaped line twice, and collapsing those made such a file FAIL ITS OWN IDENTITY MERGE — a
+permanent whole-file conflict no author action clears.
+
+**The properties are POSTCONDITIONS on the WRITTEN BYTES, not inferences from the keying.** Bytes and
+not the in-memory emit list: a terminator defect is invisible in a list where two glued records are
+still two elements. Five checks run on every verdict, over the merged lines with conflict REGIONS
+excised — no row-shaped line written more often than any one input carried it; no leading ID written
+more often (the line half compares exact text, and two nodes minting one id with different prose are
+two different lines AND two different `raw:` keys, so this half is the only net for that shape); no
+row filed under a `#` heading no input filed it under; per-key CONSERVATION, which is explicitly not
+uniqueness; and structure identity against the merged skeleton, markers excluded on BOTH sides.
+Scoping them to clean verdicts was wrong — an author resolves the marked hunks and reads everything
+outside them as settled, so a duplicate emitted beside an unrelated conflict is invisible at rc 1
+exactly as it is at rc 0.
+
+**The bar is `git merge-file`, mechanically, in every fixture.** Being quietly worse than the merge
+this driver replaces is the standard it is held to, and it is now arithmetic rather than judgement:
+every case runs a live control on the identical three blobs, losing a line git keeps or writing a row
+more often than git does fails the suite by name, and conflicting where git resolves correctly is
+counted by name against a shrink-only constant (2 today: a row one side MOVED and the other
+DELETED, in both directions, and nothing else). Every case runs a control — two of twenty-eight
+groups did before kit 2.2 — but the ARITHMETIC comparison can only bind where the control EXITS 0,
+which is 16 of 40 cases and is floored so a fixture edit cannot quietly drop one. Saying it that
+precisely matters: a suite that reads stronger than it is, is how this driver shipped rc-0
+corruption twice.
 
 **Failure is closed.** A merge driver that raises exits non-zero WITHOUT writing `%A`, and git then
 leaves the path unmerged holding OURS-only content with no markers — the incoming rows are simply
@@ -69,13 +98,27 @@ caused it, so every exception becomes a whole-file conflict instead. This is als
 import is DEFERRED into the first anchor call: at module scope an unreadable `extract.py` kills the
 process before `main()` can write anything.
 
-**Newlines are never translated, at four sites.** This repo's nodes run `core.autocrlf=true` and the
+**Newlines are never translated, at SEVEN sites.** This repo's nodes run `core.autocrlf=true` and the
 governed indexes are CRLF in the worktree while their index blobs are LF, and git hands a merge
 driver WORKING-TREE-format temp files. So the read is `newline=""`, the three `git merge-file` temps
 are `newline=""`, its stdout is captured as BYTES and decoded by hand (upstream passes `text=True`
 here, which is universal-newline mode and undoes the line above), and the result goes out through
 `write_bytes`. Stating only the write half makes every identity `cmp` red and makes a real merge
-rewrite the whole file's line endings.
+rewrite the whole file's line endings. Three more arrive with the skeleton: a token carries the
+terminator of the row it replaces; every marker line the DRIVER synthesizes carries the file's
+dominant terminator; and a row substituted for a token carries the TOKEN's terminator, never the one
+it carried in its source blob. The last is not a refinement — measured, an unterminated final row
+relocated by the merge kept its empty terminator and FUSED TWO RECORDS ONTO ONE LINE at rc 0 with no
+markers and a clean audit line, where the control refuses at rc 1 with both intact.
+
+**The conflict style is PINNED at the single `git merge-file` call site.** `git merge-file` honours
+the invoking repo's `merge.conflictStyle` and git runs a merge driver from the top of the worktree,
+so a node-local `diff3`/`zdiff3` reaches this process and adds a third `||||||| base` section. The
+reconciliation rules are defined over an ours side and a theirs side; under three sections a
+token-only region stops being token-only, the concatenation rule evaporates, and the same driver
+returns different verdicts per node on identical blobs. `-c merge.conflictStyle=merge` overrides a
+configured value (measured, git 2.54). The cost, stated: the driver's own conflict output carries no
+base section even where the adopter asked for one.
 
 **The wiring is two facts, and only one of them is committed.** `.gitattributes` declares
 `merge=rows`; `merge.rows.driver` is per-node git config. A node that never ran
@@ -111,27 +154,37 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
   plus the worktree's grammar, so a merge that itself changes `FAMILIES` keys its index merge on the
   old grammar. Bounded rather than hidden: no row is invented or duplicated, and at worst a row whose
   anchor only the NEW grammar recognises is treated as unkeyed content.
-- **Conflict markers are written with LF terminators** even into a CRLF file. Harmless — a marker line
-  is deleted during resolution — but it is a real asymmetry with the four newline sites above.
-- **A postcondition refusal is a WHOLE-FILE conflict, not a scoped hunk.** The three checks run after
-  the merge is assembled, so a refusal goes through `main()`'s fail-closed handler, which writes
-  `%A` and `%B` in full between markers. Correct and loud, and heavier than it needs to be on a
-  ~90-line append-only index: the exception could carry the offending ids and the handler could mark
-  only their neighbourhood. Refusals are rare by construction (every fixture that triggers one is a
-  shape git itself either duplicates or conflicts on), so this is ergonomics, not safety.
-- **Two DIFFERENT empty sections opened one per side still conflict where git resolves.** Each side's
-  lead-in for its new row is a different, overlapping slice of the same base furniture, so the
-  adjacency dedup cannot suppress either and one heading is emitted twice; the trailing row's lead-in
-  three-way then conflicts. Measured: driver rc 1 with both rows correctly filed and a redundant
-  heading block, `git merge-file` rc 0 and clean. Fails CLOSED and no content is lost, so it is
-  noise rather than damage — but it is a shape where the driver is still worse than the merge it
-  replaces, and closing it means merging lead-ins as text against the base rather than picking one.
-- **A `%B` cross-section MOVE of a shared row is discarded at rc 0.** `order` is seeded from `%A` and
-  shared keys are never repositioned, so if only theirs moved a row between sections, ours' position
-  wins silently. The placement postcondition does not catch it: it asks whether the merged section
-  matches an input that carries the row, and ours' does. LOW today — the backlog shards carry no
-  `## ` sections and `DECISIONS.md` is append-only in practice — but it is the one placement shape
-  the driver still decides by preference rather than by evidence.
+- **An ORDINARY conflict is now a scoped hunk; a POSTCONDITION refusal is still whole-file.** The
+  scoped half is new and structural: a disputed structure line is re-emitted as git's own region, in
+  place, so a heading rename conflict is one marker pair around one heading rather than a 186-line
+  sandwich over a ~90-line index. A postcondition refusal still goes through `main()`'s fail-closed
+  handler and writes `%A` and `%B` in full. Correct and loud, and heavier than it needs to be: the
+  exception could carry the offending keys and the handler could mark only their neighbourhood.
+  Refusals are rare by construction — every fixture that triggers one is a shape git itself either
+  duplicates or conflicts on — so this is ergonomics, not safety.
+- **The adopter's `merge.conflictStyle` is overridden, not honoured.** Pinning the style at the call
+  site is what keeps the region shape node-independent, and the price is that an adopter who chose
+  `diff3` does not get a base section in the conflicts this driver writes. The alternative — define
+  the rules over three sections and discard the base — keeps their config meaningful and costs a
+  marker grammar on the merge path, which is the class of state all three defect rounds lived in.
+  Recorded as a trade rather than an oversight.
+- **Fenced code blocks are not parsed**, deliberately. A `- ` bullet inside a fence is a ROW and is
+  tokenized. The cost is bounded and conservative — two identical bullet-shaped lines inside two
+  fences can trip the duplicate cap and produce a refusal — and measured at zero reachability here:
+  `memory/DECISIONS.md` and all four backlog shards carry no fenced blocks. A fence-tracking state
+  machine on the merge path of an append-only record buys a rare case and pays in exactly the state
+  the two-plane design exists to delete.
+- **A file that already carries a COMMITTED, unresolved conflict block refuses where git resolves.**
+  Git's own markers are now labelled with the token sentinel so the reconciliation cannot mistake an
+  input's block for one it produced — before that, rule 3 concatenated the block, erased all three
+  marker lines and silently accepted both disputed wordings at rc 0. What remains is that `settled()`
+  still excises the input's block by its marker TEXT, so conservation sees rows it cannot account
+  for and refuses. Loud and lossless, on a file the hygiene gate reds anyway.
+- **The delete/modify branch's scoped conflict block is unplaceable for the plain shape.** A row edit
+  is invisible to the skeleton by design (that is what lets a heading rename survive a row edit), so
+  when the other side deletes the row there is no token left to place the block at, and the run ends
+  in a whole-file refusal instead of the scoped hunk `resolve_rows` promises. No content is lost;
+  git returns a scoped conflict here, so it is an ergonomics gap of the same family as the one above.
 - **No `regenerate` driver, and there will not be one.** `ort` checks the merge result out only AFTER
   the per-path merges run, so a generator invoked from inside a driver renders from the pre-merge tree
   and commits a stale artifact. `memory/LIVE.md` and `memory/ledger/<month>.md` stay regenerated by
@@ -139,5 +192,5 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
 
 ## Reuse affordance
 
-seam: merge-rows.split_regions — reuse for any three-way merge of a file that is prose-then-rows; extend via a second region predicate rather than a second copy of the block arithmetic.
+seam: merge-rows.skeleton — reuse for any three-way merge where SOME lines must be merged by key and the rest positionally: project each input to a token list, let `git merge-file` merge that, key-merge the tokens separately, recombine. Extend via a second line-class predicate, never by re-deriving placement. (This replaces the retired `merge-rows.split_regions` seam, which offered the three-region prose-then-rows model — withdrawn with kit 2.2 because that model is what the two planes replace.)
 seam: pyrun.sh — reuse whenever a tool OUTSIDE `tools/run-gates.sh` must run a python script (a git driver, a hook, an editor integration); extend by calling it, never by naming a launcher.
