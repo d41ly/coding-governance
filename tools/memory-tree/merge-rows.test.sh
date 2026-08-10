@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Fixtures for the row-keyed merge driver (aMendedLedger U9; upstream ARCH-dQuarriedLedger-1 U9 S4).
 #
-# THE BAR IS `git merge-file`, MECHANICALLY, IN EVERY CASE. The driver replaces git's own three-way
-# merge on two pathspecs, so the merge it replaces is the floor: losing, duplicating or misfiling
-# content where git does not is failure, full stop. Conflicting where git RESOLVES is acceptable and
-# is COUNTED by name against a shrink-only constant, never absorbed.
+# THE CONTROL RUNS IN EVERY CASE; THE ARITHMETIC BAR BINDS WHERE GIT RESOLVES. Say it precisely,
+# because the imprecise version is the failure this file exists to stop. Every `run` case executes
+# `git merge-file` on the identical three blobs. The MECHANICAL never-worse comparison — the driver
+# may not lose a line the control keeps, nor at rc 0 write a row the control does not — can only
+# bind where the control EXITS 0, because only then is its output an ANSWER rather than a conflict
+# to be resolved by hand. Measured: 12 of the 34 `run` cases, floored below at `NEVER_WORSE_FLOOR`
+# so that a fixture edit flipping a control from rc 0 to rc 1 cannot quietly drop a case out of the
+# bar while the group count stays the same. The other 22 are held by the id-set oracle, the
+# duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
+# acceptable and is counted by name against a shrink-only constant, never absorbed.
 #
 # That bar exists because a green suite has twice signed off on corruption here. Three adversarial
 # rounds each closed the reported defect and opened a new one in the handling of unkeyed content, and
@@ -94,6 +100,11 @@ rownorm() { LC_ALL=C grep -hE '^[[:space:]]*[-*][[:space:]]' "$1" 2>/dev/null | 
 # deleting a member; raising it needs the same justification any other ratchet raise does.
 CONSERVATIVE_CAP=0
 CONSERVATIVE=""
+# How many `run` cases the arithmetic comparison actually BINDS on. A GROW-ONLY floor: without
+# it, a fixture edit that flips a control from rc 0 to rc 1 silently removes a case from the
+# mechanical bar and the suite still prints PASS with the same group count. Measured at 12.
+NEVER_WORSE_FLOOR=12
+NEVER_WORSE_BOUND=0
 # Cases where `git merge-file` exits 0 with a WRONG result — it duplicates a row-shaped line at rc 0,
 # which is the single corruption class git commits and the whole justification for this driver. The
 # never-worse comparison is meaningless against a corrupt reference, so these declare it and are
@@ -148,6 +159,7 @@ never_worse() {  # $1 label · $2 driver rc · $3 control rc · $4 control-is-wr
   local label=$1 rc=$2 crc=$3 wrong=$4 lost extra
   [ "$crc" = 0 ] || return 0
   [ "$wrong" = 1 ] && return 0
+  NEVER_WORSE_BOUND=$((NEVER_WORSE_BOUND+1))
   allnorm "$TMP/ctl" > "$TMP/nw.ctl"; allnorm "$TMP/a" > "$TMP/nw.drv"
   lost=$(LC_ALL=C comm -23 "$TMP/nw.ctl" "$TMP/nw.drv" | head -3)
   [ -z "$lost" ] \
@@ -399,8 +411,17 @@ run "empty base" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
 [ "$(grep -c '^  - notes$' "$TMP/rep.md")" = 2 ] \
   || bad "identity: the repeated-row fixture does not carry its line twice — the multiplicity arm is vacuous"
 GOVERNED=$(printf '%s\n' memory/DECISIONS.md memory/backlog/*.md "$TMP/rep.md")
-ngov=$(printf '%s\n' "$GOVERNED" | grep -c .)
-[ "$ngov" -ge 3 ] || bad "identity: the governed-index glob matched $ngov files — the arm collapsed"
+# COUNT THE FILES THAT EXIST, not the strings the glob yielded. An unmatched glob stays LITERAL in
+# sh, so `memory/backlog/*.md` counts as one "file", the `[ -f ]` guard below silently skips it,
+# and a floor of 3 is met by a TOTAL glob failure — the `vacuous-selector-empty-population` shape
+# exactly. Measured: renaming memory/backlog aside left this arm PASSing with every shard out of
+# it. So existence is counted, and the shards are counted on their own against their own floor.
+ngov=$(printf '%s
+' "$GOVERNED" | while IFS= read -r f; do [ -f "$f" ] && echo x; done | grep -c .)
+nshard=$(printf '%s
+' memory/backlog/*.md | while IFS= read -r f; do [ -f "$f" ] && echo x; done | grep -c .)
+[ "$ngov" -ge 4 ] || bad "identity: only $ngov of the governed indexes EXIST — the arm collapsed to a glob that matched nothing"
+[ "$nshard" -ge 2 ] || bad "identity: the backlog glob resolved $nshard real shard(s); the arm claims to cover a new shard the day it lands, and does not"
 while IFS= read -r f; do
   [ -n "$f" ] && [ -f "$f" ] || continue
   cp "$f" "$TMP/o"; cp "$f" "$TMP/a"; cp "$f" "$TMP/b"
@@ -582,6 +603,9 @@ cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$E/tools/lib/"
 { pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n*(none yet)*\n'; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-2 ours; } > "$TMP/a"
 { pre; row TOOL-zFixture-1 base; printf '\n## Section two\n\n'; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+cp "$TMP/a" "$TMP/ctlin"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1; c10=$?
+[ "$c10" = 1 ] || bad "shared furniture: the CONTROL exits $c10 where this arm's whole point is that git REFUSES it at rc 1 — the headline better-than-git claim is stale, re-measure before trusting it"
 want_h=$(grep -h '^## ' "$TMP/o" "$TMP/a" "$TMP/b" | LC_ALL=C sort -u | grep -c .)   # BEFORE %A moves
 [ "$want_h" = 1 ] || bad "shared furniture: the fixture declares $want_h distinct headings, expected 1"
 run "both nodes open the same empty section" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
@@ -663,6 +687,9 @@ ADJ='- TOOL-zFixture-7b OPEN an unkeyable correction row filed against the delet
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 base; } > "$TMP/a"
 { pre; row TOOL-zFixture-1 base; printf '%s\n' "$ADJ"; row TOOL-zFixture-2 base; row TOOL-zFixture-3 base; } > "$TMP/b"
+cp "$TMP/a" "$TMP/ctlin"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1; c13=$?
+[ "$c13" = 1 ] || bad "delete/adjacent: the CONTROL exits $c13 where this arm claims to be one of only TWO places the driver resolves what git refuses — the claim is stale"
 run "ours deleted, theirs filed above it" 0 "TOOL-zFixture-1 TOOL-zFixture-3 TOOL-zFixture-7b " TOOL-zFixture-2
 [ "$(grep -cF -- "$ADJ" "$TMP/a")" = 1 ] \
   || bad "delete/adjacent: theirs' correction row is not present exactly once — an honoured delete swallowed it"
@@ -719,8 +746,8 @@ cmp -s "$TMP/a" "$TMP/ctl" \
 { pre; printf '## open\n\n'; row TOOL-zFixture-1 base; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; row TOOL-zFixture-2 base; } > "$TMP/a"
 { pre; printf '## open\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-2 base; row TOOL-zFixture-9 theirs; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; } > "$TMP/b"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c15=0 || c15=1
-[ "$c15" = 1 ] || bad "unplaceable row: the CONTROL now RESOLVES this input — the arm's premise is that git refuses it too"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c15=0 || c15=$?
+[ "$c15" -ge 1 ] && [ "$c15" -lt 128 ] || bad "unplaceable row: the CONTROL answered $c15 — 0 means it now RESOLVES this input and >=128 means it could not run at all, and neither is the refusal this arm rests on — the arm's premise is that git refuses it too"
 err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
 [ "$rc" = 1 ] || bad "unplaceable row: rc=$rc, expected 1 — a row would have been written twice and the driver did not say so"
 printf '%s\n' "$err" | grep -q 'RowLoss' \
@@ -823,8 +850,8 @@ printf '%s\n' "$err" | grep -q 'DuplicatedContent' \
 { pre; row TOOL-zFixture-1 base; printf '\n## OLD HEADING\n'; row TOOL-zFixture-2 OURS-EDIT; } > "$TMP/a"
 { pre; row TOOL-zFixture-1 base; printf '\n## RENAMED HEADING\n'; row TOOL-zFixture-2 base; } > "$TMP/b"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c19=0 || c19=1
-[ "$c19" = 1 ] || bad "heading rename vs row edit: the CONTROL now resolves this input, so the BETTER-than-git claim is stale — re-measure it"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c19=0 || c19=$?
+{ [ "$c19" -ge 1 ] && [ "$c19" -lt 128 ]; } || bad "heading rename vs row edit: the CONTROL now resolves this input, so the BETTER-than-git claim is stale — re-measure it (it answered $c19; >=128 means it could not run at all)"
 run "heading renamed on theirs, row edited on ours" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
 grep -q '^## RENAMED HEADING$' "$TMP/a" || bad "heading rename: theirs' rename was DISCARDED"
 grep -q '^- TOOL-zFixture-2 · OPEN · OURS-EDIT$' "$TMP/a" || bad "heading rename: ours' row edit was DISCARDED"
@@ -913,7 +940,7 @@ cmp -s "$TMP/a" "$TMP/ctl" || bad "repeated note: the driver's file differs from
 cp "$TMP/o" "$TMP/a"                                                    # ours leaves it alone
 { pre; printf '## open\n\n'; row TOOL-zFixture-1 base; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; row TOOL-zFixture-2 base; } > "$TMP/b"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c23=0 || c23=1
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c23=0 || c23=$?
 [ "$c23" = 0 ] || bad "cross-section move: the CONTROL exits $c23 where it was MEASURED at 0 — the corpus's rc 1 was the error this arm corrects, so re-measure before changing it"
 run "a shared row moved across a section boundary, ours untouched" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 cl=$(at_line '^## closed$' "$TMP/a"); mv=$(at_line '^- TOOL-zFixture-2 ' "$TMP/a")
@@ -924,8 +951,8 @@ cmp -s "$TMP/a" "$TMP/ctl" || bad "cross-section move: the driver's file differs
 # ...and the variant that genuinely beats git: ours edits a DIFFERENT keyed row while theirs moves.
 { pre; printf '## open\n\n'; row TOOL-zFixture-1 OURS-EDIT; row TOOL-zFixture-2 base; printf '\n## closed\n\n'; row TOOL-zFixture-3 base; } > "$TMP/a"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c23b=0 || c23b=1
-[ "$c23b" = 1 ] || bad "cross-section move + keyed edit: the CONTROL now RESOLVES this input, so the BETTER-than-git claim is stale"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c23b=0 || c23b=$?
+{ [ "$c23b" -ge 1 ] && [ "$c23b" -lt 128 ]; } || bad "cross-section move + keyed edit: the CONTROL now RESOLVES this input, so the BETTER-than-git claim is stale (it answered $c23b; >=128 means it could not run at all)"
 run "a shared row moved while ours edits a different keyed row" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 cl=$(at_line '^## closed$' "$TMP/a"); mv=$(at_line '^- TOOL-zFixture-2 ' "$TMP/a")
 { [ "$cl" -gt 0 ] && [ "$mv" -gt "$cl" ]; } \
@@ -944,8 +971,8 @@ grep -q 'OURS-EDIT' "$TMP/a" || bad "cross-section move + keyed edit: ours' edit
 keys '- TOOL-zFixture-5b carries an id and no anchor separator (ours)' \
   && bad "separator-less appends: the fixture row IS keyed by the driver — this arm proves the ordinary keyed path, not the hashed one"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c24=0 || c24=1
-[ "$c24" = 1 ] || bad "separator-less appends: the CONTROL now resolves this input, so the BETTER-than-git claim is stale"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c24=0 || c24=$?
+{ [ "$c24" -ge 1 ] && [ "$c24" -lt 128 ]; } || bad "separator-less appends: the CONTROL now resolves this input, so the BETTER-than-git claim is stale (it answered $c24; >=128 means it could not run at all)"
 run "two different separator-less rows at one insertion point" 0 "TOOL-zFixture-1 TOOL-zFixture-5b TOOL-zFixture-6b "
 for w in 5b 6b; do
   [ "$(grep -c "^- TOOL-zFixture-$w " "$TMP/a")" = 1 ] \
@@ -1040,8 +1067,8 @@ nocr=$(LC_ALL=C grep -cv $'\r$' "$TMP/a" || true)
   printf -- '- repeated bullet\n'; } > "$TMP/a"
 { printf '# t\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
 cp "$TMP/a" "$TMP/ctlin"
-git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c28=0 || c28=1
-[ "$c28" = 1 ] || bad "within-side repeat: the CONTROL now resolves this input — re-measure before treating rc 0 as better than git"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1 && c28=0 || c28=$?
+{ [ "$c28" -ge 1 ] && [ "$c28" -lt 128 ]; } || bad "within-side repeat: the CONTROL now resolves this input — re-measure before treating rc 0 as better than git (it answered $c28; >=128 means it could not run at all)"
 run "a note repeated WITHIN ours' own side" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 [ "$(grep -cF -- '- repeated bullet' "$TMP/a")" = 2 ] \
   || bad "within-side repeat: ours carried the note twice and the result carries $(grep -cF -- '- repeated bullet' "$TMP/a") — rule 3 deduped WITHIN a side"
@@ -1055,6 +1082,9 @@ run "a note repeated WITHIN ours' own side" 0 "TOOL-zFixture-1 TOOL-zFixture-2 T
 { printf '# t\n\n'; row TOOL-zFixture-1 base; } > "$TMP/o"
 { printf '# t\n\n'; row TOOL-zFixture-1 base; printf -- '- TOOL-zFixture-2 · OPEN · ours'; } > "$TMP/a"   # NO terminator
 { printf '# t\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+cp "$TMP/a" "$TMP/ctlin"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" >/dev/null 2>&1; c29=$?
+[ "$c29" = 1 ] || bad "unterminated final row: the CONTROL exits $c29 where the arm's prose says it refuses at rc 1 with both rows intact"
 run "ours' final row carries no terminator (rule 3)" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 [ "$(grep -c '^- TOOL-zFixture-2 · OPEN · ours$' "$TMP/a")" = 1 ] \
   || bad "unterminated final row: ours' record is not a line of its own — it fused with its neighbour"
@@ -1277,6 +1307,100 @@ mk12; cp "$TMP/a" "$TMP/sab.a"
 [ "$(sab dup_line,dup_id,row_loss,structure,misfiled)" = "1 RowLoss" ] \
   || bad "construction conservation: with ALL FIVE postconditions disabled, case 12's duplicate answers [$(sab dup_line,dup_id,row_loss,structure,misfiled)] — take()'s conservation is what refuses an input-reachable duplicate, and the arms above are written on that measurement"
 
+# --- 35. A KEY PRESENT ON BOTH SIDES OF A rule-4 REGION -------------------------------------------
+# The most ordinary rule-4 shape there is: two nodes rename the same heading AND each append a row,
+# so the shared row's token lands on BOTH sides of git's hunk. One cursor shared across the region's
+# ours/base/theirs sections consumed ours' only body on the ours side and then ran off the end on
+# the theirs side — a `StructureDrift` refusal and a whole-file marker sandwich where git returns a
+# scoped hunk. Per side the driver's output is byte-identical to git's, and THAT is the assertion:
+# an rc-only arm reads identically whether the region was reproduced or the file was sandwiched.
+{ printf '# t\n\n## H\n\n'; row TOOL-zFixture-1 base; } > "$TMP/o"
+{ printf '# t\n\n## Hours\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-2 ours; } > "$TMP/a"
+{ printf '# t\n\n## Hthem\n\n'; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+run "a shared row on both sides of a heading-rename hunk" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+cmp -s "$TMP/a" "$TMP/ctl" \
+  || bad "rule-4 both sides: the driver's file differs from git merge-file's — a cursor shared across the region's sections refuses where git emits a scoped hunk"
+[ "$(grep -c '^<<<<<<<' "$TMP/a")" = 1 ] \
+  || bad "rule-4 both sides: $(grep -c '^<<<<<<<' "$TMP/a") marker pair(s) — a whole-file sandwich is not a scoped hunk"
+
+# --- 36. A LINE ENDS IN CRLF, LF OR CR — AND IN NOTHING ELSE ---------------------------------------
+# `str.splitlines()` also breaks on VT, FF, FS, GS, RS, NEL, U+2028 and U+2029, none of which git or
+# `_split_term` treat as terminators. Splitting with one rule and terminating with another made a
+# file carrying a U+2028 soft break — the ordinary Word/macOS paste — FAIL ITS OWN IDENTITY MERGE,
+# and the fail-closed body then wrote the line back split in two by a newline that was never in the
+# input. The control returns it byte for byte at rc 0.
+for esc in '\013' '\014' '\034' '\035' '\036' '\302\205' '\342\200\250' '\342\200\251'; do
+  { printf "# t\n\nA${esc}B\n\n"; row TOOL-zFixture-1 base; } > "$TMP/brk"
+  cp "$TMP/brk" "$TMP/o"; cp "$TMP/brk" "$TMP/a"; cp "$TMP/brk" "$TMP/b"
+  $DRV "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1 \
+    || bad "line breaks: an identity merge of a file containing byte(s) [$esc] reported a conflict"
+  cmp -s "$TMP/brk" "$TMP/a" \
+    || bad "line breaks: an identity merge of a file containing byte(s) [$esc] REWROTE it — the splitter and the terminator disagree about what a line is"
+done
+# ...and the fixture is not vacuous: the character really is one `str.splitlines` breaks on, so the
+# arm would have failed before the fix rather than passing over a shape nothing produces.
+"$PY" -c 'import sys; sys.exit(0 if len("A B\n".splitlines()) == 2 else 1)' \
+  || bad "line breaks: U+2028 does not split under str.splitlines on this interpreter — the arm asserts nothing"
+
+# --- 37. A BYTE THAT IS NOT VALID UTF-8 SURVIVES THE MERGE -----------------------------------------
+# `errors="replace"` turned every such byte into U+FFFD and `write_bytes` committed the replacement:
+# a CP-1252 apostrophe pasted into a record was DESTROYED at rc 0 with a `clean` audit line, and two
+# sides carrying DIFFERENT invalid bytes at one spot decoded EQUAL and auto-resolved to a third
+# value neither author wrote. `git merge-file` preserves those bytes exactly, so this is squarely
+# the never-worse bar. Asserted on BYTES — the corruption is invisible in any decoded view, which is
+# why every postcondition was silent over it.
+{ printf '# t\n\n## TOOL\n\n'; printf -- '- TOOL-zFixture-1 \302\267 the node\222s ledger \227 kept\n'; } > "$TMP/o"
+cp "$TMP/o" "$TMP/a"; cp "$TMP/o" "$TMP/b"
+row TOOL-zFixture-2 ours >> "$TMP/a"; row TOOL-zFixture-3 theirs >> "$TMP/b"
+run "a CP-1252 byte in a record neither side touched" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+LC_ALL=C grep -q "$(printf 'node\222s')" "$TMP/a" \
+  || bad "invalid bytes: the 0x92 in a record NEITHER side touched was rewritten — U+FFFD is not the byte the author typed"
+LC_ALL=C grep -q "$(printf '\357\277\275')" "$TMP/a" \
+  && bad "invalid bytes: a U+FFFD replacement character reached the written file"
+# ...and two sides carrying DIFFERENT invalid bytes are two different records, never one.
+printf '# t\n\n## TOOL\n\n- TOOL-zFixture-1 \302\267 v0\n'    > "$TMP/o"
+printf '# t\n\n## TOOL\n\n- TOOL-zFixture-1 \302\267 v\267\n' > "$TMP/a"
+printf '# t\n\n## TOOL\n\n- TOOL-zFixture-1 \302\267 v\240\n' > "$TMP/b"
+$DRV "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1 \
+  && bad "invalid bytes: two sides with DIFFERENT invalid bytes at one spot merged CLEAN — they decoded equal and a third value neither author wrote was committed"
+LC_ALL=C grep -q "$(printf 'v\267')" "$TMP/a" || bad "invalid bytes: ours' byte is not in the conflict"
+LC_ALL=C grep -q "$(printf 'v\240')" "$TMP/a" || bad "invalid bytes: theirs' byte is not in the conflict"
+
+# --- 38. INDENTATION IS NESTING, AND NESTING IS CONTENT --------------------------------------------
+# The `raw:` digest hashed `line.strip()`, so `- notes` and `  - notes` — two different records in
+# markdown — collapsed to ONE key. The row plane then resolved two distinct lines as one and rule 4
+# substituted one side's body for the other's: measured, a line carried identically by all three
+# inputs and touched by nobody was DESTROYED while another was written twice, at rc 1, with the loss
+# OUTSIDE the marked hunk where the author resolving it has no signal. The control is rc 0 and
+# correct, so this is the never-worse bar again.
+printf -- '- notes\n* TOOL-zFixture-4 | star\n- TOOL-zFixture-2 | beta\n' > "$TMP/o"
+printf -- '  - notes\n- notes\n* TOOL-zFixture-4 | star\n- TOOL-zFixture-2 | beta\n' > "$TMP/a"
+printf -- '- notes\n### sub\n- TOOL-zFixture-2 | beta\n' > "$TMP/b"
+run "a nested twin of an unkeyable row" 0 "TOOL-zFixture-2 " TOOL-zFixture-4
+[ "$(grep -cx -- '- notes' "$TMP/a")" = 1 ] \
+  || bad "nesting: the un-indented note, carried by all three inputs and edited by nobody, appears $(grep -cx -- '- notes' "$TMP/a") time(s) — expected exactly 1"
+[ "$(grep -cx -- '  - notes' "$TMP/a")" = 1 ] \
+  || bad "nesting: ours' indented note appears $(grep -cx -- '  - notes' "$TMP/a") time(s) — expected exactly 1"
+cmp -s "$TMP/a" "$TMP/ctl" || bad "nesting: the driver's file differs from git merge-file's, which is CORRECT here"
+
+# --- 39. A CONFLICTED KEY IN TWO SECTIONS REFUSES RATHER THAN RELOCATING ---------------------------
+# A marker block that "speaks for every occurrence of its key" reads as a tidy way to avoid a
+# refusal. Measured, it RELOCATES: one key carried in two `## FAMILY` sections and edited on both
+# sides collapsed into a single block under the FIRST heading and left the second section empty, at
+# rc 1, where git emits two scoped conflicts in place. Whichever side the author then picks, the
+# record has permanently left the section it was filed under — the exact class `no_misfiled_rows`
+# exists to refuse and cannot see, because `sections()` records only a key's FIRST heading.
+{ pre; printf '## PLAY\n\n'; row PLAY-zFixture-1 a; printf '  - shared note \n'; row PLAY-zFixture-2 b
+  printf '\n## TOOL\n\n'; row TOOL-zFixture-3 c; printf '  - shared note \n'; } > "$TMP/o"
+sed 's/  - shared note $/  - shared note/'  "$TMP/o" > "$TMP/a"
+sed 's/  - shared note $/   - shared note/' "$TMP/o" > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null); rc=$?
+[ "$rc" = 1 ] || bad "two-section key: rc=$rc, expected 1 — a key carried in two sections must never be collapsed into one block"
+printf '%s\n' "$err" | grep -q 'RowLoss' \
+  || bad "two-section key: the refusal does not name conservation — stderr was [$err]"
+[ "$(awk '/## TOOL/,0' "$TMP/a" | grep -c 'shared note')" -gt 0 ] \
+  || bad "two-section key: the '## TOOL' section lost its note entirely — the record was relocated across a heading"
+
 # --- 34. THE CONSERVATIVE TALLY — a redesign that trades a fix for a conflict must SHOW it (AC3) ---
 ncons=$(printf '%s' "$CONSERVATIVE" | grep -c . || true)
 if [ "$ncons" -gt "$CONSERVATIVE_CAP" ]; then
@@ -1291,7 +1415,15 @@ fi
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
+# TWO floors, because one of them counts COMMENT BANNERS. `grep -c '^# --- '` is a ratchet on the
+# number of headers, not on the number of executed assertions: measured, commenting out every line
+# of a group's body while keeping its banner leaves this count unchanged and the suite still prints
+# PASS. So the executable population is floored too — the `run` invocations that actually drive the
+# driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
-[ "$ngroups" -ge 40 ] || bad "the fixture-group scan found $ngroups groups, expected at least 40 — a group was deleted or the count is mis-selecting"
-[ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups fixture groups held, $ncons conservative (cap $CONSERVATIVE_CAP)"
+nruns=$(grep -c '^run "' "$SELF")
+[ "$ngroups" -ge 45 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 45 — a group was deleted"
+[ "$nruns" -ge 33 ] || bad "only $nruns 'run' case(s) remain, expected at least 33 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
+[ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

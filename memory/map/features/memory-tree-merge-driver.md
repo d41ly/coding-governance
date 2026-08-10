@@ -44,13 +44,16 @@ placeholder, a repeated lead-in note, a sub-heading opened in two sections.
 
 **The two planes recombine through a SKELETON, which is what makes the recombination ordered rather
 than guessed.** Each of `%O %A %B` is projected to a line list of the same length in which every row
-becomes one token line — its id when the grammar keys it, a digest of its STRIPPED text when it does
+becomes one token line — its id when the grammar keys it, a digest of its text when it does
 not — and every structure line passes through byte for byte. `git merge-file` merges the three
 skeletons, and the merged skeleton is walked and its tokens substituted. Keying a token on the ID
 rather than the text is what keeps a row EDIT invisible to the structure plane; otherwise every row
 edit is a structural change and git starts arbitrating record text, which is where duplication comes
-from. Hashing the STRIPPED text is what stops line form smuggling a duplicate: a final copy with no
-newline and an interior copy with one produce the same token.
+from. The digest drops the terminator and trailing whitespace, which stops line form
+smuggling a duplicate — a final copy with no newline and an interior copy with one hash the same —
+and KEEPS leading whitespace, because indentation is nesting and nesting is content. Collapsing
+`- x` and `  - x` onto one key made rule 4 substitute one side's body for the other's and destroy a
+line no side had touched.
 
 **A conflict region that is entirely tokens on both sides resolves by CONCATENATION; any disputed
 structure line is always a conflict.** Both sides of a diff hunk sit between the same context lines,
@@ -81,8 +84,11 @@ exactly as it is at rc 0.
 this driver replaces is the standard it is held to, and it is now arithmetic rather than judgement:
 every case runs a live control on the identical three blobs, losing a line git keeps or writing a row
 more often than git does fails the suite by name, and conflicting where git resolves correctly is
-counted against a shrink-only constant (0 today). Two of twenty-eight fixture groups ran a control
-before kit 2.0; all forty-two do now, because a green suite twice signed off on rc-0 corruption here.
+counted against a shrink-only constant (0 today). Every case runs a control — two of twenty-eight
+groups did before kit 2.0 — but the ARITHMETIC comparison can only bind where the control EXITS 0,
+which is 13 of 37 cases and is floored so a fixture edit cannot quietly drop one. Saying it that
+precisely matters: a suite that reads stronger than it is, is how this driver shipped rc-0
+corruption twice.
 
 **Failure is closed.** A merge driver that raises exits non-zero WITHOUT writing `%A`, and git then
 leaves the path unmerged holding OURS-only content with no markers — the incoming rows are simply
@@ -167,6 +173,25 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
   `memory/DECISIONS.md` and all four backlog shards carry no fenced blocks. A fence-tracking state
   machine on the merge path of an append-only record buys a rare case and pays in exactly the state
   the two-plane design exists to delete.
+- **A row MOVED by one side and DELETED by the other is dropped at rc 0, where `git merge-file`
+  keeps it.** The row plane's delete branch compares the key's row BODIES, which a relocation does
+  not change, so a side that deliberately moved a record reads as having left it alone. Measured on
+  the flat backlog shape with no headings involved, and confirmed through a real `git merge`:
+  auto-committed, `1 deletion(-)`, no markers. PRE-EXISTING — the retired driver loses it too — so
+  this unit does not regress it, but it is a live violation of the never-worse bar and the only one
+  known to remain. Closing it needs a placement rule the row plane deliberately does not have, which
+  is why it is recorded here rather than patched in at the end of a redesign.
+- **A file that already carries a COMMITTED, unresolved conflict block refuses where git resolves.**
+  Git's own markers are now labelled with the token sentinel so the reconciliation cannot mistake an
+  input's block for one it produced — before that, rule 3 concatenated the block, erased all three
+  marker lines and silently accepted both disputed wordings at rc 0. What remains is that `settled()`
+  still excises the input's block by its marker TEXT, so conservation sees rows it cannot account
+  for and refuses. Loud and lossless, on a file the hygiene gate reds anyway.
+- **The delete/modify branch's scoped conflict block is unplaceable for the plain shape.** A row edit
+  is invisible to the skeleton by design (that is what lets a heading rename survive a row edit), so
+  when the other side deletes the row there is no token left to place the block at, and the run ends
+  in a whole-file refusal instead of the scoped hunk `resolve_rows` promises. No content is lost;
+  git returns a scoped conflict here, so it is an ergonomics gap of the same family as the one above.
 - **No `regenerate` driver, and there will not be one.** `ort` checks the merge result out only AFTER
   the per-path merges run, so a generator invoked from inside a driver renders from the pre-merge tree
   and commits a stale artifact. `memory/LIVE.md` and `memory/ledger/<month>.md` stay regenerated by

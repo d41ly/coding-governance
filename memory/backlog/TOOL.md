@@ -19,3 +19,4 @@
 - TOOL-aBatchedTribunal-5 · CLOSED · the launcher ban keyed on the retired idiom, so a BARE invocation carried nothing to match — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
 - TOOL-aBatchedTribunal-7 · CLOSED · the epoch gate's endpoint comparison let one early bump excuse every later change in the range — closed by TOOL-aBatchedTribunal-8 (W6); the record is in DECISIONS.md
 - TOOL-aMendedLedger-8 · CLOSED · scoped as the driver's FOURTH repair; closed instead by U9, which replaces the algorithm — the record is in DECISIONS.md
+- TOOL-aMendedLedger-9 · OPEN · the merge driver drops a row one side MOVED and the other DELETED, at rc 0, where `git merge-file` keeps it — pre-existing, the only known live never-worse violation; see the dossier Gaps

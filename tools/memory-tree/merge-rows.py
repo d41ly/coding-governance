@@ -475,12 +475,23 @@ def text_merge(o: list[str], a: list[str], b: list[str]) -> tuple[list[str], boo
             # `newline=""` — site 2 of the newline contract. Without it Python translates every "\n"
             # in the joined text to the platform separator on write, and a CRLF region round-trips as
             # CRCRLF.
-            (p / name).write_text("".join(data), encoding="utf-8", newline="")
+            (p / name).write_text("".join(data), encoding="utf-8", errors="surrogateescape",
+                                  newline="")
         # -L labels the markers `ours`/`base`/`theirs`. Without them git labels a conflict with the
         # temp FILENAMES, so a real conflict reads `<<<<<<< C:\\Users\\…\\tmpqm5j4r78\\a` — an
         # absolute scratch path in the file the author now has to resolve by hand.
-        r = subprocess.run(["git", "-c", "merge.conflictStyle=merge",
-                            "merge-file", "-p", "-L", "ours", "-L", "base", "-L", "theirs",
+        # THE LABELS CARRY THE SENTINEL, and that is the only way to tell git's markers from the
+        # input's. A governed index can already contain a committed, unresolved conflict block —
+        # this build's own risk section records two merges auto-committed before anyone looked — and
+        # those `<<<<<<<` lines are STRUCTURE that rule 1 passes through byte for byte. Matching on
+        # the marker TEXT made the reconciliation read that block as a region IT had produced:
+        # measured, rule 3 concatenated it, erased all three marker lines, and silently accepted
+        # both disputed wordings into an append-only record at rc 0 with a `clean` audit line, where
+        # `git merge-file` preserves them. No input line can contain the sentinel — that is refused
+        # up front — so a sentinel-labelled marker is git's by construction. The labels are rewritten
+        # to plain `ours`/`theirs` before anything is written out.
+        r = subprocess.run(["git", "-c", "merge.conflictStyle=merge", "merge-file", "-p",
+                            "-L", _SENT + "ours", "-L", _SENT + "base", "-L", _SENT + "theirs",
                             str(p / "a"), str(p / "o"), str(p / "b")],
                            capture_output=True)
         # SITE 3 of the newline contract, and the one upstream does not solve: it passes
@@ -488,12 +499,28 @@ def text_merge(o: list[str], a: list[str], b: list[str]) -> tuple[list[str], boo
         # careful `newline=""` two lines up is undone. Capture BYTES and decode by hand instead —
         # this repo's nodes run `core.autocrlf=true` and the governed indexes are CRLF in the
         # worktree, which is exactly the format git hands a merge driver.
-        return r.stdout.decode("utf-8", "replace").splitlines(keepends=True), r.returncode != 0
+        return _lines(r.stdout.decode("utf-8", "surrogateescape")), r.returncode != 0
 
 
 # --------------------------------------------------------------------------------------------
 # The skeleton
 # --------------------------------------------------------------------------------------------
+
+# WHAT A LINE IS, declared ONCE. `str.splitlines()` also breaks on VT, FF, FS, GS, RS, NEL, U+2028
+# and U+2029 — eight characters `_split_term` does not recognise as terminators, and neither does
+# git. Splitting with one rule and terminating with another makes the two halves of the newline
+# contract disagree about what a line is: measured, a file carrying a U+2028 soft break (the
+# ordinary Word/macOS paste) failed its OWN IDENTITY MERGE and the fail-closed body then wrote the
+# line back split in two by a `\n` that was never in the input, where `git merge-file` returns it
+# byte for byte at rc 0. So the split is defined here, over exactly the three terminators the rest
+# of this file honours, and `str.splitlines` is used nowhere.
+_LINE_RE = re.compile(r"[^\r\n]*(?:\r\n|[\r\n])|[^\r\n]+")
+
+
+def _lines(text: str) -> list[str]:
+    """`text` split into lines with terminators kept, on `\r\n` / `\n` / `\r` and nothing else."""
+    return _LINE_RE.findall(text)
+
 
 def _split_term(line: str) -> tuple[str, str]:
     """(body, terminator). The empty terminator of an unterminated final line is a real answer."""
@@ -503,30 +530,54 @@ def _split_term(line: str) -> tuple[str, str]:
     return line, ""
 
 
-def _dominant(lines: list[str]) -> str:
-    """The file's dominant line terminator — site 6, computed over `%A`, LF when empty or tied."""
-    n = {"\r\n": 0, "\n": 0, "\r": 0}
-    for ln in lines:
-        t = _split_term(ln)[1]
-        if t:
-            n[t] += 1
-    top = max(n.values())
-    winners = [t for t, c in n.items() if c == top]
-    return "\n" if top == 0 or len(winners) != 1 else winners[0]
+def _dominant(*sides: list[str]) -> str:
+    """The file's dominant line terminator — site 6. LF when nothing is terminated, or on a tie.
+
+    `%A` decides whenever it can, and the later sides are a FALLBACK rather than a vote: a merge
+    where ours emptied the file, or where ours is a single unterminated line, has no terminator
+    evidence in `%A` at all, and defaulting to LF there writes LF markers into an all-CRLF file —
+    which is the exact asymmetry site 6 exists to remove. Measured on the fail-closed path with
+    `%A` empty and `%O`/`%B` CRLF: three LF marker lines in a file whose every other line ends CRLF.
+    A side that carries terminators is never overridden by a later one, so this cannot change any
+    verdict where `%A` had an answer.
+    """
+    for lines in sides:
+        n = {"\r\n": 0, "\n": 0, "\r": 0}
+        for ln in lines:
+            t = _split_term(ln)[1]
+            if t:
+                n[t] += 1
+        top = max(n.values())
+        if top == 0:
+            continue
+        winners = [t for t, c in n.items() if c == top]
+        if len(winners) == 1:
+            return winners[0]
+        return "\n"
+    return "\n"
 
 
 def _row_key(line: str) -> str:
     """The row plane's key for a row-shaped line: its id when the grammar keys it, else a digest.
 
-    The digest is over the STRIPPED text, which is what makes line form unable to smuggle a
-    duplicate past the plane: a final copy with no newline and an interior copy with one hash the
-    same. `row:`/`raw:` prefixes keep the two namespaces from colliding and make the audit line's
+    The digest drops the TERMINATOR and any trailing whitespace, which is what makes line form
+    unable to smuggle a duplicate past the plane: a final copy with no newline and an interior copy
+    with one hash the same. It KEEPS LEADING WHITESPACE, and that is the correction to an earlier
+    `line.strip()`: indentation is nesting, nesting is content, and `- notes` and `  - notes` are
+    two different records in markdown. Collapsing them to one key made the row plane resolve two
+    distinct lines as one, and rule 4 then substituted one side's body for the other's — measured,
+    a line carried identically by all three inputs and touched by nobody was DESTROYED while
+    another was written twice, at rc 1, with the loss OUTSIDE the marked hunk where the author
+    resolving the conflict has no signal.
+
+    `row:`/`raw:` prefixes keep the two namespaces from colliding and make the audit line's
     keyed/hashed split derivable from the keys themselves.
     """
     k = key(line)
     if k is not None:
         return "row:" + k
-    return "raw:" + hashlib.sha1(line.strip().encode("utf-8", "replace")).hexdigest()[:16]
+    body = _split_term(line)[0].rstrip()
+    return "raw:" + hashlib.sha1(body.encode("utf-8", "surrogateescape")).hexdigest()[:16]
 
 
 def _token_of(body: str) -> str | None:
@@ -673,9 +724,14 @@ def _parse_region(block: list[str]) -> dict:
             "close": close_ln}
 
 
+def _is_git_open(line: str) -> bool:
+    """Did GIT write this marker in this merge, or did it arrive in the input?"""
+    return line.lstrip().startswith(_OPEN + " " + _SENT)
+
+
 def _region_end(skel: list[str], i: int) -> int:
     for j in range(i + 1, len(skel)):
-        if skel[j].lstrip().startswith(_CLOSE):
+        if skel[j].lstrip().startswith(_CLOSE + " " + _SENT):
             return j
     raise StructureDrift("a conflict region in the merged skeleton is never closed")
 
@@ -693,11 +749,19 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
     out: list[str] = []
     cursor: dict[str, int] = {}
     conflict_done: set[str] = set()
+    # How many of each key's rows land in SETTLED text — i.e. outside every marker
+    # pair. This is what conservation compares the written bytes against, and it is
+    # exact where the old `region_keys` blanket exclusion was blind: a key with one
+    # token inside a rule-4 region and another outside it was excused ENTIRELY, so a
+    # row destroyed at the outside occurrence was invisible to every check.
+    emitted: dict[str, int] = {}
     region_keys: set[str] = set()
+    outside_keys: set[str] = set()
     n_regions = 0
 
     def take(k: str, t: str) -> list[str]:
         """Rule 2. One token occurrence consumes one entry of `resolved[k]`."""
+        outside_keys.add(k)
         entries = resolved.get(k)
         if entries is None:
             raise RowLoss(f"the merged skeleton carries a token for {k!r} that the row plane never "
@@ -711,10 +775,14 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
             return []
         i = cursor.get(k, 0)
         if i >= len(entries):
-            # A marker block speaks for EVERY occurrence of its key, so a second token for a
-            # conflicted key emits nothing rather than refusing.
-            if k in conflict_done:
-                return []
+            # NO SHORT-CIRCUIT FOR A CONFLICTED KEY, and the absence is deliberate. Letting a marker
+            # block "speak for every occurrence" and emitting nothing for the later ones reads as a
+            # tidy way to avoid a refusal; measured, it RELOCATES content across a section boundary.
+            # One key carried in two `## FAMILY` sections and edited on both sides collapsed into a
+            # single block under the FIRST heading and left the second section empty, at rc 1, where
+            # `git merge-file` emits two scoped conflicts in place. Whichever side the author then
+            # picks, the record has permanently left the section it was filed under. Refusing is
+            # loud, lossless, and the only answer the driver is entitled to give.
             raise RowLoss(
                 f"key {k!r}: the merged skeleton carries its token {i + 1} time(s) and the row plane "
                 f"resolved it to {len(entries)} — {_quote(entries)} would be written twice or "
@@ -722,12 +790,35 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
         cursor[k] = i + 1
         kind, payload = entries[i]
         if kind == "row":
+            emitted[k] = emitted.get(k, 0) + 1
             return [payload + t]                       # SITE 7: the TOKEN's terminator, not the row's
         conflict_done.add(k)
-        return [b + term for b in payload]             # SITE 6: synthesized markers, dominant term
+        # SITE 6 for the MARKERS the driver synthesizes, SITE 7 for the row bodies between them.
+        # Applying the dominant terminator to the whole block rewrites the rows' own endings —
+        # measured, an LF row inside an otherwise-CRLF file came back CRLF, and the mirror flipped a
+        # CRLF row to LF — which is precisely the translation this contract exists to prevent. The
+        # token's terminator falls back to the dominant one only when the token is the file's last
+        # line and carries none, where an interior block line must still be terminated.
+        rt = t or term
+        return [b + (term if _MARKER_RE.match(b) else rt) for b in payload]
 
-    def per_side(sec_lines: list[str], side: dict, seen: dict) -> list[str]:
+    # ONE CURSOR PER SIDE, and they are file-wide rather than per-region. Sharing a single cursor
+    # across a region's ours/base/theirs sections is a defect, not a simplification: each section
+    # indexes a DIFFERENT body dict, so a key present on both sides — the most ordinary rule-4 shape
+    # there is, two nodes renaming the same heading while each appends a row — consumed ours' only
+    # body on the ours side and then found the cursor past the end on the theirs side. Measured: a
+    # `StructureDrift` refusal and a whole-file marker sandwich where `git merge-file` returns a
+    # scoped ten-line hunk. Per side, the driver's output is byte-identical to git's.
+    #
+    # File-wide rather than per-region because a key of multiplicity 2 can appear in two different
+    # regions on the same side, and a cursor that restarted per region would substitute the same
+    # body twice. It cannot exhaust: every region-slice token on side S is a distinct line of S's
+    # own skeleton, and S's skeleton carries exactly `len(S[k])` tokens for k.
+    side_seen: dict[int, dict[str, int]] = {}
+
+    def per_side(sec_lines: list[str], side: dict) -> list[str]:
         """Rule 4. A token is replaced by the row from the side of the region it appears on."""
+        seen = side_seen.setdefault(id(side), {})
         got: list[str] = []
         for ln in sec_lines:
             body, t = _split_term(ln)
@@ -741,9 +832,9 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
                 bodies = O.get(k) or A.get(k) or B.get(k)
             i = seen.get(k, 0)
             if not bodies or i >= len(bodies):
-                # Unreachable by construction — a region's ours side is a slice of %A's skeleton and
-                # its theirs side a slice of %B's, so the bodies are there. Refusing is the
-                # fail-closed direction if that ever stops being true.
+                # Unreachable by the counting argument above. Refusing stays the fail-closed
+                # direction if that argument ever stops holding — but note that it converts a
+                # SCOPED hunk into a whole-file conflict, so it must stay genuinely unreachable.
                 raise StructureDrift(f"key {k!r} appears in a conflict region more often than the "
                                      f"side it is on carries it")
             seen[k] = i + 1
@@ -753,7 +844,7 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
     i = 0
     while i < len(skel):
         ln = skel[i]
-        if ln.lstrip().startswith(_OPEN):
+        if _is_git_open(ln):
             j = _region_end(skel, i)
             sec = _parse_region(skel[i:j + 1])
             if _token_only(sec):
@@ -776,15 +867,14 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
                 # and structure is precisely the class git is right about and this driver has been
                 # wrong about three times.
                 n_regions += 1
-                seen: dict[str, int] = {}
-                out.append(sec["open"])
-                out.extend(per_side(sec["ours"], A, seen))
+                out.append(sec["open"].replace(_SENT, "", 1))
+                out.extend(per_side(sec["ours"], A))
                 if sec["basemark"] is not None:
-                    out.append(sec["basemark"])
-                    out.extend(per_side(sec["base"], O, seen))
+                    out.append(sec["basemark"].replace(_SENT, "", 1))
+                    out.extend(per_side(sec["base"], O))
                 out.append(sec["sep"])
-                out.extend(per_side(sec["theirs"], B, seen))
-                out.append(sec["close"])
+                out.extend(per_side(sec["theirs"], B))
+                out.append(sec["close"].replace(_SENT, "", 1))
             i = j + 1
             continue
         body, t = _split_term(ln)
@@ -798,6 +888,19 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
     # CONSERVATION AT THE CONSTRUCTION LEVEL, the other direction from `take`'s. Every entry the row
     # plane resolved must have been consumed, unless the key lives inside a rule-4 region where
     # `settled()` excises it by design.
+    # A KEY MAY NOT BE PLACED BOTH INSIDE A rule-4 REGION AND OUTSIDE ONE. Inside, the region's own
+    # sides speak for the key; outside, `resolved` does. Split across both, the two cursors are
+    # independent and start at 0, so the outside occurrence writes entry 0 while the region writes a
+    # side's body — and entry 1 is never written at all. Measured: a row byte-identical in all three
+    # inputs vanished from the file while another was written twice, at rc 1, with the loss OUTSIDE
+    # the markers where the author resolving the conflict never looks, and every postcondition
+    # silent because the old form excused the whole key. Refusing is loud and lossless.
+    split = sorted(region_keys & outside_keys)
+    if split:
+        raise RowLoss(
+            f"{len(split)} key(s) are placed both inside a conflict region and outside one, e.g. "
+            f"{split[0]!r} ({_quote(resolved.get(split[0], []))}) — the region and the row plane "
+            f"would each write a different one of its rows and the rest would be lost")
     for k, entries in resolved.items():
         if k in region_keys or k in conflict_done:
             continue
@@ -805,7 +908,8 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
             raise RowLoss(
                 f"key {k!r}: the row plane resolved {len(entries)} row(s) and the merged skeleton "
                 f"carries {cursor.get(k, 0)} token(s) — a row would be lost")
-    return out, {"regions": n_regions, "conflicts": conflict_done, "region_keys": region_keys}
+    return out, {"regions": n_regions, "conflicts": conflict_done,
+                 "region_keys": region_keys, "emitted": emitted}
 
 
 # --------------------------------------------------------------------------------------------
@@ -820,25 +924,28 @@ def no_row_loss(merged: list[str], resolved: dict, facts: dict) -> None:
     that way turns an IDENTITY merge of such a file into a permanent whole-file conflict no author
     can clear — measured.
 
-    Keys resolved to a marker block, and keys inside a rule-4 region, are excluded: `settled()`
-    excises their lines by design, so their count here is zero for a reason that is not loss.
+    NO KEY IS EXCLUDED, and that is the correction to an earlier form which excused every key that
+    appeared inside a rule-4 region. A key can appear BOTH inside a region and outside it, and the
+    blanket exclusion then hid a real loss at the outside occurrence — measured: a row carried
+    identically by all three inputs and edited by neither was destroyed while another was written
+    twice, and all five postconditions were silent. So the comparison is against what the
+    reconciliation actually EMITTED into settled text, which is zero for a marker block and zero for
+    a rule-4 substitution by construction, rather than against `len(resolved[key])` with a list of
+    excuses.
     """
-    excluded = facts["conflicts"] | facts["region_keys"]
     seen: dict[str, int] = {}
     for ln in settled(merged):
         if not _ROW_RE.match(ln):
             continue
-        seen[_row_key(ln)] = seen.get(_row_key(ln), 0) + 1
+        k = _row_key(ln)
+        seen[k] = seen.get(k, 0) + 1
+    emitted = facts["emitted"]
     bad = []
-    for k in sorted(set(seen) | set(resolved)):
-        if k in excluded:
-            continue
+    for k in sorted(set(seen) | set(emitted)):
         got = seen.get(k, 0)
-        want = len(resolved.get(k, []))
-        if k not in resolved:
-            bad.append((k, got, "no input carries it", "?"))
-        elif got != want:
-            bad.append((k, got, str(want), _quote(resolved[k])))
+        want = emitted.get(k, 0)
+        if got != want:
+            bad.append((k, got, str(want), _quote(resolved.get(k, []))))
     if bad:
         k, got, want, txt = bad[0]
         raise RowLoss(f"{len(bad)} key(s) written a different number of times than the row plane "
@@ -879,7 +986,7 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
             if _SENT in ln:
                 raise StructureDrift(f"{name} line {n} contains the token sentinel U+0001, so "
                                      f"tokenization cannot be unambiguous")
-    term = _dominant(a_lines)
+    term = _dominant(a_lines, b_lines, o_lines)
     o_skel, O = skeleton(o_lines)
     a_skel, A = skeleton(a_lines)
     b_skel, B = skeleton(b_lines)
@@ -898,7 +1005,7 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
         if not ln.endswith(("\n", "\r")):
             raise StructureDrift(f"output line {n} carries no terminator and is not the last line — "
                                  f"joining would fuse two records onto one line")
-    merged = "".join(out).splitlines(keepends=True)
+    merged = _lines("".join(out))
     for n, ln in enumerate(merged, 1):
         if _SENT in ln:
             raise StructureDrift(f"output line {n} still carries a token sentinel — a token was not "
@@ -942,8 +1049,15 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
 def read(p: str) -> list[str]:
     # SITE 1 of the newline contract. `newline=""` suppresses universal-newline translation, so a
     # CRLF line keeps its "\r\n" and every downstream comparison is over the real bytes.
-    with open(p, "r", encoding="utf-8", errors="replace", newline="") as fh:
-        return fh.read().splitlines(keepends=True)
+    # `_lines` rather than `str.splitlines`, which also breaks on eight characters this driver does
+    # not treat as terminators. And `errors="surrogateescape"` rather than `"replace"`, which is a
+    # correctness fix and not a nicety: `"replace"` turns every byte that is not valid UTF-8 into
+    # U+FFFD and `write_bytes` then commits the replacement, so a CP-1252 apostrophe pasted into a
+    # record was DESTROYED at rc 0 with a `clean` audit line — and two sides carrying DIFFERENT
+    # invalid bytes at one spot decoded EQUAL and auto-resolved to a third value neither author
+    # wrote. `git merge-file` preserves those bytes exactly; surrogateescape round-trips them.
+    with open(p, "r", encoding="utf-8", errors="surrogateescape", newline="") as fh:
+        return _lines(fh.read())
 
 
 def main(argv: list[str]) -> int:
@@ -974,17 +1088,17 @@ def main(argv: list[str]) -> int:
         # line is terminated before `=======` follows it — an unterminated last line is the ordinary
         # shape of "one node's editor left no trailing newline", and joining it to a marker is the
         # same record-fusing defect site 7 closes on the merge path.
-        t = _dominant(ours)
+        t = _dominant(ours, theirs)
         cap = lambda side: [ln if ln.endswith(("\n", "\r")) else ln + t for ln in side]  # noqa: E731
         body = ([_OPEN + " ours" + t] + cap(ours) + [_SEP + t] + cap(theirs)
                 + [_CLOSE + " theirs (merge-rows failed; resolve by hand)" + t])
-        pathlib.Path(a).write_bytes("".join(body).encode("utf-8"))
+        pathlib.Path(a).write_bytes("".join(body).encode("utf-8", "surrogateescape"))
         return 1
     # SITE 4 of the newline contract: written as BYTES, with the newlines already carried by the
     # source lines. `write_text` translates on Windows and would rewrite the whole file's line
     # endings — the governed indexes are CRLF in this repo's worktrees, so that is every line of
     # every file, on a merge that was supposed to add one row.
-    pathlib.Path(a).write_bytes("".join(merged).encode("utf-8"))
+    pathlib.Path(a).write_bytes("".join(merged).encode("utf-8", "surrogateescape"))
     return 1 if conflicted else 0
 
 
