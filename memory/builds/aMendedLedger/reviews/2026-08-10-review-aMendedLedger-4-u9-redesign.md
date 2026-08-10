@@ -90,7 +90,19 @@ exactly one call site and measures its own premise; group 33's injections inject
 `|||||||` is unreachable under the pinned style; a setext `=======` mis-splits a region but always
 falls to rule 4 and is byte-preserving.
 
-## Upheld and deliberately NOT fixed
+## Upheld, deferred at review time, CLOSED on the owner's instruction
+
+**Closed in `973512f` (kit 2.2), after this report was written.** The finding and the reasoning for
+deferring it stand as recorded below; what changed is the owner's call to fix it rather than carry
+it. The fix does not give the row plane a placement rule — it asks the plane that already has the
+answer. A surviving token for a key the row plane deleted can only mean the side that kept it MOVED
+it, so inside a rule-3 region the drop stands (which is what keeps the delete-plus-adjacent-content
+auto-resolve) and outside one the two planes disagree, which is delete/modify by another name and
+takes the same answer: a scoped conflict naming both intents, in both directions. It is the first
+case in the suite where the driver conflicts and git resolves, so `CONSERVATIVE_CAP` moved 0 → 2
+with both members named — the tally doing exactly what it exists for.
+
+## The finding, as reviewed
 
 **A row MOVED by one side and DELETED by the other is dropped at rc 0, where `git merge-file` keeps
 it.** The delete branch compares the key's row BODIES, which a relocation does not change, so the
@@ -98,7 +110,7 @@ side that moved it reads as having left it alone. Confirmed through a real `git 
 auto-committed, `1 deletion(-)`, no markers. It predates this unit — the retired driver loses it
 too — so the redesign does not regress it, and closing it needs a placement rule the row plane
 deliberately does not have. Adding one, unreviewed, at the end of a redesign is exactly how rounds
-one through three shipped corruption. Recorded in the dossier Gaps and as `TOOL-aMendedLedger-9`.
+one through three shipped corruption. Recorded at review time in the dossier Gaps and as `TOOL-aMendedLedger-9`; both now closed.
 
 Two smaller limits are recorded with it: a file that already carries a committed conflict block now
 REFUSES where git resolves (loud and lossless, on a file hygiene reds anyway), and the delete/modify
@@ -107,10 +119,10 @@ skeleton by design, so that shape ends in a whole-file refusal rather than git's
 
 ## What the bar reads at the end
 
-`PASS — merge-rows: 47 groups / 37 run cases held, 13 under the arithmetic never-worse bar,
-0 conservative (cap 0)` · `tools/check-wiring.test.sh` 56/56 · `tools/run-gates.sh` 38/38.
+`PASS — merge-rows: 48 groups / 40 run cases held, 16 under the arithmetic never-worse bar,
+2 conservative (cap 2)` · `tools/check-wiring.test.sh` 56/56 · `tools/run-gates.sh` 38/38.
 
-The number that should be read first is **0 conservative**: across every case in the suite, there is
-no input where the driver refuses and `git merge-file` resolves correctly. The number that should be
-read second is **13 of 37** — because the previous version of that sentence claimed 42 of 42, and a
-suite that reads stronger than it is, is how this driver shipped rc-0 corruption twice.
+The number to read first is **2 conservative, both named**: the move-vs-delete pair, and nothing
+else. Every other case in the suite either matches git or beats it. The number to read second is
+**16 of 40** — because the first version of that sentence claimed 42 of 42, and a suite that reads
+stronger than it is, is how this driver shipped rc-0 corruption twice.
