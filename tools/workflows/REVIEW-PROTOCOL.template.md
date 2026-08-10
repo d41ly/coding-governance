@@ -27,22 +27,51 @@ no verdict as **unverified**, never as refuted. `workflows/tier2-review.js` does
 
 ## Enforcement — and where it does NOT reach
 
-The rule is mechanical, in two places, with ONE implementation:
+The rule is mechanical, and there are TWO MODALITIES to enforce it in, because there are two ways a
+session spawns agents:
 
-- `hooks/agent-cap.js` — a `PreToolUse` hook on the `Workflow` tool call. It sees the inline
-  `script` string and (when given one) reads `scriptPath` off disk. **This is the primary point**,
-  because the ad-hoc review script written in a session is never a file, so no file-scoped gate can
-  see it. Measured: of the `Workflow` calls in the session that motivated this document, every one
-  passed `script` and none passed `scriptPath`.
+- `hooks/agent-cap.js` on the **`Workflow`** tool call — the STATIC half. It sees the inline
+  `script` string and (when given one) reads `scriptPath` off disk. **This is the primary point** for
+  a review, because the ad-hoc review script written in a session is never a file, so no file-scoped
+  gate can see it. Measured: of the `Workflow` calls in the session that motivated this document,
+  every one passed `script` and none passed `scriptPath`.
+- The same hook on the **`Agent`** tool call — the RUNTIME half, and the modality that was unguarded
+  entirely until `agent-cap` 1.3. A direct spawn carries no script, so it is COUNTED: each spawn
+  claims a numbered slot with `O_EXCL` under a `session_id` + `prompt_id`-keyed directory in the git
+  common dir, and the spawn that finds every slot taken is denied. The budget resets on the next user
+  prompt, so nothing has to remember to clear it. Measured before it was built: `PreToolUse` does
+  fire for a direct `Agent` spawn, `tool_name` arrives as exactly `Agent`, and `session_id`,
+  `prompt_id` and `tool_use_id` are all present.
+
+  The count does **not** distinguish a verifier from any other agent, and that is deliberate: keying
+  on "is this a verify agent" would need a session-to-build binding no payload field provides, while
+  the concurrency rule below already binds every fan-out to the same number. The residual is a wide
+  fan-out that is legitimately not a review — accepted, for that reason.
+
+  Why slots and not a running count: read-then-decide loses updates (measured — a four-call burst
+  overlapped its hook processes and two of four read the same count), and create-a-token-then-count
+  does not fix it either, since each of six concurrent processes sees between its own ordinal and
+  six. Only the atomic claim of a numbered slot decides the question in the create.
 - `workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
-  not re-implement the rule; it feeds each script to the hook. One predicate, two entry points.
+  not re-implement the static rule; it feeds each script to the hook. One predicate, two entry points.
 
-**What neither reaches:** a `Workflow({name:'…'})` run of a saved workflow supplies no source to the
-hook. Those workflows live in `workflows/` and the merge-bar leg covers them there. And nothing
-counts the agents a workflow script spawns INSIDE itself: that script runs in a sidechain with no
-hooks, so no process observes those spawns and none ever will. That is a statement about the sidechain
-specifically, not a blanket claim that runtime counting is impossible — a `PreToolUse` hook on a
-main-loop tool call is a different case, and it is judged on its own evidence.
+The wiring is therefore `"matcher": "Workflow|Agent"` — a list of exact strings in ONE group, not a
+regular expression. `check-wiring.sh` asserts that VALUE, because a group left at `Workflow`
+alone still contains the string `agent-cap.js` and used to report the tree correctly wired.
+
+**Where enforcement does NOT reach**, stated rather than implied away:
+
+- A `Workflow({name:'…'})` run of a saved workflow supplies no source to the hook. Those workflows
+  live in `workflows/` and the merge-bar leg covers them there.
+- The agents a workflow script spawns INSIDE itself. That script runs in a sidechain with no hooks,
+  so no process observes those spawns and none ever will. This is a statement about the SIDECHAIN
+  specifically — not a blanket claim that runtime counting is impossible, which is what it used to
+  read as. A `PreToolUse` hook on a main-loop tool call is a different case and was measured on its
+  own evidence.
+- A session whose token directory cannot be resolved at all — no git dir, or a payload missing
+  `session_id` / `prompt_id` / `tool_use_id`. That fails OPEN and silently, because a hook that
+  denies every spawn on a filesystem hiccup is worse than the burst it prevents. A token that could
+  not be CREATED is a different fact and denies.
 
 ### The predicate
 

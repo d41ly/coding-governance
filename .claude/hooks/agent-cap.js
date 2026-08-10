@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * agent-cap — project-agnostic PreToolUse guard against unbounded Workflow fan-out.
+ * agent-cap — project-agnostic PreToolUse guard against unbounded agent fan-out.
  *
  * WHY: `Workflow` `parallel()` / `pipeline()` fan out to the harness cap
  * (min(16, cores-2) ≈ 14). Large concurrent agent bursts saturate server
@@ -15,6 +15,13 @@
  * boundedPipeline(items, CAP, ...stages). The sanctioned helper bodies are the
  * ONLY place a raw `parallel(`/`pipeline(` may appear, and each such line
  * carries a `gov:bounded-fanout` marker. Any other raw primitive call = deny.
+ *
+ * TWO MODALITIES, not one. A `Workflow` call is read STATICALLY (its script).
+ * A direct `Agent` call carries no script, so it is counted at RUNTIME: each
+ * spawn claims a numbered slot with O_EXCL under a session+prompt-keyed dir in
+ * the git common dir, and the spawn that finds every slot taken is denied. The
+ * budget resets on the next user prompt. Agents spawned INSIDE a workflow
+ * sidechain remain uncounted and always will be — no hook runs there.
  *
  * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
@@ -42,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.2' // gov:kit agent-cap@1.2 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.3' // gov:kit agent-cap@1.3 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -535,6 +542,136 @@ function capFindings(script) {
   return bad
 }
 
+// ---------------------------------------------------------------------------
+// RULE 4 — the ARITY of DIRECT `Agent` spawns, as an ATOMIC COUNT.
+//
+// Rules 1-3 read a workflow SCRIPT, so they reach exactly one of the two ways agents get spawned. A
+// session that fans out with direct `Agent` tool calls met no rule at all — the charter calls the
+// number BINDING and the commonest modality was unguarded.
+//
+// THE CASE THIS FILE'S OWN REJECTED ALTERNATIVE WAS ABOUT IS STILL REJECTED. Counting agents spawned
+// INSIDE a workflow script is impossible: that script runs in a sidechain with no hooks, so nothing
+// observes those spawns. A main-loop `Agent` call differs in kind — a hook DOES fire. MEASURED on
+// node a before any of this was written: `tool_name` arrives as exactly `Agent`, and the payload
+// carries `session_id`, `prompt_id` and `tool_use_id`.
+//
+// WHY SLOTS AND NOT A COUNT. Read-then-decide loses updates: measured on node a, a four-call burst
+// overlapped its hook processes and two of four read the same count. Create-a-token-then-count does
+// not fix it either — six concurrent processes each see between their own ordinal and six, so
+// several deny and the arm requiring EXACTLY ONE deny fails nondeterministically. Claiming a
+// NUMBERED slot with O_EXCL is decided entirely by the atomic create: exactly MAX_VERIFIERS slots
+// can ever exist, so exactly one process out of the sixth-and-beyond is refused, every time.
+//
+// The budget is keyed per PROMPT, so a new user turn resets it with no cleanup step; a TTL sweep
+// drops the directories a long-lived tree accumulates. The count does NOT distinguish a verifier
+// from any other agent, because keying on "is this a verify agent" needs a session-to-build binding
+// no payload field provides — and the concurrency rule binds every fan-out to the same number
+// anyway, so a uniform cap needs no such binding.
+const AGENT_TTL_MS = 12 * 60 * 60 * 1000
+const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
+
+// The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
+function gitCommonDir(start) {
+  const fs = require('fs')
+  const path = require('path')
+  let dir = path.resolve(start)
+  for (let i = 0; i < 64; i++) {
+    const g = path.join(dir, '.git')
+    let st = null
+    try { st = fs.statSync(g) } catch { st = null }
+    if (st) {
+      if (st.isDirectory()) return g
+      // A WORKTREE: `.git` is a FILE holding `gitdir: <path>`, and that gitdir names the shared
+      // common dir in its own `commondir`. One budget per repo, not per worktree — a session is a
+      // session whichever checkout it stands in.
+      try {
+        const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(g, 'utf8'))
+        if (!m) return null
+        const gd = path.resolve(dir, m[1].trim())
+        try {
+          return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
+        } catch {
+          return gd
+        }
+      } catch {
+        return null
+      }
+    }
+    const up = path.dirname(dir)
+    if (up === dir) return null
+    dir = up
+  }
+  return null
+}
+
+function sweepTurns(root, keep) {
+  const fs = require('fs')
+  const path = require('path')
+  let names
+  try { names = fs.readdirSync(root) } catch { return }
+  const now = Date.now()
+  for (const n of names) {
+    const p = path.join(root, n)
+    if (p === keep) continue
+    // Never fatal: a concurrent hook process may be sweeping the same entry, and losing that race is
+    // not a reason to refuse a spawn.
+    try {
+      if (now - fs.statSync(p).mtimeMs < AGENT_TTL_MS) continue
+      fs.rmSync(p, { recursive: true, force: true })
+    } catch { /* ignore */ }
+  }
+}
+
+// null = allow · string = the deny message.
+function guardAgentSpawn(data) {
+  const fs = require('fs')
+  const path = require('path')
+  const { session_id: sid, prompt_id: pid, tool_use_id: uid } = data
+  // FAIL OPEN, SILENTLY, when the budget cannot be KEYED or its directory cannot be resolved. The
+  // split is stated rather than blurred: a hook that denies every spawn on a filesystem hiccup is
+  // worse than the burst it prevents. A token that cannot be CREATED is a different fact and denies.
+  if (!sid || !pid || !uid) return null
+  const common = gitCommonDir(data.cwd || process.cwd())
+  if (!common) return null
+  const root = path.join(common, 'agent-cap')
+  const turn = path.join(root, `${slug(sid)}__${slug(pid)}`)
+  try { fs.mkdirSync(turn, { recursive: true }) } catch { return null }
+  sweepTurns(root, turn)
+
+  // IDEMPOTENT PER tool_use_id. A hook re-invoked for the same call must not spend a second slot.
+  for (let n = 1; n <= MAX_VERIFIERS; n++) {
+    let held
+    try { held = fs.readFileSync(path.join(turn, `slot-${n}`), 'utf8') } catch { continue }
+    if (held.trim() === uid) return null
+  }
+
+  for (let n = 1; n <= MAX_VERIFIERS; n++) {
+    let fd
+    try {
+      fd = fs.openSync(path.join(turn, `slot-${n}`), 'wx') // O_CREAT|O_EXCL — the atomic decision
+    } catch (e) {
+      if (e.code === 'EEXIST') continue
+      return (
+        `BLOCKED by agent-cap: this spawn's token could not be created in ${turn} ` +
+        `(${e.code || e.message}), so the ${MAX_VERIFIERS}-agent budget could not be enforced for ` +
+        `it. A spawn this hook cannot count is not a spawn it may approve.`
+      )
+    }
+    try { fs.writeSync(fd, uid) } finally { try { fs.closeSync(fd) } catch { /* ignore */ } }
+    return null
+  }
+
+  return (
+    `BLOCKED by agent-cap: the direct-Agent spawn budget for this prompt is exhausted — ` +
+    `${MAX_VERIFIERS} of ${MAX_VERIFIERS} already spawned in this turn. A review's verify stage ` +
+    `spawns at most ${MAX_VERIFIERS} agents TOTAL and the charter binds every other fan-out to the ` +
+    `same number (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
+    `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
+    `count and the agent count does not. For a review, tools/workflows/tier2-review.js already does ` +
+    `it. A new user prompt resets the budget; nothing needs cleaning up.\n`
+  )
+}
+
 function main() {
   let data
   try {
@@ -542,7 +679,7 @@ function main() {
   } catch {
     process.exit(0)
   }
-  if (!data || data.tool_name !== 'Workflow') process.exit(0)
+  if (!data || (data.tool_name !== 'Workflow' && data.tool_name !== 'Agent')) process.exit(0)
 
   // AGENT_CAP used to raise the ceiling and no longer can. REFUSED rather than ignored: this hook's
   // own header advertised the override for two releases after it stopped deciding anything, and a
@@ -557,6 +694,15 @@ function main() {
         `change it in tools/hooks/agent-cap.js and in memory/guides/REVIEW-PROTOCOL.md, where the ` +
         `rule is stated.\n`,
     )
+    process.exit(2)
+  }
+
+  // RULE 4 first for an `Agent` payload, and it is the ONLY thing that path runs: the rules below
+  // all read a script, and an Agent spawn carries none.
+  if (data.tool_name === 'Agent') {
+    const deny = guardAgentSpawn(data)
+    if (!deny) process.exit(0)
+    process.stderr.write(deny)
     process.exit(2)
   }
 

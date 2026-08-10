@@ -386,8 +386,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ```
   The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
   and not two blocks. `Workflow` is where the hook reads a script; `Agent` is the direct-spawn
-  modality it was blind to. `tools/check-wiring.sh` asserts this VALUE, not merely that the file
-  mentions `agent-cap.js`: a group left at `Workflow` alone contains the string and used to report ok.
+  modality, which carries no script and is COUNTED instead: each spawn claims a numbered slot with
+  `O_EXCL` under a session+prompt-keyed directory in the git common dir (`<common>/agent-cap/`, so
+  git never tracks it), and the budget resets on the next user prompt. `tools/check-wiring.sh` asserts
+  this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
+  alone contains the string and used to report ok.
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
   `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
   site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is

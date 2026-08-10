@@ -323,6 +323,82 @@ if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workfl
   echo "ok   rule-2 deny text names the 5-verifier cap"; pass=$((pass+1))
 else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 
+# ---- rule 4: a direct `Agent` spawn is COUNTED ---------------------------------------------------
+# THE SEAM WAS MEASURED BEFORE ANY OF THIS WAS WRITTEN, per the spec's own F4: a throwaway PreToolUse
+# hook on the `Agent` matcher captured a real spawn's payload on node a. `tool_name` arrives as
+# exactly `Agent`, and `session_id`, `prompt_id` and `tool_use_id` are all present. The fixtures below
+# are that payload shape, not a guess at it.
+#
+# THE TOKEN DIRECTORY IS ISOLATED WITHOUT A KNOB: the hook resolves it from the payload's own `cwd`,
+# so a scratch tree with a `.git` directory in it is all the isolation this needs. A test-only env
+# override would be one more caller-settable knob in the unit that exists to remove them.
+mkdir -p "$TMP/agentrepo/.git"
+AGJ="$NODEDIR/agentrepo"                       # node's spelling of the path, as the scriptPath arms use
+AGROOT="$TMP/agentrepo/.git/agent-cap"
+apay() { # session · prompt · tool_use_id
+  printf '{"tool_name":"Agent","cwd":"%s","session_id":"%s","prompt_id":"%s","tool_use_id":"%s"}' \
+    "$AGJ" "$1" "$2" "$3"
+}
+
+# AC23 — six SEQUENTIAL spawns in one turn: five allowed, the sixth denied. Asserted on a string
+# unique to this branch and never on the exit code, which all four rules in this file share.
+ok5=1
+for i in 1 2 3 4 5; do
+  printf '%s' "$(apay S1 P1 "u$i")" | node "$HOOK" >/dev/null 2>"$TMP/ag.err" || ok5=0
+done
+printf '%s' "$(apay S1 P1 u6)" | node "$HOOK" >/dev/null 2>"$TMP/ag6.err"; rc6=$?
+if [ "$ok5" = 1 ] && [ "$rc6" = 2 ] \
+   && grep -qF 'direct-Agent spawn budget for this prompt is exhausted' "$TMP/ag6.err"; then
+  echo "ok   rule4: six sequential spawns — five allowed, the sixth denied by name"; pass=$((pass+1))
+else
+  echo "FAIL rule4: sequential budget (first five ok=$ok5, sixth exit $rc6)"; sed 's/^/     /' "$TMP/ag6.err"; fail=$((fail+1))
+fi
+
+# ...and the SAME tool_use_id re-fed does not spend a second slot. A hook re-invoked for one call
+# would otherwise burn the turn's budget on a single spawn.
+printf '%s' "$(apay S1 P1 u3)" | node "$HOOK" >/dev/null 2>&1; rcdup=$?
+[ "$rcdup" = 0 ] && { echo "ok   rule4: a repeated tool_use_id is idempotent"; pass=$((pass+1)); } \
+                 || { echo "FAIL rule4: a repeated tool_use_id was charged again (exit $rcdup)"; fail=$((fail+1)); }
+
+# AC24 — THE ARM THE READ-THEN-DECIDE DESIGN FAILS. Six CONCURRENT payloads: exactly five slots
+# exist afterwards and exactly ONE deny is emitted. Run repeatedly, not once, because the miscount it
+# guards against is nondeterministic — measured on node a, a four-call burst overlapped its hook
+# processes and two of four read the same count. Create-a-token-THEN-count does not fix that either:
+# each of six processes sees between its own ordinal and six, so several deny. Only the atomic claim
+# of a NUMBERED slot decides it in the create, which is why the slots are numbered.
+conc=1; why=""
+for round in 1 2 3 4 5 6 7 8; do
+  P="Pc$round"
+  rm -f "$TMP"/ag.rc.*
+  for i in 1 2 3 4 5 6; do
+    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | node "$HOOK" >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
+  done
+  wait
+  denies=$(cat "$TMP"/ag.rc.* 2>/dev/null | grep -c '^2$')
+  slots=$(ls "$AGROOT/S1__$P" 2>/dev/null | grep -c .)
+  if [ "$denies" != 1 ] || [ "$slots" != 5 ]; then conc=0; why="round $round: $denies deny(s), $slots slot(s)"; break; fi
+done
+[ "$conc" = 1 ] && { echo "ok   rule4: 8 concurrent bursts of six — exactly 5 slots, exactly 1 deny, every time"; pass=$((pass+1)); } \
+                || { echo "FAIL rule4: concurrent burst miscounted ($why)"; fail=$((fail+1)); }
+
+# AC25 — a FRESH prompt resets the budget, with no cleanup step run in between. The budget is keyed
+# per prompt precisely so nothing has to remember to clear it.
+printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
+[ "$rcf" = 0 ] && { echo "ok   rule4: a new prompt resets the budget with no cleanup"; pass=$((pass+1)); } \
+               || { echo "FAIL rule4: a new prompt did not reset the budget (exit $rcf)"; fail=$((fail+1)); }
+
+# FAIL OPEN when the budget cannot be KEYED — and prove it by the ABSENCE of a token, not by the exit
+# code alone, which a hook that allowed everything would also produce. A hook that denies every spawn
+# because a payload field is missing is worse than the burst it prevents; a token it could not
+# CREATE is a different fact and denies (the branch above it).
+before=$(ls "$AGROOT" 2>/dev/null | grep -c .)
+printf '{"tool_name":"Agent","cwd":"%s","session_id":"S9","tool_use_id":"x"}' "$AGJ" \
+  | node "$HOOK" >/dev/null 2>&1; rcn=$?
+after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
+{ [ "$rcn" = 0 ] && [ "$before" = "$after" ]; } \
+  && { echo "ok   rule4: an unkeyable payload fails OPEN and writes no token"; pass=$((pass+1)); } \
+  || { echo "FAIL rule4: unkeyable payload (exit $rcn, dirs $before -> $after)"; fail=$((fail+1)); }
+
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `tools/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A
