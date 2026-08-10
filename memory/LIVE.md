@@ -15,6 +15,6 @@ terminal status. Nothing here is edited by hand.
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | TOOL-aPortableWarden-1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aQuarriedLantern-1..-3 |
 | [aRootedPrefix](builds/aRootedPrefix/README.md) | INPROGRESS | a | 2026-08-09 | tooling | TOOL-aRootedPrefix-1 |
-| [aUnmannedHelm](builds/aUnmannedHelm/README.md) | SPECCED | a | 2026-08-10 | tooling+kickoff+playbook+deployer | TOOL-aUnmannedHelm-1 |
+| [aUnmannedHelm](builds/aUnmannedHelm/README.md) | INPROGRESS | a | 2026-08-10 | tooling+kickoff+playbook+deployer | TOOL-aUnmannedHelm-1 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | TOOL-aWireWarden-1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | TOOL-bConvergentLodestar-1 |

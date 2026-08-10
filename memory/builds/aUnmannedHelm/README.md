@@ -109,9 +109,9 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | SPECCED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | INPROGRESS | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->

@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.2   # gov:kit memory-tree@2.2 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.3   # gov:kit memory-tree@2.3 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -255,6 +255,13 @@ $bad3"
 # FAMILY↔discipline pairing left to assert here. A recording filename MAY carry a FAMILY qualifier
 # (`<date>-<kind>-<FAMILY>-<slug>-<seq>.md`), which is how one slug shared by two families survives
 # the merge into a single folder; the alternation is the CLOSED one from FAMILIES, never `[A-Z]+`.
+#
+# RUN.md (2.3) is the THIRD whitelisted root file: the run-state file an unattended run writes, which
+# needs a name a resuming session can compute without knowing when the run started. A dated recording
+# under build/ is legal today and has no stable resume target, which is why the name is fixed here
+# rather than left to the recording grammar. It joins index_set() (check 6's caps) and check 7's
+# prose exemption; it deliberately does NOT join check 8, whose seven-token status vocabulary cannot
+# express the run phases — the unattended leg owns validating those.
 BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && NF > 3 { print $3 }' | LC_ALL=C sort -u | grep -c .)
 pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
 bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
@@ -272,7 +279,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         n=0; for (k in ent) keys[++n]=k
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
-          if (k=="F:README.md"||k=="F:STATUS.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (k=="F:README.md"||k=="F:STATUS.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
         folder=""; delete ent
@@ -320,6 +327,12 @@ index_set() {
     fi
     printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
+    # RUN.md (2.3): the run-state file is capped like every other index. It is designed to GROW —
+    # a parked entry per refused decision — so the cap is the point, not an accident: the protocol
+    # spills the oldest parked entries into the build's own build/ folder as a dated recording
+    # (a name check 5's grammar already admits) before the cap is reached. Entry-budget exempt
+    # below, because the standing mandate is verbatim prose, not index rows.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.md$"
     # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
     # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
     # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
@@ -349,13 +362,14 @@ fi
 $bad6"
 
 # 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
-#     not index rows — and, when the codebase-map kit is adopted under this tree, its
-#     dossiers/FOUNDATION (detail files).
+#     not index rows — builds/*/RUN.md, whose standing-mandate block is quoted prose reproduced
+#     verbatim and must not be reflowed to fit an index budget — and, when the codebase-map kit is
+#     adopted under this tree, its dossiers/FOUNDATION (detail files).
 # ONE base plus an APPEND, never a second full spelling (aMendedLedger U3). The MAP_SUB branch used to
 # rebuild the whole expression, which silently dropped the guides/ alternative on any repo carrying a
 # .codebase-map.conf — every guide entered this check's population and nothing said so. Two spellings
 # of one expression is the two-answers-to-one-question class, and this is how it fired.
-ex7='/guides/[^/]+\.md$'
+ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN\.md$'
 [ -n "$MAP_SUB" ] && ex7="$ex7|/$MAP_SUB/FOUNDATION\.md\$|/$MAP_SUB/features/[^/]+\.md\$"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the

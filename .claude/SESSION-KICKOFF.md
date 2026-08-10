@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T17:10:29+03:00 @ 16aeb5efe98083c31a927a73541644020ee6bb57
+last-audit: 2026-08-10T19:52:00+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -146,6 +146,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- Hygiene checks 13-19 are OFF unless a pin is armed. `corpus_ids.py`'s `armed(conf)` returns early
+  when every one of `ORPHAN_ID_PIN`/`DEAD_PATH_PIN`/`READ_PATH_CEILING`/`CHARTER` is blank, and
+  `gotchas.py` short-circuits on an empty record set. So a fixture tree written WITHOUT pins arms
+  nothing in that range: measured 2026-08-10 while adding a check-13 arm — `def_builds` held both
+  colliding slugs and `--check` still returned 0. The main fixture tree in
+  `check-memory-hygiene.test.sh` deliberately sets no pins, so any 13-19 arm belongs in its own
+  scratch tree with the pin set. This is the `vacuous-selector-empty-population` class one level up:
+  the population is fine, the CHECK is switched off.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

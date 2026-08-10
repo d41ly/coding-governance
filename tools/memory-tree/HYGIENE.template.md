@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.2 -->
+<!-- gov:kit memory-tree@2.3 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -29,6 +29,7 @@ memory/
 ├── project/               the gate's own waiver registries (`*.txt`, five of them) and nothing else
 └── builds/<slug>/
     ├── README.md · STATUS.md       (required only when >3 files / multi-item)
+    ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
     └── prompts/ · spec/ · build/ · reviews/   (<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md)
 ```
 
@@ -106,8 +107,12 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
    `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
-   build folder only `README.md STATUS.md prompts/ spec/ build/ reviews/` plus loose recording-named
-   `.md`; non-md only in `build/`.
+   build folder only `README.md STATUS.md RUN.md prompts/ spec/ build/ reviews/` plus loose
+   recording-named `.md`; non-md only in `build/`. `RUN.md` is the UNATTENDED run-state file: one
+   generated region plus an authored one, present only while a run is or was live. It is capped by
+   rule 6, exempt from rule 7 (the standing mandate is verbatim prose), and deliberately OUTSIDE
+   rule 8 — a run phase is not a slot status, and no token in that vocabulary means "built and
+   reviewed, not yet landed".
 5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
    `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
    from the file's immediate parent — `spec/units/x.md` is a spec. The family is the closed
@@ -117,7 +122,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
    `guides/*.md` is in that set: a guide is MANDATORY reading the charter points a session at, and
    check 16 refuses a charter-cited file that nothing caps. Entry-budget exempt (check 7's `ex7`) —
-   a guide is prose, not index rows.
+   a guide is prose, not index rows. `builds/*/RUN.md` is in the set on both counts: it is designed
+   to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
+   build's own `build/` folder as a dated recording), and its mandate block is prose.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `memory-tree/gen_build_index.py --check` must be clean. The index is
