@@ -82,19 +82,6 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- 2026-08-10 · `AGENTS.md:94` · the codebase-map prefix claim is stale on all three of its assertions.
-  `adopt-codebase-map.sh` does NOT refuse at `tools/` (it accepts `*/codebase-map` and refuses only a
-  two-segment prefix), `reuse_lookup.py`/`map_diff.py` do NOT need `CODEBASE_MAP_ROOT` (measured: 277
-  symbols, 72 keys, exit 0 with nothing set), and the cited `§Gaps` section lists no such gap. The
-  repo's own `.codebase-map.conf` says the override is gone and must not be reintroduced. Fixed by
-  `TOOL-aRootedPrefix-1`; the charter never caught up · prune when `AGENTS.md:94` is rewritten.
-- 2026-08-10 · `AGENTS.md:69` · says the memory-tree engine is "at kit 1.8"; the live constant is
-  `KIT_MEMORY_TREE_VERSION=2.2` · prune when the charter line is corrected.
-- 2026-08-10 · `AGENTS.md:6-7` · says `memory/map/features/codebase-map.md` is the first and only
-  dossier; there are two (the second is `memory-tree-merge-driver.md`) · prune when corrected.
-- 2026-08-10 · `memory/backlog/TOOL.md:21` · `TOOL-aRootedPrefix-1` reads INPROGRESS and "unmerged";
-  it is landed on `main` (decision rows in `memory/archive/DECISIONS.2026-08-10.md:80-84`, engine at
-  `map_lib.py:83-119`) · prune when the row reads CLOSED.
 
 ### Environment traps worth front-loading
 

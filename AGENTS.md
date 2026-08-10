@@ -3,8 +3,9 @@
 Project-agnostic governance + tooling for running Claude Code (or any agent) across several
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
 gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
-itself. The map lives at `memory/map/`; its first dossier is `memory/map/features/codebase-map.md`
-and the other 69 inventory keys are still in the shrink-only `baseline.toml`.
+itself. The map lives at `memory/map/`; it carries two dossiers so far
+(`memory/map/features/codebase-map.md` and `memory-tree-merge-driver.md`) and 69 inventory keys are
+still in the shrink-only `baseline.toml`.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
 doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
@@ -66,7 +67,7 @@ its shards sit frozen under `memory/archive/`.
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 1.8) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 2.2 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
@@ -91,7 +92,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed under the `tools/` prefix and every entrypoint is correct there with no environment set — `map_lib.resolve_root` walks up for the conf, bounded by `.git` (`TOOL-aRootedPrefix-1`, kit 1.1). The former `CODEBASE_MAP_ROOT` workaround is BANNED by the kit's own selftest; do not reintroduce it
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

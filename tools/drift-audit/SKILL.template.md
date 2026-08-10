@@ -69,8 +69,8 @@ Use when the question is "is there dead / unwired / duplicated code", or after a
 build wave. This is a deliberate spend; say so before starting it.
 
 ```
-workflows/drift-audit-code.js     # dead · unwired · duplication · inefficiency · instruments
-workflows/drift-audit-state.js    # records · charter · work-state · record-gate integrity
+{{WORKFLOWS_DIR}}/drift-audit-code.js     # dead · unwired · duplication · inefficiency · instruments
+{{WORKFLOWS_DIR}}/drift-audit-state.js    # records · charter · work-state · record-gate integrity
 ```
 
 Run them **sequentially**, not together — the concurrency cap is fleet-wide, not per-workflow.

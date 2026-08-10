@@ -20,7 +20,7 @@ reading the runbook.
 
 ## Start here
 
-**State.** Two units, both SPECCED at rev-3, both reviewed once (Tier-2, 5 lenses, 48 confirmed
+**State.** Two units, both SPECCED at rev-4, both reviewed once (Tier-2, 5 lenses, 48 confirmed
 findings, 6 blockers — all folded). Nothing is built.
 
 **Next action.** Unit 1 (`TOOL-aSealedCaravan-1`) is buildable and depends on nothing outside this
@@ -46,7 +46,11 @@ reasoning at rev-1 and by running it at rev-2: 95 hits across 37 files naive, 50
 That turned two invented scope items into two measured ones (S12, S13) and a guessed waiver list into
 a four-entry registry. Every number in both specs is now measured or marked.
 
-**Three forks remain open** across the two specs; none blocks a build.
+**Forks.** Six were open; four are resolved (2026-08-10) — the ratchet lands flat at
+`tools/manifest-check.sh`, the prefix gate polices the shipping surface only, the memory-tree kit
+ships its own `merge-rows.sh`, and `tools/govkit/` is ratified over the research's `deploy/`. Unit 1
+is fully resolved and carries the ratified pointer. Unit 2's F2, F3 and F4 stay open deliberately:
+none blocks a build, and each wants the read-only `plan`/`check` slice to exist first.
 
 Records live under `spec/` and, once built, `build/` and `reviews/`. The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
@@ -56,6 +60,6 @@ from the status header of every spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-3 | 2026-08-10 |
-| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | SPECCED | rev-3 | 2026-08-10 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-4 | 2026-08-10 |
+| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | SPECCED | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->

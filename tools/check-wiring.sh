@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-wiring.sh — detect coding-governance tools installed-but-unwired in THIS repo, and
-# (with --fix/--session) wire the zero-risk ones. Spec: memory/tooling/builds/2026-07-15-TOOL-aWireWarden/.
+# (with --fix/--session) wire the zero-risk ones. Spec: memory/builds/aWireWarden/.
 #
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
 #   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder

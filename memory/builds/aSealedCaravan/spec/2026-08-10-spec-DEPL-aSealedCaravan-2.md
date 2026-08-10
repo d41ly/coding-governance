@@ -1,6 +1,6 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams deployer
+**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams deployer
 
 ## 1. Goal
 
@@ -369,10 +369,10 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 
 ## 8. Open questions
 
-- **F1 — `tools/govkit/` or the research's `deploy/`?** RECOMMENDATION: `tools/govkit/`, on the
-  four-gate measurement in section 4. One of the four cited at rev-1 (`check-arms.py`) was wrong and
-  has been dropped; the remaining three hold and were re-verified. This departs from an approved
-  research shape, so it is the owner's to ratify.
+- **F1 — `tools/govkit/` or the research's `deploy/`?** RESOLVED (owner, 2026-08-10):
+  `tools/govkit/`, ratifying the departure from the 2026-07-12 research shape. The argument is the
+  three re-verified gate and inventory exclusions in section 4; the fourth cited at rev-1
+  (`check-arms.py`) was wrong and has been dropped.
 - **F2 — does the target descriptor live in the target or in gov?** RECOMMENDATION: the target,
   copier-style, so it travels with clones. The cost is that a target repo carries a file naming its
   gov source, which is a disclosure the owner should weigh for a public target.
@@ -410,6 +410,9 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
   repo-wide consumer audit showed "not a kit" does not mean "leftover". It becomes a permanent
   registry exemption whose stated reason carries the three ways it is load-bearing, so `selfcheck`
   is where a future reader meets that fact. Rollout commit 1 is no longer blocked.
+- rev-4 · 2026-08-10 · owner ratified F1, so `tools/govkit/` is settled rather than recommended. F2,
+  F3 and F4 stay open by choice — none blocks a build, and each wants the `plan`/`check` slice to
+  exist before it is answered. The header carries no ratified pointer while they do.
 
 ## 10. Reuse audit
 

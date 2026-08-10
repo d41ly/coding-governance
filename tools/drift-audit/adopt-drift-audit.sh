@@ -97,8 +97,21 @@ DA_PY=$(resolve_python) || exit 2
 KIT_REL="$("$DA_PY" -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]).replace(os.sep,'/'))" "$KIT_DIR" "$ROOT")"
 [ -n "$KIT_REL" ] || { echo "drift-audit: could not derive the kit path — refusing to render a Skill with an empty command prefix"; exit 2; }
 
+# The two deep-tier workflow scripts live in a SIBLING kit, so their path is DERIVED from this kit's
+# own install prefix, never spelled. Measured: the template hardcoded
+# `workflows/`, so at this repo's own `tools/` prefix the rendered Skill instructed an agent to run
+# two files that do not exist — and `--check` reported "in sync", because it diffs the render against
+# the template and BOTH carried the same wrong spelling. Parameterising this kit's own dir while
+# hardcoding a sibling's is the whole defect; a derived value cannot drift from the install.
+case "$KIT_REL" in
+  */*) WORKFLOWS_REL="${KIT_REL%/*}/workflows" ;;   # prefixed install: sibling of this kit
+  *)   WORKFLOWS_REL="workflows" ;;                 # root install: sibling at the root
+esac
+
 render() { # -> stdout; LF only (the rendered Skill is pinned LF in .gitattributes)
-  sed -e "s|{{KIT_DIR}}|$KIT_REL|g" -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" "$TEMPLATE" | tr -d '\r'
+  sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
+      -e "s|{{WORKFLOWS_DIR}}|$WORKFLOWS_REL|g" \
+      -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" "$TEMPLATE" | tr -d '\r'
 }
 
 if [ "$MODE" = "--check" ]; then

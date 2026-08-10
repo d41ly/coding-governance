@@ -40,7 +40,7 @@ in `map_extractors.py` is gone and must not be reintroduced — the kit's selfte
 `Path.resolve()` in kit code, because it follows a junction to the link target and would disagree
 with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
 
-`baseline.toml` holds the initial backfill of 71 keys and is shrink-only: a new key must be claimed
+`baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed
 in a dossier, never appended to the baseline. The gate proved this on its own first run — adding the
 `codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
 again when `codebase-map adopter e2e` arrived from main.
@@ -57,9 +57,10 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Gaps
 
-- **No feature dossiers beyond this one.** 69 of 71 keys sit in `baseline.toml`, so coverage is
+- **Two feature dossiers so far.** 69 inventory keys still sit in `baseline.toml`, so coverage is
   ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
-  answer "what is this repo made of".
+  answer "what is this repo made of". Read the live counts from `reuse_lookup.py`'s corpus header,
+  never from this line — it is prose and this gap is exactly where prose rots.
 - **bash is recall-dark.** It carries the product here — the gates, adopters and hooks — and
   `map_lib` ships no shell symbol extractor. Declared in `.codebase-map.conf` `RECALL_DARK_LAYERS`
   so `reuse_lookup.py` prints a partial-recall notice rather than a falsely confident miss.

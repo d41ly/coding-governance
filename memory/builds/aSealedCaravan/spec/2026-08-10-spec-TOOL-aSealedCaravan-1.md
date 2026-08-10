@@ -1,6 +1,6 @@
 # TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true
 
-**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
 
 ## 1. Goal
 
@@ -363,20 +363,25 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 
 ## 8. Open questions
 
-- **F1 — does `manifest-check.sh` move to `tools/`?** S2 says yes, for one home rather than three.
-  Against: the manifest template's `check-script:` field already parameterizes it, and existing
-  adopters carry `scripts/`. RECOMMENDATION: move it, keep the kickoff engine's fallback chain
-  accepting both, and cover the move with AC11 — at rev-1 this fork had no observer at all.
-- **F2 — should the S8 gate also cover a target repo?** RECOMMENDATION: shipping surface only. A
-  target-side check belongs to `govkit check` in unit 2, which already reads a target's state.
+- **F1 — does `manifest-check.sh` move to `tools/`?** RESOLVED (owner, 2026-08-10):
+  `tools/manifest-check.sh`, flat. It is a standalone gate file, not a kit — the kickoff ENGINE is a
+  per-machine junction and never lands in the target, so there is no kit dir for it to live in. The
+  kickoff skill's manifest search is already a first-hit chain, so a `scripts/` install keeps
+  resolving for existing adopters with no compatibility shim. Covered by AC11.
+- **F2 — should the S8 gate also cover a target repo?** RESOLVED (owner, 2026-08-10): shipping
+  surface only. A target-side check belongs to `govkit check` in unit 2, which already reads target
+  state and has the receipt to compare against. A second copy of the predicate would mean a second
+  population, a second waiver registry and a parity gate between them — the engine-identical-copy
+  drift class this repo already pays for elsewhere.
 - **F3 — what happens to `tools/lib/`?** RESOLVED (owner, 2026-08-10): it is not a kit. The fork was
   mis-framed at rev-2 as "does it become a shipped kit", a binary whose other branch reads as
   "delete it" — and it is load-bearing three ways (section 4). It stays gov-internal, becomes a
   declared registry exemption in `DEPL-aSealedCaravan-2`, and ships nothing. The packaging
   sub-question it was hiding is now S9, and the choice there is mine to confirm: ship
   `merge-rows.sh` inside the memory-tree kit with the resolver inlined, rather than copying
-  `tools/lib/` across. Confirm that shape before commit 2 — it adds one member to the inline-copy
-  parity population and re-scopes one assertion in `merge-rows.test.sh`.
+  `tools/lib/` across. CONFIRMED (owner, 2026-08-10): that shape. It adds one member to the
+  inline-copy parity population and re-scopes one assertion in `merge-rows.test.sh` from any launcher
+  by name to that path.
 
 ## 9. Revision log
 
@@ -397,6 +402,9 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
   the runbook copying `tools/lib/` across, which keeps one canon and preserves the
   `TOOL-aBatchedTribunal-6j` boundary. Added section 4's consumer table, AC12 for the behaviour S9
   actually buys and AC13 for the parity-population change.
+- rev-4 · 2026-08-10 · owner resolved F1 (`tools/manifest-check.sh`, flat) and F2 (shipping surface
+  only), and confirmed S9's kit-internal launcher. Section 8 is fully resolved, so the header carries
+  the ratified pointer and this spec is buildable as three commits.
 
 ## 10. Reuse audit
 
