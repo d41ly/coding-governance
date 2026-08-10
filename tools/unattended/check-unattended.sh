@@ -206,15 +206,20 @@ if [ -n "$KICKOFF_ENGINE" ]; then
   if [ ! -f "$KICKOFF_ENGINE" ]; then
     fail 12 "KICKOFF_ENGINE names a file that does not exist, so the hand-back check reads nothing and passes: $KICKOFF_ENGINE"
   else
-    grep -qF 'Step 5b' "$KICKOFF_ENGINE" \
+    # CR-STRIPPED, and not because today's patterns need it. Every assertion below happens to match
+    # mid-line, so a CRLF worktree passes them by luck rather than by design — and the engine is NOT
+    # `eol=lf`-pinned repo-wide, so CRLF here is the normal state of a linked worktree. The first
+    # pattern anchored to a line END would break silently on the node that wrote it. Strip once.
+    eng=$(tr -d '\r' < "$KICKOFF_ENGINE")
+    grep -qF 'Step 5b' <<<"$eng" \
       || fail 12 "the kickoff engine declares no unattended hand-back, so a mandated run still halts at the READY card with nobody to answer it: $KICKOFF_ENGINE"
     # BOTH DIRECTIONS. The hand-back is the exception; the stop is the default, and a change that
     # deleted the stop would make every ATTENDED kickoff run on without asking. The literal prompt
     # string is asserted, not the section heading — a heading survives a gutted body.
-    grep -qF "Ready — say go and I'll start, or adjust any field." "$KICKOFF_ENGINE" \
+    grep -qF "Ready — say go and I'll start, or adjust any field." <<<"$eng" \
       || fail 12 "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked: $KICKOFF_ENGINE"
     if [ -n "$KICKOFF_EXITS" ]; then
-      nex=$(grep -cE '^[0-9]+\. \*\*Step ' "$KICKOFF_ENGINE" || true)
+      nex=$(grep -cE '^[0-9]+\. \*\*Step ' <<<"$eng" || true)
       [ "$nex" -ge "$KICKOFF_EXITS" ] \
         || fail 12 "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS"
     fi

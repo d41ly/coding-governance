@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:54:40+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T21:03:17+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -156,6 +156,16 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will never
+  tell you: its eol population is scoped to `.claude/` paths carrying the pin. Every UNPINNED path
+  smudges, because `.gitattributes` opens with `* text=auto` and this fleet runs `core.autocrlf=true`.
+  Measured 2026-08-10: all four `tools/workflows/*.js` came out at CRLF (`tier2-review.js`, 350 CR
+  bytes) and **no gate saw it** — `check-workflow-syntax.js` parses CRLF happily. It surfaced when
+  the shipped Tier-2 harness could not be LAUNCHED: a workflow script is inlined into the tool call
+  that runs it, and the permission layer rejects control characters in that payload. Ask which
+  CONSUMER reads a file whole (a launcher, a `.`-sourced conf, a hook), not which gate diffs it.
+  Pinned since: `tools/workflows/*.js`, `skills/session-kickoff/SKILL.md`, `tools/unattended/*.md`,
+  `.unattended.conf`. Still unpinned and latent: `AGENTS.md`, `WIRE-INTO-PROJECT.md`, `.gitattributes`.
 - A NEW record file under `memory/gotchas/` needs THREE things, and two of them are separate gates:
   `gotchas.py --write` to re-render `INDEX.md` (hygiene check 17), and a dossier claim for its key
   (codebase-map coverage). Adding the file and regenerating the map is not enough — the coverage

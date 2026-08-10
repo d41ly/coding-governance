@@ -66,6 +66,22 @@ parallel-coding-governance*.md text eol=lf
 # the whole of that wiring and the script needs no edit.
 .claude/skills/unattended/SKILL.md text eol=lf
 
+# The /session-kickoff engine. Pinned because a GATE now reads it — check 12 of the unattended leg
+# greps its text, which nothing did before. That leg strips CR anyway, and both halves are the point:
+# strip so the comparison is right, pin so the bytes are. Measured 2026-08-10: the engine came out of
+# this worktree with 224 CR bytes, and every pattern in check 12 survived only because each happens
+# to match mid-line. The first pattern anchored to a line end would have broken silently.
+skills/session-kickoff/SKILL.md text eol=lf
+
+# The workflow scripts. They are not byte-compared by any gate — `check-workflow-syntax.js` parses
+# them and CRLF parses fine — so this pin is not about a gate. It is about the LAUNCHER: a workflow
+# script is INLINED into the tool call that runs it, and the permission layer refuses a payload
+# carrying control characters. Measured 2026-08-10 in a linked worktree: `tier2-review.js` came out
+# of the checkout with 350 CR bytes and the shipped Tier-2 harness could not be launched at all,
+# while its own syntax leg stayed green. The committed blobs were already LF; `* text=auto` plus
+# core.autocrlf smudged every unpinned path on the way out.
+tools/workflows/*.js text eol=lf
+
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
 # generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
 # differs on EVERY line — the same green-only-right-after-a-render failure the memory-tree pins above
