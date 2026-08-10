@@ -7,7 +7,7 @@
 
 ## PLAY — playbook
 
-*(none yet)*
+- PLAY-aCandidStub-1 · the §10-into-`gotchas/` retirement is REFUTED, not deferred: the kit is Optional so no universal rule may route to its dir, `aFoldedQuarry` U4 §2 S8/§3 charter the corpora disjoint, and DERIVED anchors make a generic record inert. The drift is one level up
 
 ## KICK — kickoff
 
