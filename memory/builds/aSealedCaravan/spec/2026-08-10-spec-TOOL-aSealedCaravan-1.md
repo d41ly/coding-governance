@@ -1,6 +1,6 @@
 # TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true
 
-**Status:** SPECCED · rev-2 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
 
 ## 1. Goal
 
@@ -43,9 +43,10 @@ five; the gates that should notice a wrong prefix report success instead.
 - **S8** A new merge-bar leg proves the declaration mechanically: no file that is copied or rendered
   into a target repo spells a root-install kit path. The predicate, its measured population and its
   waiver registry are in section 4, measured rather than estimated.
-- **S9** `tools/lib/pyrun.sh` and `tools/lib/resolve-python.sh` are delivered by the runbook. Today
-  `cp -r tools/memory-tree` ships `merge-rows.py`, whose runtime shim lives outside the kit dir, and
-  no runbook line copies it.
+- **S9** The memory-tree kit ships its own launcher, `tools/memory-tree/merge-rows.sh`, so a
+  copy-installed kit can start its merge driver. `tools/lib/` is NOT delivered to adopters and does
+  not become a kit — see section 4. `check-wiring.sh` probes the kit-internal launcher alongside the
+  two `tools/lib/pyrun.sh` spellings it already resolves.
 - **S10** The fourteen provably false runbook claims listed in section 4 are corrected as part of the
   rewrite.
 - **S11** The five stale records listed in section 4 are corrected, headed by the charter line at
@@ -169,6 +170,33 @@ its reason, seeded at **4 entries** and pinned shrink-only. Every entry is a del
 
 S12 and S13 exist because running the predicate found them; at rev-1 they were fifteen and five hits
 with no owning scope item, and the builder would have met them mid-commit-3.
+
+### Why `tools/lib/` is not delivered, and what ships instead
+
+`tools/lib/` reads as an unclassified leftover — no README, no version constant, no adopter, and
+`check-kit-versions.sh` asserts nothing about it. `map_extractors.py:42` records that this is
+deliberate: `tools/hooks`, `tools/lib` and `tools/workflows` carry no README and the kits inventory
+is therefore not README-gated. Every surface signal that marks a kit is absent, and it is still one
+of the most load-bearing directories here.
+
+| Consumer | What it needs | What breaks without it |
+|---|---|---|
+| `resolve-python.test.sh:85` | `resolve-python.sh` as the CANON | 11 inline copies have nothing to be byte-compared against; the leg is vacuous |
+| `run-gates.sh:9`, `run-gates.test.sh:7`, `check-wiring.sh:54`, `agent-cap.test.sh:13`, `merge-rows.test.sh:43` | source it at runtime | the runner and four gates cannot resolve an interpreter |
+| `merge.rows.driver` git config | `pyrun.sh` | the driver never starts, so it never writes its output — git prints CONFLICT and leaves ours-only content with NO markers |
+
+So it stays, gov-internal, and it is neither a kit nor a registry entry: `DEPL-aSealedCaravan-2`
+carries it as a declared exemption with that reason. The boundary
+`TOOL-aBatchedTribunal-6j` drew is preserved rather than crossed.
+
+What an adopter actually needs is one file, not the directory. `merge-rows.py` names a launcher at
+runtime, and a kit copy-installed as a standalone directory cannot reach `tools/lib/pyrun.sh` — the
+gap the merge-driver dossier records as "a packaging question rather than a rewrite". S9 ships
+`merge-rows.sh` INSIDE the kit, carrying the resolver inline byte-identically like every other
+copy-installed kit file, rather than copying `tools/lib/` across. That keeps one canon, adds one
+member to the existing inline-copy parity population, and leaves `tools/lib/pyrun.sh` free to keep
+SOURCING the resolver, which is why `merge-rows.test.sh:257` asserts it carries no inline block —
+that assertion is re-scoped to `tools/lib/pyrun.sh` by path rather than to any launcher by name.
 
 ### Migration
 
@@ -303,7 +331,14 @@ unnecessary — both spellings resolve.
 - **AC11** When `manifest-check.sh` is installed at `tools/manifest-check.sh` per S2 and the kickoff
   engine's four-path manifest search runs, the checker resolves and exits 0; the engine's fallback
   chain still accepts a `scripts/` install for an existing adopter.
-- **AC12** When the runbook's own verification steps are executed against a fresh fixture repo, the
+- **AC12** When a memory-tree kit is copy-installed alone into a fresh repo and
+  `merge.rows.driver` is wired to its own `merge-rows.sh`, a per-family append collision on
+  `memory/DECISIONS.md` merges cleanly with no row missing or duplicated. Today the shim it names
+  lives outside the kit and the merge leaves ours-only content with no conflict markers.
+- **AC13** When `bash tools/lib/resolve-python.test.sh` runs after S9, `merge-rows.sh` is in the
+  inline-copy parity population and byte-identical to the canon, and `tools/lib/pyrun.sh` is still
+  excluded from it.
+- **AC14** When the runbook's own verification steps are executed against a fresh fixture repo, the
   memory-tree, codebase-map, memory-recall and drift-audit kits all sit under `tools/` and every gate
   the runbook names is green.
 
@@ -334,12 +369,14 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
   accepting both, and cover the move with AC11 — at rev-1 this fork had no observer at all.
 - **F2 — should the S8 gate also cover a target repo?** RECOMMENDATION: shipping surface only. A
   target-side check belongs to `govkit check` in unit 2, which already reads a target's state.
-- **F3 — does `tools/lib/` become a shipped kit?** S9 delivers two files from it, which crosses the
-  boundary `TOOL-aBatchedTribunal-6j` drew when it kept the bare-launcher ban gov-internal on the
-  grounds that `tools/lib/` does not ship. RECOMMENDATION: ship the two files as part of the
-  memory-tree kit rather than promoting `tools/lib/` to a kit, since `merge-rows.py` is the only
-  consumer an adopter gets, and record the boundary change. `DEPL-aSealedCaravan-2` AC8 cannot be
-  written until this resolves.
+- **F3 — what happens to `tools/lib/`?** RESOLVED (owner, 2026-08-10): it is not a kit. The fork was
+  mis-framed at rev-2 as "does it become a shipped kit", a binary whose other branch reads as
+  "delete it" — and it is load-bearing three ways (section 4). It stays gov-internal, becomes a
+  declared registry exemption in `DEPL-aSealedCaravan-2`, and ships nothing. The packaging
+  sub-question it was hiding is now S9, and the choice there is mine to confirm: ship
+  `merge-rows.sh` inside the memory-tree kit with the resolver inlined, rather than copying
+  `tools/lib/` across. Confirm that shape before commit 2 — it adds one member to the inline-copy
+  parity population and re-scopes one assertion in `merge-rows.test.sh`.
 
 ## 9. Revision log
 
@@ -354,6 +391,12 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
   shape it can see; strengthened AC5 and AC6 from negatives a no-op satisfies to failures that name
   what they found; added AC11 for S2, which had no observer; and re-cited the `KIT_DIR` non-goal,
   which `TOOL-aRootedPrefix-1b` does not support.
+- rev-3 · 2026-08-10 · resolved F3 on the owner's steer that `tools/lib/` is not a kit. Audited its
+  consumers repo-wide first: it is load-bearing three ways, so "not a kit" does not mean "leftover".
+  Rewrote S9 — the memory-tree kit ships its own `merge-rows.sh` with the resolver inlined instead of
+  the runbook copying `tools/lib/` across, which keeps one canon and preserves the
+  `TOOL-aBatchedTribunal-6j` boundary. Added section 4's consumer table, AC12 for the behaviour S9
+  actually buys and AC13 for the parity-population change.
 
 ## 10. Reuse audit
 

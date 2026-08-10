@@ -20,7 +20,7 @@ reading the runbook.
 
 ## Start here
 
-**State.** Two units, both SPECCED at rev-2, both reviewed once (Tier-2, 5 lenses, 48 confirmed
+**State.** Two units, both SPECCED at rev-3, both reviewed once (Tier-2, 5 lenses, 48 confirmed
 findings, 6 blockers — all folded). Nothing is built.
 
 **Next action.** Unit 1 (`TOOL-aSealedCaravan-1`) is buildable and depends on nothing outside this
@@ -28,9 +28,13 @@ repo. Its three-commit rollout is in section 4. Unit 2 (`DEPL-aSealedCaravan-2`)
 until unit 1 lands, because govkit's install plan is written against one prefix and unit 1 is what
 makes that prefix true.
 
-**Two forks BLOCK work, and they are the same fork.** Unit 1's F3 asks whether `tools/lib/` becomes a
-shipped kit. Unit 2's F5 cannot be answered without it, and unit 2's rollout commit 1 — the registry
-plus `selfcheck`, its whole first deliverable — cannot be written until it is. Resolve F3 first.
+**Nothing blocks either unit.** The one blocking pair — unit 1's F3 and unit 2's F5, both about
+`tools/lib/` — resolved on 2026-08-10: it is not a kit, it ships nothing, and it becomes a permanent
+registry exemption. A repo-wide consumer audit ran first, because "not a kit" is true and "leftover"
+is not: it is the canon 11 inline resolver copies are gated against, five gates and the gate runner
+source it at runtime, and `pyrun.sh` is named in the `merge.rows.driver` config where its absence
+produces a silent ours-only merge with no conflict markers. Unit 1 S9 gives the memory-tree kit its
+own launcher instead.
 
 **Read the grounding before either.** Both specs rest on a five-probe inventory that ran all eight
 adoption entrypoints end to end in throwaway repos and proved four silent-green failures cold,
@@ -42,7 +46,7 @@ reasoning at rev-1 and by running it at rev-2: 95 hits across 37 files naive, 50
 That turned two invented scope items into two measured ones (S12, S13) and a guessed waiver list into
 a four-entry registry. Every number in both specs is now measured or marked.
 
-**Five forks are open** across the two specs.
+**Three forks remain open** across the two specs; none blocks a build.
 
 Records live under `spec/` and, once built, `build/` and `reviews/`. The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
@@ -52,6 +56,6 @@ from the status header of every spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-2 | 2026-08-10 |
-| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | SPECCED | rev-2 | 2026-08-10 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-3 | 2026-08-10 |
+| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | SPECCED | rev-3 | 2026-08-10 |
 <!-- /gen:build-index -->

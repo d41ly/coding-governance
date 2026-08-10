@@ -1,6 +1,6 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** SPECCED · rev-2 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams deployer
+**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams deployer
 
 ## 1. Goal
 
@@ -92,13 +92,22 @@ Four files carry all state. Nothing is inferred from a directory listing.
 
 **`tools/govkit/registry.toml`** — the kit population, tracked and asserted in both directions by
 `selfcheck`. It exists because no directory listing equals the deployable set: `tools/` holds ten
-directories, of which `tools/lib/` is gov-internal by `TOOL-aBatchedTribunal-6j` and `tools/hooks/`
+directories, of which `tools/lib/` is a permanent EXEMPTION and `tools/hooks/`
 deploys as part of the review-harness entry, while three deployable surfaces are not `tools/*`
 directories at all — the playbook and its two companions are root files, the manifest ratchet is
 `skills/session-kickoff/manifest-check.sh`, and `settings-merge.py` is a single file. Each entry
 names its descriptor's location; each `tools/*` directory not in the registry is listed as exempt
 with a reason. `map_extractors._tool_kits()`'s own docstring records why this must be a declaration
 rather than a heuristic: README-gating "would have silently dropped three of ten".
+
+`tools/lib/`'s exemption carries the longest reason, because it is the entry most likely to be
+misread as dead. It has no README, no version constant and no adopter, and it is load-bearing three
+ways — `resolve-python.sh` is the canon 11 inline copies are gated against, five gates and the gate
+runner source it at runtime, and `pyrun.sh` is named in the `merge.rows.driver` git config, where its
+absence produces a silent ours-only merge with no conflict markers. The registry states that in the
+exemption itself rather than in a comment, so `selfcheck`'s output is where a future reader meets it.
+`TOOL-aSealedCaravan-1` S9 gives the memory-tree kit its own launcher, so nothing under `tools/lib/`
+ever needs to travel.
 
 **`kit.toml`**, one per registry entry, beside the kit where the kit is a directory:
 
@@ -238,8 +247,7 @@ a named failure rather than a fall-through.
 Four commits, each independently valuable and independently green:
 
 1. `registry.toml`, a `kit.toml` for every entry, and `selfcheck`. No deployer behaviour; immediate
-   value as a machine-readable kit inventory. TOOL fork F3 must resolve first, since it decides
-   whether `tools/lib/` is an entry or an exemption.
+   value as a machine-readable kit inventory. Unblocked: F5 is resolved.
 2. `plan` and `check`, both read-only. Zero write risk, and `check` is usable against an
    already-adopted target on day one.
 3. `apply`, `apply --resume` and the receipt, plus the acceptance matrix.
@@ -376,8 +384,9 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 - **F4 — what does `apply` do when a selected kit's gate is red in the target for reasons predating
   the install?** RECOMMENDATION: record the baseline before touching anything, and fail only on a leg
   that was green before and is red after. The knob is in the target descriptor.
-- **F5 — is `tools/lib/` a registry entry or an exemption?** Blocked on `TOOL-aSealedCaravan-1` fork
-  F3. `selfcheck` is rollout commit 1's whole deliverable and cannot be written until it resolves.
+- **F5 — is `tools/lib/` a registry entry or an exemption?** RESOLVED (owner, 2026-08-10): a
+  permanent exemption. It is not a kit and ships nothing; `TOOL-aSealedCaravan-1` S9 gives the
+  memory-tree kit its own launcher instead. Rollout commit 1 is unblocked.
 
 ## 9. Revision log
 
@@ -397,6 +406,10 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
   than porcelain, AC3 proves provenance, AC5 covers the blocked kit, AC6 derives the outbox from
   declared holes, AC8 names its detection predicate, and `plan`, `intake` and the S5 ordering gained
   the criteria they lacked.
+- rev-3 · 2026-08-10 · resolved F5 on the owner's steer that `tools/lib/` is not a kit, after a
+  repo-wide consumer audit showed "not a kit" does not mean "leftover". It becomes a permanent
+  registry exemption whose stated reason carries the three ways it is load-bearing, so `selfcheck`
+  is where a future reader meets that fact. Rollout commit 1 is no longer blocked.
 
 ## 10. Reuse audit
 
