@@ -131,7 +131,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
 - Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
 - Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
-- Gate-discipline rules → `parallel-coding-governance.domain-rules.md` §7 (failing case OBSERVED before a gate lands, no guard sharing state with what it guards, predicate run over the real tree first, a skip that announces itself). LOAD when adding or changing a gate.
+- Gate-discipline rules → `parallel-coding-governance.domain-rules.md` §7 (failing case OBSERVED before a gate lands, no guard sharing state with what it guards, a skip that announces itself). LOAD when adding or changing a gate.
 - Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — never exempt them to "unblock" a landing (claiming the key IS the unblock).
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
@@ -162,11 +162,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §10 — Recurring bug classes (run in every Tier-2 review)
 
-- Recurring-bug-classes checklist (~19 classes) → `parallel-coding-governance.domain-rules.md` §10. RUN it in every Tier-2 review (§8); left-shift each confirmed class into a gate (§7).
+- Recurring-bug-classes checklist (25 generic classes) → `parallel-coding-governance.domain-rules.md` §10, and your own under `{{MEMORY_ROOT}}/gotchas/` (§5) — disjoint by design, run both in every Tier-2 review (§8); left-shift each confirmed class into a gate (§7).
 
 ## §11 — Cross-OS & toolchain hygiene
 
-- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11 (the two that bite most: force `LF` via `.gitattributes` on execution-sensitive files, and forward-slash `git -C` paths on Windows POSIX shells; plus byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls, silenced crash reporters). LOAD for cross-OS or toolchain work.
+- Cross-OS + toolchain rules → `parallel-coding-governance.domain-rules.md` §11 (force `LF` via `.gitattributes` on execution-sensitive files, forward-slash `git -C` paths on Windows POSIX shells, byte-verify with `cat -A`, pinned toolchain, deterministic run modes, native-shell reinstalls, silenced crash reporters). LOAD for cross-OS or toolchain work.
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 
