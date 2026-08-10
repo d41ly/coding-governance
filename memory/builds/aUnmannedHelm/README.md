@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-10
 streams: tooling+kickoff+playbook+deployer
 roster: TOOL
-ids: TOOL-aUnmannedHelm-1/-2
+ids: TOOL-aUnmannedHelm-1
 ---
 
 # aUnmannedHelm — the unattended-run kit: a mandate on disk, not a block of chat
@@ -79,7 +79,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1/-2
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
