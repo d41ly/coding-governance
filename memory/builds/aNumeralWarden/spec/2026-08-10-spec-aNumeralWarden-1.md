@@ -1,6 +1,6 @@
 # TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, not just the helper shape
 
-**Status:** SPECCED · rev-2 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · consumed-by TOOL-aUnmannedHelm-1
 
 ## 1. Goal
 
@@ -57,6 +57,18 @@ cap the charter calls BINDING is enforced by a predicate rather than by conventi
 - **S13** — the wired copy `.claude/hooks/agent-cap.js` is re-copied from the kit. It is the file
   `.claude/settings.json:9` actually executes, and `agent-cap.test.sh:215-227` gates the two
   byte-identical.
+- **S14** — the `Agent`-matcher modality refusal, folded in from `TOOL-aUnmannedHelm-1` on
+  2026-08-10 when its owner ratified F2 as a FOLD. The matcher widens as a MEASURED NO-OP commit
+  first, which the tool gate at `agent-cap.js:305` makes provably safe, and only then gains a
+  per-call refusal of a direct `Agent` spawn while the consuming build's run-state file declares a
+  verify phase. It does NOT count: measured on node a, a four-call burst overlapped its hook
+  processes and two of four read the same counter value, so a read-then-decide gate miscounts
+  nondeterministically. The refusal emits its own distinguishable string, because exit 2 is shared
+  by every branch here and an arm phrased on the exit code cannot attribute the deny. Two things
+  this unit must state rather than imply: the fail-open when no run-state file exists, and the
+  session-to-build binding, without which the refusal is either arbitrary or a tree-wide false deny.
+  Also fixes `check-wiring.sh`'s file-wide `agent-cap.js` marker grep, which reports `ok` when only
+  one of two fragments is wired.
 
 ## 3. Non-goals (OUT)
 
@@ -260,6 +272,11 @@ documented on any adopter whose hook enforced the rule.
   S13 for the BINDING protocol rewrite, the drift-audit kit version and the wired hook copy. Replaced
   the four acceptance criteria that could not fail, and moved every arm from an exit code to the
   specific message its branch emits.
+
+- rev-3 · 2026-08-10 · S14 folded in from `TOOL-aUnmannedHelm-1` per that build's ratified F2. This
+  spec now owns every `agent-cap` edit, and `TOOL-aUnmannedHelm-1` depends on it landing. S14 has
+  not been reviewed: the fold happened after this spec's Tier-2, so it re-reviews before code, and
+  the three forks in §8 remain open.
 
 ## 10. Reuse audit
 
