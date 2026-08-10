@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T14:56:13+03:00 @ e7ec3365175f58f8a8c4ad7b8476d14433bba3f3
+last-audit: 2026-08-10T17:10:29+03:00 @ 16aeb5efe98083c31a927a73541644020ee6bb57
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -95,14 +95,27 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
   line. Either alone leaves the file green only right after a render.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook enforces TWO rules: route fan-out through the cap-5 helpers, AND a
-  review's verify stage spawns at most 5 agents TOTAL. Concurrency is not a budget —
+- The `agent-cap` PreToolUse hook is wired on `Workflow|Agent` and enforces FOUR rules (kit 1.3):
+  route fan-out through the helpers; a verify stage spawns at most 5 agents TOTAL; the BOUND ITSELF
+  is resolved wherever it is written (call site, default parameter, `gov:bounded-fanout` width); and
+  a direct `Agent` spawn is COUNTED at runtime, 5 per user prompt. Concurrency is not a budget —
   `boundedParallel(t, 5)` still spawns N agents for N findings, five at a time. Bound the group
-  COUNT: `chunk(x, Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`. Binding rules:
-  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`.
+  COUNT: `chunk(x, Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`. The 5 is a FILE
+  CONSTANT: `AGENT_CAP` is refused, not honoured, and an `<expr> || <int>` fallback no longer
+  resolves as a bound anywhere. Binding rules: `memory/guides/REVIEW-PROTOCOL.md`. Ready-made
+  harness: `tools/workflows/tier2-review.js`.
+- Editing `.claude/settings.json` DOES take effect mid-session — hooks are re-read, not snapshotted
+  at session start. Measured 2026-08-10 by wiring a throwaway `PreToolUse` hook and observing it fire
+  on the very call that checked for it. This is what makes a live hook measurement trustworthy; do
+  not assume the opposite and skip the probe, and do not skip the LIVENESS half either, because a
+  hook that silently never fires returns a false negative that looks like a real answer.
 - A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added
   in `TOOL-aBatchedLintel-1` were wrong on their first run — the interval ban matched the `) {`
-  opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban.
+  opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban. Hit twice more
+  by the agent-cap bound-reading predicate: an argument-position check denied
+  `tools/workflows/tier2-review.js` on its prettier TRAILING COMMA, which splits into a phantom empty
+  argument, and an acceptance grep for a banned spelling matched the comment explaining why it was
+  banned — the `LC_ALL` shape again.
 - A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
   byte, through a filename argument, through `getline` AND through a pipe. Assert at source level.
 - A `git worktree` checkout can land CRLF on a path `.gitattributes` pins `eol=lf`, and `git status`
