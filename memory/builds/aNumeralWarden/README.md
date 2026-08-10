@@ -19,5 +19,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, not just the helper shape](spec/2026-08-10-spec-aNumeralWarden-1.md) | SPECCED | rev-2 | 2026-08-10 |
+| [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, not just the helper shape](spec/2026-08-10-spec-aNumeralWarden-1.md) | SPECCED | rev-3 | 2026-08-10 |
 <!-- /gen:build-index -->
