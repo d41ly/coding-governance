@@ -63,27 +63,35 @@ SRC_OPEN='<!-- gen:build-index -->'; SRC_CLOSE='<!-- /gen:build-index -->'
 GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
 MAN_OPEN='<!-- run:mandate -->';     MAN_CLOSE='<!-- /run:mandate -->'
 
-# Exactly one open, exactly one close, close AFTER open, print the slice between them. Never a
+# Exactly one open, exactly one close, CLOSE AFTER OPEN, print the slice between them. Never a
 # whole-file regex — the splice contract this borrows from gen_build_index.py's apply_region().
 # Exit 3 = the marker pair is malformed, which is a different answer from "the slice is empty".
+#
+# THE ORDER CHECK IS NOT DECORATION. Both comments promised close-after-open and neither awk enforced
+# it: a TRANSPOSED pair satisfies `no==1 && nc==1`, so `region` returned an empty slice at exit 0 and
+# `splice` emitted everything up to the close, then dropped from the open marker to EOF — and the
+# caller, seeing exit 0, moved that truncation over the run-state file. That deletes the
+# owner-authored mandate block. Recording the two line numbers and comparing them is the whole fix.
 region() { # file · open · close   (reads stdin when file is `-`)
   awk -v o="$2" -v c="$3" '
-    index($0, o) == 1 { no++; if (nc == 0) inside = 1; next }
-    index($0, c) == 1 { nc++; inside = 0; next }
+    index($0, o) == 1 { no++; if (no == 1) oat = NR; if (nc == 0) inside = 1; next }
+    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; inside = 0; next }
     inside { print }
-    END { if (no != 1 || nc != 1) exit 3 }
+    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
-# Replace the slice between the markers with the payload, keeping both markers. Same contract.
+# Replace the slice between the markers with the payload, keeping both markers. Same contract, and
+# the same order check — this is the copy whose absence destroyed data rather than merely lying.
 splice() { # file · open · close · payload-file
   awk -v o="$2" -v c="$3" -v pf="$4" '
-    index($0, o) == 1 { no++; print; while ((getline pl < pf) > 0) { sub(/\r$/, "", pl); print pl }
+    index($0, o) == 1 { no++; if (no == 1) oat = NR; print
+                        while ((getline pl < pf) > 0) { sub(/\r$/, "", pl); print pl }
                         close(pf); skip = 1; next }
-    index($0, c) == 1 { nc++; skip = 0; print; next }
+    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; skip = 0; print; next }
     skip { next }
     { print }
-    END { if (no != 1 || nc != 1) exit 3 }
+    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
@@ -101,15 +109,65 @@ default_branch() {
   printf '%s' "${d#origin/}"
 }
 
-# The BASE the whole mandate assertion hangs on. Remote-tracking ref first, then the local branch —
-# and a hard failure if neither resolves. See the no-fallback note at the call site.
+# The BASE the whole mandate assertion hangs on — so every input to it must be OUTSIDE the run's
+# reach. It was not. Three separate defeats, all reproduced:
+#
+#   * A bare LOCAL branch is not an anchor. `git branch -f main HEAD` makes the merge-base equal
+#     HEAD, and the mandate at BASE is then the mandate the run just wrote. The earlier code
+#     refused to FALL BACK to HEAD and happily accepted being MOVED to it — same destination, and
+#     the comment saying otherwise made it harder to see.
+#   * A remote-TRACKING ref is the weakest thing the run cannot rewrite. Moving it requires a push,
+#     which is the act being authorized, so using it is not circular.
+#   * BASE == HEAD is refused outright even when the ref is legitimate. Nothing was built on top of
+#     it, so there is no diff to authorize and the comparison is trivially true.
 resolve_base() {
-  local d b; d=$(default_branch) || return 1
-  for b in "origin/$d" "$d"; do
+  local d b mb; d=$(default_branch) || return 1
+  for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
     git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-    git merge-base "$b" HEAD 2>/dev/null && return 0
+    mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
+    [ -n "$mb" ] || continue
+    # Degenerate: the anchor is at or ahead of HEAD, so BASE is HEAD and the run authored everything
+    # the comparison reads.
+    [ "$mb" = "$(git rev-parse HEAD)" ] && return 2
+    printf '%s\n' "$mb"; return 0
   done
   return 1
+}
+
+# The mandate assertion's inputs, re-derived and cross-checked, in ONE place so preflight and close
+# cannot disagree about them. Returns the trustworthy base on stdout.
+#
+# `--close` used to read the base out of the run-state file — a file the run writes. With the
+# `base:` line simply DELETED, the empty value made the comparison `git show ":$path"`, which is the
+# git INDEX: both sides of the "did the run author this" test became bytes the run had just staged,
+# and a forged mandate passed. So the recorded value is now EVIDENCE, never the input: it is
+# compared against the freshly derived one and a mismatch or an absence is a refusal.
+#
+# RETURNS VIA A GLOBAL, not stdout. `fail` writes to stdout, so a caller written as
+# `tb=$(trusted_base …)` CAPTURED the refusal into the variable instead of showing it: --close
+# printed only the downstream symptom and never said why. Separating the value channel from the
+# message channel is the fix, and it is why this function returns 0/1 and sets `TB`.
+TB=""
+trusted_base() { # run-state file  ->  sets TB
+  local fresh rc rec
+  TB=""
+  fresh=$(resolve_base); rc=$?
+  if [ "$rc" = 2 ]; then
+    fail 16 "the merge-base equals HEAD, so the run authored every byte the mandate comparison would read; nothing was built on top of the anchor"
+    return 1
+  fi
+  if [ "$rc" != 0 ] || [ -z "$fresh" ]; then
+    fail 16 "cannot resolve a merge-base against a remote-tracking default branch — refusing rather than trusting a local ref the run can move with 'git branch -f', or HEAD, either of which makes the mandate check pass by construction"
+    return 1
+  fi
+  if [ -f "$1" ]; then
+    rec=$(fact "$1" base)
+    if [ -n "$rec" ] && [ "$rec" != "$fresh" ]; then
+      fail 18 "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded $rec, derived $fresh"
+      return 1
+    fi
+  fi
+  TB="$fresh"
 }
 
 # ------------------------------------------------------------------------------------ preconditions
@@ -151,9 +209,22 @@ check_branch() {
 
 check_wiring() {
   [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
-  # The NON-repairing mode, by declaration. If the project declared a repairing one, that is the
-  # project's error and it is named here rather than silently honoured.
-  case "$WIRING_CHECK" in *--fix*) fail 4 "WIRING_CHECK declares a REPAIRING mode, and preflight delegates to a check, never a fix: $WIRING_CHECK"; return 1;; esac
+  # The NON-repairing mode, by declaration — expressed as an ALLOW-LIST, because the blacklist form
+  # was one substring wide. `*--fix*` is walked through by every other repairing spelling a project
+  # might declare, `--session` among them, and that mode repairs too. Naming what IS permitted makes
+  # the unknown case a refusal instead of a pass.
+  # Every DASH-LED token must be one this kit recognises as read-only. Word-split rather than
+  # substring-matched, so `--session` (which repairs) is refused instead of walking through a
+  # `*--fix*` blacklist, and a bare command with no flags is still legal.
+  local tok
+  for tok in $WIRING_CHECK; do
+    case "$tok" in
+      -*) case "$tok" in
+            --check|--dry-run|--verify|-n) ;;
+            *) fail 4 "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n: $tok" ; return 1 ;;
+          esac ;;
+    esac
+  done
   $WIRING_CHECK >/dev/null 2>&1 && return 0
   fail 4 "the declared wiring check failed, and a dormant hook makes every later green meaningless: $WIRING_CHECK"
   return 1
@@ -177,15 +248,32 @@ check_single_live() {
 # the BASE" and "did the run author it" are the same question, so there is one answer and one place
 # for it to be wrong.
 check_mandate() { # slug · base
-  local rel base_blob here
-  rel=$(runmd_of "$1"); base="$2"
+  local rel base_blob a b rc
+  rel=$(runmd_of "$1"); local base="$2"
+  # NO GUARD HERE FOR AN EMPTY BASE, deliberately. An empty one would make the line below read
+  # `git show ":path"` — the git INDEX, i.e. bytes the run itself staged, on both sides of a test
+  # about provenance. That is exactly how a forged mandate passed. The fix is upstream: `trusted_base`
+  # is the ONLY producer of this argument and it refuses before returning, so a guard here would be a
+  # branch no fixture can reach. `unattended.test.sh` asserts at SOURCE level that every call site
+  # is guarded, which is the house pattern for a hazard no input can produce.
   if ! base_blob=$(git show "$base:$rel" 2>/dev/null); then
     fail 6 "no run-state file at the pinned BASE, so the mandate cannot be reachable — the owner authors and commits it BEFORE the run starts: $base:$rel"
     return 1
   fi
-  local a b
-  a=$(printf '%s\n' "$base_blob" | region - "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null) || true
-  b=$(region "$rel" "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null) || true
+  # THE EXIT STATUS IS THE POINT, and `|| true` threw it away on both sides. `region` exits 3 on a
+  # malformed pair — including a SECOND mandate block — and swallowing that made a run-authored
+  # second block invisible: the first block matched, the extra one granting force-push was never
+  # compared to anything, and preflight printed OK.
+  a=$(printf '%s\n' "$base_blob" | region - "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null); rc=$?
+  if [ "$rc" != 0 ]; then
+    fail 20 "the run-state file at the pinned BASE does not carry exactly one well-formed mandate block, so there is no single authorization to compare against"
+    return 1
+  fi
+  b=$(region "$rel" "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null); rc=$?
+  if [ "$rc" != 0 ]; then
+    fail 20 "the working copy does not carry exactly one well-formed mandate block; a second block is a second authorization nobody granted"
+    return 1
+  fi
   if [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ]; then
     fail 7 "the mandate block is absent or empty at the pinned BASE — a mandate introduced after the branch point is one the run could have written, and grants nothing"
     return 1
@@ -210,13 +298,11 @@ verb_preflight() { # slug · keepalive-id
   if [ ! -f "$rel" ]; then
     fail 15 "no run-state file to assert against — preflight asserts a mandate, it does not create one: $rel"
   else
-    # NO FALLBACK TO HEAD. A merge-base that cannot be resolved must be a refusal, because HEAD
-    # trivially contains whatever the run just wrote — the mandate check would pass by construction
-    # and the one hole this kit exists to close would be open with every gate green.
-    if base=$(resolve_base); then
+    # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about
+    # which commit they are measuring against. `trusted_base` names its own refusals.
+    if trusted_base "$rel"; then
+      base="$TB"
       check_mandate "$slug" "$base" || true
-    else
-      fail 16 "cannot resolve a merge-base against the default branch — refusing rather than pinning HEAD, which would make the mandate check pass by construction"
     fi
   fi
   # NOTHING is written until every precondition above has passed. A verb that writes and then
@@ -299,6 +385,14 @@ verb_close() { # slug · override-item · reason
     case " $(dod) " in *" $ov:"*) ;;
       *) fail 12 "--override names an item that is not in the declared DoD set, and an override on an item nobody declared is not an override: $ov"; return 1;; esac
     [ -n "$reason" ] || { fail 12 "--override requires --reason: an unrecorded override is indistinguishable from a passing check"; return 1; }
+    # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no
+    # override for this one" — and the generic loop happily accepted it, which makes the override on
+    # the authorization check the authorization check. Named here so the refusal cites the rule.
+    case "$ov" in
+      mandate-reachable)
+        fail 21 "the mandate item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+        return 1 ;;
+    esac
   fi
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
@@ -317,7 +411,10 @@ verb_close() { # slug · override-item · reason
     park "$rel" "$ov" "$reason"
     echo "unattended: override recorded for '$ov' (checker $(checker_of "$ov")) — parked entry written"
   fi
-  set_fact "$rel" phase LANDING
+  # The phase write is the CLOSE. Reporting success before checking it printed "close OK" over a
+  # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
+  # make the record agree with reality.
+  set_fact "$rel" phase LANDING || return 1
   echo "unattended: close OK — every declared DoD item met; phase LANDING. Land with: $LANDER"
   return 0
 }
@@ -328,7 +425,9 @@ dod_met() { # slug · run-state file · item · checker
   local slug="$1" rel="$2" item="$3" ck="$4"
   case "$item" in
     mandate-reachable)
-      check_mandate "$slug" "$(fact "$rel" base)" >/dev/null 2>&1 ;;
+      # RE-DERIVED, never read out of the run-state file. That file is written by the subject of the
+      # test, and an absent `base:` line used to degenerate the comparison to the git index.
+      trusted_base "$rel" && check_mandate "$slug" "$TB" >/dev/null 2>&1 ;;
     gates-green)
       [ -n "$GATE_CMD" ] && $GATE_CMD >/dev/null 2>&1 ;;
     records-current)

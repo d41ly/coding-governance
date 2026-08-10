@@ -1,6 +1,6 @@
 # TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have
 
-**Status:** INPROGRESS · rev-2 · 2026-08-10 · node a · Tier-2 · base 09b9bd1c · streams tooling · ratified 2026-08-10 · review wf_077104e6
+**Status:** INPROGRESS · rev-3 · 2026-08-10 · node a · Tier-2 · base 09b9bd1c · streams tooling · ratified 2026-08-10 · review wf_077104e6
 
 ## 1. Goal
 
@@ -227,6 +227,47 @@ none
      before writing, so a dirty fixture still arms the message branches — but it never reaches the
      write phase, where checks 9 and 17 live. Those three arms silently exercised the dirty-tree
      branch instead until the fixture committed.
+
+- rev-3 · 2026-08-10 · FOLDED the second Tier-2 review (37 raw, 34 confirmed, precision 0.92, 15
+  distinct defects). Its verdict on this unit was correct and its three blockers were reproduced
+  end-to-end before anything was changed. All three were ONE rule broken at three layers — every
+  input to the mandate comparison must lie outside the run's reach — and they are fixed as one
+  change, not three patches.
+
+  **The BASE was read from the file the run writes.** `--close` took it from `base:` in the
+  run-state file; with that line simply DELETED, the empty value made the comparison
+  `git show ":$path"` — the git INDEX. Both sides became bytes the run had just staged, and a forged
+  mandate passed with the bar green. Reproduced. The recorded value is now EVIDENCE, not input: a
+  single `trusted_base` re-derives it and refuses on absence or disagreement.
+
+  **The anchor was movable.** `resolve_base` accepted a bare local branch, so `git branch -f main
+  HEAD` made BASE == HEAD and the mandate at BASE was the mandate the run had just written. The
+  NO-FALLBACK-TO-HEAD comment was satisfied and the destination reached anyway, by moving the anchor
+  instead of falling back — the comment made it harder to see, not easier. Reproduced. Only a
+  remote-TRACKING ref is accepted now (moving one requires the push being authorized), and BASE ==
+  HEAD is its own refusal.
+
+  **`region`'s exit 3 was discarded** by `|| true` on both sides of the comparison, so a SECOND
+  run-authored mandate block granting force-push compared byte-equal to the owner's. Reproduced.
+  Both sides now refuse on anything that is not exactly one well-formed block.
+
+  Four more, each reproduced: neither `region` nor `splice` enforced close-after-open despite both
+  comments promising it, so a transposed pair made `--preflight` TRUNCATE the run-state file from the
+  open marker to EOF — destroying the owner's mandate — and only then print an unrelated refusal;
+  `--override` accepted `mandate-reachable`, which makes the override on the authorization check BE
+  the authorization check; the repairing-mode ban was a `*--fix*` substring blacklist that
+  `--session` walked straight through, now an allow-list of read-only flags; and `verb_close`
+  printed `close OK` after a failed phase write.
+
+  One defect was introduced BY the fix and caught by the arms: `trusted_base` returned the base on
+  stdout while `fail` also writes to stdout, so `tb=$(trusted_base …)` captured its own refusals into
+  the variable and `--close` reported only the downstream symptom. It returns via a global now —
+  the value channel and the message channel cannot be the same channel.
+
+  Branches 26 -> 31, all armed; 44 -> 54 assertions. `check_mandate` grew no guard against an empty
+  base on purpose: `trusted_base` is its only producer and refuses first, so a runtime guard would be
+  a branch no fixture can reach. The invariant is asserted at SOURCE level instead — every call site
+  guarded within four lines — which is this repo's pattern for a hazard no input can produce.
 
 ## 10. Reuse audit
 

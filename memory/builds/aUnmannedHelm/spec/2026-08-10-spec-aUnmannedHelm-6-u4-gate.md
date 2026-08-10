@@ -1,6 +1,6 @@
 # TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it
 
-**Status:** INPROGRESS · rev-2 · 2026-08-10 · node a · Tier-2 · base 20f8082e · streams tooling · ratified 2026-08-10 · review wf_077104e6
+**Status:** INPROGRESS · rev-3 · 2026-08-10 · node a · Tier-2 · base 20f8082e · streams tooling · ratified 2026-08-10 · review wf_077104e6
 
 ## 1. Goal
 
@@ -208,6 +208,29 @@ none
   the effective vocabulary. Those two sets are declared independently, so the check has something to
   disagree about. Also added: an undeclared `CORE_FLOOR` is its own refusal — omitting the key is the
   quietest way to disarm a shrink-only pin.
+
+- rev-3 · 2026-08-10 · FOLDED the second Tier-2 review. Its finding on this unit was the one that
+  mattered most and the one easiest to miss: **the leg did not contain the string `run:mandate` at
+  all.** It checked the driver's bookkeeping — the recorded BASE, the phase, the copied region — and
+  never the thing the bookkeeping is about, so all three reproduced authorization blockers were
+  invisible to the merge bar and the whole thing stayed green. A gate that verifies the paperwork of
+  a claim without verifying the claim is not defence in depth; it is a second signature on the same
+  document.
+
+  Check 13 is new and is a SECOND OPINION rather than a second implementation: it re-extracts both
+  mandate blocks itself, from the recorded BASE commit and from the working copy, and refuses on
+  anything that is not exactly one well-formed block on each side.
+
+  Two more, both the same shape as the vacuous-subset defect this unit already catalogued: check 9
+  was wrapped in `if [ -n "$rb" ]`, so DELETING one line from a run-writable file disarmed the only
+  BASE assertion on the bar — an absent pin is not a satisfied one, and it is now its own refusal;
+  and a MALFORMED `CORE_FLOOR` (`"6"`, `"six:six"`) left both shrink-only pins unenforced while the
+  conf still read as configured, with only the wholly UNDECLARED case caught. The easier half of a
+  mistake being armed is how the harder half hides.
+
+  The leg also now measures against remote-tracking refs only, matching the driver, and refuses a
+  merge-base equal to HEAD. Branches 26 -> 33, all armed; 42 -> 57 assertions. The header's "Eleven
+  checks" was stale at thirteen and is corrected.
 
 ## 10. Reuse audit
 

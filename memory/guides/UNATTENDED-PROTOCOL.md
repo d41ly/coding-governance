@@ -77,8 +77,9 @@ Kit-owned core, in run order:
 status-vocabulary check.
 
 A project MAY append members via `PHASES_EXTRA` in `.unattended.conf`. It may NOT delete a core
-member: the gate asserts core membership against a shrink-only floor, because a deletable core
-member is a silent, reason-free override of everything keyed on it.
+member: the gate pins a shrink-only COUNT of the core set (`CORE_FLOOR`), because a
+deletable core member is a silent, reason-free override of everything keyed on it — and a
+membership assertion cannot work here, since the checker composes the effective set FROM core.
 
 **Every phase claim carries a witness** — a sha, a tag, or a workflow id — and the witness must be
 PRESENT. Presence is its own refusal, checked separately from whether the witness resolves. The
@@ -100,12 +101,12 @@ something no machine could have checked:
 | `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
 | `records-current` | machine | every unit's status header and every generated region match a fresh render |
 | `mandate-reachable` | machine | the mandate is reachable from the pinned BASE and was not introduced on the run's own branch |
-| `landed-via-lander` | machine | the landing step used the declared lander and emitted no bypass flag |
+| `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up |
 
-A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate asserts the core
-set is present against the same shrink-only floor.
+A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate pins the core set's
+COUNT against the same shrink-only floor, for the reason §3 gives.
 
 `--close` BLOCKS on any unmet item. The override is named (it cites the item), recorded (it writes a
 parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
@@ -163,8 +164,11 @@ where this document says it may:
 | `GATE_CMD` | the full merge bar, for `gates-green` |
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
+| `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
+| `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
+| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.

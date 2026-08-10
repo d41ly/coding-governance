@@ -1,51 +1,51 @@
-# .unattended.conf — the project layer for the unattended-run kit (coding-governance, dogfooding).
+# .unattended.conf.example — copy to the ADOPTING repo's root as `.unattended.conf` and fill it in.
 #
-# Every value below is a DECLARATION the driver and the gate leg READ. Neither restates one: a phase
-# token or a DoD item spelled into a script is itself a defect, and the leg reds on it. The kit owns
-# the CORE phase vocabulary and the CORE DoD set; this file may only EXTEND them.
+# THIS FILE IS A TEMPLATE, NOT A DEFAULT. It shipped once as a byte copy of the authoring repo's own
+# conf, which meant an adopter who copied it inherited that repo's lander, that repo's merge bar and
+# — worse — that repo's MEASURED pins. A pin copied from another corpus is either vacuous or
+# permanently red; this fleet tracks that as a named bug class. Every value below is either a
+# placeholder to replace or a number to MEASURE against your own tree.
 #
-# Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding).
+# Contract: <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md (binding). The driver and the gate leg READ
+# these declarations; neither restates one. A phase token or a DoD item spelled into a script is a
+# defect the leg reds on.
 
-# The memory tree, matching .memory-tree.conf. The run-state file is <MEMORY_ROOT>/builds/<slug>/RUN.md.
+# The memory tree, matching your .memory-tree.conf.
 MEMORY_ROOT=memory
 
-# The MANDATED lander. The pre-push hook refuses any default-branch push lacking this script's
-# marker, because it reconciles origin BEFORE the gate so the bar never runs on an already-stale
-# tree. An unattended run that meets that refusal with nobody to interpret it either stalls or learns
-# to bypass, and bypassing discards the entire bar the mandate leaned on.
+# REPLACE. The mandated landing command. If your pre-push hook refuses an un-marked default-branch
+# push, name the script that sets the marker — it exists so the remote is reconciled BEFORE the gate.
 LANDER="bash tools/push-main.sh"
 
-# The flag the close path must NEVER emit. Grepped in both directions: lander present, flag absent.
+# REPLACE if your hook uses a different bypass. The close path must never emit this, and the leg
+# greps the run-state record for it in both directions.
 BYPASS_BAN="--no-verify"
 
-# The full merge bar, for the `gates-green` DoD item.
+# REPLACE. Your full merge bar, for the `gates-green` DoD item.
 GATE_CMD="bash tools/run-gates.sh"
 
-# The NON-repairing wiring check --preflight delegates to. Deliberately not `--fix`: that mode sets
-# git config and rewrites the bytes of tracked skill renders, and its own source records the scar —
-# a wider selector once stripped CR bytes out of a settings file and a PNG. The run's first act is
-# not the repairing mode.
+# REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
+# accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
+# bytes, and the run's first act must not be that.
 WIRING_CHECK="bash tools/check-wiring.sh --check"
 
-# The agent-facing scheduler, named for the AGENT to call — no script can reach the store, which is
-# in-memory and session-scoped. The driver only records the id the agent hands it and later asserts
-# a recorded reap. Two spellings are live on this fleet; the Cron pair is the harness-native one.
-KEEPALIVE_CREATE="CronCreate"
-KEEPALIVE_DELETE="CronDelete"
+# REPLACE with YOUR harness's scheduler tool names. These are named for the AGENT to call — no
+# script can reach the store, which is in-memory and session-scoped. The driver only records the id
+# the agent hands it and later asserts a recorded reap.
+KEEPALIVE_CREATE="<your-schedule-create-tool>"
+KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 
-# The /session-kickoff engine, for the hand-back check. BLANK turns that check off — an adopter may
-# not use the kickoff skill at all. KICKOFF_EXITS is a shrink-only FLOOR on how many interactive
-# exits the engine enumerates a no-owner-turn resolution for: dropping one from the list is how a run
-# silently regains a place to stop, and the count is the only thing that notices.
-KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"
-KICKOFF_EXITS="6"
-
-# The kit's CORE set sizes, `<phases>:<dod>`, SHRINK-ONLY. The names live in the driver and are not
-# repeated here; what is pinned is the count, so deleting a core member reds and adding one is free.
-# A membership list would be a second spelling of the driver's, and the membership form of this
-# check was measured VACUOUS: the effective set is composed as core plus extras, so core is a subset
-# by construction and "every core member is present" can never fail.
+# MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
+# ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
+# here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
 CORE_FLOOR="6:6"
+
+# OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
+# which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
+# interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
+# because the count is a property of that document and not of this kit.
+KICKOFF_ENGINE=""
+KICKOFF_EXITS=""
 
 # Project EXTENSIONS to the kit-owned core sets, space-separated. Empty is legal and means "core
 # only"; it is NOT the same as an empty core set, which is a refusal.

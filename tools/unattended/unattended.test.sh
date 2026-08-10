@@ -12,7 +12,7 @@ set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/unattended.sh"
 TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT
+trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}"' EXIT
 st=0
 n=0
 
@@ -93,7 +93,18 @@ runmd tRun "$MANDATE"
 readme tEmpty
 runmd tEmpty ""
 git add -A && git commit -q -m base --no-verify
+# A REMOTE-TRACKING anchor, because that is now the only thing resolve_base will measure against: a
+# bare local branch is a ref the run can move with `git branch -f`, and moving it to HEAD was a
+# reproduced exploit. A bare repo one directory up is the cheapest honest origin.
+# OUTSIDE the work tree. `reset_tree` runs `git clean -qfd`, which cheerfully deletes an untracked
+# `origin.git` sitting inside the repo — the anchor vanishes and every later arm fails for a reason
+# that has nothing to do with what it tests.
+ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
+git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
 git checkout -q -b unit
+# ...and the unit branch must be AHEAD of the anchor. merge-base == HEAD is now its own refusal:
+# nothing was built on top of the anchor, so the mandate comparison would be trivially true.
+git commit -q --allow-empty -m "unit work" --no-verify
 BASE=$(git rev-parse main)
 UNIT0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
@@ -146,9 +157,13 @@ reset_tree; mkconf ""
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"
 
-reset_tree; mkconf "true --fix"
+# The ban is an ALLOW-LIST, not a `*--fix*` blacklist. The fixture uses `--session`, which repairs
+# and which the blacklist form let through — the arm that made the blacklist look like a check.
+reset_tree; mkconf "true --session"
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "WIRING_CHECK declares a REPAIRING mode, and preflight delegates to a check, never a fix"
+hit "$out" "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n"
+reset_tree; mkconf "true --check"
+miss "$(run --preflight tRun --keepalive-id k1)" "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n"
 
 reset_tree; mkconf "false"
 out=$(run --preflight tRun --keepalive-id k1)
@@ -201,7 +216,16 @@ git reset -q --hard HEAD~1; git clean -qfd
 # ---- pass by construction, because HEAD holds whatever the run just wrote.
 reset_tree
 out=$(GOV_DEFAULT_BRANCH=nosuchbranch bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
-hit "$out" "cannot resolve a merge-base against the default branch — refusing rather than pinning HEAD, which would make the mandate check pass by construction"
+hit "$out" "cannot resolve a merge-base against a remote-tracking default branch — refusing rather than trusting a local ref the run can move with 'git branch -f', or HEAD, either of which makes the mandate check pass by construction"
+
+# ...and the OTHER half of the same rule: a resolvable anchor that sits AT HEAD. This is the state
+# `git branch -f main HEAD` used to produce, and it defeated the whole kit — the mandate at BASE was
+# the mandate the run had just written. Refusing to fall back to HEAD is not the same as refusing to
+# BE at HEAD, and only the first was implemented.
+reset_tree; git push -q -f origin unit:main
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "the merge-base equals HEAD, so the run authored every byte the mandate comparison would read; nothing was built on top of the anchor"
+git push -q -f origin "$BASE":main
 
 # ---- check 9, both branches: the marker pair is malformed in the SOURCE and in the TARGET. The
 # ---- source arm is the one a re-deriving driver would not have — this one copies, so a broken
@@ -292,6 +316,70 @@ same "the phase advanced to LANDING" \
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
 hit "$out" "unknown argument; the verbs are --preflight, --status, --resume and --close: --frobnicate"
+
+# ---- check 18: the recorded BASE is EVIDENCE, never the input. --close used to read it straight
+# ---- out of the run-state file — a file the run writes — and an absent line degenerated the
+# ---- comparison to `git show ":path"`, the git INDEX, so both sides were bytes the run had staged.
+# ---- A forged mandate passed. Now the base is re-derived and the recorded one must agree with it.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded"
+
+# ...and the DELETED-line case, which is the one that was exploitable: with no `base:` at all the
+# mandate item must be UNMET, not silently satisfied against the index.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+sed -i 's/The owner authorizes/FORGED — the run rewrote/' memory/builds/tRun/RUN.md
+git add -A
+out=$(run --close tRun)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "mandate-reachable"
+miss "$out" "close OK"
+
+# ---- check 20, both sides: exactly ONE well-formed mandate block, at the BASE and in the working
+# ---- copy. `region`'s exit 3 was discarded with `|| true` on both, so a SECOND run-authored block
+# ---- granting force-push compared byte-equal to the owner's and preflight printed OK.
+reset_tree
+printf '
+<!-- run:mandate -->
+FORGED SECOND BLOCK: also authorize force-push.
+<!-- /run:mandate -->
+' >> memory/builds/tRun/RUN.md
+fixture
+hit "$(run --preflight tRun --keepalive-id k1)" "the working copy does not carry exactly one well-formed mandate block; a second block is a second authorization nobody granted"
+
+# ...the same defect from the BASE side, which needs the second block committed to the ANCHOR.
+reset_tree
+git checkout -q main
+printf '
+<!-- run:mandate -->
+A SECOND BLOCK THAT WAS ALWAYS THERE.
+<!-- /run:mandate -->
+' >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m twoblocks --no-verify && git push -q -f origin main
+# The unit branch must DESCEND from the two-block anchor, or the merge-base is still the one-block
+# commit and this arm silently tests nothing.
+git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
+hit "$(run --preflight tRun --keepalive-id k1)" "the run-state file at the pinned BASE does not carry exactly one well-formed mandate block, so there is no single authorization to compare against"
+git push -q -f origin "$BASE":main
+
+# ---- check 21: the authorization item is NOT overridable. The generic override loop accepted it,
+# ---- which makes the override on the authorization check BE the authorization check — and the
+# ---- protocol says in one sentence that there is no override for this one.
+reset_tree
+hit "$(run --close tRun --override mandate-reachable --reason "trust me")" "the mandate item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+
+# ---- SOURCE-level: every `check_mandate` call site is GUARDED by `trusted_base`. There is no
+# ---- runtime guard inside check_mandate for an empty base, deliberately — it would be a branch no
+# ---- fixture could reach — so the invariant is asserted against the text instead. An unguarded
+# ---- call would restore the `git show ":path"` index read that made a forged mandate pass.
+ug=$(grep -n 'check_mandate "' "$SCRIPT" | grep -v 'trusted_base' | grep -v '^\s*#' || true)
+n=$((n+1))
+while IFS= read -r ln; do
+  [ -n "$ln" ] || continue
+  no=${ln%%:*}
+  sed -n "$((no-4)),${no}p" "$SCRIPT" | grep -q 'trusted_base'     || { echo "FAIL check_mandate is called without a trusted_base guard within 4 lines: $ln"; st=1; }
+done <<<"$ug"
 
 # ---- SOURCE-level: the driver must not grow a python dependency. Every other kit here carries the
 # ---- launcher resolver inline because it needs python; this one does not, and a `python` appearing

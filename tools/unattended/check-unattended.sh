@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. Eleven checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. THIRTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -67,8 +67,19 @@ DOD="$DOD_CORE $DOD_EXTRA"
 # project layer can reach neither number, which is the property F3 asked for.
 [ -n "$CORE_FLOOR" ] \
   || fail 1 "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one"
+# A MALFORMED floor is a refusal, not a skip. `case *:*` accepted only the well-formed shape and
+# left both floors EMPTY otherwise, so `CORE_FLOOR="6"` or `"six:six"` disarmed both shrink-only
+# pins while the conf still looked configured. Only the wholly UNDECLARED case was being caught,
+# which is the easier half of the same mistake.
 pfloor=""; dfloor=""
-case "$CORE_FLOOR" in *:*) pfloor=${CORE_FLOOR%%:*}; dfloor=${CORE_FLOOR##*:} ;; esac
+if [ -n "$CORE_FLOOR" ]; then
+  case "$CORE_FLOOR" in
+    *[!0-9:]* | *:*:* | :* | *: | *[!0-9]) ;;
+    *:*) pfloor=${CORE_FLOOR%%:*}; dfloor=${CORE_FLOOR##*:} ;;
+  esac
+  [ -n "$pfloor" ] && [ -n "$dfloor" ] \
+    || fail 1 "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon: $CORE_FLOOR"
+fi
 [ -n "$(printf '%s' "$PHASES" | tr -d '[:space:]')" ] \
   || fail 2 "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
 nphase=$(printf '%s\n' $PHASES_CORE | grep -c . || true)
@@ -103,11 +114,13 @@ fi
 
 phase_of() { sed -n 's/^phase: *//p' "$1" | head -1 | tr -d '\r'; }
 fact_of()  { sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'; }
+# Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
+# pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
 region()   { awk -v o="$2" -v c="$3" '
-               index($0,o)==1 { no++; if (nc==0) inside=1; next }
-               index($0,c)==1 { nc++; inside=0; next }
+               index($0,o)==1 { no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
+               index($0,c)==1 { nc++; if (nc==1) cat=NR; inside=0; next }
                inside { print }
-               END { if (no!=1 || nc!=1) exit 3 }' "$1"; }
+               END { if (no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 
 live=""; nlive=0
 for f in $RUNS; do
@@ -155,17 +168,48 @@ for f in $RUNS; do
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
   # ---- is not a pin, and every mandate assertion hangs on this value.
+  # ---- AN ABSENT `base:` LINE IS THE VIOLATION, not the exemption. Wrapping this in `if [ -n ]`
+  # ---- meant deleting one line from a run-writable file disarmed the only BASE check on the bar.
   rb=$(fact_of "$f" base)
-  if [ -n "$rb" ]; then
+  if [ -z "$rb" ]; then
+    fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
+  else
     d=${GOV_DEFAULT_BRANCH:-}
     [ -n "$d" ] || { d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || d=""; d=${d#origin/}; }
     if [ -n "$d" ]; then
-      for b in "origin/$d" "$d"; do
+      # REMOTE-TRACKING ONLY, matching the driver: a bare local branch is a ref the run can move
+      # with `git branch -f`, which is how BASE was made to equal HEAD.
+      for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
         git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
         mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
         [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
+        [ "$mb" != "$(git rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
         break
       done
+    fi
+  fi
+
+  # ---- 13: THE MANDATE, asserted by the BAR and not only by the driver. The leg did not contain the
+  # ---- string `run:mandate` at all: it checked the driver's bookkeeping and never the thing the
+  # ---- bookkeeping is about, so all three of the authorization defects reproduced against it were
+  # ---- invisible here and the whole bar stayed green.
+  # ----
+  # ---- This is deliberately a SECOND OPINION and not a second implementation: it re-extracts both
+  # ---- blocks itself, from the base commit and from the working copy, and refuses on anything that
+  # ---- is not exactly one well-formed block on each side.
+  if [ -n "$rb" ] && git rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
+    if bb=$(git show "$rb:$f" 2>/dev/null); then
+      ma=$(printf '%s\n' "$bb" | region - '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && ra=0 || ra=$?
+      mb2=$(region "$f" '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && rb2=0 || rb2=$?
+      if [ "$ra" != 0 ] || [ "$rb2" != 0 ]; then
+        fail 13 "a run-state file does not carry exactly one well-formed mandate block on both sides of the BASE comparison; a second block is a second authorization nobody granted: $f"
+      elif [ -z "$(printf '%s' "$ma" | tr -d '[:space:]')" ]; then
+        fail 13 "the mandate block is absent or empty at the recorded BASE, so nothing committed before the run authorizes it: $f"
+      elif [ "$ma" != "$mb2" ]; then
+        fail 13 "a run-state file's mandate differs from the one at its recorded BASE — the run edited its own authorization: $f"
+      fi
+    else
+      fail 13 "a run-state file does not exist at its own recorded BASE, so its mandate cannot have been committed before the run: $rb in $f"
     fi
   fi
 

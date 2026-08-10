@@ -11,7 +11,7 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 TMP=$(mktemp -d)
-trap 'rm -rf "$TMP"' EXIT
+trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}"' EXIT
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
@@ -69,11 +69,18 @@ EOF
 
 mkconf; build tRun
 git add -A && git commit -q -m base --no-verify
+# A REMOTE-TRACKING anchor: check 9 measures against `refs/remotes/...` only, because a bare local
+# branch is a ref the run can move with `git branch -f` — a reproduced way to make BASE equal HEAD.
+# It lives OUTSIDE the work tree, or `git clean -qfd` in reset_tree deletes it.
+ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
+git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+ANCHOR0=$(git rev-parse main)
 git checkout -q -b unit
+git commit -q --allow-empty -m "unit work" --no-verify
 BASE0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
-sed -i "s/^base: BASE$/base: $(git merge-base main HEAD)/" memory/builds/tRun/RUN.md
+sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
 git add -A && git commit -q -m facts --no-verify
 PRISTINE=$(git rev-parse HEAD)
 reset_tree() { git reset -q --hard "$PRISTINE"; git clean -qfd; }
@@ -271,6 +278,62 @@ hit "$(run)" "KICKOFF_ENGINE names a file that does not exist, so the hand-back 
 # ...blank turns it off, which is what lets an adopter without the kickoff skill stay green.
 sed -i 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' .unattended.conf
 same "a blank KICKOFF_ENGINE turns the check off" "$(run)" ""
+
+# ---- check 1 branch 5: a MALFORMED floor is a refusal, not a skip. Only the wholly UNDECLARED case
+# ---- was caught, so `CORE_FLOOR="6"` left BOTH shrink-only pins unenforced while the conf still
+# ---- read as configured — the easier half of the same mistake, armed and the harder half not.
+reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="6"/' .unattended.conf
+hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
+reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="six:six"/' .unattended.conf
+hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
+
+# ---- check 9 branch 1: an ABSENT `base:` line is the violation, not the exemption. The check was
+# ---- wrapped in `if [ -n "$rb" ]`, so deleting one line from a run-WRITABLE file disarmed the only
+# ---- BASE assertion on the bar.
+reset_tree; sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
+hit "$(run)" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
+
+# ---- check 9 branch 3: the anchor sitting AT HEAD. `git branch -f main HEAD` was the reproduced
+# ---- exploit; the leg now refuses the resulting state as well as the driver.
+reset_tree; git push -q -f origin unit:main
+sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md; git add -A
+hit "$(run)" "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- check 13, all four branches: THE MANDATE, asserted by the BAR. Before this the leg did not
+# ---- contain the string `run:mandate` at all — it checked the driver's bookkeeping and never the
+# ---- thing the bookkeeping is about, so every authorization defect was invisible here.
+reset_tree
+sed -i 's/^The owner authorizes tRun to merge and to push\.$/FORGED — the run rewrote its own authorization./' memory/builds/tRun/RUN.md
+git add -A
+hit "$(run)" "a run-state file's mandate differs from the one at its recorded BASE — the run edited its own authorization"
+
+reset_tree
+printf '
+<!-- run:mandate -->
+FORGED SECOND BLOCK: also authorize force-push.
+<!-- /run:mandate -->
+' >> memory/builds/tRun/RUN.md
+git add -A
+hit "$(run)" "a run-state file does not carry exactly one well-formed mandate block on both sides of the BASE comparison; a second block is a second authorization nobody granted"
+
+reset_tree; build tEmptyMandate
+sed -i '/^The owner authorizes tEmptyMandate to merge and to push\.$/d' memory/builds/tEmptyMandate/RUN.md
+sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tEmptyMandate/RUN.md
+sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tEmptyMandate/RUN.md
+# The EMPTY-mandate file must exist AT THE ANCHOR, or check 13 branch 4 fires instead of branch 2.
+git add -A && git commit -q -m emptymandate --no-verify && git push -q -f origin unit:main
+git commit -q --allow-empty -m ahead --no-verify
+sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tEmptyMandate/RUN.md
+git add -A && git commit -q -m rebase --no-verify
+hit "$(run)" "the mandate block is absent or empty at the recorded BASE, so nothing committed before the run authorizes it"
+
+reset_tree; build tNoBase
+sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tNoBase/RUN.md
+sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tNoBase/RUN.md
+sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tNoBase/RUN.md
+git add -A && git commit -q -m nobase --no-verify
+hit "$(run)" "a run-state file does not exist at its own recorded BASE, so its mandate cannot have been committed before the run"
 
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T21:03:17+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T21:44:20+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -156,6 +156,16 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- A gate that returns a VALUE on stdout cannot also report on stdout. `fail` echoes, so
+  `x=$(some_check …)` captures the diagnostics into `x` and the operator sees only the downstream
+  symptom. Measured 2026-08-10: `--close` printed "a machine-checked DoD item is unmet" and swallowed
+  the sentence explaining why. Return via a global (or a separate fd); the value channel and the
+  message channel must not be the same channel.
+- When hardening a check, ask what SUPPLIES each of its inputs. The unattended mandate check was
+  sound in design and defeated three ways at once because all three inputs were reachable by the
+  subject it distrusts: a value read back from the file the run writes, an anchor ref the run can
+  `git branch -f`, and an error signal dropped with `|| true`. Reproduce each with a control before
+  and after — a review finding that has not been reproduced is a hypothesis.
 - CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will never
   tell you: its eol population is scoped to `.claude/` paths carrying the pin. Every UNPINNED path
   smudges, because `.gitattributes` opens with `* text=auto` and this fleet runs `core.autocrlf=true`.

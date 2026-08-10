@@ -34,8 +34,10 @@ hook's schedule.
 
 ## Start here
 
-**State.** All seven units are SPECCED and BUILT on `branch/aunmannedhelm-build-setup-38f3a9`, and
-**unmerged**. Every unit sits at INPROGRESS rather than CLOSED, which in this tree's vocabulary means
+**State.** All seven units are SPECCED, BUILT and REVIEWED on
+`branch/aunmannedhelm-build-setup-38f3a9`, and **unmerged**. A second Tier-2 ran over the built diff
+and returned "do not land" on three reproduced authorization blockers; all three are fixed and armed,
+and the review record is `reviews/2026-08-10-review-aUnmannedHelm-2.md`. Every unit sits at INPROGRESS rather than CLOSED, which in this tree's vocabulary means
 built-but-not-landed — the state this build's own unit 1 argued the seven-token set cannot express.
 
 **Next action:** the merge to `main` and the push. Both still need an explicit owner ask. This run
@@ -113,7 +115,27 @@ driver only records the id and asserts a recorded reap.
 
 ## Review record
 
-`reviews/2026-08-10-review-aUnmannedHelm-1.md` — Tier-2 on the rev-2 spec. Five spec lenses over 57
+`reviews/2026-08-10-review-aUnmannedHelm-2.md` — Tier-2 over the BUILT diff at tip `f1ad6e9`. 37 raw,
+34 confirmed, precision 0.92, consolidating to 15 distinct defects: 3 blockers, 4 highs, 6 mediums,
+2 lows. Verdict: do not land. Every blocker was reproduced end-to-end before a line was changed, and
+re-tested after.
+
+The three blockers were one rule broken at three layers — **every input to the mandate comparison
+must lie outside the run's reach**, and all three inputs were supplied or steerable by the subject
+the check distrusts:
+
+- the BASE was read from the run-written record, and an absent line degenerated the comparison to the
+  git INDEX, so both sides became bytes the run had just staged;
+- the anchor was a bare local branch, so `git branch -f main HEAD` made BASE equal HEAD — the
+  NO-FALLBACK-TO-HEAD comment was satisfied while the destination was reached by moving the anchor;
+- the malformed-marker signal was discarded with `|| true`, so a SECOND run-authored mandate block
+  granting force-push compared byte-equal to the owner's.
+
+The fourth finding was the one that made the other three survivable: **the merge bar performed no
+mandate assertion at all** — the leg did not contain the string `run:mandate`. It checked the
+paperwork and never the claim.
+
+`reviews/2026-08-10-review-aUnmannedHelm-1.md` — the earlier Tier-2, on the rev-2 spec. Five spec lenses over 57
 raw findings, five batched default-refute skeptics, 50 confirmed at precision 0.88, no lens dead.
 Eight blocker-severity findings collapsing to five distinct defects, all folded at rev-3.
 
@@ -127,8 +149,8 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 |---|---|---|---|
 | [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | INPROGRESS | rev-4 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-4 — the protocol document, and the authorization it rests on](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md) | INPROGRESS | rev-2 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | INPROGRESS | rev-2 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | INPROGRESS | rev-2 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | INPROGRESS | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | INPROGRESS | rev-3 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | INPROGRESS | rev-2 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | INPROGRESS | rev-2 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | INPROGRESS | rev-2 | 2026-08-10 |
