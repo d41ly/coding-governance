@@ -12,7 +12,7 @@ gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driv
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
-skill-engines = []
+skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = []
 guides = ["UNATTENDED-PROTOCOL.md"]
@@ -82,11 +82,11 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-The feature is mid-build. Units 1 through 5 of seven have landed on the unit branch: the run-state
+The feature is mid-build. Units 1 through 6 of seven have landed on the unit branch: the run-state
 file is legal in the memory tree, the protocol and the project declaration exist, the authorization
-amendment reaches all four sites, the four-verb driver is built, the rendered Skill is installed and four
-gate legs are on the bar. Units 6 and 7 — the `/session-kickoff` hand-back and the adopter path —
-are not built, so:
+amendment reaches all four sites, the four-verb driver is built, the rendered Skill is installed, four gate legs are on the
+bar, and the `/session-kickoff` engine hands back on a mandate while keeping its default stop. Unit
+7 — the adopter path — is not built, so:
 
 - The adopter path does not exist (unit 7), so nothing installs this kit into another repo and the
   two adopter legs the review budgeted are not on the bar yet.

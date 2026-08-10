@@ -2,8 +2,8 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:35:29+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
+last-audit: 2026-08-10T20:40:47+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
 -->
@@ -90,9 +90,13 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32688/32768 (**80 bytes free** at v2.5, measured 2026-08-10 by `bash tools/check-template-size.sh`
+  It sits at 32578/32768 (**190 bytes free**, measured 2026-08-10 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here), so a line added to it either fits that margin or
-  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`.
+  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
+  before `TOOL-aUnmannedHelm-4` needed 114 for F1's amendment and funded them by externalizing the
+  kickoff-manifest merge exception — a ~490-byte procedure that only applies when the project keeps a
+  manifest — into companion §1. That is the sanctioned move and it is available again: the §-stub
+  parentheticals in §9/§11/§12/§13 duplicate the companion's own headings and are the next candidate.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every

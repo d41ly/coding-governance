@@ -224,6 +224,54 @@ hit "$out" "drifted line"
 reset_tree; rm -f tools/unattended/PROTOCOL.template.md
 hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 
+# ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
+# ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
+# ---- ratchet watches the project layer and the coverage gate enumerates the skill's PATH.
+reset_tree
+mkdir -p skills/session-kickoff
+cat > skills/session-kickoff/SKILL.md <<'ENG'
+## Step 5 — READY card, then stop
+control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building.
+## Step 5b — the unattended hand-back
+1. **Step 0 · one** → abort.
+2. **Step 0 · two** → abort.
+3. **Step 1 · three** → abort.
+4. **Step 2 · four** → park.
+5. **Step 3 · five** → park.
+6. **Step 5 · six** → replaced by the hand-back.
+ENG
+printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\nKICKOFF_EXITS="6"\n' >> .unattended.conf
+git add -A && git commit -q -m engine --no-verify
+same "a conforming kickoff engine is green" "$(run)" ""
+
+# ...the hand-back deleted: a mandated run halts at the card with nobody to answer it.
+sed -i '/^## Step 5b/d' skills/session-kickoff/SKILL.md
+hit "$(run)" "the kickoff engine declares no unattended hand-back, so a mandated run still halts at the READY card with nobody to answer it"
+
+# ...the STOP deleted, which is the other direction and the more dangerous one: every ATTENDED
+# kickoff would then run on without asking. Asserted on the literal prompt string, because a section
+# heading survives a gutted body.
+git checkout -q -- skills/session-kickoff/SKILL.md
+sed -i "/Ready — say go/d" skills/session-kickoff/SKILL.md
+hit "$(run)" "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked"
+
+# ...an exit dropped from the enumeration: the count is the only thing that notices a run silently
+# regaining a place to stop.
+git checkout -q -- skills/session-kickoff/SKILL.md
+sed -i '/^4\. \*\*Step 2/d' skills/session-kickoff/SKILL.md
+out=$(run)
+hit "$out" "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
+hit "$out" "5 against 6"
+
+# ...and a declared engine that is not there. Without this the whole check is skipped by a typo.
+git checkout -q -- skills/session-kickoff/SKILL.md
+sed -i 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE="skills/session-kickoff/NOPE.md"|' .unattended.conf
+hit "$(run)" "KICKOFF_ENGINE names a file that does not exist, so the hand-back check reads nothing and passes"
+
+# ...blank turns it off, which is what lets an adopter without the kickoff skill stay green.
+sed -i 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' .unattended.conf
+same "a blank KICKOFF_ENGINE turns the check off" "$(run)" ""
+
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
 reset_tree

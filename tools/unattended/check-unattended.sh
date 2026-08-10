@@ -32,6 +32,7 @@ if [ ! -f "$CONF" ]; then
 fi
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
+KICKOFF_ENGINE=""; KICKOFF_EXITS=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -195,6 +196,29 @@ if [ -f "$SHIP" ] && [ -f "$LIVEDOC" ]; then
   fi
 elif [ ! -f "$SHIP" ] || [ ! -f "$LIVEDOC" ]; then
   fail 10 "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail: $SHIP / $LIVEDOC"
+fi
+
+# ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not
+# ---- use the kickoff skill at all. This is the one check that reads a file outside the kit, and it
+# ---- exists because nothing else does: the manifest ratchet watches the project layer, and the
+# ---- coverage gate enumerates the skill's PATH, so the engine's TEXT was read by no leg.
+if [ -n "$KICKOFF_ENGINE" ]; then
+  if [ ! -f "$KICKOFF_ENGINE" ]; then
+    fail 12 "KICKOFF_ENGINE names a file that does not exist, so the hand-back check reads nothing and passes: $KICKOFF_ENGINE"
+  else
+    grep -qF 'Step 5b' "$KICKOFF_ENGINE" \
+      || fail 12 "the kickoff engine declares no unattended hand-back, so a mandated run still halts at the READY card with nobody to answer it: $KICKOFF_ENGINE"
+    # BOTH DIRECTIONS. The hand-back is the exception; the stop is the default, and a change that
+    # deleted the stop would make every ATTENDED kickoff run on without asking. The literal prompt
+    # string is asserted, not the section heading — a heading survives a gutted body.
+    grep -qF "Ready — say go and I'll start, or adjust any field." "$KICKOFF_ENGINE" \
+      || fail 12 "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked: $KICKOFF_ENGINE"
+    if [ -n "$KICKOFF_EXITS" ]; then
+      nex=$(grep -cE '^[0-9]+\. \*\*Step ' "$KICKOFF_ENGINE" || true)
+      [ "$nex" -ge "$KICKOFF_EXITS" ] \
+        || fail 12 "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS"
+    fi
+  fi
 fi
 
 exit "$status"

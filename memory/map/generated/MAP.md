@@ -91,7 +91,7 @@ Inventories: gate-legs: 44 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `session-kickoff` | baseline |
+| `session-kickoff` | unattended |
 
 ## rendered-skills
 
