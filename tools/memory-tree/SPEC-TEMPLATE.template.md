@@ -12,7 +12,7 @@ by filename date — never retrofit them.
 ## SPEC10_CUTOFF — how §10 is phased in
 
 `§10 Reuse audit` is required only for specs whose FILENAME date is on or after `SPEC10_CUTOFF`
-(default `2026-08-04`, set in `memory-tree/check-memory-hygiene.sh`). Specs dated before it
+(default `2026-08-04`, set in `{{KIT_DIR}}/check-memory-hygiene.sh`). Specs dated before it
 keep the nine-section canon, so adopting the reuse audit never retroactively reds landed work. It is
 env-overridable for adoption in a repo with a different history — raising it grandfathers more, and
 lowering it is how you'd ratchet an existing corpus forward. It is a merge-bar knob: changing it
@@ -153,7 +153,7 @@ when clear.
 ## 10. Reuse audit
 
 The reuse-discovery result: the existing seam this unit wires through (from a
-`codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the evidence.
+`{{TOOL_ROOT}}codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the evidence.
 Records the reuse decision so an author cannot silently skip it — the machinery already ships in
 this kit, and a checklist item nobody is asked to answer is not a checklist item.
 ```

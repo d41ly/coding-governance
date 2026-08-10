@@ -256,6 +256,12 @@ copies=$(git grep -l '^# >>> resolve_python' -- '*.sh' || true)
 [ -n "$copies" ] || bad "no inline resolver copy found — the marker-population assertion below is vacuous"
 printf '%s\n' "$copies" | grep -qx 'tools/lib/pyrun.sh' \
   && bad "tools/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
+# ...and the COMPLEMENT, which is the half that matters to an adopter. The kit-internal launcher
+# ships inside the kit, where `../lib/` does not exist, so it MUST carry the inline block — and being
+# in the marker population is what puts it under the byte-identical parity gate. Asserting only the
+# exclusion above would pass on a kit that ships no launcher at all.
+printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
+  || bad "tools/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
 
 # --- 0c. FAIL CLOSED: every deferred-resolution failure becomes a conflict, never a take-ours ------
 # The driver reads its anchor grammar from the worktree at merge time. At module scope that import

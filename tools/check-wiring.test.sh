@@ -33,7 +33,7 @@ src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; 
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
-  for rel in memory-tree/merge-rows.py lib/pyrun.sh lib/resolve-python.sh \
+  for rel in memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh \
              memory-recall/extract.py memory-recall/recall_conf.py; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
@@ -270,19 +270,22 @@ cleanup
 newrepo
 git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
 mkdir -p tools/memory-tree tools/lib memory/backlog
-WANT="bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P"
+WANT="bash tools/memory-tree/merge-rows.sh %O %A %B %P"
 
 # state 1 — kit not adopted -> skip, exit 0
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     merge' && printf '%s' "$out" | grep -q 'not adopted'; } \
   && ck "AC10 merge driver absent -> skip, exit 0" 1 || ck "AC10 merge driver absent -> skip, exit 0" 0
 
-# state 2 — the driver is present but the shim its command names is missing. git would exec a command
-# that cannot start, and a merge driver that cannot start exits non-zero without writing %A.
+# state 2 — the driver is present but NO launcher is. git would exec a command that cannot start, and
+# a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
+# leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
+# TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
 cp "$(src_of memory-tree/merge-rows.py)" tools/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
-{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'shim it names is missing'; } \
-  && ck "AC10 shim missing -> UNWIRED, exit 1" 1 || ck "AC10 shim missing -> UNWIRED, exit 1" 0
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
+  && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
+  || ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 0
 
 # state 3 — the whole kit is present, but no tracked path declares merge=rows: nothing to wire, so a
 # SKIP rather than a permanent false UNWIRED in every repo that carries the kit without the
@@ -305,26 +308,39 @@ out=$(chk --check); rc=$?
 chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); rc=$?
 { [ "$got" = "$WANT" ] && [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 --fix sets the driver, re-check ok" 1 || ck "AC10 --fix sets the driver, re-check ok" 0
+# ...and it is the KIT-INTERNAL launcher that won, not the gov-internal shim. `install_driver` lays
+# both, so without this the fallback could silently win everywhere and every arm here would still
+# pass — while an adopter, who receives only the kit, got a command naming a file they do not have.
+{ printf '%s' "$got" | grep -q 'memory-tree/merge-rows.sh' \
+  && ! printf '%s' "$got" | grep -q 'pyrun'; } \
+  && ck "AC10 the kit launcher wins over the gov-internal shim" 1 \
+  || ck "AC10 the kit launcher wins over the gov-internal shim" 0
 
 # state 5b — the config is UNCHANGED and correct, and the driver still cannot START: the resolver
 # `pyrun.sh` sources is gone. MEASURED before this arm existed: `ok  merge  — merge.rows.driver
 # wired`, and the very next `git merge` printed CONFLICT and left memory/DECISIONS.md holding
 # OURS-only content with `grep -c '<<<<<<<'` = 0 and status UU — the incoming row simply absent.
 # "Wired" has to mean the command RUNS, so this state must not be green.
-mv tools/lib/resolve-python.sh tools/lib/resolve-python.sh.away
+# RE-AIMED: the kit-internal launcher carries the resolver INLINE, so removing `tools/lib/` no
+# longer breaks it — that decoupling is the whole point of shipping a launcher with the kit. What it
+# still cannot survive is a driver that will not parse. Removing the FILE would trip the
+# not-adopted probe one test earlier and never reach this arm, so the content is what breaks.
+cp tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.py.away
+printf 'this is not python(
+' > tools/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
-  && ck "AC10 driver cannot start (no resolver) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot start (no resolver) -> UNWIRED, exit 1" 0
+  && ck "AC10 driver cannot start (unparseable driver) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot start (unparseable driver) -> UNWIRED, exit 1" 0
 # ...and --fix must not DECLARE a broken driver wired either. Wiring a command that cannot run is
 # strictly worse than leaving it unset: unset falls back to git's line merge, wired-and-broken is
 # the silent take-ours above.
 git config --unset merge.rows.driver
 chk --fix >/dev/null; got=$(git config merge.rows.driver 2>/dev/null || true)
 [ -z "$got" ] && ck "AC10 --fix refuses to wire a driver that cannot run" 1 || ck "AC10 --fix refuses to wire a driver that cannot run" 0
-mv tools/lib/resolve-python.sh.away tools/lib/resolve-python.sh
+mv -f tools/memory-tree/merge-rows.py.away tools/memory-tree/merge-rows.py
 chk --fix >/dev/null; out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
-  && ck "AC10 restoring the resolver goes green again" 1 || ck "AC10 restoring the resolver goes green again" 0
+  && ck "AC10 restoring the driver goes green again" 1 || ck "AC10 restoring the driver goes green again" 0
 
 # state 5b2 — the smoke run itself cannot run. A verifier that could not verify must not print the
 # same `ok` as one that did: this file already deleted a `cannot verify` skip from the recall arm for

@@ -588,6 +588,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "kit_rel",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "last_qid",
       "kind": "function",
       "file": "tools/memory-recall/query.py"

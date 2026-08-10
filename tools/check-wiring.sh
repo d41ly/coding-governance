@@ -258,7 +258,7 @@ EOF
 # `ok`, the built command and the configured one are the same string, which is the case that had to
 # be covered. (aMendedLedger U5)
 check_merge_rows() {
-  local drv shim want cur declared
+  local drv launcher want cur declared
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
   # <root>/tools/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
@@ -267,13 +267,21 @@ check_merge_rows() {
     echo "skip     merge     — memory-tree merge driver not adopted (no merge-rows.py)"
     return
   fi
-  shim=$(first_of tools/lib/pyrun.sh lib/pyrun.sh)
-  if [ -z "$shim" ]; then
-    echo "UNWIRED  merge     — $drv is present but the shim it names is missing (tools/lib/pyrun.sh); git would exec a command that cannot start. Fix: copy tools/lib/pyrun.sh + tools/lib/resolve-python.sh in"
+  # The KIT-INTERNAL launcher first. It travels with the kit, so it is the only one an adopter is
+  # guaranteed to have; `tools/lib/pyrun.sh` is gov-internal and ships nothing, and a wiring that
+  # names it in an adopting repo execs a command that cannot start. A driver that never starts never
+  # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
+  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" tools/lib/pyrun.sh lib/pyrun.sh)
+  if [ -z "$launcher" ]; then
+    echo "UNWIRED  merge     — $drv is present but no launcher is: expected $(dirname "$drv")/merge-rows.sh beside it. git would exec a command that cannot start, and a driver that never starts leaves OURS-only content with no conflict markers. Fix: re-copy the memory-tree kit"
     unwired=$((unwired+1))
     return
   fi
-  want="bash $shim $drv %O %A %B %P"
+  # pyrun.sh takes the driver as an argument; the kit launcher already knows its own sibling.
+  case "$launcher" in
+    */merge-rows.sh) want="bash $launcher %O %A %B %P" ;;
+    *)               want="bash $launcher $drv %O %A %B %P" ;;
+  esac
   # ONE call over every tracked path, and it reads what GIT judges rather than grepping
   # `.gitattributes` — attributes come from several files, the same rule check_eol follows. Looping
   # per file would be ~500 process spawns inside a SessionStart hook; `--stdin` is one process
@@ -284,7 +292,7 @@ check_merge_rows() {
     return
   fi
   # RUN THE COMMAND, do not pattern-match its parts. "Wired" is "the command git will exec actually
-  # merges", and the three tests above — driver exists, shim exists, config string matches — are all
+  # merges", and the three tests above — driver exists, launcher exists, config string matches — are all
   # path-and-string. They cannot see the two runtime dependencies the driver reaches for at merge
   # time: `lib/resolve-python.sh`, which `pyrun.sh` sources, and the sibling memory-recall kit that
   # owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
@@ -335,7 +343,13 @@ check_merge_rows() {
     printf -- '- %s-001 | base\n- %s-002 | ours\n'    "$f" "$f" >> "$smoke/a"
     printf -- '- %s-001 | base\n- %s-003 | theirs\n'  "$f" "$f" >> "$smoke/b"
   done
-  bash "$shim" "$drv" "$smoke/o" "$smoke/a" "$smoke/b" merge-rows-smoke \
+  # Run the SAME argv the wiring declares, minus git's placeholders, so the smoke proves the
+  # CONFIGURED command starts rather than a second spelling of it that might start when it does
+  # not. The two launcher shapes take different argv, so rebuilding the command here by hand was
+  # a standing way for the probe to disagree with the thing it blesses.
+  # shellcheck disable=SC2086
+  set -- ${want%% %O %A %B %P}
+  "$@" "$smoke/o" "$smoke/a" "$smoke/b" merge-rows-smoke \
     >/dev/null 2>"$smoke/err" || rc_smoke=$?
   # rc alone is not enough: assert every row of all three inputs is in %A exactly once. A driver that
   # exits 0 without touching %A is the same silent take-ours by another route, and one that keys only
@@ -346,7 +360,7 @@ check_merge_rows() {
     done
   done
   if [ "$rc_smoke" != 0 ] || [ -n "$miss" ]; then
-    echo "UNWIRED  merge     — the configured driver cannot merge: 'bash $shim $drv' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore $(dirname "$shim")/resolve-python.sh and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
+    echo "UNWIRED  merge     — the configured driver cannot merge: '$launcher' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore the launcher beside $drv and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
     unwired=$((unwired+1))
     rm -rf "$smoke"
     return
@@ -370,7 +384,7 @@ check_merge_rows() {
     return
   fi
   if [ "$hs" != 0 ]; then
-    echo "UNWIRED  merge     — the driver runs and resolves, but it keyed only $kd of the smoke's $((kd + hs)) rows and HASHED $hs of them: the anchor grammar it imports does not recognise ids it declares (families:${fams:+ }${fams% }). Rows that only hash still merge, so nothing fails loudly, but the id-level no-duplicate guarantee is off on the files this driver is wired to. Fix: check .memory-tree.conf FAMILIES against the ids the indexes use and that $(dirname "$shim")/../memory-recall/extract.py is the shipped grammar, then re-run"
+    echo "UNWIRED  merge     — the driver runs and resolves, but it keyed only $kd of the smoke's $((kd + hs)) rows and HASHED $hs of them: the anchor grammar it imports does not recognise ids it declares (families:${fams:+ }${fams% }). Rows that only hash still merge, so nothing fails loudly, but the id-level no-duplicate guarantee is off on the files this driver is wired to. Fix: check .memory-tree.conf FAMILIES against the ids the indexes use and that the memory-recall kit beside $drv ships the grammar, then re-run"
     unwired=$((unwired+1))
     rm -rf "$smoke"
     return

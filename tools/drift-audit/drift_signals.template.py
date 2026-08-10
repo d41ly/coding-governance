@@ -2,8 +2,8 @@
 
 gov:kit drift-audit@1.0
 
-Copied from drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
-then run `python drift-audit/drift_report.py`.
+Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
+then run `python tools/drift-audit/drift_report.py`.
 
 The engine (`drift_report.py`) owns the five signal IMPLEMENTATIONS. This file owns only what is
 genuinely repo-shaped. The corpus root and disciplines are NOT here — they come from

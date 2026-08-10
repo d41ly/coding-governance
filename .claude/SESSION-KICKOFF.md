@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T16:59:16+03:00 @ 16aeb5efe98083c31a927a73541644020ee6bb57
+last-audit: 2026-08-10T19:56:04+03:00 @ 16aeb5efe98083c31a927a73541644020ee6bb57
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -145,6 +145,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   ratchet (`tools/gate-legs.json` is a watched pathspec, so `last-audit` re-stamps), and drift-audit's
   handkept signal (cite the leg's script path in this charter's `## The gate suite` section). That
   last one has ZERO slack — the pin is 7 of 40 at tolerance 0, so an uncited leg 41 reds immediately.
+- A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never
+  spelled. Three shapes ship here: shell `KIT_REL=${HERE#"$ROOT_N"/}` with both sides normalised
+  through the same `cd … && pwd` chain (`adopt-memory-tree.sh`), python `kit_rel()` walking up for
+  `.git` (`gen_build_index.py`), and brace-delimited KIT_DIR / TOOL_ROOT placeholders rendered at
+  scaffold time (`HYGIENE.template.md`; the literal token shape is omitted here because the manifest
+  ratchet's check 1 scans this file for exactly it). A hardcoded prefix in a RENDERED artifact is the worst case — it
+  lands a dead path in the adopter's own committed tree and the byte-compare that guards the file
+  agrees with it.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

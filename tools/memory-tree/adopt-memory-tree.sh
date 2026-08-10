@@ -3,11 +3,21 @@
 # For a NEW project. (A project MIGRATING an existing docs tree does that once as its own landing —
 # see README.md "Adopting into an existing tree"; the tree shape below is the target either way.)
 #
-#   memory-tree/adopt-memory-tree.sh --scaffold
+#   tools/memory-tree/adopt-memory-tree.sh --scaffold
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# This install's own prefix, derived once and used for every path this script WRITES or PRINTS.
+# Both sides are normalised through the same `cd ... && pwd` chain on purpose: under MSYS one
+# directory has two spellings (a drive-letter one from `git rev-parse`, a mount-point one from
+# `pwd`) and a raw strip across those flavors silently yields an ABSOLUTE path, which then
+# substitutes nothing and looks like it worked.
+ROOT_N="$(cd "$ROOT" && pwd)"
+KIT_REL=${HERE#"$ROOT_N"/}
+[ "$KIT_REL" != "$HERE" ] || { echo "memory-tree: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
+TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 MEMORY_ROOT=memory
 # DISCIPLINES is a CLOSED ENUM of stream values, not a directory list (kit 1.5). The tree is flat.
 DISCIPLINES="architecture deployment blocks design performance"   # demo defaults; a real .memory-tree.conf overrides these
@@ -39,11 +49,15 @@ fi
 # redirects below cannot create their own directory.
 mkdir -p "$M/project" "$M/builds" "$M/backlog"
 # root index + rules
-if [ -f "$HERE/HYGIENE.template.md" ]; then cp "$HERE/HYGIENE.template.md" "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
-if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then cp "$HERE/SPEC-TEMPLATE.template.md" "$M/TEMPLATE-SPEC.md"; fi
+# RENDERED, not copied: these two land in the adopter's tree as their committed rule set, so a
+# verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
+# owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
+render_doc() { sed -e "s|{{KIT_DIR}}|$KIT_REL|g" -e "s|{{TOOL_ROOT}}|$TOOL_ROOT|g" "$1" | tr -d "\r"; }
+if [ -f "$HERE/HYGIENE.template.md" ]; then render_doc "$HERE/HYGIENE.template.md" > "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
+if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLATE.template.md" > "$M/TEMPLATE-SPEC.md"; fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
-  echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards (memory-tree/gen_build_index.py)."; echo
+  echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo
   echo "The discipline is a SIGNAL, not a directory. A build folder is named for its slug alone; which"
   echo "discipline it served is declared in each spec's status header as \`streams <value>[+<value>]\`,"
   echo "over the closed enum \`.memory-tree.conf\` declares."; echo
@@ -148,9 +162,9 @@ git add "$M" >/dev/null 2>&1 || true
 echo "Scaffolded $M/ ($(echo $DISCIPLINES | wc -w) disciplines) — staged."
 echo "Next:"
 echo "  1. git add $M/ .memory-tree.conf && commit."
-echo "  2. Wire the gate: add 'bash memory-tree/check-memory-hygiene.sh' to CI + your local gate runner;"
+echo "  2. Wire the gate: add 'bash $KIT_REL/check-memory-hygiene.sh' to CI + your local gate runner;"
 echo "     add a pre-commit fast leg calling it with --staged on staged $M/** paths."
-echo "  3. Verify: bash memory-tree/check-memory-hygiene.sh ; echo \$?   (expect 0)"
+echo "  3. Verify: bash $KIT_REL/check-memory-hygiene.sh ; echo \$?   (expect 0)"
 echo "  4. Arm the spec-format ratchet: set SPEC_FORMAT_CUTOFF=<today> in .memory-tree.conf"
 echo "     (every spec dated >= it must follow $M/TEMPLATE-SPEC.md — hygiene check 12)."
 echo "  5. Arm the streams ratchet: set STREAMS_CUTOFF in .memory-tree.conf STRICTLY AHEAD of every"

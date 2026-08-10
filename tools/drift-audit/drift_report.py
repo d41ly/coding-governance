@@ -3,9 +3,9 @@
 
 gov:kit drift-audit@1.0
 
-    python drift-audit/drift_report.py            # human table, always exits 0
-    python drift-audit/drift_report.py --json     # machine-readable, always exits 0
-    python drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
+    python tools/drift-audit/drift_report.py            # human table, always exits 0
+    python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
+    python tools/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.

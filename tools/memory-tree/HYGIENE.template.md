@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.2 -->
+<!-- gov:kit memory-tree@2.3 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -8,7 +8,7 @@ The tree is FLAT: the discipline is a SIGNAL, not a directory. Which discipline 
 declared in each spec's status header as `streams <value>[+<value>]`, over the closed enum your
 repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two disciplines is one
 build, in one folder.
-This file is the rule set; the single mechanical enforcement is `memory-tree/check-memory-hygiene.sh`
+This file is the rule set; the single mechanical enforcement is `{{KIT_DIR}}/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
 script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
 
@@ -17,7 +17,7 @@ script is the law, this doc explains it. (Replace `memory/` throughout with your
 ```
 memory/
 ├── README.md              root index (one-liners)
-├── LIVE.md                GENERATED — builds with a non-terminal unit (memory-tree/gen_build_index.py)
+├── LIVE.md                GENERATED — builds with a non-terminal unit ({{KIT_DIR}}/gen_build_index.py)
 ├── ledger/<YYYY-MM>.md    GENERATED — one row per build opened that month; freezes when the month passes
 ├── HYGIENE.md             this file
 ├── TEMPLATE-SPEC.md       the canonical spec/design-pass format (check 12; ships with the kit)
@@ -95,7 +95,7 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 All five are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
-## The check catalog (all in `memory-tree/check-memory-hygiene.sh`; this file is the prose home)
+## The check catalog (all in `{{KIT_DIR}}/check-memory-hygiene.sh`; this file is the prose home)
 
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
@@ -120,7 +120,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    a guide is prose, not index rows.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
-9. **build-index drift** — `memory-tree/gen_build_index.py --check` must be clean. The index is
+9. **build-index drift** — `{{KIT_DIR}}/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
@@ -158,7 +158,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
     `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
 
-Checks 13-16 live in `memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
+Checks 13-16 live in `{{KIT_DIR}}/corpus_ids.py` and are DISABLED when their pins are blank.
 Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
 copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
 memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
@@ -206,7 +206,7 @@ aggregate: a total lets one gate's deletion be masked by another gate's addition
 whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
 the walk, so one bad gate cannot hide every other gate's findings.
 
-`memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
+`{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
 The pin is EMPTY today — 30 of 30 branches across both gates are armed — and an empty pin is the
 file's working state, not its retirement. A row appears when a new branch lands that no fixture can
@@ -230,7 +230,7 @@ REPORTED as unanchored rather than silently never firing.
 Hand a reviewer the classes their diff can hit:
 
 ```bash
-python memory-tree/gotchas.py --for-diff <base>..<head>
+python {{KIT_DIR}}/gotchas.py --for-diff <base>..<head>
 ```
 
 Its stdout IS the checklist. A checklist nobody can finish is not a checklist.

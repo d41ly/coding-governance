@@ -97,14 +97,14 @@ either way:
 bash tools/check-wiring.sh --fix     # resolves both prefixes, then sets ONE string
 ```
 
-`check-wiring.sh` probes for `pyrun.sh` and `merge-rows.py` at each prefix and sets exactly one of
-the two commands below. They are quoted here so you can VERIFY what it set — not so you can retype
+`check-wiring.sh` probes for `merge-rows.sh` and `merge-rows.py` at each prefix and sets exactly one
+of the two commands below. They are quoted here so you can VERIFY what it set — not so you can retype
 one of them:
 
 - kit under a `tools/` prefix (what this repo dogfoods):
-  `bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P`
+  `bash tools/memory-tree/merge-rows.sh %O %A %B %P`
 - kit copy-installed at the repo root:
-  `bash lib/pyrun.sh memory-tree/merge-rows.py %O %A %B %P`
+  `bash memory-tree/merge-rows.sh %O %A %B %P`
 
 A command that MIXES the two prefixes names a driver that exists in neither layout, and that failure
 is not loud. Git prints `CONFLICT (content)`, but a driver that never starts never writes `%A`, so

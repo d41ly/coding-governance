@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-memory-recall.sh — render the memory-recall Skill from `.memory-tree.conf` and converge.
 #
-#   memory-recall/adopt-memory-recall.sh --scaffold [--with-hook]
-#   memory-recall/adopt-memory-recall.sh --check                  # gate leg: has the skill drifted?
+#   tools/memory-recall/adopt-memory-recall.sh --scaffold [--with-hook]
+#   tools/memory-recall/adopt-memory-recall.sh --check                  # gate leg: has the skill drifted?
 #
 # The Skill's `description` is the whole trigger mechanism and it names project values (the id
 # families, the query-script path, the corpus root), so the skill is GENERATED from the conf rather

@@ -212,20 +212,38 @@ else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 # The arm used to sit inside `if BOTH files exist`, so a DELETED wired copy satisfied it by absence —
 # the parity assertion's own failure mode. Inside the governance repo the pair is REQUIRED; in an
 # adopting tree with no tools/hooks/ the arm skips loudly instead of vanishing.
+# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `tools/hooks/` made
+# this arm disarm itself in every tree that installs the kit anywhere else: measured in a scratch
+# repo with the kit at `<root>/hooks/` and NO wired copy at all, this file reported "39 passed, 0
+# failed", exit 0. A stale wired hook enforcing yesterday's fan-out rules was undetectable there.
+# Finding nothing is still a legitimate skip — an adopting tree need not carry the kit — but finding
+# the kit and then not checking it is not.
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
-if [ -n "$ROOT" ] && [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
+KITJS=""
+if [ -n "$ROOT" ]; then
+  for c in "$ROOT/tools/hooks/agent-cap.js" "$ROOT/hooks/agent-cap.js"; do
+    [ -f "$c" ] && { KITJS="$c"; break; }
+  done
+  # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
+  if [ -z "$KITJS" ]; then
+    rel=$(git -C "$ROOT" ls-files -- '*/hooks/agent-cap.js' 'hooks/agent-cap.js' 2>/dev/null \
+          | grep -v '^\.claude/' | head -1)
+    [ -n "$rel" ] && KITJS="$ROOT/$rel"
+  fi
+fi
+if [ -n "$KITJS" ]; then
   if [ ! -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
     echo "FAIL the wired copy .claude/hooks/agent-cap.js is MISSING (parity must not be satisfiable by absence)"
     fail=$((fail+1))
-  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$ROOT/tools/hooks/agent-cap.js") >/dev/null; then
+  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$KITJS") >/dev/null; then
     echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
   else
-    echo "FAIL .claude/hooks/agent-cap.js has drifted from tools/hooks/agent-cap.js"
-    echo "     fix: cp tools/hooks/agent-cap.js .claude/hooks/agent-cap.js"
+    echo "FAIL .claude/hooks/agent-cap.js has drifted from ${KITJS#"$ROOT/"}"
+    echo "     fix: cp ${KITJS#"$ROOT/"} .claude/hooks/agent-cap.js"
     fail=$((fail+1))
   fi
 else
-  echo "skip the two-copy parity arm — no tools/hooks/agent-cap.js in this tree"
+  echo "skip the two-copy parity arm — no kit copy of agent-cap.js is tracked in this tree (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/)"
 fi
 
 echo "---- $pass passed, $fail failed ----"

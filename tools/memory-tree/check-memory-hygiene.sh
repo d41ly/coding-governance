@@ -5,12 +5,12 @@
 # of truth: HYGIENE.md's "Check" section, CI, the pre-commit hook, and the local gate runner all invoke
 # THIS script — never hand-copy the checks. Part of the coding-governance memory-tree kit.
 #
-#   memory-tree/check-memory-hygiene.sh            # full check
-#   memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (set-checks tree-wide, file-checks on staged paths)
+#   tools/memory-tree/check-memory-hygiene.sh            # full check
+#   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (set-checks tree-wide, file-checks on staged paths)
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.2   # gov:kit memory-tree@2.2 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.3   # gov:kit memory-tree@2.3 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
