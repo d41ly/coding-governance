@@ -88,10 +88,13 @@ expression, a `.length`, a parameter, or a literal above 5.
 
 **`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
 or an identifier bound DIRECTLY by `const <name> = <int>` and never reassigned. An `<expr> || <int>`
-right-hand side does NOT resolve. It reads as a constant and behaves as a knob: `(args && args.cap)
-|| 5` let two shipped harnesses raise their own agent count from the caller while the guard read the
-5 and every gate stayed green. The form is still legal JavaScript and still fine for constants
-nothing here resolves — only its use as a BOUND is refused.
+right-hand side does NOT resolve. It reads as a constant and behaves as a knob: an
+`(args && args.<knob>) || 5` fallback let two shipped harnesses raise their own agent count from the
+caller while the guard read the 5 and every gate stayed green. The form is still legal JavaScript and
+still fine for constants nothing here resolves — only its use as a BOUND is refused. (The retired
+spelling is paraphrased rather than quoted: this document renders into `workflows/`, which the
+acceptance grep for that spelling sweeps, so quoting it would make the ban fire on the text
+explaining the ban.)
 
 The marker is a claim; the gate checks the claim's SHAPE. `chunk(all, 1) // gov:fixed-verifiers`
 reds, and so does `splitInto(all, all.length)` — blessing a helper by NAME would bless `chunk`
