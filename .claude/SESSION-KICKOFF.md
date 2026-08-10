@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T11:03:18+03:00 @ e6fb7047fabb500b4e2405e34cb61bfbec2bca57
+last-audit: 2026-08-10T13:16:10+03:00 @ e7ec3365175f58f8a8c4ad7b8476d14433bba3f3
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -127,6 +127,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   conf, bounded by `.git`), and the `CODEBASE_MAP_ROOT` workaround that preceded it is now BANNED by
   the kit's own selftest. Kept as a trap because the class outlives the instance: this repo installs
   every kit under `tools/`, so a kit written against a root install is wrong here by one segment.
+- Two memory-tree spec-authoring traps, both found by hitting them. A build README's `roster:` is
+  `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with "roster value 'PLAY TOOL' is
+  outside the FAMILIES set", which reads like a families misconfiguration rather than a separator.
+  And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
+  spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
+  Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides
