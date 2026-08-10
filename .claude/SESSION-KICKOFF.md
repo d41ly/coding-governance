@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T19:52:00+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T20:04:15+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -33,9 +33,12 @@ here is short — `AGENTS.md` (the charter) holds the substance.
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
-- **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit ask.
+- **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
+  ask, or a committed standing mandate naming the build and both actions (`memory/guides/UNATTENDED-PROTOCOL.md`).
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
+  Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
+  `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
 
 ### Pointer map (load the row(s) the task touches)
 

@@ -54,6 +54,7 @@
       "memory-recall",
       "memory-tree",
       "pytest-parallel-guardrails",
+      "unattended",
       "workflows"
     ],
     "git-hooks": [
@@ -86,7 +87,8 @@
       "vacuous-selector-empty-population.md"
     ],
     "guides": [
-      "REVIEW-PROTOCOL.md"
+      "REVIEW-PROTOCOL.md",
+      "UNATTENDED-PROTOCOL.md"
     ],
     "backlog-shards": [
       "DEPL.md",

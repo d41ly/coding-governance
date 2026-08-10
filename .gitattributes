@@ -76,6 +76,19 @@ parallel-coding-governance*.md text eol=lf
 # shipped example is pinned too, because the adopter copies it to the sourced path verbatim.
 .memory-tree.conf text eol=lf
 tools/memory-tree/.memory-tree.conf.example text eol=lf
+
+# The unattended-run kit's conf, pinned for the identical reason as the two above: it is SOURCED BY
+# BASH by the driver and by the gate leg, with no CR stripping. Its values are shell COMMANDS
+# (`LANDER`, `GATE_CMD`, `WIRING_CHECK`) — a trailing CR on a CRLF checkout does not merely dirty a
+# string here, it appends a carriage return to the command the run lands with.
+.unattended.conf text eol=lf
+tools/unattended/.unattended.conf.example text eol=lf
+# The shipped protocol is BYTE-COMPARED against this repo's installed copy under `memory/guides/`,
+# which `memory/**/*.md` already pins. A gate that byte-compares needs BOTH halves — the pin so the
+# committed bytes are right, and CR normalisation in the comparison so a Windows checkout does not
+# red every line — and the shipped half had only the second.
+tools/unattended/*.md text eol=lf
+
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf
 memory/map/affordance-exempt.toml text eol=lf

@@ -1,14 +1,40 @@
-# Governance domain rules — runtime, cross-OS, architecture, security, recurring bugs & design system
+# Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
 <!-- governance-template: v2.5 -->
 
-Companion to `parallel-coding-governance.template.md`, holding eight activity-scoped domain sections
+Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a
-risky surface or runs a Tier-2 review). Deploy this file alongside the playbook and re-pull it in
-lockstep — the marker above must read the same version as the template's. Numbering is one-to-one:
-companion §N extends template §N, and the template's §4 and §7–§13 stubs each point at exactly one
-section here. Four are droppable-per-project (§4, §9, §11 and §13, per the customize companion); §7,
-§8, §10 and §12 are universal core.
+risky surface, runs a Tier-2 review, or runs with no human in the loop). Deploy this file alongside
+the playbook and re-pull it in lockstep — the marker above must read the same version as the
+template's. Numbering is one-to-one: companion §N extends template §N, and the template's §1, §4 and
+§7–§13 stubs each point at exactly one section here. Four are droppable-per-project (§4, §9, §11 and
+§13, per the customize companion) and §1's unattended block is a fifth, line-scoped one; §7, §8, §10
+and §12 are universal core.
+
+## §1 — Work-unit lifecycle: the manifest merge exception, and unattended runs
+
+*Two independent blocks. The first applies whenever the project keeps a kickoff manifest. The second
+applies only when the project adopts the unattended-run kit — drop it otherwise.*
+
+**Kickoff-manifest merge exception.**
+
+- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
+
+**Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
+
+- An unattended run is one that will merge and push with no owner turn between start and finish. The explicit-ask checkpoint is not removed, it is REPLACED by something a machine can check — if the replacement is not checkable, the run is not unattended, it is unsupervised.
+- Authorization is a **committed standing mandate** naming the build and both actions. The run ASSERTS it and never writes it; it must be reachable from the pinned BASE and not introduced by a commit on the run's own branch. A run that can author its own mandate authorizes itself, and every gate certifies it.
+- Only the mandate's SHAPE is checkable. That is a reason to make the two provenance properties mechanical, not a reason to skip the check.
+- The run's state lives in ONE file per build, split mechanically: a GENERATED region the driver renders and the gate byte-compares, and an AUTHORED region holding only what nothing in the tree derives. An authored half that restates a derived fact is the two-answers-to-one-question class, and the derived half is the one that never rots.
+- Authored rows cite ids INLINE IN PROSE. A dash or pipe row leading with an id anchors it under this build folder, and a run-state file naturally wants cross-build rows — a parked dependency, a blocked unit elsewhere — which is exactly the shape that collides.
+- Phases come from a declared vocabulary with named terminal members, and each claim carries a PRESENT witness (a sha, a tag, a run id). Presence is its own refusal: an oracle that skips an unwitnessed claim as unjudgeable makes "name no witness" the cheapest way to say nothing, and the run is the sole author of that field.
+- At most ONE run-state file in the tree may be non-terminal, or "the run" is undefined and anything keyed on it must either OR the phases (a tree-wide false deny) or pick one (nondeterminism).
+- The kit owns a CORE phase vocabulary and a CORE Definition-of-Done set; the project may EXTEND both and delete from neither. Deletion is otherwise a silent, reason-free override of everything keyed on them — assert core membership against a shrink-only floor.
+- The keepalive is an AGENT obligation on BOTH ends. The scheduling store is in-memory and session-scoped, so no script can create or reap the job; the driver only RECORDS the id the agent hands it and asserts a recorded reap, and labels the item agent-attested wherever it reports.
+- `--close` BLOCKS on an unmet DoD item. The override is named, recorded as a parked entry, and surfaced in the wrap-up. Agent-attested items do NOT spend the override budget — attestation is not a machine verdict, and counting it as one makes an override look like a failed check.
+- Land through the project's declared lander and NEVER with a hook-bypass flag. A mandatory lander exists because it reconciles the remote BEFORE the gate; an unattended run that meets its refusal with nobody to interpret it either stalls or learns to bypass, and bypassing discards the whole bar the mandate leaned on.
+- Preflight delegates to the project's non-repairing wiring CHECK, never the repairing mode: repair sets git config and rewrites tracked bytes, and the run's first act must not be the mode whose over-firing is the cautionary case.
+- Parked decisions carry the question, the options seen, and the reason the run refused. A bare "parked" is indistinguishable from "forgotten", and the wrap-up is where the owner gets the turn the run did not take.
 
 ## §4 — Runtime isolation & the verification harness
 

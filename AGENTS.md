@@ -25,6 +25,10 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
   that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
+  `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
+  reads the project's `.unattended.conf` declarations rather than restating them — a run that will
+  merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
+  mandate it ASSERTS and cannot have written),
   `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
   attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
@@ -114,4 +118,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
   in a companion, not the template.
 - Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask.**
+- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed standing
+  mandate naming the build and both actions**, whose shape the merge bar validates. The mandate is
+  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE:
+  a run that authors its own authorization has none. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.

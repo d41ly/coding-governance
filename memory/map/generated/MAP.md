@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 40 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 2 · gotcha-classes: 10 · guides: 1 · backlog-shards: 4
+Inventories: gate-legs: 40 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 2 · gotcha-classes: 10 · guides: 2 · backlog-shards: 4
 
 ## gate-legs
 
@@ -64,6 +64,7 @@ Inventories: gate-legs: 40 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 | `memory-recall` | baseline |
 | `memory-tree` | baseline |
 | `pytest-parallel-guardrails` | baseline |
+| `unattended` | unattended |
 | `workflows` | baseline |
 
 ## git-hooks
@@ -115,6 +116,7 @@ Inventories: gate-legs: 40 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 | key | claimant |
 |---|---|
 | `REVIEW-PROTOCOL.md` | baseline |
+| `UNATTENDED-PROTOCOL.md` | unattended |
 
 ## backlog-shards
 
