@@ -1,6 +1,6 @@
 # TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to
 
-**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2
+**Status:** INPROGRESS · rev-5 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · built 3086cab..3aec132
 
 ## 1. Goal
 
@@ -325,30 +325,33 @@ this unit.
 
 ## 8. Open questions
 
-### F4 — does `PreToolUse` actually fire for a direct `Agent` spawn?
+### F4 — does `PreToolUse` actually fire for a direct `Agent` spawn? — RESOLVED at build, YES
 
-S15 depends on it and it is NOT established. The hook documentation does not enumerate the tool names
-usable as a `PreToolUse` matcher, and it documents a SEPARATE `SubagentStart` event for subagent
-spawns whose matcher filters on `agent_type` rather than on a tool name. `SubagentStart` explicitly
-cannot block: exit 2 shows a notice and the subagent starts regardless.
+Measured at the build's first step, ahead of any S15 code, exactly as this fork required. A throwaway
+`PreToolUse` hook wired on the `Agent` matcher captured a real spawn on node a:
 
-**First build step, ahead of any S15 code (AC22):** wire a throwaway hook on the `Agent` matcher,
-make one spawn, and record whether a payload arrives and what `tool_name` it carries.
+- `PreToolUse` **does** fire, and `tool_name` arrives as exactly `Agent`.
+- The payload carries `session_id`, `prompt_id` and `tool_use_id`, all present — the three fields S15
+  keys on.
+- Full key set observed: `session_id transcript_path cwd prompt_id permission_mode effort
+  hook_event_name tool_name tool_input tool_use_id`.
 
-**Fallback if it does not fire:** S15 becomes a `SubagentStart` COUNTER that records and reports but
-cannot deny. The number then stays unenforced at spawn time for direct `Agent` calls, and that
-residual is written into `memory/guides/REVIEW-PROTOCOL.md` under S11's rewrite rather than implied
-away — that document already has a section for exactly this, naming where enforcement does NOT reach.
+A LIVENESS PROBE ran before it and is the reason the measurement is trustworthy. Hook settings could
+plausibly be snapshotted at session start, in which case a mid-session matcher edit would not be live
+and the `Agent` probe would return a FALSE NEGATIVE — wrongly triggering the fallback below and
+rewriting this spec. So a throwaway hook was first wired on `Bash` and observed firing on the very
+call that checked for it: settings ARE re-read mid-session.
 
-**Recommendation:** measure before speccing further. Do not build S15 on the assumption, and do not
-let S14 wait on it, since S14 is inert either way.
+The `SubagentStart` fallback therefore does **not** apply and is not built. S15 landed as specced,
+with one design correction recorded in rev-5.
 
-### F1 — what happens when `AGENT_CAP` is set after this unit
+### F1 — what happens when `AGENT_CAP` is set after this unit — RESOLVED, deny
 
-`AGENT_CAP` becomes meaningless once the ceiling is the file constant. Options: deny with an
-explanatory message so the misconfiguration is discoverable, or ignore it with a one-line stderr
-notice. **Recommendation:** deny. A silently-ignored knob that used to appear to work is how the
-current false doc claim survived two releases.
+Ratified at build by this fork's own recommendation, since nothing in the alternative was left
+undecided by evidence: a set `AGENT_CAP` is REFUSED with a message naming the value and the file
+constant that replaced it. A silently-ignored knob that used to appear to work is how the false
+override claim survived two releases, and ignoring it would repeat exactly that. Arms both ways in
+`tools/hooks/agent-cap.test.sh`: set → deny with the message, unset → nothing changes.
 
 ### F2 — `MAX_LENSES` is 6 while `MAX_VERIFIERS` is 5
 
@@ -358,12 +361,13 @@ lens allowance is a find-stage affordance, or gate the two by stage. **Recommend
 document it, because `REVIEW-PROTOCOL.md:94` explicitly prescribes adding lenses rather than skeptics
 for a large surface. A decision is owed either way.
 
-### F3 — how far S12 bumps the drift-audit kit
+### F3 — how far S12 bumps the drift-audit kit — RESOLVED, minor
 
-S5 narrows an `args` contract the kit ships, which is a breaking change for an adopter passing
-`cap` or `maxVerifiers`. Options: a minor bump with a migration line, or a major bump.
-**Recommendation:** minor with the migration line, because the removed inputs never worked as
-documented on any adopter whose hook enforced the rule.
+Ratified at build by this fork's own recommendation: drift-audit 1.0 → 1.1, with the migration
+paragraph in `tools/drift-audit/README.md`. All four of the kit's version literals moved together
+(the engine constant, the README marker, and each harness's `meta.version` + `gov:kit` marker), and
+`tools/check-kit-versions.sh` now holds each harness's `meta.version` to the kit constant so the
+next half-bump reds instead of passing.
 
 ## 9. Revision log
 
@@ -391,6 +395,29 @@ documented on any adopter whose hook enforced the rule.
   the five missing Files-touched rows, the three-commit Rollout, the section 5 security split, the
   gate list, the title and section 1 which described only half the unit, and F4 for the seam this
   unit has not measured.
+
+- rev-5 · 2026-08-10 · BUILT, all three Rollout commits, each gated by the full bar:
+  `3086cab` (S1-S13) · `fb29755` (S14) · `3aec132` (S15). Every acceptance criterion AC1-AC27
+  observed; AC12, AC14 and AC20 measured as live negatives and restored. `agent-cap.test.sh` grew
+  from 34 arms to 59, `check-wiring.test.sh` from 56 to 58. Kits moved: agent-cap 1.1 → 1.3,
+  settings-merge 1.0 → 1.1, drift-audit 1.0 → 1.1.
+
+  Three forks closed by the build: F4 measured YES (see §8, and the liveness probe that makes the
+  measurement trustworthy), F1 and F3 ratified by their own recommendations. F2 (`MAX_LENSES` 6 vs
+  `MAX_VERIFIERS` 5) remains OPEN and is untouched — no code moved for it, as §3 said.
+
+  ONE DESIGN CORRECTION, found by building. S15 specified create-a-token-then-count. That cannot
+  satisfy its own AC24: six concurrent processes each observe a count between their own ordinal and
+  six, so SEVERAL deny where the AC requires exactly one, nondeterministically. The atomic create is
+  the only part of create-and-count that decides anything, so the built form claims a NUMBERED slot
+  with `O_EXCL` — exactly five slots can ever exist, so the sixth and beyond is refused every time.
+  AC24 runs eight rounds rather than one for the same reason the spec gave for running it repeatedly.
+
+  Two predicate defects found by running the new gate over the real tree BEFORE trusting it, per the
+  manifest's standing trap. The S1 call-site check denied `tools/workflows/tier2-review.js` — this
+  repo's own review harness — on its trailing comma, which split into a phantom second argument
+  reading as a cap of nothing. And AC10's repo-wide grep matched the comments explaining the ban it
+  greps for, the same shape that broke the `LC_ALL` ban in `TOOL-aBatchedLintel-1`.
 
 ## 10. Reuse audit
 

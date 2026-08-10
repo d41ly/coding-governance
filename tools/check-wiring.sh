@@ -34,13 +34,37 @@ abspath() { ( cd "$1" 2>/dev/null && pwd ); }
 # First of the candidates that is a file ("" if none).
 first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 
-# THE wired signal, for every arm: the hook's marker substring present in .claude/settings.json.
-# settings-merge.py documents that same substring as the deployer's is-it-wired test (its module
-# docstring), so this is the one predicate stated once — not a second spelling of it. Grepping it
-# directly also removes the "settings-merge.py absent, cannot verify" skip, which was a false
-# all-clear in every adopter (the tool is copied in per WIRE §3c step 4 / §5, so an arm that
-# REQUIRED it to answer reported `skip … exit 0` on the state the runbook calls the one bad state).
-wired() { [ -f .claude/settings.json ] && grep -qF "$1" .claude/settings.json; }
+# THE wired signal, for every arm: the hook's marker substring present in .claude/settings.json —
+# INSIDE A GROUP WHOSE MATCHER IS THE ONE THE FRAGMENT DECLARES. settings-merge.py documents that
+# same substring as the deployer's is-it-wired test (its module docstring), so the marker half is the
+# one predicate stated once — not a second spelling of it. Reading it here also removes the
+# "settings-merge.py absent, cannot verify" skip, which was a false all-clear in every adopter (the
+# tool is copied in per WIRE §3c step 4 / §5, so an arm that REQUIRED it to answer reported
+# `skip … exit 0` on the state the runbook calls the one bad state).
+#
+# THE MATCHER HALF IS NEW, AND IT IS THE WHOLE POINT. A file-wide grep for `agent-cap.js` answers
+# "is the hook mentioned"; the question is "does it fire on the events it must". A group still
+# matching only `Workflow` — the state where a direct `Agent` spawn meets no rule at all — contains
+# the string and reported `ok`, so the arm could not tell a correctly-widened wiring from a stale one
+# and never could have. Same class as the merge arm's "declared vs wired" gap.
+#
+# Read WITHOUT a JSON parser on purpose: this runs as a SessionStart hook and must answer on a host
+# with no python. Flattened, each `{"matcher": …}` group starts a chunk and its own hooks array ends
+# at the first `]`, so the marker and the matcher that governs it are one contiguous span.
+# EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
+# may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
+# migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
+matchers_of() { # marker -> the matcher of each group carrying it (empty if the marker is absent)
+  [ -f .claude/settings.json ] || return 0
+  tr -d ' \t\r\n' < .claude/settings.json \
+    | sed 's/{"matcher":/\n{"matcher":/g' \
+    | sed 's/\].*$//' \
+    | grep -F "$1" \
+    | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
+}
+wired() { # marker · the matcher the fragment declares
+  [ -n "$2" ] && matchers_of "$1" | grep -qxF "$2"
+}
 
 # The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
 # must be resolved by running: a remedy line naming a launcher that cannot execute is a wrong
@@ -87,8 +111,15 @@ check_hooks() {
 
 # --- Check A: agent-cap PreToolUse hook in .claude/settings.json ----------------------------------
 # Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
+#
+# THE MATCHER IS A LIST OF EXACT STRINGS separated by `|`, not a regular expression: the hook fires
+# for `Workflow` (where it reads the script) and for `Agent` (where a direct spawn would otherwise
+# meet no rule at all). A group carrying only `Workflow` is the stale state, and it is named by the
+# value found rather than reported as a generic miss — an operator who is told "unwired" about a
+# hook that is plainly in the file will conclude the checker is broken.
+AGENTCAP_MATCHER='Workflow|Agent'
 check_agentcap() {
-  local smerge; smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  local smerge found; smerge=$(first_of tools/settings-merge.py settings-merge.py)
   # Left as a plain skip on purpose: agent-cap's hook path is not declared anywhere this script can
   # read (settings-merge.py hardcodes it), so "settings wired, script missing" cannot be told from a
   # deliberate out-of-tree copy. The recall arm below CAN — its fragment declares `hook_path`.
@@ -96,12 +127,17 @@ check_agentcap() {
     echo "skip     agent-cap — not adopted (.claude/hooks/agent-cap.js absent)"
     return
   fi
-  if wired "agent-cap.js"; then
-    echo "ok       agent-cap — PreToolUse hook wired in .claude/settings.json"
+  if wired "agent-cap.js" "$AGENTCAP_MATCHER"; then
+    echo "ok       agent-cap — PreToolUse hook wired in .claude/settings.json (matcher '$AGENTCAP_MATCHER')"
+    return
+  fi
+  found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
+  if [ -n "$found" ]; then
+    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-tools/settings-merge.py}"
   else
     echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
-    unwired=$((unwired+1))
   fi
+  unwired=$((unwired+1))
 }
 
 # --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
@@ -116,7 +152,7 @@ json_str() {  # value of a top-level "key": "..." in a small flat JSON file
   sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
 }
 check_recall_opened() {
-  local frag smerge marker hookjs
+  local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/tools/memory-recall/ in this repo.
   frag=$(first_of memory-recall/recall-opened.fragment.json tools/memory-recall/recall-opened.fragment.json)
@@ -127,13 +163,17 @@ check_recall_opened() {
   smerge=$(first_of tools/settings-merge.py settings-merge.py)
   marker=$(json_str "$frag" marker)
   hookjs=$(json_str "$frag" hook_path)
-  if [ -z "$marker" ] || [ -z "$hookjs" ]; then
-    echo "UNWIRED  recall    — $frag declares no marker/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+  # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
+  # not itself declare — the same rule the marker already followed, applied to the half that decides
+  # whether the hook fires at all.
+  rmatcher=$(json_str "$frag" matcher)
+  if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$rmatcher" ]; then
+    echo "UNWIRED  recall    — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
     unwired=$((unwired+1))
     return
   fi
   if [ ! -f "$hookjs" ]; then
-    if wired "$marker"; then
+    if wired "$marker" "$rmatcher"; then
       echo "UNWIRED  recall    — settings.json dispatches the hook but $hookjs is missing; every Read runs node against nothing. Fix: bash $(dirname "$frag")/adopt-memory-recall.sh --scaffold --with-hook"
       unwired=$((unwired+1))
     else
@@ -141,7 +181,7 @@ check_recall_opened() {
     fi
     return
   fi
-  if wired "$marker"; then
+  if wired "$marker" "$rmatcher"; then
     echo "ok       recall    — recall-opened PostToolUse hook wired in .claude/settings.json"
   else
     echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
