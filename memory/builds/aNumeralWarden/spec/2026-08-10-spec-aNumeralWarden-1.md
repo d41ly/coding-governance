@@ -1,6 +1,6 @@
-# TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, not just the helper shape
+# TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to
 
-**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · consumed-by TOOL-aUnmannedHelm-1
+**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2
 
 ## 1. Goal
 
@@ -8,6 +8,11 @@
 the bound itself, so a shipped harness can raise its own verifier count from the caller and every
 gate stays green. This unit makes the hook resolve the number wherever a bound is written, so the
 cap the charter calls BINDING is enforced by a predicate rather than by convention.
+
+The hook also reaches only one of the two ways agents get spawned. It is wired on the `Workflow`
+tool, so it inspects a workflow SCRIPT; a session that fans out with direct `Agent` tool calls meets
+no rule at all. S14 and S15 close that, so this unit has two halves: the hook reads the bound it
+enforces, and it sees the modality it was blind to.
 
 ## 2. Scope (IN)
 
@@ -57,18 +62,40 @@ cap the charter calls BINDING is enforced by a predicate rather than by conventi
 - **S13** — the wired copy `.claude/hooks/agent-cap.js` is re-copied from the kit. It is the file
   `.claude/settings.json:9` actually executes, and `agent-cap.test.sh:215-227` gates the two
   byte-identical.
-- **S14** — the `Agent`-matcher modality refusal, folded in from `TOOL-aUnmannedHelm-1` on
-  2026-08-10 when its owner ratified F2 as a FOLD. The matcher widens as a MEASURED NO-OP commit
-  first, which the tool gate at `agent-cap.js:305` makes provably safe, and only then gains a
-  per-call refusal of a direct `Agent` spawn while the consuming build's run-state file declares a
-  verify phase. It does NOT count: measured on node a, a four-call burst overlapped its hook
-  processes and two of four read the same counter value, so a read-then-decide gate miscounts
-  nondeterministically. The refusal emits its own distinguishable string, because exit 2 is shared
-  by every branch here and an arm phrased on the exit code cannot attribute the deny. Two things
-  this unit must state rather than imply: the fail-open when no run-state file exists, and the
-  session-to-build binding, without which the refusal is either arbitrary or a tree-wide false deny.
-  Also fixes `check-wiring.sh`'s file-wide `agent-cap.js` marker grep, which reports `ok` when only
-  one of two fragments is wired.
+- **S14** — the matcher widening, which is self-contained and provably a no-op. The `PreToolUse`
+  matcher becomes the exact-string LIST `"Workflow|Agent"` in ONE group, which the hook documentation
+  evaluates as a list of exact strings separated by `|` — so there is no second fragment, no second
+  marker, and no `settings-merge.py` dedup question. The widening changes no behaviour by itself,
+  because `agent-cap.js:305` exits 0 on any `tool_name` that is not `Workflow`; the no-op is MEASURED
+  by feeding every existing arm of `agent-cap.test.sh` through the hook before and after and
+  requiring byte-identical output. This half also fixes `check-wiring.sh`'s `wired()` join, which
+  greps the whole of `.claude/settings.json` for the literal `agent-cap.js` and so cannot tell a
+  correctly-widened matcher from a stale `Workflow`-only one: it must assert the matcher VALUE, not
+  that the file contains the string. Ships alone, in its own commit, ahead of S15.
+- **S15** — arity enforcement for direct `Agent` spawns, as an ATOMIC COUNT rather than a modality
+  refusal. Per spawn the hook creates a token file with `O_EXCL` under a `session_id`-keyed directory
+  in the git common dir, named for the payload's `tool_use_id`, then counts the tokens carrying the
+  current `prompt_id` and denies past the cap. Create-and-count with `O_EXCL` is atomic where
+  read-then-decide is not: measured on node a, a four-call burst overlapped its hook processes and
+  two of four read the same count, so a read-then-decide gate loses updates nondeterministically.
+  That measurement refutes a read-then-decide COUNTER; it does not refute counting, and `tool_use_id`
+  is precisely the key that makes the count exact. Tokens are keyed per prompt, so a new user prompt
+  resets the budget with no cleanup; a TTL sweep drops directories older than the window, and a token
+  is removed only by the process that wrote it, per the recorded scar where an unconditional unlink
+  let one builder release another's protection.
+- **S15 is a deliberate REVERSAL and is argued as one.** This spec's own rejected alternative says
+  runtime counting is impossible, and that reasoning holds for the case it was written about: a
+  workflow script runs in a sidechain with no hooks, so nothing observes those spawns. The main-loop
+  `Agent` case differs in kind — a hook does fire, and the payload carries `session_id`, `prompt_id`
+  and `tool_use_id`, all measured present. The rejected alternative is rewritten to name the case it
+  rejects instead of reading as a blanket ban, and `memory/guides/REVIEW-PROTOCOL.md` takes the same
+  distinction under S11, since it currently states the blanket form.
+- **S15 counts every direct `Agent` spawn in a turn, not only review verifiers.** Keying on "is this
+  a verify agent" would need a session-to-build binding that no payload field provides. The charter's
+  concurrency rule already binds every fan-out, so the cap applies uniformly and needs no binding, no
+  run-state file and no phase vocabulary. That is what dissolves the dependency the fold created:
+  nothing in this unit reads `TOOL-aUnmannedHelm-1`'s run-state file, so neither build blocks the
+  other.
 
 ## 3. Non-goals (OUT)
 
@@ -139,9 +166,18 @@ adopters the cap varies by adopter, so the contract change must be visible to ve
 
 ### Rollout
 
-One commit, gated by the full bar. The hook is deployed verbatim into adopting repos, so S10's
-version bump is what tells a deployer the contract moved, and S13's re-copy is what makes the change
-take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` copy, not the kit copy.
+THREE commits, each gated by the full bar, in this order.
+
+1. S1 through S13 — the bound-reading predicate, as specced at rev-2.
+2. S14 alone — the matcher widening plus the `check-wiring.sh` join fix. Provably a no-op on
+   behaviour, so it lands and is observed before any new predicate exists to confuse the observation.
+3. S15 — the atomic count, the only commit that changes what a session is allowed to do.
+
+Reverting commit 3 leaves the widened matcher in place, which is a safe standalone state precisely
+because `agent-cap.js:305` exits 0 on a non-`Workflow` tool name. The hook is deployed verbatim into
+adopting repos, so S10's version bump tells a deployer the contract moved, and S13's re-copy is what
+makes any of it take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` copy,
+not the kit copy, and that re-copy does NOT cover `.claude/settings.json` itself.
 
 ### Files touched (estimate)
 
@@ -158,21 +194,35 @@ take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` c
 | `tools/workflows/REVIEW-PROTOCOL.template.md` | S11 — re-rendered, never hand-edited |
 | `tools/drift-audit/README.md` | S12 — the migration line |
 | `README.md` | S7 |
-| `WIRE-INTO-PROJECT.md` | S7 |
+| `WIRE-INTO-PROJECT.md` | S7 S14 — `:376-393` publishes the Workflow-only matcher block verbatim |
+| `.claude/settings.json` | S14 — the widened matcher; the wiring that actually executes |
+| `tools/settings-merge.py` | S14 S15 — the fragment's matcher, its docstring block, the selftest arms that pin it, and its own version pair |
+| `tools/check-wiring.sh` | S14 — `wired()` asserts the matcher VALUE, not a file-wide grep |
+| `tools/check-wiring.test.sh` | S14 — the arm for a stale Workflow-only matcher |
 
 ### Alternatives rejected
 
 - **Make `AGENT_CAP` the real enforced bound.** Rejected. It converts the cap into the DEFEATABLE
   class the audit flagged across 32 other caps, and an environment variable leaves no diff.
-- **Count agents at runtime instead of statically.** Rejected. `REVIEW-PROTOCOL.md:42` records that a
-  workflow script runs in a sidechain with no hooks, so nothing can observe the spawn.
+- **Count agents spawned INSIDE a workflow script.** Still rejected, and this is the case the
+  original rejection was written about: a workflow script runs in a sidechain with no hooks, so
+  nothing observes those spawns. S15 does not attempt it; the `Workflow` path stays static.
+- **A modality refusal for direct `Agent` spawns** — deny the spawn while a run-state file declares a
+  verify phase. Rejected at rev-4. It expresses a KIND, not a cardinality, so it cannot enforce a
+  number; it fires only under the unattended driver, leaving interactive sessions unguarded, which is
+  the modality that produced the incident; and it needs a session-to-build binding no payload field
+  provides.
 - **Ban the `||` binding form everywhere in the file.** Rejected as too wide. S3 refuses it only
   where a BOUND is being resolved, which covers every path that matters without touching constants
   the hook never reads.
 
 ## 5. Production-readiness checklist
 
-- security — the hook is a guard; every new branch fails closed, matching `agent-cap.js:242-245`.
+- security — the STATIC rules are a guard and every new branch of them fails closed, matching
+  `agent-cap.js:242-245`. S15's count is different and the split is stated rather than blurred: a
+  spawn whose token cannot be created is DENIED, but a session whose token directory cannot be
+  resolved at all fails OPEN and silently, because a hook that denies every spawn on a filesystem
+  hiccup is worse than the burst it prevents. Both directions carry an arm.
 - perf / scale — the forward paren join is bounded by the balance point, so the scan stays linear.
 - a11y — N/A. No user interface.
 - i18n — N/A. Operator-facing English strings only.
@@ -180,11 +230,17 @@ take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` c
   path at `:325` is unchanged.
 - observability — every new deny names its own branch, its line, and the resolved value, so an arm
   can attribute the deny rather than reading a shared exit code.
-- risks — a false deny blocks a legitimate review. The specific hazard is S4 against the three
-  shipped harnesses, which is why S4 admits the `cap` parameter explicitly and AC9 regresses all
-  three.
+- risks — a false deny blocks a legitimate review. The specific hazard for the static half is S4
+  against the three shipped harnesses, which is why S4 admits the `cap` parameter explicitly and AC9
+  regresses all three. For S15 the hazard is a legitimate wide fan-out that is not a review at all,
+  since the count does not distinguish verifiers from any other agent; the residual is accepted
+  because the charter's concurrency rule already binds every fan-out to the same number. Second
+  residual, written down rather than implied: an agent spawned INSIDE a workflow sidechain is still
+  uncounted, and always will be.
 - testing + left-shift gates — `agent-cap.test.sh` plus `check-verifier-fanout.sh`, both already legs.
-- migration / rollback — revert is one commit; adopters re-pull on kit update, signalled by S10+S12.
+- migration / rollback — three commits per the Rollout order, each independently revertible.
+  Reverting S15 leaves the widened matcher, which is inert. Adopters re-pull on kit update, signalled
+  by S10, S12 and the settings-merge version pair S14 moves.
 - user docs — S7 corrects the three override claims and S11 corrects the BINDING protocol document.
 
 ## 6. Acceptance criteria
@@ -225,6 +281,29 @@ take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` c
 - **AC17** — When `.claude/hooks/agent-cap.js` is compared to `tools/hooks/agent-cap.js`, they are
   byte-identical and `agent-cap.test.sh`'s parity arm passes.
 - **AC18** — When `bash tools/run-gates.sh` runs, all 40 legs pass.
+- **AC19** — When every existing arm of `agent-cap.test.sh` is fed through the hook before and after
+  the S14 widening, the output is byte-identical. That is the MEASURED no-op, and the corpus is named:
+  the arms of that file at the commit S14 lands on.
+- **AC20** — When `.claude/settings.json` carries a Workflow-only matcher, `bash tools/check-wiring.sh
+  --check` reports UNWIRED naming the matcher value it found; with `"Workflow|Agent"` it reports ok.
+  Both observed. Today's file-wide grep reports ok for both, so the arm fails before the fix.
+- **AC21** — When the wiring block is grepped across `WIRE-INTO-PROJECT.md`, `tools/hooks/agent-cap.js`
+  and `tools/settings-merge.py`, no site states a matcher narrower than what S14 requires.
+- **AC22** — When a real direct `Agent` spawn is made with a throwaway hook wired on that matcher,
+  a payload is captured and its `tool_name` recorded. If no payload arrives, F4's fallback applies and
+  S15 does not land as specced. This AC runs FIRST, before any S15 code.
+- **AC23** — When six `Agent` payloads sharing one `prompt_id` are fed sequentially, the first five
+  exit 0 and the sixth exits 2 with a message containing a string unique to this branch, asserted with
+  `grep -qF` on the message and never on the exit code, which every branch of this hook shares.
+- **AC24** — When the same six are fed CONCURRENTLY, exactly five tokens exist afterwards and exactly
+  one deny is emitted. This is the arm the read-then-decide design fails, and it is run repeatedly
+  rather than once, because the miscount it guards against is nondeterministic.
+- **AC25** — When payloads carrying a fresh `prompt_id` follow a denied turn, they exit 0 with no
+  cleanup step run in between.
+- **AC26** — When the full `agent-cap.test.sh` suite runs after S15, every pre-existing `Workflow` arm
+  passes unchanged, proving the count did not alter the static path.
+- **AC27** — When only one of the two `settings-merge` version literals is bumped,
+  `bash tools/check-kit-versions.sh` exits non-zero.
 
 ## 7. Gates
 
@@ -233,12 +312,36 @@ take effect in THIS repo — `.claude/settings.json:9` executes the `.claude/` c
 - `tools/workflows/check-protocol-parity.test.sh` — extended by S8, re-rendered by S11.
 - `tools/check-kit-versions.sh` — extended by S10, and the S12 pair.
 - `tools/memory-tree/check-memory-hygiene.sh` — this spec is corpus and check 12 binds it.
+- `tools/check-wiring.test.sh` — extended by S14 with the stale-matcher arm.
+- `python tools/settings-merge.py --selftest` — its matcher arms are pinned literals and move with S14.
+- `python tools/drift-audit/drift_report.py --check` — `non_terminal_specs_cited_by_product_source`
+  sits at its pin with ZERO headroom, and this unit edits files under `tools/` and `.claude/`. No file
+  in a product path may cite a non-terminal spec id; cite the run-state path and the phase contract
+  instead, and keep build ids in `memory/`, which is deliberately outside that glob set.
 - `bash tools/run-gates.sh` — the full bar at the push boundary.
 
-S10 adds an assertion to an existing leg rather than a new leg. Every other assertion lands in a leg
-that already runs.
+S10 and S14 add assertions to existing legs rather than new legs. No new gate leg is introduced by
+this unit.
 
 ## 8. Open questions
+
+### F4 — does `PreToolUse` actually fire for a direct `Agent` spawn?
+
+S15 depends on it and it is NOT established. The hook documentation does not enumerate the tool names
+usable as a `PreToolUse` matcher, and it documents a SEPARATE `SubagentStart` event for subagent
+spawns whose matcher filters on `agent_type` rather than on a tool name. `SubagentStart` explicitly
+cannot block: exit 2 shows a notice and the subagent starts regardless.
+
+**First build step, ahead of any S15 code (AC22):** wire a throwaway hook on the `Agent` matcher,
+make one spawn, and record whether a payload arrives and what `tool_name` it carries.
+
+**Fallback if it does not fire:** S15 becomes a `SubagentStart` COUNTER that records and reports but
+cannot deny. The number then stays unenforced at spawn time for direct `Agent` calls, and that
+residual is written into `memory/guides/REVIEW-PROTOCOL.md` under S11's rewrite rather than implied
+away — that document already has a section for exactly this, naming where enforcement does NOT reach.
+
+**Recommendation:** measure before speccing further. Do not build S15 on the assumption, and do not
+let S14 wait on it, since S14 is inert either way.
 
 ### F1 — what happens when `AGENT_CAP` is set after this unit
 
@@ -277,6 +380,17 @@ documented on any adopter whose hook enforced the rule.
   spec now owns every `agent-cap` edit, and `TOOL-aUnmannedHelm-1` depends on it landing. S14 has
   not been reviewed: the fold happened after this spec's Tier-2, so it re-reviews before code, and
   the three forks in §8 remain open.
+
+- rev-4 · 2026-08-10 · folded the scoped Tier-2 on S14, `wf_154599e2`: 28 raw, 25 confirmed,
+  precision 0.89, 6 blockers. S14 split at its seam per the owner's ratification — the matcher
+  widening and the `check-wiring.sh` join fix stay here as a self-contained S14, and the enforcement
+  predicate becomes S15 as an ATOMIC COUNT keyed on `tool_use_id` rather than a modality refusal.
+  That choice dissolves the dependency cycle the fold created: S15 reads no run-state file, so
+  `TOOL-aUnmannedHelm-1` and this spec no longer block each other. Six review findings died with the
+  modality refusal. The rest are folded: acceptance criteria for both halves where there were none,
+  the five missing Files-touched rows, the three-commit Rollout, the section 5 security split, the
+  gate list, the title and section 1 which described only half the unit, and F4 for the seam this
+  unit has not measured.
 
 ## 10. Reuse audit
 

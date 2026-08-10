@@ -21,9 +21,16 @@ This README is the **master overview and the owner decision menu**, per `memory/
 Each unit below becomes its own conforming sub-spec under `spec/`. Unit 1 is specced;
 units 2 through 7 are not yet written.
 
-**This build DEPENDS on `TOOL-aNumeralWarden-1`.** The F2 fold moved the agent-cap work there, and
-that spec is at rev-3 with three of its own forks unresolved. No unit here may claim an edit to
-`tools/hooks/agent-cap.js`, its test, its wired copy, or `memory/guides/REVIEW-PROTOCOL.md`.
+**`TOOL-aNumeralWarden-1` owns every agent-cap edit** after the F2 fold, so no unit here may claim
+one — not `tools/hooks/agent-cap.js`, its test, its wired copy, nor `memory/guides/REVIEW-PROTOCOL.md`.
+That spec is at rev-4 with four open forks.
+
+It is **not** a blocking dependency, and the earlier claim that it was is withdrawn. The scoped
+Tier-2 on the folded scope item found that the fold had created a dependency CYCLE: it keyed its
+refusal on this build's run-state file, which this build's unit 1 defines. Resolving it to an atomic
+count that reads no run-state file dissolved the cycle in both directions. Neither build blocks the
+other now, and this build's own AC13 already required the arity guarantee not to depend on the
+hook's schedule.
 
 ## The units
 
