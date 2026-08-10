@@ -98,7 +98,13 @@ rownorm() { LC_ALL=C grep -hE '^[[:space:]]*[-*][[:space:]]' "$1" 2>/dev/null | 
 # Measured at 0 on this suite: every case where the driver refuses, the control refuses too, or the
 # control resolves INCORRECTLY (it duplicates) and the case declares `ctl_wrong`. Lower it only by
 # deleting a member; raising it needs the same justification any other ratchet raise does.
-CONSERVATIVE_CAP=0
+# ONE member, named: `a row ours MOVED and theirs DELETED` (group 40) and its mirror. Raised from 0
+# to 1 by TOOL-aMendedLedger-9, and the raise is the ratchet WORKING rather than being defeated: it
+# buys back an rc-0 CONTENT LOSS — a record silently dropped where `git merge-file` keeps it,
+# confirmed auto-committed through a real `git merge` — at the price of a scoped conflict on the one
+# shape where the row plane and the skeleton genuinely disagree about intent. Shrink-only from here:
+# lower it by deleting a member, never by absorbing a new one.
+CONSERVATIVE_CAP=2
 CONSERVATIVE=""
 # How many `run` cases the arithmetic comparison actually BINDS on. A GROW-ONLY floor: without
 # it, a fixture edit that flips a control from rc 0 to rc 1 silently removes a case from the
@@ -1401,6 +1407,51 @@ printf '%s\n' "$err" | grep -q 'RowLoss' \
 [ "$(awk '/## TOOL/,0' "$TMP/a" | grep -c 'shared note')" -gt 0 ] \
   || bad "two-section key: the '## TOOL' section lost its note entirely — the record was relocated across a heading"
 
+# --- 40. A ROW ONE SIDE MOVED AND THE OTHER DELETED (TOOL-aMendedLedger-9) -------------------------
+# THE ONE CASE IN THIS FILE WHERE THE DRIVER CONFLICTS AND GIT RESOLVES, and it is the reason
+# `CONSERVATIVE_CAP` is 1 rather than 0. Before the fix this was rc 0 CONTENT LOSS: the row plane's
+# delete branch compares the key's row BODIES, which a relocation does not change, so a side that
+# deliberately MOVED a record read as having left it alone and the other side's delete was honoured.
+# Measured on the flat backlog shape with no headings involved, and confirmed through a real
+# `git merge`: auto-committed, `1 deletion(-)`, no markers, while `git merge-file` keeps the row.
+#
+# The row plane is position-blind by design — ordering is the skeleton's job — so it cannot see the
+# move. The SKELETON can, and git has already ruled there: a surviving token for a key the row plane
+# deleted can only mean the side that kept it MOVED it, because a side that left a row alone
+# contributes no token git would place anywhere new. The two planes disagree, and neither answer is
+# the driver's to pick silently: honouring the delete discards a deliberate relocation, honouring the
+# move discards a deliberate delete. That is delete/modify by another name, and it takes the same
+# answer — a scoped conflict naming both. Asserted on BYTES, because an rc-only arm reads the same
+# whether the row survived or was swallowed, which is the exact failure this case exists for.
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-2 two; row TOOL-zFixture-3 three; } > "$TMP/o"
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-3 three; row TOOL-zFixture-2 two; } > "$TMP/a"
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-3 three; } > "$TMP/b"
+cp "$TMP/a" "$TMP/ctlin"
+git merge-file -p -L ours -L base -L theirs "$TMP/ctlin" "$TMP/o" "$TMP/b" > "$TMP/ctl40" 2>/dev/null; c40=$?
+{ [ "$c40" = 0 ] && [ "$(grep -c '^- TOOL-zFixture-2 ' "$TMP/ctl40")" = 1 ]; } \
+  || bad "move-vs-delete: the CONTROL answered $c40 with $(grep -c '^- TOOL-zFixture-2 ' "$TMP/ctl40") copies of the moved row — this arm is the tally's only member BECAUSE git resolves it correctly, so re-measure before changing the cap"
+run "a row ours MOVED and theirs DELETED" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^- TOOL-zFixture-2 ' "$TMP/a")" = 1 ] \
+  || bad "move-vs-delete: the moved row appears $(grep -c '^- TOOL-zFixture-2 ' "$TMP/a") time(s) — it must survive the refusal exactly once, or the conflict is hiding the loss it exists to prevent"
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "move-vs-delete: rc 1 with no markers is the marker-free-UU trap"
+grep -q '^>>>>>>> theirs (deleted)$' "$TMP/a" \
+  || bad "move-vs-delete: the conflict does not name the DELETE, so the author cannot see what the other side intended"
+[ "$(grep -c '^<<<<<<<' "$TMP/a")" = 1 ] \
+  || bad "move-vs-delete: $(grep -c '^<<<<<<<' "$TMP/a") marker pair(s) — the refusal must be SCOPED to the disputed key, not a whole-file sandwich"
+# ...and the MIRROR, because the delete branch has two arms and only one of them was measured.
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-3 three; } > "$TMP/a"
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-3 three; row TOOL-zFixture-2 two; } > "$TMP/b"
+run "a row theirs MOVED and ours DELETED" 1 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^- TOOL-zFixture-2 ' "$TMP/a")" = 1 ] \
+  || bad "move-vs-delete mirror: the moved row is not present exactly once"
+grep -q '^<<<<<<< ours (deleted)$' "$TMP/a" \
+  || bad "move-vs-delete mirror: the conflict does not name OURS' delete"
+# ...and an ORDINARY honoured delete is untouched by all of this: no token survives, no conflict.
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-2 two; } > "$TMP/o"
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; row TOOL-zFixture-2 two; } > "$TMP/a"
+{ printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; } > "$TMP/b"
+run "an ordinary delete is still honoured silently" 0 "TOOL-zFixture-1 " TOOL-zFixture-2
+
 # --- 34. THE CONSERVATIVE TALLY — a redesign that trades a fix for a conflict must SHOW it (AC3) ---
 ncons=$(printf '%s' "$CONSERVATIVE" | grep -c . || true)
 if [ "$ncons" -gt "$CONSERVATIVE_CAP" ]; then
@@ -1422,8 +1473,8 @@ fi
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 45 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 45 — a group was deleted"
-[ "$nruns" -ge 33 ] || bad "only $nruns 'run' case(s) remain, expected at least 33 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 46 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 46 — a group was deleted"
+[ "$nruns" -ge 36 ] || bad "only $nruns 'run' case(s) remain, expected at least 36 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

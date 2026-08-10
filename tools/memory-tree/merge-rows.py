@@ -757,9 +757,10 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
     emitted: dict[str, int] = {}
     region_keys: set[str] = set()
     outside_keys: set[str] = set()
+    moved_vs_deleted: set[str] = set()
     n_regions = 0
 
-    def take(k: str, t: str) -> list[str]:
+    def take(k: str, t: str, in_region: bool = False) -> list[str]:
         """Rule 2. One token occurrence consumes one entry of `resolved[k]`."""
         outside_keys.add(k)
         entries = resolved.get(k)
@@ -767,12 +768,46 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
             raise RowLoss(f"the merged skeleton carries a token for {k!r} that the row plane never "
                           f"resolved — a row would be written that no input carries")
         if not entries:
-            # A DELETE THE ROW PLANE HONOURED. The token survives git's merge of the skeleton
-            # whenever the deletion abuts a change on the other side, and dropping it here is what
-            # turns that shape from git's refusal into an auto-resolve: the delete is honoured AND
-            # whatever the other side filed next to it is kept, because that content is a separate
-            # key with its own decision. Refusing instead would red an ordinary honoured delete.
-            return []
+            # A DELETE THE ROW PLANE HONOURED — but the row plane is POSITION-BLIND, and that is
+            # where it needs the other plane's help.
+            #
+            # Inside a rule-3 region the drop is right and is what turns "a delete abutting new
+            # content" from git's refusal into an auto-resolve: the delete is honoured AND whatever
+            # the other side filed beside it survives, because that content is a separate key with
+            # its own decision.
+            #
+            # OUTSIDE a region it is wrong, and this is TOOL-aMendedLedger-9. The delete branch
+            # compares the key's row BODIES, which a RELOCATION does not change, so a side that
+            # deliberately moved a record read as having left it alone and the other side's delete
+            # was honoured — measured on the flat backlog shape and confirmed through a real
+            # `git merge`: auto-committed, `1 deletion(-)`, no markers, where `git merge-file` keeps
+            # the row at rc 0. The skeleton is exactly where position lives, and git has already
+            # ruled on it: a surviving token for a key the row plane deleted can only mean the side
+            # that kept it MOVED it, because a side that left a row alone contributes no token git
+            # would place anywhere new.
+            #
+            # So the two planes DISAGREE, and neither answer is the driver's to pick silently.
+            # Honouring the delete discards a deliberate relocation; honouring the move discards a
+            # deliberate delete. That is delete/modify by another name — §4 carve-out 3 already
+            # rules that "neither the edit nor the delete is the driver's to discard" — so it takes
+            # the same answer: a scoped conflict on that key, naming both. It is the one shape in
+            # this suite where the driver conflicts and git resolves, and it is counted by name.
+            if in_region:
+                return []
+            surviving = A.get(k) or B.get(k)
+            if not surviving:
+                return []                              # both sides deleted it; nothing to arbitrate
+            if k in moved_vs_deleted:
+                raise RowLoss(
+                    f"key {k!r}: a row one side MOVED and the other DELETED has more than one "
+                    f"surviving token, so the conflict cannot be placed — {_quote([('row', surviving[0])])}")
+            moved_vs_deleted.add(k)
+            conflict_done.add(k)
+            ours = surviving if k in A else None
+            theirs = None if k in A else surviving
+            block = _conflict(ours, theirs)[1]
+            rt = t or term
+            return [b + (term if _MARKER_RE.match(b) else rt) for b in block]
         i = cursor.get(k, 0)
         if i >= len(entries):
             # NO SHORT-CIRCUIT FOR A CONFLICTED KEY, and the absence is deliberate. Letting a marker
@@ -855,13 +890,13 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
                 ours_keys = {_token_of(_split_term(x)[0]) for x in sec["ours"]}
                 for x in sec["ours"]:
                     body, t = _split_term(x)
-                    out.extend(take(_token_of(body), t))
+                    out.extend(take(_token_of(body), t, in_region=True))
                 for x in sec["theirs"]:
                     body, t = _split_term(x)
                     k = _token_of(body)
                     if k in ours_keys:
                         continue
-                    out.extend(take(k, t))
+                    out.extend(take(k, t, in_region=True))
             else:
                 # RULE 4. The moment a structure line is in dispute, the structure is in dispute —
                 # and structure is precisely the class git is right about and this driver has been

@@ -84,9 +84,10 @@ exactly as it is at rc 0.
 this driver replaces is the standard it is held to, and it is now arithmetic rather than judgement:
 every case runs a live control on the identical three blobs, losing a line git keeps or writing a row
 more often than git does fails the suite by name, and conflicting where git resolves correctly is
-counted against a shrink-only constant (0 today). Every case runs a control — two of twenty-eight
-groups did before kit 2.1 — but the ARITHMETIC comparison can only bind where the control EXITS 0,
-which is 13 of 37 cases and is floored so a fixture edit cannot quietly drop one. Saying it that
+counted by name against a shrink-only constant (2 today: a row one side MOVED and the other
+DELETED, in both directions, and nothing else). Every case runs a control — two of twenty-eight
+groups did before kit 2.2 — but the ARITHMETIC comparison can only bind where the control EXITS 0,
+which is 16 of 40 cases and is floored so a fixture edit cannot quietly drop one. Saying it that
 precisely matters: a suite that reads stronger than it is, is how this driver shipped rc-0
 corruption twice.
 
@@ -173,14 +174,6 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
   `memory/DECISIONS.md` and all four backlog shards carry no fenced blocks. A fence-tracking state
   machine on the merge path of an append-only record buys a rare case and pays in exactly the state
   the two-plane design exists to delete.
-- **A row MOVED by one side and DELETED by the other is dropped at rc 0, where `git merge-file`
-  keeps it.** The row plane's delete branch compares the key's row BODIES, which a relocation does
-  not change, so a side that deliberately moved a record reads as having left it alone. Measured on
-  the flat backlog shape with no headings involved, and confirmed through a real `git merge`:
-  auto-committed, `1 deletion(-)`, no markers. PRE-EXISTING — the retired driver loses it too — so
-  this unit does not regress it, but it is a live violation of the never-worse bar and the only one
-  known to remain. Closing it needs a placement rule the row plane deliberately does not have, which
-  is why it is recorded here rather than patched in at the end of a redesign.
 - **A file that already carries a COMMITTED, unresolved conflict block refuses where git resolves.**
   Git's own markers are now labelled with the token sentinel so the reconciliation cannot mistake an
   input's block for one it produced — before that, rule 3 concatenated the block, erased all three
@@ -199,5 +192,5 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
 
 ## Reuse affordance
 
-seam: merge-rows.skeleton — reuse for any three-way merge where SOME lines must be merged by key and the rest positionally: project each input to a token list, let `git merge-file` merge that, key-merge the tokens separately, recombine. Extend via a second line-class predicate, never by re-deriving placement. (This replaces the retired `merge-rows.split_regions` seam, which offered the three-region prose-then-rows model — withdrawn with kit 2.1 because that model is what the two planes replace.)
+seam: merge-rows.skeleton — reuse for any three-way merge where SOME lines must be merged by key and the rest positionally: project each input to a token list, let `git merge-file` merge that, key-merge the tokens separately, recombine. Extend via a second line-class predicate, never by re-deriving placement. (This replaces the retired `merge-rows.split_regions` seam, which offered the three-region prose-then-rows model — withdrawn with kit 2.2 because that model is what the two planes replace.)
 seam: pyrun.sh — reuse whenever a tool OUTSIDE `tools/run-gates.sh` must run a python script (a git driver, a hook, an editor integration); extend by calling it, never by naming a launcher.
