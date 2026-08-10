@@ -351,6 +351,30 @@ check_merge_rows() {
     rm -rf "$smoke"
     return
   fi
+  # ...AND THE SMOKE'S OWN ROWS ACTUALLY KEYED, which is a NEW obligation and not a tidy-up. Under
+  # the retired driver a dead anchor grammar made the append collision conflict, so the arm above
+  # caught it: inert was LOUD. Under the two-plane driver a row the grammar cannot key is still a
+  # ROW — it falls to a hashed token, reconciliation rule 3 resolves the collision anyway, and all
+  # three ids land exactly once. MEASURED with `anchor_at` stubbed to return None on this same
+  # 4-family / 12-row fixture: rc 0, 12 of 12 present, and `git merge-file` on the identical three
+  # blobs returns rc 1. So the driver is BETTER than git while being completely inert on the ids it
+  # exists to key, and every check above is green over it. The audit line's keyed/hashed split is
+  # the only surviving signal, and this is where it is read.
+  local kd hs
+  kd=$(sed -n 's/.*written (\([0-9]*\) keyed.*/\1/p' "$smoke/err" | tail -1)
+  hs=$(sed -n 's/.*keyed, \([0-9]*\) hashed.*/\1/p' "$smoke/err" | tail -1)
+  if [ -z "$hs" ]; then
+    echo "UNWIRED  merge     — the driver merged the smoke but printed no keyed/hashed audit line, so there is no way to tell whether it KEYED the rows or merely copied them; a driver whose anchor grammar is dead resolves this fixture too. Fix: the installed tools/memory-tree/merge-rows.py predates the audit line — re-copy the kit, then re-run"
+    unwired=$((unwired+1))
+    rm -rf "$smoke"
+    return
+  fi
+  if [ "$hs" != 0 ]; then
+    echo "UNWIRED  merge     — the driver runs and resolves, but it keyed only $kd of the smoke's $((kd + hs)) rows and HASHED $hs of them: the anchor grammar it imports does not recognise ids it declares (families:${fams:+ }${fams% }). Rows that only hash still merge, so nothing fails loudly, but the id-level no-duplicate guarantee is off on the files this driver is wired to. Fix: check .memory-tree.conf FAMILIES against the ids the indexes use and that $(dirname "$shim")/../memory-recall/extract.py is the shipped grammar, then re-run"
+    unwired=$((unwired+1))
+    rm -rf "$smoke"
+    return
+  fi
   rm -rf "$smoke"
   # ...AND THE DECLARED FAMILIES ARE THE ONES THE INDEXES ACTUALLY USE. The fixture above is built
   # FROM the conf, so it stays self-consistent under a family RENAME: one token of drift

@@ -365,6 +365,43 @@ out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the declared family goes green again" 1 || ck "AC10 restoring the declared family goes green again" 0
 
+# state 5e — THE INERTNESS CHANNEL THE TWO-PLANE DRIVER OPENS, and state 5d cannot reach it.
+#
+# 5d drifts FAMILIES, and the smoke fixture is built FROM the conf, so its rows rename with it and
+# key normally under exactly the drift being applied — 100% keyed. What reds 5d is the pre-existing
+# harvest of the LANDED row's prefix, and control only reaches that harvest because the smoke
+# PASSED. So 5d is a regression guard on a different arm and proves nothing about the keyed count.
+#
+# The state that does: a grammar that IMPORTS cleanly and keys NOTHING. Under the retired driver an
+# unkeyable row was content, so the append collision conflicted and inert was loud. Under the two
+# planes it is a hashed ROW, reconciliation rule 3 resolves the collision, and all twelve ids land
+# exactly once at rc 0 — better than `git merge-file`, which refuses the same three blobs, while the
+# id-level no-duplicate guarantee is entirely off. Every other assertion in the arm is green over it.
+# `anchor_at` is REDEFINED rather than deleted, so the import still succeeds and the fail-closed
+# handler is not what answers: this state is about a grammar that works and recognises nothing.
+printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> tools/memory-recall/extract.py
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'HASHED'; } \
+  && ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 1 || ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 0
+# ...and the state really is the quiet one it claims to be: with the keyed-count assertion removed
+# from the checker, this same tree passes every other assertion the arm makes. Proved by running the
+# smoke's own three-way by hand and observing a clean, complete, id-preserving merge.
+Q=$(mktemp -d); printf -- '- TOOL-001 | base\n' > "$Q/o"
+printf -- '- TOOL-001 | base\n- TOOL-002 | ours\n' > "$Q/a"; printf -- '- TOOL-001 | base\n- TOOL-003 | theirs\n' > "$Q/b"
+qerr=$(bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py "$Q/o" "$Q/a" "$Q/b" x 2>&1 >/dev/null); qrc=$?
+qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && qn=$((qn+1)); done
+{ [ "$qrc" = 0 ] && [ "$qn" = 3 ] && printf '%s' "$qerr" | grep -q '(0 keyed, 3 hashed)'; } \
+  && ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet" 1 \
+  || ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet [rc=$qrc ids=$qn err=$qerr]" 0
+rm -rf "$Q"
+git checkout -q -- tools/memory-recall/extract.py 2>/dev/null || true
+if grep -q 'def anchor_at(line, g=None):' tools/memory-recall/extract.py; then
+  cp "$(src_of memory-recall/extract.py)" tools/memory-recall/extract.py
+fi
+out=$(chk --check); rc=$?
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
+  && ck "AC10 restoring the real grammar goes green again" 1 || ck "AC10 restoring the real grammar goes green again" 0
+
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
 out=$(chk --check); rc=$?
