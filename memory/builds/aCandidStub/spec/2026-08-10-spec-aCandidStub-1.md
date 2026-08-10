@@ -1,6 +1,6 @@
 # PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs
 
-**Status:** SPECCED · rev-1 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams playbook+tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams playbook+tooling · ratified 2026-08-10
 
 ## 1. Goal
 
@@ -25,11 +25,15 @@ Every item below is a defect CONFIRMED by an adversarial skeptic in review `aCan
   so a script written exactly to that line exits 2 under `tools/hooks/agent-cap.js` [28, blocker].
   Spell the second marker and both shapes, and correct "DENIES raw-primitive scripts" to also cover
   an `agent()` fanned over a receiver the hook cannot prove bounded.
-- **S3 — the adoption path stops handing out a pre-flatten tree.**
+- **S3 — the adoption path stops handing out a pre-flatten conf.**
   `tools/memory-tree/.memory-tree.conf.example` is what `adopt-memory-tree.sh --scaffold` copies into
   a fresh repo, and its comments still define `DISCIPLINES` as folders each carrying `TREE.md`, ship
-  inCMS's five discipline names, and document build folders under a dated, family-qualified path
-  (`builds/<date>-<FAMILY>-<slug>/`) [16, high]. Re-render it to the flat shape. Correct
+  inCMS's five discipline names, document build folders under a dated, family-qualified path
+  (`builds/<date>-<FAMILY>-<slug>/`), claim nine canonical spec sections against ten, and name
+  `gen-memory-tree.sh`, deleted in U2. It ships 4 of the 15 conf keys the kit reads [16, CORRECTED to
+  medium — see §9 rev-2: the scaffolder ignores these comments and builds the correct flat tree, so
+  the defect misinforms the adopter the script tells to EDIT IT, and does NOT red the gate].
+  Re-render it to the flat shape with all 15 keys. Correct
   `customize.md:27`'s description of `{{MEMORY_DISCIPLINES}}` to match the conf's own words, a closed
   enum of stream values with `FAMILIES` as a separate key [7, high], and spell the adopter-side
   invocation path the kit's own usage string uses [21, medium].
@@ -147,8 +151,10 @@ subagent tokens. Deferring them re-buys that cost later.
   "agent() fanned over `batches`, which this file does not show to be bounded" — both halves are
   observed, so the test is not vacuous.
 - **AC3** — When `adopt-memory-tree.sh --scaffold` runs into a scratch repo and
-  `check-memory-hygiene.sh` runs against the result, the gate exits 0. Today the copied conf example
-  documents a shape hygiene checks 3 and 4 reject.
+  `check-memory-hygiene.sh` runs against the result, the gate exits 0 AND every conf key the kit
+  reads is present in the copied example. The gate half is a CONTROL, not the proof: the pre-fix
+  example also exits 0, measured, so the deliverable is the conf's correctness as documentation, and
+  the key-coverage half is what actually moves.
 - **AC4** — When the new cross-reference gate runs over the two playbook files, it exits 0; when a
   companion `##` section is added with no template stub routing to it, the gate exits non-zero and
   names that section. Both arms are fixtured.
@@ -196,6 +202,14 @@ still wants a shipped seed corpus, the seam is the existing `KINDS` enum — a n
 already exempt from checks 18 and 19 and already excluded from `--for-diff` — but that is a `TOOL-`
 unit against the kit, not a playbook change, and it should be specced on its own merits.
 
+**RESOLVED (owner, 2026-08-10): the memory-tree kit is MANDATORY, and the retirement is dropped.**
+Making the kit required removes ground 1 outright — a universal rule may now name `{{MEMORY_ROOT}}`,
+which is why §5's bullet reads "Required" and the customize companion no longer lists the kit as
+droppable. Grounds 2 and 3 are untouched by that decision and remain fatal to the retirement: the
+charter is ratified and derived anchors are a property of the mechanism, not of the kit's optional
+status. The relationship clause is therefore the right shape, and it is now affordable to state
+positively rather than defensively, because every adopter has the catalogue.
+
 ### Fork 2 — how the orphaned companion §14 is repaired
 
 Adding a template §14 stub costs roughly 150 B against a 685 B margin and leaves two differently
@@ -216,6 +230,15 @@ carry rules §1 and §7 reference unconditionally, so they are not in fact dropp
 - rev-1 · 2026-08-10 · initial draft, written from review `aCandidStub-1` (workflow
   `wf_e8863e8c-821`, 34 raw findings, 15 confirmed, precision 0.44) plus two defects found while
   reproducing finding 28.
+- rev-2 · 2026-08-10 · owner made the memory-tree kit MANDATORY and directed the blockers built.
+  Fork 1 RESOLVED against the retirement, which the mandatory decision does not revive. S1, S2 and
+  S3 are BUILT at template v2.5; S4 is partly built (the companion's count, droppable set and version
+  marker) with its routing half still open as fork 2; S5 and the rest of S6 remain specced. Finding
+  16's severity is CORRECTED from high to medium: the spec asserted a freshly scaffolded repo reds
+  the gate, and scaffolding one proved otherwise — both the pre-fix and post-fix example confs exit 0
+  and produce the same flat tree, because the scaffolder reads `DISCIPLINES` as an enum and never
+  consults the stale comments. The defect is real but it misinforms rather than breaks, and the claim
+  was confirmed by a skeptic who read the comments against the checks without running the scaffolder.
 
 ## 10. Reuse audit
 

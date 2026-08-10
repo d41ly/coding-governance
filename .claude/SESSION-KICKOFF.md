@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T13:16:10+03:00 @ e7ec3365175f58f8a8c4ad7b8476d14433bba3f3
+last-audit: 2026-08-10T14:01:55+03:00 @ e7ec3365175f58f8a8c4ad7b8476d14433bba3f3
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -87,7 +87,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32083/32768 (**685 bytes free**, measured 2026-08-10 by `bash tools/check-template-size.sh`
+  It sits at 32412/32768 (**356 bytes free** at v2.5, measured 2026-08-10 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here), so a line added to it either fits that margin or
   funds itself by moving prose into `parallel-coding-governance.domain-rules.md`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.

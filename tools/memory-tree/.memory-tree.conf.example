@@ -1,22 +1,69 @@
 # .memory-tree.conf — per-repo config for the memory-tree hygiene kit.
-# Copy to your repo ROOT as `.memory-tree.conf` and edit. Sourced by every kit script
-# (check-memory-hygiene.sh, gen-memory-tree.sh, adopt-memory-tree.sh). Plain shell assignments only.
+# Copy to your repo ROOT as `.memory-tree.conf` and EDIT. Sourced by every kit script
+# (check-memory-hygiene.sh, gen_build_index.py, corpus_ids.py, gotchas.py, adopt-memory-tree.sh).
+# Plain shell assignments only.
 
 # Root folder of the structured memory tree, relative to the repo root.
 MEMORY_ROOT=memory
 
-# Discipline folders under $MEMORY_ROOT/ — your project's development streams. Each gets
-# README.md + TREE.md + DECISIONS.md + BACKLOG.md + decisions/ guides/ archive/ builds/.
-# Space-separated, lowercase, [a-z-] only. Add a discipline only when content exists for it.
-DISCIPLINES="architecture deployment blocks design performance"
+# DISCIPLINES is a CLOSED ENUM of stream values, NOT a list of directories. The tree is FLAT: every
+# build folder sits directly at $MEMORY_ROOT/builds/<slug>/ with no discipline segment and no date
+# prefix, and which stream a spec served is declared in its own status header as
+# `· streams <value>[+<value>]`. Space-separated, lowercase, [a-z-] only. Add a value only when
+# content exists for it. REPLACE the example below with your project's streams.
+DISCIPLINES="architecture deployment design"
 
-# discipline:FAMILY pairs. FAMILY is the id-family prefix that discipline's decisions/backlog use
-# (e.g. ARCH-<slug>-<seq>) AND the FAMILY a build folder under that discipline must carry
-# (builds/YYYY-MM-DD-<FAMILY>-<slug>/). Space-separated, FAMILY uppercase [A-Z].
-FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
+# <enum value>:FAMILY — the id prefix for that stream's decisions (FAMILY-<slug>-<seq>), its backlog
+# shard at $MEMORY_ROOT/backlog/<FAMILY>.md, and the optional FAMILY qualifier in a recording
+# filename. There is ONE append-only $MEMORY_ROOT/DECISIONS.md for every family, grouped for
+# reading. Space-separated, FAMILY uppercase [A-Z].
+FAMILIES="architecture:ARCH deployment:DEPL design:DES"
 
-# Spec-format ratchet (hygiene check 12). Set to the date you adopt the kit (YYYY-MM-DD): every
-# spec file whose FILENAME date is >= this must follow <MEMORY_ROOT>/TEMPLATE-SPEC.md (status
-# header; nine canonical sections + body assertions for Tier-2). Older specs are grandfathered by
-# filename date — never retrofit them. Blank = check 12 disabled.
+# Old tree roots being migrated away from; blank when scaffolding fresh.
+TOMBSTONE_ROOTS=""
+
+# Spec-format ratchet (check 12). Set to the date you adopt the kit: every spec whose FILENAME date
+# is >= this must follow $MEMORY_ROOT/TEMPLATE-SPEC.md — the status header, and for Tier-2 the ten
+# canonical ## sections with no empty bodies. Older specs are grandfathered by filename date; never
+# retrofit them. Blank = check 12 off. (§10 Reuse audit is separately date-gated by SPEC10_CUTOFF,
+# which is a script default in check-memory-hygiene.sh and overridable from the environment.)
 SPEC_FORMAT_CUTOFF=""
+
+# Streams ratchet (check 12): specs dated >= this MUST carry `· streams <value>` in the status
+# header. Set it strictly AHEAD of every committed spec's filename date at adoption, so no landed
+# spec goes retroactively red — which also means your corpus does not exercise the required arm, and
+# the kit's self-test carries explicit red/green fixtures for it instead.
+STREAMS_CUTOFF=""
+
+# The document a session is pointed at before it touches code; check 16 derives the mandatory read
+# path from it. Usually AGENTS.md or CLAUDE.md.
+CHARTER="AGENTS.md"
+
+# --- corpus_ids.py (checks 13-16). Every number below is MEASURED against YOUR corpus by
+# --- `python memory-tree/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
+# --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
+# --- Ship them blank, run --measure once the tree has content, and paste what it prints.
+# Orphan ids: cited but never defined. Shrink-only once set.
+ORPHAN_ID_PIN=""
+# Dead repo-path citations in the present-tense corpus. Measure 0 on a fresh tree and it becomes a
+# ratchet: the next unresolving citation reds until it is registered or repaired.
+DEAD_PATH_PIN=""
+# The charter's read path under MEMORY_ROOT, in bytes, plus headroom. One-sided: a session's
+# mandatory reading is a budget, and a new binding doc spends from it visibly.
+READ_PATH_CEILING=""
+# Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
+# membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
+# identically on every node — which is why the answer is declared here rather than probed.
+DEAD_PATH_EXCLUDE=""
+# Read-path members deliberately under no byte cap, space-separated. Blank = every member is capped.
+READ_PATH_WAIVER=""
+
+# gotchas.py (checks 17-19): how many bug-class records under $MEMORY_ROOT/gotchas/ may be
+# `universal: true`. A universal record is emitted on EVERY reviewer checklist, so this is budgeted
+# rather than left to drift — a checklist nobody can finish is not a checklist. Blank = no budget.
+UNIVERSAL_BUDGET="3"
+
+# memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole
+# `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);
+# BLANK = uncapped.
+RECALL_CACHE_BUDGET_MB="512"

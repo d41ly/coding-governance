@@ -1,8 +1,14 @@
 # Governance domain rules — runtime, cross-OS, architecture, security, recurring bugs & design system
 
-Companion to `parallel-coding-governance.template.md`, holding seven activity-scoped domain sections the
-template references by section number rather than inlining (they apply only when a unit touches a
-risky surface or runs a Tier-2 review). Deploy this file alongside the playbook; the template's §4, §8, §9, §10, §11, §12 and §13 stubs point here. All are droppable-per-project (see the customize companion).
+<!-- governance-template: v2.5 -->
+
+Companion to `parallel-coding-governance.template.md`, holding eight activity-scoped domain sections
+the template references by section number rather than inlining (they apply only when a unit touches a
+risky surface or runs a Tier-2 review). Deploy this file alongside the playbook and re-pull it in
+lockstep — the marker above must read the same version as the template's. The template's §4, §8, §9,
+§10, §11, §12 and §13 stubs point here; §14 carries the gate-discipline rules §7 relies on and is not
+yet reached by a stub of its own. Four are droppable-per-project (§4, §9, §11 and §13, per the
+customize companion); §8, §10, §12 and §14 are universal core.
 
 ## §4 — Runtime isolation & the verification harness
 

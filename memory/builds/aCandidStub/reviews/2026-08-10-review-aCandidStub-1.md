@@ -253,3 +253,30 @@ the companion and `customize.md` costs nothing: neither is size-gated.
     unreachable. **Refuted:** the ~25 figure bounds the LENS axis (the same clause says "scale … with
     LENSES, not skeptics"), while ≤5 bounds the verify-stage axis. `MAX_LENSES = 6` in `agent-cap.js`
     is an array-literal allowlist bound, not a doctrinal total.
+
+## 6. Post-audit corrections
+
+Recorded after the run, from verification done while building the fixes. A confirmed finding is not
+a proven one, and two of these were confirmed by reading rather than running.
+
+**Finding 16 — severity CORRECTED, high to medium.** The finding claimed a freshly scaffolded repo
+reds the gate because `.memory-tree.conf.example` documents a shape hygiene checks 3 and 4 reject.
+Measured: it does not. Both the pre-fix and the post-fix example conf scaffold into a scratch repo
+and exit 0, producing the same flat tree (`DECISIONS.md HYGIENE.md LIVE.md README.md
+TEMPLATE-SPEC.md backlog builds project`). `adopt-memory-tree.sh` reads `DISCIPLINES` as an enum,
+exactly as its own line 12 comment says, and never consults the stale prose. The defect is real —
+the comments describe discipline folders, `TREE.md`, a dated build path, nine canonical spec sections
+against ten, and `gen-memory-tree.sh` which U2 deleted, and the file ships 4 of the 15 conf keys the
+kit reads — but it misinforms the adopter the script explicitly tells to EDIT IT, rather than
+breaking the gate. The skeptic confirmed it by reading the comments against `HYGIENE.md`; nobody ran
+the scaffolder until the build did.
+
+**Finding 28 — CONFIRMED by reproduction, both arms.** A script written to the letter of the old
+`template.md:146` exits 2 under `tools/hooks/agent-cap.js`; the same script with the marker the
+revised §8 now spells exits 0. Both observed.
+
+**New defect, out of this review's scope.** Reproducing 28 surfaced a hole in the hook itself: an
+identifier bound from an EMPTY array literal is blessed as bounded and never re-examined when a later
+statement grows it, so `const batches = []` plus a per-finding `push` fans one agent per item past
+both the hook and the merge-bar leg, at exit 0. `tools/hooks/agent-cap.js:171` already guards the
+`[].concat(x)` spelling of the same hole. Filed `TOOL-aCandidStub-1`.
