@@ -1,6 +1,6 @@
 # TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to
 
-**Status:** INPROGRESS · rev-5 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · landed 990f07b
+**Status:** CLOSED · rev-6 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · landed 990f07b
 
 ## 1. Goal
 
@@ -97,6 +97,11 @@ enforces, and it sees the modality it was blind to.
   nothing in this unit reads `TOOL-aUnmannedHelm-1`'s run-state file, so neither build blocks the
   other.
 
+- **S16** (added rev-6, on the owner's F2 ratification) — the array-literal element count drops a
+  TRAILING COMMA, by reusing S1's `topLevelArgs` splitter instead of scoring `1 + every top-level
+  comma`; then `MAX_LENSES` moves 6 → 5. The order is load-bearing: the constant alone denies both
+  drift-audit harnesses, which measure 6 while holding five lenses.
+
 ## 3. Non-goals (OUT)
 
 - The enclosing-opener walk in `agent-cap.js:222-240`. Two nested wrappers or 59 lines of distance
@@ -105,8 +110,11 @@ enforces, and it sees the modality it was blind to.
 - Gating a pin RAISE against the base ref. That is the deeper ratchet fix and touches
   `tools/drift-audit/drift_report.py`, not this hook. Follow-up row `TOOL-aNumeralWarden-3`.
 - Adding `bash tools/check-wiring.sh --check` to `tools/gate-legs.json`. Cheap and unrelated.
-- Reconciling `MAX_LENSES` with `MAX_VERIFIERS`. Surfaced as a fork in §8 because a decision is owed
-  before the numbers can diverge further, but no code moves for it in this unit.
+- ~~Reconciling `MAX_LENSES` with `MAX_VERIFIERS`. Surfaced as a fork in §8 because a decision is owed
+  before the numbers can diverge further, but no code moves for it in this unit.~~ **Amended at rev-6:
+  the owner ratified F2 and code DID move for it — S16.** Recorded as an amendment rather than
+  silently deleted, because the non-goal was true when written and the reason it stopped being true
+  (F2 rested on a miscount) is the finding.
 - Any change to the ≤5 value itself. This unit makes the existing number enforceable and does not
   argue it.
 
@@ -305,6 +313,13 @@ not the kit copy, and that re-copy does NOT cover `.claude/settings.json` itself
 - **AC27** — When only one of the two `settings-merge` version literals is bumped,
   `bash tools/check-kit-versions.sh` exits non-zero.
 
+- **AC28** — When a 5-element lens array written across lines WITH a trailing comma is fed to the
+  hook, it exits 0; the single-line 5-element form did too before the fix, so the multi-line form is
+  the arm that can actually fail. And when each of the three shipped harnesses is fed unchanged after
+  S16, each exits 0 and `bash tools/workflows/check-verifier-fanout.sh` exits 0.
+- **AC29** — When a 6-element lens array is fed, in both the single-line and the trailing-comma
+  forms, the hook exits 2. Both forms, because the trailing comma must not buy a sixth element back.
+
 ## 7. Gates
 
 - `tools/hooks/agent-cap.test.sh` — the kit self-test, extended by S9.
@@ -324,6 +339,11 @@ S10 and S14 add assertions to existing legs rather than new legs. No new gate le
 this unit.
 
 ## 8. Open questions
+
+none — all four forks below are RESOLVED; kept for the record. F4 was measured, F1 and F3 were
+ratified by their own recommendations because the build could not land without them, and F2 was
+ratified by the owner. F2 is the one that went AGAINST this spec's recommendation, and it was right
+to: the recommendation rested on a miscount.
 
 ### F4 — does `PreToolUse` actually fire for a direct `Agent` spawn? — RESOLVED at build, YES
 
@@ -353,13 +373,26 @@ constant that replaced it. A silently-ignored knob that used to appear to work i
 override claim survived two releases, and ignoring it would repeat exactly that. Arms both ways in
 `tools/hooks/agent-cap.test.sh`: set → deny with the message, unset → nothing changes.
 
-### F2 — `MAX_LENSES` is 6 while `MAX_VERIFIERS` is 5
+### F2 — `MAX_LENSES` is 6 while `MAX_VERIFIERS` is 5 — RESOLVED, lowered to 5
 
-`agent-cap.js:97` admits a 6-element array literal as a bounded receiver, so a six-lens verify stage
-passes a rule the charter states at 5. Options: lower `MAX_LENSES` to 5, keep 6 and document that the
-lens allowance is a find-stage affordance, or gate the two by stage. **Recommendation:** keep 6 and
-document it, because `REVIEW-PROTOCOL.md:94` explicitly prescribes adding lenses rather than skeptics
-for a large surface. A decision is owed either way.
+Ratified by the owner 2026-08-10, against this spec's recommendation, and the ratification turned out
+to rest on a premise this fork got wrong.
+
+**The 6 was never a decision.** The array-literal counter scored `1 + every top-level comma`, so a
+TRAILING COMMA counted as an element and every prettier-formatted 5-lens array measured 6. No shipped
+harness has ever had six lenses: `tier2-review.js` has four, `drift-audit-code.js` and
+`drift-audit-state.js` have five each. The constant had been raised to fit the miscount, and this
+fork's own framing — "admits a 6-element array literal, so a six-lens verify stage passes" —
+inherited it. So did the recommendation to keep 6.
+
+Measured before the constant was touched: lowering to 5 WITHOUT fixing the count denies both
+drift-audit harnesses, because each measures 6. The count is fixed first, by reusing the same
+`topLevelArgs` splitter S1 already needed for the identical trailing-comma defect at the call site —
+one splitter, one rule about what a trailing comma is. With it fixed, every shipped harness measures
+its real size and passes at 5.
+
+The find-stage argument the recommendation rested on survives as prose in `REVIEW-PROTOCOL.md`, which
+still prescribes scaling a large surface by adding lenses — it simply does so within the same 5.
 
 ### F3 — how far S12 bumps the drift-audit kit — RESOLVED, minor
 
@@ -418,6 +451,16 @@ next half-bump reds instead of passing.
   repo's own review harness — on its trailing comma, which split into a phantom second argument
   reading as a cap of nothing. And AC10's repo-wide grep matched the comments explaining the ban it
   greps for, the same shape that broke the `LC_ALL` ban in `TOOL-aBatchedLintel-1`.
+
+- rev-6 · 2026-08-10 · F2 ratified by the owner — `MAX_LENSES` lowered to 5, against this spec's
+  recommendation — and the ratification exposed the premise the fork was written on. The 6 was not an
+  affordance anyone chose: the array counter scored a TRAILING COMMA as an element, so every
+  prettier-formatted 5-lens array measured 6, and the constant had been raised to fit the miscount.
+  Measured before the constant moved — lowering it alone denies both drift-audit harnesses. S16 fixes
+  the count first, by reusing the `topLevelArgs` splitter S1 already needed for the identical defect
+  at the call site, then lowers the number. Third instance of one root cause in this unit; the first
+  two were the call site and this spec's own §3 non-goal, now amended. agent-cap 1.3 → 1.4,
+  62 arms. Unit CLOSED — code landed as `990f07b`, §8 carries no unresolved question.
 
 ## 10. Reuse audit
 

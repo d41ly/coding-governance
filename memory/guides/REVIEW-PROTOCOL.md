@@ -79,8 +79,8 @@ An `agent(` call reached through an iteration construct is allowed only when its
 
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers`, where that line
   spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` resolves; or
-- an identifier assigned exactly once from an array LITERAL with ≤ 6 elements — the finder-lens case,
-  where the agent count is visible in the source.
+- an identifier assigned exactly once from an array LITERAL with ≤ 5 elements — the finder-lens case,
+  where the agent count is visible in the source. A trailing comma is not an element.
 
 Everything else is denied: a `for` / `while` / `forEach` body containing `agent(`, a `.map` /
 `.flatMap` / `Array.from` over any other receiver, and a marked line whose second argument is an
@@ -142,7 +142,10 @@ the process cwd twice made it audit a repository nobody had briefed it on.
   write paths; over already-hardened code it manufactures defence-in-depth noise. Review light, or
   skip.
 - **Scale a large fresh surface by adding LENSES, not skeptics.** Coverage is what more agents buy;
-  precision saturates.
+  precision saturates. The lens allowance is **5**, the same number as everything else here — it
+  briefly read as 6, which was never a decision: the hook counted a trailing comma as an element, so
+  every prettier-formatted 5-lens array measured 6 and the constant had been raised to fit the error.
+  Ratified at 5 by the owner once the miscount was found.
 - **Stop re-reviewing a spec once the judge calls the design clean.** Findings after that land in the
   prose about the design rather than in the design. Building is both cheaper and stricter — upstream
   measured a build that found four defects a seventh review had not.

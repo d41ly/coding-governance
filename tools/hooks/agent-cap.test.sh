@@ -161,6 +161,37 @@ js "rule2: a fixed lens literal → allow" 0 <<'EOF'
 const LENSES = [{ k: 'security' }, { k: 'correctness' }, { k: 'seams' }, { k: 'dead-code' }]
 const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
 EOF
+# THE LENS ALLOWANCE IS THE SAME 5 AS EVERYTHING ELSE, and these three arms are why it can be. It
+# read as 6 for one release and that was never a decision: the counter scored `1 + every top-level
+# comma`, so a prettier-formatted 5-element array measured 6 and the constant had been raised to fit
+# the error. Both drift-audit waves ship exactly this shape, so without the trailing-comma arm below
+# lowering the number would deny two shipped harnesses — and the arm that proves the count is fixed
+# has to be the multi-line, trailing-comma form, because the single-line one never mis-measured.
+js "rule2: five lenses, prettier-formatted with a trailing comma → allow" 0 <<'EOF'
+const LENSES = [
+  { k: 'dead-code' },
+  { k: 'unwired' },
+  { k: 'duplication' },
+  { k: 'inefficient' },
+  { k: 'instruments' },
+]
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: six lenses → deny (the allowance is 5)" 2 <<'EOF'
+const LENSES = [{ k: 'a' }, { k: 'b' }, { k: 'c' }, { k: 'd' }, { k: 'e' }, { k: 'f' }]
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: six lenses with a trailing comma → deny (the comma is not a sixth escape)" 2 <<'EOF'
+const LENSES = [
+  { k: 'a' },
+  { k: 'b' },
+  { k: 'c' },
+  { k: 'd' },
+  { k: 'e' },
+  { k: 'f' },
+]
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
 js "rule2: a marked derivation from a bounded literal → allow" 0 <<'EOF'
 const ALL_LENSES = [{ s: 'a' }, { s: 'b' }, { s: 'c' }]
 const LENSES = a.lenses ? ALL_LENSES.filter((L) => a.lenses.includes(L.s)) : ALL_LENSES // gov:fixed-verifiers

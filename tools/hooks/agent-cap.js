@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.3' // gov:kit agent-cap@1.3 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.4' // gov:kit agent-cap@1.4 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -105,13 +105,18 @@ function offendingLines(script) {
 //       chunk(x, Math.ceil(x.length / K)) or splitInto(x, K) and K is an integer literal <= 5 or an
 //       identifier bound in this file to one. The marker is the AUTHOR'S CLAIM; the shape check is
 //       what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
-//   (b) an identifier assigned from an ARRAY LITERAL with <= 6 elements — the finder-lens case,
-//       where the agent count is a constant visible in the source.
+//   (b) an identifier assigned from an ARRAY LITERAL with <= MAX_LENSES elements — the finder-lens
+//       case, where the agent count is a constant visible in the source. The count drops a trailing
+//       comma; counting it as an element is what made this allowance read as 6.
 // Everything else is denied, including a for/while/forEach body containing `agent(`: a loop-built
 // thunk array is the evasion, not an edge case.
 const FIXED_MARK = 'gov:fixed-verifiers'
 const MAX_VERIFIERS = 5
-const MAX_LENSES = 6
+// ONE NUMBER, ratified by the owner 2026-08-10 (spec F2). The lens allowance used to sit at 6 and
+// read as a deliberate find-stage affordance; it was not. It was the trailing-comma miscount above,
+// and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
+// have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
+const MAX_LENSES = 5
 // Every array method that can carry an agent() call once per element. The list is closed and
 // generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
 const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
@@ -221,15 +226,13 @@ function fanoutFindings(script) {
     // A SPREAD makes the count invisible: `[...allFindings]` is one top-level element and any number
     // of agents.
     if (inner.includes('...')) return
-    // top-level commas only
-    let d = 0
-    let n = inner.trim() ? 1 : 0
-    for (const ch of inner) {
-      if ('[{('.includes(ch)) d++
-      else if (']})'.includes(ch)) d--
-      else if (ch === ',' && d === 0) n++
-    }
-    if (n <= MAX_LENSES) ok.add(name)
+    // ONE splitter, shared with the call-site walk below, because a TRAILING COMMA is not an element
+    // any more than it is an argument. Counting `1 + every top-level comma` made a 5-element lens
+    // array measure 6 — which is the entire reason MAX_LENSES was 6. It never meant "six lenses are
+    // allowed"; it meant "five lenses, plus the phantom the counter invented". Every shipped harness
+    // is prettier-formatted, so every one of them was mis-measured, and the constant was raised to
+    // fit the error rather than the error being found.
+    if (topLevelArgs(inner).length <= MAX_LENSES) ok.add(name)
   }
   lines.forEach(scan)
   lines.forEach(scan)
