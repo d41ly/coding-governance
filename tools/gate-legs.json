@@ -310,6 +310,14 @@
     ]
   },
   {
+    "name": "unattended skill wiring",
+    "argv": [
+      "bash",
+      "tools/unattended/adopt-unattended.sh",
+      "--check"
+    ]
+  },
+  {
     "name": "run-gates canary",
     "argv": [
       "bash",

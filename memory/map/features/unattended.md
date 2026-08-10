@@ -8,12 +8,12 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest"]
+gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
-rendered-skills = []
+rendered-skills = ["unattended"]
 gotcha-classes = []
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
@@ -82,13 +82,12 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-The feature is mid-build. Units 1 through 4 of seven have landed on the unit branch: the run-state
+The feature is mid-build. Units 1 through 5 of seven have landed on the unit branch: the run-state
 file is legal in the memory tree, the protocol and the project declaration exist, the authorization
-amendment reaches all four sites, the four-verb driver is built and the three gate legs are on the
-bar. Units 5 through 7 — the rendered skill, the `/session-kickoff` hand-back and the adopter path —
+amendment reaches all four sites, the four-verb driver is built, the rendered Skill is installed and four
+gate legs are on the bar. Units 6 and 7 — the `/session-kickoff` hand-back and the adopter path —
 are not built, so:
 
-- `rendered-skills` is EMPTY: unit 5 has not landed.
 - The adopter path does not exist (unit 7), so nothing installs this kit into another repo and the
   two adopter legs the review budgeted are not on the bar yet.
 - No end-to-end run has been driven through this kit. Every property above is designed and

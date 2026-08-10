@@ -105,6 +105,11 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   the shipped protocol equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
+- unattended skill wiring — `bash tools/unattended/adopt-unattended.sh --check` (the rendered
+  `.claude/skills/unattended/SKILL.md` still matches `SKILL.template.md` + `.unattended.conf`, AND
+  carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
+  two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
+  sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default

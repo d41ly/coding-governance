@@ -41,6 +41,7 @@
       "unattended driver selftest",
       "unattended gate selftest",
       "unattended kit gate",
+      "unattended skill wiring",
       "verdict epoch (kit version dates the engine)",
       "verdict-epoch self-test",
       "verifier fan-out (≤5 verify agents per review)",
@@ -75,7 +76,8 @@
     ],
     "rendered-skills": [
       "drift-audit",
-      "memory-recall"
+      "memory-recall",
+      "unattended"
     ],
     "gotcha-classes": [
       "absence-assertion-over-whole-file-text.md",

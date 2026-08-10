@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T20:30:08+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
+last-audit: 2026-08-10T20:35:29+03:00 @ 990f07b7e3bffcc3886050cc7eb8aa7f3a68299d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -149,6 +149,19 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
   spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
   Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
+- This node's `merge.rows.driver` pointed at `tools/memory-tree/merge-rows.sh`, which does not exist
+  (only the `.py` and its `.test.sh` do), so `bash tools/check-wiring.sh --check` exited 1 on a
+  worktree whose SessionStart line had said `ok merge`. `--fix` correctly DECLINES to overwrite a set
+  value, so it self-heals only an UNSET one. Remedy, and it is machine state that travels with no
+  commit: `git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'`.
+  Worth front-loading because a broken value reads as configured to every check but this one.
+- Template parity and PLACEHOLDER COMPLETENESS are two different questions about a rendered file. A
+  render whose conf declares nothing for a key is byte-identical to a fresh render — perfectly in
+  sync — and instructs the agent to invoke the placeholder's own name as if it were a tool. A
+  `--check` that only diffs against the template cannot see that; grep the render for a surviving
+  brace-shaped placeholder as its OWN arm. (Paraphrased on purpose: `manifest-check.sh` check 1 bans
+  the literal double-brace shape anywhere in this file, so quoting one reds the manifest — the same
+  trap hygiene check 12's skeleton scan sets, one file over.)
 - A "core set ⊆ effective set" assertion is VACUOUS whenever the checker COMPOSES the effective set
   from the core one. Measured 2026-08-10 in the new unattended leg: the leg built `PHASES` as
   `$PHASES_CORE $PHASES_EXTRA` and then asserted every core member was in `PHASES` — a subset by
