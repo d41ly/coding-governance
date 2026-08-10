@@ -56,6 +56,14 @@ is filled in exactly one place.
   `codebase-map/` kit — else delete all four.
 - **Memory-recall line** (the §5 kit bullet): keep only if adopting the `memory-recall/` kit — which
   needs the memory tree, since the kit refuses without `.memory-tree.conf`.
+- **Unattended-run lines** (the `, or a committed standing mandate …` clause in §1's Landing block,
+  the `, or the §1 standing mandate` clause in §8, and companion §1's second block): keep only if
+  adopting the `unattended/` kit — else delete the two clauses, restoring the unamended explicit-ask
+  rule, and delete the companion block. Companion §1's FIRST block (the kickoff-manifest merge
+  exception) is independent of this kit and stays whenever the project keeps a manifest. The clauses
+  are written to stay true without the kit — they say the merge bar validates the mandate's shape,
+  and a project with no such bar has no mandate — but a repo that keeps them without the kit is
+  carrying a rule nothing can make true, which is the drift this row exists to prevent.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
 - **§11** — drop for single-OS teams.
 - **§4** harness lines and **§13** entirely — drop if the project has no UI.

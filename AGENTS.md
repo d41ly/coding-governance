@@ -14,7 +14,9 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
   ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh` — trim or externalize, never
   raise the limit). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
-  (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references by §-stub).
+  (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
+  holding the kickoff-manifest merge exception the byte-gated template externalized, plus the
+  kit-conditional unattended-run rules).
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
 - **`tools/`** — `lib/resolve-python.sh` (the one python-launcher resolver: it RUNS the candidate,
@@ -25,6 +27,10 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
   that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
+  `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
+  reads the project's `.unattended.conf` declarations rather than restating them — a run that will
+  merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
+  mandate it ASSERTS and cannot have written),
   `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
   attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
@@ -91,6 +97,27 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
+- **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
+  merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
+  mandate it ASSERTS and cannot have written. Three legs: `tools/unattended/check-unattended.sh`
+  (eleven checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
+  live, the run-state file's generated region still equals the build README slice it is a COPY of,
+  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, and
+  the shipped protocol equals the installed one), plus its sibling
+  `tools/unattended/check-unattended.test.sh` and the driver's
+  `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
+- unattended adopter e2e — `bash tools/unattended/adopt-unattended.test.sh`: the adopter WRITES, so
+  it is gated on the EFFECTS in BOTH trees, never on the exit code. It refuses a foreign repo and an
+  install prefix carrying whitespace (the kit path is interpolated into shell commands in the
+  rendered Skill) before it reads anything, and it ADOPTS through a junction inside the adopting
+  repo — the walk is logical, never physical. The junction arm skips LOUDLY where the host cannot
+  create a link, because a copy would score a refusal as success
+- unattended skill wiring — `bash tools/unattended/adopt-unattended.sh --check` (the rendered
+  `.claude/skills/unattended/SKILL.md` still matches `SKILL.template.md` + `.unattended.conf`, AND
+  carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
+  two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
+  sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
@@ -114,4 +141,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
   in a companion, not the template.
 - Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask.**
+- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed standing
+  mandate naming the build and both actions**, whose shape the merge bar validates. The mandate is
+  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE:
+  a run that authors its own authorization has none. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.

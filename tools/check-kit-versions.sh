@@ -51,6 +51,14 @@ if [ -z "$c" ] || ! grep -qE "gov:kit memory-tree@$c([^0-9.]|\$)" tools/memory-t
   fails=$((fails+1))
 fi
 
+need "KIT_UNATTENDED_VERSION"     tools/unattended/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"
+# The unattended kit carries its version in TWO hand-kept literals — the driver and the leg — and the
+# leg's own comment claimed this gate paired them while nothing did. Same shape as memory-tree below.
+u=$(grep -oE "^KIT_UNATTENDED_VERSION=$V" tools/unattended/unattended.sh | head -1 | cut -d= -f2)
+if [ -z "$u" ] || ! grep -qE "^KIT_UNATTENDED_VERSION=$u([^0-9.]|\$)" tools/unattended/check-unattended.sh; then
+  echo "kit-versions: check-unattended.sh KIT_UNATTENDED_VERSION != unattended.sh (${u:-unreadable})"
+  fails=$((fails+1))
+fi
 need "KIT_MEMORY_RECALL_VERSION"  tools/memory-recall/recall_conf.py         "^KIT_MEMORY_RECALL_VERSION = \"$V\""
 
 # memory-recall: constant in recall_conf.py, marker in the README the adopter keeps. Same pair

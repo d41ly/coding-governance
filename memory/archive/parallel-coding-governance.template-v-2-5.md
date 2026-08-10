@@ -1,14 +1,13 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.6** · 2026-08-10. One line per directive (a wrapped line is still one rule). Deploy +
-re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
+*Template **v2.5** · 2026-08-10. One line per directive (a wrapped line is still one rule). Deploy +
+re-pull BOTH files per `parallel-coding-governance.customize.md`; the eight domain checklists (§4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.6 (2026-08-10):** §1 and §8 accept a committed
-standing mandate in place of the explicit ask; the kickoff-manifest merge exception moved into the
-new companion §1, which also carries the unattended-run checklist — re-pull §1, §8 and the
-companion in lockstep.*
+`…-v-N-N.md` snapshots + git. **v2.5 (2026-08-10):** the `memory-tree` kit is REQUIRED; §8 spells the
+second fan-out marker `agent-cap` demands; the orphaned gate-discipline section is now companion §7 —
+re-pull §0, §5, §7, §8 and the companion in lockstep.*
 
-<!-- governance-template: v2.6 -->
+<!-- governance-template: v2.5 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -47,10 +46,10 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
-- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask, or a committed standing mandate whose shape your merge bar validates (companion §1, §8).
+- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask (§8).
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
-- Kickoff-manifest merge exception (its `last-audit` line), and the unattended-run rules → `parallel-coding-governance.domain-rules.md` §1. LOAD when a merge touches the manifest, or before a run with no human in the loop.
+- Kickoff-manifest exception: it reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
 
@@ -155,7 +154,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Structured-output schemas for orchestration returns → `parallel-coding-governance.domain-rules.md` §8. LOAD when writing a Workflow script.
 - Orchestration scripts run in sidechains inheriting neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the ≤5 cap is enforced at the `Workflow` tool-call (where a main-loop `PreToolUse` fires), never inside the script where no hook reaches.
 - Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
-- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing on shared `main` and `git push` each require an explicit ask, or the §1 standing mandate.
+- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing on shared `main` and `git push` each require an explicit ask.
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 
