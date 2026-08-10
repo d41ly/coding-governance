@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T01:58:20+03:00 @ 289daf72975dba130904edc1512733fa5e9f5d54
+last-audit: 2026-08-10T02:03:04+03:00 @ 289daf72975dba130904edc1512733fa5e9f5d54
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -54,12 +54,10 @@ python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
 
-The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. Both CLIs
-below need `CODEBASE_MAP_ROOT` — without it they answer from an EMPTY corpus and say so in a way
-that reads like a real answer:
+The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
+environment is needed — the engine resolves this repo's `tools/` install prefix itself:
 
 ```bash
-export CODEBASE_MAP_ROOT="$(git rev-parse --show-toplevel)"
 python tools/codebase-map/map_diff.py <old>..<new>          # Step 1: what a fast-forward brought in
 python tools/codebase-map/reuse_lookup.py "<behaviour>"     # Step 4 / §10: the seam to wire through
 ```
@@ -123,12 +121,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
   2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
   and sweep TRACKED AND UNTRACKED files when repairing.
-- Every kit here installs under `tools/`, but the codebase-map kit resolves the repo root as its own
-  dir's GRANDPARENT — which is `tools/`, not the root. `adopt-codebase-map.sh` refuses to run at all
-  (it guards on `$ROOT/codebase-map`), and `reuse_lookup.py` / `map_diff.py` answer from an EMPTY
-  corpus while printing "no seam fits" and "mapped 0/N" — a confident answer with nothing behind it.
-  `tools/codebase-map/map_extractors.py` sets `CODEBASE_MAP_ROOT` for the entrypoints that import it
-  (gen_map + the gate); the other two need it exported. See `memory/map/features/codebase-map.md`.
+- A kit that resolves the repo root by counting directories UP from itself breaks at any install
+  prefix but the one it assumed, and it breaks SILENTLY — codebase-map answered from an empty corpus
+  printing "no seam fits" and "mapped 0/N". Fixed in the engine (`resolve_root` walks up for the
+  conf, bounded by `.git`), and the `CODEBASE_MAP_ROOT` workaround that preceded it is now BANNED by
+  the kit's own selftest. Kept as a trap because the class outlives the instance: this repo installs
+  every kit under `tools/`, so a kit written against a root install is wrong here by one segment.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides
