@@ -171,7 +171,21 @@ for f in $RUNS; do
   # ---- AN ABSENT `base:` LINE IS THE VIOLATION, not the exemption. Wrapping this in `if [ -n ]`
   # ---- meant deleting one line from a run-writable file disarmed the only BASE check on the bar.
   rb=$(fact_of "$f" base)
-  if [ -z "$rb" ]; then
+  # A TERMINAL run's branch point is gone by construction: after the run merges and the branch is
+  # deleted, merge-base(origin/default, HEAD) is no longer the commit it forked from. Reproducing it
+  # for a landed record turns the default-branch bar permanently red on the first successful landing
+  # — the pin polices a LIVE run's provenance. Reachability still holds and is what is asserted.
+  ph=$(fact_of "$f" phase)
+  TERMINAL_REC=0
+  case " $PHASES_TERMINAL " in *" $ph "*) TERMINAL_REC=1 ;; esac
+  if [ "$TERMINAL_REC" = 1 ]; then
+    # SKIPS THE MERGE-BASE REPRODUCTION ONLY — never the mandate assertion below, which is the whole
+    # reason this leg exists. An earlier spelling used `continue` here and silently took check 13
+    # with it, which its own self-test caught.
+    if [ -n "$rb" ] && ! git merge-base --is-ancestor "$rb" HEAD >/dev/null 2>&1; then
+      fail 9 "a terminal run-state file records a BASE that is not an ancestor of HEAD, so the run it describes did not land on this history: $f"
+    fi
+  elif [ -z "$rb" ]; then
     fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
     # THE LEG DOES NOT READ GOV_DEFAULT_BRANCH. The driver may be steered by an operator; the gate

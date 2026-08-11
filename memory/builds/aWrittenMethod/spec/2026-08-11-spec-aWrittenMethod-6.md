@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-6 — escaping conf values before substitution
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -160,6 +160,12 @@ same exposure, and a test whose fixture is blander than reality is this repo's
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-11 · folded closing review wf_384dfc48-5a9. H3 CONFIRMED: `out=$(cat X; printf X)
+  || return 1` is a branch no input can take, because a command substitution reports the LAST
+  command's status and printf always succeeds — so the unreadable-template guard was dead in all
+  five renderers this unit wrote. Verified both directions in isolation before and after. This is
+  the same unreachable-branch class unit 2 deleted one pass earlier, reintroduced by the fix for a
+  different one.
 - rev-3 · 2026-08-11 · BUILT on branch, unmerged. All six substitution sites converted. Every
   rendered artifact byte-identical (AC4/AC7), adopter e2e 26 assertions up from 19. Two defects
   found while building: the FIXTURE was first written with sed using the pipe delimiter and

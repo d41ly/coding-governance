@@ -191,7 +191,7 @@ trusted_base() { # run-state file  ->  sets TB
     return 1
   fi
   if [ "$RESOLVED_REF" != "$canon" ]; then
-    fail 22 "the resolved default-branch ref is not the one refs/remotes/origin/HEAD names" "resolved $RESOLVED_REF, canonical $canon"
+    fail 22 "resolved $RESOLVED_REF against canonical $canon — the resolved default-branch ref is not the one refs/remotes/origin/HEAD names"
     return 1
   fi
   if [ -f "$1" ]; then
@@ -204,7 +204,7 @@ trusted_base() { # run-state file  ->  sets TB
     # never read as input. An absent one is the violation, not the exemption.
     rec=$(fact "$1" base-ref)
     if [ -n "$rec" ] && [ "$rec" != "$RESOLVED_REF" ]; then
-      fail 22 "the base-ref recorded in the run-state file is not the ref this history resolves" "recorded $rec, resolved $RESOLVED_REF"
+      fail 22 "recorded $rec against resolved $RESOLVED_REF — the base-ref recorded in the run-state file is not the ref this history resolves"
       return 1
     fi
   fi

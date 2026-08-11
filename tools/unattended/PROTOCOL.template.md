@@ -19,10 +19,15 @@ authorized actions (the merge and the push). Three properties, all mechanical:
 
 - **It is asserted, never written by the run.** `--preflight` reads it and refuses if it is absent.
   A run that could write its own mandate authorizes itself, and the gate would certify it.
-- **The BASE it is reachable from is anchored outside the run.** The ref BASE came from is recorded
-  and independently re-derived by the gate (§2, fact 6). Without that, a run could name its own
-  default branch and write the matching remote-tracking ref locally — no push, no network — and every
-  gate stayed green.
+- **The BASE it is reachable from is NARROWED, not anchored.** The ref BASE came from is recorded and
+  independently re-derived by the gate (§2, fact 6), which removes the steer where a run names its own
+  default branch through the environment. It does NOT make the anchor unreachable: a
+  remote-tracking ref is an ordinary local ref, and `git update-ref refs/remotes/origin/<default>
+  <commit>` succeeds with no push and no network, after which both the BASE check and the mandate
+  comparison read a commit the run chose. Reproduced with a control. Closing that needs an anchor no
+  local command can write — the remote's own answer via `git ls-remote`, or an owner-signed tag — and
+  a gate that REFUSES when it cannot reach one. Until then this property is a narrowing, and a
+  document that claimed otherwise would be the most expensive kind of wrong.
 - **It is reachable from the pinned BASE.** A mandate introduced by a commit on the run's own branch
   grants nothing. Reachability is the machine-checkable form of "the owner wrote this first".
 - **Only its SHAPE is checked.** No gate can tell whether the owner meant it. The two properties

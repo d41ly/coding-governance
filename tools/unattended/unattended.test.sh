@@ -166,7 +166,7 @@ reset_tree
 # assert a refusal it never reached. The steer has to survive the earlier guard to test the later one.
 git update-ref refs/remotes/origin/steered HEAD~1
 out=$(GOV_DEFAULT_BRANCH=steered bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
-hit "$out" "the resolved default-branch ref is not the one refs/remotes/origin/HEAD names"
+hit "$out" "— the resolved default-branch ref is not the one refs/remotes/origin/HEAD names"
 git update-ref -d refs/remotes/origin/steered
 
 # The recorded base-ref is EVIDENCE on the same footing as the recorded base: re-derived here, never
@@ -175,7 +175,7 @@ reset_tree
 out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
 sed -i 's|^base-ref: .*|base-ref: refs/remotes/origin/forged|' memory/builds/tRun/RUN.md
 out=$(bash "$SCRIPT" --close tRun 2>&1)
-hit "$out" "the base-ref recorded in the run-state file is not the ref this history resolves"
+hit "$out" "— the base-ref recorded in the run-state file is not the ref this history resolves"
 
 # POSITIVE CONTROL for the pair above: unsteered, the same tree still preflights. An arm set that
 # only ever reds proves the refusal fires, never that it fires for the right reason.

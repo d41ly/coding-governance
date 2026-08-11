@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -194,6 +194,16 @@ is implementable. A repo whose remote is not `origin` sets `origin/HEAD` or does
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-11 · folded closing review wf_384dfc48-5a9. B1 CONFIRMED and reproduced with a
+  control: refs/remotes/origin/<default> is an ordinary local ref, so `git update-ref` steers the
+  BASE with no push and both check 9 and check 13 certify a self-authored mandate. The CODE limit
+  was already F2; what was wrong was the PROTOCOL, which this unit shipped claiming the BASE is
+  "anchored outside the run". Both copies now say NARROWED, name the command that moves the value,
+  and name what closing it needs. H2: check 9 reproduced a merge-base for TERMINAL records, so the
+  first successful landing would have redded main permanently — terminal records now assert
+  reachability instead, armed both directions. An earlier spelling used `continue` and silently took
+  the mandate assertion with it; the leg's own self-test caught that. M2: fail 22 computed a third
+  argument that fail() discards, so the operator never saw the values.
 - rev-3 · 2026-08-11 · BUILT on branch, unmerged. Driver 59 assertions, leg 64, arms clean,
   ARMS_FLOORS raised 31->34 and 33->38. Two defects the arms caught during the build: resolve_base
   ran under $( ) so the global it set never reached the caller, and a default_branch refusal inside

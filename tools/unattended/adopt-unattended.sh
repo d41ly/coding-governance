@@ -93,8 +93,10 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   # eaten unquoted and preserved quoted. The quotes are the fix, not decoration.
   local out
   # The `X` sentinel exists because `$( )` strips ALL trailing newlines: without it a template
-  # ending in two blank lines renders with one, and the parity diff blames the author for it.
-  out=$(cat "$TEMPLATE"; printf X) || return 1
+  # ending in two blank lines renders with one, and the parity diff blames the author for it. `cat`
+  # gets its own subshell and an explicit `exit 1`, because a substitution reports the LAST command's
+  # status — printf's, always 0 — so the guard below was unreachable without it.
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}

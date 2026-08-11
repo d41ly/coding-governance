@@ -143,6 +143,24 @@ git update-ref refs/remotes/origin/main "$ORPHAN"
 hit "$(run)" "and HEAD, so the recorded BASE reproduces nothing"
 git update-ref refs/remotes/origin/main main
 
+# A TERMINAL record is exempt from the merge-base reproduction — after a run lands, its branch point
+# is gone by construction and reproducing it would red main forever. What still holds is REACHABILITY,
+# so a terminal record whose BASE is not an ancestor of HEAD describes a run that landed somewhere
+# else, and that is a red.
+reset_tree
+sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tRun/RUN.md
+ORPH=$(git commit-tree "$(git hash-object -t tree -w /dev/null)" -m orphan)
+sed -i "s/^base: .*/base: $ORPH/" memory/builds/tRun/RUN.md
+hit "$(run)" "a terminal run-state file records a BASE that is not an ancestor of HEAD, so the run it describes did not land on this history"
+
+# POSITIVE CONTROL for the exemption itself: the same terminal record with a REACHABLE base is green,
+# which is the half that proves the skip is a skip and not a blanket pass.
+reset_tree
+sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
+out=$(run); rc=$?
+same "a terminal record with a reachable BASE is green" "$rc" "0"
+
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
 reset_tree; rm -f .unattended.conf
 hit "$(run)" "no .unattended.conf at the repo root, and every value this leg checks is declared there"
