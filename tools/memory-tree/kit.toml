@@ -1,0 +1,75 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "memory-tree"
+home = "tools/memory-tree"
+scope = "repo"
+version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
+requires = []
+requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"], why = "corpus_ids.py arms checks 13-16 on any of these three pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged" }]
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["HYGIENE.template.md"]
+role = "rendered"
+to = "{memory_root}/HYGIENE.md"
+placeholders = ["KIT_DIR", "TOOL_ROOT"]
+
+[[files]]
+include = ["SPEC-TEMPLATE.template.md"]
+role = "rendered"
+to = "{memory_root}/TEMPLATE-SPEC.md"
+placeholders = ["KIT_DIR", "TOOL_ROOT"]
+
+[[files]]
+include = ["BUILD-METHOD.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/BUILD-METHOD.md"
+placeholders = ["KIT_DIR", "TOOL_ROOT"]
+
+[config]
+file = ".memory-tree.conf"
+owner = "memory-tree"
+required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
+required_keys_render = ["MEMORY_ROOT"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
+conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"]
+defaults = { MEMORY_ROOT = "memory" }
+
+[adopt]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--scaffold"]
+mutates_index = true
+
+[[outcome]]
+code = 1
+probe = { must_exist = ".memory-tree.conf", must_not_exist = "{memory_root}/HYGIENE.md" }
+means = "seed-and-stop"
+
+[[outcome]]
+code = 1
+probe = { must_exist = "{memory_root}/HYGIENE.md" }
+means = "refused-foreign-tree"
+
+[[gate_leg]]
+name = "memory hygiene"
+argv = ["bash", "{kit}/check-memory-hygiene.sh"]
+guard = []
+history_depth = "full"
+
+[[hole]]
+id = "memory-tree-taxonomy"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = false
+why = "DISCIPLINES and FAMILIES ship as the example's DEMO values rather than blank, so an un-edited conf scaffolds another project's enum into the target and every gate stays green. Neither flag set: measured, the adopter exits 0 and the hygiene leg exits 0."
+discharge = { command = ["bash", "-c", "! diff -q <(grep -E '^(DISCIPLINES|FAMILIES)=' .memory-tree.conf) <(grep -E '^(DISCIPLINES|FAMILIES)=' {kit}/.memory-tree.conf.example) >/dev/null"] }
+
+[[hole]]
+id = "measured-pins"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-16 are simply OFF, so the hygiene leg exits 0 with the hole wide open."
+discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN READ_PATH_CEILING; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }

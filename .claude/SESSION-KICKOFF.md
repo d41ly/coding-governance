@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T21:36:48+03:00 @ 7890becf4456b1f6587a7bcde9d8f1fb70077673
+last-audit: 2026-08-11T21:08:50+03:00 @ 1a1f798383af19dec27407ef0e986125d4e5e441
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -244,14 +244,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   `check-memory-hygiene.test.sh` deliberately sets no pins, so any 13-19 arm belongs in its own
   scratch tree with the pin set. This is the `vacuous-selector-empty-population` class one level up:
   the population is fine, the CHECK is switched off.
-- MEASURING ON THIS BOX: wall clock is not a metric and a PATH shim is not free. Ten worktrees share
-  this machine and other sessions run full bars, so identical code timed 77s and 95s twenty minutes
-  apart — any optimisation judged on wall time here is judged on someone else's load. Count PROCESSES
-  instead; that is deterministic. Two traps in the counting itself, both hit: a shim that execs
-  `/usr/bin/git` silently breaks every call because that path does not exist on this node (git is
-  `/mingw64/bin/git`), and the suite then 'passes' in 14s having done nothing — so a shim MUST assert
-  its subject still passes. And a Windows-spelled directory prepended to `PATH` is never searched by
-  MSYS bash, so the shim silently never fires and reports zero. Use a `mktemp -d` path.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

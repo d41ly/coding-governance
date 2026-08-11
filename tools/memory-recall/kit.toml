@@ -1,0 +1,44 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "memory-recall"
+home = "tools/memory-recall"
+scope = "repo"
+version_from = { file = "recall_conf.py", pattern = "^KIT_MEMORY_RECALL_VERSION = " }
+requires = ["memory-tree"]
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/memory-recall/SKILL.md"
+placeholders = ["FAMILIES", "MEMORY_ROOT", "QUERY_CLI"]
+
+[config]
+file = ".memory-tree.conf"
+owner = "memory-tree"
+required_keys_render = ["MEMORY_ROOT", "FAMILIES"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".claude/skills/memory-recall/SKILL.md" }
+means = "adopted"
+
+[[gate_leg]]
+name = "memory-recall kit selftest"
+argv = ["python", "{kit}/selftest.py"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "memory-recall skill wiring"
+argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
+guard = []

@@ -144,6 +144,20 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
+  DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
+  and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under
+  `tools/`, everything under `.githooks/` and `skills/session-kickoff/`, and the shipped root playbook
+  files is an entry, a member of exactly one entry's file rules, or an exemption carrying a reason. An
+  exemption naming a path that no longer exists reds, because a stale one silently widens the surface
+  it was written to narrow. **No population count is written in the spec or the registry** — the leg
+  derives every one, after the spec twice stated a figure the tree then moved underneath. Its first
+  run over the real tree found seven problems, three of them real, which is why a new predicate is run
+  before it is trusted rather than after. `plan` and `check` are READ-ONLY and their leg is
+  `python tools/govkit/selftest.py`, whose arms assert a specific MESSAGE or on-disk effect and
+  never an exit code alone — including the on-disk arm that `plan` leaves the target byte-identical
+  a read-only verb that writes is the whole risk of that verb. It found two real defects on its
+  first run, one of them a token regex matching the `{k}` inside a shell `${k}`
 
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·

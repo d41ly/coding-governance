@@ -132,7 +132,7 @@ spec in this folder — do not hand-edit it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
-| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | CLOSED | rev-4 | 2026-08-11 |
+| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | CLOSED | rev-5 | 2026-08-11 |
 | [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | CLOSED | rev-3 | 2026-08-11 |
 | [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | CLOSED | rev-6 | 2026-08-11 |
 | [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | CLOSED | rev-3 | 2026-08-11 |

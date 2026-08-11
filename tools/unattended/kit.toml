@@ -1,0 +1,77 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "unattended"
+home = "tools/unattended"
+scope = "repo"
+version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
+requires = ["memory-tree"]
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/unattended/SKILL.md"
+placeholders = ["KIT_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
+
+[[files]]
+include = ["PROTOCOL.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
+placeholders = []
+
+[config]
+file = ".unattended.conf"
+owner = "unattended"
+required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR"]
+required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA"]
+defaults = { MEMORY_ROOT = "memory" }
+
+[adopt]
+argv = ["bash", "{kit}/adopt-unattended.sh"]
+mutates_index = false
+requires_config_first = true
+
+[check]
+argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
+
+[[outcome]]
+code = 1
+probe = { must_not_exist = ".unattended.conf" }
+means = "no-project-layer"
+
+[[outcome]]
+code = 1
+probe = { must_exist = "{memory_root}/guides/UNATTENDED-PROTOCOL.md", must_not_exist = ".claude/skills/unattended/SKILL.md" }
+means = "render-failed-half-stamped"
+
+[[gate_leg]]
+name = "unattended kit gate"
+argv = ["bash", "{kit}/check-unattended.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
+name = "unattended skill wiring"
+argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
+guard = []
+red_after_land = true
+
+[[hole]]
+id = "keepalive-tool-names"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "a key ABSENT from the conf reds both the adopter check arm and the kit gate leg. But the shipped conf example copied verbatim renders its angle-bracket placeholder text as literal prose and passes EVERY check, because the placeholder detector greps the brace shape only — so this hole is half-silent and the probe is the only thing that sees that half."
+discharge = { command = ["bash", "-c", "! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md"] }
+
+[[hole]]
+id = "core-floor"
+kind = "measured-pin"
+blocks_adopt = false
+blocks_gate = true
+why = "undeclared or malformed reds the kit gate. For a faithful copy install the correct value is the driver's own core set sizes, so this is a transcription hole rather than a corpus measurement."
+discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
