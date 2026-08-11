@@ -132,3 +132,64 @@ running `--fix` in a fixture of each layout, so a stray third spelling in this f
 Adopting the sibling `codebase-map/` kit with `MAP_ROOT` under this tree (e.g. `memory/map`)?
 The hygiene + TREE scripts read `.codebase-map.conf` and carve that subtree in automatically —
 see the "Codebase-map interop" section the HYGIENE template ships. No conf keys here change.
+
+## The build method's displaced sections
+
+`memory/guides/BUILD-METHOD.md` is capped at 250 lines by hygiene rule 6 and is re-read WHOLE at every pass
+boundary, so it grows only by displacement. These two sections live here because they are EXPLANATION: nothing
+below changes what an agent does next, and the rules that do stayed in the method.
+
+### M5 — the probe-failure taxonomy
+
+**Never read a probe's exit status as a verdict — these exit 0 on a miss.** A clean "nothing found" is an ANSWER:
+record it as the no-seam evidence, and do not re-run with softer words until it says something.
+
+**A partial-recall or blind-layer notice means the probe cannot see that layer at all.** In this repo **bash is
+recall-dark**, so the gates, adopters and hooks that ARE the product never surface as seams; `grep` that layer
+specifically and say so in §10.
+
+**A miss on one phrasing is not absence.** Try the behaviour, then the artifact noun, once.
+
+**An absent tool does not remove the obligation.** Grep the tree and the nearest record, and write in §10 what you
+did instead.
+
+**A hit can be STALE.** A record describes what was true when it was written. Verify any claim about current code
+against source before building on it, and say in §10 where a record and the source disagreed. This one is not
+theoretical: a recall pass during `TOOL-aWrittenMethod-1` returned four hits asserting the parity render runs
+LIVE to SHIPPED, which the source contradicts.
+
+### The method's pointer table
+
+Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
+method.
+
+- `skills/session-kickoff/SKILL.md` + `.claude/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
+  the six interactive exits.
+- `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
+- `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
+- `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
+- `parallel-coding-governance.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
+  gate discipline, diff-scoping, the final-message format.
+- `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
+
+### M2 and M3 — the judgment calls, and why they are not procedure
+
+**Sub-spec disagreement (M2)** is a read you perform, and its only trace is the §9 line naming what disagreed.
+Nothing can check that you performed it.
+
+**M3's vetoes 2 and 3** — a new dependency or install location, and a widened security, data or write surface — are
+what a run under token pressure reads generously, because both are phrased as judgements about scope. Park is the
+brake, and "no survivors → park" means park, not the least-bad option.
+
+**M7's honest limit:** a compaction landing mid-pass is not caught until the next boundary. Small passes are the
+only mitigation; there is no detector.
+
+### M4 — the spec-audit lens catalogue
+
+Three to five, primed with the mandate, the build overview and the spec format:
+
+- **underspecification** — which §2 item has no §6 criterion, and which §6 criterion names no observation.
+- **contradiction** — §2 against §3; a sub-spec against the main spec on M2's four axes; §4 Design against §7 Gates.
+- **unstated assumption** — what must be true of existing code for §4 to work that §4 never says and §10 never
+  checked.
+- **prior art** — has a record already decided this? That is the recall probe, M5.
