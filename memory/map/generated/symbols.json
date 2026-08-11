@@ -173,6 +173,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "apply_front_matter_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "apply_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1156,6 +1161,11 @@
       "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "rosters",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "row_ids",

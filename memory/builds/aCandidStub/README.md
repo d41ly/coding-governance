@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-10
 streams: playbook+tooling
 roster: PLAY+TOOL
-ids: PLAY-aCandidStub-1
+ids: PLAY-aCandidStub-1 PLAY-aCandidStub-2 TOOL-aCandidStub-1 TOOL-aCandidStub-2 TOOL-aCandidStub-3 TOOL-aCandidStub-4
 ---
 
 # aCandidStub — the playbook reconverges on the repo it governs
@@ -24,7 +24,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-10 · streams playbook+tooling · ids PLAY-aCandidStub-1
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-10 · streams playbook+tooling · ids PLAY-aCandidStub-1 PLAY-aCandidStub-2 TOOL-aCandidStub-1 TOOL-aCandidStub-2 TOOL-aCandidStub-3 TOOL-aCandidStub-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

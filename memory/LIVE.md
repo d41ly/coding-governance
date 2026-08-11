@@ -6,14 +6,14 @@ terminal status. Nothing here is edited by hand.
 
 | Build | Status | Node | Opened | Streams | Ids |
 |---|---|---|---|---|---|
-| [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aBatchedLintel-1/-2 |
-| [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | DEPL-aDeployScout-1 |
-| [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | TOOL-aDrainedSluice-1..-9 |
-| [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aGuardedTally-1 |
-| [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | TOOL-aMendedLedger-1..-8 |
-| [aMouldedFolio](builds/aMouldedFolio/README.md) | SPECCED | a | 2026-08-11 | tooling | TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 |
-| [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | TOOL-aPortableWarden-1 |
-| [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aQuarriedLantern-1..-3 |
-| [aSealedCaravan](builds/aSealedCaravan/README.md) | SPECCED | a | 2026-08-10 | deployer+tooling | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
-| [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | TOOL-aWireWarden-1 |
-| [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | TOOL-bConvergentLodestar-1 |
+| [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
+| [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
+| [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
+| [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
+| [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
+| [aMouldedFolio](builds/aMouldedFolio/README.md) | SPECCED | a | 2026-08-11 | tooling | 2 |
+| [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
+| [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
+| [aSealedCaravan](builds/aSealedCaravan/README.md) | SPECCED | a | 2026-08-10 | deployer+tooling | 2 |
+| [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
+| [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |

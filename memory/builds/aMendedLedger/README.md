@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-09
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-aMendedLedger-1..-8
+ids: TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 TOOL-aMendedLedger-9
 ---
 
 # aMendedLedger — finish the memory rework: drain the ledger, drive the merge, re-true the docs
@@ -19,7 +19,7 @@ Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook · ids TOOL-aMendedLedger-1..-8
+**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook · ids TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 TOOL-aMendedLedger-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
