@@ -56,7 +56,7 @@ fi
 
 # `project/` still needs creating even though it now holds only files: the registry printf
 # redirects below cannot create their own directory.
-mkdir -p "$M/project" "$M/builds" "$M/backlog"
+mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
 # root index + rules
 # RENDERED, not copied: these two land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
@@ -64,6 +64,9 @@ mkdir -p "$M/project" "$M/builds" "$M/backlog"
 render_doc() { sed -e "s|{{KIT_DIR}}|$KIT_REL|g" -e "s|{{TOOL_ROOT}}|$TOOL_ROOT|g" "$1" | tr -d "\r"; }
 if [ -f "$HERE/HYGIENE.template.md" ]; then render_doc "$HERE/HYGIENE.template.md" > "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLATE.template.md" > "$M/TEMPLATE-SPEC.md"; fi
+# The build method joins the same rendered set: an adopter that receives the spec format and the
+# hygiene rules but not the method for using them has been handed two thirds of one contract.
+if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.template.md" > "$M/guides/BUILD-METHOD.md"; fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
   echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo

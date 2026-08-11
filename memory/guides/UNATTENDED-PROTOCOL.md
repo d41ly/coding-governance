@@ -164,6 +164,7 @@ where this document says it may:
 | `GATE_CMD` | the full merge bar, for `gates-green` |
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
+| `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
