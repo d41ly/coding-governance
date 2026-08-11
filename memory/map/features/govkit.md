@@ -12,7 +12,7 @@ gate-legs = ["govkit selfcheck", "govkit selftest"]
 kits = ["govkit"]
 git-hooks = []
 workflow-scripts = []
-skill-engines = []
+skill-engines = ["deploy-governance"]
 rendered-skills = []
 gotcha-classes = []
 guides = []
@@ -22,6 +22,7 @@ globs = [
   "tools/govkit/*",
   "tools/govkit/entries/*",
   "tools/*/kit.toml",
+  "skills/deploy-governance/*",
 ]
 ```
 
@@ -108,11 +109,10 @@ unit exists to replace:
   the real one; the receipt records them, `apply` does not write them.
 - **The gate-runner and CI emitter is not built.** S5's last step is reported as SKIPPED on every
   run.
-- **The runbook demotion and its parity gate are not built.** `WIRE-INTO-PROJECT.md` is still the
+- **The runbook demotion and its parity gate are not built.** The Skill exists and points at the
+  deployer, but `WIRE-INTO-PROJECT.md` is still the
   prose runbook rather than narrative kept honest by a gate asserting every descriptor step has a
   section and the reverse.
-- **`skills/deploy-governance/SKILL.md` is not written**, so an agent still reaches for the runbook
-  rather than the deployer.
 All three AC10 assertions that were open have landed: the version cross-check, the guard-class
 partition, and the derived `mutates_index`. Each carries a LIVENESS arm in the selftest — a scratch
 gov tree fed input that must red — because an assertion finding nothing on a clean tree is

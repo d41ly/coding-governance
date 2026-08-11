@@ -80,6 +80,7 @@
       "tier2-review.js"
     ],
     "skill-engines": [
+      "deploy-governance",
       "session-kickoff"
     ],
     "rendered-skills": [
