@@ -179,10 +179,13 @@ def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str)
 
 
 # ------------------------------------------------------------------------------- selection + tokens
-# The DEFAULT set, spelled once. `--all` is DERIVED from the registry rather than listed, because a
-# hand-kept list is how a registry grows an entry no selection ever reaches — which is exactly the
-# state the unattended kit was in when this unit's grounding found it.
-DEFAULT_KITS = ("playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall")
+# The DEFAULT set is DECLARED IN THE REGISTRY, not here. It began as a constant in this file, and a
+# scratch fixture caught what that meant: the engine named five kits by hand while the registry named
+# the population, so any registry but gov's own reported five entries missing. Two answers to one
+# question, inside the tool whose whole thesis is that there should be one. `--all` was already
+# derived; the default set now comes from the same single source.
+def default_kits(reg: dict) -> tuple[str, ...]:
+    return tuple((reg.get("selection") or {}).get("default") or ())
 
 
 def all_kits(descs: dict[str, tuple[dict, str]]) -> list[str]:
@@ -190,7 +193,8 @@ def all_kits(descs: dict[str, tuple[dict, str]]) -> list[str]:
     return sorted(e for e, (d, _) in descs.items() if d.get("selectable") != "conditional")
 
 
-def resolve_selection(descs: dict[str, tuple[dict, str]], mode: str, kits: list[str]) -> list[str]:
+def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
+                      kits: list[str]) -> list[str]:
     if mode == "all":
         return all_kits(descs)
     if mode == "kits":
@@ -201,10 +205,14 @@ def resolve_selection(descs: dict[str, tuple[dict, str]], mode: str, kits: list[
                 f"not a registry entry; the population is the registry, never a directory listing"
             )
         return sorted(kits)
-    missing = [k for k in DEFAULT_KITS if k not in descs]
+    dk = default_kits(reg)
+    if not dk:
+        raise Refusal("registry.toml declares no [selection] default set, and this tool will not "
+                      "invent one: a default nobody declared is a decision nobody made")
+    missing = [k for k in dk if k not in descs]
     if missing:
         raise Refusal(f"the default set names {', '.join(missing)}, absent from the registry")
-    return sorted(DEFAULT_KITS)
+    return sorted(dk)
 
 
 # The negative lookbehind is load-bearing and was bought by a failing arm. A discharge probe is a
@@ -415,13 +423,67 @@ def selfcheck(root: pathlib.Path) -> int:
     #          computed from the registry rather than listed anywhere, so an entry cannot exist that
     #          no selection reaches — the state the unattended kit was found in.
     derived_all = all_kits(descs)
-    for k in DEFAULT_KITS:
+    for k in default_kits(reg):
         if k not in descs:
             r.fail(f"the default set names '{k}', which is not a registry entry")
     unreachable = [e for e in descs if e not in derived_all
                    and descs[e][0].get("selectable") != "conditional"]
     for e in unreachable:
         r.fail(f"entry '{e}' is reached by no selection and is not marked conditional")
+
+    # ---- 7c: every guard pathspec in gov's OWN manifest falls into exactly ONE declared class.
+    #          A class table that does not partition its input is how the emitter gets a rule for the
+    #          majority and no rule for the rest — which is what happened when the hooks directory
+    #          and the kickoff tree were classed "cannot exist in a target" while the same revision
+    #          deployed both.
+    legs_path = root / "tools" / "gate-legs.json"
+    if legs_path.is_file():
+        kit_dirs = {f"tools/{e}/" for e in descs} | {"tools/"}
+        exempt_prefixes = {x.get("path", "").rstrip("/") + "/" for x in exempts if x.get("path")}
+        verbatim = (".githooks/", ".claude/")
+        renamed = ("skills/session-kickoff/",)
+        for leg in json.loads(legs_path.read_text(encoding="utf-8")):
+            for g in leg.get("guard", []) or []:
+                classes = []
+                if g.startswith("memory/"):
+                    classes.append("memory-root-relative")
+                if any(g.startswith(v) for v in verbatim):
+                    classes.append("verbatim-repo-root")
+                if any(g.startswith(v) for v in renamed):
+                    classes.append("renamed")
+                if any(g == p.rstrip("/") or g.startswith(p) for p in exempt_prefixes):
+                    classes.append("exempt")
+                if any(g == k or g.startswith(k) for k in kit_dirs) and "exempt" not in classes:
+                    classes.append("kit-relative")
+                if len(classes) != 1:
+                    r.fail(f"guard pathspec '{g}' (leg '{leg.get('name')}') falls into "
+                           f"{len(classes)} declared classes {classes or '[]'}, not exactly one — "
+                           f"a taxonomy that does not partition its own input gives the emitter no "
+                           f"rule for the remainder")
+
+    # ---- 7d: `mutates_index` is DERIVED, never trusted as a declared value. A `git add` string
+    #          inside an `echo` is not a staging call, and mistaking one for the other is how this
+    #          unit's own spec published a measured claim that was three times the truth.
+    for eid, (d, _dpath) in descs.items():
+        adopt = d.get("adopt") or {}
+        declared = adopt.get("mutates_index")
+        if declared is None:
+            continue
+        argv = adopt.get("argv") or []
+        script = next((a for a in argv if a.endswith(".sh")), None)
+        if not script:
+            continue
+        home = (d.get("home") or "").rstrip("/")
+        cand = root / (f"{home}/{pathlib.PurePosixPath(script).name}" if home
+                       else pathlib.PurePosixPath(script).name)
+        if not cand.is_file():
+            continue
+        actual = any(re.match(r"^[ \t]*git add ", ln)
+                     for ln in cand.read_text(encoding="utf-8", errors="replace").splitlines())
+        if bool(declared) != actual:
+            r.fail(f"entry '{eid}' declares mutates_index = {str(declared).lower()} but its adopter "
+                   f"{'does' if actual else 'does not'} execute `git add` — the declared value is "
+                   f"not the measured one")
 
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.
@@ -513,7 +575,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
     deploy = load_deploy(target)
-    selection = resolve_selection(descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits)
     rows = planned_writes(root, target, deploy, descs, selection, r)
 
     print(f"govkit plan — target {target.as_posix()} · selection: {', '.join(selection)}")
@@ -692,7 +754,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                       "stated non-goal and would be indistinguishable from a self-overwrite")
 
     deploy = load_deploy(target)
-    selection = resolve_selection(descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits)
     commit = git(root, "rev-parse", "HEAD").strip()
 
     receipt_path = target / ".governance" / "install.json"
@@ -829,6 +891,18 @@ def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> 
             blobs += (to if isinstance(to, list) else [to]) if to else []
         for h in d.get("hole", []):
             blobs += (h.get("discharge") or {}).get("command") or []
+        # Every place a token can appear, not just the two obvious ones. A gate leg's argv carries
+        # `{gate_file}` for one shipped kit, and scanning only destinations and hole probes meant
+        # `intake` never asked for it — so `apply` would land, and the leg it wired would name a
+        # path nobody supplied. Found by running intake over the default set.
+        for leg in d.get("gate_leg", []):
+            blobs += leg.get("argv") or []
+            blobs += leg.get("guard") or []
+        blobs += (d.get("adopt") or {}).get("argv") or []
+        blobs += (d.get("check") or {}).get("argv") or []
+        cfg = d.get("config") or {}
+        if cfg.get("seeded_from"):
+            blobs.append(cfg["seeded_from"])
         for b in blobs:
             want.update(k for k in TOKEN_RX.findall(b or "") if k not in derived)
     return sorted(want)
@@ -848,7 +922,7 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
-    selection = resolve_selection(descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits)
     out = target / ".governance" / "deploy.toml"
     if out.is_file():
         raise Refusal(

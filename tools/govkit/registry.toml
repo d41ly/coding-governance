@@ -31,6 +31,11 @@ globs = [
   "parallel-coding-governance.template.md",
 ]
 
+# The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
+# non-conditional entry) and is deliberately not written down anywhere.
+[selection]
+default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall"]
+
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
 id = "memory-tree"

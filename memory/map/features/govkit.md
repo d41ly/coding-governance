@@ -44,6 +44,12 @@ moved when the unattended kit landed, and the playbook file count was always one
 customize companion is explicitly not shipped. `selfcheck` derives every figure at the moment it
 checks. A number in that prose is now a defect in the document.
 
+**The DEFAULT selection is declared in the registry, not the engine.** It began as a constant in
+`govkit.py` and a scratch fixture caught what that meant: the engine named five kits by hand while the
+registry named the population, so any registry but gov's own reported five entries missing. Two
+answers to one question, inside the tool whose thesis is that there should be one. `--all` was already
+derived; the default set now comes from the same single source.
+
 **The surface predicate is the ratchet.** Every tracked path in the declared surface — depth-1 under
 `tools/`, everything under the hook and kickoff trees, and the shipped root playbook files — is an
 entry, a member of exactly one entry's file rules, or an exemption carrying a non-empty reason. It is
@@ -107,5 +113,8 @@ unit exists to replace:
   section and the reverse.
 - **`skills/deploy-governance/SKILL.md` is not written**, so an agent still reaches for the runbook
   rather than the deployer.
-- **Two AC10 assertions are unimplemented**: the guard-class partition, and the derived
-  `mutates_index`. The version cross-check landed.
+All three AC10 assertions that were open have landed: the version cross-check, the guard-class
+partition, and the derived `mutates_index`. Each carries a LIVENESS arm in the selftest — a scratch
+gov tree fed input that must red — because an assertion finding nothing on a clean tree is
+indistinguishable from one that cannot find anything, and that is this repo's own
+`fixture-passes-by-finding-nothing` class.

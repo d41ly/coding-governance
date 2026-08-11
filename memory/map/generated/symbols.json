@@ -398,6 +398,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "default_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"

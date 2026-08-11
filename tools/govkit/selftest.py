@@ -281,6 +281,64 @@ def main() -> int:
         check("that refusal calls it the standing authorization",
               "standing authorization" in p.stderr, p.stderr)
 
+        # ================= liveness of the two derived assertions =================
+        # An assertion that finds nothing on a clean tree is indistinguishable from one that CANNOT
+        # find anything. These arms build a scratch gov tree — a copy of the engine plus a minimal
+        # registry — and feed it input that MUST red. Without them, the two arms below would be the
+        # repo's own `fixture-passes-by-finding-nothing` class living inside the tool that gates it.
+        def scratch_gov(mutates: str, guard: str) -> pathlib.Path:
+            g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n\n'
+                '[[exempt]]\npath = "tools/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "tools/demo"\n'
+                'version_from = { none = "fixture" }\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n',
+                encoding="utf-8", newline="\n")
+            # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
+            # the distinction that made this assertion necessary in the first place.
+            (g / "tools" / "demo" / "adopt-demo.sh").write_text(
+                '#!/usr/bin/env bash\necho "  1. git add something && commit."\ngit add .\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "gate-legs.json").write_text(
+                json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard]}], indent=2) + "\n",
+                encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "base")
+            return g
+
+        def run_in(g: pathlib.Path) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+                                   "selfcheck"], capture_output=True, text=True)
+
+        good = run_in(scratch_gov("true", "tools/demo/"))
+        check("the scratch gov fixture is GREEN when both facts agree", good.returncode == 0,
+              good.stdout + good.stderr)
+
+        bad_m = run_in(scratch_gov("false", "tools/demo/"))
+        check("mutates_index reds when the declared value is not the measured one",
+              bad_m.returncode == 1 and "mutates_index" in bad_m.stdout, bad_m.stdout)
+        check("that message says the declared value is not the measured one",
+              "not the measured one" in bad_m.stdout, bad_m.stdout)
+
+        bad_g = run_in(scratch_gov("true", "docs/nowhere/"))
+        check("a guard in no declared class reds",
+              bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
+        check("that message says the taxonomy must partition its own input",
+              "does not partition its own input" in bad_g.stdout, bad_g.stdout)
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")
