@@ -36,6 +36,7 @@
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
+      "row-grammar selftest",
       "row-keyed merge driver replay",
       "run-gates canary",
       "run-gates evidence",

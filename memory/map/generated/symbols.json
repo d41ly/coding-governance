@@ -1738,6 +1738,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "tree_root",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "unfenced",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"

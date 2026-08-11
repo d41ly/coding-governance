@@ -54,6 +54,19 @@ def read(path):
         return fh.read()
 
 
+def tree_root():
+    """The tree being AUDITED, not the tree this file lives in.
+
+    Every sibling delegate resolves it this way (gen_build_index, corpus_ids, gotchas), and the
+    first cut of this module did not: it walked up from __file__, so the kit graded ITS OWN repo
+    whichever tree it was pointed at — reporting this repo's row count and this repo's pinned
+    duplicates, at exit 0, about somebody else's corpus. That is grammar-bound-to-the-wrong-root
+    verbatim. No arm caught it because every arm passed an explicit root, so the resolver was never
+    executed by the selftest at all; the arm at the bottom now shells out with a foreign cwd.
+    """
+    return run("git", "rev-parse", "--show-toplevel").strip()
+
+
 def resolve_root(start=None):
     """Walk up for the conf, bounded by .git — the kit must work at any install prefix."""
     here = os.path.abspath(start or os.path.dirname(__file__))
@@ -99,6 +112,16 @@ def id_pattern(conf):
     return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-[A-Za-z0-9]+-\d+[a-z]*")
 
 
+# Family-INDEPENDENT id shape, used only as the vacuity precondition. Deriving that precondition
+# from the declared FAMILIES would assert one value against another the same call derives — the
+# tautology this repo records as assertion-between-two-derived-values, and it made the
+# wrong-families arm pass by finding nothing twice over.
+# Written with a real string builder, never a shell heredoc: the first cut of this line carried a
+# word-boundary escape that reached the file as a literal BACKSPACE byte, so the pattern compiled,
+# printed correctly, and matched nothing. Only repr() showed it.
+GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
+
+
 def row_docs(root, m):
     """Every row-shaped document: the live index, the backlog shards, and the rotated archives."""
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
@@ -119,7 +142,7 @@ def scan(root, conf):
     # A ROW leads with a dash and then an id, optionally emphasised. Anything else on the line is
     # prose and is not this check's business.
     rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + idre.pattern + r")\b")
-    rows = unkeyed = 0
+    rows = unkeyed = loose = 0
     dupes = []
     for p in row_docs(root, m):
         seen = {}
@@ -130,6 +153,8 @@ def scan(root, conf):
                 continue
             if in_fence:
                 continue
+            if GENERIC_ID.search(line):
+                loose += 1
             mm = rowre.match(line)
             if not mm:
                 # A dash-led line that carries no id at all is prose, not an unkeyed row. A line that
@@ -143,29 +168,35 @@ def scan(root, conf):
         for i, lines in sorted(seen.items()):
             if len(lines) > 1:
                 dupes.append((p, i, lines))
-    return rows, unkeyed, dupes
+    return rows, unkeyed, dupes, loose
 
 
 def pin_of(conf):
+    """Undeclared means ZERO — the STRICTEST value, never a refusal and never off.
+
+    The first cut refused an undeclared pin, reasoning that omitting a key is the quietest way to
+    disarm a gate. That reasoning is sound for a pin whose absence RELAXES the check and wrong for
+    this one, because 0 is the strict end: a tree that never declares the key can never tolerate a
+    duplicate. The refusal bought nothing and cost two real trees — every fixture in the hygiene
+    self-test, and every repo scaffolded from the shipped conf example, which is the adopter breakage
+    the closing review caught as a blocker. A default that can only tighten needs no ceremony.
+    """
     raw = conf.get(PIN_KEY, "").strip()
     if raw == "":
-        raise Problem(
-            f"row-grammar: {PIN_KEY} is not declared in .memory-tree.conf. An undeclared pin is not "
-            f"a disabled check — omitting the key is the quietest way to disarm a gate, so it is a "
-            f"refusal. Set it to the count `--emit-pin` reports."
-        )
+        return 0
     if not raw.isdigit():
         raise Problem(f"row-grammar: {PIN_KEY} must be a non-negative integer, got '{raw}'")
     return int(raw)
 
 
 def do_check(root, conf):
-    rows, unkeyed, dupes = scan(root, conf)
+    rows, unkeyed, dupes, loose = scan(root, conf)
     pin = pin_of(conf)
     bad = []
-    if rows == 0:
-        bad.append(f"check {CHECK}: no row parsed in any row document — the grammar recognises "
-                   f"nothing, and recognising nothing is what a CLEAN corpus also looks like")
+    if rows == 0 and loose:
+        bad.append(f"check {CHECK}: {loose} line(s) under the row documents carry id-shaped text but "
+                   f"NOT ONE keyed as a row — the grammar is mis-segmented. (A tree with no ids at "
+                   f"all is young, not broken, and stays silent.)")
     if unkeyed:
         bad.append(f"check {CHECK}: {unkeyed} dash-led line(s) carry an id the row grammar cannot "
                    f"key, so a key-merge would drop or duplicate them")
@@ -186,7 +217,7 @@ def do_check(root, conf):
 
 
 def do_report(root, conf):
-    rows, unkeyed, dupes = scan(root, conf)
+    rows, unkeyed, dupes, loose = scan(root, conf)
     print(f"rows keyed   : {rows}")
     print(f"unkeyed rows : {unkeyed}")
     print(f"duplicates   : {len(dupes)}")
@@ -196,7 +227,7 @@ def do_report(root, conf):
 
 
 def do_emit_pin(root, conf):
-    _rows, _unkeyed, dupes = scan(root, conf)
+    _rows, _unkeyed, dupes, _loose = scan(root, conf)
     print(f'{PIN_KEY}="{len(dupes)}"')
     return 0
 
@@ -264,15 +295,18 @@ def do_selftest():
             "the pin is shrink-only", lambda: cap(t4, c4))
         # An UNDECLARED pin is a refusal, not a disabled check.
         t5 = os.path.join(base, "nopin"); os.makedirs(t5)
-        c5 = _tree(t5, "- ARCH-tOne-1 · one\n")
+        c5 = _tree(t5, "\n".join(["- ARCH-tOne-1 · one",
+                                  "- ARCH-tOne-1 · the same id twice", ""]))
         del c5[PIN_KEY]
-        arm("an undeclared pin is a refusal", "is not declared in .memory-tree.conf",
-            lambda: cap(t5, c5))
+        # An undeclared pin is the STRICTEST value, not a refusal and not off: this fixture holds one
+        # duplicate and no pin, so it must RED on the duplicate rather than on the missing key.
+        arm("an undeclared pin reds on a duplicate rather than on the missing key",
+            "two answers to one question", lambda: cap(t5, c5))
         # VACUITY: the wrong-grammar case must red, not pass by finding nothing.
         t6 = os.path.join(base, "wrongfam"); os.makedirs(t6)
         c6 = _tree(t6, "- ARCH-tOne-1 · one\n", families="other:OTHER")
         arm("a families list that recognises nothing reds instead of passing",
-            "recognising nothing is what a CLEAN corpus also looks like", lambda: cap(t6, c6))
+            "the grammar is mis-segmented", lambda: cap(t6, c6))
         # An id inside a fenced block is an example, not a row.
         t7 = os.path.join(base, "fenced"); os.makedirs(t7)
         c7 = _tree(t7, "- ARCH-tOne-1 · one\n\n```\n- ARCH-tOne-1 · an example in a fence\n```\n")
@@ -283,6 +317,21 @@ def do_selftest():
         c8 = _tree(t8, "- ARCH-tOne-1 · one\n- see ARCH-tOne-9 for the rationale\n")
         arm("a dash-led line whose id is not in key position is counted unkeyed",
             "the row grammar cannot key", lambda: cap(t8, c8))
+
+        # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
+        # them executes the resolver — which is exactly how this module shipped a review blocker:
+        # it walked up from __file__ and graded the KIT's repo whichever tree it was pointed at,
+        # reporting this repo's counts at exit 0 about a foreign corpus. An arm that cannot reach
+        # the resolver cannot see that, so this one SHELLS OUT with a foreign cwd.
+        t9 = os.path.join(base, "foreign"); os.makedirs(t9)
+        _tree(t9, "\n".join(["- ARCH-tOne-1 · one",
+                             "- ARCH-tOne-1 · the same id twice", ""]), pin="0")
+        def _foreign():
+            r = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"],
+                               cwd=t9, capture_output=True, text=True)
+            return f"rc={r.returncode} {r.stdout}{r.stderr}"
+        arm("--check grades the tree it is RUN IN, not the tree the kit lives in",
+            "two answers to one question", _foreign)
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
@@ -295,7 +344,11 @@ def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return do_selftest()
-    root = resolve_root()
+    try:
+        root = tree_root()
+    except Problem:
+        print("row-grammar: not a git repo")
+        return 2
     conf = load_conf(root)
     if mode == "--check":
         return do_check(root, conf)

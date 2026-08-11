@@ -200,8 +200,8 @@ sibling test is a named failure. `*.test.sh` is excluded, because a fixture that
 would otherwise demand a `<stem>.test.test.sh` that will never exist.
 
 The key is `(gate, check number, ordinal)`. The gate is in the key because the PIN's keys are global
-and several gates number their checks from 1, so keys collide across gates — `--report` prints the
-current overlap. The ordinal is in the key because one number can carry several branches and a
+and several gates number their checks from 1, so keys collide across gates; the gate name in the
+key is what keeps them apart. The ordinal is in the key because one number can carry several branches and a
 number-keyed pin lets the cheapest arm hide the valuable one.
 
 A branch's signature ends at the first UNESCAPED closing quote of its message. Capturing to end of

@@ -9,11 +9,14 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-TWO SOURCES, NOTHING ELSE
-  * each build's README front matter (slug node opened streams roster ids [status])
+THREE SOURCES, NOTHING ELSE
+  * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
-No git history, no mtimes, no scanning of build/ or reviews/. A source the renderer does not read
-cannot make the render drift.
+  * for the ROSTER only, every tracked file under the memory root EXCEPT this field's own outputs —
+    the build's own README and the generated index and shards. `ids` is therefore an OUTPUT, not a
+    source: `--write` overwrites whatever was authored there.
+No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
+source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
 ONE SOURCE OF TRUTH PER BUILD
   * any spec carries a parseable header -> the status is DERIVED, and an authored `status:` is an
@@ -358,7 +361,7 @@ def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
     this function a scaffolder, which it is not.
     """
     lines = readme_text.split("\n")
-    want = "ids: " + " ".join(roster)
+    want = ("ids: " + " ".join(roster)).rstrip()
     for i, line in enumerate(lines[1:], start=1):
         if line.strip() == "---":
             break
@@ -399,7 +402,7 @@ def render_live(builds: list, m: str) -> str:
         # A COUNT, not the list. This file is in check 7's entry-budget population and the build
         # README's region is not, so the full roster renders there and a bounded number renders here:
         # a ten-id row measured 316 chars against a 300-char cap, on a file with no slack.
-        out += ["| Build | Status | Node | Opened | Streams | Ids |", "|---|---|---|---|---|---|"]
+        out += ["| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|"]
         for b in live:
             fm = b["fm"]
             out.append(
@@ -423,7 +426,7 @@ def render_shards(builds: list, m: str) -> dict:
             "",
             "Frozen once the month passes: its inputs stop changing, so no rotation rule is needed.",
             "",
-            "| Build | Status | Node | Streams | Ids |",
+            "| Build | Status | Node | Streams | Ids (n) |",
             "|---|---|---|---|---|",
         ]
         for b in sorted(rows, key=lambda x: x["slug"]):

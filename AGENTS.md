@@ -128,13 +128,14 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 
-- **the self-test legs** — every gate whose own harness rides the bar as a separate leg:
-  `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/memory-tree/check-verdict-epoch.test.sh` ·
-  `skills/session-kickoff/manifest-check.test.sh` · `tools/workflows/check-verifier-fanout.test.sh` ·
-  `tools/workflows/check-review-join.test.sh`, plus the two engines that carry their own arms in a
-  `--selftest` mode rather than a sibling file, `tools/memory-tree/gen_build_index.py` and
-  `tools/memory-tree/corpus_ids.py`. A gate and the harness proving it can fail are two legs, and
-  the charter names both — a self-test nobody cites is a leg nobody notices going quiet.
+- **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
+  can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
+  `tools/memory-tree/check-verdict-epoch.test.sh` · `skills/session-kickoff/manifest-check.test.sh` ·
+  `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
+  the engines carrying their arms in a `--selftest` mode rather than a sibling file —
+  `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
+  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

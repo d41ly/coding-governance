@@ -114,6 +114,16 @@ if [ "$MODE" = "--check" ]; then
     grep -nE '\{\{[A-Z_]+\}\}' "$SKILL_OUT" | head -5 | sed 's/^/    /'
     exit 1
   fi
+  # The adopter installs TWO artifacts, so --check verifies two. Checking only the one it renders
+  # reported "in sync" over a protocol half that had been deleted or hand-edited — and check 10 of
+  # the gate fails HARD when that half is missing, so the drift would surface as an unexplained gate
+  # failure somewhere else entirely.
+  if [ ! -f "$PROTO_OUT" ]; then
+    echo "unattended: $PROTO_REL is missing — run $0 to install the protocol's live half"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $PROTO_REL has drifted from the shipped protocol; re-run $0"; exit 1
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
