@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
+ids: TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
 ---
 
 # aMouldedFolio — enforceable templates and generated documents for the load-bearing corpus
@@ -43,9 +43,9 @@ Records live under `build/`. The table below is GENERATED from this folder's spe
 do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | SPECCED | rev-3 | 2026-08-11 |
+| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | CLOSED | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->

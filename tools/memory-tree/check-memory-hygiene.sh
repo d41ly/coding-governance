@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.7   # gov:kit memory-tree@2.7 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.8   # gov:kit memory-tree@2.8 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -631,9 +631,22 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         if (!inr) { if (L ~ /^## 8\. Open questions/) { inr = 1; rng[++q] = L } }
         else { rng[++q] = L; if (L ~ /^## 9\. /) inr = 0 }
       }
-      q8 = ""
-      for (i = 2; i <= q - 1; i++) if (rng[i] !~ /^[[:space:]]*$/) { q8 = rng[i]; break }
-      if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/) print f " (terminal Status with unresolved §8 Open questions)"
+      # TEMPLATE-SPEC promises TWO ways for a terminal spec to satisfy §8: it reads `none`, OR every
+      # question is marked RESOLVED in place. Only the first was ever implemented, so the documented
+      # second option was unreachable and a fully-resolved spec could not go CLOSED — a rule the doc
+      # states and the gate does not enforce is the same false-claim class this catalogue exists for.
+      q8 = ""; items = 0; resolved = 0
+      for (i = 2; i <= q - 1; i++) {
+        if (rng[i] ~ /^[[:space:]]*$/) continue
+        if (q8 == "") q8 = rng[i]
+        # An ITEM is a list bullet; prose between items is commentary and is not graded.
+        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/) {
+          items++
+          if (rng[i] ~ /RESOLVED/) resolved++
+        }
+      }
+      if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
+        print f " (terminal Status with unresolved §8 Open questions)"
     }
   }')
 fi
