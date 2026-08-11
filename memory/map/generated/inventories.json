@@ -97,6 +97,7 @@
       "vacuous-selector-empty-population.md"
     ],
     "guides": [
+      "BUILD-METHOD.md",
       "REVIEW-PROTOCOL.md",
       "UNATTENDED-PROTOCOL.md"
     ],
