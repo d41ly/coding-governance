@@ -23,8 +23,16 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** SPECCED at rev-1, unreviewed at the time of writing. One Tier-2 spec covers the whole
-change, because it is one contract revision rather than a kit built from nothing.
+**State.** OPEN at rev-2. The Tier-2 review returned **do not build**, and rev-2 folds it. Awaiting
+owner decisions on F1 through F8 below.
+
+**Read this first.** The review reproduced, end to end and with a live control, an authorization
+bypass in the unattended kit **as it is merged and gated on `main` today**. The pinned BASE anchors
+on a remote-tracking ref, and `unattended.sh:119-120` claims moving it "requires a push". It does
+not: `git update-ref refs/remotes/origin/main <sha>` does it offline. A run can author its own
+mandate, forge the anchor, and pass `--preflight`, the gate leg and `--close`, then land. It is
+recorded as its own backlog row because it is a defect in landed code and does not depend on this
+build. **F8 asks whether the repair lands ahead of everything else. It should.**
 
 **The problem in one line.** `unattended.sh` refuses a run whose build has no owner-authored
 `RUN.md` (`fail 15`), and the surrounding checks make that refusal correct — so the kit is working
@@ -49,50 +57,63 @@ it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.m
 reproduced blockers are the reason the current authorization is shaped the way it is. A review of
 this build that does not re-derive those three attacks against the NEW surface has not reviewed it.
 
-**Live constraints, measured 2026-08-11:**
+**Live constraints, measured 2026-08-11 by running the gates, not by copying a note:**
 
-- The playbook template has **190 bytes free** (`bash tools/check-template-size.sh`). This build
-  amends existing clauses rather than adding a section, so it should spend none — verify, don't
-  assume.
+- The playbook template has **148 bytes free** (`bash tools/check-template-size.sh` reports
+  32620/32768). Rev-1 said 190; that figure was copied from a manifest note stale since before the
+  last merge, and the note itself says to read the number from the gate.
 - `ARMS_FLOORS` pins `tools/unattended/unattended.sh` at 31 branches and
-  `tools/unattended/check-unattended.sh` at 33, both one-sided upward. Deleting the mandate branches
-  lowers a floor, which reds. The floors move down only in a commit that says why.
-- `ORPHAN_ID_PIN` is 5 and shrink-only. Minting unit ids ahead of their specs would create orphans,
-  which is why the plan region names units by TITLE and never by id.
+  `tools/unattended/check-unattended.sh` at 33, with **zero slack** on both. The floor is a per-gate
+  NET count, so this build's additions can mask its deletions and six guards can vanish in silence.
+  Re-measure and re-pin in the same commit; the spec's AC13 asserts the number.
+- `non_terminal_specs_cited_by_product_source` sits AT its pin with zero headroom, and six of the
+  seven amendment targets are inside its globs. One comment citing this spec's id while it is
+  non-terminal reds the bar.
 
 ## The units
 
-One spec, scope items `S1`–`S7`. The rows below are the reading order, not a decomposition into
+One spec, scope items `S0`–`S7`. The rows below are the reading order, not a decomposition into
 sub-specs.
 
 | Area | What changes |
 |---|---|
+| **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
 | **S1** | authorization reads the build README at BASE; the mandate block and its marker pair retire |
-| **S2** | `RUN.md` becomes wholly generated — `--preflight` creates it, the authored facts drop to four |
-| **S3** | the merge-base-equals-HEAD refusal is scoped to the verbs that can honestly assert it |
-| **S4** | `--plan`, deriving the gap list from specs and review records rather than from prose |
-| **S5** | the authored plan region, and the build-README template that documents it |
-| **S6** | the phase vocabulary gains the members `--plan` needs to name a position |
-| **S7** | the amendment set — protocol, charter, playbook companion, manifest, skill render, hand-back |
+| **S2** | `RUN.md` loses its authored mandate; `--preflight` creates it and commits it, so the leg can still see it |
+| **S3** | the merge-base-equals-HEAD refusal is scoped by verb, with the BASE value for that state defined |
+| **S4** | `--plan`, over DECLARED pointers only — the filename join and the title match are both deleted |
+| **S5** | the authored plan region, its ordinal key, and the build-README template |
+| **S6** | three new phase members, a meaning for `RUNNING`, and a verb that can actually write one |
+| **S7** | the amendment set — seven files, not four |
 
 ## Owner decision menu
 
-Four forks are open and live in the spec's §8. They are summarised here; the spec carries the
-tradeoffs.
+Eight forks are live in the spec's §8. They are summarised here; the spec carries the tradeoffs.
 
-**F1** — does the plan region's byte-equality across BASE become a hard precondition, or stay an
-opt-in that lights up only when the region exists? Recommendation: opt-in, because a hard
-precondition reintroduces the per-build authoring this build exists to remove.
+**F8 — take this one first.** Does S0 land as its own series, ahead of any decision on the rest?
+Recommendation: yes. It repairs a live bypass in merged code and depends on nothing below.
 
-**F2** — when a legitimate mid-run reconciliation moves the merge-base forward, does the recorded
-BASE assertion relax from equality to ancestry? Recommendation: yes, with the plan-region comparison
-carrying the integrity the equality used to carry.
+**F5** — is self-propagating authorization acceptable? A run that lands a new build README authorizes
+the next run. Recommendation: require the plan region for any build created after this lands, which
+makes the integrity check non-vacuous for exactly the population that can propagate.
 
-**F3** — does `--plan` read tracked files only, matching every other gate here, or also the working
-tree? Recommendation: tracked only, so an uncommitted spec is invisible until the run commits it.
+**F6** — how are the two actions named, now that a README names none? Recommendation: accept that
+every build authorizes both, and say so in the amended charter sentence rather than leaving the old
+wording to mean something new.
 
-**F4** — is the widening the owner ratified recorded as a decision row, given it converts a
-per-build grant into a class grant? Recommendation: yes, and named as such.
+**F7** — where is the parallel session owning the instruction layer? The review could not find it in
+any branch, worktree, build folder or backlog row. Recommendation: name it or fold the work here.
+
+**F1** — is the plan-region integrity check a hard precondition or an opt-in? Recommendation: opt-in,
+with the template shipping the region commented out — rev-1's version of this fork contradicted its
+own empty-region rule.
+
+**F2** — does the recorded-BASE assertion relax to ancestry? Recommendation: no. The hazard rev-1
+cited cannot occur, because the lander refuses to run off the default branch.
+
+**F3** — does `--plan` read tracked files only? Recommendation: yes.
+
+**F4** — is the widening recorded as a decision row? Recommendation: yes, naming all five losses.
 
 ## Ratified decisions
 
@@ -110,15 +131,22 @@ this says which step remains.
 
 ## Review record
 
-None yet. The spec is unreviewed at rev-1.
+`reviews/2026-08-11-review-aStandingWrit-1.md` — Tier-2 over the rev-1 spec. Five lenses, five
+cold-start agents, at the review protocol's cap of five total; no lens dead. Verdict: **do not
+build**. Seven blockers, thirteen highs, seven verified factual errors, and one reproduced bypass in
+landed code that outranks the spec entirely. Three findings were independently confirmed by two
+lenses each. Folded at rev-2.
+
+The review also returned two negative results worth keeping: no live branch or worktree collides
+with this build's file list, and the rev-1 spec was machine-clean against the format contract.
 
 Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1
+**Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | OPEN | rev-2 | 2026-08-11 |
 <!-- /gen:build-index -->

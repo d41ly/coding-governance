@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff
+**Status:** OPEN · rev-2 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff
 
 ## 1. Goal
 
@@ -9,381 +9,404 @@ owner-authored block inside the file the run writes, and onto the build folder t
 creates. The run must still author none of its own inputs, and the driver must be able to say which
 step of the build remains without re-reading prose.
 
+The rev-1 draft assumed the anchor that decides "outside the run's reach" was already trustworthy.
+The review disproved that against landed code, so this rev's first goal is to make the assumption
+true before anything is built on it.
+
 ## 2. Scope (IN)
 
-**S1 — the authorization surface moves to the build README at BASE.** `check_mandate()` in
-`tools/unattended/unattended.sh` is replaced by `check_authorization()`, which asserts that
-`<MEMORY_ROOT>/builds/<slug>/README.md` exists at the pinned BASE, parses as build front matter, and
-carries a `slug:` equal to the requested slug. The marker constants `MAN_OPEN` and `MAN_CLOSE`, the
-mandate extraction on both sides, and every refusal keyed on them retire.
+**S0 — close the anchor bypass, first and separately.** The pinned BASE anchors on
+`refs/remotes/origin/<default>`, and `tools/unattended/unattended.sh:119-120` justifies that by
+claiming "Moving it requires a push". `git update-ref refs/remotes/origin/main <sha>` moves it
+offline. The gate leg reads the same ref list and the same `GOV_DEFAULT_BRANCH` override
+(`tools/unattended/check-unattended.sh:177` and `:182`), so it recomputes the same forged value and
+agrees. S0 makes the anchor an observation of the REMOTE rather than of a local ref, refuses
+`GOV_DEFAULT_BRANCH` in the gate leg, records the resolved ref NAME alongside the sha, and deletes
+the false comment. Every other scope item depends on this one.
 
-**S2 — `RUN.md` becomes wholly generated.** `--preflight` CREATES the run-state file when it is
-absent, replacing the `fail 15` refusal. The authored region drops the mandate and carries four
-facts: the phase with its witness, the keepalive id, parked decisions, and the run's BASE.
+**S1 — the authorization surface moves to the build README at BASE.** `check_mandate()` is replaced
+by `check_authorization()`, which asserts that the build README resolves at the pinned BASE, parses
+as build front matter, carries a `slug:` equal to the requested slug, and — when a plan region is
+present at BASE — that the region is byte-equal in the working copy. `MAN_OPEN`, `MAN_CLOSE` and
+every refusal keyed on them retire.
 
-**S3 — the merge-base-equals-HEAD refusal is scoped by verb.** `trusted_base()` currently turns
-`resolve_base` rc 2 into a refusal for every caller. It becomes a refusal for `--close` and for the
-gate leg, and a legal state for `--preflight`, where it is the normal condition of a run that has
-correctly built nothing yet.
+**S2 — `RUN.md` loses its authored mandate and gains a creating verb.** `--preflight` creates the
+run-state file when absent, replacing `fail 15`, and COMMITS it before returning. The authored region
+carries four facts. The file keeps an authored region; rev-1's "wholly generated" was wrong.
 
-**S4 — `--plan`, the derived gap list.** A fifth verb prints, per unit, whether it needs a spec, a
-review, a build, or nothing, and names the next one. It derives this from tracked spec status
-headers and tracked review-record filenames, reusing `tools/memory-tree/gen_build_index.py` rather
-than re-parsing either.
+**S3 — the merge-base-equals-HEAD refusal is scoped by verb, after S0.** It becomes legal at
+`--preflight` and stays a refusal at `--close` and in the gate leg. The BASE value for that state is
+defined explicitly rather than left to an empty string.
 
-**S5 — the authored plan region, and a build-README template.** An optional marker-delimited region
-in the build README lists planned units by title. A new `memory/TEMPLATE-README.md` documents the
-build README's shape, which closes the open backlog row recorded inline as TOOL-aUnmannedHelm-3 —
-the build README is the entrypoint a session starts from and has had no template.
+**S4 — `--plan`, over DECLARED joins only.** A fifth verb prints per-unit state and names the next
+step. It reads spec status headers and two declared pointers in those headers. It performs no
+filename join and no title match, both of which the review measured wrong on every multi-unit build
+in this corpus.
 
-**S6 — the phase vocabulary gains members.** `SPECCING`, `REVIEWING` and `BUILDING` join the
-kit-owned core between `PREFLIGHT` and `VERIFYING`, so a phase claim can name a position `--plan`
-computes. `CORE_FLOOR` rises from `6:6` to `9:6`.
+**S5 — the authored plan region, its ordinal key, and a build-README template.** The template is
+`memory/TEMPLATE-README.md`, and admitting it is an engine change with a four-gate repair set named
+in §4. It closes the open backlog row recorded inline as TOOL-aUnmannedHelm-3, including that row's
+own cited evidence about the `ids:` key.
 
-**S7 — the amendment set.** `memory/guides/UNATTENDED-PROTOCOL.md` §1, §2, §3 and §7;
-`tools/unattended/PROTOCOL.template.md` and the kit-parity assertion that holds them equal;
-`tools/unattended/SKILL.template.md` and its render; `AGENTS.md`; the playbook's domain-rules
-companion §1; `.claude/SESSION-KICKOFF.md`; and Step 5b of `skills/session-kickoff/SKILL.md`, whose
-first sentence conditions the hand-back on a mandate that will no longer exist.
+**S6 — the phase vocabulary gains members and a producer.** `SPECCING`, `REVIEWING` and `BUILDING`
+join the core set, `RUNNING` is given an explicit meaning rather than left ambient, and a `--phase`
+verb writes a phase with its witness. `--preflight` stops unconditionally rewriting the phase.
+
+**S7 — the amendment set**, enumerated by file and by sentence in §4.
 
 ## 3. Non-goals (OUT)
 
 The instruction layer. How an agent writes a sub-spec, how it conducts the adversarial review, and
-what "built" means for a given unit are being designed in a parallel session. This build defines the
-seam — the gap list `--plan` emits and the phase members that name a position — and stops. A second
-author of the same prose here would collide with that session.
+what "built" means for a given unit belong to a parallel session. The review could not locate that
+session anywhere in the repo — no branch, worktree, build folder or backlog row names it — so this
+cut-line is currently asserted by this author alone and F7 in §8 asks the owner to identify it or
+fold the work here.
 
-`tools/hooks/agent-cap.js` and `memory/guides/REVIEW-PROTOCOL.md` are owned by another build and no
-scope item may touch them.
+`tools/hooks/agent-cap.js` and `memory/guides/REVIEW-PROTOCOL.md` are owned by another build.
 
-The keepalive actor split is unchanged. It stays agent-attested, and this build does not make it
-machine-checked, because nothing about the authorization change alters what a script can reach.
+The keepalive actor split is unchanged.
 
-No migration is written for an adopter who installed the kit at 1.0. There is no such adopter — the
-dossier records that nothing has travelled the adopter path — so a migration would be untested code
-for a population of zero. Follow-up if one appears.
-
-`push-main.sh` and `.githooks/pre-push` are read but not modified. The interaction found in §5 under
-risks is resolved inside this kit or it is deferred, never by loosening the lander.
+No adopter migration. Nothing has travelled the adopter path, so a migration would be untested code
+for a population of zero.
 
 ## 4. Design
 
-### The property that must survive
-
-The kit exists to replace a checkpoint with something a machine can check. The property doing that
-work is not "the owner wrote a block". It is:
+### The rule, and what the review did to it
 
 > Every input to the authorization comparison lies outside the run's reach.
 
-The three blockers in the second Tier-2 on the prior build were one violation of that rule at three
-layers. Any redesign is judged against the same rule, and the surface below is chosen because it
-satisfies it, not because it is convenient.
+Rev-1 asserted this was satisfied by moving the read to the build README. It is not, and was not
+before this build either. The review reproduced, end to end and with a live control, a run that
+authors its own mandate, forges the anchor with one offline command, passes `--preflight`, passes the
+gate leg silently, closes with the machine-checked authorization item MET, and lands on the remote
+default branch. The bypass is in code that is merged and gated today.
 
-A build folder committed on the default branch before the run's branch exists is outside the run's
-reach in exactly the way the mandate block was: the run cannot make a commit it did not make contain
-a file it did not write. The reachability test is unchanged in kind. Only the blob it reads moves —
-from a file the driver splices into, to one the driver never writes.
-
-That move also deletes a hazard rather than relocating it. The prior review found that a transposed
-marker pair made `--preflight` truncate the run-state file from the open marker to EOF, destroying
-the owner-authored mandate, and only then print an unrelated refusal. Under S1 there are no owner
-bytes in that file at all, so the worst case of that bug is the loss of regenerable state. The
-marker bug is still a bug and is not in this build's scope to leave unfixed if it survives.
+So the ordering is: S0 closes the anchor, and only then is the surface question worth answering. A
+run that can move the anchor does not care which blob the check reads.
 
 ### What the new check is, precisely
 
-`check_authorization()` takes the slug and the pinned BASE and asserts four things in order, each
-its own refusal:
+| # | Assertion | Refuses when | Acceptance |
+|---|---|---|---|
+| 1 | the build README blob resolves at BASE | the folder was created on the run's own branch | AC2 |
+| 2 | the blob parses as build front matter | the file exists but is not a build README | AC10 |
+| 3 | its `slug:` equals the requested slug | a folder was renamed or a README copied between builds | AC11 |
+| 4 | the plan region, when present at BASE, is byte-equal in the working copy | the run rewrote the scope it is executing against | AC4 |
 
-| # | Assertion | Refuses when |
-|---|---|---|
-| 1 | the build README blob resolves at BASE | the folder was created on the run's own branch |
-| 2 | the blob parses as build front matter | the file exists but is not a build README |
-| 3 | its `slug:` equals the requested slug | a folder was renamed or a README copied between builds |
-| 4 | the plan region, when present at BASE, is byte-equal in the working copy | the run rewrote the scope it is executing against |
+Assertion 4 propagates a malformed-region status on EITHER side as its own refusal. The extractor's
+exit code conflates "absent" with "two regions present", and rev-1 left the working-copy side
+unstated — which is the discarded-error-signal defect from the prior build, reintroduced.
 
-Assertion 4 is conditional by design, and F1 in §8 is whether it stays that way. When the region is
-absent at BASE the run is authorized on existence alone, which is precisely what the owner ratified;
-when it is present the run additionally cannot edit its own scope mid-flight.
+### What is lost, stated completely
 
-### What is lost, stated plainly
+Rev-1 named two losses. The review found three more.
 
-The old check compared two blobs for equality and could therefore assert integrity: the run had not
-edited its authorization. The new one cannot make that assertion about the README as a whole,
-because the README is a living document whose generated region the run legitimately re-renders. The
-authorization degrades from **integrity** to **existence**, and assertion 4 buys back integrity only
-over the plan region.
+1. **Integrity becomes existence.** The README is a living document whose generated region the run
+   re-renders, so no whole-file equality is assertable. Assertion 4 buys integrity back over the plan
+   region only.
+2. **The grant widens from per-build to class-wide.** Every build folder in the tree satisfies the
+   predicate. Ratified by the owner as F0a.
+3. **The grant no longer names the ACTIONS.** Both charter statements read "naming the build and both
+   actions". A README names no action, so merge-only or push-only becomes unexpressible and every
+   build authorizes the maximum. F6 in §8 is the fork for it.
+4. **The grant is irrevocable and retroactive.** A mandate could be withdrawn by deleting it. A build
+   README cannot be deleted — the hygiene gate and the generated index depend on it — so after this
+   lands there is no act meaning "not this build", and every build ever created is eligible.
+5. **Authorization becomes self-propagating.** A legitimately authorized run whose diff creates a new
+   build README authorizes the NEXT run by bytes a run wrote and landed. The per-run property still
+   holds; the system property does not. Under the mandate this required authoring a file whose only
+   purpose was authorization, which was conspicuous and tripped the single-live-run rule. Under
+   README-existence it is indistinguishable from ordinary work.
 
-The second loss is selectivity. The old mandate named one build. The new predicate is satisfied by
-every build folder in the tree, so the grant is a class grant: any build the owner has ever
-committed a README for is unattended-eligible. The narrowing is the slug the owner types, and chat
-is not machine-checkable. The owner was shown this at kickoff and ratified it as F0a. It is recorded
-as a decision rather than buried in a diff, and F4 in §8 asks whether that record is written.
+Loss 5 changes the shape of the threat model, and no scope item addresses it. F5 in §8 puts it to the
+owner rather than burying it.
 
 ### Data model
 
-The run-state file's authored region, after S2:
+The run-state file's authored region after S2, using the fact names the driver actually reads. Rev-1
+listed a `parked:` key that does not exist: the override path appends an unkeyed line and the reader
+greps a different key, and the single-value reader takes only the first line.
 
 ```
 phase: BUILDING
 witness: <sha>
 base: <sha>
 keepalive: <id>
-parked: <one entry per line, each carrying question, options seen, and reason>
+parked-surfaced: yes
 ```
 
-The mandate line is gone. `base` remains the fifth authored fact from the prior build minus the
-mandate, and it is still a runtime observation nothing else in the tree holds.
+Parked entries remain unkeyed appended lines, unchanged from the shipped shape.
 
-The optional plan region in a build README, delimited by a marker pair in the same family as the
-generated one:
+The plan region in a build README, ORDINAL-keyed:
 
 ```
 <!-- plan:units -->
 1. the run-state file, and the hygiene contract that admits it
 2. the protocol document, and the authorization it rests on
-3. the driver, and the four verbs it is allowed to have
 <!-- /plan:units -->
 ```
 
-Units are named by TITLE and never by id. Minting ids ahead of their specs would create ids that are
-cited and never defined, which is what `ORPHAN_ID_PIN` counts, and that pin is at 5 and shrink-only.
-It also matches the rule the protocol already states in §2: a planned unit is NAMED rather than
-LINKED until its record exists.
+A spec claims its ordinal in its own status-header tail, which the format contract already reserves
+for pointers. The join is therefore DECLARED by the spec, never inferred from a title. The review
+measured zero of seven title matches on the prior build, and rev-1's design made the mismatch
+unrecoverable: the run would see `SPEC NEEDED` forever and assertion 4 forbids editing the region to
+match, so the run could neither converge nor repair.
+
+Ids are not written in the plan region. Rev-1's reason was wrong — a dash-led backlog row DEFINES an
+id, and the protocol requires minting one — but the conclusion holds for a different reason: a
+numbered list row is not an anchor shape, so an id there would be a citation with no definition, and
+the orphan waiver is full at five of five.
 
 ### Inventory
 
-`--plan` joins three sources and emits one row per unit.
+`--plan` reads two sources and no filenames.
 
 | Source | Read via | Yields |
 |---|---|---|
-| planned units | the plan region of the build README, tracked | the titles the owner intends |
-| specs and their statuses | `gen_build_index.py` `collect()` and `parse_spec()` | id, status token, rev |
-| review records | tracked filenames under the build's `reviews/`, matched against the recording grammar check 5 enforces | which units have been reviewed |
+| planned units | the plan region, tracked, ordinal-keyed | the count and titles the owner intends |
+| specs | the status header of each tracked spec | status, rev, the claimed plan ordinal, the review pointer |
 
-The join key between a spec and its review record is the sequence number both filenames carry. That
-is a filename join and it is fragile; F3 in §8 and the risks line in §5 both name it.
+Review coverage is read from the spec's own header tail, not from `reviews/` filenames. The review
+measured the filename join wrong on 7 of 7 multi-unit builds and correct on none: the spec's sequence
+number is a per-build record counter and a review's is "which review is this", the key is not unique
+across families, and phase-scoped reviews cover many units at once. The two counters are not the same
+quantity, so the join is not repairable.
 
-The derived state per unit, in the order the run consumes them:
+The derived state per unit:
 
 | Condition | State |
 |---|---|
-| a planned title with no spec | `SPEC NEEDED` |
-| a spec at a non-terminal status with no review record | `REVIEW NEEDED` |
-| a spec reviewed and non-terminal | `BUILD NEEDED` |
-| a spec at a terminal status | `DONE` |
+| a planned ordinal with no spec | `SPEC NEEDED` |
+| a spec at `OPEN` | `SPEC NEEDED` |
+| a spec at `SPECCED` with no review pointer | `REVIEW NEEDED` |
+| a spec at `SPECCED` with a review pointer | `BUILD NEEDED` |
+| a spec at `INPROGRESS` | `LAND NEEDED` |
+| a spec at `BLOCKED` or `DEFERRED` | `PARKED`, never a `next:` target |
+| a spec at `CLOSED` | `DONE` |
+| a spec at `WONTDO` | `ABANDONED`, never a `next:` target |
 
-`--plan` prints these rows and one `next:` line naming the first non-`DONE` unit and the phase that
-corresponds to its state. It exits non-zero when it cannot join a source, because a gap list that
-silently omits a unit is worse than no gap list.
+`INPROGRESS` means built-but-not-landed in this tree, which the prior build's README states outright.
+Rev-1's four-state table mapped it to `BUILD NEEDED` and would have told five live units to rebuild
+what is already built.
+
+A spec with no parseable status header is invisible to the collector. Five exist. `--plan` reports
+them by path as `UNPARSEABLE` rather than silently omitting them, because reporting `SPEC NEEDED` for
+a spec on disk makes the run write a duplicate.
 
 ### Migration
 
-`memory/builds/aUnmannedHelm/RUN.md` does not exist, so no live run-state file carries a mandate
-block to migrate. The prior build's units are all CLOSED. The only migration is textual: the four
-places that state the explicit-ask rule, amended by the prior build to accept a committed standing
-mandate, are amended again to accept a committed build plan. They are `AGENTS.md`, the playbook §1
-and §8 by way of the domain-rules companion §1, and `.claude/SESSION-KICKOFF.md`.
+No live run-state file exists, so there is nothing to migrate at runtime. The migration is textual and
+larger than rev-1 claimed. The explicit-ask rule is spelled in seven places, not four: `AGENTS.md`;
+`parallel-coding-governance.template.md` in three sites plus its version marker;
+`parallel-coding-governance.customize.md`'s conditional-sections row; `.claude/SESSION-KICKOFF.md`;
+`WIRE-INTO-PROJECT.md`; `tools/memory-tree/HYGIENE.template.md` with its render; and the check-7
+exemption comment in `tools/memory-tree/check-memory-hygiene.sh`, whose stated justification is that
+the mandate is verbatim prose — a reason S2 deletes.
 
 ### Rollout
 
-Single commit series on this build's branch, landed through `tools/push-main.sh` like everything
-else. There is no runtime state to roll forward and no adopter to coordinate with.
+Two landings, not one. S0 lands first as its own series, because it repairs a live defect and must
+not wait on a design the owner has not approved. S1 through S7 land after.
 
 ### Files touched (estimate)
 
 | Path | Change |
 |---|---|
-| `tools/unattended/unattended.sh` | S1, S2, S3, S4, S6 |
-| `tools/unattended/unattended.test.sh` | arms for every branch added or moved |
-| `tools/unattended/check-unattended.sh` | check 13 re-points to the new surface; check 9 keeps its refusal |
-| `tools/unattended/check-unattended.test.sh` | arms, including the three reproduced attacks re-aimed |
-| `tools/unattended/PROTOCOL.template.md` | S7 |
+| `tools/unattended/unattended.sh` | S0, S1, S2, S3, S4, S6 |
+| `tools/unattended/unattended.test.sh` | arms; and the source-grep arm keyed on the literal `check_mandate "` must move with the rename, or it passes by matching nothing |
+| `tools/unattended/check-unattended.sh` | S0, S1; check 9 relaxes with the driver, not against it |
+| `tools/unattended/check-unattended.test.sh` | arms, including all three prior attacks re-aimed |
+| `tools/unattended/PROTOCOL.template.md` | S7, §1 §2 §3 §4 §6 §7 |
 | `tools/unattended/SKILL.template.md` | S7 |
-| `tools/unattended/.unattended.conf.example` | `CORE_FLOOR` and the phase members |
+| `tools/unattended/.unattended.conf.example` | `CORE_FLOOR`; today it ships a value nothing compares against the driver |
 | `.unattended.conf` | `CORE_FLOOR` to `9:6` |
-| `memory/guides/UNATTENDED-PROTOCOL.md` | S7 |
+| `memory/guides/UNATTENDED-PROTOCOL.md` | S7, the same six sections |
 | `memory/TEMPLATE-README.md` | new, S5 |
-| `memory/HYGIENE.md` | the new template joins the documented set |
+| `tools/memory-tree/check-memory-hygiene.sh` | check 3's closed memory-root allowlist; the check-7 comment |
+| `tools/memory-tree/HYGIENE.template.md` | the documented set; the live copy is a RENDER and is never hand-edited |
+| `memory/HYGIENE.md` | re-rendered |
+| `KIT_MEMORY_TREE_VERSION` | the verdict-epoch gate requires it to move with the engine |
+| `.memory-tree.conf` | `ARMS_FLOORS` for both unattended scripts and for the hygiene engine |
+| `parallel-coding-governance.template.md` + archive snapshot | three clause sites and the version marker |
+| `parallel-coding-governance.customize.md`, `WIRE-INTO-PROJECT.md`, `AGENTS.md` | S7 |
+| `.claude/SESSION-KICKOFF.md` | S7 and the ratchet re-stamp |
+| `skills/session-kickoff/SKILL.md` | Step 5b; the leg asserts a literal exit count of exactly six against a floor of six |
 | `.claude/skills/unattended/SKILL.md` | re-rendered |
-| `AGENTS.md` | S7 |
-| `parallel-coding-governance.domain-rules.md` | S7 |
-| `.claude/SESSION-KICKOFF.md` | S7, plus the ratchet re-stamp |
-| `skills/session-kickoff/SKILL.md` | Step 5b, S7 |
-| `.memory-tree.conf` | `ARMS_FLOORS` for both unattended scripts |
-| `memory/map/features/unattended.md` | the dossier's constraints and gaps both change |
-| `memory/DECISIONS.md`, `memory/backlog/TOOL.md` | the rows this build defines and closes |
+| `memory/map/features/unattended.md` | constraints and gaps both change |
 
 ### Alternatives rejected
 
-**A conf-declared policy key plus README existence.** Recommended at kickoff and rejected by the
-owner as F0a. It would have kept an owner-authored, committed, un-forgeable artifact in the tree at
-the cost of one line written once. The owner's bar was zero declarations and that is the ratified
-answer.
+**A conf-declared policy key, or a README front-matter key.** Both rejected by the owner as F0a. They
+preserved a genuine per-build opt-in and named both actions.
 
-**A front-matter key in the build README.** Also rejected as F0a. It preserved a genuine per-build
-opt-in and named both actions, at the cost of one line per build.
+**Keeping the mandate and generating it.** A mandate the toolchain produces is self-authorization
+with an extra step.
 
-**Keeping the mandate and generating it.** Considered and rejected on the rule at the top of §4: a
-mandate the tooling generates is a mandate the run's own toolchain produces, which is the
-self-authorization the whole kit exists to refuse. The generation step being in a script rather than
-in the agent's output changes nothing about who supplies the input.
+**Repairing the filename join.** Rejected on measurement, not taste. The two sequence numbers are
+different quantities.
 
-**Deriving the plan from the README's prose unit table.** Rejected. The prior build's own README
-carries a unit table whose `ids:` front-matter key lists one id for a build that has seven, which is
-the evidence the open backlog row cites. A parser over that prose would inherit its ambiguity, and
-`gen_build_index.py` deliberately reads no prose for exactly this reason.
+**Calling `gen_build_index.py` from the driver.** Refuted by a shipped, armed assertion at
+`tools/unattended/unattended.test.sh:384-388` that refuses any python launcher in the driver. The
+driver is bash, the module exposes no machine-readable mode, and the two kits install independently.
+S4 therefore parses the status header in the driver's own language, and §10 records the cost.
 
 ## 5. Production-readiness checklist
 
-- **security** — the whole build is one security property. The threat is a run that authorizes
-  itself; the control is that both inputs to `check_authorization()` come from a commit the run
-  cannot have made. Every one of the three attacks reproduced in the prior Tier-2 must be re-aimed
-  at the new surface and shown to fail, and that is AC7.
-- **perf / scale** — `--plan` adds one `git ls-files` pass and one front-matter parse per build. The
-  hygiene gate already does both on every build in the tree. Immaterial.
+- **security** — the build is one security property and the review found it unmet in landed code. S0
+  is the fix; AC12 is its proof; AC7 re-aims all three prior attacks at the new surface in both the
+  driver and the leg.
+- **perf / scale** — one extra tracked-file pass per build. Immaterial.
 - **a11y** — N/A — a shell driver with no user interface.
 - **i18n** — N/A — the repo is single-locale by charter.
-- **error / empty / loading states** — three empty cases each need a defined answer rather than a
-  crash: a build with no plan region, a plan region with no entries, and a build whose `spec/` is
-  empty. The first authorizes on existence, the second is a refusal because an empty declaration is
-  not a passing one, and the third is the ordinary first-run state where every planned unit reads
-  `SPEC NEEDED`.
-- **observability** — `--status` gains the derived position, so a compaction-resumed run reads its
-  place instead of inferring it. Every refusal continues to name itself, which is the existing house
-  rule and what makes an unattended refusal legible to nobody.
-- **risks (concurrency, data-loss, rollback hazards)** — three, and the first is the one that
-  worries me most.
-  - **The lander moves the merge-base.** `tools/push-main.sh` reconciles origin BEFORE the gate. If
-    that reconciliation brings the run's branch onto a newer `origin/<default>`, the derived
-    merge-base advances past the recorded BASE and `fail 18` fires at close on a run that did
-    nothing wrong. This is a live interaction between two shipped components and F2 in §8 is the
-    fork for it. It is not hypothetical: the lander doing this is the reason it is mandatory.
-  - **The filename join.** Matching a review record to a spec by their shared sequence number breaks
-    the moment a build reviews two units in one record or reviews the build as a whole, which is
-    what both of the prior build's own review records do. `--plan` would read seven units as
-    unreviewed. F3 does not fix this and it needs an answer before S4 is built.
-  - **Data loss.** Reduced, not eliminated. S2 removes owner bytes from the file the driver splices,
-    so the truncation path found in the prior review can no longer destroy anything unrecoverable.
+- **error / empty / loading states** — six cases need defined answers: no plan region; an empty plan
+  region; an empty `spec/`; no `reviews/` directory (nine builds); a spec with no parseable header
+  (five specs); and a build with no specs at all. Rev-1 covered three.
+- **observability** — `--status` gains the derived position. Every refusal names itself.
+- **risks (concurrency, data-loss, rollback hazards)** — four.
+  - **The leg goes blind on an untracked run-state file.** Every leg check is keyed on tracked files.
+    Under S2 the run creates the file, so it is untracked until committed, and seven checks vanish
+    silently. This is why S2 commits it, and why the single-live-run rule would otherwise let two
+    concurrent preflights each see zero live runs.
+  - **The ARMS floor is a per-gate NET count.** S1 deletes six named guards and adds four. If the net
+    lands at or above the pin, nothing reds and six guards disappear unnoticed. The per-gate design
+    stops cross-gate masking and cannot stop within-gate masking, which is this build's exact shape.
+    The floors are re-measured and re-pinned in the same commit, and AC13 asserts the count.
+  - **The drift signal has zero headroom.** `non_terminal_specs_cited_by_product_source` sits at its
+    pin, and six of S7's seven targets are inside its globs. A single comment citing this spec's id
+    while it is non-terminal reds the bar.
+  - **Data loss.** Reduced. No owner bytes live in the file the driver splices.
 - **testing + left-shift gates** — every branch added or moved needs a positive assertion naming its
-  own failure text, and `ARMS_FLOORS` pins both scripts one-sided upward. Deleting the mandate
-  branches LOWERS a floor, which reds until the floor is lowered in the same commit with a reason.
-  That is the intended friction and it must not be met by widening a pin.
-- **migration / rollback** — no runtime state. Rollback is a revert of the series.
-- **user docs** — the rendered skill and the protocol are the user docs, and both are in S7. The
-  skill's "Find the mandate. Do not write one." step becomes wrong the moment S1 lands, and its
-  wiring check compares the render to its template, so a stale render reds rather than misleads.
+  own failure text. Two arms are keyed on literal strings this build changes: the source grep for
+  `check_mandate "`, and the kickoff leg's exit count.
+- **migration / rollback** — no runtime state; rollback is a revert. S0 reverts independently.
+- **user docs** — the rendered skill and the protocol. Note the limit honestly: the wiring check
+  compares the render to its template and the parity leg compares the two protocol copies to each
+  other. Neither compares any of them to the driver's actual behaviour, so a stale claim that lives
+  in BOTH copies is invisible to every gate.
 
 ## 6. Acceptance criteria
 
 **AC1** — When a build's README is committed on the default branch and a run branches from it and
-invokes `--preflight <slug> --keepalive-id <id>` having authored nothing, preflight succeeds and
-writes a run-state file it created itself.
+invokes `--preflight` having authored nothing, preflight succeeds and creates and commits the
+run-state file.
 
-**AC2** — When a run creates a build folder and README on its own branch and invokes `--preflight`
-against it, preflight refuses, naming that the README does not resolve at the pinned BASE.
+**AC2** — When a run creates a build folder and README on its own branch and invokes `--preflight`,
+preflight refuses, naming that the README does not resolve at the pinned BASE.
 
-**AC3** — When the merge-base equals HEAD, `--preflight` proceeds and `--close` refuses. Both arms
-run in `unattended.test.sh`, and the close arm asserts the existing refusal text is unchanged.
+**AC3** — When the merge-base equals HEAD, `--preflight` proceeds with an explicitly defined BASE and
+`--close` refuses, with the close refusal text unchanged.
 
-**AC4** — When a build carries a plan region at BASE and the working copy's region differs,
-`--preflight` refuses, naming that the run edited the scope it is executing against.
+**AC4** — When a plan region present at BASE differs in the working copy, or is malformed on either
+side, `--preflight` refuses, with the malformed case its own named refusal.
 
-**AC5** — When `--plan` runs over a build with one closed unit, one specced-and-unreviewed unit and
-one planned-but-unspecced title, it prints exactly three rows reading `DONE`, `REVIEW NEEDED` and
-`SPEC NEEDED`, and a `next:` line naming the review.
+**AC5** — When `--plan` runs over a fixture carrying one `CLOSED` unit, one `SPECCED` unit with no
+review pointer, one `INPROGRESS` unit and one planned ordinal with no spec, it prints four rows
+reading `DONE`, `REVIEW NEEDED`, `LAND NEEDED` and `SPEC NEEDED`, in plan-ordinal order, and a
+`next:` line naming the review. The case runs in `unattended.test.sh`.
 
-**AC6** — When `.unattended.conf` declares a `CORE_FLOOR` whose phase count is below the shipped
-core set, `check-unattended.sh` refuses. The floor rising to nine is asserted, not assumed.
+**AC6** — When `PHASES_CORE` holds nine members and `.unattended.conf` declares a phase floor below
+nine, a leg refuses. This is a NEW check: the shipped one fires only when the core set shrinks below
+the floor, so a stale floor is silently legal and rev-1's AC asserted the comparison backwards.
 
-**AC7** — When each of the three attacks from the prior Tier-2 is re-aimed at the new surface — a
-BASE read back from the run-written record, an anchor moved with a local branch force, and a
-discarded error signal — `--preflight` refuses in all three cases, and `check-unattended.sh` refuses
-independently in all three.
+**AC7** — When each of the three prior attacks is re-aimed at the new surface, `--preflight` refuses
+in all three and `check-unattended.sh` refuses independently in all three.
 
-**AC8** — When `bash tools/unattended/adopt-unattended.sh --check` runs after the render, it exits 0
-and the render carries no surviving placeholder, so template parity and placeholder completeness are
-both observed.
+**AC8** — When the adopter check runs after the render, it exits 0 and the render carries no surviving
+placeholder.
 
-**AC9** — When `python tools/codebase-map/test_codebase_map.py` runs, the unattended dossier claims
-every gate leg this build adds or renames, and the generated map artifacts byte-compare against a
-fresh render.
+**AC9** — When the codebase-map coverage gate runs, every inventory this build moves is claimed and
+the generated artifacts byte-compare against a fresh render.
+
+**AC10** — When the blob at BASE is not parseable build front matter, `--preflight` refuses.
+
+**AC11** — When the blob's `slug:` does not equal the requested slug, `--preflight` refuses.
+
+**AC12** — When the anchor ref is moved with `git update-ref` to a commit the run authored, and again
+when `GOV_DEFAULT_BRANCH` names a manufactured tracking ref, `--preflight` refuses and
+`check-unattended.sh` refuses. Both arms carry a live control that passes on an honest anchor.
+
+**AC13** — When the harness meta-gate runs, the re-measured branch and armed counts for both
+unattended scripts equal their re-pinned floors, and the count is asserted rather than inferred from
+the gate's silence.
 
 ## 7. Gates
 
-The full bar, `bash tools/run-gates.sh`, at the push boundary. The legs this build moves rather than
-merely keeps green:
+The full bar at the push boundary. Legs this build MOVES rather than merely keeps green: both
+unattended legs and their two self-tests, the adopter check and its e2e, the harness meta-gate against
+re-pinned floors, the memory hygiene engine, the verdict-epoch gate, the kit-version pair, the
+kit/dogfood parity leg, the hygiene-parity floor, the template size gate, the kickoff-manifest ratchet,
+the codebase-map coverage gate, and the drift-audit records leg. Rev-1 claimed no leg moves; twelve do.
 
-- `bash tools/unattended/check-unattended.sh` and its sibling `check-unattended.test.sh`
-- `bash tools/unattended/unattended.test.sh`
-- `bash tools/unattended/adopt-unattended.sh --check` and `adopt-unattended.test.sh`
-- `python tools/memory-tree/check-arms.py`, against the lowered `ARMS_FLOORS` entries
-- `bash tools/memory-tree/check-memory-hygiene.sh`, for the new template and the new build folder
-- `bash tools/check-template-size.sh`, if any amendment reaches the template rather than the companion
-- `bash skills/session-kickoff/manifest-check.sh`, since `.unattended.conf` is a watched pathspec
-- `python tools/codebase-map/test_codebase_map.py`
-- `python tools/drift-audit/drift_report.py`
-
-No new gate leg is added. S4's verb is exercised by the driver's own self-test rather than by a
-tenth leg, because a leg that only runs a verb duplicates the self-test that already runs it.
+No new gate leg is added. `--plan` is exercised by the driver self-test, which is itself a leg.
 
 ## 8. Open questions
 
-**F1 — is the plan region's byte-equality a hard precondition or an opt-in?**
-Hard makes the integrity property universal and reintroduces per-build authoring, which is the thing
-this build removes. Opt-in honours F0a and leaves a build with no region authorized on existence
-alone. **Recommendation: opt-in**, with the template shipping the region so new builds get it by
-default and the ladder is a default rather than a choice anyone has to make.
+**F1 — is assertion 4 a hard precondition or an opt-in?** Rev-1 recommended opt-in with the template
+shipping the region. The review showed those two halves contradict: an empty region is a refusal, so a
+scaffolded build refuses until the owner hand-fills it, which is the per-build authoring F0a removed.
+**Recommendation: opt-in, and the template ships the region COMMENTED OUT** with one line saying what
+filling it buys. No build refuses, and filling it is a choice with a stated benefit.
 
-**F2 — does the recorded-BASE assertion relax from equality to ancestry?**
-As written, `fail 18` fires when the derived merge-base differs from the recorded one, and the
-mandated lander can cause exactly that by reconciling origin mid-run. Relaxing to "the recorded BASE
-is an ancestor of the derived merge-base" admits legitimate forward movement. The obvious objection
-is that it lets the run record an arbitrary older ancestor — but every ancestor of the branch point
-is also pre-run, and assertion 4 compares the plan region across whichever BASE is recorded, so a
-run that reaches back to an older commit with a different plan fails that comparison rather than
-passing this one. **Recommendation: relax to ancestry**, and say in the refusal text why ancestry
-rather than equality is the honest test.
+**F2 — does the recorded-BASE assertion relax from equality to ancestry?** The review refuted rev-1's
+defence of this — the defence was assertion 4, which F1 makes conditional, so a run reaching back past
+the region's introduction escapes both. It also found rev-1's premise wrong: the mandated lander
+refuses to run off the default branch, so it cannot move the run's branch. **Recommendation: keep
+equality** until a real mechanism that moves the merge-base is demonstrated. Relaxing a guard for a
+hazard nobody has reproduced is how the anchor bypass survived.
 
-**F3 — does `--plan` read tracked files only?**
-Tracked-only matches every other gate here and means an uncommitted spec is invisible until the run
-commits it, which suits a run that commits as it goes. Reading the working tree would let `--plan`
-see work in progress and would also let it see a spec the run has written but not committed, which
-is a state the rest of the tooling treats as not existing. **Recommendation: tracked only.** Note
-that this does NOT resolve the filename-join risk in §5, which is a separate defect and needs its
-own answer before S4 is built.
+**F3 — does `--plan` read tracked files only?** **Recommendation: tracked only.** The filename-join
+question this fork disclaimed in rev-1 is now resolved in §4 by deleting the join.
 
-**F4 — is the widening recorded as a decision row?**
-F0a converts a per-build grant into a class grant over every build in the tree. The tree's
-convention is that a ratified fork becomes a row in `memory/DECISIONS.md`.
-**Recommendation: yes**, worded as the widening it is rather than as an ergonomics improvement, so a
-future reader who finds an unattended run on a build nobody remembers authorizing can see it was
-foreseen.
+**F4 — is the widening recorded as a decision row?** **Recommendation: yes**, and the row must name
+losses 3, 4 and 5, not only the class grant.
+
+**F5 — is self-propagating authorization acceptable?** A run that lands a new build README authorizes
+the next run. Options: accept it; refuse a build README whose introducing commit is authored by an
+unattended run, which is checkable because the run-state file records the run; or require the plan
+region for any build created after this lands. **Recommendation: the third** — it is the cheapest, it
+is mechanical, and it makes assertion 4 non-vacuous for exactly the population that can propagate.
+
+**F6 — how are the ACTIONS named, now that the README names none?** Options: accept that every build
+authorizes both; declare the pair once in the conf, which F0a rejected as a declaration; or let the
+plan region carry an optional actions line. **Recommendation: accept both**, and say so in the amended
+charter sentence rather than letting the old wording stand while meaning something else.
+
+**F7 — where is the parallel session?** The review could not find it. If it does not exist, the
+instruction layer is unowned and this build's cut-line is fiction. **Recommendation: the owner names
+it or folds it here** before S4 is built, since §4's state table already answers three questions §3
+assigns away.
+
+**F8 — does S0 land as its own series, ahead of any owner decision on S1 through S7?**
+**Recommendation: yes.** It repairs a live bypass in merged code and depends on none of the design
+questions above.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. Two owner forks resolved at kickoff and recorded as F0a and
-  F0b in the build README; four new forks opened as F1 through F4.
+- rev-1 · 2026-08-11 · initial draft. Two owner forks resolved at kickoff as F0a and F0b; four opened.
+- rev-2 · 2026-08-11 · folded review-aStandingWrit-1, which returned do-not-build. Added S0 for the
+  anchor bypass the review reproduced in landed code. Deleted the filename join and the title match
+  from S4 in favour of declared pointers. Replaced the four-state table with an eight-state one that
+  can express built-but-not-landed. Corrected seven factual claims. Expanded the amendment set from
+  four files to seven and the moved-leg count from zero to twelve. Named three further losses and
+  opened F5 through F8. Status returned to OPEN.
 
 ## 10. Reuse audit
 
-`python tools/codebase-map/reuse_lookup.py "derive per-unit build progress from spec status headers
-and review records"` returns `parse_spec` and `derive_status` in `tools/memory-tree/gen_build_index.py`,
-and `.unattended.conf` as the affordance seam for this kit's declarations.
+The reuse lookup returns `parse_spec` and `derive_status` in `tools/memory-tree/gen_build_index.py`,
+and `.unattended.conf` as this kit's affordance seam.
 
-The seam S4 wires through is `gen_build_index.py`. Its module docstring states that a build's status
-is a pure function of the build front matter plus every status header under that build's `spec/`,
-and that it reads no git history, no mtimes, and neither `build/` nor `reviews/`. `collect()` already
-walks tracked spec paths per build and `parse_spec()` already extracts the status token and rev.
-`--plan` calls those rather than re-parsing a status header, because two parsers for one header is
-the assertion-between-two-derived-values shape one level up: they would agree until they did not,
-and the gate that byte-compares the generated region would side with one of them arbitrarily.
+**The obvious reuse is unavailable, and rev-1 claimed it anyway.** `tools/unattended/unattended.test.sh:384-388`
+is a shipped, armed assertion that the driver invokes no python launcher, on the stated ground that a
+bare launcher in that file would be an unresolved one. The driver is bash; the module exposes only
+`--check`, `--write` and `--selftest`, all of which print prose; and the two kits copy-install
+independently, so a spelled sibling path assumes another kit's prefix in an adopter tree. There is no
+seam, and rev-1's §10 asserted one.
 
-The two sources `gen_build_index.py` deliberately does not read — the plan region and `reviews/` —
-are new reads that belong to `--plan` and not to the renderer. Pushing them into `gen_build_index.py`
-would change what the generated region contains, which would change what the hygiene gate
-byte-compares, for the benefit of one verb in another kit. `--plan` composes; the renderer stays a
-pure function of the two things it already reads.
+S4 therefore reimplements the status-header parse in the driver's own language, and this spec records
+the cost rather than hiding it: two parsers now read one header, which is the shape that agrees until
+it does not. The mitigation is that the header grammar is FROZEN by a published format contract and a
+gate already enforces it, so both parsers read against a specification rather than against each other.
+The alternative — adding a machine-readable mode to `gen_build_index.py` and a conf key naming it —
+was rejected because F0a ratified that this kit gains no declaration.
 
-`.unattended.conf` is read for `MEMORY_ROOT` and `CORE_FLOOR` and gains no key, which is F0a's
-ratified shape.
+`.unattended.conf` is read for the memory root and the core floor, and gains no key.
