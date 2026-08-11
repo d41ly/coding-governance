@@ -13,13 +13,13 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d34027c9b7b6ac349169ef20afe466acebb4971c
+witness: 9c28300649d93e12e65e1ee4378a26e14e8dd3ff
 phase: BUILDING
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
-anchor-sha: 7890becf4456b1f6587a7bcde9d8f1fb70077673
+anchor-sha: 91ef1b05eb320512c0697bee72cfc228b00eee85
 anchor-ref: refs/heads/main
-base: 081c3669df7ce43f8e448dc88e9be94b6d44c557
+base: 91ef1b05eb320512c0697bee72cfc228b00eee85
 
 ## Parked
 
