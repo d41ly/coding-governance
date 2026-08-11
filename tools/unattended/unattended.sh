@@ -48,7 +48,7 @@ KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — kit identity; set HERE
 export GIT_GRAFT_FILE=/dev/null
 GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a git repo"; exit 2; }
+ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — the kit reads every"; \
@@ -71,7 +71,7 @@ PHASES_TERMINAL="LANDED ABORTED"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine mandate-reachable:machine landed-via-lander:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
@@ -82,7 +82,6 @@ checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "$
 # Kit-owned, NOT a project declaration: an adopter chooses paths and commands, not the file's shape.
 SRC_OPEN='<!-- gen:build-index -->'; SRC_CLOSE='<!-- /gen:build-index -->'
 GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
-MAN_OPEN='<!-- run:mandate -->';     MAN_CLOSE='<!-- /run:mandate -->'
 
 # Exactly one open, exactly one close, CLOSE AFTER OPEN, print the slice between them. Never a
 # whole-file regex — the splice contract this borrows from gen_build_index.py's apply_region().
@@ -158,25 +157,25 @@ observe_anchor() {
   # ---- for this script's own reads, so this is a tripwire and not a barrier: it says the lever is
   # ---- here, and an unattended run is the wrong moment to guess why.
   levers=""
-  [ -n "$(git for-each-ref --format='%(refname)' refs/replace 2>/dev/null)" ] && levers="$levers refs/replace"
-  [ -f "$(git rev-parse --git-path info/grafts)" ] && levers="$levers info/grafts"
+  [ -n "$(GIT for-each-ref --format='%(refname)' refs/replace 2>/dev/null)" ] && levers="$levers refs/replace"
+  [ -f "$(GIT rev-parse --git-path info/grafts)" ] && levers="$levers info/grafts"
   if [ -n "$levers" ]; then
     fail 23 "this clone carries an object-substitution lever, which rewrites what a sha MEANS for every read below it, so the anchor can be honest and the bytes at it forged:$levers"
     return 1
   fi
   # ---- 24: exactly one remote. With two the kit would be CHOOSING which endpoint to believe, and
   # ---- the one it believes has to be the one the landing push goes to.
-  nrem=$(git remote | grep -c . || true)
+  nrem=$(GIT remote | grep -c . || true)
   if [ "$nrem" != 1 ]; then
     fail 24 "this clone declares a number of remotes other than one, and the anchor has to be the endpoint the landing push goes to, so the kit refuses to pick one: $nrem"
     return 1
   fi
-  rem=$(git remote | head -1)
+  rem=$(GIT remote | head -1)
   # ---- 25: observe and push must be the SAME endpoint. A cost-raiser, NOT the property: a relay the
   # ---- run seeded satisfies it with one URL and one config source. Kept because it is free and
   # ---- catches the honest misconfiguration.
-  uf=$(git ls-remote --get-url "$rem" 2>/dev/null)
-  up=$(git remote get-url --push "$rem" 2>/dev/null)
+  uf=$(GIT ls-remote --get-url "$rem" 2>/dev/null)
+  up=$(GIT remote get-url --push "$rem" 2>/dev/null)
   if [ "$uf" != "$up" ]; then
     fail 25 "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch $uf, push $up"
     return 1
@@ -184,7 +183,7 @@ observe_anchor() {
   # ---- 27/28: the REMOTE names its own default branch. `--exit-code` is what makes "answered but
   # ---- advertised nothing" distinguishable from "answered": without it the call exits 0 and prints
   # ---- nothing, which is exactly what a bare repo with a dangling HEAD produces.
-  adv=$(GIT_TERMINAL_PROMPT=0 git ls-remote --symref --exit-code "$rem" HEAD 2>/dev/null) && rc=0 || rc=$?
+  adv=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$rem" HEAD 2>/dev/null) && rc=0 || rc=$?
   if [ "$rc" != 0 ] && [ "$rc" != 2 ]; then
     fail 27 "the remote did not answer, and the anchor is an observation of it rather than of any local ref; a run that cannot reach the remote cannot land on it either: $rem at $uf"
     return 1
@@ -217,7 +216,7 @@ observe_anchor() {
 default_branch() {
   [ -n "$AREF" ] && { printf '%s' "${AREF#refs/heads/}"; return 0; }
   if [ -n "${GOV_DEFAULT_BRANCH:-}" ]; then printf '%s' "$GOV_DEFAULT_BRANCH"; return 0; fi
-  local d; d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || return 1
+  local d; d=$(GIT symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || return 1
   printf '%s' "${d#origin/}"
 }
 
@@ -249,12 +248,17 @@ resolve_base() {
 # printed only the downstream symptom and never said why. Separating the value channel from the
 # message channel is the fix, and it is why this function returns 0/1 and sets `TB`.
 TB=""
-trusted_base() { # run-state file  ->  sets TB
+trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec
   TB=""
   fresh=$(resolve_base); rc=$?
   if [ "$rc" = 2 ]; then
-    fail 16 "the merge-base equals HEAD, so the run authored every byte the mandate comparison would read; nothing was built on top of the anchor"
+    # BASE == HEAD. Legal only where the caller says so, and only ONE caller does - see verb_preflight.
+    if [ "${2:-}" = "allow-degenerate" ]; then
+      TB=$(GIT rev-parse HEAD)
+      return 0
+    fi
+    fail 16 "the merge-base equals HEAD, so the run authored every byte the authorization comparison would read; nothing was built on top of the anchor"
     return 1
   fi
   if [ "$rc" != 0 ] || [ -z "$fresh" ]; then
@@ -291,17 +295,17 @@ check_clean() {
   # `git status --porcelain` alone is NOT the test. A linked worktree can carry a stale stat cache
   # and report a path modified whose content is byte-identical after the eol filter — measured on
   # this repo's own `.claude/skills/*/SKILL.md` renders. Refresh first, then ask about CONTENT.
-  git update-index -q --refresh >/dev/null 2>&1 || true
+  GIT update-index -q --refresh >/dev/null 2>&1 || true
   local d
-  d=$( { git diff --name-only; git diff --cached --name-only; \
-         git ls-files --others --exclude-standard; } | grep -c . || true)
+  d=$( { GIT diff --name-only; GIT diff --cached --name-only; \
+         GIT ls-files --others --exclude-standard; } | grep -c . || true)
   [ "$d" = 0 ] && return 0
   fail 2 "the working tree is dirty, so the pinned BASE would name a state that is not what runs: $d path(s)"
   return 1
 }
 
 check_branch() {
-  local cur def; cur=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  local cur def; cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null)
   def=$(default_branch) || { fail 3 "cannot resolve the default branch (set GOV_DEFAULT_BRANCH) — refusing rather than assuming one"; return 1; }
   [ "$cur" != "$def" ] && return 0
   fail 3 "the run is on the default branch, where its own commits would land unreviewed on the branch it means to merge INTO: $def"
@@ -335,7 +339,7 @@ check_wiring() {
 # keyed on it must either OR the phases together or pick one arbitrarily.
 check_single_live() {
   local n=0 f p live=""
-  for f in $(git ls-files "$M/builds/*/RUN.md" 2>/dev/null); do
+  for f in $(GIT ls-files "$M/builds/*/RUN.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
     n=$((n + 1)); live="$live $f"
@@ -348,41 +352,76 @@ check_single_live() {
 # ONE comparison enforces BOTH provenance properties. At a pinned merge-base, "was it reachable from
 # the BASE" and "did the run author it" are the same question, so there is one answer and one place
 # for it to be wrong.
-check_mandate() { # slug · base
-  local rel base_blob a b rc
-  rel=$(runmd_of "$1"); local base="$2"
-  # NO GUARD HERE FOR AN EMPTY BASE, deliberately. An empty one would make the line below read
-  # `git show ":path"` — the git INDEX, i.e. bytes the run itself staged, on both sides of a test
-  # about provenance. That is exactly how a forged mandate passed. The fix is upstream: `trusted_base`
-  # is the ONLY producer of this argument and it refuses before returning, so a guard here would be a
-  # branch no fixture can reach. `unattended.test.sh` asserts at SOURCE level that every call site
-  # is guarded, which is the house pattern for a hazard no input can produce.
-  if ! base_blob=$(GIT show "$base:$rel" 2>/dev/null); then
-    fail 6 "no run-state file at the pinned BASE, so the mandate cannot be reachable — the owner authors and commits it BEFORE the run starts: $base:$rel"
+# S1 - THE AUTHORIZATION IS THE BUILD FOLDER, not a block the owner hand-writes into the file this
+# driver then splices. A build README committed on the default branch before the run's branch existed
+# is outside the run's reach in exactly the way the mandate block was, and it is a file the owner
+# already writes when they shape a build. The owner's act is `/unattended <slug>` and nothing else.
+#
+# What this deletes, on purpose: the mandate marker pair and every comparison over it. The prior
+# review found that a transposed pair made --preflight truncate the run-state file from the open
+# marker to EOF - destroying the owner's only authored bytes - and only then print an unrelated
+# refusal. There are no owner-authored bytes in that file now, so the worst case of that bug is the
+# loss of regenerable state.
+#
+# What it costs, stated here because a reader of this function should not have to find it elsewhere:
+# the check degrades from INTEGRITY to EXISTENCE. The README is a living document whose generated
+# region the run legitimately re-renders, so no whole-file equality is assertable. The grant also
+# widens from one build to every build folder in the tree, it names no ACTIONS, it cannot be revoked,
+# and a run that lands a NEW build README authorizes the next run. All five are enumerated in
+# memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
+check_authorization() { # slug · base
+  local slug="$1" base="$2" rel blob fmslug
+  rel=$(readme_of "$slug")
+  # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
+  # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
+  # the run itself staged, on both sides of a test about provenance. `trusted_base` is the ONLY
+  # producer of this argument and refuses before returning, so a guard here would be a branch no
+  # fixture can reach. The SOURCE-level arm in unattended.test.sh is what holds that invariant.
+  if ! blob=$(GIT show "$base:$rel" 2>/dev/null); then
+    fail 6 "no build README at the pinned BASE, so nothing committed before this run branched authorizes it, and a build folder the run created on its own branch authorizes nothing: $base:$rel"
     return 1
   fi
-  # THE EXIT STATUS IS THE POINT, and `|| true` threw it away on both sides. `region` exits 3 on a
-  # malformed pair — including a SECOND mandate block — and swallowing that made a run-authored
-  # second block invisible: the first block matched, the extra one granting force-push was never
-  # compared to anything, and preflight printed OK.
-  a=$(printf '%s\n' "$base_blob" | region - "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null); rc=$?
-  if [ "$rc" != 0 ]; then
-    fail 20 "the run-state file at the pinned BASE does not carry exactly one well-formed mandate block, so there is no single authorization to compare against"
+  # Front matter opens at LINE 1 and nowhere else - the same rule the build-index generator enforces, and for
+  # the same reason: `---` is also a horizontal rule, so a parser that scans for the first pair can
+  # swallow half a document. A blob that resolves but is not a build README means the path pointed at
+  # something else entirely, which is a different failure from the folder being absent.
+  case "$blob" in
+    "---"*) ;;
+    *) fail 7 "the blob at the pinned BASE is not a build README - front matter opens at line 1 and this does not, so the path resolved to something that is not a build: $base:$rel"
+       return 1 ;;
+  esac
+  fmslug=$(printf '%s\n' "$blob" | awk '
+    NR == 1 { next }
+    /^---[[:space:]]*\r?$/ { exit }
+    /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
+  if [ "$fmslug" != "$slug" ]; then
+    fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
   fi
-  b=$(region "$rel" "$MAN_OPEN" "$MAN_CLOSE" 2>/dev/null); rc=$?
-  if [ "$rc" != 0 ]; then
-    fail 20 "the working copy does not carry exactly one well-formed mandate block; a second block is a second authorization nobody granted"
-    return 1
-  fi
-  if [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ]; then
-    fail 7 "the mandate block is absent or empty at the pinned BASE — a mandate introduced after the branch point is one the run could have written, and grants nothing"
-    return 1
-  fi
-  if [ "$a" != "$b" ]; then
-    fail 7 "the mandate block differs from the one at the pinned BASE — the run edited its own authorization"
-    return 1
-  fi
+  return 0
+}
+
+# S2 - the run-state file is CREATED by --preflight rather than asserted. It holds no owner bytes now,
+# so there is nothing for the owner to author and nothing for a truncation to destroy.
+#
+# It is STAGED, not committed. The gate leg's whole per-run population is `git ls-files`, which reads
+# the INDEX, so staging is what makes the run visible to every leg check; leaving it untracked would
+# hand the run a silent opt-out from the entire leg. Committing it from here was the alternative and
+# was rejected: a driver that makes commits has to decide about hooks, and the one flag it would reach
+# for is the flag this kit bans.
+scaffold_runmd() { # slug -> writes and stages <MEMORY_ROOT>/builds/<slug>/RUN.md
+  local slug="$1" rel
+  rel=$(runmd_of "$slug")
+  mkdir -p "$(dirname "$rel")" || return 1
+  {
+    printf '# %s - run state\n\n' "$slug"
+    printf 'Generated by `unattended.sh --preflight`. The generated region is a COPY of the build\n'
+    printf 'README slice named by the same marker grammar; never hand-edit it.\n\n'
+    printf '%s\n%s\n\n' "$GEN_OPEN" "$GEN_CLOSE"
+    printf '## Run facts\n\n'
+    printf '## Parked\n'
+  } > "$rel" || return 1
+  GIT add -- "$rel" >/dev/null 2>&1 || return 1
   return 0
 }
 
@@ -400,19 +439,29 @@ verb_preflight() { # slug · keepalive-id
   check_branch || true
   check_wiring || true
   check_single_live || true
-  if [ ! -f "$rel" ]; then
-    fail 15 "no run-state file to assert against — preflight asserts a mandate, it does not create one: $rel"
-  else
-    # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about
-    # which commit they are measuring against. `trusted_base` names its own refusals.
-    if [ -n "$ASHA" ] && trusted_base "$rel"; then
-      base="$TB"
-      check_mandate "$slug" "$base" || true
-    fi
+  # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
+  # commit they are measuring against. `trusted_base` names its own refusals.
+  #
+  # S3 - `allow-degenerate` is passed HERE and nowhere else. A merge-base equal to HEAD is the normal
+  # state of a run that has correctly built nothing yet, which is every run at preflight; refusing it
+  # here refused every run this kit exists to enable. It stays a refusal at --close, where a run that
+  # built nothing has nothing to land. The premise is sound only because the anchor is observed: with
+  # merge-base == HEAD, HEAD is an ancestor of the tip the REMOTE advertised, so every byte at BASE is
+  # on the remote's default branch. Against a local ref that premise was false, which is why this
+  # relaxation could not have shipped before the anchor moved.
+  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate; then
+    base="$TB"
+    check_authorization "$slug" "$base" || true
   fi
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
+
+  # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
+  # then discovers a refusal has already changed the state the refusal was about.
+  if [ ! -f "$rel" ]; then
+    scaffold_runmd "$slug" || { fail 9 "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in: $rel"; return 1; }
+  fi
 
   src=$(readme_of "$slug")
   payload=$(mktemp) || return 2
@@ -491,7 +540,7 @@ verb_close() { # slug · override-item · reason
   local slug="$1" ov="$2" reason="$3" rel item ck unmet=0
   check_slug "$slug" || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
-  # run wrote. Its refusals are not fatal to --close: mandate-reachable simply cannot be met without
+  # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
   observe_anchor >/dev/null 2>&1 || true
   rel=$(runmd_of "$slug")
@@ -504,8 +553,8 @@ verb_close() { # slug · override-item · reason
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
     case "$ov" in
-      mandate-reachable)
-        fail 21 "the mandate item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+      authorization-reachable)
+        fail 21 "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
         return 1 ;;
     esac
   fi
@@ -539,12 +588,12 @@ verb_close() { # slug · override-item · reason
 dod_met() { # slug · run-state file · item · checker
   local slug="$1" rel="$2" item="$3" ck="$4"
   case "$item" in
-    mandate-reachable)
+    authorization-reachable)
       # RE-DERIVED, never read out of the run-state file. That file is written by the subject of the
       # test, and an absent `base:` line used to degenerate the comparison to the git index. The
       # ASHA guard is not decoration: with no observation there is no anchor, and an unanchored
       # merge-base is the thing this item exists to refuse.
-      [ -n "$ASHA" ] && trusted_base "$rel" && check_mandate "$slug" "$TB" >/dev/null 2>&1 ;;
+      [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" >/dev/null 2>&1 ;;
     gates-green)
       [ -n "$GATE_CMD" ] && $GATE_CMD >/dev/null 2>&1 ;;
     records-current)

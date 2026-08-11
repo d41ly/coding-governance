@@ -203,27 +203,34 @@ for f in $RUNS; do
     fi
   fi
 
-  # ---- 13: THE MANDATE, asserted by the BAR and not only by the driver. The leg did not contain the
-  # ---- string `run:mandate` at all: it checked the driver's bookkeeping and never the thing the
-  # ---- bookkeeping is about, so all three of the authorization defects reproduced against it were
-  # ---- invisible here and the whole bar stayed green.
+  # ---- 13: THE AUTHORIZATION, asserted by the BAR and not only by the driver. This leg once did not
+  # ---- contain the marker string at all: it checked the driver's bookkeeping and never the thing the
+  # ---- bookkeeping was about, so all three authorization defects reproduced against it were invisible
+  # ---- here and the whole bar stayed green. The subject moved from a mandate block inside the
+  # ---- run-state file to the BUILD FOLDER itself; the obligation to assert it here did not.
   # ----
-  # ---- This is deliberately a SECOND OPINION and not a second implementation: it re-extracts both
-  # ---- blocks itself, from the base commit and from the working copy, and refuses on anything that
-  # ---- is not exactly one well-formed block on each side.
+  # ---- A SECOND OPINION, not a second implementation: it derives the build README path from the
+  # ---- run-state file's own location and reads it at the recorded BASE itself.
+  # ----
+  # ---- Honest limit, and it belongs next to the code rather than in a document nobody reads at the
+  # ---- same time: `rb` is read from a file the run writes. This is an internal-consistency assertion
+  # ---- over run-written facts, stable and offline and deterministic - not an authorization verdict.
+  # ---- What makes it one is running this same leg in a clone the run never touched.
   if [ -n "$rb" ] && GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
-    if bb=$(GIT show "$rb:$f" 2>/dev/null); then
-      ma=$(printf '%s\n' "$bb" | region - '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && ra=0 || ra=$?
-      mb2=$(region "$f" '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && rb2=0 || rb2=$?
-      if [ "$ra" != 0 ] || [ "$rb2" != 0 ]; then
-        fail 13 "a run-state file does not carry exactly one well-formed mandate block on both sides of the BASE comparison; a second block is a second authorization nobody granted: $f"
-      elif [ -z "$(printf '%s' "$ma" | tr -d '[:space:]')" ]; then
-        fail 13 "the mandate block is absent or empty at the recorded BASE, so nothing committed before the run authorizes it: $f"
-      elif [ "$ma" != "$mb2" ]; then
-        fail 13 "a run-state file's mandate differs from the one at its recorded BASE — the run edited its own authorization: $f"
-      fi
+    bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
+    bre="$M/builds/$bslug/README.md"
+    if bb=$(GIT show "$rb:$bre" 2>/dev/null); then
+      case "$bb" in
+        "---"*) ;;
+        *) fail 13 "the build README at a run's recorded BASE is not a build README - front matter opens at line 1 and this does not, so the authorization names something that is not a build: $bre" ;;
+      esac
+      dslug=$(printf '%s\n' "$bb" | awk '
+        NR == 1 { next }
+        /^---[[:space:]]*\r?$/ { exit }
+        /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
+      [ "$dslug" = "$bslug" ] || fail 13 "a build README at its run's recorded BASE declares a different slug, so the folder was renamed or its README copied from another build: declared $dslug, folder $bslug"
     else
-      fail 13 "a run-state file does not exist at its own recorded BASE, so its mandate cannot have been committed before the run: $rb in $f"
+      fail 13 "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it: $rb in $bre"
     fi
   fi
 

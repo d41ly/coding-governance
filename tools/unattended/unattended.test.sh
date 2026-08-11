@@ -87,11 +87,19 @@ MANDATE="The owner authorizes build tRun to merge to main and to push."
 mkconf
 readme tRun
 runmd tRun "$MANDATE"
-# tEmpty exists ON MAIN with an EMPTY mandate block, because check 7 branch 1 asks about the BASE.
-# Producing that state by editing on the unit branch is impossible by construction: the branch is
-# exactly what the BASE is not.
-readme tEmpty
-runmd tEmpty ""
+# Both live ON MAIN, because the authorization is asked about the BASE. Producing either by editing on
+# the unit branch is impossible by construction: the branch is exactly what the BASE is not.
+mkdir -p memory/builds/tNoFm
+printf 'not front matter at all
+
+# tNoFm
+' > memory/builds/tNoFm/README.md
+readme tWrongSlug
+sed -i 's/^slug: tWrongSlug$/slug: someoneElse/' memory/builds/tWrongSlug/README.md
+# A build whose README is on MAIN and which never had a run-state file - S2's subject. Deleting
+# tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
+# would have tested the dirty-tree refusal while claiming to test creation.
+readme tFresh
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor, because that is now the only thing resolve_base will measure against: a
 # bare local branch is a ref the run can move with `git branch -f`, and moving it to HEAD was a
@@ -189,25 +197,26 @@ git add -A && git commit -q -m two --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined"
 
-# ---- check 6: the run-state file exists on the unit branch but NOT at the pinned BASE. This is the
-# ---- self-authored case in its purest form — the run created the file that holds its own mandate.
+# ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
+# ---- self-authored case in its purest form - the run invented the build that authorizes it.
 reset_tree
-readme tNew; runmd tNew "$MANDATE"
+readme tNew
 git add -A && git commit -q -m new --no-verify
 out=$(run --preflight tNew --keepalive-id k1)
-hit "$out" "no run-state file at the pinned BASE, so the mandate cannot be reachable — the owner authors and commits it BEFORE the run starts"
+hit "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it, and a build folder the run created on its own branch authorizes nothing"
 
-# ---- check 7 branch 1: the file is reachable but its mandate block is EMPTY at the BASE. Reaching
-# ---- the file is not reaching the mandate, and a run that filled an empty block authored it.
+# ---- check 7: the path RESOLVES at the BASE and is not a build README. Distinct from check 6 on
+# ---- purpose: "the folder is not there" and "it is there and is not a build" are different facts,
+# ---- and collapsing them tells an operator to create something that already exists.
 reset_tree
-out=$(run --preflight tEmpty --keepalive-id k1)
-hit "$out" "the mandate block is absent or empty at the pinned BASE — a mandate introduced after the branch point is one the run could have written, and grants nothing"
+out=$(run --preflight tNoFm --keepalive-id k1)
+hit "$out" "the blob at the pinned BASE is not a build README - front matter opens at line 1 and this does not, so the path resolved to something that is not a build"
 
-# ---- check 7 branch 2: present at BASE, EDITED in the working copy. Same comparison, other side.
+# ---- check 20: the README at BASE declares a DIFFERENT slug - a folder renamed, or a README copied
+# ---- from another build. The authorization resolves, and it does not name this build.
 reset_tree
-runmd tRun "$MANDATE and also to force-push, which the owner never wrote."
-out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the mandate block differs from the one at the pinned BASE — the run edited its own authorization"
+out=$(run --preflight tWrongSlug --keepalive-id k1)
+hit "$out" "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared"
 
 # ---- check 8: the keepalive id is the AGENT's half of the split. No script can produce it, so its
 # ---- absence is a refusal rather than a default.
@@ -215,11 +224,26 @@ reset_tree
 out=$(run --preflight tRun)
 hit "$out" "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
 
-# ---- check 15: a build folder with no run-state file at all.
-reset_tree; readme tBare; fixture
-out=$(run --preflight tBare --keepalive-id k1)
-hit "$out" "no run-state file to assert against — preflight asserts a mandate, it does not create one"
-git reset -q --hard HEAD~1; git clean -qfd
+# ---- S2: a build with no run-state file is the NORMAL case now - preflight creates it and the owner
+# ---- authors nothing, which is the whole point of this build. Three claims, three assertions: it
+# ---- succeeds, the file exists, and it is STAGED. The third is not decoration - every check in the
+# ---- gate leg iterates `git ls-files`, so an unstaged run-state file is a silent opt-out from the
+# ---- entire leg.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1)
+hit "$out" "preflight OK"
+n=$((n+1)); [ -f memory/builds/tFresh/RUN.md ] || { echo "FAIL preflight did not create the run-state file for a build that never had one"; st=1; }
+same "the created run-state file is STAGED, or the gate leg cannot see the run" "$(git ls-files memory/builds/tFresh/RUN.md)" "memory/builds/tFresh/RUN.md"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+
+# ---- check 9 branch 1: the scaffold cannot write. A DIRECTORY where the run-state file belongs is
+# ---- the cheapest unwritable path that does not need permissions this node may not honour, and an
+# ---- empty directory is invisible to git, so check 2 stays green and this arm tests its own branch.
+reset_tree
+mkdir -p memory/builds/tFresh/RUN.md
+out=$(run --preflight tFresh --keepalive-id k1)
+hit "$out" "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in"
+rmdir memory/builds/tFresh/RUN.md
 
 # ---- check 29: THE SECOND REPORTED BYPASS ROUTE, closed. A bogus GOV_DEFAULT_BRANCH used to SELECT
 # ---- which ref the anchor was measured against, and the gate leg read the same variable, so it
@@ -316,9 +340,16 @@ git replace -d "$BASE" >/dev/null 2>&1
 # `git branch -f main HEAD` used to produce, and it defeated the whole kit — the mandate at BASE was
 # the mandate the run had just written. Refusing to fall back to HEAD is not the same as refusing to
 # BE at HEAD, and only the first was implemented.
+# ---- S3 SPLIT THIS ONE by verb. The state is legal at --preflight, where a run has correctly built
+# ---- nothing yet, and a refusal at --close, where a run that built nothing has nothing to land. Both
+# ---- arms run against the SAME fixture one command apart, which is the only way to show it is the
+# ---- VERB that differs and not the tree.
 reset_tree; git push -q -f origin unit:main
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the merge-base equals HEAD, so the run authored every byte the mandate comparison would read; nothing was built on top of the anchor"
+hit "$out" "preflight OK"
+miss "$out" "the merge-base equals HEAD"
+out=$(run --close tRun)
+hit "$out" "the merge-base equals HEAD, so the run authored every byte the authorization comparison would read; nothing was built on top of the anchor"
 git push -q -f origin "$BASE":main
 
 # ---- check 9, both branches: the marker pair is malformed in the SOURCE and in the TARGET. The
@@ -419,49 +450,40 @@ reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 hit "$(run --close tRun)" "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded"
 
-# ...and the DELETED-line case, which is the one that was exploitable: with no `base:` at all the
-# mandate item must be UNMET, not silently satisfied against the index.
+# ...and the DELETED-line case, which was THE exploitable one: an absent `base:` used to degenerate
+# the comparison to the git index, so both sides became bytes the run had just staged. It is no
+# longer a hazard at all - `trusted_base` DERIVES the value when the record carries none, so the item
+# is evaluated honestly instead of silently satisfied. Assert the HARMLESSNESS, because a reader
+# cannot otherwise tell a closed hole from an untested one.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
-sed -i 's/The owner authorizes/FORGED — the run rewrote/' memory/builds/tRun/RUN.md
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
 git add -A
 out=$(run --close tRun)
-hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
-hit "$out" "mandate-reachable"
-miss "$out" "close OK"
+miss "$out" "authorization-reachable"
 
-# ---- check 20, both sides: exactly ONE well-formed mandate block, at the BASE and in the working
-# ---- copy. `region`'s exit 3 was discarded with `|| true` on both, so a SECOND run-authored block
-# ---- granting force-push compared byte-equal to the owner's and preflight printed OK.
+# ...and the item GENUINELY unmet, which is now a different fixture entirely: a build whose README is
+# not at the pinned BASE because the run created it. The close-side twin of check 6.
 reset_tree
-printf '
-<!-- run:mandate -->
-FORGED SECOND BLOCK: also authorize force-push.
-<!-- /run:mandate -->
-' >> memory/builds/tRun/RUN.md
+readme tNew; runmd tNew "irrelevant now"
+printf 'phase: RUNNING
+keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tNew/RUN.md
 fixture
-hit "$(run --preflight tRun --keepalive-id k1)" "the working copy does not carry exactly one well-formed mandate block; a second block is a second authorization nobody granted"
-
-# ...the same defect from the BASE side, which needs the second block committed to the ANCHOR.
-reset_tree
-git checkout -q main
-printf '
-<!-- run:mandate -->
-A SECOND BLOCK THAT WAS ALWAYS THERE.
-<!-- /run:mandate -->
-' >> memory/builds/tRun/RUN.md
-git add -A && git commit -q -m twoblocks --no-verify && git push -q -f origin main
-# The unit branch must DESCEND from the two-block anchor, or the merge-base is still the one-block
-# commit and this arm silently tests nothing.
-git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
-hit "$(run --preflight tRun --keepalive-id k1)" "the run-state file at the pinned BASE does not carry exactly one well-formed mandate block, so there is no single authorization to compare against"
-git push -q -f origin "$BASE":main
+out=$(run --close tNew)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "authorization-reachable"
+miss "$out" "close OK"
+git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 21: the authorization item is NOT overridable. The generic override loop accepted it,
 # ---- which makes the override on the authorization check BE the authorization check — and the
 # ---- protocol says in one sentence that there is no override for this one.
 reset_tree
-hit "$(run --close tRun --override mandate-reachable --reason "trust me")" "the mandate item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+hit "$(run --close tRun --override authorization-reachable --reason "trust me")" "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
 
 # ---- THE DEREFERENCE PIN. A sha is a NAME, and both levers below rewrite what it resolves to at a
 # ---- PERFECTLY HONEST anchor - so no amount of anchor hardening closes either, and an anchor fix
@@ -512,16 +534,16 @@ n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$SCRIPT"   || {
 unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
 
-# ---- SOURCE-level: every `check_mandate` call site is GUARDED by `trusted_base`. There is no
+# ---- SOURCE-level: every `check_authorization` call site is GUARDED by `trusted_base`. There is no
 # ---- runtime guard inside check_mandate for an empty base, deliberately — it would be a branch no
 # ---- fixture could reach — so the invariant is asserted against the text instead. An unguarded
 # ---- call would restore the `git show ":path"` index read that made a forged mandate pass.
-ug=$(grep -n 'check_mandate "' "$SCRIPT" | grep -v 'trusted_base' | grep -v '^\s*#' || true)
+ug=$(grep -n 'check_authorization "' "$SCRIPT" | grep -v 'trusted_base' | grep -v '^\s*#' || true)
 n=$((n+1))
 while IFS= read -r ln; do
   [ -n "$ln" ] || continue
   no=${ln%%:*}
-  sed -n "$((no-4)),${no}p" "$SCRIPT" | grep -q 'trusted_base'     || { echo "FAIL check_mandate is called without a trusted_base guard within 4 lines: $ln"; st=1; }
+  sed -n "$((no-4)),${no}p" "$SCRIPT" | grep -q 'trusted_base'     || { echo "FAIL check_authorization is called without a trusted_base guard within 4 lines: $ln"; st=1; }
 done <<<"$ug"
 
 # ---- SOURCE-level: the driver must not grow a python dependency. Every other kit here carries the
