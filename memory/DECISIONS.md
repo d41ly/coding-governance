@@ -27,6 +27,7 @@
 - TOOL-aUnmannedHelm-6 · a gate that verifies the PAPERWORK of a claim without verifying the claim is a second signature, not defence in depth: the leg checked the recorded BASE, the phase and the copied region, and never contained the string `run:mandate`
 - TOOL-aUnmannedHelm-10 · CRLF reaches past everything that watches for it: `check-wiring.sh` only sees `.claude/`, and a byte-comparing gate is not the only consumer. Ask which consumer reads a file WHOLE — a launcher, a sourced conf, a hook
 - TOOL-aUnmannedHelm-9 · an adopter's refusals are ordered before it READS anything: the conf check fired first and told an operator running from a foreign repo to create a conf in the very tree the adopter must not adopt. A correct refusal with the wrong remedy is a defect
+- TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
 ## DEPL — deployer
 

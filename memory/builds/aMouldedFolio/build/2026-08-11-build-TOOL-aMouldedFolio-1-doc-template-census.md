@@ -7,8 +7,9 @@ template, and how much of each can move from authored to GENERATED? Scope covers
 `memory/` tree, the root product docs, the shipped playbook template and its two companions, the
 backfill of existing content, and migration for already-landed adopters.*
 
-*Status: RECOMMENDATION — pre-build. No template, renderer or gate leg was written. The owner
-ratifies the route in §8 before any spec is authored.*
+*Status: RATIFIED 2026-08-11 — the owner approved the §8 route with one amendment (step 7 folds in
+as unit 7 of this build). The three §10 questions are answered and recorded there. No template,
+renderer or gate leg was written by this pass; unit 1's spec is the next artifact.*
 
 ---
 
@@ -310,7 +311,7 @@ regen, a kickoff re-stamp, an `AGENTS.md` bullet against a pin at tolerance 0, a
 | **4** | **Row-grammar validator for backlog + DECISIONS** | Reuse `merge-rows.py`'s parser; ship with an empty registry and a 0 pin | **0 rows migrated** (136/136 conform); repairs the duplicate-id defect | 0–1 |
 | **5** | **Unify the marker-region primitive** | Parametrize the Python markers, delete the dead twin, settle one well-formedness contract | 4 impls → 1–2; re-validate 25 READMEs + INDEX + 2 fixture sets | 0 |
 | **6** | **Generate `AGENTS.md`'s gate-suite + kit roster** | From `gate-legs.json` and `git ls-files 'tools/*/*'`; drives the drift pin toward 0 | 1 file, 2 regions, 1 renderer; repairs 5 stale claims | 0 |
-| **7** | **Adopter reachability** (optional, and the honest one) | Install `UNATTENDED-PROTOCOL.md`; stamp kit version into renders; add an *upgrade-path* e2e leg | 1 `cp`; 1 marker; 1 leg | 1 |
+| **7** | **Adopter reachability** — RATIFIED INTO THIS BUILD (§10 q3) | Install `UNATTENDED-PROTOCOL.md`; stamp kit version into renders; add an *upgrade-path* e2e leg | 1 `cp`; 1 marker; 1 leg **+ the six leg obligations** | 1 |
 
 **Explicitly NOT recommended:** a build-README prose template (§3); a cutoff for any class lacking a
 date key (§5); Route B's schema half (§7); and **any templating of the playbook template or its
@@ -356,17 +357,37 @@ adoption surface*, from a review at precision 0.82.
 
 ---
 
-## 10 · Open questions — owner calls, not research gaps
+## 10 · The three questions — ANSWERED 2026-08-11
 
-1. **Which `ids:` semantics is canon** — every id the build minted, or only its units? Reading A
-   survives `aSealedCaravan`; reading B survives `aUnmannedHelm`. Unit 1 cannot start without this,
-   and it also decides whether the range spellings (`..`, `/`, `·`) stay legal or normalize to one.
-2. **Does unit 1 repair the 25 existing `ids:` values, or only validate new ones?** Validation-only
-   reds the bar immediately on at least `aUnmannedHelm` and `aBatchedTribunal`. Repair is ~5 files
-   of judgment, and the judgment is the answer to question 1.
-3. **Is adopter reachability (step 7) in this build or its own?** It is the only step that adds a
-   gate leg, the only one that touches `WIRE-INTO-PROJECT.md`, and the only one whose value is
-   unmeasurable until an upgrade-path test exists.
+**A late finding reframed question 1 before it was put.** `corpus_ids.py` already builds
+`def_builds` — an id → build-slug map over the whole corpus, which is what check 13 uses for
+collision detection. So `ids:` is machine-known under *either* candidate semantics. The question was
+never which reading is enforceable; both are. It was which set serves a reader, and whether the
+field stays authored at all.
+
+1. **`ids:` semantics — RATIFIED: derive the FULL ROSTER.** Every id defined under the build, any
+   family, generated from `def_builds`. The field stops being authored, which removes the defect
+   class in Exhibit B at its root rather than validating around it. Nothing is lost: ids minted
+   without a spec stay listed, which the units-only reading would have dropped (`aBatchedTribunal`
+   would have gone from 8 to 3). The four separator spellings (`..`, `/`, `·`, space) become a
+   renderer decision rather than an authoring convention, so no grammar has to be policed.
+2. **Existing corpus — RATIFIED: unit 1 repairs what it touches.** Regeneration fixes all 25 `ids:`
+   values with no authoring acts. Unit 1 additionally repairs defect 3 (the duplicate
+   `TOOL-aUnmannedHelm-5`/`-6` rows in the append-only `DECISIONS.md`) and defect 1 (HYGIENE.md's
+   false arms count, which step 2 generates anyway). ~3 files beyond the mechanism. The remaining
+   defects in §9 stay open and unclaimed.
+3. **Adopter reachability — RATIFIED WITH AMENDMENT: folds in as unit 7 of this build.** The owner
+   chose the end-to-end story over the leg-free build. Consequences the spec must carry: this build
+   now adds **one gate leg** and therefore its six obligations (a `gate-legs.json` entry, a dossier
+   claim, a `MAP.md` regen, a kickoff re-stamp, an `AGENTS.md` gate-suite bullet against a pin at
+   tolerance 0, and a sibling test if the leg is a bare `*.sh` with `fail()`); it touches
+   `WIRE-INTO-PROJECT.md`, which no gate reads; and the upgrade-path e2e leg is what finally makes
+   §5's migration costs falsifiable, including this record's own.
+
+**Still not known, and not a question anyone can answer here.** nicocares's install state is
+unknowable from this repo. And the prose-quality problem — 22 of 25 build READMEs not naming a next
+action — is real, named in §3, and deliberately left without a mechanism, because the only honest
+mechanism is authoring discipline.
 
 **What this record does not know.** nicocares's install state is unknowable from this repo. No
 migration cost stated here is falsifiable until an upgrade-path leg exists. And the prose-quality

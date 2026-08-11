@@ -4,8 +4,7 @@ node: a
 opened: 2026-08-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aMouldedFolio-1
-status: OPEN
+ids: TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
 ---
 
 # aMouldedFolio — enforceable templates and generated documents for the load-bearing corpus
@@ -18,12 +17,17 @@ enforceable template, and how much of each can stop being authored at all.
 
 ## Start here
 
-**State.** RESEARCH COMPLETE, route NOT ratified. One record:
-[the census + route recommendation](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md).
-No template, renderer or gate leg was written — that was the agreed cut-line.
+**State.** RESEARCH COMPLETE, **route RATIFIED 2026-08-11**. One record:
+[the census + route](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md). No
+template, renderer or gate leg written yet — that was the research cut-line, not the build's.
 
-**Next action.** The owner ratifies (or amends) the recommended route in §8 of that record. A spec
-for unit 1 is written only after that. Three §10 questions are owner calls, not research gaps.
+**Next action.** Write unit 1's spec: `ids:` becomes GENERATED from `corpus_ids.def_builds` (the
+full roster), the README's mechanical prose blocks join the generated region, and the unit repairs
+the three defects it touches. Tier 2, so the spec is approved before building.
+
+**The three ratified calls** (§10): `ids:` is derived, not authored — the field that caused the
+headline defect stops existing. Unit 1 repairs what it touches. Adopter reachability folds in as
+unit 7, which makes this a **7-unit build that adds one gate leg** and its six obligations.
 
 **What the research changed about the ask.** Templates are not the binding constraint — this repo
 already runs the template→render→byte-parity mechanism five times and it is green over documents
@@ -39,7 +43,9 @@ Records live under `build/`. The table below is GENERATED from this folder's spe
 do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
 
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | SPECCED | rev-2 | 2026-08-11 |
 <!-- /gen:build-index -->
