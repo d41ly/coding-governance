@@ -27,6 +27,8 @@
 - TOOL-aUnmannedHelm-6 · a gate that verifies the PAPERWORK of a claim without verifying the claim is a second signature, not defence in depth: the leg checked the recorded BASE, the phase and the copied region, and never contained the string `run:mandate`
 - TOOL-aUnmannedHelm-10 · CRLF reaches past everything that watches for it: `check-wiring.sh` only sees `.claude/`, and a byte-comparing gate is not the only consumer. Ask which consumer reads a file WHOLE — a launcher, a sourced conf, a hook
 - TOOL-aUnmannedHelm-9 · an adopter's refusals are ordered before it READS anything: the conf check fired first and told an operator running from a foreign repo to create a conf in the very tree the adopter must not adopt. A correct refusal with the wrong remedy is a defect
+- TOOL-aStandingWrit-1 · replacing an owner-authored mandate with a build README's existence trades FIVE properties, not one: integrity becomes existence, the grant goes class-wide, it names no ACTIONS, it cannot be revoked, and a run that lands a new build README authorizes the next run
+- TOOL-aStandingWrit-2 · an anchor is only as trustworthy as the cheapest way to move it. `refs/remotes/origin/<x>` READS like an observation of the remote and IS a local write; a source comment asserting a ref cannot move without a push is not a check, and it survived two Tier-2 reviews
 
 ## DEPL — deployer
 

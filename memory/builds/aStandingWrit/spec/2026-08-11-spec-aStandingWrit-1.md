@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** OPEN · rev-2 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff
+**Status:** SPECCED · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -56,11 +56,18 @@ verb writes a phase with its witness. `--preflight` stops unconditionally rewrit
 
 ## 3. Non-goals (OUT)
 
-The instruction layer. How an agent writes a sub-spec, how it conducts the adversarial review, and
-what "built" means for a given unit belong to a parallel session. The review could not locate that
-session anywhere in the repo — no branch, worktree, build folder or backlog row names it — so this
-cut-line is currently asserted by this author alone and F7 in §8 asks the owner to identify it or
-fold the work here.
+The instruction layer: the prose that tells an agent HOW to write a sub-spec, HOW to conduct the
+adversarial review, and what evidence makes a unit built. A parallel session owns it. The review
+could not locate that session anywhere in this tree — no branch, worktree, build folder or backlog
+row names it — so F7 resolved by narrowing the cut-line instead of asserting one.
+
+The narrowing, stated so the boundary is checkable rather than rhetorical. This build decides
+exactly three things the instruction layer must then honour, and they are decided in §4's state
+table rather than in prose: that a unit's position is READ from its spec's status header and its
+declared pointers, never inferred; that `INPROGRESS` means built-but-not-landed; and that
+`BLOCKED`, `DEFERRED` and `WONTDO` are never a `next:` target. Everything else about the work is the
+other session's. The dependency is recorded as a backlog row so the parallel session inherits it
+rather than rediscovering it.
 
 `tools/hooks/agent-cap.js` and `memory/guides/REVIEW-PROTOCOL.md` are owned by another build.
 
@@ -341,44 +348,51 @@ No new gate leg is added. `--plan` is exercised by the driver self-test, which i
 
 ## 8. Open questions
 
+All eight are RESOLVED. The owner ratified every recommendation on 2026-08-11.
+
 **F1 — is assertion 4 a hard precondition or an opt-in?** Rev-1 recommended opt-in with the template
 shipping the region. The review showed those two halves contradict: an empty region is a refusal, so a
 scaffolded build refuses until the owner hand-fills it, which is the per-build authoring F0a removed.
-**Recommendation: opt-in, and the template ships the region COMMENTED OUT** with one line saying what
-filling it buys. No build refuses, and filling it is a choice with a stated benefit.
+RESOLVED (owner, 2026-08-11): opt-in, and the template ships the region COMMENTED OUT with one line
+saying what filling it buys. No build refuses, and filling it is a choice with a stated benefit.
 
 **F2 — does the recorded-BASE assertion relax from equality to ancestry?** The review refuted rev-1's
 defence of this — the defence was assertion 4, which F1 makes conditional, so a run reaching back past
 the region's introduction escapes both. It also found rev-1's premise wrong: the mandated lander
-refuses to run off the default branch, so it cannot move the run's branch. **Recommendation: keep
-equality** until a real mechanism that moves the merge-base is demonstrated. Relaxing a guard for a
-hazard nobody has reproduced is how the anchor bypass survived.
+refuses to run off the default branch, so it cannot move the run's branch.
+RESOLVED (owner, 2026-08-11): keep equality. Relaxing a guard for a hazard nobody has reproduced is
+how the anchor bypass survived for two reviews.
 
-**F3 — does `--plan` read tracked files only?** **Recommendation: tracked only.** The filename-join
-question this fork disclaimed in rev-1 is now resolved in §4 by deleting the join.
+**F3 — does `--plan` read tracked files only?** RESOLVED (owner, 2026-08-11): tracked only. The
+filename-join question this fork disclaimed in rev-1 is resolved in §4 by deleting the join.
 
-**F4 — is the widening recorded as a decision row?** **Recommendation: yes**, and the row must name
-losses 3, 4 and 5, not only the class grant.
+**F4 — is the widening recorded as a decision row?** RESOLVED (owner, 2026-08-11): yes, naming all
+five losses rather than the class grant alone. Written as the first of two rows recorded for this
+build in `memory/DECISIONS.md`.
 
 **F5 — is self-propagating authorization acceptable?** A run that lands a new build README authorizes
-the next run. Options: accept it; refuse a build README whose introducing commit is authored by an
-unattended run, which is checkable because the run-state file records the run; or require the plan
-region for any build created after this lands. **Recommendation: the third** — it is the cheapest, it
-is mechanical, and it makes assertion 4 non-vacuous for exactly the population that can propagate.
+the next run. Options were: accept it; refuse a build README whose introducing commit is authored by
+an unattended run; or require the plan region for any build created after this lands.
+RESOLVED (owner, 2026-08-11): require the plan region for any build created after this lands. It is
+the cheapest of the three, it is mechanical, and it makes assertion 4 non-vacuous for exactly the
+population that can propagate. The 26 builds that predate this keep existence-only authorization,
+and that grandfathering is deliberate: they were created before any run could have authored them.
 
-**F6 — how are the ACTIONS named, now that the README names none?** Options: accept that every build
-authorizes both; declare the pair once in the conf, which F0a rejected as a declaration; or let the
-plan region carry an optional actions line. **Recommendation: accept both**, and say so in the amended
-charter sentence rather than letting the old wording stand while meaning something else.
+**F6 — how are the ACTIONS named, now that the README names none?** Options were: accept that every
+build authorizes both; declare the pair once in the conf, which F0a rejected; or let the plan region
+carry an optional actions line. RESOLVED (owner, 2026-08-11): accept that a build authorizes both,
+and say so in the amended charter sentence rather than leaving the old wording to mean something new.
+The replacement wording is written in §4's Migration and is a scope item, not a paraphrase.
 
-**F7 — where is the parallel session?** The review could not find it. If it does not exist, the
-instruction layer is unowned and this build's cut-line is fiction. **Recommendation: the owner names
-it or folds it here** before S4 is built, since §4's state table already answers three questions §3
-assigns away.
+**F7 — where is the parallel session owning the instruction layer?** The review could not find it.
+RESOLVED (owner, 2026-08-11): the layer stays out of scope and the cut-line is NARROWED instead, in
+§3, to the three decisions §4's state table actually makes. A backlog row records the dependency so
+the parallel session inherits it. If that session proves not to exist, the row is what surfaces it.
 
-**F8 — does S0 land as its own series, ahead of any owner decision on S1 through S7?**
-**Recommendation: yes.** It repairs a live bypass in merged code and depends on none of the design
-questions above.
+**F8 — does S0 land as its own series, ahead of any decision on S1 through S7?**
+RESOLVED (owner, 2026-08-11): yes. It repairs a live bypass in merged code and depends on none of the
+design questions above. Its mechanism is settled by a dedicated design panel rather than by this
+author's first instinct, because the first instinct is what shipped the bypass.
 
 ## 9. Revision log
 
@@ -389,6 +403,11 @@ questions above.
   can express built-but-not-landed. Corrected seven factual claims. Expanded the amendment set from
   four files to seven and the moved-leg count from zero to twelve. Named three further losses and
   opened F5 through F8. Status returned to OPEN.
+- rev-3 · 2026-08-11 · all eight forks RESOLVED by the owner, every one as recommended. F5 adds the
+  plan-region requirement for builds created after this lands, with the existing 26 grandfathered.
+  F6's replacement charter wording becomes a scope item rather than a paraphrase. F7 narrows §3's
+  cut-line to the three decisions the state table makes, instead of asserting an owner for the rest.
+  Two decision rows recorded. Status SPECCED; S0's mechanism is pending a dedicated design panel.
 
 ## 10. Reuse audit
 

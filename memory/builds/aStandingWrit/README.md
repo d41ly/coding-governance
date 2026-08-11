@@ -23,8 +23,9 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** OPEN at rev-2. The Tier-2 review returned **do not build**, and rev-2 folds it. Awaiting
-owner decisions on F1 through F8 below.
+**State.** SPECCED at rev-3. The Tier-2 review returned **do not build** on rev-1; rev-2 folded it and
+rev-3 carries all eight owner forks RESOLVED. S0 is the next thing built, per F8, and its mechanism is
+being settled by a dedicated design panel before a line is written.
 
 **Read this first.** The review reproduced, end to end and with a live control, an authorization
 bypass in the unattended kit **as it is merged and gated on `main` today**. The pinned BASE anchors
@@ -48,9 +49,12 @@ an instruction-layer question:
    undifferentiated, so `--status` after a compaction cannot say where the run is and `--resume`
    cannot say what to pick up.
 
-**What this build does NOT do.** It defines the seam the instruction layer plugs into and stops
-there. How to write a sub-spec, how to run an adversarial review, what "built" means for a given
-unit — all of that belongs to the parallel session, and a second author here would collide with it.
+**What this build does NOT do.** It decides exactly three things the instruction layer must honour —
+that a unit's position is READ from its spec's status header and declared pointers rather than
+inferred, that `INPROGRESS` means built-but-not-landed, and that `BLOCKED`, `DEFERRED` and `WONTDO`
+are never a `next:` target — and stops. How to write a sub-spec, how to run the adversarial review,
+and what evidence makes a unit built belong to the parallel session. That session is unlocatable from
+this tree, so the dependency is a backlog row rather than an assumption.
 
 **Read before reviewing:** `memory/guides/UNATTENDED-PROTOCOL.md` (binding, and this build amends
 it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`, whose three
@@ -86,34 +90,36 @@ sub-specs.
 | **S6** | three new phase members, a meaning for `RUNNING`, and a verb that can actually write one |
 | **S7** | the amendment set — seven files, not four |
 
-## Owner decision menu
+## Owner decision menu — all eight RESOLVED 2026-08-11
 
-Eight forks are live in the spec's §8. They are summarised here; the spec carries the tradeoffs.
+Every fork resolved as recommended. The spec's §8 carries each one in place with its tradeoffs; this
+is the summary.
 
-**F8 — take this one first.** Does S0 land as its own series, ahead of any decision on the rest?
-Recommendation: yes. It repairs a live bypass in merged code and depends on nothing below.
+**F8** — S0 lands as its own series, ahead of everything else. It repairs a live bypass in merged
+code and depends on none of the design questions. Its mechanism is being settled by a dedicated
+design panel rather than by this author's first instinct, because the first instinct is what shipped
+the bypass.
 
-**F5** — is self-propagating authorization acceptable? A run that lands a new build README authorizes
-the next run. Recommendation: require the plan region for any build created after this lands, which
-makes the integrity check non-vacuous for exactly the population that can propagate.
+**F5** — self-propagating authorization is refused. Any build created after this lands must carry a
+plan region, which makes the integrity check non-vacuous for exactly the population that can
+propagate. The 26 existing builds are grandfathered deliberately: they predate any run that could
+have authored them.
 
-**F6** — how are the two actions named, now that a README names none? Recommendation: accept that
-every build authorizes both, and say so in the amended charter sentence rather than leaving the old
-wording to mean something new.
+**F6** — a build authorizes both actions, and the amended charter sentence says so. Replacing the
+wording is a scope item, not a paraphrase.
 
-**F7** — where is the parallel session owning the instruction layer? The review could not find it in
-any branch, worktree, build folder or backlog row. Recommendation: name it or fold the work here.
+**F7** — the instruction layer stays out of scope and the cut-line is narrowed instead, to the three
+decisions the state table actually makes. The dependency is a backlog row, so if the parallel session
+proves not to exist, the row is what surfaces it.
 
-**F1** — is the plan-region integrity check a hard precondition or an opt-in? Recommendation: opt-in,
-with the template shipping the region commented out — rev-1's version of this fork contradicted its
-own empty-region rule.
+**F1** — the plan-region integrity check is opt-in, and the template ships the region commented out.
 
-**F2** — does the recorded-BASE assertion relax to ancestry? Recommendation: no. The hazard rev-1
-cited cannot occur, because the lander refuses to run off the default branch.
+**F2** — the recorded-BASE assertion keeps equality. The hazard rev-1 cited cannot occur; the lander
+refuses to run off the default branch.
 
-**F3** — does `--plan` read tracked files only? Recommendation: yes.
+**F3** — `--plan` reads tracked files only.
 
-**F4** — is the widening recorded as a decision row? Recommendation: yes, naming all five losses.
+**F4** — the widening is recorded, naming all five losses.
 
 ## Ratified decisions
 
@@ -144,9 +150,9 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | OPEN | rev-2 | 2026-08-11 |
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | SPECCED | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->
