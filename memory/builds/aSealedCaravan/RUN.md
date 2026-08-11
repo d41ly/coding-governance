@@ -23,6 +23,33 @@ base: 67d23d6b97643a0b34de227f26c78f680f6c7252
 
 ## Parked
 
+**BLOCKING — the driver refuses a reconcile the leg accepts, and it wedges this run.** After merging
+twelve commits of `origin/main` into this branch, `unattended.sh --preflight` refuses with check 18:
+the recorded BASE 67d23d6 is no longer the merge-base the history derives, which is now 081c366. That
+is not a forgery, it is arithmetic — merging the anchor moves the merge-base to the anchor.
+
+The gate LEG disagrees with the driver about this exact property, and the leg is right. Its check 9
+tests ANCESTRY rather than equality, and its own comment says why: equality "wedged the bar
+permanently: merging then pushing, the two acts an authorization grants, move the merge-base past the
+pin forever, so a LANDED record red every later default-branch push. Reproduced on an honest fixture
+with no attacker." The recorded BASE here IS an ancestor of both the anchor and HEAD, so the leg's
+check 9 passes. The fix landed in the leg and was never carried to the driver's `trusted_base`.
+
+Consequences, stated rather than worked around. `--preflight` is the only verb that re-splices the
+run-state file's generated region, so that region is now one token stale and leg check 8 is red, which
+reds the bar and blocks the push. `--close` shares `trusted_base` and will refuse for the same reason.
+Un-merging does not escape it: the mandated lander reconciles origin BEFORE the gate, so the
+merge-base moves at landing whatever this run does now. Any unattended run in this repo whose remote
+moves before it lands meets this wall, and with several nodes active that is most runs.
+
+The options I saw were to edit `unattended.sh` so the driver matches its own leg, to un-merge and hit
+the same wall later, or to stop short of landing and report. I refused the first, and the refusal is
+the point: §9 of the protocol names "a run that edits this kit and commits it" as the FIRST of the
+bypasses it cannot close, and a run that repairs the check that is currently refusing it has done
+exactly that, however good its reasons. It is filed as a backlog row instead. This run therefore
+builds, reviews and records, and does NOT land. That is a real limit on what was asked for, and it
+belongs in the owner's hands rather than in a workaround.
+
 **Should `apply` land its own writes?** The M4 audit's blocker id=3 found the spec saying two
 incompatible things. Section 5 asserted "landing is by branch and PR", bounded the half-applied-install
 risk on it, and defined rollback as deleting that branch — while S5's two phases end at `git add` and no
