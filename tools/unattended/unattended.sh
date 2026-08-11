@@ -25,7 +25,28 @@
 # It also derives NOTHING. The generated region is a COPY of the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.0   # gov:kit unattended@1.0 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — kit identity; set HERE, never from .unattended.conf
+
+# ------------------------------------------------------------------------------ the dereference pin
+# A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
+# store. Two one-command levers rewrite that dereference without touching a single tracked byte, and
+# both defeat the mandate comparison no matter how trustworthy the anchor it is measured against is.
+# Both MEASURED on this node, each against a live control:
+#
+#   * `git replace -f <base> <forged>` made `git show "<base>:<path>"` return bytes written seconds
+#     earlier, at the true unforged base sha, with a clean worktree and an empty `git status`.
+#   * a two-line `info/grafts` gave two UNRELATED histories a merge-base — a commit the run authored,
+#     and not HEAD, so the degenerate-base refusal does not fire either.
+#
+# The suppressions are NOT interchangeable and neither covers both: `-c core.useReplaceRefs=false`
+# left the graft fully effective, and `GIT_NO_REPLACE_OBJECTS=1` did too. Only `GIT_GRAFT_FILE`
+# pointed away from the repo restored the honest answer. A command-line `-c` was measured to beat a
+# repo-local `core.useReplaceRefs=true`, which is why it is spelled per-invocation and not configured.
+#
+# Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
+# index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
+export GIT_GRAFT_FILE=/dev/null
+GIT() { git -c core.useReplaceRefs=false "$@"; }
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -116,19 +137,29 @@ default_branch() {
 #     HEAD, and the mandate at BASE is then the mandate the run just wrote. The earlier code
 #     refused to FALL BACK to HEAD and happily accepted being MOVED to it — same destination, and
 #     the comment saying otherwise made it harder to see.
-#   * A remote-TRACKING ref is the weakest thing the run cannot rewrite. Moving it requires a push,
-#     which is the act being authorized, so using it is not circular.
+#   * A remote-TRACKING ref IS REWRITABLE, and the sentence that used to sit here - "moving it
+#     requires a push, which is the act being authorized" - was false. It is a plain file under
+#     $GIT_DIR. `git update-ref refs/remotes/origin/<default> <sha>` moves it offline, with no
+#     network, leaving the real remote untouched. REPRODUCED end to end with a live control: this
+#     driver printed `preflight OK` over a base the run had authored seconds earlier, the gate leg
+#     agreed at exit 0 and silent, and the push landed. That claim survived two Tier-2 reviews
+#     because it reads like reasoning and was never executed.
+#
+#     IT IS STILL OPEN HERE. This function is unchanged; TOOL-aStandingWrit-2 in the backlog carries
+#     the repair. What HAS landed is the dereference pin above, which is orthogonal and necessary:
+#     the two levers it closes forge the bytes at a perfectly honest anchor, so fixing the anchor
+#     alone would have left them both working.
 #   * BASE == HEAD is refused outright even when the ref is legitimate. Nothing was built on top of
 #     it, so there is no diff to authorize and the comparison is trivially true.
 resolve_base() {
   local d b mb; d=$(default_branch) || return 1
   for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-    git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-    mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
+    GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
+    mb=$(GIT merge-base "$b" HEAD 2>/dev/null) || continue
     [ -n "$mb" ] || continue
     # Degenerate: the anchor is at or ahead of HEAD, so BASE is HEAD and the run authored everything
     # the comparison reads.
-    [ "$mb" = "$(git rev-parse HEAD)" ] && return 2
+    [ "$mb" = "$(GIT rev-parse HEAD)" ] && return 2
     printf '%s\n' "$mb"; return 0
   done
   return 1
@@ -256,7 +287,7 @@ check_mandate() { # slug · base
   # is the ONLY producer of this argument and it refuses before returning, so a guard here would be a
   # branch no fixture can reach. `unattended.test.sh` asserts at SOURCE level that every call site
   # is guarded, which is the house pattern for a hazard no input can produce.
-  if ! base_blob=$(git show "$base:$rel" 2>/dev/null); then
+  if ! base_blob=$(GIT show "$base:$rel" 2>/dev/null); then
     fail 6 "no run-state file at the pinned BASE, so the mandate cannot be reachable — the owner authors and commits it BEFORE the run starts: $base:$rel"
     return 1
   fi
@@ -326,7 +357,7 @@ verb_preflight() { # slug · keepalive-id
   set_fact "$rel" base "$base"      || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
   set_fact "$rel" phase RUNNING     || return 1
-  set_fact "$rel" witness "$(git rev-parse HEAD)" || return 1
+  set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
   echo "unattended: preflight OK — base $base · keepalive $kid · region copied from $src"
   return 0
 }

@@ -369,6 +369,51 @@ git push -q -f origin "$BASE":main
 reset_tree
 hit "$(run --close tRun --override mandate-reachable --reason "trust me")" "the mandate item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
 
+# ---- THE DEREFERENCE PIN. A sha is a NAME, and both levers below rewrite what it resolves to at a
+# ---- PERFECTLY HONEST anchor - so no amount of anchor hardening closes either, and an anchor fix
+# ---- shipped without this would have read forged bytes at a sha it had just proved trustworthy.
+# ---- Each arm carries a LIVE CONTROL proving the forgery is real in THIS fixture on THIS node,
+# ---- because without one "the driver refused" is indistinguishable from "the attack never worked
+# ---- here" - and the second reading passes against a driver with no pin at all.
+reset_tree
+runmd tEmpty "$MANDATE"        # the run writes, in its own working copy, the mandate it wants to have
+fixture
+FORGED=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m forged)
+git replace -f "$BASE" "$FORGED" >/dev/null 2>&1
+# control — the substitution IS in force for an unpinned read at the unchanged BASE sha.
+same "replace-control: an unpinned read at BASE returns the run's bytes"      "$(git show "$BASE:memory/builds/tEmpty/RUN.md" 2>/dev/null | grep -c "authorizes build")" "1"
+# control — and the pinned read at the SAME sha does not.
+same "replace-control: the pinned read at BASE returns the honest bytes"      "$(git -c core.useReplaceRefs=false show "$BASE:memory/builds/tEmpty/RUN.md" 2>/dev/null | grep -c "authorizes build")" "0"
+# the arm — the driver compares against the honest block, so the forged match never happens.
+hit "$(run --preflight tEmpty --keepalive-id k1)" "the mandate block is absent or empty at the pinned BASE"
+git replace -d "$BASE" >/dev/null 2>&1
+
+# ---- The GRAFT flavour cannot be made exploitable in this fixture without rewriting the branch
+# ---- topology every other arm depends on, so it is armed where it is honest: that the suppression
+# ---- this node's git actually needs is IN FORCE. `-c core.useReplaceRefs=false` and
+# ---- GIT_NO_REPLACE_OBJECTS=1 were both MEASURED to leave a graft fully effective; only pointing
+# ---- GIT_GRAFT_FILE away from the repo restored the honest answer. That is version-dependent
+# ---- behaviour, so it is measured here rather than trusted.
+gtmp=$(mktemp -d)
+( cd "$gtmp" && git init -q -b main . && git config user.email t@t.test && git config user.name t   && echo a > f && git add f && git commit -q -m A --no-verify   && git checkout -q --orphan side && echo z > f && git add f && git commit -q -m Z --no-verify ) >/dev/null 2>&1
+groot=$(git -C "$gtmp" rev-parse main); gz=$(git -C "$gtmp" rev-parse side)
+# ABSOLUTE, deliberately. `rev-parse --git-path` prints a path relative to the REPO, and this shell's
+# cwd is the outer scratch repo - redirecting to it wrote the graft into the wrong .git entirely, and
+# the control then failed for a reason that had nothing to do with grafts.
+mkdir -p "$gtmp/.git/info"
+printf '%s %s
+' "$groot" "$gz" > "$gtmp/.git/info/grafts"
+same "graft-control: the graft gives two unrelated histories a merge-base"      "$(git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
+same "graft-arm: GIT_GRAFT_FILE suppresses it, which is what the driver exports"      "$(GIT_GRAFT_FILE=/dev/null git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" ""
+rm -rf "$gtmp"
+
+# ---- SOURCE-level: the pin is EXPORTED and every dereference on the authorization path goes through
+# ---- it. A pin that one call site skips is not a pin - that call site is the whole attack surface.
+n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FAIL the driver does not export GIT_GRAFT_FILE, so a graft file rewrites its merge-base"; st=1; }
+n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$SCRIPT"   || { echo "FAIL the driver defines no GIT() wrapper pinning core.useReplaceRefs"; st=1; }
+unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
+n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
+
 # ---- SOURCE-level: every `check_mandate` call site is GUARDED by `trusted_base`. There is no
 # ---- runtime guard inside check_mandate for an empty base, deliberately — it would be a branch no
 # ---- fixture could reach — so the invariant is asserted against the text instead. An unguarded
