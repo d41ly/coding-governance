@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.9 -->
+<!-- gov:kit memory-tree@2.10 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
