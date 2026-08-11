@@ -1403,6 +1403,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "strip_records_sentence",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "structure_identity",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"

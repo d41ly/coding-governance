@@ -41,6 +41,7 @@ import subprocess
 import sys
 import tempfile
 
+RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
@@ -333,12 +334,18 @@ def collect(root: str, conf: dict) -> list:
         # source names the id, the derivation takes over and a wrong authored value loses. Global
         # emptiness is the dangerous case, and the precondition above owns it.
         roster = roster_by_slug.get(slug) or [i for i in fm["ids"].split() if i]
+        # Which record folders this build actually HAS. Authored as prose in 17 READMEs and wrong
+        # in 15 of them: the sentence is written when a build opens, predicting the folders it will
+        # grow, and nothing revisits it. Seven claim a build/ that was never created.
+        kinds = [k for k in RECORD_KINDS
+                 if any(t.startswith(f"{m}/builds/{slug}/{k}/") for t in tracked)]
         builds.append(
             {
                 "slug": slug,
                 "readme": readme,
                 "fm": fm,
                 "roster": roster,
+                "kinds": kinds,
                 "units": [u for u in units if u],
                 "status": derive_status(units, fm, readme),
             }
@@ -368,8 +375,55 @@ def render_region(build: dict) -> str:
     else:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
+    if build["kinds"]:
+        ks = [f"`{k}/`" for k in build["kinds"]]
+        joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]
+        out += ["", f"Records live under {joined}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+RECORDS_SENTENCE = re.compile(r"Records live under [^.]*\.[ ]?")
+
+
+def strip_records_sentence(readme_text: str, readme: str) -> str:
+    """Remove the AUTHORED folder-claim sentence from the body, OUTSIDE the marker pair.
+
+    SENTENCE-scoped, never line-scoped, and that distinction is the whole safety property.
+    Measured over the corpus: in 17 of 17 carriers the sentence ENDS mid-line and the next
+    sentence begins on the same line, wrapping onward —
+
+        Records live under `spec/`, `build/` and `reviews/`. The table below is
+        GENERATED from the status header of every spec in this folder ...
+
+    so deleting the LINE destroys "The table below is" in every file it touches and orphans the
+    line after it. The first draft bounded the removal to "a single anchored LINE" and called that
+    a safety property; it was a description of the wrong unit, and every acceptance criterion it
+    carried would have passed while prose was eaten.
+
+    A second match outside the region is a REFUSAL, not a second removal: two matches mean the
+    anchor is not identifying what it was reasoned about.
+    """
+    lines = readme_text.split("\n")
+    opens = [i for i, l in enumerate(lines) if l.rstrip("\r") == MARK_OPEN]
+    end = opens[0] if opens else len(lines)
+    hits = [i for i in range(end) if RECORDS_SENTENCE.search(lines[i])]
+    if not hits:
+        return readme_text
+    if len(hits) > 1:
+        where = ", ".join(str(i + 1) for i in hits)
+        raise Problem(f"{readme}: the folder-claim sentence appears {len(hits)} times outside the "
+                      f"generated region, at lines {where} — the anchor is not identifying one "
+                      f"sentence, so nothing is removed")
+    i = hits[0]
+    rest = RECORDS_SENTENCE.sub("", lines[i], count=1)
+    # Only drop the physical line when the sentence WAS the whole of it; otherwise the surviving
+    # text stays exactly where the author put it.
+    if rest.strip():
+        lines[i] = rest
+    else:
+        del lines[i]
+    return "\n".join(lines)
 
 
 def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
@@ -475,7 +529,8 @@ def plan(root: str, conf: dict) -> tuple:
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
-        text = apply_front_matter_ids(read_text(path), b["roster"], b["readme"])
+        text = strip_records_sentence(read_text(path), b["readme"])
+        text = apply_front_matter_ids(text, b["roster"], b["readme"])
         artifacts[b["readme"]] = apply_region(text, render_region(b), b["readme"])
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
@@ -640,6 +695,35 @@ def do_selftest() -> int:
             lambda: plan(d5, c5)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
         arm("the capped artifacts carry a COUNT, never the id list", "| arch | 2 |",
             lambda: plan(d1, c1)[0]["memory/LIVE.md"])
+
+        # ---- the folder-claim sentence. These are FIXTURE arms on purpose: once the corpus is
+        # ---- migrated the sentence is gone from it, so a control run against the live tree has
+        # ---- nothing left to catch and passes whatever the remover does.
+        def _rec(tmp, body):
+            c = _fixture(tmp, spec_status="INPROGRESS")
+            p = os.path.join(tmp, "memory", "builds", "tOne", "README.md")
+            t = read_text(p)
+            write_text(p, t.replace("# tOne\n", "# tOne\n\n" + body + "\n"))
+            run("git", "add", "-A", cwd=tmp)
+            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=tmp)
+            return c
+
+        ta = os.path.join(base, "recsurv"); os.makedirs(ta)
+        ca = _rec(ta, "Records live under `spec/`. The table below is\nGENERATED from the header.")
+        arm("the text following the sentence SURVIVES the removal", "The table below is",
+            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
+        arm("the authored sentence leaves the body", "1",
+            lambda: str(plan(ta, ca)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tb = os.path.join(base, "recwhole"); os.makedirs(tb)
+        cb = _rec(tb, "Records live under `spec/`.")
+        arm("a line that was ONLY the sentence is removed entirely", "1",
+            lambda: str(plan(tb, cb)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tc = os.path.join(base, "rectwice"); os.makedirs(tc)
+        cc = _rec(tc, "Records live under `spec/`. one\n\nRecords live under `build/`. two")
+        arm("the sentence appearing twice outside the region is a REFUSAL",
+            "is not identifying one sentence", lambda: plan(tc, cc))
+        arm("the derived sentence names only the folders that exist", "Records live under `spec/`.",
+            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)

@@ -200,7 +200,7 @@ lenses each. Folded at rev-2.
 The review also returned two negative results worth keeping: no live branch or worktree collides
 with this build's file list, and the rev-1 spec was machine-clean against the format contract.
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -209,4 +209,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

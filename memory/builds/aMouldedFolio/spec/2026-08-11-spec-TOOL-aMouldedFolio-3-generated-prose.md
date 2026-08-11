@@ -1,6 +1,6 @@
 # TOOL-aMouldedFolio-3 — the build README's folder claim becomes derived, because 15 of 17 are false
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
 ## 1. Goal
 
@@ -145,8 +145,7 @@ is the class this unit sits closest to.
   units bump one constant, and an identical bump on two branches merges without conflict while the
   epoch gate stays satisfied. They land SEQUENTIALLY on one branch; this unit takes **3.0** if it
   lands after `-5` and `-4`, and re-bumps rather than reusing a value if the order changes.
-- **The wording once derived.** The corpus carries five variants; the build picks one. A small loss of
-  voice for a large gain in truth, and it is one string in one function.
+- **RESOLVED (agent, 2026-08-11, delegated): the wording once derived.** The majority variant wins — `Records live under <list>.` with an Oxford-free `and` before the last item, matching the 9-of-17 spelling. It is one string in one function and changeable without touching a README.
 
 ## 9. Revision log
 

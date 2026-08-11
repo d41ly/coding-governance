@@ -15,7 +15,7 @@ Closes the four items `TOOL-aFoldedQuarry-1` left open when it ported upstream
 `ARCH-dQuarriedLedger-1`: the authored session ledger, the absent row-keyed merge driver, and the
 governing docs that describe a tree this repo no longer has.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -31,4 +31,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aMendedLedger-6 — U6: doc truth, the template edit, the residual sweep and the adopter note](spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md) | SPECCED | rev-2 | 2026-08-09 |
 | [TOOL-aMendedLedger-7 — U8: a fully keyed decision corpus](spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md) | SPECCED | rev-2 | 2026-08-09 |
 | [TOOL-aMendedLedger-8 — U9: the merge driver, redesigned around what git already gets right](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md) | SPECCED | rev-2 | 2026-08-10 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

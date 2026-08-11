@@ -23,4 +23,6 @@ the reflexive re-run passed, so the evidence was gone for good.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | CLOSED | rev-1 | 2026-08-11 |
+
+Records live under `spec/`.
 <!-- /gen:build-index -->

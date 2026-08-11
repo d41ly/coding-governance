@@ -123,7 +123,7 @@ Three findings, each verified against source rather than inherited from the pass
 
 None yet. The forks are in the spec's §8.
 
-Records live under `spec/` and `build/`. The table below is GENERATED from the status header of every
+The table below is GENERATED from the status header of every
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -137,4 +137,6 @@ spec in this folder — do not hand-edit it.
 | [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | CLOSED | rev-6 | 2026-08-11 |
 | [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | CLOSED | rev-3 | 2026-08-11 |
 | [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | CLOSED | rev-4 | 2026-08-11 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

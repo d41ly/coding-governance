@@ -51,4 +51,6 @@ branch work and of each other.
 | [TOOL-aDrainedSluice-7 — V6: the recall cache is bounded](spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md) | INPROGRESS | rev-3 | 2026-08-08 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

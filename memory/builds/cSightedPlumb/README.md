@@ -23,4 +23,6 @@ because the generated index needs it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cSightedPlumb-1 — the drift-audit kit: port record-vs-reality auditing out of inCMS](spec/2026-08-05-spec-cSightedPlumb-1.md) | CLOSED | rev-1 | 2026-08-05 |
+
+Records live under `spec/`.
 <!-- /gen:build-index -->

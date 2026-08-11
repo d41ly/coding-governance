@@ -53,7 +53,7 @@ ships its own `merge-rows.sh`, and `tools/govkit/` is ratified over the research
 is fully resolved and carries the ratified pointer. Unit 2's F2, F3 and F4 stay open deliberately:
 none blocks a build, and each wants the read-only `plan`/`check` slice to exist first.
 
-Records live under `spec/` and, once built, `build/` and `reviews/`. The table below is GENERATED
+The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -63,4 +63,6 @@ from the status header of every spec in this folder — do not hand-edit it.
 |---|---|---|---|
 | [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-4 | 2026-08-10 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
