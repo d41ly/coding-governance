@@ -57,7 +57,21 @@ done
 
 # The kit's CORE sets, read from the driver — the single source. Parsed rather than sourced, because
 # sourcing a script whose tail runs a verb would run the verb.
-core_of() { sed -n "s/^$1=\"\\(.*\\)\"[[:space:]]*$/\\1/p" "$DRIVER" | head -1; }
+# Pure bash for the same reason as the accessors below: this runs three times per leg invocation and
+# cost two processes each. Semantics preserved exactly — the line must be `KEY="…"` with only
+# whitespace after the closing quote, the first such line wins, and anything else (no quotes, a
+# truncated line) yields the empty string, which is the state check 1 refuses by name.
+core_of() { # KEY  ->  the quoted value from $DRIVER
+  local l p="$1=\"" v
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    while :; do case "$l" in *' '|*$'\t') l=${l%?} ;; *) break ;; esac; done
+    case "$l" in
+      "$p"*'"') v=${l#"$p"}; printf '%s\n' "${v%\"}"; return 0 ;;
+    esac
+  done < "$DRIVER"
+  return 0
+}
 PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
@@ -126,8 +140,23 @@ if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
 fi
 
-phase_of() { sed -n 's/^phase: *//p' "$1" | head -1 | tr -d '\r'; }
-fact_of()  { sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'; }
+# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
+# are called per run-state file per check, so the leg paid them dozens of times per invocation and
+# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
+# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
+# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
+# valueless key yields the empty string, and a trailing CR is stripped.
+fact_of() { # file · key
+  local l p="$2:"
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    case "$l" in
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+    esac
+  done < "$1"
+  return 0
+}
+phase_of() { fact_of "$1" phase; }
 # Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
 # pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
 # A marker line is the marker or it is malformed — the prefix test IDENTIFIES the line, equality

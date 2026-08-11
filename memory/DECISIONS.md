@@ -39,6 +39,7 @@
 - TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
 - TOOL-aWidenedGuide-1 · the index cap splits by CLASS: a guide is PROSE read end to end, an index is ROWS a sweep prunes. Guides get 3x (60 KB / 750 lines), rows keep 20 KB / 250. The line count was always a proxy; check 16's byte-measured READ_PATH_CEILING is the real budget and is NOT relaxed
+- TOOL-aWidenedGuide-2 · check 12 graded only BULLET forks in a spec's Open questions, while TEMPLATE-SPEC sanctions a bullet OR a ### sub-head. A spec using sub-heads scored zero items and could never go terminal however completely answered — the doc offered two shapes, the gate one
 ## DEPL — deployer
 
 *(none yet)*

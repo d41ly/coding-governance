@@ -244,6 +244,14 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   `check-memory-hygiene.test.sh` deliberately sets no pins, so any 13-19 arm belongs in its own
   scratch tree with the pin set. This is the `vacuous-selector-empty-population` class one level up:
   the population is fine, the CHECK is switched off.
+- MEASURING ON THIS BOX: wall clock is not a metric and a PATH shim is not free. Ten worktrees share
+  this machine and other sessions run full bars, so identical code timed 77s and 95s twenty minutes
+  apart — any optimisation judged on wall time here is judged on someone else's load. Count PROCESSES
+  instead; that is deterministic. Two traps in the counting itself, both hit: a shim that execs
+  `/usr/bin/git` silently breaks every call because that path does not exist on this node (git is
+  `/mingw64/bin/git`), and the suite then 'passes' in 14s having done nothing — so a shim MUST assert
+  its subject still passes. And a Windows-spelled directory prepended to `PATH` is never searched by
+  MSYS bash, so the shim silently never fires and reports zero. Use a `mktemp -d` path.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

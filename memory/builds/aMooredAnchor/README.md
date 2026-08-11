@@ -111,9 +111,9 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATE
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | INPROGRESS | rev-4 | 2026-08-11 |
+| [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | CLOSED | rev-5 | 2026-08-11 |
 <!-- /gen:build-index -->

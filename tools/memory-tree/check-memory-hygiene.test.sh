@@ -148,6 +148,14 @@ good | sed 's/SPECCED/CLOSED/' \
   | sed 's/^none$/- **RESOLVED (owner, 2026-08-01): fork one.** picked A/' \
   | sed '/^- \*\*RESOLVED/a\- fork two, still open' \
   > "$D/spec/2026-08-01-spec-tFixture-44.md"                                     # one unresolved among resolved -> red
+# ---- ...and the SAME PAIR in the OTHER sanctioned shape. TEMPLATE-SPEC says "One fork per bullet or
+# ---- ### sub-head", and only the bullet was ever counted — so a spec using sub-heads scored zero
+# ---- items, could never satisfy `items == resolved`, and could never go terminal however completely
+# ---- its forks were answered. 45 is the arm that proves sub-heads are graded at all; 46 is the one
+# ---- that proves they are still graded STRICTLY, because 45 alone would also pass if the branch
+# ---- simply counted every sub-head as resolved.
+good | sed 's/SPECCED/CLOSED/'   | sed 's/^none$/### F1 — the only fork · RESOLVED (owner, 2026-08-01): picked A/'   > "$D/spec/2026-08-01-spec-tFixture-45.md"                                     # sub-head + RESOLVED -> silent
+good | sed 's/SPECCED/CLOSED/'   | sed 's/^none$/### F1 — fork one · RESOLVED (owner, 2026-08-01): picked A/'   | sed '/^### F1 /a\### F2 — fork two, still open'   > "$D/spec/2026-08-01-spec-tFixture-46.md"                                     # one sub-head unresolved -> red
 # TRAILING BLANK LINES with §8 as the last section (TOOL-aBatchedLintel-1). Check 12 reproduces
 # `sed "1d;\$d"`, whose deletes act on the CONCATENATED range output — so the range's last line, and
 # therefore which line `\$d` removes, depends on whether the body still carries its trailing blanks.
@@ -331,6 +339,8 @@ hit  'tFixture-14.md (unfilled skeleton placeholder'
 miss 'tFixture-15.md ('
 miss 'tFixture-43.md ('                       # every §8 item RESOLVED satisfies a terminal status
 hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'
+miss 'tFixture-45.md ('                       # a ### sub-head fork, RESOLVED, satisfies a terminal status
+hit  'tFixture-46.md (terminal Status with unresolved §8 Open questions'
 hit  'tFixture-16.md (## sections differ'
 miss 'tFixture-16.md (terminal Status'
 # Emission ORDER inside one file: a per-file loop got it for free, one awk over a driver does not.

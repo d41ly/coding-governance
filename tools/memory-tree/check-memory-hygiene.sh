@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.9   # gov:kit memory-tree@2.9 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.10   # gov:kit memory-tree@2.10 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -650,8 +650,13 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       for (i = 2; i <= q - 1; i++) {
         if (rng[i] ~ /^[[:space:]]*$/) continue
         if (q8 == "") q8 = rng[i]
-        # An ITEM is a list bullet; prose between items is commentary and is not graded.
-        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/) {
+        # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
+        # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
+        # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
+        # items, could never satisfy `items == resolved`, and could never go terminal no matter how
+        # thoroughly its forks were answered. That is the same false-claim class as the note directly
+        # above, one level down: the doc offered two shapes and the gate implemented one.
+        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/ || rng[i] ~ /^###[[:space:]]/) {
           items++
           if (rng[i] ~ /RESOLVED/) resolved++
         }
