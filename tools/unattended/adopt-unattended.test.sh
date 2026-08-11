@@ -58,6 +58,37 @@ same "arm 1 left no placeholder" \
 ( cd "$A" && bash tools/unattended/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 
+# ---- ARM 1b: HOSTILE CONF VALUES, round-tripped. TOOL-aWrittenMethod-6.
+# ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into
+# ---- `s|…|…|`, where a `|` closed the delimiter — sed exited 1, the trailing `tr` exited 0, so a
+# ---- ZERO-BYTE Skill was written and `--check` then diffed it clean against an equally empty
+# ---- render. An `&` re-inserted the whole match instead. This arm is a ROUND TRIP, not a
+# ---- non-empty check: the values must come back byte-for-byte, which is the only assertion that
+# ---- distinguishes a correct render from a plausible one.
+H="$TMP/hostile"; seed "$H"
+# Written with a QUOTED HEREDOC, never `sed`: these values carry `|`, which is the delimiter every
+# `s|…|…|` in this kit used, so editing them in with sed reproduces the very defect the fixture
+# exists to catch. It did, on the first attempt at writing this arm.
+grep -v -e '^LANDER=' -e '^KEEPALIVE_INTERVAL=' "$H/.unattended.conf" > "$H/.conf.tmp"
+cat >> "$H/.conf.tmp" <<'HOSTILEEOF'
+LANDER="bash tools/land.sh | tee log & echo done \\ok"
+KEEPALIVE_INTERVAL="every 10 min | offset 3 & then \\wait"
+HOSTILEEOF
+mv "$H/.conf.tmp" "$H/.unattended.conf"
+out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh 2>&1); rc=$?
+same "a hostile conf still adopts" "$rc" "0"
+SK="$H/.claude/skills/unattended/SKILL.md"
+present "$SK" "the Skill is written for a hostile conf"
+hit "$(cat "$SK")" 'bash tools/land.sh | tee log & echo done \ok'
+hit "$(cat "$SK")" 'every 10 min | offset 3 & then \wait'
+# NEGATIVE control: a render that silently drops a substitution leaves the token standing, and would
+# otherwise satisfy every assertion above by writing nothing useful.
+n=$((n+1)); grep -qF '{{LANDER}}' "$SK" && { echo "FAIL a dropped substitution left {{LANDER}} standing"; st=1; }
+n=$((n+1)); grep -qF '{{KEEPALIVE_INTERVAL}}' "$SK" && { echo "FAIL a dropped substitution left {{KEEPALIVE_INTERVAL}} standing"; st=1; }
+# And the gate agrees, rather than comparing one empty file to another.
+out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh --check 2>&1); rc=$?
+same "--check agrees on a hostile conf" "$rc" "0"
+
 # ---- ARM 2: a FOREIGN repo. The kit lives in host A; the caller runs it from host B. Nothing may be
 # ---- written into EITHER tree — not the caller's, and not the kit owner's.
 B="$TMP/other"; mkdir -p "$B"
