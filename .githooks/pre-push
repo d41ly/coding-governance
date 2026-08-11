@@ -76,6 +76,11 @@ fi
 # Run the full bar once, stdin denied so the gate can't consume any remaining ref lines. The gate
 # command is overridable (GOV_GATE_CMD) so the hook's own test can stub it.
 echo "pre-push: full gate on $def push (${main_local:0:8})..."
+# GATE_FULL makes run-gates.sh ignore every leg `guard`. This is THE run that must be total: the
+# self-test legs are diff-scoped on earlier (DoR / post-merge) runs, and if that scoping reached here
+# no run would ever execute every leg against the tree that actually lands. Exported, not passed as an
+# argument, so a stubbed GOV_GATE_CMD inherits it too.
+export GATE_FULL=1
 gate=${GOV_GATE_CMD:-bash tools/run-gates.sh}
 $gate </dev/null
 rc=$?

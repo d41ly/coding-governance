@@ -73,7 +73,23 @@ its shards sit frozen under `memory/archive/`.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
-The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
+The full bar is green at the push boundary; earlier runs are diff-scoped, and now MECHANICALLY so.
+Each self-test leg carries a `guard` in `tools/gate-legs.json` naming the kit dir it exercises, so a
+records-only commit skips them and runs only the legs that check this repo's actual state — read the
+split FROM the manifest, never from here. **`GATE_FULL=1` bypasses every guard, and
+`.githooks/pre-push` sets it**, so the authoritative run is still total: a guard can only ever scope a
+NON-authoritative run, which is what makes a too-narrow guard cost an early signal rather than a wrong
+merge verdict. A guard naming an untracked path would skip forever and silently, so the run-gates
+canary refuses one.
+The runner executes legs **CONCURRENTLY** through a bounded pool, width `min(8, nproc)`, overridable
+with `GATE_JOBS`; `GATE_JOBS=1` is the serial bar through the same code path and is the rollback for
+any suspected concurrency problem. Legs are safe to run together because each heavy one is already
+hermetic — it builds its own `mktemp -d` scratch repo and never writes into the real tree. Execution
+order is scheduled longest-first from a timing cache the runner writes at `<git-dir>/gate-timings.tsv`;
+REPORTING is always manifest order, so output is byte-stable whatever the width, and a corrupt or
+absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at width 8. Every leg's
+output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
+`gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
 - `memory/` hygiene (20 checks, flat tree since kit 1.5; engine at kit 2.6 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)

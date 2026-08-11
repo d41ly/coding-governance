@@ -1,6 +1,6 @@
 # TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region
 
-**Status:** SPECCED · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · ratified 2026-08-11
+**Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · ratified 2026-08-11
 
 ## 1. Goal
 

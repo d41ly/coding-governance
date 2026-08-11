@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T17:10:00+03:00 @ 89cc4075a99a8ec2f0c3c096d219bcf854fe745d
+last-audit: 2026-08-11T17:35:00+03:00 @ 6a377cdcf24cb03cb6a08ad34b3f4b965a2b5c93
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -52,7 +52,9 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates.sh    # runs all legs, single-sourced from tools/gate-legs.json — read THAT for the list, not this line
+bash tools/run-gates.sh    # runs all legs CONCURRENTLY (width min(8,nproc)), single-sourced from tools/gate-legs.json — read THAT for the list, not this line
+GATE_JOBS=1 bash tools/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
+GATE_FULL=1 bash tools/run-gates.sh   # ignore every leg guard — what .githooks/pre-push runs, and what a DoD needs
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -91,7 +93,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32688/32768 (**80 bytes free**, measured 2026-08-11 by `bash tools/check-template-size.sh`
+  It sits at 32682/32768 (**86 bytes free**, measured 2026-08-11 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here: this number moved TWICE in one day, so treat any figure written here as a lower bound on staleness), so a line added to it either fits that margin or
   funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
   before the unattended build's playbook unit needed 114 for the standing-mandate clauses and funded

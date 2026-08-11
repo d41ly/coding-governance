@@ -39,6 +39,10 @@
     "argv": [
       "bash",
       "tools/memory-tree/check-verdict-epoch.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -58,8 +62,8 @@
       "skills/session-kickoff/manifest-check.test.sh"
     ],
     "guard": [
-      "skills/session-kickoff/manifest-check.sh",
-      "skills/session-kickoff/manifest-check.test.sh"
+      "skills/session-kickoff/",
+      "tools/lib/"
     ]
   },
   {
@@ -67,6 +71,10 @@
     "argv": [
       "bash",
       "tools/lib/resolve-python.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
     ]
   },
   {
@@ -74,6 +82,10 @@
     "argv": [
       "bash",
       "tools/hooks/agent-cap.test.sh"
+    ],
+    "guard": [
+      "tools/hooks/",
+      "tools/lib/"
     ]
   },
   {
@@ -81,6 +93,10 @@
     "argv": [
       "bash",
       "tools/agent-instructions/adopt-agent-instructions.test.sh"
+    ],
+    "guard": [
+      "tools/agent-instructions/",
+      "tools/lib/"
     ]
   },
   {
@@ -88,6 +104,10 @@
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -95,6 +115,10 @@
     "argv": [
       "bash",
       "tools/memory-tree/merge-rows.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -102,6 +126,12 @@
     "argv": [
       "bash",
       "tools/memory-tree/kit-dogfood-parity.test.sh"
+    ],
+    "guard": [
+      "memory/HYGIENE.md",
+      "memory/TEMPLATE-SPEC.md",
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -110,6 +140,10 @@
       "python3",
       "tools/memory-tree/gen_build_index.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -118,6 +152,10 @@
       "python3",
       "tools/memory-tree/corpus_ids.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -126,6 +164,10 @@
       "python3",
       "tools/memory-tree/gotchas.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -134,6 +176,10 @@
       "python3",
       "tools/memory-tree/row_grammar.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -150,6 +196,10 @@
       "python3",
       "tools/memory-tree/check-arms.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
     ]
   },
   {
@@ -157,6 +207,10 @@
     "argv": [
       "bash",
       ".githooks/pre-commit.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/lib/"
     ]
   },
   {
@@ -164,6 +218,10 @@
     "argv": [
       "bash",
       ".githooks/pre-push.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/lib/"
     ]
   },
   {
@@ -171,6 +229,11 @@
     "argv": [
       "bash",
       "tools/push-main.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/",
+      "tools/lib/"
     ]
   },
   {
@@ -178,6 +241,11 @@
     "argv": [
       "bash",
       "tools/check-wiring.test.sh"
+    ],
+    "guard": [
+      ".claude/",
+      "tools/",
+      "tools/lib/"
     ]
   },
   {
@@ -192,6 +260,10 @@
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/workflows/"
     ]
   },
   {
@@ -199,6 +271,11 @@
     "argv": [
       "bash",
       "tools/workflows/check-protocol-parity.test.sh"
+    ],
+    "guard": [
+      "memory/guides/REVIEW-PROTOCOL.md",
+      "tools/lib/",
+      "tools/workflows/"
     ]
   },
   {
@@ -220,6 +297,10 @@
     "argv": [
       "bash",
       "tools/workflows/check-review-join.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/workflows/"
     ]
   },
   {
@@ -227,6 +308,10 @@
     "argv": [
       "bash",
       "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/pytest-parallel-guardrails/"
     ]
   },
   {
@@ -234,6 +319,10 @@
     "argv": [
       "python3",
       "tools/codebase-map/selftest.py"
+    ],
+    "guard": [
+      "tools/codebase-map/",
+      "tools/lib/"
     ]
   },
   {
@@ -248,6 +337,10 @@
     "argv": [
       "bash",
       "tools/codebase-map/adopt-codebase-map.test.sh"
+    ],
+    "guard": [
+      "tools/codebase-map/",
+      "tools/lib/"
     ]
   },
   {
@@ -256,6 +349,10 @@
       "python3",
       "tools/settings-merge.py",
       "--selftest"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
     ]
   },
   {
@@ -263,6 +360,10 @@
     "argv": [
       "python3",
       "tools/memory-recall/selftest.py"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-recall/"
     ]
   },
   {
@@ -278,6 +379,10 @@
     "argv": [
       "python",
       "tools/drift-audit/selftest.py"
+    ],
+    "guard": [
+      "tools/drift-audit/",
+      "tools/lib/"
     ]
   },
   {
@@ -308,6 +413,11 @@
     "argv": [
       "bash",
       "tools/unattended/check-unattended.test.sh"
+    ],
+    "guard": [
+      "memory/guides/UNATTENDED-PROTOCOL.md",
+      "tools/lib/",
+      "tools/unattended/"
     ]
   },
   {
@@ -315,6 +425,10 @@
     "argv": [
       "bash",
       "tools/unattended/unattended.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
     ]
   },
   {
@@ -330,6 +444,10 @@
     "argv": [
       "bash",
       "tools/unattended/adopt-unattended.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
     ]
   },
   {
@@ -337,6 +455,11 @@
     "argv": [
       "bash",
       "tools/run-gates.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/gate-legs.json",
+      "tools/lib/"
     ]
   },
   {
@@ -344,6 +467,10 @@
     "argv": [
       "bash",
       "tools/run-gates.evidence.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
     ]
   },
   {
@@ -358,6 +485,10 @@
     "argv": [
       "bash",
       "tools/check-install-prefix.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
     ]
   }
 ]
