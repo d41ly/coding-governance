@@ -70,6 +70,9 @@ MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
+PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"
+PROTO_REL="$MEMORY_ROOT/guides/UNATTENDED-PROTOCOL.md"
+PROTO_OUT="$ROOT/$PROTO_REL"
 
 render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
@@ -104,6 +107,16 @@ if [ "$MODE" = "--check" ]; then
   exit 0
 fi
 
+# THE PROTOCOL PAIR. check 10 compares the SHIPPED protocol against the installed copy, and fails
+# hard when either half is missing — "a parity check with one file is a check that cannot fail".
+# Nothing installed the live half, so that check was UNPASSABLE in every adopter: the kit shipped
+# a gate its own adopter could not satisfy. Copied, not rendered — the protocol carries no
+# placeholder, so a render step would be a second spelling of `cat`.
+mkdir -p "$ROOT/$MEMORY_ROOT/guides"
+if [ ! -f "$PROTO_OUT" ] || ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$PROTO_SHIP" > "$PROTO_OUT"
+  echo "unattended: installed $PROTO_REL"
+fi
 mkdir -p "$SKILL_DIR"
 render > "$SKILL_OUT"
 echo "unattended: rendered $SKILL_OUT"

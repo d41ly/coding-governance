@@ -49,6 +49,10 @@ EOF
 A="$TMP/host"; seed "$A"
 out=$( cd "$A" && bash tools/unattended/adopt-unattended.sh 2>&1 )
 present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
+# check 10 of the gate compares the SHIPPED protocol against the installed copy and fails hard
+# when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
+present "$A/memory/guides/UNATTENDED-PROTOCOL.md" "arm 1 installed the protocol's live half"
+hit "$(cat "$A/memory/guides/UNATTENDED-PROTOCOL.md")" "standing mandate"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"

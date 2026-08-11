@@ -250,17 +250,6 @@ def _cell(s: str) -> str:
     return s.replace("|", "\\|").strip()
 
 
-def apply_region(existing: str, body: str, path: str) -> str:
-    if BEGIN not in existing or END not in existing:
-        return body
-    lines = existing.split("\n")
-    o = [i for i, l in enumerate(lines) if l.strip() == BEGIN]
-    c = [i for i, l in enumerate(lines) if l.strip() == END]
-    if len(o) != 1 or len(c) != 1 or c[0] < o[0]:
-        raise Problem(f"{path}: expected exactly one marker pair, found {len(o)} open / {len(c)} close")
-    return body
-
-
 # ------------------------------------------------------------------------------------------- checks
 def do_check(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
