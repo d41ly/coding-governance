@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.1
+gov:kit drift-audit@1.2
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.1"
+KIT_DRIFT_AUDIT_VERSION = "1.2"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -123,6 +123,76 @@ def load_project_layer(root: pathlib.Path):
 # --------------------------------------------------------------------------------------------
 # git helpers
 # --------------------------------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------------------------------
+# RATCHET GUARD — a pin RAISE and a population DRAIN look identical to `value > pin`
+# --------------------------------------------------------------------------------------------
+# Reads each declared scalar at the BASE and at HEAD. A move in the weakening direction is refused
+# unless a comment within the preceding few lines names both numbers as `<old> -> <new>`. That marker
+# convention already existed in this repo's prose; this only makes it read.
+#
+# The base value is taken with `git show`, so this compares against the commit the branch forked
+# from, not against a working copy the same run could have edited.
+_RATCHET_LOOKBACK = 14
+
+
+def _scalar_at(text: str, key: str):
+    """The integer bound to `key`, for the two shapes this repo pins numbers in.
+
+    A shell conf writes `KEY="7"` or `KEY=7`; a python declaration writes `"key": 7,`. Comment lines
+    are skipped, or the prose justification directly above a pin ("RAISED 2 -> 3") is itself matched
+    and the guard reads the old value as the new one — silently passing every raise it exists to
+    catch. Returns (value, line_index) or (None, None).
+    """
+    pats = (
+        re.compile(r"^\s*" + re.escape(key) + r"\s*=\s*\"?(\d+)\"?\s*$"),
+        re.compile(r"^\s*[\"']" + re.escape(key) + r"[\"']\s*:\s*(\d+)\s*,?\s*$"),
+    )
+    for i, line in enumerate(text.splitlines()):
+        if line.lstrip().startswith("#"):
+            continue
+        for p in pats:
+            m = p.match(line)
+            if m:
+                return int(m.group(1)), i
+    return None, None
+
+
+def _justified(text: str, at: int, old: int, new: int) -> bool:
+    """A comment near the pin naming BOTH numbers, in `<old> -> <new>` form."""
+    lines = text.splitlines()
+    want = re.compile(r"\b" + str(old) + r"\b\s*(?:->|→|to)\s*\b" + str(new) + r"\b")
+    for line in lines[max(0, at - _RATCHET_LOOKBACK): at + 1]:
+        if want.search(line):
+            return True
+    return False
+
+
+def ratchet_findings(git: "Git", root: pathlib.Path, ratchets) -> list[str]:
+    out: list[str] = []
+    for r in ratchets or ():
+        path, key, weakens = r["file"], r["key"], r["weakens"]
+        head_txt = (root / path).read_text(encoding="utf-8", errors="replace") \
+            if (root / path).exists() else ""
+        base = git.run("show", f"{git.base_ref}:{path}")
+        if base.returncode != 0:
+            continue                      # the file is new on this branch; nothing to compare
+        now, at = _scalar_at(head_txt, key)
+        was, _ = _scalar_at(base.stdout, key)
+        if now is None or was is None or now == was:
+            continue
+        weaker = now > was if weakens == "up" else now < was
+        if not weaker:
+            continue                      # a tightening ratchet is always free
+        if not _justified(head_txt, at, was, now):
+            out.append(
+                f"{path}: {key} moved {was} -> {now}, which WEAKENS it, with no justification "
+                f"beside it. A raise and a drain are indistinguishable to the gate that owns this "
+                f"number — write why, naming both values as '{was} -> {now}', within "
+                f"{_RATCHET_LOOKBACK} lines above it."
+            )
+    return out
 
 
 class Git:
@@ -514,6 +584,9 @@ def main(argv: list[str] | None = None) -> int:
         # rule with no exception here would red every fresh adopter on their first run. The exception
         # is enumerated in the project layer, never inferred.
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()))
+        for r in ratchets:
+            print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
         for s in over:
@@ -526,7 +599,7 @@ def main(argv: list[str] | None = None) -> int:
                   f"empty, so its value ({s['value']}) means nothing. Either its selector no longer "
                   f"matches this tree, or the signal is empty on purpose and belongs in "
                   f"DECLARED_EMPTY with the reason.", file=sys.stderr)
-        return 1 if (over or dead) else 0
+        return 1 if (over or dead or ratchets) else 0
     return 0
 
 

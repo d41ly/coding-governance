@@ -456,12 +456,89 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"stderr={fires.stderr.strip()[:200]}")
 
 
+def test_ratchet_guard(tmp: pathlib.Path) -> None:
+    """A pin RAISE and a population DRAIN look identical to `value > pin` — TOOL-aNumeralWarden-3.
+
+    Three directions over ONE fixture, so the justification comment is the only variable between the
+    two that matter. Direction one moves a declared scalar in its WEAKENING direction with nothing
+    beside it and demands red. Direction two makes the IDENTICAL move with a justification naming
+    both numbers and demands green — without it, direction one would pass just as well against a
+    guard that refused every edit to the file, which is a different and useless check. Direction
+    three moves the same scalar the TIGHTENING way, unjustified, and demands green: a ratchet that
+    also refuses improvement is a ratchet nobody will turn.
+    """
+    print("RATCHET guard (a weakening move needs a reason; a tightening one never does)")
+    r = make_repo(tmp, name="ratchet")
+    conf = r / ".memory-tree.conf"
+    sig = r / "drift-audit" / "drift_signals.py"
+
+    # The pin must be COMMITTED before the arm moves it: the guard compares the working copy against
+    # `git show <base>:<file>`, so a pin that exists only in the working tree has no prior value and
+    # is correctly ignored. Seeding it in the working tree alone would make every direction below
+    # pass by finding nothing.
+    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+                    encoding="utf-8", newline="\n")
+    # `make_repo` writes its own MINIMAL signals module, so there is no RATCHETS list to edit —
+    # appending one is the only thing that arms this fixture. A `.replace()` against a string this
+    # file does not contain is a no-op, and every direction below then grades an empty declaration
+    # and passes by finding nothing. That is exactly what the first cut of this arm did.
+    sig.write_text(
+        sig.read_text(encoding="utf-8")
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    seeded = run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
+    check("the ratchet fixture committed its seed", seeded.returncode == 0,
+          (seeded.stdout + seeded.stderr)[-200:])
+    # The base value has to be READABLE, or every direction is a skip wearing a pass.
+    at_base = run(["git", "show", "main:.memory-tree.conf"], r)
+    check("the pin is readable at the fixture's base",
+          at_base.returncode == 0 and 'ORPHAN_ID_PIN="5"' in at_base.stdout,
+          at_base.stdout[-200:])
+    committed = conf.read_text(encoding="utf-8")
+
+    def _check() -> subprocess.CompletedProcess:
+        return run([sys.executable, str(r / "drift-audit" / "drift_report.py"), "--check"], r)
+
+    base_ok = _check()
+    check("the fixture is clean before the arm", base_ok.returncode == 0,
+          (base_ok.stdout + base_ok.stderr)[-400:])
+
+    # --- direction one: weakened, unjustified -------------------------------------------------
+    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+                    encoding="utf-8", newline="\n")
+    out = _check()
+    check("an unjustified RAISE is refused",
+          out.returncode != 0 and "RATCHET WEAKENED" in out.stderr,
+          (out.stdout + out.stderr)[-400:])
+
+    # --- direction two: the SAME raise, justified in place ------------------------------------
+    justified = "# RAISED 5 -> 9 because the fixture says so.\n" + 'ORPHAN_ID_PIN="9"'
+    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', justified),
+                    encoding="utf-8", newline="\n")
+    out = _check()
+    check("the same RAISE with a justification naming both values is allowed",
+          out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
+          (out.stdout + out.stderr)[-400:])
+
+    # --- direction three: TIGHTENED, unjustified ----------------------------------------------
+    # A ratchet that also refuses improvement is a ratchet nobody turns, so this direction must be
+    # free. Without it, direction one would pass equally against a guard that refused any edit.
+    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="1"'),
+                    encoding="utf-8", newline="\n")
+    out = _check()
+    check("a tightening move needs no justification",
+          out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
+          (out.stdout + out.stderr)[-400:])
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
         test_declared_empty(tmp)
+        test_ratchet_guard(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

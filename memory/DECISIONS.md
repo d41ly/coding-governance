@@ -44,6 +44,7 @@
 
 - TOOL-aWidenedGuide-2 · check 12 graded only BULLET forks in a spec's Open questions, while TEMPLATE-SPEC sanctions a bullet OR a ### sub-head. A spec using sub-heads scored zero items and could never go terminal however completely answered — the doc offered two shapes, the gate one
 
+- TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
 ## DEPL — deployer
 
 *(none yet)*
