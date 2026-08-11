@@ -48,20 +48,22 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 
 | Unit | State |
 |---|---|
-|  | **BUILT** on branch, unmerged (). rev-3, INPROGRESS |
-|     | SPECCED rev-2, forks resolved, NOT built |
+| `TOOL-aWrittenMethod-2` | **BUILT** on branch, unmerged (`5d1faf9`). rev-3, INPROGRESS |
+| `-6` `-3` `-4` `-5` | SPECCED rev-2, forks resolved, NOT built |
 
-Landing order  — not parallel-safe. Unit 2 is done and its two build-time
-defects are in its §9: a global set inside  never reached the caller, and one refusal branch
-was unreachable because an earlier call already returns on the same failure.
+Landing order `2 → 6 → 3 → 4 → 5` — not parallel-safe. Unit 2 is done, and its two build-time
+defects are recorded in its §9: a global set inside `$( )` never reached the caller because command
+substitution runs in a subshell, and one refusal branch was unreachable because an earlier call
+already returns on the same failure. The first broke every preflight until it was found; the second
+was deleted rather than left as decoration.
 
 **PARKED — units 6, 3, 4, 5.** *The question:* build the remaining four, then the closing diff
 review, the bar, and landing. *The options seen:* push on with what context remains; park after the
-blocker. *The reason:* unit 2 alone consumed the pass — it took two build-time defects, a fixture
-repair the audit had predicted, six new armed branches and an arms-floor ratchet. Unit 6 rewrites six
+blocker. *The reason:* unit 2 alone consumed the pass — two build-time defects, a fixture repair the
+audit had predicted, six new armed branches and an arms-floor ratchet. Unit 6 rewrites six
 substitution sites under a hostile-value fixture and unit 4 adds two gate legs; neither is a thing to
-start with the budget left. Unit 2 is independently valuable and self-contained: it is the blocker,
-its write set is disjoint from the other four, and nothing pending depends on it.
+start on the budget left. Unit 2 is independently valuable and self-contained: it is the blocker, its
+write set is disjoint from the other four, and nothing pending depends on it.
 
 **Next action:** build unit 6 per its rev-2 spec, then 3, 4, 5. Keepalive NOT reaped.
 
