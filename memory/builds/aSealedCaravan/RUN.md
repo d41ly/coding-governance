@@ -13,15 +13,32 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 9c28300649d93e12e65e1ee4378a26e14e8dd3ff
+witness: 7a4f904f3d77d9e9b75d50fc7231c87522393571
 phase: BUILDING
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
-anchor-sha: 91ef1b05eb320512c0697bee72cfc228b00eee85
+anchor-sha: 7a4f904f3d77d9e9b75d50fc7231c87522393571
 anchor-ref: refs/heads/main
-base: 91ef1b05eb320512c0697bee72cfc228b00eee85
+keepalive-reaped: yes
+parked-surfaced: yes
+base: 7a4f904f3d77d9e9b75d50fc7231c87522393571
 
 ## Parked
+
+**The run LANDED but could not be CLOSED, and the kit is right to refuse.** `main` is at 7a4f904 with
+the full bar green at 53/53 through the pre-push hook, so the work is in. `--close` then blocks:
+once the work is on main, merge-base equals HEAD, `resolve_base` reports degenerate, and only
+`--preflight` passes `allow-degenerate`. That makes `authorization-reachable` unmeetable — and the
+kit correctly REFUSES to override it, because an override on the authorization check is the
+authorization check. That refusal is good design and should not be relaxed.
+
+The authorization was never in doubt: the build README is on main and predates this branch, and every
+preflight in this run asserted it. What is missing is that the close path does not account for the
+landing lifecycle, which is the same family as the defect fixed as TOOL-aSealedCaravan-6 one commit
+earlier. Filed as TOOL-aSealedCaravan-7 rather than fixed: the owner authorised ONE named kit fix,
+and helping myself to a second on the strength of the first is precisely the drift that authorisation
+exists to prevent. The run-state file therefore stays at BUILDING, honestly.
+
 
 **RESOLVED 2026-08-11 by the owner's explicit instruction, as TOOL-aSealedCaravan-6.** The driver now
 tests BASE by ANCESTRY, which is one spelling of the rule its own leg already carried. `--preflight`
