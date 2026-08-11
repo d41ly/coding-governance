@@ -48,24 +48,38 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 
 | Unit | State |
 |---|---|
-| `TOOL-aWrittenMethod-2` | **BUILT** on branch, unmerged (`5d1faf9`). rev-3, INPROGRESS |
-| `-6` `-3` `-4` `-5` | SPECCED rev-2, forks resolved, NOT built |
+| `TOOL-aWrittenMethod-2` | **BUILT** `5d1faf9` — the mandate BASE the run cannot steer |
+| `TOOL-aWrittenMethod-6` | **BUILT** `3ff7b4e` + `1a531cb` — all six renderers stop interpreting their inputs |
+| `TOOL-aWrittenMethod-3` | **BUILT** `b6e02f2` — the guide displaced 247 to 236 lines |
+| `TOOL-aWrittenMethod-4` | SPECCED rev-2, NOT built |
+| `TOOL-aWrittenMethod-5` | SPECCED rev-2, NOT built |
 
-Landing order `2 → 6 → 3 → 4 → 5` — not parallel-safe. Unit 2 is done, and its two build-time
-defects are recorded in its §9: a global set inside `$( )` never reached the caller because command
-substitution runs in a subshell, and one refusal branch was unreachable because an earlier call
-already returns on the same failure. The first broke every preflight until it was found; the second
-was deleted rather than left as decoration.
+Landing order `2 → 6 → 3 → 4 → 5`; three done, in order, unmerged on the branch.
 
-**PARKED — units 6, 3, 4, 5.** *The question:* build the remaining four, then the closing diff
-review, the bar, and landing. *The options seen:* push on with what context remains; park after the
-blocker. *The reason:* unit 2 alone consumed the pass — two build-time defects, a fixture repair the
-audit had predicted, six new armed branches and an arms-floor ratchet. Unit 6 rewrites six
-substitution sites under a hostile-value fixture and unit 4 adds two gate legs; neither is a thing to
-start on the budget left. Unit 2 is independently valuable and self-contained: it is the blocker, its
-write set is disjoint from the other four, and nothing pending depends on it.
+**What the arms caught, that reasoning had not.** Each of the three built units surfaced a defect no
+amount of reading would have found, which is the argument for the arms being scope items rather than
+test details:
 
-**Next action:** build unit 6 per its rev-2 spec, then 3, 4, 5. Keepalive NOT reaped.
+- unit 2 — `resolve_base` ran under `$( )`, so the global it set never reached the caller. Every
+  preflight failed until it was derived in the caller instead. A second refusal branch was
+  unreachable because an earlier call already returns on the same failure, and was deleted.
+- unit 6 — the hostile-value FIXTURE was first written with `sed 's|^LANDER=.*|…|'`, whose
+  replacement carries a `|`, and so reproduced the defect inside the test meant to catch it. Then
+  the conversion silently dropped `{{QUERY_CLI}}`, because its replacement is a literal expression
+  rather than a bare variable; the adopter's own surviving-placeholder arm refused immediately.
+- unit 3 — the 225-line target did not survive measurement. The taxonomy is 7 lines, not the ~18 the
+  estimate assumed. The number moved to 236 and the content did not, per M2's change-the-spec rule.
+
+**PARKED — units 4 and 5.** *The question:* build the cross-carrier gate and the manifest watch entry,
+then the closing diff review, the bar, and landing. *The options seen:* start unit 4 on what remains;
+take unit 5 out of order because it is small; park both. *The reason:* unit 4 adds TWO gate legs, a
+shipped registry, a dossier claim and an `AGENTS.md` row, and its own audit found its positive control
+asserted the wrong population — it is the unit most likely to land looking finished while being wrong.
+Unit 5 is small but is ordered last on purpose: it puts the method under a manifest ratchet that taxes
+every earlier commit, so pulling it forward would make unit 4's commit pay a re-stamp it should not.
+
+**Next action:** build unit 4 per its rev-2 spec, then 5, then the M8 closing review over
+`7f614a1..HEAD`, the full bar, and landing. Keepalive NOT reaped.
 
 ## The two passes, and why there are two
 
