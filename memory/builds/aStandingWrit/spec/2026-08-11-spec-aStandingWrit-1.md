@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
+**Status:** INPROGRESS · rev-5 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -45,19 +45,40 @@ carries four facts. The file keeps an authored region; rev-1's "wholly generated
 `--preflight` and stays a refusal at `--close` and in the gate leg. The BASE value for that state is
 defined explicitly rather than left to an empty string.
 
-**S4 — `--plan`, over DECLARED joins only.** A fifth verb prints per-unit state and names the next
-step. It reads spec status headers and two declared pointers in those headers. It performs no
-filename join and no title match, both of which the review measured wrong on every multi-unit build
-in this corpus.
+**S4 — `--plan`, MECHANISING the build method's classification rather than inventing one.** A fifth
+verb prints per-unit state and names the next step. It reads spec status headers and the review
+pointer declared in them; it performs no filename join and no title match, both of which the review
+measured wrong on every multi-unit build in this corpus.
 
-**S5 — the authored plan region, its ordinal key, and a build-README template.** The template is
-`memory/TEMPLATE-README.md`, and admitting it is an engine change with a four-gate repair set named
-in §4. It closes the open backlog row recorded inline as TOOL-aUnmannedHelm-3, including that row's
-own cited evidence about the `ids:` key.
+The four states are `memory/guides/BUILD-METHOD.md` M2's, spelled exactly — MISSING, THIN, FORKED,
+READY — and the RULE for each stays in M2. That document's own governing constraint is that a rule
+appearing both in it and in a carrier it points at is a defect IN IT, so this verb may compute the
+classification and must not restate it. The eight-state table rev-2 designed is withdrawn: it was
+authored before M2 existed and is a second vocabulary for one question.
 
-**S6 — the phase vocabulary gains members and a producer.** `SPECCING`, `REVIEWING` and `BUILDING`
-join the core set, `RUNNING` is given an explicit meaning rather than left ambient, and a `--phase`
-verb writes a phase with its witness. `--preflight` stops unconditionally rewriting the phase.
+**S5 — WITHDRAWN, superseded on main.** It proposed a marker-delimited plan region and a
+`memory/TEMPLATE-README.md` to document it. `memory/guides/BUILD-METHOD.md` M2 landed first and
+answers the same question with no new artifact: the roster is the build README's authored Units table
+where one exists, else the conforming specs under the build's `spec/`. It also resolves this scope
+item's stated motivation outright — the `ids:` key is a reservation RANGE and not a roster, which is
+exactly the ambiguity the backlog row recorded inline as TOOL-aUnmannedHelm-3 cited as its evidence.
+
+Building S5 would add a second roster surface and a template whose content M2 already carries, and
+M2's own rule makes the duplicate a defect. The engine change it required — admitting a new file to
+hygiene check 3's closed memory-root allowlist, with its four-gate repair set — is avoided entirely.
+The withdrawal also retires F5's plan-region requirement, which was the mitigation for
+self-propagating authorization; §8 records what replaces it.
+
+**S6 — the phase vocabulary gains members and a producer, named for PASSES.** The members are
+`memory/guides/BUILD-METHOD.md` M6's pass kinds rather than three tokens this spec invented:
+`SPECCING`, `REVIEWING`, `FOLDING`, `BUILDING`. M6 defines a pass as exactly one of a spec authored,
+a spec reviewed, a review's fixes folded in, a unit built, or the closing diff review — and the last
+is already `VERIFYING`. Phases are the unattended protocol's to own (M11 says so), so naming them
+after M6's passes aligns the two without either restating the other.
+
+`RUNNING` is retained with an explicit meaning — a run between named passes — because the core set is
+shrink-only and deleting it would lower the floor. A `--phase` verb writes a phase with its witness,
+and `--preflight` stops unconditionally rewriting one, which today clobbers a resumed run's position.
 
 **S7 — the amendment set**, enumerated by file and by sentence in §4.
 
@@ -399,6 +420,13 @@ the cheapest of the three, it is mechanical, and it makes assertion 4 non-vacuou
 population that can propagate. The 26 builds that predate this keep existence-only authorization,
 and that grandfathering is deliberate: they were created before any run could have authored them.
 
+RE-ANSWERED at rev-5, because S5 withdrew the artifact this resolution named. The build method's M2
+makes the README's authored Units table the roster, and that table is what a build README already
+carries here — so the integrity comparison binds to the Units table rather than to a plan region
+nobody now builds. The property is unchanged and the ratified intent is honoured; only the surface
+moved, and it moved onto one that already exists. Where a README carries no Units table, M2 falls
+back to the specs under `spec/`, and a build with neither is not a build a run can execute anyway.
+
 **F6 — how are the ACTIONS named, now that the README names none?** Options were: accept that every
 build authorizes both; declare the pair once in the conf, which F0a rejected; or let the plan region
 carry an optional actions line. RESOLVED (owner, 2026-08-11): accept that a build authorizes both,
@@ -434,6 +462,13 @@ author's first instinct, because the first instinct is what shipped the bypass.
   check inside the run's own process, and two further levers were found that defeat the mandate
   comparison at a perfectly honest anchor. The protocol gains a §9 stating the boundary, and the
   charter's claim is amended to match. Status INPROGRESS: S0 landed, S1 through S7 not started.
+- rev-5 · 2026-08-11 · reconciled against `memory/guides/BUILD-METHOD.md`, which landed on main while
+  S0 was building and is the instruction layer F7 recorded as unlocatable. S5 is WITHDRAWN: M2
+  answers the roster question with no new artifact and resolves the `ids:` ambiguity that was S5's
+  stated motivation. S4 is rescoped to MECHANISE M2's four states rather than carry the eight-state
+  vocabulary rev-2 invented, which is now a second spelling of one question. S6's phase members are
+  renamed for M6's pass kinds. F5's mitigation moved with S5 and is re-answered in §8. Nothing about
+  S1, S2, S3 or S7 changed — the authorization half of this build never overlapped that document.
 
 ## 10. Reuse audit
 

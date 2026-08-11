@@ -23,9 +23,9 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** SPECCED at rev-3. The Tier-2 review returned **do not build** on rev-1; rev-2 folded it and
-rev-3 carries all eight owner forks RESOLVED. S0 is the next thing built, per F8, and its mechanism is
-being settled by a dedicated design panel before a line is written.
+**State.** INPROGRESS at rev-5. S0 is BUILT and LANDED on main. S5 is WITHDRAWN and S4/S6 are
+rescoped, because `memory/guides/BUILD-METHOD.md` landed on main while S0 was building and already
+answers part of what they proposed. S1, S2, S3 and S7 are unchanged and unbuilt.
 
 **Read this first.** The review reproduced, end to end and with a live control, an authorization
 bypass in the unattended kit **as it is merged and gated on `main` today**. The pinned BASE anchors
@@ -49,12 +49,11 @@ an instruction-layer question:
    undifferentiated, so `--status` after a compaction cannot say where the run is and `--resume`
    cannot say what to pick up.
 
-**What this build does NOT do.** It decides exactly three things the instruction layer must honour —
-that a unit's position is READ from its spec's status header and declared pointers rather than
-inferred, that `INPROGRESS` means built-but-not-landed, and that `BLOCKED`, `DEFERRED` and `WONTDO`
-are never a `next:` target — and stops. How to write a sub-spec, how to run the adversarial review,
-and what evidence makes a unit built belong to the parallel session. That session is unlocatable from
-this tree, so the dependency is a backlog row rather than an assumption.
+**What this build does NOT do.** The instruction layer is `memory/guides/BUILD-METHOD.md`, which
+landed on main mid-build and is binding for any build of more than one pass. This build MECHANISES
+what that document defines and restates none of it — M2's own rule is that a rule appearing both
+there and in a carrier it points at is a defect THERE, so the four classification states are spelled
+exactly as M2 spells them and their definitions stay in M2.
 
 **Read before reviewing:** `memory/guides/UNATTENDED-PROTOCOL.md` (binding, and this build amends
 it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`, whose three
@@ -85,9 +84,9 @@ sub-specs.
 | **S1** | authorization reads the build README at BASE; the mandate block and its marker pair retire |
 | **S2** | `RUN.md` loses its authored mandate; `--preflight` creates it and commits it, so the leg can still see it |
 | **S3** | the merge-base-equals-HEAD refusal is scoped by verb, with the BASE value for that state defined |
-| **S4** | `--plan`, over DECLARED pointers only — the filename join and the title match are both deleted |
-| **S5** | the authored plan region, its ordinal key, and the build-README template |
-| **S6** | three new phase members, a meaning for `RUNNING`, and a verb that can actually write one |
+| **S4** | `--plan`, MECHANISING BUILD-METHOD M2's four states — never restating them, and no filename join |
+| **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
+| **S6** | phase members named for M6's PASS kinds, a meaning for `RUNNING`, and a verb that can write one |
 | **S7** | the amendment set — seven files, not four |
 
 ## Owner decision menu — all eight RESOLVED 2026-08-11
@@ -100,17 +99,18 @@ code and depends on none of the design questions. Its mechanism is being settled
 design panel rather than by this author's first instinct, because the first instinct is what shipped
 the bypass.
 
-**F5** — self-propagating authorization is refused. Any build created after this lands must carry a
-plan region, which makes the integrity check non-vacuous for exactly the population that can
-propagate. The 26 existing builds are grandfathered deliberately: they predate any run that could
-have authored them.
+**F5** — self-propagating authorization is refused. RE-ANSWERED at rev-5: the integrity comparison
+binds to the build README's authored Units table, which BUILD-METHOD M2 makes the roster and which a
+build README already carries, rather than to the plan region S5 would have invented. The property and
+the ratified intent are unchanged; the surface moved onto one that already exists.
 
 **F6** — a build authorizes both actions, and the amended charter sentence says so. Replacing the
 wording is a scope item, not a paraphrase.
 
-**F7** — the instruction layer stays out of scope and the cut-line is narrowed instead, to the three
-decisions the state table actually makes. The dependency is a backlog row, so if the parallel session
-proves not to exist, the row is what surfaces it.
+**F7** — the instruction layer stays out of scope. The session F7 could not find HAS since landed:
+`memory/guides/BUILD-METHOD.md`, binding for any multi-pass build. The backlog row did its job — it
+was the thing that made the dependency findable — and rev-5 reconciles against the document rather
+than against an assumption about it.
 
 **F1** — the plan-region integrity check is opt-in, and the template ships the region commented out.
 
@@ -154,5 +154,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | INPROGRESS | rev-4 | 2026-08-11 |
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | INPROGRESS | rev-5 | 2026-08-11 |
 <!-- /gen:build-index -->
