@@ -23,9 +23,13 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** INPROGRESS at rev-5. S0 is BUILT and LANDED on main. S5 is WITHDRAWN and S4/S6 are
-rescoped, because `memory/guides/BUILD-METHOD.md` landed on main while S0 was building and already
-answers part of what they proposed. S1, S2, S3 and S7 are unchanged and unbuilt.
+**State.** All scope items are BUILT. S0 landed on main mid-build; S1, S2, S3, S4, S6 and S7 are
+built on the branch and reviewed as one cumulative code diff. S5 is WITHDRAWN, superseded by
+`memory/guides/BUILD-METHOD.md` M2. P1 remains parked — it is the only thing this build refused, and
+it blocks nothing that was built.
+
+**The owner's ask, met.** `/unattended <slug>` is now sufficient. Nobody authors a mandate, nobody
+authors a run-state file, and a run that invents its own build folder is refused.
 
 **Read this first.** The review reproduced, end to end and with a live control, an authorization
 bypass in the unattended kit **as it is merged and gated on `main` today**. The pinned BASE anchors
@@ -81,13 +85,13 @@ sub-specs.
 | Area | What changes |
 |---|---|
 | **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
-| **S1** | authorization reads the build README at BASE; the mandate block and its marker pair retire |
-| **S2** | `RUN.md` loses its authored mandate; `--preflight` creates it and commits it, so the leg can still see it |
-| **S3** | the merge-base-equals-HEAD refusal is scoped by verb, with the BASE value for that state defined |
-| **S4** | `--plan`, MECHANISING BUILD-METHOD M2's four states — never restating them, and no filename join |
+| **S1** | BUILT — authorization reads the build README at BASE; the mandate block and its marker pair retire |
+| **S2** | BUILT — `--preflight` CREATES and stages the run-state file; staging is what the gate leg can see |
+| **S3** | BUILT — merge-base-equals-HEAD is legal at preflight, still a refusal at close |
+| **S4** | BUILT — `--plan` mechanises BUILD-METHOD M2's four states, and names the two things it cannot see |
 | **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
-| **S6** | phase members named for M6's PASS kinds, a meaning for `RUNNING`, and a verb that can write one |
-| **S7** | the amendment set — seven files, not four |
+| **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
+| **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
 
 ## Owner decision menu — all eight RESOLVED 2026-08-11
 
