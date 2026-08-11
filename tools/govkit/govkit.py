@@ -275,6 +275,33 @@ def selfcheck(root: pathlib.Path) -> int:
                    f"exactly one — a pattern matching none is unfillable and one matching several "
                    f"cannot say which is the version")
 
+    # ---- 5b: the version claims cross-checked against the repo's OWN version gate, BOTH directions.
+    #
+    # This arm exists because without it the registry is a SECOND POPULATION describing the same
+    # fact as `check-kit-versions.sh`'s `need` list, and nothing would assert they agree — which is
+    # exactly the defect class this unit was built to close, reproduced inside the unit. It is not a
+    # tautology: the two sides are authored independently, in different languages, by different
+    # units. A disagreement is REPORTED rather than repaired; repairing gov's own version bookkeeping
+    # is a stated non-goal of this unit and is filed as its own backlog row.
+    gate = root / "tools" / "check-kit-versions.sh"
+    if gate.is_file():
+        gate_txt = gate.read_text(encoding="utf-8", errors="replace")
+        gate_files = set(re.findall(r'^need\s+"[^"]*"\s+(\S+)', gate_txt, re.M))
+        reg_files: dict[str, str] = {}
+        for eid, (d, _dpath) in descs.items():
+            vf = d.get("version_from") or {}
+            if "none" in vf or not vf.get("file"):
+                continue
+            home = (d.get("home") or "").rstrip("/")
+            reg_files[f"{home}/{vf['file']}" if home else vf["file"]] = eid
+        for f, eid in sorted(reg_files.items()):
+            if f not in gate_files:
+                r.note(f"entry '{eid}' declares a version constant in '{f}' that "
+                       f"tools/check-kit-versions.sh does not assert — reported, not repaired")
+        for f in sorted(gate_files - set(reg_files)):
+            r.note(f"tools/check-kit-versions.sh asserts a constant in '{f}' that no registry entry "
+                   f"claims — reported, not repaired")
+
     # ---- 6: every declared hole carries a discharge probe. A hole observed by NEITHER flag is the
     #         majority case measured across the shipped kits, and there the probe is the only
     #         evidence the hole exists at all.
