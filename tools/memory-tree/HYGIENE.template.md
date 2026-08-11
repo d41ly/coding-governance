@@ -190,8 +190,8 @@ sibling test is a named failure. `*.test.sh` is excluded, because a fixture that
 would otherwise demand a `<stem>.test.test.sh` that will never exist.
 
 The key is `(gate, check number, ordinal)`. The gate is in the key because the PIN's keys are global
-and two gates both number their checks from 1 — measured, seven keys are claimed by both of this
-repo's gates. The ordinal is in the key because one number can carry several branches and a
+and several gates number their checks from 1, so keys collide across gates — `--report` prints the
+current overlap. The ordinal is in the key because one number can carry several branches and a
 number-keyed pin lets the cheapest arm hide the valuable one.
 
 A branch's signature ends at the first UNESCAPED closing quote of its message. Capturing to end of
@@ -215,7 +215,8 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
-The pin is EMPTY today — 30 of 30 branches across both gates are armed — and an empty pin is the
+The pin is EMPTY today — every discovered branch is armed; `--report` prints the count, and this
+sentence deliberately does not, because a number written here rots while the gate stays green — and an empty pin is the
 file's working state, not its retirement. A row appears when a new branch lands that no fixture can
 reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
 from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
