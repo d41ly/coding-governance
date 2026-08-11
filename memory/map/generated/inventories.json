@@ -91,6 +91,7 @@
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
       "pin-copied-from-another-corpus.md",
+      "second-implementation-is-not-a-second-opinion.md",
       "subprocess-resolves-a-different-shell.md",
       "trailing-comma-counted-as-an-element.md",
       "two-answers-to-one-question.md",

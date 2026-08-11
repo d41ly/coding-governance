@@ -204,7 +204,18 @@ act was taken. It does not prevent one.
 rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
 now inert rather than detected — neither value is read at all. Two more are neutralised for this
 kit's own reads and named where they sit: an object-substitution ref and a graft file, either of
-which rewrites what a sha MEANS at a perfectly honest anchor.
+which rewrites what a sha MEANS at a perfectly honest anchor. Their mere PRESENCE in a repo carrying
+a run-state file is also refused outright, because suppression only makes THIS kit's reads honest
+and binds no other tool that reads the same objects.
+
+Two further defects were closed on the same evidence discipline, neither of them about the anchor.
+A marker line is now the marker or the pair is malformed: the marker test was a prefix test followed
+by a skip, so text appended to the `run:mandate` line itself sat in neither extracted slice — a run
+widened its own authorization inside the block a human reads while both sides compared byte-equal.
+And the recorded BASE is now asserted to be an ANCESTOR of the anchor rather than equal to the
+merge-base: equality was a proxy that holds only while a run is live, so the first successful
+landing moved the merge-base past the pin and red the bar permanently, on an honest tree with no
+attacker involved.
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
 commits it — nothing binds the executing code to code an owner approved. A run that shims the

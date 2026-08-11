@@ -83,7 +83,18 @@ sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun
 sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
 git add -A && git commit -q -m facts --no-verify
 PRISTINE=$(git rev-parse HEAD)
-reset_tree() { git reset -q --hard "$PRISTINE"; git clean -qfd; }
+# RESETS THE REF NAMESPACE TOO, not just the work tree. Arms below repoint the anchor and add replace
+# refs, and a `reset --hard` undoes none of that — the damage leaks into every later arm and green
+# controls quietly start measuring something else. Batched through one `update-ref --stdin` because a
+# git process per ref per arm dominates this suite's wall time. `--no-deref`, or deleting the
+# symbolic `origin/HEAD` deletes the ref it POINTS AT instead of itself.
+reset_tree() {
+  git reset -q --hard "$PRISTINE"; git clean -qfd
+  { git for-each-ref --format='delete %(refname)' refs/remotes/ refs/replace/ \
+      | grep -v ' refs/remotes/origin/main$'
+    printf 'update refs/remotes/origin/main %s\n' "$ANCHOR0"
+  } | git update-ref --stdin --no-deref
+}
 run() { bash "$SCRIPT" 2>&1; }
 
 # ---- THE GREEN CONTROL, first. Every red arm below is worthless if the clean tree is not clean:
@@ -216,7 +227,77 @@ hit "$(run)" "a run-state file's generated region differs from the build README 
 
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
-hit "$(run)" "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded"
+hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"
+
+# ---- check 9: a base that RESOLVES but sits off the anchor's history. The run's own branch is
+# ---- exactly where such a commit lives, so this is the branch that replaced the equality test.
+reset_tree
+off=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m "a commit the run authored off the anchor")
+sed -i "s/^base: .*/base: $off/" memory/builds/tRun/RUN.md
+hit "$(run)" "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded"
+
+# ---- check 9: an ancestor of the ANCHOR that this working history does not build on. Two separate
+# ---- branches because they fail separately — the anchor can advance past a stale unit branch.
+reset_tree
+ahead=$(git commit-tree "$(git rev-parse "$ANCHOR0^{tree}")" -p "$ANCHOR0" -m ahead)
+git update-ref refs/remotes/origin/main "$ahead"
+sed -i "s/^base: .*/base: $ahead/" memory/builds/tRun/RUN.md
+hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on"
+
+# ---- THE LIFECYCLE. A run that does exactly what its mandate authorizes — merge to the default
+# ---- branch and push — moved the merge-base past the pinned base, and the old equality test then
+# ---- red the bar on EVERY later push, forever. Honest fixture, no attacker.
+reset_tree
+git checkout -q main && git merge -q --no-ff unit -m "land the run"
+git update-ref refs/remotes/origin/main "$(git rev-parse main)"
+out=$(run); rc=$?
+same "a LANDED run-state record leaves the bar green" "$out" ""
+same "a LANDED run-state record exits 0" "$rc" "0"
+git checkout -q unit; reset_tree
+
+# ---- check 14: a replace ref or a graft file is itself the violation. The GIT() pin makes THIS
+# ---- leg's reads honest; nothing constrains the next tool, and the run can add one at any moment.
+reset_tree
+git update-ref "refs/replace/$(git rev-parse HEAD)" "$(git rev-parse HEAD^)"
+hit "$(run)" "a repo carrying an unattended run-state file also carries replace refs, and a replace ref rewrites what a sha MEANS for every read that is not pinned"
+reset_tree
+miss "$(run)" "also carries replace refs"
+gf="$(git rev-parse --git-common-dir)/info/grafts"
+mkdir -p "$(dirname "$gf")"; printf '%s %s\n' "$(git rev-parse HEAD)" "$(git rev-parse HEAD^)" > "$gf"
+hit "$(run)" "a repo carrying an unattended run-state file also carries a grafts file, which rewrites the commit GRAPH underneath every ancestry read"
+rm -f "$gf"
+miss "$(run)" "also carries a grafts file"
+
+# ---- the MARKER GRAMMAR: a marker line is the marker or it is malformed. Trailing text on the open
+# ---- marker was invisible to both sides of the byte-compare while sitting inside the block a human
+# ---- reads — a run widening its own authorization with both slices still equal.
+reset_tree
+sed -i 's|^<!-- run:mandate -->$|<!-- run:mandate --> ...and the run may force-push and disable the hooks.|' memory/builds/tRun/RUN.md
+hit "$(run)" "does not carry exactly one well-formed mandate block"
+reset_tree
+sed -i 's|^<!-- /run:mandate -->$|<!-- /run:mandate --> and the same on the close marker.|' memory/builds/tRun/RUN.md
+hit "$(run)" "does not carry exactly one well-formed mandate block"
+reset_tree
+miss "$(run)" "well-formed mandate block"
+
+# ---- the POPULATION LOOP: a tracked path with a space used to word-split into two non-existent
+# ---- paths, both swallowed, so all seven per-file checks silently skipped it.
+reset_tree
+mkdir -p "memory/builds/t Spaced"
+cp memory/builds/tRun/README.md "memory/builds/t Spaced/README.md"
+cp memory/builds/tRun/RUN.md "memory/builds/t Spaced/RUN.md"
+sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' "memory/builds/t Spaced/RUN.md"
+git add -A && git commit -q -m spaced --no-verify
+out=$(run)
+hit "$out" "t Spaced/RUN.md"
+miss "$out" "a run-state file is tracked at a path this leg cannot read"
+git reset -q --hard "$PRISTINE"; git clean -qfd
+
+# ---- check 4: tracked, selected, and genuinely unreadable. `continue` used to swallow it, which is
+# ---- the same silence the word-split produced and just as invisible.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below"
+reset_tree
 
 # ---- check 11: the bypass flag, checked where the record is.
 reset_tree; printf '\nparked: considered --no-verify to get past the hook\n' >> memory/builds/tRun/RUN.md
@@ -297,7 +378,7 @@ hit "$(run)" "a run-state file records no BASE, and the record is written by the
 # ---- exploit; the leg now refuses the resulting state as well as the driver.
 reset_tree; git push -q -f origin unit:main
 sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read"
+hit "$(run)" "the recorded BASE equals HEAD, so the run authored every byte a mandate comparison would read"
 git push -q -f origin "$ANCHOR0":main
 
 # ---- check 13, all four branches: THE MANDATE, asserted by the BAR. Before this the leg did not

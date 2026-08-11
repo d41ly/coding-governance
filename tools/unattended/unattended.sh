@@ -95,10 +95,11 @@ MAN_OPEN='<!-- run:mandate -->';     MAN_CLOSE='<!-- /run:mandate -->'
 # owner-authored mandate block. Recording the two line numbers and comparing them is the whole fix.
 region() { # file · open · close   (reads stdin when file is `-`)
   awk -v o="$2" -v c="$3" '
-    index($0, o) == 1 { no++; if (no == 1) oat = NR; if (nc == 0) inside = 1; next }
-    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; inside = 0; next }
+    { ln = $0; sub(/\r$/, "", ln) }
+    index(ln, o) == 1 { if (ln != o) bad = 1; no++; if (no == 1) oat = NR; if (nc == 0) inside = 1; next }
+    index(ln, c) == 1 { if (ln != c) bad = 1; nc++; if (nc == 1) cat = NR; inside = 0; next }
     inside { print }
-    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
+    END { if (bad || no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
@@ -106,13 +107,14 @@ region() { # file · open · close   (reads stdin when file is `-`)
 # the same order check — this is the copy whose absence destroyed data rather than merely lying.
 splice() { # file · open · close · payload-file
   awk -v o="$2" -v c="$3" -v pf="$4" '
-    index($0, o) == 1 { no++; if (no == 1) oat = NR; print
+    { ln = $0; sub(/\r$/, "", ln) }
+    index(ln, o) == 1 { if (ln != o) bad = 1; no++; if (no == 1) oat = NR; print
                         while ((getline pl < pf) > 0) { sub(/\r$/, "", pl); print pl }
                         close(pf); skip = 1; next }
-    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; skip = 0; print; next }
+    index(ln, c) == 1 { if (ln != c) bad = 1; nc++; if (nc == 1) cat = NR; skip = 0; print; next }
     skip { next }
     { print }
-    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
+    END { if (bad || no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
