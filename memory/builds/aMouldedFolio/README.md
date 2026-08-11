@@ -50,5 +50,5 @@ do not hand-edit it.
 | [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | CLOSED | rev-3 | 2026-08-11 |
 | [TOOL-aMouldedFolio-3 — the build README's folder claim becomes derived, because 15 of 17 are false](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md) | SPECCED | rev-2 | 2026-08-11 |
 | [TOOL-aMouldedFolio-4 — one marker contract across four readers, and a test that drives all four](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md) | SPECCED | rev-2 | 2026-08-11 |
-| [TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md) | SPECCED | rev-2 | 2026-08-11 |
+| [TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md) | CLOSED | rev-2 | 2026-08-11 |
 <!-- /gen:build-index -->

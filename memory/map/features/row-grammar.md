@@ -70,10 +70,11 @@ test; extend by widening the family character class, never by rebuilding it from
 
 ## Gaps
 
-- The fence toggle is a bare boolean and is not checked at EOF, so an unterminated fence hides every
-  remaining row in that file, and `~~~` fences are not recognised at all.
-- The `unkeyed` assertion is zero-tolerance with no waiver, and it reports a bare count rather than
-  the path and line the duplicate branch prints.
+- CLOSED by TOOL-aMouldedFolio-5: fence handling delegates to the index generator's reader, so
+  `~~~` and marker-matched close come for free, and an unterminated fence is now a named refusal
+  naming the file and the opening line. The five shell replicas of `_unfenced` keep the defect —
+  they exit 0 with the fence open — and that is a named non-goal, not an oversight.
+- CLOSED by TOOL-aMouldedFolio-5: `unkeyed` reports path and line per offender.
 - The root is resolved from the tree being audited, but the first cut walked up from the module's own
   location and graded the kit's repo instead. The arm that covers it shells out with a foreign cwd,
   because every other arm passes an explicit root and so cannot reach the resolver at all.

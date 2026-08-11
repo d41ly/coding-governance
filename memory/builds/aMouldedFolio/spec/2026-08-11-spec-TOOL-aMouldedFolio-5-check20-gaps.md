@@ -1,6 +1,6 @@
 # TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
 ## 1. Goal
 

@@ -116,19 +116,40 @@ def load_conf(root: str) -> dict:
     return conf
 
 
-def unfenced(text: str):
+def unfenced_lines(text: str):
+    """Yield (lineno, line) for every line OUTSIDE a fenced block, then the open fence's line.
+
+    The final yield is `(opened_at, None)` when the document ends inside a fence, and nothing when it
+    does not. A caller that only wants the text ignores it; a caller that must REFUSE a document it
+    could not fully read needs it, and no reader in either kit had it — the shell `_unfenced` and this
+    module's own generator both end silently with the fence still open, dropping every later line at
+    exit 0. That is invisible by construction: a fence opened near the top of a row document hides
+    every duplicate below it, and hiding duplicates is what the check that reads this exists to stop.
+    """
     fence = ""
-    for line in text.split("\n"):
+    opened_at = 0
+    for n, line in enumerate(text.split("\n"), 1):
         stripped = line.lstrip()
         if stripped.startswith("```") or stripped.startswith("~~~"):
             mark = "```" if stripped.startswith("```") else "~~~"
             if not fence:
-                fence = mark
+                fence, opened_at = mark, n
                 continue
+            # Only the marker that OPENED the fence closes it: a ``` line inside a ~~~ block is
+            # content, not a toggle.
             if mark == fence:
                 fence = ""
                 continue
         if not fence:
+            yield n, line
+    if fence:
+        yield opened_at, None
+
+
+def unfenced(text: str):
+    """The text-only view, kept as the one fence machine's façade rather than a second copy."""
+    for _n, line in unfenced_lines(text):
+        if line is not None:
             yield line
 
 

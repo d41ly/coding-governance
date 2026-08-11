@@ -1748,6 +1748,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "unfenced_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "walk",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
