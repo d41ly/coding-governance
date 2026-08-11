@@ -133,16 +133,17 @@ obligation — grep the tree and the nearest record, and write in §10 what you 
 **A PASS is exactly one of:** a spec authored · a spec reviewed · a review's fixes folded in · a unit built · the
 closing diff review. Nothing else is a pass.
 
-**Commit at the end of every pass**, on the run's branch, with the unit id in the subject. The bug-class checklist
-needs a NON-EMPTY range, so stage the pass first:
+**Commit at the end of every pass**, on the run's branch, with the unit id in the subject. Then run the bug-class
+checklist over what you just committed, and act on it before the next pass begins:
 
 ```bash
-git add -- <the pass's paths> && python {{KIT_DIR}}/gotchas.py --for-diff <pass-base>..HEAD
+python {{KIT_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
-`<pass-base>` is the sha the pass started from — the previous pass's commit, or the run's BASE for the first.
-`HEAD..HEAD` resolves to an empty range and prints "touches no file", which reads as a clean checklist and is not
-one. Its stdout IS the checklist and it always exits 0 — finish it, do not read its status. Then the diff-scoped
+**It takes a COMMITTED range, so it runs after the commit, not before it.** Staged-but-uncommitted work is not in
+`HEAD`, so the pre-commit spelling `<pass-base>..HEAD` resolves to an empty range and prints "touches no file" —
+which reads as a clean checklist and is not one. Its stdout IS the checklist and it always exits 0 — finish it, do
+not read its status. If a class it names is already violated, that is the next pass. Then the diff-scoped
 gates for what the pass touched; the full bar runs ONCE, at the push boundary. A pass whose gate is red is not
 followed by another: fix it, or park it with the reason. A pass that produced no change commits nothing and says so.
 
