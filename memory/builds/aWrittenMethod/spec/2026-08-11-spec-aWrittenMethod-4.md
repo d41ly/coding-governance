@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-4 — a gate for the sixth carrier
 
-**Status:** SPECCED · rev-5 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-6 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -287,6 +287,13 @@ review already punished.
   registry cannot both ship empty and carry this repo's rows when the repo dogfoods the kit, and both
   candidate homes cost something M3 reserves for the owner. Recorded as F4 and parked. Nothing was
   written — no leg, no registry, no gate-legs.json row — so the tree carries no half-built check.
+- rev-6 · 2026-08-11 · BUILT on branch. Bar 48/48 at 49 legs. AC11 observed: hygiene redded naming
+  the new registry BEFORE the widening, so the widening was necessary rather than assumed. AC12d
+  verified in a scratch adoption — six registries, and the seeded leg green on three carriers the
+  adopter tree measured itself. Two things the build found: adding the registry DESCRIPTION to
+  HYGIENE.template.md made that file a method carrier, so it is declared rather than reworded away;
+  and the first leg draft carried its failure logic twice, once in pipeline subshells where st=1 is
+  set and discarded, which is the shape that makes a red gate exit 0.
 - rev-5 · 2026-08-11 · folded audit `wf_60c1e357-19d` (3 blockers, 4 highs). Rev-4 claimed the F4
   move REMOVED the adopter asymmetry; it renames it. The kit ships two files that are themselves
   method carriers, so an adopter reds on install unless the scaffolder seeds the registry — S2c, and

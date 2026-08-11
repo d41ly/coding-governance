@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.5   # gov:kit memory-tree@2.5 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.6   # gov:kit memory-tree@2.6 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -223,12 +223,12 @@ b3c=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/" | awk -F/ -v m="$M" '
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$b3b" "$b3c")
 # project/ holds the gate's OWN waiver registries and nothing else (aMendedLedger U3). The session
 # machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —
-# is retired, and the `F:*.md` catch-all goes with it: a directory defined as five named files cannot
+# is retired, and the `F:*.md` catch-all goes with it: a directory defined as six named files cannot
 # also admit any `.md` anyone drops in. Nothing scaffolds those names any more either, so an
 # admitted-but-never-written entry would be a third answer to a question this list is closing.
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 # The precondition is deliberately UN-SEGMENTED (see pop_guard): `project/` is drained of session
-# machinery, not emptied — the five registries stay — so the population is 5 on a real tree and 0
+# machinery, not emptied — the six registries stay — so the population is 6 on a real tree and 0
 # only when the path expression is mis-segmented, which is the one shape that silently disarms this
 # sub-lint. A tree with no `.txt` anywhere is a young tree and stays silent.
 PRE_REGISTRY=$(printf '%s\n' "$FILES" | grep -cE '\.txt$')
@@ -237,6 +237,7 @@ pop_guard 3 "no registry under $M/project/" \
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:legacy-files.txt|F:curation-debt.txt) ;;
   F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
+  F:method-carriers.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then

@@ -23,7 +23,7 @@ closed enum `.memory-tree.conf` declares. A build that spans two disciplines is 
 - [map/](map/) — the self-verifying codebase map: feature dossiers, the shrink-only baseline, generated artifacts.
 - [archive/](archive/) — rotated indexes, template version snapshots, and the RETIRED session ledger at [archive/ledger/](archive/ledger/).
 - [ledger/](ledger/) — GENERATED month shards, one row per build opened that month. Never hand-edited.
-- [project/](project/) — the gate's own waiver registries (`*.txt`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches.
+- [project/](project/) — the gate's own waiver registries (`*.txt`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers.
 
 ## Streams (the closed enum)
 

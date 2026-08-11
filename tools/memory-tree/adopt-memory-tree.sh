@@ -94,7 +94,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
   echo "## Directories"; echo
   echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
-  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches."; echo
+  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers."; echo
   echo "## Streams (the closed enum)"; echo
   echo "| Value | Family |"; echo "|---|---|"
   for d in $DISCIPLINES; do echo "| \`$d\` | \`$(FAMILY_of "$d")\` |"; done
@@ -113,7 +113,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. ALL FIVE are written here, not two:
+# project/ — the gate's OWN waiver registries and nothing else. ALL SIX are written here, not two:
 # three of them are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py) and were created
 # by nothing, so an adopter met them as a missing file rather than as an empty ratchet. The gate reads
 # "absent" and "present and empty" identically, which is exactly what makes the omission invisible.
@@ -135,6 +135,28 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
 ' > "$M/project/unarmed-branches.txt"
+# method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
+# files that POINT AT the build method — this adopter is one, the kit README is another — so an
+# adopter handed an empty registry reds on install with carriers they never wrote. The seed is
+# measured from THEIR tree with the same predicate the leg uses, so gov's paths never travel.
+{
+  printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
+  printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
+  printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
+  printf '# <path>:<line> - that keying is what unpinned install-prefix-waivers.txt.\n'
+  printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
+  git ls-files 2>/dev/null | while IFS= read -r f; do
+    case "$f" in
+      "$M"/*) continue ;;
+      "$KIT_REL"/BUILD-METHOD.template.md) continue ;;
+      "$KIT_REL"/check-method-carriers.sh) continue ;;
+      *.test.sh) continue ;;
+    esac
+    if grep -qF 'BUILD-METHOD.md' "$f" 2>/dev/null; then
+      printf '%s \xc2\xb7 declared at adoption; replace this with why it points at the method\n' "$f"
+    fi
+  done
+} > "$M/project/method-carriers.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")
