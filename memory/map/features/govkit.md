@@ -70,10 +70,9 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
 - `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan` and `check`, and `apply` /
-  `apply --resume` with the receipt. `intake` is a later rollout commit and is ABSENT rather than
-  stubbed, because a subcommand that parses and does nothing is indistinguishable from one that
-  works. `apply` lands the roles it can honour and refuses the others BY NAME, and reports the two
-  steps of the hard order it cannot perform on every run rather than skipping them quietly.
+  `apply --resume` with the receipt, and `intake`. All five verbs. `apply` lands the roles it can
+  honour and refuses the others BY NAME, and reports the two steps of the hard order it cannot
+  perform on every run rather than skipping them quietly.
 - `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
   arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
   six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.
@@ -103,6 +102,10 @@ unit exists to replace:
   the real one; the receipt records them, `apply` does not write them.
 - **The gate-runner and CI emitter is not built.** S5's last step is reported as SKIPPED on every
   run.
-- **`intake` is absent**, so a target descriptor is authored by hand today.
+- **The runbook demotion and its parity gate are not built.** `WIRE-INTO-PROJECT.md` is still the
+  prose runbook rather than narrative kept honest by a gate asserting every descriptor step has a
+  section and the reverse.
+- **`skills/deploy-governance/SKILL.md` is not written**, so an agent still reaches for the runbook
+  rather than the deployer.
 - **Two AC10 assertions are unimplemented**: the guard-class partition, and the derived
   `mutates_index`. The version cross-check landed.

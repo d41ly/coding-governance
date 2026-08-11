@@ -246,6 +246,41 @@ def main() -> int:
         check("that refusal says there is no install to resume",
               "no install here to resume" in p.stderr, p.stderr)
 
+        # ================= intake =================
+        # AC12: given a prepared answer stream, intake writes a descriptor `apply` accepts with no
+        # further prompting. The arm is the CHAIN, not the file: intake then apply, no hand editing.
+        ik = make_target(tmp / "h", None)
+        p = run("intake", "--target", str(ik), "--kits", "check-wiring")
+        check("intake exits 0 when the selection needs no answers", p.returncode == 0,
+              p.stdout + p.stderr)
+        check("intake wrote the descriptor", (ik / ".governance" / "deploy.toml").is_file())
+        p = run("apply", "--target", str(ik), "--kits", "check-wiring")
+        check("apply accepts intake's descriptor with no further prompting", p.returncode == 0,
+              p.stdout + p.stderr)
+
+        # --- intake refuses to invent an answer, and NAMES the ones it wants.
+        ik2 = make_target(tmp / "i", None)
+        p = run("intake", "--target", str(ik2), "--kits", "playbook")
+        check("intake refuses when an answer is missing", p.returncode == 2)
+        check("intake names the missing answers", "playbook_path" in p.stderr, p.stderr)
+        check("intake refuses to INVENT one", "Refusing to invent" in p.stderr, p.stderr)
+        check("intake wrote nothing when it refused",
+              not (ik2 / ".governance" / "deploy.toml").exists(), "")
+
+        p = run("intake", "--target", str(ik2), "--kits", "playbook",
+                "--answer", "playbook_path=docs/PARALLEL.md",
+                "--answer", "playbook_dir=docs")
+        check("intake accepts a prepared answer stream", p.returncode == 0, p.stdout + p.stderr)
+        check("the descriptor records the answers",
+              "playbook_path" in (ik2 / ".governance" / "deploy.toml").read_text(encoding="utf-8"))
+
+        # --- intake will NOT silently rewrite a standing authorization.
+        p = run("intake", "--target", str(ik2), "--kits", "playbook",
+                "--answer", "playbook_path=x", "--answer", "playbook_dir=y")
+        check("intake refuses to overwrite an existing descriptor", p.returncode == 2)
+        check("that refusal calls it the standing authorization",
+              "standing authorization" in p.stderr, p.stderr)
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

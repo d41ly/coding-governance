@@ -3,10 +3,11 @@
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. `selfcheck`, the read-only `plan` and `check`, and
-`apply` / `apply --resume`. `intake` is a later rollout commit and is ABSENT rather than stubbed: a
-subcommand that parses and does nothing is indistinguishable, from the outside, from one that works,
-and this unit exists because that class of silence ships broken installs.
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. All five verbs: `selfcheck`, the read-only `plan`
+and `check`, `apply` / `apply --resume`, and `intake`. What it does NOT do is stated on every run
+rather than left to be discovered — see the two SKIPPED lines `apply` prints. A subcommand that
+parses and does nothing is indistinguishable, from the outside, from one that works, and this unit
+exists because that class of silence ships broken installs.
 
 `apply` lands the roles it can honour and REFUSES the ones it cannot, by name. Two steps of S5's hard
 order have no implementation anywhere in this repo — writing a gov-owned region into a target-owned
@@ -811,6 +812,83 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     return r.emit()
 
 
+# ---------------------------------------------------------------------------------------- intake
+def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> list[str]:
+    """Every token a selected kit's destinations and probes need that is not derived.
+
+    Derived from the descriptors, never listed: a hand-kept question list is how `intake` stops
+    asking for something a kit started needing.
+    """
+    derived = {"prefix", "kit", "kit_id", "relpath", "memory_root"}
+    want: set[str] = set()
+    for eid in selection:
+        d, _p = descs[eid]
+        blobs: list[str] = []
+        for rule in d.get("files", []):
+            to = rule.get("to")
+            blobs += (to if isinstance(to, list) else [to]) if to else []
+        for h in d.get("hole", []):
+            blobs += (h.get("discharge") or {}).get("command") or []
+        for b in blobs:
+            want.update(k for k in TOKEN_RX.findall(b or "") if k not in derived)
+    return sorted(want)
+
+
+def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+               answers: dict[str, str]) -> int:
+    """Write the target descriptor ONCE, from answers supplied non-interactively.
+
+    AC12's shape: given a prepared answer stream, `intake` writes a `deploy.toml` that
+    `apply` accepts with no further prompting. It refuses to invent an answer, and it refuses to
+    overwrite a descriptor that already exists — that file is the standing authorization for an
+    unattended re-run, and silently rewriting it would replace a decision the operator made.
+    """
+    r = Report()
+    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    descs = read_descriptors(root, reg, r)
+    if r.problems:
+        return r.emit()
+    selection = resolve_selection(descs, mode, kits)
+    out = target / ".governance" / "deploy.toml"
+    if out.is_file():
+        raise Refusal(
+            f"{out.as_posix()} already exists. It is the standing authorization for an unattended "
+            f"re-run, so this verb will not silently rewrite a decision the operator already made; "
+            f"edit it, or remove it deliberately"
+        )
+    need = needed_answers(descs, selection)
+    missing = [k for k in need if k not in answers]
+    if missing:
+        raise Refusal(
+            "the selected kits need answer(s) " + ", ".join(missing) +
+            " and none was supplied. Refusing to invent one: an answer this tool guesses is one the "
+            "operator never made and cannot audit. Supply them as --answer key=value"
+        )
+    body = ['# deploy.toml — written once by `govkit intake`. Committed, it is the standing',
+            '# authorization for an unattended re-run: it carries every owner decision, so a later',
+            '# `apply` reads answers rather than asking for them again.',
+            '',
+            f'gov_source = "{root.as_posix()}"',
+            f'gov_commit = "{git(root, "rev-parse", "HEAD").strip()}"',
+            'prefix = "tools"',
+            'kits = [' + ", ".join(f'"{k}"' for k in selection) + ']',
+            '',
+            '[answers]']
+    body += [f'{k} = "{answers[k]}"' for k in need]
+    body += ['', '[policy]',
+             '# on_baseline_red: proceed | refuse — a target leg already red BEFORE the install',
+             'on_baseline_red = "proceed"',
+             '# on_hook_block: report | refuse — apply never commits, so no pre-commit hook fires',
+             '# during an install; this exists so a target whose hooks WILL refuse the operator\'s',
+             '# own landing commit is told before they discover it by hand.',
+             'on_hook_block = "report"', '']
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("\n".join(body), encoding="utf-8", newline="\n")
+    print(f"govkit intake — wrote {out.as_posix()} for {len(selection)} kit(s); "
+          f"{len(need)} answer(s) recorded")
+    return r.emit()
+
+
 def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tuple[dict, str]]:
     """Shared by every verb: the registry's entries, parsed. A missing one is a refusal, not a skip."""
     descs: dict[str, tuple[dict, str]] = {}
@@ -833,24 +911,32 @@ USAGE = """usage:
   govkit.py plan  --target <path> [--kits a,b | --all]
   govkit.py check --target <path>
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
+  govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
-`plan` and `check` are READ-ONLY and neither writes a byte. `intake` is a later rollout commit and is
-absent rather than stubbed — a subcommand that parses and does
+`plan` and `check` are READ-ONLY and neither writes a byte. `intake` writes the target descriptor
+ONCE and refuses to overwrite one that exists — a subcommand that parses and does
 nothing looks exactly like one that works, from the outside, and this unit exists because that class
 of silence ships broken installs.
 """
 
 
-def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str], bool]:
+def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str], bool, dict[str, str]]:
     verb = argv[0]
     target: pathlib.Path | None = None
     mode, kits = "default", []
     resume = False
+    answers: dict[str, str] = {}
     i = 1
     while i < len(argv):
         a = argv[i]
         if a == "--target" and i + 1 < len(argv):
             target = pathlib.Path(argv[i + 1]).resolve()
+            i += 2
+        elif a == "--answer" and i + 1 < len(argv):
+            k, _, v = argv[i + 1].partition("=")
+            if not _:
+                raise Refusal(f"--answer needs key=value, got: {argv[i + 1]}")
+            answers[k.strip()] = v
             i += 2
         elif a == "--resume":
             resume = True
@@ -863,7 +949,7 @@ def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits, resume
+    return verb, target, mode, kits, resume, answers
 
 
 def main(argv: list[str]) -> int:
@@ -871,13 +957,13 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits, RESUME = parse_args(argv)
+        verb, target, mode, kits, RESUME, ANSWERS = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             if len(argv) != 1:
                 raise Refusal("selfcheck takes no arguments")
             return selfcheck(root)
-        if verb in ("plan", "check", "apply"):
+        if verb in ("plan", "check", "apply", "intake"):
             if target is None:
                 raise Refusal(
                     f"{verb} needs an explicit --target. Refusing to default it to the process cwd: "
@@ -889,6 +975,8 @@ def main(argv: list[str]) -> int:
                 return cmd_plan(root, target, mode, kits)
             if verb == "check":
                 return cmd_check(root, target)
+            if verb == "intake":
+                return cmd_intake(root, target, mode, kits, ANSWERS)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

@@ -343,6 +343,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_intake",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "cmd_plan",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -966,6 +971,11 @@
       "id": "module_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "needed_answers",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "no_misfiled_rows",
