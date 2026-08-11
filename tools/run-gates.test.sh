@@ -86,7 +86,7 @@ cat > "$SCRATCH/tools/gate-legs.json" <<'JSON'
 JSON
 ( cd "$SCRATCH" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
 
-run_scratch() { ( cd "$SCRATCH" && GATE_FULL= GATE_JOBS=$1 bash tools/run-gates.sh 2>&1 ); }
+run_scratch() { ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash tools/run-gates.sh 2>&1 ); }
 
 # 3a. width 1 and width 4 agree line for line. This is the equivalence the pool rests on: one code
 #     path, so the serial reading is not a second implementation that can drift.
@@ -149,7 +149,7 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 #     HANG the bar rather than red it — converting a production hang into a hang on the gate.
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
-  out=$(GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); trc=$?
+  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); trc=$?
   [ "$trc" = 124 ] && { echo "canary: GATE_JOBS='$w' never terminated — the clamp let it spin"; fail=1; continue; }
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
@@ -179,7 +179,7 @@ json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)
 #     parent scratch repo and the arm runs the 4-leg manifest at width 1: exactly the configuration
 #     the comment above forbids, reported green. So assert the run HAPPENED first.
 for rep in 1 2 3 4; do
-  o=$( cd "$SCRATCH/many" && GATE_JOBS=1 bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 30/30 legs passed$' \
     || { echo "canary: the 30-leg width-1 fixture did not run — arm 3g proves nothing"
          printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; break; }
@@ -212,14 +212,14 @@ JSON
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
-o=$( cd "$G" && GATE_FULL= GATE_JOBS=4 bash tools/run-gates.sh 2>&1 )
+o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash tools/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 # Pass 2 with origin/HEAD pinned: the guard path resolves and the unchanged leg must SKIP.
 ( cd "$G" && git update-ref refs/remotes/origin/main HEAD \
   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 for w in 1 4; do
-  o=$( cd "$G" && GATE_FULL= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^GATE skip  guarded (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
@@ -237,7 +237,7 @@ grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
 #     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
 #     SAME fixture that skips without it, so the two readings differ only by the variable.
 for w in 1 4; do
-  o=$( cd "$G" && GATE_FULL=1 GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
     || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^GATE skip' \

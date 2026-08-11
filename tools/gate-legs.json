@@ -1,6 +1,6 @@
 [
   {
-    "name": "memory hygiene (19 checks)",
+    "name": "memory hygiene (20 checks)",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
@@ -163,6 +163,18 @@
     "argv": [
       "python3",
       "tools/memory-tree/gotchas.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "row-grammar selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/row_grammar.py",
       "--selftest"
     ],
     "guard": [
@@ -447,6 +459,17 @@
     "guard": [
       "tools/",
       "tools/gate-legs.json",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "run-gates evidence",
+    "argv": [
+      "bash",
+      "tools/run-gates.evidence.test.sh"
+    ],
+    "guard": [
+      "tools/",
       "tools/lib/"
     ]
   },

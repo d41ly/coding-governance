@@ -25,7 +25,7 @@
       "kit version markers",
       "kit/dogfood doc parity",
       "manifest-check self-test",
-      "memory hygiene (19 checks)",
+      "memory hygiene (20 checks)",
       "memory-hygiene self-test",
       "memory-recall kit selftest",
       "memory-recall skill wiring",
@@ -36,8 +36,10 @@
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
+      "row-grammar selftest",
       "row-keyed merge driver replay",
       "run-gates canary",
+      "run-gates evidence",
       "settings-merge selftest",
       "template size <=32KiB",
       "unattended adopter e2e",
@@ -97,6 +99,7 @@
       "vacuous-selector-empty-population.md"
     ],
     "guides": [
+      "BUILD-METHOD.md",
       "REVIEW-PROTOCOL.md",
       "UNATTENDED-PROTOCOL.md"
     ],

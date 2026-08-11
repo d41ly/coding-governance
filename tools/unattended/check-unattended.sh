@@ -14,7 +14,21 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.0   # gov:kit unattended@1.0 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — must match unattended.sh; check-kit-versions.sh pairs them
+
+# ------------------------------------------------------------------------------ the dereference pin
+# Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
+# every read, and a graft file rewrites the commit GRAPH, so check 13 could compare against the honest
+# anchor and still read forged bytes. Both MEASURED with live controls, and the two suppressions are
+# NOT interchangeable - only GIT_GRAFT_FILE stops the graft.
+#
+# The driver additionally refuses a run whose ENVIRONMENT supplies git config. This leg deliberately
+# does NOT. It runs on the bar, the bar runs under the pre-push hook, and which GIT_* variables git
+# exports to a hook varies by git version - measured unset for pre-push on this node, but a leg that
+# reds on another node's git is a false positive on the merge bar. The levers that matter are pinned
+# below rather than detected.
+export GIT_GRAFT_FILE=/dev/null
+GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended-check: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -149,7 +163,7 @@ for f in $RUNS; do
     # ---- not fetched) are skipped, which is legal ONLY because check 5 already refused absence.
     case "$w" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
-        git rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1 \
+        GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1 \
           || fail 6 "a witness looks like a sha and resolves to no commit in this history: $w in $f" ;;
       *) ;;   # not sha-shaped: unjudgeable, and skipping it is the discipline, not an omission
     esac
@@ -180,10 +194,10 @@ for f in $RUNS; do
       # REMOTE-TRACKING ONLY, matching the driver: a bare local branch is a ref the run can move
       # with `git branch -f`, which is how BASE was made to equal HEAD.
       for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-        git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-        mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
+        GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
+        mb=$(GIT merge-base "$b" HEAD 2>/dev/null) || continue
         [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
-        [ "$mb" != "$(git rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
+        [ "$mb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
         break
       done
     fi
@@ -197,8 +211,8 @@ for f in $RUNS; do
   # ---- This is deliberately a SECOND OPINION and not a second implementation: it re-extracts both
   # ---- blocks itself, from the base commit and from the working copy, and refuses on anything that
   # ---- is not exactly one well-formed block on each side.
-  if [ -n "$rb" ] && git rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
-    if bb=$(git show "$rb:$f" 2>/dev/null); then
+  if [ -n "$rb" ] && GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
+    if bb=$(GIT show "$rb:$f" 2>/dev/null); then
       ma=$(printf '%s\n' "$bb" | region - '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && ra=0 || ra=$?
       mb2=$(region "$f" '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && rb2=0 || rb2=$?
       if [ "$ra" != 0 ] || [ "$rb2" != 0 ]; then

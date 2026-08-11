@@ -4,7 +4,7 @@ node: a
 opened: 2026-07-19
 streams: playbook+tooling
 roster: PLAY+TOOL
-ids: PLAY-aPrunedCeremony-1..-4 · TOOL-aPrunedCeremony-1/-2
+ids: PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 PLAY-aPrunedCeremony-5 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2
 ---
 
 # aPrunedCeremony — gate-economy uplift (playbook + tooling)
@@ -112,7 +112,7 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
    port the signal. Detail in TOOL-2 §4/§8.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-07-19 · streams playbook+tooling · ids PLAY-aPrunedCeremony-1..-4 · TOOL-aPrunedCeremony-1/-2
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-07-19 · streams playbook+tooling · ids PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 PLAY-aPrunedCeremony-5 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

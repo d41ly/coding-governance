@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aTimedTurnstile-5
+ids: TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
 ---
 
 # aTimedTurnstile — the merge bar stops being the sum of its legs
@@ -22,7 +22,7 @@ This build makes them run together. A scratchpad prototype completed all 47 legs
 with `fails=0`, which is the number this unit is built to reproduce.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aTimedTurnstile-5
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

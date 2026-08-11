@@ -64,19 +64,32 @@ TEMPLATE="$KIT_DIR/SKILL.template.md"
 
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — render it after adopting the project layer"; exit 1; }
-MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""
+# An interpolated key left UNSET keeps its own placeholder, so an undeclared value reds on the
+# placeholder arm instead of rendering a clean sentence with a hole in it. Absence-of-placeholder is
+# not presence-of-value, and "" made every such key invisible to the only check looking for it.
+MEMORY_ROOT=memory; LANDER="{{LANDER}}"; KEEPALIVE_CREATE="{{KEEPALIVE_CREATE}}"
+KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVAL}}"
 # shellcheck disable=SC1090
 . "$CONF"
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
+PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"
+PROTO_REL="$MEMORY_ROOT/guides/UNATTENDED-PROTOCOL.md"
+PROTO_OUT="$ROOT/$PROTO_REL"
 
+# NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
+# the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
+# empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
+# truncation into a loud one. Escaping the values themselves is TOOL-aWrittenMethod-6.
 render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+  set -o pipefail 2>/dev/null || true
   sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
       -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" \
       -e "s|{{LANDER}}|$LANDER|g" \
       -e "s|{{KEEPALIVE_CREATE}}|$KEEPALIVE_CREATE|g" \
       -e "s|{{KEEPALIVE_DELETE}}|$KEEPALIVE_DELETE|g" \
+      -e "s|{{KEEPALIVE_INTERVAL}}|$KEEPALIVE_INTERVAL|g" \
       "$TEMPLATE" | tr -d '\r'
 }
 
@@ -86,7 +99,8 @@ if [ "$MODE" = "--check" ]; then
   [ -f "$SKILL_OUT" ] || { echo "unattended: $SKILL_OUT is not rendered — run $0"; exit 1; }
   TMP=$(mktemp) || exit 2
   trap 'rm -f "$TMP"' EXIT
-  render > "$TMP"
+  render > "$TMP" || { echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; refusing to compare"; exit 1; }
+  [ -s "$TMP" ] || { echo "unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
   if ! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1; then
     echo "unattended: $SKILL_OUT is out of sync with SKILL.template.md + .unattended.conf"
     echo "  re-render with: $0"
@@ -100,12 +114,37 @@ if [ "$MODE" = "--check" ]; then
     grep -nE '\{\{[A-Z_]+\}\}' "$SKILL_OUT" | head -5 | sed 's/^/    /'
     exit 1
   fi
+  # The adopter installs TWO artifacts, so --check verifies two. Checking only the one it renders
+  # reported "in sync" over a protocol half that had been deleted or hand-edited — and check 10 of
+  # the gate fails HARD when that half is missing, so the drift would surface as an unexplained gate
+  # failure somewhere else entirely.
+  if [ ! -f "$PROTO_OUT" ]; then
+    echo "unattended: $PROTO_REL is missing — run $0 to install the protocol's live half"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $PROTO_REL has drifted from the shipped protocol; re-run $0"; exit 1
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
 
+# THE PROTOCOL PAIR. check 10 compares the SHIPPED protocol against the installed copy, and fails
+# hard when either half is missing — "a parity check with one file is a check that cannot fail".
+# Nothing installed the live half, so that check was UNPASSABLE in every adopter: the kit shipped
+# a gate its own adopter could not satisfy. Copied, not rendered — the protocol carries no
+# placeholder, so a render step would be a second spelling of `cat`.
+mkdir -p "$ROOT/$MEMORY_ROOT/guides"
+if [ ! -f "$PROTO_OUT" ] || ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$PROTO_SHIP" > "$PROTO_OUT"
+  echo "unattended: installed $PROTO_REL"
+fi
 mkdir -p "$SKILL_DIR"
-render > "$SKILL_OUT"
+TMPW=$(mktemp) || exit 2
+render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; the Skill is unchanged"; exit 1; }
+# Write through a temp file and refuse an EMPTY one. Redirecting straight into the target truncated it
+# to zero bytes the instant sed failed, and then reported success.
+[ -s "$TMPW" ] || { rm -f "$TMPW"; echo "unattended: the render produced an EMPTY file — refusing to install it over the Skill"; exit 1; }
+mv "$TMPW" "$SKILL_OUT"
 echo "unattended: rendered $SKILL_OUT"
 cat <<EOF
 unattended: next

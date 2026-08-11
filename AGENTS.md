@@ -3,9 +3,9 @@
 Project-agnostic governance + tooling for running Claude Code (or any agent) across several
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
 gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
-itself. The map lives at `memory/map/`; it carries two dossiers so far
-(`memory/map/features/codebase-map.md` and `memory-tree-merge-driver.md`) and 69 inventory keys are
-still in the shrink-only `baseline.toml`.
+itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
+keys not yet claimed by one are in the shrink-only `baseline.toml`. Both counts move as dossiers
+land, so neither is spelled here — `python tools/codebase-map/reuse_lookup.py` prints the live pair.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
 doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
@@ -60,6 +60,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 | `a` | daily-agent | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 | `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 | `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
+| `d` | d41ly | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
 minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
@@ -73,20 +74,23 @@ its shards sit frozen under `memory/archive/`.
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary; earlier runs are diff-scoped, and now MECHANICALLY so.
-The 30 self-test legs each carry a `guard` in `tools/gate-legs.json` naming the kit dir they exercise,
-so a records-only commit skips them and runs only the 17 legs that check this repo's actual state.
-**`GATE_FULL=1` bypasses every guard, and `.githooks/pre-push` sets it**, so the authoritative run is
-still total — a guard can only ever scope a NON-authoritative run, which is what makes a too-narrow
-guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
-skip forever and silently, so the run-gates canary refuses one. Each leg rides the runner.
+Each self-test leg carries a `guard` in `tools/gate-legs.json` naming the kit dir it exercises, so a
+records-only commit skips them and runs only the legs that check this repo's actual state — read the
+split FROM the manifest, never from here. **`GATE_FULL=1` bypasses every guard, and
+`.githooks/pre-push` sets it**, so the authoritative run is still total: a guard can only ever scope a
+NON-authoritative run, which is what makes a too-narrow guard cost an early signal rather than a wrong
+merge verdict. A guard naming an untracked path would skip forever and silently, so the run-gates
+canary refuses one.
 The runner executes legs **CONCURRENTLY** through a bounded pool, width `min(8, nproc)`, overridable
 with `GATE_JOBS`; `GATE_JOBS=1` is the serial bar through the same code path and is the rollback for
 any suspected concurrency problem. Legs are safe to run together because each heavy one is already
 hermetic — it builds its own `mktemp -d` scratch repo and never writes into the real tree. Execution
 order is scheduled longest-first from a timing cache the runner writes at `<git-dir>/gate-timings.tsv`;
 REPORTING is always manifest order, so output is byte-stable whatever the width, and a corrupt or
-absent cache costs wall clock only. Measured on node `a`: 335s serial to 87s at width 8. Each leg:
-- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 2.2 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at width 8. Every leg's
+output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
+`gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
+- `memory/` hygiene (20 checks, flat tree since kit 1.5; engine at kit 2.6 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
@@ -103,6 +107,7 @@ absent cache costs wall clock only. Measured on node `a`: 335s serial to 87s at 
 - verifier fan-out — `tools/workflows/check-verifier-fanout.sh` (+ `.test.sh`) and the protocol's kit/dogfood parity, `tools/workflows/check-protocol-parity.test.sh`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js` git can see — tracked OR untracked-and-unignored), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
+- run-gates evidence — `tools/run-gates.evidence.test.sh` (a red leg's own output survives on disk under `<gitdir>/gate-logs/`, the durable summary POINTS at it, and `gate-last-failure.txt` outlives a green re-run; drives the runner through `GATE_LEGS` so it never re-enters the real bar)
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - pre-push self-test — `.githooks/pre-push.test.sh` (the pre-push runs the full bar on a default-branch push, blocks a red one)
 - push-main self-test — `tools/push-main.test.sh` (the lander reconciles origin before the gate, retries a mid-gate race capped, aborts a conflict; the hook refuses a raw default-branch push)
@@ -114,12 +119,16 @@ absent cache costs wall clock only. Measured on node `a`: 335s serial to 87s at 
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
 - **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate it ASSERTS and cannot have written. Three legs: `tools/unattended/check-unattended.sh`
-  (eleven checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  mandate it ASSERTS and cannot have written. The BASE that mandate hangs on is OBSERVED from the
+  remote's own HEAD advertisement, never read from a local ref and never named by the environment —
+  both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
+  under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
+  (thirteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
-  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, and
-  the shipped protocol equals the installed one), plus its sibling
+  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the
+  mandate at that BASE is asserted by the bar and not only by the driver, and the shipped protocol
+  equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
 - unattended adopter e2e — `bash tools/unattended/adopt-unattended.test.sh`: the adopter WRITES, so
@@ -133,7 +142,16 @@ absent cache costs wall clock only. Measured on node `a`: 335s serial to 87s at 
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+
+- **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
+  can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
+  `tools/memory-tree/check-verdict-epoch.test.sh` · `skills/session-kickoff/manifest-check.test.sh` ·
+  `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
+  the engines carrying their arms in a `--selftest` mode rather than a sibling file —
+  `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
+  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated
@@ -150,6 +168,10 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
 
 ## Conventions
 
+- A build that runs more than one pass follows `memory/guides/BUILD-METHOD.md` — the spec set, the
+  fork rule, the pass loop, regrounding, and the wrap-up derivation. It is rendered from the
+  memory-tree kit; the unattended kit points at it, and `/session-kickoff` loads it at the hand-back.
+
 - **LF** on all `.sh` + the memory-tree data files (`.gitattributes`); verify staged bytes on Windows.
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
 - The template is the operating ruleset — keep it ≤32 KiB; anything activity-scoped or one-time goes
@@ -158,5 +180,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
   rules — this repo is its reference dogfood.
 - Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed standing
   mandate naming the build and both actions**, whose shape the merge bar validates. The mandate is
-  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE:
-  a run that authors its own authorization has none. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.
+  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE,
+  which is observed from the remote rather than read from any local ref. A run with full shell access
+  can still defeat that; the protocol's §9 says exactly how, and the control that actually binds lives
+  on the remote. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.

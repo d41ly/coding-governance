@@ -4,7 +4,7 @@ Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec 
 too) whose filename date is on or after this repo's `SPEC_FORMAT_CUTOFF` (`.memory-tree.conf`)
 follows this shape. Machine-enforced by check 12 of `check-memory-hygiene.sh`: the status header
 must parse; a Tier-2 spec must carry exactly the ten canonical `##` sections in order (§10 is
-date-gated by `SPEC10_CUTOFF` — specs dated before it keep the ten-section canon), with no
+date-gated by `SPEC10_CUTOFF` — specs dated before it keep the NINE-section canon), with no
 empty section bodies, its header `rev-N` logged in §9, and a resolved §8 before a terminal status;
 both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
 by filename date — never retrofit them.
@@ -83,7 +83,11 @@ retroactively red — and which means every spec written from that date onward m
 - **Recurring §4 sub-heads** — use these names, don't invent synonyms: `### Data model` ·
   `### Inventory` · `### Migration` · `### Rollout` · `### Files touched (estimate)` ·
   `### Alternatives rejected`.
-- **Resolved owner forks:** mark each fork in §8 in place — `RESOLVED (owner, <date>): <pick>` —
+- **Resolved forks:** mark each fork in §8 in place, naming the RESOLVER — `RESOLVED (owner,
+  <date>): <pick>` for the owner's own decision, `RESOLVED (agent, <date>, delegated): <pick>` when a
+  standing mandate delegated the resolver authority. Never sign as the owner for a decision the owner
+  did not make; the two are indistinguishable afterwards otherwise. The mark is prose — the hygiene
+  gate reads only §8's first non-blank line —
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
@@ -142,7 +146,8 @@ The named gate legs this unit must keep green, plus any new gate it adds.
 ## 8. Open questions
 
 One fork per bullet or ### sub-head; options and tradeoffs may span lines. Each fork carries a
-recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>. Write `none`
+recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>, or
+RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
 ## 9. Revision log

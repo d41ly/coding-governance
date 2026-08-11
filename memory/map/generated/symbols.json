@@ -108,6 +108,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "Problem",
+      "kind": "class",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "Ranked",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -173,14 +178,14 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
-      "id": "apply_region",
+      "id": "apply_front_matter_ids",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "apply_region",
       "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "armed",
@@ -378,9 +383,19 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "do_check",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "do_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "do_emit_pin",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "do_for_diff",
@@ -408,6 +423,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "do_report",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "do_selftest",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -426,6 +446,11 @@
       "id": "do_selftest",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "do_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "do_write",
@@ -543,6 +568,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "id_pattern",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "index_of",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -651,6 +681,11 @@
       "id": "load_conf",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "load_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "load_corpus",
@@ -776,6 +811,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "main",
@@ -928,6 +968,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "pin_of",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "plan",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -996,6 +1041,11 @@
       "id": "read",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "read",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "read_log",
@@ -1153,9 +1203,24 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "rosters",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "row_docs",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "row_ids",
@@ -1205,6 +1270,11 @@
     {
       "id": "run",
       "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
       "file": "tools/settings-merge.py"
     },
     {
@@ -1236,6 +1306,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
+    },
+    {
+      "id": "scan",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "score",
@@ -1661,6 +1736,11 @@
       "id": "tree",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "tree_root",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "unfenced",

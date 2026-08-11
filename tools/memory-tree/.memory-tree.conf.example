@@ -69,3 +69,8 @@ UNIVERSAL_BUDGET="3"
 # `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);
 # BLANK = uncapped.
 RECALL_CACHE_BUDGET_MB="512"
+
+# Check 20 — ids duplicated INSIDE one row document. A POLICY refusal, not a measured-blank
+# pin: ship it with a value. `row_grammar.py --emit-pin` prints the measured count for a tree
+# that already has content.
+ROW_DUPLICATE_PIN="0"

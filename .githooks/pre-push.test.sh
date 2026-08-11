@@ -67,4 +67,38 @@ case "$msg" in
   *) bad "6 expected fail-closed refusal, got: ${msg:-<push SUCCEEDED>}" ;;
 esac
 
+# case 7 — a NON-EMPTY but meaningless GOV_DEFAULT_BRANCH must be refused, not classified against.
+#          Reproduced as a live, repo-wide bypass on 2026-08-11: the loop never matched, main_local
+#          stayed empty, and the hook exited 0 down the "nothing to gate" path — skipping the lander
+#          refusal AND the full bar. Case 6 covers an EMPTY value; this is the worse, non-empty one.
+git checkout -q main
+git commit -q --allow-empty -m c7
+msg=$( ( GOV_DEFAULT_BRANCH=nosuchthing GOV_GATE_CMD="bash $red" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"no branch in this clone"*) ok "7 non-empty but unresolvable default branch → refused" ;;
+  *) bad "7 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
+esac
+# case 7c — the LIVE CONTROL for 7, one variable changed: the honest value on the same tree must reach
+#           the gate and be blocked BY THE GATE, not by the classification refusal. Without this, case
+#           7 would also pass against a hook that refuses everything.
+# NOTE: both streams here. The hook's gate-RED line goes to STDOUT while its refusals go to stderr,
+# so the stderr-only capture used above would have discarded exactly the evidence this control needs.
+msg=$( ( GOV_DEFAULT_BRANCH=main GOV_GATE_CMD="bash $red" git push -q origin main 2>&1 ) )
+case "$msg" in
+  *"gate RED"*) ok "7c control — the honest value classifies, and the gate runs" ;;
+  *) bad "7c control expected the gate to run, got: ${msg:-<push SUCCEEDED>}" ;;
+esac
+
+# case 8 — once a default branch IS observable, the environment may only AGREE with it. This is the
+#          shape the real repo is in (refs/remotes/origin/HEAD is set there), and it is why the
+#          reproduced bypass is closed rather than merely made harder: `feature` exists, so this is
+#          refused for DISAGREEING, not for being unresolvable. Runs last: it sets origin/HEAD.
+git remote set-head origin main >/dev/null 2>&1
+git commit -q --allow-empty -m c8
+msg=$( ( GOV_DEFAULT_BRANCH=feature GOV_GATE_CMD="bash $red" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"does not observe as the default"*) ok "8 env disagreeing with the observed default → refused" ;;
+  *) bad "8 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
+esac
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.4 -->
+<!-- gov:kit memory-tree@2.7 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -180,6 +180,16 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
     because every universal record is emitted on EVERY reviewer's checklist.
 
+20. **one id, one row per document** — within a single row document (the decision index, a backlog
+    shard, a rotated archive) an id appears at most once. The count of survivors is pinned
+    shrink-only by `ROW_DUPLICATE_PIN`, and an UNDECLARED pin is a refusal, not a disabled check.
+    Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
+    pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
+    and is re-minted is not caught here; the all-time collision grep the index's own header
+    prescribes covers that. Keyability is asserted alongside it, but only as the precondition that
+    makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
+    property the merge driver already enforces where it can be violated.
+
 ## The harness meta-gate
 
 Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
@@ -190,8 +200,8 @@ sibling test is a named failure. `*.test.sh` is excluded, because a fixture that
 would otherwise demand a `<stem>.test.test.sh` that will never exist.
 
 The key is `(gate, check number, ordinal)`. The gate is in the key because the PIN's keys are global
-and two gates both number their checks from 1 — measured, seven keys are claimed by both of this
-repo's gates. The ordinal is in the key because one number can carry several branches and a
+and several gates number their checks from 1, so keys collide across gates; the gate name in the
+key is what keeps them apart. The ordinal is in the key because one number can carry several branches and a
 number-keyed pin lets the cheapest arm hide the valuable one.
 
 A branch's signature ends at the first UNESCAPED closing quote of its message. Capturing to end of
@@ -215,7 +225,8 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
-The pin is EMPTY today — 30 of 30 branches across both gates are armed — and an empty pin is the
+The pin is EMPTY today — every discovered branch is armed; `--report` prints the count, and this
+sentence deliberately does not, because a number written here rots while the gate stays green — and an empty pin is the
 file's working state, not its retirement. A row appears when a new branch lands that no fixture can
 reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
 from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a

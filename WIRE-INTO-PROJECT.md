@@ -571,6 +571,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   write-back + Landing reconcile exception) into instantiated playbooks. The manifest carries its own
   `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos — copy the newer
   versions in wholesale.
+  **v2.7 (2026-08-11) DELETES text you may already hold:** companion §1's unattended block is now a
+  single pointer at `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md`, and §8's restatement of the §1
+  landing rule is a pointer too. Both were paraphrases of documents the kits install; re-pull §8 and
+  the companion together, and delete rather than merge — a kept paraphrase is the drift the collapse
+  removed.
   **v2.6 (2026-08-10) moves a rule you may already hold:** §1's Landing bullet and §8's commit bullet
   now accept a committed standing mandate in place of the explicit ask, and the kickoff-manifest
   merge exception left §1 for the new companion §1. Re-pull §1, §8 and the companion in lockstep, and

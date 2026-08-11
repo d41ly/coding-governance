@@ -27,6 +27,16 @@
 - TOOL-aUnmannedHelm-6 · a gate that verifies the PAPERWORK of a claim without verifying the claim is a second signature, not defence in depth: the leg checked the recorded BASE, the phase and the copied region, and never contained the string `run:mandate`
 - TOOL-aUnmannedHelm-10 · CRLF reaches past everything that watches for it: `check-wiring.sh` only sees `.claude/`, and a byte-comparing gate is not the only consumer. Ask which consumer reads a file WHOLE — a launcher, a sourced conf, a hook
 - TOOL-aUnmannedHelm-9 · an adopter's refusals are ordered before it READS anything: the conf check fired first and told an operator running from a foreign repo to create a conf in the very tree the adopter must not adopt. A correct refusal with the wrong remedy is a defect
+- TOOL-aStandingWrit-1 · replacing an owner-authored mandate with a build README's existence trades FIVE properties, not one: integrity becomes existence, the grant goes class-wide, it names no ACTIONS, it cannot be revoked, and a run that lands a new build README authorizes the next run
+- TOOL-aStandingWrit-2 · an anchor is only as trustworthy as the cheapest way to move it. `refs/remotes/origin/<x>` READS like an observation of the remote and IS a local write; a source comment asserting a ref cannot move without a push is not a check, and it survived two Tier-2 reviews
+- TOOL-aStandingWrit-4 · a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN, not an override: any unmatched `GOV_DEFAULT_BRANCH` sent pre-push down its own "nothing to gate" exit 0, skipping the lander refusal and every leg on the bar
+
+
+- TOOL-aWrittenMethod-1 · the build METHOD is generic and belongs to the memory-tree kit beside the spec format and the record rules, not to the unattended kit, which points at it. It rides the existing parity leg as a third PAIRS row, so the bar stays at 47 legs
+- TOOL-aWrittenMethod-1 · a mis-aimed BRIEFING yields a confident wrong answer, not a visibly confused one: pass 1 was told the tension was self-authorship and scored on checkability, so every candidate delivered enforcement where a procedure was asked for
+- TOOL-aWrittenMethod-1 · absence-of-placeholder is not presence-of-value. Pre-initialising an interpolated conf key to empty makes emptiness the failure mode the `{{TOKEN}}` grep cannot see; default the key to its own token so an undeclared value reds
+- TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
+- TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
 ## DEPL — deployer
 
