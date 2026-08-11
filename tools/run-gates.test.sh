@@ -27,6 +27,24 @@ if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' || fail=1
 
+# 1b. every `guard` pathspec matches at least one TRACKED path. This is the quietest hole a guard can
+#     open: `git diff --quiet BASE -- does/not/exist` reports NO difference, so a leg guarded on a
+#     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring
+#     `GATE skip`. Checked against `git ls-files` rather than the filesystem, because the guard is a
+#     pathspec git resolves, and an untracked file is invisible to it.
+"$PYBIN" -c '
+import json, subprocess, sys
+tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
+bad = []
+for l in json.load(open("tools/gate-legs.json")):
+    for g in l.get("guard", []):
+        if not any(t == g or t.startswith(g) for t in tracked):
+            bad.append("%s -> %s" % (l["name"], g))
+if bad:
+    print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
+    sys.exit(1)
+' || fail=1
+
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —
 #    launcher tokens (bash/python/python3) and flags are excluded; the parse path is the manifest
 #    filename, not a leg path, so it never matches.
@@ -68,7 +86,7 @@ cat > "$SCRATCH/tools/gate-legs.json" <<'JSON'
 JSON
 ( cd "$SCRATCH" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
 
-run_scratch() { ( cd "$SCRATCH" && GATE_JOBS=$1 bash tools/run-gates.sh 2>&1 ); }
+run_scratch() { ( cd "$SCRATCH" && GATE_FULL= GATE_JOBS=$1 bash tools/run-gates.sh 2>&1 ); }
 
 # 3a. width 1 and width 4 agree line for line. This is the equivalence the pool rests on: one code
 #     path, so the serial reading is not a second implementation that can drift.
@@ -194,14 +212,14 @@ JSON
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
-o=$( cd "$G" && GATE_JOBS=4 bash tools/run-gates.sh 2>&1 )
+o=$( cd "$G" && GATE_FULL= GATE_JOBS=4 bash tools/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 # Pass 2 with origin/HEAD pinned: the guard path resolves and the unchanged leg must SKIP.
 ( cd "$G" && git update-ref refs/remotes/origin/main HEAD \
   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 for w in 1 4; do
-  o=$( cd "$G" && GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^GATE skip  guarded (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
@@ -213,5 +231,22 @@ done
 # diff-scoped run blanks the dispatch hint the next full run needs.
 grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached timing row was dropped by the cache rewrite"; fail=1; }
+
+# 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
+#     `.githooks/pre-push` sets it, so a guard can only ever scope a NON-authoritative run and a
+#     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
+#     SAME fixture that skips without it, so the two readings differ only by the variable.
+for w in 1 4; do
+  o=$( cd "$G" && GATE_FULL=1 GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
+  printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
+    || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  printf '%s\n' "$o" | grep -q '^GATE skip' \
+    && { echo "canary: GATE_FULL=1 at width $w still skipped a guarded leg"; fail=1; }
+done
+
+# 3j. the push boundary FORCES the full bar. The hook is the only place this is guaranteed, and a
+#     scoped authoritative run would mean no run ever executes every leg against the tree that lands.
+grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push" \
+  || { echo "canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
 
 [ "$fail" = 0 ] && exit 0 || exit 1

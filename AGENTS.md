@@ -72,7 +72,13 @@ its shards sit frozen under `memory/archive/`.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
-The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner.
+The full bar is green at the push boundary; earlier runs are diff-scoped, and now MECHANICALLY so.
+The 30 self-test legs each carry a `guard` in `tools/gate-legs.json` naming the kit dir they exercise,
+so a records-only commit skips them and runs only the 17 legs that check this repo's actual state.
+**`GATE_FULL=1` bypasses every guard, and `.githooks/pre-push` sets it**, so the authoritative run is
+still total — a guard can only ever scope a NON-authoritative run, which is what makes a too-narrow
+guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
+skip forever and silently, so the run-gates canary refuses one. Each leg rides the runner.
 The runner executes legs **CONCURRENTLY** through a bounded pool, width `min(8, nproc)`, overridable
 with `GATE_JOBS`; `GATE_JOBS=1` is the serial bar through the same code path and is the rollback for
 any suspected concurrency problem. Legs are safe to run together because each heavy one is already

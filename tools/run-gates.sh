@@ -20,7 +20,11 @@ fails=0; n=0; skips=0
 # Unresolvable (no remote / shallow / detached) → empty, and changed() fails safe to "run".
 DEFBR=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); DEFBR=${DEFBR#origin/}
 BASE=$(git rev-parse --verify -q "${GATE_BASE:-origin/${DEFBR:-main}}" 2>/dev/null) || BASE=
-changed() { [ -z "$BASE" ] && return 0; ! git diff --quiet "$BASE" -- "$@" 2>/dev/null; }
+# GATE_FULL bypasses every guard, so the run checks the whole bar. `.githooks/pre-push` sets it: a
+# guard may only ever scope a NON-authoritative run, which is what makes a too-narrow guard cost an
+# early signal rather than a wrong merge verdict. Both fail-safes below keep their meaning — an
+# unresolvable BASE runs everything, and so does a guard that errors.
+changed() { [ -n "${GATE_FULL:-}" ] && return 0; [ -z "$BASE" ] && return 0; ! git diff --quiet "$BASE" -- "$@" 2>/dev/null; }
 
 gd="$(git rev-parse --git-dir 2>/dev/null)"; sfile=""; TIMINGS=""
 [ -n "$gd" ] && { sfile="$gd/gate-last-summary.txt"; TIMINGS="$gd/gate-timings.tsv"; }

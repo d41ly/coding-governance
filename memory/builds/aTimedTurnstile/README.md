@@ -22,10 +22,11 @@ This build makes them run together. A scratchpad prototype completed all 47 legs
 with `fails=0`, which is the number this unit is built to reproduce.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aTimedTurnstile-5
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aTimedTurnstile-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
+| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | INPROGRESS | rev-1 | 2026-08-11 |
 | [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->
 

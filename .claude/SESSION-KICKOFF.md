@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T13:42:06+03:00 @ af6de23172009f150e46c482fce140a724597422
+last-audit: 2026-08-11T14:24:26+03:00 @ af6de23172009f150e46c482fce140a724597422
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -54,6 +54,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 ```bash
 bash tools/run-gates.sh    # runs all legs CONCURRENTLY (width min(8,nproc)), single-sourced from tools/gate-legs.json — read THAT for the list, not this line
 GATE_JOBS=1 bash tools/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
+GATE_FULL=1 bash tools/run-gates.sh   # ignore every leg guard — what .githooks/pre-push runs, and what a DoD needs
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
