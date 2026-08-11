@@ -55,7 +55,21 @@ PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPE
 # Byte-identical in intent to `render_doc` in adopt-memory-tree.sh. Two spellings of one
 # substitution is the drift class this file exists to catch, so the SHAPE arm below proves they agree
 # on the only thing that matters: no placeholder survives a render.
-render() { sed -e "s|{{KIT_DIR}}|$KITREL|g" -e "s|{{TOOL_ROOT}}|$TOOLROOT|g" -e 's/\r$//' "$1"; }
+render() {
+  # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
+  # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
+  # The `X` sentinel is because `$( )` strips ALL trailing newlines. `cat` runs in its own
+  # subshell with an explicit `exit 1` because the substitution reports the LAST command's
+  # status, which is printf's and always 0 — the guard was unreachable without it.
+  local out
+  out=$( cat "$1" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{KIT_DIR\}\}/"$KITREL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
+  printf '%s' "$out"
+}
 
 st=0
 for pair in $PAIRS; do

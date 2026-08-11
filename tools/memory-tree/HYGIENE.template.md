@@ -26,7 +26,7 @@ memory/
 ├── decisions/             decision detail (append-only area files)
 ├── guides/                long-lived reference guides
 ├── archive/               rotated indexes + legacy material a build can't claim
-├── project/               the gate's own waiver registries (`*.txt`, five of them) and nothing else
+├── project/               the gate's own waiver registries (`*.txt`, six of them) and nothing else
 └── builds/<slug>/
     ├── README.md · STATUS.md       (required only when >3 files / multi-item)
     ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
@@ -80,7 +80,7 @@ Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle m
 
 ## The grandfather ratchet
 
-Five plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+Six plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check. Should not grow after the initial adoption.
@@ -92,8 +92,13 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
+- `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
+  `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
+  `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
+  ships none: an adopter's is scaffolded from their OWN measured population, because gov's rows would
+  name paths their tree does not have.
 
-All five are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
+All six are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
 ## The check catalog (all in `{{KIT_DIR}}/check-memory-hygiene.sh`; this file is the prose home)
@@ -103,7 +108,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
 3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
    `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/` contents are
-   unconstrained; `project/` holds ONLY the five waiver registries — no catch-all — and its selector
+   unconstrained; `project/` holds ONLY the six waiver registries — no catch-all — and its selector
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
    `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a

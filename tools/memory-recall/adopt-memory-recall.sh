@@ -121,9 +121,20 @@ fi
 # `python` is not an option either — a stock Debian/Ubuntu adopter without python-is-python3 has
 # only python3, and every command in the kit's primary agent-facing surface would exit 127.
 render() { # -> stdout
-  sed -e "s|{{FAMILIES}}|$families|g" \
-      -e "s|{{MEMORY_ROOT}}|$memory_root|g" \
-      -e "s|{{QUERY_CLI}}|python3 $REL/query.py|g" "$TEMPLATE"   # gov:literal-python — a COMMITTED render shared across the fleet; see the note above
+  # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
+  # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
+  # The `X` sentinel is because `$( )` strips ALL trailing newlines. `cat` runs in its own
+  # subshell with an explicit `exit 1` because the substitution reports the LAST command's
+  # status, which is printf's and always 0 — the guard was unreachable without it.
+  local out
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{FAMILIES\}\}/"$families"}
+  out=${out//\{\{MEMORY_ROOT\}\}/"$memory_root"}
+  out=${out//\{\{QUERY_CLI\}\}/"python3 $REL/query.py"}   # gov:literal-python — a COMMITTED render shared across the fleet; see the note above
+  printf '%s' "$out"
 }
 
 # An unsubstituted placeholder is a template that grew a value this script does not know how to

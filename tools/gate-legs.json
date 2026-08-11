@@ -135,6 +135,20 @@
     ]
   },
   {
+    "name": "method carriers (every pointer declared)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-method-carriers.sh"
+    ]
+  },
+  {
+    "name": "method-carriers self-test",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-method-carriers.test.sh"
+    ]
+  },
+  {
     "name": "build-index selftest",
     "argv": [
       "python3",

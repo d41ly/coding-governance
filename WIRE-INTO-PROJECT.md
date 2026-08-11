@@ -124,7 +124,7 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
    bash tools/memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
    ```
    The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, the generated `LIVE.md`, and
-   `project/` — which holds the gate's own five waiver registries (`*.txt`) **and nothing else**. Work
+   `project/` — which holds the gate's own six waiver registries (`*.txt`) **and nothing else**. Work
    state is not authored anywhere: `gen_build_index.py` renders it. See §3a if you already run a kit
    older than 1.8.
 3. Wire the gate in all three places:
@@ -143,7 +143,7 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
      memory/**/*.md text eol=lf
      memory/**/*.txt text eol=lf
      memory/**/*.toml text eol=lf
-     # The broad form on purpose: the scaffolder writes FIVE registries under project/, not two
+     # The broad form on purpose: the scaffolder writes SIX registries under project/, not two
      # (legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches),
      # and §6 step 6 already asserts all five exist. Naming them individually is how three of them
      # went unpinned.
@@ -509,7 +509,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
    session red). If a CI leg was wired: push the probe branch and confirm the CI job actually reds —
    proof it isn't WARN-skipping on a shallow checkout. Then delete the probe branch.
 6. **Work state generated, not authored:** `python tools/memory-tree/gen_build_index.py --check` → 0, and
-   `memory/LIVE.md` exists. Nothing under `memory/project/` but the five `*.txt` waiver registries.
+   `memory/LIVE.md` exists. Nothing under `memory/project/` but the six `*.txt` waiver registries.
 
 ## Result — what the project now has
 
