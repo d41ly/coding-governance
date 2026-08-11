@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer
 
-**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -162,6 +162,8 @@ leg can independently derive, which is the only reason to record anything.
 boundary. No new leg.
 
 ## 8. Open questions
+
+none — every fork below is RESOLVED.
 
 ### F1 — the escape when the default branch is legitimately not what `origin/HEAD` names
 

@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-4 — a gate for the sixth carrier
 
-**Status:** INPROGRESS · rev-6 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-6 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -216,6 +216,8 @@ reverses the mechanism half, leaves the scope half standing, and per M3 updates 
 rather than silently contradicting it.
 
 ## 8. Open questions
+
+none — every fork below is RESOLVED.
 
 ### F4 — where the registry lives. **PARKED, owner turn.**
 

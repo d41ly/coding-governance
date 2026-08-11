@@ -46,45 +46,31 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 
 ## State of this pass
 
-| Unit | State |
+All six units CLOSED and landed. Bar green at 48/48 across 49 legs.
+
+| Unit | What landed |
 |---|---|
-| `TOOL-aWrittenMethod-2` | **BUILT + REVIEWED** — the mandate BASE the run cannot steer by environment |
-| `TOOL-aWrittenMethod-6` | **BUILT + REVIEWED** — all six renderers stop interpreting their inputs |
-| `TOOL-aWrittenMethod-3` | **BUILT** — the guide displaced 247 to 236 lines |
-| `TOOL-aWrittenMethod-5` | **BUILT** — the method under the manifest ratchet |
-| `TOOL-aWrittenMethod-4` | **BLOCKED** — F4 is an owner turn, see its §8 |
+|  | the build method, rendered and delivered |
+|  | the mandate BASE the run cannot steer by environment |
+|  | all six renderers stopped interpreting their own inputs |
+|  | the guide displaced 247 to 236 lines |
+|  | the method under the manifest ratchet |
+|  | the carrier gate, 47 legs to 49 |
 
-Four of five built, closing review folded, bar GREEN 46/46. **Unmerged and unpushed.**
+**Three adversarial passes on the code, 56 raw findings.** Each closing review found a defect
+the bar could not: an unreachable guard reintroduced one pass after its twin was deleted, a
+render that shipped a claim stronger than the code, and — in the last review — a REGRESSION
+introduced by fixing the review before it. That last one is the record worth keeping: narrowing
+check 9 for terminal records folded the absent- refusal into the non-terminal arm, and
+check 13 hung on the same value, so deleting one line from a run-writable file skipped both and
+the leg exited 0 over a self-authored mandate. A review fix landed without enumerating the state
+space it newly partitioned.
 
-**Closing review** `reviews/2026-08-11-review-aWrittenMethod-2.md` — 18 raw, 15 confirmed, precision
-0.83, two blockers and three highs over the cumulative diff. Its own closing note is the one worth
-keeping: the kit gates its own bookkeeping and never the authorization the bookkeeping is about, and
-eight of nine defects fall out of one missing adversarial arm.
-
-**The honest limit on unit 2.** B1 was reproduced with a control: `refs/remotes/origin/<default>` is
-an ordinary local ref, so `git update-ref` steers the BASE with no push and no network, and both the
-BASE check and the mandate comparison then read a commit the run chose. Unit 2 removes the
-ENVIRONMENT steer and nothing more. The protocol shipped claiming the BASE is "anchored outside the
-run"; both copies now say NARROWED and name what closing it needs. Closing it is unit 2's F2 — an
-anchor no local command can write, via `git ls-remote` or an owner-signed tag — and it is unbuilt.
-
-**Two defects this build introduced and then caught in itself**, worth recording because both are
-classes the repo already has names for:
-
-- an unreachable `fail` branch was deleted in unit 2, and unit 6 reintroduced the same class:
-  `out=$(cat X; printf X) || return 1` can never fire, because a substitution reports the LAST
-  command's status and `printf` always succeeds. Dead in all five renderers until the review found it.
-- narrowing check 9 to skip terminal records was first written with `continue`, which silently took
-  the mandate assertion with it. The leg's own self-test caught that within one run.
-
-**PARKED — unit 4, awaiting an owner decision.** Its registry cannot both ship empty and carry this
-repo's rows when the repo dogfoods the kit. `memory/project/` needs hygiene check 3's five-name
-allowlist widened in the memory-tree ENGINE; the kit directory ships gov's rows to every adopter and
-reds them on install. M3 reserves both shapes for the owner. Nothing was written for unit 4 — no leg,
-no registry, no `gate-legs.json` row — so the tree carries no half-built check.
-
-**Next action: the owner picks a registry home, or rules the leg gov-only.** Then unit 4, then
-landing. The four built units are self-contained and their write sets are disjoint from unit 4's.
+**The honest limit.** Unit 2 removes the ENVIRONMENT steer on the mandate BASE and nothing more.
+ still moves the anchor with no push — reproduced
+with a control. Both protocol copies say NARROWED rather than anchored, and closing it is unit 2's
+F2: an anchor no local command can write, via 081c3669df7ce43f8e448dc88e9be94b6d44c557	HEAD
+081c3669df7ce43f8e448dc88e9be94b6d44c557	refs/heads/main or an owner-signed tag. Unbuilt.
 
 ## The two passes, and why there are two
 
@@ -142,14 +128,14 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
-| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | INPROGRESS | rev-4 | 2026-08-11 |
-| [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | INPROGRESS | rev-3 | 2026-08-11 |
-| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | INPROGRESS | rev-6 | 2026-08-11 |
-| [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
-| [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | INPROGRESS | rev-4 | 2026-08-11 |
+| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | CLOSED | rev-4 | 2026-08-11 |
+| [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | CLOSED | rev-3 | 2026-08-11 |
+| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | CLOSED | rev-6 | 2026-08-11 |
+| [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | CLOSED | rev-3 | 2026-08-11 |
+| [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | CLOSED | rev-4 | 2026-08-11 |
 <!-- /gen:build-index -->

@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-6 — escaping conf values before substitution
 
-**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -141,6 +141,8 @@ needs none is a dependency an adopting repo did not ask for.
 `bash tools/run-gates.sh` at the push boundary. No new leg.
 
 ## 8. Open questions
+
+none — every fork below is RESOLVED.
 
 ### F1 — how far to carry S4
 

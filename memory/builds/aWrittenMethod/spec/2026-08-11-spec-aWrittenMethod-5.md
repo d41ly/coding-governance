@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-5 — the method in the manifest's watch set
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams kickoff · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams kickoff · review wf_eb978bb2-f98
 
 ## 1. Goal
 
