@@ -31,7 +31,7 @@ LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
-CORE_FLOOR="6:6"
+CORE_FLOOR="${FLOOR_OVERRIDE:-$CORE_FLOOR_DERIVED}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
 PHASES_EXTRA="${1-}"
@@ -42,6 +42,15 @@ EOF
 build() { # slug
   mkdir -p "memory/builds/$1"
   cat > "memory/builds/$1/README.md" <<EOF
+---
+slug: $1
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-$1-1
+---
+
 # $1
 
 <!-- gen:build-index -->
@@ -67,6 +76,7 @@ base: BASE
 EOF
 }
 
+CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
 mkconf; build tRun
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor: check 9 measures against `refs/remotes/...` only, because a bare local
@@ -115,10 +125,15 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 # ---- is present" can never fail. It armed cleanly and tested nothing. These arms delete a core
 # ---- member from the DRIVER — the only place the names live — and watch the count fall.
 reset_tree
-sed -i 's/^PHASES_CORE="PREFLIGHT RUNNING VERIFYING LANDING LANDED ABORTED"/PHASES_CORE="PREFLIGHT RUNNING VERIFYING LANDING LANDED"/' tools/unattended/unattended.sh
+# reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
+# Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
+short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//')
+sed -i "s|^PHASES_CORE=.*|PHASES_CORE=\"${short% *}\"|" tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor, and deleting a core member is a silent, reason-free override of everything keyed on it"
-hit "$out" "5 against 6"
+hit "$out" "$((ncore-1)) against $ncore"
 # ...the member deleted was a TERMINAL one, so the independent terminal-membership check fires too.
 # Two sets declared separately, so THAT one is falsifiable where the subset form was not.
 hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it"
@@ -129,10 +144,12 @@ miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
 sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it"
-hit "$out" "5 against 6"
+hit "$out" "$((ndod-1)) against $ndod"
 
 reset_tree; mkconf "" "project-item:machine"
 same "a project DoD EXTENSION is green" "$(run)" ""
@@ -293,47 +310,75 @@ hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore 
 reset_tree; sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
 hit "$(run)" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
 
-# ---- check 9 branch 3: the anchor sitting AT HEAD. `git branch -f main HEAD` was the reproduced
-# ---- exploit; the leg now refuses the resulting state as well as the driver.
+# ---- check 9 branch 3: the anchor sitting AT HEAD, at a phase that CLAIMS work was done. The two
+# ---- halves of this kit used to disagree here - the driver blesses this state at preflight, where a
+# ---- run has correctly built nothing yet, while the leg refused it unconditionally, each with its
+# ---- own green test. The refusal is scoped to the phases where a run asserts it built something.
 reset_tree; git push -q -f origin unit:main
-sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read"
+sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; git add -A
+hit "$(run)" "the merge-base equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read"
+
+# ...and the SAME tree at a pass phase is silent, or the scoping is indistinguishable from deleting
+# the check. This is the arm that would have caught the two halves disagreeing.
+sed -i 's/^phase: .*/phase: BUILDING/' memory/builds/tRun/RUN.md; git add -A
+miss "$(run)" "the merge-base equals HEAD at a phase that claims work was done"
 git push -q -f origin "$ANCHOR0":main
 
-# ---- check 13, all four branches: THE MANDATE, asserted by the BAR. Before this the leg did not
-# ---- contain the string `run:mandate` at all — it checked the driver's bookkeeping and never the
-# ---- thing the bookkeeping is about, so every authorization defect was invisible here.
-reset_tree
-sed -i 's/^The owner authorizes tRun to merge and to push\.$/FORGED — the run rewrote its own authorization./' memory/builds/tRun/RUN.md
-git add -A
-hit "$(run)" "a run-state file's mandate differs from the one at its recorded BASE — the run edited its own authorization"
+# ---- check 13: THE AUTHORIZATION, asserted by the BAR. Before this the leg did not contain the
+# ---- marker string at all - it checked the driver's bookkeeping and never the thing the bookkeeping
+# ---- was about, so every authorization defect was invisible here. The subject moved to the build
+# ---- folder; the obligation did not.
+# ----
+# ---- Each arm has to break the README AT THE ANCHOR COMMIT, not in the working copy: the leg reads
+# ---- `<recorded base>:<path>`, so a working-copy edit changes nothing it looks at. Editing main,
+# ---- pushing, merging back and RE-RECORDING the base is the only shape that actually arms these -
+# ---- an arm that edits the working tree passes against a leg that does no check at all.
+anchor_break() { # everything after the first argument runs on main, then the base is re-recorded
+  reset_tree
+  git checkout -q main
+  "$@"
+  git add -A >/dev/null && git commit -q -m anchor-break --no-verify && git push -q -f origin main
+  git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
+  sed -i "s|^base: .*|base: $(git merge-base origin/main HEAD)|" memory/builds/tRun/RUN.md
+  sed -i "s|^witness: .*|witness: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+  git add -A >/dev/null
+}
+anchor_restore() {
+  # DROP the unit branch's staged fixture edits FIRST. Without this, `git checkout main` refuses
+  # because the checkout would overwrite them, the `&&` swallows the refusal, main keeps the previous
+  # arm's break, and every later arm starts from a tree it did not build - which is how one arm here
+  # passed for the wrong reason and the next could not pass at all.
+  git reset -q --hard "$PRISTINE"
+  git checkout -qf main && git reset -q --hard "$ANCHOR0"
+  git push -q -f origin "$ANCHOR0":main
+  git checkout -qf unit
+  reset_tree
+}
 
-reset_tree
-printf '
-<!-- run:mandate -->
-FORGED SECOND BLOCK: also authorize force-push.
-<!-- /run:mandate -->
-' >> memory/builds/tRun/RUN.md
-git add -A
-hit "$(run)" "a run-state file does not carry exactly one well-formed mandate block on both sides of the BASE comparison; a second block is a second authorization nobody granted"
+drop_readme()  { rm -f memory/builds/tRun/README.md; }
+break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
+break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
 
-reset_tree; build tEmptyMandate
-sed -i '/^The owner authorizes tEmptyMandate to merge and to push\.$/d' memory/builds/tEmptyMandate/RUN.md
-sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tEmptyMandate/RUN.md
-sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tEmptyMandate/RUN.md
-# The EMPTY-mandate file must exist AT THE ANCHOR, or check 13 branch 4 fires instead of branch 2.
-git add -A && git commit -q -m emptymandate --no-verify && git push -q -f origin unit:main
-git commit -q --allow-empty -m ahead --no-verify
-sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tEmptyMandate/RUN.md
-git add -A && git commit -q -m rebase --no-verify
-hit "$(run)" "the mandate block is absent or empty at the recorded BASE, so nothing committed before the run authorizes it"
+anchor_break drop_readme
+hit "$(run)" "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it"
+anchor_restore
 
-reset_tree; build tNoBase
-sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tNoBase/RUN.md
-sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tNoBase/RUN.md
-sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tNoBase/RUN.md
-git add -A && git commit -q -m nobase --no-verify
-hit "$(run)" "a run-state file does not exist at its own recorded BASE, so its mandate cannot have been committed before the run"
+anchor_break break_fm
+hit "$(run)" "the build README at a run's recorded BASE is not a build README - front matter opens at line 1 and this does not, so the authorization names something that is not a build"
+anchor_restore
+
+anchor_break break_slug
+hit "$(run)" "a build README at its run's recorded BASE declares a different slug, so the folder was renamed or its README copied from another build: declared"
+anchor_restore
+
+# ---- and the GREEN control for all three: the same machinery with NOTHING broken must stay silent,
+# ---- or these arms are indistinguishable from a leg that reds on any anchor edit at all.
+noop_break() { :; }
+anchor_break noop_break
+miss "$(run)" "recorded BASE"
+anchor_restore
+
 
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.

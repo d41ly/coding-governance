@@ -58,7 +58,7 @@ is filled in exactly one place.
   `codebase-map/` kit — else delete all four.
 - **Memory-recall line** (the §5 kit bullet): keep only if adopting the `memory-recall/` kit — which
   needs the memory tree, since the kit refuses without `.memory-tree.conf`.
-- **Unattended-run lines** (the `, or a committed standing mandate …` clause in §1's Landing block,
+- **Unattended-run lines** (the `, or a committed build plan …` clause in §1's Landing block,
   and companion §1's second block): keep only if adopting the `unattended/` kit — else delete the
   clause, restoring the unamended explicit-ask rule, and delete the companion block. §8 no longer
   carries a second spelling of the landing rule; it points at §1. Companion §1's FIRST block (the kickoff-manifest merge

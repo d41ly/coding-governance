@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.1 -->
+<!-- gov:kit unattended@1.2 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -12,26 +12,40 @@ finish. That is the only thing that makes it different, and it is the whole reas
 exists: the checkpoint the explicit-ask rule provides has to be replaced by something a machine can
 check, not merely removed.
 
-## 1. The mandate
+## 1. The authorization
 
-The run is authorized by a **committed standing mandate** — a block naming the build and both
-authorized actions (the merge and the push). Three properties, all mechanical:
+The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
+committed before the run's branch existed. The owner's act is `/unattended <slug>`; they author
+nothing per run. Three properties, all mechanical:
 
 - **It is asserted, never written by the run.** `--preflight` reads it and refuses if it is absent.
-  A run that could write its own mandate authorizes itself, and the gate would certify it.
-- **It is reachable from the pinned BASE.** A mandate introduced by a commit on the run's own branch
-  grants nothing. Reachability is the machine-checkable form of "somebody with push rights put this
-  here before this run branched" — and the run holds push rights by construction, so it is a cost,
-  not a proof. The pin is taken from the ref name and tip the REMOTE advertises for its own HEAD,
-  never from a local ref and never from the environment. What that removes, and what it leaves, is
-  §9.
-- **Only its SHAPE is checked.** No gate can tell whether the owner meant it. The two properties
-  above are what make the shape worth checking at all.
+  A run that could write its own authorization has none, and the gate would certify it.
+- **It is reachable from the pinned BASE.** A build folder introduced by a commit on the run's own
+  branch grants nothing. Reachability is the machine-checkable form of "somebody with push rights put
+  this here before this run branched" — and the run holds push rights by construction, so it is a
+  cost, not a proof. The pin is taken from the ref name and tip the REMOTE advertises for its own
+  HEAD, never from a local ref and never from the environment. What that removes, and what it leaves,
+  is §9.
+- **Only its SHAPE is checked.** The blob resolves at BASE, it parses as build front matter, and its
+  `slug:` names the build being run. No gate can tell whether the owner meant it.
 
-The mandate lives in the authored region of the run-state file, verbatim. It is the input the whole
-run is a function of, and reproducing it exactly is why that region is exempt from the entry budget.
+**What this costs, stated because the previous design paid none of it.** The authorization was once a
+block naming the build and both authorized actions, compared byte-for-byte across the BASE. Moving it
+to the build folder trades five properties:
 
-Absent or unreachable mandate → the run does not start. There is no override for this one: an
+1. **Integrity becomes existence.** A build README is a living document whose generated region the
+   run legitimately re-renders, so no whole-file equality is assertable.
+2. **The grant is class-wide.** Every build folder in the tree satisfies the predicate; the narrowing
+   is the slug the owner types, and chat is not machine-checkable.
+3. **It names no ACTIONS.** A README cannot express merge-only, so a build authorizes both.
+4. **It cannot be revoked.** A build README is a permanent record the hygiene gate and the generated
+   index depend on, so no act means "not this build".
+5. **It is self-propagating.** A run whose diff creates a new build README authorizes the NEXT run
+   with bytes a run wrote. The per-run property holds; the system property does not.
+
+All five were put to the owner and accepted. The fifth has no mechanical refusal today.
+
+Absent or unreachable authorization → the run does not start. There is no override for this one: an
 override on the authorization check is the authorization check.
 
 ## 2. The run-state file
@@ -42,21 +56,21 @@ override on the authorization check is the authorization check.
 status, both derived from build front matter and spec status headers. The gate byte-compares it
 against a fresh render. Never hand-edit it.
 
-**Authored**, carrying exactly eight facts and nothing else. Nothing in the tree derives any of them,
+**Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
+and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
-1. **The standing mandate**, verbatim.
-2. **The phase**, from the vocabulary in §3, each claim carrying a witness.
-3. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
-4. **Parked decisions** — the question, the options seen, and the reason the run refused. A bare
+1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
+2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
+3. **Parked decisions** — the question, the options seen, and the reason the run refused. A bare
    "parked" is indistinguishable from "forgotten".
-5. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
+4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
-6. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
-7. **The anchor tip sha**, from that same advertisement.
-8. **The endpoint URL** it was observed from.
+5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
+6. **The anchor tip sha**, from that same advertisement.
+7. **The endpoint URL** it was observed from.
 
-Facts 6 through 8 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
+Facts 5 through 7 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
 so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is
 the only form of verification §9 concludes actually binds.
 
@@ -81,7 +95,12 @@ the only exit: the spill exists so that never happens.
 
 Kit-owned core, in run order:
 
-`PREFLIGHT` · `RUNNING` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
+`PREFLIGHT` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RUNNING` · `VERIFYING` ·
+`LANDING` · `LANDED` · `ABORTED`
+
+The four middle members are named for the build method's PASS kinds, so a run's phase and the pass it
+is performing are one vocabulary rather than two. `RUNNING` survives with a stated meaning — a run
+between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
 `LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
 — built and reviewed, not yet merged — and it is why the run-state file is deliberately outside the
@@ -111,7 +130,7 @@ something no machine could have checked:
 |---|---|---|
 | `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
 | `records-current` | machine | every unit's status header and every generated region match a fresh render |
-| `mandate-reachable` | machine | the mandate is reachable from the pinned BASE and was not introduced on the run's own branch |
+| `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up |
@@ -151,15 +170,23 @@ either stalls or learns to bypass — and bypassing discards the entire bar the 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
 
-## 7. The four verbs
+## 7. The verbs
 
-- `--preflight` — asserts the mandate, pins the BASE, records the keepalive id the agent hands it,
+- `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
+  records the keepalive id the agent hands it,
   refuses on a dirty tree, on the default branch, and on an unwired repo, and writes the run-state
   file. It OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the
   remote does not answer or advertises no default branch of its own. Failing closed there costs
   nothing real: a run that cannot reach the remote cannot land on it either. It delegates wiring to the project's **check** mode, never the repairing one: a repairing
   mode rewrites tracked bytes and sets git config, and the run's first act must not be the mode
   whose past over-firing is the cautionary case this protocol cites.
+- `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
+  `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
+  by an agent hand-editing an artifact this kit calls generated.
+- `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
+  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It cannot see a
+  planned unit that has no spec, and says so in its own output rather than printing a complete-looking
+  list.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override.

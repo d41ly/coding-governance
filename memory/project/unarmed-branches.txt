@@ -10,3 +10,4 @@
 # with no fixture that can reach it, and it carries the reason it cannot be armed — "not yet
 # written" and "cannot be written from here" are indistinguishable in a bare pin, and only one of
 # them is acceptable.
+tools/unattended/unattended.sh	9	4	cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has

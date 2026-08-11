@@ -48,7 +48,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
-- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask, or a committed standing mandate whose shape your merge bar validates (companion §1, §8).
+- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask, or a committed build plan whose shape your merge bar validates (companion §1, §8).
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Kickoff-manifest merge exception (its `last-audit` line), and the unattended-run rules → `parallel-coding-governance.domain-rules.md` §1. LOAD when a merge touches the manifest, or before a run with no human in the loop.
