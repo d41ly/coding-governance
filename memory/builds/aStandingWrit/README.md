@@ -23,10 +23,8 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** All scope items are BUILT. S0 landed on main mid-build; S1, S2, S3, S4, S6 and S7 are
-built on the branch and reviewed as one cumulative code diff. S5 is WITHDRAWN, superseded by
-`memory/guides/BUILD-METHOD.md` M2. P1 remains parked — it is the only thing this build refused, and
-it blocks nothing that was built.
+**State.** Every scope item is BUILT and S0 through S7 are landed. S5 is WITHDRAWN, superseded by
+`memory/guides/BUILD-METHOD.md` M2. P1 is RESOLVED and S8 is what came of it.
 
 **The owner's ask, met.** `/unattended <slug>` is now sufficient. Nobody authors a mandate, nobody
 authors a run-state file, and a run that invents its own build folder is refused.
@@ -79,8 +77,11 @@ this build that does not re-derive those three attacks against the NEW surface h
 
 ## The units
 
-One spec, scope items `S0`–`S7`. The rows below are the reading order, not a decomposition into
-sub-specs.
+One spec, scope items `S0`–`S8`. The rows below are the reading order, not a decomposition into
+sub-specs — and they sit inside the roster marker pair S8 added, which is what makes this table the
+thing a run's authorization is compared against.
+
+<!-- roster:units -->
 
 | Area | What changes |
 |---|---|
@@ -92,6 +93,9 @@ sub-specs.
 | **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
 | **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
 | **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
+| **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
+
+<!-- /roster:units -->
 
 ## Owner decision menu — all eight RESOLVED 2026-08-11
 
@@ -103,10 +107,11 @@ code and depends on none of the design questions. Its mechanism is being settled
 design panel rather than by this author's first instinct, because the first instinct is what shipped
 the bypass.
 
-**F5** — self-propagating authorization is refused. RE-ANSWERED at rev-5: the integrity comparison
-binds to the build README's authored Units table, which BUILD-METHOD M2 makes the roster and which a
-build README already carries, rather than to the plan region S5 would have invented. The property and
-the ratified intent are unchanged; the surface moved onto one that already exists.
+**F5** — REWRITTEN at rev-6 to claim what it delivers. It was ratified as "refuse self-propagating
+authorization", and no option ever on the table did that: the mechanism it named restored the
+INTEGRITY property, which is that a run cannot rewrite the scope it is executing against. That is
+what S8 delivers, bound to the Units table. Self-propagation is unrefused and sits in protocol §9
+with the other residues, because nothing inside the run's own process can refuse it.
 
 **F6** — a build authorizes both actions, and the amended charter sentence says so. Replacing the
 wording is a scope item, not a paraphrase.
@@ -125,9 +130,22 @@ refuses to run off the default branch.
 
 **F4** — the widening is recorded, naming all five losses.
 
-## Parked — needs an owner turn
+## Parked — RESOLVED 2026-08-11
 
-**P1 — F5's mitigation lost its mechanism, and restoring it is a scope choice.**
+**P1 — RESOLVED (owner, 2026-08-11): option (b).** The Units table gets a marker pair, and the
+integrity comparison binds to it. Recorded below as it was parked, because the reasoning is the
+record; what changed is the answer, not the question.
+
+**What (b) actually delivered, stated plainly because F5's title overpromised.** It restores the
+INTEGRITY property: a run cannot rewrite the scope it is executing against. It does NOT refuse
+self-propagation — a run that lands a new build README still authorizes the next run, and none of the
+three options would have changed that. Nothing inside the run's own process can; protocol §9 names
+the only thing that does. F5 is rewritten to claim what it delivers.
+
+**The residue (b) leaves.** The region is OPT-IN by presence, which is F1's ratified shape and what
+keeps the 26 builds that predate this working. F5's "required for any build created after this
+lands" has no mechanism here: a cutoff needs a declared value, and F0a ratified that this kit gains
+no declaration key. So a new build gets the protection by someone adding the markers, not by force.
 
 *The question.* F5 ratified "refuse self-propagating authorization" and its mechanism was S5's
 marker-delimited plan region: a run that lands a new build README authorizes the next run, and the
@@ -184,5 +202,5 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | INPROGRESS | rev-5 | 2026-08-11 |
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | INPROGRESS | rev-6 | 2026-08-11 |
 <!-- /gen:build-index -->
