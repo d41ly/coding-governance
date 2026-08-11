@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.5   # gov:kit memory-tree@2.5 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.7   # gov:kit memory-tree@2.7 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -683,6 +683,16 @@ if [ "$STAGED" = 0 ]; then
   if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
     printf '%s
 ' "$got"; status=1
+  fi
+fi
+
+# 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason
+# 13-19 are: the assertion is a corpus walk with a pin, which is a Python job, and check-arms.py's
+# population is `*.sh` only, so the branches are armed by the module's own selftest.
+if [ "$STAGED" = 0 ]; then
+  if ! rowg=$("$_PY" "$HERE/row_grammar.py" --check 2>&1); then
+    printf '%s
+' "$rowg"; status=1
   fi
 fi
 

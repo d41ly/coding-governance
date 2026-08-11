@@ -60,6 +60,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 | `a` | daily-agent | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 | `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 | `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
+| `d` | d41ly | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
 minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
@@ -73,7 +74,7 @@ its shards sit frozen under `memory/archive/`.
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 2.2 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+- `memory/` hygiene (20 checks, flat tree since kit 1.5; engine at kit 2.6 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
@@ -90,6 +91,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - verifier fan-out — `tools/workflows/check-verifier-fanout.sh` (+ `.test.sh`) and the protocol's kit/dogfood parity, `tools/workflows/check-protocol-parity.test.sh`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js` git can see — tracked OR untracked-and-unignored), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
+- run-gates evidence — `tools/run-gates.evidence.test.sh` (a red leg's own output survives on disk under `<gitdir>/gate-logs/`, the durable summary POINTS at it, and `gate-last-failure.txt` outlives a green re-run; drives the runner through `GATE_LEGS` so it never re-enters the real bar)
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - pre-push self-test — `.githooks/pre-push.test.sh` (the pre-push runs the full bar on a default-branch push, blocks a red one)
 - push-main self-test — `tools/push-main.test.sh` (the lander reconciles origin before the gate, retries a mid-gate race capped, aborts a conflict; the hook refuses a raw default-branch push)
@@ -125,6 +127,15 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+
+- **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
+  can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
+  `tools/memory-tree/check-verdict-epoch.test.sh` · `skills/session-kickoff/manifest-check.test.sh` ·
+  `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
+  the engines carrying their arms in a `--selftest` mode rather than a sibling file —
+  `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
+  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

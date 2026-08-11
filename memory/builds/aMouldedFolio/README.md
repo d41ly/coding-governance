@@ -1,0 +1,51 @@
+---
+slug: aMouldedFolio
+node: a
+opened: 2026-08-11
+streams: tooling
+roster: TOOL
+ids: TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
+---
+
+# aMouldedFolio — enforceable templates and generated documents for the load-bearing corpus
+
+Node `a` · opened 2026-08-11 · stream tooling.
+
+Several load-bearing documents here are hand-AUTHORED and drift — between this repo and its
+adopters, and between files inside one repo. This build asks whether they can be put under an
+enforceable template, and how much of each can stop being authored at all.
+
+## Start here
+
+**State.** RESEARCH COMPLETE, **route RATIFIED 2026-08-11**. One record:
+[the census + route](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md). No
+template, renderer or gate leg written yet — that was the research cut-line, not the build's.
+
+**Next action.** Write unit 1's spec: `ids:` becomes GENERATED from `corpus_ids.def_builds` (the
+full roster), the README's mechanical prose blocks join the generated region, and the unit repairs
+the three defects it touches. Tier 2, so the spec is approved before building.
+
+**The three ratified calls** (§10): `ids:` is derived, not authored — the field that caused the
+headline defect stops existing. Unit 1 repairs what it touches. Adopter reachability folds in as
+unit 7, which makes this a **7-unit build that adds one gate leg** and its six obligations.
+
+**What the research changed about the ask.** Templates are not the binding constraint — this repo
+already runs the template→render→byte-parity mechanism five times and it is green over documents
+that are provably false. The corpus's real axis is AUTHORED-vs-DERIVED *per section*, and the
+enforcement instrument is the marker-region, not the template.
+
+**Method.** 13 agents: 5 source-verification census lanes → 3 cross-cutting analysis lanes → 5
+adversarial verifiers, all claims joined on orchestrator-assigned integer ids. 109 load-bearing
+claims judged: 92 confirmed, 17 refuted, 0 unverified. The 17 refutations are listed in §9 and
+several corrected real errors — read them before citing anything here.
+
+Records live under `build/`. The table below is GENERATED from this folder's spec status headers —
+do not hand-edit it.
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | SPECCED | rev-3 | 2026-08-11 |
+<!-- /gen:build-index -->

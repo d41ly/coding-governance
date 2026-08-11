@@ -1,6 +1,6 @@
 [
   {
-    "name": "memory hygiene (19 checks)",
+    "name": "memory hygiene (20 checks)",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
@@ -129,6 +129,14 @@
     ]
   },
   {
+    "name": "row-grammar selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/row_grammar.py",
+      "--selftest"
+    ]
+  },
+  {
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",
@@ -173,7 +181,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (\u22645 verify agents per review)",
+    "name": "verifier fan-out (≤5 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
@@ -329,6 +337,13 @@
     "argv": [
       "bash",
       "tools/run-gates.test.sh"
+    ]
+  },
+  {
+    "name": "run-gates evidence",
+    "argv": [
+      "bash",
+      "tools/run-gates.evidence.test.sh"
     ]
   },
   {
