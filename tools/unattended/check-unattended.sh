@@ -14,7 +14,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.2   # gov:kit unattended@1.2 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -143,9 +143,8 @@ region()   { awk -v o="$2" -v c="$3" '
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
-# ---- only a mechanism to suppress. The `GIT()` pin above makes this leg's own reads honest; nothing
-# ---- constrains the NEXT tool to do the same, and the run can add one at any moment. Gated on the
-# ---- population like every other check here, so a tree with no run stays silent.
+# ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the
+# ---- next tool that reads the same objects, and the run can add one at any moment.
 if [ "$POP" -gt 0 ]; then
   rr=$(git for-each-ref --format='%(refname)' refs/replace/ 2>/dev/null | grep -c . || true)
   [ "$rr" = 0 ] \
@@ -156,9 +155,9 @@ if [ "$POP" -gt 0 ]; then
 fi
 
 # ITERATED WITH `read`, NOT WORD-SPLIT. `for f in $RUNS` split a tracked path containing a space into
-# two non-existent paths, both swallowed by the `[ -f ]` guard — so checks 4, 5, 6, 8, 9, 11 and 13
-# never ran on that file and the gate exited 0 without ever naming it. The mis-segmentation guard at
-# check 4 above could not see it either: the path matches the selector, it is the LOOP that loses it.
+# two non-existent paths, both swallowed by the `[ -f ]` guard — so every per-file check below never
+# ran on that file and the gate exited 0 without ever naming it. The mis-segmentation guard at check
+# 4 above could not see it either: the path matches the selector, it is the LOOP that loses it.
 live=""; nlive=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
@@ -220,57 +219,69 @@ while IFS= read -r f; do
     if [ -n "$d" ]; then
       # REMOTE-TRACKING ONLY, matching the driver: a bare local branch is a ref the run can move
       # with `git branch -f`, which is how BASE was made to equal HEAD.
-      # THE QUESTION CHANGED, because the old one wedged the bar on the kit's FIRST SUCCESS. It
-      # asserted the recorded BASE EQUALS the merge-base — and merging then pushing, the two acts a
-      # mandate authorizes, move the merge-base past the pin forever. Reproduced on an honest fixture
-      # with no attacker: green before landing, red on every later default-branch push, permanently.
-      # Terminal records are not rare; they are the steady state of every adopter that finished a run.
-      # Keying a carve-out on `phase:` is NOT the fix — the run writes that line, so it would be a
-      # one-line escape from checks 9 and 13.
-      #
-      # Equality was a proxy. The property that actually matters, and that survives landing: the
-      # recorded BASE lies on the history the ANCHOR names rather than on the branch the run authored,
-      # and it is not HEAD. Check 13 below still does the authorization work at that commit.
-      anchor=""
       for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
         GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-        anchor="$b"; break
-      done
-      if [ -n "$anchor" ]; then
+        # ANCESTRY, NOT EQUALITY — and the reason is the kit's own first success. Equality wedged the
+        # bar permanently: merging then pushing, the two acts an authorization grants, move the
+        # merge-base past the pin forever, so a LANDED record red every later default-branch push.
+        # Reproduced on an honest fixture with no attacker. A phase-keyed carve-out is not the fix
+        # either — the run writes `phase:`, so it would be a one-line escape from this check.
+        # What actually matters, and what survives landing: the recorded BASE lies on the history the
+        # ANCHOR names rather than on the branch the run authored.
         if ! GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
           fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
-        elif ! GIT merge-base --is-ancestor "$rb" "$anchor" 2>/dev/null; then
-          fail 9 "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded $rb against $anchor in $f"
+        elif ! GIT merge-base --is-ancestor "$rb" "$b" 2>/dev/null; then
+          fail 9 "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded $rb against $b in $f"
         elif ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
           fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
-        elif [ "$rb" = "$(GIT rev-parse HEAD)" ]; then
-          fail 9 "the recorded BASE equals HEAD, so the run authored every byte a mandate comparison would read: $f"
         fi
-      fi
+        # ONLY once the run claims to have built something. At PREFLIGHT and through the pass
+        # phases the base legitimately equals HEAD - that is a run that has correctly built
+        # nothing yet, and the driver blesses it there. Refusing it here made the two halves of one
+        # kit disagree, each with its own green test.
+        case "$ph" in
+          LANDING|LANDED|ABORTED|VERIFYING)
+            [ "$rb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+        esac
+        break
+      done
     fi
   fi
 
-  # ---- 13: THE MANDATE, asserted by the BAR and not only by the driver. The leg did not contain the
-  # ---- string `run:mandate` at all: it checked the driver's bookkeeping and never the thing the
-  # ---- bookkeeping is about, so all three of the authorization defects reproduced against it were
-  # ---- invisible here and the whole bar stayed green.
+  # ---- 13: THE AUTHORIZATION, asserted by the BAR and not only by the driver. This leg once did not
+  # ---- contain the marker string at all: it checked the driver's bookkeeping and never the thing the
+  # ---- bookkeeping was about, so all three authorization defects reproduced against it were invisible
+  # ---- here and the whole bar stayed green. The subject moved from a mandate block inside the
+  # ---- run-state file to the BUILD FOLDER itself; the obligation to assert it here did not.
   # ----
-  # ---- This is deliberately a SECOND OPINION and not a second implementation: it re-extracts both
-  # ---- blocks itself, from the base commit and from the working copy, and refuses on anything that
-  # ---- is not exactly one well-formed block on each side.
+  # ---- A SECOND OPINION, not a second implementation: it derives the build README path from the
+  # ---- run-state file's own location and reads it at the recorded BASE itself.
+  # ----
+  # ---- Honest limit, and it belongs next to the code rather than in a document nobody reads at the
+  # ---- same time: `rb` is read from a file the run writes. This is an internal-consistency assertion
+  # ---- over run-written facts, stable and offline and deterministic - not an authorization verdict.
+  # ---- What makes it one is running this same leg in a clone the run never touched.
   if [ -n "$rb" ] && GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
-    if bb=$(GIT show "$rb:$f" 2>/dev/null); then
-      ma=$(printf '%s\n' "$bb" | region - '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && ra=0 || ra=$?
-      mb2=$(region "$f" '<!-- run:mandate -->' '<!-- /run:mandate -->' 2>/dev/null) && rb2=0 || rb2=$?
-      if [ "$ra" != 0 ] || [ "$rb2" != 0 ]; then
-        fail 13 "a run-state file does not carry exactly one well-formed mandate block on both sides of the BASE comparison; a second block is a second authorization nobody granted: $f"
-      elif [ -z "$(printf '%s' "$ma" | tr -d '[:space:]')" ]; then
-        fail 13 "the mandate block is absent or empty at the recorded BASE, so nothing committed before the run authorizes it: $f"
-      elif [ "$ma" != "$mb2" ]; then
-        fail 13 "a run-state file's mandate differs from the one at its recorded BASE — the run edited its own authorization: $f"
-      fi
+    bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
+    bre="$M/builds/$bslug/README.md"
+    if bb=$(GIT show "$rb:$bre" 2>/dev/null); then
+      bad_fm=0
+      case "$bb" in
+        "---"*) ;;
+        *) fail 13 "the build README at a run's recorded BASE is not a build README - front matter opens at line 1 and this does not, so the authorization names something that is not a build: $bre"
+           bad_fm=1 ;;
+      esac
+      # The slug comparison PRESUMES line 1 is the front-matter opener. Falling through emitted a
+      # second, false "declares a different slug" for a file that is simply not a README - and the
+      # driver this leg second-opinions returns after the first refusal.
+      [ "$bad_fm" = 0 ] || continue
+      dslug=$(printf '%s\n' "$bb" | awk '
+        NR == 1 { next }
+        /^---[[:space:]]*\r?$/ { exit }
+        /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
+      [ "$dslug" = "$bslug" ] || fail 13 "a build README at its run's recorded BASE declares a different slug, so the folder was renamed or its README copied from another build: declared $dslug, folder $bslug"
     else
-      fail 13 "a run-state file does not exist at its own recorded BASE, so its mandate cannot have been committed before the run: $rb in $f"
+      fail 13 "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it: $rb in $bre"
     fi
   fi
 

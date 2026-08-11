@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aMooredAnchor-1
+ids: TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 ---
 
 # aMooredAnchor — the anchor the run cannot move
@@ -21,8 +21,18 @@ This README is the master overview and the owner decision menu, per `memory/TEMP
 
 ## Start here
 
-**State.** Specced, not built. One unit. The reproduction harness ran before a line of the spec was
-written, and its transcript is in `build/`.
+**State.** BUILT and landed as one unit, after being REBASED twice onto work that landed from other
+sessions mid-build. The reproduction harness ran before a line of the spec was written, and its
+transcript is in `build/`.
+
+**What survived the rebases, and what did not.** `aStandingWrit` S0 solved the anchor half
+independently and better — it made the rewritten tracking ref and the env-supplied branch name INERT
+rather than detected, and it measured something this build had wrong: `GIT_NO_REPLACE_OBJECTS=1`
+does NOT suppress a graft file, only `GIT_GRAFT_FILE` pointing outside the repo does. So this build's
+anchor material and its §1a bound paragraph were both WITHDRAWN rather than merged, and what shipped
+is the four defects no fork answer reached, each verified still-live on `main` immediately before
+re-applying: the marker grammar, the terminal-record lifecycle, the word-split population loop, and
+the replace-ref/graft PRESENCE refusal.
 
 **What was reproduced, with controls.** The harness builds the same fixture
 `check-unattended.test.sh` builds, then runs two controls and four defeats. Both controls behave:
@@ -54,7 +64,7 @@ thing here the owner should decide rather than the builder.
 
 | Unit | Subject | Obligation |
 |---|---|---|
-| **Unit 1** | `TOOL-aMooredAnchor-1` — the trust root, and the gate's independence from it | pick and implement an anchor that survives `git update-ref`; make every unresolvable-anchor path a named refusal in the gate as well as the driver; stop the gate reading the driver's env var; arm all of it |
+| **Unit 1** | `TOOL-aMooredAnchor-1` — marker grammar, the landing lifecycle, and two silent skips | close the four reproduced defeats that no trust-root answer reaches, on whatever base main is at when it lands. **Met**, after two rebases |
 
 ## Owner decision menu — RESOLVED
 
@@ -71,9 +81,9 @@ the only purely-local unforgeable root, and three repo-local `git config` lines 
 So the recommendation changed to **D — concede the bound and write it as a checkable sentence** —
 and the review's structural finding is what makes that cost nothing: *none of the work that closes a
 reproduced defeat depends on which trust root is chosen.* The bound now lives in
-`PROTOCOL.template.md` §1a and in the driver's own source, replacing the sentence that asserted the
-opposite. Closing the anchor at all is `TOOL-aMooredAnchor-2`, deferred with C as the only candidate
-that can be made true.
+the driver's own source, replacing the sentence that asserted the opposite. The protocol statement
+was withdrawn in favour of `aStandingWrit`'s §9, which says it better — a rule in two carriers is a
+defect in the second. Closing the anchor at all is `aStandingWrit`'s ground now, not this build's.
 
 **F2 — one resolver or two · resolved to neither.** With A withdrawn there is no fetch to share, so
 no `anchor.sh` is added. The rev-1 cost note was wrong in both directions: `check-arms.py` discovers
@@ -101,7 +111,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATE
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

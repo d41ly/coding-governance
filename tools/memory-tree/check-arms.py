@@ -17,9 +17,11 @@ whole suite goes permanently red. `*.test.sh` is excluded outright as well: the 
 heredoc away, and this module's own selftest already writes one.
 
 WHY THE KEY CARRIES THE GATE. Not because one gate's arm could silence another's — it could not, the
-arm scan reads each gate's own sibling test. Because the PIN's keys are global: measured, seven keys
-are claimed by both of this repo's gates — (1,1) (2,1) (3,1) (4,1) (5,1) (5,2) (6,1) — so a two-field
-pin row raises false stale-signature reds against the other gate, or falsely EXEMPTS it.
+arm scan reads each gate's own sibling test. Because the PIN's keys are global, and every discovered
+gate numbers its checks from 1, so the same (number, ordinal) pair is claimed by several gates at
+once — a two-field pin row raises false stale-signature reds against the other gate, or falsely
+EXEMPTS it. The overlap COUNT is deliberately not written here: it moves with every gate that lands,
+and the copy of it that used to sit in this docstring outlived the four-gate population by two.
 
 WHY THE CAPTURE STOPS AT THE CLOSING QUOTE. `manifest-check.sh` writes five branches inline as
 `{ fail 2 "…"; BLOCK_OK=0; }`. Capturing to end of line puts `"; BLOCK_OK=0; }` into the signature —

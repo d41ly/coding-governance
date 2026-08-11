@@ -5,7 +5,9 @@
 # Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
 #
 # EMPTY, and that is the point of the file rather than the end of it. Every branch in every
-# discovered gate is armed today (30/30, measured). A row appears here only when a NEW branch lands
+# discovered gate is armed today; `check-arms.py --report` prints the count, and this comment does
+# not, because a number written here rots silently. A row appears here only when a NEW branch lands
 # with no fixture that can reach it, and it carries the reason it cannot be armed — "not yet
 # written" and "cannot be written from here" are indistinguishable in a bare pin, and only one of
 # them is acceptable.
+tools/unattended/unattended.sh	9	4	cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has

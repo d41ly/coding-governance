@@ -1,6 +1,6 @@
 ---
 name: unattended
-description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner has committed a standing mandate for a build and wants it carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
+description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
 
 # Unattended runs
@@ -18,10 +18,10 @@ distinction real.
 0. **Read the build method first, if this project ships one:** `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`.
    It is the memory-tree kit's, not this one's, so it may be absent — that is legal, and this kit
    states none of what it carries.
-1. **Find the mandate. Do not write one.** The owner authors a mandate block in the build's run-state
-   file and commits it BEFORE the run starts. If there is none, stop and say so — a mandate you
-   wrote authorizes nothing, and the preflight will refuse it anyway by comparing against the pinned
-   BASE.
+1. **The build folder IS the authorization — you do not write one, and neither does the owner.** A
+   `{{MEMORY_ROOT}}/builds/<slug>/README.md` committed before your branch existed is the whole
+   precondition. Preflight refuses a build folder you created, because a run that authorizes itself
+   has no authorization. You also do not create the run-state file: preflight does that.
 2. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
    store is in-memory and session-scoped, reachable only through your own tool calls. Use
    `{{KEEPALIVE_CREATE}}`, at the cadence this project declares — {{KEEPALIVE_INTERVAL}}. Keep the
@@ -32,8 +32,9 @@ distinction real.
    bash {{KIT_DIR}}/unattended.sh --preflight <slug> --keepalive-id <id>
    ```
 
-   It refuses on a dirty tree, on the default branch, on an unwired repo, on an absent or edited
-   mandate, and when a second run is already live. It writes nothing until every one of those
+   It refuses on a dirty tree, on the default branch, on an unwired repo, when the build README is
+   absent at the pinned BASE or does not name this build, when the remote does not answer or
+   advertises no default branch of its own, and when a second run is already live. It writes nothing until every one of those
    passes. Read the refusal it prints — each one names itself.
 
 ## While it runs
@@ -45,6 +46,25 @@ distinction real.
   bare "parked" is indistinguishable from "forgotten", and the wrap-up is where the owner gets the
   turn you did not take.
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
+
+## While the work runs
+
+Move the phase as each pass ends, and give it a witness. The members are named for the build method's
+pass kinds, so the run's position and the pass it is performing are one vocabulary rather than two:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
+```
+
+Ask what is left instead of re-reading prose for it:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --plan <slug>
+```
+
+It prints each tracked spec's id, status and classification, and names the next unit. It cannot see a
+planned unit that has no spec yet, and says so on every run rather than printing a complete-looking
+list.
 
 ## Resume
 
@@ -83,7 +103,7 @@ override nobody can read afterwards is just a skipped check.
 
 Never with a hook-bypass flag. The lander is mandatory because it reconciles the remote BEFORE the
 gate, so the bar never runs on an already-stale tree. If it refuses, read why and fix it — bypassing
-discards the entire bar the mandate leaned on, and the gate greps your run-state file for the flag.
+discards the entire bar the authorization leaned on, and the gate greps your run-state file for the flag.
 
 ## Reap
 

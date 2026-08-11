@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-10
 streams: deployer+tooling
 roster: DEPL+TOOL
-ids: TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+ids: DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1
 ---
 
 # aSealedCaravan — one install prefix, and a deployer that lands the chain mechanically
@@ -57,7 +57,7 @@ Records live under `spec/` and, once built, `build/` and `reviews/`. The table b
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

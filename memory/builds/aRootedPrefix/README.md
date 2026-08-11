@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-09
 streams: tooling
 roster: TOOL
-ids: TOOL-aRootedPrefix-1
+ids: TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 ---
 
 # aRootedPrefix — codebase-map at any install prefix
@@ -16,7 +16,7 @@ corpus that produced instead of failing. Measured on paired fixture repos: one r
 shipped reinvention reports `collision_flags: 1` at a root install and `0` at a prefixed one.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aRootedPrefix-1
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
