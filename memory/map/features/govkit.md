@@ -69,9 +69,11 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
 
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
-- `tools/govkit/govkit.py` — `selfcheck`, plus the read-only `plan` and `check`. `apply`,
-  `apply --resume` and `intake` are later rollout commits and are ABSENT rather than stubbed,
-  because a subcommand that parses and does nothing is indistinguishable from one that works.
+- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan` and `check`, and `apply` /
+  `apply --resume` with the receipt. `intake` is a later rollout commit and is ABSENT rather than
+  stubbed, because a subcommand that parses and does nothing is indistinguishable from one that
+  works. `apply` lands the roles it can honour and refuses the others BY NAME, and reports the two
+  steps of the hard order it cannot perform on every run rather than skipping them quietly.
 - `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
   arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
   six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.
@@ -91,11 +93,16 @@ registry-shaped assertion this unit adds.
 
 ## Gaps
 
-The deployer does not deploy yet: `apply`, `apply --resume`, `intake`, the receipt and the acceptance
-matrix are rollout commits 3 and 4. `check` therefore reports on a receipt no verb in this tree
-writes, which is why its NOT-LANDED arm is the one a fixture can reach today.
+Named rather than assumed, because a deployer that is quiet about its own holes is the thing this
+unit exists to replace:
 
-Two AC10 assertions remain unimplemented and are named rather than assumed: the guard-class partition
-(every guard pathspec falls into exactly one declared class) and the derived `mutates_index` (grep
-each adopter for an EXECUTED `git add` rather than trusting a declared value). The version
-cross-check landed.
+- **`merged` and `rendered` roles do not land.** `apply` refuses a `merged` rule by name. Writing a
+  gov-owned region into a target-owned file has no seam anywhere in this repo — measured, nothing
+  here writes a `.gitattributes` block or performs the renormalize that follows it. `rendered`
+  artifacts are produced by the ADOPTERS, so govkit copying one would be a second renderer racing
+  the real one; the receipt records them, `apply` does not write them.
+- **The gate-runner and CI emitter is not built.** S5's last step is reported as SKIPPED on every
+  run.
+- **`intake` is absent**, so a target descriptor is authored by hand today.
+- **Two AC10 assertions are unimplemented**: the guard-class partition, and the derived
+  `mutates_index`. The version cross-check landed.

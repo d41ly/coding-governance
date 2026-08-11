@@ -233,6 +233,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "blob_at",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -326,6 +331,11 @@
       "id": "cleanup",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "cmd_apply",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "cmd_check",
@@ -566,6 +576,11 @@
       "id": "fan_in",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "foreign_kit_present",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "git",

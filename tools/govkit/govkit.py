@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""govkit — the mechanical deployer. Rollout commit 1: the registry and `selfcheck`.
+"""govkit — the mechanical deployer.
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. Rollout commit 1 ships `registry.toml`, a
-descriptor per entry, and `selfcheck`. `plan`, `check`, `apply`, `apply --resume` and `intake` are
-commits 2 through 4 and are ABSENT rather than stubbed: a subcommand that parses and does nothing is
-indistinguishable, from the outside, from one that works, and this unit exists because that class of
-silence ships broken installs.
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. `selfcheck`, the read-only `plan` and `check`, and
+`apply` / `apply --resume`. `intake` is a later rollout commit and is ABSENT rather than stubbed: a
+subcommand that parses and does nothing is indistinguishable, from the outside, from one that works,
+and this unit exists because that class of silence ships broken installs.
+
+`apply` lands the roles it can honour and REFUSES the ones it cannot, by name. Two steps of S5's hard
+order have no implementation anywhere in this repo — writing a gov-owned region into a target-owned
+file, and emitting a leg into the target's own gate runner — and both are REPORTED on every run
+rather than skipped quietly. A deployer that says nothing about what it did not do is the failure
+this unit was built to end.
 
 `selfcheck` is the ratchet. Its most load-bearing arm is the SURFACE predicate (spec S12): every
 tracked path in the declared surface is an entry, a member of exactly one entry's file rules, or an
@@ -20,7 +25,8 @@ EVERY REFUSAL PRINTS ITS OWN MESSAGE AND IS COUNTED. Exit 0 clean, 1 findings, 2
 
 from __future__ import annotations
 
-import os
+import hashlib
+import json
 import pathlib
 import re
 import subprocess
@@ -553,7 +559,6 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                "in the target — but `check` cannot verify an install that left no record")
         return r.emit()
 
-    import json  # noqa: PLC0415 — only this path needs it
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
@@ -608,6 +613,204 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
     return r.emit()
 
 
+# ----------------------------------------------------------------------------------------- apply
+# Roles `apply` can land today. `merged` is deliberately NOT here: writing a gov-owned region into a
+# file the target owns is the one shape with no seam anywhere in this repo — measured, nothing here
+# writes a `.gitattributes` block or performs the renormalize that follows it — and a half-written
+# anchored-region writer is worse than a named refusal. `rendered` is not here either, and for the
+# opposite reason: the ADOPTERS render those artifacts themselves, so govkit copying a rendered
+# output would be a second renderer racing the real one.
+LANDABLE_ROLES = ("engine", "seed")
+
+
+def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
+    """Bytes from the gov git INDEX at a recorded commit — never from the working tree.
+
+    This is the receipt's whole provenance claim. Reading the working tree would make the receipt
+    say "these bytes came from <commit>" about bytes that came from whatever the operator had
+    checked out and half-edited at the time.
+    """
+    out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
+                         capture_output=True, check=False)
+    return out.stdout if out.returncode == 0 else None
+
+
+def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
+                        receipt: dict | None) -> list[str]:
+    """Registry entries resolvable in the target that THIS target's receipt does not claim.
+
+    The unqualified form of this predicate refuses every re-run the unit designs for: after the
+    first apply, a version constant resolves AND a receipt exists, so idempotency, `--resume` and
+    a re-apply all become unreachable. The carve-out is the receipt: a kit this target's own receipt
+    claims is the authorized path and proceeds.
+    """
+    claimed = set((receipt or {}).get("kits") or [])
+    found = []
+    for eid, (d, _p) in descs.items():
+        if eid in claimed:
+            continue
+        # Probe the entry's DECLARED destinations, at both the canonical and the root prefix. An
+        # earlier form guessed a kit-relative path from the entry id, which missed every FLAT entry
+        # — the ones with no kit directory at all — so a target already carrying one of those was
+        # not detected as kitted. Caught by this file's own arm.
+        probes: list[str] = []
+        vf = d.get("version_from") or {}
+        vf_name = pathlib.PurePosixPath(vf["file"]).name if vf.get("file") else None
+        for prefix in ("tools", ""):
+            ctx = {"prefix": prefix, "kit_id": eid,
+                   "kit": f"{prefix}/{eid}" if prefix else eid, "memory_root": "memory"}
+            for rule in d.get("files", []):
+                for dest in rule_destinations(d, rule):
+                    resolved, missing = resolve_tokens(dest, ctx)
+                    if missing:
+                        continue
+                    if vf_name is None or pathlib.PurePosixPath(resolved).name == vf_name:
+                        probes.append(resolved)
+            if vf_name:
+                probes.append(f"{prefix}/{eid}/{vf_name}" if prefix else f"{eid}/{vf_name}")
+        if d.get("sentinel"):
+            probes.append(d["sentinel"])
+        for pr in dict.fromkeys(probes):
+            if pr and (target / pr).exists():
+                found.append(f"{eid} (at {pr})")
+                break
+    return found
+
+
+def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+              resume: bool) -> int:
+    r = Report()
+    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    descs = read_descriptors(root, reg, r)
+    if r.problems:
+        return r.emit()
+    # Target IDENTITY first, before anything is read out of it. A refusal about WHICH repository
+    # this is must not queue behind a complaint about that repository's contents.
+    if pathlib.Path(root).resolve() == target.resolve():
+        raise Refusal("--target resolves to the gov checkout itself; deploying into this repo is a "
+                      "stated non-goal and would be indistinguishable from a self-overwrite")
+
+    deploy = load_deploy(target)
+    selection = resolve_selection(descs, mode, kits)
+    commit = git(root, "rev-parse", "HEAD").strip()
+
+    receipt_path = target / ".governance" / "install.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8")) if receipt_path.is_file() else None
+    if resume and receipt is None:
+        raise Refusal("--resume needs an existing receipt; there is no install here to resume")
+
+    # ---- AC8: refuse a FOREIGN kit before writing anything. A kit this target's own receipt claims
+    # ---- is the authorized re-run and proceeds.
+    foreign = foreign_kit_present(target, descs, receipt)
+    if foreign and not resume:
+        raise Refusal(
+            "the target already carries " + ", ".join(sorted(foreign)) + " and this target's "
+            "receipt does not claim it. Converging a repo that already has kits is a stated "
+            "non-goal; refusing before writing anything"
+        )
+
+    # ---- refuse a role this commit cannot honour, BEFORE writing. Naming it beats half-landing it.
+    for eid in selection:
+        for rule in descs[eid][0].get("files", []):
+            role = rule.get("role", "engine")
+            if role == "merged":
+                r.fail(f"entry '{eid}' declares a `merged` rule, and no verb here can write a "
+                       f"gov-owned region into a target-owned file yet — nothing in this repo does "
+                       f"it, so there is no seam to extend. Refusing rather than half-landing it")
+    if r.problems:
+        return r.emit()
+
+    written: list[dict] = []
+    # ---- LAND. Kit content from the index at `commit`, in the hard order S5 states. The
+    # ---- `.gitattributes` block and the gate-runner wiring are the two steps this commit cannot
+    # ---- perform; both are reported so the order is honest about what it skipped.
+    print(f"govkit apply — LAND from {commit[:8]} into {target.as_posix()}")
+    print("govkit apply — .gitattributes blocks: SKIPPED (no writer exists yet; reported, not silent)")
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        home = (d.get("home") or "").rstrip("/")
+        for rule in d.get("files", []):
+            role = rule.get("role", "engine")
+            if role not in LANDABLE_ROLES or rule.get("scope") == "machine" or rule.get("link"):
+                continue
+            inc = rule.get("include")
+            srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+            if any(s == "**" for s in srcs):
+                pool = [f for f in tracked(root) if home and f.startswith(home + "/")]
+            else:
+                pool = rule_sources(d, rule)
+            for src in pool:
+                # An explicit `to` WINS for every role. Defaulting engine files to the kit-relative
+                # form regardless is how a flat entry — one with no kit directory at all — silently
+                # lands under a directory it does not have. The default applies only where the rule
+                # declared no destination.
+                if rule.get("to"):
+                    dests = [resolve_tokens(x.replace("{relpath}",
+                                                      pathlib.PurePosixPath(src).name), ctx)[0]
+                             for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
+                else:
+                    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
+                        pathlib.PurePosixPath(src).name
+                    dests = [f"{ctx['kit']}/{rel}"]
+                data = blob_at(root, commit, src)
+                if data is None:
+                    r.fail(f"entry '{eid}': {src} does not resolve at {commit[:8]}")
+                    continue
+                for dest in dests:
+                    dp = target / dest
+                    if role == "seed" and dp.exists():
+                        continue  # seed: copied ONCE, then the target owns it
+                    dp.parent.mkdir(parents=True, exist_ok=True)
+                    dp.write_bytes(data)
+                    written.append({"path": dest, "role": role, "kit": eid,
+                                    "sha256": hashlib.sha256(data).hexdigest(),
+                                    "source": src, "commit": commit})
+    print(f"govkit apply — landed {len(written)} file(s)")
+
+    # ---- STAGE. Not housekeeping: every gate in this suite reads the INDEX, so an unstaged install
+    # ---- is invisible to the verification that follows it.
+    if written:
+        subprocess.run(["git", "-C", str(target), "add", "--"] + [w["path"] for w in written],
+                       capture_output=True, check=False)
+    print("govkit apply — staged everything written")
+    print("govkit apply — gate-runner and CI legs: SKIPPED (no emitter yet; reported, not silent)")
+
+    # ---- CONFIGURE. A kit with a blocks_adopt hole lands and is NOT configured.
+    outbox = target / ".governance" / "outbox"
+    outbox.mkdir(parents=True, exist_ok=True)
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        blocked = [h for h in d.get("hole", []) if h.get("blocks_adopt")]
+        for h in d.get("hole", []):
+            (outbox / f"{h.get('id')}.md").write_text(
+                f"# {h.get('id')} — {eid}\n\n{h.get('why', '').strip()}\n\n"
+                f"Discharge is decided by RUNNING this hole's probe, never by deleting this file.\n",
+                encoding="utf-8", newline="\n")
+        if blocked and not resume:
+            print(f"govkit apply — CONFIGURE {eid}: skipped, blocked by hole "
+                  f"'{blocked[0].get('id')}' — landed but inert")
+            continue
+        argv = d.get("adopt", {}).get("argv") or []
+        if not argv:
+            continue
+        resolved = [resolve_tokens(a, ctx)[0] for a in argv]
+        rc = subprocess.run(resolved, cwd=str(target), capture_output=True, text=True).returncode
+        print(f"govkit apply — CONFIGURE {eid}: adopter exit {rc}")
+
+    # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
+    (target / ".governance").mkdir(exist_ok=True)
+    receipt_path.write_text(json.dumps(
+        {"gov_source": str(root), "gov_commit": commit,
+         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": written},
+        indent=2) + "\n", encoding="utf-8", newline="\n")
+    (target / ".governance" / "install.sums").write_text(
+        "".join(f"{w['sha256']}  {w['path']}\n" for w in written), encoding="utf-8", newline="\n")
+    print(f"govkit apply — receipt written: {len(written)} file(s), {len(selection)} kit(s)")
+    return r.emit()
+
+
 def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tuple[dict, str]]:
     """Shared by every verb: the registry's entries, parsed. A missing one is a refusal, not a skip."""
     descs: dict[str, tuple[dict, str]] = {}
@@ -629,24 +832,29 @@ USAGE = """usage:
   govkit.py selfcheck
   govkit.py plan  --target <path> [--kits a,b | --all]
   govkit.py check --target <path>
+  govkit.py apply --target <path> [--kits a,b | --all] [--resume]
 
-`plan` and `check` are READ-ONLY and neither writes a byte. `apply`, `apply --resume` and `intake`
-are later rollout commits and are absent rather than stubbed — a subcommand that parses and does
+`plan` and `check` are READ-ONLY and neither writes a byte. `intake` is a later rollout commit and is
+absent rather than stubbed — a subcommand that parses and does
 nothing looks exactly like one that works, from the outside, and this unit exists because that class
 of silence ships broken installs.
 """
 
 
-def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str]]:
+def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str], bool]:
     verb = argv[0]
     target: pathlib.Path | None = None
     mode, kits = "default", []
+    resume = False
     i = 1
     while i < len(argv):
         a = argv[i]
         if a == "--target" and i + 1 < len(argv):
             target = pathlib.Path(argv[i + 1]).resolve()
             i += 2
+        elif a == "--resume":
+            resume = True
+            i += 1
         elif a == "--all":
             mode = "all"
             i += 1
@@ -655,7 +863,7 @@ def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits
+    return verb, target, mode, kits, resume
 
 
 def main(argv: list[str]) -> int:
@@ -663,13 +871,13 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits = parse_args(argv)
+        verb, target, mode, kits, RESUME = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             if len(argv) != 1:
                 raise Refusal("selfcheck takes no arguments")
             return selfcheck(root)
-        if verb in ("plan", "check"):
+        if verb in ("plan", "check", "apply"):
             if target is None:
                 raise Refusal(
                     f"{verb} needs an explicit --target. Refusing to default it to the process cwd: "
@@ -677,7 +885,11 @@ def main(argv: list[str]) -> int:
                 )
             if not (target / ".git").exists():
                 raise Refusal(f"--target {target.as_posix()} is not a git repository")
-            return cmd_plan(root, target, mode, kits) if verb == "plan" else cmd_check(root, target)
+            if verb == "plan":
+                return cmd_plan(root, target, mode, kits)
+            if verb == "check":
+                return cmd_check(root, target)
+            return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2
     except Refusal as e:

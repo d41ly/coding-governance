@@ -175,6 +175,77 @@ def main() -> int:
         check("check reds on a receipt claiming an unknown kit", p.returncode == 1, p.stdout)
         check("that message names the kit", "claims kit 'ghost-kit'" in p.stdout, p.stdout)
 
+        # ================= apply =================
+        # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
+        # adopter, so these arms measure the LAND path rather than somebody else's adopter.
+        ap = make_target(tmp / "d", DEPLOY_FULL)
+        p = run("apply", "--target", str(ap), "--kits", "check-wiring")
+        check("apply exits 0 over a clean target", p.returncode == 0, p.stdout + p.stderr)
+        check("apply landed the flat destination its descriptor DECLARES, not a kit-relative default",
+              (ap / "tools" / "check-wiring.sh").is_file(),
+              str(sorted(q.as_posix() for q in (ap / "tools").rglob("*"))))
+        check("apply wrote a receipt", (ap / ".governance" / "install.json").is_file())
+        check("apply wrote the flat sums sidecar a target verifies with bash alone",
+              (ap / ".governance" / "install.sums").is_file())
+        check("apply STAGED what it wrote — every gate here reads the index",
+              "tools/check-wiring.sh" in subprocess.run(
+                  ["git", "-C", str(ap), "diff", "--cached", "--name-only"],
+                  capture_output=True, text=True).stdout, "")
+        check("apply reports the steps it could NOT perform rather than skipping silently",
+              "SKIPPED (no writer exists yet; reported, not silent)" in p.stdout and
+              "gate-runner and CI legs: SKIPPED" in p.stdout, p.stdout)
+
+        rec1 = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        # --- AC3 provenance: the bytes are the INDEX's at the recorded commit, not the working
+        # --- tree's. Asserted by comparing against `git show`, which is the receipt's whole claim.
+        f0 = rec1["files"][0]
+        idx = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+                              f"{f0['commit']}:{f0['source']}"], capture_output=True).stdout
+        check("a landed file's bytes equal the gov INDEX at the recorded commit",
+              (ap / f0["path"]).read_bytes() == idx, f0["path"])
+
+        # --- AC2 idempotency: path-and-hash over the receipt, not porcelain. The second run must be
+        # --- ALLOWED — the unqualified refuse-a-kitted-repo predicate made this unreachable.
+        p = run("apply", "--target", str(ap), "--kits", "check-wiring")
+        check("a second apply is NOT refused — the receipt authorises it", p.returncode == 0,
+              p.stdout + p.stderr)
+        rec2 = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("apply twice changes no path and no hash",
+              {(f["path"], f["sha256"]) for f in rec1["files"]} ==
+              {(f["path"], f["sha256"]) for f in rec2["files"]}, "")
+
+        # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
+        for_ = make_target(tmp / "e", DEPLOY_FULL)
+        (for_ / "tools").mkdir(parents=True, exist_ok=True)
+        (for_ / "tools" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
+                                                        encoding="utf-8")
+        p = run("apply", "--target", str(for_), "--kits", "memory-tree")
+        check("apply refuses a target already carrying a kit no receipt claims", p.returncode == 2)
+        check("that refusal NAMES the kit and where it resolved",
+              "check-wiring (at tools/check-wiring.sh)" in p.stderr, p.stderr)
+        check("the refusal happened BEFORE any write",
+              not (for_ / ".governance" / "install.json").exists(), "")
+
+        # --- a `merged` rule refuses by name rather than half-landing.
+        p = run("apply", "--target", str(make_target(tmp / "f", DEPLOY_FULL)),
+                "--kits", "pytest-parallel-guardrails")
+        check("apply refuses a merged rule it cannot honour", p.returncode == 1, p.stdout)
+        check("that refusal says there is no seam to extend",
+              "no seam to extend" in p.stdout, p.stdout)
+
+        # --- deploying into gov itself is a stated non-goal, and is refused before anything.
+        p = run("apply", "--target", str(HERE.parents[1]), "--kits", "check-wiring")
+        check("apply refuses the gov checkout as its own target", p.returncode == 2)
+        check("that refusal calls it a stated non-goal", "stated non-goal" in p.stderr, p.stderr)
+
+        # --- --resume needs an install to resume.
+        p = run("apply", "--target", str(make_target(tmp / "g", DEPLOY_FULL)),
+                "--kits", "check-wiring", "--resume")
+        check("--resume refuses with no receipt", p.returncode == 2)
+        check("that refusal says there is no install to resume",
+              "no install here to resume" in p.stderr, p.stderr)
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")
