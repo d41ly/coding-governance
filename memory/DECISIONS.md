@@ -28,6 +28,12 @@
 - TOOL-aUnmannedHelm-10 · CRLF reaches past everything that watches for it: `check-wiring.sh` only sees `.claude/`, and a byte-comparing gate is not the only consumer. Ask which consumer reads a file WHOLE — a launcher, a sourced conf, a hook
 - TOOL-aUnmannedHelm-9 · an adopter's refusals are ordered before it READS anything: the conf check fired first and told an operator running from a foreign repo to create a conf in the very tree the adopter must not adopt. A correct refusal with the wrong remedy is a defect
 
+
+- TOOL-aWrittenMethod-1 · the build METHOD is generic and belongs to the memory-tree kit beside the spec format and the record rules, not to the unattended kit, which points at it. It rides the existing parity leg as a third PAIRS row, so the bar stays at 47 legs
+- TOOL-aWrittenMethod-1 · a mis-aimed BRIEFING yields a confident wrong answer, not a visibly confused one: pass 1 was told the tension was self-authorship and scored on checkability, so every candidate delivered enforcement where a procedure was asked for
+- TOOL-aWrittenMethod-1 · absence-of-placeholder is not presence-of-value. Pre-initialising an interpolated conf key to empty makes emptiness the failure mode the `{{TOKEN}}` grep cannot see; default the key to its own token so an undeclared value reds
+- TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
+
 ## DEPL — deployer
 
 *(none yet)*

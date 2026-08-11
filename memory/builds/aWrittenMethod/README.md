@@ -45,7 +45,15 @@ in the template is now a pointer, which FREED 57 bytes against a gate with 148 t
 `customize.md` carries the fourteenth placeholder and a deletion recipe that no longer names a
 clause that is gone.
 
-**Next action:** the closing adversarial review of the code diff, the full bar, then land.
+**Closing review.** `reviews/2026-08-11-review-aWrittenMethod-1.md` — Tier-2 over the cumulative
+diff from the pinned BASE. 18 raw, 15 confirmed, 3 refuted, precision 0.83, no blockers, 2 highs.
+Both highs shared one root the review named exactly: the diff ships documents to adopters, and this
+repo is not an adopter, so every mechanism that would show what an adopter receives was blind. Both
+are fixed and armed. One defect is deliberately NOT fixed — the unescaped `sed` interpolation is
+`TOOL-aWrittenMethod-6`; its dangerous symptom (a zero-byte Skill certified green) is refused loudly
+at both paths, but two attempts at the escape itself were wrong and neither shipped.
+
+**Next action:** none. Built, reviewed, gates green at 46/46, landed.
 
 ## The two passes, and why there are two
 
@@ -103,9 +111,9 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | INPROGRESS | rev-3 | 2026-08-11 |
+| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
 <!-- /gen:build-index -->

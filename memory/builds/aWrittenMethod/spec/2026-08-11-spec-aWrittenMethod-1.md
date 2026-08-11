@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-1 — the build method, rendered and delivered
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · review wf_198d8c01-46e · ratified 2026-08-11
+**Status:** CLOSED · rev-4 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · review wf_198d8c01-46e · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -223,6 +223,9 @@ leg is added.
 
 ## 8. Open questions
 
+none — all six forks below are RESOLVED, five per their own recommendation and F6 per the
+spec audit that raised it.
+
 ### F1 — does the method ship to adopters, or dogfood only
 
 **RESOLVED (agent, 2026-08-11, delegated): ship it.** S3 puts a `render_doc` call in the memory-tree
@@ -272,6 +275,14 @@ sessions through a per-machine junction is a change whose blast radius exceeds t
 
 - rev-1 · 2026-08-11 · initial draft. Converges pass 1 (enforcement, rejected for scope) and pass 2
   (method and delivery). Folds seven pass-2 blockers into §4 Migration as B1 through B7.
+- rev-4 · 2026-08-11 · all eleven scope items built; folded the closing diff review
+  `wf_6e8c83dc-95a` (18 raw, 15 confirmed, 3 refuted, precision 0.83, no blockers, 2 highs). Both
+  highs were adopter-facing and invisible from inside the dogfood: an empty `KEEPALIVE_INTERVAL`
+  rendered a sentence with a hole in it behind three green legs, and an unescaped conf value could
+  write a zero-byte Skill that `--check` then certified. The truncation is refused at both paths and
+  armed both directions; the ESCAPING is not fixed and is `TOOL-aWrittenMethod-6`, because two
+  attempts were wrong and a demonstrated refusal beats an undemonstrated escape. The v2.7 prose
+  cluster (id=5/16, id=6) was an unmet acceptance item of S6 and is now met. Status CLOSED.
 - rev-3 · 2026-08-11 · built S1 and S2. Two corrections the build forced. AC4 asserted the RENDERED
   guide holds no `tools/`, which is backwards: `{{TOOL_ROOT}}` renders to exactly that, so the rule
   binds the template and the AC now says so. F2's 15,000 B / 220-line budget did not survive contact

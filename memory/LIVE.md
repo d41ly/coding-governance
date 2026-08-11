@@ -15,5 +15,4 @@ terminal status. Nothing here is edited by hand.
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | TOOL-aQuarriedLantern-1..-3 |
 | [aSealedCaravan](builds/aSealedCaravan/README.md) | SPECCED | a | 2026-08-10 | deployer+tooling | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | TOOL-aWireWarden-1 |
-| [aWrittenMethod](builds/aWrittenMethod/README.md) | INPROGRESS | a | 2026-08-11 | tooling+playbook+kickoff | TOOL-aWrittenMethod-1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | TOOL-bConvergentLodestar-1 |
