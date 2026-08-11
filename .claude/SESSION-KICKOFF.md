@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T14:40:51+03:00 @ 82b8e8980fbdf270e404adedf908982c6254b525
+last-audit: 2026-08-11T14:46:26+03:00 @ aae9f39cef816c31bda061213650fbfef4b6bc12
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -93,7 +93,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32688/32768 (**80 bytes free**, measured 2026-08-11 by `bash tools/check-template-size.sh`
+  It sits at 32682/32768 (**86 bytes free**, measured 2026-08-11 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here: this number moved TWICE in one day, so treat any figure written here as a lower bound on staleness), so a line added to it either fits that margin or
   funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
   before the unattended build's playbook unit needed 114 for the standing-mandate clauses and funded
