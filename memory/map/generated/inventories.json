@@ -38,6 +38,7 @@
       "review-protocol parity (kit vs dogfood)",
       "row-keyed merge driver replay",
       "run-gates canary",
+      "run-gates evidence",
       "settings-merge selftest",
       "template size <=32KiB",
       "unattended adopter e2e",

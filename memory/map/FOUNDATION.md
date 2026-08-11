@@ -8,7 +8,7 @@ streams = ["architecture"]
 decisions = []
 
 [claims]
-gate-legs = []
+gate-legs = ["run-gates evidence"]
 kits = []
 git-hooks = []
 workflow-scripts = []
