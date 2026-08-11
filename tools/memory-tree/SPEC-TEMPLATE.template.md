@@ -83,7 +83,11 @@ retroactively red — and which means every spec written from that date onward m
 - **Recurring §4 sub-heads** — use these names, don't invent synonyms: `### Data model` ·
   `### Inventory` · `### Migration` · `### Rollout` · `### Files touched (estimate)` ·
   `### Alternatives rejected`.
-- **Resolved owner forks:** mark each fork in §8 in place — `RESOLVED (owner, <date>): <pick>` —
+- **Resolved forks:** mark each fork in §8 in place, naming the RESOLVER — `RESOLVED (owner,
+  <date>): <pick>` for the owner's own decision, `RESOLVED (agent, <date>, delegated): <pick>` when a
+  standing mandate delegated the resolver authority. Never sign as the owner for a decision the owner
+  did not make; the two are indistinguishable afterwards otherwise. The mark is prose — the hygiene
+  gate reads only §8's first non-blank line —
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
@@ -142,7 +146,8 @@ The named gate legs this unit must keep green, plus any new gate it adds.
 ## 8. Open questions
 
 One fork per bullet or ### sub-head; options and tradeoffs may span lines. Each fork carries a
-recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>. Write `none`
+recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>, or
+RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
 ## 9. Revision log

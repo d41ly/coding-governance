@@ -64,7 +64,7 @@ TEMPLATE="$KIT_DIR/SKILL.template.md"
 
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — render it after adopting the project layer"; exit 1; }
-MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""
+MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; KEEPALIVE_INTERVAL=""
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -77,6 +77,7 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
       -e "s|{{LANDER}}|$LANDER|g" \
       -e "s|{{KEEPALIVE_CREATE}}|$KEEPALIVE_CREATE|g" \
       -e "s|{{KEEPALIVE_DELETE}}|$KEEPALIVE_DELETE|g" \
+      -e "s|{{KEEPALIVE_INTERVAL}}|$KEEPALIVE_INTERVAL|g" \
       "$TEMPLATE" | tr -d '\r'
 }
 

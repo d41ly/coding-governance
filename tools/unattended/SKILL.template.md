@@ -21,7 +21,8 @@ distinction real.
    BASE.
 2. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
    store is in-memory and session-scoped, reachable only through your own tool calls. Use
-   `{{KEEPALIVE_CREATE}}`. Keep the id it returns.
+   `{{KEEPALIVE_CREATE}}`, at the cadence this project declares — {{KEEPALIVE_INTERVAL}}. Keep the
+   id it returns.
 3. **Preflight**, handing over that id:
 
    ```bash
