@@ -112,7 +112,7 @@ esac
 render() { # -> stdout; LF only (the rendered Skill is pinned LF in .gitattributes)
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
-  # 5.1 gave an unquoted one the same `&` meaning sed has. TOOL-aWrittenMethod-6.
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
   # The `X` sentinel is because `$( )` strips ALL trailing newlines.
   local out
   out=$(cat "$TEMPLATE"; printf X) || return 1

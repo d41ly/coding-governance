@@ -58,7 +58,7 @@ same "arm 1 left no placeholder" \
 ( cd "$A" && bash tools/unattended/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 
-# ---- ARM 1b: HOSTILE CONF VALUES, round-tripped. TOOL-aWrittenMethod-6.
+# ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
 # ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into
 # ---- `s|…|…|`, where a `|` closed the delimiter — sed exited 1, the trailing `tr` exited 0, so a
 # ---- ZERO-BYTE Skill was written and `--check` then diffed it clean against an equally empty

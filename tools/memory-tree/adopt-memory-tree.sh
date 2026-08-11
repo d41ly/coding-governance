@@ -64,7 +64,7 @@ mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
-  # 5.1 gave an unquoted one the same `&` meaning sed has. TOOL-aWrittenMethod-6.
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
   # The `X` sentinel is because `$( )` strips ALL trailing newlines.
   local out
   out=$(cat "$1"; printf X) || return 1

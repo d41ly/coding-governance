@@ -78,7 +78,7 @@ SKILL_OUT="$SKILL_DIR/SKILL.md"
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
 # empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
-# truncation into a loud one. Escaping the values themselves is TOOL-aWrittenMethod-6.
+# truncation into a loud one. Escaping the values themselves is tracked separately.
 render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   # NO `sed`. Conf values are FREE PROSE, and unescaped they landed in `s|…|…|` where a `|` closes
   # the delimiter (sed exits 1, the trailing `tr` exits 0, so a ZERO-BYTE Skill was written and

@@ -77,7 +77,7 @@ ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
 # The gate derives the default branch from refs/remotes/origin/HEAD ONLY, and a bare push creates
 # refs/remotes/origin/main WITHOUT it — so without this line the leg has nothing to derive and every
-# arm below would pass because the check was OFF (TOOL-aWrittenMethod-2).
+# arm below would pass because the check was OFF.
 git remote set-head origin main >/dev/null 2>&1
 ANCHOR0=$(git rev-parse main)
 git checkout -q -b unit
@@ -98,7 +98,7 @@ out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
-# ---- TOOL-aWrittenMethod-2: check 9's BASE provenance. The leg must be a second OPINION, not a
+# ---- check 9's BASE provenance. The leg must be a second OPINION, not a
 # ---- second computation of the same steered value — a leg that reads the same input the driver read
 # ---- confirms the steer instead of contradicting it, which is how three reproduced authorization
 # ---- defects stayed green on the bar.

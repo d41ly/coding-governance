@@ -121,7 +121,7 @@ default_branch() {
 #   * BASE == HEAD is refused outright even when the ref is legitimate. Nothing was built on top of
 #     it, so there is no diff to authorize and the comparison is trivially true.
 # EXACTLY ONE ref, and its NAME is published so a second party can re-derive it. The
-# `refs/remotes/$d` fallback is gone (TOOL-aWrittenMethod-2, D3 fix 1): it widened what the run could
+# `refs/remotes/$d` fallback is gone (D3 fix 1): it widened what the run could
 # write, and a fallback the GATE does not walk is a shape the comparison cannot express.
 RESOLVED_REF=""
 resolve_base() {

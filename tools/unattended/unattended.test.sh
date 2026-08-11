@@ -103,7 +103,7 @@ ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
 # The gate derives the default branch from refs/remotes/origin/HEAD ONLY, and a bare push creates
 # refs/remotes/origin/main WITHOUT it — so without this line the leg has nothing to derive and every
-# arm below would pass because the check was OFF (TOOL-aWrittenMethod-2).
+# arm below would pass because the check was OFF.
 git remote set-head origin main >/dev/null 2>&1
 git checkout -q -b unit
 # ...and the unit branch must be AHEAD of the anchor. merge-base == HEAD is now its own refusal:
@@ -152,7 +152,7 @@ git symbolic-ref -d refs/remotes/origin/HEAD >/dev/null 2>&1
 out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
 hit "$out" "cannot resolve the default branch (set GOV_DEFAULT_BRANCH) — refusing rather than assuming one"
 
-# ---- TOOL-aWrittenMethod-2. The BASE was steerable two ways and both are refused here.
+# ---- The BASE was steerable two ways and both are refused here.
 # (a) origin/HEAD absent, variable SET: the variable is the run's own input, so an unresolvable
 #     anchor is a refusal and never a licence to trust it. Without this the run picks its own BASE.
 out=$(GOV_DEFAULT_BRANCH=main bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
