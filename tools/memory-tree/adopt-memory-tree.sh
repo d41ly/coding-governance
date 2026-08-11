@@ -145,7 +145,13 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
   printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
   printf '# <path>:<line> - that keying is what unpinned install-prefix-waivers.txt.\n'
   printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
-  git ls-files 2>/dev/null | while IFS= read -r f; do
+  # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
+  # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds
+  # on carriers they never wrote. Fall back to the working tree, which is what actually exists at
+  # scaffold time. This is the vacuous-selector-empty-population class, met inside the block whose
+  # own comment claims to prevent it.
+  { git ls-files 2>/dev/null; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||'; } \
+    | sort -u | while IFS= read -r f; do
     case "$f" in
       "$M"/*) continue ;;
       "$KIT_REL"/BUILD-METHOD.template.md) continue ;;

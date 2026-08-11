@@ -175,18 +175,29 @@ for f in $RUNS; do
   # deleted, merge-base(origin/default, HEAD) is no longer the commit it forked from. Reproducing it
   # for a landed record turns the default-branch bar permanently red on the first successful landing
   # — the pin polices a LIVE run's provenance. Reachability still holds and is what is asserted.
+  # AN ABSENT `base:` IS THE VIOLATION, UNCONDITIONALLY — before any phase is consulted. This
+  # refusal sat inside the non-terminal arm for exactly one commit, and in that commit a record
+  # carrying a run-written TERMINAL phase with its `base:` line deleted skipped this check AND
+  # check 13 below, so the leg exited 0 over a mandate that authorised itself. The terminal
+  # exemption is keyed on `phase:`, which the run writes; it may buy a weaker BASE assertion, and
+  # it may never buy the absence of one.
+  if [ -z "$rb" ]; then
+    fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
+  fi
   ph=$(fact_of "$f" phase)
   TERMINAL_REC=0
   case " $PHASES_TERMINAL " in *" $ph "*) TERMINAL_REC=1 ;; esac
-  if [ "$TERMINAL_REC" = 1 ]; then
-    # SKIPS THE MERGE-BASE REPRODUCTION ONLY — never the mandate assertion below, which is the whole
-    # reason this leg exists. An earlier spelling used `continue` here and silently took check 13
-    # with it, which its own self-test caught.
-    if [ -n "$rb" ] && ! git merge-base --is-ancestor "$rb" HEAD >/dev/null 2>&1; then
+  if [ -z "$rb" ]; then
+    : # already refused above; fall through so check 13 still runs on whatever else is recorded
+  elif [ "$TERMINAL_REC" = 1 ]; then
+    # SKIPS THE MERGE-BASE REPRODUCTION ONLY. After a run lands its branch point is gone, so
+    # reproducing it would red main forever. What is asserted instead is reachability — a WEAKER
+    # claim, and honestly so: every commit the run authored satisfies it. The strength here comes
+    # from check 13, which still reads the mandate at this same BASE and is no longer gated on
+    # anything the run can delete.
+    if ! git merge-base --is-ancestor "$rb" HEAD >/dev/null 2>&1; then
       fail 9 "a terminal run-state file records a BASE that is not an ancestor of HEAD, so the run it describes did not land on this history: $f"
     fi
-  elif [ -z "$rb" ]; then
-    fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
     # THE LEG DOES NOT READ GOV_DEFAULT_BRANCH. The driver may be steered by an operator; the gate
     # may not, because a leg recomputing the identical wrong value CONFIRMS the steer instead of

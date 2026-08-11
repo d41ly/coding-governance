@@ -73,21 +73,30 @@ declared=$(grep -vE '^\s*(#|$)' "$REG" | sed 's/ *·.*//;s/[[:space:]]*$//')
 # ONE pass, collecting into variables the MAIN shell owns. Every `while` below would otherwise run in
 # a pipeline subshell, where `st=1` is set and discarded — the defect that makes a red gate print its
 # complaint and exit 0.
+# `while read`, never `for x in $list`: an unquoted expansion word-splits, so any path with a space
+# becomes two nonexistent paths and reds forever with no fix available to the adopter. gov's tree has
+# no such path, which is exactly why this was invisible here.
 undeclared=""; copied=""
-for c in $carriers; do
+while IFS= read -r c; do
+  [ -n "$c" ] || continue
   printf '%s\n' "$declared" | grep -qxF "$c" || undeclared="$undeclared$c
 "
   grep -qE '^## M[0-9]+' "$c" 2>/dev/null && copied="$copied$c
 "
-done
+done <<EOF
+$carriers
+EOF
 gone=""; stale=""
-for d in $declared; do
+while IFS= read -r d; do
+  [ -n "$d" ] || continue
   if [ ! -f "$d" ]; then gone="$gone$d
 "
   elif ! grep -qF "$DOC" "$d"; then stale="$stale$d
 "
   fi
-done
+done <<EOF
+$declared
+EOF
 
 # ---- 3: every carrier is DECLARED. The drift this leg exists to catch — a new file starts
 # ---- mentioning the method and nobody decided whether it points at it or restates it.

@@ -118,6 +118,14 @@ git symbolic-ref -d refs/remotes/origin/HEAD >/dev/null 2>&1
 hit "$(run)" "this leg cannot derive a default branch: refs/remotes/origin/HEAD does not resolve, so the recorded BASE cannot be checked against anything outside the run's reach — repair it with 'git remote set-head origin -a'"
 git remote set-head origin main >/dev/null 2>&1
 
+# A run-written TERMINAL phase must NOT buy the absence of a BASE. For one commit the absent-base
+# refusal lived inside the non-terminal arm and check 13 was gated on the same value, so deleting one
+# line from a run-writable file skipped BOTH and the leg exited 0 over a self-authored mandate.
+reset_tree
+sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file records no BASE, and the record is written by the run"
+
 # base-ref absent is the violation, not the exemption — the same rule the base: arm already carries.
 reset_tree; sed -i '/^base-ref: /d' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file records no base-ref, so the ref its BASE was derived from cannot be re-resolved — an absent pin is not a satisfied one"
