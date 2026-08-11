@@ -23,8 +23,39 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** Two design passes, one converged spec. The spec is SPECCED and awaits owner scope
-approval. Nothing is built.
+**State.** Two design passes, one converged spec at rev-3, and ten of eleven scope items BUILT on
+`branch/unattended-kit-builds-27d8c6`. Unmerged and unpushed, deliberately — see the park below.
+
+| Pass | Landed | Scope |
+|---|---|---|
+| 1 | `a383375` | S1 the method template, S2 the render pair and its derived count |
+| 2 | `7ff43c1` | S3 the adopter path, S4 the kit version pair, and M6's own broken recipe |
+| 3 | `0f7688e` | S9 the delegated-resolver grammar, S7 the declared keepalive cadence |
+| 4 | `22b14ca` | S5 the four delivery sites, S10 and S6's charter half |
+| 5 | `f8182aa` | S8 the map dossier, S11 the three declines |
+
+**PARKED — S6, the playbook half, and why the build does not land.**
+
+*The question:* collapse the thirteen-bullet unattended block in
+`parallel-coding-governance.domain-rules.md` §1 to one pointer, shorten the duplicate landing clause
+at `parallel-coding-governance.template.md:158`, add `MEMORY_ROOT` to the companion's catalog and
+update its three-deletion recipe, bump both `governance-template` markers to v2.7, and snapshot v2.6
+into `memory/archive/`.
+
+*The options seen:* do it now under a nearly exhausted context window; or park it whole; or split it
+and land the safe half. The middle option was taken.
+
+*The reason:* S6 is the only destructive item in the build, it edits a byte-gated product template
+whose size gate leaves 154 bytes free, and a §-renumbering there has already broken three shipped
+cross-references once. A careful restructure attempted at the end of a long run is how the removals
+become a defect instead of a repair. Nothing already landed depends on S6.
+
+*Why this blocks landing rather than just deferring:* the owner's standing rule is that the merge and
+push happen only when the ENTIRE build is done. A scope item parked means it is not. AC10 is
+unmet by construction, so the bar would be graded against a spec the tree does not satisfy. The
+correct terminal state for this run is therefore not LANDED.
+
+**Next action:** build S6, then the closing diff review, then the full bar, then land.
 
 **Next action:** owner reads the spec's §8 and resolves the open forks.
 
