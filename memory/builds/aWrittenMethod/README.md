@@ -42,9 +42,31 @@ The roster. This table is the roster, not the `ids:` key — M2 says so and this
 
 **Unit 2 is the blocker and leads.** It is the unapplied half of `D3` from
 `../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`: fixes 1 and 2 landed with that
-build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end during unit 1. The
-mandate is the only thing standing between an unattended run and an unreviewed push, so this is the
-one item on the list whose absence makes every other guarantee decorative.
+build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end during unit 1.
+
+## State of this pass
+
+All five specs are SPECCED at **rev-2**, audited (`wf_eb978bb2-f98`), and every fork resolved.
+**No code is written yet.** The landing order is `2 → 6 → 3 → 4 → 5` and is NOT parallel-safe.
+
+The audit returned 73 raw, 29 confirmed, 5 blockers — two of which were designs that could not have
+worked, both reproduced before folding:
+
+- unit 6 asserted that bash `${v//pat/rep}` treats `&` as ordinary text. Bash 5.1 gave the
+  REPLACEMENT a sed-like `&`; measured on 5.3.9, the unquoted spelling reproduces exactly the
+  corruption of the first failed escape attempt. The replacement is now quoted.
+- unit 2 swapped a steerable input for a NULLABLE one. `git symbolic-ref -d refs/remotes/origin/HEAD`
+  exits 0 with no push, and the leg then skips its entire merge-base body at exit 0.
+
+**PARKED — the build itself.** *The question:* build all five units in the fixed order, then the
+closing diff review, the bar, and landing. *The options seen:* build the blocker alone and land it;
+build all five in one pass; park the code and keep the specs. *The reason:* the context budget left
+after authoring, auditing and folding five specs does not cover ~25 files of which one is a security
+path whose whole purpose is being correct under an adversarial assumption. A half-built mandate check
+is worse than none, because it looks like a fix. Nothing already landed depends on this pass.
+
+**Next action:** build unit 2 per its rev-2 spec, then 6, 3, 4, 5. The keepalive is deliberately NOT
+reaped — the run is unfinished, and that mechanism exists for exactly this hand-off.
 
 ## The two passes, and why there are two
 
