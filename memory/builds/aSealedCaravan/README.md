@@ -21,17 +21,26 @@ reading the runbook.
 ## Start here
 
 **State.** Unit 1 is CLOSED — built, reviewed, and landed on `main` at `82e6dcf`. Unit 2 is
-INPROGRESS at rev-6 and is the whole remaining build. It has now been reviewed twice: once at rev-1
-alongside unit 1, and again as an M4 spec audit at rev-5 that returned **BLOCKED** with seven
-blockers, all folded at rev-6.
+INPROGRESS at rev-7 and is the whole remaining build. It has been reviewed three times: at rev-1
+alongside unit 1, as an M4 spec audit at rev-5 that returned **BLOCKED** with seven blockers, and as a
+scoped re-audit of that fold at rev-6 that returned **BLOCKED** with two. Both folds are in.
 
 **Classification (M2), written before acting on it.** Unit 2 was FORKED — §8 carried three
-unresolved items — became READY at rev-5, and the M4 audit then sent it back. It is READY again at
-rev-6. §2, §6, §7 and §10 are all filled and name observable checks.
+unresolved items — became READY at rev-5, and each audit then sent it back. It is READY at rev-7.
+§2, §6, §7 and §10 are all filled and name observable checks.
 
-**Next action.** A tight re-audit of the rev-6 fold, then rollout commit 1 — `registry.toml`, a
-`kit.toml` per registry entry, and `selfcheck`. The audit's verdict was BLOCKED rather than clean, so
-M4's stop rule has not fired; the re-audit is scoped to the fold, not to the design that held.
+**Next action.** Rollout commit 1 — `registry.toml`, a `kit.toml` per registry entry, and `selfcheck`.
+**Stop auditing this document.** Precision fell 0.50 → 0.25 across the two passes on a narrowing
+scope, every rev-7 edit was a repair between two paragraphs of one earlier pass rather than a design
+gap, and the re-audit's own closing advice is that a further pass finds prose about the design instead
+of defects in it.
+
+**LANDING IS BLOCKED, and not by this build.** The unattended driver tests the run's pinned BASE by
+EQUALITY where its own gate leg deliberately tests ANCESTRY, so reconciling `origin/main` — which the
+mandated lander does before the gate anyway — wedges `--preflight` and `--close`. The run-state file's
+generated region cannot be re-spliced, which reds the bar. Filed as a backlog row and parked in
+`RUN.md` with the options; deliberately NOT repaired here, because the protocol names a run editing
+this kit as the first bypass it cannot close.
 
 **What rev-6 changed, because four blockers land inside rollout commit 1.** The registry could not be
 written as specified: `[[files]]` carried no destination, so four entries had nowhere to land; two
@@ -80,6 +89,6 @@ from the status header of every spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-6 | 2026-08-11 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-7 | 2026-08-11 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->

@@ -1,6 +1,6 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** INPROGRESS · rev-6 · 2026-08-11 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
+**Status:** INPROGRESS · rev-7 · 2026-08-11 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -99,9 +99,13 @@ steps by hand is how a target ends up with kits in five homes and no record of w
   refusals were each bought with a defect; section 4 solves the collision by probing effects instead.
 - **Landing the install.** `apply` writes and stages; it never commits, branches, pushes or opens a
   pull request, and the operator lands. Measured 2026-08-11: no adopter under `tools/*/` runs
-  `git commit`, `git push`, `git checkout -b` or `git switch -c`; three of the six stage their own
-  writes; and `WIRE-INTO-PROJECT.md` has an agent working directly on the target's default branch
-  rather than on a branch it opened. A deployer that pushes to somebody else's remote unattended is a
+  `git commit`, `git push`, `git checkout -b` or `git switch -c`; exactly ONE of the six —
+  `adopt-memory-tree.sh` — executes `git add`, twice; and `WIRE-INTO-PROJECT.md` has an agent working
+  directly on the target's default branch rather than on a branch it opened. rev-6 said three of six
+  stage, which was never true: the other two `git add` strings in the adopters sit inside an `echo`
+  and a next-steps heredoc and never execute. It is corrected here and made DERIVED by AC10, because
+  a measured claim in prose is the same defect as a population count in prose, one step short of the
+  rule this spec already applies to counts. A deployer that pushes to somebody else's remote unattended is a
   write surface this unit does not price. If it is wanted it is a further unit, and it inherits
   `memory/guides/UNATTENDED-PROTOCOL.md` rather than inventing a second answer to the same question.
   Two failure-policy knobs die with this cut, on a diverged remote and on a push-scope failure, because
@@ -206,8 +210,12 @@ to = "{memory_root}/HYGIENE.md"
 placeholders = ["KIT_DIR", "TOOL_ROOT"]
 [[files]]
 include = [".memory-tree.conf.example"]
-role = "project-owned"
-to = ".memory-tree.conf"               # repo ROOT, renamed, whatever the prefix
+role = "engine"                        # the EXAMPLE travels as engine, at the kit-relative default
+# The root conf is NOT govkit's to write. The adopter seeds it from the example and exits 1, which is
+# the `seed-and-stop` outcome this same descriptor probes for below. A `to = ".memory-tree.conf"` here
+# would land the conf during the LAND phase, make that outcome unreachable, and let `--scaffold`
+# proceed against the example's unedited demo taxonomy — the inherited-vacuous install this spec warns
+# about. One side seeds. It is the adopter.
 
 [config]
 file = ".memory-tree.conf"
@@ -217,6 +225,9 @@ owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT"]
 optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "DEAD_PATH_EXCLUDE"]
+# The keys a `requires_if` condition may name. Declared HERE so `selfcheck` has something to resolve
+# them against; they are NOT an `intake` question, because they ship blank by design and are a hole.
+conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -312,18 +323,33 @@ the kit-relative form, so the common case stays silent; `flat = true` is the sho
 with no kit directory, and `link = true` marks a machine-scoped entry whose order is a junction rather
 than a copy.
 
+**`to` is a LIST, because one source has two destinations.** rev-6 wrote it as a single string while
+the sentence above says the agent-cap hook lands outside any kit prefix AND a second time inside one.
+Both cannot hold under a single-valued field resolved by "later rules win", so that descriptor could
+not be written at all. It is not a corner case: the kit's own parity arm fails outright when the wired
+copy is absent, so a single-destination model reds that arm in every target that takes the kit. A
+rule's `to` is a list, every element of which is written, and a one-element list is spelled as a bare
+string so nothing else in this document changes. Two rules writing the SAME destination remains a
+`selfcheck` refusal — what `to` now expresses is one source reaching two places, never two sources
+contending for one.
+
 **The role enum grew, because three shapes had no slot.** `engine`, `project-owned` and `generated`
 could not classify a file gov RENDERS, a file gov contributes a BLOCK to, or a file gov seeds once and
 the target then owns.
 
-| role | receipt row | re-apply | measured reason it exists |
-|---|---|---|---|
-| `engine` | sha256 + source commit | overwritten | the base case |
-| `project-owned` | sha256 at install, then never compared | never rewritten | the target edits it |
-| `generated` | path only | never carried across | produced in the target |
-| `rendered` | template path, substitution inputs, output sha256 | re-rendered and compared | a substituted file equals no gov blob, so AC3's byte-equality is false for it |
-| `merged` | anchor pair and the sha256 of the BLOCK ONLY | the block is replaced, the rest untouched | the target owns the file and gov owns a region of it |
-| `seed` | sha256 at install, then never compared | never rewritten | copied from gov once, then owned — the version gate copied verbatim reds immediately, and its own runbook step is "edit its list to your kit subset" |
+| role | copied from gov on first apply | receipt row | re-apply | measured reason it exists |
+|---|---|---|---|---|
+| `engine` | yes | sha256 + source commit | overwritten | the base case |
+| `seed` | **yes** | sha256 at install, then never compared | never rewritten | copied from gov once, then owned — the version gate copied verbatim reds immediately, and its own runbook step is "edit its list to your kit subset" |
+| `rendered` | yes, through a substitution | template path, substitution inputs, output sha256 | re-rendered and compared | a substituted file equals no gov blob, so AC3's byte-equality is false for it |
+| `merged` | a region of it | anchor pair and the sha256 of the BLOCK ONLY | the block is replaced, the rest untouched | the target owns the file and gov owns a region of it |
+| `project-owned` | **no** | sha256 at install, then never compared | never rewritten | the target authors it; gov never supplies the bytes |
+| `generated` | no | path only | never carried across | produced in the target |
+
+The first column is the one that separates `seed` from `project-owned`, and rev-6 shipped the table
+without it — leaving two roles whose operative columns were byte-identical and distinguishable only by
+prose. That is the two-spellings-of-one-fact class appearing inside this unit's own model, so
+`selfcheck` refuses two roles whose operative columns coincide.
 
 **`[config]` splits its required keys by consumer.** A single `required_keys` list records the wrong
 answer for any kit whose renderer and whose gate leg disagree, and one shipped kit is measurably in
@@ -348,12 +374,25 @@ group is observed by nothing at all — the adopter exits 0 and every leg the ki
 hole wide open. `selfcheck` refuses a hole with neither flag and no probe, because in that state the
 probe is the only evidence the hole exists.
 
-**`red_after_land` separates two states rev-2 conflated.** `blocks_adopt` models a kit whose ADOPTER
-fails, which stops the configure phase. A different and commoner state is a kit that lands, configures
-cleanly, and whose gate legs are simply red until the configure phase has run — measured on the
-unattended kit, where both unguarded legs are red after land and green after adopt. Marking that with
-`blocks_adopt` would falsely stop the configure phase; leaving it unmarked makes AC1 unsatisfiable.
-The flag exists so a leg's red window is declared rather than discovered.
+**`red_after_land` separates two states rev-2 conflated, and it is a WINDOW rather than an exemption.**
+`blocks_adopt` models a kit whose ADOPTER fails, which stops the configure phase. A different and
+commoner state is a kit that lands, configures cleanly, and whose gate legs are simply red until the
+configure phase has run — measured on the unattended kit, where both unguarded legs are red after land
+and green after adopt. Marking that with `blocks_adopt` would falsely stop the configure phase; leaving
+it unmarked makes AC1 unsatisfiable.
+
+rev-6 then let both consumers read the flag as a PERMANENT exemption, which is worse than the problem
+it was added for. AC1 excluded a flagged leg from its exit-0 assertion after a fixture that runs both
+phases, and the baseline's `absent` row exempted it from failing the install, and nothing else ever
+picked the leg up again — so an `--all` install could land the unattended kit with both legs red
+forever and every criterion pass. That is the deployed-leg-vacuously-green class §7 names, reintroduced
+by the flag added to prevent it.
+
+The window is therefore scoped in both places rather than loosened. A `red_after_land` leg is exempt
+BETWEEN land and configure and is asserted GREEN after configure (AC1). The baseline's `absent` row
+exempts it only when that kit's configure phase was skipped by a `blocks_adopt` hole. An exemption
+whose consumers are all negative is by construction unobservable, so `selfcheck` refuses a descriptor
+flag that no criterion in §6 asserts POSITIVELY.
 
 **`.governance/deploy.toml`** in the target: `gov_source`, `prefix`, the selected kit ids, one table
 per kit holding its config answers, the `[gate_runner]` declaration S13 defines, and the failure-policy
@@ -416,7 +455,7 @@ The verdict is three-valued, because two values cannot express a leg that is not
 |---|---|---|
 | `green` | the leg ran and passed before the install | a red one after fails the install, naming the leg |
 | `red` | the leg ran and failed before the install | reported, does not fail the install — `on_baseline_red` |
-| `absent` | the leg did not exist before the install | expected to become green; red after fails, UNLESS a hole declares `blocks_gate` or its leg declares `red_after_land` |
+| `absent` | the leg did not exist before the install | expected to become green; red after fails, UNLESS an undischarged hole declares `blocks_gate`, or the leg declares `red_after_land` AND its kit's configure phase was skipped by a `blocks_adopt` hole |
 
 Reading `absent` as `green` would fail every install that legitimately leaves a leg red by design,
 including the two the inventory now marks that way. Reading it as `red` would mean no newly installed
@@ -451,12 +490,27 @@ Guards are therefore RENDERED, and three classes of pathspec exist:
 |---|---|---|
 | kit-relative | to the target's install prefix | the largest class |
 | memory-root-relative | to the target's memory root | a handful, and one of them is a literal that is wrong the moment a target renames its memory root |
-| gov-layout only | DROPPED — the path cannot exist in a target | the hooks directory, the kickoff engine's own tree, and `tools/lib/` |
+| verbatim repo-root | emitted UNCHANGED, under the identity substitution | the git hooks directory and the Claude Code directory |
+| renamed | to the destination `to` gives that source | the kickoff ratchet, which travels flat and renamed |
+| gov-layout only | DROPPED — the path cannot exist in a target | `tools/lib/` and the gate-runner pair |
+
+The third and fourth classes are rev-7's correction and the reason matters more than the rows. rev-6
+put the git hooks directory and the kickoff engine's tree in the DROPPED class on the stated ground
+that they "cannot exist in a target" — while `to` and S12, written in the same pass, deploy both. The
+runbook agrees with `to`: it copies the pre-push hook to a verbatim repo-root path, installs the
+agent-cap hook under the target's Claude Code directory, and lands the ratchet flat under the install
+prefix. A taxonomy whose stated reason is false for its own members gives the emitter a rule for the
+majority and no rule for the rest, and AC24 would then be graded against it. "The hooks directory" is
+also two different things — the git hooks directory and the deployable `tools/hooks/` kit — and the
+table now says which it means.
 
 `tools/lib/` alone accounts for most guard occurrences in gov's manifest, and it is the directory this
 unit declares permanently exempt. Emitting it would also red the target's own run-gates canary, which
 refuses a guard matching no tracked path — so the same value is both a silent skip and a loud failure
 depending on which gates the target took.
+
+`selfcheck` asserts that every guard pathspec in gov's manifest falls into exactly ONE of these
+classes. A class table that does not partition its own input is how this defect arose.
 
 A leg whose guard set renders to nothing is emitted UNGUARDED rather than emitted empty. That costs an
 unnecessary run and never a silent skip, which is the correct direction to fail. The empty-prefix edge
@@ -685,15 +739,21 @@ information without touching them.
 
 - **AC1** When `apply` runs unattended against a fixture repo with no kit and a committed target
   descriptor, every selected repo-scoped kit with no `blocks_adopt` hole lands AND configures, and every
-  gate leg of a kit with no undischarged `blocks_gate` hole and no `red_after_land` flag exits 0 in that
-  fixture. Machine-scoped entries are excluded — §4 gives them an order, not an install, so "lands and
-  configures" has no meaning for them. The kit-by-kit exclusions are DERIVED from the descriptors, never
-  listed in this criterion: rev-2 named codebase-map by hand and the criterion was then unsatisfiable
-  for the kickoff-manifest kit, which nobody noticed because nothing derived the list.
+  gate leg of a kit with no undischarged `blocks_gate` hole exits 0 in that fixture — INCLUDING a leg
+  flagged `red_after_land`, which the fixture runs both phases and must therefore find green. A
+  `red_after_land` leg is excluded only from a check taken BETWEEN the two phases. Machine-scoped
+  entries are excluded entirely — §4 gives them an order, not an install, so "lands and configures" has
+  no meaning for them. The kit-by-kit exclusions are DERIVED from the descriptors, never listed in this
+  criterion: rev-2 named codebase-map by hand and the criterion was then unsatisfiable for the
+  kickoff-manifest kit, which nobody noticed because nothing derived the list. rev-6 then exempted
+  `red_after_land` legs unconditionally, which let an `--all` install land a kit with legs red forever
+  and every criterion pass; the exemption is scoped to its window here rather than removed.
 - **AC2** When that `apply` runs a second time, no path in the receipt changes content hash and no
   path is added or removed. The predicate is path-and-hash over the receipt, not `git status
-  --porcelain`, because the adopters stage their own writes and a porcelain-empty tree would be
-  satisfied by an install that did nothing. Runs on POSIX and Git-Bash.
+  --porcelain`, because S5 has `apply` stage everything it writes and at least one adopter stages its
+  own — so a porcelain-empty tree is satisfied by an install that did nothing. The ground deliberately
+  does not depend on HOW MANY adopters stage; rev-6's version did, and the number was wrong.
+  Runs on POSIX and Git-Bash.
 - **AC3** When `apply` runs from a gov checkout whose working tree is deliberately dirty, every file
   named in the receipt whose role is `engine` has bytes equal to `git show <recorded_commit>:<path>`.
   This is the receipt's provenance claim and nothing else observes it. The role scope is load-bearing
@@ -740,6 +800,16 @@ information without touching them.
   observation flag carries a probe; `--all` selects exactly the non-exempt, non-conditional entries; and
   the S12 surface predicate holds in both directions, reddening on an exemption whose path no longer
   exists. No count in this spec is an input to any of those — each is derived.
+
+  Six further arms, each retiring a class this spec has already produced once. `selfcheck` refuses two
+  roles whose operative columns coincide; refuses a guard pathspec falling into no declared class or
+  into more than one; refuses a descriptor flag that no §6 criterion asserts POSITIVELY; refuses a
+  `requires_if` condition key that resolves in none of the named kit's `[config]` key lists, or that
+  names a kit which is not a registry entry; refuses two `[[files]]` rules writing the same destination,
+  while accepting one rule writing a source to several; and DERIVES each descriptor's `mutates_index`
+  by grepping that adopter for an EXECUTED `git add` rather than reading a declared value — a string
+  inside an `echo` is not a staging call, and mistaking one for the other is how this spec published a
+  measured claim that was three times the truth.
 - **AC11** When `plan` runs against a fixture, it lists every file it would write with its role and
   source commit, including side-effect files an adopter or a merge produces, and writes nothing;
   running `apply` then produces exactly that file set, with no path added and none missing.
@@ -889,6 +959,22 @@ resolver authority for forks these specs already state.
 - rev-4 · 2026-08-10 · owner ratified F1, so `tools/govkit/` is settled rather than recommended. F2,
   F3 and F4 stay open by choice — none blocks a build, and each wants the `plan`/`check` slice to
   exist before it is answered. The header carries no ratified pointer while they do.
+- rev-7 · 2026-08-11 · folded the re-audit of the rev-6 fold, which returned BLOCKED with two blockers
+  at precision 0.25 — half rev-6's, on a deliberately narrower scope. Every one of the six edits is a
+  disagreement between two paragraphs rev-6 wrote in the SAME pass, which is the honest diagnosis of
+  that fold: its new fields were argued into existence one at a time and never audited against each
+  other. `to` becomes a list, because the same section that introduced it said one entry needs two
+  destinations for one source and the agent-cap descriptor could not otherwise be written. The role
+  table gains a copied-on-first-apply column, which is the only column separating `seed` from
+  `project-owned`, and the conf example is retagged: the ADOPTER seeds the root conf, not govkit, so
+  the `seed-and-stop` outcome stays reachable. The guard class table gains a verbatim-repo-root class
+  and a renamed class, because rev-6 dropped the git hooks directory and the kickoff engine's tree as
+  paths that "cannot exist in a target" while `to` and S12 deploy both. `red_after_land` is scoped to
+  its window, because both consumers read it as a permanent exemption and an `--all` install could
+  land a kit with legs red forever and pass everything. `conditional_keys` is declared. And §3's
+  staging measurement is corrected from three of six to one of six and made derived — it was never
+  true, not even at the commit it was measured at, and a measured claim in prose is the same defect as
+  a count in prose. Six new `selfcheck` arms retire each class rather than each instance.
 - rev-6 · 2026-08-11 · folded the M4 spec audit, which returned BLOCKED with seven blockers, and the
   four measurement probes the fold needed. Four blockers landed inside rollout commit 1's own
   deliverable, so none of this could have waited for code. The population claims are gone: no count of
