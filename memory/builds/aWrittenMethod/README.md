@@ -50,27 +50,26 @@ All six units CLOSED and landed. Bar green at 48/48 across 49 legs.
 
 | Unit | What landed |
 |---|---|
-|  | the build method, rendered and delivered |
-|  | the mandate BASE the run cannot steer by environment |
-|  | all six renderers stopped interpreting their own inputs |
-|  | the guide displaced 247 to 236 lines |
-|  | the method under the manifest ratchet |
-|  | the carrier gate, 47 legs to 49 |
+| `-1` | the build method, rendered and delivered |
+| `-2` | the mandate BASE the run cannot steer by environment |
+| `-6` | all six renderers stopped interpreting their own inputs |
+| `-3` | the guide displaced 247 to 236 lines |
+| `-5` | the method under the manifest ratchet |
+| `-4` | the carrier gate, 47 legs to 49 |
 
-**Three adversarial passes on the code, 56 raw findings.** Each closing review found a defect
-the bar could not: an unreachable guard reintroduced one pass after its twin was deleted, a
-render that shipped a claim stronger than the code, and — in the last review — a REGRESSION
-introduced by fixing the review before it. That last one is the record worth keeping: narrowing
-check 9 for terminal records folded the absent- refusal into the non-terminal arm, and
-check 13 hung on the same value, so deleting one line from a run-writable file skipped both and
-the leg exited 0 over a self-authored mandate. A review fix landed without enumerating the state
-space it newly partitioned.
+**Three adversarial passes on the code, 56 raw findings.** Each closing review found a defect the bar
+could not: an unreachable guard reintroduced one pass after its twin was deleted, a render that
+shipped a claim stronger than the code, and — in the last review — a REGRESSION introduced by fixing
+the review before it. That last is the record worth keeping. Narrowing check 9 for terminal records
+folded the absent-`base:` refusal into the non-terminal arm, and check 13 hung on the same value, so
+deleting one line from a run-writable file skipped both and the leg exited 0 over a self-authored
+mandate. A review fix landed without enumerating the state space it newly partitioned.
 
 **The honest limit.** Unit 2 removes the ENVIRONMENT steer on the mandate BASE and nothing more.
- still moves the anchor with no push — reproduced
-with a control. Both protocol copies say NARROWED rather than anchored, and closing it is unit 2's
-F2: an anchor no local command can write, via 081c3669df7ce43f8e448dc88e9be94b6d44c557	HEAD
-081c3669df7ce43f8e448dc88e9be94b6d44c557	refs/heads/main or an owner-signed tag. Unbuilt.
+`git update-ref refs/remotes/origin/main <commit>` still moves the anchor with no push and no
+network — reproduced with a control. Both protocol copies say NARROWED rather than anchored, and
+closing it is unit 2's F2: an anchor no local command can write, via `git ls-remote` or an
+owner-signed tag. Unbuilt, and filed rather than claimed.
 
 ## The two passes, and why there are two
 
