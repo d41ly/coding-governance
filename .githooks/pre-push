@@ -11,12 +11,36 @@ set -u
 top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 cd "$top" || exit 0
 
-def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)}
-def=${def#origin/}
+# $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
+# ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
+# made it a fail-OPEN over every leg on the bar, not just this hook's own refusals.
+#
+# Reproduced 2026-08-11 with a live control, one variable changed between the two runs: with
+# GOV_DEFAULT_BRANCH=main a raw push to main was refused (rc 1, remote unmoved); with
+# GOV_DEFAULT_BRANCH naming a branch nobody was pushing, the SAME commit landed at rc 0 with the gate
+# stubbed RED and no lander marker. The loop below simply never matched, main_local stayed empty, and
+# the hook exited 0 down the "nothing to gate" path.
+#
+# So the observed default WINS, and the environment value is a CROSS-CHECK that can only refuse, never
+# select. Where nothing is observable (a fresh `git init` + `remote add`, which is what this hook's own
+# test builds) the environment is the only source and must at least name a branch that exists.
+obs=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); obs=${obs#origin/}
+env_def=${GOV_DEFAULT_BRANCH:-}
+if [ -n "$obs" ] && [ -n "$env_def" ] && [ "$obs" != "$env_def" ]; then
+  echo "pre-push: GOV_DEFAULT_BRANCH names a branch this clone does not observe as the default, and the pushed ref is classified by that name — so an unrecognised one skips the bar entirely: env '$env_def' against observed '$obs'." >&2
+  exit 1
+fi
+def=${obs:-$env_def}
 if [ -z "$def" ]; then
   echo "pre-push: can't determine the default branch (origin/HEAD unset and GOV_DEFAULT_BRANCH unset)." >&2
   echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
   echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  exit 1
+fi
+if ! git rev-parse --verify --quiet "refs/heads/$def" >/dev/null 2>&1 \
+   && ! git rev-parse --verify --quiet "refs/remotes/origin/$def" >/dev/null 2>&1; then
+  echo "pre-push: the default branch resolves to a name that is no branch in this clone, so every pushed ref would classify as 'not the default branch' and skip the gate: $def" >&2
+  echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<a branch that exists>." >&2
   exit 1
 fi
 

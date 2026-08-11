@@ -29,6 +29,7 @@
 - TOOL-aUnmannedHelm-9 · an adopter's refusals are ordered before it READS anything: the conf check fired first and told an operator running from a foreign repo to create a conf in the very tree the adopter must not adopt. A correct refusal with the wrong remedy is a defect
 - TOOL-aStandingWrit-1 · replacing an owner-authored mandate with a build README's existence trades FIVE properties, not one: integrity becomes existence, the grant goes class-wide, it names no ACTIONS, it cannot be revoked, and a run that lands a new build README authorizes the next run
 - TOOL-aStandingWrit-2 · an anchor is only as trustworthy as the cheapest way to move it. `refs/remotes/origin/<x>` READS like an observation of the remote and IS a local write; a source comment asserting a ref cannot move without a push is not a check, and it survived two Tier-2 reviews
+- TOOL-aStandingWrit-4 · a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN, not an override: any unmatched `GOV_DEFAULT_BRANCH` sent pre-push down its own "nothing to gate" exit 0, skipping the lander refusal and every leg on the bar
 
 ## DEPL — deployer
 
