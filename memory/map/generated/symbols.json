@@ -118,6 +118,16 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "Refusal",
+      "kind": "class",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "Report",
+      "kind": "class",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "RowLoss",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -478,6 +488,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "entry_members",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "enumerate_exports",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -531,6 +546,11 @@
       "id": "fan_in",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "git",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "git",
@@ -713,6 +733,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_toml",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "log_event",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -756,6 +781,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "main",
@@ -1165,6 +1195,11 @@
     {
       "id": "repo_root",
       "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "repo_root",
+      "kind": "function",
       "file": "tools/memory-recall/query.py"
     },
     {
@@ -1236,6 +1271,16 @@
       "id": "rrf",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "rule_destinations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "rule_sources",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "run",
@@ -1343,6 +1388,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "selfcheck",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "settings_merge_src",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -1411,6 +1461,11 @@
       "id": "subtokens",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "surface_paths",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "t_adopter_layout",
@@ -1731,6 +1786,11 @@
       "id": "text_merge",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "tracked",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "tree",

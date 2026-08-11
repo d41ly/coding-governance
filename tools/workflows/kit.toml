@@ -1,0 +1,33 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "review-harness"
+home = "tools/workflows"
+scope = "repo"
+version_from = { file = "tier2-review.js", pattern = "version: " }
+requires = ["agent-cap"]
+why_two_ids = "this directory versions its files under TWO kit ids — the review harness and the drift-audit workflows — so a single version_from cannot describe it. The drift-audit workflow scripts travel with the drift-audit entry."
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["REVIEW-PROTOCOL.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/REVIEW-PROTOCOL.md"
+placeholders = ["TOOL_ROOT"]
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the harness is copied and its protocol rendered; the render is performed by the parity gate's own --render mode rather than by a separate adopter"
+
+[[gate_leg]]
+name = "verifier fan-out"
+argv = ["bash", "{kit}/check-verifier-fanout.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "review-harness protocol parity"
+argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
+guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]

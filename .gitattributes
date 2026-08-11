@@ -114,3 +114,11 @@ tools/unattended/*.md text eol=lf
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf
 memory/map/affordance-exempt.toml text eol=lf
+
+# govkit — the deployer's registry and its per-entry descriptors. Pinned for the same reason every
+# other declaration file here is: these are READ by a tool, and a CR byte in a conf or a descriptor
+# is a class this repo has already paid for twice.
+tools/govkit/*.toml text eol=lf
+tools/govkit/*.py text eol=lf
+tools/govkit/entries/*.toml text eol=lf
+tools/*/kit.toml text eol=lf

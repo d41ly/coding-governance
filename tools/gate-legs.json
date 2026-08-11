@@ -249,7 +249,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (≤5 verify agents per review)",
+    "name": "verifier fan-out (\u22645 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
@@ -489,6 +489,14 @@
     "guard": [
       "tools/",
       "tools/lib/"
+    ]
+  },
+  {
+    "name": "govkit selfcheck",
+    "argv": [
+      "python",
+      "tools/govkit/govkit.py",
+      "selfcheck"
     ]
   }
 ]

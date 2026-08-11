@@ -1,0 +1,27 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "settings-merge"
+scope = "repo"
+kind = "flat"
+home = "tools"
+version_from = { file = "settings-merge.py", pattern = "^KIT_SETTINGS_MERGE_VERSION = " }
+requires = []
+
+[[files]]
+include = ["settings-merge.py"]
+role = "engine"
+to = "{prefix}/settings-merge.py"
+claims = ["tools/settings-merge.py"]
+
+[[files]]
+include = []
+role = "merged"
+to = ".claude/settings.json"
+marker_style = "json-pointer"
+block_id = "hooks.PreToolUse[matcher]/hooks[command~agent-cap.js]"
+side_effects = [".claude/settings.json.bak"]
+note = "the merge re-serializes the WHOLE document, so the first apply reformats bytes the target owns and gov never wrote. The receipt records that as an accepted reformat; without the note, the second-run criterion passes while any reasoning about that file's bytes is wrong."
+
+[adopt]
+argv = ["python", "{prefix}/settings-merge.py"]
+mutates_index = false

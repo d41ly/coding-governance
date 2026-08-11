@@ -1,0 +1,162 @@
+# registry.toml — the deployable population, as a DECLARATION.
+#
+# Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/ (S2, S12, AC10).
+#
+# WHY THIS IS NOT A DIRECTORY LISTING. No listing equals the deployable set, and the ways it fails
+# are not symmetric. Some `tools/*` directories are not deployable (`tools/lib/`, the gate-runner
+# cluster). Some entries are not `tools/*` directories at all: the playbook is root files, the
+# kickoff ratchet lives under `skills/`, and several single-file gates sit directly under `tools/`.
+# One directory carries TWO entries, because `tools/workflows/` versions its files under two kit ids.
+# `map_extractors._tool_kits()`'s own docstring records the same lesson from the other side:
+# README-gating "would have silently dropped three of ten".
+#
+# NO COUNT APPEARS IN THIS FILE OR IN THE SPEC. `selfcheck` derives every population figure over the
+# tracked surface. The spec stated two counts across its life and both were true when measured and
+# false when read.
+#
+# EVERY tracked path in the asserted surface is an ENTRY, a member of exactly one entry's [[files]],
+# or an EXEMPT row with a non-empty reason. `selfcheck` asserts that in both directions and reds on
+# an exemption whose path no longer exists.
+
+version = 1
+
+# The surface `selfcheck` quantifies over (spec S12). Depth-1 under tools/, everything under the
+# hook and kickoff trees, and the shipped root playbook files.
+[surface]
+globs = [
+  "tools/*",
+  ".githooks/**",
+  "skills/session-kickoff/**",
+  "parallel-coding-governance.*.md",
+  "parallel-coding-governance.template.md",
+]
+
+# ---------------------------------------------------------------- entries: kits with a directory
+[[entry]]
+id = "memory-tree"
+descriptor = "tools/memory-tree/kit.toml"
+
+[[entry]]
+id = "codebase-map"
+descriptor = "tools/codebase-map/kit.toml"
+
+[[entry]]
+id = "memory-recall"
+descriptor = "tools/memory-recall/kit.toml"
+
+[[entry]]
+id = "drift-audit"
+descriptor = "tools/drift-audit/kit.toml"
+
+[[entry]]
+id = "agent-instructions"
+descriptor = "tools/agent-instructions/kit.toml"
+
+[[entry]]
+id = "unattended"
+descriptor = "tools/unattended/kit.toml"
+
+[[entry]]
+id = "pytest-parallel-guardrails"
+descriptor = "tools/pytest-parallel-guardrails/kit.toml"
+
+[[entry]]
+id = "gate-lint"
+descriptor = "tools/gate-lint/kit.toml"
+
+[[entry]]
+id = "agent-cap"
+descriptor = "tools/hooks/kit.toml"
+why_split = "tools/hooks/ and tools/workflows/ are two kit ids with two version constants and two destinations; one inventory row could not carry them"
+
+[[entry]]
+id = "review-harness"
+descriptor = "tools/workflows/kit.toml"
+
+# ---------------------------------------------------------- entries with no kit directory of their own
+[[entry]]
+id = "playbook"
+descriptor = "tools/govkit/entries/playbook.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "kickoff-manifest"
+descriptor = "tools/govkit/entries/kickoff-manifest.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "settings-merge"
+descriptor = "tools/govkit/entries/settings-merge.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "check-wiring"
+descriptor = "tools/govkit/entries/check-wiring.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "push-main"
+descriptor = "tools/govkit/entries/push-main.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "check-kit-versions"
+descriptor = "tools/govkit/entries/check-kit-versions.kit.toml"
+kind = "flat"
+
+[[entry]]
+id = "check-install-prefix"
+descriptor = "tools/govkit/entries/check-install-prefix.kit.toml"
+kind = "flat"
+
+# ------------------------------------------------------------------------------------- exemptions
+# Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
+# a stale exemption cannot quietly widen the surface.
+
+[[exempt]]
+path = "tools/lib"
+why = """
+Not a kit. It has no README, no version constant and no adopter, and it ships nothing: it is
+gov-internal. `resolve-python.sh` is the canon every inline copy in every kit is gated against, and
+`tools/run-gates.sh` sources it at runtime — which is why the gate-runner cluster is exempt too
+rather than deployable-but-broken. TOOL-aSealedCaravan-1 S9 gave the memory-tree kit its own
+launcher, so nothing under here ever needs to travel. The `merge.rows.driver` argument earlier
+revisions of the spec gave for this exemption is STALE and is not repeated: that config now names a
+kit-internal launcher.
+"""
+
+[[exempt]]
+path = "tools/run-gates.sh"
+why = "gov's own gate runner. A spec non-goal: govkit wires legs into the runner a target already has, and this one is not deployable as it stands — it sources tools/lib/, the permanently exempt directory, and exits 2 with zero legs run when that path is absent."
+
+[[exempt]]
+path = "tools/gate-legs.json"
+why = "gov's own 49-leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
+
+[[exempt]]
+path = "tools/run-gates.test.sh"
+why = "the gate runner's own canary; travels with the runner, which is exempt."
+
+[[exempt]]
+path = "tools/run-gates.evidence.test.sh"
+why = "the gate runner's own evidence arm; travels with the runner, which is exempt."
+
+[[exempt]]
+path = "tools/check-template-size.sh"
+why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
+
+[[exempt]]
+path = "tools/govkit"
+why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
+
+[[exempt]]
+path = ".githooks/pre-commit.test.sh"
+why = "gov's own red/green self-test of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file."
+
+[[exempt]]
+path = "skills/session-kickoff/manifest-check.test.sh"
+why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
+
+[[exempt]]
+path = "parallel-coding-governance.customize.md"
+why = "the deploy-time placeholder catalog. The runbook's own words are 'read it, don't ship it'. Counting it as a playbook member is how the spec over-stated that entry's file count for four revisions."

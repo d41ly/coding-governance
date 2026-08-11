@@ -1,0 +1,33 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "check-install-prefix"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+why_conditional = "the runbook prescribes it only for a target that itself ships kits onward; a target that merely consumes them has nothing for it to police"
+version_from = { none = "no version constant exists; measured 2026-08-11." }
+requires = []
+sentinel = "tools/check-install-prefix.sh"
+
+[[files]]
+include = ["check-install-prefix.sh", "check-install-prefix.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/check-install-prefix.sh", "tools/check-install-prefix.test.sh"]
+
+[[files]]
+include = ["install-prefix-waivers.txt"]
+role = "generated"
+to = "{prefix}/install-prefix-waivers.txt"
+claims = ["tools/install-prefix-waivers.txt"]
+note = "MEASURED optional: the gate is green with the file absent and with it empty. gov's own waiver rows are gov-specific and must not travel, so this is seeded empty rather than copied."
+
+[adopt]
+argv = []
+mutates_index = false
+
+[[gate_leg]]
+name = "install-prefix self-test"
+argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
+guard = ["{prefix}/check-install-prefix.sh"]

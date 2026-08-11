@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 3 · gotcha-classes: 13 · guides: 3 · backlog-shards: 4
+Inventories: gate-legs: 50 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 3 · gotcha-classes: 13 · guides: 3 · backlog-shards: 4
 
 ## gate-legs
 
@@ -25,6 +25,7 @@ Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
 | `gotchas selftest` | baseline |
+| `govkit selfcheck` | govkit |
 | `harness arms (fail branches armed or pinned)` | baseline |
 | `install-prefix (shipped surface)` | install-prefix |
 | `install-prefix self-test` | install-prefix |
@@ -68,6 +69,7 @@ Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `codebase-map` | codebase-map |
 | `drift-audit` | baseline |
 | `gate-lint` | baseline |
+| `govkit` | govkit |
 | `hooks` | agent-cap |
 | `lib` | baseline |
 | `memory-recall` | baseline |
@@ -136,7 +138,7 @@ Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `DEPL.md` | baseline |
+| `DEPL.md` | govkit |
 | `KICK.md` | baseline |
 | `PLAY.md` | baseline |
 | `TOOL.md` | baseline |

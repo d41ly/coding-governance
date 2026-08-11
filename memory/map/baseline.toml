@@ -78,7 +78,6 @@ gotcha-classes = [
 guides = [
 ]
 backlog-shards = [
-  "DEPL.md",
   "KICK.md",
   "PLAY.md",
   "TOOL.md",
