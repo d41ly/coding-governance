@@ -1,6 +1,6 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** SPECCED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams deployer
+**Status:** INPROGRESS · rev-5 · 2026-08-11 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -189,6 +189,20 @@ one component `/session-kickoff` needs.
 per kit holding its config answers, and the failure-policy knobs — on a diverged remote, on a
 pre-existing red gate, on a hook block, on a push-scope failure.
 
+It lives in the TARGET rather than in gov, per fork F2. That location is what makes a committed
+descriptor a standing authorization an unattended re-run can read from a fresh clone. A gov-side
+descriptor is absent from that clone, so the re-run would have nothing to read, and S3's claim would
+be false. The cost is a disclosure: the target carries a file naming its gov source. The operator
+owns that repository and named it, so the disclosure is theirs to make, but it is real and it is
+stated here rather than discovered. A redaction knob is a follow-up, not this unit.
+
+The pre-existing-red knob has a decided default, per fork F4. `apply` records a baseline verdict for
+every selected kit's gate legs BEFORE it writes anything, and fails only on a leg that was green in
+that baseline and is red after. A leg already red in the baseline is reported and does not fail the
+install. Failing on any red leg instead would make a target with one unrelated red leg undeployable,
+and section 3 does not make a pre-existing red gate a refusal. AC15's pre-existing-red fixture arm is
+the observation that this holds.
+
 **`.governance/install.json`** — the receipt, tool-written only, plus the flat `install.sums` sidecar.
 The apply layer has no code path that writes a file whose role is `project-owned`.
 
@@ -347,6 +361,11 @@ information without touching them.
 - **AC15** When the acceptance matrix runs, it covers at minimum a fresh empty repo, a non-Python
   repo, a repo whose pre-commit hook blocks, and a repo with a pre-existing red gate; each arm asserts
   a specific message or on-disk effect, never an exit code alone.
+- **AC16** When `govkit.py selfcheck` runs, every refusal message in `govkit.py` is asserted by name
+  somewhere in the acceptance matrix, and a refusal branch whose message no arm asserts reds naming
+  that branch. This is fork F3's resolution made mechanical. `check-arms.py` scans tracked `*.sh` and
+  is deliberately not extended here, so without this criterion the strongest new write path in the
+  repo would also be its least armed.
 
 ## 7. Gates
 
@@ -369,21 +388,32 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 
 ## 8. Open questions
 
+none — every fork below is RESOLVED. F1 and F5 by the owner on 2026-08-10. F2, F3 and F4 by the agent
+on 2026-08-11 under the standing mandate of `memory/builds/aSealedCaravan/README.md`, which delegates
+resolver authority for forks these specs already state.
+
 - **F1 — `tools/govkit/` or the research's `deploy/`?** RESOLVED (owner, 2026-08-10):
   `tools/govkit/`, ratifying the departure from the 2026-07-12 research shape. The argument is the
   three re-verified gate and inventory exclusions in section 4; the fourth cited at rev-1
   (`check-arms.py`) was wrong and has been dropped.
-- **F2 — does the target descriptor live in the target or in gov?** RECOMMENDATION: the target,
-  copier-style, so it travels with clones. The cost is that a target repo carries a file naming its
-  gov source, which is a disclosure the owner should weigh for a public target.
-- **F3 — does `check-arms.py` grow a Python population?** It scans tracked `*.sh` repo-wide today, so
-  `govkit.py`'s refusal branches carry no arming obligation, and the strongest new write path in the
-  repo would be the least armed. RECOMMENDATION: do not extend it in this unit — require instead that
-  every refusal branch is exercised by a matrix arm asserting its own message, which buys the same
-  guarantee at the test layer. Raise the engine change separately.
+- **F2 — does the target descriptor live in the target or in gov?** RESOLVED (agent, 2026-08-11,
+  delegated): the target, copier-style, as S3 already declares. It is the only option that makes S3's
+  own claim true — a committed descriptor is a standing authorization for an unattended re-run, and a
+  gov-side descriptor is not present in a fresh clone of the target, so that re-run would have nothing
+  to read. A gov-side descriptor would also accumulate one file per target in a public deployer repo,
+  a write and disclosure surface this unit never priced. The accepted cost is stated in section 4.
+- **F3 — does `check-arms.py` grow a Python population?** RESOLVED (agent, 2026-08-11, delegated): it
+  does not, in this unit. Its population is every tracked `*.sh` repo-wide, so admitting Python either
+  demands an arm from every tracked `*.py` or needs a scoping rule — and either is a change to a
+  governance carrier, which M3's second veto reserves for the owner. The engine change is raised as
+  its own backlog row. The guarantee moves to the test layer, where AC16 makes it mechanical rather
+  than a convention that decays.
 - **F4 — what does `apply` do when a selected kit's gate is red in the target for reasons predating
-  the install?** RECOMMENDATION: record the baseline before touching anything, and fail only on a leg
-  that was green before and is red after. The knob is in the target descriptor.
+  the install?** RESOLVED (agent, 2026-08-11, delegated): record a per-leg baseline verdict before
+  writing anything, and fail only on a leg that was green in that baseline and is red after. The knob
+  lives in the target descriptor. Failing on any red leg instead would make a target with one
+  unrelated red leg undeployable, and section 3 does not make a pre-existing red gate a refusal.
+  Section 4 carries the mechanism and AC15's fixture arm observes it.
 - **F5 — is `tools/lib/` a registry entry or an exemption?** RESOLVED (owner, 2026-08-10): a
   permanent exemption. It is not a kit and ships nothing; `TOOL-aSealedCaravan-1` S9 gives the
   memory-tree kit its own launcher instead. Rollout commit 1 is unblocked.
@@ -413,6 +443,15 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 - rev-4 · 2026-08-10 · owner ratified F1, so `tools/govkit/` is settled rather than recommended. F2,
   F3 and F4 stay open by choice — none blocks a build, and each wants the `plan`/`check` slice to
   exist before it is answered. The header carries no ratified pointer while they do.
+- rev-5 · 2026-08-11 · resolved F2, F3 and F4 under the standing mandate, closing the fork set before
+  the first line of code. Deferring them until the `plan`/`check` slice existed was rev-4's plan, and
+  it is abandoned rather than forgotten: a fork resolved mid-build is a rewrite of code already
+  written, and all three turned out to be answerable from what the spec already states. F2 ratifies
+  the target-side descriptor S3 already declares and names the disclosure it costs. F3 keeps
+  `check-arms.py` shell-only, because extending it is a governance-carrier change, and moves the
+  guarantee to the test layer where new AC16 makes it mechanical. F4 fixes the pre-existing-red policy
+  as a measured baseline, which AC15's own fixture arm had no defined behaviour to observe until now.
+  Section 4 carries the two design consequences and the header gains its ratified pointer.
 
 ## 10. Reuse audit
 
