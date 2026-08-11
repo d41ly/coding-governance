@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -10,11 +10,24 @@ the displacement rule the method's own M1 states, so the rule is load-bearing ra
 
 ## 2. Scope (IN)
 
-- **S1** — move M5's probe-failure taxonomy (the exit-status, blind-layer, stale-hit and absent-tool
-  paragraph) out of `tools/memory-tree/BUILD-METHOD.template.md` into `tools/memory-tree/README.md`,
-  leaving in M5 a one-line pointer plus the two rules a reader cannot afford to look up: probes exit 0
-  on a miss, and a hit can be stale.
+
+**Landing order.** This unit is step three of five. The set lands `2 → 6 → 3 → 4 → 5`, fixed by the
+audit `wf_eb978bb2-f98`: unit 6 rewrites the renderer unit 3 measures against, unit 3 creates a new
+method carrier unit 4 must then enumerate, and unit 5 puts the method under a manifest ratchet that
+would otherwise tax every earlier unit's commit. These are NOT parallel-safe under M6.
+
+- **S1** — move BOTH displacements the backlog row named, not one. (a) M5's probe-failure taxonomy —
+  measured at SEVEN lines (the guide's M5 spans 109-130 and the taxonomy is 123-129); and (b) M11's
+  pointer list, ~14 lines. Target `tools/memory-tree/README.md`, APPENDED after existing content so
+  the line-keyed waiver in `tools/install-prefix-waivers.txt` is not unpinned. M5 keeps a pointer plus
+  the two rules a reader cannot afford to look up (probes exit 0 on a miss; a hit can be stale); M11
+  keeps a pointer. **In the TEMPLATE the pointer is spelled `{{KIT_DIR}}/README.md`**, never a literal
+  `tools/` path, which would red the install-prefix gate on a shipped file.
 - **S2** — re-render and land the guide at **≤225 lines**, giving at least 25 lines of headroom.
+  Arithmetic, stated so the builder does not improvise deletions: 247 today, minus 7 for the taxonomy,
+  minus ~14 for M11's list, plus ~4 for the two pointers ≈ 230; a further ~5 comes from tightening
+  the paragraphs the moves leave stranded. Rev-1 scoped only the 7-line move and kept the 225 target,
+  which was arithmetically unreachable — 247 − 7 + 3 ≈ 243.
 - **S3** — record the achieved figure in the spec's §9 and in the build README, so the next author
   sees a number rather than a cap.
 
@@ -42,10 +55,14 @@ reader who cannot find the spilled text will re-derive it worse.
 ## 5. Acceptance criteria
 
 - **AC1** — When `wc -l memory/guides/BUILD-METHOD.md` runs, it reports at most 225 lines.
+- **AC1b** — When `bash tools/check-install-prefix.sh` runs, it exits 0, with the
+  `tools/install-prefix-waivers.txt` row for `tools/memory-tree/README.md` re-keyed in the SAME commit
+  if the append moved the line it is keyed on.
 - **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs, it reports three
   pairs and exits 0.
-- **AC3** — When M5 is read, it carries the two retained rules and a pointer naming
-  `tools/memory-tree/README.md` and the section holding the moved text.
+- **AC3** — When the TEMPLATE's M5 and M11 are read, each carries a pointer spelled
+  `{{KIT_DIR}}/README.md`; when the RENDERED guide is read, each reads `tools/memory-tree/README.md`.
+  Two assertions, because the shipped side and the installed side are different files.
 - **AC4** — When the spilled text is searched for in `tools/memory-tree/README.md`, every sentence
   moved is present; nothing was dropped in transit.
 - **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, it exits 0.
@@ -59,11 +76,18 @@ reader who cannot find the spilled text will re-derive it worse.
 
 ### F1 — spill M5's taxonomy, or M11's pointer list
 
-M11 is longer, but it is the method's index and moving it makes the method point at a file that points
-at files. **Recommendation: M5's taxonomy.** It is explanation rather than instruction, which is the
-only safe thing to move, and M11 is what a compacted agent uses to find everything else.
+**RESOLVED (agent, 2026-08-11, delegated): BOTH**, which is what the backlog row this unit came from
+specified and what the 225-line target requires arithmetically. Rev-1 recommended M5's taxonomy alone
+and kept a target that move cannot reach. M11 keeps a pointer in the guide, so a compacted agent still
+finds the index in one hop — the objection rev-1 raised is answered by leaving the pointer, not by
+leaving the list.
 
 ## 8. Revision log
 
+- rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. BLOCKER: AC1's 225-line target was
+  arithmetically unreachable from S1's scope — the taxonomy is seven lines, so the move lands at ~243
+  — and reaching 225 by trimming would have deleted content §3 forbids and unit 1 measured as
+  load-bearing. F1 re-resolved to BOTH displacements. Added the template-vs-rendered pointer
+  distinction and the install-prefix waiver re-key.
 - rev-1 · 2026-08-11 · initial draft. Raised by unit 1 as `TOOL-aWrittenMethod-3` when the guide
   landed at 247 lines with the line axis binding and the byte axis comfortable.

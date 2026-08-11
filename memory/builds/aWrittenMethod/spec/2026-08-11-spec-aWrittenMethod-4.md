@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-4 — a gate for the sixth carrier
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -11,11 +11,24 @@ rather than a thing that happens.
 
 ## 2. Scope (IN)
 
+
+**Landing order.** This unit is step four of five. The set lands `2 → 6 → 3 → 4 → 5`, fixed by the
+audit `wf_eb978bb2-f98`: unit 6 rewrites the renderer unit 3 measures against, unit 3 creates a new
+method carrier unit 4 must then enumerate, and unit 5 puts the method under a manifest ratchet that
+would otherwise tax every earlier unit's commit. These are NOT parallel-safe under M6.
+
 - **S1** — `tools/memory-tree/check-method-carriers.sh`: enumerate every TRACKED file that mentions
-  `BUILD-METHOD.md`, excluding the method, its template, and the memory tree's own records under
-  `<MEMORY_ROOT>/`; require each to be listed in a declared registry; red on an undeclared one.
+  `BUILD-METHOD.md`, excluding the method, its template, the memory tree's own records under
+  `<MEMORY_ROOT>/`, **the leg itself, its registry, and every `*.test.sh`** — the last three because
+  each necessarily contains the literal the leg greps for, so without them the leg self-hits. This is
+  `check-install-prefix.sh`'s own exclusion shape, including its reason for excluding tests: they
+  build violating fixtures on purpose.
 - **S2** — the registry `tools/memory-tree/method-carriers.txt`, one `<path> · <why>` row per
-  declared carrier, seeded with the four that landed. Shrink-only in spirit and gated on staleness:
+  declared carrier. It SHIPS EMPTY with a header comment, and `adopt-memory-tree.sh` scaffolds an
+  adopter's from their own measured population; this repo's rows live in this repo's copy. A registry
+  shipped pre-seeded with gov's paths would red every adopter on install — the asymmetry F3's own
+  reasoning forbids. The registry resolves at `<scanned repo>/<kit dir>/method-carriers.txt`, derived
+  from the leg's own location and never spelled; an ABSENT registry is a refusal, not an empty set. Shrink-only in spirit and gated on staleness:
   a row whose file no longer mentions the method reds as stale, the same both-directions discipline
   `install-prefix-waivers.txt` uses.
 - **S3** — the leg asserts each declared carrier's mention is a **path token**, not a paraphrase:
@@ -38,7 +51,7 @@ No equivalent gate for the other governing documents. The protocol, the review p
 hygiene rules have the same exposure, and generalising before this one has survived a single fold-in
 would be designing for a population of one. F2.
 
-No change to the four existing pointers. They are correct; they are the seed.
+No change to the existing pointers. They are correct, and they are what the registry declares in this repo’s copy — the count is measured at build time, not asserted here.
 
 ## 4. Design
 
@@ -59,9 +72,11 @@ exactly that reason.
 ### Why a structural check is enough
 
 The paraphrase this unit fears has a shape: it copies a section. `## M<n>` is the method's own heading
-grammar and appears nowhere else in the tree, so a file carrying one has copied rather than pointed.
-That is a narrow test, and it catches the specific historical failure — the four unattended spellings
-were each a bulleted restatement, not a subtle rewording.
+grammar. It is NOT unique tree-wide — it occurs in review records under `<MEMORY_ROOT>/` — but every
+such occurrence sits inside the region S1 excludes, so the heuristic is sound over the SCANNED
+population and unsound as a general claim. Rev-1 asserted the general claim. That is a narrow test,
+and it catches the specific historical failure: the four unattended spellings were each a bulleted
+restatement, not a subtle rewording.
 
 ### Files touched (estimate)
 
@@ -89,8 +104,9 @@ where an adopter cannot edit it without patching the kit.
 - risks — a false red on a record legitimately discussing the method. §2's exclusion of
   `<MEMORY_ROOT>/` covers specs, reviews and backlog rows, which is where such discussion lives.
 - testing + left-shift gates — S5, four arms plus the positive control.
-- migration / rollback — the registry is seeded with today's four carriers, so the leg is green on
-  landing. Rollback is deleting the leg and its row.
+- migration / rollback — the SHIPPED registry is empty; this repo's copy is seeded from the measured
+  population in the same commit, so the leg is green on landing here and silent for an adopter until
+  they scaffold. Rollback is deleting the two legs and their rows.
 - user docs — the registry's own header comment, and the `AGENTS.md` line S4 adds.
 
 ## 6. Acceptance criteria
@@ -101,16 +117,23 @@ where an adopter cannot edit it without patching the kit.
   the row as stale.
 - **AC3** — When a carrier contains a `## M<n>` heading, the leg REDS naming it as a copy rather than
   a pointer.
-- **AC4** — When the tree stands as landed, the leg exits 0 and reports four carriers. Positive
-  control.
+- **AC4** — When the tree stands as landed, the leg exits 0 and every path it reports is declared.
+  Positive control. The count is DERIVED at build time, never asserted as a literal: rev-1 said
+  "four", which was unit 1's count of the pointers it authored, while S1's actual population measures
+  SEVEN before this unit's own three files are excluded. A hardcoded count is a repo-specific value
+  sitting in an acceptance criterion.
 - **AC5** — When every mention is removed from the tree, the leg REDS on the empty population rather
   than passing.
 - **AC6** — When `bash tools/memory-tree/check-method-carriers.test.sh` runs, it passes with every
   arm above exercised by a fixture that can actually produce the condition.
 - **AC7** — When `bash tools/run-gates.sh` runs, the new leg appears in its output and the run-gates
   canary passes with the leg single-sourced from `tools/gate-legs.json`.
-- **AC8** — When `python tools/codebase-map/test_codebase_map.py` runs, the new leg is claimed by
+- **AC8** — When `python tools/codebase-map/test_codebase_map.py` runs, BOTH new legs are claimed by
   `memory/map/features/build-method.md` and coverage exits 0.
+- **AC9** — When `python tools/memory-tree/check-arms.py` runs, every fail branch in the new leg is
+  armed by a named assertion and an `ARMS_FLOORS` entry for it exists in `.memory-tree.conf`.
+- **AC10** — When `bash skills/session-kickoff/manifest-check.sh --staged` runs on this unit's commit,
+  it passes: `tools/gate-legs.json` and `.memory-tree.conf` are watched, so the re-stamp is bundled.
 
 ## 7. Gates
 
@@ -119,9 +142,13 @@ where an adopter cannot edit it without patching the kit.
 `tools/check-install-prefix.sh` · `python tools/memory-tree/check-arms.py` ·
 `tools/memory-tree/check-memory-hygiene.sh` · `bash tools/run-gates.sh` at the push boundary.
 
-**This unit ADDS a gate leg**, taking the bar from 47 to 48. Unit 1 declined to add one and gave its
-reasons; those reasons were about the METHOD not needing a leg, and do not bind a unit whose entire
-deliverable is a check.
+**This unit ADDS TWO gate legs**, taking the bar from 47 to **49**. In this repo a kit self-test is
+itself a leg in `tools/gate-legs.json`, so the leg and its self-test both enter — rev-1 said 48 while
+listing the self-test as a gate in the same paragraph. Unit 1 declined to add a leg and gave its
+reasons; those were about the METHOD not needing one, and do not bind a unit whose entire deliverable
+is a check. That decline was unit 1's **F4**, RESOLVED as "a backlog row, not a gate"; this unit
+reverses the mechanism half, leaves the scope half standing, and per M3 updates F4's mark in place
+rather than silently contradicting it.
 
 ## 8. Open questions
 
@@ -129,7 +156,7 @@ deliverable is a check.
 
 S3's structural test catches a copied section and misses a fluent paraphrase that invents its own
 headings. Options: ship the heuristic; ship the registry alone and rely on the declaration being a
-decision point; ship neither. **Recommendation: ship the heuristic.** It is the most feature-rich
+decision point; ship neither. **RESOLVED (agent, 2026-08-11, delegated): ship the heuristic.** It is the most feature-rich
 option that satisfies the constraints — it costs three lines, it catches the exact historical shape,
 and §3 already states plainly that it is structural rather than semantic, so no reader is misled
 about what it proves.
@@ -138,20 +165,26 @@ about what it proves.
 
 The protocol, `REVIEW-PROTOCOL.md` and `HYGIENE.md` have identical exposure. Options: generalise the
 leg now to a declared set of documents; ship method-only and file the generalisation.
-**Recommendation: ship method-only and file it.** The registry format and the two failure directions
+**RESOLVED (agent, 2026-08-11, delegated): ship method-only and file it.** The registry format and the two failure directions
 are unproven; generalising an unproven mechanism across four documents multiplies whatever is wrong
 with it by four. The follow-up row is S5's deferral in §4's file estimate.
 
 ### F3 — where the leg lives
 
 It gates a memory-tree artifact, so `tools/memory-tree/` is the natural home; but it reads files
-across the whole repo, which is `tools/check-*.sh`'s shape. **Recommendation: `tools/memory-tree/`.**
+across the whole repo, which is `tools/check-*.sh`'s shape. **RESOLVED (agent, 2026-08-11, delegated): `tools/memory-tree/`.**
 The document it guards ships with that kit, and an adopter who installs the kit should receive the
 guard with it — a check living outside the kit would be gov-only, which is the asymmetry unit 1's
 review already punished.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. BLOCKER: AC4's positive control was false —
+  the population measures seven, not four, and the unit's own three files self-hit for ten, so the leg
+  would have redded on landing. Added `check-install-prefix.sh`'s exclusion shape, made the count
+  derived, corrected the leg arithmetic from 48 to 49 (a self-test IS a leg here), made the registry
+  ship empty so it does not red every adopter, corrected the `## M<n>` uniqueness claim, and added the
+  arms and manifest ACs. All four forks resolved per their recommendations.
 - rev-1 · 2026-08-11 · initial draft. Raised by unit 1 as `TOOL-aWrittenMethod-4`, where it was
   explicitly declined as out of scope with the reasoning that enforcement was not that unit's job.
 

@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-6 — escaping conf values before substitution
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -11,19 +11,32 @@ them, and arm the fix with a hostile-value fixture so a third wrong attempt cann
 
 ## 2. Scope (IN)
 
-- **S1** — replace the `sed`-based substitution in `render()` with one that has **no
-  replacement-side metacharacters**: bash parameter expansion over the template read into a variable.
-  `${v//pat/rep}` treats `&` and `|` as ordinary text, which removes the defect class rather than
-  escaping around it.
+
+**Landing order.** This unit is step two of five. The set lands `2 → 6 → 3 → 4 → 5`, fixed by the
+audit `wf_eb978bb2-f98`: unit 6 rewrites the renderer unit 3 measures against, unit 3 creates a new
+method carrier unit 4 must then enumerate, and unit 5 puts the method under a manifest ratchet that
+would otherwise tax every earlier unit's commit. These are NOT parallel-safe under M6.
+
+- **S1** — replace the `sed`-based substitution in `render()` with bash parameter expansion over the
+  template read into a variable, **with the replacement QUOTED**: `out=${out//\{\{KEY\}\}/"$VAL"}`.
+  The quoting is load-bearing and rev-1 got this wrong. Bash 5.1 gave the pattern-substitution
+  replacement a sed-like `&` meaning "the matched text"; quoting any part of the replacement inhibits
+  it. Measured on bash 5.3.9 with `V='a&b'`: unquoted yields `a{{K}}b` — reproducing failed attempt
+  number one — and quoted yields `a&b`. Backslash is likewise consumed unquoted and preserved quoted.
+  Also DELETE the two now-unreachable `render FAILED` branches unit 1 added, or respell them for the
+  surviving cause (an unreadable template): once `sed` is gone nothing can reach them, and a fail
+  branch no input can produce is the class this repo gates on.
 - **S2** — a hostile-value fixture in `tools/unattended/adopt-unattended.test.sh`: a conf whose
   `LANDER` and `KEEPALIVE_INTERVAL` each carry `|`, `&` and a backslash, asserting the rendered Skill
   contains those values **byte-for-byte**. A round-trip assertion, not a non-empty one.
 - **S3** — a NEGATIVE control in the same fixture: assert the rendered Skill does NOT contain the
   literal `{{LANDER}}` or `{{KEEPALIVE_INTERVAL}}`, so a render that silently drops a substitution
   cannot pass by leaving the token in place.
-- **S4** — the same treatment for `tools/memory-tree/kit-dogfood-parity.test.sh`'s `render()` and
-  `tools/memory-tree/adopt-memory-tree.sh`'s `render_doc()`, whose substituted values (`KIT_DIR`,
-  `TOOL_ROOT`) are install paths. A path with a `&` is unlikely and a path with a backslash is a
+- **S4** — the same treatment for the other FIVE substitution sites, not two.
+  `tools/memory-tree/kit-dogfood-parity.test.sh` `render()` and
+  `tools/memory-tree/adopt-memory-tree.sh` `render_doc()` substitute install paths; but
+  `tools/memory-recall/adopt-memory-recall.sh` and `tools/drift-audit/adopt-drift-audit.sh`
+  substitute CONF-AUTHORED values, which is this unit's exact exposure class and was missed in rev-1. A path with a `&` is unlikely and a path with a backslash is a
   Windows spelling away; the two renderers are byte-identical in intent and must not diverge on this.
 - **S5** — keep unit 1's emptiness refusals at both paths. They are the backstop for whatever the
   next defect in this area turns out to be, and they are cheap.
@@ -84,7 +97,8 @@ needs none is a dependency an adopting repo did not ask for.
 
 - security — an adopter-supplied string reaching a shell-adjacent substitution. Removing the engine
   that interprets it is the fix; the values are repo-authored, not remote, so this is robustness
-  rather than an injection boundary.
+  rather than an injection boundary. The REPLACEMENT side is where the defect lives, not the pattern
+  side — rev-1's risk bullet said the opposite and that is what made its design wrong.
 - perf / scale — a 4 KB template in a shell variable. Irrelevant.
 - a11y · i18n — N/A.
 - error / empty / loading states — S5 keeps both emptiness refusals.
@@ -108,6 +122,11 @@ needs none is a dependency an adopting repo did not ask for.
   one the current `sed` implementation produces. Verified by rendering before and after and diffing.
 - **AC5** — When the rendered Skill is greped for `{{LANDER}}` and `{{KEEPALIVE_INTERVAL}}`, neither
   appears — the negative control against a silently dropped substitution.
+- **AC5b** — When a conf value is exactly `&`, it survives byte-for-byte. This is the minimal witness
+  for the bash-5.1 replacement semantics S1 turns on, and it fails against rev-1's unquoted design.
+- **AC5c** — When a template ends in two or more trailing newlines, the render preserves them.
+  `$(cat …)` strips ALL trailing newlines and `printf '%s\n'` restores exactly one, so the naive
+  spelling is byte-lossy at the tail for any template that is not exactly one-newline-terminated.
 - **AC6** — When `bash tools/unattended/adopt-unattended.test.sh` runs, it passes with a grown
   assertion count including the hostile-value arm.
 - **AC7** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs after S4, it reports
@@ -127,7 +146,7 @@ needs none is a dependency an adopting repo did not ask for.
 
 The memory-tree renderers substitute install paths, not free prose, so their exposure is smaller.
 Options: convert both for symmetry; convert neither and note the asymmetry; convert only
-`adopt-memory-tree.sh`, which writes into an adopter's tree. **Recommendation: convert both.** The
+`adopt-memory-tree.sh`, which writes into an adopter's tree. **RESOLVED (agent, 2026-08-11, delegated): convert both.** The
 two renderers are documented as byte-identical in intent — `kit-dogfood-parity.test.sh` says so in
 its own comment — and letting them diverge on escaping is how the next reader learns the wrong lesson
 from whichever one they open first.
@@ -135,12 +154,18 @@ from whichever one they open first.
 ### F2 — whether the hostile fixture belongs in the shipped kit or only the dogfood
 
 `adopt-unattended.test.sh` ships to adopters. A fixture carrying `|` and `&` is slightly startling in
-a file an adopter reads. **Recommendation: ship it.** An adopter inherits the same renderer and the
+a file an adopter reads. **RESOLVED (agent, 2026-08-11, delegated): ship it.** An adopter inherits the same renderer and the
 same exposure, and a test whose fixture is blander than reality is this repo's
 `fixture-passes-by-finding-nothing` class.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. BLOCKER: S1's load-bearing claim was FALSE.
+  Bash 5.1 gave the pattern-substitution replacement a sed-like `&`, so the unquoted spelling rev-1
+  prescribed reproduces exactly the corruption of the first failed attempt. Reproduced on bash 5.3.9
+  before folding. The replacement is now quoted, §5's risk bullet names the right side, and three ACs
+  were added — the bare `&` witness, the trailing-newline case, and the negative control. §10's site
+  count corrected from three to six, and S4 widened to the two adopters that substitute conf values.
 - rev-1 · 2026-08-11 · initial draft. Raised by unit 1's closing review as id=1 and filed as
   `TOOL-aWrittenMethod-6` when two escape attempts failed and only the loud refusal shipped.
 
@@ -150,8 +175,10 @@ The reuse probe run for this unit set (`reuse_lookup.py "resolve a trustworthy b
 cannot move, and escape values before substitution"`) surfaced the gotcha class
 `heredoc-escape-reaches-the-regex.md` by name, which is the class both failed attempts fell into and
 is cited in §4. It surfaced no escaping seam, because the repo has none: `grep -rn` over `tools/`
-finds three independent `sed`-based substitution sites (`adopt-unattended.sh` `render()`,
-`kit-dogfood-parity.test.sh` `render()`, `adopt-memory-tree.sh` `render_doc()`) and no shared helper.
+finds SIX independent `sed`-based substitution sites and no shared helper — `adopt-unattended.sh`
+`render()`, `kit-dogfood-parity.test.sh` `render()`, `adopt-memory-tree.sh` `render_doc()`,
+`adopt-memory-recall.sh`, `adopt-drift-audit.sh` and the codebase-map adopter. Rev-1 said three; two
+of the three it omitted substitute conf-authored values, which is this unit's exposure class.
 
 That absence is itself the finding, and it is why S4 exists: the correct move is not to add a fourth
 implementation with an escape bolted on, but to change all three to a mechanism that needs no escape.
