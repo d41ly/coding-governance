@@ -1,8 +1,24 @@
 # TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer
 
-**Status:** CLOSED · rev-4 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** CLOSED · rev-5 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
+
+> **SUPERSEDED at the merge, and this spec is kept as the reasoning rather than the design.** Another
+> node landed a remote-OBSERVED anchor while this unit was in flight — the run-state file records
+> `anchor-ref`, `anchor-sha` and `anchor-url`, and `resolve_base` merge-bases against a sha the remote
+> answered for. That is unit 2's own F2, which this spec filed as out of scope, and it is strictly
+> stronger: it does not depend on `refs/remotes/origin/HEAD`, a ref the run rewrites locally. The
+> mechanism described below — `RESOLVED_REF`, `canonical_ref`, the `base-ref` fact — no longer exists
+> in `tools/unattended/unattended.sh`; `grep` returns zero.
+>
+> What SURVIVES is the principle, and it survived because the other node reached it independently:
+> **the gate must not read the input the driver read**, or it confirms a steer instead of
+> contradicting it. What did NOT survive is this unit's terminal-phase exemption, and the reason is
+> worth keeping: the run writes `phase:`, so keying an exemption on it is a one-line escape from the
+> check. The other implementation's comment says exactly that, and says it as a rejected option. This
+> spec shipped it, and its own closing review reproduced the bypass one commit later.
+
 
 The mandate comparison is the only thing standing between an unattended run and an unreviewed push,
 and its BASE is currently chosen by the run. **NARROW** the hole from two mechanisms to one, and make
@@ -196,6 +212,10 @@ is implementable. A repo whose remote is not `origin` sets `origin/HEAD` or does
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-11 · SUPERSEDED at the merge and marked so in section 1. The remote-observed anchor
+  another node landed is this unit's own F2, filed here as out of scope; it does not depend on
+  refs/remotes/origin/HEAD and is strictly stronger. The mechanism this spec describes is gone from
+  the driver. The principle survives; the terminal-phase exemption does not, and why is recorded.
 - rev-4 · 2026-08-11 · folded closing review wf_384dfc48-5a9. B1 CONFIRMED and reproduced with a
   control: refs/remotes/origin/<default> is an ordinary local ref, so `git update-ref` steers the
   BASE with no push and both check 9 and check 13 certify a self-authored mandate. The CODE limit

@@ -39,6 +39,11 @@
 - TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
 - TOOL-aWidenedGuide-1 · the index cap splits by CLASS: a guide is PROSE read end to end, an index is ROWS a sweep prunes. Guides get 3x (60 KB / 750 lines), rows keep 20 KB / 250. The line count was always a proxy; check 16's byte-measured READ_PATH_CEILING is the real budget and is NOT relaxed
+- TOOL-aWrittenMethod-2 · a phase-keyed carve-out is not a fix: the run writes `phase:`, so exempting terminal records from a BASE check is a one-line escape from it. Another node had already reasoned this out and rejected it; this build shipped it and its own review reproduced the bypass
+- TOOL-aWrittenMethod-2 · a global set inside `$( )` never reaches the caller. The file's own comment says so about its sibling function, and the fix for one defect walked into the documented trap of another
+- TOOL-aWrittenMethod-6 · bash 5.1 gave pattern-substitution's REPLACEMENT a sed-like `&`. Quoting it is the whole fix, and an unquoted `${v//p/$V}` corrupts exactly what an unescaped sed does
+- TOOL-aWrittenMethod-4 · `out=$(cat X; printf Y) || return 1` can never fire: a substitution reports the LAST command's status. The unreachable-branch class was deleted in one unit and reintroduced by the next unit's fix
+
 ## DEPL — deployer
 
 *(none yet)*
