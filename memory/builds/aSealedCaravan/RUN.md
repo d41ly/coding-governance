@@ -13,8 +13,8 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e127fe7e10f2ff18becb40927e308c68fa211abf
-phase: REVIEWING
+witness: 4838d3c825e2e38ccdde1e879e54cbabf8974516
+phase: FOLDING
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 67d23d6b97643a0b34de227f26c78f680f6c7252
@@ -22,3 +22,29 @@ anchor-ref: refs/heads/main
 base: 67d23d6b97643a0b34de227f26c78f680f6c7252
 
 ## Parked
+
+**Should `apply` land its own writes?** The M4 audit's blocker id=3 found the spec saying two
+incompatible things. Section 5 asserted "landing is by branch and PR", bounded the half-applied-install
+risk on it, and defined rollback as deleting that branch — while S5's two phases end at `git add` and no
+scope item mentions a branch, a commit, a push or a PR. Two of the four failure-policy knobs ("on a
+diverged remote", "on a push-scope failure") only make sense under the wider reading.
+
+The options were: scope the landing flow as a new S-item, or state in section 3 that `apply` writes and
+stages only and the operator lands. I took the narrow one and folded it at rev-6, because it is the
+reading every measurement supports — no adopter under `tools/*/` runs `git commit`, `git push`,
+`git checkout -b` or `git switch -c`, three of the six stage, and `WIRE-INTO-PROJECT.md` has an agent
+working directly in the target on its default branch rather than on a branch it opened. It is also the
+conservative reading, and a deployer that pushes to somebody else's remote unattended is a write surface
+this unit never priced.
+
+What I refused to decide is the WIDER option, because it differs in what gets built rather than in how a
+stated thing works, and that is scope rather than a fork. If the owner wants `govkit apply` to open a
+branch, commit, push and raise a PR in the target, that is a further unit, and it should inherit the
+unattended kit's protocol rather than invent a second answer to the same question — the rules for a run
+that merges and pushes with no owner turn already exist at `memory/guides/UNATTENDED-PROTOCOL.md`.
+
+**Two advisory findings folded rather than parked, recorded so the choice is visible.** Audit ids 10 and
+12 (a non-default-selection acceptance criterion, and what `scope = "machine"` actually does) were
+classed advisory by the synthesis and could have waited for rollout commit 3. Both were folded at rev-6
+instead, because each changes a descriptor field that rollout commit 1 writes, and deferring a field
+decision past the commit that writes the field is how a rewrite gets bought.

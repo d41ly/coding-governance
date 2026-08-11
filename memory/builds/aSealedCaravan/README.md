@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-10
 streams: deployer+tooling
 roster: DEPL+TOOL
-ids: DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2
+ids: DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4
 ---
 
 # aSealedCaravan — one install prefix, and a deployer that lands the chain mechanically
@@ -21,17 +21,27 @@ reading the runbook.
 ## Start here
 
 **State.** Unit 1 is CLOSED — built, reviewed, and landed on `main` at `82e6dcf`. Unit 2 is
-INPROGRESS at rev-5 and is the whole remaining build. Both were reviewed once (Tier-2, 5 lenses, 48
-confirmed findings, 6 blockers — all folded), and unit 2's spec has moved three revs since, so it is
-unreviewed in the sense M4 means.
+INPROGRESS at rev-6 and is the whole remaining build. It has now been reviewed twice: once at rev-1
+alongside unit 1, and again as an M4 spec audit at rev-5 that returned **BLOCKED** with seven
+blockers, all folded at rev-6.
 
 **Classification (M2), written before acting on it.** Unit 2 was FORKED — §8 carried three
-unresolved items — and is READY as of rev-5, which resolved them. §2, §6 and §7 are all filled and
-name observable checks, and §10 is filled, so no other class applies.
+unresolved items — became READY at rev-5, and the M4 audit then sent it back. It is READY again at
+rev-6. §2, §6, §7 and §10 are all filled and name observable checks.
 
-**Next action.** The M4 spec audit of unit 2 at rev-5, then rollout commit 1 — `registry.toml`, a
-`kit.toml` per registry entry, and `selfcheck`. The install plan is written against the prefix unit 1
-made true, so nothing external is waited on.
+**Next action.** A tight re-audit of the rev-6 fold, then rollout commit 1 — `registry.toml`, a
+`kit.toml` per registry entry, and `selfcheck`. The audit's verdict was BLOCKED rather than clean, so
+M4's stop rule has not fired; the re-audit is scoped to the fold, not to the design that held.
+
+**What rev-6 changed, because four blockers land inside rollout commit 1.** The registry could not be
+written as specified: `[[files]]` carried no destination, so four entries had nowhere to land; two
+selectable kits have no version constant, which the completeness criterion assumed; that criterion
+quantified over `tools/*` directories and missed every single-file deployable the runbook already
+prescribes; and the unattended kit — a full kit on `main` with an adopter, a rendered Skill and five
+gate legs — appeared in no entry, no inventory row, no selection set and no exemption. Three more
+blockers made criteria unsatisfiable rather than merely incomplete. Every population count is gone
+from the spec: `selfcheck` derives them now, because both counts it previously stated were true when
+measured and false when read.
 
 **Nothing blocks either unit.** The one blocking pair — unit 1's F3 and unit 2's F5, both about
 `tools/lib/` — resolved on 2026-08-10: it is not a kit, it ships nothing, and it becomes a permanent
@@ -66,10 +76,10 @@ Records live under `spec/` and, once built, `build/` and `reviews/`. The table b
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-5 | 2026-08-11 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-6 | 2026-08-11 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->
