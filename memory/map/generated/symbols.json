@@ -163,6 +163,11 @@
       "file": "tools/codebase-map/map_extractors.py"
     },
     {
+      "id": "all_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "all_symbols",
       "kind": "function",
       "file": "tools/codebase-map/map_extractors.py"
@@ -290,6 +295,11 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
     {
@@ -316,6 +326,16 @@
       "id": "cleanup",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_plan",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "collect",
@@ -555,6 +575,11 @@
     {
       "id": "git",
       "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "git",
+      "kind": "function",
       "file": "tools/memory-recall/extract.py"
     },
     {
@@ -713,6 +738,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "load_deploy",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "load_dossier_texts",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -790,6 +820,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-recall/bench.py"
     },
     {
@@ -861,6 +896,11 @@
       "id": "make_repo",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "make_target",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "map_root",
@@ -953,6 +993,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_args",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "parse_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1006,6 +1051,11 @@
       "id": "plan",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "planned_writes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "pytest_configure",
@@ -1076,6 +1126,11 @@
       "id": "read",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "read_descriptors",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "read_log",
@@ -1248,6 +1303,16 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "resolve_selection",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_tokens",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "rosters",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1286,6 +1351,11 @@
       "id": "run",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "run",
@@ -1726,6 +1796,11 @@
       "id": "t_zero_records_is_loud",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "target_context",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "terms",

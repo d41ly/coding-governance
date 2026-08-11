@@ -152,7 +152,11 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   it was written to narrow. **No population count is written in the spec or the registry** — the leg
   derives every one, after the spec twice stated a figure the tree then moved underneath. Its first
   run over the real tree found seven problems, three of them real, which is why a new predicate is run
-  before it is trusted rather than after
+  before it is trusted rather than after. `plan` and `check` are READ-ONLY and their leg is
+  `python tools/govkit/selftest.py`, whose arms assert a specific MESSAGE or on-disk effect and
+  never an exit code alone — including the on-disk arm that `plan` leaves the target byte-identical
+  a read-only verb that writes is the whole risk of that verb. It found two real defects on its
+  first run, one of them a token regex matching the `{k}` inside a shell `${k}`
 
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·

@@ -19,6 +19,7 @@
       "drift-audit wiring",
       "gotchas selftest",
       "govkit selfcheck",
+      "govkit selftest",
       "harness arms (fail branches armed or pinned)",
       "install-prefix (shipped surface)",
       "install-prefix self-test",

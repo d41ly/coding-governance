@@ -8,7 +8,7 @@ streams = ["deployer", "tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["govkit selfcheck"]
+gate-legs = ["govkit selfcheck", "govkit selftest"]
 kits = ["govkit"]
 git-hooks = []
 workflow-scripts = []
@@ -69,9 +69,12 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
 
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
-- `tools/govkit/govkit.py` — `selfcheck` today. `plan`, `check`, `apply`, `apply --resume` and
-  `intake` are later rollout commits and are ABSENT rather than stubbed, because a subcommand that
-  parses and does nothing is indistinguishable from one that works.
+- `tools/govkit/govkit.py` — `selfcheck`, plus the read-only `plan` and `check`. `apply`,
+  `apply --resume` and `intake` are later rollout commits and are ABSENT rather than stubbed,
+  because a subcommand that parses and does nothing is indistinguishable from one that works.
+- `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
+  arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
+  six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.
 - `tools/<kit>/kit.toml` — a descriptor beside each kit that is a directory.
 - `tools/govkit/entries/<id>.kit.toml` — a descriptor for each entry with no kit directory of its
   own.
@@ -88,7 +91,11 @@ registry-shaped assertion this unit adds.
 
 ## Gaps
 
-The deployer does not deploy yet: rollout commit 1 ships the registry and the ratchet only. `[[hole]]`
-discharge probes are declared and are not yet RUN by anything — `check` is commit 2. The version
-cross-check against `check-kit-versions.sh`, the guard-class partition assert, and the derived
-`mutates_index` are specified in the unit's AC10 and are not yet implemented here.
+The deployer does not deploy yet: `apply`, `apply --resume`, `intake`, the receipt and the acceptance
+matrix are rollout commits 3 and 4. `check` therefore reports on a receipt no verb in this tree
+writes, which is why its NOT-LANDED arm is the one a fixture can reach today.
+
+Two AC10 assertions remain unimplemented and are named rather than assumed: the guard-class partition
+(every guard pathspec falls into exactly one declared class) and the derived `mutates_index` (grep
+each adopter for an EXECUTED `git add` rather than trusting a declared value). The version
+cross-check landed.

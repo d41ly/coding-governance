@@ -498,5 +498,15 @@
       "tools/govkit/govkit.py",
       "selfcheck"
     ]
+  },
+  {
+    "name": "govkit selftest",
+    "argv": [
+      "python",
+      "tools/govkit/selftest.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
   }
 ]
