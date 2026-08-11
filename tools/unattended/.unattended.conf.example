@@ -35,6 +35,11 @@ WIRING_CHECK="bash tools/check-wiring.sh --check"
 KEEPALIVE_CREATE="<your-schedule-create-tool>"
 KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 
+# The cadence the agent schedules the keepalive at. Rendered into the Skill as prose, so an
+# UNDECLARED value now leaves its own placeholder standing and reds the adopter check rather than
+# rendering "at the cadence this project declares — ." with every gate green.
+KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
+
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.

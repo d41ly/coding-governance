@@ -177,6 +177,10 @@ With one: echo the READY card, add one line naming the mandate and where it is c
 **continue without halting**. The card is still emitted — an unattended run needs its scope on the
 record more than an attended one does, because nobody is going to ask.
 
+Before the first pass, load the project's build method if it ships one — `<MEMORY_ROOT>/guides/BUILD-METHOD.md`,
+rendered by the memory-tree kit. It carries the spec set, the fork rule, the pass loop and the
+regrounding procedure, none of which this engine states.
+
 **The six interactive exits, and how each resolves with no owner turn.** An unattended run that
 still stops at any of these has not been made unattended, it has been made stuck:
 

@@ -15,13 +15,17 @@ distinction real.
 
 ## Start a run
 
+0. **Read the build method first, if this project ships one:** `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`.
+   It is the memory-tree kit's, not this one's, so it may be absent — that is legal, and this kit
+   states none of what it carries.
 1. **Find the mandate. Do not write one.** The owner authors a mandate block in the build's run-state
    file and commits it BEFORE the run starts. If there is none, stop and say so — a mandate you
    wrote authorizes nothing, and the preflight will refuse it anyway by comparing against the pinned
    BASE.
 2. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
    store is in-memory and session-scoped, reachable only through your own tool calls. Use
-   `{{KEEPALIVE_CREATE}}`. Keep the id it returns.
+   `{{KEEPALIVE_CREATE}}`, at the cadence this project declares — {{KEEPALIVE_INTERVAL}}. Keep the
+   id it returns.
 3. **Preflight**, handing over that id:
 
    ```bash

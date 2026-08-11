@@ -31,6 +31,12 @@
 - TOOL-aStandingWrit-2 · an anchor is only as trustworthy as the cheapest way to move it. `refs/remotes/origin/<x>` READS like an observation of the remote and IS a local write; a source comment asserting a ref cannot move without a push is not a check, and it survived two Tier-2 reviews
 - TOOL-aStandingWrit-4 · a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN, not an override: any unmatched `GOV_DEFAULT_BRANCH` sent pre-push down its own "nothing to gate" exit 0, skipping the lander refusal and every leg on the bar
 
+
+- TOOL-aWrittenMethod-1 · the build METHOD is generic and belongs to the memory-tree kit beside the spec format and the record rules, not to the unattended kit, which points at it. It rides the existing parity leg as a third PAIRS row, so the bar stays at 47 legs
+- TOOL-aWrittenMethod-1 · a mis-aimed BRIEFING yields a confident wrong answer, not a visibly confused one: pass 1 was told the tension was self-authorship and scored on checkability, so every candidate delivered enforcement where a procedure was asked for
+- TOOL-aWrittenMethod-1 · absence-of-placeholder is not presence-of-value. Pre-initialising an interpolated conf key to empty makes emptiness the failure mode the `{{TOKEN}}` grep cannot see; default the key to its own token so an undeclared value reds
+- TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
+
 ## DEPL — deployer
 
 *(none yet)*
