@@ -166,14 +166,19 @@ manifest-audit delta line (when Step 2b ran a repair). Then hand
 control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building
 until the user confirms.
 
-## Step 5b — the unattended hand-back (only with a committed build the run did not create)
+## Step 5b — the unattended hand-back (only inside a run that was actually started as one)
 
 **Default is the stop above.** This step is the narrow exception, and it fires only when the project
-adopts an unattended-run kit AND the **build folder itself** is reachable from the pinned BASE —
-never on the strength of a chat instruction, and never on a build this session could have created.
-No such build → Step 5 halts exactly as written, prompt string and all.
+adopts an unattended-run kit AND **this session is already inside a started unattended run** — its
+run-state file exists for this build, in a non-terminal phase, written by that kit's own preflight.
+Never on the strength of a chat instruction.
 
-With one: echo the READY card, add one line naming the build and where it is committed, and
+**The authorization is a precondition, not the trigger.** A committed build folder is what lets a run
+START; it is true of every build in the tree, so treating it as the signal that a run IS happening
+hands the exception to every attended session. Anything short of a live run-state file → Step 5 halts
+exactly as written, prompt string and all.
+
+Inside one: echo the READY card, add one line naming the build and its run-state file, and
 **continue without halting**. The card is still emitted — an unattended run needs its scope on the
 record more than an attended one does, because nobody is going to ask.
 

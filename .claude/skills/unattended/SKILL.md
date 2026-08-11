@@ -47,6 +47,25 @@ distinction real.
   turn you did not take.
 - Check yourself with `bash tools/unattended/unattended.sh --status <slug>`.
 
+## While the work runs
+
+Move the phase as each pass ends, and give it a witness. The members are named for the build method's
+pass kinds, so the run's position and the pass it is performing are one vocabulary rather than two:
+
+```bash
+bash tools/unattended/unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
+```
+
+Ask what is left instead of re-reading prose for it:
+
+```bash
+bash tools/unattended/unattended.sh --plan <slug>
+```
+
+It prints each tracked spec's id, status and classification, and names the next unit. It cannot see a
+planned unit that has no spec yet, and says so on every run rather than printing a complete-looking
+list.
+
 ## Resume
 
 ```bash

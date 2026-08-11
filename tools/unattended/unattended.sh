@@ -3,6 +3,8 @@
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
+#   unattended.sh --plan <slug>                            # per-unit state, and the next unit
+#   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --resume <slug>                          # the same line, plus the next action
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
@@ -421,7 +423,13 @@ scaffold_runmd() { # slug -> writes and stages <MEMORY_ROOT>/builds/<slug>/RUN.m
     printf '## Run facts\n\n'
     printf '## Parked\n'
   } > "$rel" || return 1
-  GIT add -- "$rel" >/dev/null 2>&1 || return 1
+  return 0
+}
+
+# Staged only AFTER the facts are written. Staging the blank scaffold put a blob with no base, phase
+# or witness into the index - which is precisely what the gate leg reads.
+stage_runmd() { # run-state file
+  GIT add -- "$1" >/dev/null 2>&1 || return 1
   return 0
 }
 
@@ -478,8 +486,15 @@ verb_plan() { # slug
     return 1
   fi
   for spec in $specs; do
-    id=$(sed -n 's/^# \([A-Za-z0-9][A-Za-z0-9-]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
     st=$(sed -n 's/^\*\*Status:\*\* \([A-Z]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
+    # NO status header, NO unit. M2 defines a unit's spec as the file whose STATUS HEADER carries the
+    # id, so a file without one is a recording that happens to live here. Taking it anyway made this
+    # verb invent units and name one as `next` on 5 of the 25 builds in this corpus.
+    if [ -z "$st" ]; then
+      printf '%-34s %-11s %s\n' "$(basename "$spec")" "-" "NOT A UNIT (no status header)"
+      continue
+    fi
+    id=$(sed -n 's/^# \([A-Za-z0-9][A-Za-z0-9-]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
     [ -n "$id" ] || id=$(basename "$spec" .md)
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
@@ -503,6 +518,13 @@ verb_phase() { # slug · phase · witness
     *" $want "*) ;;
     *) fail 19 "the phase is not in the declared vocabulary, and a phase nothing recognises is not a position: $want" ; return 1 ;;
   esac
+  # A TERMINAL phase is --close's to write, never this verb's. Vocabulary membership is not
+  # permission: a run that could set LANDED here would skip the entire Definition-of-Done gate, and
+  # the two agent-attested items are enforced in no other place.
+  if is_terminal "$want"; then
+    fail 19 "a terminal phase is --close's to write and not this verb's, because reaching it through here would skip the whole Definition-of-Done gate: $want"
+    return 1
+  fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
   set_fact "$rel" phase "$want" || return 1
   set_fact "$rel" witness "$wit" || return 1
@@ -572,6 +594,7 @@ verb_preflight() { # slug · keepalive-id
   # to re-run after a compaction.
   [ -n "$(fact "$rel" phase)" ] || set_fact "$rel" phase RUNNING || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
+  stage_runmd "$rel" || { fail 9 "cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has: $rel"; return 1; }
   echo "unattended: preflight OK — base $base · anchor $AREF at $ASHA · keepalive $kid · region copied from $src"
   return 0
 }

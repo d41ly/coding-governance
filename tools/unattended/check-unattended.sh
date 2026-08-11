@@ -197,7 +197,14 @@ for f in $RUNS; do
         GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
         mb=$(GIT merge-base "$b" HEAD 2>/dev/null) || continue
         [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
-        [ "$mb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
+        # ONLY once the run claims to have built something. At PREFLIGHT and through the pass
+        # phases the merge-base legitimately equals HEAD - that is a run that has correctly built
+        # nothing yet, and the driver blesses it there. Refusing it here made the two halves of one
+        # kit disagree, each with its own green test.
+        case "$ph" in
+          LANDING|LANDED|ABORTED|VERIFYING)
+            [ "$mb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+        esac
         break
       done
     fi
@@ -220,10 +227,16 @@ for f in $RUNS; do
     bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
     bre="$M/builds/$bslug/README.md"
     if bb=$(GIT show "$rb:$bre" 2>/dev/null); then
+      bad_fm=0
       case "$bb" in
         "---"*) ;;
-        *) fail 13 "the build README at a run's recorded BASE is not a build README - front matter opens at line 1 and this does not, so the authorization names something that is not a build: $bre" ;;
+        *) fail 13 "the build README at a run's recorded BASE is not a build README - front matter opens at line 1 and this does not, so the authorization names something that is not a build: $bre"
+           bad_fm=1 ;;
       esac
+      # The slug comparison PRESUMES line 1 is the front-matter opener. Falling through emitted a
+      # second, false "declares a different slug" for a file that is simply not a README - and the
+      # driver this leg second-opinions returns after the first refusal.
+      [ "$bad_fm" = 0 ] || continue
       dslug=$(printf '%s\n' "$bb" | awk '
         NR == 1 { next }
         /^---[[:space:]]*\r?$/ { exit }

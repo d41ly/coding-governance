@@ -446,7 +446,12 @@ same "the phase was actually written" "$(sed -n 's/^phase: //p' memory/builds/tR
 
 # ...and preflight must NOT move it back. It used to rewrite the phase unconditionally, so the very
 # verb a compaction-resumed run is told to re-run silently reset its position to RUNNING.
+# COMMIT the phase move first. Without this the re-run preflight refuses on a DIRTY TREE, so the
+# phase survives because nothing ran - the arm passed with the guard reverted, which is this
+# repo's own fixture-passes-by-finding-nothing class inside the kit meant to make runs checkable.
+git add -A >/dev/null; git commit -q -m "phase moved" --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
 same "a re-run preflight leaves a reached phase alone" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "BUILDING"
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -454,6 +459,20 @@ hit "$(run --phase tRun NOSUCHPHASE --witness abc)" "the phase is not in the dec
 hit "$(run --phase tRun BUILDING)" "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips"
 reset_tree
 hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there is no run to move"
+
+# ...and a TERMINAL phase is refused here whatever the vocabulary says. Membership is not permission:
+# a run that could set LANDED through this verb would skip the entire Definition-of-Done gate, and
+# the two agent-attested items are enforced in no other place.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --phase tRun LANDED --witness abc)" "a terminal phase is --close's to write and not this verb's, because reaching it through here would skip the whole Definition-of-Done gate"
+miss "$(run --phase tRun BUILDING --witness abc)" "a terminal phase is --close's to write"
+
+# ...and the run-state file cannot be staged. A DIRECTORY at the index path is the cheapest failure
+# that needs no permissions this node may not honour.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+git rm -q --cached memory/builds/tRun/RUN.md >/dev/null 2>&1 || true
+git commit -q -m untrack --no-verify >/dev/null 2>&1 || true
+mkdir -p .git/index-blocked 2>/dev/null || true
 
 # ---- S4, the gap list. The states are the build method's M2 vocabulary, spelled exactly; what is
 # ---- asserted here is that this verb COMPUTES them, never that it defines them.

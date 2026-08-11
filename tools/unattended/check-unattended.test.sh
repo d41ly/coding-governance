@@ -310,11 +310,19 @@ hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore 
 reset_tree; sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
 hit "$(run)" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
 
-# ---- check 9 branch 3: the anchor sitting AT HEAD. `git branch -f main HEAD` was the reproduced
-# ---- exploit; the leg now refuses the resulting state as well as the driver.
+# ---- check 9 branch 3: the anchor sitting AT HEAD, at a phase that CLAIMS work was done. The two
+# ---- halves of this kit used to disagree here - the driver blesses this state at preflight, where a
+# ---- run has correctly built nothing yet, while the leg refused it unconditionally, each with its
+# ---- own green test. The refusal is scoped to the phases where a run asserts it built something.
 reset_tree; git push -q -f origin unit:main
-sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read"
+sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; git add -A
+hit "$(run)" "the merge-base equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read"
+
+# ...and the SAME tree at a pass phase is silent, or the scoping is indistinguishable from deleting
+# the check. This is the arm that would have caught the two halves disagreeing.
+sed -i 's/^phase: .*/phase: BUILDING/' memory/builds/tRun/RUN.md; git add -A
+miss "$(run)" "the merge-base equals HEAD at a phase that claims work was done"
 git push -q -f origin "$ANCHOR0":main
 
 # ---- check 13: THE AUTHORIZATION, asserted by the BAR. Before this the leg did not contain the
