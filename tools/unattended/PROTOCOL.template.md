@@ -183,6 +183,10 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
   by an agent hand-editing an artifact this kit calls generated.
+- `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
+  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It cannot see a
+  planned unit that has no spec, and says so in its own output rather than printing a complete-looking
+  list.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override.

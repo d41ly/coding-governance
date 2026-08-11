@@ -455,9 +455,75 @@ hit "$(run --phase tRun BUILDING)" "a phase claim carries a WITNESS - a sha, a t
 reset_tree
 hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there is no run to move"
 
+# ---- S4, the gap list. The states are the build method's M2 vocabulary, spelled exactly; what is
+# ---- asserted here is that this verb COMPUTES them, never that it defines them.
+mkspec() { # slug · id · status · scope · acceptance · gates · forks
+  mkdir -p "memory/builds/$1/spec"
+  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-1.md" <<SPEC
+# $2 — a unit
+
+**Status:** $3 · rev-1 · 2026-08-01 · node a · Tier-2 · base abcdef12 · streams architecture
+
+## 1. Goal
+g
+## 2. Scope (IN)
+$4
+## 3. Non-goals (OUT)
+n
+## 4. Design
+d
+## 5. Production-readiness checklist
+c
+## 6. Acceptance criteria
+$5
+## 7. Gates
+$6
+## 8. Open questions
+$7
+## 9. Revision log
+- rev-1
+## 10. Reuse audit
+r
+SPEC
+}
+
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"; fixture
+out=$(run --plan tPlan)
+hit "$out" "READY"
+hit "$out" "next: ARCH-tPlan-1 (READY - build it)"
+git reset -q --hard HEAD~1; git clean -qfd
+
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "" "the bar" "none"; fixture
+hit "$(run --plan tPlan)" "THIN"
+git reset -q --hard HEAD~1; git clean -qfd
+
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "F1 which way?"; fixture
+hit "$(run --plan tPlan)" "FORKED"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...and THIN wins over FORKED, because M2 orders the checks and the first match wins. Without this
+# arm the two are indistinguishable whenever a spec is both.
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "" "AC1 it works" "the bar" "F1 which way?"; fixture
+out=$(run --plan tPlan)
+hit "$out" "THIN"
+miss "$out" "FORKED"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...a terminal spec is DONE whatever its sections say, and is never the next target.
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 CLOSED "" "" "" "F1 unresolved"; fixture
+out=$(run --plan tPlan)
+hit "$out" "DONE"
+hit "$out" "next: none - every tracked spec is terminal"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...and a build with no tracked spec REFUSES rather than printing an empty, complete-looking list.
+reset_tree; readme tPlanEmpty; fixture
+hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse"
+git reset -q --hard HEAD~1; git clean -qfd
+
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --phase, --status, --resume and --close: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume and --close: --frobnicate"
 
 # ---- check 18: the recorded BASE is EVIDENCE, never the input. --close used to read it straight
 # ---- out of the run-state file — a file the run writes — and an absent line degenerated the

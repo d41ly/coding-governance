@@ -431,6 +431,69 @@ scaffold_runmd() { # slug -> writes and stages <MEMORY_ROOT>/builds/<slug>/RUN.m
 # artifact this kit calls generated. The witness is REQUIRED here for the same reason presence is its
 # own refusal in the leg - an unwitnessed phase claim is the cheapest possible lie, and the run is the
 # sole author of that field.
+# S4 - the gap list, MECHANISED. The four states are the build method's M2 vocabulary spelled exactly
+# - MISSING, THIN, FORKED, READY - and the RULE for each stays in M2. That document's own governing
+# constraint is that a rule appearing both in it and in a carrier it points at is a defect IN IT, so
+# this verb computes the classification and must not restate it. Read M2 for what each state MEANS.
+#
+# The roster is the tracked specs under the build's own `spec/`. M2 prefers the README's authored
+# Units table where one exists; this verb does NOT parse that table, so it cannot see a planned unit
+# that has no spec yet, and it says so in its own output rather than reporting a complete-looking
+# list. Reporting three READY units and silently omitting the four nobody has specced is worse than
+# reporting nothing.
+#
+# It performs NO filename join to `reviews/`. That join was measured wrong on 7 of 7 multi-unit builds
+# in this corpus and right on none: a spec's sequence number is a per-build record counter and a
+# review's is "which review is this", and they coincide only at one unit and one review.
+plan_state() { # spec file -> prints the M2 state
+  awk '
+    /^## / { sec = ""
+             if ($0 ~ /^## 2\./) sec = "scope"
+             else if ($0 ~ /^## 6\./) sec = "acc"
+             else if ($0 ~ /^## 7\./) sec = "gates"
+             else if ($0 ~ /^## 8\./) sec = "forks"
+             cur = sec; next }
+    cur == "" { next }
+    { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+    line == "" { next }
+    { seen[cur] = seen[cur] 1
+      if (cur == "forks" && forkline == "") forkline = line }
+    END {
+      thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
+      # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
+      if (thin) { print "THIN"; exit }
+      lf = tolower(forkline)
+      if (forkline == "" || lf ~ /^none/ || lf ~ /^n\/a/ || forkline ~ /RESOLVED/) print "READY"
+      else print "FORKED"
+    }' "$1"
+}
+
+verb_plan() { # slug
+  local slug="$1" dir specs spec id st state next=""
+  check_slug "$slug" || return 1
+  dir="$M/builds/$slug"
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
+  if [ -z "$specs" ]; then
+    fail 19 "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse: $dir/spec"
+    return 1
+  fi
+  for spec in $specs; do
+    id=$(sed -n 's/^# \([A-Za-z0-9][A-Za-z0-9-]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
+    st=$(sed -n 's/^\*\*Status:\*\* \([A-Z]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
+    [ -n "$id" ] || id=$(basename "$spec" .md)
+    state=$(plan_state "$spec")
+    case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
+    printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
+    case "$state" in
+      THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
+      READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
+    esac
+  done
+  echo "roster: tracked specs under $dir/spec (a planned unit with no spec is invisible here)"
+  if [ -n "$next" ]; then echo "next: $next"; else echo "next: none - every tracked spec is terminal"; fi
+  return 0
+}
+
 verb_phase() { # slug · phase · witness
   local slug="$1" want="$2" wit="$3" rel
   check_slug "$slug" || return 1
@@ -647,12 +710,13 @@ while [ $# -gt 0 ]; do
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     --override)     OV="${2:-}";  shift 2 || shift ;;
     --reason)       REASON="${2:-}"; shift 2 || shift ;;
+    --plan)         shift; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --phase, --status, --resume and --close: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume and --close: $arg"; exit 1 ;;
   esac
 done
 [ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>]"; exit 2; }
