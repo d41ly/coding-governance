@@ -81,16 +81,34 @@ PROTO_OUT="$ROOT/$PROTO_REL"
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
 # empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
-# truncation into a loud one. Escaping the values themselves is TOOL-aWrittenMethod-6.
+# truncation into a loud one. Escaping the values themselves is tracked separately.
 render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
-  set -o pipefail 2>/dev/null || true
-  sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
-      -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" \
-      -e "s|{{LANDER}}|$LANDER|g" \
-      -e "s|{{KEEPALIVE_CREATE}}|$KEEPALIVE_CREATE|g" \
-      -e "s|{{KEEPALIVE_DELETE}}|$KEEPALIVE_DELETE|g" \
-      -e "s|{{KEEPALIVE_INTERVAL}}|$KEEPALIVE_INTERVAL|g" \
-      "$TEMPLATE" | tr -d '\r'
+  # NO `sed`. Conf values are FREE PROSE, and unescaped they landed in `s|…|…|` where a `|` closes
+  # the delimiter (sed exits 1, the trailing `tr` exits 0, so a ZERO-BYTE Skill was written and
+  # `--check` certified it) and an `&` re-inserts the whole match. Two attempts to escape around that
+  # were wrong — one replaced `| & \` with a bare `&` and corrupted values worse than no escaping —
+  # because the count of backslash-consuming layers between the source and the regex engine was not
+  # knowable. So the engine that needs them is gone.
+  #
+  # THE REPLACEMENT MUST BE QUOTED. Bash 5.1 gave pattern substitution a sed-like `&` meaning "the
+  # matched text"; quoting any part of the replacement inhibits it. Measured on 5.3.9 with V='a&b':
+  # unquoted `${t//\{\{K\}\}/$V}` yields `a{{K}}b`, quoted yields `a&b`. A backslash is likewise
+  # eaten unquoted and preserved quoted. The quotes are the fix, not decoration.
+  local out
+  # The `X` sentinel exists because `$( )` strips ALL trailing newlines: without it a template
+  # ending in two blank lines renders with one, and the parity diff blames the author for it. `cat`
+  # gets its own subshell and an explicit `exit 1`, because a substitution reports the LAST command's
+  # status — printf's, always 0 — so the guard below was unreachable without it.
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
+  out=${out//\{\{LANDER\}\}/"$LANDER"}
+  out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
+  out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
+  out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
+  printf '%s' "$out"
 }
 
 if [ "$MODE" = "--check" ]; then
@@ -99,7 +117,7 @@ if [ "$MODE" = "--check" ]; then
   [ -f "$SKILL_OUT" ] || { echo "unattended: $SKILL_OUT is not rendered — run $0"; exit 1; }
   TMP=$(mktemp) || exit 2
   trap 'rm -f "$TMP"' EXIT
-  render > "$TMP" || { echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; refusing to compare"; exit 1; }
+  render > "$TMP" || { echo "unattended: the render FAILED — the template could not be read; refusing to compare"; exit 1; }
   [ -s "$TMP" ] || { echo "unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
   if ! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1; then
     echo "unattended: $SKILL_OUT is out of sync with SKILL.template.md + .unattended.conf"
@@ -140,7 +158,7 @@ if [ ! -f "$PROTO_OUT" ] || ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" 
 fi
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2
-render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; the Skill is unchanged"; exit 1; }
+render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — the template could not be read; the Skill is unchanged"; exit 1; }
 # Write through a temp file and refuse an EMPTY one. Redirecting straight into the target truncated it
 # to zero bytes the instant sed failed, and then reported success.
 [ -s "$TMPW" ] || { rm -f "$TMPW"; echo "unattended: the render produced an EMPTY file — refusing to install it over the Skill"; exit 1; }

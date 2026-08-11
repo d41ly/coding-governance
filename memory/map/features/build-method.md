@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = []
+gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -42,11 +42,12 @@ run tamper with its instructions" when "how does a run work" had been asked. Tha
 `memory/builds/aWrittenMethod/build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md`. Nothing
 here grades a run; the merge bar does that.
 
-**No new gate leg.** `tools/gate-legs.json` stays at 47. The method rides the existing
-`kit-dogfood-parity.test.sh` as a third `PAIRS` row, whose two arms already cover the two ways a
-rendered document goes wrong: the live copy drifting from a fresh render, and a placeholder surviving
-one. A leg would have cost a dossier claim against a shrink-only `baseline.toml` list plus a
-`run-gates` canary row, to answer a question an existing leg answers.
+**The RENDER rides an existing leg; the CARRIERS needed their own.** The method is a third `PAIRS`
+row on `kit-dogfood-parity.test.sh`, whose two arms already cover the two ways a rendered document
+goes wrong. But nothing enumerated the files POINTING at it, so `check-method-carriers.sh` and its
+self-test were added — 47 legs to 49. A self-test is itself a leg here, and both argv paths must
+appear in the charter gate suite or drift counts the uncredited one against a pin sitting exactly at
+its ceiling.
 
 **The render direction is TEMPLATE to LIVE.** `kit-dogfood-parity.test.sh:30` states it and `:66`
 implements it as `render "$ship" > "$live"`. Four memory-recall hits assert the opposite and are
@@ -68,13 +69,12 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 
 ## Gaps
 
-- **Three lines of headroom.** The rendered guide measures 247 lines against hygiene check 6's
-  250-line cap; the byte axis is comfortable at ~17.6 KB of 20,480. The LINE axis binds, which makes
-  the displacement rule in M1 load-bearing rather than decorative: the next addition must remove
-  something or spill to `tools/memory-tree/README.md`, which is outside the index set.
-- **Nothing detects a sixth carrier.** The design starts spelling-negative and every pointer is a
-  path, but the repo accumulated four spellings of the unattended rules exactly this way. Enforcement
-  was out of scope, so this is a discipline, not a check.
+- **Fourteen lines of headroom**, after the displacement moved M5's taxonomy, M11's list, three
+  judgment asides and M4's lens catalogue into `tools/memory-tree/README.md`. The line axis still
+  binds before the byte axis, so M1's displacement rule stays load-bearing.
+- **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
+  undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
+  its own headings passes, and the leg says so rather than implying a comprehension it lacks.
 - **The unattended-side pointers are conditional prose.** `check-unattended.sh` permits its kit to be
   installed without memory-tree, so both pointers say "if this project ships one". Nothing verifies
   the conditional is honoured in either direction.

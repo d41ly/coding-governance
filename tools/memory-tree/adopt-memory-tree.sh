@@ -61,7 +61,21 @@ mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
 # RENDERED, not copied: these two land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
-render_doc() { sed -e "s|{{KIT_DIR}}|$KIT_REL|g" -e "s|{{TOOL_ROOT}}|$TOOL_ROOT|g" "$1" | tr -d "\r"; }
+render_doc() {
+  # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
+  # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
+  # The `X` sentinel is because `$( )` strips ALL trailing newlines. `cat` runs in its own
+  # subshell with an explicit `exit 1` because the substitution reports the LAST command's
+  # status, which is printf's and always 0 — the guard was unreachable without it.
+  local out
+  out=$( cat "$1" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  printf '%s' "$out"
+}
 if [ -f "$HERE/HYGIENE.template.md" ]; then render_doc "$HERE/HYGIENE.template.md" > "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLATE.template.md" > "$M/TEMPLATE-SPEC.md"; fi
 # The build method joins the same rendered set: an adopter that receives the spec format and the
@@ -80,7 +94,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
   echo "## Directories"; echo
   echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
-  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches."; echo
+  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers."; echo
   echo "## Streams (the closed enum)"; echo
   echo "| Value | Family |"; echo "|---|---|"
   for d in $DISCIPLINES; do echo "| \`$d\` | \`$(FAMILY_of "$d")\` |"; done
@@ -99,7 +113,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. ALL FIVE are written here, not two:
+# project/ — the gate's OWN waiver registries and nothing else. ALL SIX are written here, not two:
 # three of them are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py) and were created
 # by nothing, so an adopter met them as a missing file rather than as an empty ratchet. The gate reads
 # "absent" and "present and empty" identically, which is exactly what makes the omission invisible.
@@ -121,6 +135,34 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
 ' > "$M/project/unarmed-branches.txt"
+# method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
+# files that POINT AT the build method — this adopter is one, the kit README is another — so an
+# adopter handed an empty registry reds on install with carriers they never wrote. The seed is
+# measured from THEIR tree with the same predicate the leg uses, so gov's paths never travel.
+{
+  printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
+  printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
+  printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
+  printf '# <path>:<line> - that keying is what unpinned install-prefix-waivers.txt.\n'
+  printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
+  # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
+  # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds
+  # on carriers they never wrote. Fall back to the working tree, which is what actually exists at
+  # scaffold time. This is the vacuous-selector-empty-population class, met inside the block whose
+  # own comment claims to prevent it.
+  { git ls-files 2>/dev/null; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||'; } \
+    | sort -u | while IFS= read -r f; do
+    case "$f" in
+      "$M"/*) continue ;;
+      "$KIT_REL"/BUILD-METHOD.template.md) continue ;;
+      "$KIT_REL"/check-method-carriers.sh) continue ;;
+      *.test.sh) continue ;;
+    esac
+    if grep -qF 'BUILD-METHOD.md' "$f" 2>/dev/null; then
+      printf '%s \xc2\xb7 declared at adoption; replace this with why it points at the method\n' "$f"
+    fi
+  done
+} > "$M/project/method-carriers.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

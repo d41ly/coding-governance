@@ -110,9 +110,20 @@ case "$KIT_REL" in
 esac
 
 render() { # -> stdout; LF only (the rendered Skill is pinned LF in .gitattributes)
-  sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
-      -e "s|{{WORKFLOWS_DIR}}|$WORKFLOWS_REL|g" \
-      -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" "$TEMPLATE" | tr -d '\r'
+  # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
+  # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
+  # 5.1 gave an unquoted one the same `&` meaning sed has.
+  # The `X` sentinel is because `$( )` strips ALL trailing newlines. `cat` runs in its own
+  # subshell with an explicit `exit 1` because the substitution reports the LAST command's
+  # status, which is printf's and always 0 — the guard was unreachable without it.
+  local out
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{WORKFLOWS_DIR\}\}/"$WORKFLOWS_REL"}
+  out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
+  printf '%s' "$out"
 }
 
 if [ "$MODE" = "--check" ]; then

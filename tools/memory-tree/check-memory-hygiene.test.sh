@@ -252,8 +252,14 @@ printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the 
 # ---- this file carries no other assertion, so growing it past 250 lines trips exactly one branch and
 # ---- nothing else. It is entry-budget exempt (check 7), which the codebase-map tree below pins from
 # ---- the other side: that exemption is the alternative the MAP_SUB branch used to overwrite.
-{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 260 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 760 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/tfixture.md
+# ---- ...and its GREEN counterpart, which is the arm that proves the guide cap actually widened.
+# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 750, so it is named
+# ---- by neither. Without this file the widening is unobservable: `tfixture.md` above would red at
+# ---- 760 lines whether the guide cap were 750 or the original 250.
+{ printf '# twide guide\n'; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+  > memory/guides/twide.md
 
 # ---- CHECK 11: the tombstone root, set in the conf above and BLANK in the two disabled-when-blank
 # ---- runs further down — which is this branch's green half.
@@ -402,6 +408,10 @@ cnot 2 'links.md -> kickoff-prompt.md'
 hit  'index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it)'
 chit 6 'memory/guides/tfixture.md'
 cnot 6 'memory/backlog/ARCH.md'
+# ---- THE TWO HALVES OF THE PER-CLASS CAP. A guide between the row cap and the guide cap is silent;
+# ---- a guide past the guide cap is named. Asserting only the second would pass identically under
+# ---- one shared 250-line cap, which is the state this change moved away from.
+cnot 6 'memory/guides/twide.md'
 hit  'backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)'
 chit 8 'memory/backlog/ARCH.md:8'
 cnot 8 'memory/backlog/ARCH.md:5'
@@ -414,6 +424,9 @@ chit 4 'memory/builds/tRunOk/RUNSTATE.md'
 # ---- (b) check 6 CAPS it. This is the load-bearing arm of the pair: a RUN.md that never entered
 # ----     index_set is silent here for the same reason a compliant one is, so the green control
 # ----     below proves nothing without it.
+# ----     It is ALSO the scoping control for the per-class cap: at 265 lines it sits over the ROW
+# ----     document cap and well under the guide cap, so it proves the widening did not leak out of
+# ----     `guides/` into the row documents.
 chit 6 'memory/builds/tRunBig/RUN.md'
 cnot 6 'memory/builds/tRunOk/RUN.md'
 # ---- (c) check 7 EXEMPTS it — asserted on the SAME file check 6 just named, so membership is

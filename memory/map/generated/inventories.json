@@ -31,6 +31,8 @@
       "memory-hygiene self-test",
       "memory-recall kit selftest",
       "memory-recall skill wiring",
+      "method carriers (every pointer declared)",
+      "method-carriers self-test",
       "pre-push self-test",
       "push-main self-test",
       "pytest-guardrails self-test",

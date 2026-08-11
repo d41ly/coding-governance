@@ -38,6 +38,11 @@
 - TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
 - TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
+- TOOL-aWidenedGuide-1 · the index cap splits by CLASS: a guide is PROSE read end to end, an index is ROWS a sweep prunes. Guides get 3x (60 KB / 750 lines), rows keep 20 KB / 250. The line count was always a proxy; check 16's byte-measured READ_PATH_CEILING is the real budget and is NOT relaxed
+- TOOL-aWrittenMethod-2 · two traps this codebase had already documented and this build walked into anyway: a phase-keyed carve-out is a one-line escape because the RUN writes `phase:`, and a global set inside `$( )` never reaches the caller — the sibling function’s own comment says so
+- TOOL-aWrittenMethod-6 · bash 5.1 gave pattern-substitution's REPLACEMENT a sed-like `&`. Quoting it is the whole fix, and an unquoted `${v//p/$V}` corrupts exactly what an unescaped sed does
+- TOOL-aWrittenMethod-4 · `out=$(cat X; printf Y) || return 1` can never fire: a substitution reports the LAST command's status. The unreachable-branch class was deleted in one unit and reintroduced by the next unit's fix
+
 ## DEPL — deployer
 
 *(none yet)*
