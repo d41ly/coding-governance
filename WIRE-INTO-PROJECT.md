@@ -445,11 +445,21 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ```
   It inserts the block below (a hand-merge works too):
   ```json
-  "PreToolUse": [ { "matcher": "Workflow", "hooks": [ { "type": "command",
+  "PreToolUse": [ { "matcher": "Workflow|Agent", "hooks": [ { "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
   ```
+  The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
+  and not two blocks. `Workflow` is where the hook reads a script; `Agent` is the direct-spawn
+  modality, which carries no script and is COUNTED instead: each spawn claims a numbered slot with
+  `O_EXCL` under a session+prompt-keyed directory in the git common dir (`<common>/agent-cap/`, so
+  git never tracks it), and the budget resets on the next user prompt. `tools/check-wiring.sh` asserts
+  this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
+  alone contains the string and used to report ok.
   It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
-  `boundedParallel`/`boundedPipeline` helpers (override the cap with env `AGENT_CAP`). This is the
+  `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
+  site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is
+  a file constant — there is no environment override, and a set `AGENT_CAP` is refused with a message
+  rather than silently ignored. This is the
   mechanical enforcement of the review protocol's TWO rules: route fan-out through the cap-5 helpers,
   AND a review's verify stage spawns at most 5 agents TOTAL. A wide fan-out trips the server rate
   limiter. The binding rules ship as `tools/workflows/REVIEW-PROTOCOL.template.md` — install it at

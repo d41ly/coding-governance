@@ -1,7 +1,17 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.0` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
-`drift_report.py` and asserted equal by `tools/check-kit-versions.sh`.
+`gov:kit drift-audit@1.1` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
+harness's own `meta.version` to the same number.
+
+**Migrating 1.0 → 1.1 (breaking, `args` only).** The two Tier-2 harnesses no longer accept a
+caller-supplied concurrency cap or verifier total; both are bare literals matching the review
+protocol's ≤5. Delete those two keys from any `args` object you pass — they are ignored, not
+honoured. Nothing else in the contract moved. The knobs never worked as documented on any adopter
+whose `agent-cap.js` enforced the rule: the guard read the literal on the fallback's right-hand side
+and the runtime used the caller's value, so the two disagreed silently. `agent-cap.js` 1.2 now
+resolves the bound and denies that binder form, which is what makes the removal load-bearing rather
+than cosmetic.
 
 Measures whether a repo's own **records** still describe reality, and — at higher tiers — hunts dead,
 unwired and duplicated code. Ported from the inCMS audit that found a repo where 24 of 58 in-flight

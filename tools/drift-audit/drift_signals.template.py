@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.0
+gov:kit drift-audit@1.1
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.

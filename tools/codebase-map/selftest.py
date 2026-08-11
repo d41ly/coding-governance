@@ -231,7 +231,7 @@ def t_gate_template_finds_the_kit(tmp: Path):
         driver.write_text(driver_src, encoding="utf-8")
         return subprocess.run(
             [_sys.executable, str(driver), str(gate_dir / "test_codebase_map.py")],
-            capture_output=True, text=True,
+            capture_output=True, text=True, encoding="utf-8",
         )
 
     # (a) PREFIXED kit, gate collected somewhere else entirely — the shape the old walk missed
@@ -325,7 +325,8 @@ def t_gate_template_boundary(tmp: Path):
         encoding="utf-8",
     )
     got = subprocess.run(
-        [_sys.executable, str(driver), str(gate)], capture_output=True, text=True
+        [_sys.executable, str(driver), str(gate)], capture_output=True, text=True,
+        encoding="utf-8",
     )
     assert got.returncode != 0, (
         f"the gate resolved a kit from OUTSIDE the project: {got.stdout.strip()}"
@@ -387,7 +388,8 @@ def t_remedy_paths_are_real(tmp: Path):
         # cwd = the repo root, and NO CODEBASE_MAP_ROOT: the resolver must do the work here.
         env = {k: v for k, v in os.environ.items() if k != "CODEBASE_MAP_ROOT"}
         return subprocess.run(
-            [_sys.executable, *args], cwd=str(repo), env=env, capture_output=True, text=True
+            [_sys.executable, *args], cwd=str(repo), env=env, capture_output=True, text=True,
+            encoding="utf-8",
         )
 
     got = run("tools/codebase-map/gen_map.py", "--scaffold")

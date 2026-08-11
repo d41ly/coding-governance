@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * agent-cap — project-agnostic PreToolUse guard against unbounded Workflow fan-out.
+ * agent-cap — project-agnostic PreToolUse guard against unbounded agent fan-out.
  *
  * WHY: `Workflow` `parallel()` / `pipeline()` fan out to the harness cap
  * (min(16, cores-2) ≈ 14). Large concurrent agent bursts saturate server
@@ -16,14 +16,29 @@
  * ONLY place a raw `parallel(`/`pipeline(` may appear, and each such line
  * carries a `gov:bounded-fanout` marker. Any other raw primitive call = deny.
  *
- * CAP: default 5 (override with env AGENT_CAP). This guard doesn't verify the
- * numeric arg — it enforces "use the helper"; the helper is where CAP lives.
+ * TWO MODALITIES, not one. A `Workflow` call is read STATICALLY (its script).
+ * A direct `Agent` call carries no script, so it is counted at RUNTIME: each
+ * spawn claims a numbered slot with O_EXCL under a session+prompt-keyed dir in
+ * the git common dir, and the spawn that finds every slot taken is denied. The
+ * budget resets on the next user prompt. Agents spawned INSIDE a workflow
+ * sidechain remain uncounted and always will be — no hook runs there.
+ *
+ * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
+ * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
+ * PARAMETER, and the width a `gov:bounded-fanout` line claims — and denies one
+ * it cannot resolve at or under the cap. Setting AGENT_CAP is REFUSED with a
+ * message rather than ignored: a knob that used to appear to work is how the
+ * override claim this version deletes survived two releases.
  *
  * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
- *   "hooks": { "PreToolUse": [ { "matcher": "Workflow",
+ *   "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent",
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
+ * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
+ * `Workflow` is where this file reads a script; `Agent` is the modality it was blind to, where a
+ * direct spawn met no rule at all. Widening it is inert on its own: main() exits 0 on any tool_name
+ * that is not Workflow.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
  * ponytail: a static scan can't prove a dynamically-built array is ≤CAP — this
@@ -34,8 +49,10 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.1' // gov:kit agent-cap@1.1 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
-const CAP = Number(process.env.AGENT_CAP) || 5
+const KIT_AGENT_CAP_VERSION = '1.4' // gov:kit agent-cap@1.4 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+// A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
+// guard exists to remove, and it leaves no diff behind when someone raises it.
+const CAP = 5
 
 function readStdin() {
   try {
@@ -88,13 +105,18 @@ function offendingLines(script) {
 //       chunk(x, Math.ceil(x.length / K)) or splitInto(x, K) and K is an integer literal <= 5 or an
 //       identifier bound in this file to one. The marker is the AUTHOR'S CLAIM; the shape check is
 //       what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
-//   (b) an identifier assigned from an ARRAY LITERAL with <= 6 elements — the finder-lens case,
-//       where the agent count is a constant visible in the source.
+//   (b) an identifier assigned from an ARRAY LITERAL with <= MAX_LENSES elements — the finder-lens
+//       case, where the agent count is a constant visible in the source. The count drops a trailing
+//       comma; counting it as an element is what made this allowance read as 6.
 // Everything else is denied, including a for/while/forEach body containing `agent(`: a loop-built
 // thunk array is the evasion, not an edge case.
 const FIXED_MARK = 'gov:fixed-verifiers'
 const MAX_VERIFIERS = 5
-const MAX_LENSES = 6
+// ONE NUMBER, ratified by the owner 2026-08-10 (spec F2). The lens allowance used to sit at 6 and
+// read as a deliberate find-stage affordance; it was not. It was the trailing-comma miscount above,
+// and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
+// have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
+const MAX_LENSES = 5
 // Every array method that can carry an agent() call once per element. The list is closed and
 // generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
 const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
@@ -107,18 +129,45 @@ function boundedK(tok, consts) {
   return false
 }
 
+// THE ONE BINDER, for every consumer of boundedK: the marker's K, the helper call site's cap
+// argument and the helper's default parameter.
+//
+// An `<expr> || <int>` right-hand side does NOT bind. It reads as a bound and is not one: the
+// literal is a FALLBACK, and `(args && args.cap) || 5` is a caller-settable knob wearing a
+// constant's clothes — which is exactly how two shipped harnesses raised their own verifier count
+// past the cap while this hook read the 5 and every gate stayed green. The form is left legal
+// JavaScript and stays usable for constants nothing here resolves; only its use as a RESOLVED BOUND
+// is refused, and it is recorded separately so the deny can name the form rather than shrug.
+function intConsts(code) {
+  const consts = new Map()
+  const orBound = new Map()
+  code.forEach((l) => {
+    const m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(\d+)\s*$/.exec(l.trim())
+    if (m) { consts.set(m[1], Number(m[2])); return }
+    const o = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[^=]*\|\|\s*(\d+)\s*$/.exec(l.trim())
+    if (o && !orBound.has(o[1])) orBound.set(o[1], Number(o[2]))
+  })
+  // A BARE REASSIGNMENT invalidates the binding, for the same reason it invalidates a bounded
+  // receiver below: `let K = 5` followed by `K = 500` published a 5 this file could read and ran a
+  // 500. The sweep existed for the receiver whitelist and was never mirrored onto the number.
+  code.forEach((l) => {
+    const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
+    if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
+      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
+        consts.delete(m[1])
+        orBound.delete(m[1])
+      }
+    }
+  })
+  return { consts, orBound }
+}
+
 function fanoutFindings(script) {
   const lines = script.split(/\r?\n/)
   const code = lines.map((l) => stripStrings(l).split('//')[0])
 
-  // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5` / `a.maxVerifiers || 5`
-  const consts = new Map()
-  code.forEach((l) => {
-    let m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(\d+)\s*$/.exec(l.trim())
-    if (m) consts.set(m[1], Number(m[2]))
-    m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[^=]*\|\|\s*(\d+)\s*$/.exec(l.trim())
-    if (m && !consts.has(m[1])) consts.set(m[1], Number(m[2]))
-  })
+  // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`
+  const { consts } = intConsts(code)
 
   // Receivers this file can prove are bounded. TWO PASSES, because a derived lens set is written
   // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
@@ -177,15 +226,13 @@ function fanoutFindings(script) {
     // A SPREAD makes the count invisible: `[...allFindings]` is one top-level element and any number
     // of agents.
     if (inner.includes('...')) return
-    // top-level commas only
-    let d = 0
-    let n = inner.trim() ? 1 : 0
-    for (const ch of inner) {
-      if ('[{('.includes(ch)) d++
-      else if (']})'.includes(ch)) d--
-      else if (ch === ',' && d === 0) n++
-    }
-    if (n <= MAX_LENSES) ok.add(name)
+    // ONE splitter, shared with the call-site walk below, because a TRAILING COMMA is not an element
+    // any more than it is an argument. Counting `1 + every top-level comma` made a 5-element lens
+    // array measure 6 — which is the entire reason MAX_LENSES was 6. It never meant "six lenses are
+    // allowed"; it meant "five lenses, plus the phantom the counter invented". Every shipped harness
+    // is prettier-formatted, so every one of them was mis-measured, and the constant was raised to
+    // fit the error rather than the error being found.
+    if (topLevelArgs(inner).length <= MAX_LENSES) ok.add(name)
   }
   lines.forEach(scan)
   lines.forEach(scan)
@@ -295,6 +342,339 @@ function fanoutFindings(script) {
   return bad
 }
 
+// ---------------------------------------------------------------------------
+// RULE 3 — the hook READS THE BOUND IT ENFORCES.
+//
+// Rules 1 and 2 above police the SHAPE of a fan-out: route it through the helper, and give the
+// verify stage a bounded group count. Neither ever read the number. `CAP` reached the remediation
+// text and decided nothing, so a shipped harness raised its own verifier count from the caller —
+// `const CAP = (args && args.cap) || 5` — and every gate stayed green over a rule the charter calls
+// BINDING. A cap enforced by convention is not enforced.
+//
+// THREE places a bound is written, and all three are resolved here:
+//   S1  the CALL SITE          boundedParallel(thunks, K) / boundedPipeline(items, K, ...stages)
+//   S2  the DEFAULT PARAMETER  async function boundedParallel(thunks, cap = K)
+//   S4  the MARKER's width     out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
+//
+// S4 is the asymmetry the audit named as the clearest lesson in this file: `gov:fixed-verifiers` is
+// a claim whose SHAPE is checked, while `gov:bounded-fanout` returned early and exempted a line
+// slicing fifty wide. Both markers are claims now.
+//
+// FAIL CLOSED, like every other branch here: a K this file cannot resolve to an integer at or under
+// MAX_VERIFIERS is a denial. The burden is on the fan-out.
+const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
+
+// A literal-blanked view: string AND TEMPLATE contents gone, comments gone, delimiters and structure
+// kept. The per-line strip the two rules above run on cannot see a template literal spanning lines,
+// and a `(` inside a prompt string unbalances a forward paren join — which is the one mechanism this
+// rule is built on. Deliberately a SECOND view rather than a replacement: the existing strip carries
+// three dozen measured arms and is not worth re-baselining for a rule that can afford its own pass.
+function blankLiterals(script) {
+  const out = []
+  let mode = 'code' // code | tmpl | block
+  for (const raw of script.split(/\r?\n/)) {
+    let res = ''
+    let i = 0
+    while (i < raw.length) {
+      const ch = raw[i]
+      const two = raw.slice(i, i + 2)
+      if (mode === 'code') {
+        if (two === '//') break
+        if (two === '/*') { mode = 'block'; i += 2; continue }
+        if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
+        if (ch === "'" || ch === '"') {
+          res += ch
+          const q = ch
+          i++
+          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
+          res += q
+          i++
+          continue
+        }
+        res += ch
+        i++
+      } else if (mode === 'tmpl') {
+        if (ch === '\\') { i += 2; continue }
+        if (ch === '`') { mode = 'code'; res += '`'; i++; continue }
+        i++
+      } else {
+        if (two === '*/') { mode = 'code'; i += 2; continue }
+        i++
+      }
+    }
+    out.push(res)
+  }
+  return out
+}
+
+// Join forward from the `(` at code[i][col] until the parens BALANCE, and return the inside. The
+// precedent is the bracket walk in the array-literal case above, which already joins lines until a
+// literal closes; every shipped call site spans lines, so a per-line read of argument 2 sees nothing
+// at all. Bounded by the balance point (and 200 lines), so the scan stays linear.
+function joinCall(code, i, col) {
+  let depth = 0
+  let buf = ''
+  for (let j = i; j < code.length && j < i + 200; j++) {
+    for (const ch of j === i ? code[j].slice(col) : code[j]) {
+      buf += ch
+      if (ch === '(') depth++
+      else if (ch === ')' && --depth === 0) return { text: buf.slice(1, -1), end: j }
+    }
+    buf += '\n'
+  }
+  return null
+}
+
+// Split on TOP-LEVEL commas only: `boundedParallel(all.map((f) => () => agent(f)), 5)` is two
+// arguments, not four.
+function topLevelArgs(text) {
+  if (!text.trim()) return []
+  const out = []
+  let d = 0
+  let cur = ''
+  for (const ch of text) {
+    if ('([{'.includes(ch)) d++
+    else if (')]}'.includes(ch)) d--
+    else if (ch === ',' && d === 0) { out.push(cur); cur = ''; continue }
+    cur += ch
+  }
+  out.push(cur)
+  // A TRAILING COMMA is not an argument. `boundedParallel(\n  LENSES.map(…),\n)` — the prettier-
+  // formatted shape both shipped harnesses use — split into two, and the phantom second one read as
+  // a cap argument of `(nothing)`: the predicate denied tier2-review.js, the repo's own review
+  // harness, on its formatting. Measured against the real tree before this rule was trusted.
+  while (out.length && !out[out.length - 1].trim()) out.pop()
+  return out
+}
+
+function capFindings(script) {
+  const lines = script.split(/\r?\n/)
+  const code = blankLiterals(script)
+  const { consts, orBound } = intConsts(code)
+  const bad = []
+
+  // ONE explanation per unresolvable K, naming the FORM rather than shrugging — an operator who
+  // cannot tell which of three spellings the hook refused fixes it by guessing.
+  const why = (tok, where) => {
+    const t = String(tok).trim()
+    if (orBound.has(t))
+      return `${where} resolves \`${t}\`, bound by an \`<expr> || ${orBound.get(t)}\` FALLBACK form — a caller-settable knob is not a bound, so it no longer resolves`
+    if (/^\d+$/.test(t))
+      return `${where} is ${t}, above the ${MAX_VERIFIERS}-agent cap`
+    if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t))
+      return `${where} resolves \`${t}\` to ${consts.get(t)}, above the ${MAX_VERIFIERS}-agent cap`
+    return `${where} is \`${t || '(nothing)'}\`, which this file cannot resolve to an integer at or under ${MAX_VERIFIERS}`
+  }
+
+  // --- S2: the helper DEFINITIONS, and the default each one carries ---------------------------
+  // Keyed by helper name, because a bare `boundedParallel(thunks)` is governed by the default of
+  // the helper it names.
+  const defaults = new Map()
+  const paramsOf = new Map()
+  code.forEach((l, i) => {
+    const d = /\bfunction\s+(boundedParallel|boundedPipeline)\s*\(/.exec(l)
+    if (!d) return
+    const j = joinCall(code, i, d.index + d[0].length - 1)
+    if (!j) return
+    const args = topLevelArgs(j.text)
+    paramsOf.set(d[1], args.map((p) => (p.split('=')[0] || '').trim()).filter(Boolean))
+    const second = args[1]
+    if (second === undefined) { defaults.set(d[1], { tok: null, n: i + 1 }); return }
+    const eq = second.indexOf('=')
+    if (eq < 0) { defaults.set(d[1], { tok: null, n: i + 1 }); return }
+    const tok = second.slice(eq + 1)
+    defaults.set(d[1], { tok, n: i + 1 })
+    if (!boundedK(tok, consts))
+      bad.push({ n: i + 1, line: lines[i], why: why(tok, `the DEFAULT PARAMETER of ${d[1]}()`) })
+  })
+
+  // --- S1: every CALL SITE ---------------------------------------------------------------------
+  code.forEach((l, i) => {
+    HELPERS.lastIndex = 0
+    let m
+    while ((m = HELPERS.exec(l))) {
+      if (/\bfunction\s+$/.test(l.slice(0, m.index))) continue // a definition — S2 judged it
+      const name = m[1]
+      const j = joinCall(code, i, m.index + m[0].length - 1)
+      if (!j) {
+        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE never closes its parens within 200 lines, so the cap argument cannot be read — a call this hook cannot parse is not a call it may approve` })
+        continue
+      }
+      const args = topLevelArgs(j.text)
+      if (args.length >= 2) {
+        if (!boundedK(args[1], consts))
+          bad.push({ n: i + 1, line: lines[i], why: why(args[1], `the cap argument at the ${name}() CALL SITE`) })
+        continue
+      }
+      // No cap argument: the helper's own DEFAULT governs. An undefined helper, or one whose second
+      // parameter carries no default, leaves nothing to resolve — and nothing to resolve is a deny.
+      const def = defaults.get(name)
+      if (!def)
+        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE passes no cap and this file defines no ${name}(), so there is no DEFAULT PARAMETER to resolve the bound from` })
+      else if (def.tok === null)
+        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE passes no cap and ${name}() (L${def.n}) declares no default for its second parameter, so nothing bounds this fan-out` })
+      // A resolvable-but-wide default already denied at its definition; not reported twice.
+    }
+  })
+
+  // --- S4: the `gov:bounded-fanout` marker is a CLAIM about a width ----------------------------
+  lines.forEach((raw, i) => {
+    if (!raw.includes('gov:bounded-fanout')) return
+    const l = code[i]
+    const s = /(?:^|[^.\w$)\]])([A-Za-z_$][\w$]*)\s*\.\s*slice\s*\(\s*[^,]*,\s*([^)]*)\)/.exec(l)
+    if (!s) {
+      bad.push({ n: i + 1, line: raw, why: 'the gov:bounded-fanout MARKED LINE does not slice a bare identifier by a visible width — the marker claims a bound and there is no bound here to check' })
+      return
+    }
+    const width = s[2].replace(/^[^+]*\+\s*/, '').trim()
+    // The enclosing helper's own `cap` PARAMETER is admitted explicitly: S2 has bounded its default
+    // and S1 has bounded every call site, so the parameter is bounded wherever it comes from. This
+    // is the token the three shipped harnesses use, and without this case S4 denies all of them.
+    const holder = (() => {
+      for (let k = i; k >= 0 && k > i - 40; k--) {
+        const d = /\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/.exec(code[k])
+        if (d) return d[1]
+      }
+      return null
+    })()
+    if (holder && paramsOf.has(holder) && paramsOf.get(holder).includes(width)) return
+    if (!boundedK(width, consts))
+      bad.push({ n: i + 1, line: raw, why: why(width, 'the gov:bounded-fanout MARKED LINE slice width') })
+  })
+
+  return bad
+}
+
+// ---------------------------------------------------------------------------
+// RULE 4 — the ARITY of DIRECT `Agent` spawns, as an ATOMIC COUNT.
+//
+// Rules 1-3 read a workflow SCRIPT, so they reach exactly one of the two ways agents get spawned. A
+// session that fans out with direct `Agent` tool calls met no rule at all — the charter calls the
+// number BINDING and the commonest modality was unguarded.
+//
+// THE CASE THIS FILE'S OWN REJECTED ALTERNATIVE WAS ABOUT IS STILL REJECTED. Counting agents spawned
+// INSIDE a workflow script is impossible: that script runs in a sidechain with no hooks, so nothing
+// observes those spawns. A main-loop `Agent` call differs in kind — a hook DOES fire. MEASURED on
+// node a before any of this was written: `tool_name` arrives as exactly `Agent`, and the payload
+// carries `session_id`, `prompt_id` and `tool_use_id`.
+//
+// WHY SLOTS AND NOT A COUNT. Read-then-decide loses updates: measured on node a, a four-call burst
+// overlapped its hook processes and two of four read the same count. Create-a-token-then-count does
+// not fix it either — six concurrent processes each see between their own ordinal and six, so
+// several deny and the arm requiring EXACTLY ONE deny fails nondeterministically. Claiming a
+// NUMBERED slot with O_EXCL is decided entirely by the atomic create: exactly MAX_VERIFIERS slots
+// can ever exist, so exactly one process out of the sixth-and-beyond is refused, every time.
+//
+// The budget is keyed per PROMPT, so a new user turn resets it with no cleanup step; a TTL sweep
+// drops the directories a long-lived tree accumulates. The count does NOT distinguish a verifier
+// from any other agent, because keying on "is this a verify agent" needs a session-to-build binding
+// no payload field provides — and the concurrency rule binds every fan-out to the same number
+// anyway, so a uniform cap needs no such binding.
+const AGENT_TTL_MS = 12 * 60 * 60 * 1000
+const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
+
+// The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
+function gitCommonDir(start) {
+  const fs = require('fs')
+  const path = require('path')
+  let dir = path.resolve(start)
+  for (let i = 0; i < 64; i++) {
+    const g = path.join(dir, '.git')
+    let st = null
+    try { st = fs.statSync(g) } catch { st = null }
+    if (st) {
+      if (st.isDirectory()) return g
+      // A WORKTREE: `.git` is a FILE holding `gitdir: <path>`, and that gitdir names the shared
+      // common dir in its own `commondir`. One budget per repo, not per worktree — a session is a
+      // session whichever checkout it stands in.
+      try {
+        const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(g, 'utf8'))
+        if (!m) return null
+        const gd = path.resolve(dir, m[1].trim())
+        try {
+          return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
+        } catch {
+          return gd
+        }
+      } catch {
+        return null
+      }
+    }
+    const up = path.dirname(dir)
+    if (up === dir) return null
+    dir = up
+  }
+  return null
+}
+
+function sweepTurns(root, keep) {
+  const fs = require('fs')
+  const path = require('path')
+  let names
+  try { names = fs.readdirSync(root) } catch { return }
+  const now = Date.now()
+  for (const n of names) {
+    const p = path.join(root, n)
+    if (p === keep) continue
+    // Never fatal: a concurrent hook process may be sweeping the same entry, and losing that race is
+    // not a reason to refuse a spawn.
+    try {
+      if (now - fs.statSync(p).mtimeMs < AGENT_TTL_MS) continue
+      fs.rmSync(p, { recursive: true, force: true })
+    } catch { /* ignore */ }
+  }
+}
+
+// null = allow · string = the deny message.
+function guardAgentSpawn(data) {
+  const fs = require('fs')
+  const path = require('path')
+  const { session_id: sid, prompt_id: pid, tool_use_id: uid } = data
+  // FAIL OPEN, SILENTLY, when the budget cannot be KEYED or its directory cannot be resolved. The
+  // split is stated rather than blurred: a hook that denies every spawn on a filesystem hiccup is
+  // worse than the burst it prevents. A token that cannot be CREATED is a different fact and denies.
+  if (!sid || !pid || !uid) return null
+  const common = gitCommonDir(data.cwd || process.cwd())
+  if (!common) return null
+  const root = path.join(common, 'agent-cap')
+  const turn = path.join(root, `${slug(sid)}__${slug(pid)}`)
+  try { fs.mkdirSync(turn, { recursive: true }) } catch { return null }
+  sweepTurns(root, turn)
+
+  // IDEMPOTENT PER tool_use_id. A hook re-invoked for the same call must not spend a second slot.
+  for (let n = 1; n <= MAX_VERIFIERS; n++) {
+    let held
+    try { held = fs.readFileSync(path.join(turn, `slot-${n}`), 'utf8') } catch { continue }
+    if (held.trim() === uid) return null
+  }
+
+  for (let n = 1; n <= MAX_VERIFIERS; n++) {
+    let fd
+    try {
+      fd = fs.openSync(path.join(turn, `slot-${n}`), 'wx') // O_CREAT|O_EXCL — the atomic decision
+    } catch (e) {
+      if (e.code === 'EEXIST') continue
+      return (
+        `BLOCKED by agent-cap: this spawn's token could not be created in ${turn} ` +
+        `(${e.code || e.message}), so the ${MAX_VERIFIERS}-agent budget could not be enforced for ` +
+        `it. A spawn this hook cannot count is not a spawn it may approve.`
+      )
+    }
+    try { fs.writeSync(fd, uid) } finally { try { fs.closeSync(fd) } catch { /* ignore */ } }
+    return null
+  }
+
+  return (
+    `BLOCKED by agent-cap: the direct-Agent spawn budget for this prompt is exhausted — ` +
+    `${MAX_VERIFIERS} of ${MAX_VERIFIERS} already spawned in this turn. A review's verify stage ` +
+    `spawns at most ${MAX_VERIFIERS} agents TOTAL and the charter binds every other fan-out to the ` +
+    `same number (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
+    `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
+    `count and the agent count does not. For a review, tools/workflows/tier2-review.js already does ` +
+    `it. A new user prompt resets the budget; nothing needs cleaning up.\n`
+  )
+}
+
 function main() {
   let data
   try {
@@ -302,7 +682,32 @@ function main() {
   } catch {
     process.exit(0)
   }
-  if (!data || data.tool_name !== 'Workflow') process.exit(0)
+  if (!data || (data.tool_name !== 'Workflow' && data.tool_name !== 'Agent')) process.exit(0)
+
+  // AGENT_CAP used to raise the ceiling and no longer can. REFUSED rather than ignored: this hook's
+  // own header advertised the override for two releases after it stopped deciding anything, and a
+  // silently-ignored knob that appears to work is exactly how that claim survived. An operator who
+  // sets it gets told, in the one place they will look.
+  if (process.env.AGENT_CAP !== undefined && process.env.AGENT_CAP !== '') {
+    process.stderr.write(
+      `BLOCKED by agent-cap: AGENT_CAP is set (${process.env.AGENT_CAP}) and this guard NO LONGER ` +
+        `reads it. The cap is the file constant ${MAX_VERIFIERS}, resolved at the call site, the ` +
+        `default parameter and the gov:bounded-fanout width. An environment override would be a ` +
+        `ceiling raise that leaves no diff behind. Unset AGENT_CAP and re-run; to change the number, ` +
+        `change it in tools/hooks/agent-cap.js and in memory/guides/REVIEW-PROTOCOL.md, where the ` +
+        `rule is stated.\n`,
+    )
+    process.exit(2)
+  }
+
+  // RULE 4 first for an `Agent` payload, and it is the ONLY thing that path runs: the rules below
+  // all read a script, and an Agent spawn carries none.
+  if (data.tool_name === 'Agent') {
+    const deny = guardAgentSpawn(data)
+    if (!deny) process.exit(0)
+    process.stderr.write(deny)
+    process.exit(2)
+  }
 
   // A saved script is a FILE, and a node hook has fs — exiting 0 here made the rules unenforceable
   // the moment anyone wrote the offending script to disk. A `name:`-only run supplies no source and
@@ -337,6 +742,24 @@ function main() {
         `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${CAP})\n\n` +
         `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
         `constant. Ready-made: tools/workflows/tier2-review.js.\n`,
+    )
+    process.exit(2)
+  }
+
+  // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
+  // both, and the arity message is the one that names the defect an operator has to fix; reversing
+  // the order would retitle the rule-2 corpus without changing a verdict.
+  const caps = capFindings(script)
+  if (caps.length) {
+    process.stderr.write(
+      `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
+        `${MAX_VERIFIERS}. The cap is enforced by reading the number, not by trusting the helper's ` +
+        `name (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
+        caps.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
+        `\n\nWrite the bound as an integer literal at or under ${MAX_VERIFIERS}, or as an identifier ` +
+        `bound DIRECTLY to one and never reassigned:\n` +
+        `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
+        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), MAX_VERIFIERS)\n`,
     )
     process.exit(2)
   }

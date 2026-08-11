@@ -2,13 +2,13 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.0
+# gov:kit settings-merge@1.1
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
 
     {"hooks": {"PreToolUse": [
-      {"matcher": "Workflow",
+      {"matcher": "Workflow|Agent",
        "hooks": [{"type": "command",
                   "command": "node \\"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\\""}]}]}}
 
@@ -25,7 +25,7 @@ Usage:
     python tools/settings-merge.py --selftest
       SETTINGS_FILE  default .claude/settings.json (resolved from cwd = target repo root)
       --fragment     a JSON file declaring {name, event, matcher, marker, hook_path}; omitted =
-                     the built-in agent-cap PreToolUse/Workflow fragment, byte-for-byte as before
+                     the built-in agent-cap PreToolUse fragment (matcher "Workflow|Agent")
       --hook-path    override the fragment's hook_path (the copied hook, repo-relative)
       --check        report drift without writing: exit 1 if a merge WOULD change the file
       --selftest     run the in-file assert suite in a tempdir; exit 0 on pass
@@ -45,7 +45,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-KIT_SETTINGS_MERGE_VERSION = "1.0"  # gov:kit settings-merge@1.0 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.1"  # gov:kit settings-merge@1.1 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 # The built-in fragment. Identical to the three values this script hardcoded before --fragment
@@ -53,7 +53,11 @@ HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is
 AGENT_CAP = {
     "name": "agent-cap",
     "event": "PreToolUse",
-    "matcher": "Workflow",
+    # A LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression, and not two
+    # fragments. The hook fires for `Workflow`, where it reads the script, and for `Agent`, where a
+    # direct spawn used to meet no rule at all. One group means one marker and no dedup question:
+    # the merge below finds the existing group by this exact matcher value.
+    "matcher": "Workflow|Agent",
     "marker": HOOK_MARKER,
     "hook_path": ".claude/hooks/agent-cap.js",
 }
@@ -158,11 +162,11 @@ def _selftest() -> int:
     with tempfile.TemporaryDirectory() as d:
         root = Path(d)
 
-        # 1) absent file -> creates the Workflow group + agent-cap command, exit 0
+        # 1) absent file -> creates the Workflow|Agent group + agent-cap command, exit 0
         sf = root / ".claude" / "settings.json"
         assert run(str(sf), hp, check=False) == 0
         wf = [g for g in json.loads(sf.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
-              if g.get("matcher") == "Workflow"]
+              if g.get("matcher") == AGENT_CAP["matcher"]]
         assert len(wf) == 1 and any(h["command"] == cmd for h in wf[0]["hooks"])
         assert "\r" not in sf.read_text(encoding="utf-8")  # LF-only on every OS
 
@@ -176,16 +180,16 @@ def _selftest() -> int:
         sf2.write_text('{"model": "x"}\n', encoding="utf-8")
         assert run(str(sf2), hp, check=False) == 0
         o2 = json.loads(sf2.read_text(encoding="utf-8"))
-        assert o2["model"] == "x" and o2["hooks"]["PreToolUse"][0]["matcher"] == "Workflow"
+        assert o2["model"] == "x" and o2["hooks"]["PreToolUse"][0]["matcher"] == "Workflow|Agent"
 
-        # 4) pre-existing Workflow group w/ a FOREIGN command -> agent-cap appended, foreign kept, ONE group
+        # 4) pre-existing group w/ a FOREIGN command -> agent-cap appended, foreign kept, ONE group
         sf3 = root / "s3.json"
         sf3.write_text(json.dumps({"hooks": {"PreToolUse": [
-            {"matcher": "Workflow",
+            {"matcher": AGENT_CAP["matcher"],
              "hooks": [{"type": "command", "command": "node other.js"}]}]}}) + "\n", encoding="utf-8")
         assert run(str(sf3), hp, check=False) == 0
         wf3 = [g for g in json.loads(sf3.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
-               if g.get("matcher") == "Workflow"]
+               if g.get("matcher") == AGENT_CAP["matcher"]]
         cmds = [h["command"] for h in wf3[0]["hooks"]]
         assert len(wf3) == 1 and "node other.js" in cmds and cmd in cmds
 
@@ -209,7 +213,10 @@ def _selftest() -> int:
         cap_only = sf6.read_text(encoding="utf-8")
         assert run(str(sf6), rhp, check=False, frag=recall) == 0
         both = json.loads(sf6.read_text(encoding="utf-8"))["hooks"]
-        assert [g["matcher"] for g in both["PreToolUse"]] == ["Workflow"]
+        # PINNED AS A LITERAL, never as AGENT_CAP["matcher"]. This is the arm that has to fail when
+        # the shipped matcher narrows back to `Workflow`; asserting it against the constant it is
+        # checking would make it agree with any value the constant happens to hold.
+        assert [g["matcher"] for g in both["PreToolUse"]] == ["Workflow|Agent"]
         assert [g["matcher"] for g in both["PostToolUse"]] == ["Read"]
         assert recall["marker"] in both["PostToolUse"][0]["hooks"][0]["command"]
         assert cap_only != sf6.read_text(encoding="utf-8")          # it really did change something

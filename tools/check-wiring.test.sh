@@ -104,6 +104,42 @@ if [ -f "$SMERGE" ]; then
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap'; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
   chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite agent-cap unwired" 1 || ck "AC6 --session exit 0 despite agent-cap unwired" 0
+
+  # AC7b — THE STALE MATCHER. `.claude/settings.json` carries the hook under `Workflow` alone: the
+  # state where a direct `Agent` spawn meets no rule at all, and the state every repo was in before
+  # the widening. The retired predicate grepped the whole file for `agent-cap.js`, so it reported
+  # `ok` here — it could not tell a correctly-widened wiring from a stale one and never could have.
+  # This arm fails against that predicate, which is what makes it a test rather than a restatement.
+  cat > .claude/settings.json <<'JSON'
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+          }
+        ]
+      }
+    ]
+  }
+}
+JSON
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
+    && ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 1 \
+    || ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 0
+  # ...and the widened value is the one that reads ok. Without this half the arm is satisfied by a
+  # checker that denies every matcher there is. Written directly rather than merged: settings-merge
+  # ADDS the widened group beside a stale one instead of migrating it, so a merge here would test
+  # the two-group state, which is a different fact.
+  sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
+    && ck "AC7b the widened matcher -> ok, exit 0" 1 || ck "AC7b the widened matcher -> ok, exit 0" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
