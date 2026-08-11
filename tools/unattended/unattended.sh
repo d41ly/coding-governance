@@ -120,18 +120,28 @@ default_branch() {
 #     which is the act being authorized, so using it is not circular.
 #   * BASE == HEAD is refused outright even when the ref is legitimate. Nothing was built on top of
 #     it, so there is no diff to authorize and the comparison is trivially true.
+# EXACTLY ONE ref, and its NAME is published so a second party can re-derive it. The
+# `refs/remotes/$d` fallback is gone (TOOL-aWrittenMethod-2, D3 fix 1): it widened what the run could
+# write, and a fallback the GATE does not walk is a shape the comparison cannot express.
+RESOLVED_REF=""
 resolve_base() {
-  local d b mb; d=$(default_branch) || return 1
-  for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-    git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-    mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
-    [ -n "$mb" ] || continue
-    # Degenerate: the anchor is at or ahead of HEAD, so BASE is HEAD and the run authored everything
-    # the comparison reads.
-    [ "$mb" = "$(git rev-parse HEAD)" ] && return 2
-    printf '%s\n' "$mb"; return 0
-  done
-  return 1
+  local d mb; d=$(default_branch) || return 1
+  RESOLVED_REF="refs/remotes/origin/$d"
+  git rev-parse --verify --quiet "$RESOLVED_REF" >/dev/null 2>&1 || return 1
+  mb=$(git merge-base "$RESOLVED_REF" HEAD 2>/dev/null) || return 1
+  [ -n "$mb" ] || return 1
+  # Degenerate: the anchor is at or ahead of HEAD, so BASE is HEAD and the run authored everything
+  # the comparison reads.
+  [ "$mb" = "$(git rev-parse HEAD)" ] && return 2
+  printf '%s\n' "$mb"; return 0
+}
+
+# The ref `refs/remotes/origin/HEAD` names, derived from NOTHING the run supplies. This is the value
+# `trusted_base` measures the resolved ref against, and the value the gate leg derives independently.
+canonical_ref() {
+  local d; d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || return 1
+  [ -n "$d" ] || return 1
+  printf 'refs/remotes/origin/%s' "${d#origin/}"
 }
 
 # The mandate assertion's inputs, re-derived and cross-checked, in ONE place so preflight and close
@@ -160,10 +170,41 @@ trusted_base() { # run-state file  ->  sets TB
     fail 16 "cannot resolve a merge-base against a remote-tracking default branch — refusing rather than trusting a local ref the run can move with 'git branch -f', or HEAD, either of which makes the mandate check pass by construction"
     return 1
   fi
+  # RESOLVED_REF is derived HERE, not read back from resolve_base: that runs under $( ) in a subshell,
+  # so a global it sets is lost before the caller sees it — the same reason this function returns TB
+  # by global rather than on stdout. default_branch is deterministic, so re-deriving is exact.
+  # No `default_branch` refusal here: `resolve_base` above already calls it and returns 1 when it
+  # fails, so fail 16 has fired and this line is unreachable. A branch no input can produce is the
+  # class this repo's own meta-gate refuses.
+  local d
+  d=$(default_branch)
+  RESOLVED_REF="refs/remotes/origin/$d"
+
+  # THE REF ITSELF MUST BE THE ONE `origin/HEAD` NAMES. `default_branch` honours GOV_DEFAULT_BRANCH so
+  # an operator can pin it, and that variable is supplied by the very process this check distrusts:
+  # a run that exports it and writes `refs/remotes/origin/<that name>` with `git update-ref` — no
+  # push, no network — steered the BASE to a commit it authored, while every gate stayed green.
+  # Refusing on the DISAGREEMENT keeps the operator pin usable and removes the silent steer.
+  local canon
+  if ! canon=$(canonical_ref); then
+    fail 22 "refs/remotes/origin/HEAD does not resolve, so nothing outside this run measures the default branch"
+    return 1
+  fi
+  if [ "$RESOLVED_REF" != "$canon" ]; then
+    fail 22 "the resolved default-branch ref is not the one refs/remotes/origin/HEAD names" "resolved $RESOLVED_REF, canonical $canon"
+    return 1
+  fi
   if [ -f "$1" ]; then
     rec=$(fact "$1" base)
     if [ -n "$rec" ] && [ "$rec" != "$fresh" ]; then
       fail 18 "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded $rec, derived $fresh"
+      return 1
+    fi
+    # The recorded REF is evidence too, on the same footing as the recorded base: re-derived here,
+    # never read as input. An absent one is the violation, not the exemption.
+    rec=$(fact "$1" base-ref)
+    if [ -n "$rec" ] && [ "$rec" != "$RESOLVED_REF" ]; then
+      fail 22 "the base-ref recorded in the run-state file is not the ref this history resolves" "recorded $rec, resolved $RESOLVED_REF"
       return 1
     fi
   fi
@@ -324,6 +365,7 @@ verb_preflight() { # slug · keepalive-id
   fi
   mv "$tmp" "$rel"; rm -f "$payload"
   set_fact "$rel" base "$base"      || return 1
+  set_fact "$rel" base-ref "$RESOLVED_REF" || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
   set_fact "$rel" phase RUNNING     || return 1
   set_fact "$rel" witness "$(git rev-parse HEAD)" || return 1

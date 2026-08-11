@@ -19,6 +19,10 @@ authorized actions (the merge and the push). Three properties, all mechanical:
 
 - **It is asserted, never written by the run.** `--preflight` reads it and refuses if it is absent.
   A run that could write its own mandate authorizes itself, and the gate would certify it.
+- **The BASE it is reachable from is anchored outside the run.** The ref BASE came from is recorded
+  and independently re-derived by the gate (§2, fact 6). Without that, a run could name its own
+  default branch and write the matching remote-tracking ref locally — no push, no network — and every
+  gate stayed green.
 - **It is reachable from the pinned BASE.** A mandate introduced by a commit on the run's own branch
   grants nothing. Reachability is the machine-checkable form of "the owner wrote this first".
 - **Only its SHAPE is checked.** No gate can tell whether the owner meant it. The two properties
@@ -38,8 +42,10 @@ override on the authorization check is the authorization check.
 status, both derived from build front matter and spec status headers. The gate byte-compares it
 against a fresh render. Never hand-edit it.
 
-**Authored**, carrying exactly five facts and nothing else. Nothing in the tree derives any of them,
-which is the test for belonging here:
+**Authored**, carrying exactly six facts and nothing else. Either nothing in the tree derives a fact,
+or it is recorded SO THAT a second party can re-derive it and contradict the record — those are the
+two tests for belonging here, and the second one is why a value the gate independently recomputes is
+evidence rather than the restatement this section otherwise bans:
 
 1. **The standing mandate**, verbatim.
 2. **The phase**, from the vocabulary in §3, each claim carrying a witness.
@@ -48,6 +54,11 @@ which is the test for belonging here:
    "parked" is indistinguishable from "forgotten".
 5. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
+6. **The ref that BASE was derived from**, `refs/remotes/origin/<default>`. The driver may be pointed
+   at a default branch by an operator; the gate leg derives the ref from `refs/remotes/origin/HEAD`
+   alone and refuses when the two disagree, when the recorded ref is absent, or when it cannot derive
+   one at all. A leg that read the same input the driver read would confirm a steer instead of
+   contradicting it.
 
 The authored half never restates a derivable fact — not a unit status, not a per-unit spec base.
 Restating the run's own BASE is not possible, because nothing else holds it.

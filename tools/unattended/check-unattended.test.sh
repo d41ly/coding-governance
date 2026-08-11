@@ -64,6 +64,7 @@ The owner authorizes $1 to merge and to push.
 phase: RUNNING
 witness: WITNESS
 base: BASE
+base-ref: refs/remotes/origin/main
 EOF
 }
 
@@ -74,11 +75,16 @@ git add -A && git commit -q -m base --no-verify
 # It lives OUTSIDE the work tree, or `git clean -qfd` in reset_tree deletes it.
 ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+# The gate derives the default branch from refs/remotes/origin/HEAD ONLY, and a bare push creates
+# refs/remotes/origin/main WITHOUT it — so without this line the leg has nothing to derive and every
+# arm below would pass because the check was OFF (TOOL-aWrittenMethod-2).
+git remote set-head origin main >/dev/null 2>&1
 ANCHOR0=$(git rev-parse main)
 git checkout -q -b unit
 git commit -q --allow-empty -m "unit work" --no-verify
 BASE0=$(git rev-parse HEAD)
-export GOV_DEFAULT_BRANCH=main
+# GOV_DEFAULT_BRANCH is deliberately NOT exported: the leg must not read it, and exporting it here
+# would hide that by making the steered and canonical answers identical.
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
 sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
 git add -A && git commit -q -m facts --no-verify
@@ -91,6 +97,51 @@ run() { bash "$SCRIPT" 2>&1; }
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
+
+# ---- TOOL-aWrittenMethod-2: check 9's BASE provenance. The leg must be a second OPINION, not a
+# ---- second computation of the same steered value — a leg that reads the same input the driver read
+# ---- confirms the steer instead of contradicting it, which is how three reproduced authorization
+# ---- defects stayed green on the bar.
+
+# The variable the DRIVER honours must not move this leg at all. If the leg read it, this arm would
+# be green for the wrong reason and a steered run would land.
+reset_tree
+out=$(GOV_DEFAULT_BRANCH=nosuchbranch run); rc=$?
+same "the leg ignores GOV_DEFAULT_BRANCH entirely" "$rc" "0"
+same "the leg ignores GOV_DEFAULT_BRANCH, silently" "$out" ""
+
+# origin/HEAD deleted: the leg has nothing outside the run's reach to derive from, and that is a RED.
+# This body used to sit under `if [ -n "$d" ]` with no else, so one local command with no push
+# disarmed every BASE check at once and the bar stayed green.
+reset_tree
+git symbolic-ref -d refs/remotes/origin/HEAD >/dev/null 2>&1
+hit "$(run)" "this leg cannot derive a default branch: refs/remotes/origin/HEAD does not resolve, so the recorded BASE cannot be checked against anything outside the run's reach — repair it with 'git remote set-head origin -a'"
+git remote set-head origin main >/dev/null 2>&1
+
+# base-ref absent is the violation, not the exemption — the same rule the base: arm already carries.
+reset_tree; sed -i '/^base-ref: /d' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file records no base-ref, so the ref its BASE was derived from cannot be re-resolved — an absent pin is not a satisfied one"
+
+# base-ref present but naming a ref this leg did not derive: the driver was pointed somewhere the
+# gate is not, which is exactly the shape GOV_DEFAULT_BRANCH steering produces.
+reset_tree; sed -i 's|^base-ref: .*|base-ref: refs/remotes/origin/steered|' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file's base-ref is not the ref this leg derives from refs/remotes/origin/HEAD, which means the driver was pointed somewhere this gate is not: recorded"
+
+# base-ref AGREES with what the leg derives, but the ref itself is gone. origin/HEAD is a symref and
+# resolves even when its target does not, so this state is reachable with one command and is NOT the
+# disagreement arm above.
+reset_tree
+git update-ref -d refs/remotes/origin/main
+hit "$(run)" "a run-state file's base-ref does not resolve, so nothing can be re-derived from it"
+git update-ref refs/remotes/origin/main main
+
+# The ref resolves but shares no history with HEAD, so there is no merge-base to reproduce. Without
+# this arm the empty-merge-base branch would read as covered by the mismatch arm, which it is not.
+reset_tree
+ORPHAN=$(git commit-tree "$(git hash-object -t tree -w /dev/null)" -m orphan)
+git update-ref refs/remotes/origin/main "$ORPHAN"
+hit "$(run)" "and HEAD, so the recorded BASE reproduces nothing"
+git update-ref refs/remotes/origin/main main
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
 reset_tree; rm -f .unattended.conf

@@ -174,18 +174,35 @@ for f in $RUNS; do
   if [ -z "$rb" ]; then
     fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
-    d=${GOV_DEFAULT_BRANCH:-}
-    [ -n "$d" ] || { d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || d=""; d=${d#origin/}; }
-    if [ -n "$d" ]; then
-      # REMOTE-TRACKING ONLY, matching the driver: a bare local branch is a ref the run can move
-      # with `git branch -f`, which is how BASE was made to equal HEAD.
-      for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-        git rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-        mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
-        [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
-        [ "$mb" != "$(git rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
-        break
-      done
+    # THE LEG DOES NOT READ GOV_DEFAULT_BRANCH. The driver may be steered by an operator; the gate
+    # may not, because a leg recomputing the identical wrong value CONFIRMS the steer instead of
+    # contradicting it — which is precisely how three reproduced authorization defects stayed green.
+    # Derived from refs/remotes/origin/HEAD and nothing else (D3 fix 3).
+    d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || d=""
+    d=${d#origin/}
+    if [ -z "$d" ]; then
+      # AND ITS ABSENCE IS THE VIOLATION. This body used to sit under `if [ -n "$d" ]` with no else,
+      # so `git symbolic-ref -d refs/remotes/origin/HEAD` — exit 0, no push, no network — disarmed
+      # every BASE check on the bar at once. Same shape the `base:` arm above already refuses.
+      fail 9 "this leg cannot derive a default branch: refs/remotes/origin/HEAD does not resolve, so the recorded BASE cannot be checked against anything outside the run's reach — repair it with 'git remote set-head origin -a'"
+    else
+      lref="refs/remotes/origin/$d"
+      rr=$(fact_of "$f" base-ref)
+      if [ -z "$rr" ]; then
+        fail 9 "a run-state file records no base-ref, so the ref its BASE was derived from cannot be re-resolved — an absent pin is not a satisfied one: $f"
+      elif [ "$rr" != "$lref" ]; then
+        fail 9 "a run-state file's base-ref is not the ref this leg derives from refs/remotes/origin/HEAD, which means the driver was pointed somewhere this gate is not: recorded $rr, derived $lref in $f"
+      elif ! git rev-parse --verify --quiet "$rr" >/dev/null 2>&1; then
+        fail 9 "a run-state file's base-ref does not resolve, so nothing can be re-derived from it: $rr in $f"
+      else
+        mb=$(git merge-base "$lref" HEAD 2>/dev/null) || mb=""
+        if [ -z "$mb" ]; then
+          fail 9 "no merge-base between $lref and HEAD, so the recorded BASE reproduces nothing: $f"
+        else
+          [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
+          [ "$mb" != "$(git rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD, so the run authored every byte a mandate comparison would read: $f"
+        fi
+      fi
     fi
   fi
 

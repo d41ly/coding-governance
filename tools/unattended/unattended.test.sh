@@ -101,6 +101,10 @@ git add -A && git commit -q -m base --no-verify
 # that has nothing to do with what it tests.
 ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+# The gate derives the default branch from refs/remotes/origin/HEAD ONLY, and a bare push creates
+# refs/remotes/origin/main WITHOUT it — so without this line the leg has nothing to derive and every
+# arm below would pass because the check was OFF (TOOL-aWrittenMethod-2).
+git remote set-head origin main >/dev/null 2>&1
 git checkout -q -b unit
 # ...and the unit branch must be AHEAD of the anchor. merge-base == HEAD is now its own refusal:
 # nothing was built on top of the anchor, so the mandate comparison would be trivially true.
@@ -142,8 +146,43 @@ rm -f untracked.txt
 # ---- that cannot be named is also a merge-base that cannot be resolved — one state, two honest
 # ---- refusals, and each is asserted by its own text.
 reset_tree
+# The fixture now carries refs/remotes/origin/HEAD, so unsetting the variable alone no longer leaves
+# the driver without an answer — the symref has to go too for this refusal to be reachable at all.
+git symbolic-ref -d refs/remotes/origin/HEAD >/dev/null 2>&1
 out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
 hit "$out" "cannot resolve the default branch (set GOV_DEFAULT_BRANCH) — refusing rather than assuming one"
+
+# ---- TOOL-aWrittenMethod-2. The BASE was steerable two ways and both are refused here.
+# (a) origin/HEAD absent, variable SET: the variable is the run's own input, so an unresolvable
+#     anchor is a refusal and never a licence to trust it. Without this the run picks its own BASE.
+out=$(GOV_DEFAULT_BRANCH=main bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "refs/remotes/origin/HEAD does not resolve, so nothing outside this run measures the default branch"
+git remote set-head origin main >/dev/null 2>&1
+
+# (b) origin/HEAD present, variable pointed at a remote-tracking ref THE RUN WROTE. `git update-ref`
+#     needs no push and no network, so this is the whole attack in two commands.
+reset_tree
+# HEAD~1, not HEAD: at HEAD the degenerate merge-base==HEAD guard fires first and this arm would
+# assert a refusal it never reached. The steer has to survive the earlier guard to test the later one.
+git update-ref refs/remotes/origin/steered HEAD~1
+out=$(GOV_DEFAULT_BRANCH=steered bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "the resolved default-branch ref is not the one refs/remotes/origin/HEAD names"
+git update-ref -d refs/remotes/origin/steered
+
+# The recorded base-ref is EVIDENCE on the same footing as the recorded base: re-derived here, never
+# read as input. A run that edits it is contradicted rather than believed.
+reset_tree
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+sed -i 's|^base-ref: .*|base-ref: refs/remotes/origin/forged|' memory/builds/tRun/RUN.md
+out=$(bash "$SCRIPT" --close tRun 2>&1)
+hit "$out" "the base-ref recorded in the run-state file is not the ref this history resolves"
+
+# POSITIVE CONTROL for the pair above: unsteered, the same tree still preflights. An arm set that
+# only ever reds proves the refusal fires, never that it fires for the right reason.
+reset_tree
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id KA-CTL 2>&1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tRun/RUN.md)" "base-ref: refs/remotes/origin/main"
 
 reset_tree; git checkout -q main
 out=$(run --preflight tRun --keepalive-id k1)
