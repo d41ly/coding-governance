@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-1 — the build method, rendered and delivered
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · review wf_198d8c01-46e · ratified 2026-08-11
+**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · review wf_198d8c01-46e · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -14,7 +14,8 @@ run actually reads, and survives a compaction the agent cannot observe.
 - **S1** — `tools/memory-tree/BUILD-METHOD.template.md`, the authored source. Its content is the
   pass-2 draft at `../build/2026-08-11-build-aWrittenMethod-1-method-pass.md`, trimmed to budget and
   with B1 through B7 applied. Eleven sections M1 through M11, keeping that draft's own numbering.
-  Budget **≤15,000 B and ≤220 lines**, measured on the RENDERED copy. Paths follow the
+  Budget: the hygiene check 6 caps on `memory/guides/*.md`, **≤20,480 B and ≤250 lines**, measured on
+  the RENDERED copy. See F2 — the tighter self-imposed budget did not survive contact. Paths follow the
   `HYGIENE.template.md` precedent: `{{KIT_DIR}}/…` for own-kit paths, `{{TOOL_ROOT}}<kit>/…` for
   sibling kits, and a literal `memory/` for the memory root with that file's `:13` rename caveat.
   `{{MEMORY_ROOT}}` is NOT a substitution key of this renderer and would red the placeholder arm.
@@ -95,9 +96,9 @@ kit, which points at it the way it points at `LANDER` and `GATE_CMD`.
 | `tools/memory-tree/BUILD-METHOD.template.md` | yes, by hand | the parity leg's placeholder arm |
 | `memory/guides/BUILD-METHOD.md` | no, rendered | the parity leg's diff arm, hygiene check 6 |
 
-Hygiene check 6 caps a file in `memory/guides/` at 20,480 B and 250 lines. The S1 budget sits inside
-that deliberately, because a method at 240 lines has ten lines of headroom and the first fold-in
-makes it red.
+Hygiene check 6 caps a file in `memory/guides/` at 20,480 B and 250 lines. Measured after the trim:
+246 lines and 17,486 B. The byte axis is comfortable; the line axis has four and binds. F2 records
+why the tighter self-imposed budget was abandoned rather than met.
 
 ### Migration
 
@@ -181,8 +182,10 @@ nothing forces the first read.
   `memory/guides/BUILD-METHOD.md`, and its printed remedy regenerates the live copy.
 - **AC3** — When a `{{PLACEHOLDER}}` is left unsubstituted in the template, the leg's second arm
   fails naming the shipped file, independently of the diff arm.
-- **AC4** — When `wc -c -l memory/guides/BUILD-METHOD.md` runs, it reports at most 15,000 bytes and
-  at most 220 lines, and `grep -c 'tools/' ` on it reports 0.
+- **AC4** — When `wc -c -l memory/guides/BUILD-METHOD.md` runs, it reports at most 20,480 bytes and
+  at most 250 lines. Separately, `grep -c 'tools/' tools/memory-tree/BUILD-METHOD.template.md`
+  reports 0: the no-literal-prefix rule binds the TEMPLATE, because `{{TOOL_ROOT}}` renders precisely
+  to `tools/` in this install and a rendered copy without it would be wrong, not clean.
 - **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the tree carrying the new
   guide, it exits 0.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, the new guide is claimed by
@@ -228,9 +231,15 @@ same half-delivery this build exists to fix.
 
 ### F2 — the size budget
 
-**RESOLVED (agent, 2026-08-11, delegated): take the tighter budget**, 15,000 B and 220 lines against
-the 20,480 B and 250-line cap. The pass-2 draft measures 18,217 B at 262 lines as committed, so the
-trim is real work, and every review this method survives will want to add to it.
+**RESOLVED (agent, 2026-08-11, delegated): take the tighter budget** — and it did not survive the
+build, which is recorded here rather than quietly widened. Measured after trimming every rationale
+clause that was not load-bearing: **246 lines and 17,486 B**. The byte axis has 2,994 B of headroom
+and is comfortable; the LINE axis has four, and it binds. Cutting the further 26 lines to reach 220
+would have cost rules the audit's coverage lens requires, so the budget is the hygiene cap and the
+displacement rule in M1 is now load-bearing rather than decorative: the next addition must remove
+something or spill to `tools/memory-tree/README.md`, which is outside the index set. S11 carries a
+backlog row for the spill, because a four-line margin on a document designed to grow is a defect
+waiting for its first fold-in.
 
 ### F3 — `RESOLVED (agent, <date>, delegated)` in the spec template
 
@@ -263,6 +272,13 @@ sessions through a per-machine junction is a change whose blast radius exceeds t
 
 - rev-1 · 2026-08-11 · initial draft. Converges pass 1 (enforcement, rejected for scope) and pass 2
   (method and delivery). Folds seven pass-2 blockers into §4 Migration as B1 through B7.
+- rev-3 · 2026-08-11 · built S1 and S2. Two corrections the build forced. AC4 asserted the RENDERED
+  guide holds no `tools/`, which is backwards: `{{TOOL_ROOT}}` renders to exactly that, so the rule
+  binds the template and the AC now says so. F2's 15,000 B / 220-line budget did not survive contact
+  at 246 lines / 17,486 B; the budget is now the hygiene cap and the reasoning is in F2. Also caught
+  by the gate while building: M2's example roster used a real family prefix with a placeholder slug,
+  which hygiene check 14 correctly read as a live id citation with no definition. The example now
+  spells the family as a placeholder too. This §9 line is worded to avoid the same trap.
 - rev-2 · 2026-08-11 · folded review `wf_198d8c01-46e`, 53 raw findings, 20 confirmed, 13 rejected.
   Two blockers: S1 had no content source in the tree (the pass-2 draft is now committed under
   `build/` and AC0 grades against it), and S9 stated the render direction backwards — the same error

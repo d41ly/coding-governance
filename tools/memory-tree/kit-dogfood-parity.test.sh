@@ -50,7 +50,7 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"
 
 MODE="${1:---check}"
-PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md"
+PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md"
 
 # Byte-identical in intent to `render_doc` in adopt-memory-tree.sh. Two spellings of one
 # substitution is the drift class this file exists to catch, so the SHAPE arm below proves they agree
@@ -87,5 +87,9 @@ done
 # shape checked elsewhere in this kit.
 [ -n "$PAIRS" ] || { echo "kit-parity: no document pairs configured — that is not a pass"; exit 1; }
 [ "$MODE" = --render ] && exit 0
-[ "$st" = 0 ] && echo "kit-parity: shipped and installed docs agree (2 pairs, rendered for '$KITREL')"
+# The count is DERIVED from the population it reports on. It was a literal `2 pairs`, which is a
+# second hand-kept spelling of PAIRS — the drift class this file exists to catch, sitting in this
+# file's own success line. A third pair landed and the leg still said two.
+set -- $PAIRS; npairs=$#
+[ "$st" = 0 ] && echo "kit-parity: shipped and installed docs agree ($npairs pairs, rendered for '$KITREL')"
 exit "$st"

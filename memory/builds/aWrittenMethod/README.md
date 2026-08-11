@@ -84,9 +84,9 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | SPECCED | rev-2 | 2026-08-11 |
+| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | INPROGRESS | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->
