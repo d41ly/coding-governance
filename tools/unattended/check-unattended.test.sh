@@ -31,7 +31,7 @@ LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
-CORE_FLOOR="6:6"
+CORE_FLOOR="${FLOOR_OVERRIDE:-$CORE_FLOOR_DERIVED}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
 PHASES_EXTRA="${1-}"
@@ -76,6 +76,7 @@ base: BASE
 EOF
 }
 
+CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
 mkconf; build tRun
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor: check 9 measures against `refs/remotes/...` only, because a bare local
@@ -124,10 +125,15 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 # ---- is present" can never fail. It armed cleanly and tested nothing. These arms delete a core
 # ---- member from the DRIVER — the only place the names live — and watch the count fall.
 reset_tree
-sed -i 's/^PHASES_CORE="PREFLIGHT RUNNING VERIFYING LANDING LANDED ABORTED"/PHASES_CORE="PREFLIGHT RUNNING VERIFYING LANDING LANDED"/' tools/unattended/unattended.sh
+# reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
+# Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
+short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//')
+sed -i "s|^PHASES_CORE=.*|PHASES_CORE=\"${short% *}\"|" tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor, and deleting a core member is a silent, reason-free override of everything keyed on it"
-hit "$out" "5 against 6"
+hit "$out" "$((ncore-1)) against $ncore"
 # ...the member deleted was a TERMINAL one, so the independent terminal-membership check fires too.
 # Two sets declared separately, so THAT one is falsifiable where the subset form was not.
 hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it"
@@ -138,10 +144,12 @@ miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
 sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it"
-hit "$out" "5 against 6"
+hit "$out" "$((ndod-1)) against $ndod"
 
 reset_tree; mkconf "" "project-item:machine"
 same "a project DoD EXTENSION is green" "$(run)" ""

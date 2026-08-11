@@ -438,9 +438,26 @@ hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned ba
 same "the phase advanced to LANDING" \
   "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
 
+# ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")
+hit "$out" "phase BUILDING"
+same "the phase was actually written" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "BUILDING"
+
+# ...and preflight must NOT move it back. It used to rewrite the phase unconditionally, so the very
+# verb a compaction-resumed run is told to re-run silently reset its position to RUNNING.
+out=$(run --preflight tRun --keepalive-id k1)
+same "a re-run preflight leaves a reached phase alone" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "BUILDING"
+
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --phase tRun NOSUCHPHASE --witness abc)" "the phase is not in the declared vocabulary, and a phase nothing recognises is not a position"
+hit "$(run --phase tRun BUILDING)" "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips"
+reset_tree
+hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there is no run to move"
+
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --status, --resume and --close: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --phase, --status, --resume and --close: --frobnicate"
 
 # ---- check 18: the recorded BASE is EVIDENCE, never the input. --close used to read it straight
 # ---- out of the run-state file — a file the run writes — and an absent line degenerated the

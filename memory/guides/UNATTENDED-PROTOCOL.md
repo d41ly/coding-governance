@@ -95,7 +95,12 @@ the only exit: the spill exists so that never happens.
 
 Kit-owned core, in run order:
 
-`PREFLIGHT` · `RUNNING` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
+`PREFLIGHT` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RUNNING` · `VERIFYING` ·
+`LANDING` · `LANDED` · `ABORTED`
+
+The four middle members are named for the build method's PASS kinds, so a run's phase and the pass it
+is performing are one vocabulary rather than two. `RUNNING` survives with a stated meaning — a run
+between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
 `LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
 — built and reviewed, not yet merged — and it is why the run-state file is deliberately outside the
@@ -165,7 +170,7 @@ either stalls or learns to bypass — and bypassing discards the entire bar the 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
 
-## 7. The four verbs
+## 7. The verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
   records the keepalive id the agent hands it,
@@ -175,6 +180,9 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   nothing real: a run that cannot reach the remote cannot land on it either. It delegates wiring to the project's **check** mode, never the repairing one: a repairing
   mode rewrites tracked bytes and sets git config, and the run's first act must not be the mode
   whose past over-firing is the cautionary case this protocol cites.
+- `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
+  `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
+  by an agent hand-editing an artifact this kit calls generated.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override.

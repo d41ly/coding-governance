@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# unattended.sh — the four-verb driver for a run that will merge and push with no owner turn.
+# unattended.sh — the driver for a run that will merge and push with no owner turn.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
@@ -66,7 +66,7 @@ fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
 # CORE, in run order. A project EXTENDS via PHASES_EXTRA and deletes nothing: the gate leg asserts
 # core membership against a shrink-only floor, because a deletable core member is a silent,
 # reason-free override of everything keyed on it.
-PHASES_CORE="PREFLIGHT RUNNING VERIFYING LANDING LANDED ABORTED"
+PHASES_CORE="PREFLIGHT SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
 PHASES_TERMINAL="LANDED ABORTED"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
@@ -426,6 +426,28 @@ scaffold_runmd() { # slug -> writes and stages <MEMORY_ROOT>/builds/<slug>/RUN.m
 }
 
 # --------------------------------------------------------------------------------------- the verbs
+# S6 - the phase PRODUCER. Without it the vocabulary is decorative: only --preflight and --close ever
+# wrote a phase, so every member between them could enter the file only by an agent hand-editing an
+# artifact this kit calls generated. The witness is REQUIRED here for the same reason presence is its
+# own refusal in the leg - an unwitnessed phase claim is the cheapest possible lie, and the run is the
+# sole author of that field.
+verb_phase() { # slug · phase · witness
+  local slug="$1" want="$2" wit="$3" rel
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to move: $rel"; return 1; }
+  case " $(phases) " in
+    *" $want "*) ;;
+    *) fail 19 "the phase is not in the declared vocabulary, and a phase nothing recognises is not a position: $want" ; return 1 ;;
+  esac
+  [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
+  set_fact "$rel" phase "$want" || return 1
+  set_fact "$rel" witness "$wit" || return 1
+  echo "unattended: phase $want · witness $wit"
+  return 0
+}
+
+
 verb_preflight() { # slug · keepalive-id
   local slug="$1" kid="$2" rel base src payload tmp
   check_slug "$slug" || return 1
@@ -482,7 +504,10 @@ verb_preflight() { # slug · keepalive-id
   set_fact "$rel" anchor-sha "$ASHA" || return 1
   set_fact "$rel" anchor-url "$AURL" || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
-  set_fact "$rel" phase RUNNING     || return 1
+  # ONLY when the file carries no phase yet. Preflight used to rewrite this unconditionally, so a
+  # resumed run that had reached BUILDING was silently moved back to RUNNING by the verb it is told
+  # to re-run after a compaction.
+  [ -n "$(fact "$rel" phase)" ] || set_fact "$rel" phase RUNNING || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
   echo "unattended: preflight OK — base $base · anchor $AREF at $ASHA · keepalive $kid · region copied from $src"
   return 0
@@ -622,8 +647,12 @@ while [ $# -gt 0 ]; do
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     --override)     OV="${2:-}";  shift 2 || shift ;;
     --reason)       REASON="${2:-}"; shift 2 || shift ;;
+    --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
+                    PH_WIT=""
+                    [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
+                    verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --status, --resume and --close: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --phase, --status, --resume and --close: $arg"; exit 1 ;;
   esac
 done
 [ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>]"; exit 2; }
