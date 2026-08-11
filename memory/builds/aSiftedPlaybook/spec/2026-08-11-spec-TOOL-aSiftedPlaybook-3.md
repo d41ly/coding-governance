@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -119,7 +119,10 @@ future ones.
   because it certifies coverage that does not exist, and this repo has landed that defect before —
   `domain-rules.md:98` exists because of it. §4's three arms and S4's self-test are the response,
   and a `fail` message carrying a bare positional cannot be armed, so every value binds to a name
-  and sits after the literal sentence.
+  and sits after the literal sentence. A second authoring trap applies directly: this gate is mostly
+  regexes, and generating its source through a shell heredoc into a non-raw string turns an escape
+  into a control byte, after which the compiled pattern silently stops matching and only `repr()`
+  shows it. Write the gate with a file tool.
 - testing + left-shift gates — S4 IS the left-shift; this unit is the left-shift for the rest of the
   build.
 - migration / rollback — new files plus wiring; revert cleanly. No adopter impact — this gate is
@@ -176,6 +179,9 @@ future ones.
 - rev-1 · 2026-08-11 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-2 · 2026-08-11 · added the heredoc-to-control-byte authoring trap to §5, selected by
+  `gotchas.py --for-diff` over this build's own first commit. This gate is mostly regexes, which is
+  the exact population that class destroys silently.
 
 ## 10. Reuse audit
 
