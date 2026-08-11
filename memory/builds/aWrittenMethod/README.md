@@ -23,37 +23,28 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** Two design passes, one converged spec at rev-3, and **all eleven scope items BUILT** on
-`branch/unattended-kit-builds-27d8c6`.
+**State.** Unit 1 CLOSED and landed at `7f614a1`. Five further units are OPEN — the declines unit 1
+recorded, now taken up. All five were DECLARED at BASE as backlog rows before this run named them, so
+per the method's M2 they are MISSING (no spec carries the id), not un-declared.
 
-| Pass | Landed | Scope |
-|---|---|---|
-| 1 | `a383375` | S1 the method template, S2 the render pair and its derived count |
-| 2 | `7ff43c1` | S3 the adopter path, S4 the kit version pair, and M6's own broken recipe |
-| 3 | `0f7688e` | S9 the delegated-resolver grammar, S7 the declared keepalive cadence |
-| 4 | `22b14ca` | S5 the four delivery sites, S10 and S6's charter half |
-| 5 | `f8182aa` | S8 the map dossier, S11 the three declines |
-| 6 | this one | S6 the playbook half — UNPARKED and built |
+## Units
 
-**S6, formerly parked.** The park held for one turn and was taken up on a fresh context, which is
-what the park was for. The thirteen-bullet unattended block in
-`parallel-coding-governance.domain-rules.md` §1 is now ONE pointer at
-`{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`; every one of the thirteen was verified as a
-paraphrase of that document's §1 through §7 before deletion. The §8 duplicate of the §1 landing rule
-in the template is now a pointer, which FREED 57 bytes against a gate with 148 to spare. Both
-`governance-template` markers are v2.7 with a v2.6 snapshot in `memory/archive/`, and
-`customize.md` carries the fourteenth placeholder and a deletion recipe that no longer names a
-clause that is gone.
+The roster. This table is the roster, not the `ids:` key — M2 says so and this build is why.
 
-**Closing review.** `reviews/2026-08-11-review-aWrittenMethod-1.md` — Tier-2 over the cumulative
-diff from the pinned BASE. 18 raw, 15 confirmed, 3 refuted, precision 0.83, no blockers, 2 highs.
-Both highs shared one root the review named exactly: the diff ships documents to adopters, and this
-repo is not an adopter, so every mechanism that would show what an adopter receives was blind. Both
-are fixed and armed. One defect is deliberately NOT fixed — the unescaped `sed` interpolation is
-`TOOL-aWrittenMethod-6`; its dangerous symptom (a zero-byte Skill certified green) is refused loudly
-at both paths, but two attempts at the escape itself were wrong and neither shipped.
+| Unit | Tier | Mechanism | State |
+|---|---|---|---|
+| `TOOL-aWrittenMethod-1` | 2 | the build method, rendered and delivered | CLOSED, landed `7f614a1` |
+| `TOOL-aWrittenMethod-2` | 2 | the mandate BASE the run cannot steer | OPEN |
+| `TOOL-aWrittenMethod-3` | 1 | the method's displacement, at 247 of 250 lines | OPEN |
+| `TOOL-aWrittenMethod-4` | 2 | a gate for the sixth carrier | OPEN |
+| `TOOL-aWrittenMethod-5` | 1 | the method in the manifest's watch set | OPEN |
+| `TOOL-aWrittenMethod-6` | 2 | escaping conf values before substitution | OPEN |
 
-**Next action:** none. Built, reviewed, gates green at 46/46, landed.
+**Unit 2 is the blocker and leads.** It is the unapplied half of `D3` from
+`../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`: fixes 1 and 2 landed with that
+build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end during unit 1. The
+mandate is the only thing standing between an unattended run and an unreviewed push, so this is the
+one item on the list whose absence makes every other guarantee decorative.
 
 ## The two passes, and why there are two
 
@@ -111,9 +102,14 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
+| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | SPECCED | rev-1 | 2026-08-11 |
 <!-- /gen:build-index -->
