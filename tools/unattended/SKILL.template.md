@@ -15,6 +15,9 @@ distinction real.
 
 ## Start a run
 
+0. **Read the build method first, if this project ships one:** `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`.
+   It is the memory-tree kit's, not this one's, so it may be absent — that is legal, and this kit
+   states none of what it carries.
 1. **Find the mandate. Do not write one.** The owner authors a mandate block in the build's run-state
    file and commits it BEFORE the run starts. If there is none, stop and say so — a mandate you
    wrote authorizes nothing, and the preflight will refuse it anyway by comparing against the pinned

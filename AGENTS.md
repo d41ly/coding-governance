@@ -3,9 +3,9 @@
 Project-agnostic governance + tooling for running Claude Code (or any agent) across several
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
 gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
-itself. The map lives at `memory/map/`; it carries two dossiers so far
-(`memory/map/features/codebase-map.md` and `memory-tree-merge-driver.md`) and 69 inventory keys are
-still in the shrink-only `baseline.toml`.
+itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
+keys not yet claimed by one are in the shrink-only `baseline.toml`. Both counts move as dossiers
+land, so neither is spelled here — `python tools/codebase-map/reuse_lookup.py` prints the live pair.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
 doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
@@ -102,7 +102,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
   mandate it ASSERTS and cannot have written. Three legs: `tools/unattended/check-unattended.sh`
-  (eleven checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  (thirteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
   the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, and
@@ -120,7 +120,7 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses and `reuse_lookup.py`/`map_diff.py` need `CODEBASE_MAP_ROOT` — see `memory/map/features/codebase-map.md` §Gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated
@@ -136,6 +136,10 @@ runs `tools/check-wiring.sh --session`, which auto-sets an unset `core.hooksPath
 set value) so a fresh clone self-heals instead of running with dormant gates.
 
 ## Conventions
+
+- A build that runs more than one pass follows `memory/guides/BUILD-METHOD.md` — the spec set, the
+  fork rule, the pass loop, regrounding, and the wrap-up derivation. It is rendered from the
+  memory-tree kit; the unattended kit points at it, and `/session-kickoff` loads it at the hand-back.
 
 - **LF** on all `.sh` + the memory-tree data files (`.gitattributes`); verify staged bytes on Windows.
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
