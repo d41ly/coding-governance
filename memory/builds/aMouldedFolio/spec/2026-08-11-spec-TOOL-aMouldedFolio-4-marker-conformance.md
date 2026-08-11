@@ -1,6 +1,6 @@
 # TOOL-aMouldedFolio-4 — one marker contract across four readers, and a test that drives all four
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
 ## 1. Goal
 

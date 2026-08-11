@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-grammar selftest"]
+gate-legs = ["row-grammar selftest", "marker contract (4 readers)"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -59,6 +59,17 @@ amendment is not a member; a row answers "what is on this line", where it is.
 - The vacuity precondition uses a family-INDEPENDENT id shape on purpose. Deriving it from the
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.
+
+### The marker contract
+
+Four live readers parse the generated-region markers: `apply_region` in the index generator
+(Python, writes), `region()` in the unattended checker and in its driver (awk, read), and
+`splice()` in the driver (awk, WRITES). The contract is column 0, exact equality after one
+trailing CR is stripped, and it lives in the case table of `marker-contract.test.sh` rather than
+in any reader's prose. The Python side used to be permissive AND mutating — it accepted an
+indented marker and one carrying trailing whitespace, then re-emitted the bare marker, editing a
+line the author wrote. The test drives the SHIPPED bytes of each awk reader, sliced out at run
+time rather than transcribed, so an edit to a kit moves the verdict.
 
 ## Reuse affordance
 

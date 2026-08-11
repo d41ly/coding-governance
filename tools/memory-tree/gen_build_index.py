@@ -396,8 +396,16 @@ def apply_region(readme_text: str, region: str, readme: str) -> str:
     """Replace the marked slice EXACTLY. Never a regex substitution over the whole file: this
     generator owns a region inside an AUTHORED file, and getting it wrong eats prose."""
     lines = readme_text.split("\n")
-    opens = [i for i, l in enumerate(lines) if l.strip() == MARK_OPEN]
-    closes = [i for i, l in enumerate(lines) if l.strip() == MARK_CLOSE]
+    # COLUMN 0, EXACT EQUALITY after one trailing CR — the contract the three awk readers in the
+    # unattended kit already enforce. `.strip()` was permissive AND mutating: it accepted an
+    # indented marker and a marker with trailing whitespace (two spaces is a Markdown hard break,
+    # so an authored construct), then re-emitted the bare marker — silently rewriting a line the
+    # author wrote, in a file they ran this tool over for another reason. Refusing is the only
+    # reading that cannot edit prose behind the author.
+    def _is(line, mark):
+        return line.rstrip("\r") == mark
+    opens = [i for i, l in enumerate(lines) if _is(l, MARK_OPEN)]
+    closes = [i for i, l in enumerate(lines) if _is(l, MARK_CLOSE)]
     if not opens and not closes:
         raise Problem(f"{readme}: no '{MARK_OPEN}' / '{MARK_CLOSE}' marker pair — the generated "
                       f"region has nowhere to go, and a README without one leaves the index silently")
