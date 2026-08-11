@@ -18,34 +18,32 @@ The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds
 committed before the run's branch existed. The owner's act is `/unattended <slug>`; they author
 nothing per run. Three properties, all mechanical:
 
-- **It is asserted, never written by the run.** `--preflight` reads it and refuses if it is absent.
-  A run that could write its own authorization has none, and the gate would certify it.
+- **It is asserted, never written by the run.** `--preflight` refuses if it is absent; a run that
+    could write its own authorization has none.
 - **It is reachable from the pinned BASE.** A build folder introduced by a commit on the run's own
   branch grants nothing. Reachability is the machine-checkable form of "somebody with push rights put
   this here before this run branched" — and the run holds push rights by construction, so it is a
   cost, not a proof. The pin is taken from the ref name and tip the REMOTE advertises for its own
   HEAD, never from a local ref and never from the environment. What that removes, and what it leaves,
   is §9.
-- **Only its SHAPE is checked.** The blob resolves at BASE, parses as build front matter, and its
-  `slug:` names the build. No gate can tell whether the owner meant it.
+- **Only its SHAPE is checked.** It resolves at BASE, parses as front matter, and its `slug:` names
+  the build. No gate can tell whether the owner meant it.
 - **Its ROSTER, when present, may not move under the run.** A Units table inside a roster marker pair
   is compared across the BASE. Opt-in by presence; INTEGRITY, not a narrowing of the grant.
 
 **What this costs, stated because the previous design paid none of it.** The authorization was once a
 block naming the build and both authorized actions, compared byte-for-byte across the BASE. Moving it
-to the build folder trades five properties:
+to the build folder trades these properties:
 
-1. **Integrity becomes existence.** A build README is a living document whose generated region the
-   run legitimately re-renders, so no whole-file equality is assertable.
+1. **Integrity becomes existence.** A README's generated region legitimately moves, so no whole-file
+   equality is assertable.
 2. **The grant is class-wide.** Every build folder in the tree satisfies the predicate; the narrowing
    is the slug the owner types, and chat is not machine-checkable.
-3. **It names no ACTIONS.** A README cannot express merge-only, so a build authorizes both.
-4. **It cannot be revoked.** A build README is a permanent record the hygiene gate and the generated
-   index depend on, so no act means "not this build".
-5. **It is self-propagating.** A run whose diff creates a new build README authorizes the NEXT run.
+3. **It names no ACTIONS** and **cannot be revoked**: a build authorizes both, permanently.
+4. **It is self-propagating.** A run whose diff creates a new build README authorizes the NEXT run.
    Unrefused: §9 names the only thing that would.
 
-All five were put to the owner and accepted.
+All were put to the owner and accepted.
 
 Absent or unreachable authorization → the run does not start. There is no override for this one: an
 override on the authorization check is the authorization check.
@@ -233,7 +231,9 @@ act was taken. It does not prevent one.
 rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
 now inert rather than detected — neither value is read at all. Two more are neutralised for this
 kit's own reads and named where they sit: an object-substitution ref and a graft file, either of
-which rewrites what a sha MEANS at a perfectly honest anchor.
+which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by their
+mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other tool
+reading the same objects.
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
 commits it — nothing binds the executing code to code an owner approved. A run that shims the

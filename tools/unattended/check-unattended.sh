@@ -130,15 +130,41 @@ phase_of() { sed -n 's/^phase: *//p' "$1" | head -1 | tr -d '\r'; }
 fact_of()  { sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'; }
 # Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
 # pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
+# A marker line is the marker or it is malformed — the prefix test IDENTIFIES the line, equality
+# judges it. The old form let a run append its own authorization to the `<!-- run:mandate -->` line:
+# both slices dropped the whole line, compared byte-equal, and the injected sentence sat inside the
+# block a human reads. Reproduced at gate exit 0 with no output. CR-normalised before comparing,
+# because the prefix test tolerated a CRLF worktree by accident and an equality test does not.
 region()   { awk -v o="$2" -v c="$3" '
-               index($0,o)==1 { no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
-               index($0,c)==1 { nc++; if (nc==1) cat=NR; inside=0; next }
+               { ln=$0; sub(/\r$/,"",ln) }
+               index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
+               index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
                inside { print }
-               END { if (no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
+               END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 
+# ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
+# ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the
+# ---- next tool that reads the same objects, and the run can add one at any moment.
+if [ "$POP" -gt 0 ]; then
+  rr=$(git for-each-ref --format='%(refname)' refs/replace/ 2>/dev/null | grep -c . || true)
+  [ "$rr" = 0 ] \
+    || fail 14 "a repo carrying an unattended run-state file also carries replace refs, and a replace ref rewrites what a sha MEANS for every read that is not pinned: $rr found"
+  gf="$(git rev-parse --git-common-dir 2>/dev/null)/info/grafts"
+  [ ! -f "$gf" ] \
+    || fail 14 "a repo carrying an unattended run-state file also carries a grafts file, which rewrites the commit GRAPH underneath every ancestry read: $gf"
+fi
+
+# ITERATED WITH `read`, NOT WORD-SPLIT. `for f in $RUNS` split a tracked path containing a space into
+# two non-existent paths, both swallowed by the `[ -f ]` guard — so every per-file check below never
+# ran on that file and the gate exited 0 without ever naming it. The mis-segmentation guard at check
+# 4 above could not see it either: the path matches the selector, it is the LOOP that loses it.
 live=""; nlive=0
-for f in $RUNS; do
-  [ -f "$f" ] || continue
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if [ ! -f "$f" ]; then
+    fail 4 "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below: $f"
+    continue
+  fi
   ph=$(phase_of "$f")
 
   # ---- 4: the phase token is IN the declared vocabulary. Unit 1 kept the run-state file out of the
@@ -195,15 +221,27 @@ for f in $RUNS; do
       # with `git branch -f`, which is how BASE was made to equal HEAD.
       for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
         GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-        mb=$(GIT merge-base "$b" HEAD 2>/dev/null) || continue
-        [ "$mb" = "$rb" ] || fail 9 "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded $rb, computed $mb in $f"
+        # ANCESTRY, NOT EQUALITY — and the reason is the kit's own first success. Equality wedged the
+        # bar permanently: merging then pushing, the two acts an authorization grants, move the
+        # merge-base past the pin forever, so a LANDED record red every later default-branch push.
+        # Reproduced on an honest fixture with no attacker. A phase-keyed carve-out is not the fix
+        # either — the run writes `phase:`, so it would be a one-line escape from this check.
+        # What actually matters, and what survives landing: the recorded BASE lies on the history the
+        # ANCHOR names rather than on the branch the run authored.
+        if ! GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
+          fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
+        elif ! GIT merge-base --is-ancestor "$rb" "$b" 2>/dev/null; then
+          fail 9 "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded $rb against $b in $f"
+        elif ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
+          fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
+        fi
         # ONLY once the run claims to have built something. At PREFLIGHT and through the pass
-        # phases the merge-base legitimately equals HEAD - that is a run that has correctly built
+        # phases the base legitimately equals HEAD - that is a run that has correctly built
         # nothing yet, and the driver blesses it there. Refusing it here made the two halves of one
         # kit disagree, each with its own green test.
         case "$ph" in
           LANDING|LANDED|ABORTED|VERIFYING)
-            [ "$mb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the merge-base equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+            [ "$rb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
         esac
         break
       done
@@ -252,7 +290,9 @@ for f in $RUNS; do
   if [ -n "$BYPASS_BAN" ] && grep -qF -- "$BYPASS_BAN" "$f"; then
     fail 11 "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on: $BYPASS_BAN in $f"
   fi
-done
+done <<EOF
+$RUNS
+EOF
 
 # ---- 7: at most ONE non-terminal run-state file, or "the run" is not well-defined and anything
 # ---- keying on it must either OR the phases together or pick one arbitrarily.

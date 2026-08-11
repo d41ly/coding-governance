@@ -76,7 +76,9 @@ base: BASE
 EOF
 }
 
-CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
+CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
+' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
+' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
 mkconf; build tRun
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor: check 9 measures against `refs/remotes/...` only, because a bare local
@@ -93,7 +95,18 @@ sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun
 sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
 git add -A && git commit -q -m facts --no-verify
 PRISTINE=$(git rev-parse HEAD)
-reset_tree() { git reset -q --hard "$PRISTINE"; git clean -qfd; }
+# RESETS THE REF NAMESPACE TOO, not just the work tree. Arms below repoint the anchor and add
+# replace refs, and a `reset --hard` undoes none of that — the damage leaks into every later arm and
+# green controls quietly start measuring something else. Batched through one `update-ref --stdin`
+# because a git process per ref per arm dominates this suite's wall time. `--no-deref`, or deleting
+# the symbolic `origin/HEAD` deletes the ref it POINTS AT instead of itself.
+reset_tree() {
+  git reset -q --hard "$PRISTINE"; git clean -qfd
+  { git for-each-ref --format='delete %(refname)' refs/remotes/ refs/replace/ \
+      | grep -v ' refs/remotes/origin/main$'
+    printf 'update refs/remotes/origin/main %s\n' "$ANCHOR0"
+  } | git update-ref --stdin --no-deref
+}
 run() { bash "$SCRIPT" 2>&1; }
 
 # ---- THE GREEN CONTROL, first. Every red arm below is worthless if the clean tree is not clean:
@@ -128,8 +141,10 @@ reset_tree
 # reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
 # Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
 mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
-ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
-short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^PHASES_CORE="//; s/"$//')
+ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
+' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
+short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
+' | sed 's/^PHASES_CORE="//; s/"$//')
 sed -i "s|^PHASES_CORE=.*|PHASES_CORE=\"${short% *}\"|" tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor, and deleting a core member is a silent, reason-free override of everything keyed on it"
@@ -145,7 +160,8 @@ same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
 mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
-ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
+ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '
+' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
 sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it"
@@ -233,7 +249,7 @@ hit "$(run)" "a run-state file's generated region differs from the build README 
 
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
-hit "$(run)" "a recorded BASE is not the merge-base this history reproduces, and every mandate assertion hangs on that value: recorded"
+hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"
 
 # ---- check 11: the bypass flag, checked where the record is.
 reset_tree; printf '\nparked: considered --no-verify to get past the hook\n' >> memory/builds/tRun/RUN.md
@@ -317,12 +333,12 @@ hit "$(run)" "a run-state file records no BASE, and the record is written by the
 reset_tree; git push -q -f origin unit:main
 sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "the merge-base equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read"
+hit "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read"
 
 # ...and the SAME tree at a pass phase is silent, or the scoping is indistinguishable from deleting
 # the check. This is the arm that would have caught the two halves disagreeing.
 sed -i 's/^phase: .*/phase: BUILDING/' memory/builds/tRun/RUN.md; git add -A
-miss "$(run)" "the merge-base equals HEAD at a phase that claims work was done"
+miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done"
 git push -q -f origin "$ANCHOR0":main
 
 # ---- check 13: THE AUTHORIZATION, asserted by the BAR. Before this the leg did not contain the
@@ -379,6 +395,85 @@ anchor_break noop_break
 miss "$(run)" "recorded BASE"
 anchor_restore
 
+
+# ---- check 9: a base that RESOLVES but sits off the anchor's history. The run's own branch is
+# ---- exactly where such a commit lives, so this is the branch that replaced the equality test.
+reset_tree
+off=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m "a commit the run authored off the anchor")
+sed -i "s/^base: .*/base: $off/" memory/builds/tRun/RUN.md
+hit "$(run)" "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded"
+
+# ---- check 9: an ancestor of the ANCHOR that this working history does not build on. Two separate
+# ---- branches because they fail separately — the anchor can advance past a stale unit branch.
+reset_tree
+ahead=$(git commit-tree "$(git rev-parse "$ANCHOR0^{tree}")" -p "$ANCHOR0" -m ahead)
+git update-ref refs/remotes/origin/main "$ahead"
+sed -i "s/^base: .*/base: $ahead/" memory/builds/tRun/RUN.md
+hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on"
+
+# ---- THE LIFECYCLE, and the reason ancestry replaced equality. A run that does exactly what its
+# ---- authorization grants — merge to the default branch and push — moved the merge-base past the
+# ---- pinned base, and the old equality test then red the bar on EVERY later push, forever. Honest
+# ---- fixture, no attacker anywhere in it.
+reset_tree
+git checkout -q main && git merge -q --no-ff unit -m "land the run"
+git update-ref refs/remotes/origin/main "$(git rev-parse main)"
+out=$(run); rc=$?
+same "a LANDED run-state record leaves the bar green" "$out" ""
+same "a LANDED run-state record exits 0" "$rc" "0"
+git checkout -q unit; reset_tree
+
+# ---- check 14: a replace ref or a graft file is itself the violation. The GIT() pin makes THIS
+# ---- leg's reads honest; it binds no other tool reading the same objects.
+reset_tree
+git update-ref "refs/replace/$(git rev-parse HEAD)" "$(git rev-parse HEAD^)"
+hit "$(run)" "a repo carrying an unattended run-state file also carries replace refs, and a replace ref rewrites what a sha MEANS for every read that is not pinned"
+reset_tree
+miss "$(run)" "also carries replace refs"
+gf="$(git rev-parse --git-common-dir)/info/grafts"
+mkdir -p "$(dirname "$gf")"; printf '%s %s\n' "$(git rev-parse HEAD)" "$(git rev-parse HEAD^)" > "$gf"
+hit "$(run)" "a repo carrying an unattended run-state file also carries a grafts file, which rewrites the commit GRAPH underneath every ancestry read"
+rm -f "$gf"
+miss "$(run)" "also carries a grafts file"
+
+# ---- the MARKER GRAMMAR: a marker line is the marker or it is malformed. Trailing text on the open
+# ---- marker was invisible to both sides of the byte-compare while sitting inside the block a human
+# ---- reads — a run widening its own authorization with both slices still equal.
+# ---- The authorization moved out of a mandate BLOCK and into the build folder, so the surviving
+# ---- region() caller is check 8's generated-region copy. The grammar defect is the same one: a
+# ---- marker line carrying trailing content used to be dropped whole on BOTH sides, so a byte-compare
+# ---- could not see it, and anything a run appended there rode along invisibly.
+reset_tree
+sed -i 's|^<!-- run:generated -->$|<!-- run:generated --> trailing text the byte-compare cannot see|' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
+reset_tree
+sed -i 's|^<!-- /run:generated -->$|<!-- /run:generated --> and the same on the close marker|' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
+reset_tree
+sed -i 's|^<!-- gen:build-index -->$|<!-- gen:build-index --> trailing text on the SOURCE side|' memory/builds/tRun/README.md
+hit "$(run)" "a build README's generated markers are malformed, so the copy has no source to be compared with"
+# GREEN CONTROL: clean markers stay silent, or the three arms above prove only that region() reds.
+reset_tree
+miss "$(run)" "generated markers are malformed"
+
+# ---- the POPULATION LOOP: a tracked path with a space used to word-split into two non-existent
+# ---- paths, both swallowed, so every per-file check silently skipped it.
+reset_tree
+mkdir -p "memory/builds/t Spaced"
+cp memory/builds/tRun/README.md "memory/builds/t Spaced/README.md"
+cp memory/builds/tRun/RUN.md "memory/builds/t Spaced/RUN.md"
+sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' "memory/builds/t Spaced/RUN.md"
+git add -A && git commit -q -m spaced --no-verify
+out=$(run)
+hit "$out" "t Spaced/RUN.md"
+miss "$out" "a run-state file is tracked at a path this leg cannot read"
+git reset -q --hard "$PRISTINE"; git clean -qfd
+
+# ---- check 4: tracked, selected, and genuinely unreadable. `continue` used to swallow it, which is
+# ---- the same silence the word-split produced and just as invisible.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below"
+reset_tree
 
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
