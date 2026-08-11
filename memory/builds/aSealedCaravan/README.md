@@ -57,10 +57,10 @@ Records live under `spec/` and, once built, `build/` and `reviews/`. The table b
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-4 | 2026-08-10 |
-| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | INPROGRESS | rev-4 | 2026-08-10 |
+| [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 <!-- /gen:build-index -->

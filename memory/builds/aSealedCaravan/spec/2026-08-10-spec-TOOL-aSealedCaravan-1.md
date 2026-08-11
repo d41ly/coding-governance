@@ -1,6 +1,6 @@
 # TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true
 
-**Status:** INPROGRESS · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
+**Status:** CLOSED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
 
 ## 1. Goal
 
@@ -362,6 +362,8 @@ it to 9 and red immediately.
 Before review: `python tools/memory-tree/gotchas.py --for-diff 16aeb5ef..HEAD`.
 
 ## 8. Open questions
+
+none — all three forks were resolved by the owner on 2026-08-10 and the record is kept below.
 
 - **F1 — does `manifest-check.sh` move to `tools/`?** RESOLVED (owner, 2026-08-10):
   `tools/manifest-check.sh`, flat. It is a standalone gate file, not a kit — the kickoff ENGINE is a

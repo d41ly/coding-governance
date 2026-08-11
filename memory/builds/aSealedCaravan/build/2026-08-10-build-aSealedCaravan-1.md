@@ -1,12 +1,12 @@
 # TOOL-aSealedCaravan-1 — build record
 
-**Status:** INPROGRESS · rev-1 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
 
 ## 1. Goal
 
 Record what the three-commit rollout of `TOOL-aSealedCaravan-1` actually built, and what it found
-that the spec did not predict. Status is INPROGRESS rather than CLOSED because the work is green on
-`branch/governance-adoption-kit-9bc273` and has not landed on `main`.
+that the spec did not predict. Landed on `main` after reconciling nine commits that arrived during the unit; the merge is its own
+record and is summarised under section 4.
 
 ## 2. Scope (IN)
 
