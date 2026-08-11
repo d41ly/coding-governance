@@ -8,7 +8,7 @@ standing mandate in place of the explicit ask; the kickoff-manifest merge except
 new companion §1, which also carries the unattended-run checklist — re-pull §1, §8 and the
 companion in lockstep.*
 
-<!-- governance-template: v2.7 -->
+<!-- governance-template: v2.6 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -155,7 +155,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Structured-output schemas for orchestration returns → `parallel-coding-governance.domain-rules.md` §8. LOAD when writing a Workflow script.
 - Orchestration scripts run in sidechains inheriting neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the ≤5 cap is enforced at the `Workflow` tool-call (where a main-loop `PreToolUse` fires), never inside the script where no hook reaches.
 - Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
-- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
+- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing on shared `main` and `git push` each require an explicit ask, or the §1 standing mandate.
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 

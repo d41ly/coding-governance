@@ -42,8 +42,10 @@ is filled in exactly one place.
   including the pins that are MEASURED per corpus and never inherited from another repo.
 - **Output discipline**: `{{PROSE_AUDIT}}` (the audit-script location, or "none yet — thresholds still bind").
 
-### In `parallel-coding-governance.domain-rules.md` — 13
+### In `parallel-coding-governance.domain-rules.md` — 14
 
+- **§1 unattended runs**: `{{MEMORY_ROOT}}` — the memory tree's root, matching the memory-tree kit's
+  conf. It resolves the pointer to the unattended protocol; the block states no rule of its own.
 - **§4 runtime & verification**: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - **§11 toolchain**: `{{TOOLCHAIN_NOTES}}`.
 - **§12 architecture**: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}`.
@@ -57,9 +59,9 @@ is filled in exactly one place.
 - **Memory-recall line** (the §5 kit bullet): keep only if adopting the `memory-recall/` kit — which
   needs the memory tree, since the kit refuses without `.memory-tree.conf`.
 - **Unattended-run lines** (the `, or a committed standing mandate …` clause in §1's Landing block,
-  the `, or the §1 standing mandate` clause in §8, and companion §1's second block): keep only if
-  adopting the `unattended/` kit — else delete the two clauses, restoring the unamended explicit-ask
-  rule, and delete the companion block. Companion §1's FIRST block (the kickoff-manifest merge
+  and companion §1's second block): keep only if adopting the `unattended/` kit — else delete the
+  clause, restoring the unamended explicit-ask rule, and delete the companion block. §8 no longer
+  carries a second spelling of the landing rule; it points at §1. Companion §1's FIRST block (the kickoff-manifest merge
   exception) is independent of this kit and stays whenever the project keeps a manifest. The clauses
   are written to stay true without the kit — they say the merge bar validates the mandate's shape,
   and a project with no such bar has no mandate — but a repo that keeps them without the kit is
