@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-08
 streams: tooling
 roster: TOOL
-ids: TOOL-aDrainedSluice-1..-9
+ids: TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9
 ---
 
 # aDrainedSluice — drain the tooling backlog to zero
@@ -38,7 +38,7 @@ is. Arming before the set settles would be arming a moving target. V5–V8 are i
 branch work and of each other.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aDrainedSluice-1..-9
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

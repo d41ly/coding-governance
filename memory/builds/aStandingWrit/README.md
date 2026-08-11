@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-11
 streams: tooling+playbook+kickoff
 roster: TOOL
-ids: TOOL-aStandingWrit-1
+ids: TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7
 ---
 
 # aStandingWrit — the run authorizes on a plan it did not write
@@ -176,7 +176,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

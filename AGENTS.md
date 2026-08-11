@@ -74,7 +74,7 @@ its shards sit frozen under `memory/archive/`.
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
 The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
-- `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 2.2 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
+- `memory/` hygiene (20 checks, flat tree since kit 1.5; engine at kit 2.6 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
@@ -127,6 +127,14 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+
+- **the self-test legs** — every gate whose own harness rides the bar as a separate leg:
+  `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/memory-tree/check-verdict-epoch.test.sh` ·
+  `skills/session-kickoff/manifest-check.test.sh` · `tools/workflows/check-verifier-fanout.test.sh` ·
+  `tools/workflows/check-review-join.test.sh`, plus the two engines that carry their own arms in a
+  `--selftest` mode rather than a sibling file, `tools/memory-tree/gen_build_index.py` and
+  `tools/memory-tree/corpus_ids.py`. A gate and the harness proving it can fail are two legs, and
+  the charter names both — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
 branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated

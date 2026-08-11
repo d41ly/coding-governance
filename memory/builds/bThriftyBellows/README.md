@@ -4,7 +4,7 @@ node: b
 opened: 2026-07-16
 streams: tooling
 roster: TOOL
-ids: TOOL-bThriftyBellows-1/-2
+ids: TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 status: CLOSED
 ---
 
@@ -20,7 +20,7 @@ only record is the recording under `build/`. That recording carries no status he
 the front matter above declares `status:` outright instead of leaving it to be derived.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bThriftyBellows-1/-2
+**Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-index -->

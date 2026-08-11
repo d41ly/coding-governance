@@ -36,6 +36,7 @@
 - TOOL-aWrittenMethod-1 · a mis-aimed BRIEFING yields a confident wrong answer, not a visibly confused one: pass 1 was told the tension was self-authorship and scored on checkability, so every candidate delivered enforcement where a procedure was asked for
 - TOOL-aWrittenMethod-1 · absence-of-placeholder is not presence-of-value. Pre-initialising an interpolated conf key to empty makes emptiness the failure mode the `{{TOKEN}}` grep cannot see; default the key to its own token so an undeclared value reds
 - TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
+- TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
 ## DEPL — deployer
 

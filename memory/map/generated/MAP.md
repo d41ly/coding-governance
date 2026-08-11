@@ -32,7 +32,7 @@ Inventories: gate-legs: 48 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `kit version markers` | baseline |
 | `kit/dogfood doc parity` | baseline |
 | `manifest-check self-test` | baseline |
-| `memory hygiene (19 checks)` | baseline |
+| `memory hygiene (20 checks)` | baseline |
 | `memory-hygiene self-test` | baseline |
 | `memory-recall kit selftest` | baseline |
 | `memory-recall skill wiring` | baseline |

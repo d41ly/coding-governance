@@ -140,9 +140,9 @@ PINS: dict[str, int] = {
     # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not
     # fire at all. Its comment claimed "7 of 19" against a manifest that holds 37.
     #
-    # All 7 are SELF-TESTS whose parent gate is cited — so this drains one charter bullet at a time,
-    # which is what a pin is for.
-    "handkept_inventories_disagreeing_with_source": 7,
+    # DRAINED to 0: all seven were SELF-TESTS whose parent gate was cited but whose own script
+    # path was not; the charter now names them in one bullet, so every leg on the bar is spelled there.
+    "handkept_inventories_disagreeing_with_source": 0,
 }
 
 CHARTER = "AGENTS.md"

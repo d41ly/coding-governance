@@ -224,6 +224,48 @@ def derive_status(units: list, fm: dict, readme: str) -> str:
     return "WONTDO" if seen == {"WONTDO"} else "CLOSED"
 
 
+# ----------------------------------------------------------------------------------- roster scanning
+def _roster_sort_key(i: str):
+    """Family, then NUMERIC sequence. Lexical order puts `-10` before `-2`, which reads as data loss
+    to anyone scanning the rendered list for the newest id."""
+    return (i.split("-", 1)[0], int(i.rsplit("-", 1)[1]))
+
+
+def rosters(root: str, tracked: list, m: str, families: set) -> dict:
+    """slug -> sorted ids belonging to that build, from the id's own slug component.
+
+    An id spells its build: family-slug-sequence. So a build's roster needs no side table and no
+    anchor grammar — only the declared family alternation, which this module already loads. The
+    sequence must be all DIGITS: revision-suffixed anchors (`-6q`) are amendments to a decision, not
+    ids of their own, and admitting them multiplied one build's roster from 8 to 38.
+
+    THE READ SET EXCLUDES THIS FIELD'S OWN OUTPUTS. A build's README is skipped for its OWN slug, and
+    the generated index and shards are skipped entirely, because all three are rendered FROM the
+    value being derived. A derivation that reads its own output cannot correct a wrong value — it
+    republishes it forever, and every gate agrees, because a fresh render reproduces it exactly. That
+    is the defect this change exists to remove, so it must not be reintroduced by the fix.
+    """
+    fam = "|".join(sorted(re.escape(f) for f in families))
+    if not fam:
+        raise Problem("build-index: FAMILIES is empty, so no id can be recognised and every roster "
+                      "would render empty — which is also what a clean corpus looks like")
+    id_re = re.compile(r"\b(?:" + fam + r")-([A-Za-z0-9]+)-\d+\b")
+    out: dict = {}
+    for p in tracked:
+        if p == f"{m}/LIVE.md" or p.startswith(f"{m}/ledger/"):
+            continue
+        try:
+            text = read_text(os.path.join(root, p))
+        except Problem:
+            continue
+        for mm in id_re.finditer(text):
+            slug = mm.group(1)
+            if p == f"{m}/builds/{slug}/README.md":
+                continue
+            out.setdefault(slug, set()).add(mm.group(0))
+    return {s: sorted(v, key=_roster_sort_key) for s, v in out.items()}
+
+
 # --------------------------------------------------------------------------------------- collecting
 def collect(root: str, conf: dict) -> list:
     m = conf["MEMORY_ROOT"]
@@ -231,6 +273,19 @@ def collect(root: str, conf: dict) -> list:
     slugs = sorted({p.split("/")[2] for p in tracked if p.startswith(m + "/builds/") and p.count("/") >= 3})
     disciplines = set(conf["DISCIPLINES"].split())
     families = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
+    # Two granularities, as the hygiene engine's own guard does it. The PRECONDITION asks whether the
+    # scan recognised anything at all; the per-build POPULATION asks whether this build did. Without
+    # the first, a families list bound to the wrong tree renders every roster empty — and an empty
+    # classification is exactly what a clean corpus yields, so the failure would look like success.
+    roster_by_slug = rosters(root, tracked, m, families)
+    # NO EMPTINESS PRECONDITION HERE, deliberately. The wrong-root class says an unrecognising
+    # grammar yields the same empty result a clean corpus does, so a guard is wanted — but every
+    # signal available HERE is one this function derives from the same conf, which makes the
+    # assertion a tautology (the repo's assertion-between-two-derived-values class). Build count
+    # fails on a sparse tree; spec-file existence fails too, because a legacy recording legitimately
+    # carries no id. The guard that actually holds is INDEPENDENT and already runs below: every
+    # build's authored `roster:` value must be a declared family, so a FAMILIES list bound to the
+    # wrong tree reds there, by name, before any roster is rendered.
     builds = []
     for slug in slugs:
         readme = f"{m}/builds/{slug}/README.md"
@@ -248,11 +303,18 @@ def collect(root: str, conf: dict) -> list:
                 raise Problem(f"{readme}: roster value '{value.strip()}' is outside the FAMILIES set")
         specs = sorted(p for p in tracked if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
         units = [parse_spec(os.path.join(root, p)) for p in specs]
+        # BOOTSTRAP, not failure. A build whose ids appear nowhere but its own README is young, not
+        # broken, and there is nothing to correct the authored value against — so it stands. The
+        # anti-self-reference property still holds where it can bite: the moment any independent
+        # source names the id, the derivation takes over and a wrong authored value loses. Global
+        # emptiness is the dangerous case, and the precondition above owns it.
+        roster = roster_by_slug.get(slug) or [i for i in fm["ids"].split() if i]
         builds.append(
             {
                 "slug": slug,
                 "readme": readme,
                 "fm": fm,
+                "roster": roster,
                 "units": [u for u in units if u],
                 "status": derive_status(units, fm, readme),
             }
@@ -265,8 +327,12 @@ def render_region(build: dict) -> str:
     fm = build["fm"]
     out = [
         MARK_OPEN,
+        # `unit(s)` and `ids` answer DIFFERENT questions and are deliberately not reconciled: a unit
+        # is a spec carrying a status header, a roster member is an id that exists in the record.
+        # aUnmannedHelm is 7 and 10 because three of its ids never got a spec. Rendering them as one
+        # number would re-create, inverted, the defect this derivation removes.
         f"**Build status:** {build['status']} · {len(build['units'])} unit(s) · node {fm['node']} · "
-        f"opened {fm['opened']} · streams {fm['streams']} · ids {fm['ids']}",
+        f"opened {fm['opened']} · streams {fm['streams']} · ids {' '.join(build['roster'])}",
         "",
     ]
     if build["units"]:
@@ -280,6 +346,26 @@ def render_region(build: dict) -> str:
                    "in the front matter.*")
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
+    """Rewrite the front matter's `ids:` line from the roster, in place.
+
+    Bounded exactly like `apply_region`: only the ONE line whose key is `ids` inside the front-matter
+    block is touched, and the block ends at the first closing `---`. `parse_front_matter` has already
+    proved the block opens at line 1 and closes, so this walk cannot run away; it still refuses
+    rather than guessing if the key is absent, because writing a key that was never there would make
+    this function a scaffolder, which it is not.
+    """
+    lines = readme_text.split("\n")
+    want = "ids: " + " ".join(roster)
+    for i, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            break
+        if line.startswith("ids:"):
+            lines[i] = want
+            return "\n".join(lines)
+    raise Problem(f"{readme}: front matter has no 'ids:' line to rewrite")
 
 
 def apply_region(readme_text: str, region: str, readme: str) -> str:
@@ -310,12 +396,15 @@ def render_live(builds: list, m: str) -> str:
         "",
     ]
     if live:
+        # A COUNT, not the list. This file is in check 7's entry-budget population and the build
+        # README's region is not, so the full roster renders there and a bounded number renders here:
+        # a ten-id row measured 316 chars against a 300-char cap, on a file with no slack.
         out += ["| Build | Status | Node | Opened | Streams | Ids |", "|---|---|---|---|---|---|"]
         for b in live:
             fm = b["fm"]
             out.append(
                 f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['opened']} | {fm['streams']} | {fm['ids']} |"
+                f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |"
             )
     else:
         out.append("*No live build.*")
@@ -341,7 +430,7 @@ def render_shards(builds: list, m: str) -> dict:
             fm = b["fm"]
             body.append(
                 f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['streams']} | {fm['ids']} |"
+                f"{fm['streams']} | {len(b['roster'])} |"
             )
         out[f"{m}/ledger/{month}.md"] = "\n".join(body) + "\n"
     return out
@@ -354,7 +443,8 @@ def plan(root: str, conf: dict) -> tuple:
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
-        artifacts[b["readme"]] = apply_region(read_text(path), render_region(b), b["readme"])
+        text = apply_front_matter_ids(read_text(path), b["roster"], b["readme"])
+        artifacts[b["readme"]] = apply_region(text, render_region(b), b["readme"])
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
@@ -470,6 +560,54 @@ def do_selftest() -> int:
         conf3 = _fixture(t3, marker=False)
         arm("unpaired marker is named", "expected exactly one marker pair, found 1 open and 0 close",
             lambda: plan(t3, conf3))
+
+        # The derived roster. Each arm names one branch of `rosters()`. (The owning spec is
+        # deliberately NOT cited by id: a drift signal counts a non-terminal spec id appearing in
+        # product source, and it sits at its pin.)
+        def _roster_tree(name, extra=None, ids_line=None):
+            """A fixture whose spec defines ARCH-tOne-1, plus whatever `extra` writes."""
+            d = os.path.join(base, name); os.makedirs(d)
+            c = _fixture(d, spec_status="INPROGRESS")
+            if ids_line is not None:
+                p = os.path.join(d, "memory", "builds", "tOne", "README.md")
+                write_text(p, read_text(p).replace("ids: ARCH-tOne-1", ids_line))
+            for rel, text in (extra or {}).items():
+                full = os.path.join(d, rel.replace("/", os.sep))
+                os.makedirs(os.path.dirname(full), exist_ok=True)
+                write_text(full, text)
+            run("git", "add", "-A", cwd=d)
+            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=d)
+            return d, c
+
+        d1, c1 = _roster_tree("rosterbase", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"})
+        arm("the roster is DERIVED, not read from front matter", "ids ARCH-tOne-1 ARCH-tOne-4",
+            lambda: plan(d1, c1)[0]["memory/builds/tOne/README.md"])
+        arm("the roster sorts by NUMERIC sequence, not lexically",
+            "ARCH-tOne-2 ARCH-tOne-10",
+            lambda: plan(*_roster_tree("rostersort",
+                                       {"memory/DECISIONS.md": "- ARCH-tOne-10 · ten\n- ARCH-tOne-2 · two\n"}))[0]
+            ["memory/builds/tOne/README.md"])
+        # SELF-REFERENCE: the field must never be an input to itself, or a wrong value survives every
+        # regeneration and every gate agrees, because a fresh render reproduces it exactly.
+        d3, c3 = _roster_tree("rosterself", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"},
+                              ids_line="ids: ARCH-tOne-1 ARCH-tOne-99")
+        arm("an id present ONLY in the build's own front matter is dropped",
+            "ids: ARCH-tOne-1 ARCH-tOne-4\n",
+            lambda: plan(d3, c3)[0]["memory/builds/tOne/README.md"])
+        # A revision-suffixed anchor amends a decision; it is not an id of its own. Admitting them
+        # multiplied one real build's roster from 8 to 38.
+        d4, c4 = _roster_tree("rosterrev", {"memory/DECISIONS.md": "- ARCH-tOne-4b · an amendment\n"})
+        arm("a revision-suffixed anchor never joins a roster", "ids ARCH-tOne-1<",
+            lambda: plan(d4, c4)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
+        # The generated artifacts are rendered FROM the roster, so reading them is self-reference one
+        # hop out. LIVE.md carries a COUNT for the same reason the region carries the list: only one
+        # of the two files is inside check 7's entry budget.
+        d5, c5 = _roster_tree("rosterexcl", {"memory/LIVE.md": "ARCH-tOne-77\n",
+                                             "memory/ledger/2026-08.md": "ARCH-tOne-88\n"})
+        arm("an id present only in a GENERATED artifact never joins a roster", "ids ARCH-tOne-1<",
+            lambda: plan(d5, c5)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
+        arm("the capped artifacts carry a COUNT, never the id list", "| arch | 2 |",
+            lambda: plan(d1, c1)[0]["memory/LIVE.md"])
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)
