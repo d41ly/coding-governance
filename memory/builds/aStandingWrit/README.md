@@ -121,6 +121,32 @@ refuses to run off the default branch.
 
 **F4** — the widening is recorded, naming all five losses.
 
+## Parked — needs an owner turn
+
+**P1 — F5's mitigation lost its mechanism, and restoring it is a scope choice.**
+
+*The question.* F5 ratified "refuse self-propagating authorization" and its mechanism was S5's
+marker-delimited plan region: a run that lands a new build README authorizes the next run, and the
+region gave the integrity comparison something to bind to. S5 is withdrawn as a duplicate of
+BUILD-METHOD M2. M2's roster is the README's authored Units table, which is ordinary prose under an
+ordinary heading and carries no marker pair, so there is nothing with a stable grammar to compare.
+
+*The options seen.* (a) Bind to the Units table by locating it structurally — the slice between its
+heading and the next one. Cheap, and fragile in exactly the way marker pairs exist to prevent: a
+renamed heading silently empties the comparison, which is a check that passes by finding nothing.
+(b) Give the Units table a marker pair — which is S5's region under another name, and re-opens the
+duplication M2's own rule forbids. (c) Drop the integrity property and authorize on existence alone,
+recording self-propagation as an accepted residue in the protocol's boundary section.
+
+*Why I refused.* The three options differ in WHAT GETS BUILT, not in how. BUILD-METHOD M3 reserves
+that class to the owner, and option (c) additionally widens the authorization surface, which is a
+veto-3 owner turn under the same section. Option (a) is the one I would pick under pressure and it is
+the one whose failure mode this repo has a named bug class for.
+
+*What it blocks.* Nothing in S1, S2, S3 or S7. The authorization surface still moves off the
+owner-authored mandate; what is unresolved is only whether a run that lands a new build README
+thereby authorizes the next run, and by what mechanism that is refused.
+
 ## Ratified decisions
 
 Two forks were put to the owner on 2026-08-11 at kickoff and both resolved.
