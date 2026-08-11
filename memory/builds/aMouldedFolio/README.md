@@ -47,5 +47,5 @@ do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | SPECCED | rev-2 | 2026-08-11 |
+| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | SPECCED | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->
