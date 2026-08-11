@@ -72,7 +72,14 @@ its shards sit frozen under `memory/archive/`.
 
 ## The gate suite (the merge bar) — `bash tools/run-gates.sh`
 
-The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner:
+The full bar is green at the push boundary (earlier runs are diff-scoped); each leg rides the runner.
+The runner executes legs **CONCURRENTLY** through a bounded pool, width `min(8, nproc)`, overridable
+with `GATE_JOBS`; `GATE_JOBS=1` is the serial bar through the same code path and is the rollback for
+any suspected concurrency problem. Legs are safe to run together because each heavy one is already
+hermetic — it builds its own `mktemp -d` scratch repo and never writes into the real tree. Execution
+order is scheduled longest-first from a timing cache the runner writes at `<git-dir>/gate-timings.tsv`;
+REPORTING is always manifest order, so output is byte-stable whatever the width, and a corrupt or
+absent cache costs wall clock only. Measured on node `a`: 335s serial to 87s at width 8. Each leg:
 - `memory/` hygiene (19 checks, flat tree since kit 1.5; engine at kit 2.2 — read the version FROM `KIT_MEMORY_TREE_VERSION`, never from here) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16 and 17-19 delegate to `gen_build_index.py`, `corpus_ids.py` and `gotchas.py`
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
