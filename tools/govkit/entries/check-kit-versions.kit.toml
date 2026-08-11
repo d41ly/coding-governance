@@ -1,0 +1,30 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "check-kit-versions"
+scope = "repo"
+kind = "flat"
+home = "tools"
+version_from = { none = "the version gate is itself unversioned; measured 2026-08-11. A deployer cannot detect which vintage a target holds, which is recorded here rather than left to be discovered." }
+requires = []
+sentinel = "tools/check-kit-versions.sh"
+
+# SEED, not engine. Copied verbatim it reds immediately — its need list names kits the target does
+# not have — and the runbook's own step is to edit that list down to the target's subset. That is the
+# state the role enum's copied-on-first-apply column exists to express.
+[[files]]
+include = ["check-kit-versions.sh"]
+role = "seed"
+to = "{prefix}/check-kit-versions.sh"
+claims = ["tools/check-kit-versions.sh"]
+
+[adopt]
+argv = []
+mutates_index = false
+
+[[hole]]
+id = "kit-versions-need-list"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "MEASURED: copied verbatim into a repo holding none of the kits it names, the gate reds immediately. The runbook's own instruction is to edit its need list to the target's kit subset, which makes this a seed-then-own file rather than an engine file."
+discharge = { command = ["bash", "{prefix}/check-kit-versions.sh"] }

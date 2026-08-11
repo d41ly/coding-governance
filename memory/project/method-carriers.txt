@@ -12,3 +12,4 @@ tools/unattended/SKILL.template.md · the source of the rendered Skill's step 0
 tools/unattended/unattended.sh · verb_resume echoes the method path to a resuming run
 tools/memory-tree/HYGIENE.template.md · the shipped hygiene rules describe this registry, and naming what it guards names the method
 .memory-tree.conf · its READ_PATH_CEILING comment names the method as the largest read-path member
+tools/memory-tree/kit.toml · the deployer descriptor names the method as a RENDERED artifact of this kit — a destination, never a restatement

@@ -1,0 +1,34 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "playbook"
+scope = "repo"
+kind = "flat"
+version_from = { file = "parallel-coding-governance.template.md", pattern = "governance-template: v", kind = "marker" }
+requires = []
+
+# TWO files, not three. The customize companion is a deploy-time catalog the runbook says to read and
+# not ship, and counting it is how the spec over-stated this entry for four revisions.
+[[files]]
+include = ["parallel-coding-governance.template.md"]
+role = "project-owned"
+to = "{playbook_path}"
+claims = ["parallel-coding-governance.template.md"]
+
+[[files]]
+include = ["parallel-coding-governance.domain-rules.md"]
+role = "project-owned"
+to = "{playbook_dir}/parallel-coding-governance.domain-rules.md"
+claims = ["parallel-coding-governance.domain-rules.md"]
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "installation is a copy to an owner-chosen path; the placeholders are the hole"
+
+[[hole]]
+id = "playbook-placeholders"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = false
+why = "the placeholders span BOTH deployed files, and nothing in a target observes them — no leg reads the playbook. A probe naming only the main file was MEASURED going false-green while the companion sat unfilled, which is why both operands are named."
+discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\" \"$2\"", "--", "{playbook_path}", "{playbook_dir}/parallel-coding-governance.domain-rules.md"] }

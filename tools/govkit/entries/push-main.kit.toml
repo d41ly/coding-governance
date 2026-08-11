@@ -1,0 +1,45 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "push-main"
+scope = "repo"
+kind = "flat"
+home = "tools"
+version_from = { none = "no version constant exists; measured 2026-08-11. Prescribed for copy by the runbook and detectable only by its sentinel path." }
+requires = []
+sentinel = "tools/push-main.sh"
+
+[[files]]
+include = ["push-main.sh", "push-main.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/push-main.sh", "tools/push-main.test.sh"]
+
+# A verbatim repo-root destination with no prefix at all — the class the guard table calls
+# "verbatim repo-root", emitted under the identity substitution.
+[[files]]
+include = [".githooks/pre-push", ".githooks/pre-push.test.sh"]
+role = "engine"
+root_relative = true
+to = "{relpath}"
+claims = [".githooks/pre-push", ".githooks/pre-push.test.sh"]
+
+# The branch-guard BLOCK, not the file. The runbook's instruction is to copy that block into the
+# target's own pre-commit, which is a merged-role write into a file the target owns.
+[[files]]
+include = [".githooks/pre-commit"]
+role = "merged"
+root_relative = true
+to = ".githooks/pre-commit"
+marker_style = "hash-comment"
+block_id = "govkit:branch-guard"
+claims = [".githooks/pre-commit"]
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the hook is inert until the target points core.hooksPath at it, which is the wiring checker's job"
+
+[[gate_leg]]
+name = "push-main self-test"
+argv = ["bash", "{prefix}/push-main.test.sh"]
+guard = ["{prefix}/push-main.sh", ".githooks/"]
