@@ -599,7 +599,24 @@ hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --stat
 # ---- A forged mandate passed. Now the base is re-derived and the recorded one must agree with it.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
-hit "$(run --close tRun)" "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded"
+hit "$(run --close tRun)" "the BASE recorded in the run-state file does not resolve to a commit in this history, and the recorded value is written by the run: recorded"
+
+# ---- check 18, branch 2: a base that RESOLVES but sits off the shared history. This is the case
+# ---- that must still refuse after the test moved from equality to ancestry — a run forging its pin
+# ---- to a commit it authored on its own branch. HEAD is exactly that shape: an ancestor of HEAD,
+# ---- never an ancestor of the merge-base the anchor and this history share.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+sed -i "s/^base: .*/base: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives, so it names a commit off the history the anchor blesses - which is where a run's own commits live: recorded"
+
+# ---- check 18, THE POSITIVE ARM, and the reason this check moved off equality at all. A base that
+# ---- is an ANCESTOR of the derived one is the ordinary state after a reconcile — which the MANDATED
+# ---- lander performs before the gate — so equality refused every run whose remote had moved, on the
+# ---- one path it is required to take. Reproduced live with no attacker anywhere near it. Ancestry
+# ---- must ACCEPT it, or the fix is only a differently-worded wedge.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+sed -i "s/^base: .*/base: $(git rev-parse HEAD~1)/" memory/builds/tRun/RUN.md
+miss "$(run --close tRun 2>&1)" "the BASE recorded in the run-state file"
 
 # ...and the DELETED-line case, which was THE exploitable one: an absent `base:` used to degenerate
 # the comparison to the git index, so both sides became bytes the run had just staged. It is no

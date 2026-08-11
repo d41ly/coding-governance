@@ -27,7 +27,7 @@
 # It also derives NOTHING. The generated region is a COPY of the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.2   # gov:kit unattended@1.2 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.3   # gov:kit unattended@1.3 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -275,11 +275,39 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
     fail 16 "no merge-base against the tip the remote advertises, so this run shares no history with the branch it means to land on; the anchor is never a local ref and never a name from the environment"
     return 1
   fi
+  # ANCESTRY, NOT EQUALITY — carried here from this kit's own gate leg (check 9), which was moved off
+  # equality for a reason the driver was never given. Equality wedged the bar permanently: merging and
+  # then pushing, the two acts an authorization grants, move the merge-base past the pin forever. It
+  # is worse than that in practice, because the MANDATED lander reconciles origin BEFORE the gate — so
+  # every run whose remote moved met a refusal on the one path it is required to take, and the only
+  # exits were to stall or to edit this kit. Reproduced live on 2026-08-11 with no attacker anywhere
+  # near it.
+  #
+  # What survives, and what the leg tests in the same words: the recorded BASE lies on the history the
+  # ANCHOR blesses rather than on the branch the run authored. `--is-ancestor $rec $fresh` is exactly
+  # the leg's pair of ancestor tests — a commit that is an ancestor of both the anchor and HEAD is an
+  # ancestor of their merge-base, and `$fresh` IS that merge-base — so this is one rule with one
+  # spelling, not a second opinion. A base the run forged on its own branch is an ancestor of HEAD and
+  # NOT of `$fresh`, which is the case that must still refuse.
+  #
+  # The recorded value stays EVIDENCE and never becomes the input: `TB` is the freshly derived base,
+  # exactly as before.
   if [ -f "$1" ]; then
     rec=$(fact "$1" base)
-    if [ -n "$rec" ] && [ "$rec" != "$fresh" ]; then
-      fail 18 "the BASE recorded in the run-state file is not the one this history derives, and the recorded value is written by the run: recorded $rec, derived $fresh"
-      return 1
+    if [ -n "$rec" ]; then
+      if ! GIT rev-parse --verify --quiet "$rec^{commit}" >/dev/null 2>&1; then
+        fail 18 "the BASE recorded in the run-state file does not resolve to a commit in this history, and the recorded value is written by the run: recorded $rec"
+        return 1
+      fi
+      if ! GIT merge-base --is-ancestor "$rec" "$fresh" 2>/dev/null; then
+        fail 18 "the BASE recorded in the run-state file is not an ancestor of the base this history derives, so it names a commit off the history the anchor blesses - which is where a run's own commits live: recorded $rec, derived $fresh"
+        return 1
+      fi
+      # NO THIRD BRANCH. The leg tests ancestor-of-anchor AND ancestor-of-HEAD separately, and both
+      # are reachable THERE because it compares against the anchor ref. Here the comparison is
+      # against the merge-base, and an ancestor of the merge-base is an ancestor of HEAD by
+      # construction — so a second test could never fire. It was written, found unreachable, and
+      # removed rather than shipped as a guard with no failing case.
     fi
   fi
   TB="$fresh"
