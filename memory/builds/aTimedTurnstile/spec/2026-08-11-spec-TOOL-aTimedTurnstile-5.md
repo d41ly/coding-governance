@@ -1,6 +1,6 @@
 # TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently
 
-**Status:** INPROGRESS · rev-2 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · review aTimedTurnstile-1
 
 ## 1. Goal
 
@@ -61,6 +61,13 @@ every 50ms. That is wrong on this platform for a measurable reason: `sleep` is a
 75ms for a 50ms sleep, so the poll tick cost more than the sleep it bought and spent roughly 317s of
 a 617s serial run doing nothing else. Blocking on `wait -n` removes the tick entirely rather than
 tuning it.
+
+The width knob is bounded by LENGTH before any numeric test reads it, because `test -lt` and `$(( ))`
+both ERROR on an int64 overflow rather than comparing. Independently, the outer loop force-dispatches
+one leg whenever a pass started nothing and nothing is running, so forward progress does not depend on
+the width being sane at all. The two are deliberate defence in depth: with either one present a
+20-digit width still terminates green, and only removing BOTH reproduces the hang. That is why the arm
+asserts the observable outcome — terminates, and reports every leg — rather than either mechanism.
 
 Reporting a leg as `(no result)` is guarded by TWO further conditions, not just an empty job table:
 dispatch must be exhausted, and a full `wait` must have reaped every worker, after which the result
@@ -142,7 +149,15 @@ the rollback: no revert is needed to diagnose a suspected concurrency problem.
 - **AC6** — When the bar runs at the default width on this repo, wall clock is under 150s, against a
   measured 335.2s serial baseline.
 - **AC7** — When the runner is driven repeatedly at width 1 over a many-leg manifest, no healthy leg
-  is ever reported `(no result)`. Asserted over repeated runs, because the failure is a race.
+  is ever reported `(no result)`, AND that manifest is asserted to have actually run. Asserted over
+  repeated runs, because the failure is a race.
+- **AC8** — When a leg carries a `guard` whose paths are unchanged, the run prints `GATE skip` at that
+  leg's MANIFEST position and tallies it as skipped, at every width. When no base resolves, the same
+  leg RUNS instead. Both directions, because only asserting the skip lets an always-skip regression
+  pass.
+- **AC9** — When a guard-skipped leg had a cached duration, that row survives the run's cache rewrite.
+- **AC10** — When the width knob is given a negative, non-numeric, zero, or out-of-range value, the
+  run TERMINATES under a timeout and still reports every leg.
 
 ## 7. Gates
 
@@ -162,6 +177,15 @@ runs at the DoD, since every leg's verdict is the thing being preserved.
 ## 9. Revision log
 
 - rev-1 · 2026-08-11 · initial draft, written against measurements recorded in commit f638d8b.
+- rev-3 · 2026-08-11 · folded Tier-2 review aTimedTurnstile-1 (16 raw, 11 confirmed, precision 0.69,
+  verdict LAND IT, 0 blockers). All six confirmed defects fixed and armed. The highest, F1, was that
+  the guard/skip path — the mechanism this unit restructured most — had ZERO arm coverage, so an
+  always-skip regression stayed green by construction; AC8 now asserts both directions. F3 replaced
+  an absolute 5000ms timing pin with a ratio, because this leg is graded against load it does not
+  control. F2, F4, F5, F6 fixed per AC9/AC10. Fixing F2 initially REINTRODUCED the rev-2 race: the
+  progress guard declared undispatched legs dead once the cache decoupled dispatch from manifest
+  order, measured at 6 of 30 on the second run. Replaced by a forced dispatch. Gates A2/A3/B2 are
+  deferred to their own unit as the review recommends.
 - rev-2 · 2026-08-11 · folded two defects found while building, both caught by arming the arms rather
   than by the build passing. The dispatcher-plus-polling-reader design was replaced by a single shell
   blocking on `wait -n` after the poll tick was measured at 317s of a 617s serial run; and the

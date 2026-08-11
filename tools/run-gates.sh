@@ -31,7 +31,13 @@ gd="$(git rev-parse --git-dir 2>/dev/null)"; sfile=""; TIMINGS=""
 cores=$(nproc 2>/dev/null) || cores=${NUMBER_OF_PROCESSORS:-4}
 case "$cores" in ''|*[!0-9]*) cores=4 ;; esac
 JOBS=${GATE_JOBS:-$(( cores < 8 ? cores : 8 ))}
-case "$JOBS" in ''|*[!0-9]*) JOBS=1 ;; esac
+# Bound by LENGTH before any numeric test touches the value. Both `[ "$JOBS" -lt 1 ]` and `$(( JOBS < 1 ))`
+# ERROR on an int64 overflow instead of comparing, so a 20-digit value used to sail past the clamp into a
+# dispatch loop whose own `[ "$(live)" -lt "$JOBS" ]` errored identically: the runner spun forever having
+# executed ZERO legs and printed no verdict, which on the push boundary is a hang rather than a red.
+# `:-` substitutes the default for null as well as unset, so JOBS is never empty and an '' alternative here
+# would be dead — the arm that "covered" it was measuring the default width, not the clamp.
+case "$JOBS" in *[!0-9]*) JOBS=1 ;; ?????*) JOBS=64 ;; esac
 [ "$JOBS" -lt 1 ] && JOBS=1
 
 WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
@@ -122,6 +128,7 @@ disp=($ORDER); ndisp=${#disp[@]}; di=0; next=0
 live() { jobs -rp | wc -l; }
 while [ "$next" -lt "$total" ]; do
   if [ -z "${names[$next]}" ]; then next=$((next+1)); continue; fi   # drop-sentinel: holds an index, never runs
+  di_before=$di
   while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
@@ -134,8 +141,22 @@ while [ "$next" -lt "$total" ]; do
   # instant legs the pool can drain faster than the reader walks. Exhaust dispatch, reap everything,
   # and re-check before declaring a leg dead — an earlier revision skipped this and reported a
   # perfectly healthy leg as "(no result)" roughly one run in three.
-  [ "$di" -lt "$ndisp" ] && continue      # still legs to dispatch — go top up the pool
-  wait                                     # reap every worker, then look once more
+  if [ "$di" -lt "$ndisp" ]; then
+    # Nothing is running and legs remain. Normally the pass above dispatched one; if it dispatched
+    # NOTHING, force one here so every iteration makes progress and the loop can never spin.
+    # Falling through to the report instead would declare an UNDISPATCHED leg dead, and that is not
+    # hypothetical: guarding on "did this pass advance?" did exactly that. The window is a worker
+    # that is live when the dispatch pass looks (so nothing dispatches) and finished by the liveness
+    # check (so nothing is waited on), and the timing cache makes it common by decoupling dispatch
+    # order from manifest order — measured at 6 of 30 legs falsely reported, on the second run only,
+    # because the first run is the one with no cache.
+    if [ "$di" -eq "$di_before" ]; then
+      k=${disp[$di]}; di=$((di+1))
+      if [ -n "${names[$k]}" ] && [ ! -f "$WORK/$k.rc" ]; then runleg "$k" & fi
+    fi
+    continue
+  fi
+  wait                                     # everything dispatched and nothing running: reap, look once more
   [ -f "$WORK/$next.rc" ] && continue
   report_one "$next"; next=$((next+1))     # genuinely no result: report it, never hang
 done
@@ -143,10 +164,19 @@ wait
 
 # Feed the next run's dispatch order. Advisory: a failed write costs wall clock, never a verdict.
 if [ -n "$TIMINGS" ]; then
-  { for ((i=0; i<total; i++)); do
-      [ -z "${names[$i]}" ] && continue
-      [ -f "$WORK/$i.sec" ] && printf '%s\t%s\n' "${names[$i]}" "$(cat "$WORK/$i.sec")"
-    done; } > "$TIMINGS" 2>/dev/null || true
+  new="$WORK/timings.new"; merged="$WORK/timings.merged"; : > "$new"
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ -f "$WORK/$i.sec" ] && printf '%s\t%s\n' "${names[$i]}" "$(cat "$WORK/$i.sec")" >> "$new"
+  done
+  # A guard-SKIPPED leg never enters runleg(), so it produces no .sec. Rewriting the file from this
+  # run's rows alone therefore DELETED the cached duration of every skipped leg — and the runs where
+  # guards fire are exactly the diff-scoped ones, so a scoped run blanked the dispatch hint the next
+  # full run depends on. Carry forward any cached row this run did not measure. A leg dropped from the
+  # manifest falls out on its own, because the python side keys the hint on the manifest's names.
+  cp "$new" "$merged" 2>/dev/null || true
+  [ -s "$TIMINGS" ] && awk -F'\t' 'NR==FNR{seen[$1]=1;next} !($1 in seen)' "$new" "$TIMINGS" >> "$merged" 2>/dev/null
+  cp "$merged" "$TIMINGS" 2>/dev/null || true
 fi
 
 echo "----"

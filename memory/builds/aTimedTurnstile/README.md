@@ -26,7 +26,7 @@ with `fails=0`, which is the number this unit is built to reproduce.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-2 | 2026-08-11 |
+| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->
 
 ### The specs
