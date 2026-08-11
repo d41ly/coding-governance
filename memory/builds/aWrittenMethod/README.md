@@ -51,35 +51,23 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 | `TOOL-aWrittenMethod-2` | **BUILT** `5d1faf9` — the mandate BASE the run cannot steer |
 | `TOOL-aWrittenMethod-6` | **BUILT** `3ff7b4e` + `1a531cb` — all six renderers stop interpreting their inputs |
 | `TOOL-aWrittenMethod-3` | **BUILT** `b6e02f2` — the guide displaced 247 to 236 lines |
-| `TOOL-aWrittenMethod-4` | SPECCED rev-2, NOT built |
-| `TOOL-aWrittenMethod-5` | SPECCED rev-2, NOT built |
+| `TOOL-aWrittenMethod-5` | **BUILT** `4c0fd31` — the method under the manifest ratchet |
+| `TOOL-aWrittenMethod-4` | **BLOCKED** — F4 is an owner turn, see its §8 |
 
-Landing order `2 → 6 → 3 → 4 → 5`; three done, in order, unmerged on the branch.
+Four of five built and unmerged. Unit 4 is BLOCKED, not merely unfinished, and nothing was written
+for it: no leg, no registry, no `gate-legs.json` row, so the tree carries no half-built check.
 
-**What the arms caught, that reasoning had not.** Each of the three built units surfaced a defect no
-amount of reading would have found, which is the argument for the arms being scope items rather than
-test details:
+**Why unit 4 stopped.** Its S2 says the registry ships EMPTY and that this repo's rows live in this
+repo's copy. In a repo that dogfoods its own kit those are one file, so both cannot hold. Home (a),
+`memory/project/`, needs hygiene check 3's five-name allowlist widened in the memory-tree ENGINE plus
+`HYGIENE.md` in both copies and a kit version bump — a change to a governance carrier. Home (b), the
+kit directory, ships gov's rows to every adopter and reds them on install through S2's own stale-row
+refusal. M3 vetoes both shapes as owner turns and says a fork about WHAT GETS BUILT is parked, not
+ratified. The audit had flagged the registry-shipping half of this as a high; the contradiction with
+the dogfood copy only surfaced when S1 was about to be written.
 
-- unit 2 — `resolve_base` ran under `$( )`, so the global it set never reached the caller. Every
-  preflight failed until it was derived in the caller instead. A second refusal branch was
-  unreachable because an earlier call already returns on the same failure, and was deleted.
-- unit 6 — the hostile-value FIXTURE was first written with `sed 's|^LANDER=.*|…|'`, whose
-  replacement carries a `|`, and so reproduced the defect inside the test meant to catch it. Then
-  the conversion silently dropped `{{QUERY_CLI}}`, because its replacement is a literal expression
-  rather than a bare variable; the adopter's own surviving-placeholder arm refused immediately.
-- unit 3 — the 225-line target did not survive measurement. The taxonomy is 7 lines, not the ~18 the
-  estimate assumed. The number moved to 236 and the content did not, per M2's change-the-spec rule.
-
-**PARKED — units 4 and 5.** *The question:* build the cross-carrier gate and the manifest watch entry,
-then the closing diff review, the bar, and landing. *The options seen:* start unit 4 on what remains;
-take unit 5 out of order because it is small; park both. *The reason:* unit 4 adds TWO gate legs, a
-shipped registry, a dossier claim and an `AGENTS.md` row, and its own audit found its positive control
-asserted the wrong population — it is the unit most likely to land looking finished while being wrong.
-Unit 5 is small but is ordered last on purpose: it puts the method under a manifest ratchet that taxes
-every earlier commit, so pulling it forward would make unit 4's commit pay a re-stamp it should not.
-
-**Next action:** build unit 4 per its rev-2 spec, then 5, then the M8 closing review over
-`7f614a1..HEAD`, the full bar, and landing. Keepalive NOT reaped.
+**Next action:** the owner picks a home for the registry, or rules the leg gov-only. Then unit 4,
+then the M8 closing review over `7f614a1..HEAD`, the full bar, and landing. Keepalive NOT reaped.
 
 ## The two passes, and why there are two
 
@@ -144,7 +132,7 @@ spec in this folder — do not hand-edit it.
 | [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
 | [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | INPROGRESS | rev-3 | 2026-08-11 |
 | [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | INPROGRESS | rev-3 | 2026-08-11 |
-| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | SPECCED | rev-2 | 2026-08-11 |
+| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | BLOCKED | rev-3 | 2026-08-11 |
 | [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | SPECCED | rev-2 | 2026-08-11 |
 | [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | INPROGRESS | rev-3 | 2026-08-11 |
 <!-- /gen:build-index -->

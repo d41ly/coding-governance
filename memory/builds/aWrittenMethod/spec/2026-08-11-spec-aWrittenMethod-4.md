@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-4 — a gate for the sixth carrier
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** BLOCKED · rev-3 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -152,6 +152,33 @@ rather than silently contradicting it.
 
 ## 8. Open questions
 
+### F4 — where the registry lives. **PARKED, owner turn.**
+
+S2 is unbuildable as written: it says the registry SHIPS EMPTY *and* that "this repo's rows live in
+this repo's copy". For a repo that dogfoods its own kit those are the same file, so both cannot hold.
+Two homes exist and each costs something only the owner should spend.
+
+**(a) `<MEMORY_ROOT>/project/method-carriers.txt`** — the declared home for gate waiver registries,
+and the five that live there are exactly this shape. But hygiene check 3 carries a HARD ALLOWLIST of
+those five filenames in the memory-tree ENGINE, with the comment "a directory defined as five named
+files cannot also admit any `.md` anyone drops in". A sixth registry therefore needs the engine's
+allowlist widened, `HYGIENE.md` updated in both the shipped and the rendered copy, and a kit version
+bump — a change to a governance carrier.
+
+**(b) `<KIT_DIR>/method-carriers.txt`** — no engine change, but the registry is then a SHIPPED file.
+gov's rows travel to every adopter, whose tree does not contain those paths, and S2's own stale-row
+refusal reds them on install. That is the asymmetry F3's reasoning already forbids.
+
+*Why this is not mine:* M3 vetoes an option that "needs a new external dependency, install location,
+public surface, or a change to a governance carrier" and says those are owner turns. (a) changes a
+governance carrier; (b) changes what the kit ships. The fork is about WHAT GETS BUILT, not about how,
+and M3 says a fork of that kind is parked rather than ratified. There is no third option that is
+merely a better implementation of the same thing.
+
+*What would unblock it:* the owner picking (a) or (b), or ruling that the leg is gov-only and lives
+outside the kit — which resolves the shipping problem by removing the shipping, at the cost of
+adopters never receiving the guard, which is what F3 was decided against.
+
 ### F1 — the `## M<n>` heuristic, or nothing
 
 S3's structural test catches a copied section and misses a fluent paraphrase that invents its own
@@ -179,6 +206,10 @@ review already punished.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-11 · BLOCKED, not built. Building S1 exposed that S2 cannot be satisfied: the
+  registry cannot both ship empty and carry this repo's rows when the repo dogfoods the kit, and both
+  candidate homes cost something M3 reserves for the owner. Recorded as F4 and parked. Nothing was
+  written — no leg, no registry, no gate-legs.json row — so the tree carries no half-built check.
 - rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. BLOCKER: AC4's positive control was false —
   the population measures seven, not four, and the unit's own three files self-hit for ten, so the leg
   would have redded on landing. Added `check-install-prefix.sh`'s exclusion shape, made the count
