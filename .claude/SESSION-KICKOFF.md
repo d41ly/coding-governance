@@ -2,9 +2,9 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T12:34:52+03:00 @ 7f614a1721ff5e93cec1503788f189c7f0c86969
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
-verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
+last-audit: 2026-08-11T12:51:49+03:00 @ 7f614a1721ff5e93cec1503788f189c7f0c86969
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -28,6 +28,10 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 >   `memory/builds/<slug>/`) and the code.
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
+
+- A build of more than one pass runs on `memory/guides/BUILD-METHOD.md` — the spec set, the fork
+  rule, the pass loop, regrounding, the closing review and the wrap-up derivation. It is rendered by
+  the memory-tree kit and is in `watch:`, so editing it forces this manifest to be re-audited.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
