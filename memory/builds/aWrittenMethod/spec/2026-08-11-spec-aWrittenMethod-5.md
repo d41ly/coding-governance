@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-5 — the method in the manifest's watch set
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams kickoff · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams kickoff · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -72,6 +72,11 @@ parity coupling, and no other fork surfaced.
 
 ## 8. Revision log
 
+- rev-3 · 2026-08-11 · BUILT on branch, unmerged (4c0fd31). AC2 armed by hand: with last-audit rolled
+  back to HEAD's value and a one-byte edit to the method staged, manifest-check.sh --staged reds
+  naming memory/guides/BUILD-METHOD.md and exits 1. Tree restored by re-rendering the guide. This
+  status header was left at SPECCED for one commit after the work landed, which is the exact drift
+  M7 tells a resuming agent to check the header for.
 - rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. AC2 named an invocation that cannot produce
   its own observation — the staged leg needs `--staged`. §1's justifying premise was false: no binding
   guide is watched today, so this sets a precedent. §4's stated mechanism for the re-stamp was also
