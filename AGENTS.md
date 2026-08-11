@@ -151,8 +151,8 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
   in a companion, not the template.
 - Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed standing
-  mandate naming the build and both actions**, whose shape the merge bar validates. The mandate is
+- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build folder the
+  run did not create**, whose shape the merge bar validates. The mandate is
   ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE,
   which is observed from the remote rather than read from any local ref. A run with full shell access
   can still defeat that; the protocol's §9 says exactly how, and the control that actually binds lives

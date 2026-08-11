@@ -166,14 +166,14 @@ manifest-audit delta line (when Step 2b ran a repair). Then hand
 control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building
 until the user confirms.
 
-## Step 5b — the unattended hand-back (only with a committed standing mandate)
+## Step 5b — the unattended hand-back (only with a committed build the run did not create)
 
 **Default is the stop above.** This step is the narrow exception, and it fires only when the project
-adopts an unattended-run kit AND a **committed standing mandate** for this build is reachable from
-the pinned BASE — never on the strength of a chat instruction, and never on a mandate this session
-could have written. No mandate → Step 5 halts exactly as written, prompt string and all.
+adopts an unattended-run kit AND the **build folder itself** is reachable from the pinned BASE —
+never on the strength of a chat instruction, and never on a build this session could have created.
+No such build → Step 5 halts exactly as written, prompt string and all.
 
-With one: echo the READY card, add one line naming the mandate and where it is committed, and
+With one: echo the READY card, add one line naming the build and where it is committed, and
 **continue without halting**. The card is still emitted — an unattended run needs its scope on the
 record more than an attended one does, because nobody is going to ask.
 

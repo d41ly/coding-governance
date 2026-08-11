@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T12:49:33+03:00 @ a21a150cd5799d2b1e9661716a1b41c0a85b0dc5
+last-audit: 2026-08-11T13:05:00+03:00 @ a21a150cd5799d2b1e9661716a1b41c0a85b0dc5
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -34,7 +34,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
-  ask, or a committed standing mandate naming the build and both actions (`memory/guides/UNATTENDED-PROTOCOL.md`).
+  ask, or a build folder committed before the run's branch existed (`memory/guides/UNATTENDED-PROTOCOL.md`).
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
