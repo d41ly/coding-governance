@@ -1128,6 +1128,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "ratchet_findings",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1876,6 +1881,11 @@
       "id": "test_path_derived_keys_are_posix",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_ratchet_guard",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_signals_can_move",
