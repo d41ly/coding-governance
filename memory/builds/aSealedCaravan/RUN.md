@@ -13,8 +13,8 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 275f3e451ee3b77ad9254c9bed919b1e17a4415f
-phase: REVIEWING
+witness: 754a6e6514d86cca686e888206b135eb8b31d6ab
+phase: BUILDING
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 081c3669df7ce43f8e448dc88e9be94b6d44c557
@@ -59,10 +59,16 @@ diverged remote", "on a push-scope failure") only make sense under the wider rea
 The options were: scope the landing flow as a new S-item, or state in section 3 that `apply` writes and
 stages only and the operator lands. I took the narrow one and folded it at rev-6, because it is the
 reading every measurement supports — no adopter under `tools/*/` runs `git commit`, `git push`,
-`git checkout -b` or `git switch -c`, three of the six stage, and `WIRE-INTO-PROJECT.md` has an agent
-working directly in the target on its default branch rather than on a branch it opened. It is also the
-conservative reading, and a deployer that pushes to somebody else's remote unattended is a write surface
-this unit never priced.
+`git checkout -b` or `git switch -c`, and `WIRE-INTO-PROJECT.md` has an agent working directly in the
+target on its default branch rather than on a branch it opened. It is also the conservative reading,
+and a deployer that pushes to somebody else's remote unattended is a write surface this unit never
+priced.
+
+*(Corrected. This entry originally said "three of the six stage". That was wrong — exactly ONE adopter
+executes `git add`, and the other two matches sit inside an `echo` and a heredoc and never run. The
+re-audit caught it, it was reproduced before being accepted, and it was already false at the commit it
+was measured at. The DECISION above does not rest on that number and is unaffected; the number is
+corrected here because a parked entry is a record, not a note.)*
 
 What I refused to decide is the WIDER option, because it differs in what gets built rather than in how a
 stated thing works, and that is scope rather than a fork. If the owner wants `govkit apply` to open a
