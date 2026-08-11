@@ -48,26 +48,43 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 
 | Unit | State |
 |---|---|
-| `TOOL-aWrittenMethod-2` | **BUILT** `5d1faf9` — the mandate BASE the run cannot steer |
-| `TOOL-aWrittenMethod-6` | **BUILT** `3ff7b4e` + `1a531cb` — all six renderers stop interpreting their inputs |
-| `TOOL-aWrittenMethod-3` | **BUILT** `b6e02f2` — the guide displaced 247 to 236 lines |
-| `TOOL-aWrittenMethod-5` | **BUILT** `4c0fd31` — the method under the manifest ratchet |
+| `TOOL-aWrittenMethod-2` | **BUILT + REVIEWED** — the mandate BASE the run cannot steer by environment |
+| `TOOL-aWrittenMethod-6` | **BUILT + REVIEWED** — all six renderers stop interpreting their inputs |
+| `TOOL-aWrittenMethod-3` | **BUILT** — the guide displaced 247 to 236 lines |
+| `TOOL-aWrittenMethod-5` | **BUILT** — the method under the manifest ratchet |
 | `TOOL-aWrittenMethod-4` | **BLOCKED** — F4 is an owner turn, see its §8 |
 
-Four of five built and unmerged. Unit 4 is BLOCKED, not merely unfinished, and nothing was written
-for it: no leg, no registry, no `gate-legs.json` row, so the tree carries no half-built check.
+Four of five built, closing review folded, bar GREEN 46/46. **Unmerged and unpushed.**
 
-**Why unit 4 stopped.** Its S2 says the registry ships EMPTY and that this repo's rows live in this
-repo's copy. In a repo that dogfoods its own kit those are one file, so both cannot hold. Home (a),
-`memory/project/`, needs hygiene check 3's five-name allowlist widened in the memory-tree ENGINE plus
-`HYGIENE.md` in both copies and a kit version bump — a change to a governance carrier. Home (b), the
-kit directory, ships gov's rows to every adopter and reds them on install through S2's own stale-row
-refusal. M3 vetoes both shapes as owner turns and says a fork about WHAT GETS BUILT is parked, not
-ratified. The audit had flagged the registry-shipping half of this as a high; the contradiction with
-the dogfood copy only surfaced when S1 was about to be written.
+**Closing review** `reviews/2026-08-11-review-aWrittenMethod-2.md` — 18 raw, 15 confirmed, precision
+0.83, two blockers and three highs over the cumulative diff. Its own closing note is the one worth
+keeping: the kit gates its own bookkeeping and never the authorization the bookkeeping is about, and
+eight of nine defects fall out of one missing adversarial arm.
 
-**Next action:** the owner picks a home for the registry, or rules the leg gov-only. Then unit 4,
-then the M8 closing review over `7f614a1..HEAD`, the full bar, and landing. Keepalive NOT reaped.
+**The honest limit on unit 2.** B1 was reproduced with a control: `refs/remotes/origin/<default>` is
+an ordinary local ref, so `git update-ref` steers the BASE with no push and no network, and both the
+BASE check and the mandate comparison then read a commit the run chose. Unit 2 removes the
+ENVIRONMENT steer and nothing more. The protocol shipped claiming the BASE is "anchored outside the
+run"; both copies now say NARROWED and name what closing it needs. Closing it is unit 2's F2 — an
+anchor no local command can write, via `git ls-remote` or an owner-signed tag — and it is unbuilt.
+
+**Two defects this build introduced and then caught in itself**, worth recording because both are
+classes the repo already has names for:
+
+- an unreachable `fail` branch was deleted in unit 2, and unit 6 reintroduced the same class:
+  `out=$(cat X; printf X) || return 1` can never fire, because a substitution reports the LAST
+  command's status and `printf` always succeeds. Dead in all five renderers until the review found it.
+- narrowing check 9 to skip terminal records was first written with `continue`, which silently took
+  the mandate assertion with it. The leg's own self-test caught that within one run.
+
+**PARKED — unit 4, awaiting an owner decision.** Its registry cannot both ship empty and carry this
+repo's rows when the repo dogfoods the kit. `memory/project/` needs hygiene check 3's five-name
+allowlist widened in the memory-tree ENGINE; the kit directory ships gov's rows to every adopter and
+reds them on install. M3 reserves both shapes for the owner. Nothing was written for unit 4 — no leg,
+no registry, no `gate-legs.json` row — so the tree carries no half-built check.
+
+**Next action: the owner picks a registry home, or rules the leg gov-only.** Then unit 4, then
+landing. The four built units are self-contained and their write sets are disjoint from unit 4's.
 
 ## The two passes, and why there are two
 
