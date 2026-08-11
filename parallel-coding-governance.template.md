@@ -1,12 +1,13 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.6** · 2026-08-10. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.7** · 2026-08-11. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.6 (2026-08-10):** §1 and §8 accept a committed
+`…-v-N-N.md` snapshots + git. **v2.7 (2026-08-11):** companion §1's unattended block collapses to a
+pointer at the protocol the kit installs, and §8's second spelling of the §1 landing rule becomes a
+pointer — re-pull §8 and the companion together. **v2.6 (2026-08-10):** §1 and §8 accept a committed
 standing mandate in place of the explicit ask; the kickoff-manifest merge exception moved into the
-new companion §1, which also carries the unattended-run checklist — re-pull §1, §8 and the
-companion in lockstep.*
+new companion §1.*
 
 <!-- governance-template: v2.7 -->
 

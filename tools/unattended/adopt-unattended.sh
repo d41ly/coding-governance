@@ -64,14 +64,23 @@ TEMPLATE="$KIT_DIR/SKILL.template.md"
 
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — render it after adopting the project layer"; exit 1; }
-MEMORY_ROOT=memory; LANDER=""; KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; KEEPALIVE_INTERVAL=""
+# An interpolated key left UNSET keeps its own placeholder, so an undeclared value reds on the
+# placeholder arm instead of rendering a clean sentence with a hole in it. Absence-of-placeholder is
+# not presence-of-value, and "" made every such key invisible to the only check looking for it.
+MEMORY_ROOT=memory; LANDER="{{LANDER}}"; KEEPALIVE_CREATE="{{KEEPALIVE_CREATE}}"
+KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVAL}}"
 # shellcheck disable=SC1090
 . "$CONF"
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
 
+# NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
+# the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
+# empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
+# truncation into a loud one. Escaping the values themselves is TOOL-aWrittenMethod-6.
 render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+  set -o pipefail 2>/dev/null || true
   sed -e "s|{{KIT_DIR}}|$KIT_REL|g" \
       -e "s|{{MEMORY_ROOT}}|$MEMORY_ROOT|g" \
       -e "s|{{LANDER}}|$LANDER|g" \
@@ -87,7 +96,8 @@ if [ "$MODE" = "--check" ]; then
   [ -f "$SKILL_OUT" ] || { echo "unattended: $SKILL_OUT is not rendered — run $0"; exit 1; }
   TMP=$(mktemp) || exit 2
   trap 'rm -f "$TMP"' EXIT
-  render > "$TMP"
+  render > "$TMP" || { echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; refusing to compare"; exit 1; }
+  [ -s "$TMP" ] || { echo "unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
   if ! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1; then
     echo "unattended: $SKILL_OUT is out of sync with SKILL.template.md + .unattended.conf"
     echo "  re-render with: $0"
@@ -106,7 +116,12 @@ if [ "$MODE" = "--check" ]; then
 fi
 
 mkdir -p "$SKILL_DIR"
-render > "$SKILL_OUT"
+TMPW=$(mktemp) || exit 2
+render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — a conf value probably carries the sed delimiter; the Skill is unchanged"; exit 1; }
+# Write through a temp file and refuse an EMPTY one. Redirecting straight into the target truncated it
+# to zero bytes the instant sed failed, and then reported success.
+[ -s "$TMPW" ] || { rm -f "$TMPW"; echo "unattended: the render produced an EMPTY file — refusing to install it over the Skill"; exit 1; }
+mv "$TMPW" "$SKILL_OUT"
 echo "unattended: rendered $SKILL_OUT"
 cat <<EOF
 unattended: next
