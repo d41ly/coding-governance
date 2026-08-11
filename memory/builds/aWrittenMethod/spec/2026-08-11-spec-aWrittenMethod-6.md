@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-6 — escaping conf values before substitution
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -160,6 +160,12 @@ same exposure, and a test whose fixture is blander than reality is this repo's
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-11 · BUILT on branch, unmerged. All six substitution sites converted. Every
+  rendered artifact byte-identical (AC4/AC7), adopter e2e 26 assertions up from 19. Two defects
+  found while building: the FIXTURE was first written with sed using the pipe delimiter and
+  reproduced the defect it tests for, and the S4 conversion silently DROPPED {{QUERY_CLI}} because
+  its replacement is a literal expression rather than a bare variable — caught by the adopter own
+  placeholder arm, which is the arm this class of change exists to be caught by.
 - rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. BLOCKER: S1's load-bearing claim was FALSE.
   Bash 5.1 gave the pattern-substitution replacement a sed-like `&`, so the unquoted spelling rev-1
   prescribed reproduces exactly the corruption of the first failed attempt. Reproduced on bash 5.3.9
