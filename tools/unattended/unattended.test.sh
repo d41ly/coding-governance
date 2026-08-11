@@ -218,6 +218,55 @@ reset_tree
 out=$(run --preflight tWrongSlug --keepalive-id k1)
 hit "$out" "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared"
 
+# ---- S8, the roster region. OPT-IN by presence: a build without the markers authorizes on existence
+# ---- alone, which is what keeps every build that predates this working.
+roster() { # slug · body   (pure shell: a python launcher here is unresolved, and mkconf leaves the
+           #                   tree dirty, which is what silently blocked the checkout below)
+  printf '
+%s
+%s
+%s
+' '<!-- roster:units -->' "$2" '<!-- /roster:units -->' >> "memory/builds/$1/README.md"
+}
+
+# green control FIRST: a roster present at BASE and untouched must authorize.
+reset_tree; git checkout -qf main; roster tRun "1. the first unit"
+git add -A >/dev/null && git commit -q -m roster --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+# reset_tree rewinds to UNIT0, which PREDATES this merge - so the arms below would run against a tree
+# with no roster at all and pass by finding nothing. Pin a post-merge pristine and reset to THAT.
+RPRISTINE=$(git rev-parse HEAD)
+rreset() { git reset -q --hard "$RPRISTINE"; git clean -qfd; mkconf; }
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "rewrote the scope"
+
+# ...the run EDITS its own scope. Same tree, one line changed.
+rreset
+sed -i 's|^1\. the first unit$|1. a unit the owner never wrote|' memory/builds/tRun/README.md
+hit "$(run --preflight tRun --keepalive-id k1)" "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized"
+
+# ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
+# that proves the presence test is a grep and not that exit status.
+rreset
+roster tRun "1. a second roster nobody granted"
+hit "$(run --preflight tRun --keepalive-id k1)" "the working copy's build README does not carry exactly one well-formed roster pair while the pinned BASE does, so the scope this run is executing against cannot be compared"
+git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# ...and the BASE side MALFORMED: two pairs committed to the anchor. Without this arm the
+# grep-for-presence test and the well-formedness check cannot be told apart.
+git checkout -qf main; roster tRun "1. one"; roster tRun "2. two"
+git add -A >/dev/null && git commit -q -m tworoster --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+hit "$(run --preflight tRun --keepalive-id k1)" "the build README at the pinned BASE carries a roster marker but not exactly one well-formed pair, so there is no single scope to compare against"
+git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# ...and ABSENT at BASE is still authorized - the opt-in half, without which every existing build breaks.
+reset_tree
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "roster"
+
 # ---- check 8: the keepalive id is the AGENT's half of the split. No script can produce it, so its
 # ---- absence is a refusal rather than a default.
 reset_tree

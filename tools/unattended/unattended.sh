@@ -84,6 +84,12 @@ checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "$
 # Kit-owned, NOT a project declaration: an adopter chooses paths and commands, not the file's shape.
 SRC_OPEN='<!-- gen:build-index -->'; SRC_CLOSE='<!-- /gen:build-index -->'
 GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
+# S8 - the marker pair delimiting the build method's roster. It does NOT introduce a second roster:
+# M2 already makes the README's authored Units table the roster, and this only makes that same table
+# machine-locatable. Locating it structurally instead - the slice between one heading and the next -
+# was the cheaper option and was refused: a renamed heading silently empties the comparison, which is
+# a check that passes by finding nothing.
+ROSTER_OPEN='<!-- roster:units -->'; ROSTER_CLOSE='<!-- /roster:units -->'
 
 # Exactly one open, exactly one close, CLOSE AFTER OPEN, print the slice between them. Never a
 # whole-file regex — the splice contract this borrows from gen_build_index.py's apply_region().
@@ -96,10 +102,11 @@ GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
 # owner-authored mandate block. Recording the two line numbers and comparing them is the whole fix.
 region() { # file · open · close   (reads stdin when file is `-`)
   awk -v o="$2" -v c="$3" '
-    index($0, o) == 1 { no++; if (no == 1) oat = NR; if (nc == 0) inside = 1; next }
-    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; inside = 0; next }
+    { ln = $0; sub(/\r$/, "", ln) }
+    index(ln, o) == 1 { if (ln != o) bad = 1; no++; if (no == 1) oat = NR; if (nc == 0) inside = 1; next }
+    index(ln, c) == 1 { if (ln != c) bad = 1; nc++; if (nc == 1) cat = NR; inside = 0; next }
     inside { print }
-    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
+    END { if (bad || no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
@@ -107,13 +114,14 @@ region() { # file · open · close   (reads stdin when file is `-`)
 # the same order check — this is the copy whose absence destroyed data rather than merely lying.
 splice() { # file · open · close · payload-file
   awk -v o="$2" -v c="$3" -v pf="$4" '
-    index($0, o) == 1 { no++; if (no == 1) oat = NR; print
+    { ln = $0; sub(/\r$/, "", ln) }
+    index(ln, o) == 1 { if (ln != o) bad = 1; no++; if (no == 1) oat = NR; print
                         while ((getline pl < pf) > 0) { sub(/\r$/, "", pl); print pl }
                         close(pf); skip = 1; next }
-    index($0, c) == 1 { nc++; if (nc == 1) cat = NR; skip = 0; print; next }
+    index(ln, c) == 1 { if (ln != c) bad = 1; nc++; if (nc == 1) cat = NR; skip = 0; print; next }
     skip { next }
     { print }
-    END { if (no != 1 || nc != 1 || cat < oat) exit 3 }
+    END { if (bad || no != 1 || nc != 1 || cat < oat) exit 3 }
   ' "$1"
 }
 
@@ -399,6 +407,27 @@ check_authorization() { # slug · base
   if [ "$fmslug" != "$slug" ]; then
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
+  fi
+  # S8 - the roster region, when the BASE carries one. OPT-IN by presence, which is F1's ratified
+  # shape: a build without the markers is authorized on existence alone, exactly as before.
+  #
+  # PRESENCE is decided by grepping for the open marker, NOT by `region`'s exit status. `region` exits
+  # 3 for "absent" AND for "malformed or duplicated", and treating that one status as "absent" is how
+  # a second block once went uncompared - the discarded-signal defect this kit has already paid for.
+  if printf '%s\n' "$blob" | grep -qF -- "$ROSTER_OPEN"; then
+    local ra rb
+    if ! ra=$(printf '%s\n' "$blob" | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
+      fail 20 "the build README at the pinned BASE carries a roster marker but not exactly one well-formed pair, so there is no single scope to compare against: $base:$rel"
+      return 1
+    fi
+    if ! rb=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
+      fail 20 "the working copy's build README does not carry exactly one well-formed roster pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
+      return 1
+    fi
+    if [ "$ra" != "$rb" ]; then
+      fail 20 "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized: $rel"
+      return 1
+    fi
   fi
   return 0
 }

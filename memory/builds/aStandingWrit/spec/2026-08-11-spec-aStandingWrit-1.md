@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** INPROGRESS · rev-5 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
+**Status:** CLOSED · rev-6 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -81,6 +81,18 @@ shrink-only and deleting it would lower the floor. A `--phase` verb writes a pha
 and `--preflight` stops unconditionally rewriting one, which today clobbers a resumed run's position.
 
 **S7 — the amendment set**, enumerated by file and by sentence in §4.
+
+**S8 — the roster marker pair, and the integrity check it makes possible.** P1 resolved as option
+(b): the build README's Units table — which `memory/guides/BUILD-METHOD.md` M2 already makes the
+roster — gets a marker pair, and `check_authorization` compares that region across the pinned BASE.
+It introduces no second roster; it makes M2's roster machine-locatable. Locating it structurally
+instead was the cheaper option and was refused, because a renamed heading silently empties the
+comparison and this repo has a named bug class for a check that passes by finding nothing.
+
+It is OPT-IN by presence, which is F1's ratified shape and what keeps the 26 builds that predate it
+authorized. Presence is decided by grepping for the open marker and NOT by the extractor's exit
+status, which conflates absent with duplicated — the discarded-signal defect this kit has paid for
+once already.
 
 ## 3. Non-goals (OUT)
 
@@ -390,7 +402,8 @@ No new gate leg is added. `--plan` is exercised by the driver self-test, which i
 
 ## 8. Open questions
 
-All eight are RESOLVED. The owner ratified every recommendation on 2026-08-11.
+none — every fork below is RESOLVED, the owner ratified each on 2026-08-11, and P1 in the build
+README resolved with them.
 
 **F1 — is assertion 4 a hard precondition or an opt-in?** Rev-1 recommended opt-in with the template
 shipping the region. The review showed those two halves contradict: an empty region is a refusal, so a
@@ -462,6 +475,12 @@ author's first instinct, because the first instinct is what shipped the bypass.
   check inside the run's own process, and two further levers were found that defeat the mandate
   comparison at a perfectly honest anchor. The protocol gains a §9 stating the boundary, and the
   charter's claim is amended to match. Status INPROGRESS: S0 landed, S1 through S7 not started.
+- rev-6 · 2026-08-11 · S8 arrives from P1's resolution: the roster marker pair and the integrity
+  check bound to it. F5 is REWRITTEN rather than re-answered again — it was ratified as "refuse
+  self-propagating authorization" and no option on the table ever did that; what its mechanism
+  restored was the integrity property, and saying so is the only honest version. §8's first line is
+  made machine-legal, because hygiene check 12 reads that line and nothing else and would have redded
+  this spec the moment its status went terminal.
 - rev-5 · 2026-08-11 · reconciled against `memory/guides/BUILD-METHOD.md`, which landed on main while
   S0 was building and is the instruction layer F7 recorded as unlocatable. S5 is WITHDRAWN: M2
   answers the roster question with no new artifact and resolves the `ids:` ambiguity that was S5's

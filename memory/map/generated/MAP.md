@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 3 · gotcha-classes: 12 · guides: 3 · backlog-shards: 4
+Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 3 · gotcha-classes: 13 · guides: 3 · backlog-shards: 4
 
 ## gate-legs
 
@@ -118,6 +118,7 @@ Inventories: gate-legs: 49 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 ·
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `pin-copied-from-another-corpus.md` | baseline |
+| `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `two-answers-to-one-question.md` | baseline |

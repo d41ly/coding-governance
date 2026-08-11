@@ -129,7 +129,25 @@ printf '# old era\nfreeform, no header\n## Anything\n' > "$D/spec/2026-07-10-spe
 good > "$D/spec/2026-08-01-spec-tFixture-13.md"                                  # deleted after commit -> red
 good | sed 's/^A goal\.$/Ship on YYYY-MM-DD./; /^The design\.$/d' \
   > "$D/spec/2026-08-01-spec-tFixture-14.md"                                     # TWO findings in ONE file -> red
-good | sed 's/SPECCED/CLOSED/' > "$D/spec/2026-08-01-spec-tFixture-15.md"        # terminal + RESOLVED §8 -> silent
+good | sed 's/SPECCED/CLOSED/' > "$D/spec/2026-08-01-spec-tFixture-15.md"        # terminal + §8 `none` -> silent
+# ---- §8's SECOND documented exit. TEMPLATE-SPEC promises a terminal spec may EITHER read `none`
+# ---- OR have every question RESOLVED in place; only `none` was implemented, so a fully-resolved
+# ---- spec could not go CLOSED. Fixture 15 above tests `none` (its comment used to claim RESOLVED
+# ---- and did not test it), so these two arm the other exit and its boundary: ALL bullets resolved
+# ---- is silent, ONE unresolved among resolved ones still reds.
+good | sed 's/SPECCED/CLOSED/' \
+  | sed 's/^none$/- **RESOLVED (owner, 2026-08-01): the only fork.** picked A/' \
+  > "$D/spec/2026-08-01-spec-tFixture-43.md"                                     # terminal + all RESOLVED -> silent
+# Derived from `good`, NOT hand-built like fixture 16: check 12 reports one finding per file, so a
+# minimal spec fails the section canon first and never reaches the §8 branch at all — which is why
+# fixture 16 carries a `miss` for this very message. A fixture that cannot reach the branch it names
+# is the arm-passes-by-finding-nothing class. The second bullet is appended with `sed a\` because a
+# newline in a sed REPLACEMENT does not expand portably, and a collapsed pair is one line containing
+# RESOLVED — silent, and testing nothing.
+good | sed 's/SPECCED/CLOSED/' \
+  | sed 's/^none$/- **RESOLVED (owner, 2026-08-01): fork one.** picked A/' \
+  | sed '/^- \*\*RESOLVED/a\- fork two, still open' \
+  > "$D/spec/2026-08-01-spec-tFixture-44.md"                                     # one unresolved among resolved -> red
 # TRAILING BLANK LINES with §8 as the last section (TOOL-aBatchedLintel-1). Check 12 reproduces
 # `sed "1d;\$d"`, whose deletes act on the CONCATENATED range output — so the range's last line, and
 # therefore which line `\$d` removes, depends on whether the body still carries its trailing blanks.
@@ -305,6 +323,8 @@ miss 'tFixture-12.md ('
 hit  'tFixture-13.md (tracked but missing from worktree'
 hit  'tFixture-14.md (unfilled skeleton placeholder'
 miss 'tFixture-15.md ('
+miss 'tFixture-43.md ('                       # every §8 item RESOLVED satisfies a terminal status
+hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'
 hit  'tFixture-16.md (## sections differ'
 miss 'tFixture-16.md (terminal Status'
 # Emission ORDER inside one file: a per-file loop got it for free, one awk over a driver does not.
