@@ -88,5 +88,5 @@ spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | SPECCED | rev-1 | 2026-08-11 |
+| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | SPECCED | rev-2 | 2026-08-11 |
 <!-- /gen:build-index -->
