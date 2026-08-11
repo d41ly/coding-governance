@@ -100,7 +100,14 @@ git add -A && git commit -q -m base --no-verify
 # `origin.git` sitting inside the repo — the anchor vanishes and every later arm fails for a reason
 # that has nothing to do with what it tests.
 ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
-git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+# The bare repo must ADVERTISE a HEAD symref: the anchor is now read from the remote's own
+# advertisement, and `git init --bare` leaves HEAD pointing at whatever init.defaultBranch says,
+# which then dangles. MEASURED: `ls-remote --symref --exit-code HEAD` exits 2 against that, which
+# is check 28 - so without this line every arm below dies on a refusal about the FIXTURE.
+git init -q --bare "$ORIGIN"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+git remote add origin "$ORIGIN"
+git push -q origin main
 git checkout -q -b unit
 # ...and the unit branch must be AHEAD of the anchor. merge-base == HEAD is now its own refusal:
 # nothing was built on top of the anchor, so the mandate comparison would be trivially true.
@@ -137,13 +144,16 @@ hit "$out" "the working tree is dirty, so the pinned BASE would name a state tha
 same "check 2 wrote nothing" "$(sum)" "$before"
 rm -f untracked.txt
 
-# ---- check 3, both branches. Unresolvable default branch (no override, no origin) and the run
-# ---- sitting ON the default branch. The first run also arms check 16, because a default branch
-# ---- that cannot be named is also a merge-base that cannot be resolved — one state, two honest
-# ---- refusals, and each is asserted by its own text.
+# ---- check 3's second branch USED to be reached by unsetting GOV_DEFAULT_BRANCH in a repo with no
+# ---- origin/HEAD. The anchor is now OBSERVED from the remote, so that state resolves perfectly well
+# ---- and the branch is reachable only when the observation ALSO fails - which is check 27's job and
+# ---- has its own arm below. Unsetting the variable is now the NORMAL path, and asserting THAT is
+# ---- worth more than asserting a message the state no longer produces: the environment has stopped
+# ---- being an input to the anchor, which is exactly what route 2 of the reproduced bypass used.
 reset_tree
 out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
-hit "$out" "cannot resolve the default branch (set GOV_DEFAULT_BRANCH) — refusing rather than assuming one"
+hit "$out" "preflight OK"
+miss "$out" "cannot resolve the default branch"
 
 reset_tree; git checkout -q main
 out=$(run --preflight tRun --keepalive-id k1)
@@ -211,12 +221,96 @@ out=$(run --preflight tBare --keepalive-id k1)
 hit "$out" "no run-state file to assert against — preflight asserts a mandate, it does not create one"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ---- check 16: the default branch NAMES something that does not exist, so the merge-base cannot be
-# ---- resolved. The refusal is the point: falling back to HEAD would make the mandate comparison
-# ---- pass by construction, because HEAD holds whatever the run just wrote.
+# ---- check 29: THE SECOND REPORTED BYPASS ROUTE, closed. A bogus GOV_DEFAULT_BRANCH used to SELECT
+# ---- which ref the anchor was measured against, and the gate leg read the same variable, so it
+# ---- computed the same wrong value and agreed with it. It is now a cross-check that can only refuse.
 reset_tree
 out=$(GOV_DEFAULT_BRANCH=nosuchbranch bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
-hit "$out" "cannot resolve a merge-base against a remote-tracking default branch — refusing rather than trusting a local ref the run can move with 'git branch -f', or HEAD, either of which makes the mandate check pass by construction"
+hit "$out" "GOV_DEFAULT_BRANCH names a branch the remote does not advertise as its default, and a branch the run can create with one push is not an anchor: env"
+
+# ---- check 29, the direction that matters. A branch that genuinely EXISTS on the remote, pushed by
+# ---- the run itself, is refused just the same. Without this arm check 29 reads as "the name must
+# ---- resolve" - which is the weaker property a run defeats with one `git push`.
+reset_tree
+git push -q origin unit:refs/heads/decoy 2>/dev/null
+out=$(GOV_DEFAULT_BRANCH=decoy bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "GOV_DEFAULT_BRANCH names a branch the remote does not advertise as its default"
+git push -q origin :refs/heads/decoy 2>/dev/null
+
+# ---- check 16: no shared history with the advertised tip. Reachable now only from an orphan branch,
+# ---- because the anchor is no longer a NAME that can simply fail to resolve.
+reset_tree
+git checkout -q --orphan orphanb
+git rm -rqf . >/dev/null 2>&1 || true
+mkconf; readme tRun; runmd tRun "$MANDATE"
+git add -A >/dev/null && git commit -q -m orphan --no-verify
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "no merge-base against the tip the remote advertises, so this run shares no history with the branch it means to land on; the anchor is never a local ref and never a name from the environment"
+git checkout -qf unit; git branch -qD orphanb 2>/dev/null
+
+# ---- check 27: the remote does not answer. The anchor is an OBSERVATION, so an unreachable remote
+# ---- is a refusal and not a fallback - and the fallback is exactly what used to be forgeable.
+reset_tree
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "the remote did not answer, and the anchor is an observation of it rather than of any local ref; a run that cannot reach the remote cannot land on it either"
+git remote set-url origin "$ORIGIN"
+
+# ---- check 3 branch 2: the default branch cannot be named AT ALL. Reachable only when the
+# ---- observation fails too, which is why it sits here rather than where it used to: with an anchor
+# ---- observed, `default_branch` answers from the advertisement and this branch is unreachable.
+reset_tree
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "cannot resolve the default branch (set GOV_DEFAULT_BRANCH) — refusing rather than assuming one"
+git remote set-url origin "$ORIGIN"
+
+# ---- check 28: the remote answers but advertises no HEAD of its own. `--exit-code` is what makes
+# ---- this distinguishable from a successful answer: without it `ls-remote` exits 0 printing nothing,
+# ---- and the kit would read an empty advertisement as agreement.
+reset_tree
+git init -q --bare "$ORIGIN_DIR/headless.git"
+git remote set-url origin "$ORIGIN_DIR/headless.git"
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "the remote answered but advertised no HEAD symref, so it named no default branch of its own and this kit will not choose one for it"
+git remote set-url origin "$ORIGIN"
+
+# ---- check 30: the remote advertises a tip this clone does not have. Built INSIDE the bare repo, so
+# ---- the object genuinely does not exist here - pushing one from this clone would leave it present.
+reset_tree
+ahead=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" rev-parse main^{tree})" -p "$(git --git-dir="$ORIGIN" rev-parse main)" -m ahead)
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$ahead"
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "the remote advertises a tip this clone does not have, so no merge-base can be computed against it; fetch and re-run"
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$BASE"
+
+# ---- check 24: more than one remote, so the kit would be CHOOSING which endpoint to believe.
+reset_tree
+git remote add second "$ORIGIN"
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "this clone declares a number of remotes other than one, and the anchor has to be the endpoint the landing push goes to, so the kit refuses to pick one"
+git remote remove second
+
+# ---- check 25: observe and push name different endpoints. Labelled a cost-raiser at the call site
+# ---- rather than part of the property, because a relay satisfies it with a single URL.
+reset_tree
+git config remote.origin.pushurl "$ORIGIN_DIR/elsewhere.git"
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch"
+git config --unset remote.origin.pushurl
+
+# ---- check 22: git config supplied through the ENVIRONMENT.
+reset_tree
+out=$(GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.bare GIT_CONFIG_VALUE_0=false bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "git configuration is being supplied through the environment, and a check that reads a config its own caller injected is reading the run's answer rather than the repo's"
+
+# ---- check 23: an object-substitution lever left on disk. Refused BEFORE the mandate comparison,
+# ---- which is why the pin's end-to-end arm below asserts this message rather than check 7's.
+reset_tree
+git replace -f "$BASE" "$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m lever)" >/dev/null 2>&1
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "this clone carries an object-substitution lever, which rewrites what a sha MEANS for every read below it, so the anchor can be honest and the bytes at it forged"
+git replace -d "$BASE" >/dev/null 2>&1
 
 # ...and the OTHER half of the same rule: a resolvable anchor that sits AT HEAD. This is the state
 # `git branch -f main HEAD` used to produce, and it defeated the whole kit — the mandate at BASE was
@@ -384,8 +478,12 @@ git replace -f "$BASE" "$FORGED" >/dev/null 2>&1
 same "replace-control: an unpinned read at BASE returns the run's bytes"      "$(git show "$BASE:memory/builds/tEmpty/RUN.md" 2>/dev/null | grep -c "authorizes build")" "1"
 # control — and the pinned read at the SAME sha does not.
 same "replace-control: the pinned read at BASE returns the honest bytes"      "$(git -c core.useReplaceRefs=false show "$BASE:memory/builds/tEmpty/RUN.md" 2>/dev/null | grep -c "authorizes build")" "0"
-# the arm — the driver compares against the honest block, so the forged match never happens.
-hit "$(run --preflight tEmpty --keepalive-id k1)" "the mandate block is absent or empty at the pinned BASE"
+# the arm — the run is refused. Note WHICH refusal: check 23 sees the lever on disk and stops before
+# the mandate comparison is reached, so this end-to-end assertion proves the TRIPWIRE, not the pin.
+# The pin is proved by the two controls above, which compare a pinned and an unpinned read at the
+# SAME sha, and by the source-level arms below. Saying so matters: an end-to-end arm that would pass
+# with the pin deleted is not evidence for the pin, and this one would.
+hit "$(run --preflight tEmpty --keepalive-id k1)" "this clone carries an object-substitution lever"
 git replace -d "$BASE" >/dev/null 2>&1
 
 # ---- The GRAFT flavour cannot be made exploitable in this fixture without rewriting the branch

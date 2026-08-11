@@ -46,7 +46,7 @@ KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false "$@"; }
+GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -124,45 +124,115 @@ fact() { # run-state file · key
   sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'
 }
 
+# --------------------------------------------------------------------------------- the anchor
+# THE ANCHOR IS AN OBSERVATION OF THE REMOTE, not a read of any local ref and not a name from the
+# environment. Both reported routes die by CONSTRUCTION rather than by detection: no `refs/remotes/*`
+# is read at all, and no branch name from the environment ever reaches the anchor.
+#
+# What that is worth, stated exactly, because the comment this replaces overstated and it took two
+# Tier-2 reviews to notice. This does NOT put the anchor outside the run's reach. A design panel
+# broke four independent mechanisms and converged on the reduction: a check running under the run's
+# own uid reads refs, objects, worktree files and config, and the run writes all four. What stays
+# reachable is enumerated in memory/guides/UNATTENDED-PROTOCOL.md - a run that edits this kit, shims
+# the tools it calls, skips the hook layer, or relays through an endpoint it seeded. None of those is
+# closed here, and the control that actually binds lives on the remote.
+#
+# What IS bought: the two one-command offline forgeries become inert, the branch name comes from the
+# party being pushed to, and the observation is RECORDED so a verifier off this machine can re-derive
+# the pin without trusting a byte the run wrote.
+AREF=""; ASHA=""; AURL=""
+observe_anchor() {
+  local v names rem uf up nrem levers adv rc aref asha envd
+  # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
+  # ---- injected is reading the run's answer rather than the repo's.
+  names=""
+  for v in GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_CONFIG_GLOBAL GIT_CONFIG_SYSTEM \
+           GIT_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE; do
+    eval "[ -n \"\${$v:-}\" ]" && names="$names $v"
+  done
+  if [ -n "$names" ]; then
+    fail 22 "git configuration is being supplied through the environment, and a check that reads a config its own caller injected is reading the run's answer rather than the repo's:$names"
+    return 1
+  fi
+  # ---- 23: an object-substitution lever left on disk. The dereference pin above makes both INERT
+  # ---- for this script's own reads, so this is a tripwire and not a barrier: it says the lever is
+  # ---- here, and an unattended run is the wrong moment to guess why.
+  levers=""
+  [ -n "$(git for-each-ref --format='%(refname)' refs/replace 2>/dev/null)" ] && levers="$levers refs/replace"
+  [ -f "$(git rev-parse --git-path info/grafts)" ] && levers="$levers info/grafts"
+  if [ -n "$levers" ]; then
+    fail 23 "this clone carries an object-substitution lever, which rewrites what a sha MEANS for every read below it, so the anchor can be honest and the bytes at it forged:$levers"
+    return 1
+  fi
+  # ---- 24: exactly one remote. With two the kit would be CHOOSING which endpoint to believe, and
+  # ---- the one it believes has to be the one the landing push goes to.
+  nrem=$(git remote | grep -c . || true)
+  if [ "$nrem" != 1 ]; then
+    fail 24 "this clone declares a number of remotes other than one, and the anchor has to be the endpoint the landing push goes to, so the kit refuses to pick one: $nrem"
+    return 1
+  fi
+  rem=$(git remote | head -1)
+  # ---- 25: observe and push must be the SAME endpoint. A cost-raiser, NOT the property: a relay the
+  # ---- run seeded satisfies it with one URL and one config source. Kept because it is free and
+  # ---- catches the honest misconfiguration.
+  uf=$(git ls-remote --get-url "$rem" 2>/dev/null)
+  up=$(git remote get-url --push "$rem" 2>/dev/null)
+  if [ "$uf" != "$up" ]; then
+    fail 25 "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch $uf, push $up"
+    return 1
+  fi
+  # ---- 27/28: the REMOTE names its own default branch. `--exit-code` is what makes "answered but
+  # ---- advertised nothing" distinguishable from "answered": without it the call exits 0 and prints
+  # ---- nothing, which is exactly what a bare repo with a dangling HEAD produces.
+  adv=$(GIT_TERMINAL_PROMPT=0 git ls-remote --symref --exit-code "$rem" HEAD 2>/dev/null) && rc=0 || rc=$?
+  if [ "$rc" != 0 ] && [ "$rc" != 2 ]; then
+    fail 27 "the remote did not answer, and the anchor is an observation of it rather than of any local ref; a run that cannot reach the remote cannot land on it either: $rem at $uf"
+    return 1
+  fi
+  aref=$(printf '%s\n' "$adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); print $1; exit }')
+  asha=$(printf '%s\n' "$adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  if [ -z "$aref" ] || [ -z "$asha" ]; then
+    fail 28 "the remote answered but advertised no HEAD symref, so it named no default branch of its own and this kit will not choose one for it: $rem at $uf"
+    return 1
+  fi
+  # ---- 29: the override becomes a CROSS-CHECK that can only refuse. As an INPUT it was route 2 of
+  # ---- the reproduced bypass, and the gate leg read the same variable, so it computed the same
+  # ---- wrong value and agreed with it.
+  envd=${GOV_DEFAULT_BRANCH:-}
+  if [ -n "$envd" ] && [ "refs/heads/$envd" != "$aref" ]; then
+    fail 29 "GOV_DEFAULT_BRANCH names a branch the remote does not advertise as its default, and a branch the run can create with one push is not an anchor: env $envd against advertised $aref"
+    return 1
+  fi
+  # ---- 30: the advertised tip has to BE here before a merge-base against it means anything.
+  if ! GIT rev-parse --verify --quiet "$asha^{commit}" >/dev/null 2>&1; then
+    fail 30 "the remote advertises a tip this clone does not have, so no merge-base can be computed against it; fetch and re-run: $aref at $asha"
+    return 1
+  fi
+  AREF="$aref"; ASHA="$asha"; AURL="$uf"
+  return 0
+}
+
+# Kept ONLY for check_branch's "am I standing on the default branch" question, and sourced from the
+# observation whenever there is one. It is no longer on the authorization path.
 default_branch() {
+  [ -n "$AREF" ] && { printf '%s' "${AREF#refs/heads/}"; return 0; }
   if [ -n "${GOV_DEFAULT_BRANCH:-}" ]; then printf '%s' "$GOV_DEFAULT_BRANCH"; return 0; fi
   local d; d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || return 1
   printf '%s' "${d#origin/}"
 }
 
-# The BASE the whole mandate assertion hangs on — so every input to it must be OUTSIDE the run's
-# reach. It was not. Three separate defeats, all reproduced:
-#
-#   * A bare LOCAL branch is not an anchor. `git branch -f main HEAD` makes the merge-base equal
-#     HEAD, and the mandate at BASE is then the mandate the run just wrote. The earlier code
-#     refused to FALL BACK to HEAD and happily accepted being MOVED to it — same destination, and
-#     the comment saying otherwise made it harder to see.
-#   * A remote-TRACKING ref IS REWRITABLE, and the sentence that used to sit here - "moving it
-#     requires a push, which is the act being authorized" - was false. It is a plain file under
-#     $GIT_DIR. `git update-ref refs/remotes/origin/<default> <sha>` moves it offline, with no
-#     network, leaving the real remote untouched. REPRODUCED end to end with a live control: this
-#     driver printed `preflight OK` over a base the run had authored seconds earlier, the gate leg
-#     agreed at exit 0 and silent, and the push landed. That claim survived two Tier-2 reviews
-#     because it reads like reasoning and was never executed.
-#
-#     IT IS STILL OPEN HERE. This function is unchanged; TOOL-aStandingWrit-2 in the backlog carries
-#     the repair. What HAS landed is the dereference pin above, which is orthogonal and necessary:
-#     the two levers it closes forge the bytes at a perfectly honest anchor, so fixing the anchor
-#     alone would have left them both working.
-#   * BASE == HEAD is refused outright even when the ref is legitimate. Nothing was built on top of
-#     it, so there is no diff to authorize and the comparison is trivially true.
+# BASE is the merge-base against the OBSERVED tip. Two non-zero returns carry meaning:
+#   2 = the merge-base equals HEAD. Nothing was built on top of the anchor, so the comparison would
+#       be trivially true. Still a refusal: F2 ratified equality over ancestry, because relaxing a
+#       guard for a hazard nobody has reproduced is how the anchor bypass survived in the first place.
+#   1 = there is no observed anchor, or no shared history with it.
 resolve_base() {
-  local d b mb; d=$(default_branch) || return 1
-  for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-    GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
-    mb=$(GIT merge-base "$b" HEAD 2>/dev/null) || continue
-    [ -n "$mb" ] || continue
-    # Degenerate: the anchor is at or ahead of HEAD, so BASE is HEAD and the run authored everything
-    # the comparison reads.
-    [ "$mb" = "$(GIT rev-parse HEAD)" ] && return 2
-    printf '%s\n' "$mb"; return 0
-  done
-  return 1
+  local mb
+  [ -n "$ASHA" ] || return 1
+  mb=$(GIT merge-base "$ASHA" HEAD 2>/dev/null) || return 1
+  [ -n "$mb" ] || return 1
+  [ "$mb" = "$(GIT rev-parse HEAD)" ] && return 2
+  printf '%s\n' "$mb"; return 0
 }
 
 # The mandate assertion's inputs, re-derived and cross-checked, in ONE place so preflight and close
@@ -188,7 +258,7 @@ trusted_base() { # run-state file  ->  sets TB
     return 1
   fi
   if [ "$rc" != 0 ] || [ -z "$fresh" ]; then
-    fail 16 "cannot resolve a merge-base against a remote-tracking default branch — refusing rather than trusting a local ref the run can move with 'git branch -f', or HEAD, either of which makes the mandate check pass by construction"
+    fail 16 "no merge-base against the tip the remote advertises, so this run shares no history with the branch it means to land on; the anchor is never a local ref and never a name from the environment"
     return 1
   fi
   if [ -f "$1" ]; then
@@ -322,6 +392,10 @@ verb_preflight() { # slug · keepalive-id
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -n "$kid" ] || fail 8 "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
+  # The anchor is observed BEFORE anything that consumes it, and its refusals do not cascade: a
+  # failed observation leaves ASHA empty and the base block below is skipped entirely, so the
+  # operator reads why the observation failed rather than a second, unrelated merge-base complaint.
+  observe_anchor || true
   check_clean || true
   check_branch || true
   check_wiring || true
@@ -331,7 +405,7 @@ verb_preflight() { # slug · keepalive-id
   else
     # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about
     # which commit they are measuring against. `trusted_base` names its own refusals.
-    if trusted_base "$rel"; then
+    if [ -n "$ASHA" ] && trusted_base "$rel"; then
       base="$TB"
       check_mandate "$slug" "$base" || true
     fi
@@ -355,10 +429,13 @@ verb_preflight() { # slug · keepalive-id
   fi
   mv "$tmp" "$rel"; rm -f "$payload"
   set_fact "$rel" base "$base"      || return 1
+  set_fact "$rel" anchor-ref "$AREF" || return 1
+  set_fact "$rel" anchor-sha "$ASHA" || return 1
+  set_fact "$rel" anchor-url "$AURL" || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
   set_fact "$rel" phase RUNNING     || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
-  echo "unattended: preflight OK — base $base · keepalive $kid · region copied from $src"
+  echo "unattended: preflight OK — base $base · anchor $AREF at $ASHA · keepalive $kid · region copied from $src"
   return 0
 }
 
@@ -410,6 +487,10 @@ verb_resume() { # slug
 verb_close() { # slug · override-item · reason
   local slug="$1" ov="$2" reason="$3" rel item ck unmet=0
   check_slug "$slug" || return 1
+  # The SAME observation preflight made, made again here rather than read back from the record the
+  # run wrote. Its refusals are not fatal to --close: mandate-reachable simply cannot be met without
+  # an anchor, which is the honest outcome and is not overridable.
+  observe_anchor >/dev/null 2>&1 || true
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
   if [ -n "$ov" ]; then
@@ -457,8 +538,10 @@ dod_met() { # slug · run-state file · item · checker
   case "$item" in
     mandate-reachable)
       # RE-DERIVED, never read out of the run-state file. That file is written by the subject of the
-      # test, and an absent `base:` line used to degenerate the comparison to the git index.
-      trusted_base "$rel" && check_mandate "$slug" "$TB" >/dev/null 2>&1 ;;
+      # test, and an absent `base:` line used to degenerate the comparison to the git index. The
+      # ASHA guard is not decoration: with no observation there is no anchor, and an unanchored
+      # merge-base is the thing this item exists to refuse.
+      [ -n "$ASHA" ] && trusted_base "$rel" && check_mandate "$slug" "$TB" >/dev/null 2>&1 ;;
     gates-green)
       [ -n "$GATE_CMD" ] && $GATE_CMD >/dev/null 2>&1 ;;
     records-current)

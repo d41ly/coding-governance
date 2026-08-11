@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.0 -->
+<!-- gov:kit unattended@1.1 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -20,7 +20,11 @@ authorized actions (the merge and the push). Three properties, all mechanical:
 - **It is asserted, never written by the run.** `--preflight` reads it and refuses if it is absent.
   A run that could write its own mandate authorizes itself, and the gate would certify it.
 - **It is reachable from the pinned BASE.** A mandate introduced by a commit on the run's own branch
-  grants nothing. Reachability is the machine-checkable form of "the owner wrote this first".
+  grants nothing. Reachability is the machine-checkable form of "somebody with push rights put this
+  here before this run branched" — and the run holds push rights by construction, so it is a cost,
+  not a proof. The pin is taken from the ref name and tip the REMOTE advertises for its own HEAD,
+  never from a local ref and never from the environment. What that removes, and what it leaves, is
+  §9.
 - **Only its SHAPE is checked.** No gate can tell whether the owner meant it. The two properties
   above are what make the shape worth checking at all.
 
@@ -38,7 +42,7 @@ override on the authorization check is the authorization check.
 status, both derived from build front matter and spec status headers. The gate byte-compares it
 against a fresh render. Never hand-edit it.
 
-**Authored**, carrying exactly five facts and nothing else. Nothing in the tree derives any of them,
+**Authored**, carrying exactly eight facts and nothing else. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
 1. **The standing mandate**, verbatim.
@@ -48,6 +52,13 @@ which is the test for belonging here:
    "parked" is indistinguishable from "forgotten".
 5. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
+6. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
+7. **The anchor tip sha**, from that same advertisement.
+8. **The endpoint URL** it was observed from.
+
+Facts 6 through 8 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
+so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is
+the only form of verification §9 concludes actually binds.
 
 The authored half never restates a derivable fact — not a unit status, not a per-unit spec base.
 Restating the run's own BASE is not possible, because nothing else holds it.
@@ -144,7 +155,9 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 
 - `--preflight` — asserts the mandate, pins the BASE, records the keepalive id the agent hands it,
   refuses on a dirty tree, on the default branch, and on an unwired repo, and writes the run-state
-  file. It delegates wiring to the project's **check** mode, never the repairing one: a repairing
+  file. It OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the
+  remote does not answer or advertises no default branch of its own. Failing closed there costs
+  nothing real: a run that cannot reach the remote cannot land on it either. It delegates wiring to the project's **check** mode, never the repairing one: a repairing
   mode rewrites tracked bytes and sets git config, and the run's first act must not be the mode
   whose past over-firing is the cautionary case this protocol cites.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
@@ -172,3 +185,36 @@ where this document says it may:
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
+
+## 9. The boundary this kit claims
+
+Nothing a script running under the run's own uid constitutes authorization. Four independent
+mechanisms were designed for the anchor and all four were broken by adversarial review; they
+converged on one reduction. A check running as the run reads refs, objects, worktree files and
+config, and the run writes all four — so if every input is local, the run can construct the passing
+state exactly. The escapes are a secret the run lacks, or an observation of an external party, and
+both leak here for the same reason: what an external party returns is a NAME, and dereferencing a
+name happens in the subject's own object store.
+
+This kit therefore makes an unauthorized landing require a visibly deliberate act, and records which
+act was taken. It does not prevent one.
+
+**What it closes.** Two one-command offline forgeries that used to pass every check silently: a
+rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
+now inert rather than detected — neither value is read at all. Two more are neutralised for this
+kit's own reads and named where they sit: an object-substitution ref and a graft file, either of
+which rewrites what a sha MEANS at a perfectly honest anchor.
+
+**What it does not close, stated so no reader has to discover it.** A run that edits this kit and
+commits it — nothing binds the executing code to code an owner approved. A run that shims the
+ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`, by pointing
+`core.hooksPath` at an empty directory, or by overriding the gate command. A run that relays through
+an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
+run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
+And a run that gets one push past all of that, after which the remote's advertisement is genuine.
+
+**What actually binds.** None of those levers travels with a push. The same leg, re-run in a clone
+the run never touched by a party the run cannot execute code as — a required status check, or a
+second node — is immune to the whole class, provided the run's own push credential cannot alter the
+required-check ruleset. This kit can neither install that nor substitute for it, and no document here
+may imply otherwise.

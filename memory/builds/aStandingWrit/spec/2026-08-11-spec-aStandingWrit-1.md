@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** SPECCED · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
+**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
 ## 1. Goal
 
@@ -15,14 +15,21 @@ true before anything is built on it.
 
 ## 2. Scope (IN)
 
-**S0 — close the anchor bypass, first and separately.** The pinned BASE anchors on
-`refs/remotes/origin/<default>`, and `tools/unattended/unattended.sh:119-120` justifies that by
-claiming "Moving it requires a push". `git update-ref refs/remotes/origin/main <sha>` moves it
-offline. The gate leg reads the same ref list and the same `GOV_DEFAULT_BRANCH` override
-(`tools/unattended/check-unattended.sh:177` and `:182`), so it recomputes the same forged value and
-agrees. S0 makes the anchor an observation of the REMOTE rather than of a local ref, refuses
-`GOV_DEFAULT_BRANCH` in the gate leg, records the resolved ref NAME alongside the sha, and deletes
-the false comment. Every other scope item depends on this one.
+**S0 — the anchor and the dereference. BUILT.** The pinned BASE anchored on
+`refs/remotes/origin/<default>` behind a source comment claiming the ref could not move without a
+push. It moves offline. S0 replaces the anchor with what the remote advertises for its own HEAD,
+demotes `GOV_DEFAULT_BRANCH` to a cross-check that can only refuse, pins every dereference through a
+wrapper that disables replace refs and points the graft file away from the repo, records the
+observation as evidence, and retracts the false claim in the source, the protocol and the charter.
+
+Verified end to end with live controls on both sides: an honest build is ACCEPTED before and after,
+while a forged tracking ref, a `GOV_DEFAULT_BRANCH` naming a branch the run itself pushed to the
+remote, and a `git replace` at an honest anchor are each REFUSED. Route 1 is inert rather than
+detected — the forged ref is never read. Nine new refusal branches, all armed; the floor moved 31 to
+39, re-pinned from the measured report rather than by hand.
+
+What S0 does NOT do, and what rev-1 assumed it would: it does not make the anchor unforgeable. See
+the rule above and the protocol's §9.
 
 **S1 — the authorization surface moves to the build README at BASE.** `check_mandate()` is replaced
 by `check_authorization()`, which asserts that the build README resolves at the pinned BASE, parses
@@ -80,16 +87,27 @@ for a population of zero.
 
 ### The rule, and what the review did to it
 
-> Every input to the authorization comparison lies outside the run's reach.
+> No input to the authorization comparison can be put outside the run's reach by a check running
+> inside the run's own process. S0 removes the two that were free to forge, prices the rest, and
+> records what an off-machine verifier needs.
 
-Rev-1 asserted this was satisfied by moving the read to the build README. It is not, and was not
-before this build either. The review reproduced, end to end and with a live control, a run that
-authors its own mandate, forges the anchor with one offline command, passes `--preflight`, passes the
-gate leg silently, closes with the machine-checked authorization item MET, and lands on the remote
-default branch. The bypass is in code that is merged and gated today.
+That is rev-4's rule, and it replaces rev-1's absolute one. A design panel built four independent
+anchor mechanisms — a network witness, forensic ref provenance, out-of-band attestation, and one
+brief to reject the framing — and an adversarial skeptic broke all four. They converged on the same
+reduction: a check running under the run's uid reads refs, objects, worktree files and config, and
+the run writes all four, so if every input is local the run can construct the passing state exactly.
+Both escapes — a secret the run lacks, an observation of an external party — leak for one reason:
+what an external party returns is a NAME, and dereferencing a name happens in the subject's own
+object store.
 
-So the ordering is: S0 closes the anchor, and only then is the surface question worth answering. A
-run that can move the anchor does not care which blob the check reads.
+The panel also found two levers neither the review nor rev-2 had scoped, both effective at a
+PERFECTLY honest anchor and both reproduced here with live controls: `git replace` substitutes the
+object a sha resolves to, and a graft file rewrites the commit graph. Neither is closed by any amount
+of anchor hardening, and `--no-replace-objects` does not stop the second.
+
+So S0 is not "close the anchor". It is: make the two one-command offline forgeries inert, pin the
+dereference, and state the boundary instead of asserting a false one. What that leaves open is
+enumerated in the protocol's new §9 and is not a rounding error.
 
 ### What the new check is, precisely
 
@@ -259,9 +277,12 @@ S4 therefore parses the status header in the driver's own language, and §10 rec
 
 ## 5. Production-readiness checklist
 
-- **security** — the build is one security property and the review found it unmet in landed code. S0
-  is the fix; AC12 is its proof; AC7 re-aims all three prior attacks at the new surface in both the
-  driver and the leg.
+- **security** — the build is one security property, and the honest verdict is that it is raised
+  rather than met. S0 makes two one-command offline forgeries inert and prices the rest; the protocol
+  §9 enumerates what stays reachable, including three things no scope item here closes — a run that
+  edits this kit, one that shims the tools it calls, and one that skips the hook layer. AC12 proves
+  what S0 does buy. The control that actually binds is an off-machine re-run of the same leg in a
+  clone the run never touched, and it is a backlog row, not a scope item.
 - **perf / scale** — one extra tracked-file pass per build. Immaterial.
 - **a11y** — N/A — a shell driver with no user interface.
 - **i18n** — N/A — the repo is single-locale by charter.
@@ -408,6 +429,11 @@ author's first instinct, because the first instinct is what shipped the bypass.
   F6's replacement charter wording becomes a scope item rather than a paraphrase. F7 narrows §3's
   cut-line to the three decisions the state table makes, instead of asserting an owner for the rest.
   Two decision rows recorded. Status SPECCED; S0's mechanism is pending a dedicated design panel.
+- rev-4 · 2026-08-11 · the panel returned and S0 is BUILT. Its verdict refuted this spec's central
+  design rule, which is rewritten in §4 rather than quietly dropped: the hole is not closable by a
+  check inside the run's own process, and two further levers were found that defeat the mandate
+  comparison at a perfectly honest anchor. The protocol gains a §9 stating the boundary, and the
+  charter's claim is amended to match. Status INPROGRESS: S0 landed, S1 through S7 not started.
 
 ## 10. Reuse audit
 

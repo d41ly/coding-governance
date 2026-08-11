@@ -101,12 +101,16 @@ The full bar is green at the push boundary (earlier runs are diff-scoped); each 
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
 - **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate it ASSERTS and cannot have written. Three legs: `tools/unattended/check-unattended.sh`
-  (eleven checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  mandate it ASSERTS and cannot have written. The BASE that mandate hangs on is OBSERVED from the
+  remote's own HEAD advertisement, never read from a local ref and never named by the environment —
+  both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
+  under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
+  (thirteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
-  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, and
-  the shipped protocol equals the installed one), plus its sibling
+  the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the
+  mandate at that BASE is asserted by the bar and not only by the driver, and the shipped protocol
+  equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
 - unattended adopter e2e — `bash tools/unattended/adopt-unattended.test.sh`: the adopter WRITES, so
@@ -145,5 +149,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
   rules — this repo is its reference dogfood.
 - Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed standing
   mandate naming the build and both actions**, whose shape the merge bar validates. The mandate is
-  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE:
-  a run that authors its own authorization has none. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.
+  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE,
+  which is observed from the remote rather than read from any local ref. A run with full shell access
+  can still defeat that; the protocol's §9 says exactly how, and the control that actually binds lives
+  on the remote. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.

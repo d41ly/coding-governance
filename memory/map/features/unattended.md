@@ -33,6 +33,28 @@ something machine-checkable in the vacated slot. That is why the mandate is ASSE
 written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
 author its own authorization has none, and every gate downstream would certify it.
 
+**The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
+pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
+ref could not move without a push. That was false — `git update-ref` moves it offline — and it was
+reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
+and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
+and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert rather than
+detected: neither value is read at all.
+
+**A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
+sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
+neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
+ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
+away from the repo. The two suppressions are not interchangeable and only the second stops a graft —
+measured, not assumed.
+
+**The boundary is stated rather than implied.** A design panel broke four independent anchor
+mechanisms and converged on the reduction that a check running under the run's own uid cannot
+constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
+shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
+run-state file at all — and names the only control that binds: re-running the same leg in a clone the
+run never touched.
+
 **Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
 so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
 therefore splits by actor — the agent schedules and reaps, the driver records an id and asserts a
@@ -95,6 +117,14 @@ All seven units are built on the unit branch and UNMERGED. What remains is not d
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
+- **The gate leg still recomputes BASE against a live local ref.** The driver's anchor is observed;
+  the leg's is not. It reads `GOV_DEFAULT_BRANCH` and `refs/remotes/origin/<d>`, so handed a tree
+  with a forged tracking ref it recomputes the same wrong value and agrees. The driver refuses such a
+  run before a run-state file exists, so the reachable damage is bounded, but the leg's own
+  independence is not what it claims. Scoped as the next unit.
+- **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
+  commit them; the parity legs compare two files the same run can change together. This bounds every
+  property above and is the reason the protocol names an off-machine verifier as the real control.
 - **The keepalive half is unenforceable by construction.** Two DoD items are agent-attested because
   no script can reach the scheduling store. They are labelled everywhere they appear, and they are
   still the softest part of the contract.

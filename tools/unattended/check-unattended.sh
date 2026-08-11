@@ -28,7 +28,7 @@ KIT_UNATTENDED_VERSION=1.1   # gov:kit unattended@1.1 — must match unattended.
 # reds on another node's git is a false positive on the merge bar. The levers that matter are pinned
 # below rather than detected.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false "$@"; }
+GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended-check: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
