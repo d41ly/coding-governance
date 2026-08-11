@@ -13,7 +13,7 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 754a6e6514d86cca686e888206b135eb8b31d6ab
+witness: 8ce932dccb284c95a27e705804228b9ed890696f
 phase: BUILDING
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
