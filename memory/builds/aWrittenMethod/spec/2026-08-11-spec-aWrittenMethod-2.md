@@ -1,6 +1,6 @@
 # TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
+**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
 ## 1. Goal
 
@@ -194,6 +194,11 @@ is implementable. A repo whose remote is not `origin` sets `origin/HEAD` or does
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-11 · BUILT on branch, unmerged. Driver 59 assertions, leg 64, arms clean,
+  ARMS_FLOORS raised 31->34 and 33->38. Two defects the arms caught during the build: resolve_base
+  ran under $( ) so the global it set never reached the caller, and a default_branch refusal inside
+  trusted_base was unreachable because resolve_base already returns on that failure. Both fixed;
+  the unreachable branch was deleted rather than left as decoration.
 - rev-2 · 2026-08-11 · folded audit `wf_eb978bb2-f98`. Two blockers, both reproduced independently:
   the leg's sole input is NULLABLE (`git symbolic-ref -d refs/remotes/origin/HEAD` exits 0, after
   which the leg skips its whole body), and neither self-test fixture HAS that symref, so the arms

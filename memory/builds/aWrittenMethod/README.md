@@ -46,27 +46,24 @@ build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end 
 
 ## State of this pass
 
-All five specs are SPECCED at **rev-2**, audited (`wf_eb978bb2-f98`), and every fork resolved.
-**No code is written yet.** The landing order is `2 → 6 → 3 → 4 → 5` and is NOT parallel-safe.
+| Unit | State |
+|---|---|
+|  | **BUILT** on branch, unmerged (). rev-3, INPROGRESS |
+|     | SPECCED rev-2, forks resolved, NOT built |
 
-The audit returned 73 raw, 29 confirmed, 5 blockers — two of which were designs that could not have
-worked, both reproduced before folding:
+Landing order  — not parallel-safe. Unit 2 is done and its two build-time
+defects are in its §9: a global set inside  never reached the caller, and one refusal branch
+was unreachable because an earlier call already returns on the same failure.
 
-- unit 6 asserted that bash `${v//pat/rep}` treats `&` as ordinary text. Bash 5.1 gave the
-  REPLACEMENT a sed-like `&`; measured on 5.3.9, the unquoted spelling reproduces exactly the
-  corruption of the first failed escape attempt. The replacement is now quoted.
-- unit 2 swapped a steerable input for a NULLABLE one. `git symbolic-ref -d refs/remotes/origin/HEAD`
-  exits 0 with no push, and the leg then skips its entire merge-base body at exit 0.
+**PARKED — units 6, 3, 4, 5.** *The question:* build the remaining four, then the closing diff
+review, the bar, and landing. *The options seen:* push on with what context remains; park after the
+blocker. *The reason:* unit 2 alone consumed the pass — it took two build-time defects, a fixture
+repair the audit had predicted, six new armed branches and an arms-floor ratchet. Unit 6 rewrites six
+substitution sites under a hostile-value fixture and unit 4 adds two gate legs; neither is a thing to
+start with the budget left. Unit 2 is independently valuable and self-contained: it is the blocker,
+its write set is disjoint from the other four, and nothing pending depends on it.
 
-**PARKED — the build itself.** *The question:* build all five units in the fixed order, then the
-closing diff review, the bar, and landing. *The options seen:* build the blocker alone and land it;
-build all five in one pass; park the code and keep the specs. *The reason:* the context budget left
-after authoring, auditing and folding five specs does not cover ~25 files of which one is a security
-path whose whole purpose is being correct under an adversarial assumption. A half-built mandate check
-is worse than none, because it looks like a fix. Nothing already landed depends on this pass.
-
-**Next action:** build unit 2 per its rev-2 spec, then 6, 3, 4, 5. The keepalive is deliberately NOT
-reaped — the run is unfinished, and that mechanism exists for exactly this hand-off.
+**Next action:** build unit 6 per its rev-2 spec, then 3, 4, 5. Keepalive NOT reaped.
 
 ## The two passes, and why there are two
 
@@ -124,12 +121,12 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
+**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
-| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | SPECCED | rev-2 | 2026-08-11 |
+| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | INPROGRESS | rev-3 | 2026-08-11 |
 | [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | SPECCED | rev-2 | 2026-08-11 |
 | [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | SPECCED | rev-2 | 2026-08-11 |
 | [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | SPECCED | rev-2 | 2026-08-11 |
