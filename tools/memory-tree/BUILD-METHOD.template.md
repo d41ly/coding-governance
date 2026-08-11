@@ -54,8 +54,7 @@ a sub-spec puts IN is OUT in the overview or a sibling) · **interface** (any na
 spelled twice is spelled identically) · **ordering** (no sub-spec depends on a unit sequenced after it) ·
 **acceptance** (the overview's is implied by the union of the sub-specs'). A disagreement is a defect in exactly ONE
 document: fix that one, bump its rev, name what disagreed in its §9 line. Never build the intersection and never let
-code arbitrate between two specs; a disagreement that is a choice rather than an error is a fork (M3). *Judgment,
-not procedure — its only trace is the §9 line.*
+code arbitrate between two specs; a disagreement that is a choice rather than an error is a fork (M3).
 
 ## M3 — Forks — the decision rule, and the limit of your authority
 
@@ -74,8 +73,7 @@ after these vetoes, in order. Discard any option that:
 3. widens a security, data or write surface beyond what the unit's risk tier priced.
 
 Vetoes 2 and 3 are owner turns. Tie-break: fewer open questions, then reuse of a seam M5 found. **No survivors →
-park**, never the least-bad option. *Judgment, not procedure — vetoes 2 and 3 are what a run under token pressure
-reads generously, and park is the brake.*
+park**, never the least-bad option.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
 decision the owner did not make. **Keep §8's first non-blank line machine-legal** (`none — the forks below are
@@ -96,10 +94,9 @@ and the remaining lenses are refused with nobody to read the refusal. Agents ins
 counted against it. Shape: `memory/guides/REVIEW-PROTOCOL.md` — primed lenses → batched skeptics defaulting to
 REFUTE → one synthesis — **under its fan-out and concurrency caps, read there and not repeated here.**
 
-**Lenses (3–5), primed with the mandate, the overview and the spec format:** **underspecification** (which §2 item
-has no §6 criterion; which §6 criterion names no observation) · **contradiction** (§2 vs §3; sub-spec vs main spec
-on M2's four axes; §4 vs §7) · **unstated assumption** (what must be true of existing code for §4 to work that §4
-never says and §10 never checked) · **prior art** (has a record already decided this — M5).
+**Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue —
+underspecification, contradiction, unstated assumption, prior art — with what each hunts, is in
+`{{KIT_DIR}}/README.md`.
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Most existing review records carry no
@@ -120,13 +117,10 @@ The recall CLI is offline and cannot coin terms — you write them, 8–14, or i
 spec's §10** the seam you will extend, cited by path, or an explicit "no existing seam fits" with the evidence —
 **and the recall terms you used**, because composing them is the expensive half and M7 re-runs the query.
 
-**Never read a probe's exit status as a verdict — these exit 0 on a miss.** A clean "nothing found" is an ANSWER:
-record it as the no-seam evidence, and do not re-run with softer words until it says something. A partial-recall or
-blind-layer notice means the probe cannot see that layer at all — here **bash is recall-dark**, so the gates,
-adopters and hooks that ARE the product never surface as seams; `grep` that layer and say so in §10. **A hit can be
-STALE:** a record describes what was true when written, so verify any claim about current code against source before
-building on it, and say in §10 where a record and the source disagreed. An absent tool does not remove the
-obligation — grep the tree and the nearest record, and write in §10 what you did instead.
+Two rules you cannot afford to look up: **a probe exits 0 on a miss**, so "nothing found" is an ANSWER to record,
+never a failure to retry with softer words; and **a hit can be STALE**, so verify any claim about current code
+against source before building on it and say in §10 where the two disagreed. The rest of the probe-failure
+taxonomy — blind layers, absent tools, which phrasing to try next — is in `{{KIT_DIR}}/README.md`.
 
 ## M6 — Passes, commits, parallelism
 
@@ -176,8 +170,7 @@ anything was compacted. Read in this order, and nothing else:
 5. Re-run the recall probe with the terms recorded in that spec's §10.
 
 Then continue. **Regrounding never re-opens a resolved fork and never re-reviews a clean spec** — the §8 marks and
-the review records outrank your recollection. *Honest limit: a compaction landing mid-pass is not caught until the
-next boundary. Keep passes small; that is the only mitigation.*
+the review records outrank your recollection. Keep passes small: a compaction landing mid-pass is not caught until the next boundary.
 
 ## M8 — Closing the build
 
@@ -234,14 +227,10 @@ Two deltas, and no others. The contract — mandate, run state, phases, witnesse
 
 ## M11 — Where everything else lives — read these, do not restate them
 
-- `skills/session-kickoff/SKILL.md` + `.claude/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
-  the six interactive exits.
-- `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
-- `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
-- `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
-- `parallel-coding-governance.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
-  gate discipline, diff-scoping, the final-message format.
-- `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
+The carriers, what each owns, and when to load it: **`{{KIT_DIR}}/README.md`, section "The method's
+pointer table"**. The six are `skills/session-kickoff/SKILL.md`, `memory/TEMPLATE-SPEC.md`,
+`memory/guides/REVIEW-PROTOCOL.md`, `memory/HYGIENE.md`, the governance template with its companion, and
+`memory/guides/UNATTENDED-PROTOCOL.md`. Names here, scopes there — one hop, and this file stays re-readable.
 
 *The memory root is spelled `memory/` throughout; an adopter whose `MEMORY_ROOT` differs renames it here, the same
 caveat `HYGIENE.template.md` carries.*
