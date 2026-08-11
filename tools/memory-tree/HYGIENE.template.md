@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.8 -->
+<!-- gov:kit memory-tree@2.9 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -119,12 +119,16 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
-6. **index size caps** — the index set ≤ 20 KB / ≤ 250 lines (grandfather: `curation-debt.txt`).
-   `guides/*.md` is in that set: a guide is MANDATORY reading the charter points a session at, and
-   check 16 refuses a charter-cited file that nothing caps. Entry-budget exempt (check 7's `ex7`) —
-   a guide is prose, not index rows. `builds/*/RUN.md` is in the set on both counts: it is designed
+6. **index size caps** — TWO classes, because prose and rows fail for different reasons. Row
+   documents ≤ 20 KB / ≤ 250 lines; `guides/*.md` ≤ 60 KB / ≤ 750 lines (grandfather:
+   `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
+   and check 16 refuses a charter-cited file that nothing caps — but for a guide the LINE count is a
+   proxy, and check 16's `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed
+   here. So a guide's effective room is whichever of the two binds first, and past ~250 lines that is
+   normally the read-path ceiling rather than this cap. Entry-budget exempt (check 7's `ex7`) — a
+   guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
    to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
-   build's own `build/` folder as a dated recording), and its mandate block is prose.
+   build's own `build/` folder as a dated recording).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `{{KIT_DIR}}/gen_build_index.py --check` must be clean. The index is

@@ -38,6 +38,7 @@
 - TOOL-aWrittenMethod-1 · ship the loud refusal, not the undemonstrated escape. Two sed-escaping attempts were wrong — one corrupted values worse than none — so a temp-file write refusing an empty render landed and the escape stayed a backlog row
 - TOOL-aMouldedFolio-1 · the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION, not templated-vs-untemplated: parity and freshness are TRUTH-BLIND, both green over a false shipped rule and a self-contradicting generated line. `ids:` becomes DERIVED, not validated; Route B's schema refused
 
+- TOOL-aWidenedGuide-1 · the index cap splits by CLASS: a guide is PROSE read end to end, an index is ROWS a sweep prunes. Guides get 3x (60 KB / 750 lines), rows keep 20 KB / 250. The line count was always a proxy; check 16's byte-measured READ_PATH_CEILING is the real budget and is NOT relaxed
 ## DEPL — deployer
 
 *(none yet)*
