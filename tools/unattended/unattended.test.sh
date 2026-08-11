@@ -725,5 +725,13 @@ n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher wi
 nf=$(grep -nE 'check-wiring[^"]*--fix' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
 n=$((n+1)); [ -z "$nf" ] || { echo "FAIL the driver reaches the repairing wiring mode directly: $nf"; st=1; }
 
+# ---- SOURCE-level: the hot accessors must not fork. `fact` run per
+# ---- run-state file per check, and as `sed | head | tr` they cost three processes each — measured
+# ---- 1094 sed/head/tr spawns across this suite, 278 after. Process spawn dominates on Windows.
+# ---- Comment lines are excluded, or this grep matches the comment that explains the ban — a trap
+# ---- this repo has hit twice and recorded.
+nf=$(grep -nE 'head -1 \| tr -d' "$HERE/unattended.sh" | grep -v '^[0-9]*: *#' || true)
+n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

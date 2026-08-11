@@ -128,9 +128,20 @@ splice() { # file · open · close · payload-file
 runmd_of() { printf '%s/builds/%s/RUN.md' "$M" "$1"; }
 readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
 # One key per line, so a grep is the parser and no verb needs a second one.
+# PURE BASH, no forks. This was `sed … | head -1 | tr -d '\r'` — three processes per call, at sixteen
+# call sites. Process spawn dominates on Windows and it is what made the sibling self-tests cost 77s
+# and 73s for ~1.4s of CPU apiece. Same semantics: first matching line wins, `key:` followed by any
+# run of spaces, a valueless key yields the empty string, a trailing CR is stripped.
 fact() { # run-state file · key
   [ -f "$1" ] || return 1
-  sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'
+  local l p="$2:"
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    case "$l" in
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+    esac
+  done < "$1"
+  return 0
 }
 
 # --------------------------------------------------------------------------------- the anchor
@@ -543,7 +554,9 @@ verb_plan() { # slug
     return 1
   fi
   for spec in $specs; do
-    st=$(sed -n 's/^\*\*Status:\*\* \([A-Z]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
+    # ONE awk, not three chained processes. Same semantics: first matching line wins, a trailing CR
+    # is stripped, and nothing is printed when the file carries no status header.
+    st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
     # NO status header, NO unit. M2 defines a unit's spec as the file whose STATUS HEADER carries the
     # id, so a file without one is a recording that happens to live here. Taking it anyway made this
     # verb invent units and name one as `next` on 5 of the 25 builds in this corpus.
@@ -551,7 +564,7 @@ verb_plan() { # slug
       printf '%-34s %-11s %s\n' "$(basename "$spec")" "-" "NOT A UNIT (no status header)"
       continue
     fi
-    id=$(sed -n 's/^# \([A-Za-z0-9][A-Za-z0-9-]*\) .*/\1/p' "$spec" | head -1 | tr -d '\r')
+    id=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
     [ -n "$id" ] || id=$(basename "$spec" .md)
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac

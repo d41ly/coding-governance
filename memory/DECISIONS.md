@@ -31,7 +31,6 @@
 - TOOL-aStandingWrit-2 · an anchor is only as trustworthy as the cheapest way to move it. `refs/remotes/origin/<x>` READS like an observation of the remote and IS a local write; a source comment asserting a ref cannot move without a push is not a check, and it survived two Tier-2 reviews
 - TOOL-aStandingWrit-4 · a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN, not an override: any unmatched `GOV_DEFAULT_BRANCH` sent pre-push down its own "nothing to gate" exit 0, skipping the lander refusal and every leg on the bar
 
-
 - TOOL-aWrittenMethod-1 · the build METHOD is generic and belongs to the memory-tree kit beside the spec format and the record rules, not to the unattended kit, which points at it. It rides the existing parity leg as a third PAIRS row, so the bar stays at 47 legs
 - TOOL-aWrittenMethod-1 · a mis-aimed BRIEFING yields a confident wrong answer, not a visibly confused one: pass 1 was told the tension was self-authorship and scored on checkability, so every candidate delivered enforcement where a procedure was asked for
 - TOOL-aWrittenMethod-1 · absence-of-placeholder is not presence-of-value. Pre-initialising an interpolated conf key to empty makes emptiness the failure mode the `{{TOKEN}}` grep cannot see; default the key to its own token so an undeclared value reds
@@ -42,6 +41,8 @@
 - TOOL-aWrittenMethod-2 · two traps this codebase had already documented and this build walked into anyway: a phase-keyed carve-out is a one-line escape because the RUN writes `phase:`, and a global set inside `$( )` never reaches the caller — the sibling function’s own comment says so
 - TOOL-aWrittenMethod-6 · bash 5.1 gave pattern-substitution's REPLACEMENT a sed-like `&`. Quoting it is the whole fix, and an unquoted `${v//p/$V}` corrupts exactly what an unescaped sed does
 - TOOL-aWrittenMethod-4 · `out=$(cat X; printf Y) || return 1` can never fire: a substitution reports the LAST command's status. The unreachable-branch class was deleted in one unit and reintroduced by the next unit's fix
+
+- TOOL-aWidenedGuide-2 · check 12 graded only BULLET forks in a spec's Open questions, while TEMPLATE-SPEC sanctions a bullet OR a ### sub-head. A spec using sub-heads scored zero items and could never go terminal however completely answered — the doc offered two shapes, the gate one
 
 ## DEPL — deployer
 
