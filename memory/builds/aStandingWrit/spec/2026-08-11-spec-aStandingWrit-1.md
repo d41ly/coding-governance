@@ -1,6 +1,6 @@
 # TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write
 
-**Status:** INPROGRESS · rev-6 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
+**Status:** CLOSED · rev-6 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
 ## 1. Goal
 

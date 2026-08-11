@@ -23,8 +23,14 @@ This README is the **master overview and the owner decision menu**, per `memory/
 
 ## Start here
 
-**State.** Every scope item is BUILT and S0 through S7 are landed. S5 is WITHDRAWN, superseded by
-`memory/guides/BUILD-METHOD.md` M2. P1 is RESOLVED and S8 is what came of it.
+**State.** CLOSED. Every scope item is built and landed; S5 is WITHDRAWN, superseded by
+`memory/guides/BUILD-METHOD.md` M2; P1 is RESOLVED and S8 is what came of it.
+
+**What shipped.** `/unattended <slug>` is sufficient — the owner authors nothing per run, and a run
+that invents its own build folder is refused. Two live security defects were repaired along the way,
+both reproduced with controls before a line changed: a repo-wide `pre-push` fail-open that let any
+push skip the entire bar, and the anchor bypass this build was named for. The kit's boundary is now
+STATED in protocol §9 rather than overclaimed, which is the change that outlasts the code.
 
 **The owner's ask, met.** `/unattended <slug>` is now sufficient. Nobody authors a mandate, nobody
 authors a run-state file, and a run that invents its own build folder is refused.
@@ -198,9 +204,9 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | INPROGRESS | rev-6 | 2026-08-11 |
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
 <!-- /gen:build-index -->
