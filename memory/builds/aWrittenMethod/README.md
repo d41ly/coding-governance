@@ -2,15 +2,14 @@
 slug: aWrittenMethod
 node: a
 opened: 2026-08-11
-status: OPEN
-streams: tooling
+streams: tooling+playbook+kickoff
 roster: TOOL
 ids: TOOL-aWrittenMethod-1
 ---
 
 # aWrittenMethod — the instruction layer: the build method, written down
 
-Node `a` · opened 2026-08-11 · streams tooling.
+Node `a` · opened 2026-08-11 · streams tooling+playbook+kickoff.
 
 The unattended-run kit supervises a build but does not instruct one. `--preflight` asserts a mandate,
 pins a BASE, sets phase RUNNING and returns. Between RUNNING and `--close` the driver does nothing:
@@ -85,7 +84,9 @@ Records live under `spec/` and `build/`. The table below is GENERATED from the s
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aWrittenMethod-1
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1
 
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | SPECCED | rev-1 | 2026-08-11 |
 <!-- /gen:build-index -->
