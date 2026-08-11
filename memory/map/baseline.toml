@@ -4,7 +4,6 @@
 # dossier, not here — additions are reserved for the initial backfill and reviewed.
 
 gate-legs = [
-  "agent-cap self-test",
   "agent-instructions self-test",
   "agent-instructions wiring",
   "branch-guard self-test",
@@ -31,21 +30,17 @@ gate-legs = [
   "python resolver (behaviour + inline parity + idiom ban)",
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
-  "review-protocol parity (kit vs dogfood)",
   "run-gates canary",
   "settings-merge selftest",
   "template size <=32KiB",
   "verdict epoch (kit version dates the engine)",
   "verdict-epoch self-test",
-  "verifier fan-out (≤5 verify agents per review)",
-  "verifier fan-out self-test",
   "workflow script syntax",
 ]
 kits = [
   "agent-instructions",
   "drift-audit",
   "gate-lint",
-  "hooks",
   "lib",
   "memory-recall",
   "memory-tree",
@@ -63,7 +58,6 @@ workflow-scripts = [
   "tier2-review.js",
 ]
 skill-engines = [
-  "session-kickoff",
 ]
 rendered-skills = [
   "drift-audit",
@@ -82,7 +76,6 @@ gotcha-classes = [
   "vacuous-selector-empty-population.md",
 ]
 guides = [
-  "REVIEW-PROTOCOL.md",
 ]
 backlog-shards = [
   "DEPL.md",

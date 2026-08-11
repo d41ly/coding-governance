@@ -255,6 +255,28 @@ C7L=$(printf 'x%.0s' $(seq 1 340))
   printf -- '- ARCH-tFixture-9 · OPEN · CLOSED · two status tokens in one row\n'
 } > memory/backlog/ARCH.md
 
+# ---- RUN.md (2.3): the unattended run-state file, admitted at a build-folder root. Two hosts,
+# ---- because every one of these contracts is silent-by-absence on its own.
+# ---- tRunBig carries ALL THREE positive contracts in ONE file: check 6 names it (which is the only
+# ---- proof RUN.md entered index_set at all), check 7 must NOT (the ex7 exemption, asserted on the
+# ---- very file check 6 named — so it cannot be satisfied by a RUN.md that never joined the
+# ---- population), and check 13 files its dash-row anchor under the owning build folder.
+# ---- tRunOk is the under-cap control AND the check-13 control: it cites the same id INLINE IN
+# ---- PROSE, which anchors nothing, so the collision arm is not merely "check 13 said something".
+# ---- RUNSTATE.md is AC1's negative: a name matching NEITHER the whitelist NOR the dated-recording
+# ---- grammar. Check 4 also admits `YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md` at a build root,
+# ---- so an arbitrary dated name would red for the wrong reason and prove nothing.
+runreadme() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n' "$1" "$1" "$1"; }
+mkdir -p memory/builds/tRunOk memory/builds/tRunBig
+runreadme tRunOk  > memory/builds/tRunOk/README.md
+runreadme tRunBig > memory/builds/tRunBig/README.md
+printf '# run\n\nThe mandate names ARCH-tFixture-1 inline, in prose, so nothing anchors here.\n' \
+  > memory/builds/tRunOk/RUN.md                                     # under cap, no anchor -> silent
+printf '# not the run-state file\n' > memory/builds/tRunOk/RUNSTATE.md   # neither name nor grammar -> RED on 4
+{ printf '# run\n\n- ARCH-tFixture-1 · parked, and this dash row ANCHORS the id\n\n%s\n' "$C7L"
+  i=1; while [ "$i" -le 260 ]; do printf -- '- note %d\n' "$i"; i=$((i+1)); done; } \
+  > memory/builds/tRunBig/RUN.md                                    # 265 lines -> RED on 6; 340-char row -> silent on 7
+
 git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
@@ -363,6 +385,32 @@ cnot 6 'memory/backlog/ARCH.md'
 hit  'backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)'
 chit 8 'memory/backlog/ARCH.md:8'
 cnot 8 'memory/backlog/ARCH.md:5'
+
+# ---- RUN.md, the four membership decisions of kit 2.3. Ordered so each one's evidence is visible.
+# ---- (a) check 4 ADMITS the name at a build root and still rejects the near-miss.
+cnot 4 'memory/builds/tRunOk/RUN.md'
+cnot 4 'memory/builds/tRunBig/RUN.md'
+chit 4 'memory/builds/tRunOk/RUNSTATE.md'
+# ---- (b) check 6 CAPS it. This is the load-bearing arm of the pair: a RUN.md that never entered
+# ----     index_set is silent here for the same reason a compliant one is, so the green control
+# ----     below proves nothing without it.
+chit 6 'memory/builds/tRunBig/RUN.md'
+cnot 6 'memory/builds/tRunOk/RUN.md'
+# ---- (c) check 7 EXEMPTS it — asserted on the SAME file check 6 just named, so membership is
+# ----     already established and only the exemption is under test. The file carries a 340-char
+# ----     unfenced row: without the ex7 alternative this line fires.
+cblock "$out" 7 | grep -qF 'memory/builds/tRunBig/RUN.md' \
+  && { echo "FAIL check 7 reported the run-state file's 340-char row — RUN.md lost its ex7 exemption"; st=1; }
+# ---- (d) check 8 does NOT grow a RUN.md population. The run-phase vocabulary is deliberately not
+# ----     the seven-token slot vocabulary — no token in it means "built and reviewed, not yet
+# ----     landed" — and the unattended leg owns validating it. The dash row asserted on carries an
+# ----     id and NO status token, which is exactly the shape check 8 reds on in a backlog shard.
+cnot 8 'memory/builds/tRunBig/RUN.md'
+# ---- (e) the anchor ban — the reason the authored region cites ids inline in prose — is armed in
+# ----     its own scratch tree at the bottom of this file, NOT here. `armed()` in corpus_ids.py
+# ----     turns checks 13-16 off outright when every pin is blank, and this conf deliberately sets
+# ----     none, so a check-13 arm placed here would pass by exercising a disabled check. Measured:
+# ----     `def_builds` held both slugs and `--check` still returned 0.
 # check 9's green half is the freshly-scaffolded tree at the bottom of this file, which renders the
 # index and then asserts the WHOLE gate exits 0. This tree never renders it, so it drifts.
 hit  'generated build index differs from a fresh render'
@@ -567,6 +615,10 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
 outy=$(cd "$Y" && bash "$SCRIPT" 2>/dev/null); rcy=$?
 grep -qF 'selected an EMPTY population' <<<"$outy" \
   && { echo "FAIL a freshly scaffolded tree tripped the empty-population guard"; st=1; }
+# This rc=0 is also the arm for "a tree with no RUN.md anywhere is green and silent" (kit 2.3): the
+# run-state file is OPTIONAL, and a whitelist entry that quietly became a requirement would red here
+# and in the scaffolder arm below. RUN.md joins no pop_guard population, deliberately — a young tree
+# has no run to record, so there is no precondition that could make its absence a mis-segmentation.
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
@@ -597,6 +649,42 @@ cblock "$outm" 7 | grep -qF 'memory/guides/tguide.md' \
   && { echo "FAIL check 7 reported a guide's over-cap row — the MAP_SUB branch dropped the guides/ exemption again"; st=1; }
 cblock "$outm" 7 | grep -qF 'memory/map/features/tdoss.md' \
   && { echo "FAIL check 7 reported a codebase-map dossier's over-cap row — dossiers are detail files"; st=1; }
+
+# ---- (d) THE RUN.md ANCHOR BAN (kit 2.3), in its OWN tree because `armed()` in corpus_ids.py turns
+# ----     checks 13-16 off outright when every pin is blank, and the main fixture conf sets none.
+# ----     Measured before writing this: on that tree `def_builds` held BOTH slugs and `--check`
+# ----     still returned 0 — an arm placed there would have passed against a disabled check.
+# ----
+# ----     A dash row inside a build folder ANCHORS its id (`- <id> ·` is one of the four anchor
+# ----     shapes), so a run-state file opening a parked entry that way makes its own build a second
+# ----     claimant of an id another build defines. That is why the authored region cites ids inline
+# ----     in PROSE. tRunOk is the control and cites the SAME id that way, so the arm cannot be
+# ----     satisfied by a check 13 that merely said something.
+R=$TMP/runanchor
+mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
+         "$R/memory/backlog" "$R/memory/project"
+( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  # ORPHAN_ID_PIN is what ARMS the unit; 0 is legal because every id below is defined.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# legacy\n' > memory/project/legacy-files.txt
+  rr() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tOwner-1\n---\n\n# %s\n' "$1" "$1"; }
+  rr tOwner > memory/builds/tOwner/README.md
+  rr tRunBig > memory/builds/tRunBig/README.md
+  rr tRunOk > memory/builds/tRunOk/README.md
+  printf '# ARCH-tOwner-1 — the owning unit\n\nbody\n' > memory/builds/tOwner/spec/2026-08-01-spec-tOwner-1.md
+  printf '# run\n\n- ARCH-tOwner-1 · parked: this dash row ANCHORS the id\n' > memory/builds/tRunBig/RUN.md
+  printf '# run\n\nThe mandate names ARCH-tOwner-1 inline, in prose, so nothing anchors here.\n' > memory/builds/tRunOk/RUN.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m runanchor --no-verify )
+outr=$(cd "$R" && bash "$SCRIPT" 2>/dev/null)
+grep -qF 'check 13: id ARCH-tOwner-1 is claimed by 2 build folders' <<<"$outr" \
+  || { echo "FAIL a RUN.md dash row did not make its build folder a second claimant of the id"; st=1; }
+grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunBig' \
+  || { echo "FAIL check 13 did not name the run-state file's build folder as a claimant"; st=1; }
+grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunOk' \
+  && { echo "FAIL check 13 named tRunOk, whose RUN.md cites the id INLINE IN PROSE — prose is not an anchor"; st=1; }
 
 # ---- THE SCAFFOLDER, asserted against the GATE rather than against a second description of itself.
 # ---- A hand-built imitation asserts what this file BELIEVES adopt-memory-tree.sh emits, and that
@@ -630,5 +718,5 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (120 assertions)"
+[ "$st" = 0 ] && echo "PASS (130 assertions)"
 exit "$st"

@@ -2,8 +2,8 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-10T22:18:40+03:00 @ 530b06e7077054f6e49af25518a3afc0f6e067e3
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md
+last-audit: 2026-08-10T22:41:05+03:00 @ 5f28bd0f1e25d6b8adbba0871a1cf9456e3a273c
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md
 check-script: skills/session-kickoff/manifest-check.sh
 -->
@@ -33,9 +33,12 @@ here is short — `AGENTS.md` (the charter) holds the substance.
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
-- **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit ask.
+- **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
+  ask, or a committed standing mandate naming the build and both actions (`memory/guides/UNATTENDED-PROTOCOL.md`).
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
+  Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
+  `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -88,9 +91,16 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 *Accretes — append the trap that cost time, prune the one that stopped being true.*
 
 - The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32688/32768 (**80 bytes free** at v2.5, measured 2026-08-10 by `bash tools/check-template-size.sh`
+  It sits at 32578/32768 (**190 bytes free**, measured 2026-08-10 by `bash tools/check-template-size.sh`
   — read that number FROM the gate, never from here), so a line added to it either fits that margin or
-  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`.
+  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
+  before the unattended build's playbook unit needed 114 for the standing-mandate clauses and funded
+  them by externalizing the kickoff-manifest merge exception — a ~490-byte procedure that only
+  applies when the project keeps a manifest — into companion §1. That is the sanctioned move and it
+  is available again: the §-stub parentheticals in §9/§11/§12/§13 duplicate the companion's own
+  headings and are the next candidate. (Paraphrased rather than cited by id on purpose — the drift
+  signal `non_terminal_specs_cited_by_product_source` counts `.claude/` as product source and sits
+  AT its pin, so naming a non-terminal spec's id here reds the bar. It did, once.)
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
@@ -166,6 +176,68 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   ratchet's check 1 scans this file for exactly it). A hardcoded prefix in a RENDERED artifact is the worst case — it
   lands a dead path in the adopter's own committed tree and the byte-compare that guards the file
   agrees with it.
+- A gate that returns a VALUE on stdout cannot also report on stdout. `fail` echoes, so
+  `x=$(some_check …)` captures the diagnostics into `x` and the operator sees only the downstream
+  symptom. Measured 2026-08-10: `--close` printed "a machine-checked DoD item is unmet" and swallowed
+  the sentence explaining why. Return via a global (or a separate fd); the value channel and the
+  message channel must not be the same channel.
+- When hardening a check, ask what SUPPLIES each of its inputs. The unattended mandate check was
+  sound in design and defeated three ways at once because all three inputs were reachable by the
+  subject it distrusts: a value read back from the file the run writes, an anchor ref the run can
+  `git branch -f`, and an error signal dropped with `|| true`. Reproduce each with a control before
+  and after — a review finding that has not been reproduced is a hypothesis.
+- CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will never
+  tell you: its eol population is scoped to `.claude/` paths carrying the pin. Every UNPINNED path
+  smudges, because `.gitattributes` opens with `* text=auto` and this fleet runs `core.autocrlf=true`.
+  Measured 2026-08-10: all four `tools/workflows/*.js` came out at CRLF (`tier2-review.js`, 350 CR
+  bytes) and **no gate saw it** — `check-workflow-syntax.js` parses CRLF happily. It surfaced when
+  the shipped Tier-2 harness could not be LAUNCHED: a workflow script is inlined into the tool call
+  that runs it, and the permission layer rejects control characters in that payload. Ask which
+  CONSUMER reads a file whole (a launcher, a `.`-sourced conf, a hook), not which gate diffs it.
+  Pinned since: `tools/workflows/*.js`, `skills/session-kickoff/SKILL.md`, `tools/unattended/*.md`,
+  `.unattended.conf`. Still unpinned and latent: `AGENTS.md`, `WIRE-INTO-PROJECT.md`, `.gitattributes`.
+- A NEW record file under `memory/gotchas/` needs THREE things, and two of them are separate gates:
+  `gotchas.py --write` to re-render `INDEX.md` (hygiene check 17), and a dossier claim for its key
+  (codebase-map coverage). Adding the file and regenerating the map is not enough — the coverage
+  inventory reads TRACKED files, so a `test_codebase_map.py` run before `git add` reports ok over a
+  file it cannot see, and the gap surfaces on the full bar instead. Stage first, then measure.
+- This node's `merge.rows.driver` pointed at `tools/memory-tree/merge-rows.sh`, which does not exist
+  (only the `.py` and its `.test.sh` do), so `bash tools/check-wiring.sh --check` exited 1 on a
+  worktree whose SessionStart line had said `ok merge`. `--fix` correctly DECLINES to overwrite a set
+  value, so it self-heals only an UNSET one. Remedy, and it is machine state that travels with no
+  commit: `git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'`.
+  Worth front-loading because a broken value reads as configured to every check but this one.
+- Template parity and PLACEHOLDER COMPLETENESS are two different questions about a rendered file. A
+  render whose conf declares nothing for a key is byte-identical to a fresh render — perfectly in
+  sync — and instructs the agent to invoke the placeholder's own name as if it were a tool. A
+  `--check` that only diffs against the template cannot see that; grep the render for a surviving
+  brace-shaped placeholder as its OWN arm. (Paraphrased on purpose: `manifest-check.sh` check 1 bans
+  the literal double-brace shape anywhere in this file, so quoting one reds the manifest — the same
+  trap hygiene check 12's skeleton scan sets, one file over.)
+- A "core set ⊆ effective set" assertion is VACUOUS whenever the checker COMPOSES the effective set
+  from the core one. Measured 2026-08-10 in the new unattended leg: the leg built `PHASES` as
+  `$PHASES_CORE $PHASES_EXTRA` and then asserted every core member was in `PHASES` — a subset by
+  construction, unfailable, and it armed cleanly. Pin a shrink-only COUNT instead (the `ARMS_FLOORS`
+  / `baseline.toml` shape), so the names stay single-sourced and deletion still reds; and make an
+  UNDECLARED floor its own refusal, because omitting the key is the quietest way to disarm a pin.
+  The general rule: an assertion between two values the same code derives from one source is a
+  tautology — assert against something declared INDEPENDENTLY.
+- A positional in a gate's `fail` message CANNOT be armed. `check-arms.py` reads `${?[A-Za-z_]…` as
+  an interpolation to drop, but a bare `$1` is literal text, so it lands INSIDE the signature and no
+  assertion can ever name it — the branch reads unarmed no matter what the test says. Bind the value
+  to a name (`local slug="$1"`) and put it at the END of the message, after the literal sentence.
+  Measured 2026-08-10 on two branches of the new driver. This also means `check-arms.py` DISCOVERS
+  any tracked `*.sh` that defines `fail() {` and calls `fail <n> "` — a new script gets pulled into
+  the meta-gate's population automatically and needs a sibling `<stem>.test.sh` with a positive arm
+  per branch, plus an `ARMS_FLOORS` entry.
+- Hygiene checks 13-19 are OFF unless a pin is armed. `corpus_ids.py`'s `armed(conf)` returns early
+  when every one of `ORPHAN_ID_PIN`/`DEAD_PATH_PIN`/`READ_PATH_CEILING`/`CHARTER` is blank, and
+  `gotchas.py` short-circuits on an empty record set. So a fixture tree written WITHOUT pins arms
+  nothing in that range: measured 2026-08-10 while adding a check-13 arm — `def_builds` held both
+  colliding slugs and `--check` still returned 0. The main fixture tree in
+  `check-memory-hygiene.test.sh` deliberately sets no pins, so any 13-19 arm belongs in its own
+  scratch tree with the pin set. This is the `vacuous-selector-empty-population` class one level up:
+  the population is fine, the CHECK is switched off.
 - Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
   NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
   decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides

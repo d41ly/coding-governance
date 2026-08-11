@@ -4,13 +4,13 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 2 · gotcha-classes: 10 · guides: 1 · backlog-shards: 4
+Inventories: gate-legs: 47 · kits: 11 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 1 · rendered-skills: 3 · gotcha-classes: 12 · guides: 2 · backlog-shards: 4
 
 ## gate-legs
 
 | key | claimant |
 |---|---|
-| `agent-cap self-test` | baseline |
+| `agent-cap self-test` | agent-cap |
 | `agent-instructions self-test` | baseline |
 | `agent-instructions wiring` | baseline |
 | `branch-guard self-test` | baseline |
@@ -42,15 +42,20 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `review-join ban (no ref-keyed join)` | baseline |
 | `review-join self-test` | baseline |
-| `review-protocol parity (kit vs dogfood)` | baseline |
+| `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
 | `run-gates canary` | baseline |
 | `settings-merge selftest` | baseline |
 | `template size <=32KiB` | baseline |
+| `unattended adopter e2e` | unattended |
+| `unattended driver selftest` | unattended |
+| `unattended gate selftest` | unattended |
+| `unattended kit gate` | unattended |
+| `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out (≤5 verify agents per review)` | baseline |
-| `verifier fan-out self-test` | baseline |
+| `verifier fan-out (≤5 verify agents per review)` | agent-cap |
+| `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 
 ## kits
@@ -61,11 +66,12 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 | `codebase-map` | codebase-map |
 | `drift-audit` | baseline |
 | `gate-lint` | baseline |
-| `hooks` | baseline |
+| `hooks` | agent-cap |
 | `lib` | baseline |
 | `memory-recall` | baseline |
 | `memory-tree` | baseline |
 | `pytest-parallel-guardrails` | baseline |
+| `unattended` | unattended |
 | `workflows` | baseline |
 
 ## git-hooks
@@ -88,7 +94,7 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `session-kickoff` | baseline |
+| `session-kickoff` | unattended |
 
 ## rendered-skills
 
@@ -96,12 +102,14 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 |---|---|
 | `drift-audit` | baseline |
 | `memory-recall` | baseline |
+| `unattended` | unattended |
 
 ## gotcha-classes
 
 | key | claimant |
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
+| `assertion-between-two-derived-values.md` | unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
@@ -109,6 +117,7 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `subprocess-resolves-a-different-shell.md` | baseline |
+| `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `two-answers-to-one-question.md` | baseline |
 | `vacuous-selector-empty-population.md` | baseline |
 
@@ -116,7 +125,8 @@ Inventories: gate-legs: 42 · kits: 10 · git-hooks: 2 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `REVIEW-PROTOCOL.md` | baseline |
+| `REVIEW-PROTOCOL.md` | agent-cap |
+| `UNATTENDED-PROTOCOL.md` | unattended |
 
 ## backlog-shards
 

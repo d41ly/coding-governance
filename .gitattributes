@@ -60,6 +60,28 @@ parallel-coding-governance*.md text eol=lf
 # drops that `tr -d '\r'` from reintroducing memory-recall's green-by-accident failure.
 .claude/skills/drift-audit/SKILL.md text eol=lf
 
+# The unattended-run kit's rendered Skill, pinned for the identical reason as the two above. It is
+# the THIRD instance of the shape, and the pin is also what puts it into `check-wiring.sh`'s eol
+# population, which is DERIVED from tracked `.claude/` paths carrying this attribute — so the pin is
+# the whole of that wiring and the script needs no edit.
+.claude/skills/unattended/SKILL.md text eol=lf
+
+# The /session-kickoff engine. Pinned because a GATE now reads it — check 12 of the unattended leg
+# greps its text, which nothing did before. That leg strips CR anyway, and both halves are the point:
+# strip so the comparison is right, pin so the bytes are. Measured 2026-08-10: the engine came out of
+# this worktree with 224 CR bytes, and every pattern in check 12 survived only because each happens
+# to match mid-line. The first pattern anchored to a line end would have broken silently.
+skills/session-kickoff/SKILL.md text eol=lf
+
+# The workflow scripts. They are not byte-compared by any gate — `check-workflow-syntax.js` parses
+# them and CRLF parses fine — so this pin is not about a gate. It is about the LAUNCHER: a workflow
+# script is INLINED into the tool call that runs it, and the permission layer refuses a payload
+# carrying control characters. Measured 2026-08-10 in a linked worktree: `tier2-review.js` came out
+# of the checkout with 350 CR bytes and the shipped Tier-2 harness could not be launched at all,
+# while its own syntax leg stayed green. The committed blobs were already LF; `* text=auto` plus
+# core.autocrlf smudged every unpinned path on the way out.
+tools/workflows/*.js text eol=lf
+
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
 # generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
 # differs on EVERY line — the same green-only-right-after-a-render failure the memory-tree pins above
@@ -76,6 +98,19 @@ parallel-coding-governance*.md text eol=lf
 # shipped example is pinned too, because the adopter copies it to the sourced path verbatim.
 .memory-tree.conf text eol=lf
 tools/memory-tree/.memory-tree.conf.example text eol=lf
+
+# The unattended-run kit's conf, pinned for the identical reason as the two above: it is SOURCED BY
+# BASH by the driver and by the gate leg, with no CR stripping. Its values are shell COMMANDS
+# (`LANDER`, `GATE_CMD`, `WIRING_CHECK`) — a trailing CR on a CRLF checkout does not merely dirty a
+# string here, it appends a carriage return to the command the run lands with.
+.unattended.conf text eol=lf
+tools/unattended/.unattended.conf.example text eol=lf
+# The shipped protocol is BYTE-COMPARED against this repo's installed copy under `memory/guides/`,
+# which `memory/**/*.md` already pins. A gate that byte-compares needs BOTH halves — the pin so the
+# committed bytes are right, and CR normalisation in the comparison so a Windows checkout does not
+# red every line — and the shipped half had only the second.
+tools/unattended/*.md text eol=lf
+
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf
 memory/map/affordance-exempt.toml text eol=lf

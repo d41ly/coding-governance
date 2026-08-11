@@ -1,6 +1,6 @@
 # TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it
 
-**Status:** SPECCED · rev-3 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams tooling · ratified 2026-08-10 · review wf_077104e6
+**Status:** CLOSED · rev-5 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams tooling · ratified 2026-08-10 · review wf_077104e6
 
 ## 1. Goal
 
@@ -87,11 +87,25 @@ The prohibition on the authored half narrows accordingly: it must never restate 
 ### The anchor ban
 
 Check 13 files any anchor found inside `memory/builds/<slug>/` under that slug, so a dash row
-reading `- <FAMILY>-<slug>-<seq> ·` inside `RUN.md` would make this build a second claimant of an id
-the backlog already defines. Authored rows therefore cite ids inline in prose and never lead with a
-dash or a pipe followed by an id. Check 14 binds from the other side: a bare id may not appear
-before something anchors it, so a unit is minted as a backlog row before `RUN.md` names it. A sha
-and a workflow id are safe on both counts, being neither links nor grammar-recognised ids.
+reading `- <FAMILY>-<slug>-<seq> ·` inside `RUN.md` makes this build a claimant of that id.
+
+Corrected at rev-4, against the engine rather than against this paragraph. Check 13 counts BUILD
+FOLDERS, not definitions — `corpus_ids.py` says so in its own comment, because a decision-log row and
+its spec's H1 anchor one id by design. A backlog row therefore defines an id and adds no folder, so a
+`RUN.md` dash row naming its OWN build's id collides with nothing. What DOES collide is the row a
+run-state file is most likely to write: a parked or dependency entry leading with another build's id,
+which makes this folder a second claimant. The ban is unchanged and its reach is wider than stated —
+it binds hardest on exactly the cross-build rows the authored region exists to hold.
+
+Second correction: checks 13-16 are OFF outright when every pin in `.memory-tree.conf` is blank
+(`armed()`). Measured while arming this — on a tree with no pin, `def_builds` held both slugs and
+`--check` still returned 0 — so the fixture lives in its own scratch tree with `ORPHAN_ID_PIN` set,
+and an arm written against the main fixture tree would have passed against a disabled check.
+
+Authored rows therefore cite ids inline in prose and never lead with a dash or a pipe followed by an
+id. Check 14 binds from the other side: a bare id may not appear before something anchors it, so a
+unit is minted as a backlog row before `RUN.md` names it. A sha and a workflow id are safe on both
+counts, being neither links nor grammar-recognised ids.
 
 Check 2 binds too: no relative `.md` link may name a file that does not exist yet, so a planned unit
 is named, never linked, until its sub-spec lands.
@@ -206,8 +220,12 @@ file under `tools/`, `skills/`, `.claude/`, the playbook template, its two compa
 
 ## 8. Open questions
 
-Two forks were raised by the Tier-2 review and both are resolved. The build-level decision menu is
-in this build's `README.md`.
+none
+
+Two forks were raised by the Tier-2 review and both are resolved; they are kept below as the record
+of what was decided. The leading token is what check 12 reads on a terminal spec — it accepts only
+`none`/`N/A` there, and the "fully RESOLVED" alternative `TEMPLATE-SPEC.md` documents is not
+implemented (`TOOL-aCandidStub-3`). The build-level decision menu is in this build's `README.md`.
 
 ### B1 — what does `RUN.md` join in the hygiene engine?
 
@@ -238,6 +256,17 @@ hygiene check watches.
   B3 splits the keepalive by actor in unit 2, and the stale agent-cap file list is gone with the
   units it belonged to. Corrected here: the four shape-stating doc sites, AC1's fixture, the 239 s
   bar baseline, and §10's characterisation of the nine `unattended` files.
+- rev-4 · 2026-08-10 · BUILT, on the unit branch, unmerged — hence INPROGRESS rather than CLOSED,
+  which this spec's own §4 defines as built AND landed. Engine at kit memory-tree@2.3: `RUN.md` in
+  check 4's whitelist, in `index_set()` and in `ex7`; NOT in check 8. Four doc sites moved in one
+  commit. Self-test 120 -> 130 assertions. Two §4 claims were corrected by running the predicate
+  before trusting it, per the standing trap: check 13 keys on BUILD FOLDERS rather than on
+  definitions, and checks 13-16 are disabled outright when every pin is blank, which would have left
+  the anchor arm passing against a switched-off check. No new `fail` branch was added, so
+  `ARMS_FLOORS` stays 14:14 — S3's re-measurement is vacuous here rather than skipped, and
+  `check-arms.py --check` is green.
+
+- rev-5 · 2026-08-10 · LANDED on `main` in the merge commit that closes this build. CLOSED in this tree's vocabulary means built AND landed, which is true from the moment that commit exists; the push publishes it.
 
 ## 10. Reuse audit
 

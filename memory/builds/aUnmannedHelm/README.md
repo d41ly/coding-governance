@@ -34,38 +34,53 @@ hook's schedule.
 
 ## Start here
 
-**State.** Unit 1 is SPECCED and has cleared a Tier-2. Units 2 through 7 have no sub-spec yet.
-Nothing here is built.
+**State.** All seven units are SPECCED, BUILT and REVIEWED on
+`branch/aunmannedhelm-build-setup-38f3a9`, and **unmerged**. A second Tier-2 ran over the built diff
+and returned "do not land" on three reproduced authorization blockers; all three are fixed and armed,
+and the review record is `reviews/2026-08-10-review-aUnmannedHelm-2.md`. Every unit sits at INPROGRESS rather than CLOSED, which in this tree's vocabulary means
+built-but-not-landed — the state this build's own unit 1 argued the seven-token set cannot express.
 
-**Next action, either of:** write unit 2's sub-spec (the protocol document, which the other units
-consume), or build unit 1 from `spec/2026-08-10-spec-aUnmannedHelm-1.md`, which stands alone.
+**Next action:** none for the build itself. The owner asked for the merge and the push explicitly,
+which is the rule as it stands. This run carried a chat instruction, not a committed standing
+mandate — so the kit it just shipped would have refused to land it, correctly, and that refusal is
+the first honest test of the thing.
 
-**Read before writing any sub-spec:** `reviews/2026-08-10-review-aUnmannedHelm-1.md`. The
-obligations column below is a one-line summary of what that review pinned on each unit, not a
-replacement for it.
+**What is NOT done, and is not design work:**
 
-**Live constraints, measured 2026-08-10 and re-measurable:**
+- No end-to-end unattended run has been driven through the kit. Five legs prove the pieces refuse and
+  agree in fixtures; none proves a real run reaches `LANDED`.
+- The adopter e2e's junction arm SKIPS on node `a`, which cannot create a symlink. It skips loudly,
+  but the install shape this fleet actually uses is unexercised here.
+- The two keepalive DoD items are agent-attested by construction and remain the softest part of the
+  contract.
 
-- The playbook template has **80 bytes free** at v2.5, not the 685 this build was designed against.
-  A `aCandidStub` landing spent the headroom. Unit 2's playbook rules must be sized against 80, or
-  fund themselves by moving prose into the companion.
-- `non_terminal_specs_cited_by_product_source` sits AT its pin with zero headroom. No file under
-  `tools/`, `skills/`, `.claude/`, the template, its companions or `WIRE-INTO-PROJECT.md` may cite
-  this build's ids while the owning sub-spec is non-terminal. Records under `memory/` may.
-- `TOOL-aNumeralWarden-1` is NOT a blocking dependency. It owns every agent-cap edit; it does not
-  gate any unit here.
+**Read before reviewing:** `reviews/2026-08-10-review-aUnmannedHelm-1.md`. The obligations column
+below is a one-line summary of what that review pinned on each unit, not a replacement for it.
+
+**Live constraints, re-measured 2026-08-10 at the end of the build:**
+
+- The playbook template has **154 bytes free** at v2.6, up from the 80 this build started against.
+  Unit 2 needed 114 for F1's amendment and funded them by externalizing the kickoff-manifest merge
+  exception into the new companion §1 — the sanctioned move, and it is available again.
+- `non_terminal_specs_cited_by_product_source` still sits AT its pin of 2 with zero headroom, and no
+  file under `tools/`, `skills/`, `.claude/`, the template, its companions or `WIRE-INTO-PROJECT.md`
+  cites this build's ids. Records under `memory/` do, freely.
+- `TOOL-aNumeralWarden-1` was NOT a blocking dependency and never became one.
 
 ## The units
 
-| Unit | Subject | Obligations the Tier-2 review pinned |
+Every row's obligation was met. Where the build DEPARTED from the pinned wording, the reason is in
+that unit's own §9 and summarised in the last column.
+
+| Unit | Subject | Obligation pinned → what landed |
 |---|---|---|
-| **Unit 1** | the run-state file `RUN.md` | Joins the check-4 whitelist and `index_set`, with a check-7 exemption; NOT check 8. Moves four doc sites, not two. Carries the run BASE as an authored fact. Specced — see `spec/2026-08-10-spec-aUnmannedHelm-1.md` |
-| **Unit 2** | the protocol document + domain-rules §15 | Owns keepalive schedule AND reap as agent obligations naming the tool calls. Names `bash tools/push-main.sh` as the landing step, never `--no-verify`. Ships a kit-owned CORE DoD set the project layer may only extend |
-| **Unit 3** | the driver `tools/unattended/` | `--preflight` ASSERTS the mandate, never writes it; RECORDS a keepalive id the agent hands it; delegates to `check-wiring.sh --check`, not `--fix`. Per-verb acceptance for `--resume` and `--status` |
-| **Unit 4** | the gate leg | Budget THREE `gate-legs.json` entries, not one. Witness PRESENCE is its own `fail` branch. Asserts at most one run-state file is in a non-terminal phase. Two-granularity population guard |
-| **Unit 5** | the rendered skill | `.gitattributes` pin only — `check-wiring.sh`'s eol population is derived, so the script itself needs no edit. Drift and CRLF each need an acceptance criterion |
-| **Unit 6** | the `/session-kickoff` hand-back | Enumerate all six interactive exits by line, not five. Needs the acceptance criterion it currently lacks: mandate present hands back, mandate absent still stops |
-| **Unit 7** | the adopter path | Refuses a foreign repo and an unsupported prefix; ADOPTS correctly through a junction. Bumps the `governance-template` marker to v2.6 with a v2.5 archive snapshot — v2.5 was taken by aCandidStub on 2026-08-10 |
+| **Unit 1** | the run-state file `RUN.md` | check-4 whitelist + `index_set` + check-7 exemption, NOT check 8; four doc sites; the run BASE authored. **Met.** Two spec claims corrected against the engine: check 13 keys on BUILD FOLDERS, and checks 13-19 are OFF unless a pin is armed |
+| **Unit 2** | the protocol document + a domain-rules section | keepalive split by actor; the lander named and `--no-verify` banned; a kit-owned CORE DoD set. **Met.** The section is companion **§1**, not §15 — template §15 is Voice and the companion mirrors template numbers — and the template gained no new section, because a kit-conditional rule in universal core is the objection the review raised about F1 |
+| **Unit 3** | the driver `tools/unattended/` | assert not write; record not schedule; `--check` not `--fix`; per-verb acceptance. **Met**, 26 branches all armed. A merge-base fallback to HEAD was caught and removed: it would have made the mandate check pass by construction |
+| **Unit 4** | the gate legs | THREE entries; witness PRESENCE its own branch; at most one live run; two-granularity population guard. **Met.** The core-set assertion became a shrink-only COUNT: the membership form was measured unfailable, because the leg composes the effective set FROM core |
+| **Unit 5** | the rendered skill | `.gitattributes` pin only; drift and CRLF each with a criterion. **Met**, plus a fourth leg so the drift criterion is on the bar at this unit's landing, and a placeholder-completeness check the parity diff cannot see |
+| **Unit 6** | the `/session-kickoff` hand-back | all six exits enumerated; mandate present hands back, absent still stops. **Met.** Five of the six resolve by ABORTING or PARKING; the mandate buys exactly one |
+| **Unit 7** | the adopter path | refuses a foreign repo and an unsupported prefix, ADOPTS through a junction; v2.6 with a v2.5 snapshot. **Met.** The refusal ORDER was wrong and the e2e caught it — the conf check fired first and pointed the operator at the wrong repo |
 
 ## Ratified decisions
 
@@ -101,7 +116,27 @@ driver only records the id and asserts a recorded reap.
 
 ## Review record
 
-`reviews/2026-08-10-review-aUnmannedHelm-1.md` — Tier-2 on the rev-2 spec. Five spec lenses over 57
+`reviews/2026-08-10-review-aUnmannedHelm-2.md` — Tier-2 over the BUILT diff at tip `f1ad6e9`. 37 raw,
+34 confirmed, precision 0.92, consolidating to 15 distinct defects: 3 blockers, 4 highs, 6 mediums,
+2 lows. Verdict: do not land. Every blocker was reproduced end-to-end before a line was changed, and
+re-tested after.
+
+The three blockers were one rule broken at three layers — **every input to the mandate comparison
+must lie outside the run's reach**, and all three inputs were supplied or steerable by the subject
+the check distrusts:
+
+- the BASE was read from the run-written record, and an absent line degenerated the comparison to the
+  git INDEX, so both sides became bytes the run had just staged;
+- the anchor was a bare local branch, so `git branch -f main HEAD` made BASE equal HEAD — the
+  NO-FALLBACK-TO-HEAD comment was satisfied while the destination was reached by moving the anchor;
+- the malformed-marker signal was discarded with `|| true`, so a SECOND run-authored mandate block
+  granting force-push compared byte-equal to the owner's.
+
+The fourth finding was the one that made the other three survivable: **the merge bar performed no
+mandate assertion at all** — the leg did not contain the string `run:mandate`. It checked the
+paperwork and never the claim.
+
+`reviews/2026-08-10-review-aUnmannedHelm-1.md` — the earlier Tier-2, on the rev-2 spec. Five spec lenses over 57
 raw findings, five batched default-refute skeptics, 50 confirmed at precision 0.88, no lens dead.
 Eight blocker-severity findings collapsing to five distinct defects, all folded at rev-3.
 
@@ -109,9 +144,15 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer · ids TOOL-aUnmannedHelm-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | SPECCED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | CLOSED | rev-5 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-4 — the protocol document, and the authorization it rests on](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md) | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | CLOSED | rev-4 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | CLOSED | rev-4 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | CLOSED | rev-3 | 2026-08-10 |
 <!-- /gen:build-index -->

@@ -75,7 +75,7 @@ if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLAT
   echo "- [TEMPLATE-SPEC.md](TEMPLATE-SPEC.md) — the canonical spec / design-pass format (hygiene check 12)."
   echo "- [HYGIENE.md](HYGIENE.md) — the rule set; the check script is its enforcement."; echo
   echo "## Directories"; echo
-  echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
+  echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
   echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches."; echo
   echo "## Streams (the closed enum)"; echo
