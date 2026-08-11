@@ -332,6 +332,13 @@
     ]
   },
   {
+    "name": "run-gates evidence",
+    "argv": [
+      "bash",
+      "tools/run-gates.evidence.test.sh"
+    ]
+  },
+  {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
