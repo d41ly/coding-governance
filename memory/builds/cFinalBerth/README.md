@@ -4,17 +4,17 @@ node: c
 opened: 2026-08-13
 streams: tooling
 roster: TOOL
-ids: TOOL-cFinalBerth-1 TOOL-cFinalBerth-2
+ids: TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
 ---
 
 # cFinalBerth — the run that can finish
 
 Node `c` · opened 2026-08-13 · streams tooling.
 
-The unattended kit has ten phases and no way to reach the last two. `--phase` refuses a terminal
-phase, saying it is `--close`'s to write; `--close` writes `LANDING`. Nothing in the driver writes
-`LANDED` or `ABORTED`. A run therefore cannot finish, and a record that cannot finish is counted as
-live forever by the driver's own single-live precondition and by leg check 7.
+The unattended kit had ten phases and no way to reach the last two. `--phase` refused a terminal
+phase, saying it was `--close`'s to write; `--close` wrote `LANDING`. Nothing in the driver wrote
+`LANDED` or `ABORTED`. A run therefore could not finish, and a record that cannot finish is counted
+as live forever by the driver's own single-live precondition and by leg check 7.
 
 This README is the master overview and the owner decision menu, per `memory/TEMPLATE-SPEC.md`.
 
@@ -41,10 +41,12 @@ in isolation. The seam between them is the defect, and it is precisely the class
 `TOOL-aStandingWrit-8` names: the kit has driver arms, leg arms and parity arms, and no arm that
 runs the driver and then the leg over one tree.
 
-**What is observable in this repo right now.** The record at `memory/builds/aSealedCaravan/RUN.md`
-sits at phase `BUILDING`. That run landed — `main` carried its work at `7a4f904` with the full bar
-green — and it could not be closed. It is the only run-state file in the tree, so leg check 7 counts
-one live run and stays green by one. The next unattended run makes it two, and the bar reds.
+**What was observable in this repo when the build opened.** The record at
+`memory/builds/aSealedCaravan/RUN.md` sat at phase `BUILDING`. That run landed — `main` carried its
+work at `7a4f904` with the full bar green — and it could not be closed. It was the only run-state
+file in the tree, so leg check 7 counted one live run and stayed green by exactly one: the next
+unattended run would have made it two and red the bar. It now reads `LANDED`, repaired by unit 2's
+S7, and the tree carries no non-terminal run.
 
 **Why the second unit is here and not in a follow-up.** Not because it is the only way to unwedge
 `aSealedCaravan` — the spec audit refuted that reason, and unit 2's own S7 repairs that record
@@ -109,7 +111,7 @@ Records live under `spec/` and `reviews/`. The table below is GENERATED from the
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling · ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2
+**Build status:** SPECCED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling · ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

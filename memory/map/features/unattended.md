@@ -69,8 +69,8 @@ without that floor, deleting an item is a silent, reason-free override of everyt
 and the fleet already has a recorded case of a pin RAISE being indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is
-byte-compared against a fresh render; the authored region holds only the five facts nothing in the
-tree derives. The precedent is in this repo: one build's hand-kept status file still reads
+byte-compared against a fresh render; the authored region holds only the facts nothing in the
+tree derives — seven of them, enumerated in the protocol's own section 2 rather than counted here. The precedent is in this repo: one build's hand-kept status file still reads
 IN-PROGRESS while the generated region of the same build's README correctly reads CLOSED. The
 authored half rotted and the derived half did not.
 
@@ -104,11 +104,17 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-All seven units are built on the unit branch and UNMERGED. What remains is not design work:
+*Re-derived 2026-08-13 against the tree rather than carried forward. Three claims that stood here
+were stale: the units are on `main`, not unmerged; a run HAS been driven; and the authored region
+carries seven facts, not five. Dossier prose is ungated — only the claims tables above are — so this
+section rots silently and is worth re-deriving whenever the feature is touched.*
 
-- **No end-to-end run has been driven through this kit.** Every property above is designed,
-  gated and documented; none is yet observed on a live unattended run. The five legs prove the
-  pieces refuse and agree in fixtures — they do not prove a real run reaches `LANDED`.
+- **A run has been driven end to end, and it exposed two defects rather than confirming the
+  design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.
+  It then could not be CLOSED, and its record sat non-terminal for three days. Both causes are
+  fixed in `cFinalBerth`: no verb produced a terminal phase at all, and `--close` refused every run
+  whose HEAD was already published. What a live run proved was that the pieces refusing correctly
+  in fixtures did not add up to a lifecycle.
 - **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
   create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
   actually installs with is therefore unexercised here and needs a run on a node that can link.
@@ -121,7 +127,20 @@ All seven units are built on the unit branch and UNMERGED. What remains is not d
   the leg's is not. It reads `GOV_DEFAULT_BRANCH` and `refs/remotes/origin/<d>`, so handed a tree
   with a forged tracking ref it recomputes the same wrong value and agrees. The driver refuses such a
   run before a run-state file exists, so the reachable damage is bounded, but the leg's own
-  independence is not what it claims. Scoped as the next unit.
+  independence is not what it claims. Open as `TOOL-aStandingWrit-6`.
+
+- **Check 9's three silent exits were specced and never landed.** The `aMooredAnchor` spec's S4
+  scoped a named refusal for each — the default branch is unresolvable, no candidate ref resolves,
+  and a candidate resolves but the merge-base fails — and its rev-4 rebase note lists four items
+  carried forward with S4 absent from them. The spec closed anyway. So on a clone with no
+  `origin/HEAD` and no environment override, the whole `if [ -n "$d" ]` block is skipped in silence,
+  and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
+  above, and it was owned by nobody until this dossier row.
+
+- **The shipped protocol's version marker is not paired by any gate.** `check-kit-versions.sh` pairs
+  this kit's two script constants and not the doc it ships, which is how the marker sat at `1.2`
+  against `1.3` unnoticed. The memory-tree and memory-recall kits both pair their shipped doc; this
+  one does not. Corrected by value at 1.4; the gate is the open work.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.
