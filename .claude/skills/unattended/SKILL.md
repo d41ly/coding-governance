@@ -105,6 +105,31 @@ Never with a hook-bypass flag. The lander is mandatory because it reconciles the
 gate, so the bar never runs on an already-stale tree. If it refuses, read why and fix it — bypassing
 discards the entire bar the authorization leaned on, and the gate greps your run-state file for the flag.
 
+## Mark it landed — the run is not finished until you do
+
+```bash
+bash tools/unattended/unattended.sh --landed <slug>
+```
+
+**Run this AFTER the lander returns, not before.** It re-observes the remote and refuses unless HEAD
+is an ancestor of the tip the remote advertises, so it is the one phase claim you cannot simply
+assert — which is the point. Then commit the record it writes and land that commit too; until it is
+committed, every later run still counts yours as live and the bar reds on the second one.
+
+`--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
+Definition of Done was evaluated without evaluating it.
+
+## If it cannot finish
+
+```bash
+bash tools/unattended/unattended.sh --abort <slug> --reason "<what stopped it, and what you refused to decide>"
+```
+
+The reason is required and lands in the parked region, because an abort with no recorded reason is
+indistinguishable from a run that simply stopped. You still owe both attestations first — reap the
+keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
+leaves exactly the same decisions unseen. An abort does not merge and does not push.
+
 ## Reap
 
 Delete the keepalive with `CronDelete` before you finish. Nothing else can: when your
