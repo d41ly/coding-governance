@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-13
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-cKeyedLaunchpad-1 TOOL-cKeyedLaunchpad-5
+ids: KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 TOOL-cKeyedLaunchpad-5
 ---
 
 # cKeyedLaunchpad — the kickoff kit re-grounded, and the manifest it reads put under gates
@@ -27,11 +27,11 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1` and
-`TOOL-cKeyedLaunchpad-5` are authored and unreviewed; the other five are MISSING. No code is written
+**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1`, `-2` and
+`TOOL-cKeyedLaunchpad-5` are authored and unreviewed; the other four are MISSING. No code is written
 and none may be until each unit's spec is authored and reviewed, per `BUILD-METHOD.md` M2's hard floor.
 
-**Next action:** author the remaining five unit specs, then run the M4 spec audit over the set.
+**Next action:** author the remaining four unit specs, then run the M4 spec audit over the set.
 
 **Authoring order** (owner, 2026-08-13): `TOOL-cKeyedLaunchpad-5` first, then dependency order —
 `-2`, `-3`, `-4`, `-6`, `-7`. U5 is front-loaded because it is Tier 1 and depends on nothing, so
@@ -65,7 +65,7 @@ carries its id.
 | Unit | Id | Mechanism | Tier | Class | Depends on |
 |---|---|---|---|---|---|
 | U1 | `KICK-cKeyedLaunchpad-1` | skill-install freshness reported by `check-wiring.sh` | 1 | authored, unreviewed | none |
-| U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | MISSING | none |
+| U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | authored, unreviewed | none |
 | U3 | `KICK-cKeyedLaunchpad-3` | ratchet checks C7 size, C8 line length, C9 stamp age | 2 | MISSING | U2 |
 | U4 | `KICK-cKeyedLaunchpad-4` | the sealed §A region and its byte-compare | 2 | MISSING | U3 |
 | U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | authored, unreviewed | none |
@@ -105,17 +105,38 @@ unit's §8 carries the mark in place, naming the owner as resolver.
    are recurring bug classes become `memory/gotchas/` records reachable through U5's `--for-paths`
    selector. Traps that are genuinely machine-local stay in the manifest under a hard bullet cap.
 
+## Parked
+
+Written per `BUILD-METHOD.md` M6: the question, the options seen, and the reason it was refused. A
+bare "parked" is indistinguishable from "forgotten".
+
+1. **`AGENTS.md` is gated by nothing.** Grounding for U2 found that the charter can cite a file that
+   does not exist and the full bar stays green. Hygiene check 15's dead-path population is `memory/`
+   only, and `check-install-prefix.sh`'s population is `tools/*`, `skills/*`, `.githooks/*`, the
+   template families and `WIRE-INTO-PROJECT.md`. Neither reaches `AGENTS.md`. Options seen: widen
+   check 15's population to the charter, add a charter-scoped path check, or accept it. Refused here
+   because it is a new gate over a file outside this build's scope, and U2 already carries three
+   kits. It matters because `AGENTS.md:54` is one of the paths U2 rewrites, so the interval where it
+   could be wrong is real.
+2. **The kit/dogfood parity leg's guard does not cover its own live half.** The leg guards on
+   `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `tools/lib/` and `tools/memory-tree/`, but the
+   pair it validates includes `memory/guides/BUILD-METHOD.md`. A diff-scoped run touching only the
+   live copy skips the leg; only `GATE_FULL=1` catches it. Options seen: add the guide paths to the
+   guard, or rely on the pre-push full bar. Refused here because changing a leg guard is a merge-bar
+   change with its own blast radius. U2 works around it by requiring a `GATE_FULL=1` run.
+
 ## Unit index
 
 Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 TOOL-cKeyedLaunchpad-5
+**Build status:** OPEN · 3 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 TOOL-cKeyedLaunchpad-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-1 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-1 | 2026-08-13 |
 | [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-1 | 2026-08-13 |
 <!-- /gen:build-index -->
 
