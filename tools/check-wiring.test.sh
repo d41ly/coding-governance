@@ -558,5 +558,79 @@ else
   fi
 fi
 
+# ---- KICK-cKeyedLaunchpad-1: the machine-global /session-kickoff install ------------------------
+# Every arm drives HOME at a scratch dir, so nothing reads or writes the operator's real install.
+# The tracked side is faked inside the throwaway repo, which is what makes the adopter arm (AC7)
+# reachable at all: an adopter has the install and NO tracked kit source.
+skill_fixture() {   # $1=1 to lay a tracked skills/session-kickoff/ into the repo
+  FAKEHOME=$(mktemp -d); mkdir -p "$FAKEHOME/.claude/skills/session-kickoff"
+  if [ "${1:-0}" = 1 ]; then
+    mkdir -p skills/session-kickoff
+    printf 'engine\n' > skills/session-kickoff/SKILL.md
+    printf 'template\n' > skills/session-kickoff/MANIFEST-TEMPLATE.md
+    printf 'checker\n' > skills/session-kickoff/manifest-check.sh
+    git add -A >/dev/null 2>&1; git commit -q -m skill
+  fi
+}
+install_engine() {  # $1=SKILL.md body
+  printf '%s' "$1" > "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md"
+  printf 'template\n'  > "$FAKEHOME/.claude/skills/session-kickoff/MANIFEST-TEMPLATE.md"
+  printf 'checker\n'   > "$FAKEHOME/.claude/skills/session-kickoff/manifest-check.sh"
+}
+skill_run() { HOME="$FAKEHOME" bash "$SCRIPT" --check 2>/dev/null | grep ' skill  ' || true; }
+
+newrepo; skill_fixture 1; rm -rf "$FAKEHOME/.claude/skills/session-kickoff"
+out=$(skill_run)
+case "$out" in "skip     skill"*"not installed on this machine"*) r=1 ;; *) r=0 ;; esac
+ck "AC1 no install on this machine -> skip" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+newrepo; skill_fixture 1; install_engine 'engine
+'
+out=$(skill_run)
+case "$out" in "ok       skill"*"matches tracked"*) r=1 ;; *) r=0 ;; esac
+ck "AC3 installed engine matches tracked -> ok" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+newrepo; skill_fixture 1; install_engine 'DIFFERENT
+'
+out=$(skill_run)
+case "$out" in "UNWIRED  skill"*"differs from tracked in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
+ck "AC2 installed SKILL.md differs -> UNWIRED naming the file" "$r"
+case "$out" in *"Fix:"*) r=1 ;; *) r=0 ;; esac
+ck "AC2 the UNWIRED line carries a Fix remedy" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+# AC4 — CRLF on the installed side must NOT read as drift. This is the arm that fails if either half
+# of the normalisation is dropped, and the one the repo's own trap says a byte-compare always needs.
+newrepo; skill_fixture 1; install_engine 'engine
+'
+printf 'engine\r\n' > "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md"
+out=$(skill_run)
+case "$out" in "ok       skill"*) r=1 ;; *) r=0 ;; esac
+ck "AC4 a CRLF installed copy is not reported as drift" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+newrepo; skill_fixture 1; install_engine 'engine
+'
+rm -f "$FAKEHOME/.claude/skills/session-kickoff/manifest-check.sh"
+out=$(skill_run)
+case "$out" in "UNWIRED  skill"*"missing manifest-check.sh"*) r=1 ;; *) r=0 ;; esac
+ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+# AC7 — the adopter shape: the install exists, the repo tracks no kit source. Without this state the
+# check is a permanent false alarm in every adopting repo.
+newrepo; skill_fixture 0; install_engine 'engine
+'
+out=$(skill_run)
+case "$out" in "skip     skill"*"not adopted in this repo"*) r=1 ;; *) r=0 ;; esac
+ck "AC7 install present, kit not adopted here -> skip (not a false alarm)" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+# AC5 — --fix must NOT touch the install. The out-of-repo write is refused by design, so the bytes
+# are compared before and after rather than the refusal being argued in prose.
+newrepo; skill_fixture 1; install_engine 'DIFFERENT
+'
+before=$(cat "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md")
+HOME="$FAKEHOME" bash "$SCRIPT" --fix >/dev/null 2>&1 || true
+after=$(cat "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md")
+ck "AC5 --fix leaves the out-of-repo install byte-identical" "$([ "$before" = "$after" ] && echo 1 || echo 0)"
+rm -rf "$FAKEHOME"; cleanup
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
