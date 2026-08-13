@@ -272,19 +272,54 @@ resolve_base() {
 # message channel is the fix, and it is why this function returns 0/1 and sets `TB`.
 TB=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
-  local fresh rc rec
+  local fresh rc rec head rec0
   TB=""
   fresh=$(resolve_base); rc=$?
   if [ "$rc" = 2 ]; then
-    # BASE == HEAD. Legal only where the caller says so, and only ONE caller does - see verb_preflight.
+    # BASE == HEAD. Legal outright where the caller says so, and only ONE caller does - see
+    # verb_preflight, where a run has correctly built nothing yet and the file may not exist at all.
     if [ "${2:-}" = "allow-degenerate" ]; then
       TB=$(GIT rev-parse HEAD)
       return 0
     fi
-    fail 16 "the merge-base equals HEAD, so the run authored every byte the authorization comparison would read; nothing was built on top of the anchor"
-    return 1
-  fi
-  if [ "$rc" != 0 ] || [ -z "$fresh" ]; then
+    # NARROWED, not deleted. The refusal that used to sit here fired UNCONDITIONALLY at --close and
+    # said "the run authored every byte the authorization comparison would read; nothing was built on
+    # top of the anchor". Under the OBSERVED anchor that sentence is false: a merge-base equal to HEAD
+    # means HEAD is an ANCESTOR of the tip the remote advertises, so every byte at the base is
+    # PUBLISHED. It dates from an anchor that was a local ref the run could rewrite offline, where the
+    # same condition really did mean "the anchor is my own commit" - and verb_preflight's own comment
+    # already says the relaxation is sound precisely because the anchor moved.
+    #
+    # Reproduced on this repo's tree with a control: --close refused, and the record was byte-identical
+    # afterwards, so it was a WEDGE rather than a corruption. Every successful landing ends in exactly
+    # this state, so the kit could not close any run that had landed.
+    #
+    # What the refusal bought was the run that built NOTHING, and the merge-base cannot express that:
+    # it equals HEAD in the built-nothing state AND in the fully-landed state. The RECORDED base can,
+    # because it is pinned once at preflight and does not move. So the guard stays at the verb the
+    # owner scoped it to and its QUESTION changes.
+    #
+    # THE COST, ACCEPTED BY THE OWNER WITH IT NAMED (build fork F3, 2026-08-13): the recorded base is
+    # written by the run, so a run can edit one line to pass this refusal. Three things bound it and
+    # none removes it. It decides only WHETHER to refuse - the commit the authorization comparison
+    # reads is the derived, published one, never this value. An ABSENT value is a refusal, not a pass,
+    # which is what keeps this path out of the class where a deleted base line degenerated a
+    # comparison to the git index. And leg check 9 asserts the same facts independently on the bar.
+    head=$(GIT rev-parse HEAD)
+    rec0=$(fact "$1" base)
+    if [ -z "$rec0" ]; then
+      fail 16 "the merge-base equals HEAD and the record pins no BASE to tell a landed run from one that built nothing, and an absent discriminator is a refusal rather than a pass"
+      return 1
+    fi
+    if [ "$rec0" = "$head" ]; then
+      fail 16 "the recorded BASE equals HEAD, so this run built nothing on top of the anchor and has nothing to land; that is the state the merge-base could not distinguish from a landed one"
+      return 1
+    fi
+    # FALL THROUGH to the shared cross-check below with the derived value set to HEAD. The early
+    # return this replaces SKIPPED that cross-check entirely, so --close now runs a comparison on this
+    # path that no caller used to run.
+    fresh="$head"
+  elif [ "$rc" != 0 ] || [ -z "$fresh" ]; then
     fail 16 "no merge-base against the tip the remote advertises, so this run shares no history with the branch it means to land on; the anchor is never a local ref and never a name from the environment"
     return 1
   fi

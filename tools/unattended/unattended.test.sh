@@ -393,12 +393,48 @@ git replace -d "$BASE" >/dev/null 2>&1
 # ---- nothing yet, and a refusal at --close, where a run that built nothing has nothing to land. Both
 # ---- arms run against the SAME fixture one command apart, which is the only way to show it is the
 # ---- VERB that differs and not the tree.
+# ---- ...and after unit 2 the split SURVIVES but --close's refusal is CONDITIONAL. All four branches
+# ---- run against one fixture, which is still the only way to show the verb differs and not the tree.
 reset_tree; git push -q -f origin unit:main
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "preflight OK"
-miss "$out" "the merge-base equals HEAD"
+miss "$out" "the recorded BASE equals HEAD"
+# BRANCH 1 — the run that built NOTHING. preflight pinned the base AT HEAD through the degenerate
+# path, so the recorded value still equals HEAD and there is nothing to land. This is the property
+# the old unconditional refusal bought, and it is the one that had to survive the narrowing.
 out=$(run --close tRun)
-hit "$out" "the merge-base equals HEAD, so the run authored every byte the authorization comparison would read; nothing was built on top of the anchor"
+hit "$out" "the recorded BASE equals HEAD, so this run built nothing on top of the anchor and has nothing to land; that is the state the merge-base could not distinguish from a landed one"
+
+# BRANCH 2 — an ABSENT discriminator FAILS CLOSED. Deleting one line from a run-written file must not
+# be the way past this refusal; the kit's recorded scar is a deleted base line degenerating a
+# comparison to the git index, and this is the same shape one verb over.
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the merge-base equals HEAD and the record pins no BASE to tell a landed run from one that built nothing, and an absent discriminator is a refusal rather than a pass"
+
+# BRANCH 3 — a base off the history the anchor blesses. The early return this replaces SKIPPED the
+# cross-check entirely, so --close now runs a comparison on this path that no caller used to run.
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+# An ORPHAN commit — a real object in this repo that is on no history HEAD reaches. `commit-tree`
+# with no parent is the cheapest way to get one, and it is a genuine commit rather than a
+# rev-parse failure, so this arm tests ANCESTRY and not resolvability.
+ALIEN=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m alien </dev/null)
+sed -i "s/^base: .*/base: $ALIEN/" memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
+
+# BRANCH 4 — THE POINT OF THE UNIT: a run whose work is fully LANDED can close. Same degenerate
+# merge-base as branch 1, and the only difference is that the recorded base is no longer HEAD —
+# which is exactly the discriminator the merge-base cannot express.
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main
+out=$(run --close tRun)
+miss "$out" "the recorded BASE equals HEAD"
+miss "$out" "an absent discriminator is a refusal"
+hit "$out" "close OK"
+same "the landed run reached LANDING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
 git push -q -f origin "$BASE":main
 
 # ---- check 9, both branches: the marker pair is malformed in the SOURCE and in the TARGET. The

@@ -13,8 +13,8 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 574532f34ee0a4eb2b54319bff74b0c64ff6cdd2
-phase: BUILDING
+witness: 7a4f904f3d77d9e9b75d50fc7231c87522393571
+phase: LANDED
 keepalive: 984e2e05
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 7a4f904f3d77d9e9b75d50fc7231c87522393571
@@ -24,6 +24,19 @@ parked-surfaced: yes
 base: 7a4f904f3d77d9e9b75d50fc7231c87522393571
 
 ## Parked
+
+**REPAIRED 2026-08-13 by TOOL-cFinalBerth-2, as a records repair and NOT as a close.** This run
+landed — `main` carried its work at `7a4f904` with the full bar green through the pre-push hook — and
+then could not be closed, so the record sat at `BUILDING` and the tree counted a finished run as live
+forever. The phase is now `LANDED` and the witness is the landing sha, which is the commit the remote
+actually advertises through.
+
+It was NOT closed with the verb, deliberately. This run's process is long gone; running `--close`
+against its record from a later branch would evaluate the Definition of Done against a tree that is
+not the one it ran on, and report the answer as if it were. What the record needed was to say what
+happened, which is what a repair is for. The defect that stranded it is fixed in the same unit: the
+degenerate-base refusal at `--close` now asks the recorded base rather than the merge-base, so a run
+whose work is fully landed can close and a run that built nothing still cannot.
 
 **The run LANDED but could not be CLOSED, and the kit is right to refuse.** `main` is at 7a4f904 with
 the full bar green at 53/53 through the pre-push hook, so the work is in. `--close` then blocks:
