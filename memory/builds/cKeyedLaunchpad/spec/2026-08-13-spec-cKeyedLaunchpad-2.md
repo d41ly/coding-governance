@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -46,8 +46,11 @@ here.
   population does not reach the charter. That gap is real and is parked in the build README as a
   follow-up; closing it is a different unit.
 - **No retrofit of adopters.** NicoCares keeps `.claude/`, which survives as location 2.
-- **`READ_PATH_CEILING` is not left raised.** U6 lowers it once the traps are evicted. This unit owns
-  the raise and names the obligation; it does not own the lowering.
+- **`READ_PATH_CEILING` is not left raised.** U6's S8 lowers it once the traps are evicted, with its
+  own Files-touched row and criterion. This unit owns the raise; the obligation is ACCEPTED there, not
+  merely named here. The M4 audit found rev-1 named a sibling that had not taken the work, and nothing
+  on the bar would ever have noticed — the ceiling only fails when exceeded, so one left high is green
+  forever.
 - No change to C1-C6, and no manifest-format version bump. U3 owns that.
 
 ## 4. Design
@@ -115,6 +118,17 @@ and after the move the manifest is not one. Deleting the row makes the populatio
 coverage loss is real, is a direct cost of the owner's chosen home, and is named here rather than
 papered over with a row that always passes.
 
+### The five surviving `docs/` sites, named
+
+S7 puts them in scope and rev-1 gave no criterion that reaches them. They are
+`WIRE-INTO-PROJECT.md:336` (a `cp` step that installs the manifest into `docs/`), `:372`, `:498`,
+`:521`, and `SKILL.md:224` — the Scaffolding write target, which spec-7's §3 explicitly disclaims, so
+it is this unit's.
+
+The `cp` step and the Scaffolding target are the two that matter most: they do not merely describe the
+old layout, they instruct an adopter to CREATE a manifest at a location the same commit makes the
+engine stop looking for. Scaffolding is repointed to location 1.
+
 ### Files touched (estimate)
 
 Fourteen files across three kits plus the charter. The move itself is one `git mv`; the rest is the
@@ -144,8 +158,12 @@ tail it drags.
   trust a scoped green.
 - testing + left-shift gates — S12 plus arms for the verb; the dropped spellings are what 34 of the
   41 existing scenarios silently depend on.
-- migration / rollback — adopters at `.claude/` are unaffected; adopters at `docs/` must move, which
-  is what the manifest-format WARN channel exists to tell them.
+- migration / rollback — adopters at `.claude/` are unaffected. Adopters at a dropped spelling get the
+  exit-2 not-found message, NOT the version WARN: discovery runs before the version check and exits
+  there, and the WARN fires only on a marker-version delta this unit does not create. Their pathless
+  pre-commit and CI invocations hard-error on the kit re-pull. The migration is one `git mv` to
+  location 1 or 2, and the not-found message names both, which AC4 requires. An upgrade note goes in
+  the runbook's §4 beside the retrofit recipe.
 - user docs — S4 and S7.
 
 ## 6. Acceptance criteria
@@ -160,7 +178,14 @@ tail it drags.
   with a not-found message naming the two supported locations and no others.
 - AC5. `grep -c 'SESSION-KICKOFF.md' skills/session-kickoff/manifest-check.sh` shows the path list
   spelled once, not once per consumer.
-- AC6. `git grep -l '\.claude/SESSION-KICKOFF\.md'` returns nothing outside build records.
+- AC6. `git grep -l '\.claude/SESSION-KICKOFF\.md'` returns nothing outside build records, the
+  engine's own location array, its self-test, and the migration note. The exemption is not a
+  weakening: S3 KEEPS that path as location 2, so the array must spell it and AC1 requires the verb to
+  print it. An unexempted AC6 contradicts AC1, and a builder driving it green would delete the only
+  location every existing adopter uses.
+- AC6b. `git grep -n 'docs/SESSION-KICKOFF\.md'` returns nothing outside build records and the
+  migration note. This is the criterion that reaches the dropped spellings; AC5 and AC6 both miss
+  them by construction, and they are what F2 and F6 are about.
 - AC7. `bash tools/memory-tree/check-method-carriers.sh` exits 0 with a carrier count one lower.
 - AC8. `python tools/codebase-map/test_codebase_map.py` exits 0, with the new guide claimed by the
   `kickoff` dossier and the generated artifacts byte-identical to a fresh render.
@@ -194,6 +219,15 @@ the build README.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H4: AC6 contradicted AC1 and S3 —
+  the engine must spell location 2, so an unexempted grep for it could only be satisfied by deleting
+  the location every adopter uses; AC6 is now scoped and says why. H5: the four `docs/`-spelled sites
+  S7 puts in scope had no criterion reaching them — added AC6b, named all five sites in §4, and took
+  `SKILL.md:224` which spec-7 disclaims, including repointing the Scaffolding write target. H6: §3
+  assigned the ceiling lowering to a sibling that had not accepted it; it is accepted in that spec now
+  and this bullet says so. M2: the migration row named the version WARN, which discovery runs before
+  and which fires only on a delta this unit does not create — replaced with the real mechanism and an
+  actual migration path.
 
 ## 10. Reuse audit
 

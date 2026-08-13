@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -15,9 +15,15 @@ kit's own template has always stated and this repo's manifest has never obeyed.
 - S2. Evict exactly ONE trap to a new record, at `memory/gotchas/inputs-inside-the-subjects-reach.md`.
 - S3. Delete the merge-driver bullet outright. It is wrong, not stale.
 - S4. Correct two stale figures in surviving bullets: an agent-cap kit version and a drift-signal pin.
-- S5. A new check caps every traps bullet at 400 bytes, the same number C8 uses for a line.
+- S5. A new check, C10, caps every traps bullet at 400 bytes, the same number C8 uses for a line.
 - S6. The five orphan bug classes that are not yet worth a record stay as one-line bullets under S5's
   cap, with the reasons recorded here.
+- S7. **Rewrite the surviving machine-local bullets that exceed the cap.** Nineteen of the 27 bullets
+  are over 400 bytes today, and deletion alone does not bring the survivors under it. §4 names the
+  three largest and the rule for the rest.
+- S8. Lower `READ_PATH_CEILING` in `.memory-tree.conf` to the post-eviction measured read-path total
+  plus the stated margin, recording the measurement in the conf comment. U2 raises it for the move;
+  this unit is what makes the raise temporary.
 
 ## 3. Non-goals (OUT)
 
@@ -33,10 +39,43 @@ kit's own template has always stated and this repo's manifest has never obeyed.
 
 ## 4. Design
 
+### The measured section, and why deletion alone cannot reach the target
+
+Measured at BASE, LF-normalised: **27 bullets, 14,665 bytes, 19 of them over 400 bytes.** The M4
+audit found the first revision's arithmetic did not close: deleting the ten bullets §4 authorises
+removes at most 7,837 bytes even under the most favourable possible selection, leaving 6,828 before
+the eight replacement pointer lines. The rev-1 target of 4,000 bytes was unreachable without work no
+scope item granted, and three bullets this section explicitly KEEPS already exceed the cap the same
+unit introduces — the new-record procedure bullet at 492 bytes, the template-gate bullet at 1,198,
+and the gate-leg bullet at 595.
+
+S7 closes that gap by authorising the rewrite rather than by moving the target. The three named
+bullets are rewritten to the cap; the remaining survivors are already under it or are one-lined under
+S6. The eviction set is unchanged, because widening it costs authored anchors and a dossier claim per
+record for no repaired defect — the arithmetic §4 already priced.
+
 ### The eviction arithmetic, which is why "evict them all" is the wrong plan
 
 Of 27 bullets: **eight** are already carried by an existing record, **seven** are bug classes with no
 record, and **twelve** are machine- or repo-local facts that must stay.
+
+### The eight duplicates, named
+
+The rev-1 spec gave only the count, which made the largest edit in the unit undecidable — the wrong
+eight would satisfy a byte-count criterion equally well. The classification is the scope:
+
+| Trap bullet, opening words | Carried by |
+|---|---|
+| a byte-comparing gate needs an eol pin AND CR normalisation | `gate-green-by-accident-on-generated-bytes.md` |
+| the agent-cap rules — the concurrency half only | `concurrency-is-not-a-budget.md` |
+| run a new gate PREDICATE over the real tree first | `absence-assertion-over-whole-file-text.md` |
+| a `git worktree` checkout lands CRLF on an eol=lf path | `gate-green-by-accident-on-generated-bytes.md` |
+| `subprocess.run(["bash", …])` resolves the WSL launcher | `subprocess-resolves-a-different-shell.md` |
+| a heredoc into a non-raw Python string | `heredoc-escape-reaches-the-regex.md` |
+| ask what SUPPLIES each of a check's inputs | evicted by S2 to its own record |
+| a core ⊆ effective assertion is VACUOUS | `assertion-between-two-derived-values.md` |
+
+Each deleted bullet leaves a one-line pointer naming its record file, which is what AC2 greps for.
 
 The eight duplicates are pure deletion — the record already exists, so the bullet is a second copy
 whose only future is to disagree with it. One of them, the heredoc-escape trap, is duplicated by a
@@ -102,7 +141,7 @@ noise the module's own docstring warns about. One record, well anchored, is the 
 | `memory/map/features/unattended.md` | the new gotcha key claim |
 | `memory/map/generated/` | regenerated |
 | `skills/session-kickoff/manifest-check.sh` and its test | S5's check and arms |
-| `.memory-tree.conf` | the raised arms floor |
+| `.memory-tree.conf` | the raised arms floor, and S8's lowered `READ_PATH_CEILING` |
 
 ### Alternatives rejected
 
@@ -132,9 +171,11 @@ noise the module's own docstring warns about. One record, well anchored, is the 
 
 ## 6. Acceptance criteria
 
-- AC1. The manifest's traps section is under 4,000 bytes, down from 14,821.
-- AC2. `git grep -c` finds no surviving manifest bullet whose substance is carried by an existing
-  `memory/gotchas/` record; each deleted one leaves a pointer naming the record.
+- AC1. The manifest's traps section is under 6,000 LF-normalised bytes, down from 14,665, and every
+  bullet in it satisfies AC6 — the two are reachable together, which rev-1's 4,000 was not.
+- AC2. None of the eight bullets named in §4's classification table survives, and the traps section
+  contains a pointer line naming each of those eight record filenames — checked by grepping for the
+  eight filenames, not by judging substance.
 - AC3. `memory/gotchas/inputs-inside-the-subjects-reach.md` exists, and
   `grep -o '\[\[[a-z-]*\]\]' memory/gotchas/*.md` resolves every link to a real record.
 - AC4. `python tools/memory-tree/gotchas.py --check` passes checks 17, 18 and 19 for the new record,
@@ -148,6 +189,12 @@ noise the module's own docstring warns about. One record, well anchored, is the 
 - AC9. `python tools/codebase-map/test_codebase_map.py` passes with the new gotcha key claimed, and
   the generated artifacts byte-compare after a `git add`.
 - AC10. `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- AC11. Each of the three bullets named in §4 as exceeding the cap measures at or under 400 bytes
+  after the rewrite, and still states the fact it stated before — asserted by reading them, not by the
+  byte count alone.
+- AC12. `READ_PATH_CEILING` in `.memory-tree.conf` equals a freshly measured post-eviction read-path
+  total plus the stated margin, and `python tools/memory-tree/corpus_ids.py --report` confirms the
+  measurement the conf comment records.
 
 ## 7. Gates
 
@@ -168,6 +215,15 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H10 (blocking): AC1 and AC7 were
+  arithmetically unsatisfiable together — 19 of 27 bullets exceed the cap, the authorised deletions
+  leave 6,828 bytes against a 4,000-byte target, and three bullets §4 keeps already exceed the cap
+  this unit introduces. Added S7 authorising the rewrite of the three named survivors, restated the
+  measured baseline, and moved AC1 to a target the authorised edits reach. H11: AC2 named a grep with
+  no pattern for a semantic predicate, and was the only criterion for the unit's largest edit — the
+  eight-bullet classification is now a table in §4 and AC2 greps for the eight record filenames.
+  H6: accepted S8, the `READ_PATH_CEILING` lowering U2's §3 assigned here and rev-1 never took, with
+  a Files-touched row and AC12.
 
 ## 10. Reuse audit
 

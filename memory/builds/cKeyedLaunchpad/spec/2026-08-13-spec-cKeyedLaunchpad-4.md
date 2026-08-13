@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -22,8 +22,9 @@ of blessing it.
   self-test byte-compares the shipped seed against the same constant.
 - S6. This repo's own §A is rewritten to carry the canonical region, replacing its hand-collapsed
   one-bullet variant.
-- S7. `region()` is lifted from `check-unattended.sh` with `# >>>` / `# <<<` delimiters and added to
-  the inline-copy parity population, so the second spelling is gated rather than apologised for.
+- S7. `region()` is lifted from `check-unattended.sh` with `# >>>` / `# <<<` delimiters, and the
+  inline-copy parity arm is GENERALISED to a (marker, canonical source) table so a second predicate
+  can join it. §4 states the mechanism; there is no existing population to append to.
 - S8. The manifest format goes to v1.3, and `write_manifest` in the self-test emits the sealed region.
 
 ## 3. Non-goals (OUT)
@@ -100,6 +101,38 @@ One weakness of the prior art is NOT inherited. Its region captures go through c
 which strips trailing newlines and hides a trailing-blank-line difference. This check appends the
 sentinel that `kit-dogfood-parity` already uses against that exact strip.
 
+**There is no population to join, so S7 builds one.** The M4 audit found the existing arm is not a
+population mechanism: its marker is hardcoded in both halves — the extractor keys on one literal
+prefix and discovery greps for that same literal — and every hit is compared against ONE canonical
+blob. Nothing is parameterised. A repo-wide search for the delimiter shape returns that one predicate
+and nothing else, so `region()` carries no delimiters today and must gain them, which is an edit to
+another kit's gate script.
+
+S7 therefore generalises the arm into a table of (marker, canonical source) pairs and adds the second
+row. Two files that rev-1 omitted move with it: `tools/unattended/check-unattended.sh`, which gains
+the delimiters, and `tools/lib/resolve-python.test.sh`, which gains the table. This was described in
+rev-1 as a list addition, which understated it — the unit whose rationale is not re-typing a hard-won
+predicate was hiding a new merge-bar mechanism plus a cross-kit edit behind the phrase.
+
+**The pre-existing third copy is waived, with a reason.** `tools/unattended/unattended.sh` carries a
+textually divergent `region()` that no parity gate pairs today. Bringing it into the population is a
+behaviour change to the unattended driver, which this unit has no mandate to touch; it is named here
+so the waiver is deliberate, and it is the obvious first row for whoever generalises the table next.
+
+### This unit owns the whole Risk-tier bullet, including what leaves with it
+
+S4 replaces the seven-field enumeration in Step 3 and AC9 hardens the replacement. The seventh field
+is the Risk-tier bullet, and two things live INSIDE it that are not the field set: the spec-section
+count that spec-7's S1 corrects, and the generic high-risk heuristic the engine applies to projects
+defining no tiers. Deleting the bullet takes both. rev-1 left that uncoordinated in both directions,
+so spec-7 sequenced last would have re-added prose this unit deleted, or failed its own criterion.
+
+The disposition: the section count goes away with the bullet, because Step 3 now points at the verb
+and the manifest's own §B tier rule carries the tier enumeration. The no-tiers heuristic is engine
+behaviour with no home in a manifest, so it SURVIVES as its own short paragraph in Step 3, outside the
+sealed field set and outside the deleted bullet. spec-7's S1 and AC1 then have nothing to correct and
+are dropped there.
+
 ### Both halves of the byte-compare
 
 Neither file is `eol=lf` pinned today. U2's move fixes the manifest half by landing it under a pinned
@@ -113,7 +146,9 @@ comparison. The repo's own rule is that either alone leaves the file green only 
 | `skills/session-kickoff/manifest-check.sh` | the constant, the verb, the check, the lifted `region()`, the version |
 | `skills/session-kickoff/manifest-check.test.sh` | `write_manifest` emits the region, arms for three failure modes, the seed comparison |
 | `skills/session-kickoff/MANIFEST-TEMPLATE.md` | §A becomes the sealed region |
-| `skills/session-kickoff/SKILL.md` | Step 3 points at the verb |
+| `skills/session-kickoff/SKILL.md` | Step 3 points at the verb; the Risk-tier bullet is deleted whole |
+| `tools/unattended/check-unattended.sh` | `region()` gains the `# >>>` / `# <<<` delimiters |
+| `tools/lib/resolve-python.test.sh` | the parity arm becomes a (marker, canonical) table |
 | the manifest (at U2's path) | the canonical region, and the re-stamp the edit obliges |
 | `.gitattributes` · `.memory-tree.conf` | the template pin; the raised arms floor |
 
@@ -158,8 +193,13 @@ comparison. The repo's own rule is that either alone leaves the file green only 
 - AC8. `MANIFEST-TEMPLATE.md`'s §A region is byte-identical to the constant, asserted by the
   self-test rather than by inspection.
 - AC9. `grep -c` for the seven field names in `SKILL.md` returns zero — Step 3 points at the verb.
-- AC10. The lifted `region()` is byte-identical to `check-unattended.sh`'s, asserted by the inline
-  parity arm, and that arm refuses an empty population.
+- AC10. The lifted `region()` is byte-identical to `check-unattended.sh`'s, asserted by the
+  generalised parity arm reading its (marker, canonical) table, and that arm refuses an empty
+  population.
+- AC10b. The generalised arm still catches the predicate it caught before — the existing resolver row
+  is exercised, so the table refactor is proven non-destructive rather than assumed to be.
+- AC10c. The engine's no-tiers heuristic survives in Step 3 as its own paragraph, and the Risk-tier
+  bullet and the spec-section count inside it are gone.
 - AC11. `python tools/memory-tree/check-arms.py` reports every new branch armed with the floor raised.
 - AC12. `GATE_FULL=1 bash tools/run-gates.sh` is green.
 
@@ -185,6 +225,13 @@ none — one fork resolved by the owner, one by consistency and flagged.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H8: there is no inline-copy parity
+  POPULATION to join — the existing arm hardcodes its marker in both halves and compares against one
+  canonical blob, and `region()` carries no delimiters at all today. S7 now generalises the arm to a
+  (marker, canonical) table, §4 states the mechanism, the two omitted files are in Files touched, and
+  the pre-existing divergent third copy is waived with a reason. Added AC10b so the refactor is proven
+  non-destructive. M4: this unit and spec-7 both edited Step 3's Risk-tier bullet with no hand-off —
+  this unit now owns it whole and §4 says where the section count and the no-tiers heuristic land.
 
 ## 10. Reuse audit
 

@@ -27,14 +27,16 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass complete. All seven units are AUTHORED and UNREVIEWED. No code is written and
-none may be until the M4 spec audit runs over the set, per `BUILD-METHOD.md` M2's hard floor.
+**State.** Design pass complete and REVIEWED. All seven units are at rev-2, with the M4 audit's
+eighteen confirmed defects folded in. No code is written.
 
-**Next action:** the M4 spec audit — every spec here was authored this run and is unreviewed by definition.
+**Next action:** owner scope approval, then build in dependency order. `BUILD-METHOD.md` M4 says to
+STOP once a synthesis calls the design clean and its fixes are folded — further passes land in the
+prose about the design rather than in the design, and building is both cheaper and stricter.
 
 **Authoring order** (owner, 2026-08-13): `TOOL-cKeyedLaunchpad-5` first, then dependency order —
 `-2`, `-3`, `-4`, `-6`, `-7`. U5 is front-loaded because it is Tier 1 and depends on nothing, so
-both Tier-1 units are ready to build while the Tier-2 set is still in the M4 audit. Authoring is
+both Tier-1 units were ready before the Tier-2 set cleared the M4 audit. Authoring was
 SEQUENCED, not parallel: U3 reads U2's location interface and U6 reads U3's ceiling, so
 `BUILD-METHOD.md` M6's disjoint-write-set test fails on the contract axis even though the six files
 do not collide. Grounding research was fanned out; authoring is not.
@@ -63,16 +65,16 @@ carries its id.
 
 | Unit | Id | Mechanism | Tier | Class | Depends on |
 |---|---|---|---|---|---|
-| U1 | `KICK-cKeyedLaunchpad-1` | skill-install freshness reported by `check-wiring.sh` | 1 | authored, unreviewed | none |
-| U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | authored, unreviewed | none |
-| U3 | `KICK-cKeyedLaunchpad-3` | ratchet checks C7 size, C8 line length, C9 stamp age | 2 | authored, unreviewed | U2 |
-| U4 | `KICK-cKeyedLaunchpad-4` | the sealed task region and its byte-compare | 2 | authored, unreviewed | U3 |
-| U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | authored, unreviewed | none |
-| U6 | `KICK-cKeyedLaunchpad-6` | traps evicted from the manifest, and a ceiling so they cannot return | 2 | authored, unreviewed | U3, U5 |
-| U7 | `KICK-cKeyedLaunchpad-7` | the engine's prose pass and its size gate | 1 | authored, unreviewed | U2, U6 |
+| U1 | `KICK-cKeyedLaunchpad-1` | skill-install freshness reported by `check-wiring.sh` | 1 | rev-2, reviewed | none |
+| U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | rev-2, reviewed | none |
+| U3 | `KICK-cKeyedLaunchpad-3` | ratchet checks C7 size, C8 line length, C9 stamp age | 2 | rev-2, reviewed | U2 |
+| U4 | `KICK-cKeyedLaunchpad-4` | the sealed task region and its byte-compare | 2 | rev-2, reviewed | U3 |
+| U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | rev-2, reviewed | none |
+| U6 | `KICK-cKeyedLaunchpad-6` | traps evicted from the manifest, and a ceiling so they cannot return | 2 | rev-2, reviewed | U3, U5 |
+| U7 | `KICK-cKeyedLaunchpad-7` | the engine's prose pass and its size gate | 1 | rev-2, reviewed | U2, U6 |
 
-U1 and U5 depend on nothing and are Tier 1. They can be specced and built while the Tier-2 units are
-still in review.
+U1 and U5 depend on nothing and are Tier 1, so they can be built first while the Tier-2 units wait on
+scope approval.
 
 ## Owner decisions — where the manifest lives
 
@@ -98,11 +100,34 @@ unit's §8 carries the mark in place, naming the owner as resolver.
    ten watch-pathspec commits, or three months, with zero manifest body growth. Verified at source in
    `memory/builds/aRatchetForge/spec/manifest-ratchet-spec.md` §10.9. That spec deliberately left the
    rule to an owner-read review rather than a gate, because the delta lines it would have read live in
-   commit messages and READY cards that squash merges do not preserve. C9 is buildable because it
-   reads git directly, which is the squash-proof source that spec named. U3's §4 must say so.
+   commit messages and READY cards that squash merges do not preserve.
 3. **U6 evicts the bug-class traps and caps the remainder.** RESOLVED (owner, 2026-08-13). Traps that
    are recurring bug classes become `memory/gotchas/` records reachable through U5's `--for-paths`
    selector. Traps that are genuinely machine-local stay in the manifest under a hard bullet cap.
+4. **C9 reads a recorded baseline, not git history.** RESOLVED (owner, 2026-08-13), after the M4 audit
+   reproduced the blocker: a path-scoped `git log --name-status` reports a `git mv` as an ADD, so the
+   history walk would have read unit 2's own move as the manifest's birth and reported a stalled
+   manifest as freshly maintained. The audit block gains a `last-body-change` sha instead. This also
+   settles what CLEARS a C9 red, which the walk design had no answer for — advancing that key.
+5. **U6 rewrites the surviving over-cap trap bullets.** RESOLVED (owner, 2026-08-13), after the audit
+   measured that deletion alone could not reach the target: 19 of 27 bullets exceed 400 bytes, and
+   three the eviction KEEPS are over the cap the same unit introduces.
+
+## The invariant the audit earned
+
+Three of the eighteen confirmed defects (H6, H7, M4) were one failure wearing three faces: **a §3
+non-goal handed an obligation to a named sibling that never accepted it, and no gate detects the
+orphan.** `READ_PATH_CEILING` was raised by unit 2 and lowered by nobody. The `--for-paths` verb was
+built by unit 5, its only call site delegated to unit 7, which never mentioned it — so unit 6 would
+have deleted eight manifest bullets in favour of a path nothing in the build opens. Step 3's
+Risk-tier bullet was edited by units 4 and 7 in opposite directions.
+
+The cheap invariant, adopted for this build and worth carrying to the method: **every §3 bullet that
+names a sibling unit must be matched by an S-item in that sibling.** It is checkable by reading two
+sections, and it would have caught all three at authoring time.
+
+Left-shifting it into a gate is not free — §3 prose is not machine-parseable — so it is a reading
+rule here, and a candidate `BUILD-METHOD.md` M2 clause if it earns its keep on a second build.
 
 ## Parked
 
@@ -134,13 +159,13 @@ header of every spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-1 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-1 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the one that reds this repo](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | OPEN | rev-1 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-1 | 2026-08-13 |
-| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-1 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-1 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-1 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-2 | 2026-08-13 |
+| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-2 | 2026-08-13 |
 <!-- /gen:build-index -->
 
 ## Method

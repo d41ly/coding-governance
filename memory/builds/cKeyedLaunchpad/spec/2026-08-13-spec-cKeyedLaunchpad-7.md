@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-1 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -10,8 +10,9 @@ a measured size gate — the artifact that instructs adopters to keep their mani
 
 ## 2. Scope (IN)
 
-- S1. Correct the spec-section count in Step 3. The engine says nine canonical sections; the canon is
-  ten, date-gated by the memory kit's own cutoff.
+- S1. *(Dropped at rev-2.)* The spec-section count sat inside Step 3's Risk-tier bullet, which
+  `KICK-cKeyedLaunchpad-4` deletes whole. Correcting a line another unit removes would have been a
+  conflict, not a fix. That unit's §4 now records where the count and the no-tiers heuristic land.
 - S2. Correct the Scaffolding section's check-script destination, and the runbook line that still
   contradicts its own installation step.
 - S3. Trim the prose that U2 through U6 make redundant, and nothing else.
@@ -62,12 +63,18 @@ change that breaks them while looking harmless:
 | What is asserted | How a prose pass breaks it |
 |---|---|
 | the literal `Step 5b` | renaming or renumbering the section |
-| the exact READY prompt sentence, em-dash and curly apostrophe included | normalising punctuation, or rewording the hand-back |
+| the exact READY prompt sentence — the em-dash is U+2014, the apostrophe is straight ASCII | "restoring" a curly apostrophe, or rewording the hand-back |
 | at least six lines matching a numbered bold `Step` prefix | reformatting the six interactive exits as a table, or renumbering them |
 
 Each failure reports as an unattended-run defect, not as a prose defect, so the message would point
 away from the edit that caused it. The trim must leave all three intact, and the acceptance criteria
 assert them directly rather than trusting care.
+
+**Exactly one byte in that sentence is multibyte.** Verified with `od -c` on both the engine and the
+`grep -qF` that reads it: the dash is U+2014 and the apostrophe is straight ASCII `0x27`. rev-1 said
+"curly apostrophe", which was false about source in the one paragraph telling a builder which bytes
+are load-bearing — a pass that dutifully "restored" the curly form would have broken the very gate the
+paragraph exists to protect.
 
 ### Why the size gate is a second leg, not a new script
 
@@ -129,20 +136,22 @@ reused script strips CR, which is a further argument for riding it rather than w
 
 ## 6. Acceptance criteria
 
-- AC1. Step 3 states ten canonical sections and names the date gate, matching the memory kit's
-  template.
+- AC1. *(Dropped at rev-2 with S1 — the line lives in a bullet `KICK-cKeyedLaunchpad-4` deletes.)*
 - AC2. No path in this file or in the runbook's pre-commit snippet names a root-level script
   directory for the checker.
 - AC3. `grep -F 'Step 5b'` over the engine matches. This is asserted after the trim, not before.
-- AC4. `grep -F` for the exact READY prompt sentence matches, byte for byte including its em-dash and
-  curly apostrophe.
+- AC4. `grep -F` for the exact READY prompt sentence matches, byte for byte — the em-dash preserved as
+  U+2014 and the apostrophe left as straight ASCII.
 - AC5. `grep -cE` for the numbered bold `Step` prefix returns at least six.
 - AC6. `bash tools/unattended/check-unattended.sh` passes — the direct proof that AC3 through AC5 hold
   in the form that gate actually reads.
 - AC7. `bash tools/check-template-size.sh <file> <limit>` honours the positional limit, and omitting
-  it preserves the existing default for the playbook's own leg.
-- AC8. The new leg fails when the engine exceeds its limit, asserted with a fixture rather than by
-  inspection.
+  it preserves the existing default for the playbook's own leg. Observed by a build-time scratch
+  assertion, not by a gate leg: §7 names no carrier for it, because none exists and this unit does not
+  fund one.
+- AC8. The script exits non-zero when the named file exceeds the given limit — same build-time scratch
+  assertion, a temporary file over the limit. `tools/run-gates.test.sh` cannot decide this: it is the
+  manifest canary, parsing `gate-legs.json` for name and argv shape, and it never executes a leg.
 - AC9. The configured limit is within a stated margin of the trimmed size — not a round number
   inherited from another file.
 - AC10. `python tools/drift-audit/drift_report.py --check` passes with the new leg's script path cited
@@ -155,7 +164,9 @@ reused script strips CR, which is a further argument for riding it rather than w
 
 - `bash tools/unattended/check-unattended.sh` — the gate this unit is most likely to break.
 - `bash tools/check-template-size.sh` and the new leg over the engine.
-- `bash tools/run-gates.test.sh` — the canary validates the new leg's shape.
+- `bash tools/run-gates.test.sh` — the canary validates the new leg's SHAPE in `gate-legs.json`. It is
+  named for that and nothing more: it never executes a leg, so it does not and cannot decide AC7 or
+  AC8, which are build-time assertions by §6.
 - `python tools/drift-audit/drift_report.py --check` · `python tools/codebase-map/test_codebase_map.py`
 - `GATE_FULL=1 bash tools/run-gates.sh`.
 
@@ -168,6 +179,14 @@ an inconsistency between this spec and the review that opened the build.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. M6: §4 and AC4 claimed the READY
+  sentence carries a curly apostrophe; `od -c` shows straight ASCII, with only the em-dash multibyte —
+  a false statement about source in the one paragraph naming the load-bearing bytes, which would have
+  had a builder break the gate by "restoring" it. M4: S1 and AC1 corrected a line inside a bullet
+  `KICK-cKeyedLaunchpad-4` deletes whole; both dropped, and that unit records the disposition. M5: §7
+  credited the run-gates canary with deciding AC7 and AC8, which it cannot — it never executes a leg;
+  both are restated as build-time assertions and the gate claim is withdrawn. H7: the `--for-paths`
+  call site returns to `TOOL-cKeyedLaunchpad-5`, which owns the verb.
 
 ## 10. Reuse audit
 

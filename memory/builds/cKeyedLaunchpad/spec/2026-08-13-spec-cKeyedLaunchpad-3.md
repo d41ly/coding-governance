@@ -1,6 +1,6 @@
-# KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the one that reds this repo
+# KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -14,14 +14,18 @@ manifest carrying a 16,196-character line passes all six clean. C7, C8 and C9 cl
   period, with a `MAX_MANIFEST_BYTES` environment override for testability only.
 - S2. **C8 — line length.** No line may exceed 400 bytes, with the audit block and fenced code blocks
   exempt.
-- S3. **C9 — maintenance stall.** Red when the manifest's BODY has not changed across ten or more
-  non-merge watch-pathspec commits, or three months, whichever comes first.
+- S3. **C9 — maintenance stall.** The audit block gains a `last-body-change` key holding a full sha.
+  C9 reds when ten or more non-merge watch-pathspec commits have landed since that sha, or when its
+  committer date is three or more months old, whichever comes first.
 - S4. C7 and C8 sit after C1 and run in both the full and `--staged` legs. C9 sits inside the
   existing non-staged branch after C5 and never runs in the staged leg.
-- S5. `KIT_MANIFEST_VERSION` goes to 1.2, applied to all seven sites in one commit.
-- S6. A `KIT_MANIFEST_VERSION` entry in `tools/check-kit-versions.sh`, so the constant and the two
+- S5. C2 requires `last-body-change` and validates its shape, and C9 validates the sha is real and an
+  ancestor of HEAD, reusing C3's existing branches rather than re-implementing them.
+- S6. `KIT_MANIFEST_VERSION` goes to 1.2, applied to all seven sites in one commit, and the retrofit
+  message names the new key.
+- S7. A `KIT_MANIFEST_VERSION` entry in `tools/check-kit-versions.sh`, so the constant and the two
   shipped markers can no longer drift apart silently.
-- S7. `ARMS_FLOORS` for this script is raised from `16:16` to the new branch count, and every new
+- S8. `ARMS_FLOORS` for this script is raised from `16:16` to the new branch count, and every new
   branch gets a positive assertion naming its own literal text.
 
 ## 3. Non-goals (OUT)
@@ -35,7 +39,9 @@ manifest carrying a 16,196-character line passes all six clean. C7, C8 and C9 cl
 - **No retrofit of the NicoCares manifest.** Named in §5 as a live risk with a changed shape, but the
   work belongs to that repo.
 - **C9 does not read Step 2b's delta lines.** `aRatchetForge` §10.9 established why: they live in
-  commit messages and READY cards, which squash merges do not preserve. C9 reads git.
+  commit messages and READY cards, which squash merges do not preserve.
+- **C9 does not derive its baseline by walking history.** §4 records the measurement that closed that
+  design off.
 - No change to C1-C6 semantics, and no new gate leg.
 
 ## 4. Design
@@ -47,8 +53,9 @@ before the C2 block parse, reading the working-tree file through `tr -d '\r'` ex
 already do. That placement matters for a reason outside this script: the pre-commit hook runs the
 manifest staged leg **unconditionally**, unlike the memory-tree and template-size legs beside it,
 which both carry `git diff --cached` guards. Every commit in an adopting repo pays this leg, measured
-here at 3.76 s. Two cheap checks are affordable there; C9, measured at 2.4 s, is not, and it sits
-inside the existing `if [ "$STAGED" = 0 ]` branch where it can never reach the hook.
+here at 3.76 s. Two cheap checks are affordable there; C9 is not, and it sits inside the existing
+`if [ "$STAGED" = 0 ]` branch where it can never reach the hook. S4 is a contract, so §6 observes it
+from both sides rather than trusting placement.
 
 ### Normalisation is not optional
 
@@ -77,42 +84,73 @@ no prose to wrap. The consequence is that the only line in this repo anywhere ne
 one line C8 cannot see. That is the right trade and it is written down here so the next reader does
 not rediscover it as a defect.
 
-### C9, and the three things C5 does not have to worry about
+### Where C7's 25,600 comes from
 
-C9 inverts C5's technique: the same `git show <c>:$MF` versus `git show <c>^:$MF` pair, but comparing
-the body with `grep -v '^[[:space:]]*last-audit:'` instead of `blockstamp`, walking until the first
-real difference. Verified against this repo's real history — the last eight manifest commits classify
-as six pure re-stamps and one genuine body change, which is exactly what C9 must see through.
+It is not measured on this corpus, and it cannot be: C7 ships to adopters this build does not control,
+so a limit fitted to gov's manifest would be a pin copied from the wrong corpus in the other
+direction. The rule that set it is stated instead, so a future raise has something to argue against.
 
-Three additions C5 does not need:
+The seed a fresh adopter instantiates is 8,112 bytes. 25,600 is that seed with room to roughly triple
+— enough that a manifest accreting real project knowledge is never fighting the gate, and small
+enough that the file stays readable in one sitting. The two live data points bracket it: gov measures
+20,920 and passes with 18% of the cap free; NicoCares measures 77,056 and is three times over, which
+is the outcome the check exists to produce.
 
-1. **A rename guard.** C5 is deliberately pathspec-FREE because git's rename detection collapses a
-   pure `git mv` of the manifest; scenario 27 exists because that laundering hole was real. C9 must
-   be path-scoped, so it meets the mirror of that hole: a path-scoped walk sees a rename as a commit
-   touching the manifest whose parent blob is EMPTY, and an empty parent is indistinguishable from a
-   body change — a rename would falsely report the manifest as freshly maintained. C9 therefore
-   classifies each candidate by git's own `--name-status`: `R` is skipped, `A` is the manifest's
-   birth and terminates the walk as a body change, and only `M` is compared. **U2 performs exactly
-   this `git mv`,** so this guard is not hypothetical for this build.
-2. **A candidate cap.** This repo's manifest has 132 commits of path history at roughly 350 ms per
-   candidate pair. An uncapped walk over a manifest whose body never changed is a 46-second check.
-   The walk stops at 50 candidates and reds, because a body unchanged across fifty manifest commits
-   is the stall C9 exists to report.
-3. **A shallow-clone skip.** On a depth-1 clone, `git show <c>^:$MF` fails at the graft boundary and
-   yields an empty parent, which a naive comparison scores as a body change — a false GREEN, not a
-   missing answer. C9 reuses C3 and C5's existing `SKIP_RANGE` guard and its shallow-clone fixture.
+After U6's eviction gov drops to roughly 10 KB, leaving C7 at about 2.5 times the file it guards.
+That slack is deliberate and is the reason C10, U6's per-bullet cap, exists as a separate check: C7
+bounds the file, and a file-level cap with that much headroom cannot bound the section that actually
+accretes.
 
-### Merges are excluded from the count, and that decision reds or greens this repo
+### C9 reads a recorded baseline, because the walk cannot survive a rename
 
-`aRatchetForge` §10.9 says "≥10 watch-pathspec commits" and does not say whether merges count. It
-decides the verdict here: since this manifest's newest body change, eleven watch-touching commits
-have landed counting merges, and six excluding them, against a threshold of ten. Counting merges reds
-this repo the day C9 lands.
+The first design derived the baseline by walking `git log --name-status` over the manifest and
+classifying each commit — rename skipped, add treated as the manifest's birth, modify compared. **It
+does not work, and the measurement is recorded here because the whole design turned on it.**
 
-Merges are excluded, on the merits rather than the convenience. The threshold measures how much
-content churn the manifest has not been audited against. A merge commit carries no content of its
-own; counting it alongside the commits it brings in double-counts the same churn. `--no-merges`
-counts the content-bearing commits, which is what "watch-pathspec commits" means.
+Reproduced in a scratch repository at git 2.55: create a file, edit it, `git mv` it, then run a
+path-scoped `git log --name-status` on the new path. The move is reported as **`A`**, not `R`, and
+the walk stops there — pre-rename history is unreachable. Only `git log --follow` reports `R100` and
+reaches through. So the rename branch would have been dead code, and U2's own `git mv` of this very
+manifest would have been read as the file's birth, reporting a stalled manifest as freshly maintained.
+That is the same false-fresh outcome this section rejects the empty-parent inference for, reached by a
+different route.
+
+`--follow` would fix the classification and keep every other cost: a candidate cap for the 132-commit
+path history at roughly 350 ms per candidate pair, a shallow-clone skip because a graft boundary
+yields an empty parent that scores as a false GREEN, and a 2.4 s runtime. The baseline is recorded
+instead.
+
+**The mechanism.** The audit block gains `last-body-change`, a full sha naming the commit at which the
+manifest body was last genuinely revised. C9 counts non-merge commits touching the watch pathspecs
+between that sha and HEAD, and reads that commit's committer date for the elapsed-time arm. There is
+no walk, no classification, no candidate cap, and a rename is invisible to it because no history
+traversal of the manifest path happens at all. The shallow-clone case reduces to C3's existing
+problem — a sha that may be absent — and reuses C3's existing branch rather than inventing a second
+one.
+
+**What clears a red, which the walk had no answer for.** Advancing `last-body-change` is the remedy,
+and it is an assertion the author makes: the manifest has been re-read and is still true. That is
+deliberately the same trust model `last-audit` already runs on — the ratchet has never been able to
+tell a real verification from a reflex stamp, and it does not need to, because C5 independently reds
+whenever watched files move past the stamp. What C9 adds is a floor on how long that assertion may go
+unrepeated. Under the walk design, a stable and accurate manifest would have red quarterly forever
+with no action able to clear it, since the only exit was cosmetic body churn.
+
+**The elapsed-time arm** compares the committer date of `last-body-change` against now, three months.
+Committer date rather than author date, because a rebase preserves author date and the question is
+when this history last moved.
+
+### The version bump, and the gap it would otherwise widen
+
+Nothing mechanically forces `KIT_MANIFEST_VERSION` to agree with the two shipped markers:
+`check-kit-versions.sh` has no entry for it and `check-verdict-epoch.sh` is hardcoded to the
+memory-tree engine. The constant and the markers can drift with the full bar green — the same hole
+`check-kit-versions.sh`'s own comment describes for `BUILD-METHOD.template.md`, which went three
+bumps behind and shipped that number into every adopting tree. This unit bumps the version, so it
+adds the entry that makes the next bump mechanical.
+
+The bump has a test cost: the fixture default marker is `v1.1`, one scenario asserts the literal
+retrofit string naming that version, and every fixture manifest now needs the new audit-block key.
 
 ### Every branch must be armed, and the message shape decides whether it can be
 
@@ -126,29 +164,16 @@ The manifest already records the remedy for this class: bind the value to a name
 END of the message, after the literal sentence. Every new branch here follows that shape.
 
 `ARMS_FLOORS` is one-sided upward, so landing new branches without raising the floor leaves it green
-while quietly losing coverage over the difference. S7 raises it in the same commit.
-
-### The version bump, and the gap it would otherwise widen
-
-Nothing mechanically forces `KIT_MANIFEST_VERSION` to agree with the two shipped markers:
-`check-kit-versions.sh` has no entry for it and `check-verdict-epoch.sh` is hardcoded to the
-memory-tree engine. The constant and the markers can drift with the full bar green — the same hole
-`check-kit-versions.sh`'s own comment describes for `BUILD-METHOD.template.md`, which went three
-bumps behind and shipped that number into every adopting tree. This unit bumps the version, so it
-adds the entry that makes the next bump mechanical. That is the left-shift for a gap this unit would
-otherwise widen.
-
-The bump has a test cost: the fixture default marker is `v1.1` and one scenario asserts the literal
-string `marker to v1.1 LAST` from the retrofit message. Both move with it.
+while quietly losing coverage over the difference. S8 raises it in the same commit.
 
 ### Files touched (estimate)
 
 | File | Change |
 |---|---|
-| `skills/session-kickoff/manifest-check.sh` | C7, C8, C9, the version constant, the retrofit string |
-| `skills/session-kickoff/manifest-check.test.sh` | new arms, the fixture marker default, the v1.1 literal |
-| `skills/session-kickoff/MANIFEST-TEMPLATE.md` | the marker |
-| the manifest (at U2's new path) | the marker, and the `last-audit` re-stamp the edit obliges |
+| `skills/session-kickoff/manifest-check.sh` | C7, C8, C9, C2's new key, the version constant, the retrofit string |
+| `skills/session-kickoff/manifest-check.test.sh` | new arms, the fixture marker default, the retrofit literal, the new key in every fixture |
+| `skills/session-kickoff/MANIFEST-TEMPLATE.md` | the marker and the new audit-block key |
+| the manifest (at U2's new path) | the marker, the new key, and the `last-audit` re-stamp the edit obliges |
 | `tools/check-kit-versions.sh` | the new entry |
 | `.memory-tree.conf` | the raised `ARMS_FLOORS` pair |
 
@@ -157,34 +182,38 @@ string `marker to v1.1 LAST` from the retrofit message. Both move with it.
 - **C8 as a character cap.** Not implementable portably in POSIX awk; see above.
 - **Exempting table or body lines.** Clears the seven remaining NicoCares lines and leaves C8 gating
   nothing an author writes.
-- **C9 in the staged leg.** 2.4 s on a hook that already runs unconditionally on every commit.
-- **Deriving C9's baseline from the empty-parent blob instead of `--name-status`.** That is the exact
-  inference that makes a rename read as maintenance.
+- **C9 in the staged leg.** Even at the baseline design's lower cost, the hook runs unconditionally on
+  every commit and C9 answers a question no single commit changes.
+- **The `--name-status` walk.** Measured not to work; see above.
+- **The `--follow` walk.** Works, and carries the candidate cap, the shallow-clone skip and the
+  runtime for a question a recorded sha answers directly.
 - **A hard-coded 25,600 with no override.** `check-template-size.sh` accepts `MAX_BYTES` and drives
   its own self-test with it; without the same hatch, testing C7 means writing a >25 KiB fixture on
   every suite run, and the suite's stated cost is fixture construction.
 
 ## 5. Production-readiness checklist
 
-- security — three read-only checks over a tracked file and git history.
-- perf / scale — C7 and C8 are one fork each on a hook that fires every commit; C9 is 2.4 s and is
-  excluded from that hook. The candidate cap bounds C9's worst case.
+- security — read-only checks over a tracked file and git history.
+- perf / scale — C7 and C8 are one fork each on a hook that fires every commit; C9 is two git commands
+  against a recorded sha, with no history walk to bound.
 - a11y — N/A, terminal output.
 - i18n — the byte-versus-character decision is stated in the message rather than papered over.
-- error / empty / loading states — the shallow-clone skip, the candidate cap, and the rename class.
+- error / empty / loading states — an absent or malformed `last-body-change` is a C2 failure with the
+  retrofit text; an unreachable sha reuses C3's shallow-clone and foreign-stamp branches.
 - observability — each failure names the measured value at the END of a literal sentence, which is
-  both the armable shape and the readable one.
-- risks — **the hard-red decision rests on an assumption the grounding falsified.** The manifest
+  both the armable shape and the readable one. C9's message names the remedy: advance the key.
+- risks — **the hard-red decision for C7 rests on an assumption the grounding falsified.** The manifest
   records that adopters "re-pull on kit update", but the only real adopter's checker is several
   revisions stale and predates the MSYS path-resolution rewrite. So C7 does not red NicoCares when
-  this lands; it reds at an unpredictable future re-pull, against a manifest three times the cap,
-  with no migration staged. The decision stands — it is the owner's — but its consequence is
-  different from the one it was taken against, and §8 records that.
-- testing + left-shift gates — S7, plus S6 which makes the next version bump mechanical.
+  this lands; it reds at an unpredictable future re-pull, against a manifest three times the cap, with
+  no migration staged. The decision stands — it is the owner's — but its consequence is different from
+  the one it was taken against. C9 carries no equivalent risk now that advancing the key clears it.
+- testing + left-shift gates — S8, plus S7 which makes the next version bump mechanical.
 - migration / rollback — `MAX_MANIFEST_BYTES` exists for the self-test, not as an adopter escape
-  hatch; the remedy string says so, following `check-template-size.sh`'s "do NOT raise the limit".
-- user docs — the `WIRE` Maintenance section already documents the stall thresholds as an owner
-  review; it changes to say the check now performs it.
+  hatch. A v1.1 manifest lacking `last-body-change` gets the version WARN and the C2 retrofit text
+  naming the key, which is the upgrade instruction.
+- user docs — the `WIRE` Maintenance section documents the stall thresholds as an owner review; it
+  changes to say the check now performs it, and to name the key that clears it.
 
 ## 6. Acceptance criteria
 
@@ -197,48 +226,72 @@ string `marker to v1.1 LAST` from the retrofit message. Both move with it.
 - AC5. When a line inside a fenced block exceeds 400 bytes, C8 does NOT fire.
 - AC6. When a table content row exceeds 400 bytes, C8 DOES fire — the exemption set is audit and
   fences only.
-- AC7. When the manifest body has not changed across ten or more non-merge watch-pathspec commits,
-  the check fails naming C9 and reports the count and the baseline sha.
-- AC8. When the manifest has been re-stamped repeatedly with no body change, C9 sees through every
-  re-stamp — a fixture of six pure stamps plus one body change resolves to the body change.
-- AC9. When the manifest was renamed since its last body change, C9 does NOT report it as freshly
-  maintained. This is the arm that fails without the `--name-status` guard.
-- AC10. When the repository is a shallow clone, C9 emits a WARN and skips, and does not report green.
-- AC11. When the walk reaches the candidate cap without finding a body change, the check fails rather
-  than passing.
-- AC12. `python tools/memory-tree/check-arms.py` reports every branch armed, with the floor raised to
+- AC7. When `last-body-change` is absent from the audit block, C2 fails with a message naming the key
+  and carrying the retrofit instruction.
+- AC8. When `last-body-change` holds anything but a full 40-hex sha, C2 fails naming the malformed
+  value.
+- AC9. When ten or more non-merge watch-pathspec commits have landed since `last-body-change`, the
+  check fails naming C9, reporting the count and the baseline sha, and naming advancing the key as the
+  remedy.
+- AC10. When nine such commits have landed, C9 passes — the threshold is observed at its boundary from
+  both sides.
+- AC11. When merge commits would carry the count over the threshold but non-merge commits would not,
+  C9 passes. This is the arm that fails if `--no-merges` is dropped, and it is the difference between
+  this repo reding and passing on day one.
+- AC12. When `last-body-change` names a commit whose committer date is three or more months old, C9
+  fails on the elapsed-time arm with fewer than ten commits present. The fixture ages a commit with
+  `GIT_COMMITTER_DATE`.
+- AC13. When `last-body-change` is advanced to a current commit, a previously red C9 passes — the
+  documented remedy is observed, not assumed.
+- AC14. When the manifest is renamed with `git mv` between the baseline and HEAD, C9's verdict is
+  unchanged. This is the arm the previous design could not satisfy.
+- AC15. When `last-body-change` names a sha unknown to the repository, the check fails or WARN-skips
+  exactly as C3 does for `last-audit`, and does not report green.
+- AC16. When `manifest-check.sh --staged` runs against a staged manifest that is oversize or carries an
+  over-long line, it fails — C7 and C8 are present in the staged leg.
+- AC17. When `manifest-check.sh --staged` runs against a stalled manifest, it exits 0 with no C9 line,
+  and the staged leg's header enumeration is asserted as a literal string — C9 is absent from that leg.
+- AC18. `python tools/memory-tree/check-arms.py` reports every branch armed, with the floor raised to
   the new count.
-- AC13. `bash tools/check-kit-versions.sh` fails when `KIT_MANIFEST_VERSION` and either shipped
-  marker disagree — asserted by a fixture, not by inspection.
-- AC14. `GATE_FULL=1 bash tools/run-gates.sh` is green on this repo, C9 included. Per §4 this holds
-  only because merges are excluded; with merges counted this repo measures eleven against a threshold
-  of ten.
+- AC19. `bash tools/check-kit-versions.sh` fails when `KIT_MANIFEST_VERSION` and either shipped marker
+  disagree — asserted by a fixture, not by inspection.
+- AC20. `GATE_FULL=1 bash tools/run-gates.sh` is green on this repo, C9 included.
 
 ## 7. Gates
 
 - `bash skills/session-kickoff/manifest-check.sh` and `manifest-check.test.sh`.
 - `python tools/memory-tree/check-arms.py` — the floor moves; a slack floor is a silent coverage loss.
-- `bash tools/check-kit-versions.sh` — gains the entry S6 adds.
+- `bash tools/check-kit-versions.sh` — gains the entry S7 adds.
 - `GATE_FULL=1 bash tools/run-gates.sh`.
 - No new gate leg; all three checks ride the existing ratchet leg.
 
 ## 8. Open questions
 
-none — the forks are RESOLVED, two by the owner before authoring and one on the merits below.
+none — the forks are RESOLVED, three by the owner and one on the merits below.
 
 - The C7 severity. RESOLVED (owner, 2026-08-13): hard red from day one. Recorded with a correction:
-  the consequence is not the one the decision was taken against, per §5. The owner may revisit; the
-  spec does not assume they will.
+  the consequence is not the one the decision was taken against, per §5.
 - The C9 thresholds. RESOLVED (owner, 2026-08-13): `aRatchetForge` §10.9's ten commits or three
   months.
+- The C9 mechanism, after the M4 audit reproduced the rename defect. RESOLVED (owner, 2026-08-13): a
+  recorded baseline in the audit block rather than a `--follow` history walk. This also settles what
+  clears a C9 red, which the walk design had no answer for.
 - Whether merges count toward C9's threshold. RESOLVED (agent, 2026-08-13): excluded. The prior spec
-  is silent, so this is not a re-litigation of an owner decision but the filling of a genuine gap in
-  it. It is decided on the merits in §4 and it is the difference between this repo reding and passing
-  on day one, so it is flagged rather than buried.
+  is silent, so this fills a genuine gap rather than re-litigating an owner decision. It is decided on
+  the merits in the earlier revision's §4 and is now observed directly by AC11.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. B1 (blocker): C9's rename guard
+  could not fire — a path-scoped `git log --name-status` reports a `git mv` as an add, not a rename,
+  reproduced at git 2.55, so U2's own move would have read as the manifest's birth. Replaced the
+  history walk with a recorded `last-body-change` baseline, which also answers H3 (nothing cleared a
+  C9 red) and removes the candidate cap, the shallow-clone false-green and the 2.4 s runtime. H1: the
+  three-month branch had neither a design nor a criterion — now names committer date and carries an
+  aged-fixture criterion. H2: the staged/non-staged placement contract was unobserved — two criteria
+  added. M1: C7's 25,600 had no derivation — the rule that set it is now stated with both live data
+  points. Criteria grew from 14 to 20.
 
 ## 10. Reuse audit
 
@@ -246,14 +299,21 @@ Three seams are extended rather than re-invented. C7 copies `tools/check-templat
 measurement verbatim — `tr -d '\r' | wc -c`, an env-overridable cap, and a remedy that refuses to
 raise the limit. C8 copies the fence-tracking awk in `check-memory-hygiene.sh`'s check 7, which
 already tracks both ``` and `~~~`, strips CR, and exempts table separator rows; its exemption set is
-adapted, not its mechanism. C9 inverts `manifest-check.sh`'s own C5 loop, reusing the `WATCH` array
-C2 already parses and the `SKIP_RANGE` shallow guard C3 already sets.
+adapted, not its mechanism. C9 reuses the `WATCH` array C2 already parses and C3's existing sha
+validation branches, and after the rev-2 redesign it reuses `last-audit`'s own storage shape — a
+key in the audit block, validated the same way — rather than deriving anything from history.
 
 `reuse_lookup.py "gate a document's size and line length"` returned `check-install-prefix.sh` and the
 `template size <=32KiB` leg. The latter is the right MECHANISM and the wrong HOME: it is a gov-only
 leg over a single named file, and these checks must ride `manifest-check.sh` so an adopter inherits
 them by re-pulling the kit rather than by copying a gate. The mechanism is reused; the leg is not
 extended.
+
+C7's limit is deliberately NOT measured on this corpus, which is the opposite of what
+`memory/gotchas/pin-copied-from-another-corpus.md` prescribes. That record's rule is that a pin is
+measured at adoption rather than inherited; it assumes the gate and the corpus share an owner. This
+limit ships to repos this build has never seen, so §4 states the rule that set it and the two live
+measurements that bracket it, which is the closest available equivalent to a derivation.
 
 Recall terms used: `kickoff manifest ratchet last-audit watch verify-paths SESSION-KICKOFF discovery
 order traps accretion size gate prose`.

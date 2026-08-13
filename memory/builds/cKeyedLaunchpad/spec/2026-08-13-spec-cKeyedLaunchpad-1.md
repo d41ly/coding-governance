@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
 ## 1. Goal
 
@@ -14,7 +14,8 @@ README was found by hand; nothing reports it.
   `${HOME}/.claude/skills/session-kickoff`.
 - S2. The check compares CONTENT, not link-ness: the three shipped files
   (`SKILL.md`, `MANIFEST-TEMPLATE.md`, `manifest-check.sh`) against their tracked counterparts, with
-  CR normalised on both sides before comparison.
+  CR normalised on both sides before comparison. The comparison is CONDITIONAL on a tracked source
+  existing in the repo under inspection; where it does not, the check skips.
 - S3. Its `--check` report uses the file's existing `ok` / `skip` / `UNWIRED` vocabulary and carries a
   `Fix:` line holding the platform-appropriate junction command from `WIRE-INTO-PROJECT.md` §1.
 - S4. Arms in `tools/check-wiring.test.sh`, one per state, each asserting the specific message text.
@@ -50,9 +51,26 @@ question the check exists to answer. Comparing content answers it directly and i
 | Install state | Report | Exit contribution |
 |---|---|---|
 | Directory absent | `skip     skill     — /session-kickoff not installed on this machine (WIRE §1)` | none |
+| Installed, but no tracked `skills/session-kickoff/` in the repo under inspection | `skip     skill     — the kickoff kit is not adopted in this repo; the install is machine-global (WIRE §1)` | none |
 | Three files byte-equal to tracked, CR-normalised | `ok       skill     — installed engine matches tracked` | none |
 | Any file differs | `UNWIRED  skill     — installed <file> differs from tracked; this session is running a different engine. Fix: <junction command>` | non-zero under `--check` |
 | Directory present, a shipped file missing | `UNWIRED  skill     — installed engine is missing <file>. Fix: <junction command>` | non-zero under `--check` |
+
+### The adopting repo is the common case, not the edge
+
+`check-wiring.sh` is a copy-in kit: the runbook instructs copying it into an adopting project's
+`tools/`, and it operates on `$ROOT`, the repo under inspection. That repo has the machine-global
+junction — that is the whole point of installing it once per machine — and no tracked kickoff-kit
+source to compare against.
+
+Without the second skip state, the check reports `UNWIRED` at every SessionStart, in every adopting
+repo, forever, with a `Fix:` line naming a command the operator has already run. Every other arm in
+that file resolves both install prefixes and skips when the kit is not adopted; the recall arm's own
+comment records why, in terms — a permanent false alarm is the fastest way to train every node to
+ignore the wiring verifier.
+
+One claim from the audit finding does not survive and is not repeated here: `--check` is not a gate
+leg, so this is SessionStart noise rather than a red bar. That makes it cheaper, not acceptable.
 
 ### The CR half
 
@@ -105,6 +123,10 @@ CRLF copy reports `ok` rather than a false stale.
   before and after, asserted in the test rather than argued in prose.
 - AC6. Each arm in `tools/check-wiring.test.sh` asserts its specific message text; no arm passes on an
   exit code alone.
+- AC7. When the install directory exists but the repo under inspection tracks no
+  `skills/session-kickoff/`, `--check` prints a line beginning `skip     skill` and contributes no
+  failure. The fixture is adopter-shaped: a repo with the kit copied into `tools/` and no tracked kit
+  source. Without this arm the check is a permanent false alarm in every adopting repo.
 
 ## 7. Gates
 
@@ -121,6 +143,11 @@ constraint in §4.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H9: the state table assumed the repo
+  under inspection was this one, so an adopting repo — which has the machine-global install and no
+  tracked kit source — would have reported UNWIRED at every SessionStart forever. Added the fifth
+  state, made S2's comparison conditional on a tracked source, and added AC7 with an adopter-shaped
+  fixture. §5's exhaustiveness claim now holds.
 
 ## 10. Reuse audit
 

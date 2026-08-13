@@ -1,6 +1,6 @@
 # TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes
 
-**Status:** OPEN · rev-1 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
+**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
 ## 1. Goal
 
@@ -25,6 +25,9 @@ input-shape defects that predicate has been carrying unexercised.
 - S5. Update ALL FOUR copies of the verb list, and re-render the two generated artifacts that carry
   one.
 - S6. Four `--selftest` arms on the existing `t8` fixture, including one arm per exposed defect.
+- S7. **The one-line call site in the kickoff engine.** `SKILL.md` Step 4 invokes `--for-paths` over
+  the pointer-map row's entrypoints and reports the selected classes on the READY card. rev-1
+  delegated this to U7, which never accepted it; §3 explains why it comes back here.
 
 ## 3. Non-goals (OUT)
 
@@ -32,8 +35,11 @@ input-shape defects that predicate has been carrying unexercised.
   basename — is deliberate and documented at `gotchas.py:15-18`. This unit fixes the INPUT shapes
   reaching it, not the matching rule.
 - No new gate leg. The gotchas selftest is already a leg and already guarded on `tools/memory-tree/`.
-- No `--for-paths` call site in the kickoff engine. That is U7's edit to `SKILL.md`, sequenced after
-  U2 settles the engine's structure. This unit ships the affordance, not its consumer.
+- **The call site is IN scope, as S7.** rev-1 put it out and named U7 as the owner; U7 never took it,
+  so the verb would have shipped with zero callers, the build's own goal — a checklist reachable at
+  kickoff — would have gone unmet, and U6 would have deleted eight manifest bullets in favour of a
+  path nothing in the build opens. It is one line in an engine section this unit's own goal names, and
+  this is a Tier-1 unit with no dependencies, so it is cheaper here than as a cross-unit hand-off.
 - No minimum-length heuristic beyond S4's three refusals. A smarter noise bound is speculative until
   a real pointer-map cell produces bad output.
 
@@ -87,6 +93,7 @@ this change's own checklist. All four move together. `render()`'s block is byte-
 | File | Change |
 |---|---|
 | `tools/memory-tree/gotchas.py` | the split, the normaliser, the verb, the docstring and usage strings, `render()`'s help block, four arms |
+| `skills/session-kickoff/SKILL.md` | S7's one-line Step 4 call site |
 | `tools/memory-tree/README.md` | line 22, the fourth copy of the verb list |
 | `memory/gotchas/INDEX.md` | re-rendered by `gotchas.py --write` |
 | `tools/memory-tree/HYGIENE.template.md` | version marker line 1, plus the `--for-diff`-only mention at line 260 |
@@ -138,6 +145,12 @@ this change's own checklist. All four move together. `render()`'s block is byte-
   grown by four.
 - AC8. `bash tools/run-gates.sh` is green, including the verdict-epoch leg, hygiene check 17, and the
   codebase-map freshness byte-compare.
+- AC9. `skills/session-kickoff/SKILL.md` Step 4 invokes `--for-paths`, and the verb has at least one
+  caller in the tracked tree. Without this the affordance ships dead.
+- AC10. The new verb appears in all four copies of the verb list — the module docstring, `main`'s
+  fallback usage string, `render()`'s help block, and the kit README — asserted by one grep across the
+  four files. Only the third is gated today, and §4 names updating three of four as the very
+  two-answers class this repo records.
 
 ## 7. Gates
 
@@ -163,6 +176,11 @@ about `render()` is answered in §4's alternatives.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H7: rev-1's §3 delegated the only
+  call site to a sibling that never accepted it, so the verb would have shipped with zero callers and
+  this unit's stated goal would have gone unmet while U6 deleted eight manifest bullets pointing at a
+  path nothing opens. Taken back as S7, with AC9. M3: S5 put all four verb-list copies in scope and
+  only one was observed — AC10 now binds all four in one grep.
 
 ## 10. Reuse audit
 
