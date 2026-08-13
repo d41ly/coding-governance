@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-13
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 TOOL-cKeyedLaunchpad-5
+ids: KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
 ---
 
 # cKeyedLaunchpad — the kickoff kit re-grounded, and the manifest it reads put under gates
@@ -27,11 +27,10 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1`, `-2` and
-`TOOL-cKeyedLaunchpad-5` are authored and unreviewed; the other four are MISSING. No code is written
-and none may be until each unit's spec is authored and reviewed, per `BUILD-METHOD.md` M2's hard floor.
+**State.** Design pass complete. All seven units are AUTHORED and UNREVIEWED. No code is written and
+none may be until the M4 spec audit runs over the set, per `BUILD-METHOD.md` M2's hard floor.
 
-**Next action:** author the remaining four unit specs, then run the M4 spec audit over the set.
+**Next action:** the M4 spec audit — every spec here was authored this run and is unreviewed by definition.
 
 **Authoring order** (owner, 2026-08-13): `TOOL-cKeyedLaunchpad-5` first, then dependency order —
 `-2`, `-3`, `-4`, `-6`, `-7`. U5 is front-loaded because it is Tier 1 and depends on nothing, so
@@ -70,7 +69,7 @@ carries its id.
 | U4 | `KICK-cKeyedLaunchpad-4` | the sealed task region and its byte-compare | 2 | authored, unreviewed | U3 |
 | U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | authored, unreviewed | none |
 | U6 | `KICK-cKeyedLaunchpad-6` | traps evicted from the manifest, and a ceiling so they cannot return | 2 | authored, unreviewed | U3, U5 |
-| U7 | `KICK-cKeyedLaunchpad-7` | the engine's prose pass and its size gate | 1 | MISSING | U2, U6 |
+| U7 | `KICK-cKeyedLaunchpad-7` | the engine's prose pass and its size gate | 1 | authored, unreviewed | U2, U6 |
 
 U1 and U5 depend on nothing and are Tier 1. They can be specced and built while the Tier-2 units are
 still in review.
@@ -131,7 +130,7 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATE
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 6 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 TOOL-cKeyedLaunchpad-5
+**Build status:** OPEN · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -141,6 +140,7 @@ header of every spec in this folder — do not hand-edit it.
 | [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-1 | 2026-08-13 |
 | [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-1 | 2026-08-13 |
 | [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-1 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-1 | 2026-08-13 |
 <!-- /gen:build-index -->
 
 ## Method
