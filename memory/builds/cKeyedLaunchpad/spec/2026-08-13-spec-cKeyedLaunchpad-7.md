@@ -1,11 +1,11 @@
 # KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-1 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
-Correct the engine's two false claims, trim what U2 through U6 made redundant, and put the file under
-a measured size gate — the artifact that instructs adopters to keep their manifest short is itself
+Correct the engine's remaining false claim, trim what U2 through U6 made redundant, and put the file
+under a measured size gate — the artifact that instructs adopters to keep their manifest short is itself
 15,604 bytes and ungated, in a repo that byte-gates its playbook at 32 KiB.
 
 ## 2. Scope (IN)
@@ -38,17 +38,15 @@ a measured size gate — the artifact that instructs adopters to keep their mani
 
 ## 4. Design
 
-### The two false claims
+### The remaining false claim
 
-Step 3 tells a high-risk unit that its spec follows the memory kit's template with "nine canonical
-sections". The template requires ten, with the tenth date-gated by a cutoff that has passed. Two prior
-builds already caught this same nine-against-ten error in other carriers, which makes the engine the
-surviving copy of a defect this repo has fixed twice.
-
-It is worth recording HOW it survived: the phrase is hard-wrapped across two source lines, so a
-single-line `git grep` for it returns nothing. A whole-file search over a hard-wrapped document is
-the absence-assertion class this repo already has a record for, and it hid this claim from the review
-that was looking for exactly this kind of thing.
+The spec-section count is NOT fixed here. It sits inside Step 3's Risk-tier bullet, which
+`KICK-cKeyedLaunchpad-4` deletes whole, so correcting it here would be a conflict rather than a fix;
+that unit's §4 records where the figure and the no-tiers heuristic land. One observation is kept
+because it outlives the line: the claim survived two prior builds that fixed the same nine-against-ten
+error elsewhere, because the phrase is hard-wrapped across two source lines and a single-line
+`git grep` for it returns nothing — the absence-assertion class this repo has a record for, hiding a
+claim from a review looking for exactly it.
 
 The Scaffolding section directs the checker to a root-level script directory. The runbook installs it
 under the kit prefix — and then, four hundred lines later, emits a pre-commit snippet pointing back at
@@ -104,7 +102,7 @@ reused script strips CR, which is a further argument for riding it rather than w
 
 | File | Change |
 |---|---|
-| `skills/session-kickoff/SKILL.md` | S1, S2, S3 |
+| `skills/session-kickoff/SKILL.md` | S2 and S3 only; S1 is dropped and its line is deleted by unit 4 |
 | `WIRE-INTO-PROJECT.md` | the contradicting pre-commit snippet |
 | `tools/check-template-size.sh` | the positional limit |
 | `tools/gate-legs.json` | the second leg |
@@ -128,8 +126,8 @@ reused script strips CR, which is a further argument for riding it rather than w
   error.
 - observability — the leg names the file and the measured size against the limit.
 - risks — the three load-bearing strings; asserted in §6 rather than trusted.
-- testing + left-shift gates — the new leg IS the left shift for F7; S1 and S2's corrections are
-  one-time and are covered by the leg only insofar as it bounds regrowth.
+- testing + left-shift gates — the new leg IS the left shift for F7; S2's correction is one-time and
+  is covered by the leg only insofar as it bounds regrowth.
 - migration / rollback — adopters are unaffected; the leg is gov-only and the positional argument is
   backward compatible with every existing call.
 - user docs — the runbook's contradicting snippet is the doc fix.
@@ -179,6 +177,11 @@ an inconsistency between this spec and the review that opened the build.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-3 · 2026-08-13 · folded the M4 fix-verify pass. Dropping S1 and AC1 at rev-2 left four live
+  references still instructing the edit unit 4 now performs: §1's "two false claims", the §4
+  subsection arguing the correction, the Files-touched row, and §5's testing row. All four now
+  match the dropped scope, and the one observation worth keeping — how the claim survived two prior
+  builds — is retained without the instruction.
 - rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. M6: §4 and AC4 claimed the READY
   sentence carries a curly apostrophe; `od -c` shows straight ASCII, with only the em-dash multibyte —
   a false statement about source in the one paragraph naming the load-bearing bytes, which would have

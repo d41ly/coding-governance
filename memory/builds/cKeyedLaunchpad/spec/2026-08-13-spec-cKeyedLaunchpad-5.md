@@ -1,6 +1,6 @@
 # TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
+**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
 ## 1. Goal
 
@@ -35,6 +35,11 @@ input-shape defects that predicate has been carrying unexercised.
   basename — is deliberate and documented at `gotchas.py:15-18`. This unit fixes the INPUT shapes
   reaching it, not the matching rule.
 - No new gate leg. The gotchas selftest is already a leg and already guarded on `tools/memory-tree/`.
+- **The ordering constraint rev-1 gave is answered, not dropped.** rev-1 delegated the call site
+  because it must be "sequenced after U2 settles the engine's structure". That is now satisfied by
+  ORDER rather than by ownership: S7's edit is one added line in Step 4, it touches none of the
+  structure U2 rewrites (Step 2, Step 2b, Scaffolding), and this unit therefore builds AFTER U2
+  despite depending on none of its output. The build README's dependency column carries the edge.
 - **The call site is IN scope, as S7.** rev-1 put it out and named U7 as the owner; U7 never took it,
   so the verb would have shipped with zero callers, the build's own goal — a checklist reachable at
   kickoff — would have gone unmet, and U6 would have deleted eight manifest bullets in favour of a
@@ -176,6 +181,10 @@ about `render()` is answered in §4's alternatives.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-3 · 2026-08-13 · folded the M4 fix-verify pass. Taking the call site at rev-2 moved SKILL.md
+  into this unit's write set and silently discarded rev-1's stated sequencing reason. The reason is
+  now answered explicitly — the edit is one line in a section U2 does not touch, and this unit
+  builds after U2 — and the README's dependency column carries the edge.
 - rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H7: rev-1's §3 delegated the only
   call site to a sibling that never accepted it, so the verb would have shipped with zero callers and
   this unit's stated goal would have gone unmet while U6 deleted eight manifest bullets pointing at a

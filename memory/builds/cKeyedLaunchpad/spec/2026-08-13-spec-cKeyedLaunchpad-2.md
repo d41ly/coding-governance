@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -125,6 +125,14 @@ S7 puts them in scope and rev-1 gave no criterion that reaches them. They are
 `:521`, and `SKILL.md:224` — the Scaffolding write target, which spec-7's §3 explicitly disclaims, so
 it is this unit's.
 
+**Two further tracked sites spell the path and are NOT in scope.** The self-test's
+subdirectory-argument scenario uses `docs/` as an arbitrary relative path, not as a manifest
+location, so it tests path resolution rather than discovery and is unaffected by the list changing.
+The govkit deploy fixture carries `docs/SESSION-KICKOFF.md` as a free-form answer token feeding the
+kickoff-manifest entry's destination; retargeting it is a govkit-registry change with its own
+selfcheck, and it writes the manifest SEED rather than reading a manifest. Both are exempted by
+name in AC6b rather than dodged by narrowing the pattern.
+
 The `cp` step and the Scaffolding target are the two that matter most: they do not merely describe the
 old layout, they instruct an adopter to CREATE a manifest at a location the same commit makes the
 engine stop looking for. Scaffolding is repointed to location 1.
@@ -183,9 +191,12 @@ tail it drags.
   weakening: S3 KEEPS that path as location 2, so the array must spell it and AC1 requires the verb to
   print it. An unexempted AC6 contradicts AC1, and a builder driving it green would delete the only
   location every existing adopter uses.
-- AC6b. `git grep -n 'docs/SESSION-KICKOFF\.md'` returns nothing outside build records and the
-  migration note. This is the criterion that reaches the dropped spellings; AC5 and AC6 both miss
-  them by construction, and they are what F2 and F6 are about.
+- AC6b. `git grep -n 'docs/SESSION-KICKOFF\.md'` returns nothing outside build records, the migration
+  note, and two sites this unit deliberately leaves alone, each named in §4: the self-test scenario
+  that uses the path as an arbitrary subdirectory argument, and the govkit deploy fixture. This is
+  the criterion that reaches the dropped spellings; AC5 and AC6 both miss them by construction, and
+  they are what F2 and F6 are about. The exemptions are enumerated rather than pattern-dodged,
+  because rev-2's unexempted form reproduced exactly the defect AC6 had just been rescoped to avoid.
 - AC7. `bash tools/memory-tree/check-method-carriers.sh` exits 0 with a carrier count one lower.
 - AC8. `python tools/codebase-map/test_codebase_map.py` exits 0, with the new guide claimed by the
   `kickoff` dossier and the generated artifacts byte-identical to a fresh render.
@@ -219,6 +230,10 @@ the build README.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-3 · 2026-08-13 · folded the M4 fix-verify pass. The AC6b added at rev-2 to close H5 reproduced
+  H4's own defect: its grep hits two live tracked sites this unit does not touch — the self-test's
+  subdirectory-argument scenario and the govkit deploy fixture — so a builder driving it green would
+  edit files no S-item claims. Both are now exempted BY NAME and explained in §4.
 - rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H4: AC6 contradicted AC1 and S3 —
   the engine must spell location 2, so an unexempted grep for it could only be satisfied by deleting
   the location every adopter uses; AC6 is now scoped and says why. H5: the four `docs/`-spelled sites

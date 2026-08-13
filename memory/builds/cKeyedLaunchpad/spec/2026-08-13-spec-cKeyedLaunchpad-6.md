@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -10,17 +10,18 @@ kit's own template has always stated and this repo's manifest has never obeyed.
 
 ## 2. Scope (IN)
 
-- S1. Delete the eight bullets already carried by an existing record, each replaced by a one-line
-  pointer naming that record.
-- S2. Evict exactly ONE trap to a new record, at `memory/gotchas/inputs-inside-the-subjects-reach.md`.
-- S3. Delete the merge-driver bullet outright. It is wrong, not stale.
-- S4. Correct two stale figures in surviving bullets: an agent-cap kit version and a drift-signal pin.
-- S5. A new check, C10, caps every traps bullet at 400 bytes, the same number C8 uses for a line.
-- S6. The five orphan bug classes that are not yet worth a record stay as one-line bullets under S5's
-  cap, with the reasons recorded here.
-- S7. **Rewrite the surviving machine-local bullets that exceed the cap.** Nineteen of the 27 bullets
-  are over 400 bytes today, and deletion alone does not bring the survivors under it. §4 names the
-  three largest and the rule for the rest.
+- S1. Delete the SIX bullets wholly carried by an existing record, each replaced by a one-line pointer
+  naming that record. §4's table names all six.
+- S2. Evict exactly ONE trap to a new record, at `memory/gotchas/inputs-inside-the-subjects-reach.md`,
+  leaving a pointer in its place.
+- S3. Delete the merge-driver bullet outright, with NO pointer. It is wrong, not duplicated.
+- S4. **Rewrite the agent-cap bullet, which SPLITS.** Its concurrency half is carried by a record and
+  goes, cited inline; its wiring half is repo-local and stays, with the stale kit version corrected.
+- S5. Correct the stale drift-signal pin in the gate-leg bullet.
+- S6. A new check, **C11**, caps every traps bullet at 400 bytes, the same number C8 uses for a line.
+  U4 takes C10; §4 records why the number is not this unit's to choose.
+- S7. **Rewrite EVERY surviving bullet that exceeds the cap.** Measured: fourteen do. This is the
+  owner's decision 5 as written — "U6 rewrites the surviving over-cap trap bullets" — not a subset.
 - S8. Lower `READ_PATH_CEILING` in `.memory-tree.conf` to the post-eviction measured read-path total
   plus the stated margin, recording the measurement in the conf comment. U2 raises it for the move;
   this unit is what makes the raise temporary.
@@ -39,43 +40,70 @@ kit's own template has always stated and this repo's manifest has never obeyed.
 
 ## 4. Design
 
-### The measured section, and why deletion alone cannot reach the target
+### The measured section — every figure below is measured, none is estimated
 
-Measured at BASE, LF-normalised: **27 bullets, 14,665 bytes, 19 of them over 400 bytes.** The M4
-audit found the first revision's arithmetic did not close: deleting the ten bullets §4 authorises
-removes at most 7,837 bytes even under the most favourable possible selection, leaving 6,828 before
-the eight replacement pointer lines. The rev-1 target of 4,000 bytes was unreachable without work no
-scope item granted, and three bullets this section explicitly KEEPS already exceed the cap the same
-unit introduces — the new-record procedure bullet at 492 bytes, the template-gate bullet at 1,198,
-and the gate-leg bullet at 595.
+Measured at BASE, LF-normalised, counting each bullet as its `- ` line plus its continuation lines:
+**27 bullets, 14,535 bytes, 19 over 400 bytes, largest 1,199.**
 
-S7 closes that gap by authorising the rewrite rather than by moving the target. The three named
-bullets are rewritten to the cap; the remaining survivors are already under it or are one-lined under
-S6. The eviction set is unchanged, because widening it costs authored anchors and a dossier claim per
-record for no repaired defect — the arithmetic §4 already priced.
+Two revisions of this section were wrong before this one, both by reasoning about the numbers instead
+of taking them. rev-1 set a 4,000-byte target that deletion could not reach. rev-2 authorised
+rewriting "the three named survivors" and asserted the rest were already under the cap — measurably
+false, and the M4 fix-verify pass blocked on it a second time. The table below is the measurement.
 
-### The eviction arithmetic, which is why "evict them all" is the wrong plan
+| Disposition | Bullets | Bytes |
+|---|---|---|
+| Deleted, wholly carried by a record (S1) | 6 | 2,835 |
+| Evicted to a new record (S2) | 1 | 471 |
+| Deleted as wrong, no pointer (S3) | 1 | 603 |
+| **Removed, total** | **8** | **3,909** |
+| **Survivors** | **19** | **10,626** |
+| …of which exceed the 400-byte cap | 14 | — |
 
-Of 27 bullets: **eight** are already carried by an existing record, **seven** are bug classes with no
-record, and **twelve** are machine- or repo-local facts that must stay.
+So S7 authorises rewriting **fourteen** bullets, not three. That is what the owner's decision 5
+already said in general terms, and what rev-2 narrowed without measuring.
 
-### The eight duplicates, named
+### Why AC1's target is derived rather than chosen
 
-The rev-1 spec gave only the count, which made the largest edit in the unit undecidable — the wrong
-eight would satisfy a byte-count criterion equally well. The classification is the scope:
+Both earlier revisions picked a byte target and then failed to reach it. This one does not pick: if
+every survivor obeys C11 (AC6), the section's size is BOUNDED by construction —
+
+> 19 survivors × 400-byte cap + 7 pointer lines × ~90 bytes + ~200 bytes of section prose ≈ **8,430**
+
+AC1 asserts that ceiling and nothing tighter, so AC1 and AC6 cannot disagree: satisfying the cap
+satisfies the size. The realistic outcome is far smaller — a rewritten trap runs nearer 250 bytes than
+400, putting the section around 5,600 — but a spec that promises the realistic number is a spec that
+blocks on the pessimistic one.
+
+### The classification, named
+
+rev-1 gave only counts, which made the unit's largest edit undecidable. rev-2's table then merged
+three different dispositions into one list and double-counted the eviction. They are separated here.
+
+**Deleted outright, wholly carried by an existing record** — each leaves a one-line pointer naming its
+record, which is what AC2 greps for:
 
 | Trap bullet, opening words | Carried by |
 |---|---|
-| a byte-comparing gate needs an eol pin AND CR normalisation | `gate-green-by-accident-on-generated-bytes.md` |
-| the agent-cap rules — the concurrency half only | `concurrency-is-not-a-budget.md` |
-| run a new gate PREDICATE over the real tree first | `absence-assertion-over-whole-file-text.md` |
-| a `git worktree` checkout lands CRLF on an eol=lf path | `gate-green-by-accident-on-generated-bytes.md` |
-| `subprocess.run(["bash", …])` resolves the WSL launcher | `subprocess-resolves-a-different-shell.md` |
-| a heredoc into a non-raw Python string | `heredoc-escape-reaches-the-regex.md` |
-| ask what SUPPLIES each of a check's inputs | evicted by S2 to its own record |
-| a core ⊆ effective assertion is VACUOUS | `assertion-between-two-derived-values.md` |
+| a byte-comparing gate needs both halves | `gate-green-by-accident-on-generated-bytes.md` |
+| a new gate PREDICATE is run over the real tree first | `absence-assertion-over-whole-file-text.md` |
+| a `git worktree` checkout can land CRLF on an eol=lf path | `gate-green-by-accident-on-generated-bytes.md` |
+| `subprocess.run` resolves the SYSTEM32 WSL launcher | `subprocess-resolves-a-different-shell.md` |
+| generating source through a shell heredoc | `heredoc-escape-reaches-the-regex.md` |
+| a core-subset-of-effective assertion is VACUOUS | `assertion-between-two-derived-values.md` |
 
-Each deleted bullet leaves a one-line pointer naming its record file, which is what AC2 greps for.
+**Evicted to a new record (S2), leaving a pointer:** the "ask what SUPPLIES each of a check's inputs"
+bullet, to `inputs-inside-the-subjects-reach.md`. It is NOT one of the six above — it is one of the
+seven orphan classes, and rev-2 listing it as a seventh duplicate is what made the table contradict
+its own arithmetic.
+
+**Rewritten because it SPLITS (S4):** the agent-cap bullet. Its concurrency half is carried by
+`concurrency-is-not-a-budget.md` and goes, cited inline. Its wiring half — which matcher, which four
+rules, where the binding protocol lives — is repo-local, is carried by no record, and STAYS with its
+stale kit version corrected. rev-2 sent the whole bullet to deletion while S4 simultaneously required
+its version corrected, which no builder could satisfy both ways; the version string exists nowhere
+else in the section.
+
+**Deleted with no pointer (S3):** the merge-driver bullet, because it is wrong rather than duplicated.
 
 The eight duplicates are pure deletion — the record already exists, so the bullet is a second copy
 whose only future is to disagree with it. One of them, the heredoc-escape trap, is duplicated by a
@@ -171,11 +199,11 @@ noise the module's own docstring warns about. One record, well anchored, is the 
 
 ## 6. Acceptance criteria
 
-- AC1. The manifest's traps section is under 6,000 LF-normalised bytes, down from 14,665, and every
-  bullet in it satisfies AC6 — the two are reachable together, which rev-1's 4,000 was not.
-- AC2. None of the eight bullets named in §4's classification table survives, and the traps section
-  contains a pointer line naming each of those eight record filenames — checked by grepping for the
-  eight filenames, not by judging substance.
+- AC1. The manifest's traps section is under 8,430 LF-normalised bytes, down from 14,535. That
+  ceiling is DERIVED in §4 from AC6's cap and the survivor count, so AC1 cannot contradict AC6.
+- AC2. None of the six bullets named in §4's deletion table survives, and the traps section contains a
+  pointer line naming each of those six record filenames — checked by grepping for the six filenames,
+  not by judging substance. The evicted bullet's pointer names a seventh filename.
 - AC3. `memory/gotchas/inputs-inside-the-subjects-reach.md` exists, and
   `grep -o '\[\[[a-z-]*\]\]' memory/gotchas/*.md` resolves every link to a real record.
 - AC4. `python tools/memory-tree/gotchas.py --check` passes checks 17, 18 and 19 for the new record,
@@ -189,9 +217,11 @@ noise the module's own docstring warns about. One record, well anchored, is the 
 - AC9. `python tools/codebase-map/test_codebase_map.py` passes with the new gotcha key claimed, and
   the generated artifacts byte-compare after a `git add`.
 - AC10. `GATE_FULL=1 bash tools/run-gates.sh` is green.
-- AC11. Each of the three bullets named in §4 as exceeding the cap measures at or under 400 bytes
-  after the rewrite, and still states the fact it stated before — asserted by reading them, not by the
-  byte count alone.
+- AC11. All FOURTEEN over-cap survivors measure at or under 400 bytes after the rewrite, and each
+  still states the fact it stated before — asserted by reading them, not by the byte count alone.
+- AC13. The agent-cap bullet survives, its wiring half intact and its kit version corrected, and its
+  concurrency half is gone with the record cited inline. This is the arm that fails if the bullet is
+  deleted wholesale.
 - AC12. `READ_PATH_CEILING` in `.memory-tree.conf` equals a freshly measured post-eviction read-path
   total plus the stated margin, and `python tools/memory-tree/corpus_ids.py --report` confirms the
   measurement the conf comment records.
@@ -215,6 +245,17 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-3 · 2026-08-13 · folded the M4 fix-verify pass, which BLOCKED on this unit a second time. The
+  rev-2 arithmetic was still wrong: it reused the audit's upper bound as if it described the
+  authorised set, claimed the survivors were "already under the cap or one-lined", and narrowed the
+  owner's general rewrite authorisation to three bullets. Measured properly this revision — 27
+  bullets, 14,535 B, 19 over cap; 8 removed for 3,909 B; **19 survivors of which 14 exceed the cap**.
+  S7 now authorises all fourteen, which is the owner's decision 5 as written. AC1's ceiling is DERIVED
+  from the cap and the survivor count rather than chosen, so it cannot contradict AC6. Three further
+  defects the pass found in the rev-2 table: the agent-cap bullet SPLITS and its wiring half must
+  survive (S4, AC13) where rev-2 sent it to deletion while also requiring its version corrected; the
+  eviction was double-counted as a seventh duplicate, contradicting the 8/7/12 split; and the check
+  number C10 collided with U4, so this unit takes C11.
 - rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. H10 (blocking): AC1 and AC7 were
   arithmetically unsatisfiable together — 19 of 27 bullets exceed the cap, the authorised deletions
   leave 6,828 bytes against a 4,000-byte target, and three bullets §4 keeps already exceed the cap

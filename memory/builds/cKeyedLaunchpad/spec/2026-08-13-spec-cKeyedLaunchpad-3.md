@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
@@ -42,7 +42,9 @@ manifest carrying a 16,196-character line passes all six clean. C7, C8 and C9 cl
   commit messages and READY cards, which squash merges do not preserve.
 - **C9 does not derive its baseline by walking history.** §4 records the measurement that closed that
   design off.
-- No change to C1-C6 semantics, and no new gate leg.
+- **C2 gains a fourth required key and that IS a semantics change**, stated rather than denied: S5
+  adds `last-body-change` to the keys C2 requires and shape-checks, with its own absent and
+  malformed failures. C1 and C3-C6 are unchanged. No new gate leg.
 
 ## 4. Design
 
@@ -96,8 +98,9 @@ enough that the file stays readable in one sitting. The two live data points bra
 20,920 and passes with 18% of the cap free; NicoCares measures 77,056 and is three times over, which
 is the outcome the check exists to produce.
 
-After U6's eviction gov drops to roughly 10 KB, leaving C7 at about 2.5 times the file it guards.
-That slack is deliberate and is the reason C10, U6's per-bullet cap, exists as a separate check: C7
+After U6's eviction gov drops to roughly 15 KB — 20,920 less the 14,535-byte traps section plus its
+derived ceiling of 8,430 — leaving C7 at about 1.7 times the file it guards.
+That slack is deliberate and is the reason C11, U6's per-bullet cap, exists as a separate check: C7
 bounds the file, and a file-level cap with that much headroom cannot bound the section that actually
 accretes.
 
@@ -247,6 +250,9 @@ while quietly losing coverage over the difference. S8 raises it in the same comm
   unchanged. This is the arm the previous design could not satisfy.
 - AC15. When `last-body-change` names a sha unknown to the repository, the check fails or WARN-skips
   exactly as C3 does for `last-audit`, and does not report green.
+- AC15b. When `last-body-change` names a real commit that is NOT an ancestor of HEAD — a squash-merged
+  or rewritten stamp — the check fails exactly as C3 does for `last-audit`. S5 claims the ancestor
+  branch is reused; this is what observes it.
 - AC16. When `manifest-check.sh --staged` runs against a staged manifest that is oversize or carries an
   over-long line, it fails — C7 and C8 are present in the staged leg.
 - AC17. When `manifest-check.sh --staged` runs against a stalled manifest, it exits 0 with no C9 line,
@@ -283,6 +289,11 @@ none — the forks are RESOLVED, three by the owner and one on the merits below.
 ## 9. Revision log
 
 - rev-1 · 2026-08-13 · initial draft, grounded by workflow `wf_0aaecb50-a51`.
+- rev-3 · 2026-08-13 · folded the M4 fix-verify pass. S5 added a fourth required audit-block key
+  while §3 still claimed "No change to C1-C6 semantics" — C2 demonstrably changes, so §3 now says so
+  rather than denying it. Added AC15b: S5 claims C3's ancestor branch is reused and nothing observed
+  the non-ancestor case. Corrected the post-eviction figure, which was computed against U6's
+  superseded 4,000-byte target, and the C10/C11 echo after U4 took C10.
 - rev-2 · 2026-08-13 · folded the M4 spec audit, review record 1. B1 (blocker): C9's rename guard
   could not fire — a path-scoped `git log --name-status` reports a `git mv` as an add, not a rename,
   reproduced at git 2.55, so U2's own move would have read as the manifest's birth. Replaced the
