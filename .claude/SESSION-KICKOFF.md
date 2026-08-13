@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-11T22:45:00+03:00 @ d5d1b5435ffd19d5c830e44f5197fb015412d486
+last-audit: 2026-08-13T18:20:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -235,7 +235,13 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   Measured 2026-08-10 on two branches of the new driver. This also means `check-arms.py` DISCOVERS
   any tracked `*.sh` that defines `fail() {` and calls `fail <n> "` — a new script gets pulled into
   the meta-gate's population automatically and needs a sibling `<stem>.test.sh` with a positive arm
-  per branch, plus an `ARMS_FLOORS` entry.
+  per branch, plus an `ARMS_FLOORS` entry. Two more edges, both hit on 2026-08-13 while adding
+  branches: the arm must contain the branch's ENTIRE literal signature, so an arm asserting a
+  readable PREFIX of a long message reds; and a literal word sitting between the sentence and the
+  first interpolation is part of that signature, so end the sentence and let only interpolations
+  follow. Adding branches also RENUMBERS the per-check ordinals, which invalidates any
+  `unarmed-branches.txt` row below the insertion point — prefer routing a repeated refusal through
+  ONE shared branch over spelling it at each call site, which is both fewer ordinals and fewer pins.
 - Hygiene checks 13-19 are OFF unless a pin is armed. `corpus_ids.py`'s `armed(conf)` returns early
   when every one of `ORPHAN_ID_PIN`/`DEAD_PATH_PIN`/`READ_PATH_CEILING`/`CHARTER` is blank, and
   `gotchas.py` short-circuits on an empty record set. So a fixture tree written WITHOUT pins arms
