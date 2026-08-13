@@ -2,10 +2,9 @@
 slug: cKeyedLaunchpad
 node: c
 opened: 2026-08-13
-status: OPEN
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-cKeyedLaunchpad-1..-4 KICK-cKeyedLaunchpad-6..-7 TOOL-cKeyedLaunchpad-5
+ids: KICK-cKeyedLaunchpad-1
 ---
 
 # cKeyedLaunchpad — the kickoff kit re-grounded, and the manifest it reads put under gates
@@ -28,11 +27,11 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass. Seven units decomposed and classified; all seven are MISSING. No code is
-written and none may be until each unit's spec is authored and reviewed, per `BUILD-METHOD.md` M2's
-hard floor.
+**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1` is authored
+and unreviewed; the other six are MISSING. No code is written and none may be until each unit's spec
+is authored and reviewed, per `BUILD-METHOD.md` M2's hard floor.
 
-**Next action:** author the seven unit specs, then run the M4 spec audit over the set.
+**Next action:** author the remaining six unit specs, then run the M4 spec audit over the set.
 
 **BASE** is `f006691f7cd2231dcb95152972f1998dfe8358e4`, on `branch/session-kickoff-skill-review-0c76ec`.
 
@@ -53,12 +52,12 @@ fixed.
 
 ## Units
 
-Classification is `BUILD-METHOD.md` M2, first match wins. All seven are MISSING because no
-conforming spec carries their id yet.
+Classification is `BUILD-METHOD.md` M2, first match wins. A unit is MISSING until a conforming spec
+carries its id.
 
 | Unit | Id | Mechanism | Tier | Class | Depends on |
 |---|---|---|---|---|---|
-| U1 | `KICK-cKeyedLaunchpad-1` | skill-install freshness reported by `check-wiring.sh` | 1 | MISSING | none |
+| U1 | `KICK-cKeyedLaunchpad-1` | skill-install freshness reported by `check-wiring.sh` | 1 | authored, unreviewed | none |
 | U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | MISSING | none |
 | U3 | `KICK-cKeyedLaunchpad-3` | ratchet checks C7 size, C8 line length, C9 stamp age | 2 | MISSING | U2 |
 | U4 | `KICK-cKeyedLaunchpad-4` | the sealed §A region and its byte-compare | 2 | MISSING | U3 |
@@ -80,23 +79,24 @@ mark in place.
 | Whether the manifest stays on drift-audit's product surface | Add the explicit path to `PRODUCT_GLOBS` | U2 becomes a three-kit change and moves a drift-audit pin. |
 | The third manifest location | The skill base directory, as a machine-global fallback | It sits outside every repo, so no project gate can reach it. U2 must make the engine skip Step 2b for it and say so in the READY card. |
 
-## Open forks for the owner
+## Forks resolved by the owner
 
-These are scope questions, which M3 does not delegate. None blocks spec authoring; each blocks its
-own unit's build.
+All three were put to the owner at kickoff and resolved before any unit spec was authored. Each
+unit's §8 carries the mark in place, naming the owner as resolver.
 
-1. **The C7 size ceiling applies to which manifests?** A 25 KiB cap reds the NicoCares manifest at
-   77,056 B the moment that repo pulls the kit update. Options are a hard red, a WARN that becomes a
-   red at a declared date, or a per-repo declared ceiling with 25 KiB as the default. Recommendation
-   is the dated WARN, because the kit ships to repos this build does not control.
-2. **What C9 measures as staleness.** C5 already reds on watch drift, so C9 is about a manifest
-   nothing has touched. The `aRatchetForge` build specced a maintenance-stall review at ten watch
-   commits or three months with zero body growth. Recommendation is to reuse that threshold rather
-   than mint a new one.
-3. **Whether U6 evicts traps or caps them.** Eviction moves each trap to `memory/gotchas/` as a
-   class record, which costs a dossier claim and an index render per record. A cap alone leaves the
-   traps in place but bounded. Recommendation is eviction for the bug-class traps and a cap for the
-   machine-local remainder, which is the split the review found.
+1. **The C7 size ceiling is a hard red from day one.** RESOLVED (owner, 2026-08-13). The WARN-then-red
+   option was declined. The consequence is accepted and named here so it is not rediscovered: the
+   NicoCares manifest at 77,056 B reds the moment that repo pulls the kit update, and its cleanup is a
+   follow-up that repo owns. This build does not retrofit it, per the OUT list.
+2. **C9 reuses the `aRatchetForge` maintenance-stall thresholds.** RESOLVED (owner, 2026-08-13):
+   ten watch-pathspec commits, or three months, with zero manifest body growth. Verified at source in
+   `memory/builds/aRatchetForge/spec/manifest-ratchet-spec.md` §10.9. That spec deliberately left the
+   rule to an owner-read review rather than a gate, because the delta lines it would have read live in
+   commit messages and READY cards that squash merges do not preserve. C9 is buildable because it
+   reads git directly, which is the squash-proof source that spec named. U3's §4 must say so.
+3. **U6 evicts the bug-class traps and caps the remainder.** RESOLVED (owner, 2026-08-13). Traps that
+   are recurring bug classes become `memory/gotchas/` records reachable through U5's `--for-paths`
+   selector. Traps that are genuinely machine-local stay in the manifest under a hard bullet cap.
 
 ## Unit index
 
@@ -104,9 +104,11 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATE
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1..-4 KICK-cKeyedLaunchpad-6..-7 TOOL-cKeyedLaunchpad-5
+**Build status:** OPEN · 1 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1
 
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-1 | 2026-08-13 |
 <!-- /gen:build-index -->
 
 ## Method
