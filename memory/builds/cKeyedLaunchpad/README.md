@@ -113,6 +113,30 @@ unit's §8 carries the mark in place, naming the owner as resolver.
    measured that deletion alone could not reach the target: 19 of 27 bullets exceed 400 bytes, and
    three the eviction KEEPS are over the cap the same unit introduces.
 
+## How the build phase is authorized
+
+The unattended kit's preflight REFUSED this run, correctly, and the refusal is recorded rather than
+worked around:
+
+```
+UNATTENDED check 6 FAILED — no build README at the pinned BASE, so nothing committed
+before this run branched authorizes it, and a build folder the run created on its own
+branch authorizes nothing
+```
+
+This session created `memory/builds/cKeyedLaunchpad/` on its own branch, so the folder cannot be its
+own mandate. Nothing was back-dated and no spec was pushed early to make the check pass; the mandate
+mechanism is simply unused here.
+
+The build phase runs instead on the OTHER authorization the charter grants — the owner's explicit ask,
+given in chat naming both the merge and the push, and scoped to "when the entire build is fully done".
+`AGENTS.md` states the two as alternatives: an explicit ask, **or** a committed build folder the run
+did not create. This run has the first and not the second.
+
+The practical difference, so a later reader is not misled: there is no `RUN.md`, no phase field and no
+machine-checkable Definition-of-Done for this run. The discipline is `BUILD-METHOD.md`'s and the
+record is this README plus the commit log.
+
 ## The invariant the audit earned
 
 Three of the eighteen confirmed defects (H6, H7, M4) were one failure wearing three faces: **a §3
