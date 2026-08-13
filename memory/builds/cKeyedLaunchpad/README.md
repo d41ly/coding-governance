@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-13
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-cKeyedLaunchpad-1
+ids: KICK-cKeyedLaunchpad-1 TOOL-cKeyedLaunchpad-5
 ---
 
 # cKeyedLaunchpad — the kickoff kit re-grounded, and the manifest it reads put under gates
@@ -27,11 +27,18 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1` is authored
-and unreviewed; the other six are MISSING. No code is written and none may be until each unit's spec
-is authored and reviewed, per `BUILD-METHOD.md` M2's hard floor.
+**State.** Design pass. Seven units decomposed and classified. `KICK-cKeyedLaunchpad-1` and
+`TOOL-cKeyedLaunchpad-5` are authored and unreviewed; the other five are MISSING. No code is written
+and none may be until each unit's spec is authored and reviewed, per `BUILD-METHOD.md` M2's hard floor.
 
-**Next action:** author the remaining six unit specs, then run the M4 spec audit over the set.
+**Next action:** author the remaining five unit specs, then run the M4 spec audit over the set.
+
+**Authoring order** (owner, 2026-08-13): `TOOL-cKeyedLaunchpad-5` first, then dependency order —
+`-2`, `-3`, `-4`, `-6`, `-7`. U5 is front-loaded because it is Tier 1 and depends on nothing, so
+both Tier-1 units are ready to build while the Tier-2 set is still in the M4 audit. Authoring is
+SEQUENCED, not parallel: U3 reads U2's location interface and U6 reads U3's ceiling, so
+`BUILD-METHOD.md` M6's disjoint-write-set test fails on the contract axis even though the six files
+do not collide. Grounding research was fanned out; authoring is not.
 
 **BASE** is `f006691f7cd2231dcb95152972f1998dfe8358e4`, on `branch/session-kickoff-skill-review-0c76ec`.
 
@@ -61,7 +68,7 @@ carries its id.
 | U2 | `KICK-cKeyedLaunchpad-2` | the manifest location list, single-sourced and re-ordered | 2 | MISSING | none |
 | U3 | `KICK-cKeyedLaunchpad-3` | ratchet checks C7 size, C8 line length, C9 stamp age | 2 | MISSING | U2 |
 | U4 | `KICK-cKeyedLaunchpad-4` | the sealed §A region and its byte-compare | 2 | MISSING | U3 |
-| U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | MISSING | none |
+| U5 | `TOOL-cKeyedLaunchpad-5` | `gotchas.py --for-paths`, the anchor selector without a diff | 1 | authored, unreviewed | none |
 | U6 | `KICK-cKeyedLaunchpad-6` | traps evicted from the manifest, and a ceiling so they cannot return | 2 | MISSING | U3, U5 |
 | U7 | `KICK-cKeyedLaunchpad-7` | the engine's prose pass and its size gate | 1 | MISSING | U2, U6 |
 
@@ -104,11 +111,12 @@ Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATE
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1
+**Build status:** OPEN · 2 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 TOOL-cKeyedLaunchpad-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-1 | 2026-08-13 |
+| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-1 | 2026-08-13 |
 <!-- /gen:build-index -->
 
 ## Method
