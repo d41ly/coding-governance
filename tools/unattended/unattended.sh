@@ -552,6 +552,26 @@ stage_or_fail() { # run-state file
   return 1
 }
 
+# EVERY verb that writes a phase refuses a FINISHED run, and the rule lives in ONE place because the
+# first cut of it did not. --phase and --abort each grew their own copy; --close and --preflight grew
+# neither, and both write a phase. So `--close` on a LANDED record printed "close OK" and rewrote the
+# phase to LANDING, and from that re-opened LANDING `--landed` re-pointed the witness - the one field
+# check 15 judges - at a different commit, with the bar green the whole way. `--preflight` preserved
+# the terminal phase and rewrote the witness anyway, leaving a LANDED record the leg reds on and no
+# verb can repair.
+#
+# The lesson is the shape, not the two misses: a rule spelled at each call site is a rule that will be
+# missing from the next call site. This is the single branch, and the self-test derives the
+# phase-writer population from source and drives a terminal record through every one of them.
+refuse_if_terminal() { # run-state file · verb
+  local rel="$1" verb="$2" cur
+  [ -f "$rel" ] || return 0
+  cur=$(fact "$rel" phase)
+  [ -n "$cur" ] && is_terminal "$cur" || return 0
+  fail 26 "the run is already finished and a finished record is not something to move, re-open or re-pin; every later run is measured against the counter this record left, and the verb that would rewrite it names itself here: $cur via $verb"
+  return 1
+}
+
 # --------------------------------------------------------------------------------------- the verbs
 # S6 - the phase PRODUCER. Without it the vocabulary is decorative: only --preflight and --close ever
 # wrote a phase, so every member between them could enter the file only by an agent hand-editing an
@@ -645,11 +665,7 @@ verb_phase() { # slug · phase · witness
   # Adding the producers is what makes it reachable, so it lands with them: without it,
   # `--phase <slug> BUILDING` on a LANDED record returns the run to check_single_live and leg check 7,
   # which is the counter this whole unit exists to free.
-  cur=$(fact "$rel" phase)
-  if [ -n "$cur" ] && is_terminal "$cur"; then
-    fail 26 "the run is already finished and a terminal record is not a position to move from; re-opening one returns it to the single-live counter every later run is measured against: $cur"
-    return 1
-  fi
+  refuse_if_terminal "$rel" --phase || return 1
   # A TERMINAL phase is a PRODUCER's to write, never this verb's. Vocabulary membership is not
   # permission: a run that could set LANDED here would skip the entire Definition-of-Done gate, and
   # the two agent-attested items are enforced in no other place.
@@ -705,6 +721,7 @@ verb_landed() { # slug
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to mark landed: $rel"; return 1; }
+  refuse_if_terminal "$rel" --landed || return 1
   cur=$(fact "$rel" phase)
   if [ "$cur" != LANDING ]; then
     fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
@@ -738,7 +755,7 @@ verb_landed() { # slug
 #     objection - that the wrap-up has not happened yet - is identical at --close, where the same
 #     attestation is demanded before the same wrap-up, and it was accepted there.
 verb_abort() { # slug · reason
-  local slug="$1" reason="$2" rel cur head item ck
+  local slug="$1" reason="$2" rel head item ck key
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to abort: $rel"; return 1; }
@@ -746,18 +763,28 @@ verb_abort() { # slug · reason
     fail 33 "--abort requires --reason, because an abort with no recorded reason is indistinguishable from a run that simply stopped, and the reason is the only thing the owner gets in place of the turn nobody took"
     return 1
   fi
-  cur=$(fact "$rel" phase)
-  if [ -n "$cur" ] && is_terminal "$cur"; then
-    fail 34 "the run is already finished, and a second terminal write would overwrite the record of how it actually ended: $cur"
+  # A REASON MAY NOT SPELL THE BYPASS FLAG. park() writes it verbatim into the run-state file, and leg
+  # check 11 greps that file WHOLE for the declared flag - so a perfectly truthful abort reason ("the
+  # lander refused and I would not use it") would red the bar permanently, on a terminal record no
+  # verb can rewrite afterwards. Refusing the spelling is cheaper than mangling the operator's prose,
+  # and the message says which word to drop.
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 36 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag: $BYPASS_BAN"
     return 1
   fi
+  refuse_if_terminal "$rel" --abort || return 1
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
   for item in keepalive-reaped parked-decisions-surfaced; do
     ck=$(checker_of "$item")
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
-      fail 35 "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict: $item"
+      # NAMES THE RECORD KEY, not only the item. `parked-decisions-surfaced` is read from a line
+      # spelled `parked-surfaced:`, so a message naming only the item sends the operator to write a
+      # key nothing reads - blocking the abort forever, on the exit that exists for a run which
+      # cannot proceed. The mapping is the same one dod_met uses, so the two cannot drift apart.
+      case "$item" in parked-decisions-surfaced) key=parked-surfaced ;; *) key="$item" ;; esac
+      fail 35 "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: $item via $key"
       return 1
     fi
   done
@@ -774,6 +801,7 @@ verb_preflight() { # slug · keepalive-id
   local slug="$1" kid="$2" rel base src payload tmp
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
+  refuse_if_terminal "$rel" --preflight || return 1
   [ -n "$kid" ] || fail 8 "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
   # The anchor is observed BEFORE anything that consumes it, and its refusals do not cascade: a
   # failed observation leaves ASHA empty and the base block below is skipped entirely, so the
@@ -893,6 +921,7 @@ verb_close() { # slug · override-item · reason
   observe_anchor >/dev/null 2>&1 || true
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
+  refuse_if_terminal "$rel" --close || return 1
   if [ -n "$ov" ]; then
     case " $(dod) " in *" $ov:"*) ;;
       *) fail 12 "--override names an item that is not in the declared DoD set, and an override on an item nobody declared is not an override: $ov"; return 1;; esac

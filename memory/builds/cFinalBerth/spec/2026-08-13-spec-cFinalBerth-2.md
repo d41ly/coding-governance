@@ -1,6 +1,6 @@
 # TOOL-cFinalBerth-2 — the close that survives the landing it precedes
 
-**Status:** SPECCED · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
+**Status:** INPROGRESS · rev-3 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
 
 ## 1. Goal
 
@@ -230,6 +230,13 @@ that class; section 4's residual paragraph is the accounting of what was accepte
   change was "strictly stricter, not looser" — true for `--preflight`, the only caller that took the
   early return, and false for `--close`, which is the caller the sentence named. Status moves OPEN to
   SPECCED.
+
+- rev-3 · 2026-08-14 · BUILT. The M8 closing review of the cumulative diff returned no finding in
+  this unit's scope: the narrowing, its three refusals and the rewritten by-verb arm were all
+  confirmed as specced, and the review's own summary records the security model as intact —
+  `observe_anchor`, the `--landed` ancestry refusal and the authorization comparison are unaffected by
+  it. What the review did find lives in unit 1. Status moves SPECCED to INPROGRESS, which in this tree
+  means built and reviewed but NOT landed.
 
 ## 10. Reuse audit
 

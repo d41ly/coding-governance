@@ -1,6 +1,6 @@
 # TOOL-cFinalBerth-1 — the terminal transition: LANDED as an observation, ABORTED as a record
 
-**Status:** SPECCED · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
+**Status:** INPROGRESS · rev-3 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
 
 ## 1. Goal
 
@@ -59,11 +59,22 @@ being counted as live. `LANDED` becomes an observation of the remote rather than
 - **S12** — **`ABORTED` leaves check 9's work-claiming phase list.** An aborted run authorizes no
   landing, so a recorded base equal to HEAD buys nothing there — and a run that aborts before its
   first commit otherwise reds the bar with its own abort record.
+- **S13** — **ONE terminal guard, shared by every verb that writes a phase.** The rule was spelled at
+  each call site and was therefore missing from two of the five writers: `--close` re-opened a
+  finished record to `LANDING` printing success, and `--preflight` preserved the terminal phase while
+  rewriting the witness. Both are now the same single branch, and the self-test DERIVES the
+  phase-writer population from source and drives a finished record through every member.
+- **S14** — **An abort reason may not spell the declared bypass flag.** `park` writes the reason
+  verbatim into the file leg check 11 greps whole, so a truthful reason naming the flag would red the
+  bar permanently on a record no verb can rewrite.
+- **S15** — **Check 15's second half judges only sha-shaped, resolving witnesses.** `fail` does not
+  `continue`, so it ran on the witness the first half had just rejected and the record red twice with
+  two contradictory sentences; and its resolvability branch was a second answer to check 6's question.
 
 ## 3. Non-goals (OUT)
 
-- **Unwedging the existing run.** The record at `aSealedCaravan` is at `BUILDING`, and this unit does
-  not move it. Unit 2 repairs it directly.
+- **Unwedging the existing run.** The record at `aSealedCaravan` was at `BUILDING` when this unit was
+  written and this unit does not move it. Unit 2's S7 repairs it directly, and it now reads `LANDED`.
 - **Gating the shipped protocol document's version marker.** The version pairing covers the
   unattended kit's two script constants and not the doc it ships, which is why the marker drifted
   unnoticed. This unit corrects the value; a gate is a separate mechanism and a separate unit, filed
@@ -237,6 +248,18 @@ carve-out is a one-line escape.
   protocol copy returns a hit in each, in the verb section and the phase section.
 - **AC21** — A grep for the abort verb in the kickoff engine returns a hit inside Step 5b, and check
   12's exit count is unchanged.
+- **AC22** — When each verb that writes a phase is run against a finished record, it refuses with the
+  shared guard's text and the record is byte-identical; the population is derived from the
+  `set_fact … phase` sites in source and a count mismatch reds, so a sixth writer cannot be added
+  without being driven.
+- **AC23** — When `--abort` is given a reason spelling the declared bypass flag, it refuses naming the
+  flag and writes nothing; the control is that an ordinary reason is accepted and leaves no occurrence
+  of the flag in the record.
+- **AC24** — When a `LANDED` record carries a non-sha witness, check 15 fires ONCE — the shape half —
+  and the ancestry half is silent; when it carries an unresolvable sha, check 6 fires and check 15 is
+  silent.
+- **AC25** — When `--abort` refuses an unmet agent-attested item, its message names the RECORD KEY the
+  driver reads, not only the Definition-of-Done item name.
 
 ## 7. Gates
 
@@ -265,6 +288,16 @@ a verified verb rather than a relaxed `--phase`, and the post-landing close fold
   half inherits a silent skip nobody owns. Chose the protocol-narrowing route for the terminal
   witness rather than leaving the leg and the binding document disagreeing about whether a non-sha
   witness is legal. Status moves OPEN to SPECCED.
+
+- rev-3 · 2026-08-14 · folded the M8 closing review of the cumulative diff, `wf_3c7fa8c1-bf8`: 13
+  raw, 9 confirmed, 4 refuted, precision 0.69, verdict CHANGES REQUESTED with no blocker, 6 distinct
+  defects. One theme carried three of them and it is the lesson worth keeping: this unit correctly
+  added a "a finished record cannot be moved" guard to the two verbs it was thinking about and not to
+  the two it was not, because the rule was spelled at each call site. S13 makes it one branch and
+  derives the population from source. S14 and S15 are the other two code findings; the message naming
+  a Definition-of-Done item where the driver reads a differently-spelled record key, and the
+  hand-written verb list in the S10 arm, were folded without new scope items. Status moves SPECCED to
+  INPROGRESS, which in this tree means built and reviewed but NOT landed.
 
 ## 10. Reuse audit
 

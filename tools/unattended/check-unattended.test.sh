@@ -366,10 +366,20 @@ hit "$(run)" "a record claims LANDED with a witness that is not an ancestor of t
 sed -i "s/^witness: .*/witness: $ANCHOR0/" memory/builds/tRun/RUN.md; git add -A
 miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
 
-# ...and a witness that resolves to nothing at all, which is a different failure from a witness on
-# the wrong history and gets its own sentence.
+# ...and a witness that resolves to nothing at all is CHECK 6's question, not check 15's. Asking it
+# twice is a second answer to one question, and check 15 stays silent so the record reds ONCE with
+# the sentence that fits.
 sed -i "s/^witness: .*/witness: 0000000000000000000000000000000000000000/" memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "a record claims LANDED with a witness that resolves to no commit in this history, so the landing it claims cannot be located"
+out=$(run)
+hit "$out" "a witness looks like a sha and resolves to no commit in this history"
+miss "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ...and the DOUBLE-RED control: a non-sha witness at LANDED reds the SHAPE half and must not also
+# reach the ancestry half, which `fail` not being `continue` used to let happen.
+sed -i 's/^witness: .*/witness: wf_deadbeef-000/' memory/builds/tRun/RUN.md; git add -A
+out=$(run)
+hit "$out" "a record claims LANDED with a witness that is not sha-shaped"
+miss "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
 
 # ---- check 15, FIRST HALF: sha SHAPE, and it must fire with NO anchor available. This is the half
 # ---- that is deliberately outside check 9's loop: the loop needs a recorded BASE and a resolvable

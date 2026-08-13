@@ -570,7 +570,7 @@ miss "$(run --phase tRun BUILDING --witness abc)" "LANDING is written by --close
 # ---- counter that leg check 7 reds on.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
-hit "$(run --phase tRun BUILDING --witness abc)" "the run is already finished and a terminal record is not a position to move from; re-opening one returns it to the single-live counter every later run is measured against"
+hit "$(run --phase tRun BUILDING --witness abc)" "the run is already finished and a finished record is not something to move, re-open or re-pin; every later run is measured against the counter this record left, and the verb that would rewrite it names itself here"
 
 # ...and the run-state file cannot be staged. A DIRECTORY at the index path is the cheapest failure
 # that needs no permissions this node may not honour.
@@ -850,14 +850,14 @@ hit "$(run --abort tBare --reason r)" "no run-state file, so there is no run to 
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
-hit "$(run --abort tRun --reason "second thoughts")" "the run is already finished, and a second terminal write would overwrite the record of how it actually ended"
+hit "$(run --abort tRun --reason "second thoughts")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 
 # ...both attestations, one at a time, so the arm distinguishes them. Attesting only the keepalive
 # still refuses, which is the half a first cut of this unit let through.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict: keepalive-reaped"
+hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
 printf 'keepalive-reaped: yes\n' >> memory/builds/tRun/RUN.md
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict: parked-decisions-surfaced"
+hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
 
 # ...and the success path. AC19: the parked entry names itself an ABORT. Routed through the old
 # hardcoded `park` it would have read "override · item …", and the build method derives the owner's
@@ -877,6 +877,44 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 run --close tRun --override records-current --reason "records lag" >/dev/null 2>&1
 hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
+
+
+# ============================================================ the phase-writer population
+# THE LEFT-SHIFT for this build's own worst finding. Two verbs wrote a phase with no terminal guard
+# because the rule had been spelled at each call site instead of once, and the closing review found
+# both: --close re-opened a LANDED record to LANDING printing "close OK", and --landed then re-pointed
+# the witness check 15 judges, with the bar green throughout.
+#
+# So the population is DERIVED from source rather than listed here, and every member is driven against
+# a finished record. A sixth phase writer reds this arm until it is added to the drive list, which is
+# the property a hand-written list cannot have.
+writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
+n=$((n+1)); [ "$writers" = 5 ]   || { echo "FAIL the driver has $writers phase writer(s), and this arm drives 5 — add the new verb to the drive list below, or the terminal guard is unproven for it"; st=1; }
+
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+fixture
+before=$(sum)
+for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--preflight tRun --keepalive-id k2" "--landed tRun"; do
+  # shellcheck disable=SC2086
+  out=$(run $v)
+  hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+  same "the finished record survived $v" "$(sum)" "$before"
+done
+
+# ---- F5: a TRUTHFUL abort reason may not spell the bypass flag, because park() writes it verbatim
+# ---- into the file leg check 11 greps WHOLE — so the honest sentence would red the bar permanently,
+# ---- on a terminal record no verb can rewrite. The control is that an ordinary reason is accepted.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+before=$(sum)
+hit "$(run --abort tRun --reason "the lander refused and I would not reach for --no-verify")" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag"
+same "the refused abort wrote nothing" "$(sum)" "$before"
+out=$(run --abort tRun --reason "the lander refused and I would not bypass it")
+hit "$out" "phase ABORTED"
+miss "$(cat memory/builds/tRun/RUN.md)" "--no-verify"
 
 # ---- SOURCE-level: no verb may reach the repairing wiring mode, whatever the conf says. The runtime
 # ---- arm above covers a project that DECLARES `--fix`; this covers the driver calling it directly.

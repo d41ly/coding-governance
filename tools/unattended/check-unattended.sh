@@ -298,13 +298,18 @@ while IFS= read -r f; do
         # ---- unjudgeable one is impossible and no skip is needed. This half is INSIDE the loop
         # ---- because it needs the anchor, and it therefore inherits check 9's silent skip where no
         # ---- default branch resolves — stated in the unit's own non-goals rather than implied.
-        if [ "$ph" = LANDED ] && [ -n "$w" ]; then
-          if ! GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1; then
-            fail 15 "a record claims LANDED with a witness that resolves to no commit in this history, so the landing it claims cannot be located: $w in $f"
-          elif ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
-            fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
-          fi
-        fi
+        # SHA-SHAPED ONLY, and RESOLVING only. `fail` does not `continue`, so without the shape guard
+        # this ran on the very witness the first half had just rejected and the record red TWICE with
+        # two sentences that contradict each other - one saying the witness is not a sha, the next
+        # reasoning about its ancestry. And resolvability is check 6's question, asked one loop up for
+        # every sha-shaped witness at any phase; asking it again here is a second answer to it, so this
+        # half stays silent on an unresolvable witness and lets check 6 own it.
+        case "$w" in
+          [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
+            if [ "$ph" = LANDED ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+              fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+            fi ;;
+        esac
         break
       done
     fi
