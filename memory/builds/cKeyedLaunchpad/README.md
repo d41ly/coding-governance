@@ -68,10 +68,10 @@ carries its id.
 U1 and U5 depend on nothing and are Tier 1. They can be specced and built while the Tier-2 units are
 still in review.
 
-## Owner decisions already taken
+## Owner decisions — where the manifest lives
 
-Both were resolved by the owner at kickoff, before any spec was authored. Each unit's §8 carries the
-mark in place.
+All three were resolved by the owner at kickoff, before any spec was authored. Each unit's §8 carries
+the mark in place.
 
 | Decision | Pick | Consequence |
 |---|---|---|
@@ -79,7 +79,7 @@ mark in place.
 | Whether the manifest stays on drift-audit's product surface | Add the explicit path to `PRODUCT_GLOBS` | U2 becomes a three-kit change and moves a drift-audit pin. |
 | The third manifest location | The skill base directory, as a machine-global fallback | It sits outside every repo, so no project gate can reach it. U2 must make the engine skip Step 2b for it and say so in the READY card. |
 
-## Forks resolved by the owner
+## Owner decisions — what the new gates do
 
 All three were put to the owner at kickoff and resolved before any unit spec was authored. Each
 unit's §8 carries the mark in place, naming the owner as resolver.
