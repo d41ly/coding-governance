@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -208,6 +208,13 @@ the full bar at the push boundary.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (a) — protocol §6 Landing takes no edit.
+
+  Option (b) was VETOED under M3 rule 2: it writes a rule into a governance carrier that already
+  states it one document over, which is the two-answers-to-one-question defect this build exists to
+  avoid. The design pass already rejected D11's second half on the same ground, and the close-time
+  consequence is already printed by name at the point of use.
+
 **What is the §6 sentence the design pass called DELTA 3?** The folded design's §0 re-affirms
 "DELTA 3 (protocol §6's one sentence)" and never states the sentence; the converged design it
 supersedes is not in this tree and no commit ever added it, so the text is unrecoverable rather than
@@ -241,6 +248,8 @@ owner declined, and it is recorded because unit 22's join depends on it.
   `kit.toml`'s key list as unit 12's, because it was in nobody's scope: unit 12 arm C refuses an
   undeclared `DIRECTIVES_FLOOR` and the deployer's `required_keys_gate` would never have gained it.
   AC7 replaced: `template size` is green on an empty commit, so it observed nothing about this change.
+
+- rev-3 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 

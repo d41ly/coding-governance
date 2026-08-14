@@ -54,3 +54,4 @@
 - TOOL-cBriefedPilot-20 · OPEN · records: two dossiers re-derived, the rows this build closes, and the stale `aStandingWrit` row on the instruction layer
 - TOOL-cBriefedPilot-21 · OPEN · does ANY route dispatch a build pass concurrently without voiding the directive layer? Direct spawns exhaust a per-prompt budget that never resets in a run; a sidechain inherits no hooks. Decides unit 15's shape, and "no route" is a legitimate answer
 - TOOL-cBriefedPilot-22 · OPEN · check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table, which are joined to PHASES_CORE and DOD_CORE by no leg today
+- TOOL-cBriefedPilot-23 · OPEN · a newline in an `--override` or `--abort` reason forges a second parked line, because `park()` writes it verbatim into a region with a line grammar. Unit 3 closes it for `--waive` only; the shared refusal was vetoed out of unit 1

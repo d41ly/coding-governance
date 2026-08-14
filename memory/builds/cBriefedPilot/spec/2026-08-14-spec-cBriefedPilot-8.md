@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -154,6 +154,13 @@ the full bar at the push boundary.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option A — `tier2-review.js` keeps accepting a ref, and M8's spelling carries the rule.
+
+  Option B was ruled infeasible by the finding's own evidence: the harness has no filesystem and no
+  repo access, so it cannot see whether a mandate is in force, and the flag would have to come from
+  the caller already passing the base wrongly. The failure surfaces as an unmet DoD item naming the
+  run's own record, which is where the fix belongs. §8 named the agent as resolver.
+
 **Should `tier2-review.js` refuse a non-sha `base`, or is M8's spelling enough?** The default
 `'origin/main'` is a moving ref, and a caller who lets it stand writes a range line that satisfies
 nothing while looking like compliance.
@@ -175,6 +182,8 @@ does not take it.
   `build/2026-08-14-build-cBriefedPilot-1-design-pass.md`. Folds FG-1, FG-8, FG-13, C5 and C12's
   claim without C12's fix. The corpus measurements in §3 and §4 were re-run against this tree at
   authoring; the harness's `base` default was read at `tier2-review.js:65` and is the source of §8.
+
+- rev-2 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 

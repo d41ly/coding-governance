@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-14
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22
+ids: TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23
 ---
 
 # cBriefedPilot — the instructions an unattended build runs on, made default and waivable
@@ -290,30 +290,30 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 `gen_build_index.py` from the front matter and each spec's status header — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 22 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook · ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22
+**Build status:** OPEN · 22 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook · ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | OPEN | rev-3 | 2026-08-14 |
+| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster](spec/2026-08-14-spec-cBriefedPilot-11.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | OPEN | rev-4 | 2026-08-14 |
 | [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | OPEN | rev-3 | 2026-08-14 |
+| [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | OPEN | rev-4 | 2026-08-14 |
 <!-- /gen:build-index -->

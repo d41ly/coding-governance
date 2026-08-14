@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-16 — the method's pointers name the new layer
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -95,6 +95,13 @@ the full bar. No new leg.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (b) — M10's index counts every bullet the section carries.
+
+  An index exists so a reader can check it against what follows, and one that omits its own bullet
+  is the same class as the driver comment saying five facts where the protocol pins seven — a defect
+  unit 18 is already fixing in this build. The count is four under unit 15 branch A and three under
+  branch B; AC1 is the check either way. §8 delegated this to the agent under a standing mandate.
+
 **What does M10's index COUNT?** Options: (a) only deltas that change a rule, leaving the waiver
 bullet uncounted — which gives the three the design pass and the build README both state, and makes
 the index disagree with the bullets a reader can see; (b) every bullet M10 carries, which gives four
@@ -110,6 +117,8 @@ does not take it. Whichever is picked, AC1 is the check.
   `build/2026-08-14-build-cBriefedPilot-1-design-pass.md` §1g and §4. Two deviations from that pass
   are argued in §4 and §8: the waiver bullet cites the protocol document rather than its §10, and the
   index count is put to a resolver instead of being fixed at three.
+
+- rev-2 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 

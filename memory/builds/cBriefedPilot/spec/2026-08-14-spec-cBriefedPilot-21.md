@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -155,6 +155,15 @@ gate-suite list, the map dossiers and the map re-render are all untouched.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (b) — a PRIMED agent is under the directive layer when the priming is MECHANICAL.
+
+  On precedent, and the precedent is binding rather than merely apt: M4 already mandates dispatching
+  a pass kind — a spec review — into a `Workflow` sidechain and calls those agents primed. Option (a)
+  would make M4's own instruction a violation of the layer M4 belongs to. **This resolution does NOT
+  pre-decide the hunt.** It fixes what 'under the directives' MEANS; whether a mechanical priming
+  route actually exists, and survives testing, is what this unit still has to establish, and
+  no-route-exists remains a legitimate finding. §8 delegated this to the agent under a mandate.
+
 **Does a PRIMED agent count as being under the directives, or only an agent that INHERITS them?** It
 decides R2, and R2 is the route most likely to survive. Options: (a) inheritance only — a sidechain
 agent is outside the layer however well briefed, and R2 dies; (b) priming counts when it is
@@ -171,6 +180,8 @@ standing mandate if the owner does not take it.
   from the design panel at `build/2026-08-14-build-cBriefedPilot-1-design-pass.md` §5. Carries one
   correction to that pass: its C6 rejection treats "a sidechain inherits no hooks and no `CLAUDE.md`"
   as settled, and the R2 test exists because it is not.
+
+- rev-2 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 

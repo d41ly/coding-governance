@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -148,6 +148,13 @@ overriding both this item and unit 8's could never reach `park`.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option A — the roster marker pair encloses the PLAN only; the `State` column moves outside it.
+
+  Option C was VETOED under M3 rule 3: it weakens an integrity check that landed for a reproduced
+  reason, inside a unit that is not about authorization. Between A and B, A is the only one under
+  which both rules — the roster is the scope, and the scope may not move — hold without an author
+  remembering anything, and the column it removes is a third spelling of a state already derived twice.
+
 **What may live inside the roster marker pair, given that `check_authorization` byte-compares the
 slice across the pinned BASE?** This build's own Units table carries a `State` column that moves as
 units land, and `memory/builds/aStandingWrit/README.md` — the one build that ships the pair today —
@@ -179,6 +186,8 @@ removes is the third spelling of a state that is already derived twice. Resolver
   measured wedge at `tools/unattended/unattended.sh:503-505`. A builder reading the scope list alone
   would have landed the losing option and left the next unattended run on this repo with no exit. S6
   also now records that this build's own BASE predates the pair, so the wedge does not fire here.
+
+- rev-3 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 

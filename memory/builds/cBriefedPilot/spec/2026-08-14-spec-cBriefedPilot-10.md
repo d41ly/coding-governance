@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -109,6 +109,11 @@ arrives with unit 14.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): no — the step asks only about handles the invocation named.
+
+  An unprompted question is an owner turn the owner did not ask for, and unit 9's table already
+  carries the `reuse-first` warning at the moment it is read. §8 named the agent as resolver.
+
 **Does the step ask about a handle the owner did NOT name?** A run could reasonably surface
 `reuse-first`'s hazard unprompted. Recommendation: no — an unprompted question is an owner turn the
 owner did not ask for, and the Skill's table already carries the warning at the moment it is read.
@@ -125,6 +130,8 @@ Resolver: agent, if the owner does not take it.
   shipped the sentence into a rendered Skill the owner reads at the moment they are present. The
   clause now states the SILENT hazard and points at unit 9's §10-naming requirement, matching that
   spec's S4.
+
+- rev-3 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
 ## 10. Reuse audit
 
