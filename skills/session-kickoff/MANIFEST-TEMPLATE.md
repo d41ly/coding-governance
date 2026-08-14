@@ -1,10 +1,11 @@
 # Session kickoff manifest — {{PROJECT_NAME}}
 
-<!-- kickoff-manifest: v1.1 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.2 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
 last-audit: {{AUDIT_DATETIME}} @ {{AUDIT_SHA}}
 watch: {{WATCH_PATHSPECS}}
 verify-paths: {{VERIFY_PATHS}}
+last-body-change: {{BODY_CHANGE_SHA}}
 check-script: tools/manifest-check.sh
 -->
 

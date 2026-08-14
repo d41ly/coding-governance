@@ -15,7 +15,7 @@
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo).
 set -u
-KIT_MANIFEST_VERSION="1.1"
+KIT_MANIFEST_VERSION="1.2"
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
@@ -115,8 +115,40 @@ c1=$(grep -nE '\{\{[A-Z]' "$MF" || true)
 [ -n "$c1" ] && fail 1 "unfilled {{PLACEHOLDER}} survives in $MF (fill or delete each):
 $(printf '%s\n' "$c1" | sed 's/^/  /')"
 
-# C2 — exactly one manifest-audit block, three keys with non-empty, well-formed values.
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.1 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+# C7 — SIZE. LF-NORMALISED bytes, because the manifest is not eol-pinned in every adopting tree and
+# an unnormalised count answers differently per platform — the split that already cost this repo a
+# blocked push on the memory-tree byte caps. `check-template-size.sh` is the in-repo precedent and
+# measures the same way. The env override exists so the self-test can drive the limit without writing
+# a 25 KiB fixture on every run; it is NOT an adopter escape hatch, and the message says so.
+MAX_MANIFEST_BYTES=${MAX_MANIFEST_BYTES:-25600}
+c7bytes=$(tr -d '\r' < "$MF" | wc -c | tr -d '[:space:]')
+if [ "$c7bytes" -gt "$MAX_MANIFEST_BYTES" ]; then
+  c7over=$((c7bytes - MAX_MANIFEST_BYTES))
+  fail 7 "the manifest is over its size limit and must be trimmed, not have the limit raised: $c7bytes bytes, $c7over over the $MAX_MANIFEST_BYTES-byte limit in $MF"
+fi
+
+# C8 — LINE LENGTH, in BYTES. awk's length() counts bytes on this platform, and portable character
+# counting across busybox, mawk and BSD awk does not exist — so the limit is bytes and the message
+# says bytes rather than claiming characters it does not measure.
+#
+# Two regions are exempt. The audit block is machine-maintained data with no prose to wrap: its watch
+# list is one line that grows as pathspecs are added. Fenced blocks hold commands that cannot be
+# wrapped without breaking them. NOTHING else is exempt — a table row or a body bullet over the limit
+# is prose someone wrote, which is exactly what this check is for.
+c8=$(awk '
+  { ln=$0; sub(/\r$/,"",ln) }
+  index(ln,"<!-- manifest-audit")==1 { inblk=1; next }
+  inblk && ln ~ /-->/ { inblk=0; next }
+  inblk { next }
+  ln ~ /^[[:space:]]*(```|~~~)/ { fence=!fence; next }
+  fence { next }
+  length(ln) > 400 { printf "  line %d: %d bytes\n", NR, length(ln) }
+' "$MF")
+[ -n "$c8" ] && fail 8 "a manifest line is over the 400-byte limit; wrap the prose or move the detail out:
+$c8"
+
+# C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.2 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then
@@ -132,7 +164,13 @@ if [ "$BLOCK_OK" = 1 ]; then
   BLOCK=$(awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$MF" | tr -d '\r')
   getval() { printf '%s\n' "$BLOCK" | sed -n "s/^[[:space:]]*$1:[[:space:]]*\(.*\)$/\1/p" | head -1 | sed 's/[[:space:]]*$//'; }
   LA=$(getval 'last-audit'); WATCH_RAW=$(getval 'watch'); VP_RAW=$(getval 'verify-paths')
+  LBC=$(getval 'last-body-change')
   [ -n "$LA" ] || { fail 2 "manifest-audit block lacks a last-audit value — stamp '<ISO datetime> @ <full sha>' after verifying §B."; BLOCK_OK=0; }
+  # The C9 baseline. It is RECORDED rather than derived, because deriving it means walking the
+  # manifest's own path history, and a path-scoped `git log --name-status` reports a `git mv` as an
+  # ADD, not a rename — so a relocated manifest read as freshly created and a stalled one reported
+  # itself maintained. Reproduced at git 2.55 before this key existed.
+  [ -n "$LBC" ] || { fail 2 "manifest-audit block lacks a last-body-change value — add the full sha of the commit where this manifest's BODY was last genuinely revised; it is what check 9 measures the stall against."; BLOCK_OK=0; }
   [ -n "$WATCH_RAW" ] || { fail 2 "manifest-audit block lacks a watch value — list the gate-defining pathspecs (a missing watch silently disables the drift check)."; BLOCK_OK=0; }
   [ -n "$VP_RAW" ] || { fail 2 "manifest-audit block lacks a verify-paths value — list the 2-3 anchor paths."; BLOCK_OK=0; }
 fi
@@ -224,6 +262,41 @@ $files
   re-stamp last-audit ($STAMP_SHA_RULE) — bundled with the watched change or as a follow-up in the
   same PR. After a merge that brought in watch-touching commits, the fresh post-merge audit +
   re-stamp is the close."
+        fi
+      fi
+    fi
+
+    # C9 — MAINTENANCE STALL. Never in the staged leg: the pre-commit hook runs that leg
+    # unconditionally on every commit in an adopting repo, and this question is not one a single
+    # commit changes.
+    #
+    # The baseline is READ, not walked. `aRatchetForge` §10.9 set the thresholds and deliberately left
+    # them to an owner review because the delta lines it would have read live in commit messages and
+    # READY cards, which squash merges do not preserve. A recorded sha survives a squash, survives a
+    # rename, needs no candidate cap and cannot be defeated by a graft boundary on a shallow clone.
+    #
+    # MERGES ARE EXCLUDED. A merge commit carries no content of its own, so counting it alongside the
+    # commits it brings in double-counts the same churn. The prior spec said only "watch-pathspec
+    # commits" and that one unstated word decides the verdict: this repo measures 11 counting merges
+    # and 6 without, against a threshold of 10.
+    if [ -n "$LBC" ]; then
+      if ! printf '%s' "$LBC" | grep -qE '^[0-9a-fA-F]{40}$'; then
+        fail 9 "last-body-change is not a full 40-hex sha, so the stall check has no baseline to measure from: '$LBC'"
+      elif ! git cat-file -e "$LBC^{commit}" 2>/dev/null; then
+        if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+          echo "WARN: shallow clone and the last-body-change sha is absent — skipping C9; set 'fetch-depth: 0' on the CI checkout step."
+        else
+          fail 9 "last-body-change names a commit unknown to this repository, so the stall baseline is foreign or predates a history rewrite: $LBC"
+        fi
+      elif ! git merge-base --is-ancestor "$LBC" HEAD 2>/dev/null; then
+        fail 9 "last-body-change is not an ancestor of HEAD, so the stall baseline was squash-merged or rewritten and measures nothing: $LBC"
+      else
+        c9n=$(git rev-list --count --no-merges "$LBC..HEAD" -- "${WATCH[@]}" 2>/dev/null || echo 0)
+        c9age=$(( ( $(git log -1 --format=%ct HEAD 2>/dev/null || echo 0) - $(git log -1 --format=%ct "$LBC" 2>/dev/null || echo 0) ) / 86400 ))
+        if [ "$c9n" -ge 10 ]; then
+          fail 9 "the manifest body has not changed across ten or more watched commits, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha: $c9n non-merge commits since $LBC"
+        elif [ "$c9age" -ge 90 ]; then
+          fail 9 "the manifest body has not changed in three months or more, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha: $c9age days since $LBC"
         fi
       fi
     fi

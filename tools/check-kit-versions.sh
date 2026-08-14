@@ -22,6 +22,23 @@ need "KIT_MEMORY_TREE_VERSION"    tools/memory-tree/check-memory-hygiene.sh "^KI
 need "KIT_CODEBASE_MAP_VERSION"   tools/codebase-map/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
 need "KIT_AGENT_CAP_VERSION"      tools/hooks/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
 need "tier2-review meta.version"  tools/workflows/tier2-review.js           "version: '$V'"
+need "KIT_MANIFEST_VERSION"       skills/session-kickoff/manifest-check.sh  "^KIT_MANIFEST_VERSION=\"$V\""
+
+# The kickoff manifest format: the constant in the checker, and the marker in the SEED an adopter
+# instantiates from. Nothing forced these to agree before — this file had no entry for the constant
+# and the verdict-epoch gate is hardcoded to the memory-tree engine — so the checker could demand a
+# key the shipped template did not carry, with the full bar green. That is the same hole this file's
+# own header describes for the doc templates, which went three bumps behind and shipped the wrong
+# number into every adopting tree.
+mv_c=$(grep -oE "^KIT_MANIFEST_VERSION=\"$V\"" skills/session-kickoff/manifest-check.sh | head -1 | grep -oE "$V")
+mv_t=$(grep -oE "kickoff-manifest: v$V" skills/session-kickoff/MANIFEST-TEMPLATE.md | head -1 | grep -oE "$V")
+if [ -z "$mv_c" ]; then
+  echo "kit-versions: KIT_MANIFEST_VERSION is unreadable, so the shipped manifest seed cannot be compared against it"
+  fails=$((fails+1))
+elif [ "$mv_c" != "$mv_t" ]; then
+  echo "kit-versions: MANIFEST-TEMPLATE.md marker (${mv_t:-unreadable}) != KIT_MANIFEST_VERSION ($mv_c) — an adopter would instantiate a seed the checker rejects"
+  fails=$((fails+1))
+fi
 
 # agent-cap: constant and marker sit on ONE line, which is why this pair was presence-checked only —
 # and a half-bumped pair therefore passed. Assert they agree like every other pair; "same line" is
