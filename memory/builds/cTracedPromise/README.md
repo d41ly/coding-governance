@@ -56,7 +56,7 @@ drift-audit legs already on the bar and adds none.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | OPEN | rev-1 | 2026-08-15 |
+| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | OPEN | rev-2 | 2026-08-15 |
 <!-- /gen:build-index -->
 
 ## The owner decision menu

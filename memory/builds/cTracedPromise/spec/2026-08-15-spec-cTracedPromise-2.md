@@ -1,6 +1,6 @@
 # TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find
 
-**Status:** OPEN · rev-1 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -151,6 +151,9 @@ message ends its prose before the first variable and puts the bullet list last.
 
 - rev-1 · 2026-08-15 · initial draft, written against the three predicates measured over 597 AC
   bullets and the 43 specs that would have been retrofitted.
+- rev-2 · 2026-08-15 · AC2 and AC9 rewritten: running the proposed predicate over this spec found
+  both of them witnessless. The rule caught its own author, which is the first evidence it discriminates
+  at all.
 
 ## 10. Reuse audit
 
