@@ -48,6 +48,29 @@ session spawns agents:
   the concurrency rule below already binds every fan-out to the same number. The residual is a wide
   fan-out that is legitimately not a review — accepted, for that reason.
 
+  **A slot also EXPIRES, from 1.5, and what that buys is stated exactly.** `PreToolUse` fires BEFORE
+  the work and there is no matching after-event this hook is wired for, so a slot had no release path
+  and the raw count was LIFETIME-PER-PROMPT, not concurrency: five agents that ran one after another,
+  each finished before the next began, refused the sixth for the rest of the turn. Measured at
+  agent-cap 1.4 — six sequential spawns, distinct `tool_use_id`s, the sixth denied against five
+  long-idle slots. A slot idle past `SLOT_TTL_MS` (45 min, set above the longest subagent measured on
+  this fleet, 34 min) is now reclaimed by the next spawn, so the budget is a rolling window rather
+  than a permanent one.
+
+  **The expiry stands in for a completion signal; it does not turn the counter into a concurrency
+  meter, and the direction it fails in is chosen.** A burst — the case this rule exists for — claims
+  its five slots within a second, so no realistic TTL lets one through. What the TTL does admit is
+  the rarer shape: five agents genuinely running concurrently for longer than 45 minutes, then a
+  sixth. The precise fix is a release keyed on `tool_use_id`, which the harness guarantees identifies
+  ONE tool execution across `PreToolUse` and `PostToolUse`. It is not built, and the reason is a
+  single unmeasured fact: whether the `Agent` tool fires `PostToolUse` at all. Settle it with a
+  `PostToolUse[Agent]` probe plus a `PostToolUse[Bash]` CONTROL, in a FRESH session — settings are
+  not hot-reloaded, which is why it could not be settled where it was found. The public hooks reference says Agent skips both tool events in favour of
+  `SubagentStart`/`SubagentStop`, and `SubagentStop` carries no `tool_use_id` to correlate on — while
+  the measurement in the bullet above says `PreToolUse` DOES fire for Agent, re-confirmed by watching
+  a real spawn claim a slot. Both cannot be right, and wiring a release for an event that never
+  arrives would ship exactly the mechanism-that-cannot-fire this repo gates.
+
   Why slots and not a running count: read-then-decide loses updates (measured — a four-call burst
   overlapped its hook processes and two of four read the same count), and create-a-token-then-count
   does not fix it either, since each of six concurrent processes sees between its own ordinal and
