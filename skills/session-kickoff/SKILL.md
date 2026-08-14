@@ -169,10 +169,12 @@ high-risk unit touching an UNDOSSIERED feature creates/refreshes that dossier as
 design pass (the map's convergence rule).
 
 **The bug classes this area can hit** (when the project ships the memory-tree kit): the checklist is
-reachable before a diff exists, over the pointer-map row's entrypoints —
+reachable before a diff exists, over the pointer-map row's entrypoints. `<MEMORY_TREE_KIT>` is whichever
+of `memory-tree/` or `tools/memory-tree/` holds `gotchas.py` — a DIFFERENT kit from the `<KIT>` the
+recall step below resolves, and the two are not interchangeable:
 
 ```bash
-python <KIT>/gotchas.py --for-paths <the row's entrypoints>
+python <MEMORY_TREE_KIT>/gotchas.py --for-paths <the row's entrypoints>
 ```
 
 Its stdout IS the list; report the class names on the READY card. This is what the manifest used to

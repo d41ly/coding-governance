@@ -500,13 +500,23 @@ check_skill_install() {
     return
   fi
 
+  # THE TARGET IS THE PRIMARY WORKTREE, NEVER `$ROOT`. `$ROOT` is the CURRENT worktree, and this arm
+  # is content-keyed against the tracked engine — so it fires precisely on a branch that edits the
+  # engine, which by this project's convention is a linked worktree under `.claude/worktrees/`. That
+  # directory is disposable. An operator who followed a remedy naming it, landed the branch and ran
+  # `git worktree remove` would have a dangling junction and NO `/session-kickoff` on the whole
+  # machine — and this check returns early when the install directory is absent, so the verifier that
+  # caused the breakage could not report it. `git worktree list` puts the main worktree first.
+  local primary
+  primary=$(git worktree list 2>/dev/null | head -1 | sed 's/[[:space:]].*//')
+  [ -n "$primary" ] || primary="$ROOT"
   case "$(uname -s 2>/dev/null || echo unknown)" in
     MINGW*|MSYS*|CYGWIN*)
-      # PowerShell wants backslashes throughout; $ROOT arrives forward-slashed under MSYS, so the
+      # PowerShell wants backslashes throughout; the path arrives forward-slashed under MSYS, so the
       # whole target is converted rather than concatenated across two separator conventions.
-      fix="New-Item -ItemType Junction -Path \"\$env:USERPROFILE\\.claude\\skills\\session-kickoff\" -Target \"$(printf '%s\n' "$ROOT/$rel" | tr '/' '\\')\"" ;;
+      fix="New-Item -ItemType Junction -Path \"\$env:USERPROFILE\\.claude\\skills\\session-kickoff\" -Target \"$(printf '%s\n' "$primary/$rel" | tr '/' '\\')\"" ;;
     *)
-      fix="ln -sfn $ROOT/$rel ~/.claude/skills/session-kickoff" ;;
+      fix="ln -sfn $primary/$rel ~/.claude/skills/session-kickoff" ;;
   esac
 
   for f in SKILL.md MANIFEST-TEMPLATE.md manifest-check.sh; do

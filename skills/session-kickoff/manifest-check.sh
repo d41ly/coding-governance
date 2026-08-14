@@ -10,7 +10,10 @@
 #   manifest-check.sh [<manifest-path>]   # full check (discovers the manifest when no path given;
 #                                         # a relative path resolves from the repo root, then from
 #                                         # the invoking directory)
-#   manifest-check.sh --staged [<path>]   # pre-commit fast leg: C1 C2 C4 C6 + C5s (staged drift)
+#   manifest-check.sh --staged [<path>]   # pre-commit fast leg: C1 C2 C4 C6 C7 C8 + C5s.
+#                                         # C9/C10/C11 are FULL-RUN only: they judge the working
+#                                         # tree, not what this commit stages, and the hook that
+#                                         # runs this leg fires on every commit.
 #
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo).
@@ -190,53 +193,6 @@ c8=$(awk '
 [ -n "$c8" ] && fail 8 "a manifest line is over the 400-byte limit; wrap the prose or move the detail out:
 $c8"
 
-# C10 — THE SEALED TASK REGION. §A's field set is a contract, not guidance, and before this check it
-# was prose: deleting §A entirely left every check green.
-#
-# ABSENCE IS A FAILURE, NOT A SKIP. The prior art this borrows from skips silently when its source is
-# absent, and copying that here would make the seal dormant in exactly the population it exists for —
-# every manifest written before this format version has no region at all. Three distinct messages,
-# one per failure mode, so the remedy is never guessed.
-#
-# The comparison appends a SENTINEL. Command substitution strips trailing newlines, so without it a
-# trailing-blank-line difference inside the region is invisible — the weakness the prior art still
-# carries and `kit-dogfood-parity.test.sh` already defeats this way.
-c10n=$(grep -c '<!-- kickoff:task -->' "$MF" || true)
-if [ "$c10n" -eq 0 ]; then
-  fail 10 "the manifest carries no sealed task region, so its §A field set is prose that any edit can silently change; paste the region printed by this script's --task-skeleton verb into §A of $MF"
-elif ! c10have=$(region "$MF" '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null); then
-  fail 10 "the sealed task region's markers are malformed, so the region cannot be compared with the contract it copies; the pair must be exactly one open and one close, close after open, each alone on its line in $MF"
-else
-  c10want=$(printf '%s\n' "$TASK_SKELETON" | region /dev/stdin '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null || true)
-  if [ "${c10have}X" != "${c10want}X" ]; then
-    fail 10 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in $MF"
-  fi
-fi
-
-# C11 — PER-BULLET CAP on the environment-traps section. Not a new rule: MANIFEST-TEMPLATE.md has
-# always instructed "keep each to one line; link out for detail". It was ignored until this repo's own
-# traps section reached 14,535 bytes across 27 bullets, 19 of them over the cap. C11 makes the kit's
-# own instruction mechanical, and reuses C8's 400 rather than minting a second number — C8 already
-# defines how long a line may be, and one line is what the template asked for.
-#
-# C7 is not a substitute. It bounds the FILE, so traps can re-accrete to the size limit by crowding
-# out every other section; C11 bounds the ENTRY, which is where accretion actually happens.
-c11=$(awk '
-  { ln=$0; sub(/\r$/,"",ln) }
-  /^###[[:space:]]+Environment traps/ { intraps=1; next }
-  intraps && /^##[^#]/ { intraps=0 }
-  intraps && /^###[[:space:]]/ { intraps=0 }
-  !intraps { next }
-  /^-[[:space:]]/ {
-    if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len
-    n++; len = length(ln) + 1; head = "\"" substr(ln, 3, 40) "…\""; next
-  }
-  { len += length(ln) + 1 }
-  END { if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len }
-' "$MF")
-[ -n "$c11" ] && fail 11 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs:
-$c11"
-
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
 RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
@@ -355,6 +311,64 @@ $files
         fi
       fi
     fi
+
+    # C10 and C11 live HERE, not beside C7/C8, and the reason is the adopter upgrade path.
+    # WIRE-INTO-PROJECT.md installs the --staged leg as an UNCONDITIONAL pre-commit hook and
+    # documents overwriting this checker wholesale on a kit update. Both checks judge the
+    # WORKING-TREE manifest's structure rather than what a commit stages, so above the split they
+    # would block EVERY commit in a repo whose manifest predates this format — with no migration
+    # staged and no way to make progress. C9's own comment already drew this line; these two
+    # simply had not been held to it.
+    # C10 — THE SEALED TASK REGION. §A's field set is a contract, not guidance, and before this check it
+    # was prose: deleting §A entirely left every check green.
+    #
+    # ABSENCE IS A FAILURE, NOT A SKIP. The prior art this borrows from skips silently when its source is
+    # absent, and copying that here would make the seal dormant in exactly the population it exists for —
+    # every manifest written before this format version has no region at all. Three distinct messages,
+    # one per failure mode, so the remedy is never guessed.
+    #
+    # The comparison appends a SENTINEL. Command substitution strips trailing newlines, so without it a
+    # trailing-blank-line difference inside the region is invisible — the weakness the prior art still
+    # carries and `kit-dogfood-parity.test.sh` already defeats this way.
+    c10n=$(grep -c '<!-- kickoff:task -->' "$MF" || true)
+    if [ "$c10n" -eq 0 ]; then
+      fail 10 "the manifest carries no sealed task region, so its §A field set is prose that any edit can silently change; paste the region printed by this script's --task-skeleton verb into §A of $MF"
+    elif ! c10have=$(region "$MF" '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null); then
+      fail 10 "the sealed task region's markers are malformed, so the region cannot be compared with the contract it copies; the pair must be exactly one open and one close, close after open, each alone on its line in $MF"
+    else
+      # The sentinel goes INSIDE each substitution. Appended after, both sides have already had their
+      # trailing newlines stripped identically and it defends nothing — which is exactly what it did
+      # until the closing review pointed at it, and a trailing blank line inside the region passed.
+      c10have=$(region "$MF" '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null; printf X)
+      c10want=$(printf '%s\n' "$TASK_SKELETON" | region /dev/stdin '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null; printf X)
+      if [ "$c10have" != "$c10want" ]; then
+        fail 10 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in $MF"
+      fi
+    fi
+
+    # C11 — PER-BULLET CAP on the environment-traps section. Not a new rule: MANIFEST-TEMPLATE.md has
+    # always instructed "keep each to one line; link out for detail". It was ignored until this repo's own
+    # traps section reached 14,535 bytes across 27 bullets, 19 of them over the cap. C11 makes the kit's
+    # own instruction mechanical, and reuses C8's 400 rather than minting a second number — C8 already
+    # defines how long a line may be, and one line is what the template asked for.
+    #
+    # C7 is not a substitute. It bounds the FILE, so traps can re-accrete to the size limit by crowding
+    # out every other section; C11 bounds the ENTRY, which is where accretion actually happens.
+    c11=$(awk '
+      { ln=$0; sub(/\r$/,"",ln) }
+      /^###[[:space:]]+Environment traps/ { intraps=1; next }
+      intraps && /^##[^#]/ { intraps=0 }
+      intraps && /^###[[:space:]]/ { intraps=0 }
+      !intraps { next }
+      /^-[[:space:]]/ {
+        if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len
+        n++; len = length(ln) + 1; head = "\"" substr(ln, 3, 40) "…\""; next
+      }
+      { len += length(ln) + 1 }
+      END { if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len }
+    ' "$MF")
+    [ -n "$c11" ] && fail 11 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs:
+    $c11"
 
     # C9 — MAINTENANCE STALL. Never in the staged leg: the pre-commit hook runs that leg
     # unconditionally on every commit in an adopting repo, and this question is not one a single

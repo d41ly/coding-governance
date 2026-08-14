@@ -375,7 +375,7 @@ from §2). Write the manifest to one of those paths so it resolves.
 the INVOKING directory, not from its own location — run it with the cwd inside `<project>`).
 
 **Retrofit an existing v1.0 manifest** *(the durable recipe — the checker's C2 failure points here)*:
-1. **Body deltas first:** rewrite the §B intro/heading to the v1.1 wording ("derived at
+1. **Body deltas first:** rewrite the §B intro/heading to the current wording ("derived at
    instantiation; re-audited every kickoff; accretes"); insert the template's ratchet section; insert
    the dated-corrections section (empty — prunable per-entry, never deleted); add the traps-accrete
    note. Without this the file keeps its standing freeze directive and the older in-file contract wins.
@@ -388,7 +388,7 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    actually pulled FROM — read it out of `<gov>/parallel-coding-governance.template.md`, never from
    this line. Stamping an older number on a newer copy makes the marker lie, and the marker is what
    both the kickoff engine's Step-2 fallback and the re-pull mechanism read.
-6. Bump the manifest marker to `kickoff-manifest: v1.1` **LAST** — the bump silences the kit's
+6. Bump the manifest marker to `kickoff-manifest: v1.3` **LAST** — the bump silences the kit's
    version WARN, the only standing signal that the body still predates the ratchet.
 
 ## 5 — Optional: worktree tooling + SessionStart nudge
@@ -519,7 +519,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
 ├── docs/parallel-coding-governance.domain-rules.md  # the §4/§9–§13 domain checklists (travels with the template)
-├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
+├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.3: audit block + sealed §A region) — the engine reads this
 ├── tools/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐
