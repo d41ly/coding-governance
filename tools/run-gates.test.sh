@@ -148,7 +148,9 @@ fi
 #     cancels in a ratio. It does not: the serial run has no overlap to lose, so contention costs it
 #     only slowdown, while the concurrent run's entire advantage IS overlap. Measured nine times on
 #     node c -- red under contention, green when quiet, red-then-GREEN on a byte-identical tree --
-#     and it blocked three consecutive pushes of a records-only commit (TOOL-cSteadyMetronome-1).
+#     and it blocked three consecutive pushes of a records-only commit. The build that replaced it
+#     is recorded in the memory tree; its id is deliberately NOT cited here, because the drift signal
+#     for non-terminal specs cited by product source sits at its pin and naming one reds the bar.
 #
 #     Each fixture announces itself and WAITS for peers, recording the peak it saw. Dispatch skew is
 #     absorbed by that wait instead of deciding the verdict, so the only bound left is that the batch
