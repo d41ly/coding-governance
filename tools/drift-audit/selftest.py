@@ -369,6 +369,39 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("violated: an uncertified CLOSED spec fires the traceability signal", v6["value"] == 1,
           f"got {v6['value']} detail={v6['detail']}")
 
+    # THE `TERMINAL` FILTER, armed. Found unarmed by mutation: replacing the status test with a bare
+    # "did the header parse" produced ZERO failures, because the only non-terminal spec in the base
+    # fixture is dated before the cutoff and was unjudgeable either way. A signal that judged every
+    # status would call every OPEN spec untraceable, which is the opposite of what it is for.
+    live_spec = r / SPEC_DIR_FOR_FIXTURE / "2026-02-02-spec-aOpen-1.md"
+    live_spec.write_text("# TOOL-aOpen-1 — specced, not built, and correctly so\n\n"
+                         "**Status:** SPECCED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+                         encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "records: a post-cutoff spec that is not built yet",
+         "--no-verify"], r)
+    v6t = report(r)["closed_specs_with_no_product_commit"]
+    check("a NON-TERMINAL post-cutoff spec with no commit does not fire", v6t["value"] == 1,
+          f"got {v6t['value']} — a non-CLOSED status is being judged: {v6t['detail']}")
+    live_spec.unlink()
+
+    # THE SLUG FALLBACK, armed. Also found unarmed: the certifying subject named the slug AND the id,
+    # so deleting the slug branch changed nothing. This spec is certified by its SLUG only.
+    slugonly = r / SPEC_DIR_FOR_FIXTURE / "2026-02-02-spec-aSlugOnly-1.md"
+    slugonly.write_text("# TOOL-aSlugOnly-1 — certified by its slug and never by its id\n\n"
+                        "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+                        encoding="utf-8", newline="\n")
+    (r / "src" / "slugonly.py").write_text("# work\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "fix(aSlugOnly): the work, subject naming no unit id",
+         "--no-verify"], r)
+    v6s = report(r)["closed_specs_with_no_product_commit"]
+    check("a CLOSED spec certified by its SLUG alone does not fire", v6s["value"] == 1,
+          f"got {v6s['value']} — the slug fallback is gone: {v6s['detail']}")
+    slugonly.unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "records: drop the slug-only fixture", "--no-verify"], r)
+
     # A MERGE naming the slug must NOT certify it. Reconcile merges name the branch merged INTO, so
     # counting them let a build with no product commit of its own ride another build's merge — which
     # is exactly how this signal's pin read 0 instead of 1 on the repo that ships it.
