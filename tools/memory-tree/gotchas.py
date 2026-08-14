@@ -5,6 +5,7 @@
     python tools/memory-tree/gotchas.py --write                 # render INDEX.md
     python tools/memory-tree/gotchas.py --report                # the counts the budget is measured on
     python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # STDOUT IS THE CHECKLIST
+    python tools/memory-tree/gotchas.py --for-paths <path>...       # the same checklist, no diff yet
     python tools/memory-tree/gotchas.py --declares < record.md   # rc 0 declares, 1 does not
     python tools/memory-tree/gotchas.py --selftest
 
@@ -220,6 +221,7 @@ def render(recs: list, m: str) -> str:
         "",
         "```bash",
         "python tools/memory-tree/gotchas.py --for-diff <base>..<head>",
+        "python tools/memory-tree/gotchas.py --for-paths <path>...",
         "```",
         "",
         BEGIN,
@@ -317,13 +319,52 @@ def do_report(root: str, conf: dict) -> int:
     return 0
 
 
-def do_for_diff(root: str, conf: dict, rng: str) -> int:
-    """STDOUT IS THE CHECKLIST."""
+def normalise_paths(root: str, paths) -> list:
+    """Caller-supplied paths to the repo-relative POSIX shape `selectable` was written against.
+
+    A no-op for the git-derived caller, which is the point: BOTH callers pass through it, so this is
+    ONE normalising entry rather than a guard bolted onto the new one. It closes two defects that were
+    unreachable until a path-based verb existed, because `git diff --name-only` emits neither shape:
+
+    - `selectable`'s basename arm calls `os.path.basename`, which is PLATFORM-DEPENDENT. A backslash
+      path matches on Windows (`ntpath` splits it) and silently does not on POSIX (`posixpath` returns
+      the whole string). Same code, two answers, and the CI answer is the wrong one.
+    - The catalogue's self-exclusion is a repo-RELATIVE prefix test, so an ABSOLUTE path under
+      `<memory>/gotchas/` slips past it and the catalogue starts selecting itself — the exact noise
+      this module's docstring says destroys a checklist.
+
+    No subprocess: `run` sets `check=True` and `main` catches only `Problem`, so shelling out to git
+    here would turn an unexpected failure into a traceback out of a gate.
+    """
+    out = []
+    for p in paths:
+        q = p.replace("\\", "/").strip()
+        if os.path.isabs(q) or (len(q) > 1 and q[1] == ":"):
+            try:
+                q = os.path.relpath(q, root).replace("\\", "/")
+            except ValueError:      # a different drive on Windows: not in this repo, so unselectable
+                continue
+        while q.startswith("./"):
+            q = q[2:]
+        # A path that normalises to the repo root selects EVERY anchor through the substring arm, so
+        # the checklist becomes the whole catalogue and stops meaning anything. Refused by name
+        # rather than emitted as noise nobody will read.
+        if q in ("", ".", "/", ".."):
+            raise Problem(f"gotchas: '{p}' selects the whole tree — pass the paths a change touches, "
+                          f"not the root")
+        q = q.rstrip("/")
+        if q:
+            out.append(q)
+    return out
+
+
+def do_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "file") -> int:
+    """STDOUT IS THE CHECKLIST. The ONE selection path; `do_for_diff` delegates into it."""
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
-    changed = [p for p in run("git", "diff", "--name-only", rng, cwd=root).split("\n") if p]
-    if not changed:
-        print(f"gotchas: {rng} touches no file — nothing to check")
+    paths = normalise_paths(root, paths)
+    if not paths:
+        print(f"gotchas: {label or 'those paths'} selects no file — nothing to check")
         return 0
     hit, uni = [], []
     for r in recs:
@@ -333,14 +374,27 @@ def do_for_diff(root: str, conf: dict, rng: str) -> int:
             uni.append(r)
             continue
         for a in r["anchors"]:
-            if selectable(a, changed, m):
+            if selectable(a, paths, m):
                 hit.append(r)
                 break
-    print(f"# recurring-bug-class checklist for {rng} ({len(changed)} changed file(s))")
+    print(f"# recurring-bug-class checklist for {label or f'{len(paths)} path(s)'} ({len(paths)} {noun}(s))")
     print(f"# {len(hit)} class(es) selected by an anchor + {len(uni)} universal")
     for r in uni + hit:
         print(f"\n- [ ] {r['name']}{' (universal)' if r['universal'] else ''}\n      {r['description']}\n      {r['path']}")
     return 0
+
+
+def do_for_diff(root: str, conf: dict, rng: str) -> int:
+    """STDOUT IS THE CHECKLIST. Derives the paths from git, then delegates.
+
+    `noun` keeps this caller's header BYTE-IDENTICAL to what it printed before the split. A refactor
+    is not allowed to change existing output, and an arm asserts it rather than trusting it.
+    """
+    changed = [p for p in run("git", "diff", "--name-only", rng, cwd=root).split("\n") if p]
+    if not changed:
+        print(f"gotchas: {rng} touches no file — nothing to check")
+        return 0
+    return do_for_paths(root, conf, changed, label=rng, noun="changed file")
 
 
 # ----------------------------------------------------------------------------------------- selftest
@@ -509,6 +563,38 @@ def do_selftest() -> int:
         arm("--for-diff emits the anchored hit", "[rc=0]", lambda: 0 if "- [ ] hit" in text else 1)
         arm("--for-diff emits every universal record", "[rc=0]", lambda: 0 if "- [ ] uni (universal)" in text else 1)
         arm("--for-diff omits a record whose anchors miss", "[rc=0]", lambda: 0 if "- [ ] miss" not in text else 1)
+
+        # ---- --for-paths: the same predicate, reached without a diff --------------------------------
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            do_for_paths(t8, c8, ["tools/some-gate.sh"])
+        ptext = out.getvalue()
+        arm("--for-paths emits the anchored hit", "[rc=0]", lambda: 0 if "- [ ] hit" in ptext else 1)
+        arm("--for-paths omits a record whose anchors miss", "[rc=0]",
+            lambda: 0 if "- [ ] miss" not in ptext else 1)
+
+        # THE ARM THAT FAILS WITHOUT normalise_paths. `os.path.basename` is platform-dependent, so a
+        # backslash path matches on Windows and silently does not on POSIX. A path-based verb is the
+        # FIRST caller that can receive one — git diff emits none — so this is the only place the split
+        # is reachable at all, and CI is the side that would have been silently wrong.
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            do_for_paths(t8, c8, ["tools\\some-gate.sh"])
+        btext = out.getvalue()
+        arm("--for-paths reads a backslash path identically to a forward-slash one", "[rc=0]",
+            lambda: 0 if btext == ptext else 1)
+
+        # An ABSOLUTE path under the catalogue must not defeat the self-exclusion, which is a
+        # repo-relative prefix test: without normalisation the catalogue starts selecting itself.
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            do_for_paths(t8, c8, [os.path.join(t8, "memory", "gotchas", "INDEX.md")])
+        atext = out.getvalue()
+        arm("--for-paths: an absolute catalogue path does not select the catalogue", "[rc=0]",
+            lambda: 0 if "- [ ] hit" not in atext and "- [ ] miss" not in atext else 1)
+
+        arm("--for-paths refuses a path that selects the whole tree", "selects the whole tree",
+            lambda: do_for_paths(t8, c8, ["."]))
         arm("--for-diff omits a non-class record", "[rc=0]", lambda: 0 if "- [ ] note" not in text else 1)
 
     if fails:
@@ -542,7 +628,13 @@ def main(argv: list) -> int:
                 print("usage: gotchas.py --for-diff <base>..<head>")
                 return 2
             return do_for_diff(root, conf, argv[2])
-        print("usage: gotchas.py [--check|--write|--report|--for-diff <range>|--declares|--selftest]")
+        if mode == "--for-paths":
+            if len(argv) < 3:
+                print("usage: gotchas.py --for-paths <path>...")
+                return 2
+            return do_for_paths(root, conf, argv[2:])
+        print("usage: gotchas.py [--check|--write|--report|--for-diff <range>|"
+              "--for-paths <path>...|--declares|--selftest]")
         return 2
     except Problem as exc:
         print(f"HYGIENE {exc}")

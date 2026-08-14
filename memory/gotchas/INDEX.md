@@ -7,6 +7,7 @@ Hand a reviewer the classes their diff can hit:
 
 ```bash
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>
+python tools/memory-tree/gotchas.py --for-paths <path>...
 ```
 
 <!-- BEGIN GENERATED -->
