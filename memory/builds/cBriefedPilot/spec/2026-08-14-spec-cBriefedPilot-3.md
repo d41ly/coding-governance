@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -54,8 +54,11 @@ turn there is.
 ### Data model
 
 A waiver is a pair, not a flag. The handle names the directive; the reason is free text and may
-contain spaces, which is why the accumulator stores pairs newline-delimited and tab-separated rather
-than in a space-split list.
+contain spaces — which is why unit 1's accumulator stores each pair in parallel arrays,
+`WAIVE_ITEMS` and `WAIVE_REASONS`, with no record separator for a reason to contain. The
+tab-separated, newline-delimited string the design pass sketched was rejected there on a measured
+injection: a reason spelling a newline, a declared item, a tab and a word accumulates a second entry
+the owner never named, and the `--waive` reason is the one free-text field an owner supplies.
 
 The recorded form reuses `park()` because the parked region is already the place the wrap-up reads,
 already survives compaction, already carries a kind discriminator, and is already exempt from the
@@ -181,6 +184,12 @@ recorded because §4's idempotence rule depends on it.
 - rev-3 · 2026-08-14 · the owner resolved P1 and P4. §3 records that the waiver git join is BOUGHT
   and lands in unit 13 rather than being an open question; §8's P4 is marked RESOLVED with no sixth
   refusal; the idempotence comparison is fixed as the sorted SET.
+- rev-4 · 2026-08-14 · two cross-read corrections. §4's data model described the accumulator as
+  newline-delimited and tab-separated, which is the representation unit 1 §4 REJECTED and replaced
+  with parallel arrays on the injection the delimiter permits — so this spec described the storage of
+  a mechanism its own S1 says it consumes rather than builds. And §10 named the LEG's `core_of()` as
+  the seam supplying refusal 3's membership test; `verb_preflight` cannot call it, and the seam is
+  unit 2's `directives()` accessor in the driver.
 
 ## 10. Reuse audit
 
@@ -193,8 +202,11 @@ Four existing seams, all extended rather than duplicated.
   Building a second parser for `--waive` was the pre-review design and was cut.
 - **`verb_preflight`'s precondition block** — the existing write barrier. The five refusals join it
   rather than introducing a second ordering rule.
-- **`core_of()` in `tools/unattended/check-unattended.sh`** — the membership test reads the registry
-  unit 2 declares, through the parser that already reads `PHASES_CORE` and `DOD_CORE`.
+- **`directives()` in `tools/unattended/unattended.sh`, unit 2** — the membership test refusal 3
+  reads. It composes `DIRECTIVES_CORE` plus `DIRECTIVES_EXTRA` in the same shape as the driver's own
+  `phases()` and `dod()`, and it is the third instance of that shape. The LEG's `core_of()` reads the
+  same constant from the other side, in unit 12; `verb_preflight` cannot call it, so naming it here
+  would have pointed the builder at the wrong file.
 
 Recall terms used, recorded because M7 re-runs the query: unattended run directive waiver preflight
 override park run-state parked region reason record phase witness DoD close.

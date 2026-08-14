@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -22,6 +22,11 @@ finding F1: today the only link between the Skill and any work instruction is on
   record instead of silent. Both are settled: the owner resolved P4 on 2026-08-14.
 - **S5** — the `land-once-done` row names the close-time consequence: waiving it still owes
   `--override build-complete --reason`.
+- **S6** — the Skill's Close section states that `--override <item> --reason <text>` REPEATS, one
+  pair per unmet item. `tools/unattended/SKILL.template.md:92` spells one pair and says nothing about
+  a second; unit 1 §3 defers the sentence to this cluster by name, and units 7 and 8 add the two DoD
+  items that make two pairs the ordinary case. Without it the unattended agent — which reads only the
+  Skill — writes one pair and meets unit 1's missing-reason refusal with nobody present.
 
 ## 3. Non-goals (OUT)
 
@@ -88,6 +93,8 @@ generator-and-its-output pair, which no longer checks anything.
 - **AC3** — The table carries exactly eleven rows, and every handle in it appears in the registry
   unit 2 declares.
 - **AC4** — No gloss cell contains a numbered condition, a threshold, or a procedure.
+- **AC5** — The rendered Skill's Close section states that the `--override` pair repeats once per
+  unmet item, and the two-item example it gives spells two `--reason` values.
 
 ## 7. Gates
 
@@ -117,6 +124,10 @@ silent skip into a legible one. Resolver: owner.
   invisible skip legible.
 - rev-3 · 2026-08-14 · the owner resolved P4: the naming is REQUIRED, so S4's second clause is no
   longer conditional and §8 records the decision rather than the question.
+- rev-4 · 2026-08-14 · S6 and AC5 added on the cross-read. Unit 1 §3 defers "telling the agent that
+  the pair repeats" to units 9 through 11 and none of the three claimed it; measured, no spec in the
+  set contains the word. Units 7 and 8 make two `--override` pairs the ordinary close, so the
+  sentence had to land somewhere, and this is the unit that already owns the template's structure.
 
 ## 10. Reuse audit
 

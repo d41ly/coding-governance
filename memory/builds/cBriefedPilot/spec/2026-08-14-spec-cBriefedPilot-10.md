@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -20,7 +20,8 @@ the last question it may ask.
 - **S5** — one sentence stating that from preflight onward M10 binds and there is nobody to ask, so
   no later step may take an owner turn.
 - **S6** — the step names the interaction for each handle whose waiver has one: `land-once-done` owes
-  an override at close, `reuse-first` reds the full bar.
+  an override at close, and a waived `reuse-first` is SILENT — the bar stays green over a skipped
+  reuse audit — which is why unit 9's table requires the waived run's spec §10 to name the waiver.
 
 ## 3. Non-goals (OUT)
 
@@ -117,6 +118,13 @@ Resolver: agent, if the owner does not take it.
 
 - rev-1 · 2026-08-14 · initial draft, from the design panel recorded at
   `build/2026-08-14-build-cBriefedPilot-1-design-pass.md`. Folds C2 and D1's ordering half.
+- rev-2 · 2026-08-14 · S6's `reuse-first` clause corrected. It carried the design pass's claim that
+  waiving the handle reds the full bar; owner decision P4 records that as FALSE against source —
+  hygiene check 12 leaves the body block at `if (hdr ~ /Tier-1/) next`, and an `N/A` body satisfies
+  the Tier-2 test — and this spec was the last carrier of it. It is also the one that would have
+  shipped the sentence into a rendered Skill the owner reads at the moment they are present. The
+  clause now states the SILENT hazard and points at unit 9's §10-naming requirement, matching that
+  spec's S4.
 
 ## 10. Reuse audit
 
