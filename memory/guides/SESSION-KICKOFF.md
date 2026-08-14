@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-14T02:55:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
+last-audit: 2026-08-14T03:30:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 5fd7c7efaa3942ea5fd77777c74bbee7ef132787
@@ -160,6 +160,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Template parity and PLACEHOLDER COMPLETENESS are two different questions. A render whose conf
   declares nothing for a key is byte-identical to a fresh render and still tells the agent to invoke a
   placeholder's name as a tool. Grep the render for a surviving brace-shape as its own arm.
+- An arm must contain the branch's ENTIRE literal signature — a readable PREFIX of a long message
+  reds — and a literal word between the sentence and the first interpolation is part of it, so end
+  the sentence and let only interpolations follow. Adding branches RENUMBERS the per-check
+  ordinals, invalidating any `unarmed-branches.txt` row below the insertion point.
 - A positional in a gate's `fail` message CANNOT be armed — `check-arms.py` reads a bare `$1` as
   literal text inside the signature. Bind it to a name and put it at the END, after the sentence.
 - Hygiene checks 13-19 are OFF unless a pin is armed; a fixture tree written WITHOUT pins arms nothing
