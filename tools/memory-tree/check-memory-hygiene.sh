@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.11   # gov:kit memory-tree@2.11 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.12   # gov:kit memory-tree@2.12 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -23,6 +23,7 @@ FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performanc
 TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.g. "docs"); blank = skip check 11
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
+SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -528,7 +529,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -583,6 +584,39 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       ns = split(strv, sv, "+")
       for (si = 1; si <= ns; si++) if (sv[si] !~ "^(" discalt ")$") { nsb++; sbad = (nsb == 1) ? sv[si] : sbad ", " sv[si] }
       if (nsb > 0) print f " (streams value(s) outside the enum: " sbad "; legal values: " discalt ")"
+    }
+    # ---- acceptance witnesses: once the filename date reaches SPEC_WITNESS_CUTOFF, every
+    # ---- acceptance bullet must name something in backticks. BOTH tiers, like the streams ratchet
+    # ---- above and unlike the section canon below: a Tier-1 spec is exempt from the canon, not
+    # ---- from meaning what it writes. Measured, the widened selector below makes Tier-1 a real
+    # ---- population of 55 bullets; a bold-requiring one saw 18 and matched zero in every Tier-1
+    # ---- spec in the tree, which would have made the both-tiers claim decorative.
+    # ---- SHAPE ONLY: this asserts a bullet NAMES something, never that the named thing exists or
+    # ---- that the build satisfied it. memory/TEMPLATE-SPEC.md says so where an author reads it.
+    if (wcut != "" && fdate != "" && fdate >= wcut) {
+      inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) {
+          if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          inac = (L ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/); lab = ""; acc = ""; continue
+        }
+        if (!inac) continue
+        # After the label, ANY non-alphanumeric byte or end of line. Spelling the separators as an
+        # alternation is how a multibyte em-dash reached this file as mojibake once: those bytes
+        # cross the writing tool, the shell and the awk regex parser, and only the last of the
+        # three has an opinion about encoding. A negated class needs no such opinion, and it takes
+        # all three real label forms in the corpus at once.
+        if (L ~ /^[ 	]*(-|\*)?[ 	]*(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
+          if (lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          lab = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
+          acc = L; continue
+        }
+        if (lab != "") acc = acc " " L
+      }
+      if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+      if (nwb > 0)
+        print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
     }
     if (hdr ~ /Tier-1/) next
     # ---- Tier-2 body assertions ----

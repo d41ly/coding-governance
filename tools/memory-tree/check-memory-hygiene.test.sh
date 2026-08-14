@@ -61,7 +61,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -94,7 +94,7 @@ The design.
 
 ## 6. Acceptance criteria
 
-- AC1 When run, it passes.
+- AC1 When run, `check-memory-hygiene.sh` passes.
 
 ## 7. Gates
 
@@ -175,6 +175,23 @@ good | sed 's/base 0123abcd/base 0123abcd · streams bogus/' > "$D/spec/2026-08-
 good | sed 's/base 0123abcd/base 0123abcd · streams architecture/' > "$D/spec/2026-08-01-spec-tFixture-21.md"  # pre-cutoff WITH streams -> silent
 printf '# t22\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd\n\n## Whatever\n\nbody\n' \
   > "$D/spec/2026-08-10-spec-tFixture-22.md"                                     # TIER-1 post-cutoff, no streams -> red
+
+# ---- acceptance-witness arms. SPEC_WITNESS_CUTOFF sits between the eras exactly as
+# ---- STREAMS_CUTOFF does, so the 2026-08-01 specs are grandfathered and the 2026-08-10 ones must
+# ---- carry a witness. The real corpus cannot exercise this either: the cutoff is set ahead of
+# ---- every landed spec. Every fixture below carries streams, or it would red for the STREAMS
+# ---- reason instead and the arm would pass whether or not the branch it names exists.
+wit() { good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/"; }
+nowit() { sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, it passes with nothing named.|'; }
+unbold() { sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- AC1. When run, it passes with nothing named.|'; }
+
+wit | nowit  > "$D/spec/2026-08-10-spec-tFixture-50.md"   # post-cutoff, bolded, no witness -> red
+wit          > "$D/spec/2026-08-10-spec-tFixture-51.md"   # post-cutoff, witness present    -> silent
+good | sed "s/base 0123abcd/base 0123abcd · streams architecture/" | nowit \
+             > "$D/spec/2026-08-01-spec-tFixture-52.md"   # PRE-cutoff, same bullet         -> silent
+# the UNBOLDED label. A bold-requiring selector measured blind to 159 of 774 real bullets across 19
+# specs, which made opting out of this rule two asterisks wide. This is the arm for that.
+wit | unbold > "$D/spec/2026-08-10-spec-tFixture-53.md"   # post-cutoff, UNBOLDED, no witness -> red
 
 # ---- CHECK 5: the optional FAMILY qualifier. It exists so one slug shared by two families survives
 # ---- the merge into a single folder. The alternation is the CLOSED one from FAMILIES — a generic
@@ -383,6 +400,18 @@ hit  'tFixture-19.md (filename date 2026-08-10 is on/after STREAMS_CUTOFF 2026-0
 hit  'tFixture-20.md (streams value(s) outside the enum: bogus'
 miss 'tFixture-21.md ('
 hit  'tFixture-22.md (filename date 2026-08-10 is on/after STREAMS_CUTOFF 2026-08-05'
+# ---- acceptance-witness arms. Each asserts the branch's OWN text: a bare 'tFixture-50.md (' is
+# ---- satisfied by any other check-12 finding in the same file.
+hit  'tFixture-50.md (acceptance bullets naming no backticked witness'
+miss 'tFixture-51.md ('
+miss 'tFixture-52.md ('
+hit  'tFixture-53.md (acceptance bullets naming no backticked witness'
+# the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
+# cutoff for this violation and would misdirect the first author who hits it.
+grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08" <<<"$out" || { echo "FAIL the witness rejection does not name its own cutoff"; st=1; }
+# and the offending LABEL, not merely the file
+grep -qE "tFixture-5[03][.]md .*AC1" <<<"$out" || { echo "FAIL the witness rejection does not name the bullet label"; st=1; }
+
 # the legal set rides the message — a rejection that does not say what IS legal is a riddle
 grep -qF 'legal values: architecture' <<<"$out" || { echo "FAIL the streams rejection does not name the legal set"; st=1; }
 

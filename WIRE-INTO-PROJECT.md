@@ -109,10 +109,10 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
    cp -r <gov>/tools/memory-tree <project>/tools/memory-tree
    cp <project>/tools/memory-tree/.memory-tree.conf.example <project>/.memory-tree.conf   # then edit
    ```
-   Edit `.memory-tree.conf`. The example ships FIFTEEN keys and this lists the ones you must decide;
-   read the file itself for the rest, and note the adopter's own closing output names two more as
-   REQUIRED arming steps (`STREAMS_CUTOFF`, and MEASURING every pin against YOUR corpus rather than
-   inheriting another repo's numbers). `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
+   Edit `.memory-tree.conf`. The example ships SIXTEEN keys and this lists the ones you must decide;
+   read the file itself for the rest, and note the adopter's own closing output names three more as
+   REQUIRED arming steps (`STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF`, and MEASURING every pin against
+   YOUR corpus rather than inheriting another repo's numbers). `MEMORY_ROOT` · `DISCIPLINES` (your streams) · `FAMILIES`
    (`discipline:FAMILY`, MUST match the playbook's `{{ID_FAMILIES}}`) · `TOMBSTONE_ROOTS` (blank for a
    fresh tree; set to the old root only when migrating an existing docs tree — see `tools/memory-tree/README.md`).
    Arm the spec-format ratchet: `SPEC_FORMAT_CUTOFF=<adoption date>` — specs dated ≥ it must follow
