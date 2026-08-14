@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.2 -->
+<!-- gov:kit unattended@1.4 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -117,6 +117,18 @@ drift oracle counts a claim with no sha of its own as unjudgeable and skips it, 
 is otherwise the cheapest way for a run that cannot substantiate a phase to say nothing at all — and
 the run is the sole author of that field.
 
+**A claim of a TERMINAL phase carries a sha specifically**, narrowing the three shapes above. At
+`LANDED` the ancestry of the witness IS the claim: the gate asserts that it lies on the history the
+anchor blesses, which is what makes the landing an observation rather than an assertion. A tag or a
+workflow id there is unjudgeable, and a terminal claim is exactly where an unjudgeable witness costs
+the most — it is the last thing written and nothing later re-examines it.
+
+**Terminal is reached by a verb that evaluates what the phase claims, and never by a phase move.**
+`--phase` writes the positions between; `--landed` and `--abort` write the two ends. `LANDING` is
+close-only for the same reason: it is the record that the Definition-of-Done set was evaluated, so a
+phase move into it would be that claim without the evaluation, and `--landed` accepts a record only
+at `LANDING`. A run that is already terminal cannot be moved at all.
+
 **At most one run-state file in the tree may be in a non-terminal phase.** Otherwise "the run" is
 not well-defined, and anything keying on it must either OR the phases together (a tree-wide false
 deny) or pick one arbitrarily (nondeterminism, which is the worst property a gate can have).
@@ -189,7 +201,15 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   list.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
-- `--close` — evaluates the DoD set, blocks on any unmet item, and records any override.
+- `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the
+  only writer of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
+- `--landed` — the sole producer of `LANDED`, and an OBSERVATION rather than a claim. It accepts a
+  record only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip
+  the remote advertises. It does not refuse the default branch, because the mandated lander refuses
+  every other one, so landing happens exactly where that guard would otherwise fire.
+- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
+  items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
+  it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
 
 ## 8. What a project declares
 

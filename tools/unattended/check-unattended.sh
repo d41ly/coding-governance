@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. THIRTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. FIFTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -14,7 +14,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.3   # gov:kit unattended@1.3 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.4   # gov:kit unattended@1.4 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -224,6 +224,22 @@ while IFS= read -r f; do
     esac
   fi
 
+  # ---- 15, FIRST HALF: a claim of LANDED carries a SHA. The protocol permits a sha, a tag or a
+  # ---- workflow id for a phase claim generally, and section 3 now narrows that for the TERMINAL
+  # ---- phases, because here the ancestry assertion below IS the claim — an unjudgeable witness at
+  # ---- LANDED is a landing nothing can check, which is the whole thing this check exists for.
+  # ----
+  # ---- OUTSIDE the anchor loop, deliberately. This half needs no anchor, no recorded BASE and no
+  # ---- remote-tracking ref; folding it in with the ancestry half below would gate it on three
+  # ---- preconditions it does not need, and on a clone with no default branch resolvable it would
+  # ---- run zero times while looking like coverage.
+  if [ "$ph" = LANDED ]; then
+    case "$w" in
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+      *) fail 15 "a record claims LANDED with a witness that is not sha-shaped, so the claim that the work reached the remote cannot be judged at all, and a terminal claim is exactly where an unjudgeable witness costs the most: $w in $f" ;;
+    esac
+  fi
+
   # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
   # ---- question the README already answers, differently — the whole class this build removes.
   rd=${f%/RUN.md}/README.md
@@ -268,9 +284,31 @@ while IFS= read -r f; do
         # phases the base legitimately equals HEAD - that is a run that has correctly built
         # nothing yet, and the driver blesses it there. Refusing it here made the two halves of one
         # kit disagree, each with its own green test.
+        # ABORTED IS NOT A WORK-CLAIMING PHASE, and it used to be listed here. An aborted run
+        # authorizes no landing, so the clause buys nothing on it — while a run that aborts before its
+        # first commit records a base equal to HEAD (the pin is taken through the degenerate path at
+        # preflight) and red the bar with its own abort record, on the one exit that exists for a run
+        # which cannot meet its obligations. Reachable for the first time now that a verb writes it.
         case "$ph" in
-          LANDING|LANDED|ABORTED|VERIFYING)
+          LANDING|LANDED|VERIFYING)
             [ "$rb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+        esac
+        # ---- 15, SECOND HALF: the LANDED witness lies on the history the ANCHOR blesses. The first
+        # ---- half above already refused a witness that is not sha-shaped, so reaching this with an
+        # ---- unjudgeable one is impossible and no skip is needed. This half is INSIDE the loop
+        # ---- because it needs the anchor, and it therefore inherits check 9's silent skip where no
+        # ---- default branch resolves — stated in the unit's own non-goals rather than implied.
+        # SHA-SHAPED ONLY, and RESOLVING only. `fail` does not `continue`, so without the shape guard
+        # this ran on the very witness the first half had just rejected and the record red TWICE with
+        # two sentences that contradict each other - one saying the witness is not a sha, the next
+        # reasoning about its ancestry. And resolvability is check 6's question, asked one loop up for
+        # every sha-shaped witness at any phase; asking it again here is a second answer to it, so this
+        # half stays silent on an unresolvable witness and lets check 6 own it.
+        case "$w" in
+          [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
+            if [ "$ph" = LANDED ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+              fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+            fi ;;
         esac
         break
       done

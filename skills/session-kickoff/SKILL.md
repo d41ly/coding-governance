@@ -205,7 +205,13 @@ still stops at any of these has not been made unattended, it has been made stuck
 6. **Step 5 · the READY stop** → replaced by this step's hand-back. That replacement is the ONLY one
    the mandate buys; the other five resolve by aborting or parking, never by guessing.
 
-An ABORT writes the reason to the run-state file and stops. It does not merge and it does not push.
+An ABORT is a VERB, not a decision to stop typing: the unattended kit's `--abort <slug> --reason
+"<why>"` writes the reason into the run-state file's parked region, records a terminal phase with a
+witness, and stages it. Use it rather than simply halting — a run that stops without it stays
+non-terminal forever, and every later run is measured against a counter that still includes yours.
+It requires both agent-attested items first (reap the keepalive, surface the parked decisions),
+because an abort orphans the same job and leaves the same decisions unseen. It does not merge and it
+does not push.
 
 ## Scaffolding a manifest (only on user yes)
 
