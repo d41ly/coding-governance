@@ -164,12 +164,14 @@ phase_of() { fact_of "$1" phase; }
 # both slices dropped the whole line, compared byte-equal, and the injected sentence sat inside the
 # block a human reads. Reproduced at gate exit 0 with no output. CR-normalised before comparing,
 # because the prefix test tolerated a CRLF worktree by accident and an equality test does not.
+# >>> kickoff_region
 region()   { awk -v o="$2" -v c="$3" '
                { ln=$0; sub(/\r$/,"",ln) }
                index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
                index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
                inside { print }
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
+# <<< kickoff_region
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
 # ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the

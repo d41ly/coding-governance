@@ -15,7 +15,7 @@
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo).
 set -u
-KIT_MANIFEST_VERSION="1.2"
+KIT_MANIFEST_VERSION="1.3"
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
@@ -29,13 +29,39 @@ KIT_MANIFEST_VERSION="1.2"
 # claim to. A manifest found there is read but never audited, and the engine says so on the card.
 MANIFEST_LOCATIONS="memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md"
 
-# `--locations` answers BEFORE the repo probe below, because the whole point of the verb is to be
-# readable from OUTSIDE a repository — and the probe exits 2 there without ever reading argv. It is
-# read-only, prints one path per line, exits 0, and adds no `fail` branch (so the harness meta-gate's
-# shrink-only floor for this script is untouched).
+# THE CANONICAL TASK FIELD SET, and its ONE home. §A of a manifest used to restate what the kickoff
+# engine's Step 3 already said, with the manifest outranking the engine on conflict — two binding
+# spellings of one contract, which is the drift this kit exists to remove. Sealing the manifest's copy
+# against a constant would have FROZEN that duplication; giving the field set one home removes it.
+#
+# It lives HERE because this script is the only kickoff-kit file that is present, byte-identical and
+# overwritten wholesale in every adopting repo. MANIFEST-TEMPLATE.md cannot hold it: the template is a
+# SEED that BECOMES the manifest, so an adopting tree has no reference copy left to compare against.
+#
+# NO PLACEHOLDER inside the region. A tier value is optional by the template's own customize note, and
+# a region whose content is conditional cannot be byte-compared — it would be simultaneously required
+# by check 10 and banned by check 1. The tier enumeration already has a home in §B's tier rule, so
+# dropping it here is a deduplication that happens to be what makes the seal implementable.
+read -r -d '' TASK_SKELETON <<'KICKOFF_TASK_SKELETON' || true
+<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->
+KICKOFF_TASK_SKELETON
+
+# Both read-only verbs answer BEFORE the repo probe below, because the whole point of `--locations` is
+# to be readable from OUTSIDE a repository — and the probe exits 2 there without ever reading argv.
+# They print and exit 0, adding no `fail` branch, so the harness meta-gate's shrink-only floor for this
+# script counts neither of them.
 for _a in "$@"; do
   case "$_a" in
-    --locations) printf '%s\n' $MANIFEST_LOCATIONS; exit 0 ;;
+    --locations)     printf '%s\n' $MANIFEST_LOCATIONS; exit 0 ;;
+    --task-skeleton) printf '%s\n' "$TASK_SKELETON"; exit 0 ;;
   esac
 done
 
@@ -103,6 +129,23 @@ fi
 status=0
 fail() { echo "MANIFEST check $1 FAILED — $2"; status=1; }
 
+# LIFTED VERBATIM from tools/unattended/check-unattended.sh, and gated as an inline copy by the
+# parity table in tools/lib/resolve-python.test.sh. Do not re-type it:
+# it carries two fixes that were each reproduced before they were written. A marker line IS the marker
+# or it is malformed — the prefix test IDENTIFIES the line and equality JUDGES it, because the older
+# form let a run append its own text to a marker line and still compare byte-equal. And the pair must
+# be exactly one open, one close, CLOSE AFTER OPEN: a transposed pair satisfies a count-only check and
+# once truncated a file. CR-normalised before comparing, because the prefix test tolerated a CRLF
+# worktree by accident and an equality test does not.
+# >>> kickoff_region
+region()   { awk -v o="$2" -v c="$3" '
+               { ln=$0; sub(/\r$/,"",ln) }
+               index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
+               index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
+               inside { print }
+               END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
+# <<< kickoff_region
+
 # The block's last-audit VALUE from a manifest body on stdin (block-scoped: body decoys don't count).
 blockstamp() {
   awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' | tr -d '\r' \
@@ -147,8 +190,31 @@ c8=$(awk '
 [ -n "$c8" ] && fail 8 "a manifest line is over the 400-byte limit; wrap the prose or move the detail out:
 $c8"
 
+# C10 — THE SEALED TASK REGION. §A's field set is a contract, not guidance, and before this check it
+# was prose: deleting §A entirely left every check green.
+#
+# ABSENCE IS A FAILURE, NOT A SKIP. The prior art this borrows from skips silently when its source is
+# absent, and copying that here would make the seal dormant in exactly the population it exists for —
+# every manifest written before this format version has no region at all. Three distinct messages,
+# one per failure mode, so the remedy is never guessed.
+#
+# The comparison appends a SENTINEL. Command substitution strips trailing newlines, so without it a
+# trailing-blank-line difference inside the region is invisible — the weakness the prior art still
+# carries and `kit-dogfood-parity.test.sh` already defeats this way.
+c10n=$(grep -c '<!-- kickoff:task -->' "$MF" || true)
+if [ "$c10n" -eq 0 ]; then
+  fail 10 "the manifest carries no sealed task region, so its §A field set is prose that any edit can silently change; paste the region printed by this script's --task-skeleton verb into §A of $MF"
+elif ! c10have=$(region "$MF" '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null); then
+  fail 10 "the sealed task region's markers are malformed, so the region cannot be compared with the contract it copies; the pair must be exactly one open and one close, close after open, each alone on its line in $MF"
+else
+  c10want=$(printf '%s\n' "$TASK_SKELETON" | region /dev/stdin '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null || true)
+  if [ "${c10have}X" != "${c10want}X" ]; then
+    fail 10 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in $MF"
+  fi
+fi
+
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.2 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then

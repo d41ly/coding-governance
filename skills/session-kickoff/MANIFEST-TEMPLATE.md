@@ -1,6 +1,6 @@
 # Session kickoff manifest — {{PROJECT_NAME}}
 
-<!-- kickoff-manifest: v1.2 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.3 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
 last-audit: {{AUDIT_DATETIME}} @ {{AUDIT_SHA}}
 watch: {{WATCH_PATHSPECS}}
@@ -41,6 +41,13 @@ logs, backlog, journals, ledger) and the code — to the fullest extent possible
 approaches, or a non-code prereq only the user knows — the most common one). The template below is the
 *shape the agent fills*, not a form the user completes.
 
+The field set below is SEALED: check 10 byte-compares it against the contract `manifest-check.sh`
+carries, so it is not hand-authorable and an edit here reds the gate. Restore it with
+`bash <check-script> --task-skeleton`. Everything ABOVE this paragraph is yours to reword. The risk
+tier is deliberately absent — it is optional per project and lives in §B's tier rule, and a region
+whose content is conditional cannot be byte-compared.
+
+<!-- kickoff:task -->
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
 > - **IN scope:** …
@@ -48,7 +55,7 @@ approaches, or a non-code prereq only the user knows — the most common one). T
 > - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
 >   moves, an observed behavior; *not* an unrelated green check): …
 > - **Gates it must pass:** …
-> - **Risk tier:** {{TIER_VALUES}}
+<!-- /kickoff:task -->
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff per the ratchet above; accretes)
 
@@ -119,9 +126,11 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
   claims are derived FROM (CI workflow files, `Makefile`, script dirs first; never lockfiles;
   `package.json`-class files only if gates genuinely derive from them — they churn on every dep
   bump). ≤~8, prefer directory prefixes, each must match ≥1 tracked file.
+- `{{BODY_CHANGE_SHA}}` — the full sha of the commit where this manifest's BODY was last genuinely
+  revised, as opposed to re-stamped. Check 9 measures the maintenance stall from it, and ADVANCING it
+  is what clears that check: it is an assertion that §B has been re-read and is still true.
 - `{{VERIFY_PATHS}}` — `;`-separated, the 2–3 highest-value tracked anchors (the playbook + top
   governing doc/dir). NOT a mirror of the pointer map.
-- `{{TIER_VALUES}}` — e.g. `1 | 2`; delete the line if single-tier.
 - `{{LAYOUT}}` — e.g. "single checkout at repo root" | "worktrees as siblings under `<root>/`,
   primary tree (default branch) at `<root>/main`".
 - `{{REMOTE}}` / `{{DEFAULT_BRANCH}}` — from `git remote` / `git symbolic-ref`.

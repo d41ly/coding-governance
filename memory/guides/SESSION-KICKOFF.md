@@ -1,8 +1,8 @@
 # Session kickoff manifest — coding-governance
 
-<!-- kickoff-manifest: v1.2 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-14T00:20:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
+last-audit: 2026-08-14T01:05:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: f006691f7cd2231dcb95152972f1998dfe8358e4
@@ -24,9 +24,21 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
 
-> - **Title / Goal / IN scope / OUT / Acceptance / Gates it must pass / Risk tier** — derived from
->   the `/session-kickoff` message + the adjacent memory (`memory/DECISIONS.md`, `memory/backlog/`,
->   `memory/builds/<slug>/`) and the code.
+Derived from the `/session-kickoff` message plus the adjacent memory (`memory/DECISIONS.md`,
+`memory/backlog/`, `memory/builds/<slug>/`) and the code. The field set below is SEALED — check 10
+byte-compares it against the contract `manifest-check.sh` carries, so editing it here reds the bar.
+Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`. The tier lives in
+§B's tier rule, not here.
+
+<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 

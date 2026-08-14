@@ -131,18 +131,25 @@ primary-tree commit where project conventions forbid one.
 approaches, or a non-code prereq only the owner knows). Don't hand the user a blank form. Press hardest
 on the three that prevent mid-build churn:
 
-- **Title** + **Goal** (1–2 sentences) · **IN scope**.
-- **OUT / non-goals** — an explicit cut-line (never "high-value first" / a menu; resolve now).
-- **Acceptance check** — the observation that proves THIS change (a test it adds, a gate it
-  moves, an observed behavior) — *not* an unrelated green check.
-- **Gates it must pass** — from the manifest's gate list, else the project's obvious
-  build/lint/test commands.
-- **Risk tier**, if the project defines tiers. Generic heuristic when it doesn't: a new write
-  path / data migration / auth·sanitization·egress surface / shared-contract change is
-  high-risk → the DoR is a **design pass**: written spec (goal · scope · non-goals ·
-  acceptance) approved BEFORE building, recorded per the project's plan convention. When the
-  project's memory kit ships `TEMPLATE-SPEC.md`, the spec follows it (status header + nine
-  canonical sections; hygiene check 12).
+**The field set is the checker's, not this file's.** Ask for it rather than restating it — a second
+spelling here would outrank nothing and drift against the manifest, which is the defect this kit
+spent a build removing:
+
+```bash
+bash <check-script> --task-skeleton        # the sealed §A field set, verbatim
+```
+
+Two of those fields carry a qualifier worth stating once, because they are where units go wrong:
+**OUT / non-goals** must be an explicit cut-line, never "high-value first" or a menu — resolve it now;
+and **Acceptance check** must be the observation that proves THIS change, not an unrelated green gate.
+
+**Risk tier** is NOT in the sealed set, because not every project has tiers. When the manifest's §B
+defines them, use those. When it does not, the generic heuristic: a new write path, a data migration,
+an auth/sanitization/egress surface or a shared-contract change is high-risk → the DoR is a **design
+pass**, a written spec (goal · scope · non-goals · acceptance) approved BEFORE building and recorded
+per the project's plan convention. When the project's memory kit ships a spec template, the spec
+follows it — the template states its own section count and the gate that enforces it; do not restate
+that number here, because it has already gone stale in three other carriers.
 
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify

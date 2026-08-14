@@ -69,7 +69,7 @@ stamp_line() {
 }
 
 write_manifest() { # $1=repo $2=sha $3=watch $4=vpaths [$5=marker] [$6=extra-body]
-  local marker="${5:-kickoff-manifest: v1.2}"
+  local marker="${5:-kickoff-manifest: v1.3}"
   # The FIRST location `--locations` prints. The repo-root spelling this helper used to write is no
   # longer a discovery location, and most cases here call the checker with no path argument.
   mkdir -p "$1/memory/guides"
@@ -82,6 +82,16 @@ watch: $3
 verify-paths: $4
 last-body-change: ${7:-$2}
 -->
+## §A
+<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->
 ## §B
 gate fence:
 \`\`\`bash
@@ -292,7 +302,7 @@ mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 old body
 EOF
 commit_all "$R" manifest
-run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.2 LAST"
+run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.3 LAST"
 
 # ---- 24 v1.0 marker WITH valid block → version WARN, 0 ------------------
 mkrepo v10block
@@ -575,6 +585,44 @@ unset GIT_COMMITTER_DATE GIT_AUTHOR_DATE
 sed -i "s|^last-body-change: .*|last-body-change: $AGED|" "$R/memory/guides/SESSION-KICKOFF.md"
 restamp "$R" "$AGED"; commit_all "$R" rebaseline
 run "C9 three months or more since the baseline" "$R" 1 "the manifest body has not changed in three months or more, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha"
+
+# ---- C10 the sealed task region -----------------------------------------------------------------
+# Absence is a NAMED failure, never a skip: every manifest written before this format version has no
+# region at all, so a skip would make the seal dormant in exactly the population it exists for.
+mkrepo c10a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+python_del() { grep -v '<!-- kickoff:task -->' "$1" | grep -v '<!-- /kickoff:task -->' > "$1.t" && mv "$1.t" "$1"; }
+python_del "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "strip the markers"
+run "C10 an absent sealed region is named" "$R" 1 "the manifest carries no sealed task region, so its §A field set is prose that any edit can silently change; paste the region printed by this script's --task-skeleton verb into §A of"
+
+# ONE CHARACTER inside the region. This is the whole point of the unit: §A used to be prose that any
+# edit could change silently.
+mkrepo c10b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+sed -i 's/\*\*IN scope:\*\*/**IN SCOPE:**/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "edit the sealed region"
+run "C10 a one-character edit inside the region is caught" "$R" 1 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in"
+
+# A TRANSPOSED pair satisfies a count-only check. The lifted region() refuses it; this asserts that.
+mkrepo c10c; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+sed -i 's|<!-- /kickoff:task -->|<!-- KICKOFF-CLOSE-PLACEHOLDER -->|; s|<!-- kickoff:task -->|<!-- /kickoff:task -->|; s|<!-- KICKOFF-CLOSE-PLACEHOLDER -->|<!-- kickoff:task -->|' "$R/memory/guides/SESSION-KICKOFF.md"
+commit_all "$R" "transpose the markers"
+run "C10 a transposed marker pair is named" "$R" 1 "the sealed task region's markers are malformed, so the region cannot be compared with the contract it copies; the pair must be exactly one open and one close, close after open, each alone on its line in"
+
+# A CRLF manifest must not read as drift — the region() lifted here CR-normalises, and this is the
+# arm that fails if that half is dropped.
+mkrepo c10d; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+sed -i 's/$/\r/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" manifest
+run "C10 a CRLF manifest is not reported as region drift" "$R" 0 -
+
+# THE SHIPPED SEED. gov-only: the template an adopter instantiates must carry the same region the
+# checker enforces, or the seed produces a manifest the gate rejects on arrival.
+SEED="$(cd "$(dirname "$CHECK")" && pwd)/MANIFEST-TEMPLATE.md"
+if [ -f "$SEED" ]; then
+  if diff -q <(bash "$CHECK" --task-skeleton) \
+             <(awk '/<!-- kickoff:task -->/{f=1} f{print} /<!-- \/kickoff:task -->/{if(f)exit}' "$SEED") >/dev/null; then
+    echo "ok   the shipped seed's region equals the constant"; pass=$((pass+1))
+  else
+    echo "FAIL the shipped seed's region equals the constant"; fail=$((fail+1))
+  fi
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
