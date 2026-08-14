@@ -27,13 +27,13 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass complete and REVIEWED TWICE (18 then 19 confirmed defects, both folded).
-BUILD IN PROGRESS: units 1, 2, 3 and 5 are BUILT and committed; units 4, 6 and 7 are specced and
-UNBUILT. Nothing is merged and nothing is pushed — the owner's authorization is scoped to "when the
-entire build is fully done", and it is not.
+**State.** ALL SEVEN UNITS BUILT and committed; full bar 54/54. The design pass was reviewed twice
+before any code (18 then 19 confirmed defects, both folded). The closing adversarial review of the
+cumulative diff is the last gate before landing.
 
-**Next action:** build `KICK-cKeyedLaunchpad-4`, then `-6`, then `-7`, then the closing adversarial
-review of the cumulative diff from BASE, then land. Each built unit's commit carries what it found.
+**Next action:** fold the closing review's blockers, then land through `tools/push-main.sh`, which
+reconciles the remote before gating — the remote moved under this build and the merge is not a
+fast-forward.
 
 **Build order**, corrected by the fix-verify pass: `-1` (independent) then `-2`, `-3`, `-4`, `-5`,
 `-6`, `-7`. U5 is no longer front-loadable — taking the `--for-paths` call site gave it an edge to U2.
