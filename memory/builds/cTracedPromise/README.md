@@ -51,11 +51,12 @@ landed spec is retroactively red and no in-flight one is exempted forever. It ri
 drift-audit legs already on the bar and adds none.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
+**Build status:** OPEN · 2 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | OPEN | rev-1 | 2026-08-15 |
 <!-- /gen:build-index -->
 
 ## The owner decision menu
