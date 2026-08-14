@@ -1,6 +1,6 @@
 # TOOL-cFinalBerth-2 — the close that survives the landing it precedes
 
-**Status:** INPROGRESS · rev-3 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
+**Status:** CLOSED · rev-4 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
 
 ## 1. Goal
 
@@ -237,6 +237,9 @@ that class; section 4's residual paragraph is the accounting of what was accepte
   `observe_anchor`, the `--landed` ancestry refusal and the authorization comparison are unaffected by
   it. What the review did find lives in unit 1. Status moves SPECCED to INPROGRESS, which in this tree
   means built and reviewed but NOT landed.
+
+- rev-4 · 2026-08-14 · CLOSED. Landed at `dc15813` with the full bar green 53/53 through the
+  pre-push hook. Kit 1.4.
 
 ## 10. Reuse audit
 

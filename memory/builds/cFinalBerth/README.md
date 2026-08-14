@@ -111,10 +111,10 @@ Records live under `spec/` and `reviews/`. The table below is GENERATED from the
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node c · opened 2026-08-13 · streams tooling · ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling · ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cFinalBerth-1 — the terminal transition: LANDED as an observation, ABORTED as a record](spec/2026-08-13-spec-cFinalBerth-1.md) | INPROGRESS | rev-3 | 2026-08-14 |
-| [TOOL-cFinalBerth-2 — the close that survives the landing it precedes](spec/2026-08-13-spec-cFinalBerth-2.md) | INPROGRESS | rev-3 | 2026-08-14 |
+| [TOOL-cFinalBerth-1 — the terminal transition: LANDED as an observation, ABORTED as a record](spec/2026-08-13-spec-cFinalBerth-1.md) | CLOSED | rev-4 | 2026-08-14 |
+| [TOOL-cFinalBerth-2 — the close that survives the landing it precedes](spec/2026-08-13-spec-cFinalBerth-2.md) | CLOSED | rev-4 | 2026-08-14 |
 <!-- /gen:build-index -->

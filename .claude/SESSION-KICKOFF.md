@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.1 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-14T01:20:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
+last-audit: 2026-08-14T02:05:00+03:00 @ dc15813990205299d18ba8decd2e05b84afef691
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 check-script: skills/session-kickoff/manifest-check.sh
@@ -107,6 +107,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   headings and are the next candidate. (Paraphrased rather than cited by id on purpose — the drift
   signal `non_terminal_specs_cited_by_product_source` counts `.claude/` as product source and sits
   AT its pin, so naming a non-terminal spec's id here reds the bar. It did, once.)
+- Hygiene check 7's 300-char entry budget is measured by `awk length()`, which counts CHARACTERS or
+  BYTES depending on the awk build and the ambient locale — the check says so in its own comment and
+  declines to pin it on purpose. So a row between ~295 and ~305 gets a verdict that depends on WHERE
+  the check runs: measured 2026-08-14, one backlog row passed the pre-push bar at 300 characters and
+  failed the identical tree in an interactive shell at 302 bytes. Keep rows clear of the band by a
+  margin; a `·` costs two bytes and one character, so counting in Python lies to you here.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
 - A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
   bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every

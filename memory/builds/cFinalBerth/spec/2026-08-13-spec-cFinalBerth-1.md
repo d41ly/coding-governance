@@ -1,6 +1,6 @@
 # TOOL-cFinalBerth-1 — the terminal transition: LANDED as an observation, ABORTED as a record
 
-**Status:** INPROGRESS · rev-3 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
+**Status:** CLOSED · rev-4 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
 
 ## 1. Goal
 
@@ -298,6 +298,9 @@ a verified verb rather than a relaxed `--phase`, and the post-landing close fold
   a Definition-of-Done item where the driver reads a differently-spelled record key, and the
   hand-written verb list in the S10 arm, were folded without new scope items. Status moves SPECCED to
   INPROGRESS, which in this tree means built and reviewed but NOT landed.
+
+- rev-4 · 2026-08-14 · CLOSED. Landed at `dc15813` with the full bar green 53/53 through the
+  pre-push hook. Kit 1.4.
 
 ## 10. Reuse audit
 
