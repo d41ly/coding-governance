@@ -14,7 +14,9 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
-gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md"]
+gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
+  "inputs-inside-the-subjects-reach.md",
+]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
 [paths]

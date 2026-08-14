@@ -213,6 +213,30 @@ else
   fi
 fi
 
+# C11 — PER-BULLET CAP on the environment-traps section. Not a new rule: MANIFEST-TEMPLATE.md has
+# always instructed "keep each to one line; link out for detail". It was ignored until this repo's own
+# traps section reached 14,535 bytes across 27 bullets, 19 of them over the cap. C11 makes the kit's
+# own instruction mechanical, and reuses C8's 400 rather than minting a second number — C8 already
+# defines how long a line may be, and one line is what the template asked for.
+#
+# C7 is not a substitute. It bounds the FILE, so traps can re-accrete to the size limit by crowding
+# out every other section; C11 bounds the ENTRY, which is where accretion actually happens.
+c11=$(awk '
+  { ln=$0; sub(/\r$/,"",ln) }
+  /^###[[:space:]]+Environment traps/ { intraps=1; next }
+  intraps && /^##[^#]/ { intraps=0 }
+  intraps && /^###[[:space:]]/ { intraps=0 }
+  !intraps { next }
+  /^-[[:space:]]/ {
+    if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len
+    n++; len = length(ln) + 1; head = "\"" substr(ln, 3, 40) "…\""; next
+  }
+  { len += length(ln) + 1 }
+  END { if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len }
+' "$MF")
+[ -n "$c11" ] && fail 11 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs:
+$c11"
+
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
 RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)

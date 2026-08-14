@@ -98,6 +98,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
+      "inputs-inside-the-subjects-reach.md",
       "pin-copied-from-another-corpus.md",
       "second-implementation-is-not-a-second-opinion.md",
       "subprocess-resolves-a-different-shell.md",

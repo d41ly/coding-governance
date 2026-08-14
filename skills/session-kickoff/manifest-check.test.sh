@@ -624,5 +624,39 @@ if [ -f "$SEED" ]; then
   fi
 fi
 
+# ---- C11 the per-bullet traps cap ---------------------------------------------------------------
+TRAPS_OK='
+### Environment traps worth front-loading
+
+- a short trap, well under the cap.
+- another short one.
+'
+TRAPS_BIG="
+### Environment traps worth front-loading
+
+- a short trap, well under the cap.
+- $(printf 'y%.0s' $(seq 1 450))
+"
+mkrepo c11a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "$TRAPS_OK"
+commit_all "$R" manifest
+run "C11 short traps bullets pass" "$R" 0 -
+
+mkrepo c11b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "$TRAPS_BIG"
+commit_all "$R" manifest
+run "C11 an over-cap traps bullet is named" "$R" 1 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs"
+
+# The cap is scoped to the traps SECTION. A long bullet elsewhere in §B is C8's business (per LINE),
+# not C11's (per BULLET) — without the section scope C11 would silently police the whole document.
+mkrepo c11c
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "
+### Some other section
+
+- $(printf 'z%.0s' $(seq 1 200))
+  $(printf 'z%.0s' $(seq 1 200))
+  $(printf 'z%.0s' $(seq 1 200))
+"
+commit_all "$R" manifest
+run "C11 does not police bullets outside the traps section" "$R" 0 -
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

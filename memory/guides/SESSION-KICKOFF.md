@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-14T01:05:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
+last-audit: 2026-08-14T01:40:00+03:00 @ f006691f7cd2231dcb95152972f1998dfe8358e4
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f006691f7cd2231dcb95152972f1998dfe8358e4
+last-body-change: 5fd7c7efaa3942ea5fd77777c74bbee7ef132787
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -107,157 +107,63 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 ### Environment traps worth front-loading
 
-*Accretes — append the trap that cost time, prune the one that stopped being true.*
+*One line each; link out for detail — check 11 enforces it at 400 bytes per bullet. A recurring BUG
+CLASS does not belong here at all: it belongs in `memory/gotchas/`, where `gotchas.py --for-paths`
+puts it on the checklist for the areas a unit actually touches.*
 
-- The template is under a STRICT 32 KiB gate — never raise the limit; externalize to a companion instead.
-  It sits at 32682/32768 (**86 bytes free**, measured 2026-08-11 by `bash tools/check-template-size.sh`
-  — read that number FROM the gate, never from here: this number moved TWICE in one day, so treat any figure written here as a lower bound on staleness), so a line added to it either fits that margin or
-  funds itself by moving prose into `parallel-coding-governance.domain-rules.md`. It was 80 free
-  before the unattended build's playbook unit needed 114 for the standing-mandate clauses and funded
-  them by externalizing the kickoff-manifest merge exception — a ~490-byte procedure that only
-  applies when the project keeps a manifest — into companion §1. That is the sanctioned move and it
-  is available again: the §-stub parentheticals in §9/§11/§12/§13 duplicate the companion's own
-  headings and are the next candidate. (Paraphrased rather than cited by id on purpose — the drift
-  signal `non_terminal_specs_cited_by_product_source` counts `.claude/` as product source and sits
-  AT its pin, so naming a non-terminal spec's id here reds the bar. It did, once.)
-- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with `git diff --cached --check`.
-- A gate that BYTE-COMPARES a generated file needs both halves: an `eol=lf` pin so the committed
-  bytes are right, AND CR normalisation in the comparison so a Windows checkout does not red every
-  line. Either alone leaves the file green only right after a render.
+Evicted to the catalogue, and reachable from it: `gate-green-by-accident-on-generated-bytes.md`
+(an eol pin without a normalising comparison, and the worktree checkout that lands CRLF on a pinned
+path) · `absence-assertion-over-whole-file-text.md` (a new gate predicate run for the first time
+against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc-escape-reaches-the-regex.md`
+· `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
+composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
+
+- The template is under a STRICT 32 KiB gate. Never raise it; externalize into
+  `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
+  `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
+  `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook is wired on `Workflow|Agent` and enforces FOUR rules (kit 1.3):
-  route fan-out through the helpers; a verify stage spawns at most 5 agents TOTAL; the BOUND ITSELF
-  is resolved wherever it is written (call site, default parameter, `gov:bounded-fanout` width); and
-  a direct `Agent` spawn is COUNTED at runtime, 5 per user prompt. Concurrency is not a budget —
-  `boundedParallel(t, 5)` still spawns N agents for N findings, five at a time. Bound the group
-  COUNT: `chunk(x, Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`. The 5 is a FILE
-  CONSTANT: `AGENT_CAP` is refused, not honoured, and an `<expr> || <int>` fallback no longer
-  resolves as a bound anywhere. Binding rules: `memory/guides/REVIEW-PROTOCOL.md`. Ready-made
-  harness: `tools/workflows/tier2-review.js`.
-- Editing `.claude/settings.json` DOES take effect mid-session — hooks are re-read, not snapshotted
-  at session start. Measured 2026-08-10 by wiring a throwaway `PreToolUse` hook and observing it fire
-  on the very call that checked for it. This is what makes a live hook measurement trustworthy; do
-  not assume the opposite and skip the probe, and do not skip the LIVENESS half either, because a
-  hook that silently never fires returns a false negative that looks like a real answer.
-- A new gate PREDICATE is run over the real tree BEFORE it is trusted. Both source-level bans added
-  in `TOOL-aBatchedLintel-1` were wrong on their first run — the interval ban matched the `) {`
-  opening each if-block, and the `LC_ALL` ban fired on the comment explaining the ban. Hit twice more
-  by the agent-cap bound-reading predicate: an argument-position check denied
-  `tools/workflows/tier2-review.js` on its prettier TRAILING COMMA, which splits into a phantom empty
-  argument, and an acceptance grep for a banned spelling matched the comment explaining why it was
-  banned — the `LC_ALL` shape again.
+- The `agent-cap` PreToolUse hook is wired on `Workflow|Agent` (kit 1.4) and enforces four rules;
+  the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
+  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
+  concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
+- Editing `.claude/settings.json` takes effect MID-SESSION — hooks are re-read, not snapshotted at
+  start. Measured 2026-08-10 with a throwaway `PreToolUse` hook that fired on the call which checked
+  for it. Do not skip the liveness half of such a probe.
 - A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
-  byte, through a filename argument, through `getline` AND through a pipe. Assert at source level.
-- A `git worktree` checkout can land CRLF on a path `.gitattributes` pins `eol=lf`, and `git status`
-  stays CLEAN because the index normalises on commit. Symptom: a gate that diffs a rendered file
-  against a fresh render reports EVERY line as drift on a file the session never touched. Seen on
-  `.claude/skills/memory-recall/SKILL.md` (2026-08-08); `rm` plus `git checkout --` restores LF.
-- `node --check <file>` is NOT a syntax gate on node v24: module auto-detection retries the parse and
-  swallows the failure, so it exits 0 on a file whose parse genuinely fails. Parse a workflow script
-  by constructing an `AsyncFunction` from it — `tools/workflows/check-workflow-syntax.js`.
-- `subprocess.run(["bash", …])` from Python resolves the SYSTEM32 WSL launcher on this node, not
-  git-bash. WSL sees a different filesystem: an existing path reports `No such file or directory` and
-  a relative path resolves under `/mnt/c/`. Name the executable — see `resolve_bash()` in
-  `tools/memory-tree/corpus_ids.py`; `GOV_BASH` overrides.
-- Generating source through a shell heredoc into a NON-raw Python string turns an escape into a
-  CONTROL BYTE in the written file. A ``\b`` becomes a backspace, the compiled regex silently stops
-  matching, and printing the pattern shows nothing wrong — only `repr()` does. Hit three times on
-  2026-08-08 with three different misleading symptoms. Write source with a file tool or a raw string,
-  and sweep TRACKED AND UNTRACKED files when repairing.
-- A kit that resolves the repo root by counting directories UP from itself breaks at any install
-  prefix but the one it assumed, and it breaks SILENTLY — codebase-map answered from an empty corpus
-  printing "no seam fits" and "mapped 0/N". Fixed in the engine (`resolve_root` walks up for the
-  conf, bounded by `.git`), and the `CODEBASE_MAP_ROOT` workaround that preceded it is now BANNED by
-  the kit's own selftest. Kept as a trap because the class outlives the instance: this repo installs
-  every kit under `tools/`, so a kit written against a root install is wrong here by one segment.
-- Two memory-tree spec-authoring traps, both found by hitting them. A build README's `roster:` is
-  `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with "roster value 'PLAY TOOL' is
-  outside the FAMILIES set", which reads like a families misconfiguration rather than a separator.
-  And check 12's skeleton scan matches the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` ANYWHERE in a
-  spec body — so QUOTING a stale artifact that contains one reds the spec as an unfilled skeleton.
-  Paraphrase the quoted shape (`builds/<date>-<FAMILY>-<slug>/`) instead.
-- A new tool placed at the REPO ROOT rather than under `tools/` silently leaves the enforced surface.
-  `check-arms.py`, `check-review-join.sh` and `check-workflow-syntax.js` are all scoped to `tools/**`;
-  `map_extractors._tool_kits()` enumerates `tools/*` and nothing else, so a root dir is in no
-  codebase-map inventory and demands no dossier; and it falls outside drift-audit's PRODUCT_GLOBS.
-  Nothing reds — the tool is simply ungoverned. Put new tooling under `tools/<name>/`.
-- Adding ONE gate leg trips FOUR gates at once, and they are worth doing in one pass rather than
-  serially: the codebase-map `gate-legs` coverage assert (claim the leg in a dossier), the
-  codebase-map freshness byte-compare (re-render `MAP.md` + `inventories.json`), the kickoff-manifest
-  ratchet (`tools/gate-legs.json` is a watched pathspec, so `last-audit` re-stamps), and drift-audit's
-  handkept signal (cite the leg's script path in this charter's `## The gate suite` section). That
-  last one has ZERO slack — the pin is 7 of 40 at tolerance 0, so an uncited leg 41 reds immediately.
-- A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never
-  spelled. Three shapes ship here: shell `KIT_REL=${HERE#"$ROOT_N"/}` with both sides normalised
-  through the same `cd … && pwd` chain (`adopt-memory-tree.sh`), python `kit_rel()` walking up for
-  `.git` (`gen_build_index.py`), and brace-delimited KIT_DIR / TOOL_ROOT placeholders rendered at
-  scaffold time (`HYGIENE.template.md`; the literal token shape is omitted here because the manifest
-  ratchet's check 1 scans this file for exactly it). A hardcoded prefix in a RENDERED artifact is the worst case — it
-  lands a dead path in the adopter's own committed tree and the byte-compare that guards the file
-  agrees with it.
-- A gate that returns a VALUE on stdout cannot also report on stdout. `fail` echoes, so
-  `x=$(some_check …)` captures the diagnostics into `x` and the operator sees only the downstream
-  symptom. Measured 2026-08-10: `--close` printed "a machine-checked DoD item is unmet" and swallowed
-  the sentence explaining why. Return via a global (or a separate fd); the value channel and the
-  message channel must not be the same channel.
-- When hardening a check, ask what SUPPLIES each of its inputs. The unattended mandate check was
-  sound in design and defeated three ways at once because all three inputs were reachable by the
-  subject it distrusts: a value read back from the file the run writes, an anchor ref the run can
-  `git branch -f`, and an error signal dropped with `|| true`. Reproduce each with a control before
-  and after — a review finding that has not been reproduced is a hypothesis.
-- CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will never
-  tell you: its eol population is scoped to `.claude/` paths carrying the pin. Every UNPINNED path
-  smudges, because `.gitattributes` opens with `* text=auto` and this fleet runs `core.autocrlf=true`.
-  Measured 2026-08-10: all four `tools/workflows/*.js` came out at CRLF (`tier2-review.js`, 350 CR
-  bytes) and **no gate saw it** — `check-workflow-syntax.js` parses CRLF happily. It surfaced when
-  the shipped Tier-2 harness could not be LAUNCHED: a workflow script is inlined into the tool call
-  that runs it, and the permission layer rejects control characters in that payload. Ask which
-  CONSUMER reads a file whole (a launcher, a `.`-sourced conf, a hook), not which gate diffs it.
-  Pinned since: `tools/workflows/*.js`, `skills/session-kickoff/SKILL.md`, `tools/unattended/*.md`,
-  `.unattended.conf`. Still unpinned and latent: `AGENTS.md`, `WIRE-INTO-PROJECT.md`, `.gitattributes`.
-- A NEW record file under `memory/gotchas/` needs THREE things, and two of them are separate gates:
-  `gotchas.py --write` to re-render `INDEX.md` (hygiene check 17), and a dossier claim for its key
-  (codebase-map coverage). Adding the file and regenerating the map is not enough — the coverage
-  inventory reads TRACKED files, so a `test_codebase_map.py` run before `git add` reports ok over a
-  file it cannot see, and the gap surfaces on the full bar instead. Stage first, then measure.
-- This node's `merge.rows.driver` pointed at `tools/memory-tree/merge-rows.sh`, which does not exist
-  (only the `.py` and its `.test.sh` do), so `bash tools/check-wiring.sh --check` exited 1 on a
-  worktree whose SessionStart line had said `ok merge`. `--fix` correctly DECLINES to overwrite a set
-  value, so it self-heals only an UNSET one. Remedy, and it is machine state that travels with no
-  commit: `git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'`.
-  Worth front-loading because a broken value reads as configured to every check but this one.
-- Template parity and PLACEHOLDER COMPLETENESS are two different questions about a rendered file. A
-  render whose conf declares nothing for a key is byte-identical to a fresh render — perfectly in
-  sync — and instructs the agent to invoke the placeholder's own name as if it were a tool. A
-  `--check` that only diffs against the template cannot see that; grep the render for a surviving
-  brace-shaped placeholder as its OWN arm. (Paraphrased on purpose: `manifest-check.sh` check 1 bans
-  the literal double-brace shape anywhere in this file, so quoting one reds the manifest — the same
-  trap hygiene check 12's skeleton scan sets, one file over.)
-- A "core set ⊆ effective set" assertion is VACUOUS whenever the checker COMPOSES the effective set
-  from the core one. Measured 2026-08-10 in the new unattended leg: the leg built `PHASES` as
-  `$PHASES_CORE $PHASES_EXTRA` and then asserted every core member was in `PHASES` — a subset by
-  construction, unfailable, and it armed cleanly. Pin a shrink-only COUNT instead (the `ARMS_FLOORS`
-  / `baseline.toml` shape), so the names stay single-sourced and deletion still reds; and make an
-  UNDECLARED floor its own refusal, because omitting the key is the quietest way to disarm a pin.
-  The general rule: an assertion between two values the same code derives from one source is a
-  tautology — assert against something declared INDEPENDENTLY.
-- A positional in a gate's `fail` message CANNOT be armed. `check-arms.py` reads `${?[A-Za-z_]…` as
-  an interpolation to drop, but a bare `$1` is literal text, so it lands INSIDE the signature and no
-  assertion can ever name it — the branch reads unarmed no matter what the test says. Bind the value
-  to a name (`local slug="$1"`) and put it at the END of the message, after the literal sentence.
-  Measured 2026-08-10 on two branches of the new driver. This also means `check-arms.py` DISCOVERS
-  any tracked `*.sh` that defines `fail() {` and calls `fail <n> "` — a new script gets pulled into
-  the meta-gate's population automatically and needs a sibling `<stem>.test.sh` with a positive arm
-  per branch, plus an `ARMS_FLOORS` entry.
-- Hygiene checks 13-19 are OFF unless a pin is armed. `corpus_ids.py`'s `armed(conf)` returns early
-  when every one of `ORPHAN_ID_PIN`/`DEAD_PATH_PIN`/`READ_PATH_CEILING`/`CHARTER` is blank, and
-  `gotchas.py` short-circuits on an empty record set. So a fixture tree written WITHOUT pins arms
-  nothing in that range: measured 2026-08-10 while adding a check-13 arm — `def_builds` held both
-  colliding slugs and `--check` still returned 0. The main fixture tree in
-  `check-memory-hygiene.test.sh` deliberately sets no pins, so any 13-19 arm belongs in its own
-  scratch tree with the pin set. This is the `vacuous-selector-empty-population` class one level up:
-  the population is fine, the CHECK is switched off.
-- Under MSYS/git-bash one directory has two spellings (`/tmp/x` vs `/c/.../Temp/x`) and mount points are
-  NOT symlinks — never compare path strings (or `realpath --relative-to` outputs) across those flavors;
-  decide repo membership via git identity (`rev-parse --show-toplevel`/`--show-prefix`), both sides
-  normalized through the same `cd … && pwd` chain.
+  byte, through a filename, through `getline` AND through a pipe. Assert at source level.
+- `node --check <file>` is NOT a syntax gate on node v24 — module auto-detection retries the parse and
+  swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
+- A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
+  prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
+- A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
+  message that reads like a families misconfiguration.
+- Hygiene check 12's skeleton scan matches a literal date-shape or id-shape ANYWHERE in a spec body,
+  so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
+- A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
+  source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
+- Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
+  assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
+  signal — which is pinned at 0 of 53 with ZERO slack, so an uncited leg reds immediately.
+- A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
+  A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
+  committed tree and the byte-compare guarding that file agrees with it.
+- A gate that returns a VALUE on stdout cannot also report on stdout — `fail` echoes, so `x=$(check …)`
+  captures the diagnostics and the operator sees only the downstream symptom. Use a separate channel.
+- CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will not tell
+  you: its eol population is scoped to `.claude/` paths carrying the pin. Ask which CONSUMER reads a
+  file whole (a launcher, a sourced conf, a hook), not which gate diffs it.
+- A NEW record under `memory/gotchas/` needs `gotchas.py --write` AND a dossier claim, and the
+  coverage inventory reads TRACKED files — so `git add` first, then measure, or the gap surfaces on
+  the full bar instead.
+- Template parity and PLACEHOLDER COMPLETENESS are two different questions. A render whose conf
+  declares nothing for a key is byte-identical to a fresh render and still tells the agent to invoke a
+  placeholder's name as a tool. Grep the render for a surviving brace-shape as its own arm.
+- A positional in a gate's `fail` message CANNOT be armed — `check-arms.py` reads a bare `$1` as
+  literal text inside the signature. Bind it to a name and put it at the END, after the sentence.
+- Hygiene checks 13-19 are OFF unless a pin is armed; a fixture tree written WITHOUT pins arms nothing
+  in that range. Set the pin in the scratch tree, or the arm passes by finding nothing.
+- Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
+  strings across flavors. Decide repo membership via git identity, both sides normalized through the
+  same `cd … && pwd` chain.
