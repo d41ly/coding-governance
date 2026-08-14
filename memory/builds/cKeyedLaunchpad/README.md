@@ -157,6 +157,22 @@ sections, and it would have caught all three at authoring time.
 Left-shifting it into a gate is not free — §3 prose is not machine-parseable — so it is a reading
 rule here, and a candidate `BUILD-METHOD.md` M2 clause if it earns its keep on a second build.
 
+## The remote moved under this build
+
+`origin/main` advanced from BASE `f006691` to `dc15813` — ten commits, the `cFinalBerth` build —
+while this one was in progress. Three of the files it touches are files this build also changes, and
+one of them is the manifest this build MOVED:
+
+| Their change | This build's change | Reconciliation |
+|---|---|---|
+| `.claude/SESSION-KICKOFF.md` edited | the same file `git mv`-ed to `memory/guides/` | a rename-vs-edit conflict; take the move, replay their edit onto the new path |
+| `.memory-tree.conf` edited | `READ_PATH_CEILING` raised, `ARMS_FLOORS` raised | row-level, likely auto-resolvable by the merge driver |
+| `AGENTS.md` edited | the manifest path citation rewritten | line-level, inspect |
+
+The landing is NOT a fast-forward and must not be attempted as one. `tools/push-main.sh` reconciles
+the remote BEFORE running the gate, which is the whole reason it is mandatory — a bar run on a stale
+tree proves nothing about what would actually land.
+
 ## Parked
 
 Written per `BUILD-METHOD.md` M6: the question, the options seen, and the reason it was refused. A
