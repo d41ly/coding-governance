@@ -111,8 +111,8 @@ message ends its prose before the first variable and puts the bullet list last.
 
 - **AC1** — When a spec dated on or after the cutoff carries an AC bullet with no backtick,
   `bash tools/memory-tree/check-memory-hygiene.sh` exits 1 and its output names that bullet's label.
-- **AC2** — When that same bullet gains a backticked token, the same command exits 0, with no other
-  fixture change.
+- **AC2** — When that same bullet gains a backticked token, `bash tools/memory-tree/check-memory-hygiene.sh`
+  exits 0, with no other fixture change.
 - **AC3** — When the identical witnessless bullet sits in a spec whose filename date is before the
   cutoff, `bash tools/memory-tree/check-memory-hygiene.sh` is silent about it.
 - **AC4** — When `SPEC_WITNESS_CUTOFF` is blank in `.memory-tree.conf`, the branch is inert and the
@@ -125,8 +125,9 @@ message ends its prose before the first variable and puts the bullet list last.
   change and the `KIT_MEMORY_TREE_VERSION` bump landed together.
 - **AC8** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, it exits 0: the rendered
   `memory/TEMPLATE-SPEC.md` still equals the shipped template for this install's prefix.
-- **AC9** — When this spec itself is checked, it passes: it is dated on or after the cutoff, so it is
-  the first spec its own rule judges.
+- **AC9** — When the gate runs over `memory/builds/cTracedPromise/spec/2026-08-15-spec-cTracedPromise-2.md`,
+  it passes: this spec is dated on the cutoff, so it is the first spec its own rule judges. Both
+  bullets that failed this on the first draft were found by the rule and fixed, not waived.
 
 ## 7. Gates
 
