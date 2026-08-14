@@ -86,9 +86,9 @@ Records live under `spec/` and `reviews/`. The table below is GENERATED from the
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cSteadyMetronome-1
+**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cSteadyMetronome-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | INPROGRESS | rev-3 | 2026-08-14 |
+| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
 <!-- /gen:build-index -->

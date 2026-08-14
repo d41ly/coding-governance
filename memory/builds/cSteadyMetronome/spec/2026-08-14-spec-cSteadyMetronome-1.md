@@ -1,6 +1,6 @@
 # TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time
 
-**Status:** INPROGRESS · rev-3 · 2026-08-14 · node c · Tier-2 · base 790c1d24 · streams tooling · ratified 2026-08-14
+**Status:** CLOSED · rev-4 · 2026-08-14 · node c · Tier-2 · base 790c1d24 · streams tooling · ratified 2026-08-14
 
 ## 1. Goal
 
@@ -233,6 +233,12 @@ owner answered the direction and not a menu.
   4 3 2 1 because a leg's announcement was never withdrawn, so later legs counted the dead. The
   fixture now drops its announcement on a trap, which also covers the fixture that exits 3. Status
   moves SPECCED to INPROGRESS: built and reviewed, not landed.
+- rev-4 · 2026-08-14 · CLOSED. Landed at `d937411` with the bar green 54/54, the canary among them.
+  It did not land by this session's push: a second session working the same repo won the race and
+  carried these commits with it, while this session's own gate was KILLED at the caller's timeout and
+  the pre-push hook correctly read a killed gate as red. Worth recording as a property rather than an
+  anecdote -- a gate that cannot finish inside the caller's patience is indistinguishable from a red
+  one, and on a contended node that is reachable.
 
 ## 10. Reuse audit
 
