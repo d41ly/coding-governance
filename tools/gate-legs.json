@@ -21,6 +21,15 @@
     ]
   },
   {
+    "name": "kickoff engine size <=18KiB",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "skills/session-kickoff/SKILL.md",
+      "18432"
+    ]
+  },
+  {
     "name": "kit version markers",
     "argv": [
       "bash",
@@ -263,7 +272,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (\u22645 verify agents per review)",
+    "name": "verifier fan-out (≤5 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"

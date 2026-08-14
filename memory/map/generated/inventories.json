@@ -23,6 +23,7 @@
       "harness arms (fail branches armed or pinned)",
       "install-prefix (shipped surface)",
       "install-prefix self-test",
+      "kickoff engine size <=18KiB",
       "kickoff-manifest ratchet",
       "kit version markers",
       "kit/dogfood doc parity",

@@ -8,7 +8,7 @@ streams = ["kickoff"]
 decisions = []
 
 [claims]
-gate-legs = []
+gate-legs = ["kickoff engine size <=18KiB"]
 kits = []
 git-hooks = []
 workflow-scripts = []
