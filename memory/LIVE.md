@@ -18,4 +18,4 @@ terminal status. Nothing here is edited by hand.
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
-| [cTracedPromise](builds/cTracedPromise/README.md) | OPEN | c | 2026-08-14 | tooling | 1 |
+| [cTracedPromise](builds/cTracedPromise/README.md) | OPEN | c | 2026-08-14 | tooling | 3 |

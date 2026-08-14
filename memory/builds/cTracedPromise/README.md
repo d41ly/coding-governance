@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-14
 streams: tooling
 roster: TOOL
-ids: TOOL-cTracedPromise-1
+ids: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
 ---
 
 # cTracedPromise — a closed spec has to point at a commit that changed the product
@@ -34,33 +34,49 @@ Every apparent miss is a naming convention that predates the rule it is being ju
 axis` and `fix(aStandingWrit): fold the closing Tier-2` — the unit number or the slug, never the id.
 Three were verified by reading the commits that landed them, not by inference.
 
-Applied only to specs dated on or after the day the rule landed, the third oracle reads **0 misses
-over 13 CLOSED specs**. That is a ratchet with a live population, not a decoration.
+Applied only to specs CLOSED on or after the day the rule landed, and corrected by the M4 audit to
+drop merge commits and to stop accepting `.claude/` and the kickoff manifest as product, the third
+oracle reads **1 miss over 13 CLOSED specs**. That miss is `TOOL-aMooredAnchor-1`, whose build
+commits predate by hours the convention it is judged by. It is the signal's seeded pin, not rot.
+
+The 0 an earlier revision of this spec claimed was an artifact: reconcile merges name the branch
+being merged INTO, so `TOOL-aMooredAnchor-1` was certified by two merge subjects belonging to
+another build. That is the difference between a measurement and a number.
 
 ## What this build changes
 
-One unit. A sixth drift-audit signal, `closed_specs_with_no_product_commit`, gateable, pinned at 0,
-date-gated by a project-layer `TRACE_CUTOFF` so no landed spec is retroactively red. It rides the two
+One unit. A sixth drift-audit signal, `closed_specs_with_no_product_commit`, gateable, pinned at its
+measured 1, date-gated by a project-layer `TRACE_CUTOFF` on each spec's status-header date so no
+landed spec is retroactively red and no in-flight one is exempted forever. It rides the two
 drift-audit legs already on the bar and adds none.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1
+**Build status:** OPEN · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | OPEN | rev-2 | 2026-08-14 |
 <!-- /gen:build-index -->
 
 ## The owner decision menu
 
-**D1 — the §6 acceptance-witness rule, dropped from the approved scope.** The kickoff card scoped a
-second unit: require each `AC<n>` in a spec's §6 to name a machine-checkable witness. The measurement
-above is the argument against building it now. Not one of the 49 CLOSED specs was untraceable because
-an acceptance criterion lacked a witness; every apparent gap was commit-subject convention. That unit
-would ratchet the spec format in a second kit, needing its own cutoff, a `KIT_MEMORY_TREE_VERSION`
-bump, the verdict-epoch gate, the hygiene parity floor and the arms floors — a large surface against a
-problem with no measured instance. Filed as a backlog row instead. **Say so if you want it built
-anyway; the evidence is a recommendation, not a refusal.**
+**D1 — the §6 acceptance-witness rule, deferred from the approved scope. This is a cost decision, not
+an evidence-backed one, and the earlier draft of this section overstated it.** The kickoff card scoped
+a second unit: require each `AC<n>` in a spec's §6 to name a machine-checkable witness. The
+measurement above is **silent** on whether that rule is needed — all three oracles key on commit
+subjects and none of them reads a spec's §6 at all, so "no measured instance" was a claim the
+measurement could not support.
+
+What can be said, measured on this tree: **123 of 359 acceptance bullets across 33 of the 49 CLOSED
+specs carry no backticked token** — no test name, no gate leg, no command. That is a candidate count,
+not a defect count, since an AC can name its witness in prose. It is the population such a rule would
+act on.
+
+The argument for deferring is cost. That unit ratchets the spec format in a second kit, needing its
+own cutoff, a `KIT_MEMORY_TREE_VERSION` bump, the verdict-epoch gate, the hygiene parity floor and the
+arms floors — and it would grade 359 bullets on a shape rather than on whether the witness is real.
+Filed as a `TOOL` backlog row. **Say so if you want it built; this is a recommendation, not a
+refusal.**
 
 **D2 — what this signal cannot do, stated so it is not assumed.** It measures LINKAGE, not fidelity.
 A build that cites its unit correctly and then implements something else entirely passes it. Nothing

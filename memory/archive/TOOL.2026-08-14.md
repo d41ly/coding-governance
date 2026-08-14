@@ -1,0 +1,54 @@
+# tooling backlog — rotated rows (archive)
+
+> Frozen. Rows that reached CLOSED or WONTDO in `memory/backlog/TOOL.md`, rotated 2026-08-14
+> when that index reached its size cap. Superseded, never edited. The live index is
+> `memory/backlog/TOOL.md`.
+
+- TOOL-aRuledParchment-2 · CLOSED · check 5 did not govern a nested free-named recording file — closed by TOOL-aDrainedSluice-3 (V3); the record is in DECISIONS.md
+- TOOL-bThriftyBellows-2 · WONTDO · a single-pass gen-memory-tree.sh generator for check 9 — closed by TOOL-aDrainedSluice-9 (V9) — the subject was deleted in U2; the measurement it preserved lives in the bug-class catalogue; the record is in DECISIONS.md
+- TOOL-aQuarriedLantern-2 · CLOSED · three divergent python-launcher detectors, none of which ran the candidate — closed by TOOL-aDrainedSluice-6 (V5); the record is in DECISIONS.md
+- TOOL-aQuarriedLantern-3 · CLOSED · the recall cache had no per-worktree cap and no LRU — closed by TOOL-aDrainedSluice-7 (V6); the record is in DECISIONS.md
+- TOOL-aBatchedLintel-2 · CLOSED · the §9 rev-scan ran past §9, so a later heading inflated the high-water — closed by TOOL-aDrainedSluice-4 (V4); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-3 · CLOSED · the two JavaScript gates could not see an untracked file — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-4 · CLOSED · a checkout can land CRLF on an eol=lf-pinned render and git stays quiet — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-5 · CLOSED · hygiene-parity.test.sh accepted a baseline it cannot legally compare across — closed by TOOL-aDrainedSluice-8 (V7); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-6 · CLOSED · the flatten left dead path citations the census could not see — closed by TOOL-aDrainedSluice-9 (V8); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-7 · CLOSED · nine hygiene fail branches were pinned unarmed — closed by TOOL-aDrainedSluice-5 (V2); the record is in DECISIONS.md
+- TOOL-aFoldedQuarry-8 · CLOSED · check-arms covered ONE gate/test pair by name — closed by TOOL-aDrainedSluice-2 (V1); the record is in DECISIONS.md
+- TOOL-aDrainedSluice-1 · CLOSED · non-markdown inside a build's kind folders was governed by nothing — closed by TOOL-aDrainedSluice-3 (V3); the record is in DECISIONS.md
+- TOOL-aBatchedTribunal-2 · CLOSED · memory-recall `_mid_build` could not see most of a build — worse than the row said, and it was live data loss: a concurrent repro killed a sibling's build — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
+- TOOL-aBatchedTribunal-3 · CLOSED · the parity floor tracked a constant that had stopped being true; the constant was wrong, not the floor — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
+- TOOL-aBatchedTribunal-4 · CLOSED · `corpus_ids.py`'s shape filter was a tautology and could not be covered by any behavioural arm — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
+- TOOL-aBatchedTribunal-5 · CLOSED · the launcher ban keyed on the retired idiom, so a BARE invocation carried nothing to match — closed by TOOL-aBatchedTribunal-6 (W4); the record is in DECISIONS.md
+- TOOL-aBatchedTribunal-7 · CLOSED · the epoch gate's endpoint comparison let one early bump excuse every later change in the range — closed by TOOL-aBatchedTribunal-8 (W6); the record is in DECISIONS.md
+- TOOL-aRootedPrefix-1 · CLOSED · codebase-map hardcoded its `<root>/codebase-map/` install convention and answered from an empty corpus at any other prefix — landed on main (`map_lib.resolve_root`, kit 1.1); the record is in DECISIONS.md
+- TOOL-aRootedPrefix-2 · CLOSED · `REGEN_CMD` and the scaffolded map README spelled a kit path that does not exist at a prefixed install — closed by TOOL-aRootedPrefix-1 at rev-2 (S9); the record is in DECISIONS.md
+- TOOL-aMendedLedger-8 · CLOSED · scoped as the driver's FOURTH repair; closed instead by U9, which replaces the algorithm — the record is in DECISIONS.md
+- TOOL-aMendedLedger-9 · CLOSED · the driver dropped a row one side MOVED and the other DELETED, at rc 0, where git keeps it — closed by arbitrating with the skeleton: a surviving token for a deleted key means a move, and the two planes' disagreement becomes a scoped conflict naming both intents
+- TOOL-aNumeralWarden-1 · CLOSED · agent-cap.js never reads the fan-out bound it enforces, so `a.maxVerifiers || 5` lets a caller raise the verifier count past the BINDING cap with every gate green; at rev-3 it also owns the Agent-matcher refusal folded in from TOOL-aUnmannedHelm-1
+- TOOL-aCandidStub-3 · CLOSED · check 12 now implements the documented second exit: a terminal spec satisfies §8 by reading `none` OR by having every item RESOLVED in place. Hit while closing TOOL-aMouldedFolio-2, whose own §8 could not pass — closed by TOOL-aMouldedFolio-2
+- TOOL-aUnmannedHelm-1 · CLOSED · unit 1 of the unattended-run kit: RUN.md and the hygiene contract admitting it — landed at memory-tree@2.3. The dependency on TOOL-aNumeralWarden-1 was WITHDRAWN and that fold has since landed too
+- TOOL-aUnmannedHelm-3 · CLOSED · the `ids:` key stopped being authored rather than gaining a rule: it is DERIVED, so the two readings are moot — closed by TOOL-aMouldedFolio-2; the README's remaining authored prose is deliberately untemplated (17 of 25 carry no heading)
+- TOOL-aUnmannedHelm-4 · CLOSED · unit 2 of the unattended-run kit: the protocol document, the domain-rules companion section, and F1's amendment at all FOUR live statements of the explicit-ask rule. Owns the phase vocabulary and a kit-owned CORE DoD set the project layer may only EXTEND
+- TOOL-aUnmannedHelm-5 · CLOSED · unit 3: the driver kit. `--preflight` ASSERTS the mandate and never writes it, RECORDS the keepalive id the agent hands it, and delegates to `check-wiring.sh --check`. Per-verb acceptance for the status and resume verbs
+- TOOL-aUnmannedHelm-6 · CLOSED · unit 4: the gate legs. THREE `gate-legs.json` entries, witness PRESENCE as its own fail branch, at most one run-state file non-terminal, and a two-granularity population guard in the engine's own `pop_guard` shape
+- TOOL-aUnmannedHelm-7 · CLOSED · unit 5: the rendered skill. `.gitattributes` `eol=lf` pin only — `check-wiring.sh`'s eol population is derived — with drift and CRLF each carrying their own acceptance criterion
+- TOOL-aUnmannedHelm-8 · CLOSED · unit 6: the `/session-kickoff` hand-back. Enumerate all six interactive exits by line; mandate present hands back without halting, mandate absent still stops at Step 5 with the literal prompt string
+- TOOL-aUnmannedHelm-9 · CLOSED · unit 7: the adopter path. Refuses a foreign repo and an unsupported prefix, ADOPTS through a junction per the codebase-map precedent, and bumps `governance-template` to v2.6 with a v2.5 archive snapshot
+- TOOL-aStandingWrit-4 · CLOSED · `.githooks/pre-push` fail-open: an unmatched `GOV_DEFAULT_BRANCH` skipped the lander refusal and the entire bar at exit 0. Fixed here — the observed default WINS and the env value may only cross-check; cases 7/7c/8 arm it. The record is in DECISIONS.md
+- TOOL-aWrittenMethod-1 · CLOSED · the build method is rendered at memory/guides/BUILD-METHOD.md and reaches a run from four path-only pointers; the record is in DECISIONS.md
+- TOOL-aWrittenMethod-2 · CLOSED · SUPERSEDED in the merge: another node landed the remote-observed anchor, which is strictly stronger than this row's fix. The record is in DECISIONS.md and the spec's rev-5
+- TOOL-aWrittenMethod-3 · CLOSED · the guide displaced to 236 lines against a 250 cap by moving explanation, never instruction, into the kit README; the record is in DECISIONS.md
+- TOOL-aWrittenMethod-4 · CLOSED · check-method-carriers.sh plus its self-test, with a per-repo registry the adopter scaffolds from its own measured population; the record is in DECISIONS.md
+- TOOL-aWrittenMethod-5 · CLOSED · the method is in the kickoff manifest's watch and verify-paths sets; the record is in DECISIONS.md
+- TOOL-aWrittenMethod-6 · CLOSED · all six renderers substitute with quoted bash parameter expansion and interpret nothing; the record is in DECISIONS.md
+- TOOL-aMooredAnchor-1 · CLOSED · unattended kit: a marker line must BE the marker, check 9 asks ancestor-of-anchor not equality so a landed run stops redding the bar, the population loop stops word-splitting, and a replace ref or graft is refused by presence. Landed at 7890bec
+- TOOL-aMooredAnchor-2 · CLOSED · superseded by aStandingWrit S0, which made the rewritten tracking ref and the env-supplied default-branch name INERT rather than detected and states the residual boundary in PROTOCOL §9. The anchor question is answered there, not here
+- TOOL-aMooredAnchor-4 · CLOSED · the sibling self-tests were fork-bound, not git-bound: the hot accessors were sed|head|tr, three processes per call per run-state file per check. Pure bash plus two awks took 1094 sed/head/tr spawns to 278, and a source-level arm pins it
+- TOOL-aWidenedGuide-1 · CLOSED · hygiene check 6 caps by class: guides 60 KB / 750 lines, row documents unchanged. Armed both ways — a guide between the two caps is silent, a 265-line RUN.md still reds — and the read-path ceiling is untouched
+- TOOL-aWidenedGuide-2 · CLOSED · hygiene check 12 grades a ### sub-head fork as an item, not only a bullet. Found by closing this session's own spec, which uses sub-heads and could not go terminal. Armed both ways: fixture 45 silent when RESOLVED, 46 red when one is not
+- TOOL-aSealedCaravan-3 · CLOSED · the marker/constant pairing named ONE template, so the two it did not name drifted: BUILD-METHOD three bumps behind and shipping that number to adopters, SPEC-TEMPLATE carrying no marker at all. Now DERIVED over every shipped template
+- TOOL-aSealedCaravan-6 · CLOSED · the unattended DRIVER tested BASE by EQUALITY where the LEG's check 9 already used ANCESTRY, so a reconcile — which the lander does before the gate — wedged `--preflight` and `--close`. Fixed at kit 1.3; the record is in the build's RUN.md
+- TOOL-aSealedCaravan-7 · CLOSED · `--close` could not succeed after the land it follows: merge-base == HEAD goes degenerate and only `--preflight` allowed that. Fixed at kit 1.4 by TOOL-cFinalBerth-2 — the refusal stays at `--close` and asks the RECORDED base
+- TOOL-cFinalBerth-1 · CLOSED · ten phases, no producer for the last two, so every finished run stayed live forever. `--landed` observes the remote, `--abort` records a reason, `LANDING` goes close-only, a terminal record cannot re-open, leg check 15 arms both. Kit 1.4
+- TOOL-cFinalBerth-2 · CLOSED · `--close`'s merge-base-equals-HEAD refusal fired on every published HEAD, which is the state every landing ends in. NARROWED by owner decision rather than deleted: it asks the recorded base, the discriminator the merge-base cannot express
