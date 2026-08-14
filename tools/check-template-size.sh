@@ -11,7 +11,13 @@
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
 FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
-MAX_BYTES=${MAX_BYTES:-32768}     # 32 KiB — the STRICT ceiling; never raise to fit new prose, externalize instead
+# The limit, in precedence order: positional $2, then the environment, then the playbook's own 32 KiB.
+# The POSITIONAL exists because a gate leg cannot set an environment variable: `run-gates.sh` execs
+# its argument vector directly with no shell, and the canary pins argv[0] to a known interpreter, so
+# neither `env MAX_BYTES=… bash …` nor a variable assignment is a legal leg. This one line is what
+# lets a second file ride this script instead of a sibling script being written for it.
+MAX_BYTES=${2:-${MAX_BYTES:-32768}}   # 32 KiB default — the STRICT ceiling for the playbook template;
+                                      # never raise to fit new prose, externalize instead
 
 [ -f "$FILE" ] || { echo "TEMPLATE-SIZE env ERROR — file not found: $FILE"; exit 2; }
 # Measure LF-NORMALIZED bytes (strip CR) so the gate is checkout-independent — a Windows autocrlf

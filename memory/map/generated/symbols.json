@@ -453,6 +453,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "do_for_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "do_measure",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -1001,6 +1006,11 @@
       "id": "no_subdirs",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "normalise_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "owners_of",

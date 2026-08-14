@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.10 -->
+<!-- gov:kit memory-tree@2.11 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -39,7 +39,7 @@ unit's spec is the file under `spec/` whose status header carries the id. Shape,
 
 **Act.** **MISSING → author the spec, then re-classify.** *Authoring a spec is allowed:* the rule that a run may not
 write its own mandate is about AUTHORIZATION — the mandate authorizes, the spec is the WORK. Write it at the tier
-`.claude/SESSION-KICKOFF.md` assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
+`memory/guides/SESSION-KICKOFF.md` assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
 **THIN → fill it as a `rev-N` bump on the existing file** with its §9 line, never a second file for a unit that has
 one — that is how a spec set stops agreeing with itself. **FORKED → M3.** **READY → build what it says**; to
 diverge, change the spec first (rev bump + §9 line), then code.

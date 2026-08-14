@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 53 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 13 · guides: 3 · backlog-shards: 4
+Inventories: gate-legs: 54 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 14 · guides: 4 · backlog-shards: 4
 
 ## gate-legs
 
@@ -30,6 +30,7 @@ Inventories: gate-legs: 53 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `harness arms (fail branches armed or pinned)` | baseline |
 | `install-prefix (shipped surface)` | install-prefix |
 | `install-prefix self-test` | install-prefix |
+| `kickoff engine size <=18KiB` | session-kickoff |
 | `kickoff-manifest ratchet` | baseline |
 | `kit version markers` | baseline |
 | `kit/dogfood doc parity` | baseline |
@@ -123,6 +124,7 @@ Inventories: gate-legs: 53 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
+| `inputs-inside-the-subjects-reach.md` | unattended |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
@@ -136,6 +138,7 @@ Inventories: gate-legs: 53 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 |---|---|
 | `BUILD-METHOD.md` | build-method |
 | `REVIEW-PROTOCOL.md` | agent-cap |
+| `SESSION-KICKOFF.md` | session-kickoff |
 | `UNATTENDED-PROTOCOL.md` | unattended |
 
 ## backlog-shards

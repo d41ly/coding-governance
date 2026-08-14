@@ -51,7 +51,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
   `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
   `memory/archive/`.
-- `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
+- `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
 
@@ -94,7 +94,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
-- template size ≤32 KiB — `tools/check-template-size.sh`
+- template size ≤32 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
+  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
+  positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - verdict epoch — `tools/memory-tree/check-verdict-epoch.sh` (+ self-test): the kit version DATES the engine's verdicts, so a diff that moves a non-comment line of `check-memory-hygiene.sh` must move `KIT_MEMORY_TREE_VERSION` too — `hygiene-parity.test.sh` derives its baseline floor from that constant, and a stale one made the floor point before the change
 - row-keyed merge driver replay — `tools/memory-tree/merge-rows.test.sh` (the driver `tools/memory-tree/merge-rows.py`, launched through the kit's own `merge-rows.sh` (which carries the resolver inline, so a copy-installed kit can start it; `tools/lib/` is gov-internal and ships nothing), splits every line by SHAPE into ROW and STRUCTURE, hands structure to `git merge-file` positionally, key-merges only the row set, and recombines through a token skeleton — so `memory/DECISIONS.md` and `memory/backlog/*.md` auto-resolve an append-collision without duplicating, dropping or misfiling a row, and an unresolvable anchor grammar becomes a conflict rather than a silent take-ours). **The bar is mechanical: never worse than `git merge-file` on the same three blobs.** Every case runs a live control; conflicting where git resolves correctly is counted by name against a shrink-only constant (2 today: a row one side MOVED and the other DELETED, both directions), never hidden. Per-node: `bash tools/check-wiring.sh --fix` sets `merge.rows.driver`
