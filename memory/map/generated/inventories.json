@@ -108,6 +108,7 @@
     "guides": [
       "BUILD-METHOD.md",
       "REVIEW-PROTOCOL.md",
+      "SESSION-KICKOFF.md",
       "UNATTENDED-PROTOCOL.md"
     ],
     "backlog-shards": [

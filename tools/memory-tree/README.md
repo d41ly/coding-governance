@@ -163,7 +163,7 @@ LIVE to SHIPPED, which the source contradicts.
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
 method.
 
-- `skills/session-kickoff/SKILL.md` + `.claude/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
+- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
   the six interactive exits.
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.

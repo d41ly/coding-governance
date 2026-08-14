@@ -558,7 +558,7 @@ else
   fi
 fi
 
-# ---- KICK-cKeyedLaunchpad-1: the machine-global /session-kickoff install ------------------------
+# ---- the machine-global /session-kickoff install ------------------------------------------------
 # Every arm drives HOME at a scratch dir, so nothing reads or writes the operator's real install.
 # The tracked side is faked inside the throwaway repo, which is what makes the adopter arm (AC7)
 # reachable at all: an adopter has the install and NO tracked kit source.

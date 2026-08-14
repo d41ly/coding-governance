@@ -51,7 +51,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
   `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
   `memory/archive/`.
-- `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
+- `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
 

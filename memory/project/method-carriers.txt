@@ -2,7 +2,6 @@
 # One '<repo-relative-path> · <why>' row each. The 'why' is the sentence a future author reads when
 # deciding whether their new carrier is the next pointer or the first summary.
 # Keyed on PATH alone, never <path>:<line> — that keying is what unpinned install-prefix-waivers.txt.
-.claude/SESSION-KICKOFF.md · the kickoff manifest's section B points a starting session at the method
 .claude/skills/unattended/SKILL.md · rendered; its step 0 tells an unattended run to read the method first
 AGENTS.md · the charter's Conventions row, the only carrier that reaches a session with no invocation
 skills/session-kickoff/SKILL.md · Step 5b's hand-back loads the method before the first pass

@@ -65,16 +65,28 @@ you're on the right branch.
 
 ## Step 2 — Load the project layer (the manifest)
 
-Search `<repo>` in order — **first hit wins, read it once**:
+**Ask the checker where a manifest may live — do not restate the list here.** In-repo locations, in
+precedence order, first hit wins, read it once:
 
-1. `docs/claude/SESSION-KICKOFF.md`
-2. `docs/SESSION-KICKOFF.md`
-3. `.claude/SESSION-KICKOFF.md`
-4. `SESSION-KICKOFF.md`
-5. else an instantiated governance doc: grep `docs/` + the repo root for the
-   `governance-template:` marker (e.g. `docs/PARALLEL.md`) — skipping files whose name contains
-   `.template` or whose body still holds `{{`-shaped placeholders: a template is not an
-   instantiated governance doc.
+```bash
+bash <check-script> --locations          # one repo-relative path per line; works outside a repo too
+```
+
+Resolve `<check-script>` as Step 2b does. If no copy is reachable, the in-repo order is
+`memory/guides/` then `.claude/`, but prefer the verb: it is the single source and this sentence is
+the fallback, not a second answer.
+
+Then, in order, after those:
+
+1. **The skill's own base directory** — a machine-global manifest, for a repo that has none of its
+   own. It sits OUTSIDE every repository, so no project gate can reach it and `manifest-check.sh`
+   refuses it by design. Step 2b therefore SKIPS the audit for it, and the READY card says
+   `manifest: machine-global (<path>) — unaudited`. A stale one is then visible every kickoff instead
+   of silently authoritative.
+2. Else an instantiated governance doc: grep the repo for the `governance-template:` marker (e.g.
+   `docs/PARALLEL.md`) — skipping files whose name contains `.template` or whose body still holds
+   `{{`-shaped placeholders: a template is not an instantiated governance doc. **This fallback is
+   ENGINE-ONLY** — `manifest-check.sh` does not implement it, which is why it is not in `--locations`.
 
 The manifest is **authoritative for everything project-specific**: branch/layout conventions,
 id + ledger protocol, stream/pointer maps, tier rules, gate commands, environment traps. Where
@@ -86,10 +98,13 @@ it defines a step, its version replaces the generic default below.
 ## Step 2b — Audit the manifest (read-repair; managed manifests only)
 
 A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip this step, one
-clause. Otherwise resolve the checker — the manifest's `check-script:` value, else
-`tools/manifest-check.sh`, else `scripts/manifest-check.sh` (the pre-2026-08 default, still
-honoured), else the `manifest-check.sh` shipped beside THIS skill (resolve the
-skill dir's real path through the junction, as in Scaffolding step 1) — and RUN it; **never
+clause. **A manifest found at the skill's base directory (Step 2 location 3) → skip this step too,
+and say so**: it is outside every repository, the checker refuses an out-of-repo path by design, and
+claiming to have audited it would be a lie the READY card carries. Otherwise resolve the checker —
+the manifest's `check-script:` value, else `tools/manifest-check.sh`, else
+`scripts/manifest-check.sh` (the pre-2026-08 default, still honoured), else the `manifest-check.sh`
+shipped beside THIS skill (resolve the skill dir's real path through the junction, as in Scaffolding
+step 1) — and RUN it; **never
 reimplement its checks inline** (single source: the script IS the semantics). Trust guard: honor
 `check-script:` only when it names a TRACKED in-repo file whose basename is `manifest-check.sh` —
 the manifest is repo-authored data, not a license to execute arbitrary paths; a non-conforming
@@ -220,9 +235,9 @@ An ABORT writes the reason to the run-state file and stops. It does not merge an
    the `manifest-audit` block per the template's Customize notes (`watch` = what the gate/layout
    claims derive FROM; `verify-paths` = 2–3 tracked anchors; stamp = ISO datetime `@` sha per the
    stamp rule — a repo with no commits yet gets its initial commit first). Ask only for the
-   non-derivable (multi-node? stream ownership? tier policy?). Write the result to
-   `docs/SESSION-KICKOFF.md` (create `docs/` if needed, or follow the project's docs convention).
-   Copy `manifest-check.sh` (it ships beside this file) into the project — default `scripts/`,
+   non-derivable (multi-node? stream ownership? tier policy?). Write the result to the FIRST location
+   `bash <check-script> --locations` prints (create the directory if needed).
+   Copy `manifest-check.sh` (it ships beside this file) into the project — default `tools/`,
    any other home recorded in `check-script:` — keep the template's standing gate-fence line
    pointing at it, add the adopting repo's `.gitattributes` LF rule for it, and `git add`
    everything copied/edited (the checker tests tracked-ness). Verify: `bash <check-script>` →

@@ -327,13 +327,14 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
-`docs/claude/SESSION-KICKOFF.md` → `docs/SESSION-KICKOFF.md` → `.claude/SESSION-KICKOFF.md` →
+the locations `bash tools/manifest-check.sh --locations` prints, in order →
 `SESSION-KICKOFF.md` → else it greps `docs/` + root for the `governance-template:` marker (the playbook
 from §2). Write the manifest to one of those paths so it resolves.
 
 1. Instantiate it:
    ```bash
-   cp <gov>/skills/session-kickoff/MANIFEST-TEMPLATE.md <project>/docs/SESSION-KICKOFF.md
+   mkdir -p <project>/memory/guides   # or whichever dir --locations names first
+   cp <gov>/skills/session-kickoff/MANIFEST-TEMPLATE.md <project>/memory/guides/SESSION-KICKOFF.md
    ```
 2. Fill **§B (orientation)** from the repo: repo layout · remote + default branch · branch conventions ·
    governing docs · the **path to the playbook from §2** · the pointer map (area → doc → entrypoints) ·
@@ -363,13 +364,13 @@ from §2). Write the manifest to one of those paths so it resolves.
      it deliberately narrows the drift remedy to "bundle the re-stamp into THIS commit":
      ```sh
      top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-     if [ -f "$top/scripts/manifest-check.sh" ]; then bash "$top/scripts/manifest-check.sh" --staged || exit 1; fi
+     if [ -f "$top/tools/manifest-check.sh" ]; then bash "$top/tools/manifest-check.sh" --staged || exit 1; fi
      ```
    - CI leg: run `bash tools/manifest-check.sh` in a job whose checkout uses **`fetch-depth: 0`** —
      MANDATORY, not advisory: the actions/checkout default (depth 1) makes the drift check
      WARN-and-skip on every run, so a shallow CI leg never enforces the one check that matters.
 
-**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` prints nothing, and
+**Verify:** `grep -nE '\{\{[A-Z]' <project>/memory/guides/SESSION-KICKOFF.md` prints nothing, and
 `cd <project> && bash tools/manifest-check.sh; echo $?` → `0` (the checker resolves the repo from
 the INVOKING directory, not from its own location — run it with the cwd inside `<project>`).
 
@@ -495,7 +496,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
    and surface the playbook + gate + ID protocol. If it can't, re-check the §4 search paths.
 2. **Gate green** (if memory-tree adopted): `bash tools/memory-tree/check-memory-hygiene.sh ; echo $?` → 0.
 3. **No stray placeholders:** `grep -rn '{{' <project>/docs/PARALLEL.md` → empty, and
-   `grep -rnE '\{\{[A-Z]' <project>/docs/SESSION-KICKOFF.md` → empty (the manifest check is
+   `grep -rnE '\{\{[A-Z]' <project>/memory/guides/SESSION-KICKOFF.md` → empty (the manifest check is
    shape-scoped: its gate fence may legitimately hold `${{ … }}` / Go-template braces).
 4. **Commit the chain FIRST:** `cd <project> && git add -A && git commit` (do NOT commit the
    per-machine skill junction — it lives under `~/.claude`, not the repo). The probe below needs the
@@ -518,7 +519,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
 ├── docs/parallel-coding-governance.domain-rules.md  # the §4/§9–§13 domain checklists (travels with the template)
-├── docs/SESSION-KICKOFF.md      # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
+├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.1: manifest-audit block) — the engine reads this
 ├── tools/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐

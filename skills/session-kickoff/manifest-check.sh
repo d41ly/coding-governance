@@ -17,6 +17,28 @@
 set -u
 KIT_MANIFEST_VERSION="1.1"
 
+# THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
+# from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
+# engine and WIRE-INTO-PROJECT.md invoke INSTEAD of restating the list. It used to be spelled in five
+# files that did not agree with each other, and two of the four spellings named directories no live
+# install has ever used.
+#
+# The skill's own base directory is a THIRD location the ENGINE honours and this script deliberately
+# does not list: it sits outside every repository, and this script decides membership by git identity
+# and refuses an out-of-repo path with exit 2 by design. It cannot check that one, so it does not
+# claim to. A manifest found there is read but never audited, and the engine says so on the card.
+MANIFEST_LOCATIONS="memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md"
+
+# `--locations` answers BEFORE the repo probe below, because the whole point of the verb is to be
+# readable from OUTSIDE a repository — and the probe exits 2 there without ever reading argv. It is
+# read-only, prints one path per line, exits 0, and adds no `fail` branch (so the harness meta-gate's
+# shrink-only floor for this script is untouched).
+for _a in "$@"; do
+  case "$_a" in
+    --locations) printf '%s\n' $MANIFEST_LOCATIONS; exit 0 ;;
+  esac
+done
+
 CALLER_PWD=$PWD
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "MANIFEST env ERROR — not a git repository"; exit 2; }
 ROOT=$(cd "$ROOT" 2>/dev/null && pwd) || { echo "MANIFEST env ERROR — cannot enter repo root"; exit 2; }   # normalize to the shell's path flavor (git-bash: C:/ vs /c/)
@@ -51,11 +73,16 @@ if [ -n "$MF" ]; then
   fi
   MF="$(git -C "$dir" rev-parse --show-prefix 2>/dev/null)$(basename -- "$abs")"
 else
-  for p in docs/claude/SESSION-KICKOFF.md docs/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md SESSION-KICKOFF.md; do
+  for p in $MANIFEST_LOCATIONS; do
     [ -f "$p" ] && { MF="$p"; break; }
   done
 fi
-[ -n "$MF" ] && [ -f "$MF" ] || { echo "MANIFEST env ERROR — no SESSION-KICKOFF.md at docs/claude/ docs/ .claude/ or the repo root (and no valid path argument)"; exit 2; }
+# The message is BUILT from the same array the loop walks, so it can never again describe a different
+# list than the one that was searched.
+[ -n "$MF" ] && [ -f "$MF" ] || {
+  echo "MANIFEST env ERROR — no kickoff manifest at $(printf '%s, ' $MANIFEST_LOCATIONS | sed 's/, $//') (and no valid path argument). Move an existing manifest to the first of those, or run this script with --locations to see the list."
+  exit 2
+}
 
 # Unmanaged manifest (no kickoff-manifest marker, e.g. a prototype) — not ratchet-managed.
 # An UNREADABLE manifest is an env error, never a green.

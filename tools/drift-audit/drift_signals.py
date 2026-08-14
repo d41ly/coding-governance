@@ -21,6 +21,10 @@ PRODUCT_GLOBS: list[str] = [
     "tools",
     "skills",
     ".claude",
+    # The kickoff manifest, by FILE path. `memory/` stays absent for the reason above; this one file
+    # is product CONFIGURATION that moved into the tree, not a record. Naming the DIRECTORY would let
+    # every spec cite its own id through the corpus and certify all of them at once.
+    "memory/guides/SESSION-KICKOFF.md",
     "parallel-coding-governance.template.md",
     "parallel-coding-governance.customize.md",
     "parallel-coding-governance.domain-rules.md",
