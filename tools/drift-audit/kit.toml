@@ -62,6 +62,14 @@ why = "PRODUCT_GLOBS ships empty and the oracle then searches with no pathspec, 
 discharge = { command = ["python", "-c", "import subprocess, sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(1) if not d.PRODUCT_GLOBS else [sys.exit(1) for g in d.PRODUCT_GLOBS if not subprocess.run(['git','ls-files','--',g],capture_output=True,text=True).stdout.strip()] and sys.exit(0) or sys.exit(0)"] }
 
 [[hole]]
+id = "drift-trace-cutoff"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "TRACE_CUTOFF ships empty and the engine then returns gateable:False for closed_specs_with_no_product_commit — correct on day one, and permanently inert if nobody ever fills it. Unlike drift-product-globs an unfilled hole here INVENTS nothing, it just never speaks: the adopter keeps a signal that reads 0 of 0 forever while the gate stays green, which is the dead-instrument class this kit exists to refuse."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'TRACE_CUTOFF', '') or '').strip() else 1)"] }
+
+[[hole]]
 id = "drift-pins"
 kind = "measurement"
 blocks_adopt = false

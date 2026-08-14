@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.1
+gov:kit drift-audit@1.2
 
     python drift-audit/selftest.py
 
@@ -187,12 +187,41 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         "# TOOL-aThing-1 — a thing\n\n**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
         encoding="utf-8", newline="\n")
 
+    # --- signal 6's population, three specs, all DISTINCT from aThing ------------------------
+    # aThing is mutated by the arms in test_signals_can_move (SPECCED -> CLOSED and back), so
+    # building signal 6's fixture on it would couple two independent oracles' arms to one file.
+    #
+    # CLOSED after the cutoff and CERTIFIED: `commit the traced work` below names its slug and
+    # touches src/, which is this fixture's TRACE_GLOBS. Signal 6 must be silent on it.
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-02-02-spec-aTraced-1.md").write_text(
+        "# TOOL-aTraced-1 — a traced thing\n\n"
+        "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+        encoding="utf-8", newline="\n")
+    # The UNCERTIFIED spec is NOT written here. The base fixture must be CLEAN for every signal, or
+    # the `--check` pin-semantics arms below inherit a second over-pin signal and stop asserting what
+    # their names say. The violating spec is created by the arm that needs it, and removed after.
+    #
+    # CLOSED BEFORE the cutoff and uncertified: grandfathered, so it must land in `unjudgeable`
+    # rather than in `value`. Without it the cutoff is asserted only by its own absence.
+    (r / SPEC_DIR_FOR_FIXTURE / "2025-12-31-spec-aElder-1.md").write_text(
+        "# TOOL-aElder-1 — a thing that closed before the convention\n\n"
+        "**Status:** CLOSED · rev-1 · 2025-12-31 · node a · Tier-2 · base 0000000\n",
+        encoding="utf-8", newline="\n")
+
     for f in ("drift_report.py", "drift_signals.template.py"):
         (r / "drift-audit" / f).write_bytes((KIT / f).read_bytes())
     (r / "drift-audit" / "drift_signals.py").write_text(
         "PRODUCT_GLOBS = ['src']\n"
+        # Signal 6's declarations. TRACE_CUTOFF must be SET here: unset, the engine returns
+        # gateable:False and the arms below would assert over a signal that never ran — the
+        # fixture-passes-by-finding-nothing class. The cutoff sits between aElder (2025-12-31) and
+        # the two 2026-02-02 specs, so one spec is grandfathered and two are judged.
+        "TRACE_CUTOFF = '2026-01-15'\n"
+        "TRACE_GLOBS = ['src']\n"
         "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
         "HANDKEPT = []\n"
+        # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
+        # this literal, and seeding a pin here would silently turn that arm into a no-op.
         "PINS = {}\n"
         # HANDKEPT is empty here, as it is in the shipped template — so the signal it feeds is empty
         # BY DECLARATION, not blind, and must be named as such or `--check` reds this fixture for
@@ -216,6 +245,13 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
                    encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "clean ledger row cites unmerged side work"], r)
+
+    # Signal 6's CERTIFYING commit: its subject names aTraced's slug AND it touches src/, which is
+    # this fixture's TRACE_GLOBS. Written as a real commit rather than folded into the seed because
+    # the seed's subject ("seed") names nothing — a certified spec has to be certified by something.
+    (r / "src" / "traced.py").write_text("# the traced work\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "feat(aTraced): the work TOOL-aTraced-1 specified", "--no-verify"], r)
     return r
 
 
@@ -310,6 +346,72 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
 
+    # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
+    print("closed-spec traceability (signal 6)")
+    ghost = r / SPEC_DIR_FOR_FIXTURE / "2026-02-02-spec-aGhost-1.md"
+    base6 = report(r)["closed_specs_with_no_product_commit"]
+    check("clean fixture: the traceability signal is silent", base6["value"] == 0,
+          f"got {base6['value']} detail={base6['detail']}")
+    check("clean fixture: ...and LIVE, over a judged population", base6["live"] is True
+          and base6["of"] >= 1, f"live={base6['live']} of={base6['of']}")
+    # THE GRANDFATHER ARM. aElder is CLOSED before the cutoff with nothing naming it anywhere, so if
+    # the cutoff were ignored it would be counted. Asserting it sits in `unjudgeable` — and not
+    # merely that `value` is 0 — is what separates "grandfathered" from "not looked at at all".
+    check("clean fixture: the pre-cutoff CLOSED spec is unjudgeable, not clean",
+          base6["unjudgeable"] >= 1, f"unjudgeable={base6['unjudgeable']}")
+
+    ghost.write_text("# TOOL-aGhost-1 — a thing with no commit behind it\n\n"
+                     "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+                     encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "records: close it with nothing built", "--no-verify"], r)
+    v6 = report(r)["closed_specs_with_no_product_commit"]
+    check("violated: an uncertified CLOSED spec fires the traceability signal", v6["value"] == 1,
+          f"got {v6['value']} detail={v6['detail']}")
+
+    # A MERGE naming the slug must NOT certify it. Reconcile merges name the branch merged INTO, so
+    # counting them let a build with no product commit of its own ride another build's merge — which
+    # is exactly how this signal's pin read 0 instead of 1 on the repo that ships it.
+    #
+    # THE MERGE HAS TO BE NON-TREESAME OR THIS ARM PROVES NOTHING. A path-restricted `git log`
+    # applies default history simplification, so a merge whose result for `src/` equals one parent's
+    # is dropped from the walk before `--no-merges` is ever consulted. Measured: with a fast
+    # side-branch merge this arm stayed green when `--no-merges` was deleted from the engine — it was
+    # asserting that a commit git had already hidden was not being counted. Both sides therefore
+    # touch the SAME file and the merge resolves to a third content, so the merge commit differs from
+    # both parents and survives simplification. Verified by deleting `--no-merges` and watching this
+    # arm go red.
+    shared = r / "src" / "shared.py"
+    shared.write_text("base\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "seed the shared file", "--no-verify"], r)
+    run(["git", "checkout", "-q", "-b", "ghostwork"], r)
+    shared.write_text("branch side\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "unrelated work on the branch", "--no-verify"], r)
+    run(["git", "checkout", "-q", "main"], r)
+    shared.write_text("main side\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "unrelated work on main", "--no-verify"], r)
+    run(["git", "merge", "--no-ff", "-q", "--no-commit", "ghostwork"], r)   # conflicts, by design
+    shared.write_text("resolved\n", encoding="utf-8", newline="\n")         # a third content
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "merge: aGhost — reconcile ghostwork", "--no-verify"], r)
+    merge_seen = run(["git", "log", "main", "--format=%s", "--", "src"], r).stdout
+    check("the merge fixture is VISIBLE to a path-restricted walk (else the arm below is vacuous)",
+          "merge: aGhost" in merge_seen,
+          "history simplification dropped it; the arm would pass without the guard")
+    v6m = report(r)["closed_specs_with_no_product_commit"]
+    check("a MERGE subject naming the slug does not certify it", v6m["value"] == 1,
+          f"got {v6m['value']} — merge subjects are being counted as evidence")
+
+    # Restore: every arm below judges a fixture whose only over-pin signal is the one it names.
+    ghost.unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "reopen it", "--no-verify"], r)
+    check("...and goes quiet once the uncertified spec is gone",
+          report(r)["closed_specs_with_no_product_commit"]["value"] == 0)
+
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
     sig = r / "drift-audit" / "drift_signals.py"
@@ -322,6 +424,22 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     at = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
     check("--check greens once the pin is seeded at the measured value", at.returncode == 0,
           f"rc={at.returncode} stderr={at.stderr.strip()[:200]}")
+
+    # --- an UNSET TRACE_CUTOFF is "not asked", not "dead" ------------------------------------
+    # Every existing adopter has a project layer with no TRACE_CUTOFF in it. If the engine returned
+    # gateable:True there, `--check`'s dead-probe rule would red them on the first pull of this kit
+    # for doing nothing at all — and DECLARED_EMPTY could not save them, because that set lives in
+    # the file they have not edited. So the engine, not the declaration, has to answer this.
+    keep = sig.read_text(encoding="utf-8")
+    sig.write_text(keep.replace("TRACE_CUTOFF = '2026-01-15'", "TRACE_CUTOFF = ''"),
+                   encoding="utf-8", newline="\n")
+    unset = report(r)["closed_specs_with_no_product_commit"]
+    check("unset cutoff: the signal is not gateable", unset["gateable"] is False,
+          f"gateable={unset['gateable']}")
+    quiet6 = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    check("unset cutoff: --check stays green rather than reding a dead gateable probe",
+          quiet6.returncode == 0, f"rc={quiet6.returncode} stderr={quiet6.stderr.strip()[:200]}")
+    sig.write_text(keep, encoding="utf-8", newline="\n")
 
     # --- a missing project layer is a REFUSAL, never a default ------------------------------
     sig.unlink()

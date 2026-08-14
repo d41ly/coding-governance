@@ -1513,6 +1513,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "signal_closed_specs_untraceable",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "signal_dangling_pointers",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
