@@ -27,14 +27,13 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 
 ## Start here
 
-**State.** Design pass complete and REVIEWED TWICE. The M4 audit returned BLOCKED with 18 confirmed
-defects; the fix-verify pass over the fold returned BLOCKED again with 19 more, including the same U6
-arithmetic a second time. Both folds are in. Units 2, 3, 5, 6 and 7 are at rev-3; units 1 and 4 at
-rev-2.
+**State.** Design pass complete and REVIEWED TWICE (18 then 19 confirmed defects, both folded).
+BUILD IN PROGRESS: units 1, 2, 3 and 5 are BUILT and committed; units 4, 6 and 7 are specced and
+UNBUILT. Nothing is merged and nothing is pushed — the owner's authorization is scoped to "when the
+entire build is fully done", and it is not.
 
-**Next action:** owner scope approval, then build in dependency order. `BUILD-METHOD.md` M4 says to
-STOP once a synthesis calls the design clean and its fixes are folded — further passes land in the
-prose about the design rather than in the design, and building is both cheaper and stricter.
+**Next action:** build `KICK-cKeyedLaunchpad-4`, then `-6`, then `-7`, then the closing adversarial
+review of the cumulative diff from BASE, then land. Each built unit's commit carries what it found.
 
 **Build order**, corrected by the fix-verify pass: `-1` (independent) then `-2`, `-3`, `-4`, `-5`,
 `-6`, `-7`. U5 is no longer front-loadable — taking the `--for-paths` call site gave it an edge to U2.
