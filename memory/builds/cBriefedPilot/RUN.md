@@ -33,7 +33,7 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d5bd482d0cb1f606e61b76b544383a6a1ef71b01
+witness: d7a9eae66c63706a2d6ba692ef4956d662de00e9
 phase: BUILDING
 keepalive: ad706085
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -93,3 +93,20 @@ will not have that property, which is what the fork's §8 warned.
 What the next attempt needs, so it is not re-derived: the fixture wants a build shape that is
 complete by default with explicit opt-outs, not a complete-build helper seeded per arm. That is a
 unit of its own and it should be specced before it is built.
+
+**PARKED 2026-08-15 · unit 8 (`closing-review-recorded`), derived rather than attempted.** It is the
+second new Definition-of-Done item, so it lands in exactly the wall unit 7 parked on: every
+close-path arm in the harness would need a tracked review record naming the run's pinned BASE, and
+five of those arms are about other items entirely. The fixture cannot supply that for the same reason
+it cannot supply a complete build — `tRun` is shared across arms with incompatible requirements.
+
+I did not attempt it. Unit 7 established the shape over six rounds and the prediction here is
+mechanical, not a guess: same harness, same shared fixture, same class of precondition. Spending six
+more rounds to reach the same park would be the least-bad option M3 says not to take.
+
+Both items are blocked on ONE piece of work — a fixture whose build shape is complete by default with
+explicit opt-outs. That is a unit, it is not in this roster, and adding one is SCOPE, which a standing
+mandate does not delegate. It goes to the owner.
+
+The run continues at unit 9. Units 9 through 11 write the Skill template, add no DoD item, and touch
+no shared fixture, so the blockage is specific to 7 and 8 rather than to the rest of the build.
