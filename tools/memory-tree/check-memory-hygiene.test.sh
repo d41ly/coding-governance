@@ -7,7 +7,7 @@
 # states), one carrying a .codebase-map.conf (the only place check 7's MAP_SUB branch is reachable),
 # and one built by adopt-memory-tree.sh --scaffold itself, so the scaffolder is asserted against the
 # GATE rather than against a second description of the scaffolder.
-#   bash memory-tree/check-memory-hygiene.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash memory-tree/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
 #
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
 # discipline is a value in the spec status header, not a directory.
@@ -61,7 +61,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -94,7 +94,7 @@ The design.
 
 ## 6. Acceptance criteria
 
-- AC1 When run, it passes.
+- AC1 When run, `check-memory-hygiene.sh` passes.
 
 ## 7. Gates
 
@@ -175,6 +175,36 @@ good | sed 's/base 0123abcd/base 0123abcd · streams bogus/' > "$D/spec/2026-08-
 good | sed 's/base 0123abcd/base 0123abcd · streams architecture/' > "$D/spec/2026-08-01-spec-tFixture-21.md"  # pre-cutoff WITH streams -> silent
 printf '# t22\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd\n\n## Whatever\n\nbody\n' \
   > "$D/spec/2026-08-10-spec-tFixture-22.md"                                     # TIER-1 post-cutoff, no streams -> red
+
+# ---- acceptance-witness arms. SPEC_WITNESS_CUTOFF sits between the eras exactly as
+# ---- STREAMS_CUTOFF does, so the 2026-08-01 specs are grandfathered and the 2026-08-10 ones must
+# ---- carry a witness. The real corpus cannot exercise this either: the cutoff is set ahead of
+# ---- every landed spec. Every fixture below carries streams, or it would red for the STREAMS
+# ---- reason instead and the arm would pass whether or not the branch it names exists.
+wit() { good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/"; }
+nowit() { sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, it passes with nothing named.|'; }
+unbold() { sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- AC1. When run, it passes with nothing named.|'; }
+
+wit | nowit  > "$D/spec/2026-08-10-spec-tFixture-50.md"   # post-cutoff, bolded, no witness -> red
+wit          > "$D/spec/2026-08-10-spec-tFixture-51.md"   # post-cutoff, witness present    -> silent
+good | sed "s/base 0123abcd/base 0123abcd · streams architecture/" | nowit \
+             > "$D/spec/2026-08-01-spec-tFixture-52.md"   # PRE-cutoff, same bullet         -> silent
+# the UNBOLDED label. A bold-requiring selector measured blind to 159 of 774 real bullets across 19
+# specs, which made opting out of this rule two asterisks wide. This is the arm for that.
+wit | unbold > "$D/spec/2026-08-10-spec-tFixture-53.md"   # post-cutoff, UNBOLDED, no witness -> red
+# TIER-1, post-cutoff, witnessless. S3 says the rule runs on both tiers, and narrowing the branch
+# guard to Tier-2 left this harness byte-identical until this fixture existed.
+printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 6. Acceptance criteria\n\n- **AC1** When run, it passes with nothing named.\n' \
+  > "$D/spec/2026-08-10-spec-tFixture-54.md"
+# The witness sits on a CONTINUATION line. The accumulator that folds continuations into their
+# bullet had no fixture: deleting it left this harness unchanged while the real gate went red.
+wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash tools/memory-tree/check-memory-hygiene.sh`|' \
+  > "$D/spec/2026-08-10-spec-tFixture-55.md"   # witness on a continuation -> silent
+# A hard-wrapped continuation that OPENS with a cross-reference to other ACs. The first selector
+# read this as a new bullet head: it closed the real bullet early and invented a phantom label, so
+# a spec whose every criterion carried a witness could red naming a label the file does not hold.
+wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When the guard is removed, `run-gates.sh` reds and\n  AC1-AC3 all go with it.|' \
+  > "$D/spec/2026-08-10-spec-tFixture-56.md"   # INDENTED continuation opens with an AC ref -> silent
 
 # ---- CHECK 5: the optional FAMILY qualifier. It exists so one slug shared by two families survives
 # ---- the merge into a single folder. The alternation is the CLOSED one from FAMILIES — a generic
@@ -383,6 +413,21 @@ hit  'tFixture-19.md (filename date 2026-08-10 is on/after STREAMS_CUTOFF 2026-0
 hit  'tFixture-20.md (streams value(s) outside the enum: bogus'
 miss 'tFixture-21.md ('
 hit  'tFixture-22.md (filename date 2026-08-10 is on/after STREAMS_CUTOFF 2026-08-05'
+# ---- acceptance-witness arms. Each asserts the branch's OWN text: a bare 'tFixture-50.md (' is
+# ---- satisfied by any other check-12 finding in the same file.
+hit  'tFixture-50.md (acceptance bullets naming no backticked witness'
+miss 'tFixture-51.md ('
+miss 'tFixture-52.md ('
+hit  'tFixture-53.md (acceptance bullets naming no backticked witness'
+hit  'tFixture-54.md (acceptance bullets naming no backticked witness'   # TIER-1: S3, both tiers
+miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
+miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head
+# the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
+# cutoff for this violation and would misdirect the first author who hits it.
+grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08" <<<"$out" || { echo "FAIL the witness rejection does not name its own cutoff"; st=1; }
+# and the offending LABEL, not merely the file
+grep -qE "tFixture-5[03][.]md .*AC1" <<<"$out" || { echo "FAIL the witness rejection does not name the bullet label"; st=1; }
+
 # the legal set rides the message — a rejection that does not say what IS legal is a riddle
 grep -qF 'legal values: architecture' <<<"$out" || { echo "FAIL the streams rejection does not name the legal set"; st=1; }
 
@@ -567,6 +612,7 @@ if ! grep -qF 'HYGIENE check 12' <<<"$out"; then echo "FAIL: check 12 never fire
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
 out3=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'on/after STREAMS_CUTOFF' <<<"$out3"; then echo "FAIL: the streams requirement fired with a blank STREAMS_CUTOFF"; st=1; fi
+if grep -qF 'no backticked witness' <<<"$out3"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
 # an ILLEGAL value is still illegal with the cutoff blank — validation and the ratchet are separate
@@ -761,5 +807,10 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (130 assertions)"
+# NO COUNT. The number here was AUTHORED, not derived, and it sat at 130 while arms were added
+# under it more than once -- including six in this build before anyone noticed. A static count
+# of the call sites gives 115, which reconciles with nothing. A tally that cannot be derived is
+# the two-answers-to-one-question defect wearing a reassuring number, so it is deleted rather
+# than guessed at again. Deriving one is TOOL-cTracedPromise-4.
+[ "$st" = 0 ] && echo "PASS"
 exit "$st"

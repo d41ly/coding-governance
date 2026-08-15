@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.11 -->
+<!-- gov:kit memory-tree@2.13 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -139,6 +139,12 @@ For Tier-2, unresolved items become the owner scope menu.
 Numbered (AC1, AC2, …). Phrase each as "When <action>, <observable result>" — an observation that
 proves THIS change works: a test it adds, a gate it moves, a browser observation. Never an
 unrelated green gate.
+
+Once a spec's filename date reaches `SPEC_WITNESS_CUTOFF` (`.memory-tree.conf`), every acceptance
+bullet must carry at least one **backticked token** — the command, file, flag or test that makes the
+observation. The gate reads SHAPE only: it asserts the bullet names something, never that the named
+thing exists or that the build satisfied it. The label may be written `- **AC1** — `, `- AC1. ` or
+`**AC1** `; the rule does not care which, and does not require the bold.
 
 ## 7. Gates
 

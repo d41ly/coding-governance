@@ -34,7 +34,7 @@ file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"]
 defaults = { MEMORY_ROOT = "memory" }
 

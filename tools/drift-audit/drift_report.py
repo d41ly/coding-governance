@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.1
+gov:kit drift-audit@1.2
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -20,7 +20,7 @@ whose numbers cannot move is worse than no report: the adopter's convergence too
 0 as "converged" for thirteen days. So every signal here carries a `live` field asserting the probe
 can still move over a non-empty population, and a dead probe prints DEAD PROBE instead of a clean 0.
 
-WHAT IS ENGINE AND WHAT IS PROJECT. The five signal implementations are generic over any repo that
+WHAT IS ENGINE AND WHAT IS PROJECT. The signal implementations are generic over any repo that
 follows the governance playbook (a memory tree, TEMPLATE-SPEC status headers, a per-node in-flight
 ledger, a node registry in the charter). Everything genuinely repo-shaped — which paths are product
 source, which lists promise to shrink, which hand-kept inventories mirror a generated one, and the
@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.1"
+KIT_DRIFT_AUDIT_VERSION = "1.2"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -228,7 +228,10 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # The spec's OWN id, from its H1 (`# TOOL-cSightedPlumb-1 — title`). Keying on the SLUG instead was
 # tried upstream and over-flagged 107/126: one shipped unit made all 14 siblings of its multi-spec
 # build look stale, because every id of a build shares the slug. The seq is the discriminator.
-_OWN_ID = re.compile(r"^#\s+([A-Z]+-[a-zA-Z]+-\d+)\b", re.M)
+#
+# Group 2 is the slug, for `signal_closed_specs_untraceable` — which asks a BUILD-level question the
+# slug answers correctly. Group 1 is untouched, so `signal_spec_status` reads exactly what it did.
+_OWN_ID = re.compile(r"^#\s+([A-Z]+-([a-zA-Z]+)-\d+)\b", re.M)
 NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 
@@ -387,8 +390,103 @@ def signal_dangling_pointers(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal 6 — CLOSED specs with no commit that both names them and changed the product
+# --------------------------------------------------------------------------------------------
+
+# The status header's date, which TEMPLATE-SPEC defines as the LAST-CHANGE date — so on a CLOSED
+# spec it is the close date. Keyed on deliberately instead of the FILENAME date, which is the WRITE
+# date: measured on the dogfood, a filename key exempted 18 specs still in flight, every one of which
+# will close under the convention this signal judges. Both keys select the same population today.
+_HEADER_DATE = re.compile(r"^\*\*Status:\*\*[^\n]*?(\d{4}-\d{2}-\d{2})", re.M)
+# CLOSED only. WONTDO is terminal too and is deliberately NOT judged: an abandoned unit correctly has
+# no product commit, so judging it would manufacture a permanent false positive out of a true record.
+TERMINAL = frozenset({"CLOSED"})
+
+
+def signal_closed_specs_untraceable(ctx) -> dict:
+    """The mirror of `signal_spec_status`. That one asks whether a spec claiming NOT-DONE is
+    contradicted by product source; this one asks whether a spec claiming DONE is supported by any
+    commit at all. Together they cover both ways a status can lie about git.
+
+    WHAT THIS DOES NOT MEASURE, stated because a linkage signal is easy to read as a fidelity one: it
+    proves a commit exists that names the unit and touched the product. It cannot tell whether that
+    commit implemented the spec. A build that cites its unit correctly and builds something else
+    passes. Fidelity is the spec audit and the closing review, and it stays there.
+    """
+    if not ctx.trace_cutoff:
+        # UNSET is not "clean" and not "dead" — it is NOT ASKED. Returning gateable:False is what
+        # makes that distinction reach `--check`, which reds a gateable signal whose population is
+        # empty. Doing this in the ENGINE rather than through the project layer's DECLARED_EMPTY is
+        # deliberate: that set lives in each adopter's own file, so it reaches neither this kit's
+        # test fixture nor an adopter who has not edited theirs, which is exactly where the
+        # dead-and-undeclared red would land on people who did nothing wrong.
+        return {"signal": "closed_specs_with_no_product_commit", "value": 0, "of": 0,
+                "tolerance": 0, "gateable": False, "live": False, "unjudgeable": 0,
+                "detail": [{"note": "TRACE_CUTOFF is not set in the project layer; nothing judged"}]}
+
+    # ONE walk, over BOTH tips. The spec population is read from the working tree, so the evidence
+    # must be too — a unit that flips its own spec to CLOSED on its branch has its certifying commits
+    # on that branch and nowhere else, and `base_ref` alone cannot see them. Measured on the dogfood:
+    # replaying the judged specs at the commit the default branch sat on immediately before each
+    # CLOSED flip landed, a base-only walk reds 2 of 13 CORRECT closes. The `drift-audit records` leg
+    # carries an empty guard, so it runs on every branch-scoped bar — which is precisely when.
+    #
+    # `--full-history` because `--no-merges` does NOT defeat default history simplification: a
+    # path-restricted walk drops a commit that is TREESAME with a parent, so a build's own
+    # product commit can vanish behind an unrelated merge and score a false MISS. Reproduced in
+    # a scratch repo with an `-s ours` merge. An earlier comment here claimed --no-merges
+    # settled the traversal question; the selftest's merge arm said the opposite, and the
+    # selftest was right.
+    #
+    # `--no-merges` because a reconcile merge's subject names the branch being merged INTO, so it
+    # certifies whichever build it was merged into rather than the build that shipped. Measured: with
+    # merges counted this signal read 0 on the dogfood and one of those greens rested entirely on two
+    # merge subjects belonging to another build. Dropping them also removes the default
+    # history-simplification ambiguity, which would otherwise decide the answer by accident.
+    walk = ctx.git.run("log", ctx.git.base_ref, "HEAD", "--no-merges", "--full-history",
+                       "--format=%s", "--", *ctx.trace_globs)
+    subjects = walk.stdout if walk.returncode == 0 else ""
+
+    suspect, checked, unjudged = [], 0, 0
+    for p in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
+        head = p.read_text(encoding="utf-8", errors="replace")[:4000]
+        m = _STATUS.search(head)
+        if not m or m.group(1).upper() not in TERMINAL:
+            continue
+        own, when = _OWN_ID.search(head), _HEADER_DATE.search(head)
+        if not own or not when:
+            unjudged += 1  # no id or no header date: the probe cannot judge it. Counted, not guessed.
+            continue
+        if when.group(1) < ctx.trace_cutoff:
+            unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
+            continue
+        checked += 1
+        uid, slug = own.group(1), own.group(2)
+        # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
+        # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
+        # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
+        # the id half could never decide a case the slug half did not already decide.
+        if re.search(r"\b" + re.escape(slug) + r"\b", subjects):
+            continue
+        suspect.append({
+            "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
+            "id": uid, "slug": slug, "closed": when.group(1),
+        })
+    return {
+        "signal": "closed_specs_with_no_product_commit",
+        "value": len(suspect),
+        "of": checked,
+        "tolerance": 0,
+        "gateable": True,
+        "live": checked > 0,
+        "unjudgeable": unjudged,
+        "detail": suspect,
+    }
+
+
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
-           signal_dangling_pointers]
+           signal_dangling_pointers, signal_closed_specs_untraceable]
 
 
 # --------------------------------------------------------------------------------------------
@@ -406,6 +504,13 @@ class Ctx:
         self.ledger_dir = root / self.memory_root / "project" / "in-flight"
         self.git = Git(root, base_ref)
         self.product_globs = list(proj.PRODUCT_GLOBS)
+        # The cutoff and the evidence paths for signal 6. Both are repo-shaped, so both live in the
+        # project layer; both are optional, so an adopter who has not filled them gets a signal that
+        # says "not asked" rather than one that guesses. `TRACE_GLOBS` falls back to PRODUCT_GLOBS —
+        # a usable default — but this repo narrows it, because PRODUCT_GLOBS holds `.claude/` and the
+        # kickoff manifest, and a records commit touching those would certify the record.
+        self.trace_cutoff = (getattr(proj, "TRACE_CUTOFF", "") or "").strip()
+        self.trace_globs = list(getattr(proj, "TRACE_GLOBS", None) or proj.PRODUCT_GLOBS)
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)

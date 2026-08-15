@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-14T04:05:00+03:00 @ dc15813990205299d18ba8decd2e05b84afef691
+last-audit: 2026-08-15T03:20:00+03:00 @ 709d260da8c81551e59da769aceca47202bb5923
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5fd7c7efaa3942ea5fd77777c74bbee7ef132787
+last-body-change: e99de5b6c3fa257277490eb19dcd05b4a137b855
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -168,6 +168,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   literal text inside the signature. Bind it to a name and put it at the END, after the sentence.
 - Hygiene checks 13-19 are OFF unless a pin is armed; a fixture tree written WITHOUT pins arms nothing
   in that range. Set the pin in the scratch tree, or the arm passes by finding nothing.
+- `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
+  order does not error: it emits a plausible file with the other side's rows silently dropped.
+  Diff the merged id-set against BOTH inputs, never eyeball the output.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
