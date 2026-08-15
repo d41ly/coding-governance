@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
+**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -59,8 +59,9 @@ through would only produce a refusal the owner is no longer present to read.
 ### Why this is the last owner turn
 
 The Skill says it, and unit 3's ordering branch means it. `--waive` is accepted by `--preflight`
-alone and only while no run-state file exists, so after preflight there is no verb that could take an
-answer. M10's "never ask: there is nobody to answer, so a question is a stall" then holds for the
+alone, and only while no run-state file exists OR the requested set equals the recorded one — so
+after preflight there is no verb that could take a NEW answer, while a post-compaction re-preflight
+re-issuing the SAME recorded pairs is not a refusal. M10's "never ask: there is nobody to answer, so a question is a stall" then holds for the
 rest of the run without contradiction.
 
 ### Files touched (estimate)
@@ -133,6 +134,9 @@ Resolver: agent, if the owner does not take it.
 
 - rev-3 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
 
+- rev-4 · 2026-08-15 · §8's audit fold. The ordering echo was WRONG — it dropped unit 3's `OR the requested set equals the
+  recorded one`, which would have forbidden the post-compaction re-preflight unit 3's S5 and unit 5's
+  §4 both require. Unit 3 is the document that was right; this was one of two bad echoes.
 ## 10. Reuse audit
 
 No existing seam fits, and the evidence is that nothing in this repo takes an interactive turn from

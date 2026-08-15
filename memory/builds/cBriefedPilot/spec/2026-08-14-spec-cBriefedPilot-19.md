@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-19 — the kit identifies as the version it now is
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -86,8 +86,10 @@ comparison into a generator and its output, which checks nothing.
 ## 6. Acceptance criteria
 
 - **AC1** — All eight spellings read `1.5`, verified by
-  `grep -rn "unattended@1\.5\|KIT_UNATTENDED_VERSION=1\.5"` returning the six files in §4's table and
-  no occurrence of `1.4` surviving outside `memory/`.
+  `grep -rn "unattended@1\.5\|KIT_UNATTENDED_VERSION=1\.5"` returning the six files in §4's table, and
+  `git grep -n "unattended@1\.4\|KIT_UNATTENDED_VERSION=1\.4"` returning nothing. The bare-`1.4` form
+  was measured FALSE against this tree — five legitimate hits survive outside `memory/` (`agent-cap.js`
+  twice, `WIRE-INTO-PROJECT.md`, and two timing comments), none of them this kit's version token.
 - **AC2** — `bash tools/check-kit-versions.sh` exits 0.
 - **AC3** — Reverting any ONE of the SIX spellings in the four kit files to `1.4` reds
   `bash tools/check-kit-versions.sh`, observed for each of the six rather than argued.
@@ -124,6 +126,8 @@ withdrawn.
   observations could not have been made. The version leg now claims six, and the other two are
   observed against check 10 and `unattended skill wiring`, which are the gates that do see them.
 
+- rev-3 · 2026-08-15 · §8's audit fold. AC1's bare-`1.4` clause was measured FALSE against this tree — five legitimate
+  hits survive outside `memory/` — so it is scoped to the kit's own version tokens.
 ## 10. Reuse audit
 
 - **`tools/check-kit-versions.sh`** — the seam this unit is graded by rather than one it extends.

@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -19,12 +19,22 @@ with the leg.
   narrows to the half that survives — the Skill's step 0 is unconditional after unit 9 and
   `--preflight` refuses an absent carrier after unit 4, while `verb_resume`'s echo is still guarded
   by `[ -f "$M/guides/BUILD-METHOD.md" ]`.
-- **S3** — `memory/backlog/TOOL.md`: every `TOOL-cBriefedPilot-*` row to its terminal token;
+- **S3** — `memory/backlog/TOOL.md`: every `TOOL-cBriefedPilot-*` row to its terminal token, EXCEPT
+  `TOOL-cBriefedPilot-23`, which stays OPEN. That row is the residual unit 1's §8 filed on 2026-08-15
+  when M3 veto 1 discarded the shared newline refusal: unit 3 closes the `--waive` half only, and the
+  `override` and `abort` park kinds keep the hole. Closing it here would silently undo the veto;
   `TOOL-cFinalBerth-3` CLOSED against unit 17; `TOOL-aStandingWrit-3` CLOSED as STALE, naming
   `aWrittenMethod` as what owned the instruction layer and this build as what made it default.
 - **S4** — `memory/DECISIONS.md` rows for the decisions this build minted that outlive it: the
   registry is a kit constant and not a conf key, a waiver is taken at preflight and nowhere else, and
   the contract names zero handles.
+- **S4b** — a `memory/DECISIONS.md` row for unit 21's recorded verdict token, whichever branch it
+  names. The token decides unit 15 and unit 16's index count, so a build that leaves it only in a
+  review recording leaves the next run to re-derive a decision this one made. Stated conditionally so
+  branch A and branch B each have a home.
+- **S5b** — a second NEW backlog row carrying the per-route "one thing that would have to change"
+  from unit 21's recording, so a route the hunt rejected is re-openable on evidence rather than
+  re-argued from scratch.
 - **S5** — the F4 read-budget finding filed as a NEW backlog row, MEASURED at close in this tree and
   not copied. Today the charter's fixed read path is 68,989 B across six files against a
   `READ_PATH_CEILING` of 86,476; the RECURRING cost — M7 re-reading the method whole at every pass
@@ -148,6 +158,9 @@ edit, argued in §4 rather than left open.
   `tools/unattended/check-unattended.sh:2` both read fifteen today. What is unowned is the final
   reconciliation, which no gate watches, and that is all S6 now claims.
 
+- rev-3 · 2026-08-15 · §8's audit fold. S3 now EXCLUDES `TOOL-cBriefedPilot-23`, the residual the M3 veto deliberately
+  preserved, which S3 would otherwise have closed and silently undone. S4b and S5b give unit 21's
+  verdict token a record owner, so the next run reads a decision instead of re-deriving it.
 ## 10. Reuse audit
 
 - **`memory/map/features/*.md`'s Gaps sections** — the seam extended, and the one this repo has

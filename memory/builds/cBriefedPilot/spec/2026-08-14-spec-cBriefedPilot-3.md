@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -13,10 +13,24 @@ turn there is.
 
 - **S1** — `--waive <handle> --reason <text>`, repeatable, accepted by `--preflight` and by no other
   verb. It consumes the paired accumulator unit 1 builds; it does not build a second one.
-- **S2** — five refusals, each validated in the precondition block ABOVE the write barrier, so a
-  refused invocation leaves the run-state file byte-identical:
-  1. the verb is not `--preflight`;
-  2. a run-state file already exists AND the requested set differs from the recorded one;
+- **S2** — five refusals, taking check numbers **37 through 41**. Number 34 is unit 4's and is the
+  driver's only gap today, so this unit's numbers start above the highest spelled one; unit 6 derives
+  its own from the same rule rather than restating a literal.
+
+  Refusal 1 does NOT live in the precondition block, and that is the correction this spec needed:
+  `verb_preflight` never runs when the verb is something else, so a guard placed there can never fire.
+  It is a guard in the argv DISPATCH, evaluated inside the `--plan` and `--phase` arms as well as
+  after the parse loop — both of those exit inside the loop, so a post-loop guard alone misses them.
+
+  1. **(dispatch)** the verb is not `--preflight`;
+
+  Refusals 2 through 5 validate in the precondition block ABOVE the write barrier, so a refused
+  invocation leaves the run-state file byte-identical:
+
+  2. a run-state file already exists AND the requested set differs from the recorded one. The
+     comparison runs only when the invocation carries at least one `--waive` pair: an invocation
+     naming no handle leaves the recorded set untouched and is NOT a refusal, which is what makes the
+     `--preflight` that unit 5's §4 requires before every `--close` legal over a waived run;
   3. the handle is not in the effective directive set;
   4. no `--reason` follows the handle;
   5. the reason spells the project's declared bypass flag, or contains a newline.
@@ -80,7 +94,8 @@ that reason. Any verb reachable mid-run is a place the run could answer its own 
 
 `verb_preflight` writes nothing until every precondition has passed, and its own comment says why: a
 verb that writes and then discovers a refusal has already changed the state the refusal was about.
-The five refusals join that block.
+The four remaining refusals join that block. Refusal 1 cannot: it fires on a verb that never enters
+this function, so it is a dispatch guard and §10 names the dispatch as a fifth seam.
 
 The `park()` calls cannot join it, because they write. They sit after the `set_fact` block and before
 `stage_or_fail`. Placing them earlier is a measured hazard rather than a stylistic one: `park()`
@@ -191,6 +206,10 @@ recorded because §4's idempotence rule depends on it.
   the seam supplying refusal 3's membership test; `verb_preflight` cannot call it, and the seam is
   unit 2's `directives()` accessor in the driver.
 
+- rev-5 · 2026-08-15 · §8's audit fold. Refusal 1 moved OUT of the precondition block — `verb_preflight` never runs
+  for another verb, so a guard there can never fire; it is a dispatch guard, and §4 and §10 follow.
+  S2 allocates checks 37-41, and refusal 2 now states that an invocation naming no handle is not a
+  refusal, which is what makes unit 5's mandatory pre-close `--preflight` legal over a waived run.
 ## 10. Reuse audit
 
 Four existing seams, all extended rather than duplicated.
@@ -207,6 +226,10 @@ Four existing seams, all extended rather than duplicated.
   `phases()` and `dod()`, and it is the third instance of that shape. The LEG's `core_of()` reads the
   same constant from the other side, in unit 12; `verb_preflight` cannot call it, so naming it here
   would have pointed the builder at the wrong file.
+
+- **The argv dispatch loop in `tools/unattended/unattended.sh`** — the fifth seam, and the home of
+  refusal 1. It already exits inside the loop for `--plan` and `--phase`, which is why the guard is
+  evaluated in those arms and not only after the loop.
 
 Recall terms used, recorded because M7 re-runs the query: unattended run directive waiver preflight
 override park run-state parked region reason record phase witness DoD close.

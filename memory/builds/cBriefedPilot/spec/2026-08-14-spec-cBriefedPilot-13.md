@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -24,7 +24,12 @@ being re-run somewhere the run could not write.
 - **S6** — the honest limit lives in a source comment beside the branch, matching check 13's
   precedent, not in a document read at a different time.
 - **S7** — `tools/unattended/check-unattended.test.sh` gains a committing fixture and one arm per
-  refusal beside the green control; `ARMS_FLOORS` is raised in the same commit; the leg header's
+  refusal beside the green control. **At least one arm's waiver line is PRODUCED by invoking
+  `unattended.sh --preflight --waive <handle> --reason <text>` inside the fixture and committing it**,
+  not hand-authored, and AC4 and the S4 join arm anchor on THAT line. `TOOL-aStandingWrit-8` names
+  this exact gap — the kit has driver arms and leg arms and zero arms that run the driver and THEN
+  the leg over one tree — and a hand-authored line tests the checker against the checker's own idea
+  of the grammar; `ARMS_FLOORS` is raised in the same commit; the leg header's
   check count and the charter's gate-suite count move with it.
 
 ## 3. Non-goals (OUT)
@@ -168,6 +173,9 @@ and `grep -qF` needs no parser at all.
   2026-08-14 (P1: buy the git join). The design pass had this unit at Tier 1 with shape checks only;
   the join is what moves it.
 
+- rev-2 · 2026-08-15 · §8's audit fold. S7 now requires at least one arm whose waiver line is PRODUCED by the driver and
+  committed, not hand-authored, and §10 cites `TOOL-aStandingWrit-8` — the row naming this kit's
+  driver-arms-and-leg-arms-but-never-both gap, which is exactly what the join needs closed.
 ## 10. Reuse audit
 
 - **Check 13's blob read** — the seam. It already derives a path from the run-state file's own
@@ -181,6 +189,9 @@ and `grep -qF` needs no parser at all.
   override. The selector reads it rather than inventing a marker.
 - **Check 13's honest-limit comment** — the precedent for where the limit goes: beside the branch,
   because a document stating it is read at a different time from the code relying on it.
+
+The cross-component gap this unit's S7 closes for one line is `TOOL-aStandingWrit-8`, cited here
+because §10 is where a reused seam is named and that row is the reason the arm has its shape.
 
 Recall terms used: unattended waiver parked region park kind grammar run-state first commit blob git
 show join tamper evidence shape check directive handle reason index population.

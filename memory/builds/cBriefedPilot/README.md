@@ -37,18 +37,23 @@ findings; 47 folded into the design, 4 were rejected on measured evidence, and 5
 questions below. Three of the four lenses returned BLOCKED before folding. The recording is
 `build/2026-08-14-build-cBriefedPilot-1-design-pass.md`.
 
-**Classification (M2), written before acting on it.** Four units are READY and specced: units 2, 3,
-9 and 10, which are the owner's core ask — the registry exists, and it is overridable. The other
-eighteen are MISSING: declared as backlog rows, no conforming spec yet.
+**Classification (M2), RE-DERIVED against the tree 2026-08-15.** All 22 units now carry a conforming
+spec. Twenty classify READY. Unit 5 is FORKED and its fork is PARKED — freezing the anchor triple
+with the base is scope and touches a governance carrier, neither of which a standing mandate
+delegates. Unit 15 is FORKED and correctly so: its resolver is unit 21's verdict token, which the
+hunt has not produced yet. The earlier reading of this block — four specced, eighteen MISSING — was
+true when it was written and is kept nowhere, because a classification that has gone stale is worse
+than one that was never written.
 
 **All five owner decisions are RESOLVED**, answered 2026-08-14 and recorded below with their
 reasoning. Two of the answers grew the roster from twenty units to twenty-two: P2 refused to let D6's
 inversion ship on an excusing clause and bought a research unit instead, and P5 pulled the
 protocol-table join into scope. One answer moved unit 13 from Tier 1 to Tier 2.
 
-**Next action.** Spec unit 1, then unit 21. Unit 1 is the paired accumulator every later flag
+**Next action.** Build unit 1, then unit 21. Unit 1 is the paired accumulator every later flag
 depends on; unit 21 is the research that decides whether D6 can be built at all, and it is the only
-unit in the build whose write set lets it run alongside the rest.
+unit in the build whose write set lets it run alongside the rest. The M4 spec audit is recorded at
+`reviews/2026-08-15-review-cBriefedPilot-1.md` — CLEAN WITH FIXES, no blockers, all fixes folded.
 
 **The one thing that must not be lost.** Every directive is a POINTER. `BUILD-METHOD.md` M1 states
 that nothing in it is stated anywhere else in this repo, and that a rule appearing both there and in
@@ -145,7 +150,8 @@ The DoD core moves from six items to eight, so `CORE_FLOOR`'s DoD half moves 6 �
 ```
 
 **The ordering guarantee is one branch, not a convention.** `--waive` is accepted by `--preflight`
-alone and only while no run-state file exists. That single refusal makes every other verb reject a
+alone, and only while no run-state file exists OR the requested set equals the recorded one. That
+single refusal makes every other verb reject a
 late answer, and makes a re-preflight after compaction unable to change a recorded set. It is what
 keeps the design from contradicting M10's "never ask": the owner turn happens before the run is
 unattended, and afterwards there is no verb that could take one.
@@ -295,24 +301,24 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | OPEN | rev-3 | 2026-08-14 |
-| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | OPEN | rev-3 | 2026-08-14 |
+| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | OPEN | rev-4 | 2026-08-14 |
 | [TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster](spec/2026-08-14-spec-cBriefedPilot-11.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-3 | 2026-08-14 |
-| [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-4 | 2026-08-14 |
+| [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | OPEN | rev-4 | 2026-08-14 |
+| [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | OPEN | rev-5 | 2026-08-14 |
 | [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | OPEN | rev-2 | 2026-08-14 |
+| [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | OPEN | rev-4 | 2026-08-14 |
