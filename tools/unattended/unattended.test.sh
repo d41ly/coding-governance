@@ -595,6 +595,64 @@ base2=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
 same "the base did not move on the second preflight" "$base2" "$base1"
 hit "$out" "base $base1"
 
+# ---- TOOL-cBriefedPilot-2: the directive registry. AC1 is exercised by every arm in this file -
+# ---- mkconf does NOT emit DIRECTIVES_EXTRA, so a driver that read it without a default would have
+# ---- aborted under set -u on the first invocation. Asserted explicitly anyway, because a property
+# ---- that holds by accident of another fixture is one nobody notices losing.
+reset_tree
+out=$(run --status tRun)
+miss "$out" "unbound variable"
+hit "$out" "phase "
+
+# ---- eleven pairs, read from the driver's OWN constant line — the same line the gate leg's
+# ---- core_of() parses, so a count here and a count there cannot disagree.
+dirline=$(grep '^DIRECTIVES_CORE=' "$SCRIPT")
+ndir=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*' | wc -l | tr -d ' ')
+same "the registry declares eleven handles" "$ndir" "11"
+
+# ---- every handle POINTS at a build-method section and none of them restates one. The pointer is
+# ---- the whole design: a gloss grown into a condition would be the M1 defect this build exists to
+# ---- avoid, and a shape check is the cheapest thing that notices it happening.
+nbad=$(printf '%s\n' "$dirline" | sed -e 's/^DIRECTIVES_CORE="//' -e 's/"$//' | tr ' ' '\n' \
+       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+$' || true)
+same "every registry entry is handle:M-section and nothing else" "$nbad" "0"
+
+# ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
+# ---- it can silently not ship while the suite stays green.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+same "resume names the directive table" "$(run --resume tRun | grep -c 'the directives and their waivers')" "1"
+
+# ---- S2, the ACCESSOR exists and composes core plus extra. This arm is here because its absence
+# ---- was invisible: the accessor edit silently no-opped, the suite stayed green at 192, and the
+# ---- source-level arm below could not see it either — it checks that a key is DEFAULTED, not that
+# ---- anything READS it. A scope item with no arm is a scope item that can quietly not ship.
+same "directives() is defined" "$(grep -c '^directives()' "$SCRIPT")" "1"
+same "directives() composes core and extra" \
+  "$(grep '^directives()' "$SCRIPT" | grep -c 'DIRECTIVES_CORE.*DIRECTIVES_EXTRA')" "1"
+
+# ---- S6, the SOURCE-level arm: every conf key the DRIVER reads is defaulted in its own init block.
+# ---- The population is the KIT'S SHIPPED EXAMPLE, not the fixture's conf. The first cut read
+# ---- `.unattended.conf`, which under `mkconf` omits the very key the arm was written for, so it was
+# ---- VACUOUS — observed by stripping DIRECTIVES_EXTRA from the init line and watching the suite
+# ---- stay green. The example is the kit's own declaration of the surface a project fills in, it is
+# ---- tracked, and no fixture can narrow it.
+example="$HERE/.unattended.conf.example"
+initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
+undefaulted=""
+checked=0
+for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
+  grep -q "[^A-Z_]$k" "$SCRIPT" || continue
+  checked=$((checked + 1))
+  case "$initblock" in *"$k="*) ;; *) undefaulted="$undefaulted $k" ;; esac
+done
+same "every conf key the driver reads is defaulted in its init block" "$undefaulted" ""
+
+# ---- and the population is NON-EMPTY and plausible. Without this the arm above passes when the
+# ---- example cannot be read, when the reference test matches nothing, or when a path resolves
+# ---- differently for two tools — all three of which happened while this arm was being written.
+same "the arm actually checked a plausible number of keys" \
+  "$([ "$checked" -ge 8 ] && echo yes || echo no)" "yes"
+
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")

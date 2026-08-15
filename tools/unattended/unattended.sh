@@ -58,7 +58,7 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — the kit reads every"; \
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -77,8 +77,24 @@ PHASES_TERMINAL="LANDED ABORTED"
 # override look like a check that failed.
 DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
+# TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
+# a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
+# method's own M1 forbids a rule appearing both there and in a carrier it points at, and this is a
+# carrier; a gloss here that grew into a condition would be that defect.
+#
+# Kit-owned, like the two sets above it, and for the same reason: the owner asked that these be
+# MUST-by-default. A conf key would let a project declare zero directives, which is a global waiver
+# carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
+#
+# Two handles may cite one section - the section is the carrier, not the rule.
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9"
+
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
+# TOOL-cBriefedPilot-2 - the third instance of a shape that already had two. Unit 3's membership test
+# for a --waive handle reads THIS, so the effective set is composed in one place rather than in each
+# consumer.
+directives() { printf '%s %s\n' "$DIRECTIVES_CORE" "$DIRECTIVES_EXTRA"; }
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -943,6 +959,7 @@ verb_resume() { # slug
     # The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the authored region
     # carries five facts and never restates a derivable one (protocol section 2).
     [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
+    echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
   fi
   return 0
 }
