@@ -21,7 +21,7 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
-cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" tools/unattended/
+cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -36,6 +36,8 @@ KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
 PHASES_EXTRA="${1-}"
 DOD_EXTRA="${2-}"
+DIRECTIVES_EXTRA=""
+DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 EOF
 }
 
@@ -76,6 +78,7 @@ base: BASE
 EOF
 }
 
+DIRECTIVES_FLOOR_DERIVED="$(grep '^DIRECTIVES_CORE=' "$HERE/unattended.sh" | sed 's/^DIRECTIVES_CORE="//; s/"$//' | wc -w)"
 CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
@@ -548,3 +551,56 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
+
+# ---- check 16, the DIRECTIVE REGISTRY joined to the table an agent reads. Nine branches, nine arms,
+# ---- each beside the green control the suite opened with. The join is a SECOND OPINION: a shell
+# ---- constant against a hand-authored markdown table in a different file. A generator would make
+# ---- the two agree by construction and check nothing.
+
+# arm 1: the kit ships no template at all — a broken install, not a project choice.
+reset_tree; mv tools/unattended/SKILL.template.md tools/unattended/SKILL.template.md.bak
+hit "$(run)" "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
+mv tools/unattended/SKILL.template.md.bak tools/unattended/SKILL.template.md
+
+# arm 2: a template with no readable row. This is the arm that matters most — without it the join
+# passes by finding nothing, which is the class this whole build keeps meeting.
+reset_tree; grep -v '^| `[a-z]' tools/unattended/SKILL.template.md > t.md && mv t.md tools/unattended/SKILL.template.md
+hit "$(run)" "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
+
+# arm 3: a row citing two sections has no single answer to read.
+reset_tree; sed -i 's/| `minimal-prose` | the transcript rule under a mandate | M10 |/| `minimal-prose` | the transcript rule under a mandate M2 | M10 |/' tools/unattended/SKILL.template.md
+hit "$(run)" "a directive row cites more than one build-method section, so the join has no single answer to read for that handle"
+
+# arm 4: declared in the registry, absent from the table.
+reset_tree; sed -i '/| `wrap-up-derived` |/d' tools/unattended/SKILL.template.md
+hit "$(run)" "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown"
+
+# arm 5: in the table, absent from the registry — the other direction, and it needs its own arm
+# because a one-way containment check would pass here.
+reset_tree; sed -i 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="/' tools/unattended/unattended.sh
+hit "$(run)" "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept"
+
+# arm 6: a cited section that does not resolve. Arm B is SILENT without the carrier, so the fixture
+# has to HAVE one for this to be reachable at all.
+reset_tree; printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n' > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach:"
+rm -f memory/guides/BUILD-METHOD.md
+
+# arm 7: the floor undeclared.
+reset_tree; sed -i '/^DIRECTIVES_FLOOR=/d' .unattended.conf
+hit "$(run)" "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
+
+# arm 8: the floor malformed. Undeclared and malformed are separate branches, mirroring CORE_FLOOR,
+# because either one leaves the pin unenforced while the conf still looks configured.
+reset_tree; sed -i 's/^DIRECTIVES_FLOOR=.*/DIRECTIVES_FLOOR="eleven"/' .unattended.conf
+hit "$(run)" "DIRECTIVES_FLOOR is not a plain integer, so the shrink-only pin on the directive set is unenforced while the conf still looks configured"
+
+# arm 9: the core set shrunk below its floor.
+reset_tree; sed -i 's/^DIRECTIVES_CORE="[a-z-]*:M[0-9]* /DIRECTIVES_CORE="/' tools/unattended/unattended.sh
+hit "$(run)" "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it"
+
+# ---- and the green control AGAIN, after nine mutations. reset_tree restores refs as well as the
+# ---- work tree, but a suite that only ever reds is a suite that arms every branch and checks
+# ---- nothing; this is what says the mutations above were the cause.
+reset_tree
+same "the tree is still clean after nine mutations" "$(run >/dev/null 2>&1; echo $?)" "0"

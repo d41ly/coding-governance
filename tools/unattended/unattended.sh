@@ -738,9 +738,13 @@ verb_plan() { # slug
   # exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
   # discarded-signal defect this kit has already paid for once - a build whose markers are duplicated
   # or transposed would otherwise get the complete-looking list this unit exists to stop printing.
-  if grep -qF -- "$ROSTER_OPEN" "$(readme_of "$slug")" 2>/dev/null; then
-    if ! region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
-      fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $(readme_of "$slug")"
+  # The path is bound to a NAME. check-arms reads the literal text up to the first interpolation as
+  # the branch's signature, and a $( ) inside the message lands IN that signature - so no arm can
+  # ever match it. Same class as the positional trap this repo already documents.
+  local _rmp; _rmp=$(readme_of "$slug")
+  if grep -qF -- "$ROSTER_OPEN" "$_rmp" 2>/dev/null; then
+    if ! region "$_rmp" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
+      fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
       return 1
     fi
   fi

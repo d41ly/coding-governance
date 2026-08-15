@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. FIFTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. SIXTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -46,7 +46,7 @@ if [ ! -f "$CONF" ]; then
 fi
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
-KICKOFF_ENGINE=""; KICKOFF_EXITS=""
+KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -74,6 +74,7 @@ core_of() { # KEY  ->  the quoted value from $DRIVER
 }
 PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
+DIRECTIVES_CORE=$(core_of DIRECTIVES_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
@@ -411,6 +412,69 @@ if [ -n "$KICKOFF_ENGINE" ]; then
         || fail 12 "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS"
     fi
   fi
+fi
+
+
+# ---- 16: the DIRECTIVE REGISTRY, joined to the table an agent actually reads. Three arms.
+# ----
+# ---- Arm A is a SECOND OPINION, not a recomputation. The driver's constant and the Skill's
+# ---- hand-authored table are two different artifacts in two different languages; joining them
+# ---- catches a handle added to one and forgotten in the other, which is the drift this build's
+# ---- whole pointer-not-copy design depends on not happening. A generator would make the two agree
+# ---- by construction and check nothing.
+tmpl="$HERE/SKILL.template.md"
+if [ ! -f "$tmpl" ]; then
+  fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
+else
+  # By CONTENT, never by column ordinal: the handle is the row's first backticked cell and the
+  # carrier is its M<n> token wherever it sits. A table whose columns are reordered still joins.
+  tbl=$(tr -d '\r' < "$tmpl" | sed -n 's/^[[:space:]]*|[[:space:]]*`\([a-z][a-z-]*\)`[[:space:]]*|.*/\1/p' | sort -u)
+  tblpairs=$(tr -d '\r' < "$tmpl" | awk -F'|' '
+    /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+      h = ""; c = ""; n = 0
+      for (i = 2; i <= NF; i++) {
+        cell = $i
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+        if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+        if (cell ~ /^M[0-9]+$/) { c = cell; n++ }
+      }
+      if (h != "" && n == 1) print h ":" c
+      else if (h != "" && n != 1) print h ":AMBIGUOUS"
+    }' | sort -u)
+  if [ -z "$tbl" ]; then
+    fail 16 "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
+  else
+    case "$tblpairs" in *":AMBIGUOUS"*)
+      fail 16 "a directive row cites more than one build-method section, so the join has no single answer to read for that handle" ;;
+    esac
+    core=$(printf '%s\n' $DIRECTIVES_CORE | sort -u)
+    only_reg=$(comm -23 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
+    only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
+    [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"
+    [ -z "$only_tbl" ] || fail 16 "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: $only_tbl"
+  fi
+  # Arm B: every cited section RESOLVES. SILENT when the carrier is absent — the leg grades the
+  # TREE and an adopter may install this kit without the memory-tree one; the DRIVER is what grades
+  # the RUN, and unit 4's refusal is where a missing carrier actually stops something.
+  if [ -f "$M/guides/BUILD-METHOD.md" ]; then
+    for pair in $core; do
+      sec=${pair#*:}
+      grep -qE "^## $sec( |\$)" "$M/guides/BUILD-METHOD.md" \
+        || fail 16 "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach: $pair"
+    done
+  fi
+fi
+# Arm C: the floor. Mirrors CORE_FLOOR's two branches — undeclared and malformed are both refusals,
+# because either one leaves the pin unenforced while the conf still looks configured.
+if [ -z "$DIRECTIVES_FLOOR" ]; then
+  fail 16 "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
+else
+  case "$DIRECTIVES_FLOOR" in
+    ''|*[!0-9]*) fail 16 "DIRECTIVES_FLOOR is not a plain integer, so the shrink-only pin on the directive set is unenforced while the conf still looks configured: $DIRECTIVES_FLOOR" ;;
+    *) ndir=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+       [ "$ndir" -ge "$DIRECTIVES_FLOOR" ] \
+         || fail 16 "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it: $ndir against $DIRECTIVES_FLOOR" ;;
+  esac
 fi
 
 exit "$status"
