@@ -869,7 +869,22 @@ verb_preflight() { # slug · keepalive-id
     return 1
   fi
   mv "$tmp" "$rel"; rm -f "$payload"
-  set_fact "$rel" base "$base"      || return 1
+  # TOOL-cBriefedPilot-5 - the BASE is pinned ONCE, in the same shape as the phase write below. It
+  # used to be rewritten on every preflight, so the verb a run is TOLD to re-run after a compaction
+  # silently re-pinned the run against a merge-base that had moved underneath it - and the mandated
+  # lander reconciles origin before the gate, so on this fleet it moves on most runs.
+  #
+  # Protocol section 2 calls the base a runtime observation pinned ONCE at run start. This is the
+  # line that makes that sentence true rather than aspirational.
+  #
+  # The anchor triple below is deliberately NOT frozen with it. Freezing it is behaviour-neutral
+  # today and probably right, but it widens this unit past its scoped line and section 2's wording
+  # belongs to another unit; the fork is parked in the run-state file rather than taken.
+  [ -n "$(fact "$rel" base)" ] || set_fact "$rel" base "$base" || return 1
+  # Re-read, so the echo below reports what is ON the record rather than what was just derived. A
+  # second preflight that printed a base it did not write would be the same lie in the operator's
+  # face that the unconditional write was on disk.
+  base=$(fact "$rel" base)
   set_fact "$rel" anchor-ref "$AREF" || return 1
   set_fact "$rel" anchor-sha "$ASHA" || return 1
   set_fact "$rel" anchor-url "$AURL" || return 1

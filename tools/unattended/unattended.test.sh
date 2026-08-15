@@ -577,6 +577,24 @@ out=$(run --preflight tFresh --keepalive-id KA-1234)
 hit "$out" "preflight OK"
 miss "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
 
+# ---- TOOL-cBriefedPilot-5: the BASE is pinned ONCE. Re-preflight is the verb a run is TOLD to
+# ---- re-run after a compaction, and it used to re-pin against a merge-base that had moved - which
+# ---- the mandated lander makes happen on most runs, because it reconciles origin before the gate.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+base1=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
+same "the first preflight wrote a base" "$([ -n "$base1" ] && echo yes || echo no)" "yes"
+# advance the anchor and reconcile it, which is exactly what the lander does before the gate
+git -C "$ORIGIN" --work-tree=. --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+git checkout -q main && echo advance >> advance.txt && git add -A && git commit -q -m advance --no-verify
+git push -q "$ORIGIN" main 2>/dev/null || true
+git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1 || true
+git fetch -q "$ORIGIN" 2>/dev/null || true
+out=$(run --preflight tRun --keepalive-id k1)
+base2=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
+same "the base did not move on the second preflight" "$base2" "$base1"
+hit "$out" "base $base1"
+
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")
