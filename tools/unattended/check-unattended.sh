@@ -431,9 +431,10 @@ core=$(printf '%s\n' $DIRECTIVES_CORE | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
-  # By CONTENT, never by column ordinal: the handle is the row's first backticked cell and the
-  # carrier is its M<n> token wherever it sits. A table whose columns are reordered still joins.
-  tbl=$(tr -d '\r' < "$tmpl" | sed -n 's/^[[:space:]]*|[[:space:]]*`\([a-z][a-z-]*\)`[[:space:]]*|.*/\1/p' | sort -u)
+  # The handle must be the row's FIRST cell; the carrier is its M<n> token wherever it sits, so the
+  # M<n> column may move but the handle column may not. A `tbl` sed used to sit here duplicating this
+  # awk's row filter in BRE — non-empty in exactly the same cases, readable only by the emptiness
+  # test below. Two grammars over one row shape, and no input could tell them apart, so one is gone.
   tblpairs=$(tr -d '\r' < "$tmpl" | awk -F'|' '
     /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
       h = ""; c = ""; n = 0
@@ -446,7 +447,7 @@ else
       if (h != "" && n == 1) print h ":" c
       else if (h != "" && n != 1) print h ":AMBIGUOUS"
     }' | sort -u)
-  if [ -z "$tbl" ]; then
+  if [ -z "$tblpairs" ]; then
     fail 16 "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
   else
     case "$tblpairs" in *":AMBIGUOUS"*)

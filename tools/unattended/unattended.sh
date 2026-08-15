@@ -779,7 +779,15 @@ verb_plan() { # slug
       continue
     fi
     id=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
-    [ -n "$id" ] || id=$(basename "$spec" .md)
+    # NO basename fallback. `spec_ids` prints only when BOTH the status header and the id parse, so a
+    # fallback here made the two halves disagree about an unparseable heading: the file listed under
+    # its basename with a real status, and the SAME unit counted absent by `missing_units` — printed
+    # twice, once as a phantom MISSING that sends an unattended agent to re-spec a specced unit.
+    # Zero divergent files across all tracked specs today; this keeps both halves blind alike.
+    if [ -z "$id" ]; then
+      printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+      continue
+    fi
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
     printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
@@ -1006,7 +1014,9 @@ verb_preflight() { # slug · keepalive-id
     return 1
   fi
   mv "$tmp" "$rel"; rm -f "$payload"
-  # TOOL-cBriefedPilot-5 - the BASE is pinned ONCE, in the same shape as the phase write below. It
+  # The BASE is pinned ONCE, in the same shape as the phase write below (the unit that established
+  # this is deliberately NOT named: its spec is non-terminal, and the drift signal for non-terminal
+  # specs cited by product source sits at its shrink-only pin, so naming one reds the bar). It
   # used to be rewritten on every preflight, so the verb a run is TOLD to re-run after a compaction
   # silently re-pinned the run against a merge-base that had moved underneath it - and the mandated
   # lander reconciles origin before the gate, so on this fleet it moves on most runs.

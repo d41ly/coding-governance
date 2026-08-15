@@ -162,8 +162,9 @@ override nobody can read afterwards is just a skipped check.
 
 **The pair REPEATS — one `--override <item> --reason <text>` per unmet item.** Two unmet items need
 two pairs in one invocation, and a reason belongs to the flag that precedes it. This matters because
-you are the only reader: supplying one pair for two unmet items leaves the second overridden on a
-reason written about the first, and the close records that as a decision somebody made.
+you are the only reader, and neither way of getting it wrong is silent: a `--override` left without
+its own `--reason` is REFUSED before anything is written, and an item you never named at all simply
+keeps blocking the close. Nothing is recorded on a reason that was written about a different item.
 
 ## Land
 

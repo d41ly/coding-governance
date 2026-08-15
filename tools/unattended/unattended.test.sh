@@ -577,7 +577,8 @@ out=$(run --preflight tFresh --keepalive-id KA-1234)
 hit "$out" "preflight OK"
 miss "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
 
-# ---- TOOL-cBriefedPilot-5: the BASE is pinned ONCE. Re-preflight is the verb a run is TOLD to
+# ---- The BASE is pinned ONCE (unit deliberately unnamed — non-terminal spec, and the drift signal
+# ---- for those cited by product source is at its pin). Re-preflight is the verb a run is TOLD to
 # ---- re-run after a compaction, and it used to re-pin against a merge-base that had moved - which
 # ---- the mandated lander makes happen on most runs, because it reconciles origin before the gate.
 reset_tree

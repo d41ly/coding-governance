@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-15T22:15:00+03:00 @ 709d260da8c81551e59da769aceca47202bb5923
+last-audit: 2026-08-16T02:40:00+03:00 @ 709d260da8c81551e59da769aceca47202bb5923
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5fd7c7efaa3942ea5fd77777c74bbee7ef132787
+last-body-change: 9297f7dd6e5d67207cf4458f6ff9a8df63c336ae
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -56,6 +56,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
+- **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
+  POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
+  preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
+  registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
+  the handles are written here — that is the drift the pointer design exists to avoid.
 
 ### Pointer map (load the row(s) the task touches)
 
