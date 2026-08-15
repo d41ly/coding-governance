@@ -47,14 +47,36 @@ distinction real.
    `{{MEMORY_ROOT}}/builds/<slug>/README.md` committed before your branch existed is the whole
    precondition. Preflight refuses a build folder you created, because a run that authorizes itself
    has no authorization. You also do not create the run-state file: preflight does that.
-2. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
+2. **If — and only if — the invocation named a directive to waive: THIS IS THE LAST OWNER TURN.**
+   Skip this step entirely when no handle was named, which is the ordinary case.
+
+   Ask **once**, with a single `AskUserQuestion` covering every named handle together. Not one call
+   per handle: the owner is trying to walk away, and a three-round conversation at that moment is
+   the thing this whole kit exists to remove. More than four handles go in groups of four, because
+   that is the call's own limit.
+
+   **DEFAULT-DENY. A handle named on the invocation line but not confirmed WITH A REASON is not
+   waived.** The flag requests the question; the answer grants the waiver. An agent that mis-parses
+   the line and invents a handle gets a question, not a silent relaxation. Carry each confirmed pair
+   into step 3 as `--waive <handle> --reason "<text>"`, repeatable.
+
+   Say what the waiver costs, for the two handles that have a consequence: `reuse-first` is silent
+   and is recommended against, and `land-once-done` still owes an override at close.
+
+   **From the next command onward there is nobody to ask.** The driver enforces that rather than
+   trusting it — `--waive` is accepted by `--preflight` alone, and only while no run-state file
+   exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
+   a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
+
+3. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
    store is in-memory and session-scoped, reachable only through your own tool calls. Use
    `{{KEEPALIVE_CREATE}}`, at the cadence this project declares — {{KEEPALIVE_INTERVAL}}. Keep the
    id it returns.
-3. **Preflight**, handing over that id:
+4. **Preflight**, handing over that id and any waiver pairs step 2 confirmed:
 
    ```bash
    bash {{KIT_DIR}}/unattended.sh --preflight <slug> --keepalive-id <id>
+   bash {{KIT_DIR}}/unattended.sh --preflight <slug> --keepalive-id <id> --waive <handle> --reason "<why>"
    ```
 
    It refuses on a dirty tree, on the default branch, on an unwired repo, when the build README is
