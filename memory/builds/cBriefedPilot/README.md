@@ -182,30 +182,37 @@ than adding an attestation line the run ticks for itself.
 
 The roster. This table is the roster, not the `ids:` key.
 
-| # | Unit | Tier | Mechanism | Depends on | State |
-|---|---|---|---|---|---|
-| 1 | `TOOL-cBriefedPilot-1` | 1 | one accumulator parses repeated flag/value/reason triples; `--override` becomes repeatable | — | MISSING |
-| 2 | `TOOL-cBriefedPilot-2` | 1 | the kit-owned `DIRECTIVES_CORE` of eleven pointer pairs | — | READY |
-| 3 | `TOOL-cBriefedPilot-3` | 2 | `--waive` at preflight: validated, parked, staged | 1, 2 | READY |
-| 4 | `TOOL-cBriefedPilot-4` | 1 | preflight refuses when the derived build-method carrier is absent | — | MISSING |
-| 5 | `TOOL-cBriefedPilot-5` | 1 | the recorded BASE is written once, not re-pinned per preflight | — | MISSING |
-| 6 | `TOOL-cBriefedPilot-6` | 2 | `--plan` sees a planned unit that has no spec | — | MISSING |
-| 7 | `TOOL-cBriefedPilot-7` | 2 | the `build-complete` Definition-of-Done item, over a roster marker now MANDATORY in an unattended build's README (P3) | 1, 6 | MISSING |
-| 8 | `TOOL-cBriefedPilot-8` | 2 | the `closing-review-recorded` Definition-of-Done item | 1, 5 | MISSING |
-| 9 | `TOOL-cBriefedPilot-9` | 1 | the Skill's directive table and its hard step 0 | 2 | READY |
-| 10 | `TOOL-cBriefedPilot-10` | 1 | the Skill's waiver turn — one AskUserQuestion, default-deny | 9 | READY |
-| 11 | `TOOL-cBriefedPilot-11` | 1 | the Skill's kickoff step and the README-as-roster read | 10 | MISSING |
-| 12 | `TOOL-cBriefedPilot-12` | 2 | leg check 16 — the registry join, both directions | 2, 9 | MISSING |
-| 13 | `TOOL-cBriefedPilot-13` | 2 | leg check 17 — a waiver line names a declared handle and a reason, AND is present in the FIRST committed blob of the run-state file | 3, 12 | MISSING |
-| 14 | `TOOL-cBriefedPilot-14` | 1 | leg check 18 — the Skill names kickoff AFTER preflight | 11 | MISSING |
-| 21 | `TOOL-cBriefedPilot-21` | 2 | the parallelism mechanism hunt — does ANY route dispatch a build pass concurrently without voiding the directive layer? | — | MISSING |
-| 15 | `TOOL-cBriefedPilot-15` | 2 | M6's parallelism inversion — shape decided by unit 21; if no route survives, this unit ships the finding instead of the inversion | 21 | MISSING |
-| 16 | `TOOL-cBriefedPilot-16` | 1 | the method's pointers name the new layer; M10's delta index count is unit 16 §8's fork, three or four depending on unit 15's branch | 15 | MISSING |
-| 17 | `TOOL-cBriefedPilot-17` | 1 | `check-kit-versions.sh` pairs the shipped protocol marker | — | MISSING |
-| 18 | `TOOL-cBriefedPilot-18` | 2 | the protocol pair gains §10 and the domain-rules enumeration | 3, 7, 8, 13, 16 | MISSING |
-| 22 | `TOOL-cBriefedPilot-22` | 1 | check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table | 12, 18 | MISSING |
-| 19 | `TOOL-cBriefedPilot-19` | 1 | the kit identifies as version 1.5 | 17, 18, 22 | MISSING |
-| 20 | `TOOL-cBriefedPilot-20` | 1 | the dossiers, the closed rows, the stale row F5 names | all | MISSING |
+*The `State` column is gone deliberately. Option A of this unit's resolved fork: `check_authorization`
+byte-compares the roster slice across the pinned BASE, so anything inside the markers that MOVES as
+units land makes `authorization-reachable` unmeetable — and that item has no override. State is
+already derived twice, by `gen:build-index` and by `--plan`.*
+
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism | Depends on |
+|---|---|---|---|---|
+| 1 | `TOOL-cBriefedPilot-1` | 1 | one accumulator parses repeated flag/value/reason triples; `--override` becomes repeatable | — |
+| 2 | `TOOL-cBriefedPilot-2` | 1 | the kit-owned `DIRECTIVES_CORE` of eleven pointer pairs | — |
+| 3 | `TOOL-cBriefedPilot-3` | 2 | `--waive` at preflight: validated, parked, staged | 1, 2 |
+| 4 | `TOOL-cBriefedPilot-4` | 1 | preflight refuses when the derived build-method carrier is absent | — |
+| 5 | `TOOL-cBriefedPilot-5` | 1 | the recorded BASE is written once, not re-pinned per preflight | — |
+| 6 | `TOOL-cBriefedPilot-6` | 2 | `--plan` sees a planned unit that has no spec | — |
+| 7 | `TOOL-cBriefedPilot-7` | 2 | the `build-complete` Definition-of-Done item, over a roster marker now MANDATORY in an unattended build's README (P3) | 1, 6 |
+| 8 | `TOOL-cBriefedPilot-8` | 2 | the `closing-review-recorded` Definition-of-Done item | 1, 5 |
+| 9 | `TOOL-cBriefedPilot-9` | 1 | the Skill's directive table and its hard step 0 | 2 |
+| 10 | `TOOL-cBriefedPilot-10` | 1 | the Skill's waiver turn — one AskUserQuestion, default-deny | 9 |
+| 11 | `TOOL-cBriefedPilot-11` | 1 | the Skill's kickoff step and the README-as-roster read | 10 |
+| 12 | `TOOL-cBriefedPilot-12` | 2 | leg check 16 — the registry join, both directions | 2, 9 |
+| 13 | `TOOL-cBriefedPilot-13` | 2 | leg check 17 — a waiver line names a declared handle and a reason, AND is present in the FIRST committed blob of the run-state file | 3, 12 |
+| 14 | `TOOL-cBriefedPilot-14` | 1 | leg check 18 — the Skill names kickoff AFTER preflight | 11 |
+| 21 | `TOOL-cBriefedPilot-21` | 2 | the parallelism mechanism hunt — does ANY route dispatch a build pass concurrently without voiding the directive layer? | — |
+| 15 | `TOOL-cBriefedPilot-15` | 2 | M6's parallelism inversion — shape decided by unit 21; if no route survives, this unit ships the finding instead of the inversion | 21 |
+| 16 | `TOOL-cBriefedPilot-16` | 1 | the method's pointers name the new layer; M10's delta index count is unit 16 §8's fork, three or four depending on unit 15's branch | 15 |
+| 17 | `TOOL-cBriefedPilot-17` | 1 | `check-kit-versions.sh` pairs the shipped protocol marker | — |
+| 18 | `TOOL-cBriefedPilot-18` | 2 | the protocol pair gains §10 and the domain-rules enumeration | 3, 7, 8, 13, 16 |
+| 22 | `TOOL-cBriefedPilot-22` | 1 | check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table | 12, 18 |
+| 19 | `TOOL-cBriefedPilot-19` | 1 | the kit identifies as version 1.5 | 17, 18, 22 |
+| 20 | `TOOL-cBriefedPilot-20` | 1 | the dossiers, the closed rows, the stale row F5 names | all |
+<!-- /roster:units -->
 
 *Units 21 and 22 are listed in BUILD order, not id order — 21 must precede 15 because it decides
 15's shape, and 22 follows 18 because it joins against the tables 18 writes.*

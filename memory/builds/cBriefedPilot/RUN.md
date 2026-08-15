@@ -33,7 +33,7 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d1eeac1b8caa5d79203e5d5dc79adcf99043a1f6
+witness: d5bd482d0cb1f606e61b76b544383a6a1ef71b01
 phase: BUILDING
 keepalive: ad706085
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -63,3 +63,33 @@ them back — which makes it cheap, not authorized. The fork stays open and unit
 recorded verdict token as the resolver, and that token does not exist until the hunt runs. It is
 sequenced, not refused: the branch is a read of unit 21's finding, not a decision this run may make
 early. Recorded here so a resumed run does not mistake it for an unswept fork.
+
+**PARKED 2026-08-15 · unit 7 (`build-complete`) is reverted, and the reason is scope rather than
+design.** The item itself is sound and was built: `build-complete:machine` on `DOD_CORE`, a five-term
+conjunction in `dod_met`, `CORE_FLOOR` at `10:7`. The roster join it rests on was confirmed working
+against the LIVE tree — `--plan` reports 22 ids, 0 with no tracked spec.
+
+What defeated it is the test fixture, not the item. `build-complete` is the first DoD item that
+constrains the SHAPE OF THE BUILD FOLDER rather than the state of the run, so every pre-existing
+close-path arm — five of them, none about completeness — needs a build that is complete. The fixture
+cannot supply that without a refactor: `tRun` has to stay non-terminal for the `--status` arms, the
+S8 arms construct roster mismatches on purpose so a default roster breaks them, and `records-current`
+diffs the README slice against the run-state copy so any row edit has to move both. I attempted the
+integration six times. Three attempts left the failure count unchanged, and the last made it worse —
+25 failures against the 9 I started with.
+
+The options I saw were to keep patching arm by arm, to refactor the fixture's build shape inside this
+unit, or to revert and park. I refused the second: it is a change to the shared harness every other
+unit's arms run against, it was not priced in this spec's S7, and M6 says a pass whose gate is red is
+not followed by another. Patching arm by arm had already failed three times on a diagnosis I could
+not make stick.
+
+What stays: `memory/builds/cBriefedPilot/README.md` keeps its roster markers with the `State` column
+outside them, per this unit's resolved fork. That edit is independent of the item, it is what P3
+obliges of every unattended build, and it is safe here specifically because the pair is ABSENT at
+this run's pinned BASE — so `check_authorization` takes its opt-in-by-presence branch. The NEXT run
+will not have that property, which is what the fork's §8 warned.
+
+What the next attempt needs, so it is not re-derived: the fixture wants a build shape that is
+complete by default with explicit opt-outs, not a complete-build helper seeded per arm. That is a
+unit of its own and it should be specced before it is built.
