@@ -259,6 +259,7 @@ owner declined, and it is recorded because unit 22's join depends on it.
 
 - rev-4 · 2026-08-15 · §8's audit fold. S12b and AC9b: §1 reads `Three properties` over FOUR bullets in both halves, in
   the very section S12 rewrites — the same class as the five-against-seven comment S9 fixes.
+
 ## 10. Reuse audit
 
 - **The protocol pair itself, `tools/unattended/PROTOCOL.template.md` and

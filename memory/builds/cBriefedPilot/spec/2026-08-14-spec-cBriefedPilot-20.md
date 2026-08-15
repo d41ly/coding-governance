@@ -161,6 +161,7 @@ edit, argued in §4 rather than left open.
 - rev-3 · 2026-08-15 · §8's audit fold. S3 now EXCLUDES `TOOL-cBriefedPilot-23`, the residual the M3 veto deliberately
   preserved, which S3 would otherwise have closed and silently undone. S4b and S5b give unit 21's
   verdict token a record owner, so the next run reads a decision instead of re-deriving it.
+
 ## 10. Reuse audit
 
 - **`memory/map/features/*.md`'s Gaps sections** — the seam extended, and the one this repo has

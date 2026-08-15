@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -142,8 +142,11 @@ The join is not the control that binds; §9 names the one that does.
 - **AC5** — When the run-state file has never been committed, the shape checks still run and the
   join prints nothing.
 - **AC6** — The fixture's green control still exits 0 and prints nothing with check 17 live.
-- **AC7** — `python tools/memory-tree/check-arms.py` is green with the raised `ARMS_FLOORS`, and red
-  with the floor left unraised.
+- **AC7** — `python tools/memory-tree/check-arms.py` is green with the branch armed and the floor
+  raised, and RED when the branch is present and its arm is removed — twice over: once naming
+  the unarmed branch, once at the armed count against the raised floor. *An UNRAISED floor does
+  NOT red on an added branch: `ARMS_FLOORS` is a one-sided minimum, so a higher count passes.
+  Measured on unit 4, where the same wording was an acceptance criterion no run could fail.*
 
 ## 7. Gates
 
@@ -176,6 +179,10 @@ and `grep -qF` needs no parser at all.
 - rev-2 · 2026-08-15 · §8's audit fold. S7 now requires at least one arm whose waiver line is PRODUCED by the driver and
   committed, not hand-authored, and §10 cites `TOOL-aStandingWrit-8` — the row naming this kit's
   driver-arms-and-leg-arms-but-never-both gap, which is exactly what the join needs closed.
+- rev-3 · 2026-08-15 · the acceptance criterion asserting that an UNRAISED `ARMS_FLOORS`
+  reds is corrected against measurement. It cannot: the floor is a one-sided minimum and a
+  higher branch count passes. Found on unit 4 and swept across the set; three specs carried it.
+
 ## 10. Reuse audit
 
 - **Check 13's blob read** — the seam. It already derives a path from the run-state file's own

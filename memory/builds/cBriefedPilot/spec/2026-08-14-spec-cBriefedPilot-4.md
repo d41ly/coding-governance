@@ -149,6 +149,7 @@ its own stated reason. The build README records both.
   one-sided minimum. Observed: floor unraised exits 0, arm removed exits 1. AC5 now names the
   observation that exists. The `--preflight` count in §4's Rollout was 61 when this spec was
   authored and is 66 today — unit 1's arms moved it; AC4 is the property, not the number.
+
 ## 10. Reuse audit
 
 - **`verb_resume` at `tools/unattended/unattended.sh:910`** — the seam. It already derives

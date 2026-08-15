@@ -128,6 +128,7 @@ withdrawn.
 
 - rev-3 · 2026-08-15 · §8's audit fold. AC1's bare-`1.4` clause was measured FALSE against this tree — five legitimate
   hits survive outside `memory/` — so it is scoped to the kit's own version tokens.
+
 ## 10. Reuse audit
 
 - **`tools/check-kit-versions.sh`** — the seam this unit is graded by rather than one it extends.

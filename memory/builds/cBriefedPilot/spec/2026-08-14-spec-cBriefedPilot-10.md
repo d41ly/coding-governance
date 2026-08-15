@@ -137,6 +137,7 @@ Resolver: agent, if the owner does not take it.
 - rev-4 · 2026-08-15 · §8's audit fold. The ordering echo was WRONG — it dropped unit 3's `OR the requested set equals the
   recorded one`, which would have forbidden the post-compaction re-preflight unit 3's S5 and unit 5's
   §4 both require. Unit 3 is the document that was right; this was one of two bad echoes.
+
 ## 10. Reuse audit
 
 No existing seam fits, and the evidence is that nothing in this repo takes an interactive turn from

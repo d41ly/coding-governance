@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else
 
-**Status:** OPEN · rev-5 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-6 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -154,7 +154,11 @@ rewrites. The refusal is a mirror of the one `verb_abort` already carries for th
 - **AC5** — When a byte-identical preflight is re-run over a live record, the parked region is
   diff-equal; when a DIFFERING set is re-run, the driver refuses and changes nothing.
 - **AC6** — Each of the five refusals is observed RED with its arm in place and its branch removed.
-- **AC7** — `check-arms.py` is green with the raised floor, and red with the floor left unraised.
+- **AC7** — `python tools/memory-tree/check-arms.py` is green with the branch armed and the floor
+  raised, and RED when the branch is present and its arm is removed — twice over: once naming
+  the unarmed branch, once at the armed count against the raised floor. *An UNRAISED floor does
+  NOT red on an added branch: `ARMS_FLOORS` is a one-sided minimum, so a higher count passes.
+  Measured on unit 4, where the same wording was an acceptance criterion no run could fail.*
 
 ## 7. Gates
 
@@ -210,6 +214,10 @@ recorded because §4's idempotence rule depends on it.
   for another verb, so a guard there can never fire; it is a dispatch guard, and §4 and §10 follow.
   S2 allocates checks 37-41, and refusal 2 now states that an invocation naming no handle is not a
   refusal, which is what makes unit 5's mandatory pre-close `--preflight` legal over a waived run.
+- rev-6 · 2026-08-15 · the acceptance criterion asserting that an UNRAISED `ARMS_FLOORS`
+  reds is corrected against measurement. It cannot: the floor is a one-sided minimum and a
+  higher branch count passes. Found on unit 4 and swept across the set; three specs carried it.
+
 ## 10. Reuse audit
 
 Four existing seams, all extended rather than duplicated.

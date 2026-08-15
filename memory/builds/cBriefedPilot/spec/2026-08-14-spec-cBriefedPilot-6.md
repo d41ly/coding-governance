@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -125,8 +125,12 @@ acceptance criterion, so a refactor and a new rule are never in the same reviewa
   including the sentence that a planned unit with no spec is invisible.
 - **AC4** — `--status`'s next-unit line is byte-identical before and after the S6 extraction, on a
   fixture with one non-terminal unit and one terminal one.
-- **AC5** — The check-37 branch is observed RED with its arm in place and its branch removed, and
-  `check-arms.py` is red with the driver's `ARMS_FLOORS` left unraised.
+- **AC5** — The new refusal is observed RED with its arm in place and its branch removed, and
+  `python tools/memory-tree/check-arms.py` is green with the branch armed and the floor
+  raised, and RED when the branch is present and its arm is removed — twice over: once naming
+  the unarmed branch, once at the armed count against the raised floor. *An UNRAISED floor does
+  NOT red on an added branch: `ARMS_FLOORS` is a one-sided minimum, so a higher count passes.
+  Measured on unit 4, where the same wording was an acceptance criterion no run could fail.*
 
 ## 7. Gates
 
@@ -154,6 +158,10 @@ has already shipped that mistake once.
 
 - rev-3 · 2026-08-15 · §8's audit fold. S4's check number is DERIVED rather than the literal 37, which was stale before it
   could be read: unit 3 lands first and takes 37 through 41.
+- rev-4 · 2026-08-15 · the acceptance criterion asserting that an UNRAISED `ARMS_FLOORS`
+  reds is corrected against measurement. It cannot: the floor is a one-sided minimum and a
+  higher branch count passes. Found on unit 4 and swept across the set; three specs carried it.
+
 ## 10. Reuse audit
 
 - **`region()` and the `ROSTER_OPEN` / `ROSTER_CLOSE` pair in `tools/unattended/unattended.sh`** —
