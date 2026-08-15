@@ -168,7 +168,7 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
 
 ## 3d — Adopt the drift-audit kit (optional, recommended)
 
-Does this repo's own RECORD of its state still match reality? Five signals over stdlib + git, seconds,
+Does this repo's own RECORD of its state still match reality? Signals over stdlib + git, seconds,
 no agents. It reads `.memory-tree.conf` and **refuses** without it, so §3 comes first.
 
 1. `cp -r <gov>/tools/drift-audit <project>/tools/drift-audit`

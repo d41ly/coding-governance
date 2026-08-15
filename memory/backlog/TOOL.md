@@ -1,6 +1,8 @@
 # tooling backlog
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
+> Rows that reached CLOSED or WONTDO before 2026-08-14 are frozen in
+> `../archive/TOOL.2026-08-14.md`, rotated when this index hit its size cap.
 - TOOL-aRootedPrefix-3 · OPEN · hygiene checks 6/7 measure RAW working-tree bytes, so an adopter without the eol=lf pin still gets a platform-dependent cap and entry budget — normalize before measuring, as `check-template-size.sh` already does
 - TOOL-aNumeralWarden-2 · OPEN · agent-cap's enclosing-opener walk is defeated by two nested wrappers or 59 lines of distance between the `.map` and the `agent(` call; it needs a statement-level walk, not an opener count, and the 58/59 boundary is unfixtured
 - TOOL-aNumeralWarden-3 · OPEN · a drift-audit pin RAISE is indistinguishable from a population drain to every gate leg; `--check` compares only `value > pin`, so `ORPHAN_ID_PIN` 4 -> 5 and `handkept` 1 -> 7 both landed unchallenged
@@ -37,3 +39,7 @@
 - TOOL-cFinalBerth-5 · OPEN · the run-gates canary's `par*2 < ser` ratio FLIPS run to run on one tree: red then GREEN on consecutive full bars at 550d9b6, no edit between; the red missed by 4.5% (7705x2 vs 14753). Its fixtures are fixed sleeps, so the margin is overhead-dependent by construction
 - TOOL-cTracedPromise-2 · OPEN · the §6 acceptance-witness rule, deferred from cTracedPromise on cost: require each AC bullet to name a machine-checkable witness. Candidates measured at 123 of 359 AC bullets across 33 CLOSED specs
 - TOOL-cTracedPromise-3 · OPEN · tighten `closed_specs_with_no_product_commit` to an id-only key, the unit-level claim. Blocked on id-in-subject being universal: today it misses 3 of 13 against slug-or-id's 1
+- TOOL-cTracedPromise-4 · OPEN · `check-memory-hygiene.test.sh` printed an AUTHORED assertion count, stuck at 130 while arms landed under it. The numeral is deleted; derive one from the `hit`/`miss` and inline `st=1` arms instead
+- TOOL-cTracedPromise-5 · OPEN · an adopter who fills `TRACE_CUTOFF` before closing any spec after it reds `drift-audit records` with DEAD PROBE — the hole pushes them straight into it. Document `DECLARED_EMPTY` as the interim state
+- TOOL-cTracedPromise-6 · OPEN · hygiene check 10 resolves a rotated index's live counterpart by fixed path, so it is blind to every `memory/backlog/*.md` shard; a 48-row rotation went unnoticed. Resolve it anywhere under the memory root
+- TOOL-cTracedPromise-7 · OPEN · the unset-`TRACE_CUTOFF` row prints `DEAD PROBE` though `--check` ignores it: the status ladder reads `live` and never `gateable`. Print the note instead, so `not asked` and `blind` stop reading alike

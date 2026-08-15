@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-14
 streams: tooling
 roster: TOOL
-ids: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
+ids: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
 ---
 
 # cTracedPromise — a closed spec has to point at a commit that changed the product
@@ -45,24 +45,35 @@ another build. That is the difference between a measurement and a number.
 
 ## What this build changes
 
-One unit. A sixth drift-audit signal, `closed_specs_with_no_product_commit`, gateable, pinned at its
+Two units.
+
+**U1** — a sixth drift-audit signal, `closed_specs_with_no_product_commit`, gateable, pinned at its
 measured 1, date-gated by a project-layer `TRACE_CUTOFF` on each spec's status-header date so no
 landed spec is retroactively red and no in-flight one is exempted forever. It rides the two
 drift-audit legs already on the bar and adds none.
 
+**U2** — an acceptance-witness branch in check 12 of the memory-tree hygiene gate: once a spec's
+filename date reaches `SPEC_WITNESS_CUTOFF`, every acceptance bullet must name something in
+backticks. Both tiers, a forward ratchet, four fixtures. Added on the owner's instruction after D1
+below was put to them.
+
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | OPEN | rev-2 | 2026-08-14 |
-| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | OPEN | rev-3 | 2026-08-15 |
+| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | CLOSED | rev-3 | 2026-08-15 |
+| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | CLOSED | rev-4 | 2026-08-15 |
 <!-- /gen:build-index -->
 
 ## The owner decision menu
 
-**D1 — the §6 acceptance-witness rule, deferred from the approved scope. This is a cost decision, not
-an evidence-backed one, and the earlier draft of this section overstated it.** The kickoff card scoped
+**D1 — RESOLVED (owner, 2026-08-15): build it. Shipped as `TOOL-cTracedPromise-2`.** The record of
+what was put to them, and the correction the first draft needed, is kept below because the reasoning
+is what a later reader needs, not the outcome alone.
+
+**The deferral as it was argued. This was a cost decision, not an evidence-backed one, and the first
+draft of this section overstated it.** The kickoff card scoped
 a second unit: require each `AC<n>` in a spec's §6 to name a machine-checkable witness. The
 measurement above is **silent** on whether that rule is needed — all three oracles key on commit
 subjects and none of them reads a spec's §6 at all, so "no measured instance" was a claim the
@@ -76,8 +87,7 @@ act on.
 The argument for deferring is cost. That unit ratchets the spec format in a second kit, needing its
 own cutoff, a `KIT_MEMORY_TREE_VERSION` bump, the verdict-epoch gate, the hygiene parity floor and the
 arms floors — and it would grade 359 bullets on a shape rather than on whether the witness is real.
-Filed as a `TOOL` backlog row. **Say so if you want it built; this is a recommendation, not a
-refusal.**
+Filed as a `TOOL` backlog row, and then built when the owner asked for it in the same session.
 
 **D2 — what this signal cannot do, stated so it is not assumed.** It measures LINKAGE, not fidelity.
 A build that cites its unit correctly and then implements something else entirely passes it. Nothing

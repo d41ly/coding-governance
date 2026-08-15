@@ -432,13 +432,20 @@ def signal_closed_specs_untraceable(ctx) -> dict:
     # CLOSED flip landed, a base-only walk reds 2 of 13 CORRECT closes. The `drift-audit records` leg
     # carries an empty guard, so it runs on every branch-scoped bar — which is precisely when.
     #
+    # `--full-history` because `--no-merges` does NOT defeat default history simplification: a
+    # path-restricted walk drops a commit that is TREESAME with a parent, so a build's own
+    # product commit can vanish behind an unrelated merge and score a false MISS. Reproduced in
+    # a scratch repo with an `-s ours` merge. An earlier comment here claimed --no-merges
+    # settled the traversal question; the selftest's merge arm said the opposite, and the
+    # selftest was right.
+    #
     # `--no-merges` because a reconcile merge's subject names the branch being merged INTO, so it
     # certifies whichever build it was merged into rather than the build that shipped. Measured: with
     # merges counted this signal read 0 on the dogfood and one of those greens rested entirely on two
     # merge subjects belonging to another build. Dropping them also removes the default
     # history-simplification ambiguity, which would otherwise decide the answer by accident.
-    walk = ctx.git.run("log", ctx.git.base_ref, "HEAD", "--no-merges", "--format=%s",
-                       "--", *ctx.trace_globs)
+    walk = ctx.git.run("log", ctx.git.base_ref, "HEAD", "--no-merges", "--full-history",
+                       "--format=%s", "--", *ctx.trace_globs)
     subjects = walk.stdout if walk.returncode == 0 else ""
 
     suspect, checked, unjudged = [], 0, 0
@@ -456,8 +463,11 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             continue
         checked += 1
         uid, slug = own.group(1), own.group(2)
-        if re.search(r"\b" + re.escape(uid) + r"\b", subjects) or \
-           re.search(r"\b" + re.escape(slug) + r"\b", subjects):
+        # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
+        # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
+        # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
+        # the id half could never decide a case the slug half did not already decide.
+        if re.search(r"\b" + re.escape(slug) + r"\b", subjects):
             continue
         suspect.append({
             "file": str(p.relative_to(ctx.root)).replace("\\", "/"),

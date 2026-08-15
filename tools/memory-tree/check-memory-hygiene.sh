@@ -607,7 +607,12 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         # cross the writing tool, the shell and the awk regex parser, and only the last of the
         # three has an opinion about encoding. A negated class needs no such opinion, and it takes
         # all three real label forms in the corpus at once.
-        if (L ~ /^[ 	]*(-|\*)?[ 	]*(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
+        # The list marker is now REQUIRED unless the label sits at column 0. Without that, a
+        # hard-wrapped continuation opening with a cross-reference -- a line beginning
+        # AC1-AC3 all red -- was read as a new head: it closed the real bullet early and
+        # invented a phantom one, so a spec whose every criterion carried a witness could red
+        # naming a label the file does not contain.
+        if (L ~ /^([ 	]*(-|\*)[ 	]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
           if (lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
           lab = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           acc = L; continue

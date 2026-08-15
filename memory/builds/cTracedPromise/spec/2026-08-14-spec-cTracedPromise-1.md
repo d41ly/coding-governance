@@ -1,6 +1,6 @@
 # TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -17,7 +17,7 @@ measures, so the pair covers both ways a spec status can lie about git.
 - **S2** — the oracle. For each spec whose status is `CLOSED` and whose STATUS-HEADER date is on or
   after `TRACE_CUTOFF`, at least one commit must carry the spec's own id OR its slug in its subject
   and touch a `TRACE_GLOBS` path. The commit set is
-  `git log <base_ref> HEAD --no-merges --format=%s -- <TRACE_GLOBS>`.
+  `git log <base_ref> HEAD --no-merges --full-history --format=%s -- <TRACE_GLOBS>`.
 - **S3** — the commit set unions BOTH tips. The spec population is read from the working tree, so the
   evidence must be too: a unit that flips its own spec to CLOSED on its branch has its certifying
   commits on that branch and nowhere else. Measured: replaying the 13 judged specs at the commit the
@@ -27,8 +27,12 @@ measures, so the pair covers both ways a spec status can lie about git.
 - **S4** — `--no-merges`. A reconcile merge's subject names the branch being merged INTO, so a merge
   certifies whichever build it was merged into rather than the build that shipped. Measured: merges
   counted reads 0 misses, merges dropped reads 1, and the difference is entirely `TOOL-aMooredAnchor-1`
-  resting on two conflict-resolving merge subjects. Dropping merges also removes the traversal
-  ambiguity that default history simplification would otherwise leave in the answer.
+  resting on two conflict-resolving merge subjects. `--full-history` rides with it, because
+  `--no-merges` does NOT defeat default history simplification: a path-restricted log drops a commit
+  that is TREESAME with a parent, so a build's own product commit can vanish behind an unrelated
+  merge and score a false MISS. Reproduced in a scratch repo with an `-s ours` merge. An earlier
+  revision of this spec claimed the opposite here while the selftest's merge arm stated the rule
+  correctly — two answers to one question, inside a single unit.
 - **S5** — `TRACE_CUTOFF` in `tools/drift-audit/drift_signals.py`, set to `2026-08-11`, carrying the
   commit and the reason in a comment. When it is absent or empty the signal returns
   `gateable: False`, so it is neither gated nor scored DEAD. This is an ENGINE behaviour, not a
@@ -127,15 +131,18 @@ spec path, id, slug and the date the cutoff was judged on.
 
 ### The commit walk
 
-One `git log` over both tips, `--no-merges`, path-restricted to `TRACE_GLOBS`, `--format=%s`. Matching
+One `git log` over both tips, `--no-merges --full-history`, path-restricted to `TRACE_GLOBS`,
+`--format=%s`. Matching
 is a word-boundary search for the id and for the slug.
 
 `WONTDO` is excluded from `TERMINAL`: an abandoned unit is expected to have no product commit, so
 judging it would manufacture a false positive out of a correct record.
 
 The slug is accepted alongside the id because it is what the corpus actually carries. Over the judged
-population the id-only key misses 3 of 13 — `TOOL-aMooredAnchor-1`, `TOOL-aMouldedFolio-2` and
-`TOOL-aStandingWrit-1` — against the slug-or-id key's 1. The id-only key is the stronger, unit-level
+population the id-only key misses 4 of 13 — `TOOL-aMooredAnchor-1`, `TOOL-aMouldedFolio-2`,
+`TOOL-aStandingWrit-1` and `TOOL-aWrittenMethod-5` — against the slug key's 1. The fourth is a
+consequence of S6: `4c0fd31` changes only `.claude/SESSION-KICKOFF.md`, which S6 removed from the
+evidence set, so the narrowing costs one verdict under the id-only key it is scheduled to become. The id-only key is the stronger, unit-level
 claim and is the tightening this signal should take once every build carries id subjects; that is F1
 and a backlog row, not this unit.
 
@@ -163,7 +170,7 @@ leg, no new conf.
 
 ### Alternatives rejected
 
-- **Key on the id alone.** Reads 3 misses of the 13 judged, against 1. The right key eventually, and
+- **Key on the id alone.** Reads 4 misses of the 13 judged, against 1. The right key eventually, and
   a ratchet this unit does not turn. The figure of 38 that an earlier revision cited was measured over
   the 49-spec corpus this signal never judges, which is the `pin-copied-from-another-corpus` class
   applied to a design fork.
@@ -227,11 +234,15 @@ leg, no new conf.
 
 ## 8. Open questions
 
-- **F1 — slug-or-id, or id only?** Over the judged population the id-only key misses 3 of 13 and the
-  slug-or-id key misses 1. Id-only is the unit-level claim and the stronger ratchet.
-  RESOLVED (agent, 2026-08-14, delegated): slug-or-id, pin 1, with the id-only tightening filed as a
-  backlog row. Three known-false reds on the first run of a new predicate is how a signal gets
-  disbelieved; the tightening is cheap once id subjects are universal.
+none — all four forks are RESOLVED below.
+
+- **F1 — slug, or id only?** Over the judged population the id-only key misses 4 of 13 and the slug
+  key misses 1. Id-only is the unit-level claim and the stronger ratchet.
+  RESOLVED (agent, 2026-08-14, delegated): the slug, pin 1, with the id-only tightening filed as a
+  backlog row. Four known-false reds on the first run of a new predicate is how a signal gets
+  disbelieved; the tightening is cheap once id subjects are universal. The closing review also
+  retired the `id OR slug` disjunct as dead code: `\bslug\b` already matches inside
+  `\bFAMILY-slug-seq\b`, so the id half could never decide a case the slug half did not.
 - **F2 — is `2026-08-11` the right cutoff?** A cutoff of `2026-08-12` reads 0 misses over 3 judged
   specs, dropping ten from the population to avoid investigating three entries.
   RESOLVED (agent, 2026-08-14, delegated): `2026-08-11`, the day the convention landed. The three
@@ -247,6 +258,13 @@ leg, no new conf.
 ## 9. Revision log
 
 - rev-1 · 2026-08-14 · initial draft, written against the measurement in the build README.
+- rev-3 · 2026-08-15 · folded the M8 closing review (`wf_53313ce6-33b`): 23 confirmed findings of 27
+  raised. `--full-history` added — `--no-merges` does not defeat history simplification, and this
+  spec had claimed it did while its own selftest said otherwise. The `id OR slug` disjunct retired
+  as dead code. Six behaviours found UNARMED by mutation and armed: the `TRACE_GLOBS` narrowing,
+  the header-date key, the union of both tips (the rev-2 blocker fix, which had no arm at all), the
+  `unjudgeable` count, and the `TRACE_GLOBS` fallback. The id-only figure restated 3 to 4 — S6's
+  narrowing costs one verdict under the key this signal is scheduled to become. Status to CLOSED.
 - rev-2 · 2026-08-14 · folded the M4 audit (`wf_b8f7a1f2-240`): 28 confirmed findings of 35 raised,
   four of them blockers. The base-only walk became a union of both tips (S3), merges were dropped and
   the pin re-seeded 0 to 1 (S4, S7), the cutoff moved from the filename date to the status-header date,

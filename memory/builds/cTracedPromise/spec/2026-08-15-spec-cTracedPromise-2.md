@@ -1,6 +1,6 @@
 # TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find
 
-**Status:** OPEN · rev-3 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -174,6 +174,8 @@ not by `tools/memory-tree/check-arms.py`, which never sees it.
 
 ## 8. Open questions
 
+none — all three forks are RESOLVED below.
+
 - **F1 — both tiers, or Tier-2 only?** RESOLVED (agent, 2026-08-15, delegated): both. Measured, the
   widened selector makes Tier-1 a real population of 55 bullets rather than the 18 a bold-requiring
   selector saw, so the claim is now testable rather than decorative.
@@ -192,6 +194,13 @@ not by `tools/memory-tree/check-arms.py`, which never sees it.
 - rev-2 · 2026-08-15 · AC2 and AC9 rewritten: running the proposed predicate over this spec found
   both of them witnessless. The rule caught its own author, which is the first evidence it discriminates
   at all.
+- rev-4 · 2026-08-15 · folded the M8 closing review (`wf_53313ce6-33b`). The head selector now
+  requires a list marker unless the label sits at column 0: an indented continuation opening with a
+  cross-reference was read as a new bullet head, closing the real bullet early and inventing a
+  phantom label, so a spec whose every criterion carried a witness could red naming a label the file
+  does not contain. Three more behaviours were found UNARMED and armed — the both-tiers rule, the
+  continuation accumulator, and the blank-cutoff inertness. The harness's authored assertion count
+  was deleted rather than re-guessed: it read 130 while arms were added under it. Status to CLOSED.
 - rev-3 · 2026-08-15 · folded the M4 audit (`wf_f6c630a6-cf1`): 14 confirmed findings of 20 raised,
   one a blocker. The `ARMS_FLOORS` raise is deleted — `check-arms.py` scans shell `fail` call sites
   and cannot see an awk branch, so the raise would have made the meta-gate permanently red and the
