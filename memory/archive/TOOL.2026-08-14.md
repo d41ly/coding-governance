@@ -1,8 +1,8 @@
-# tooling backlog — rotated rows (archive)
+# tooling backlog — rotated 2026-08-14
 
-> Frozen. Rows that reached CLOSED or WONTDO in `memory/backlog/TOOL.md`, rotated 2026-08-14
-> when that index reached its size cap. Superseded, never edited. The live index is
-> `memory/backlog/TOOL.md`.
+> Terminal rows (CLOSED, WONTDO) moved byte-identical out of `../backlog/TOOL.md` when it
+> reached the index size cap. Nothing was edited and nothing was deleted; the all-time
+> id-collision grep still reaches every row here.
 
 - TOOL-aRuledParchment-2 · CLOSED · check 5 did not govern a nested free-named recording file — closed by TOOL-aDrainedSluice-3 (V3); the record is in DECISIONS.md
 - TOOL-bThriftyBellows-2 · WONTDO · a single-pass gen-memory-tree.sh generator for check 9 — closed by TOOL-aDrainedSluice-9 (V9) — the subject was deleted in U2; the measurement it preserved lives in the bug-class catalogue; the record is in DECISIONS.md

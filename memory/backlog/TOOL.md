@@ -1,8 +1,7 @@
 # tooling backlog
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
-> Rows that reached CLOSED or WONTDO before 2026-08-14 are frozen in
-> `../archive/TOOL.2026-08-14.md`, rotated when this index hit its size cap.
+> **Rotated 2026-08-14** — 48 terminal rows moved byte-identical to [`../archive/TOOL.2026-08-14.md`](../archive/TOOL.2026-08-14.md), covering `TOOL-aRuledParchment-2` through `TOOL-cFinalBerth-2`. Nothing deleted; the all-time id-collision grep still reaches them there.
 - TOOL-aRootedPrefix-3 · OPEN · hygiene checks 6/7 measure RAW working-tree bytes, so an adopter without the eol=lf pin still gets a platform-dependent cap and entry budget — normalize before measuring, as `check-template-size.sh` already does
 - TOOL-aNumeralWarden-2 · OPEN · agent-cap's enclosing-opener walk is defeated by two nested wrappers or 59 lines of distance between the `.map` and the `agent(` call; it needs a statement-level walk, not an opener count, and the 58/59 boundary is unfixtured
 - TOOL-aNumeralWarden-3 · OPEN · a drift-audit pin RAISE is indistinguishable from a population drain to every gate leg; `--check` compares only `value > pin`, so `ORPHAN_ID_PIN` 4 -> 5 and `handkept` 1 -> 7 both landed unchallenged
@@ -43,3 +42,21 @@
 - TOOL-cTracedPromise-5 · OPEN · an adopter who fills `TRACE_CUTOFF` before closing any spec after it reds `drift-audit records` with DEAD PROBE — the hole pushes them straight into it. Document `DECLARED_EMPTY` as the interim state
 - TOOL-cTracedPromise-6 · OPEN · hygiene check 10 resolves a rotated index's live counterpart by fixed path, so it is blind to every `memory/backlog/*.md` shard; a 48-row rotation went unnoticed. Resolve it anywhere under the memory root
 - TOOL-cTracedPromise-7 · OPEN · the unset-`TRACE_CUTOFF` row prints `DEAD PROBE` though `--check` ignores it: the status ladder reads `live` and never `gateable`. Print the note instead, so `not asked` and `blind` stop reading alike
+- TOOL-cBriefedPilot-1 · OPEN · `--override` stores a scalar, so a second one overwrites the first and `--close` blocks forever; one paired accumulator serves it and `--waive`
+- TOOL-cBriefedPilot-4 · OPEN · `--preflight` refuses an absent build-method carrier — the MUST-by-default teeth at the driver, which grades the RUN, not the leg, which grades the TREE
+- TOOL-cBriefedPilot-5 · OPEN · `--preflight` re-pins `base:` every invocation, so a resumed run is measured against a base it moved itself; write it only when the record carries none
+- TOOL-cBriefedPilot-6 · OPEN · `--plan` joins the README's authored roster ids against tracked specs, so a planned unit with no spec stops being invisible
+- TOOL-cBriefedPilot-7 · OPEN · the `build-complete` DoD item: `--close` blocks while a roster unit is unbuilt. D8's "land only when fully done" had no checker
+- TOOL-cBriefedPilot-8 · OPEN · the `closing-review-recorded` DoD item: a tracked review under this build names the run's pinned BASE
+- TOOL-cBriefedPilot-11 · OPEN · the Skill invokes `/session-kickoff` AFTER preflight and reads the README as roster; kickoff-first deadlocks at the READY card
+- TOOL-cBriefedPilot-12 · OPEN · leg check 16 joins the driver's directive registry to the Skill's table both ways and resolves every cited M-section
+- TOOL-cBriefedPilot-13 · OPEN · leg check 17 grades every parked waiver line for a declared handle and a non-empty reason; shape only, and P1 is why
+- TOOL-cBriefedPilot-14 · OPEN · leg check 18 asserts the Skill names kickoff AFTER preflight — order, not presence
+- TOOL-cBriefedPilot-15 · OPEN · M6 inverts under a mandate: disjoint passes are owed concurrency, bounded by a clause on not voiding the instruction layer
+- TOOL-cBriefedPilot-16 · OPEN · the method's pointers name the new layer; M10's delta index moves two to three
+- TOOL-cBriefedPilot-17 · OPEN · absorbs TOOL-cFinalBerth-3; the 1.4 to 1.5 bump this build performs is the edit that reproduces it
+- TOOL-cBriefedPilot-18 · OPEN · the protocol pair gains §10, §2's fourth parked kind, §4's count six to eight, and the domain-rules enumeration
+- TOOL-cBriefedPilot-19 · OPEN · the unattended kit identifies as 1.5 across both constants and the shipped doc marker
+- TOOL-cBriefedPilot-20 · OPEN · records: two dossiers re-derived, the rows this build closes, and the stale `aStandingWrit` row on the instruction layer
+- TOOL-cBriefedPilot-21 · OPEN · does ANY route dispatch a build pass concurrently without voiding the directive layer? Direct spawns exhaust a per-prompt budget that never resets in a run; a sidechain inherits no hooks. Decides unit 15's shape, and "no route" is a legitimate answer
+- TOOL-cBriefedPilot-22 · OPEN · check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table, which are joined to PHASES_CORE and DOD_CORE by no leg today
