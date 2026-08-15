@@ -497,7 +497,16 @@ check_waivers() { # run-state file
   if [ -f "$rel" ]; then
     want=$(printf '%s\n' "${WAIVE_ITEMS[@]}" | sort -u)
     have=$(recorded_waivers "$rel")
-    if [ -n "$have" ] && [ "$want" != "$have" ]; then
+    # The `[ -n "$have" ]` half is GONE, and unit 13's cross-component arm is what found it.
+    # With it, a record created by a waiver-free preflight had an EMPTY recorded set, so a
+    # SECOND preflight could add waivers to it - a second owner turn, which is the one thing
+    # this ordering exists to prevent. Leg check 17 then refused the resulting record forever,
+    # because the line is absent from the file's first committed blob. Driver and leg
+    # disagreed, and the driver was wrong.
+    #
+    # The first preflight is unaffected: it runs BEFORE scaffold_runmd, so the file does not
+    # exist yet and this block is skipped entirely.
+    if [ "$want" != "$have" ]; then
       fail 38 "the requested waiver set differs from the one already recorded, and a re-preflight is a RESUME rather than a second owner turn; re-issue the recorded set or none at all"
       return 1
     fi

@@ -33,7 +33,7 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 8a1e8b5620e251e0c46908ba12aaa9c487ca7f11
+witness: 2039507fd27cd8157f68d3f7b71caf0f44658443
 phase: BUILDING
 keepalive: ad706085
 anchor-url: https://github.com/d41ly/coding-governance.git
@@ -110,3 +110,38 @@ mandate does not delegate. It goes to the owner.
 
 The run continues at unit 9. Units 9 through 11 write the Skill template, add no DoD item, and touch
 no shared fixture, so the blockage is specific to 7 and 8 rather than to the rest of the build.
+
+**PARKED 2026-08-15 · unit 13's leg check 17, deferred — but the DEFECT IT FOUND IS FIXED AND KEPT.**
+
+The check was built and proven: three forgeries against the live tree, each refused by name — a
+well-formed waiver appended after the owner turn, an undeclared handle, an empty reason. The first is
+the tamper evidence P1 bought.
+
+Its cross-component arm is what matters here, and it is the first thing in this kit's history to run
+the DRIVER and then the LEG over one tree. `TOOL-aStandingWrit-8` predicted that would catch the two
+halves disagreeing. It caught three disagreements on first contact: the leg fixture has no build
+method, so unit 4's own check 34 refused the driver; its bare origin advertises no HEAD symref, so
+check 28 refused; and then the leg REFUSED A RECORD THE DRIVER HAD JUST WRITTEN.
+
+That third one is a real hole in landed code and it is now closed. Unit 3's refusal 2 read
+`[ -n "$have" ] && [ "$want" != "$have" ]`. A record created by a waiver-free preflight has an EMPTY
+recorded set, so the first conjunct short-circuited and a SECOND preflight could add waivers to it —
+a second owner turn, which is the one thing that ordering exists to prevent, and which the Skill
+tells the owner is impossible. Check 17's join then refused the resulting record forever. Driver and
+leg disagreed and the driver was wrong. The guard is now `[ "$want" != "$have" ]` alone; the first
+preflight is unaffected because it runs before the record exists.
+
+Unit 3's own happy-path arm was encoding the same bug: the fixture pre-creates the run-state file, so
+the arm exercised "add a first waiver to an existing record" and passed BECAUSE the guard was
+permissive. Arm and guard were wrong together and agreed with each other. Corrected to the real flow.
+
+Why the check itself is deferred rather than landed: its arms live in
+`tools/unattended/check-unattended.test.sh`, and I damaged that file twice tonight with over-broad
+content-scoped replacements — the second rewrote `tRun` to `tFresh` across roughly forty lines of
+arms that had nothing to do with this unit. I reverted rather than kept repairing. Landing check 17
+with unarmed branches would mean pinning them in `unarmed-branches.txt`, which weakens the meta-gate
+for my convenience, and that is not a trade I will make unasked.
+
+What the next attempt needs: the leg fixture wants a build-method stub and a HEAD symref on its bare
+origin before it can run the driver at all — both established here — and the arms want writing with
+location-scoped edits, not content-scoped ones.

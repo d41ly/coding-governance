@@ -696,6 +696,12 @@ same "a refused --waive preflight left the run-state file byte-identical" "$(sum
 
 # ---- the happy path: two pairs, both parked with their reasons, in the STAGED blob.
 reset_tree
+# PREFLIGHT CREATES the record — protocol section 2 — so a first waiver arrives on a build
+# that has none. The fixture pre-makes tRun's, which let the old permissive guard accept a
+# SECOND owner turn: a waiver added to an existing waiver-free record. Unit 13's
+# cross-component arm found that, the guard was narrowed, and this arm now exercises the
+# flow a real run takes.
+rm -f memory/builds/tRun/RUN.md; git add -A >/dev/null; git commit -q -m 'no record yet' --no-verify
 out=$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "nobody reads it" --waive parallel-when-disjoint --reason "sequenced by hand")
 hit "$out" "preflight OK"
 hit "$out" "directive waived — minimal-prose"
