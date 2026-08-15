@@ -192,7 +192,8 @@ recording grammar before the next gate run**, or check 5 reds on a free-named fi
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
 `memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns. **Landing** —
-merge and push authorization, the lander, the bypass ban, conflict reconciliation — is template §1 Landing and
+merge and push authorization, the lander, the bypass ban, conflict reconciliation, when a build may land — is
+template §1 Landing and
 `memory/guides/UNATTENDED-PROTOCOL.md`.
 
 ## M9 — The wrap-up — a derivation, not a recollection
@@ -205,7 +206,7 @@ from, the line does not go in.**
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
-| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override |
+| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
 
 **Completeness test, the only one that matters:** every row has a source on disk. A field you cannot cite a source
@@ -215,7 +216,7 @@ apply: §16 budgets a completion message, and this is the only turn the owner ge
 
 ## M10 — If the run is unattended
 
-Two deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
+Three deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
 `memory/guides/UNATTENDED-PROTOCOL.md`, deliberately not paraphrased here.
 
 - **Nobody reads the transcript.** Speak only when it changes what happens next: a refusal, an abort, a park, the
@@ -224,6 +225,8 @@ Two deltas, and no others. The contract — mandate, run state, phases, witnesse
   are derive, park and abort; Step 5b says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it before preflight, reap it before the wrap-up. Both halves: protocol §5.
+- **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,
+  its record and what it cannot reach are protocol §10.
 
 ## M11 — Where everything else lives — read these, do not restate them
 
