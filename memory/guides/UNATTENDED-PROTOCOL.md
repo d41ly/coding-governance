@@ -247,37 +247,6 @@ where this document says it may:
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
 
-## 10. The default directive set
-
-A run is bound by a set of named DIRECTIVES. Each is a POINTER into a section of the project's build
-method at `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, never a copy of the rule it points at — the method's own M1 forbids a rule appearing both
-there and in a carrier it points at, and this contract is a carrier.
-
-**Kit-owned, and the project may only EXTEND.** The core set is a constant in the driver, read by the
-gate leg through the same parse it uses for the phase and Definition-of-Done sets. `DIRECTIVES_EXTRA`
-is where a project adds; the core is not deletable from the project layer, and `DIRECTIVES_FLOOR`
-pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key holding the whole set
-was rejected: a project could then declare zero directives, which is a global waiver carrying no
-name, no reason and no record.
-
-**This section names no handle.** The list an agent reads is the table in the rendered Skill, and
-naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both
-directions, so a handle in one and not the other is a refusal rather than a discrepancy nobody sees.
-
-**A waiver is the owner's, taken once, at preflight.** `--waive <handle> --reason <text>` is accepted
-by `--preflight` and by no other verb, and only while no run-state file exists or the requested set
-equals the recorded one. That single refusal is what makes the owner turn provably the LAST one: no
-later verb can take an answer, and a re-preflight after a compaction re-issues the recorded set
-rather than opening a new turn. A waiver with no reason is refused, because one that records no
-reason is indistinguishable from one nobody meant.
-
-**What a waiver reaches, and what it does not.** It is recorded as a parked entry of the `waiver`
-kind, so the wrap-up derivation surfaces it with the other parked kinds. It relaxes the DIRECTIVE for
-that run only. It is **never a Definition-of-Done override** — the two are separate acts with
-separate records, and `--override` remains the only route to a DoD item. And it **never removes a
-GATE**: a directive relaxed here does not relax any check the merge bar performs, so a waiver whose
-directive has a machine-enforced consequence still meets that consequence at the bar.
-
 ## 9. The boundary this kit claims
 
 Nothing a script running under the run's own uid constitutes authorization. Four independent
@@ -312,3 +281,34 @@ the run never touched by a party the run cannot execute code as — a required s
 second node — is immune to the whole class, provided the run's own push credential cannot alter the
 required-check ruleset. This kit can neither install that nor substitute for it, and no document here
 may imply otherwise.
+
+## 10. The default directive set
+
+A run is bound by a set of named DIRECTIVES. Each is a POINTER into a section of the project's build
+method at `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, never a copy of the rule it points at — the method's own M1 forbids a rule appearing both
+there and in a carrier it points at, and this contract is a carrier.
+
+**Kit-owned, and the project may only EXTEND.** The core set is a constant in the driver, read by the
+gate leg through the same parse it uses for the phase and Definition-of-Done sets. `DIRECTIVES_EXTRA`
+is where a project adds; the core is not deletable from the project layer, and `DIRECTIVES_FLOOR`
+pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key holding the whole set
+was rejected: a project could then declare zero directives, which is a global waiver carrying no
+name, no reason and no record.
+
+**This section names no handle.** The list an agent reads is the table in the rendered Skill, and
+naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both
+directions, so a handle in one and not the other is a refusal rather than a discrepancy nobody sees.
+
+**A waiver is the owner's, taken once, at preflight.** `--waive <handle> --reason <text>` is accepted
+by `--preflight` and by no other verb, and only while no run-state file exists or the requested set
+equals the recorded one. That single refusal is what makes the owner turn provably the LAST one: no
+later verb can take an answer, and a re-preflight after a compaction re-issues the recorded set
+rather than opening a new turn. A waiver with no reason is refused, because one that records no
+reason is indistinguishable from one nobody meant.
+
+**What a waiver reaches, and what it does not.** It is recorded as a parked entry of the `waiver`
+kind, so the wrap-up derivation surfaces it with the other parked kinds. It relaxes the DIRECTIVE for
+that run only. It is **never a Definition-of-Done override** — the two are separate acts with
+separate records, and `--override` remains the only route to a DoD item. And it **never removes a
+GATE**: a directive relaxed here does not relax any check the merge bar performs, so a waiver whose
+directive has a machine-enforced consequence still meets that consequence at the bar.

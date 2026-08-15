@@ -464,7 +464,10 @@ check_method() {
 # file byte-identical - which is the property the arms assert, not merely the exit code.
 recorded_waivers() { # run-state file -> the handles already parked, sorted
   [ -f "$1" ] || return 0
-  sed -n 's/^.* waiver · item \([^ ]*\) · reason .*$/\1/p' "$1" | sort -u
+  # ANCHORED on the timestamp the writer emits, not on `^.*`. Greedy, that leading wildcard matched
+  # the LAST " waiver · item X · reason " on the line, so a reason quoting that shape could name a
+  # handle the owner never waived — and refusal 38 compares against exactly this reading.
+  sed -n 's/^[0-9][0-9-]*T[0-9:]*Z waiver · item \([^ ]*\) · reason .*$/\1/p' "$1" | sort -u
 }
 check_waivers() { # run-state file
   local rel="$1" n=${#WAIVE_ITEMS[@]} i=0 h r want have
@@ -481,7 +484,9 @@ check_waivers() { # run-state file
     # naming the bypass flag would red the bar permanently on a record no verb rewrites. A newline
     # is refused in the same branch because park()'s grammar is one line per entry: a reason
     # carrying one forges a second, well-formed entry the owner never granted.
-    case "$r" in *"$BYPASS_BAN"*)
+    # GUARDED on non-empty. An empty BYPASS_BAN makes this glob `*""*`, which matches every
+    # string — so an undeclared bypass flag would refuse every waiver ever offered.
+    case "${BYPASS_BAN:+x}$r" in "") ;; *"$BYPASS_BAN"*)
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
       return 1 ;;
     esac
@@ -759,7 +764,7 @@ verb_plan() { # slug
   fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
   if [ -z "$specs" ]; then
-    fail 19 "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse: $dir/spec"
+    fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
     return 1
   fi
   for spec in $specs; do

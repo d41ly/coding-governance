@@ -423,6 +423,11 @@ fi
 # ---- whole pointer-not-copy design depends on not happening. A generator would make the two agree
 # ---- by construction and check nothing.
 tmpl="$HERE/SKILL.template.md"
+# Bound BEFORE either guard, because arm B reads it from outside the branch that used to assign it.
+# A template present but carrying no readable row left `core` unset, and under `set -u` arm B then
+# died on it — so the refusal for an unreadable table took arm C and this leg's own exit code down
+# with it, reporting one problem where there were two.
+core=$(printf '%s\n' $DIRECTIVES_CORE | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -447,7 +452,6 @@ else
     case "$tblpairs" in *":AMBIGUOUS"*)
       fail 16 "a directive row cites more than one build-method section, so the join has no single answer to read for that handle" ;;
     esac
-    core=$(printf '%s\n' $DIRECTIVES_CORE | sort -u)
     only_reg=$(comm -23 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
     only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
     [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"

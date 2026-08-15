@@ -549,8 +549,6 @@ n=$((n+1)); [ -z "$w" ] || { echo "FAIL the leg contains a write: $w"; st=1; }
 nf=$(grep -nE 'head -1 \| tr -d' "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
 
-[ "$st" = 0 ] && echo "PASS ($n assertions)"
-exit "$st"
 
 # ---- check 16, the DIRECTIVE REGISTRY joined to the table an agent reads. Nine branches, nine arms,
 # ---- each beside the green control the suite opened with. The join is a SECOND OPINION: a shell
@@ -564,11 +562,13 @@ mv tools/unattended/SKILL.template.md.bak tools/unattended/SKILL.template.md
 
 # arm 2: a template with no readable row. This is the arm that matters most — without it the join
 # passes by finding nothing, which is the class this whole build keeps meeting.
-reset_tree; grep -v '^| `[a-z]' tools/unattended/SKILL.template.md > t.md && mv t.md tools/unattended/SKILL.template.md
+reset_tree; grep -v '^[[:space:]]*| `[a-z]' tools/unattended/SKILL.template.md > t.md && mv t.md tools/unattended/SKILL.template.md
 hit "$(run)" "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
 
-# arm 3: a row citing two sections has no single answer to read.
-reset_tree; sed -i 's/| `minimal-prose` | the transcript rule under a mandate | M10 |/| `minimal-prose` | the transcript rule under a mandate M2 | M10 |/' tools/unattended/SKILL.template.md
+# arm 3: a row citing two sections has no single answer to read. The reset is load-bearing: without
+# it this ran on the tree arm 2 left behind, whose rows were all stripped, so the sed matched nothing
+# and the arm asserted a state its own fixture had just made unreachable.
+reset_tree; sed -i 's/| the transcript rule under a mandate |/| M2 |/' tools/unattended/SKILL.template.md   # a second M<n> must be its OWN CELL
 hit "$(run)" "a directive row cites more than one build-method section, so the join has no single answer to read for that handle"
 
 # arm 4: declared in the registry, absent from the table.
@@ -582,7 +582,22 @@ hit "$(run)" "the Skill's table names a directive the registry does not declare,
 
 # arm 6: a cited section that does not resolve. Arm B is SILENT without the carrier, so the fixture
 # has to HAVE one for this to be reachable at all.
-reset_tree; printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n' > memory/guides/BUILD-METHOD.md
+reset_tree; printf '# method
+
+## M2
+
+## M3
+
+## M4
+
+## M5
+
+## M6
+
+## M8
+
+## M10
+' > memory/guides/BUILD-METHOD.md   # M9 omitted on purpose
 hit "$(run)" "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach:"
 rm -f memory/guides/BUILD-METHOD.md
 
@@ -604,3 +619,6 @@ hit "$(run)" "the kit's CORE directive set has shrunk below its floor, and delet
 # ---- nothing; this is what says the mutations above were the cause.
 reset_tree
 same "the tree is still clean after nine mutations" "$(run >/dev/null 2>&1; echo $?)" "0"
+
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
+exit "$st"
