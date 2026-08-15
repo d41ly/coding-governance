@@ -458,6 +458,53 @@ check_method() {
   return 1
 }
 
+# TOOL-cBriefedPilot-3 - refusals 2 through 5. These CAN live in the precondition block, because
+# they are about the invocation's own content and verb_preflight is the only verb that reaches them.
+# The block writes nothing until every one has passed, so a refused invocation leaves the run-state
+# file byte-identical - which is the property the arms assert, not merely the exit code.
+recorded_waivers() { # run-state file -> the handles already parked, sorted
+  [ -f "$1" ] || return 0
+  sed -n 's/^.* waiver · item \([^ ]*\) · reason .*$/\1/p' "$1" | sort -u
+}
+check_waivers() { # run-state file
+  local rel="$1" n=${#WAIVE_ITEMS[@]} i=0 h r want have
+  [ "$n" -gt 0 ] || return 0
+  while [ "$i" -lt "$n" ]; do
+    h=${WAIVE_ITEMS[$i]}; r=${WAIVE_REASONS[$i]}
+    case " $(directives) " in *" $h:"*) ;;
+      *) fail 39 "--waive names a handle that is not in the effective directive set, and a waiver on a directive nobody declared relaxes nothing: $h"; return 1;; esac
+    if [ -z "$r" ]; then
+      fail 40 "--waive requires --reason, because a waiver with no recorded reason is indistinguishable from one nobody meant and the wrap-up has nothing to surface"
+      return 1
+    fi
+    # park() writes the reason VERBATIM and the leg greps this file whole, so a truthful reason
+    # naming the bypass flag would red the bar permanently on a record no verb rewrites. A newline
+    # is refused in the same branch because park()'s grammar is one line per entry: a reason
+    # carrying one forges a second, well-formed entry the owner never granted.
+    case "$r" in *"$BYPASS_BAN"*)
+      fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+      return 1 ;;
+    esac
+    if [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ]; then
+      fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+      return 1
+    fi
+    i=$((i + 1))
+  done
+  # Refusal 2, and it runs ONLY when the invocation carries a pair. An invocation naming no handle
+  # leaves the recorded set untouched and is not a refusal - which is what keeps the --preflight that
+  # unit 5's design requires before every --close legal over a run that waived something.
+  if [ -f "$rel" ]; then
+    want=$(printf '%s\n' "${WAIVE_ITEMS[@]}" | sort -u)
+    have=$(recorded_waivers "$rel")
+    if [ -n "$have" ] && [ "$want" != "$have" ]; then
+      fail 38 "the requested waiver set differs from the one already recorded, and a re-preflight is a RESUME rather than a second owner turn; re-issue the recorded set or none at all"
+      return 1
+    fi
+  fi
+  return 0
+}
+
 check_single_live() {
   local n=0 f p live=""
   for f in $(GIT ls-files "$M/builds/*/RUN.md" 2>/dev/null); do
@@ -846,6 +893,7 @@ verb_preflight() { # slug · keepalive-id
   check_branch || true
   check_wiring || true
   check_method || true
+  check_waivers "$rel" || true
   check_single_live || true
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
@@ -910,6 +958,19 @@ verb_preflight() { # slug · keepalive-id
   # to re-run after a compaction.
   [ -n "$(fact "$rel" phase)" ] || set_fact "$rel" phase RUNNING || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
+  # TOOL-cBriefedPilot-3 - AFTER the facts and BEFORE staging. park() appends with >>, which CREATES
+  # the file, so calling it before the scaffold guard makes the later splice fail naming the wrong
+  # cause; and the gate leg's whole per-run population is the INDEX, so a waiver written after
+  # staging would be invisible to every check it has. Skipped when the set is already recorded,
+  # which is what makes a re-preflight idempotent rather than duplicating every entry.
+  if [ "${#WAIVE_ITEMS[@]}" -gt 0 ] && [ -z "$(recorded_waivers "$rel")" ]; then
+    _wi=0
+    while [ "$_wi" -lt "${#WAIVE_ITEMS[@]}" ]; do
+      park "$rel" waiver "${WAIVE_ITEMS[$_wi]}" "${WAIVE_REASONS[$_wi]}"
+      echo "unattended: directive waived — ${WAIVE_ITEMS[$_wi]} (parked with its reason)"
+      _wi=$((_wi + 1))
+    done
+  fi
   stage_or_fail "$rel" || return 1
   echo "unattended: preflight OK — base $base · anchor $AREF at $ASHA · keepalive $kid · region copied from $src"
   return 0
@@ -1083,17 +1144,40 @@ park() { # file · kind · item · reason
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
+# TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
+# one. Same reason for parallel arrays: the reason is free text an owner types, and a record
+# separator inside it is an injection.
+WAIVE_ITEMS=(); WAIVE_REASONS=(); WV_PEND=""
+# PRE-SCANNED, because --plan and --phase exit INSIDE the parse loop: at the moment those arms run,
+# a later --waive has not been consumed yet and the array is still empty. Asking argv directly is
+# the only form of the question that does not depend on where the answer is needed. The first cut
+# of this guard read the array and was unreachable for exactly the two verbs the spec named.
+WAIVE_SEEN=0
+for _a in "$@"; do [ "$_a" = "--waive" ] && WAIVE_SEEN=1; done
+# Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
+# first put it: that function never runs for another verb, so a guard there could never fire. It is a
+# DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
+# those exit INSIDE the loop and a post-loop check alone never sees them.
+refuse_waive_unless_preflight() { # verb
+  [ "$WAIVE_SEEN" = 1 ] || return 0
+  local v="$1"
+  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
+  return 1
+}
 while [ $# -gt 0 ]; do
   case "$1" in
     --preflight|--status|--resume|--close|--landed|--abort) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
-    --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; shift 2 || shift ;;
+    --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; WV_PEND=""; shift 2 || shift ;;
+    --waive)        WAIVE_ITEMS+=("${2:-}"); WAIVE_REASONS+=(""); WV_PEND=wv; OV_PEND=""; shift 2 || shift ;;
     --reason)       if [ "$OV_PEND" = ov ]; then OV_REASONS[$(( ${#OV_REASONS[@]} - 1 ))]="${2:-}"; OV_PEND=""
+                    elif [ "$WV_PEND" = wv ]; then WAIVE_REASONS[$(( ${#WAIVE_REASONS[@]} - 1 ))]="${2:-}"; WV_PEND=""
                     else REASON="${2:-}"; fi; shift 2 || shift ;;
-    --plan)         shift; verb_plan "${1:-}"; exit $? ;;
+    --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
+                    refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
     *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed and --abort: $arg"; exit 1 ;;
@@ -1103,6 +1187,7 @@ done
 # and the refusal above used to name three DIFFERENT sets: the usage line was already two verbs behind
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
+case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
 [ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text>"; exit 2; }
 
 case "$VERB" in

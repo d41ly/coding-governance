@@ -653,6 +653,79 @@ same "every conf key the driver reads is defaulted in its init block" "$undefaul
 same "the arm actually checked a plausible number of keys" \
   "$([ "$checked" -ge 8 ] && echo yes || echo no)" "yes"
 
+# ---- TOOL-cBriefedPilot-3: --waive. Five refusals, and the first is a DISPATCH guard rather than a
+# ---- precondition: verb_preflight never runs for another verb, so a guard there could never fire.
+# ---- The M4 audit found that; the spec had put it in the wrong place.
+reset_tree
+hit "$(run --status tRun --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+# --plan and --phase EXIT INSIDE the parse loop, so a post-loop guard alone never sees them. Both
+# arms are here because that is exactly the miss the guard is shaped to avoid.
+hit "$(run --plan tRun --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+hit "$(run --phase tRun BUILDING --witness deadbeef --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+
+# ---- an undeclared handle waives nothing.
+reset_tree; before_waive=$(sum)
+hit "$(run --preflight tRun --keepalive-id k1 --waive no-such-directive --reason because)" \
+  "--waive names a handle that is not in the effective directive set, and a waiver on a directive nobody declared relaxes nothing:"
+
+# ---- a waiver with no reason is indistinguishable from one nobody meant.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose)" \
+  "--waive requires --reason, because a waiver with no recorded reason is indistinguishable from one nobody meant and the wrap-up has nothing to surface"
+
+# ---- the reason may not spell the declared bypass flag: park writes it verbatim and the leg greps
+# ---- this file whole, so a truthful reason would red the bar forever on a record no verb rewrites.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason 'ran with --no-verify')" \
+  "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+
+# ---- nor a newline: park's grammar is one line per entry, so a reason carrying one forges a second
+# ---- well-formed entry the owner never granted.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "$(printf 'first\nsecond')")" \
+  "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+
+# ---- every refusal above leaves the run-state file ABSENT, not merely prints. A refused preflight
+# ---- that had already written would have changed the state its refusal is about.
+# tRun SHIPS a run-state file, so `absent` was never the right claim - the property is that a
+# refused preflight changed NOTHING. `sum` is the idiom every other no-write arm here uses.
+same "a refused --waive preflight left the run-state file byte-identical" "$(sum)" "$before_waive"
+
+# ---- the happy path: two pairs, both parked with their reasons, in the STAGED blob.
+reset_tree
+out=$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "nobody reads it" --waive parallel-when-disjoint --reason "sequenced by hand")
+hit "$out" "preflight OK"
+hit "$out" "directive waived — minimal-prose"
+hit "$out" "directive waived — parallel-when-disjoint"
+same "two waivers parked, one per pair" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "2"
+hit "$(cat memory/builds/tRun/RUN.md)" "nobody reads it"
+hit "$(cat memory/builds/tRun/RUN.md)" "sequenced by hand"
+same "the waivers are in the STAGED blob, which is the leg's whole population" \
+  "$(git show :memory/builds/tRun/RUN.md | grep -c 'waiver · item ')" "2"
+
+# ---- a re-preflight naming the SAME set is idempotent: it is a resume, not a second owner turn.
+before=$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)
+run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "nobody reads it" --waive parallel-when-disjoint --reason "sequenced by hand" >/dev/null
+same "a re-preflight with the same set duplicates nothing" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "$before"
+
+# ---- and one naming a DIFFERENT set refuses, rather than silently re-writing what the owner granted.
+hit "$(run --preflight tRun --keepalive-id k1 --waive diff-reviewed --reason "changed my mind")" \
+  "the requested waiver set differs from the one already recorded, and a re-preflight is a RESUME rather than a second owner turn; re-issue the recorded set or none at all"
+
+# The happy path STAGED the run-state file, so the tree is dirty and check_clean refuses for a
+# reason that has nothing to do with waivers. Commit it, as every arm reaching the write phase does.
+fixture
+# ---- an invocation naming NO handle is not a refusal. Unit 5's design requires a --preflight before
+# ---- every --close, and over a waived run that invocation carries no pairs.
+hit "$(run --preflight tRun --keepalive-id k1)" "preflight OK"
+same "a no-handle re-preflight left the recorded set intact" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "2"
+
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")
