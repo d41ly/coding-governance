@@ -845,6 +845,56 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ...and a build with no tracked spec REFUSES rather than printing an empty, complete-looking list.
 reset_tree; readme tPlanEmpty; fixture
+
+# ---- TOOL-cBriefedPilot-6: --plan sees the planned unit that has no spec. M2 makes the README's
+# ---- authored Units table the roster; this verb did not parse it, so it enumerated the half of the
+# ---- roster that already had specs and said so in its own closing line.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tPlan "1. ARCH-tPlan-1 the specced one
+2. ARCH-tPlan-7 the one nobody has specced"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "ARCH-tPlan-7"
+hit "$out" "MISSING"
+same "exactly one MISSING row, for the id with no spec" "$(printf '%s\n' "$out" | grep -c 'MISSING')" "1"
+miss "$out" "ARCH-tPlan-1        -           MISSING"
+hit "$out" "roster: the README roster region"
+
+# ---- a MALFORMED pair is a NAMED refusal, not a silent fall-through to the no-roster path. `region`
+# ---- exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
+# ---- discarded-signal defect this kit has already shipped once.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tPlan "1. one"; roster tPlan "2. a second pair nobody granted"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice:"
+miss "$out" "ARCH-tPlan-1"
+
+# ---- no roster marker at all: today's output, today's sentence, and the caveat is then TRUE.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "roster: tracked specs under"
+hit "$out" "a planned unit with no spec is invisible here"
+miss "$out" "MISSING"
+
+# ---- S6's extraction is BYTE-IDENTICAL at --status. A refactor and a behaviour change in one
+# ---- reviewable diff is what this criterion exists to prevent.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+same "--status names a non-terminal unit through the extracted helper" "$(run --status tRun | grep -c 'next ')" "1"
+# ---- the extraction selects the SAME first row as the inline pipeline it replaced. `region` is a
+# ---- function INSIDE the driver, not a command here, so the control re-derives the slice with awk.
+# ---- The first cut called `region` and the control returned empty, which would have compared the
+# ---- helper against nothing and passed forever.
+want_unit=$(awk '/<!-- run:generated -->/{f=1;next} /<!-- .run:generated -->/{f=0} f' memory/builds/tRun/RUN.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
+same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
+
+
 hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse"
 git reset -q --hard HEAD~1; git clean -qfd
 

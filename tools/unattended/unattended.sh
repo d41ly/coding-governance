@@ -697,10 +697,53 @@ plan_state() { # spec file -> prints the M2 state
     }' "$1"
 }
 
+# TOOL-cBriefedPilot-6 - the roster join. M2 makes the README's authored Units table the roster and
+# this verb did not parse it, so it enumerated the half of the roster that already had specs and said
+# so in its own output. These read that table.
+#
+# The ids are matched against the build's OWN slug. A looser pattern would mint units out of prose:
+# a roster row citing a sibling build's id names a DEPENDENCY, not a unit of this build.
+roster_ids() { # slug
+  local slug="$1" rel; rel=$(readme_of "$slug")
+  [ -f "$rel" ] || return 0
+  grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
+  region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null \
+    | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+}
+# The ids verb_plan already derives, lifted so the listing and the join cannot disagree about what a
+# unit's id IS. A spec whose heading and status header disagree is then invisible to both halves in
+# the same way, rather than counted present by one and absent by the other.
+spec_ids() { # dir
+  local dir="$1" spec
+  for spec in $(git ls-files "$dir/spec/*.md" 2>/dev/null); do
+    awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ /{ hdr=1 } /^# [A-Za-z0-9][A-Za-z0-9-]* /{ if (id=="") id=$2 } END { if (hdr && id != "") print id }' "$spec"
+  done | sort -u
+}
+missing_units() { # slug · dir
+  local want have; want=$(roster_ids "$1"); have=$(spec_ids "$2")
+  [ -n "$want" ] || return 0
+  comm -23 <(printf '%s\n' "$want") <(printf '%s\n' "$have")
+}
+# S6 - extracted out of verb_status's inline pipeline, ahead of the unit that consumes it. Unit 7's
+# build-complete asks the same two questions, and a second copy would be two answers to one question
+# in the two verbs that report on the same region.
+unit_rows() { region "$1" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | grep -E '^\| \['; }
+nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
+
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state next=""
+  local slug="$1" dir specs spec id st state next="" miss nmiss=0
   check_slug "$slug" || return 1
   dir="$M/builds/$slug"
+  # A malformed pair is a NAMED refusal, never a silent fall-through to the no-roster path. `region`
+  # exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
+  # discarded-signal defect this kit has already paid for once - a build whose markers are duplicated
+  # or transposed would otherwise get the complete-looking list this unit exists to stop printing.
+  if grep -qF -- "$ROSTER_OPEN" "$(readme_of "$slug")" 2>/dev/null; then
+    if ! region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
+      fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $(readme_of "$slug")"
+      return 1
+    fi
+  fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
   if [ -z "$specs" ]; then
     fail 19 "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse: $dir/spec"
@@ -727,7 +770,19 @@ verb_plan() { # slug
       READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
     esac
   done
-  echo "roster: tracked specs under $dir/spec (a planned unit with no spec is invisible here)"
+  # The planned units nobody has specced. These are what M2 calls MISSING, and until this
+  # unit they were simply absent from the listing rather than reported.
+  for miss in $(missing_units "$slug" "$dir"); do
+    printf '%-34s %-11s %s
+' "$miss" "-" "MISSING"
+    nmiss=$((nmiss + 1))
+    [ -n "$next" ] || next="$miss (MISSING - spec it first)"
+  done
+  if [ -n "$(roster_ids "$slug")" ]; then
+    echo "roster: the README roster region, $(roster_ids "$slug" | grep -c .) id(s); $nmiss with no tracked spec"
+  else
+    echo "roster: tracked specs under $dir/spec (a planned unit with no spec is invisible here)"
+  fi
   if [ -n "$next" ]; then echo "next: $next"; else echo "next: none - every tracked spec is terminal"; fi
   return 0
 }
@@ -1001,9 +1056,7 @@ verb_status() { # slug
   p=$(fact "$rel" phase); w=$(fact "$rel" witness)
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
   # The first non-terminal unit, read from the COPIED generated region — never re-derived.
-  unit=$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null \
-         | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 \
-         | sed -e 's/^| \[//' -e 's/\].*//')
+  unit=$(nonterminal_units "$rel" | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   printf 'unattended: %s · phase %s · witness %s · next %s\n' "$slug" "$p" "${w:-NONE}" "$unit"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
