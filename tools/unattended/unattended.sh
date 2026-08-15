@@ -1084,7 +1084,7 @@ verb_resume() { # slug
   else
     echo "unattended: resume at phase $p — read $rel, then continue the first non-terminal unit above"
     # The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the authored region
-    # carries five facts and never restates a derivable one (protocol section 2).
+    # carries seven facts and never restates a derivable one (protocol section 2).
     [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
     echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
   fi

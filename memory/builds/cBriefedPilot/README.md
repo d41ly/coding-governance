@@ -325,7 +325,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-4 | 2026-08-14 |
+| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-5 | 2026-08-14 |
 | [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | OPEN | rev-3 | 2026-08-14 |

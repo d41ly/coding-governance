@@ -16,7 +16,8 @@ check, not merely removed.
 
 The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
 committed before the run's branch existed. The owner's act is `/unattended <slug>`; they author
-nothing per run. Three properties, all mechanical:
+nothing per run except the reason text of a directive waiver, which `--preflight` records on
+their behalf (§10). Four properties, all mechanical:
 
 - **It is asserted, never written by the run.** `--preflight` refuses if it is absent; a run that
     could write its own authorization has none.
@@ -45,6 +46,10 @@ to the build folder trades these properties:
 
 All were put to the owner and accepted.
 
+**The build method is a RUN-TIME dependency of this kit.** Every directive is a pointer into a
+section of `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, so `--preflight` refuses a tree where it is absent rather than starting a run bound
+by a set that resolves to nothing.
+
 Absent or unreachable authorization → the run does not start. There is no override for this one: an
 override on the authorization check is the authorization check.
 
@@ -62,8 +67,10 @@ which is the test for belonging here:
 
 1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
 2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
-3. **Parked decisions** — the question, the options seen, and the reason the run refused. A bare
-   "parked" is indistinguishable from "forgotten".
+3. **Parked entries**, of four kinds, which `park()`'s own kind argument already discriminates: a
+   parked DECISION — the question, the options seen, and the reason the run refused, because a bare
+   "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, and an
+   owner directive WAIVER (§10).
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
@@ -88,6 +95,9 @@ run-state file names it, and is NAMED rather than LINKED until its record exists
 caps, and it is designed to GROW. The authored region is budgeted at 8 KB. When the budget is
 reached the oldest parked entries spill into the build's own `build/` folder as a dated recording —
 a name the recording grammar already admits — and the authored region keeps a one-line pointer.
+**Waiver entries are not spillable.** Written at preflight they are permanently the OLDEST entries,
+so the rule would evict them first — after which the leg check that grades them passes by finding
+nothing.
 Crossing the cap mid-flight makes the gates red, which blocks `--close`, which makes the override
 the only exit: the spill exists so that never happens.
 
@@ -185,6 +195,7 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 ## 7. The verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
+  accepts `--waive <handle> --reason <text>` and no other verb does (§10),
   records the keepalive id the agent hands it,
   refuses on a dirty tree, on the default branch, and on an unwired repo, and writes the run-state
   file. It OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the
@@ -196,9 +207,9 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
   by an agent hand-editing an artifact this kit calls generated.
 - `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
-  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It cannot see a
-  planned unit that has no spec, and says so in its own output rather than printing a complete-looking
-  list.
+  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
+  against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a
+  roster whose markers are malformed is a named refusal rather than a complete-looking list.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the
@@ -226,6 +237,8 @@ where this document says it may:
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
+| `DIRECTIVES_EXTRA` | project directive members, appended to the core set |
+| `DIRECTIVES_FLOOR` | the shrink-only SIZE of the kit's core directive set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
@@ -233,6 +246,37 @@ where this document says it may:
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
+
+## 10. The default directive set
+
+A run is bound by a set of named DIRECTIVES. Each is a POINTER into a section of the project's build
+method at `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, never a copy of the rule it points at — the method's own M1 forbids a rule appearing both
+there and in a carrier it points at, and this contract is a carrier.
+
+**Kit-owned, and the project may only EXTEND.** The core set is a constant in the driver, read by the
+gate leg through the same parse it uses for the phase and Definition-of-Done sets. `DIRECTIVES_EXTRA`
+is where a project adds; the core is not deletable from the project layer, and `DIRECTIVES_FLOOR`
+pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key holding the whole set
+was rejected: a project could then declare zero directives, which is a global waiver carrying no
+name, no reason and no record.
+
+**This section names no handle.** The list an agent reads is the table in the rendered Skill, and
+naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both
+directions, so a handle in one and not the other is a refusal rather than a discrepancy nobody sees.
+
+**A waiver is the owner's, taken once, at preflight.** `--waive <handle> --reason <text>` is accepted
+by `--preflight` and by no other verb, and only while no run-state file exists or the requested set
+equals the recorded one. That single refusal is what makes the owner turn provably the LAST one: no
+later verb can take an answer, and a re-preflight after a compaction re-issues the recorded set
+rather than opening a new turn. A waiver with no reason is refused, because one that records no
+reason is indistinguishable from one nobody meant.
+
+**What a waiver reaches, and what it does not.** It is recorded as a parked entry of the `waiver`
+kind, so the wrap-up derivation surfaces it with the other parked kinds. It relaxes the DIRECTIVE for
+that run only. It is **never a Definition-of-Done override** — the two are separate acts with
+separate records, and `--override` remains the only route to a DoD item. And it **never removes a
+GATE**: a directive relaxed here does not relax any check the merge bar performs, so a waiver whose
+directive has a machine-enforced consequence still meets that consequence at the bar.
 
 ## 9. The boundary this kit claims
 

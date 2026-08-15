@@ -13,3 +13,4 @@ tools/memory-tree/HYGIENE.template.md · the shipped hygiene rules describe this
 .memory-tree.conf · its READ_PATH_CEILING comment names the method as the largest read-path member
 tools/memory-tree/kit.toml · the deployer descriptor names the method as a RENDERED artifact of this kit — a destination, never a restatement
 tools/unattended/check-unattended.sh · check 16 arm B resolves each cited M-section against the method's own heading grammar; it POINTS at the sections rather than restating any rule
+tools/unattended/PROTOCOL.template.md · §10 names the build method as the carrier every directive points into, and §1 names it a run-time dependency; both POINT, neither restates a rule

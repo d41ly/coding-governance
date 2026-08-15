@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
+**Status:** OPEN · rev-5 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -214,6 +214,23 @@ the full bar at the push boundary.
 
 ## 8. Open questions
 
+none — the fork this spec carried was RESOLVED (owner, 2026-08-15) and §6's Landing takes no
+  edit. What is recorded here instead is a PARTIAL BUILD, because two scope items describe behaviour
+  that does not exist.
+
+  **S4 and S12 are NOT BUILT.** S4 adds §4 rows for `build-complete` and `closing-review-recorded`
+  and moves the count six to eight; S12 makes the roster REQUIRED and names `build-complete`'s
+  term 1 as the enforcement. Units 7 and 8 are PARKED, so neither item is in `DOD_CORE` and no
+  term 1 exists. Writing them would put the binding contract in the position this whole build
+  keeps finding others in: a record describing a rule nobody shipped. The count would say eight
+  over six rows, which is the same defect S12b fixes two sections up.
+
+  The other eleven items ARE built, because each documents something that shipped: §10 the
+  directive layer (units 2, 3, 9, 10), §2's fourth parked kind and its spill rule (unit 3), §1's
+  run-time dependency (unit 4), §7's `--waive` and `--plan` bullets (units 3, 6), §8's two
+  declarations (unit 2).
+
+
 none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (a) — protocol §6 Landing takes no edit.
 
   Option (b) was VETOED under M3 rule 2: it writes a rule into a governance carrier that already
@@ -260,6 +277,10 @@ owner declined, and it is recorded because unit 22's join depends on it.
 - rev-4 · 2026-08-15 · §8's audit fold. S12b and AC9b: §1 reads `Three properties` over FOUR bullets in both halves, in
   the very section S12 rewrites — the same class as the five-against-seven comment S9 fixes.
 
+- rev-5 · 2026-08-15 · built PARTIALLY and the omission is in §8. S4 and S12 describe the two
+  Definition-of-Done items units 7 and 8 park, so they would document behaviour that does not
+  exist — including a count of eight over six rows. Eleven items built; both halves moved in one
+  commit, as S11 requires.
 ## 10. Reuse audit
 
 - **The protocol pair itself, `tools/unattended/PROTOCOL.template.md` and
