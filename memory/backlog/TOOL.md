@@ -46,7 +46,7 @@
 - TOOL-cBriefedPilot-12 · CLOSED · leg check 16 joins the driver's directive registry to the Skill's table both ways and resolves every cited M-section
 - TOOL-cBriefedPilot-13 · DEFERRED · check 17 is built and proven on three forgeries; its arms need a test file damaged twice this run. The DEFECT it found IS fixed — a second preflight could take a second owner turn
 - TOOL-cBriefedPilot-14 · DEFERRED · leg check 18 needs arms in the same harness as 13
-- TOOL-cBriefedPilot-15 · CLOSED · M6 inverts under a mandate: disjoint passes are owed concurrency, bounded by a clause on not voiding the instruction layer
+- TOOL-cBriefedPilot-15 · CLOSED · M6 does NOT invert: unit 21's hunt found no dispatch route clearing the standard whole, so `parallel-when-disjoint` ships as a POINTER at M6 as written. The row previously claimed the inversion shipped; M6's own text is the witness it did not
 - TOOL-cBriefedPilot-16 · CLOSED · the method's pointers name the new layer; M10's delta index moves two to three
 - TOOL-cBriefedPilot-17 · CLOSED · absorbs TOOL-cFinalBerth-3; the 1.4 to 1.5 bump this build performs is the edit that reproduces it
 - TOOL-cBriefedPilot-18 · CLOSED · the protocol pair gains §10, §2's fourth parked kind, §4's count six to eight, and the domain-rules enumeration
@@ -61,3 +61,5 @@
 - TOOL-cBriefedPilot-27 · OPEN · `check-arms` certifies an assertion EXISTS in a test file; the suite certifies which lines RUN. Neither notices arms appended past the summary — unit 12 landed nine that never executed, and both gates were green. One of them should read the other's reachability
 - TOOL-cBriefedPilot-28 · OPEN · the parallelism routes are re-openable on evidence: R2+R5 needs E3 and E4 RUN (they never were); R3 needs the CLI on PATH; R1 needs a budget key without a prompt id. Per-route detail in cBriefedPilot's build/2026-08-15 parallelism recording
 - TOOL-cBriefedPilot-29 · OPEN · M7 re-reads BUILD-METHOD.md WHOLE at every pass boundary and nothing counts that RECURRING cost. The charter's fixed read path measures 72642 B against a 86476 ceiling; the per-boundary re-read is invisible to it. Measured 2026-08-15, not built
+- TOOL-cBriefedPilot-30 · OPEN · there is no `--park` verb: the protocol tells the agent to park mid-run and §2 declares four parked kinds, but only `--abort` and `--close --override` ever write one, so a decision refused mid-run has nowhere the gate reads. Hit during this build's own fold
+- TOOL-cBriefedPilot-31 · OPEN · `DIRECTIVES_EXTRA` widens what `--waive` accepts but check 16 joins only CORE against the Skill table, so an extra handle is waivable and unshowable at once — and unfixable by the project, the template being kit-owned. Contract call, not a defect fix
