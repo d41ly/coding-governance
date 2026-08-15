@@ -523,6 +523,32 @@ hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned ba
 same "the phase advanced to LANDING" \
   "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
 
+# ---- TOOL-cBriefedPilot-1: the override REPEATS. The scalar form overwrote the first pair, so
+# ---- verb_close blocked on the second unmet item forever with nobody to read the block.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+mkconf "false" "false"
+out=$(run --close tRun --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
+hit "$out" "close OK"
+hit "$out" "override recorded for 'gates-green'"
+hit "$out" "override recorded for 'records-current'"
+hit "$(cat memory/builds/tRun/RUN.md)" "bar run by hand"
+hit "$(cat memory/builds/tRun/RUN.md)" "index re-rendered by hand"
+same "two overrides parked, not one" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "2"
+
+# ---- the non-overridable item refuses wherever it sits, not only last. The scalar form could only
+# ---- ever see the FINAL pair, so a first-position authorization-reachable was invisible to it.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+out=$(run --close tRun --override authorization-reachable --reason "first" --override gates-green --reason "second")
+hit "$out" "the authorization item is NOT overridable"
+miss "$out" "close OK"
+
+# ---- a flag left pending when argv ends keeps its EMPTY reason, so it meets the missing-reason
+# ---- refusal that already exists rather than vanishing. No second branch was added for it.
+out=$(run --close tRun --override gates-green --reason "has one" --override records-current)
+hit "$out" "--override requires --reason: an unrecorded override is indistinguishable from a passing check"
+miss "$out" "close OK"
+
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")

@@ -912,8 +912,22 @@ verb_resume() { # slug
   return 0
 }
 
-verb_close() { # slug · override-item · reason
-  local slug="$1" ov="$2" reason="$3" rel item ck unmet=0
+# TOOL-cBriefedPilot-1 - EVERY accumulated override is validated, skipped and parked, not just the
+# last one. The override pairs arrive in the OV_ITEMS / OV_REASONS globals rather than as positionals,
+# because an array cannot be passed as one argument and splitting it back out of a string is the
+# delimiter problem the accumulator exists to avoid.
+is_overridden() { # item -> 0 when it appears in OV_ITEMS
+  local want="$1" j=0 n=${#OV_ITEMS[@]}
+  while [ "$j" -lt "$n" ]; do
+    [ "${OV_ITEMS[$j]}" = "$want" ] && return 0
+    j=$((j + 1))
+  done
+  return 1
+}
+
+verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason
+  n=${#OV_ITEMS[@]}
   check_slug "$slug" || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
@@ -922,22 +936,27 @@ verb_close() { # slug · override-item · reason
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
   refuse_if_terminal "$rel" --close || return 1
-  if [ -n "$ov" ]; then
+  # Validate EVERY pair before any of them is acted on. The three messages below are byte-unchanged
+  # from the single-override form, so their arms stay valid and no per-check ordinal moves.
+  while [ "$i" -lt "$n" ]; do
+    ov=${OV_ITEMS[$i]}; reason=${OV_REASONS[$i]}
     case " $(dod) " in *" $ov:"*) ;;
       *) fail 12 "--override names an item that is not in the declared DoD set, and an override on an item nobody declared is not an override: $ov"; return 1;; esac
     [ -n "$reason" ] || { fail 12 "--override requires --reason: an unrecorded override is indistinguishable from a passing check"; return 1; }
     # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
+    # It fires wherever the item appears in the list, not only first: the loop reaches every pair.
     case "$ov" in
       authorization-reachable)
         fail 21 "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
         return 1 ;;
     esac
-  fi
+    i=$((i + 1))
+  done
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
-    [ "$item" = "$ov" ] && continue
+    is_overridden "$item" && continue
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
@@ -948,10 +967,13 @@ verb_close() { # slug · override-item · reason
     fi
   done
   [ "$unmet" = 0 ] || return 1
-  if [ -n "$ov" ]; then
-    park "$rel" override "$ov" "$reason"
+  i=0
+  while [ "$i" -lt "$n" ]; do
+    ov=${OV_ITEMS[$i]}
+    park "$rel" override "$ov" "${OV_REASONS[$i]}"
     echo "unattended: override recorded for '$ov' (checker $(checker_of "$ov")) — parked entry written"
-  fi
+    i=$((i + 1))
+  done
   # The phase write is the CLOSE. Reporting success before checking it printed "close OK" over a
   # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
   # make the record agree with reality.
@@ -997,13 +1019,25 @@ park() { # file · kind · item · reason
 }
 
 # --------------------------------------------------------------------------------------- dispatch
-VERB=""; SLUG=""; KID=""; OV=""; REASON=""; arg=""
+# TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
+# second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
+# with nobody to read the block. Reasons contain spaces and may contain anything else an owner types,
+# so the pairs go into PARALLEL ARRAYS rather than a delimited string: a record separator inside a
+# free-text field the owner supplies is an injection, and the reason is exactly that field.
+#
+# `--reason` CLOSES the pair its preceding flag opened. With no pair open it keeps its scalar meaning,
+# which is what `--abort <slug> --reason <text>` uses. A flag still pending when argv ends keeps the
+# EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
+# of vanishing - the refusal is reached by the value, not by a second branch.
+VERB=""; SLUG=""; KID=""; REASON=""; arg=""
+OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --preflight|--status|--resume|--close|--landed|--abort) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
-    --override)     OV="${2:-}";  shift 2 || shift ;;
-    --reason)       REASON="${2:-}"; shift 2 || shift ;;
+    --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; shift 2 || shift ;;
+    --reason)       if [ "$OV_PEND" = ov ]; then OV_REASONS[$(( ${#OV_REASONS[@]} - 1 ))]="${2:-}"; OV_PEND=""
+                    else REASON="${2:-}"; fi; shift 2 || shift ;;
     --plan)         shift; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
@@ -1023,7 +1057,7 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
   --status)    verb_status "$SLUG" ;;
   --resume)    verb_resume "$SLUG" ;;
-  --close)     verb_close "$SLUG" "$OV" "$REASON" ;;
+  --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
 esac

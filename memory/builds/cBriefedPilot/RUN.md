@@ -33,8 +33,8 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: a87773d9c5b6e5b569aed50a193305710e4684f8
-phase: FOLDING
+witness: f90d63e405c6c4a27f74092ece7ef4817af5dba8
+phase: BUILDING
 keepalive: ad706085
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 709d260da8c81551e59da769aceca47202bb5923
