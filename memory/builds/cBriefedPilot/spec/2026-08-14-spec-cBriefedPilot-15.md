@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -158,6 +158,11 @@ boundary. No new leg.
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED by unit 21's recorded verdict, not by an argument made here.
+  The token reads `parallelism route: none`, so this unit takes BRANCH B: M6 is not touched and the
+  finding ships. The evidence is `build/2026-08-15-build-cBriefedPilot-2-parallelism-routes.md`,
+  which records per-route observations rather than conclusions. §8 said the resolution would be a
+  READ and not a design decision, and it was.
 **Which branch does this unit take?** Unresolved, and it cannot be resolved here: the resolver is
 unit 21's recorded verdict token, which does not exist yet. Options are branch A, the inversion, and
 branch B, the finding; both are fully specified above, so the resolution is a read, not a design
@@ -174,6 +179,10 @@ classification and correctly so.
   the ROW-document cap and not the guides cap this file falls under; and its unit-15 entry listed no
   dependency, which the owner's resolution made 21.
 
+- rev-2 · 2026-08-15 · branch B taken on unit 21's token. M6 is UNCHANGED, so this unit spends
+  ZERO lines and ZERO bytes of the method's budget — the measured cost S5 asks for, and the only
+  branch where that number is nil. The build README's design section is corrected so the record
+  does not describe a rule that did not ship.
 ## 10. Reuse audit
 
 - **`tools/memory-tree/kit-dogfood-parity.test.sh`** — the render seam, extended by using it rather

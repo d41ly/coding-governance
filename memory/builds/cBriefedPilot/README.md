@@ -119,13 +119,22 @@ and whose absence reads as silence. `DIRECTIVES_EXTRA` is the project extension 
 Nine of the eleven handles point at a rule that already exists and needs no edit. Three things are
 genuinely new:
 
-1. **M6 inverts under a mandate.** Today: "Sequence is the default; parallelism is a claim you
-   substantiate." The owner wants non-conflicting passes parallelized. Under a standing mandate the
-   claim is owed the other way — two passes meeting M6's three existing conditions SHOULD run
-   concurrently, because nobody is waiting to be asked. The three conditions, the write-set rule and
-   the fallback are unchanged. **The owner refused to let this ship on an excusing clause (P2):**
-   unit 21 first establishes whether any route dispatches a build pass concurrently without voiding
-   the directive layer, and unit 15 ships that finding if the answer is none.
+1. **M6's inversion DID NOT SHIP, and M6 is unchanged.** The intent was to invert "Sequence is the
+   default; parallelism is a claim you substantiate" under a standing mandate, so that two passes
+   meeting M6's three conditions were OWED concurrency. The owner refused at P2 to let that ship on a
+   clause excusing it where no mechanism exists, and bought unit 21's hunt instead.
+
+   Unit 21's verdict is `parallelism route: none`, recorded with per-route observations at
+   `build/2026-08-15-build-cBriefedPilot-2-parallelism-routes.md`. Unit 15 read that token and took
+   branch B: the finding ships, the rule does not. **D6 is the one owner directive this build does
+   not deliver**, and saying so here is the point of the branch — a record that described an
+   inversion nobody built would be worse than the gap itself.
+
+   The nearest survivor is a `Workflow` sidechain with one worktree per pass. It fails the evidence
+   standard on two criteria that were NEVER RUN rather than two that failed, which is a distinction
+   the recording preserves for whoever re-opens it. And the hunt found that the claim BLOCKING it —
+   `REVIEW-PROTOCOL.md` asserting a sidechain inherits no hooks and no `CLAUDE.md` — is measurably
+   false in both halves. Correcting a binding document is not unit 21's to do, so that is the owner's.
 2. **`build-complete`** — a new Definition-of-Done item. D8's "merge and push ONLY when the entire
    build is fully done" had no checker; `--close` would block on nothing.
 3. **`closing-review-recorded`** — a new Definition-of-Done item, for D7. It joins on the run's
@@ -313,7 +322,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | OPEN | rev-1 | 2026-08-14 |
-| [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | OPEN | rev-4 | 2026-08-14 |
