@@ -46,6 +46,10 @@
 - TOOL-cFinalBerth-1 · a terminal phase is written by a verb that EVALUATES what it claims, never by a phase move. `LANDING` becomes close-only with it: without that, the precondition gating `--landed` is satisfiable by one `--phase` call, which is the hole being closed
 - TOOL-cFinalBerth-2 · the merge-base cannot tell a run that BUILT NOTHING from one FULLY LANDED — it equals HEAD in both; the recorded base can. The refusal keeps its verb and changes its question, accepting a run-written input and bounding it three ways
 - TOOL-cSteadyMetronome-1 · a gate asserts what the SUBJECT does, never what the NODE does. The canary's elapsed-time ratio measured the machine and blocked three pushes over a tree it had passed; a rendezvous measures dispatch and ignores load
+- TOOL-cBriefedPilot-2 · the directive set is a KIT CONSTANT, never a conf key. A key lets a project declare zero directives, which is a global waiver carrying no name, no reason and no record — the argument CORE_FLOOR already made, applied one set over
+- TOOL-cBriefedPilot-3 · a waiver is taken at PREFLIGHT and nowhere else, enforced by ONE branch rather than promised by the Skill: accepted only while no run-state file exists or the requested set equals the recorded one. That is what makes the owner turn provably the last
+- TOOL-cBriefedPilot-18 · the contract names ZERO handles. The list an agent reads is the Skill's table, joined to the registry by leg check 16 in both directions; naming it twice is the drift a pointer design exists to avoid
+- TOOL-cBriefedPilot-21 · `parallelism route: none` — D6 does not ship. Measured: R3 dies on a PATH lookup, R1 on a budget key an unattended run cannot mint. And the claim that BLOCKED it — a sidechain inherits no hooks and no CLAUDE.md — is FALSE in both halves
 
 ## DEPL — deployer
 

@@ -81,6 +81,13 @@ headroom, so the unattended rules live in the domain-rules companion (§1) with 
 the template proper, both written to stay true for a non-adopting re-puller. A new universal-core
 section for an opt-in kit was rejected on both counts.
 
+**A run is bound by eleven named directives, and each is a POINTER.** The set is a kit constant the
+project may extend but not delete; the rules live in the build method and the contract names zero
+handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
+taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
+cannot take an answer and a re-preflight re-issues the recorded set. A waiver relaxes the directive,
+never a DoD item and never a gate.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -139,10 +146,15 @@ section rots silently and is worth re-deriving whenever the feature is touched.*
   and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
   above, and it was owned by nobody until this dossier row.
 
-- **The shipped protocol's version marker is not paired by any gate.** `check-kit-versions.sh` pairs
-  this kit's two script constants and not the doc it ships, which is how the marker sat at `1.2`
-  against `1.3` unnoticed. The memory-tree and memory-recall kits both pair their shipped doc; this
-  one does not. Corrected by value at 1.4; the gate is the open work.
+- **The DIRECTIVE LAYER is half-gated, and the ungated half is the enforcement.** The registry is
+  joined to the Skill's table in both directions by check 16, and every cited method section is
+  resolved. What is NOT gated is the parked waiver record: check 17 was built, proven on three
+  forgeries, and PARKED unbuilt because its arms need a harness this build damaged. So a waiver's
+  shape and its provenance are unchecked on the bar today.
+- **Two Definition-of-Done items are specced and absent.** `build-complete` and
+  `closing-review-recorded` are both parked, because each needs every close-path arm to run against
+  a fixture the shared one cannot supply. `--close` therefore still blocks on nothing where
+  completeness is concerned, which is the half of D8 that did not ship.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.

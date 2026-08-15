@@ -17,7 +17,7 @@
 - TOOL-aUnmannedHelm-10 · OPEN · three root docs (`AGENTS.md`, `WIRE-INTO-PROJECT.md`, `.gitattributes`) come out of a linked worktree CRLF with no `eol=lf` pin; nothing byte-reads them today, so this is latent, but `check-wiring.sh`'s eol population is scoped to `.claude/` and will never see them
 - TOOL-aStandingWrit-1 · SPECCED · the unattended run authorizes on the committed build README at BASE rather than an owner-authored mandate block, `RUN.md` becomes wholly generated, and a `--plan` verb derives the gap list from spec status headers and review records
 - TOOL-aStandingWrit-2 · OPEN · SECURITY in landed code: the pinned BASE anchors on a remote-tracking ref that `unattended.sh:119-120` says needs a push to move. `git update-ref` moves it offline; reproduced with a control, a forged anchor passes preflight, the leg and close
-- TOOL-aStandingWrit-3 · OPEN · the unattended INSTRUCTION layer — how an agent writes a sub-spec, runs the adversarial review, and evidences a built unit — is unowned in this tree: no branch, worktree, build or row named it on 2026-08-11. It must honour the state contract in aStandingWrit §4
+- TOOL-aStandingWrit-3 · CLOSED · STALE when written, and measurably so: aWrittenMethod closed all six of its units the same day and BUILD-METHOD.md has existed since. cBriefedPilot is what made that layer DEFAULT and waivable
 - TOOL-aStandingWrit-5 · OPEN · `.githooks/pre-commit`'s branch guard fails CLOSED on a bogus `GOV_DEFAULT_BRANCH` but is DISABLED by an honest-looking one: setting it to the branch already checked out makes the primary-tree guard pass. Lower severity than the pre-push twin, which is now fixed
 - TOOL-aStandingWrit-6 · OPEN · the unattended gate leg still recomputes BASE from `GOV_DEFAULT_BRANCH` and `refs/remotes/origin/<d>`, so handed a tree with a forged tracking ref it agrees with it. The driver's anchor is observed; the leg's is not, and its claim of independence is what is wrong
 - TOOL-aStandingWrit-7 · OPEN · nothing binds the EXECUTING kit code to code an owner approved: a run may edit the driver, the leg or the protocol and commit them, and every parity leg compares two files that same run can change together. This bounds every property the kit asserts
@@ -36,26 +36,28 @@
 - TOOL-cFinalBerth-3 · CLOSED · `check-kit-versions.sh` paired the unattended kit’s two SCRIPT constants but not the doc it SHIPS, which is how `PROTOCOL.template.md` sat at @1.2 unnoticed. Closed by TOOL-cBriefedPilot-17 — the population is DERIVED
 - TOOL-cFinalBerth-4 · OPEN · the three named refusals `aMooredAnchor` S4 scoped for check 9's silent exits never landed; its rev-4 carried-forward list omits S4 and the spec closed. With no `origin/HEAD` the block is skipped in silence, and check 15's ancestry half inherits it
 - TOOL-cFinalBerth-5 · OPEN · the run-gates canary's `par*2 < ser` ratio FLIPS run to run on one tree: red then GREEN on consecutive full bars at 550d9b6, no edit between; the red missed by 4.5% (7705x2 vs 14753). Its fixtures are fixed sleeps, so the margin is overhead-dependent by construction
-- TOOL-cBriefedPilot-1 · OPEN · `--override` stores a scalar, so a second one overwrites the first and `--close` blocks forever; one paired accumulator serves it and `--waive`
-- TOOL-cBriefedPilot-4 · OPEN · `--preflight` refuses an absent build-method carrier — the MUST-by-default teeth at the driver, which grades the RUN, not the leg, which grades the TREE
-- TOOL-cBriefedPilot-5 · OPEN · `--preflight` re-pins `base:` every invocation, so a resumed run is measured against a base it moved itself; write it only when the record carries none
-- TOOL-cBriefedPilot-6 · OPEN · `--plan` joins the README's authored roster ids against tracked specs, so a planned unit with no spec stops being invisible
-- TOOL-cBriefedPilot-7 · OPEN · the `build-complete` DoD item: `--close` blocks while a roster unit is unbuilt. D8's "land only when fully done" had no checker
-- TOOL-cBriefedPilot-8 · OPEN · the `closing-review-recorded` DoD item: a tracked review under this build names the run's pinned BASE
-- TOOL-cBriefedPilot-11 · OPEN · the Skill invokes `/session-kickoff` AFTER preflight and reads the README as roster; kickoff-first deadlocks at the READY card
-- TOOL-cBriefedPilot-12 · OPEN · leg check 16 joins the driver's directive registry to the Skill's table both ways and resolves every cited M-section
-- TOOL-cBriefedPilot-13 · OPEN · leg check 17 grades every parked waiver line for a declared handle and a non-empty reason; shape only, and P1 is why
-- TOOL-cBriefedPilot-14 · OPEN · leg check 18 asserts the Skill names kickoff AFTER preflight — order, not presence
-- TOOL-cBriefedPilot-15 · OPEN · M6 inverts under a mandate: disjoint passes are owed concurrency, bounded by a clause on not voiding the instruction layer
-- TOOL-cBriefedPilot-16 · OPEN · the method's pointers name the new layer; M10's delta index moves two to three
-- TOOL-cBriefedPilot-17 · OPEN · absorbs TOOL-cFinalBerth-3; the 1.4 to 1.5 bump this build performs is the edit that reproduces it
-- TOOL-cBriefedPilot-18 · OPEN · the protocol pair gains §10, §2's fourth parked kind, §4's count six to eight, and the domain-rules enumeration
-- TOOL-cBriefedPilot-19 · OPEN · the unattended kit identifies as 1.5 across both constants and the shipped doc marker
-- TOOL-cBriefedPilot-20 · OPEN · records: two dossiers re-derived, the rows this build closes, and the stale `aStandingWrit` row on the instruction layer
-- TOOL-cBriefedPilot-21 · OPEN · does ANY route dispatch a build pass concurrently without voiding the directive layer? Direct spawns exhaust a per-prompt budget that never resets in a run; a sidechain inherits no hooks. Decides unit 15's shape, and "no route" is a legitimate answer
-- TOOL-cBriefedPilot-22 · OPEN · check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table, which are joined to PHASES_CORE and DOD_CORE by no leg today
+- TOOL-cBriefedPilot-1 · CLOSED · `--override` stores a scalar, so a second one overwrites the first and `--close` blocks forever; one paired accumulator serves it and `--waive`
+- TOOL-cBriefedPilot-4 · CLOSED · `--preflight` refuses an absent build-method carrier — the MUST-by-default teeth at the driver, which grades the RUN, not the leg, which grades the TREE
+- TOOL-cBriefedPilot-5 · CLOSED · `--preflight` re-pins `base:` every invocation, so a resumed run is measured against a base it moved itself; write it only when the record carries none
+- TOOL-cBriefedPilot-6 · CLOSED · `--plan` joins the README's authored roster ids against tracked specs, so a planned unit with no spec stops being invisible
+- TOOL-cBriefedPilot-7 · DEFERRED · build-complete is sound and its roster join works on the live tree, but every close-path arm needs a COMPLETE build and the shared fixture cannot supply one. Blocked on a fixture unit not in this roster, which is scope
+- TOOL-cBriefedPilot-8 · DEFERRED · the second new DoD item hits the identical fixture wall as 7, derived rather than attempted. Both blocked on ONE unbuilt fixture unit
+- TOOL-cBriefedPilot-11 · CLOSED · the Skill invokes `/session-kickoff` AFTER preflight and reads the README as roster; kickoff-first deadlocks at the READY card
+- TOOL-cBriefedPilot-12 · CLOSED · leg check 16 joins the driver's directive registry to the Skill's table both ways and resolves every cited M-section
+- TOOL-cBriefedPilot-13 · DEFERRED · check 17 is built and proven on three forgeries; its arms need a test file damaged twice this run. The DEFECT it found IS fixed — a second preflight could take a second owner turn
+- TOOL-cBriefedPilot-14 · DEFERRED · leg check 18 needs arms in the same harness as 13
+- TOOL-cBriefedPilot-15 · CLOSED · M6 inverts under a mandate: disjoint passes are owed concurrency, bounded by a clause on not voiding the instruction layer
+- TOOL-cBriefedPilot-16 · CLOSED · the method's pointers name the new layer; M10's delta index moves two to three
+- TOOL-cBriefedPilot-17 · CLOSED · absorbs TOOL-cFinalBerth-3; the 1.4 to 1.5 bump this build performs is the edit that reproduces it
+- TOOL-cBriefedPilot-18 · CLOSED · the protocol pair gains §10, §2's fourth parked kind, §4's count six to eight, and the domain-rules enumeration
+- TOOL-cBriefedPilot-19 · CLOSED · the unattended kit identifies as 1.5 across both constants and the shipped doc marker
+- TOOL-cBriefedPilot-20 · CLOSED · records: both dossiers re-derived, the rows this build closed and deferred, the decisions it minted, and the stale aStandingWrit row on the instruction layer
+- TOOL-cBriefedPilot-21 · CLOSED · does ANY route dispatch a build pass concurrently without voiding the directive layer? Direct spawns exhaust a per-prompt budget that never resets in a run; a sidechain inherits no hooks. Decides unit 15's shape, and "no route" is a legitimate answer
+- TOOL-cBriefedPilot-22 · DEFERRED · extends check 16 arm A in the same harness as 13 and 14
 - TOOL-cBriefedPilot-23 · OPEN · a newline in an `--override` or `--abort` reason forges a second parked line, because `park()` writes it verbatim into a region with a line grammar. Unit 3 closes it for `--waive` only; the shared refusal was vetoed out of unit 1
 - TOOL-cBriefedPilot-24 · OPEN · `--plan` cannot see a unit BUILT on the run's branch but not landed: specs stay OPEN until the build lands (measured — cKeyedLaunchpad has 7 built units, all OPEN), so `next:` names unit 1 for the whole build and a resumed unattended run would rebuild it
 - TOOL-cBriefedPilot-25 · OPEN · only `--preflight` re-splices RUN.md's generated region and it refuses a dirty tree, so a mid-run edit to the build README strands the copy until the tree is clean and the keepalive id is to hand. Hit live on 2026-08-15 after the M4 fold
 - TOOL-cBriefedPilot-26 · OPEN · the driver's remote observation is environment-sensitive: the anchor arm passes under `bash unattended.test.sh` and FAILS under a python subprocess, measured 2026-08-15. Protocol §9 rests on that anchor, so a probe answering differently per context matters
 - TOOL-cBriefedPilot-27 · OPEN · `check-arms` certifies an assertion EXISTS in a test file; the suite certifies which lines RUN. Neither notices arms appended past the summary — unit 12 landed nine that never executed, and both gates were green. One of them should read the other's reachability
+- TOOL-cBriefedPilot-28 · OPEN · the parallelism routes are re-openable on evidence: R2+R5 needs E3 and E4 RUN (they never were); R3 needs the CLI on PATH; R1 needs a budget key without a prompt id. Per-route detail in cBriefedPilot's build/2026-08-15 parallelism recording
+- TOOL-cBriefedPilot-29 · OPEN · M7 re-reads BUILD-METHOD.md WHOLE at every pass boundary and nothing counts that RECURRING cost. The charter's fixed read path measures 72642 B against a 86476 ceiling; the per-boundary re-read is invisible to it. Measured 2026-08-15, not built
