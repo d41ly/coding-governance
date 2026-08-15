@@ -33,9 +33,11 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 7b3e7a06a61bdad58b28fdfb4ad1ec7dac46f297
-phase: FOLDING
+witness: 74892ce4a885dbe121b1a43bb80ab085594e33b6
+phase: ABORTED
 keepalive: ad706085
+keepalive-reaped: yes
+parked-surfaced: yes
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 8b8d6db834d2e6072fb55f8398d2cfd2dda4583e
 anchor-ref: refs/heads/main
@@ -145,3 +147,5 @@ for my convenience, and that is not a trade I will make unasked.
 What the next attempt needs: the leg fixture wants a build-method stub and a HEAD symref on its bare
 origin before it can run the driver at all — both established here — and the arms want writing with
 location-scoped edits, not content-scoped ones.
+
+2026-08-15T22:31:13Z abort · item cBriefedPilot · reason the build is not fully done, and directive land-once-done (D8, pointing at M8) is in force with no waiver taken: 16 of 22 units CLOSED, 5 DEFERRED (7, 8, 13, 14, 22), 1 BLOCKED (5, on a fork whose resolver is the owner). The decisive fact is that unit 7 IS the checker for this very rule -- build-complete, whose fifth term requires zero non-terminal units -- so the only reason a close would pass here is that this run failed to build the check that would have stopped it. Landing through that gap would be the run manufacturing its own authorization, which protocol section 1 forbids. WHAT I REFUSED TO DECIDE: whether 16 of 22 units is a landable build. That is a scope decision, reserved to the owner by M3 and not delegated by a standing mandate. The branch is green at 74892ce (54/54 legs, GATE_FULL) and needs one command to merge if the owner agrees.
