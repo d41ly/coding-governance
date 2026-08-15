@@ -47,6 +47,11 @@ distinction real.
    `memory/builds/<slug>/README.md` committed before your branch existed is the whole
    precondition. Preflight refuses a build folder you created, because a run that authorizes itself
    has no authorization. You also do not create the run-state file: preflight does that.
+
+   **READ it, though — it is also the ROSTER.** M2 makes the README's authored Units table the
+   roster for the whole build, and its Start-here section carries the state, the
+   classification and the next action. Asserting the file as authorization and never opening
+   it leaves you executing a build whose scope you have not read.
 2. **If — and only if — the invocation named a directive to waive: THIS IS THE LAST OWNER TURN.**
    Skip this step entirely when no handle was named, which is the ordinary case.
 
@@ -84,6 +89,17 @@ distinction real.
    advertises no default branch of its own, and when a second run is already live. It writes nothing until every one of those
    passes. Read the refusal it prints — each one names itself.
 
+5. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
+   The engine's unattended hand-back fires only when a run-state file already exists in a
+   non-terminal phase, and `--preflight` is the only thing that creates one. Invoked first it
+   halts at the READY card waiting for a confirmation nobody is present to give; invoked here it
+   emits the card and continues. That ordering is the whole reason this step is numbered rather
+   than mentioned.
+
+   It buys the orientation preflight does not: the manifest audit, the pointer map, the tier rule,
+   and the dated corrections and environment traps that repo has front-loaded. Skip it silently if
+   the project has no such skill — that is legal, and this kit states none of what it carries.
+
 ## While it runs
 
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
@@ -109,9 +125,10 @@ Ask what is left instead of re-reading prose for it:
 bash tools/unattended/unattended.sh --plan <slug>
 ```
 
-It prints each tracked spec's id, status and classification, and names the next unit. It cannot see a
-planned unit that has no spec yet, and says so on every run rather than printing a complete-looking
-list.
+It prints each tracked spec's id, status and classification, and names the next unit. It also joins
+the build README's roster region against the tracked specs, so a planned unit nobody has specced
+is reported as MISSING rather than silently omitted — and a roster whose markers are malformed is
+a named refusal rather than a complete-looking list.
 
 ## Resume
 
