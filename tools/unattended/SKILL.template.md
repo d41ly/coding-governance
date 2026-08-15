@@ -15,9 +15,34 @@ distinction real.
 
 ## Start a run
 
-0. **Read the build method first, if this project ships one:** `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`.
-   It is the memory-tree kit's, not this one's, so it may be absent — that is legal, and this kit
-   states none of what it carries.
+0. **Read `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md` WHOLE, before anything else.** Not conditionally.
+   Every directive below is a POINTER into a section of that file, so a run that has not read it is
+   bound by a set that resolves to nothing. `--preflight` refuses a tree where it is absent.
+
+   **The directives this run is bound by.** Each NAMES a rule and points at the section that states
+   it; none of them restates one, and a cell here that grew into a rule would be a defect in this
+   table rather than a second source of truth.
+
+   | Handle | What it names | Carrier | From |
+   |---|---|---|---|
+   | `minimal-prose` | the transcript rule under a mandate | M10 | D1 |
+   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | D2 |
+   | `forks-resolved` | when open questions are settled | M3 | D3 |
+   | `specs-reviewed` | the spec audit that precedes code | M4 | D4 |
+   | `reuse-first` | the recall and reuse obligation | M5 | D5 |
+   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | D6 |
+   | `passes-committed` | the commit boundary | M6 | D8 |
+   | `diff-reviewed` | the closing review of the cumulative diff | M8 | D7 |
+   | `land-once-done` | when a build may land | M8 | D8 |
+   | `conflicts-reconciled` | merge-conflict disposition | M8 | D8 |
+   | `wrap-up-derived` | how the wrap-up is composed | M9 | D8 |
+
+   Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
+   against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,
+   because nothing machine-checks a spec's reuse section for content. A waived run's spec §10 must
+   NAME the waiver, or the skip leaves no trace at all. **`land-once-done`** — waiving it does not
+   remove the Definition-of-Done item that observes completeness; that still owes an override at
+   close.
 1. **The build folder IS the authorization — you do not write one, and neither does the owner.** A
    `{{MEMORY_ROOT}}/builds/<slug>/README.md` committed before your branch existed is the whole
    precondition. Preflight refuses a build folder you created, because a run that authorizes itself
@@ -94,6 +119,11 @@ bash {{KIT_DIR}}/unattended.sh --close <slug> --override <item> --reason "<why>"
 
 The override is written into the run-state file as a parked entry and surfaces in the wrap-up. An
 override nobody can read afterwards is just a skipped check.
+
+**The pair REPEATS — one `--override <item> --reason <text>` per unmet item.** Two unmet items need
+two pairs in one invocation, and a reason belongs to the flag that precedes it. This matters because
+you are the only reader: supplying one pair for two unmet items leaves the second overridden on a
+reason written about the first, and the close records that as a decision somebody made.
 
 ## Land
 
