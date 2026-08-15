@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

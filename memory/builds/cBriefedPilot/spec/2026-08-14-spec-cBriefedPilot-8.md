@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
+**Status:** DEFERRED · rev-2 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 

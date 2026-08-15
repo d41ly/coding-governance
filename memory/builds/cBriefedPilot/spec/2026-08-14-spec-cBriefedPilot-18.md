@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists
 
-**Status:** OPEN · rev-5 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
+**Status:** CLOSED · rev-5 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
 
 ## 1. Goal
 

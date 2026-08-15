@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** DEFERRED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

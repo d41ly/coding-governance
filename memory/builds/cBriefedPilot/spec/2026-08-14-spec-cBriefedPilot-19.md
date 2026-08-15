@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-19 — the kit identifies as the version it now is
 
-**Status:** OPEN · rev-3 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

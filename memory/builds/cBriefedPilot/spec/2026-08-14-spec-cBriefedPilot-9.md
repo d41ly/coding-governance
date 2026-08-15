@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

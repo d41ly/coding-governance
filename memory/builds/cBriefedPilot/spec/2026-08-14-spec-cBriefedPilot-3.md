@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else
 
-**Status:** OPEN · rev-6 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -168,8 +168,9 @@ rewrites. The refusal is a mirror of the one `verb_abort` already carries for th
 
 ## 8. Open questions
 
-**RESOLVED (owner, 2026-08-14): no sixth refusal here; the visibility lands in unit 9's table.** The
-reasoning is below and is kept because it is what changed the answer.
+### P4 — RESOLVED (owner, 2026-08-14): no sixth refusal here; the visibility lands in unit 9's table
+
+The reasoning is below and is kept because it is what changed the answer.
 
 **P4 — how is `reuse-first`'s waiver made visible?** The design pass held that waiving it reds the
 full bar, which would have argued for a sixth refusal here. That is false, measured against source:

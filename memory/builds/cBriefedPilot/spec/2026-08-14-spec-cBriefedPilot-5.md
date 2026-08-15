@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** BLOCKED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

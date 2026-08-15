@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

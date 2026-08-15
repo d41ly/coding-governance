@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

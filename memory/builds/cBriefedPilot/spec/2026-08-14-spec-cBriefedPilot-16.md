@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-16 — the method's pointers name the new layer
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

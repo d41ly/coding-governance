@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
+**Status:** CLOSED · rev-4 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
