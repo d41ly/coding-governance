@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-14
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23
+ids: TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25
 ---
 
 # cBriefedPilot — the instructions an unattended build runs on, made default and waivable
@@ -296,7 +296,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 `gen_build_index.py` from the front matter and each spec's status header — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 22 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook · ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23
+**Build status:** OPEN · 22 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook · ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -316,7 +316,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | OPEN | rev-5 | 2026-08-14 |
-| [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | OPEN | rev-1 | 2026-08-14 |
+| [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | OPEN | rev-3 | 2026-08-14 |
 | [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | OPEN | rev-3 | 2026-08-14 |

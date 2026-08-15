@@ -423,6 +423,25 @@ check_wiring() {
 
 # At most one run-state file may be non-terminal, or "the run" is not well-defined and anything
 # keyed on it must either OR the phases together or pick one arbitrarily.
+# TOOL-cBriefedPilot-4 - every directive this run is bound by is a POINTER into a section of the
+# build method. A tree with no carrier holds a directive set that resolves to nothing, and before
+# this branch the run started anyway with nobody present to notice.
+#
+# The path expression is verb_resume's, not a second spelling and not a conf key: a key would be a
+# second name for a derivable value, which .unattended.conf's own header bans, and two spellings of
+# one path is how they drift apart. EXISTENCE only - what the sections CONTAIN is leg check 16 arm
+# B's question, and that arm stays SILENT exactly where this refuses, because the leg grades the
+# TREE and the driver grades the RUN.
+#
+# The path is bound to a NAME and placed last. check-arms reads the literal text up to the first
+# interpolation as the branch's signature, so a message that resumes after one can never be armed.
+check_method() {
+  local carrier="$M/guides/BUILD-METHOD.md"
+  [ -f "$carrier" ] && return 0
+  fail 34 "no build method under the memory root, so every directive this run is bound by points into a file that does not exist: $carrier"
+  return 1
+}
+
 check_single_live() {
   local n=0 f p live=""
   for f in $(GIT ls-files "$M/builds/*/RUN.md" 2>/dev/null); do
@@ -810,6 +829,7 @@ verb_preflight() { # slug · keepalive-id
   check_clean || true
   check_branch || true
   check_wiring || true
+  check_method || true
   check_single_live || true
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.

@@ -100,6 +100,12 @@ sed -i 's/^slug: tWrongSlug$/slug: someoneElse/' memory/builds/tWrongSlug/README
 # tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
 # would have tested the dirty-tree refusal while claiming to test creation.
 readme tFresh
+# TOOL-cBriefedPilot-4: the build-method carrier, which --preflight now REFUSES without. A stub,
+# because the driver tests existence and nothing else; the file whose sections have to resolve lives
+# in the LEG's fixture. It is created before the initial commit deliberately - every arm begins with
+# `reset_tree`, which runs `git clean -qfd`, and an untracked stub would be deleted by the first one.
+mkdir -p memory/guides
+printf '# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n' > memory/guides/BUILD-METHOD.md
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor, because that is now the only thing resolve_base will measure against: a
 # bare local branch is a ref the run can move with `git branch -f`, and moving it to HEAD was a
@@ -548,6 +554,28 @@ miss "$out" "close OK"
 out=$(run --close tRun --override gates-green --reason "has one" --override records-current)
 hit "$out" "--override requires --reason: an unrecorded override is indistinguishable from a passing check"
 miss "$out" "close OK"
+
+# ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
+# ---- directive is a pointer into a section of that file, so a run without it is bound by a set
+# ---- that resolves to nothing. The refusal joins the precondition block, so it writes nothing.
+reset_tree
+rm -f memory/guides/BUILD-METHOD.md
+# COMMIT the removal. Left dirty, check_clean refuses first and the two assertions below are
+# satisfied by the dirty-tree path instead of by the subject - over-determined, and they would
+# stay green with this unit's branch deleted. Observed: only the message arm went red.
+fixture
+out=$(run --preflight tFresh --keepalive-id KA-1234)
+hit "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
+hit "$out" "unattended: --preflight refused; the run-state file is unchanged"
+present=$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)
+same "a refused preflight left NO run-state file" "$present" "absent"
+
+# ---- the green control. Without it the arm above passes on ANY preflight failure, which is the
+# ---- fixture-passes-by-finding-nothing class this repo has already paid for once.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id KA-1234)
+hit "$out" "preflight OK"
+miss "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
 
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null

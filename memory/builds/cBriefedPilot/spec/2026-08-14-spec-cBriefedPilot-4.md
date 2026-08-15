@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -115,8 +115,16 @@ resolve lives in the LEG's fixture, not this one.
 - **AC3** — The refusal is observed RED with its arm in place and the branch removed.
 - **AC4** — Every pre-existing `--preflight` arm is green with the fixture carrying the stub, which
   is the observation that the fixture change is inert apart from the branch it arms.
-- **AC5** — `python tools/memory-tree/check-arms.py` is green with the floor raised and red with the
-  floor left unraised.
+- **AC5** — `python tools/memory-tree/check-arms.py` is green with the branch armed and the floor
+  raised, and RED when the branch is present and its arm is removed — twice over: once for the
+  unarmed branch by name, and once for 56 armed against a floor of 57.
+
+  *Corrected at rev-2, measured. The rev-1 wording — red with the floor left unraised — asserts an
+  observation that cannot happen. `ARMS_FLOORS` is one-sided upward, so 58 branches against a
+  floor of 57 passes; a floor catches a DELETED guard, never an added one. Left as written, AC5
+  was an acceptance criterion no run could ever fail, which is the class this build keeps
+  finding. What the floor raise actually buys is the SECOND refusal above: at the old floor,
+  dropping the arm leaves 56 armed against 56 and only the unarmed-branch check fires.*
 
 ## 7. Gates
 
@@ -136,6 +144,11 @@ its own stated reason. The build README records both.
   `build/2026-08-14-build-cBriefedPilot-1-design-pass.md`. Folds C10 and DEC-4; the free check number
   and the 61 measured `--preflight` invocations were re-measured against source at authoring.
 
+- rev-2 · 2026-08-15 · AC5 corrected against measurement. Its rev-1 form asserted that an
+  unraised `ARMS_FLOORS` reds on this unit's added branch; it does not, because the floor is a
+  one-sided minimum. Observed: floor unraised exits 0, arm removed exits 1. AC5 now names the
+  observation that exists. The `--preflight` count in §4's Rollout was 61 when this spec was
+  authored and is 66 today — unit 1's arms moved it; AC4 is the property, not the number.
 ## 10. Reuse audit
 
 - **`verb_resume` at `tools/unattended/unattended.sh:910`** — the seam. It already derives
