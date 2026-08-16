@@ -1,186 +1,251 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
 Both machine readers of a spec's §8 Open questions decide resolution with an unanchored
-case-sensitive substring over the section's FIRST non-blank line, so a §8 whose first line announces
-that a fork is NOT resolved classifies as resolved, and any unresolved bullet below that line is
-invisible. Harden both readers so the fork rule every other unit in this build writes is actually
-enforceable.
+case-sensitive substring, and both short-circuit on the section's first non-blank line, so a §8 whose
+first line announces that a fork is NOT resolved classifies as resolved and any unresolved bullet
+below it is invisible. Harden both readers so the fork rule every other unit in this build writes is
+actually enforceable.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/unattended/unattended.sh`'s `plan_state` stops testing `forkline ~ /RESOLVED/`.
-  The replacement requires the resolution marker to appear as the documented mark rather than as any
-  occurrence of the word: anchored to a bullet or sub-head, and carrying the attribution shape
-  `memory/TEMPLATE-SPEC.md` already demands — a resolver of `owner` or `agent`, a date, and the
-  optional `delegated` qualifier.
+- **S1** — `tools/unattended/unattended.sh`'s `plan_state` stops testing for the bare resolution
+  word anywhere on one line. The replacement walks every §8 ITEM and requires the documented mark:
+  the resolution word followed by a parenthesised attribution whose first field is `owner` or
+  `agent`, whose second is a date, and whose optional third is the delegation qualifier. The
+  classifier is tightened unconditionally, with no date gate, because it grades only the specs of the
+  build currently running.
 - **S2** — the same predicate in `tools/memory-tree/check-memory-hygiene.sh` check 12, at both the
-  per-item count and the first-line short circuit. One predicate, spelled once per gate, with the
-  two spellings byte-compared by an arm rather than trusted to stay in step.
-- **S3** — both readers stop deciding on the first non-blank line alone. `plan_state` classifies
-  FORKED when ANY §8 item is unresolved, matching what check 12 already attempts per item; check 12
-  stops short-circuiting a terminal spec's §8 on the first line's shape.
-- **S4** — the marker grammar becomes a stated contract in `memory/TEMPLATE-SPEC.md`'s §8 section,
-  where an author reads it, phrased as the shape the gate reads rather than as advice.
-- **S5** — a corpus pass before the predicate tightens: every tracked spec whose §8 currently passes
-  and would newly fail is enumerated, and each is either repaired in this unit or registered with a
-  reason. A predicate that reds landed work on the day it lands is not shippable.
-- **S6** — `KIT_MEMORY_TREE_VERSION` moves, because S2 edits a non-comment line of the hygiene
-  engine and the verdict-epoch gate dates the engine's verdicts by that constant.
+  per-item count and the first-line short circuit, gated by a new cutoff (S6). The two spellings are
+  joined by ONE CASE TABLE driving both, in the shape `tools/memory-tree/marker-contract.test.sh`
+  already uses for the generated-region markers — not by a byte-comparison of two dissimilar
+  languages.
+- **S3** — both readers stop deciding on the first non-blank line alone. The none form ends the
+  section only when the section has ZERO items; with any item present, the per-item walk decides and
+  no first line suppresses it.
+- **S4** — the marker grammar becomes a stated contract in the two carriers that today describe the
+  OLD behaviour: `memory/TEMPLATE-SPEC.md`'s §8 guidance, and `memory/guides/BUILD-METHOD.md` M3,
+  whose sentence "Keep §8's first non-blank line machine-legal … the hygiene gate reads that line and
+  nothing else" becomes false the moment S3 lands. Both ship from kits, so both templates move too.
+- **S5** — the predicate is MEASURED against the whole tracked corpus before it tightens, and the
+  measurement is recorded in the conf beside the cutoff it justifies, the way the acceptance-witness
+  ratchet records its own. The measurement is evidence for the cutoff, not a repair worklist.
+- **S6** — a new `.memory-tree.conf` cutoff key gating S2, set strictly ahead of every committed
+  spec's filename date so nothing landed is retroactively red. This is the fourth instance of a
+  pattern the conf already carries three times, and the reason it is used here rather than a waiver
+  registry is that check 12 HAS no waiver mechanism — its population is selected only by the dated
+  filename regex, the format cutoff and the diff-scope test.
+- **S7** — `KIT_MEMORY_TREE_VERSION` moves, because S2 edits a non-comment line of the hygiene
+  engine and the verdict-epoch gate dates the engine's verdicts by that constant. The constant is
+  required present on every tracked memory-tree template, so the marker-only edits ride with it.
 
 ## 3. Non-goals (OUT)
 
 - No change to what §8 MEANS, to the resolver-authority rules, or to who may sign a resolution. This
   unit changes only how a machine recognises the mark.
+- No repair of any landed spec. S6's cutoff is what makes that unnecessary, and rewriting a ratified
+  record is against the memory tree's own rule.
 - No new gate leg. Both readers already exist and both already run on the bar.
-- No repair of the planning verb's other known blindness beyond what S3 incidentally closes; the
-  tracked backlog row for it keeps its own disposition, and this spec's revision log names the
-  overlap rather than silently absorbing it.
 - No enforcement that a delegated resolution is signed as delegated rather than as the owner. The
-  attribution SHAPE is checked; whether the named resolver really decided is not checkable here and
-  this unit does not pretend otherwise.
+  attribution SHAPE is checked; whether the named resolver really decided is not checkable here.
+- No repair of the planning verb's other known blindness beyond what S3 incidentally closes. The
+  tracked backlog row for it keeps its own disposition.
 
 ## 4. Design
 
 ### Data model
 
-A §8 item is a line opening with a bullet marker or a `###` sub-head, which is the population check
-12 already walks. An item is RESOLVED when its text carries the mark in the documented shape:
-the literal resolution word immediately followed by a parenthesised attribution whose first field is
-`owner` or `agent`, whose second is a date, and whose optional third is the delegation qualifier.
-The section is resolved when it has at least one item and every item is resolved, or when its first
-non-blank line is the machine-legal none form.
+**An ITEM** is a line opening with a bullet marker or a `###` sub-head, TOGETHER WITH every following
+line until the next item or the end of the section. The block reading is not a preference: the spec
+template explicitly sanctions a multi-line fork, and the corpus's dominant convention puts the mark
+on an indented continuation line — the most recent closed build has both its §8 marks on the second
+line of their bullets. Both existing readers grade one line and have no notion of an item spanning
+lines, so block extraction is new work in both, and S1 and S2 each carry it.
 
-The current predicate accepts three strings it must not: a line saying a fork is not resolved, a
-line describing the resolution rule in prose, and a line quoting another spec's resolved fork. All
-three are reachable in ordinary authoring and the first is reachable by accident.
+**An item is RESOLVED** when its block carries the resolution word immediately followed by a
+parenthesised attribution whose first field is `owner` or `agent`, whose second is a date, and whose
+optional third is the delegation qualifier.
+
+**A SECTION is resolved** when either of two conditions holds, and the ordering between them is the
+whole of what rev-1 got wrong:
+
+1. it has ZERO items and its first non-blank line is the bare none or not-applicable form; or
+2. it has at least one item and EVERY item is resolved.
+
+**The none form never suppresses the per-item walk.** With any item present, condition 2 decides
+alone. Rev-1's §4 and its inventory row said the opposite of its own S3 and acceptance criteria, and
+the two readings select mutually exclusive code — this ordering is the resolution.
+
+The current predicate accepts three strings it must not: a line saying a fork is not resolved, a line
+describing the resolution rule in prose, and a line quoting another spec's resolved fork. All three
+are reachable in ordinary authoring and the first is reachable by accident.
 
 ### Inventory
 
 | Site | Today | After |
 |---|---|---|
-| `unattended.sh` `plan_state` | unanchored substring over the first non-blank line only | the shaped mark over every item |
-| `check-memory-hygiene.sh` check 12, per-item count | unanchored substring per item | the shaped mark per item |
-| `check-memory-hygiene.sh` check 12, first-line short circuit | section skipped when the first line opens with the none form | the none form still exits early; any other first line no longer suppresses the per-item walk |
+| `unattended.sh` `plan_state` | the bare word, on the first non-blank line only | the shaped mark, over every item's block; the none form ends the section only when there are no items |
+| `check-memory-hygiene.sh` check 12, per-item count | the bare word, on the item's opening line | the shaped mark, over the item's block |
+| `check-memory-hygiene.sh` check 12, first-line short circuit | a none or not-applicable first line suppresses the verdict whatever the walk found | it ends the section only over a zero-item section |
 | `memory/TEMPLATE-SPEC.md` §8 guidance | prose describing the mark | the same prose plus the shape the gate reads |
+| `memory/guides/BUILD-METHOD.md` M3 | states the gate reads the first line and nothing else | states the per-item rule this unit installs |
 
-The two gates cannot share source — one is a shell gate in the unattended kit, the other a shell
-gate in the memory-tree kit, and neither may import the other. The kits are independently
-installable and a cross-kit import would make one a dependency of the other. So the predicate is
-spelled twice on purpose, and the defence against drift is an arm that feeds one case table to both
-spellings, in the shape `tools/memory-tree/marker-contract.test.sh` already uses for the
-generated-region markers: the contract lives in the table, not in prose.
+The two gates cannot share source — one is a shell gate in the unattended kit, the other in the
+memory-tree kit, and neither may import the other, because the kits are independently installable
+and a cross-kit import would make one a dependency of the other. So the predicate is spelled twice
+on purpose, and the defence against drift is the shared case table S2 names.
 
 ### Migration
 
-S5 is the migration and it runs BEFORE S1 and S2 land, not after. The enumeration is mechanical: run
-the new predicate over every tracked spec, diff the resolved/unresolved verdict against the old
-predicate's, and read every spec whose verdict moves. A spec whose §8 is genuinely resolved but
-whose mark is malformed is repaired in place with a rev bump and a revision-log line. A spec that is
-genuinely unresolved under a terminal status is a pre-existing defect this unit surfaces rather than
-creates, and it gets a backlog row rather than a silent waiver.
+**There is none on disk, and S6 is why.** The cutoff grandfathers every landed spec by filename date,
+so the tightened predicate applies to specs written after it and to nothing else. This replaces
+rev-1's plan to repair or waive the affected specs, which was unbuildable in both halves: check 12
+has no waiver mechanism at all — its §8 grading block reads no registry and none of the six under
+`memory/project/` is consulted by it — and repairing a landed spec rewrites a ratified record.
+
+The consequence is that the corpus does NOT exercise the tightened arm, which this repo names as its
+own vacuity class. The arm is therefore explicit red and green fixtures in each gate's sibling test,
+which is the same disposition the streams ratchet took for the same reason and recorded in the conf.
 
 ### Alternatives rejected
 
-- **Anchor the match without requiring the attribution.** Cheaper, and it closes the accidental case
-  — a line saying a fork is not resolved no longer passes. It leaves the deliberate case open: a
-  bare resolution word with no resolver still counts, in the exact remedy that makes agent-signed
-  resolutions the norm. Rejected because the attribution is already mandatory in the authoring
-  contract and checking a rule nobody enforces is how that rule rotted.
-- **Fix only the hygiene gate.** The planning verb is what an unattended run actually consults
-  before building a unit, so leaving it blind leaves the run building forked units. Rejected.
-- **Fix only the planning verb.** Leaves a terminal spec with an unresolved fork passing the merge
-  bar. Rejected.
-- **Extract the predicate into a shared script both kits call.** Rejected on the install-prefix
-  rule: it would put a memory-tree file on the unattended kit's dependency list, and each kit
-  resolves its own prefix precisely so neither has to find the other.
+- **Anchor the match without requiring the attribution.** Cheaper, and it closes the accidental case.
+  It leaves the deliberate case open: a bare resolution word with no resolver still counts, in the
+  exact remedy that makes agent-signed resolutions the norm. Rejected because the attribution is
+  already mandatory in the authoring contract and checking a rule nobody enforces is how that rule
+  rotted.
+- **Grade the item's opening line only.** Cheaper in both readers and needs no block extraction.
+  Rejected on the corpus: the dominant convention puts the mark on a continuation line, so the
+  opening-line reading measures 33 of 41 item-bearing terminal specs newly red against 13 for the
+  block reading — a 2.5x swing that is an artifact of the reading, not of the specs.
+- **Repair or waive the affected specs instead of a cutoff.** Rejected in §4 Migration, on measurement.
+- **Fix only one reader.** The planning verb is what an unattended run consults before building a
+  unit, and the hygiene gate is what holds the merge bar. Leaving either blind leaves half the rule
+  unenforced.
+- **Extract the predicate into a shared script both kits call.** Rejected on the install-prefix rule:
+  each kit resolves its own prefix precisely so neither has to find the other.
 
 ### Files touched (estimate)
 
 `tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` ·
 `tools/memory-tree/check-memory-hygiene.sh` · `tools/memory-tree/check-memory-hygiene.test.sh` ·
-`memory/TEMPLATE-SPEC.md` and its kit template · `.memory-tree.conf` (the arms floors) · whichever
-specs S5's enumeration names.
+`tools/memory-tree/marker-contract.test.sh` or a new sibling beside it, for the shared case table ·
+`memory/TEMPLATE-SPEC.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md` ·
+`memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` ·
+`memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md` — marker-only, because the kit
+version gate requires the constant present on every tracked memory-tree template and the parity test
+byte-compares each against its installed copy · `.memory-tree.conf` (the new cutoff and its recorded
+measurement) · `memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; the hygiene engine and the
+conf are both on its watch list).
 
 ## 5. Production-readiness checklist
 
 - security — N/A. No new input, no new write path, no new surface.
-- perf / scale — N/A. The per-item walk already exists in check 12; the planning verb gains one pass
-  over a section it already reads.
+- perf / scale — the per-item walk already exists in check 12; both readers gain block extraction
+  over a section that is a few dozen lines at most.
 - a11y — N/A. No user-facing surface.
-- i18n — N/A. The mark is a repo-internal grammar, not prose for translation.
-- error / empty / loading states — a §8 with no items and no none form is today silently resolved by
-  the empty-first-line branch. The new predicate must decide it explicitly and the decision must be
-  refuse, on this repo's own rule that a check never selects an empty population.
-- observability — the enumeration in S5 is the observation, and it is recorded rather than run and
-  discarded.
-- risks — the real one is S5's blast radius: a predicate that reds landed specs. It is the reason S5
-  precedes S1 and S2 rather than following them.
-- testing + left-shift gates — the shared case table is the left-shift. A future third reader of §8
-  is expected to join it.
-- migration / rollback — rollback is reverting the two predicates; the version constant moves with
-  them so a half-reverted tree reds rather than passing quietly.
-- user docs — S4 is the doc change, and it is in the file authors actually read.
+- i18n — N/A. The mark is a repo-internal grammar.
+- error / empty / loading states — the one genuinely undecided shape is a §8 with NO items and no
+  none form, reached today through the empty-first-line branch and silently resolved. §8's F1 decides
+  it, and taking the refusal is the only thing in this unit that gives either gate a new `fail`
+  branch.
+- observability — the measurement S5 records is the observation, and it is committed beside the
+  cutoff rather than run and discarded.
+- risks — rev-1's risk was S5's blast radius. S6 removes it, and the residual risk moves to the
+  opposite failure: a cutoff set so far ahead that the rule never binds anything. It is set to the
+  landing date, which is the tightest value that grandfathers the corpus.
+- testing + left-shift gates — the shared case table is the left-shift, and a future third reader of
+  §8 is expected to join it rather than spell a third predicate.
+- migration / rollback — no migration. Rollback is reverting both predicates and the cutoff; the
+  version constant moves with them so a half-reverted tree reds rather than passing quietly.
+- user docs — S4 is the doc change, in the two files authors and runs actually read.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a spec's §8 opens with a line announcing the fork is not resolved,
-  `bash tools/unattended/unattended.sh --plan <slug>` classifies it FORKED, not `READY - build it`.
+  `bash tools/unattended/unattended.sh --plan <slug>` classifies it FORKED, not ready to build.
   Fixtured in `tools/unattended/unattended.test.sh` with the pre-change behaviour as the control.
-- **AC2** — When a spec's §8 first line carries the none form and a LATER bullet is unresolved,
+- **AC2** — When a spec's §8 first line carries the none form and a LATER item is unresolved,
   `bash tools/unattended/unattended.sh --plan <slug>` classifies it FORKED. Same fixture file.
-- **AC3** — When a spec under a terminal status carries an unresolved §8 item below a none-form
-  first line, `bash tools/memory-tree/check-memory-hygiene.sh` reds naming that file, and the arm
-  lives in `tools/memory-tree/check-memory-hygiene.test.sh`.
-- **AC4** — When a §8 item carries the resolution word with no parenthesised attribution, both
-  readers treat it as unresolved. One case table drives both, asserted by a new arm beside
+- **AC3** — When a spec dated at or after the new cutoff carries an unresolved §8 item below a
+  none-form first line under a terminal status, `bash tools/memory-tree/check-memory-hygiene.sh`
+  reds naming that file; when the same spec is dated before the cutoff, it is silent. Both arms in
+  `tools/memory-tree/check-memory-hygiene.test.sh`.
+- **AC4** — When an item's mark sits on a CONTINUATION line rather than the opening line, both
+  readers treat the item as resolved. One case table drives both spellings, asserted beside
   `tools/memory-tree/marker-contract.test.sh`.
-- **AC5** — When the new predicate runs over every tracked spec, the enumeration of specs whose
-  verdict moves is committed under this build's `build/` folder, and every named spec is repaired or
-  carries a backlog row.
-- **AC6** — When a non-comment line of `tools/memory-tree/check-memory-hygiene.sh` moves,
-  `bash tools/memory-tree/check-verdict-epoch.sh` stays green, which requires
-  `KIT_MEMORY_TREE_VERSION` to move in the same commit.
-- **AC7** — When every new refusal branch is in place, `python tools/memory-tree/check-arms.py
-  --check` exits 0, with the `ARMS_FLOORS` entries for both edited gates raised in the same commit.
-- **AC8** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC5** — When a §8 item carries the resolution word with no parenthesised attribution, both
+  readers treat it as unresolved. Same case table beside `tools/memory-tree/marker-contract.test.sh`.
+- **AC6** — When the corpus measurement is run, its result is recorded in `.memory-tree.conf` beside
+  the new cutoff, in the shape `SPEC_WITNESS_CUTOFF`'s comment already uses.
+- **AC7** — When `memory/guides/BUILD-METHOD.md` M3 is read, it describes the per-item rule and no
+  longer says the gate reads the first line and nothing else, and
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh` is green.
+- **AC8** — When a non-comment line of `tools/memory-tree/check-memory-hygiene.sh` moves,
+  `bash tools/memory-tree/check-verdict-epoch.sh` and `bash tools/check-kit-versions.sh` are both
+  green, which requires `KIT_MEMORY_TREE_VERSION` to move and every tracked memory-tree template's
+  marker to move with it.
+- **AC9** — When any NEW `fail` branch exists, it is armed in that gate's sibling test or pinned in
+  `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
+  --check` exits 0. The `ARMS_FLOORS` entries move only where `--report` shows the measured counts
+  actually grew.
+- **AC10** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
 
 ## 7. Gates
 
 `tools/memory-tree/check-memory-hygiene.sh` and its sibling test ·
-`tools/memory-tree/check-verdict-epoch.sh` and its sibling ·
-`tools/memory-tree/kit-dogfood-parity.test.sh` (the spec template ships from the kit) ·
-`tools/memory-tree/check-arms.py` · `tools/unattended/check-unattended.sh` and its two siblings ·
-`tools/memory-tree/marker-contract.test.sh` · `bash tools/run-gates.sh`.
+`tools/memory-tree/check-verdict-epoch.sh` and its sibling · `tools/check-kit-versions.sh` ·
+`tools/memory-tree/kit-dogfood-parity.test.sh` · `python tools/memory-tree/check-arms.py` ·
+`tools/unattended/check-unattended.sh` and its two siblings ·
+`tools/memory-tree/marker-contract.test.sh` · `skills/session-kickoff/manifest-check.sh` ·
+`bash tools/run-gates.sh`.
 
 ## 8. Open questions
 
-- **F1 — does a §8 with items but no marks and no none form refuse, or pass?** The empty-section
-  branch is what makes today's behaviour silent. Options: refuse, which is this repo's stated rule
-  about empty populations and is what §5 recommends; or pass, preserving today's behaviour for a
-  shape no landed spec is known to use. Recommendation: refuse, and let S5's enumeration price it.
+- **F1 — does a §8 with NO items and no none form refuse, or pass?** This is the shape reached
+  through the empty-first-line branch and silently resolved today; it is the only genuinely
+  undecided population, and it is exactly what §4's condition 1 protects. Options: refuse, which is
+  this repo's stated rule about empty populations; or pass, which is a deliberate choice to keep a
+  hollow section legal. Recommendation: refuse. Taking it gives each gate one new `fail` branch and
+  is the only thing in this unit that could move an arms floor.
 - **F2 — is the attribution's DATE validated as a date, or only as a non-empty field?** Validating
-  the shape costs one pattern and catches a mark whose date field holds prose. Not validating keeps
-  the predicate readable. Recommendation: shape only, on the same grounds the acceptance-witness rule
-  gives for checking that a bullet names something rather than that the thing exists.
+  the shape costs one pattern and catches a mark whose date field holds prose. Recommendation: shape
+  only, on the same grounds the acceptance-witness rule gives for checking that a bullet names
+  something rather than that the thing exists.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · initial draft. Records that S3 incidentally closes the blindness a tracked
-  backlog row raises against the planning verb's first-line-only read; that row keeps its own
-  disposition and is not claimed closed here.
+- rev-1 · 2026-08-16 · initial draft.
+- rev-2 · 2026-08-16 · folded the M4 spec audit's first round. The predicate was specified two
+  incompatible ways across §4, S3 and the acceptance criteria; §4 now states it once, with the
+  section-resolution conditions ordered so the none form never suppresses the per-item walk. The item
+  boundary was unstated and swung the affected population by 2.5x; §4 now defines an item as its
+  opening line plus its continuation lines, and both scope items carry block extraction. The repair
+  and waiver plan was unbuildable — check 12 has no waiver mechanism — and is replaced by a dated
+  cutoff, which is this conf's fourth use of that pattern. The floor-raise instruction contradicted
+  the green-bar criterion and is replaced by the pin-or-arm rule that actually binds. Added M3 as a
+  carrier, the kit-version gate and its four marker files, the shared case table in place of a
+  byte-compare, the manifest re-stamp, and the real output of the recorded reuse probe.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "decide whether a spec's open questions are resolved"`
-returns the two readers named in S1 and S2 and no third, which is what makes the two-spellings
-decision in §4 a bounded one rather than an open-ended one. The seam this unit extends is
-`tools/memory-tree/marker-contract.test.sh`'s case-table shape — an existing, gated arm that already
-drives four live readers of one marker grammar over a single table, which is exactly the problem
-this unit has with two readers of another. No new seam is created.
+returns neither reader. It returns the python-launcher resolvers, two codebase-map tests, a registry,
+the install-prefix gate, the manifest checker, the map library, the merge skeleton and a spec parser.
+The reason is recorded rather than worked around: the symbol tier of the corpus is Python-only, so a
+shell function cannot appear in it at all, and a tracked backlog row already records the same
+blindness for JavaScript. Rev-1 claimed this probe returned the two readers, which it does not.
 
-Recall terms used, recorded for the reground: fork resolution marker RESOLVED attribution delegated
-owner agent open questions predicate anchored substring plan_state hygiene check 12.
+The claim that there are exactly TWO readers rests instead on a grep of tracked shell and python for
+the predicate, which is the evidence that actually establishes it and which the next session should
+re-run rather than re-running the probe.
+
+The seam this unit extends is `tools/memory-tree/marker-contract.test.sh`'s case-table shape — an
+existing, gated arm that already drives four live readers of one marker grammar over a single table,
+which is exactly the problem this unit has with two readers of another. No new seam is created.
+
+Recall terms used, recorded for the reground: fork resolution marker attribution delegated owner
+agent open questions predicate anchored substring plan_state hygiene check 12 cutoff ratchet.

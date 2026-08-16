@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -15,16 +15,28 @@ stopped without reading prose.
 - **S1** — a kit-owned core halt vocabulary in the driver, one member per halt site this build's
   research actually enumerated, and no member invented for symmetry: the review budget was exhausted
   with the unit not clean; a fork survived the method's vetoes with no resolution the mandate
-  delegates; a unit awaits owner scope approval the mandate does not supply; a unit's acceptance or
-  gates could not be derived; the repository state at start was outside what the mandate reaches; a
-  gate is red and its fix lies outside the mandate's scope.
+  delegates; a unit awaits owner scope approval the mandate does not supply; a unit is blocked on an
+  EXTERNAL PREREQUISITE, which is a different owner turn from an unapproved scope and is the case
+  `TOOL-aBoundedVerdict-3` S1 routes here; a unit's acceptance or gates could not be derived; the
+  repository state at start was outside what the mandate reaches; a gate is red and its fix lies
+  outside the mandate's scope.
 - **S2** — `--abort <slug> --reason <text> --code <CODE>`, with the code REQUIRED and validated
   against the effective vocabulary. An unlisted code is refused naming the legal set.
-- **S3** — the code is recorded as its own authored fact through the existing fact writer, not
-  buried in the reason prose, so a reader is a field read rather than a parse.
+- **S3** — the code is recorded as an AUTHORED FACT through the existing fact writer, not buried in
+  the reason prose, so a reader is a field read rather than a parse. It is therefore the region's
+  EIGHTH fact, and S7 moves the pin that says seven rather than leaving the spec silently in breach
+  of it. The justification is the protocol's own membership test — nothing in the tree derives the
+  code, and only the run knows it — and the shape: a halt code is a per-run SINGLETON that three
+  readers read by key, which is what a fact is for. A tracked sibling spec declined an eighth fact
+  and added a park KIND instead, and that remains the right answer for append-only history; it is
+  the wrong answer for a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
+  takes the park-kind route for exactly that reason, so this build uses both shapes deliberately and
+  moves the pin exactly once.
 - **S4** — a project may APPEND members through a new `.unattended.conf` key and may not delete a
-  core member. The core set's size is pinned shrink-only by its OWN new conf key, deliberately not
-  by extending the existing two-field floor.
+  core member. The core set's size is pinned shrink-only by its OWN new conf key. Both keys are
+  NAMED in the design, and both are added to the adopter's seed conf as well as this repo's, because
+  the seed is what a real adopter copies and a gate-required key missing from it reds the unattended
+  leg's first check on install with no gate here noticing.
 - **S5** — three readers, because a vocabulary with no reader is decoration and this kit says so
   about its own phase writer: `--status` names the code on its single line; `--resume` names it and
   states that the run is finished rather than resumable; and a new leg check asserts that every
@@ -32,8 +44,21 @@ stopped without reading prose.
   vocabulary.
 - **S6** — the wrap-up derivation gains the code as a derived row, so the one turn the owner gets
   opens with why the run stopped.
-- **S7** — the protocol's phase and verb sections, the conf's key table, the rendered Skill, and the
-  kit version constants.
+- **S7** — the SEVEN-FACT PIN moves to eight, in every place it is spelled, because it has moved
+  twice before and left a stale reader each time. All four: the "exactly seven facts and nothing
+  else" sentence in `tools/unattended/PROTOCOL.template.md` and the installed
+  `memory/guides/UNATTENDED-PROTOCOL.md`; the closed enumeration beneath it, which gains the code as
+  its eighth entry; the driver comment in `unattended.sh`'s resume path, which today still says the
+  region carries FIVE and was already stale before this unit; and the count in
+  `memory/map/features/unattended.md`. Nothing counts the facts, so no leg catches a missed one —
+  which is why the list is enumerated here rather than left to the builder.
+- **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
+  rendered Skill, and the kit version constants.
+- **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
+  arm asserts they cannot silently stop carrying it. No existing gate joins a documented invocation
+  to the driver's argument set — the adopter check, the protocol parity check and the kickoff-engine
+  check are all copy-parity or literal-string tests — so without this the full bar stays green while
+  every documented invocation is missing a required argument.
 
 ## 3. Non-goals (OUT)
 
@@ -58,11 +83,14 @@ The vocabulary is a driver constant, read by the leg the same way the leg alread
 phase and Definition-of-Done sets from the driver rather than restating them. The effective set is
 the core set plus the project's declared extras, composed the way the phase set already is.
 
-The size pin gets its own conf key rather than a third field on the existing floor. That existing
-key parses by taking the text before the first colon and after the last, so a three-field value
-would silently drop the middle one — and this repo has already been burned by that key, where a
-malformed value disarmed both pins at once. A separate key is one more line of conf and no new
-failure mode; an extended key is one fewer line and a silent hole.
+The size pin gets its own conf key rather than a third field on the existing floor. The rationale
+rev-1 gave for that — that a three-field value is dropped in silence — is FALSE and was refuted
+against source: the existing key's parser matches a three-field value on its reject arm first and
+fires a named refusal saying it wants two integers separated by a colon, a guard added precisely
+because a malformed value once disarmed both pins. The decision survives on the grounds that
+actually hold: the floor key is a two-field contract whose malformed-value guard is written for
+exactly two fields, so widening it means editing that guard and its arm, while a separate key costs
+one conf line, one entry in the leg's required-key loop, and no change to a working refusal.
 
 | Fact | Written by | Read by |
 |---|---|---|
@@ -84,6 +112,7 @@ owner turn it needs:
 | review budget exhausted | unit 1's cap refusal | the unit's design is not converging; re-scope or split it |
 | fork unresolvable | the method's vetoes 2 and 3, and a scope fork | decide the fork |
 | awaiting scope approval | a unit whose status says it awaits the owner's scope approval | approve or amend the scope |
+| blocked on an external prerequisite | a unit whose status names a prerequisite outside the run | clear the prerequisite |
 | acceptance underivable | the kickoff engine's fifth interactive exit | supply the acceptance check, or split the unit |
 | precondition unmet | the kickoff engine's first three interactive exits | repair the repository state |
 | gate red out of scope | a red gate whose fix the mandate does not reach | authorise the fix, or widen the mandate |
@@ -103,10 +132,29 @@ mechanical and small; it is committed under this build's `build/` folder rather 
 
 ### Rollout
 
-The verb's new required argument is a breaking change for any caller. The callers are the rendered
-Skill and the kickoff engine's prose, both in this repository, both under parity gates that will red
-if they are not updated in the same commit. That is the rollout: there is no external caller,
-and the gates enforce it rather than a checklist.
+The verb's new required argument is a breaking change for every caller, and rev-1's claim that the
+existing gates enforce the update was verified FALSE. There are three documented call sites, not
+two: the Skill template and its render, the protocol template and its installed copy, and the
+kickoff engine. Every gate over them is a copy-parity or literal-string test — the adopter check
+compares the render against its template and conf, the leg compares the shipped protocol against the
+installed one, and the kickoff check asserts two literal strings and an exit count. **No gate joins a
+documented invocation to the driver's argument set.** So all three could keep omitting the argument
+with the full bar green, and the first unattended run to follow the Skill would meet a refusal on
+the one exit that exists for a run which cannot proceed.
+
+S9 is the rollout, and it has teeth: the three sites are an explicit scope item, and a source-level
+arm asserts that every tracked file spelling the abort invocation also spells the code argument.
+
+### The kickoff engine's size budget
+
+S9 edits `skills/session-kickoff/SKILL.md`, which rides a HARD gate leg no other unit in this build
+touches and which this spec's §7 did not name. Measured at base:
+`bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` prints 18215 of 18432
+bytes — 217 under, at 98.8% — and that exact argv is a leg in `tools/gate-legs.json`. The edit is the
+code argument on the one abort line plus a code named on each code-bearing exit, measured at 102
+bytes against a scratch copy, landing at 18317 with 115 to spare. **It fits, and the finding is that
+nothing in the spec knew the margin existed.** The builder re-measures rather than trusting either
+number, and the leg is now in §7.
 
 ### Alternatives rejected
 
@@ -128,12 +176,17 @@ and the gates enforce it rather than a checklist.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` and its sibling ·
-`tools/unattended/unattended.test.sh` · `.unattended.conf` · `tools/unattended/kit.toml` ·
-`tools/unattended/PROTOCOL.template.md` and the installed protocol ·
-`tools/unattended/SKILL.template.md` and the rendered Skill · `skills/session-kickoff/SKILL.md`
-(the exits' abort disposition names the code) · `memory/guides/BUILD-METHOD.md`'s wrap-up table ·
-`.memory-tree.conf` (arms floors) · the kit version constants.
+`tools/unattended/unattended.sh` (the vocabulary, the verb, and the stale five-fact comment in the
+resume path) · `tools/unattended/check-unattended.sh` and its sibling ·
+`tools/unattended/unattended.test.sh` · `.unattended.conf` ·
+`tools/unattended/.unattended.conf.example` — the seed a real adopter copies, which nothing
+validates against the required-key set · `tools/unattended/kit.toml` ·
+`tools/unattended/PROTOCOL.template.md` and the installed protocol (the verb section, the phase
+section, and the seven-fact pin with its enumeration) · `tools/unattended/SKILL.template.md` and the
+rendered Skill · `skills/session-kickoff/SKILL.md` (the exits' abort disposition names the code) ·
+`memory/map/features/unattended.md` (the fact count) · `memory/guides/SESSION-KICKOFF.md` (the
+manifest re-stamp; `.unattended.conf` and the kickoff engine are both on its watch list) · the kit
+version constants.
 
 ## 5. Production-readiness checklist
 
@@ -171,20 +224,36 @@ and the gates enforce it rather than a checklist.
 - **AC5** — When the core vocabulary shrinks below its declared floor,
   `bash tools/unattended/check-unattended.sh` reds; when the floor key is absent or malformed, it
   refuses rather than passing with the pin disarmed.
-- **AC6** — When the leg reads the vocabulary, it reads it from the driver:
-  `grep -c 'REVIEW\|SCOPE-APPROVAL' tools/unattended/check-unattended.sh` finds no member spelled in
-  the leg.
-- **AC7** — When the Skill and protocol are re-rendered,
+- **AC6** — When the leg reads the vocabulary, it reads it from the driver, asserted as the
+  COMPLEMENT rather than as a prefix grep: the leg's only reference to the vocabulary is the
+  `core_of` helper call taking the key as its argument, and no member token appears in
+  `tools/unattended/check-unattended.sh` under a word-anchored grep of the members themselves. The
+  prefix alternation rev-1 proposed cannot distinguish a member from an unrelated identifier, and
+  `TOOL-aBoundedVerdict-1` lands a constant whose name that alternation would have matched.
+- **AC7** — When every tracked file spelling the abort invocation is greped, each also spells the
+  code argument — all three documented call sites — and the arm that asserts it lives in
+  `tools/unattended/unattended.test.sh`.
+- **AC8** — When the region's fact count is greped across the four places it is spelled, none still
+  says seven or five: `grep -rn 'seven facts\|five facts' tools/unattended/ memory/guides/ memory/map/`
+  returns nothing.
+- **AC9** — When `skills/session-kickoff/SKILL.md` is edited,
+  `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` is green, re-measured
+  rather than assumed.
+- **AC10** — When the Skill and protocol are re-rendered,
   `bash tools/unattended/adopt-unattended.sh --check` reports in sync with no surviving placeholder
   shape, and `bash tools/check-kit-versions.sh` is green with both unattended constants moved.
-- **AC8** — `python tools/memory-tree/check-arms.py --check` exits 0 with both unattended
-  `ARMS_FLOORS` entries raised, and `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC11** — When any NEW `fail` branch exists, it is armed in that gate's sibling test or pinned in
+  `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
+  --check` exits 0. `ARMS_FLOORS` moves only where `--report` shows the measured counts grew.
+- **AC12** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
 
 ## 7. Gates
 
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
+`tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` — the hard leg on the kickoff
+engine, at 98.8% of its ceiling · `skills/session-kickoff/manifest-check.sh` ·
 `python tools/memory-tree/check-arms.py` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `python tools/drift-audit/drift_report.py
 --check` · `bash tools/run-gates.sh`.
@@ -213,6 +282,19 @@ and the gates enforce it rather than a checklist.
 
 - rev-1 · 2026-08-16 · initial draft. Records that the owner ratified the code-over-phase decision
   against the measured cost of both, so §3's central non-goal is a decision and not an omission.
+- rev-2 · 2026-08-16 · folded the M4 spec audit's first round. The set-level blocker: the code is an
+  EIGHTH authored fact in a region the binding protocol pins at seven, which rev-1 neither named nor
+  moved while a tracked sibling spec answered the identical question the other way by name. S3 now
+  argues the fact shape on the protocol's own membership test and on the singleton-versus-history
+  distinction, and S7 moves the pin in all four places it is spelled — including a driver comment
+  that was already stale at five. The rollout claimed two callers under enforcing gates; there are
+  three and no gate joins any of them to the argument set, so S9 and AC7 replace the claim. Added
+  the seventh member for a unit blocked on an external prerequisite, which
+  `TOOL-aBoundedVerdict-3` routes here and the six-member set excluded. Added the kickoff engine's
+  measured size budget and its hard gate leg, the adopter's seed conf, the map dossier's fact count,
+  and the manifest re-stamp. The floor-key rationale rested on a false claim about the existing
+  parser and is restated on grounds that hold. AC6's prefix grep would have broken under the unit
+  that lands after this one and is replaced by the complement assertion.
 
 ## 10. Reuse audit
 

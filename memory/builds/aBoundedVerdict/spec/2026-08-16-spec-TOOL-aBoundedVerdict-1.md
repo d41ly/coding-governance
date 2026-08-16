@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -19,9 +19,18 @@ its own rule that a rev-moved spec is unreviewed means folding one round's fixes
 - **S3** — the verdict vocabulary is the build method's own three, kit-owned: clean, clean with
   fixes, blocked. An unlisted verdict is refused. The three exist in the method as prose today and in
   no machine anywhere.
-- **S4** — the round count and last verdict are authored facts, one key per subject, written through
-  the existing fact writer. The key embeds the subject id and the line therefore does not lead with a
-  dash or a pipe, which is what the authored region's anchor ban requires.
+- **S4** — a round is recorded as one line in the PARKED region under a new `review` KIND, through
+  the existing park helper unchanged, carrying the subject and the verdict. The count is the number
+  of `review` lines naming that subject. **No new authored fact**, so the region's fact pin does not
+  move here: an append-only history of rounds is exactly what a park kind is for, and a tracked
+  sibling spec set the precedent by adding a kind rather than a field for the same reason.
+  `TOOL-aBoundedVerdict-2` takes the FACT route for the halt code, which is a per-run singleton read
+  by key, and the two shapes are chosen deliberately rather than for consistency. The helper's output
+  leads with a timestamp, so the region's anchor ban is satisfied by construction.
+- **S4a** — the `review` kind is a NON-DECISION kind, and `TOOL-aBoundedVerdict-5` owns that
+  taxonomy. Its surfaced-count refusal and the method's wrap-up derivation both count DECISION kinds
+  only, so review rounds do not inflate the count of decisions the owner must be shown. This is an
+  interface both specs spell, and it is spelled identically in both.
 - **S5** — the SUBJECT is the spec document for a method spec-audit round, and the BUILD SLUG for the
   method's closing diff review. One counter, one cap, two denominators, because the two review kinds
   have two denominators and a single per-unit cap would price a build-level event on a unit-level
@@ -55,18 +64,24 @@ its own rule that a rev-moved spec is unreviewed means folding one round's fixes
 
 ### Data model
 
-Two authored facts per subject, written through the driver's existing fact writer, which rewrites a
-key's line in place or appends it under the run-facts heading:
+One appended line per round, in the PARKED region, under a new `review` kind:
 
-| Fact | Value |
+| Field | Value |
 |---|---|
-| the subject's round count | an integer, at or under the cap |
-| the subject's last verdict | one of the three kit-owned tokens |
+| kind | `review` — a non-decision kind, per `TOOL-aBoundedVerdict-5`'s taxonomy |
+| item | the subject: a spec document for a spec-audit round, the build slug for the closing round |
+| reason | the verdict, one of the three kit-owned tokens |
 
-One key per subject rather than one key holding every subject's count. The per-subject shape reuses
-the fact writer unchanged and needs no parsing at all on the read side; a single packed key would
-need a read-modify-write the driver does not currently have. A build with twenty-two units costs
-forty-four lines in a file capped at two hundred and fifty, which the size budget absorbs.
+The count is derived, not stored: the number of `review` lines naming the subject. Rev-1 made these
+two AUTHORED FACTS, one key per subject, which was wrong twice over. The binding protocol pins the
+authored region at a closed set of facts and enumerates them, and rev-1 would have made these the
+ninth and tenth without naming or moving the pin — while a tracked sibling spec had already declined
+an eighth fact by name for this exact reason and added a park kind instead. And a round count is
+append-only HISTORY, which is what the parked region is; a fact is a mutable singleton, which a round
+count is not.
+
+Rev-1 also priced the per-subject keys against the run-state file's line cap. The region that grows
+carries its OWN byte budget with a spill rule, and that is the budget this spends.
 
 ### The boundary, stated
 
@@ -116,8 +131,14 @@ the same disposition the streams ratchet already took for the same reason and re
 - **Derive the count from the spec's rev number.** The only per-unit monotone number that exists
   today, and it counts the wrong thing: a rev bumps for any material change, review-driven or not.
 - **A conf key for the cap.** Rejected on S1's reused argument.
-- **Extend the existing core-set floor key to carry the cap.** That key parses by taking the text
-  before the first colon and after the last, so a third field is dropped in silence.
+- **Extend the existing core-set floor key to carry the cap.** Rev-1 rejected this because a third
+  field is "dropped in silence", which is FALSE and was refuted against source: the parser matches a
+  three-field value on its reject arm and fires a named refusal wanting two integers separated by a
+  colon. The rejection stands on the grounds that hold — the key is a two-field contract whose
+  malformed-value guard is written for exactly two fields, so widening it means editing that guard
+  and its arm, against a file constant that costs neither.
+- **Two authored facts per subject.** Rev-1's shape. Rejected in §4 Data model on the protocol's fact
+  pin and on the singleton-versus-history distinction.
 - **Refuse the third review at the review harness instead of the driver.** The harness reviews diffs
   and cannot perform a method spec audit at all, so it sees at most one of the two review kinds.
 
@@ -129,12 +150,24 @@ the same disposition the streams ratchet already took for the same reason and re
 `tools/unattended/SKILL.template.md` and the rendered Skill · `memory/guides/BUILD-METHOD.md` and
 its kit template · `.memory-tree.conf` (arms floors) · the kit version constants.
 
-### The method document's size budget
+### The method document's size budget — measured, and not what rev-1 said
 
-The method file is capped in lines and bytes and its own rule is that it grows only by displacement,
-because it is re-read whole at every pass boundary. S7 adds prose to it. The displacement is
-identified and made in the same commit, and the current margin is read from the gate rather than
-carried in this spec — a number written here would rot between the writing and the build.
+Rev-1 asserted the method file was at its line cap and made the displacement a gate requirement.
+Measured at base: `memory/guides/BUILD-METHOD.md` is 236 lines and 16466 bytes, and the hygiene
+gate's cap for a `memory/guides/` file is 61440 bytes and 750 lines — the file is at 31% of the
+gated cap with 514 lines of margin. The 20 KB and 250-line figures are the method's OWN line-8
+self-declaration, which no gate reads for a guide, because the two classes were split by a recorded
+decision.
+
+So the displacement obligation is EDITORIAL, not mechanical: it is M1's growth rule, machine-checked
+by nothing, and it exists because the file is re-read whole at every pass boundary. This spec honours
+it and says plainly that no gate will catch a failure to.
+
+The budget that IS mechanical is the charter read-path ceiling, measured at 70262 bytes against a
+ceiling of 86476 — **16214 bytes of headroom, shared** between the method and the unattended
+protocol, both of which this build grows. This unit's share is the method prose S7 adds;
+`TOOL-aBoundedVerdict-3` is the other spender and names the same figure. Neither carries the number
+as authority: the builder re-measures with the corpus reporter before spending.
 
 ## 5. Production-readiness checklist
 
@@ -174,8 +207,10 @@ carried in this spec — a number written here would rot between the writing and
 - **AC5** — When the leg reads the cap, it reads it from the driver:
   `grep -c 'REVIEW_CAP=' tools/unattended/check-unattended.sh` is zero.
 - **AC6** — When the method's spec-audit section is read, it states a disposition for a blocked
-  verdict and the round-count clarification, and `bash tools/memory-tree/check-memory-hygiene.sh`
-  is green — which requires the displacement, since the file is at its line cap.
+  verdict and the round-count clarification; the paragraph displaced to make room is absent from
+  `memory/guides/BUILD-METHOD.md` and present in `tools/memory-tree/README.md`; the file's line count
+  is no higher than before; and `python tools/memory-tree/corpus_ids.py --report` shows the read path
+  still under its ceiling.
 - **AC7** — When the method template and the installed copy are compared,
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` is green.
 - **AC8** — `python tools/memory-tree/check-arms.py --check` exits 0 with both unattended
@@ -212,6 +247,16 @@ carried in this spec — a number written here would rot between the writing and
 - rev-1 · 2026-08-16 · initial draft. Records the owner's decision that the cap binds unattended runs
   only, taken on the measurement in §3, so the absent corpus-wide enforcement is a decision rather
   than an oversight.
+- rev-2 · 2026-08-16 · folded the M4 spec audit's first round. No unit-only defect survived
+  verification; all three folds are set-level. The round count and last verdict were specced as the
+  ninth and tenth AUTHORED FACTS in a region the binding protocol pins closed and enumerates, which
+  rev-1 neither named nor moved — they become lines under a new non-decision park kind, which is
+  what a tracked sibling spec already chose for the same question, and the pin does not move here.
+  The size-budget paragraph and AC6 rested on a false premise: the file is at 31% of the gated cap,
+  not at it, and the displacement obligation is editorial with no gate behind it — the mechanical
+  budget is the read-path headroom, now allocated explicitly against the other unit that spends it.
+  The floor-key rejection rested on a false claim about the existing parser and is restated on
+  grounds that hold.
 
 ## 10. Reuse audit
 

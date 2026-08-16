@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -12,12 +12,14 @@ proceeds, parks or halts rather than stopping with nothing written.
 
 ## 2. Scope (IN)
 
-- **S1** — a disposition for the awaiting-approval status. A unit whose spec is REACHABLE from the
-  run's pinned base carries the same owner act that authorized the run, and is treated as
-  scope-approved by it. A unit whose spec the run itself authored is governed by the method's
-  existing authoring rule and is not awaiting anything. A unit at either status that is neither —
-  present at base under a status naming an external prerequisite — halts with the awaiting-approval
-  halt code.
+- **S1** — a disposition for the awaiting-approval status, in three cases. A unit whose spec is
+  REACHABLE from the run's pinned base carries the same owner act that authorized the run, and is
+  treated as scope-approved by it. A unit whose spec the run itself authored is governed by the
+  method's existing authoring rule and is not awaiting anything. A unit present at base under a
+  status naming an EXTERNAL PREREQUISITE halts with the external-prerequisite halt code — NOT the
+  awaiting-approval one, whose owner turn is to approve or amend scope and which would tell a
+  returning owner to do the wrong thing. `TOOL-aBoundedVerdict-2` carries that member and lands
+  first.
 - **S2** — the method's fork section states the collapse its own text already implies but never
   spells: under a mandate, a fork whose only surviving option trips the second or third veto has no
   delegated resolver, so the sentence that follows applies and it is parked. Today a reader reaches
@@ -109,16 +111,30 @@ fork rather than burying it here.
 ### Files touched (estimate)
 
 `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` ·
-`memory/guides/BUILD-METHOD.md` and its kit template · `tools/unattended/SKILL.template.md` and the
-rendered Skill · possibly `memory/TEMPLATE-SPEC.md`'s open-questions section, for the fact-question
-mark · the kit version constants for whichever kits move.
+`memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` ·
+`tools/memory-tree/README.md`, receiving the displaced paragraph ·
+`tools/unattended/SKILL.template.md` and the rendered Skill · possibly `memory/TEMPLATE-SPEC.md`'s
+open-questions section, for the fact-question mark · `memory/gotchas/vacuous-selector-empty-population.md`
+if §8's F4 is taken · `memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; the method and the
+kickoff engine are both on its watch list) · the kit version constants for whichever kits move, and
+their marker files.
 
-### The method document's size budget
+### The method document's size budget — measured, and not what rev-1 said
 
-The method file is re-read whole at every pass boundary and is capped accordingly; its own rule is
-that it grows only by displacement. S2, S4, S5 and S6 all add prose to it. This is the largest
-displacement demand of any unit in this build, and the displacement is identified and made in the
-same commit. The margin is read from the gate at build time, never carried in this spec.
+Rev-1 called this "the largest displacement demand of any unit in this build" against the wrong
+instrument. Measured at base: `memory/guides/BUILD-METHOD.md` is 236 lines and 16466 bytes against a
+gated cap of 61440 bytes and 750 lines for a `memory/guides/` file — 31% of the cap. The 20 KB and
+250-line figures are the method's own line-8 self-declaration, which no gate reads for a guide.
+
+The displacement obligation is therefore EDITORIAL — M1's growth rule, machine-checked by nothing —
+and it is real for that reason and not because a gate would catch it. S2, S4, S5 and S6 are four
+rules and will not fit in the 14 lines M1's own budget leaves, so the displacement is identified and
+made in the same commit.
+
+The MECHANICAL budget is the charter read-path ceiling: 70262 bytes measured against 86476, so
+**16214 bytes of headroom, shared** with `TOOL-aBoundedVerdict-1`, which grows the same method file,
+and with the unattended protocol, which this unit also grows. That unit names the same figure. The
+builder re-measures with the corpus reporter before spending rather than trusting either spec.
 
 ## 5. Production-readiness checklist
 
@@ -157,14 +173,26 @@ same commit. The margin is read from the gate at build time, never carried in th
 - **AC3** — When the fork section of `memory/guides/BUILD-METHOD.md` is read, the fact-question
   subclass names its three requirements — the probe, the deciding observation, and the liveness
   assertion — and states the built-arm prohibition with its two reasons.
-- **AC4** — When the method's fork section is read, the vacuous-selector counter-rule is stated and
-  cites the class record by name, and `python tools/memory-tree/gotchas.py --for-paths
-  memory/guides/BUILD-METHOD.md` still resolves that class.
-- **AC5** — When the method file is measured after the additions,
-  `bash tools/memory-tree/check-memory-hygiene.sh` is green, which requires the displacement.
+- **AC4** — When the fork section of `memory/guides/BUILD-METHOD.md` is read, the vacuous-selector
+  counter-rule is stated and cites `memory/gotchas/vacuous-selector-empty-population.md` by path.
+  The observation is that citation, NOT a gotchas run: a record's anchors are derived from the
+  backticked tokens in its OWN body, that record's tokens name the hygiene gate and its adopter, and
+  the class is not universal — so `gotchas.py --for-paths` over the method resolves it neither before
+  nor after this unit, and rev-1's criterion was unsatisfiable by any edit in scope. Giving the
+  record a method anchor is a separate decision, changing what every future diff touching the method
+  is checklisted for, and it is §8's F4.
+- **AC5** — When the method file is measured after the additions, its line count is no higher than
+  before, the displaced paragraph is absent from `memory/guides/BUILD-METHOD.md` and present in
+  `tools/memory-tree/README.md`, and `python tools/memory-tree/corpus_ids.py --report` shows the read
+  path still under its ceiling.
 - **AC6** — When the run-state file, the protocol and the method are cross-read, no rule in this
-  unit appears in two of them: the method's own pointer rule is satisfied, and
-  `bash tools/memory-tree/check-method-carriers.sh` is green.
+  unit appears in two of them. The observation is a literal grep: the sentence stating the veto
+  collapse appears in `memory/guides/BUILD-METHOD.md` and is absent from
+  `memory/guides/UNATTENDED-PROTOCOL.md`, and the sentence stating the awaiting-approval disposition
+  is present in the protocol and absent from the method. `bash tools/memory-tree/check-method-carriers.sh`
+  stays in §7 because the Skill template and its render are declared carriers, but it CANNOT witness
+  this criterion — its population loop skips every tracked path under the memory root, which is where
+  all three carriers live, and its own header states it is structural only.
 - **AC7** — When the kickoff engine is unchanged, `bash tools/unattended/check-unattended.sh` still
   finds at least the declared floor of interactive exits.
 - **AC8** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
@@ -195,12 +223,30 @@ same commit. The margin is read from the gate at build time, never carried in th
   the test to the run's judgment, which is what every other ordering decision already is; or add a
   dependency field to the README front matter, which is a new mechanism and belongs to its own unit.
   Recommendation: judgment, and a backlog row for the field.
+- **F4 — does `memory/gotchas/vacuous-selector-empty-population.md` gain an anchor naming the build
+  method?** Without one, the counter-rule S6 writes is prose no checklist ever surfaces to a reviewer
+  touching the method. With one, every future diff touching the method carries that class. Options:
+  add the anchor, which is one backticked path in the record's body and puts the record in this
+  unit's Files touched; or leave it, and rely on the rule being read in the method itself where it
+  binds. Recommendation: add it — the record already fires for the hygiene gate, and the method is
+  where the rule now lives.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft. Records that the fact-question subclass is the owner's chosen
   narrowing of a general testing rule, taken on the three-of-forty-six measurement, so §3's first
   non-goal is a decision rather than a scope omission.
+- rev-2 · 2026-08-16 · folded the M4 spec audit's first round. No blocker; the rules themselves
+  survived verification and the two highs were acceptance criteria that certify nothing. AC4 named a
+  gotchas run that resolves the class neither before nor after this unit, because a record's anchors
+  come from its own body — the observation is now the citation, and giving the record a method anchor
+  becomes F4. AC6 named a gate whose population loop skips every path the three carriers live under
+  and whose own header says it is structural only — the observation is now a literal grep, and the
+  gate stays in §7 for the write set it does reach. The size-budget paragraph and AC5 measured the
+  method against a self-declaration no gate reads; both are restated on the gated cap and the
+  read-path headroom, with the share this unit spends named against the other unit that spends it.
+  S1's third case routed an externally-blocked unit into the scope-approval code, whose owner turn is
+  the wrong one; it now names the member `TOOL-aBoundedVerdict-2` adds for it.
 
 ## 10. Reuse audit
 

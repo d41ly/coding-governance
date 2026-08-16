@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -25,12 +25,27 @@ generated and whose grammar the driver owns. Give parking a verb.
   fourth copy of that rule.
 - **S5** — `--status` reports the count of parked entries alongside the phase, so a run that parked
   everything and reached the close is visible without reading the file.
-- **S6** — the Definition-of-Done item asserting that parked decisions reached the wrap-up stops
-  being satisfiable by a run that parked nothing and attested anyway. The item stays agent-attested —
-  a machine cannot observe a wrap-up — but the driver additionally refuses the attestation when the
-  record carries parked entries and the attestation line is the only thing mentioning them.
-- **S7** — the protocol's verb section and the parked-decisions rows gain the verb, and the rendered
-  Skill gains the call.
+- **S6** — the Definition-of-Done item asserting that parked decisions reached the wrap-up gains a
+  countable observable. The attestation's VALUE carries the number surfaced, and the close verb
+  refuses when that integer does not equal the number of parked lines in the record. The item stays
+  agent-attested — a machine cannot observe a wrap-up — but "I surfaced them" becomes "I surfaced
+  four, and the record holds four". Two constraints bound the shape:
+  - It extends the existing key's value rather than adding a field. The current predicate matches the
+    key with a yes-or-true value and tolerates trailing text, so a richer value costs no new authored
+    fact and does not touch the region's seven-fact pin.
+  - **The refusal lives in the close verb ONLY.** The evaluator is shared: the abort verb calls it for
+    the same item, and the abort verb writes its own parked line. A refusal in the shared helper would
+    block the exit that exists for a run which cannot proceed, which is the hazard the driver's own
+    comment warns about by name. The abort path keeps the existing attestation test unchanged.
+- **S7** — the parked region's KINDS become a declared two-class taxonomy, because this unit is the
+  first to need the distinction and `TOOL-aBoundedVerdict-1` depends on it. A **decision** kind is
+  one the owner must be shown — the existing abort and override kinds, and this unit's park. A
+  **record** kind is history the owner need not adjudicate, of which `TOOL-aBoundedVerdict-1`'s
+  review round is the first. S6's count and the method's wrap-up derivation both range over DECISION
+  kinds only. Without this, a build's review rounds would inflate the count of decisions a run must
+  surface, and the two units would disagree about what a parked line is.
+- **S8** — the protocol's verb section and the parked-decisions rows gain the verb and the taxonomy,
+  and the rendered Skill gains the call.
 
 ## 3. Non-goals (OUT)
 
@@ -70,11 +85,12 @@ verb must not reformat it.
 | callers of `park()` | the abort verb and the close verb's override | those two plus `--park` |
 | a park's required fields | none — the method asks in prose | three, refused by the driver |
 | seeing that a run parked | read the file | `--status` reports the count |
-| the attested Definition-of-Done item | a grep for a line the run writes about itself | the same grep, plus a refusal when the record carries parks the attestation does not account for |
+| the attested Definition-of-Done item | a grep for a line the run writes about itself | the same grep, plus a close-verb refusal when the attested COUNT does not equal the parked-line count |
 
 S6 is the part worth stating plainly: it does not make the item machine-checked. It narrows one
-specific dishonesty — a record with parked entries and a bare attestation — and leaves the general
-case exactly as attested as it was. The protocol's own boundary section is the model for saying so.
+specific dishonesty — a record with parked entries and an attestation that does not account for them
+— and leaves the general case exactly as attested as it was, since the run authors both numbers. The
+protocol's own boundary section is the model for saying so.
 
 ### Alternatives rejected
 
@@ -126,13 +142,16 @@ installed protocol · `tools/unattended/SKILL.template.md` and the rendered Skil
 - **AC3** — When a field spells the declared bypass flag, the verb refuses before writing, and
   `bash tools/unattended/check-unattended.sh` is green afterwards — the arm proves the refusal
   prevented the wedge rather than merely reporting it.
-- **AC4** — When the record is terminal, `--park` refuses through the shared refusal, and the
-  driver's own phase-writer population test covers the new verb without a new fixture of its own.
+- **AC4** — When the record is terminal, `--park` refuses through the shared refusal. The verb is
+  ADDED to the finished-record drive list in `tools/unattended/unattended.test.sh`, reusing that
+  arm's existing fixture; the arm's derived phase-writer count stays at five, because the park verb
+  writes no phase.
 - **AC5** — When a run has parked entries, `bash tools/unattended/unattended.sh --status <slug>`
   names the count on its single line.
-- **AC6** — When a record carries parked entries and the attestation line is bare,
-  `bash tools/unattended/unattended.sh --close <slug>` refuses naming the attested item and the
-  record key, matching the existing refusal's shape.
+- **AC6** — When a record carries four parked lines and the attestation counts fewer,
+  `bash tools/unattended/unattended.sh --close <slug>` refuses naming the attested item, the record
+  key and both integers. The same record aborts WITHOUT that refusal, proving the close-verb-only
+  placement rather than asserting it.
 - **AC7** — When the Skill is re-rendered, `bash tools/unattended/adopt-unattended.sh --check`
   reports in sync and the render carries no surviving placeholder shape.
 - **AC8** — `python tools/memory-tree/check-arms.py --check` exits 0 with the driver's `ARMS_FLOORS`
@@ -162,6 +181,12 @@ installed protocol · `tools/unattended/SKILL.template.md` and the rendered Skil
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft.
+- rev-2 · 2026-08-16 · folded the M4 spec audit's first round. S6's refusal was phrased three
+  different ways with no named observable and was attached to an evaluator the abort verb shares,
+  which would have wedged the exit that exists for a run unable to proceed; it now names a countable
+  observable carried in the existing attestation's value, and states close-verb-only placement with
+  the reason. AC4's second clause read as a false claim about today's test rather than as the
+  instruction it is, and is rewritten as an instruction.
 
 ## 10. Reuse audit
 

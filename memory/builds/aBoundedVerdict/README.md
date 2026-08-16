@@ -73,13 +73,13 @@ it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | OPEN | rev-1 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | OPEN | rev-2 | 2026-08-16 |
 
-Records live under `spec/` and `build/`.
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units — the authored roster
@@ -115,10 +115,28 @@ concurrently — and their write sets intersect in the protocol document, so the
 - **No unit adds a phase-vocabulary member.** The measured cost of doing so is in the research
   record, and the owner's second decision rules it out. A unit that finds itself wanting one has
   found a fork, not a licence.
-- **Every new refusal branch is armed in the same unit that adds it.** Adding one refusal to the
-  driver was measured to red the harness meta-gate immediately, naming the unarmed branch. Both
-  unattended gates sit at fully-armed floors, so the arm is not optional and its floor entry moves
-  in the same commit.
+- **Every new refusal branch is armed in the same unit that adds it** — armed in that gate's sibling
+  test, or pinned in `memory/project/unarmed-branches.txt` with the reason it cannot be. That
+  pin-or-arm refusal is the mechanism, not the floors: `ARMS_FLOORS` is a one-sided MINIMUM that reds
+  only when a measured count falls BELOW it, so raising it is never what makes an arm mandatory and
+  raising it without a real branch reds the bar. The floors move only where the report mode shows the
+  measured counts actually grew. Measured: adding one refusal to the driver reds the meta-gate
+  immediately, naming the unarmed branch — and only one of the two unattended gates is fully armed,
+  the driver carrying a standing pin for one branch.
+- **The authored region's fact pin moves exactly once, and only for a singleton.** The binding
+  protocol pins that region at a closed, enumerated set of facts, and the pin has moved twice before
+  leaving a stale reader each time — the driver's own resume comment still says five. This build
+  therefore splits by SHAPE, not by convenience: `TOOL-aBoundedVerdict-2`'s halt code is a per-run
+  singleton three readers read by key, so it becomes the eighth fact and that unit moves the pin in
+  all four places it is spelled. `TOOL-aBoundedVerdict-1`'s review rounds are append-only history, so
+  they become lines under a new park KIND and move nothing — which is what a tracked sibling spec
+  chose for the identical question, by name.
+- **Any unit touching a path on the kickoff manifest's watch list re-audits the claims derived from
+  it and re-stamps the manifest in the same commit.** Every unit in this build touches at least one:
+  the hygiene engine and `.memory-tree.conf`, `.unattended.conf`, the kickoff engine, and the build
+  method are all watched, and the manifest ratchet is a merge-bar leg that reds on a watched file
+  changed with no re-stamp at or after the change. `memory/guides/SESSION-KICKOFF.md` is in each
+  affected unit's Files-touched list for that reason.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.
