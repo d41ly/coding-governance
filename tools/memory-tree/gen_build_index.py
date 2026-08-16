@@ -41,6 +41,7 @@ import subprocess
 import sys
 import tempfile
 
+CR = chr(13)   # one carriage return; see _is() and _one_cr()
 RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
@@ -383,31 +384,57 @@ def render_region(build: dict) -> str:
     return "\n".join(out)
 
 
-RECORDS_SENTENCE = re.compile(r"Records live under [^.]*\.[ ]?")
+# A period ends the sentence only when whitespace or end-of-line follows it. A dot INSIDE the claim
+# — `notes.md`, `(see AGENTS.md)` — is content. The first cut used `[^.]*` and stopped at the first
+# dot, deleting `Records live under `spec/` and `notes.` mid-token and writing the fragment back as
+# prose: the exact corruption this unit exists to prevent, one class narrower than the line-scoped
+# removal the review had already rejected.
+RECORDS_SENTENCE = re.compile(r"Records live under (?:[^.]|\.(?!\s|$))*\.[ ]?")
+RECORDS_ANCHOR = "Records live under"
 
 
 def strip_records_sentence(readme_text: str, readme: str) -> str:
     """Remove the AUTHORED folder-claim sentence from the body, OUTSIDE the marker pair.
 
-    SENTENCE-scoped, never line-scoped, and that distinction is the whole safety property.
-    Measured over the corpus: in 17 of 17 carriers the sentence ENDS mid-line and the next
-    sentence begins on the same line, wrapping onward —
+    SENTENCE-scoped, never line-scoped: measured over the corpus, in 17 of 17 carriers the sentence
+    ENDS mid-line and the next sentence begins on the same line, so deleting the LINE destroys
+    unrelated prose in every file.
 
-        Records live under `spec/`, `build/` and `reviews/`. The table below is
-        GENERATED from the status header of every spec in this folder ...
+    FENCE-AWARE, because a README documenting this very migration quotes the retired boilerplate
+    inside a code block — and the first cut rewrote that block. Unit 5 of this same build added the
+    fence reader precisely because a scanner that ignores fences is wrong by construction; the writer
+    has no excuse the reader did not.
 
-    so deleting the LINE destroys "The table below is" in every file it touches and orphans the
-    line after it. The first draft bounded the removal to "a single anchored LINE" and called that
-    a safety property; it was a description of the wrong unit, and every acceptance criterion it
-    carried would have passed while prose was eaten.
+    THE WHOLE DOCUMENT outside the marked slice is in scope, not merely the text above it. Bounding
+    the scan at the opening marker left an authored claim below the close marker neither removed nor
+    refused, so the file shipped two contradicting sentences and `--check` was a stable fixed point
+    on that state.
 
-    A second match outside the region is a REFUSAL, not a second removal: two matches mean the
-    anchor is not identifying what it was reasoned about.
+    TWO REFUSALS, not one. More than one match is a refusal, as before. And a line carrying the
+    anchor that the SENTENCE pattern does not match is also a refusal — a claim wrapped across lines
+    is exactly the case where the anchor is not identifying what it was reasoned about, and silently
+    leaving it produces the same two-answers state by a different route.
     """
     lines = readme_text.split("\n")
-    opens = [i for i, l in enumerate(lines) if l.rstrip("\r") == MARK_OPEN]
-    end = opens[0] if opens else len(lines)
-    hits = [i for i in range(end) if RECORDS_SENTENCE.search(lines[i])]
+    opens = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_OPEN]
+    closes = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_CLOSE]
+    inside = range(opens[0], closes[0] + 1) if opens and closes and closes[0] >= opens[0] else range(0)
+    fenced = {n for n, line in unfenced_lines(readme_text) if line is None}
+    unfenced_no = {n for n, line in unfenced_lines(readme_text) if line is not None}
+
+    hits, anchored = [], []
+    for i, line in enumerate(lines):
+        if i in inside or (i + 1) not in unfenced_no:
+            continue
+        if RECORDS_SENTENCE.search(line):
+            hits.append(i)
+        elif RECORDS_ANCHOR in line:
+            anchored.append(i)
+    if anchored:
+        where = ", ".join(str(i + 1) for i in anchored)
+        raise Problem(f"{readme}: line(s) {where} carry the folder-claim anchor but no complete "
+                      f"sentence — a claim wrapped across lines is not identifying what this remover "
+                      f"was reasoned about, so nothing is removed")
     if not hits:
         return readme_text
     if len(hits) > 1:
@@ -457,7 +484,12 @@ def apply_region(readme_text: str, region: str, readme: str) -> str:
     # author wrote, in a file they ran this tool over for another reason. Refusing is the only
     # reading that cannot edit prose behind the author.
     def _is(line, mark):
-        return line.rstrip("\r") == mark
+        # ONE trailing CR, not all of them. awk's `sub(/\r$/, "")` in the three unattended readers
+        # removes exactly one, so `rstrip("\r")` would accept a line ending in two CRs that they
+        # refuse — a divergence introduced by the very change that removed two others. It cannot be
+        # demonstrated on an MSYS node, where the runtime strips CR before awk sees a byte, so it is
+        # asserted at SOURCE level here rather than by a fixture that would pass either way.
+        return (line[:-1] if line.endswith(CR) else line) == mark
     opens = [i for i, l in enumerate(lines) if _is(l, MARK_OPEN)]
     closes = [i for i, l in enumerate(lines) if _is(l, MARK_CLOSE)]
     if not opens and not closes:
@@ -724,6 +756,33 @@ def do_selftest() -> int:
             "is not identifying one sentence", lambda: plan(tc, cc))
         arm("the derived sentence names only the folders that exist", "Records live under `spec/`.",
             lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
+
+        # ---- the four shapes the closing review reproduced against the first cut. Each corrupted or
+        # ---- silently skipped an authored README, and each is now a fixture rather than a promise.
+        td = os.path.join(base, "recdot"); os.makedirs(td)
+        cd_ = _rec(td, "Records live under `spec/` and `notes.md`. The table below is\nGENERATED.")
+        # The surviving line must be EXACTLY the next sentence. Asserting merely that "The table
+        # below is" appears does NOT discriminate: the truncating pattern leaves `md`. The table
+        # below is`, which contains it — both first-cut arms passed over the corruption they were
+        # written to catch, and only the negative control exposed them.
+        arm("a dot INSIDE the claim does not truncate the match, leaving no fragment",
+            chr(10) + "The table below is" + chr(10),
+            lambda: plan(td, cd_)[0]["memory/builds/tOne/README.md"])
+        te = os.path.join(base, "recfence"); os.makedirs(te)
+        ce = _rec(te, "The old text read:\n\n```\nRecords live under `spec/`, `build/`. Quoted.\n```\n\nNow derived.")
+        arm("a fenced QUOTE of the sentence is left untouched", "Records live under `spec/`, `build/`. Quoted.",
+            lambda: plan(te, ce)[0]["memory/builds/tOne/README.md"])
+        tf = os.path.join(base, "recbelow"); os.makedirs(tf)
+        cf = _rec(tf, "intro")
+        _p = os.path.join(tf, "memory", "builds", "tOne", "README.md")
+        write_text(_p, read_text(_p) + "\n### later\n\nRecords live under `build/`. Read in order.\n")
+        run("git", "add", "-A", cwd=tf); run("git", "commit", "-q", "-m", "b", "--no-verify", cwd=tf)
+        arm("a claim BELOW the marker pair is removed too, not ignored", "1",
+            lambda: str(plan(tf, cf)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tg = os.path.join(base, "recwrap"); os.makedirs(tg)
+        cg = _rec(tg, "Records live under `spec/`, `build/` and\n`reviews/`. The table below is GENERATED.")
+        arm("a claim WRAPPED across lines is a named refusal, not a silent skip",
+            "no complete sentence", lambda: plan(tg, cg))
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)
