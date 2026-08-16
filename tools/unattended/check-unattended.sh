@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. SIXTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. SEVENTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -360,6 +360,45 @@ while IFS= read -r f; do
   if [ -n "$BYPASS_BAN" ] && grep -qF -- "$BYPASS_BAN" "$f"; then
     fail 11 "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on: $BYPASS_BAN in $f"
   fi
+  # ---- 17: a parked WAIVER names a declared handle, carries a reason, and was in the run-state
+  # ---- file's FIRST committed blob. Unit 3 refuses a bad waiver at the moment of writing; this is
+  # ---- the SECOND OPINION over what actually landed.
+  # ----
+  # ---- Only the waiver kind is joined. `park()` writes four, and the other three legitimately
+  # ---- arrive late — an `override` is written at `--close`, an `abort` reason later still — so
+  # ---- joining them to the first blob would red every honest run. The waiver's whole claim is that
+  # ---- it was taken at preflight, which is exactly why the join means something on it alone.
+  # ----
+  # ---- HONEST LIMIT, in source rather than in a document read at a different time (check 13's
+  # ---- precedent): run locally this proves little, because the run writes BOTH sides — it can
+  # ---- commit a waiver at pass 4 and the blob it is compared against is one it also authored.
+  # ---- What changes is that the same leg re-run in a clone the run never touched now has something
+  # ---- to catch here. This is not an authorization verdict and does not claim to be.
+  while IFS= read -r wl; do
+    [ -n "$wl" ] || continue
+    # Free text LAST, so nothing after the reason is ever read: a reason that could contain the
+    # separator would make this parse ambiguous, which is why unit 3 refuses a newline in one.
+    wh=${wl#* waiver · item }; wh=${wh%% · reason *}
+    wr=${wl#* · reason }
+    case " $DIRECTIVES_CORE $DIRECTIVES_EXTRA " in
+      *" $wh:"*) ;;
+      *) fail 17 "a parked waiver names a handle outside the effective directive set, so the record claims a relaxation of a rule no verb would have accepted: $wh in $f" ;;
+    esac
+    [ -n "$wr" ] \
+      || fail 17 "a parked waiver carries an empty reason, and a waiver recording no reason is indistinguishable from one nobody meant: $wh in $f"
+    # --diff-filter=A with `tail -1` takes the OLDEST add, so a file deleted and re-added is still
+    # judged against its original commit. Rename following is off on purpose: this leg selects its
+    # population at an exact path, so a renamed run-state file is a different file to every check.
+    # SILENT when the file has no committed blob at all — that is the honest preflight-to-first-
+    # commit window, and reddening it would red a correct run with nobody present to read it.
+    wfirst=$(GIT log --diff-filter=A --format=%H -- "$f" 2>/dev/null | tail -1)
+    if [ -n "$wfirst" ]; then
+      GIT show "$wfirst:$f" 2>/dev/null | grep -qF -- "$wl" \
+        || fail 17 "a parked waiver line is absent from the run-state file's FIRST committed blob, so it was appended after the record was created and the claim that the owner took it at preflight is not what landed: $wh in $f"
+    fi
+  done <<WAIVERS
+$(grep -F ' waiver · item ' "$f" 2>/dev/null | grep -F ' · reason ' || true)
+WAIVERS
 done <<EOF
 $RUNS
 EOF

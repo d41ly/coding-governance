@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit
 
-**Status:** DEFERRED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -158,14 +158,15 @@ trip, only the charter's gate-suite bullet moves, for its check count.
 
 ## 8. Open questions
 
-**Silent or red when the run-state file has no committed blob? — RESOLVED at authoring: silent, with
-the cost written down.** Red is the stricter reading and it reds the honest preflight-to-first-commit
+### Silent or red when the run-state file has no committed blob? — RESOLVED at authoring: silent
+
+The cost is written down. Red is the stricter reading and it reds the honest preflight-to-first-commit
 window on every diff-scoped run, with nobody present to interpret it. The residual it leaves is a
 weaker form of a hole §9 already enumerates, so the trade buys nothing it does not already concede.
 This is the spec author's decision, not a fork the owner declined.
 
-**The whole line, or the extracted `(handle, reason)` pair? — RESOLVED at authoring: the whole
-line.** The pair form needs a second parser over the blob, and the two parsers would then have to
+### The whole line, or the extracted `(handle, reason)` pair? — RESOLVED at authoring: the whole line
+ The pair form needs a second parser over the blob, and the two parsers would then have to
 agree about whitespace forever. The line is stable because unit 3's re-preflight does not re-park,
 and `grep -qF` needs no parser at all.
 

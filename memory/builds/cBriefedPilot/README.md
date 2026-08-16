@@ -320,7 +320,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | CLOSED | rev-4 | 2026-08-16 |
 | [TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster](spec/2026-08-14-spec-cBriefedPilot-11.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | DEFERRED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | DEFERRED | rev-1 | 2026-08-16 |
 | [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | CLOSED | rev-2 | 2026-08-16 |

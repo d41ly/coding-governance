@@ -620,5 +620,102 @@ hit "$(run)" "the kit's CORE directive set has shrunk below its floor, and delet
 reset_tree
 same "the tree is still clean after nine mutations" "$(run >/dev/null 2>&1; echo $?)" "0"
 
+# ---- check 17, the parked WAIVER: a declared handle, a non-empty reason, and presence in the
+# ---- run-state file's FIRST committed blob. TOOL-aStandingWrit-8 names this arm set by id — the
+# ---- kit had driver arms and leg arms and ZERO arms that run the driver and THEN the leg over one
+# ---- tree — so the green control's waiver line is PRODUCED BY `--preflight --waive`, never
+# ---- hand-authored. A hand-authored line only tests the checker against its own idea of the grammar.
+# ----
+# ---- A FRESH build slug, because `--diff-filter=A | tail -1` takes the OLDEST add: reusing tRun,
+# ---- whose RUN.md is already committed, would compare against a blob written before any waiver
+# ---- existed and the control would fail for a reason that has nothing to do with the check.
+reset_tree
+# The driver's preflight OBSERVES the remote's own HEAD advertisement, and this suite's bare
+# origin has no HEAD symref because no leg check ever needed one. Set it here, where the only
+# arms that run the driver live; nothing else in this file reads the remote's advertisement.
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+git checkout -q main
+printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n' > memory/guides/BUILD-METHOD.md
+mkdir -p memory/builds/tWaive
+cat > memory/builds/tWaive/README.md <<'RM'
+---
+slug: tWaive
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-tWaive-1
+---
+
+# tWaive
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+<!-- /gen:build-index -->
+RM
+# tRun's record is RUNNING, and a second live run trips check 7 — 'the run' stops being well
+# defined for anything keyed on it. Retire it in the same commit so this block's green control
+# measures check 17 rather than a collision this fixture created.
+sed -i 's/^phase: RUNNING$/phase: ABORTED/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
+git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
+WP=$(git rev-parse HEAD)
+wreset() { git reset -q --hard "$WP"; git clean -qfd; }
+drive() { bash tools/unattended/unattended.sh "$@" 2>&1; }
+wline() { grep -F ' waiver · item ' memory/builds/tWaive/RUN.md; }
+
+# GREEN CONTROL: the driver writes the waiver, the record's first commit carries it, the leg is silent.
+wreset
+dout=$(drive --preflight tWaive --keepalive-id k1 --waive minimal-prose --reason taken-by-the-owner)
+hit "$dout" "preflight OK"
+same "the driver wrote a waiver line the leg can select" "$([ -n "$(wline)" ] && echo yes)" "yes"
+git add -A && git commit -q -m waived --no-verify
+out=$(run)
+same "a tree whose waiver was taken at preflight exits 0" "$?" "0"
+miss "$out" "check 17"
+
+# arm 1 — an UNDECLARED handle. Edited before the first commit, so the join is satisfied and this
+# arm can only fire on the membership test rather than on two branches at once.
+wreset
+drive --preflight tWaive --keepalive-id k1 --waive minimal-prose --reason taken-by-the-owner >/dev/null 2>&1
+sed -i 's/· item minimal-prose ·/· item no-such-handle ·/' memory/builds/tWaive/RUN.md
+git add -A && git commit -q -m bad-handle --no-verify
+out=$(run)
+hit "$out" "a parked waiver names a handle outside the effective directive set, so the record claims a relaxation of a rule no verb would have accepted"
+miss "$out" "absent from the run-state file's FIRST committed blob"
+
+# arm 2 — an EMPTY reason. Unit 3 refuses one at the moment of writing; this is the second opinion
+# over a record where that refusal was bypassed by editing the file directly.
+wreset
+drive --preflight tWaive --keepalive-id k1 --waive minimal-prose --reason taken-by-the-owner >/dev/null 2>&1
+sed -i 's/· reason taken-by-the-owner$/· reason /' memory/builds/tWaive/RUN.md
+git add -A && git commit -q -m empty-reason --no-verify
+hit "$(run)" "a parked waiver carries an empty reason, and a waiver recording no reason is indistinguishable from one nobody meant"
+
+# arm 3 — THE JOIN, and the whole point of the check: a well-formed waiver naming a declared handle
+# with a real reason, APPENDED after the record was created. Every shape test passes; only the git
+# join can see that the owner did not take it at preflight.
+wreset
+drive --preflight tWaive --keepalive-id k1 >/dev/null 2>&1
+git add -A && git commit -q -m no-waiver --no-verify
+printf '2026-08-16T00:00:00Z waiver · item minimal-prose · reason appended later\n' >> memory/builds/tWaive/RUN.md
+git add -A && git commit -q -m appended --no-verify
+out=$(run)
+hit "$out" "a parked waiver line is absent from the run-state file's FIRST committed blob, so it was appended after the record was created and the claim that the owner took it at preflight is not what landed"
+miss "$out" "outside the effective directive set"
+miss "$out" "empty reason"
+
+# arm 4 — S5: a record STAGED but never committed is in the population (`git ls-files` reads the
+# index) and has no first blob, so the join is SILENT. Reddening it would red the honest
+# preflight-to-first-commit window with nobody present to interpret it.
+wreset
+drive --preflight tWaive --keepalive-id k1 --waive minimal-prose --reason taken-by-the-owner >/dev/null 2>&1
+git add -A
+out=$(run)
+miss "$out" "absent from the run-state file's FIRST committed blob"
+
+# restore: main back to the shared anchor, or every later arm inherits tWaive and the method file.
+git checkout -q main; git reset -q --hard "$ANCHOR0"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
