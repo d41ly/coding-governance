@@ -12,16 +12,16 @@ isn't in the code (the *(ask user)* items below); propose-and-flag anything infe
 filled template to the project's governing doc (its agent-instruction file, e.g. `AGENTS.md` /
 `CLAUDE.md`, or `docs/PARALLEL.md`) and place the filled companion beside it under the name the
 template's §-stubs spell. Then run `grep -nE '\{\{[A-Z]'` over **both** written files to confirm no
-placeholder survived — a template-only grep passes green while 14 of the 37 placeholders sit
-unfilled in the companion, and the §-stubs then point at a file the project never received.
+placeholder survived — a template-only grep passes green while the companion's placeholders sit
+unfilled, and the §-stubs then point at a file the project never received.
 
 ## Placeholders
 
-37 in total: 24 in the template and 14 in the companion, which sums to 38 because the groups are
+38 in total: 24 in the template and 15 in the companion, which sums to 39 because the groups are
 **not disjoint**. **1 shared: `{{MEMORY_ROOT}}`** — it appears in both files and must be filled
 IDENTICALLY in each. Every other placeholder is filled in exactly one place.
 
-The counts below are per-file and each is individually correct; the union is what the 37 counts.
+The counts below are per-file and each is individually correct; the union is what the 38 counts.
 Do not read a per-file heading as a share of the total.
 
 ### In `parallel-coding-governance.template.md` — 24
@@ -55,14 +55,16 @@ Do not read a per-file heading as a share of the total.
   including the pins that are MEASURED per corpus and never inherited from another repo.
 - **Output discipline**: `{{PROSE_AUDIT}}` (the audit-script location, or "none yet — thresholds still bind").
 
-### In `parallel-coding-governance.domain-rules.md` — 14
+### In `parallel-coding-governance.domain-rules.md` — 15
 
 - **§1 unattended runs**: `{{MEMORY_ROOT}}` — **SHARED with the template group above; fill both
   identically.** The memory tree's root, matching the memory-tree kit's
   conf. It resolves the pointer to the unattended protocol; the block states no rule of its own.
 - **§4 runtime & verification**: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - **§11 toolchain**: `{{TOOLCHAIN_NOTES}}`.
-- **§12 architecture**: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}`.
+- **§12 architecture**: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}` ·
+  `{{LEXICON_CONF}}` — the naming declaration's path (the `lexicon/` kit's conf, `.lexicon.conf` at
+  the repo root by default). Only needed if the five kit-conditional naming bullets are kept.
 - **§13 design system**: `{{TOKENS_LOCATION}}` · `{{SPACING_SCALE}}` · `{{TYPE_SCALE}}` ·
   `{{BREAKPOINTS}}` · `{{MIN_TOUCH_TARGET}}` · `{{GALLERY_ROUTE}}` · `{{VISUAL_CONTRACT_DOC}}`.
 
@@ -90,6 +92,11 @@ Do not read a per-file heading as a share of the total.
   proves nothing where PowerShell does not exist.
 - **§7's `govkit/` bullet** — drop unless this repo DEPLOYS the kits into other repos; an adopter
   that only consumes them has no population to declare.
+- **Naming-lexicon lines** (companion §12's five kit-conditional bullets, and the "naming included"
+  clause in the template's §12 stub): keep only if adopting the `lexicon/` kit — else delete the five
+  bullets and `{{LEXICON_CONF}}` with them, and trim the stub clause back to "gate layout
+  conventions". The bullets are the only consumer of that placeholder, so keeping them without the
+  kit leaves a rule the project has nothing to enforce with.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
 - **§11** — drop for single-OS teams.
 - **§4** harness lines and **§13** entirely — drop if the project has no UI.

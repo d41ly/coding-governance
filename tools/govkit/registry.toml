@@ -70,6 +70,15 @@ id = "gate-lint"
 descriptor = "tools/gate-lint/kit.toml"
 
 [[entry]]
+id = "lexicon"
+descriptor = "tools/lexicon/kit.toml"
+
+[[entry]]
+id = "check-placeholders"
+descriptor = "tools/govkit/entries/check-placeholders.kit.toml"
+why_split = "a FLAT entry for two depth-1 FILES under tools/, not a kit directory; `tools/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
+
+[[entry]]
 id = "agent-cap"
 descriptor = "tools/hooks/kit.toml"
 why_split = "tools/hooks/ and tools/workflows/ are two kit ids with two version constants and two destinations; one inventory row could not carry them"

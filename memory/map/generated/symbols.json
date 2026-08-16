@@ -30,6 +30,11 @@
     {
       "id": "ConfError",
       "kind": "class",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
+      "id": "ConfError",
+      "kind": "class",
       "file": "tools/memory-recall/recall_conf.py"
     },
     {
@@ -86,6 +91,11 @@
       "id": "Misfiled",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "Offender",
+      "kind": "class",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "Problem",
@@ -263,6 +273,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_module_index",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "build_reference_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -305,7 +320,17 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_layer_violation",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "checks",
@@ -578,6 +603,16 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "extract_chunks",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -698,9 +733,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "langs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "last_qid",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "leading_verb",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "lf",
@@ -731,6 +776,11 @@
       "id": "load_conf",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "load_conf",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
     },
     {
       "id": "load_conf",
@@ -798,6 +848,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "load_waivers",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "log_event",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -851,6 +906,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lexicon/scaffold_lexicon.py"
     },
     {
       "id": "main",
@@ -1328,6 +1393,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_import",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1405,6 +1475,11 @@
     {
       "id": "run",
       "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
     {
@@ -1436,6 +1511,11 @@
       "id": "run",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "run_case",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "run_dense",
@@ -1471,6 +1551,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scan_unselective_rules",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "score",
@@ -1586,6 +1671,11 @@
       "id": "subtokens",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "subtokens",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "surface_paths",
@@ -1926,6 +2016,11 @@
       "id": "tracked",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "tracked_files",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "tree",

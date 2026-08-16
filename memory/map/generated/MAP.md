@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 14 · guides: 4 · backlog-shards: 4
+Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4
 
 ## gate-legs
 
@@ -34,6 +34,9 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `kickoff-manifest ratchet` | baseline |
 | `kit version markers` | baseline |
 | `kit/dogfood doc parity` | baseline |
+| `lexicon naming predicates` | lexicon |
+| `lexicon selftest` | lexicon |
+| `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
 | `marker contract (4 readers)` | row-grammar |
 | `memory hygiene (20 checks)` | baseline |
@@ -42,8 +45,10 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `memory-recall skill wiring` | baseline |
 | `method carriers (every pointer declared)` | build-method |
 | `method-carriers self-test` | build-method |
+| `placeholder-catalogue self-test` | lexicon |
 | `playbook parity` | playbook |
 | `playbook parity selftest` | playbook |
+| `playbook placeholder catalogue` | lexicon |
 | `pre-push self-test` | baseline |
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
@@ -79,6 +84,7 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `gate-lint` | baseline |
 | `govkit` | govkit |
 | `hooks` | agent-cap |
+| `lexicon` | lexicon |
 | `lib` | baseline |
 | `memory-recall` | baseline |
 | `memory-tree` | baseline |
@@ -122,6 +128,7 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | key | claimant |
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
+| `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `fixture-passes-by-finding-nothing.md` | baseline |
