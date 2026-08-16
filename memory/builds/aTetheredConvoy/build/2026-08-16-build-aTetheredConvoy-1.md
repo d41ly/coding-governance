@@ -8,15 +8,21 @@ What ran, what landed, and what did not. Derived from the branch, the review rec
 | Unit | State | Commit |
 |---|---|---|
 | 1 — the truthful core | BUILT | `0dfc56f` |
-| 2 — `update` | BUILT | `e4d14c4` |
+| 2 — `update` | BUILT, blockers folded | `e4d14c4`, `7f8b172` |
 | 3 — the convergence ratchet | BUILT | `a21e2ce` |
-| 5 — check carries evidence | **PART** — receipt-evidence half only | `0de03f7` |
-| 4 — the gate-runner declaration | NOT BUILT | — |
-| 6 — the merged role | NOT BUILT | — |
-| 7 — the harness | NOT BUILT | — |
+| 4 — the gate-runner declaration | BUILT | `66d6f18` |
+| 5 — check carries evidence | BUILT | `0de03f7`, `9ea510b` |
+| 6 — the merged region | **PART** — the region writer; the LF-pin block and its renormalize are not built | `9a939f8` |
+| 7 — the harness | **PART** — the refusal join; the acceptance matrix and runbook parity gate are not built | `180bc8b` |
 
-All seven specs exist, are Tier-2 conformant, were audited, and are folded. Three units and part of a
-fourth are implemented.
+Five units whole, two in part. The selftest went 61 -> 170 arms, all holding, and the refusal join
+enumerates 135 refusal branches with both of its pins derived rather than guessed.
+
+**What is NOT built, named rather than implied.** Unit 6's line-ending pin block and the
+`git add --renormalize` that follows it — the half whose spec carries four reproduced constraints,
+including deriving the renormalize population from git rather than from a pattern string. Unit 7's
+acceptance matrix over repo SHAPES, and the runbook parity gate with the runbook demotion it grades.
+Each has a folded, audited spec; none is blocked by anything but session budget.
 
 ## Parked — the landing question
 
@@ -31,24 +37,30 @@ and then assert it; or build and commit on the unit branch and leave landing to 
 the third. *Reason:* the second is precisely the bypass the protocol names — a run writing the
 authorization it then reads — and the first would have refused for the same reason, more slowly.
 
-## Parked — the scope call
+## Parked — what is left, and why it is these two halves
 
-**Units 4, 6 and 7 are not built, and unit 5 is half built.** The build ran out of session budget, not
-out of design: every one of the four has a folded, audited spec and a stated position in the ordering
-contract.
+**Unbuilt: unit 6's line-ending pin block with its renormalize, and unit 7's acceptance matrix with
+the runbook parity gate.** Session budget, not design — both halves have folded, audited specs.
 
-*Options seen:* build unit 4 next per the ordering contract and stop mid-unit; or take unit 5's
-receipt-evidence half, which the ordering contract does NOT make dependent on unit 4, and land it
-whole. *Chosen:* the second. *Reason:* unit 5's integrity, provenance and sidecar loops close a
-MEASURED silent-green — a target whose files were all deleted and whose receipt was corrupted exited
-0 — and they depend only on unit 1's receipt. Unit 4's value is latent until a target has a runner
-wired. A half-built unit 4 would have left the `[gate_runner]` declaration written and unread, which
-is the declared-and-dead class this build spent unit 3 closing.
+*Options seen at the point the budget bound:* spread the remaining budget thinly across both halves;
+or take the piece of each that the rest of the build actually depends on and leave the piece that
+stands alone. *Chosen:* the second. *Reason:* unit 6's REGION WRITER is what four other things
+needed — it is what makes the `merged` role honourable, what unit 2's verdict table needed a real row
+for, and what `check`'s drift arm had no precondition without; the pin block needs none of them and
+is reachable on its own. Unit 7's REFUSAL JOIN grades the refusal population units 1–6 actually
+produced, and that population only stopped moving when unit 6 landed; the acceptance matrix grades
+repo SHAPES and does not depend on it.
 
-*Deviation recorded:* this takes unit 5 out of the stated order. What unit 5 assumes of unit 4 —
-`check --observe` and the emitted-leg presence loop — is exactly what was NOT built, so the
-dependency is not violated, only unused. The remaining halves of unit 5 (adopter fan-out, rendered
-rows, machine-scoped orders, the `[[outcome]]` evaluator, the outbox reader) are unbuilt.
+*What that leaves, stated so it is not discovered:* an adopter gets no line-ending pins, so the
+`gate-green-by-accident-on-generated-bytes` class stays open for a target on a foreign platform —
+which is precisely the class this repo already records against itself, and which bit this very
+session in three `.claude/skills/*/SKILL.md` renders. And the four repo SHAPES the contract names
+(empty, non-Python, blocking hook, pre-existing red leg) are exercised by no fixture; the shapes the
+selftest does exercise are the ones each unit needed.
+
+*Deviation from the ordering contract, recorded:* unit 5 was built before unit 4. What unit 5 assumed
+of unit 4 — `check --observe` and the emitted-leg presence loop — was not built at that point, so the
+dependency was unused rather than violated; unit 4 landed afterwards and both are whole now.
 
 ## Parked — the full bar is unconfirmed, and what a failed run of it DID surface
 
@@ -92,11 +104,15 @@ This is a DoD gap, not a claim of green. It leads the wrap-up for that reason.
   pre-commit hook, and the command comes from a file committed in the target repo. The resolution
   taken makes the committed descriptor the approval and re-prompts when the argv or its commit
   changes. That is a security posture resolved under delegation, and a posture deserves an owner's
-  eye. Unit 4 is unbuilt, so nothing has acted on it yet.
+  eye. **Unit 4 is now BUILT, so this is live**: an `apply` against a target declaring
+  `kind = "manifest"` runs that target's own command twice and its pre-commit hook once. The argv and
+  its source are printed before the first run.
 - **Unit 6 F3** — appending gov's line-ending pins at the end of a target's attributes file makes
   gov's rules WIN, so a target that deliberately set the opposite is overridden and told, rather than
   refused. It is the one place this build knowingly overrides a target's own declared rule and answers
-  with a message rather than a stop. Unit 6 is unbuilt.
+  with a message rather than a stop. **Still not live**: the pin block is the half of unit 6 that was
+  not built, so nothing writes to a target's attributes file yet. The decision stands for whoever
+  builds it.
 
 ## What the reviews cost, and what they bought
 
