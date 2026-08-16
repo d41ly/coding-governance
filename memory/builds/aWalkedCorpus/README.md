@@ -25,11 +25,11 @@ The table below is GENERATED from the status header of every spec in this folder
 hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2
+**Build status:** DEFERRED · 2 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.

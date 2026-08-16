@@ -1,6 +1,6 @@
 # TOOL-aWalkedCorpus-1 — the two corpus enumerators become one
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
