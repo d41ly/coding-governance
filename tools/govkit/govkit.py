@@ -34,7 +34,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.6"  # gov:kit govkit@1.6 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.7"  # gov:kit govkit@1.7 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 

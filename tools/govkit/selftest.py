@@ -882,6 +882,95 @@ user_skills = "/tmp/gk-fake-skills"
             check("and nothing was installed on that refusal: " + needle[:20],
                   not (bt / ".governance" / "install.json").exists(), "")
 
+        # ===== unit 6: the merged region =====
+        NLc = chr(10)
+
+        def hook_target(name: str, hook: str) -> pathlib.Path:
+            g = tmp / name
+            (g / ".githooks").mkdir(parents=True, exist_ok=True)
+            (g / ".githooks" / "pre-commit").write_text(hook, encoding="utf-8", newline=NLc)
+            (g / ".governance").mkdir(exist_ok=True)
+            (g / ".governance" / "deploy.toml").write_text(
+                'gov_source = "l"' + NLc + 'prefix = "tools"' + NLc +
+                'kits = ["push-main"]' + NLc + "[answers]" + NLc + 'memory_root = "memory"' + NLc,
+                encoding="utf-8", newline=NLc)
+            git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "b")
+            return g
+
+        MARKED = ("#!/usr/bin/env bash" + NLc + "set -u" + NLc + "echo MINE" + NLc +
+                  "# govkit:branch-guard" + NLc + "# old" + NLc + "# /govkit:branch-guard" + NLc +
+                  "echo TAIL" + NLc)
+
+        hg = hook_target("u6a", MARKED)
+        pa = run("apply", "--target", str(hg), "--kits", "push-main")
+        hook_now = (hg / ".githooks" / "pre-commit").read_text(encoding="utf-8")
+        check("a merged rule SPLICES its block into a target-owned file",
+              "merged [spliced]" in pa.stdout, pa.stdout)
+        check("the target's own lines on BOTH sides of the block survive",
+              "echo MINE" in hook_now and "echo TAIL" in hook_now, hook_now)
+        check("and the block's previous content is replaced, not appended to",
+              NLc + "# old" + NLc not in hook_now, hook_now)
+        before_bytes = (hg / ".githooks" / "pre-commit").read_bytes()
+        run("apply", "--target", str(hg), "--kits", "push-main")
+        check("a second apply leaves the merged file byte-identical",
+              (hg / ".githooks" / "pre-commit").read_bytes() == before_bytes, "")
+
+        # AC1's two clauses, one mechanism: the receipt hashes the BLOCK, so an edit OUTSIDE it is
+        # invisible by construction — the extractor only ever reads the marked lines.
+        with open(hg / ".githooks" / "pre-commit", "a", encoding="utf-8", newline=NLc) as fh:
+            fh.write("echo OUTSIDE" + NLc)
+        pc = run("check", "--target", str(hg))
+        check("an edit OUTSIDE the block is NOT drift — asserted positively, not by omission",
+              "DRIFT" not in pc.stdout and "merged blocks:" in pc.stdout, pc.stdout)
+        hp = hg / ".githooks" / "pre-commit"
+        hp.write_text(hp.read_text(encoding="utf-8").replace("rc=1", "rc=0", 1),
+                      encoding="utf-8", newline=NLc)
+        pc = run("check", "--target", str(hg))
+        check("an edit INSIDE the block IS drift, naming the block and both hashes",
+              "DRIFT: gov block 'govkit:branch-guard'" in pc.stdout, pc.stdout)
+        hp.write_text(hp.read_text(encoding="utf-8")
+                      .replace("# govkit:branch-guard" + NLc, "")
+                      .replace("# /govkit:branch-guard" + NLc, ""),
+                      encoding="utf-8", newline=NLc)
+        pc = run("check", "--target", str(hg))
+        check("deleting the marker pair is REMOVED, a state distinct from drift",
+              "REMOVED" in pc.stdout, pc.stdout)
+
+        # insert = "refuse": the branch guard's position is SEMANTIC and this rule will not guess.
+        ug = hook_target("u6b", "#!/usr/bin/env bash" + NLc + "echo MINE" + NLc)
+        before_u = (ug / ".githooks" / "pre-commit").read_bytes()
+        pa = run("apply", "--target", str(ug), "--kits", "push-main")
+        check("an unmarked destination whose rule declares insert=refuse REFUSES",
+              "insert = \"refuse\"" in pa.stdout or "position is SEMANTIC" in pa.stdout, pa.stdout)
+        check("and the target's file is byte-identical after that refusal",
+              (ug / ".githooks" / "pre-commit").read_bytes() == before_u, "")
+
+        # THE APPEND, and the guard that makes it safe. MEASURED: appending to a file whose last
+        # line lacks a trailing newline concatenates the two, which destroys the target's own final
+        # rule and leaves the open marker off column 0 — after which every later apply refuses
+        # forever while the receipt claims a block that can never be found again.
+        pj = tmp / "u6c"
+        (pj / ".governance").mkdir(parents=True, exist_ok=True)
+        (pj / "pyproject.toml").write_bytes(b"[tool.other]\nkey = 1")      # NO trailing newline
+        (pj / ".governance" / "deploy.toml").write_text(
+            'gov_source = "l"' + NLc + 'prefix = "tools"' + NLc +
+            'kits = ["pytest-parallel-guardrails"]' + NLc + "[answers]" + NLc +
+            'memory_root = "memory"' + NLc, encoding="utf-8", newline=NLc)
+        git(pj, "init", "-q", "-b", "main"); git(pj, "config", "user.email", "t@e")
+        git(pj, "config", "user.name", "t"); git(pj, "add", "-A"); git(pj, "commit", "-qm", "b")
+        run("apply", "--target", str(pj), "--kits", "pytest-parallel-guardrails")
+        body = (pj / "pyproject.toml").read_text(encoding="utf-8")
+        check("an append to a file with no trailing newline does NOT join two lines",
+              "key = 1# govkit" not in body, body[:200])
+        check("the target's pre-existing final line survives intact",
+              "key = 1" in body and NLc + "# govkit:pytest-guardrails" in body, body[:200])
+        check("and the open marker is at column 0, so the block stays findable",
+              any(l == "# govkit:pytest-guardrails" for l in body.split(NLc)), body[:200])
+        pc = run("check", "--target", str(pj))
+        check("which check confirms by FINDING it", "merged blocks: 1/1 intact" in pc.stdout,
+              pc.stdout)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)
@@ -894,12 +983,16 @@ user_skills = "/tmp/gk-fake-skills"
         check("the refusal happened BEFORE any write",
               not (for_ / ".governance" / "install.json").exists(), "")
 
-        # --- a `merged` rule refuses by name rather than half-landing.
+        # --- SUPERSEDED. These two arms asserted that a `merged` rule REFUSES by name, and the
+        # --- merged-region writer inverts them: the role is honourable now. Replaced with a
+        # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string
+        # --- is the classic one that keeps passing after the string merely moves, so its
+        # --- replacement has to observe an effect. The full behaviour is in the unit 6 block above.
         p = run("apply", "--target", str(make_target(tmp / "f", DEPLOY_FULL)),
                 "--kits", "pytest-parallel-guardrails")
-        check("apply refuses a merged rule it cannot honour", p.returncode == 1, p.stdout)
-        check("that refusal says there is no seam to extend",
-              "no seam to extend" in p.stdout, p.stdout)
+        check("a merged rule now LANDS rather than refusing", p.returncode == 0, p.stdout)
+        check("and it reports the mode it used, on disk",
+              "merged [" in p.stdout, p.stdout)
 
         # --- deploying into gov itself is a stated non-goal, and is refused before anything.
         p = run("apply", "--target", str(HERE.parents[1]), "--kits", "check-wiring")

@@ -633,6 +633,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "find_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "foreign_kit_present",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -986,6 +991,11 @@
       "id": "map_root",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "marker_pair",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "match_expr",
@@ -2046,6 +2056,11 @@
       "id": "write",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "write_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "write_text",
