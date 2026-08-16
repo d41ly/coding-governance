@@ -12,13 +12,17 @@ isn't in the code (the *(ask user)* items below); propose-and-flag anything infe
 filled template to the project's governing doc (its agent-instruction file, e.g. `AGENTS.md` /
 `CLAUDE.md`, or `docs/PARALLEL.md`) and place the filled companion beside it under the name the
 template's §-stubs spell. Then run `grep -nE '\{\{[A-Z]'` over **both** written files to confirm no
-placeholder survived — a template-only grep passes green while 13 of the 36 placeholders sit
+placeholder survived — a template-only grep passes green while 14 of the 36 placeholders sit
 unfilled in the companion, and the §-stubs then point at a file the project never received.
 
 ## Placeholders
 
-36 in total, and the two groups are **disjoint** — no placeholder appears in both files, so each one
-is filled in exactly one place.
+36 in total: 23 in the template and 14 in the companion, which sums to 37 because the groups are
+**not disjoint**. **1 shared: `{{MEMORY_ROOT}}`** — it appears in both files and must be filled
+IDENTICALLY in each. Every other placeholder is filled in exactly one place.
+
+The counts below are per-file and each is individually correct; the union is what the 36 counts.
+Do not read a per-file heading as a share of the total.
 
 ### In `parallel-coding-governance.template.md` — 23
 
@@ -31,7 +35,8 @@ is filled in exactly one place.
 - **Gates & git**: `{{GATE_COMMANDS}}` · `{{CI_FILE}}` · `{{GATE_RUNNER}}` · `{{COMMIT_TRAILER}}` ·
   `{{WORKTREE_SCRIPT}}`.
 - **Memory tree** — REQUIRED, not a choice: §5's work-state rules and §6's record protocol both
-  assume it. `{{MEMORY_ROOT}}` (default `memory`) · `{{MEMORY_DISCIPLINES}}`, which is a **closed
+  assume it. `{{MEMORY_ROOT}}` (default `memory`) — **SHARED: this is the one placeholder that
+  also appears in the companion group below, and both must be filled identically** · `{{MEMORY_DISCIPLINES}}`, which is a **closed
   enum of stream values**, space-separated — **not** a list of directories. The tree is flat: every
   build folder sits directly under `<MEMORY_ROOT>/builds/<slug>/` and each spec declares its own
   stream in its status header. The stream→FAMILY map is a **separate** `FAMILIES` key in the
@@ -44,7 +49,8 @@ is filled in exactly one place.
 
 ### In `parallel-coding-governance.domain-rules.md` — 14
 
-- **§1 unattended runs**: `{{MEMORY_ROOT}}` — the memory tree's root, matching the memory-tree kit's
+- **§1 unattended runs**: `{{MEMORY_ROOT}}` — **SHARED with the template group above; fill both
+  identically.** The memory tree's root, matching the memory-tree kit's
   conf. It resolves the pointer to the unattended protocol; the block states no rule of its own.
 - **§4 runtime & verification**: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - **§11 toolchain**: `{{TOOLCHAIN_NOTES}}`.

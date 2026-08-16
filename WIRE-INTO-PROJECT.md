@@ -95,7 +95,7 @@ alongside — both then appear; pick by description.) Skip this step on a machin
 3. The customize companion lists the conditional sections to delete when they don't apply; apply that.
 
 **Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md <project>/docs/parallel-coding-governance.domain-rules.md`
-prints nothing. BOTH files — the companion carries 13 of the 36 placeholders, and a template-only grep
+prints nothing. BOTH files — the companion carries 14 of the 36 placeholders, and a template-only grep
 passes green while the §-stubs point at a file the project never filled. The grep is SHAPE-scoped
 (`\{\{[A-Z]`) rather than a bare `{{`, because a filled `{{GATE_COMMANDS}}` may legitimately contain
 GitHub Actions `${{ }}` expressions; the shipped template contains none, so an unscoped grep is green

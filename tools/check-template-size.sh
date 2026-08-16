@@ -3,7 +3,7 @@
 # The template is the operational ruleset an agent reads every session; it must stay lean.
 # Prose that doesn't affect instruction clarity still belongs in a companion
 # (parallel-coding-governance.customize.md / .domain-rules.md) rather than the template. The ceiling
-# moved 32 KiB -> 48 KiB on owner order (TOOL-aSiftedPlaybook-1); the PREFERENCE for externalizing
+# moved 32 KiB -> 48 KiB on owner order (recorded in memory/DECISIONS.md); the PREFERENCE for externalizing
 # did not move with it, and the high-water ratchet below is what prices growth now that the ceiling
 # is no longer doing it.
 #

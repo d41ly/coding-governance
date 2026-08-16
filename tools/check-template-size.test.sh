@@ -5,7 +5,7 @@
 #
 # Exit 0 = every arm held · 1 = an arm failed · 2 = the harness could not set up.
 #
-# WHY THIS EXISTS. Until TOOL-aSiftedPlaybook-2 this gate had no test anywhere in the repo, no
+# WHY THIS EXISTS. Until this file landed, the gate had no test anywhere in the repo, no
 # `fail()` helper and therefore no entry in check-arms.py's population: its failing case had never
 # been observed by any committed harness. `parallel-coding-governance.domain-rules.md:44-45` — "a
 # gate you have only ever seen pass is an assertion about nothing." The debt was paid at the moment

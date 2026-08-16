@@ -7,9 +7,10 @@ the template references by section number rather than inlining (they apply only 
 risky surface, runs a Tier-2 review, or runs with no human in the loop). Deploy this file alongside
 the playbook and re-pull it in lockstep — the marker above must read the same version as the
 template's. Numbering is one-to-one: companion §N extends template §N, and the template's §1, §4 and
-§7–§13 stubs each point at exactly one section here. Four are droppable-per-project (§4, §9, §11 and
-§13, per the customize companion) and §1's unattended block is a fifth, line-scoped one; §7, §8, §10
-and §12 are universal core.
+§7–§13 stubs each point at exactly one section here. Five are droppable-per-project, in two SHAPES
+(per the customize companion): §11 and §13 drop WHOLE, while §4, §9 and §1's unattended block are
+LINE-SCOPED — §4 loses its harness lines and §9 its outbound-call / stored-HTML lines, and the rest
+of each section stays. §7, §8, §10 and §12 are universal core.
 
 ## §1 — Work-unit lifecycle: the manifest merge exception, and unattended runs
 
