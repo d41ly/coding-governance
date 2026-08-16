@@ -31,14 +31,14 @@ The table below is GENERATED from the status header of every spec in this folder
 hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | SPECCED | rev-2 | 2026-08-16 |
+| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

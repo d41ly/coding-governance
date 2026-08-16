@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 

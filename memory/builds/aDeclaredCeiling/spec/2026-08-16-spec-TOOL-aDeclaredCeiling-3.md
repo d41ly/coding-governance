@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
