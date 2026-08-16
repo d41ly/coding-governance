@@ -5,7 +5,7 @@
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `tools/run-gates.sh`.
-**Budget: ≤20 KB, ≤250 lines** (`memory/HYGIENE.md` rule 6); it grows only by DISPLACEMENT, because M7 re-reads it
+**Budget: ≤20 KB, ≤250 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
@@ -25,9 +25,10 @@ or generated artifact is a separate unit with its own id and spec. Two mechanism
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
-`memory/builds/<slug>/spec/`. **The README's `ids:` key is NOT a roster** — it is a reservation range written as
-ranges and unions (`<FAMILY>-<slug>-1..-9`), and reading it as a unit list silently drops every unit after the first. A
-unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
+`memory/builds/<slug>/spec/`. **The README's `ids:` key is not it either** — `ids:` is DERIVED and rewritten by the
+index generator from every id the corpus mentions, so it answers "which ids exist" and never "which units are
+planned". A unit with no spec yet appears in neither, and cannot be added to `ids:` by hand: the next render removes
+it. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
 `memory/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
 
 **Classify, first match wins.** Write it into the build README before acting on it.
@@ -149,8 +150,14 @@ turn you did not take.
 WRITE sets — actual paths, written down before dispatch — do not intersect; (2) neither writes a file the other
 reads as a contract (conf, template, interface, generator input) or as an acceptance input, and neither depends on
 the other's output either way; (3) neither touches a shared mutable record — `memory/DECISIONS.md`,
-`memory/backlog/*.md`, the build README, the run-state file, or any generated index with its generator. If you
-cannot write both path lists down, the work is not known to be disjoint — sequence it. The fan-out and concurrency
+`memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
+cannot write both path lists down, the work is not known to be disjoint — sequence it.
+
+Clause 3 once named the build README and every generated index outright. That reading is VACUOUS, not strict: a
+build README is regenerated from its specs' status headers, and every pass changes one, so no two passes of any
+build could ever be concurrent. A rule that forbids everything is obeyed by nobody. What actually collides is two
+passes RENDERING the same artifact, or one editing a generator while another runs it — a rendered artifact whose
+inputs are disjoint is regenerated once, at the end, by whichever pass finishes last. The fan-out and concurrency
 CEILINGS are `memory/guides/REVIEW-PROTOCOL.md`'s; this is about WHICH work is parallel, never HOW MUCH.
 
 ## M7 — Regrounding

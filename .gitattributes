@@ -29,7 +29,7 @@ tools/template-size-highwater.txt text eol=lf
 # files"; this is that claim made true.
 #
 # Pinned by EXTENSION rather than by listing today's index files, because the index set is DERIVED
-# (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build STATUS.md joins
+# (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build README joins
 # it with no edit here. A pin that must be remembered is the pin that gets forgotten.
 memory/**/*.md text eol=lf
 memory/**/*.toml text eol=lf

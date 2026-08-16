@@ -467,7 +467,7 @@ cnot 6 'memory/backlog/ARCH.md'
 # ---- a guide past the guide cap is named. Asserting only the second would pass identically under
 # ---- one shared 250-line cap, which is the state this change moved away from.
 cnot 6 'memory/guides/twide.md'
-hit  'backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)'
+hit  'backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO)'
 chit 8 'memory/backlog/ARCH.md:8'
 cnot 8 'memory/backlog/ARCH.md:5'
 
@@ -525,11 +525,13 @@ n17=$(awk '/tFixture-17\.md \(## sections differ/{g=1; next} g && /^    /{c++; n
 
 # ---- CHECK 7: unfenced line NUMBERING and the three exemptions.
 hit  'HYGIENE check 7 FAILED'
-n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars\)$' <<<"$out")
+# The finding now NAMES THE CAP it was measured against. With a per-class width (300 for an index,
+# 350 for a build README) "419 chars" alone does not tell an operator whether that is a violation.
+n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out")
 [ "$n7" = 2 ] || { echo "FAIL check 7 emitted $n7 findings, expected exactly 2 (fence, comment and separator are exempt; the 300-byte row is under the cap)"; st=1; }
-hitl 'memory/backlog/ARCH.md:7 (301 chars)'
+hitl 'memory/backlog/ARCH.md:7 (301 chars > 300)'
 miss 'memory/backlog/ARCH.md:6 ('
-c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars\)$' <<<"$out" | head -1)
+c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out" | head -1)
 case "$c7line" in 'memory/backlog/ARCH.md:5 ('*) ;;
   *) echo "FAIL check 7 reported '$c7line'; expected the offending row at UNFENCED line 5 (raw line 8)"; st=1;; esac
 

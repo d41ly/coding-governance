@@ -131,7 +131,7 @@ pop_guard() { # check-number · label · population-count · precondition-count
 PRE_ANYBUILD=$(printf '%s\n' "$FILES" | grep -cE "/builds/" || true)
 PRE_RECORD=$(printf '%s\n' "$FILES" | grep -cE "/builds/.+/.+\.md$" || true)
 PRE_SPEC=$(printf '%s\n' "$FILES" | grep -cE "/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[^/]*\.md$" || true)
-PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/STATUS\.md$|/BACKLOG\.md$|^$M/backlog/)" || true)
+PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -281,7 +281,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         n=0; for (k in ent) keys[++n]=k
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
-          if (k=="F:README.md"||k=="F:STATUS.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (k=="F:README.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
         folder=""; delete ent
@@ -445,7 +445,11 @@ fi
 [ -n "$bad7" ] && fail 7 "index entry lines over 300 chars:
 $bad7"
 
-# 8 — status vocabulary on BACKLOG.md / STATUS.md (grandfather: curation-debt.txt).
+# 8 — status vocabulary on the backlog shards (grandfather: curation-debt.txt).
+#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it
+#     contradicted its own build README, nothing ever wrote one, and no decision record created
+#     the slot. The population is the shards alone, which is non-empty, so the guard below still
+#     measures something rather than passing by finding nothing.
 # One awk over the whole filtered file set (was _unfenced + grep -n PER file and a 3-fork
 # printf|grep -oE|wc -l PER row). nmatch() reproduces `grep -oE '…\b' | wc -l` EXACTLY: the
 # `^[[:space:]]*-` slot can only anchor once (caret pattern on the first match, no-caret thereafter),
@@ -454,7 +458,7 @@ $bad7"
 # the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
 # tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
-pop_guard 8 "no backlog shard under $M/backlog/ and no STATUS.md under $M/builds/" "$pop8" "$PRE_STATUSY"
+pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
 files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
   [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
 bad8=""
@@ -479,7 +483,7 @@ if [ -n "$files8" ]; then
       if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/ && nmatch(line)!=1) print FILENAME ":" uln
     }')
 fi
-[ -n "$bad8" ] && fail 8 "backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
+[ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
 
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried

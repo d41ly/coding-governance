@@ -16,7 +16,7 @@ closed enum `.memory-tree.conf` declares. A build that spans two disciplines is 
 
 ## Directories
 
-- [builds/](builds/) — one folder per slug: `README.md` · `STATUS.md` · `RUN.md` (unattended run-state, only while a run is or was live) · `prompts/` `spec/` `build/` `reviews/`.
+- [builds/](builds/) — one folder per slug: `README.md` · `RUN.md` (unattended run-state, only while a run is or was live) · `prompts/` `spec/` `build/` `reviews/`.
 - [backlog/](backlog/) — one mutable shard per id family: `PLAY.md` `KICK.md` `TOOL.md` `DEPL.md`.
 - [gotchas/](gotchas/) — the recurring-bug-class catalogue behind hygiene checks 17-19.
 - [guides/](guides/) — binding protocols that are not rules of the tree: [REVIEW-PROTOCOL.md](guides/REVIEW-PROTOCOL.md) · [UNATTENDED-PROTOCOL.md](guides/UNATTENDED-PROTOCOL.md).

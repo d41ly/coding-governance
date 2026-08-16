@@ -28,7 +28,7 @@ memory/
 ├── archive/               rotated indexes + legacy material a build can't claim
 ├── project/               the gate's own waiver registries (`*.txt`, six of them) and nothing else
 └── builds/<slug>/
-    ├── README.md · STATUS.md       (required only when >3 files / multi-item)
+    ├── README.md                   (the build's entry point; mostly generated)
     ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
     └── prompts/ · spec/ · build/ · reviews/   (<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md)
 ```
@@ -37,7 +37,7 @@ memory/
 named for its SLUG alone — no date, no family. A recording filename MAY carry the family as an
 optional qualifier, which is how one slug shared by two families survives in a single folder.
 Ceremony is conditional: subfolders exist only when non-empty; a single-file build is one spec file
-plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only inside
+plus its backlog row — no README. Non-markdown artifacts (scripts, data) are legal only inside
 `builds/*/build/`, `guides/`, and `archive/`.
 
 ## Rules
@@ -57,7 +57,7 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 
 ## Index budgets, caps, rotation
 
-- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `STATUS.md`,
+- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
   `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
@@ -69,9 +69,9 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
   covers them. Rotation moves whole files — it never rewrites or renumbers a ratified record.
 
-## Status vocabulary (backlogs + STATUS.md)
+## Status vocabulary (backlogs)
 
-Every backlog / STATUS row leads with exactly one token of
+Every backlog row leads with exactly one token of
 `OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`, in its `·`/`|`/leading-dash slot
 (a prose mention of one of these words elsewhere on the line does not count). New-entry dash form:
 `- <id> · <STATUS> · <one-liner>[ → <pointer>]`.
@@ -112,7 +112,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
    `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
-   build folder only `README.md STATUS.md RUN.md prompts/ spec/ build/ reviews/` plus loose
+   build folder only `README.md RUN.md prompts/ spec/ build/ reviews/` plus loose
    recording-named `.md`; non-md only in `build/`. `RUN.md` is the UNATTENDED run-state file: one
    generated region plus an authored one, present only while a run is or was live. It is capped by
    rule 6, exempt from rule 7 (the standing mandate is verbatim prose), and deliberately OUTSIDE
@@ -135,7 +135,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
    build's own `build/` folder as a dated recording).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
-8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
+8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
