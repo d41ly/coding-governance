@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -146,7 +146,7 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 | File | Change |
 |---|---|
 | `tools/check-template-size.test.sh` | new |
-| `tools/govkit/registry.toml` | the harness above DECLARED. **Mandatory and measured:** in a scratch clone of BASE, `python tools/govkit/govkit.py selfcheck` exits 0 with `0 unclaimed`, and exits 1 the moment `tools/check-template-size.test.sh` is staged — "neither an entry member nor an exemption". Exemptions are exact-path (`tools/govkit/govkit.py:501-519`), so the sibling gate's own `[[exempt]]` row at `registry.toml:150` does NOT cover it; the `run-gates.sh` / `.test.sh` / `.evidence.test.sh` trio at `:134`/`:142`/`:146` is the precedent that each path needs its own row |
+| `tools/govkit/registry.toml` | the harness above DECLARED. **Mandatory and measured** on this branch's post-merge tree, where the kit exists — it post-dates `base 91ef1b05` and arrived at `a4caea9`: in a scratch clone of `f43a48c`, `python tools/govkit/govkit.py selfcheck` exits 0 with `0 unclaimed`, and exits 1 the moment `tools/check-template-size.test.sh` is staged — "neither an entry member nor an exemption". Exemptions are exact-path (`tools/govkit/govkit.py:501-519`), so the sibling gate's own `[[exempt]]` row at `registry.toml:150` does NOT cover it; the `run-gates.sh` / `.test.sh` / `.evidence.test.sh` trio at `:134`/`:142`/`:146` is the precedent that each path needs its own row |
 | `tools/check-template-size.sh` | S6's `fail()` refactor — F1 is RESOLVED, this is unconditional |
 | `tools/gate-legs.json` | one leg entry |
 | `AGENTS.md` | one gate-suite bullet |
@@ -204,14 +204,25 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
   `bash tools/check-template-size.test.sh` reds naming A6 or A7;
   when the high-water record's path resolution is broken, A8 reds; when `--bump` is made to rewrite
   the whole record instead of the subject's row, **A9** reds; when the absent-record branch is made
-  to fall through silently, **A10** reds. The ratchet arms were the
-  only ones in this unit with no proof they can fail, inside the unit whose §1 quotes "a gate you
-  have only ever seen pass is an assertion about nothing" — AC2's inversion touches the ceiling
-  comparison, not the warn branch.
+  to fall through silently, **A10** reds; and when the non-numeric branch is made to fall through to
+  the numeric comparison — or to a bare shell error — instead of a named failure, **A11** reds.
+  **The A11 limb is not optional and is the one this criterion was shipped without.** A11 arms the
+  contract "non-numeric high-water → a NAMED failure", and `set -u` is live at
+  `tools/check-template-size.sh:11` with the comparison at `:28`, so a `set -u` explosion also
+  satisfies a bare non-zero-exit assertion: without a mutation criterion a builder writes A11 as
+  exactly that and every AC here stays green. `check-arms.py` cannot backstop it, because S6 reads
+  the `ARMS_FLOORS` values from `--report` AFTER the refactor — a gate built without the branch
+  yields a floor derived from its own omission.
+  This criterion covers A6-A11, **not just the ratchet arms**: A10 and A11 are degenerate-record
+  arms and were inside its reach before this sentence said so. A3 and A5 still carry no mutation
+  criterion, which is a deliberate limit rather than an oversight — they observe the gate's
+  pre-existing branches, not the ones this unit adds. All of this sits inside the unit whose §1
+  quotes "a gate you have only ever seen pass is an assertion about nothing" — AC2's inversion
+  touches the ceiling comparison, not the warn branch.
 - **AC9** — When `python tools/govkit/govkit.py selfcheck` runs, it is green with
   `tools/check-template-size.test.sh` declared in `tools/govkit/registry.toml`. This unit creates a
   depth-1 path under `tools/` and the registry asserts that surface, so the declaration and the
-  harness land in the same commit. Reproduced at BASE rather than argued: without the row the leg
+  harness land in the same commit. Reproduced rather than argued, on a scratch clone of `f43a48c` — the leg post-dates `base 91ef1b05`, so this observation is only available post-merge: without the row the leg
   exits 1, and the leg carries no `guard` in `tools/gate-legs.json`, so it reds on diff-scoped runs
   as well as at the push boundary — AC4's `bash tools/run-gates.sh` cannot be green without this.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage and freshness are
@@ -276,17 +287,28 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-8 · 2026-08-16 · folded round-5 M1 and L1. **M1**: round-4 M1's remedy was two-part per arm
+  and the AC8 half reached A10 and not A11 — while the rev-7 entry below certified both. A11 arms
+  the named-failure contract for a non-numeric record, and a `set -u` explosion satisfies a bare
+  non-zero-exit assertion, so without a mutation criterion the arm is vacuous and every AC stays
+  green; `check-arms.py` cannot backstop it, since S6 derives the floor from the refactored gate
+  itself. AC8 gained the A11 limb and its closing sentence no longer scopes itself to "the ratchet
+  arms", which was already false of A10. **L1**: three carriers said the blocker's reproduction
+  was measured "in a scratch clone of BASE"; `govkit` post-dates `base 91ef1b05` and arrived at
+  `a4caea9`, so the command cannot run there. All three now name `f43a48c`, the tree it was
+  actually measured on — round 4's own text was right and this fold degraded it.
 - rev-7 · 2026-08-16 · folded round-4's **blocker B1**, plus M1 and H3. **B1**: S1 creates
   `tools/check-template-size.test.sh`, a depth-1 path under the `tools/*` surface
   `tools/govkit/registry.toml` asserts, and this spec named the registry in no section — no §4 row,
-  no §7 gate line, no AC. Reproduced rather than argued: in a scratch clone of BASE,
+  no §7 gate line, no AC. Reproduced rather than argued: in a scratch clone of `f43a48c`,
   `govkit selfcheck` exits 0 with `0 unclaimed` and exits 1 the moment that path is staged, and the
   leg carries no `guard`, so it reds diff-scoped runs too. Round 3's fold enumerated four new
   depth-1 paths and there are five; the count in `TOOL-aSiftedPlaybook-1` AC12 that certified
   otherwise is deleted there. Added the §4 row, the §7 line and **AC9**. **M1**: `TOOL-aSiftedPlaybook-1`
   S8 ends "Both are armed in `TOOL-aSiftedPlaybook-2` S2" and neither was — A3 is a missing TEMPLATE,
   not a missing RECORD, and `set -u` is live at the numeric comparison. Added **A10** (absent record)
-  and **A11** (non-numeric), with AC8 extended. **H3**: A6-A8 read `H` from an un-keyed value while
+  and **A11** (non-numeric). *AC8 was extended to A10 only — round 5 measured this clause as
+  overstated and rev-8 added the A11 limb.* **H3**: A6-A8 read `H` from an un-keyed value while
   S8 requires one row per measured subject; the arms are now bound to a subject row and **A9** proves
   a `--bump` on one subject leaves the other byte-identical — the arm round-3 H1 asked for and the
   only one that distinguishes the keyed record from the single number S8 forbids. (Round 4's fold

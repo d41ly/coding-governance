@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -273,7 +273,10 @@ blocking objection" would write a mischaracterization into a record the repo dec
 - `python tools/govkit/govkit.py selfcheck` — **mandatory.** S7 creates the depth-1 path
   `tools/playbook-kit-waivers.txt`, and the registry asserts a `tools/*` surface on which any
   undeclared tracked path reds. AC10 already observes the leg; the gate line was missing, so the
-  three units receiving this obligation each carried it in a different subset of sections.
+  units receiving this obligation each carried it in a different subset of sections. The rule is
+  derived, never counted: **every unit that creates a depth-1 `tools/` path carries it in §4, §7 and
+  an AC.** A spelled count here said three and went stale in the same commit that made a fourth unit
+  a receiver.
 - `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -304,6 +307,9 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-16 · folded round-5 L3. §7's new `govkit selfcheck` line said "the three units
+  receiving this obligation", which the same fold made four. De-numbered to the derivation, the
+  policy this build adopted everywhere else in the same pass.
 - rev-8 · 2026-08-16 · folded round-4 H2, H5, M2, L3 and L4. **H2**: AC7 still required the archive
   byte-identical to the template "before this build's first template edit" while S8 copies the
   PRE-BUMP blob — this is unit 6, after two other units have edited the template, so the two name

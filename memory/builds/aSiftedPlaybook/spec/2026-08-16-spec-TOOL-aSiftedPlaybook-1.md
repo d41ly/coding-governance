@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -30,10 +30,15 @@ records which relied on the old ceiling, because at least three of them cited it
   by two consumers, so its wording must stay true for the kickoff engine at 18 KiB as well as the
   playbook at 48.
 
-  **`:14` is in scope because AC3 measures it.** Run at BASE, AC3's grep returns eleven hits and
-  `:14` is one of them; it was named by neither S1 (which scopes `:19` and the trailing comment at
-  `:19-20`) nor by any earlier draft of this item, so a builder working the scope list ships it and
-  AC3 reds on the unit's own acceptance run. Cheap to fix, and stated rather than left for the gate
+  **`:14` is in scope because AC3 measures it.** Run on the post-merge tree this unit builds on,
+  AC3's grep returns eleven hits and `:14` is one of them; it was named by neither S1 (which scopes
+  `:19` and the trailing comment at `:19-20`) nor by any earlier draft of this item, so a builder
+  working the scope list ships it and
+  AC3 reds on the unit's own acceptance run. **The frame matters and an earlier draft got it wrong**:
+  at the spec's declared `base 91ef1b05` the same grep returns TWELVE (two hits in the retired
+  `.claude/SESSION-KICKOFF.md`) and `:14` is the constant assignment S1 already owns, not the
+  precedence comment — so read at BASE this item reads as duplicated scope. Every acting carrier
+  here is HEAD-relative, including AC3 itself, which takes no revision argument. Cheap to fix, and stated rather than left for the gate
   to catch, because "the AC will find it" is how a two-part edit becomes a one-part edit here.
 - **S3 — the charter.** `AGENTS.md:16-17` (the most emphatic never-raise carrier — the sentence
   SPANS the line break, "…trim or externalize, never" / "raise the limit)", so an edit scoped to
@@ -300,6 +305,19 @@ ratchet's own rule.
   the build creates five such paths across four units, and that spelled population is precisely what
   let `TOOL-aSiftedPlaybook-2`'s `tools/check-template-size.test.sh` be missed until round 4
   reproduced the red. Each unit declares its own paths; none quantifies over the others'.
+- **AC14** — When
+  `grep -nE '32 ?KiB|[Nn]ever raise' memory/guides/SESSION-KICKOFF.md` runs, it reads the new ceiling
+  and carries no never-raise clause. **S5's carrier is observed by nothing else in this build.** AC3
+  is the only sweep criterion and its pathspec is `-- ':!memory/'`; the kickoff manifest moved under
+  `memory/` at `24f3991`, so the sweep that used to see this trap at `.claude/SESSION-KICKOFF.md` no
+  longer reaches it — the hole was opened by the relocation, not by the spec. AC4 does not cover it
+  either: `skills/session-kickoff/manifest-check.sh` validates the audit block, the ratchet and the
+  watch pathspec, and reads none of the body, so a re-stamp passes with the trap intact. Without
+  this criterion every other AC in this unit goes green while the manifest every session must read
+  keeps saying the gate is a strict 32 KiB never to be raised — the rot §1 exists to prevent,
+  shipped by the unit that exists to prevent it. This is the same three-carrier standard
+  `PLAY-aSiftedPlaybook-1` §3 states for `README.md:33`: scope item, inventory row, and an AC that
+  observes it. S5 had the first two.
 - **AC13** — When `grep -nE '[0-9]+-check' README.md` runs, every hit reads 20 and none reads 19.
   This is S4's second carrier, and it needs its own criterion because AC3's alternation
   (`32768|32 ?KiB|never raise the limit|[Dd]o NOT raise|raise the limit|inflating`) cannot match
@@ -391,6 +409,15 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-16 · folded round-5 H1 and L2. **H1**: S5's carrier — the kickoff manifest's
+  32 KiB trap — was observed by no acceptance criterion in the entire build. AC3 is the only sweep
+  and its pathspec is `-- ':!memory/'`; the manifest moved under `memory/` at `24f3991`, so the
+  sweep that once caught this trap at `.claude/SESSION-KICKOFF.md` stopped reaching it, and AC4
+  reads the audit block rather than the body. **AC14** closes it. The hole is structurally the one
+  AC13 closed for `README.md:33` one scope item over, missed by the fold that wrote the standard.
+  **L2**: the new S2 sub-item said "Run at BASE" while measuring the post-merge tree — at
+  `base 91ef1b05` the grep returns twelve, not eleven, and `:14` is the constant S1 already owns,
+  so in the frame it named its own argument inverted. Re-framed here and in the rev-8 entry below.
 - rev-8 · 2026-08-16 · folded the round-4 audit. **B1's second half**: AC12's "three units in this
   build create one" is DELETED rather than corrected — the build creates five such paths across four
   units, and that spelled population is what let `TOOL-aSiftedPlaybook-2`'s harness path be missed
@@ -402,7 +429,8 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
   true of the section it names. **M2's knock-on**: S8's `34963` forecast was derived from a subtotal
   that had gone stale; it is now re-derived from `PLAY-aSiftedPlaybook-3` §4 with the argument made
   independent of the value. Also folded a carrier round 4 did not find: **`tools/check-template-size.sh:14`**
-  spells "the playbook's own 32 KiB", is one of AC3's eleven BASE hits, and was in no scope item —
+  spells "the playbook's own 32 KiB", is one of AC3's eleven hits on the post-merge tree (rev-9
+  corrected this clause, which said BASE), and was in no scope item —
   now S2 with an inventory row.
   **Three rev-6 clauses below were corrected in this pass** for certifying edits their sections did
   not carry; the note is kept in place rather than rewritten away, because a log that quietly
