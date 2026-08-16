@@ -1,18 +1,18 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-2 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
-Six statements in `parallel-coding-governance.template.md` describe the enforcement machinery
+Eight statements in `parallel-coding-governance.template.md` describe the enforcement machinery
 inaccurately. Two of them make the template prescribe behaviour the machinery actually refuses, so
-an agent following the ruleset verbatim is denied by this repo's own hook. Correct all six against
+an agent following the ruleset verbatim is denied by this repo's own hook. Correct all eight against
 source, so the operating ruleset and the code that enforces it agree.
 
 ## 2. Scope (IN)
 
 Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 come from the
-2026-08-11 audit; D6 and D7 were found while writing this spec.
+2026-08-16 audit; D6 and D7 were found while writing this spec.
 
 - **S1 (D6) — the lens-array bound stops prescribing a denied script.** Template `:150` says "an
   array LITERAL of ≤6 elements (the lens fan) passes unmarked". The enforced bound is
@@ -94,6 +94,7 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 | S5 landing artifact | "build plan" | "build folder" | `UNATTENDED-PROTOCOL.md` |
 | S6 landing xref | `(companion §1, §8)` | §8 points back at §1 | template `:159` |
 | S7 §0 cap summary | concurrency only | concurrency AND total | `REVIEW-PROTOCOL.md:12-13` |
+| S8 enforcement reach | `Workflow` tool-call only | `Workflow` AND `Agent` tool-calls | `agent-cap.js:549` · `REVIEW-PROTOCOL.md:62-70` |
 
 ### Migration
 
@@ -104,8 +105,9 @@ None. No adopter data, no generated artifact, no config key changes shape. An ad
 
 | File | Items |
 |---|---|
-| `parallel-coding-governance.template.md` | S1, S2, S3 at `:150`; S4 at `:107`; S5, S6 at `:51`; S7 at `:24` |
+| `parallel-coding-governance.template.md` | S1, S2, S3 at `:150`; S8 at `:157`; S4 at `:107`; S5, S6 at `:51`; S7 at `:24` |
 | `parallel-coding-governance.customize.md` | S5 only, at `:61`, which quotes the template's clause |
+| `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec, so §7's re-stamp is a file this unit touches, not a side effect |
 
 ### Rollout
 
@@ -156,8 +158,11 @@ fix held hostage.
 ## 6. Acceptance criteria
 
 - **AC1** — When each corrected value is re-derived from its source file at build time, it equals
-  the value written into the template. The seven derivations are the §4 Inventory table's third
+  the value written into the template. The **eight** derivations are the §4 Inventory table's third
   column; each is a single grep and none may be taken from this spec.
+- **AC1b** — When template `:157` is read, it names both the `Workflow` and the `Agent` tool-call as
+  points where the cap is enforced, and no longer says the cap is never enforced outside a script.
+  S8 needs its own observation because AC2 exercises the lens bound and nothing else reads `:157`.
 - **AC2** — When a workflow script declaring a 5-element lens array is fed to
   `node tools/hooks/agent-cap.js`, it is allowed; when one declaring 6 is fed, it is DENIED. This
   observes S1's defect directly rather than asserting the constant, and is the check that proves the
@@ -181,7 +186,7 @@ fix held hostage.
 - `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` — after the commit, per M6.
 - `bash skills/session-kickoff/manifest-check.sh` — `parallel-coding-governance.template.md` IS in
   the manifest's `watch:` list, so this unit re-stamps `last-audit` with a delta line.
-- `python tools/drift-audit/drift_report.py` — the template is in `PRODUCT_GLOBS`. This unit must not
+- `python tools/drift-audit/drift_report.py --check` — the template is in `PRODUCT_GLOBS`. This unit must not
   cite its own non-terminal spec id from the template as provenance; the signal sits at pin 2,
   tolerance 0. Note the tension with template §6's "non-obvious rules carry provenance inline" —
   provenance may only be added once this spec is CLOSED.
@@ -199,10 +204,16 @@ fix held hostage.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. D1–D5 carried from the 2026-08-11 audit and re-verified
+- rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
-- rev-2 · 2026-08-11 · folded the `template-fixes` lens of discovery `wf_4e13d9e7-550`. Added S8
+- rev-3 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S8 was in §2 but in nothing else:
+  it had no §4 Inventory row, no source of truth, no Files-touched entry and no acceptance
+  criterion, so a builder working the ACs would have shipped seven of eight fixes and passed.
+  §1 still said "six statements" against §2's eight. Added the `.claude/SESSION-KICKOFF.md`
+  re-stamp to Files touched, which §7 already mandated. Corrected the `drift_report.py` gate
+  spelling to `--check`, without which it reports and cannot fail.
+- rev-2 · 2026-08-16 · folded the `template-fixes` lens of discovery `wf_4e13d9e7-550`. Added S8
   (D8): template `:157` still says the cap is enforced at the `Workflow` tool-call "never inside the
   script", which is the same pre-`agent-cap`-1.3 staleness as S2 one line below it. Corrected S4's
   authority for the check count — it is NOT derivable from `check-memory-hygiene.sh`, whose own

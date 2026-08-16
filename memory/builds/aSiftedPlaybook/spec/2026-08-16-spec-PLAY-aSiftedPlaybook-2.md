@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
@@ -18,9 +18,12 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
   and can copy its fill instruction verbatim, which also makes the two halves of the product agree
   on one spelling.
 - **S2 — the seventeen substitutions.** Anchored on verified (line, column) pairs, never a global
-  replace. Of thirty `main` substrings in the file, thirteen are other senses and must NOT be
-  touched: eleven are the `.domain-rules.md` filename, one is the English adjective at `:100`, and
-  one is `main-loop` at `:157`.
+  replace. Measured at BASE: the file holds **30 `main` substrings**, of which **11 sit inside the
+  word `domain`** — ten in the `.domain-rules.md` filename and one in "domain checklists" at `:4`,
+  a distinction that matters to anyone writing a guard against the filename. The remaining **19 are
+  word-boundary `main`** (`grep -oE '\bmain\b'`), spread over 16 lines. Two of those 19 are not the
+  branch: the English adjective at `:100` and `main-loop` at `:157`. **17 branch senses remain, on
+  14 lines.**
 - **S3 — the two §16 micro-formats.** `:218` (`pushed <remote>/main …`) and `:219`
   (`merged --no-ff <branch> → main <sha> …`). Treated as their own scope item because §16 declares
   micro-formats "MANDATORY, byte-stable, greppable" and a reader is entitled to know the change was
@@ -51,11 +54,16 @@ wrong:
 
 | Claim | Location | Today | After |
 |---|---|---|---|
-| total | `customize.md:20` | 36 | **37** |
-| in the template | `customize.md:23` | 23 | **24** |
-| in the companion | `customize.md:45` | 14 | 14 — unchanged |
-| "13 of the 36 … unfilled in the companion" | `customize.md:15` | 13 | 13 — the phrasing's `36` moves, the `13` does not |
-| the same claim, restated | `WIRE-INTO-PROJECT.md:98` | 13 | 13 — same treatment |
+| total | the sentence stating the total | 36 | **37** |
+| in the template | the template group heading | 23 | **24** |
+| in the companion | the companion group heading | 14 | 14 — unchanged |
+| "13 of the 36 … unfilled in the companion" | the fill-procedure sentence | 13 | 13 — the phrasing's `36` moves, the `13` does not |
+| the same claim, restated | `WIRE-INTO-PROJECT.md` | 13 | 13 — same treatment |
+
+Cited by stated VALUE rather than by line number on purpose: at BASE these sit at `customize.md:20`,
+`:23`, `:45`, `:15` and `WIRE-INTO-PROJECT.md:98`, but §4 Rollout sequences this unit AFTER
+`PLAY-aSiftedPlaybook-4`, which rewrites the first and fourth of those sentences. Line anchors
+written here would be stale by the time this unit is built.
 
 A template-only placeholder cannot change a companion-only count. A spec that "fixed all four
 numbers uniformly" would introduce a fresh error into the very file it was correcting, which is
@@ -135,19 +143,30 @@ than being written twice against two different totals.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `grep -c '{{DEFAULT_BRANCH}}' parallel-coding-governance.template.md` runs, it
-  returns 17.
-- **AC2** — When `grep -n '\bmain\b' parallel-coding-governance.template.md` runs, every surviving
-  hit is one of the thirteen non-branch senses, enumerated by line in the build record. **Zero
-  surviving hits mean the substitution was too greedy**, since the `.domain-rules.md` filename must
-  still be intact — so this AC fails in both directions, which is the point.
+- **AC1** — When `grep -o '{{DEFAULT_BRANCH}}' parallel-coding-governance.template.md | wc -l` runs,
+  it returns **17**; when `grep -c '{{DEFAULT_BRANCH}}' …` runs it returns **14**. Both figures are
+  stated because `grep -c` counts matching LINES, not occurrences, and template `:51` alone carries
+  two branch senses in one line — an AC spelled with `grep -c` and the number 17 fails a correct
+  build.
+- **AC2** — Two observations, because one pattern cannot see both failure modes:
+  - **(a) not too greedy:** `grep -c 'parallel-coding-governance\.domain-rules\.md'
+    parallel-coding-governance.template.md` still returns its BASE value of 10. The filename is the
+    substitution's main corruption target and **`\bmain\b` never matched it** — `domain` contains
+    `main` only as a substring, with no word boundary before the `m` — so a word-boundary grep is
+    structurally blind to that corruption and cannot be the check for it.
+  - **(b) not too timid:** `grep -oE '\bmain\b' parallel-coding-governance.template.md | wc -l`
+    returns exactly **2** — the adjective at `:100` and `main-loop` at `:157`, both named in §2.
 - **AC3** — When `bash tools/check-template-size.sh` runs, it exits 0 and reports the measured size
   read FROM the gate.
 - **AC4** — When the placeholder sets are recomputed by `PLAY-aSiftedPlaybook-4` AC1's recipe, the
   union is 37, the template group is 24, the companion group is 14, and the intersection is still
   exactly `{{MEMORY_ROOT}}`.
-- **AC5** — When `grep -nE '\{\{[A-Z]' ` is run over a freshly instantiated copy of both deploy
-  files, it returns empty — the new placeholder is fillable and documented, not merely added.
+- **AC5** — When `parallel-coding-governance.customize.md` is read, `{{DEFAULT_BRANCH}}` appears in
+  the template group with a fill instruction whose derivation matches
+  `skills/session-kickoff/MANIFEST-TEMPLATE.md:60,126` verbatim. **Deliberately not phrased as "run
+  the grep over a freshly instantiated copy"**: nothing in this repo instantiates the playbook —
+  there is no `adopt-playbook.sh` — so that observation names a step a builder cannot perform, and
+  an AC nobody can run is not an AC.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0. Its `{{[A-Z]`
   ban is scoped to `.claude/SESSION-KICKOFF.md` and never reads the playbook, so a 37th placeholder
   cannot trip it — confirmed, and stated so the build does not go looking for a red that cannot
@@ -158,7 +177,7 @@ than being written twice against two different totals.
 - `bash tools/check-template-size.sh` — the template grows by 238 bytes.
 - `bash skills/session-kickoff/manifest-check.sh` — the template is a watched pathspec; re-stamp.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
-- `python tools/drift-audit/drift_report.py` — the template is in `PRODUCT_GLOBS`; no non-terminal
+- `python tools/drift-audit/drift_report.py --check` — the template is in `PRODUCT_GLOBS`; no non-terminal
   spec id may be cited from it.
 - `bash tools/run-gates.sh` at the push boundary.
 - No new gate; the left-shift is `TOOL-aSiftedPlaybook-3`.
@@ -176,7 +195,13 @@ than being written twice against two different totals.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. The seventeen-of-thirty split, the 238-byte cost and the
+- rev-2 · 2026-08-16 · folded four findings from the spec audit `wf_4ed62ebb-cef`, all re-measured
+  before folding. AC1 counted lines where it meant occurrences and would have failed a correct build
+  (17 occurrences sit on 14 lines). AC2 was structurally blind to the corruption it claimed to
+  catch — `\bmain\b` scores zero on `domain-rules`, so it never guarded the filename — and is now
+  two observations. AC5 named an instantiation step this repo has no tool to perform. S2's
+  "eleven are the filename" was off by one: eleven are the word `domain`, ten of them the filename.
+- rev-1 · 2026-08-16 · initial draft. The seventeen-of-thirty split, the 238-byte cost and the
   `{{TRUNK}}` alternative were measured by the `default-branch` lens of `wf_4e13d9e7-550`; the
   pre-existing `{{DEFAULT_BRANCH}}` in `MANIFEST-TEMPLATE.md` was found by that lens and changed the
   unit's design from "mint a placeholder" to "adopt the one this product already has".

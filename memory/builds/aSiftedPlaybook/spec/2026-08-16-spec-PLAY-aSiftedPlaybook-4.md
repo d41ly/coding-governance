@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-1 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
@@ -16,7 +16,10 @@ themselves, none changes a rule, and none is byte-gated — neither companion is
   companion. Measured: 23 + 14 = 37 while the union is 36, because `{{MEMORY_ROOT}}` appears in
   BOTH files. Replace the disjointness guarantee with the true statement — one placeholder is
   shared and must be filled identically in both files — and keep the per-file counts, which are
-  each individually correct.
+  each individually correct. **State the intersection explicitly and by name** ("1 shared:
+  `{{MEMORY_ROOT}}`"), not merely as prose about sharing: `TOOL-aSiftedPlaybook-3` S3 checks the
+  named shared placeholder against the measured intersection, and it can only read a value the file
+  actually states.
 - **S2 — the shared placeholder is named where it is filled.** The template group at `:33-42` and
   the companion group at `:47-48` both list `{{MEMORY_ROOT}}`. Neither says the other one exists.
   Mark it in both places as the shared key, so an agent filling either group learns of the other.
@@ -133,7 +136,10 @@ none
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. Placeholder arithmetic measured directly at BASE 91ef1b05
+- rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S1 now requires the intersection to
+  be stated by name, because `TOOL-aSiftedPlaybook-3` S3 was written to compare against a value the
+  file never stated — a compare-against-nothing that would have passed vacuously.
+- rev-1 · 2026-08-16 · initial draft. Placeholder arithmetic measured directly at BASE 91ef1b05
   (23 / 14 / 1 shared / 36 union) rather than taken from the audit narrative.
 
 ## 10. Reuse audit

@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -25,6 +25,13 @@ constant change is exactly when an unproven gate is most likely to be silently w
   | A3 | a missing path | exit 2 |
   | A4 | a file at `MAX_BYTES` bytes with every LF turned into CRLF | exit 0 |
   | A5 | `MAX_BYTES` set in the environment | the override is honoured, both directions |
+
+  **How the harness learns `MAX_BYTES` decides whether these arms mean anything.** The gate reads
+  `MAX_BYTES=${MAX_BYTES:-49152}`, so a harness that simply exports its own value tests the
+  override path five times and never once observes the SHIPPED ceiling — the arms would stay green
+  through any edit to the default. A1, A2 and A4 therefore run the gate with **no override** and
+  read the limit back out of its own OK line (`printf … %d / %d bytes`, `:29`); only A5 sets the
+  environment, because exercising the override is its whole purpose.
 
   A4 is the one that matters most and the one a hand-written test would omit. The gate normalizes
   CR before measuring (`:17-19`) precisely so a Windows `autocrlf` smudge cannot inflate the count
@@ -126,7 +133,7 @@ dossier is created once; the specs must not both create it.
   gate's `tr -d '\r'` is removed by hand, A4 reds.
 - **AC4** — When `bash tools/run-gates.sh` runs, the new leg appears in the output by name and is
   green; when `bash tools/run-gates.test.sh` runs, the canary is green with the new manifest entry.
-- **AC5** — When `python tools/drift-audit/drift_report.py` runs,
+- **AC5** — When `python tools/drift-audit/drift_report.py --check` runs,
   `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0 — i.e. S4's charter
   citation landed. A red here means the leg was added and the charter was not told.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage and freshness are
@@ -137,7 +144,7 @@ dossier is created once; the specs must not both create it.
 - `bash tools/check-template-size.test.sh` — the new leg itself.
 - `bash tools/run-gates.test.sh` — the canary over the changed manifest.
 - `python tools/codebase-map/test_codebase_map.py` — coverage + freshness.
-- `python tools/drift-audit/drift_report.py` — the zero-slack citation signal.
+- `python tools/drift-audit/drift_report.py --check` — the zero-slack citation signal.
 - `bash skills/session-kickoff/manifest-check.sh` — `tools/gate-legs.json` is watched.
 - `python tools/memory-tree/check-arms.py` — only if F1 resolves to the `fail()` refactor, in which
   case an `ARMS_FLOORS` entry is mandatory and an undeclared floor is its own refusal.
@@ -158,15 +165,24 @@ dossier is created once; the specs must not both create it.
   and produced a gate with no test at all. Owner's call because it widens the diff on a merge-bar
   gate, which the tier rule prices as a contract change.
 
-- **F2 — who mints `memory/map/features/playbook.md`, this unit or `TOOL-aSiftedPlaybook-1`?**
-  Both need it and neither should create it twice. **Recommendation: whichever lands first mints it,
-  and the other extends it**, with the ordering fixed at build time and written into both §9s. Not
-  an owner decision unless F1 of `TOOL-aSiftedPlaybook-1` resolves to option 1 or 2, in which case
-  this unit owns it outright.
+- **F2 — who mints `memory/map/features/playbook.md`?** **THREE units need it**, not two:
+  `TOOL-aSiftedPlaybook-1` under F1 option 3, this unit for its new leg key, and
+  `TOOL-aSiftedPlaybook-3` for its own leg key. The README fixes the order TOOL-1 → TOOL-2 → TOOL-3.
+  **Recommendation: the first unit that needs it mints it; the later two EXTEND it and red if it is
+  absent** — never mint a second. Concretely: if `TOOL-aSiftedPlaybook-1` F1 resolves to option 3,
+  TOOL-1 mints; under options 1 or 2 it does not need a dossier at all and this unit mints. Either
+  way `TOOL-aSiftedPlaybook-3` always extends. Written into all three §9s at build time. Not an
+  owner decision on its own — it is downstream of F1 — but it must not be left implicit, because two
+  dossiers claiming overlapping keys reds coverage in both directions.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. The absence of any test was established by direct search
+- rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S2 never said how the harness learns
+  `MAX_BYTES`; a harness exporting its own value would have tested the override path five times and
+  never observed the shipped ceiling, leaving every arm green through an edit to the default.
+  F2 counted two contenders for the map dossier where there are three. Corrected the
+  `drift_report.py` gate spelling to `--check` in §7 and AC5.
+- rev-1 · 2026-08-16 · initial draft. The absence of any test was established by direct search
   (no `tools/check-template-size.test.sh`, no `fail()` in the gate, no `ARMS_FLOORS` entry) and
   confirmed independently by the `blast-radius` lens of `wf_4e13d9e7-550`.
 

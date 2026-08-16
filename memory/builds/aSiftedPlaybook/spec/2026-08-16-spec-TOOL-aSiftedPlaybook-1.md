@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -22,9 +22,13 @@ records which relied on the old ceiling, because at least three of them cited it
   leg bullet), `:178` (the Conventions restatement). Note `:97` spells `≤32 KiB` with a unicode `≤`
   while the leg itself spells `<=32KiB`, so a grep for the leg name alone misses it.
 - **S4 — the adopter-facing README.** `README.md:12`.
-- **S5 — the kickoff manifest trap.** `.claude/SESSION-KICKOFF.md:99` (the rule) and `:100-107` (the
-  measured 32682/32768/86-free figure plus a nine-line scarcity-funding policy that the raise makes
-  obsolete). This is the largest single edit and the one an agent reads at every kickoff.
+- **S5 — the kickoff manifest trap.** `.claude/SESSION-KICKOFF.md:99` (the rule) and `:100-106`
+  (the measured 32682/32768/86-free figure plus the scarcity-funding policy the raise makes
+  obsolete). The paragraph actually runs to `:109`, and **`:107-109` SURVIVES the rewrite**: it is
+  the parenthetical explaining why the trap paraphrases rather than citing a non-terminal spec id,
+  which is still true and still load-bearing — see §7's landmine. Scoping the edit to `:99-109`
+  without saying that would delete the warning that keeps this very unit from redding the bar.
+  This is the largest single edit and the one an agent reads at every kickoff.
 - **S6 — the decision record.** A new `memory/DECISIONS.md` row minting the reversal and naming the
   records that relied on the old ceiling. Append-only: nothing prior is edited.
 
@@ -63,6 +67,7 @@ raise touches no shipped adopter artifact.
 | `memory/map/baseline.toml` | 35 | the label as an inventory key — see F1 |
 | `memory/map/generated/inventories.json` | 46 | generated mirror of the key |
 | `memory/map/generated/MAP.md` | 53 | generated mirror of the key |
+| `memory/DECISIONS.md` | append | S6's reversal row — append-only, nothing edited |
 
 ### The blast radius, measured rather than assumed
 
@@ -145,7 +150,7 @@ ratchet's own rule.
 - `bash skills/session-kickoff/manifest-check.sh` — `tools/check-template-size.sh` is a watched
   pathspec; the re-stamp is mandatory, not optional.
 - `python tools/codebase-map/test_codebase_map.py` — only if F1 resolves to a rename.
-- `python tools/drift-audit/drift_report.py` — expected unaffected by the rename per §4; run it to
+- `python tools/drift-audit/drift_report.py --check` — expected unaffected by the rename per §4; run it to
   confirm that rather than trust the analysis. Also guards the landmine below.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
 - `bash tools/run-gates.sh` at the push boundary.
@@ -196,7 +201,12 @@ the spec closes.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. Carrier inventory and blast radius measured by a five-lens
+- rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S5's line range stopped mid-paragraph
+  at `:107` and would have taken the drift-signal warning at `:107-109` with it — the warning that
+  stops this unit redding the bar. Added `memory/DECISIONS.md` to the §4 Inventory, which S6 always
+  required. Corrected the "smallest dossier" citation (`codebase-map.md` at 76 lines, not
+  `install-prefix.md` at 77) and the `drift_report.py` gate spelling to `--check`.
+- rev-1 · 2026-08-16 · initial draft. Carrier inventory and blast radius measured by a five-lens
   discovery pass (`wf_4e13d9e7-550`), not estimated; the "four gates" trap was tested and found to
   over-predict for a rename, and `baseline.toml`'s shrink-only rule was tested and found unenforced.
 
@@ -211,7 +221,7 @@ is why F1 is a fork at all rather than a rename.
 For F1 option 3 the extended seam is `memory/map/features/*.md`: a new dossier follows the pinned
 heading contract in `tools/codebase-map/map_lib.py:58` (`## Constraints & why`, `## Shared seams`,
 `## Gaps`) plus the graced `## Reuse affordance`, modelled on
-`memory/map/features/install-prefix.md` (77 lines, the smallest).
+`memory/map/features/codebase-map.md` (76 lines, the smallest of the seven).
 
 Recall terms used, recorded per M5: `template size gate byte ceiling externalize companion
 domain-rules headroom strict limit raise refuse stub`. The query returned the three records this

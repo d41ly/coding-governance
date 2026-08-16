@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-1 · 2026-08-11 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
@@ -32,6 +32,12 @@ Give each a template placement and a conditional-section row.
   placement, the customize row, and the charter's kit list.
 - **S5 — the customize conditional rows.** One per kit (~685 bytes total), in that file's existing
   voice, stating what to delete when the kit is declined.
+- **S7 — the exemption registry.** `tools/playbook-kit-waivers.txt`, seeded from the measured
+  population with the three kits that are legitimately not adopter-facing (`lib/`, `hooks/`,
+  `workflows/`) and a reason each, modelled on `tools/install-prefix-waivers.txt`. **This unit
+  creates it; `TOOL-aSiftedPlaybook-3` consumes it.** Without it AC1 quantifies over a "declared
+  exempt set" that exists only as prose inside this spec, which no builder can observe and no later
+  gate can read.
 - **S6 — two broken cross-references found alongside.** `WIRE-INTO-PROJECT.md:81` cites a §2a
   section for the agent-instructions install **that does not exist**, and
   `tools/gate-lint/README.md:35` cites `parallel-coding-governance.domain-rules.md §14` for the
@@ -64,7 +70,7 @@ for kits whose concern is not memory, and would have been wrong for two of the f
 ### The population is machine-enumerable, so the acceptance criterion quantifies over it
 
 `tools/` holds eleven tracked kit dirs. The same derivation is already used twice —
-`tools/codebase-map/map_extractors.py` (feeding `inventories.json:62`) and
+`tools/codebase-map/map_extractors.py` (feeding the `kits` inventory in `inventories.json`) and
 `check-install-prefix.sh:38`'s kit-name alternation — so AC1 quantifies over that enumeration rather
 than over a list of four, which would go stale the moment a twelfth kit lands. Three kits are
 legitimately not adopter-facing and belong on the exemption side: `lib/` (gov-internal, ships
@@ -106,6 +112,8 @@ reading the review record will conclude the playbook re-added something a skepti
 | `AGENTS.md` | S4's charter kit list |
 | `WIRE-INTO-PROJECT.md` | S6's dead §2a reference |
 | `tools/gate-lint/README.md` | S6's dead §14 reference |
+| `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/`, `hooks/`, `workflows/` |
+| `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec |
 
 ### Alternatives rejected
 
@@ -136,8 +144,10 @@ reading the review record will conclude the playbook re-added something a skepti
 ## 6. Acceptance criteria
 
 - **AC1** — When the tracked kit dirs under `tools/` are enumerated, every one is either named in at
-  least one of the three playbook files, or listed in the declared not-adopter-facing set with a
-  reason. The enumeration is the machine one, not a hand-list.
+  least one of the three playbook files (matched as a path segment, never a bare substring), or
+  listed in `tools/playbook-kit-waivers.txt` with a reason. The enumeration is the machine one, not
+  a hand-list, and the waiver file is the artifact S7 creates — an AC that quantified over a set
+  declared only in this spec's prose would be unobservable.
 - **AC2** — When `parallel-coding-governance.customize.md`'s conditional-sections list is read,
   every kit named in the template has a row saying what to delete when it is declined.
 - **AC3** — When each new bullet is read against its kit's own README, every claim it makes is
@@ -153,7 +163,7 @@ reading the review record will conclude the playbook re-added something a skepti
 - `bash tools/check-template-size.sh` — this unit spends ~2 KB of the new headroom.
 - `bash skills/session-kickoff/manifest-check.sh` — the template is watched; re-stamp.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
-- `python tools/drift-audit/drift_report.py` — `AGENTS.md` gains a kit; confirm no hand-kept
+- `python tools/drift-audit/drift_report.py --check` — `AGENTS.md` gains a kit; confirm no hand-kept
   inventory signal moves.
 - `bash tools/run-gates.sh` at the push boundary.
 
@@ -174,7 +184,13 @@ reading the review record will conclude the playbook re-added something a skepti
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-11 · initial draft. The fourth kit (`gate-lint`), the false "every other kit gets
+- rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. AC1 quantified over a
+  "declared not-adopter-facing set" that existed only as prose in §4, so nothing a builder could
+  read; S7 now creates `tools/playbook-kit-waivers.txt` as that artifact and
+  `TOOL-aSiftedPlaybook-3` consumes it. Dropped the `inventories.json:62` line anchor — the file is
+  regenerated, `:62` is the string `"gate-lint"`, and the `kits` key is at `:58`. Added the manifest
+  re-stamp to Files touched and corrected the `drift_report.py` spelling to `--check`.
+- rev-1 · 2026-08-16 · initial draft. The fourth kit (`gate-lint`), the false "every other kit gets
   a §5 bullet" premise, the byte costs, and both dead cross-references in S6 came from the
   `unwired-kits` lens of `wf_4e13d9e7-550`; the aCandidStub id-19 refutation was surfaced by the same
   lens and changed the unit's framing from "add missing bullets" to "land a finding whose blocking
@@ -188,7 +204,7 @@ four new ones copy rather than reinvent. AC3 makes conformance to the kit's READ
 bullets stay derived from the kits rather than authored about them.
 
 For AC1 the reused seam is the kit enumeration already implemented twice —
-`tools/codebase-map/map_extractors.py` (the `kits` inventory, `inventories.json:62`) and
+`tools/codebase-map/map_extractors.py` (the `kits` inventory, the `kits` inventory in `inventories.json`) and
 `tools/check-install-prefix.sh:38`'s derived alternation. **No third enumeration is written**; the
 acceptance criterion reads one of the existing two, which is also what makes
 `TOOL-aSiftedPlaybook-3` cheap to build later.

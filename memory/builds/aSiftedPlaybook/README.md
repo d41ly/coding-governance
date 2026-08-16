@@ -1,7 +1,7 @@
 ---
 slug: aSiftedPlaybook
 node: a
-opened: 2026-08-11
+opened: 2026-08-16
 streams: playbook+tooling
 roster: PLAY+TOOL
 ids: PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
@@ -9,7 +9,7 @@ ids: PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-a
 
 # aSiftedPlaybook — the playbook reconverges again, and its ceiling moves
 
-Node `a` · opened 2026-08-11 · streams playbook+tooling.
+Node `a` · opened 2026-08-16 · streams playbook+tooling.
 
 A read-only audit of the three shipped `parallel-coding-governance*.md` files at template v2.7
 confirmed eleven defects and refuted eight suspected ones. The owner then ordered two things: spec
@@ -33,17 +33,17 @@ Records live under `spec/` and `reviews/`. The table below is GENERATED from the
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-11 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-11-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-2 | 2026-08-11 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-11-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-1 | 2026-08-11 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-11-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-1 | 2026-08-11 |
-| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-11-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-1 | 2026-08-11 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-11-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-1 | 2026-08-11 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-11-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-1 | 2026-08-11 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-11-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-2 | 2026-08-11 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-3 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-2 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-3 | 2026-08-16 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -69,8 +69,14 @@ reproduced inside the build that exists to close it. Read the spec, not the cell
 
 - **The version marker moves once, at the integration boundary**, not per unit. The template and
   `domain-rules.md` both carry `<!-- governance-template: vN.N -->` and are re-pulled in lockstep, so
-  a unit landing a marker bump mid-build would ship a version that describes a partial change. The
-  last unit to land bumps both to **v2.8** and archives a v2.7 snapshot under `memory/archive/`.
+  a unit landing a marker bump mid-build would ship a version that describes a partial change.
+  **Owner: the last TEMPLATE-touching unit to land — `PLAY-aSiftedPlaybook-3` under the order
+  below.** Not `TOOL-aSiftedPlaybook-3`, which touches no playbook file and would have to reach
+  outside its own scope to do it; and not "the last unit to land", which is how a build-level rule
+  ends up belonging to nobody. That unit carries it as a scope item and an AC, naming
+  `parallel-coding-governance.template.md` line 12, `parallel-coding-governance.domain-rules.md`
+  line 3, and the v2.7 snapshot under `memory/archive/`. If the owner re-sequences, the rule moves
+  with the ordering, not with the unit id.
 - **Every template-touching unit re-measures.** `bash tools/check-template-size.sh` is an acceptance
   item in each, read FROM the gate, never carried between specs as a remembered number.
 - **`memory/DECISIONS.md` is append-only.** The ceiling reversal supersedes prior records by minting
