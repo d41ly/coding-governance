@@ -333,6 +333,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "classify_outcome",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "classify_row",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

@@ -649,6 +649,73 @@ def main() -> int:
         check("and it names the missing files rather than reporting a bare count",
               "is in the receipt and not on disk" in pc.stdout, pc.stdout)
 
+        # ===== unit 5, the rest: orders, observation, outcomes, the outbox =====
+        # These paths had NO arms at all, and it showed: a NameError in the machine-order writer
+        # reached runtime, because nothing here had ever executed that branch. The review's finding
+        # that the write block is the least-armed block is the reason these exist.
+        MACH = """gov_source = "local"
+prefix = "tools"
+kits = ["kickoff-manifest"]
+
+[answers]
+memory_root = "memory"
+manifest_path = "docs/KICK.md"
+user_skills = "/tmp/gk-fake-skills"
+"""
+        mt = make_target(tmp / "u5f", MACH)
+        pa = run("apply", "--target", str(mt), "--kits", "kickoff-manifest")
+        check("apply prints the OBSERVE step id", "/OBSERVE]" in pa.stdout, pa.stdout)
+        ob = mt / ".governance" / "outbox"
+        mach = [q for q in ob.glob("kickoff-manifest-*.md")]
+        check("a machine-scoped RULE gets an order, named for the entry and its destination",
+              len(mach) == 1, str(sorted(q.name for q in ob.glob("*"))))
+        body = mach[0].read_text(encoding="utf-8") if mach else ""
+        check("the order carries the destination and BOTH platforms' link commands",
+              "session-kickoff" in body and "mklink /J" in body and "ln -s" in body, body[:300])
+        check("and apply wrote nothing at that destination — it is outside the repository",
+              not (mt / "tools" / "session-kickoff").exists(), "")
+
+        pc = run("check", "--target", str(mt))
+        check("check reports the machine destination undischargeable, not missing",
+              "undischargeable" in pc.stdout, pc.stdout)
+        check("and it READS the outbox, reporting a derived order count",
+              "outbox:" in pc.stdout and "order(s) recorded" in pc.stdout, pc.stdout)
+
+        # The order's ABSENCE is what reds: there is no probe for a path outside the repo, so the
+        # order is the only observable artifact. Stated in the spec as the asymmetry with a hole,
+        # which HAS a probe and must not go green when its order is deleted.
+        mach[0].unlink()
+        pc = run("check", "--target", str(mt))
+        check("deleting a machine order REDS — the order is the only observable there is",
+              pc.returncode == 1 and "not on disk" in pc.stdout, pc.stdout)
+
+        # A stale order — one for a hole no selected kit declares — is an instruction nobody owns.
+        (ob / "ghost-hole.md").write_text("stale\n", encoding="utf-8", newline="\n")
+        rp = mt / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        rec["orders"] = [{"kind": "hole", "id": "ghost-hole",
+                          "path": ".governance/outbox/ghost-hole.md"}]
+        rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+        pc = run("check", "--target", str(mt))
+        check("an order for a hole no selected kit declares is reported STALE",
+              "which no selected kit" in pc.stdout, pc.stdout)
+
+        # The [[outcome]] evaluator: six descriptors declared these blocks and ZERO code read them,
+        # so an exit code shared by six unrelated branches was the whole report. A fixture asserts a
+        # MEANING now, which is what the acceptance layer needs and could not have.
+        cmt = make_target(tmp / "u5g", DEPLOY_FULL)
+        pa = run("apply", "--target", str(cmt), "--kits", "memory-tree")
+        check("a declared outcome is reported by its MEANING, not as a bare integer",
+              "seed-and-stop" in pa.stdout or "refused-foreign-tree" in pa.stdout
+              or "unclassified" in pa.stdout, pa.stdout)
+
+        # The two selfcheck arms this unit adds, with their liveness halves.
+        ps = run("selfcheck")
+        check("selfcheck reports how many shipped scripts the wiring arm READ",
+              "check wiring:" in ps.stdout and "shipped script(s) read" in ps.stdout, ps.stdout)
+        check("and how many entry scopes it checked against their derived value",
+              "entry scope:" in ps.stdout, ps.stdout)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)

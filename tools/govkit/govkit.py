@@ -28,12 +28,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
 import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.4"  # gov:kit govkit@1.4 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.5"  # gov:kit govkit@1.5 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -808,6 +809,63 @@ def selfcheck(root: pathlib.Path) -> int:
                        f"to the surface predicate, which is depth-1")
     r.note(f"per-file claim: {unclaimed_in_home} unclaimed file(s) under a non-flat home")
 
+    # ---- 7j: `--check` WIRING PARITY, derived in BOTH directions like `mutates_index`. A shipped
+    #          script that accepts the arm and is wired by no descriptor is a verifier nobody runs; a
+    #          `[check].argv` naming a script with no such arm is a claim the engine cannot honour.
+    #          The scan is scoped to the NAMED script, which is what excludes the false positives a
+    #          repo-wide grep would collect.
+    n_scanned = 0
+    for eid, (d, _dpath) in descs.items():
+        chk = d.get("check") or {}
+        wired, declared_none = bool(chk.get("argv")), "none" in chk
+        home = (d.get("home") or "").rstrip("/")
+
+        # The population is every ADOPTER-shaped script this entry ships, not only the ones an argv
+        # names — the two entries this arm exists for name their script in no argv at all, and an
+        # argv-only scan cannot see them.
+        cands: list[pathlib.Path] = []
+        for av in ((d.get("adopt") or {}).get("argv") or [], chk.get("argv") or []):
+            for a in av:
+                if a.endswith(".sh"):
+                    cands.append(root / (f"{home}/{pathlib.PurePosixPath(a).name}" if home
+                                         else pathlib.PurePosixPath(a).name))
+        for rule in d.get("files", []):
+            for s in rule_sources(d, rule):
+                if s.endswith(".sh") and not s.endswith(".test.sh"):
+                    cands.append(root / s)
+
+        for cand in dict.fromkeys(cands):
+            if not cand.is_file():
+                continue
+            n_scanned += 1
+            body = [ln for ln in cand.read_text(encoding="utf-8", errors="replace").splitlines()
+                    if not ln.lstrip().startswith("#")]
+            accepts = any("--check" in ln for ln in body)
+            # A DECLARED absence is the legal escape, exactly as it is for a version constant: an
+            # entry may say `[check] = { none = "<reason>" }` and may not say nothing.
+            if accepts and not wired and not declared_none:
+                r.fail(f"entry '{eid}': {cand.name} accepts `--check`, no `[check].argv` wires it, "
+                       f"and no reason is declared — a verifier the kit ships and nothing runs")
+            if wired and not accepts and cand.name in "".join(chk.get("argv") or []):
+                r.fail(f"entry '{eid}': `[check].argv` names {cand.name}, which has no `--check` arm")
+    r.note(f"check wiring: {n_scanned} shipped script(s) read")
+
+    # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
+    #          descriptor declares one and the engine read only the rule-level spelling, so the
+    #          contract's machine-scoped criterion had no referent at all.
+    n_scope = 0
+    for eid, (d, _dpath) in descs.items():
+        if "scope" not in d:
+            continue
+        n_scope += 1
+        rules = d.get("files", [])
+        derived = "machine" if rules and all(
+            rr.get("scope") == "machine" or rr.get("link") for rr in rules) else "repo"
+        if d["scope"] != derived:
+            r.fail(f"entry '{eid}' declares scope '{d['scope']}' and its rules derive '{derived}' — "
+                   f"an entry is machine-scoped only when every one of its rules is")
+    r.note(f"entry scope: {n_scope} declaration(s) checked against their derived value")
+
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.
     globs = reg.get("surface", {}).get("globs", [])
@@ -1034,6 +1092,28 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
             r.fail(f"the receipt carries {missing[1]} ({missing[0][:12]}) which install.sums does not")
         r.note(f"sidecar: {len(sums)} line(s) compared against {len(want_pairs)} hashed row(s)")
 
+    # ---- THE OUTBOX. The contract names it as an arm and the verb never opened it. Every order the
+    # ---- receipt records must exist; an order for a hole no selected kit declares is stale.
+    declared_holes = {h.get("id") for eid in selection if eid in descs
+                      for h in descs[eid][0].get("hole", [])}
+    n_orders = 0
+    for order in receipt.get("orders") or []:
+        n_orders += 1
+        op = target / order["path"]
+        if not op.is_file():
+            r.fail(f"the receipt records order '{order['path']}' and it is not on disk")
+        if order.get("kind") == "hole" and order.get("id") not in declared_holes:
+            r.fail(f"order '{order['path']}' is for hole '{order.get('id')}', which no selected kit "
+                   f"declares — a stale order is an instruction nobody owns")
+        if order.get("kind") == "machine":
+            # NOT `landed-but-inert` and NOT a missing-file finding. The destination is outside the
+            # repository, so a check running inside it cannot answer the question — the ORDER is the
+            # only observable artifact, and its absence is what reds.
+            print(f"govkit check — {order.get('kit')}: undischargeable — "
+                  f"{order.get('destination')} is outside this repository")
+    if n_orders:
+        r.note(f"outbox: {n_orders} order(s) recorded")
+
     for eid in selection:
         if eid not in descs:
             r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
@@ -1111,6 +1191,40 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 # ----------------------------------------------------------------------------------------- apply
 # LANDABLE_ROLES and UNLANDED_REASON live with the resolver, above: which roles land is a property of
 # the resolution, not of the apply verb, and spelling it twice is the defect this file exists to end.
+
+
+def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> str | None:
+    """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
+
+    The exit-code collision is per BRANCH, not per kit: one shipped adopter exits 1 for six unrelated
+    outcomes, so a code-to-meaning table cannot tell them apart and parsing stdout is fragile. Each
+    `[[outcome]]` therefore declares what must and must not exist, and this RUNS that probe. Six
+    descriptors declared these blocks and nothing read them, so an integer was the whole report.
+
+    Returns None when no declared outcome matches — reported as unclassified, never invented.
+    """
+    for oc in desc.get("outcome", []):
+        if oc.get("code") != rc:
+            continue
+        probe = oc.get("probe") or {}
+        ok = True
+        for key, want in (("must_exist", True), ("must_not_exist", False)):
+            spec = probe.get(key)
+            if not spec:
+                continue
+            for p in (spec if isinstance(spec, list) else [spec]):
+                resolved, miss = resolve_tokens(p, ctx)
+                if miss:
+                    ok = False
+                    break
+                if (target / resolved).exists() is not want:
+                    ok = False
+                    break
+            if not ok:
+                break
+        if ok:
+            return oc.get("means")
+    return None
 
 
 def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
@@ -1275,6 +1389,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     # ---- CONFIGURE. A kit with a blocks_adopt hole lands and is NOT configured.
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
+    orders: list[dict] = []
     for eid in selection:
         d, _p = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -1284,6 +1399,39 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                 f"# {h.get('id')} — {eid}\n\n{h.get('why', '').strip()}\n\n"
                 f"Discharge is decided by RUNNING this hole's probe, never by deleting this file.\n",
                 encoding="utf-8", newline="\n")
+            orders.append({"kind": "hole", "id": h.get("id"),
+                           "path": f".governance/outbox/{h.get('id')}.md"})
+
+        # A machine-scoped RULE gets an ORDER, never a write. The population is the RULE and not the
+        # entry: every descriptor declares an entry-level scope of `repo` and exactly one rule in the
+        # tree is machine-scoped, so an entry-keyed state would have no instance while apply writes
+        # per rule — the two sides would quantify over different populations and the state would be
+        # permanently unreachable. The order's own name is `<entry>-<slug>.md`, because a rule has no
+        # hole id and the outbox's other names are hole ids.
+        for rule in d.get("files", []):
+            if not (rule.get("scope") == "machine" or rule.get("link")):
+                continue
+            for dest in rule_destinations(d, rule):
+                resolved, miss = resolve_tokens(dest, ctx)
+                if miss:
+                    continue
+                slug = re.sub(r"[^A-Za-z0-9]+", "-", resolved).strip("-").lower()[:60]
+                name = f"{eid}-{slug}.md"
+                link = (f"mklink /J \"{resolved}\" \"<gov>/{'/'.join(rule_sources(d, rule)[:1])}\""
+                        if os.name == "nt" else
+                        f"ln -s \"<gov>/{'/'.join(rule_sources(d, rule)[:1])}\" \"{resolved}\"")
+                other = (f"ln -s \"<gov>/…\" \"{resolved}\"" if os.name == "nt"
+                         else f"mklink /J \"{resolved}\" \"<gov>/…\"")
+                (outbox / name).write_text(
+                    f"# {eid} — a MACHINE-scoped destination\n\n"
+                    f"destination: {resolved}\n\n"
+                    f"This lives OUTSIDE the repository, so `apply` writes nothing for it and "
+                    f"`check` reports it undischargeable rather than missing — a check running "
+                    f"inside the repo cannot answer a question about a path outside it.\n\n"
+                    f"On this host:\n    {link}\n\nOn the other platform:\n    {other}\n",
+                    encoding="utf-8", newline="\n")
+                orders.append({"kind": "machine", "id": name[:-3], "path":
+                               f".governance/outbox/{name}", "destination": resolved, "kit": eid})
         if blocked and not resume:
             print(f"govkit apply — CONFIGURE {eid}: skipped, blocked by hole "
                   f"'{blocked[0].get('id')}' — landed but inert")
@@ -1293,8 +1441,15 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
         rc = subprocess.run(resolved, cwd=str(target), capture_output=True, text=True).returncode
-        print(f"govkit apply — CONFIGURE {eid}: adopter exit {rc}")
-        if rc != 0:
+        means = classify_outcome(target, d, ctx, rc)
+        print(f"govkit apply — CONFIGURE {eid}: adopter exit {rc}"
+              + (f" — {means}" if means else ""))
+        if rc != 0 and means:
+            # The `[[outcome]]` blocks were declared by six descriptors and read by ZERO code, so an
+            # exit code shared by six unrelated branches was reported as an integer. A declared
+            # meaning lets a fixture assert a MEANING, which is what the acceptance layer needs.
+            r.fail(f"kit '{eid}': its adopter exited {rc} — {means}")
+        elif rc != 0:
             # A non-zero adopter exit is a FINDING, not a printed integer. Measured before this:
             # `apply --resume` printed 'adopter exit 1' and exited 0, so an install whose configure
             # phase failed was indistinguishable from one that worked. WHICH failure it is needs the
@@ -1303,11 +1458,35 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             r.fail(f"kit '{eid}': its adopter exited {rc} — unclassified, because no `[[outcome]]` "
                    f"evaluator exists yet to say WHICH declared outcome that code means")
 
+    # ---- OBSERVE. apply does NOT render — the adopters do, and a second renderer would race the
+    # ---- real one. What it does is look at what they produced, so `update` and `check` have
+    # ---- something to reason about. A rendered destination that is ABSENT after configure is a
+    # ---- FINDING: before this, every non-landable role vanished with no message at all.
+    step(STEP_OBSERVE, "rendered destinations")
+    n_rendered = 0
+    for row in rows:
+        if row.get("role") != "rendered":
+            continue
+        n_rendered += 1
+        dp = target / row["path"]
+        if not dp.is_file():
+            r.fail(f"'{row['path']}' is declared `rendered` by kit '{row['kit']}' and is absent "
+                   f"after its adopter ran — the adopter owns those bytes and did not write them")
+            continue
+        row["output_sha256"] = hashlib.sha256(dp.read_bytes()).hexdigest()
+        row["template"] = row.get("source")
+        conf = (descs[row["kit"]][0].get("config") or {}).get("file")
+        if conf and (target / conf).is_file():
+            row["inputs"] = [{"path": conf,
+                              "sha256": hashlib.sha256((target / conf).read_bytes()).hexdigest()}]
+    print(f"govkit apply — observed {n_rendered} rendered destination(s)")
+
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
     (target / ".governance").mkdir(exist_ok=True)
     receipt_path.write_text(json.dumps(
         {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
-         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows},
+         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows,
+         "orders": orders},
         indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
