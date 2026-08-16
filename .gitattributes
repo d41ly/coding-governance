@@ -126,6 +126,8 @@ tools/*/kit.toml text eol=lf
 # The lexicon kit's conf. Pinned for the same determinism reason as the two confs above: it is read
 # by the kit's Python reader AND grepped by `adopt-lexicon.sh`, whose `ratified` extraction strips a
 # trailing quote with `s/"$//` — a CRLF checkout puts a carriage return after that quote and the
-# anchor stops matching. Harmless today because the check only asks whether the value is non-empty,
-# which is exactly how this class survives until something starts reading the value itself.
+# anchor stops matching, leaving `"`, a NON-EMPTY value. That INVERTS the unratified-seed refusal:
+# the one check stopping an uncurated verb table from reaching the merge bar passes exactly when it
+# must fire. Not harmless, and MEASURED — this comment previously said "harmless today", which the
+# same kit's own selftest then disproved. The reader also strips CR; both halves are armed.
 .lexicon.conf text eol=lf

@@ -47,16 +47,21 @@ moment it IS the banned shape. The resolution is procedural: mark it `PROPOSED`,
 empty, and red until a human stamps it. Without that arm an unedited seed reaches the merge bar
 disguised as a curated vocabulary.
 
-**Vacuity is armed THREE ways, and the third exists because the first two were not enough.** The
+**Vacuity is pushed back on three ways, and the third is narrower than it first shipped.** The
 corpus-side arm is `DEAD PROBE`: a `parser` or `probe` language whose definition population is empty
 against a corpus containing that extension is a refusal. That arm is itself defeated by an empty
 corpus, so the kit-side arm is a frozen SENTINEL fixture per shipped pattern set in `selftest.py`.
-The third is `UNMATCHABLE LAYERS RULE`, added after the closing review: `NOT ARMED` tests whether
-`LAYERS` is EMPTY and `DEAD PROBE` tests whether an extractor selects anything, and **neither tests
-whether a non-empty rule can ever FIRE**. The kit's first real declaration went through that gap —
-it named a hyphenated directory, no import could resolve into it, and the offender pin read a
-confident 0 that no edit could move. Reachability is now proved by CONSTRUCTION rather than
-observation: each rule must flag its own synthetic violation, or the run reds.
+The third is `UNSELECTIVE LAYERS RULE` — a rule whose FROM or TO glob matches no tracked file.
+
+**Reachability itself is NOT proved, and the failed attempt is the more useful record.** The kit's
+first real declaration named a hyphenated directory no import could resolve into, so P3's offender
+pin read a confident 0 that no edit could move. The first fix added a construction-based reachability
+proof, and a review measured it a tautology: every synthetic derived from a target's PATH round-trips
+through the resolver's own path-mirroring reading, so restoring the pre-fix blind resolver still
+certified the rule REACHABLE. It was removed rather than patched. What P3's correctness rests on is
+`resolve_import`, an OBSERVED failing case, and fixtures in the PRODUCTION shape — a hyphenated
+directory reached by a bare-stem import, which is precisely the shape a path-shaped fixture cannot
+represent. See `armed-but-unreachable-rule`.
 
 **Coverage is DECLARED per extension, and an undeclared one is a named refusal.**
 `map_extractors.py` refuses to ship a regex extractor for shell and declares that language dark

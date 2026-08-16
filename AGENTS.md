@@ -168,7 +168,11 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   language whose definition population is empty against a corpus containing that extension prints
   `DEAD PROBE` and reds, and `tools/lexicon/selftest.py` freezes a SENTINEL per shipped pattern set,
   because the corpus-side arm is defeated by an empty corpus. An empty `LAYERS` is `NOT ARMED` and
-  REDS rather than passing. Waivers key on the matched TEXT, never `<path>:<line>`, so an edit above a
+  REDS rather than passing, and a rule whose globs select no tracked file is `UNSELECTIVE`. What is
+  NOT checked — stated because an earlier revision claimed it was — is whether a selective rule can
+  actually FIRE: a construction-based proof of that was built, measured to be a tautology (it
+  certified the very resolver whose blindness it existed to catch) and removed. P3 rests on its
+  resolver, an OBSERVED failing case, and production-shaped fixtures. Waivers key on the matched TEXT, never `<path>:<line>`, so an edit above a
   waived line cannot unpin it; a waiver whose text is gone reds as stale. Wiring:
   `tools/lexicon/adopt-lexicon.sh --check`. The three offender pins are MEASURED against this corpus
   and are honestly non-zero on day one

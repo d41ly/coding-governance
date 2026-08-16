@@ -43,29 +43,40 @@ The fixture missed it for a different reason, and that is the more transferable 
 `core/* -> adapters/*` with `import adapters.db`, where the namespace **happens to spell the path**.
 A fixture easier than production certifies coverage production does not have.
 
-## The check
+## The check that does NOT work, recorded because it was written and shipped
 
-**Prove reachability by CONSTRUCTION, not by observation.** For each declared rule, synthesise the
-thing that would violate it — from real corpus members, in the real shape a real author would write —
-and require the predicate to flag it. A rule that survives its own synthetic violation will never see
-a real one.
+**Proving reachability by CONSTRUCTION is a tautology, and the attempt is instructive.** The first
+fix synthesised a violating import from each real target file — its stem, its dotted path, a relative
+form — and required the matcher to flag one. It looked rigorous. It certified everything:
 
-```python
-# tools/lexicon/lexicon.py — scan_unmatchable_rules()
-for t in targets:                       # real tracked files on the TO side
-    for synthetic in (stem, dotted, "./" + t):   # the shapes a real importer writes
-        if check_layer_violation(probe_src, synthetic, [(frm, to)], index):
-            reachable = True
+```
+with the PRE-FIX (known-blind) resolver, unreachable rules reported: NONE
+synthetic dotted form: tools.codebase-map..codebase-map.conf   <- a string no import can spell
 ```
 
-And **fixture the production shape**, not a convenient one: if the real declaration names a
-hyphenated directory reached by a flat stem import, the fixture must too.
+Every synthetic derived from the target's own PATH round-trips through the resolver's own
+path-mirroring reading, so the construction proves the resolver agrees with itself. Restoring the
+exact resolver whose blindness the arm existed to catch still yielded a clean bill. **A vacuity check
+that is itself vacuous is worse than none, because it gets cited as coverage** — in a docstring, a
+commit message, a dossier and a charter bullet, all of which claimed proof this arm never delivered.
 
-Gated by `tools/lexicon/lexicon.py`, whose `scan_unmatchable_rules()` reds an `UNMATCHABLE LAYERS
-RULE`, and armed in `tools/lexicon/selftest.py` by two arms — one where the rule's globs select
-nothing, and one reproducing the production shape that shipped the original defect. The GENERAL form
-is not gated and cannot be from one repo: no predicate can know what "reachable" means for a rule
-type it has never seen. This class is the review question to ask instead.
+## What actually works
+
+1. **Check the part that IS decidable, and claim only that.** Both globs must select a real tracked
+   file. Narrow, true, and it fires: it caught five of the kit's own fixtures declaring a rule they
+   had no files to express.
+2. **OBSERVE the failing case** (companion §7). Stage the real violation, watch it red, unstage. That
+   is evidence; a synthetic that the matcher's own logic generates is not.
+3. **Fixture the PRODUCTION shape.** The original fixture used `import adapters.db` against
+   `adapters/*` — a namespace that HAPPENS to spell the path. Production named a hyphenated directory
+   reached by a bare stem, which shares no characters with its own directory. A fixture easier than
+   production certifies coverage production does not have, and that single substitution is what let
+   the blocker through.
+
+Gated by `tools/lexicon/lexicon.py`, whose `scan_unselective_rules()` reds an `UNSELECTIVE LAYERS
+RULE` — emptiness only, and its name says so. The GENERAL form is not gated and cannot be from one
+repo: no predicate can know what "reachable" means for a rule type it has never seen. This class is
+the review question to ask instead, and the question is: **what edit would make this number go up?**
 
 ## Where else this bites
 

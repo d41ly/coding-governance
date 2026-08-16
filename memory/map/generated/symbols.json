@@ -1548,7 +1548,7 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
-      "id": "scan_unmatchable_rules",
+      "id": "scan_unselective_rules",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },

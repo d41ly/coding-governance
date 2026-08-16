@@ -90,7 +90,7 @@ code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SID
 check("P1 green: a declared verb passes", code == 0, out)
 
 code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF)
-check("P1 red: an undeclared leading token reds", code != 0, out)
+check("P1 red: an undeclared leading token reds", code != 0 and "P1 verb" in out, out)
 check("P1 red names the file", "core/a.py" in out, out)
 check("P1 red names the identifier", "frobnicate_index" in out, out)
 check("P1 red names the offending token", "'frobnicate'" in out, out)
@@ -98,6 +98,11 @@ check("P1 red names the offending token", "'frobnicate'" in out, out)
 # ---- P2: the banned-suffix predicate ------------------------------------------------------------
 code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass ThingManager:\n    pass\n"}, BASE_CONF)
 check("P2 red: a type DEFINITION ending in a banned suffix reds", code != 0 and "ThingManager" in out, out)
+
+# The bare case, which used to be EXEMPT via a `name != suf` guard — the purest instance of "a type
+# nobody scoped" was the one the predicate let through.
+code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass Manager:\n    pass\n", **LAYER_SIDES}, BASE_CONF)
+check("P2 red: a type named EXACTLY the banned suffix reds", code != 0 and "P2 suffix" in out, out)
 
 # The F-A3 arm: a blanket ban breaks on contact with imported names and parameters. P2 is scoped to
 # DEFINITION sites only, so neither of these is an offender.
@@ -146,8 +151,32 @@ check("P3 green: a bare-stem import NOT under the forbidden dir is silent", code
 # ever fire. A rule naming a directory that does not exist is the checkable form of that.
 code, out = run_case({"core/a.py": "def build_x():\n    pass\n"},
                      BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  core/* -> nowhere/at-all/*\n")
-check("P3 unreachable: a rule whose TO glob matches no tracked file reds", code != 0, out)
-check("P3 unreachable: it says UNMATCHABLE", "UNMATCHABLE" in out, out)
+check("P3 unselective: a rule whose TO glob matches no tracked file reds", code != 0, out)
+check("P3 unselective: it says UNSELECTIVE", "UNSELECTIVE" in out, out)
+
+# The OTHER end of the same check. Both branches need an arm or one of them is a claim nobody tests.
+code, out = run_case({"core/a.py": "def build_x():\n    pass\n", **LAYER_SIDES},
+                     BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  nowhere/at-all/* -> adapters/*\n")
+check("P3 unselective: a rule whose FROM glob matches no tracked file reds",
+      code != 0 and "UNSELECTIVE" in out, out)
+
+# H1 — the stem lookup is SCOPED. Unscoped it returned every tracked file sharing a basename, so a
+# LOCAL sibling import resolved into the forbidden directory it never touches. The only escape would
+# have been a waiver, which then permanently silences the genuine violation it was hiding.
+code, out = run_case(
+    {"pkg/consumer/a.py": "import helper\n\n\ndef build_x():\n    pass\n",
+     "pkg/consumer/helper.py": "def build_local():\n    pass\n",
+     "pkg/shared-core/helper.py": "def build_far():\n    pass\n"},
+    HYPHEN_CONF)
+check("P3 green: an importer-local file WINS over a same-stem file in the forbidden dir", code == 0, out)
+
+# And the extension half of that scoping: a `.py` import never denotes a `.md`.
+code, out = run_case(
+    {"pkg/consumer/a.py": "import notes\n\n\ndef build_x():\n    pass\n",
+     "pkg/shared-core/notes.md": "# not a module\n"},
+    HYPHEN_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                        'LANGS="py:python-ast:parser conf::dark md::dark"'))
+check("P3 green: a same-stem file of a DIFFERENT extension is not a resolution", code == 0, out)
 
 # H1 — a RELATIVE specifier must resolve against the IMPORTER's directory. Swapping dots for slashes
 # mangles `../shared-core/x.js` into `///shared-core/x/js` and matches nothing, which made the
@@ -264,6 +293,24 @@ with tempfile.TemporaryDirectory() as td:
     out = r.stdout + r.stderr
     check("scaffold: --check REDS on the unratified seed", r.returncode != 0, out)
     check("scaffold: and says the seed is unratified", "ratified" in out, out)
+
+    # BOTH HALVES OF THE CRLF FIX, ARMED. Reverting either one used to leave every arm green, which
+    # made the fix a claim rather than a behaviour. The failure it prevents is an INVERSION: an
+    # anchored `s/"$//` cannot strip a quote a carriage return follows, so `ratified=""` in a CRLF
+    # conf yields `"\r` — a NON-EMPTY value — and the one check that stops an uncurated table
+    # reaching the merge bar passes exactly when it must fire.
+    check("scaffold: the conf it wrote contains NO CR bytes",
+          b"\r" not in (root / ".lexicon.conf").read_bytes(),
+          repr((root / ".lexicon.conf").read_bytes()[:120]))
+
+    crlf = (root / ".lexicon.conf").read_bytes().replace(b"\n", b"\r\n")
+    (root / ".lexicon.conf").write_bytes(crlf)
+    r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+                       capture_output=True, text=True)
+    out = r.stdout + r.stderr
+    check("scaffold: --check STILL reds on an unratified seed in a CRLF conf (the reader strips CR)",
+          r.returncode != 0, out)
+    check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
 # ---- verdict ------------------------------------------------------------------------------------
 if FAILURES:

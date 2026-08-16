@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-16
 streams: playbook+tooling
 roster: PLAY+TOOL
-ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4
+ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5
 ---
 
 # dClosedLexicon — a declared naming lexicon, gated, and portable into an unknown repo
@@ -77,7 +77,7 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4
+**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

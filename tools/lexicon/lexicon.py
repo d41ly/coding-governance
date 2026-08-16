@@ -22,17 +22,27 @@ in the corpus carries a DECLARED mode and an undeclared one is a named refusal:
     dark    none, declared explicitly     named every run, never silently absent
 
 VACUITY IS THE DOMINANT FAILURE MODE, not false positives — a predicate that selects an empty
-population passes green forever and tells you nothing. It is armed THREE ways, and the third was
-added after the first two proved insufficient in this file's own first landing:
+population passes green forever and tells you nothing. Three checks push back, and the third is
+narrower than an earlier version of this docstring claimed:
 
   DEAD PROBE          a parser/probe language whose definition population is empty against a corpus
                       containing that extension — an extractor that has gone inert
   frozen SENTINELS    a fixture per shipped pattern set in `selftest.py`, because the corpus-side
                       arm above is itself defeated by an empty corpus
-  UNMATCHABLE RULE    a LAYERS rule that is NON-EMPTY but cannot fire. `NOT ARMED` tests emptiness
-                      and DEAD PROBE tests extractors; neither tests REACHABILITY, and a real rule
-                      shipped through that gap reporting an unfalsifiable 0. Reachability is proved
-                      by CONSTRUCTION: the rule must flag its own synthetic violation.
+  UNSELECTIVE RULE    a LAYERS rule whose FROM or TO glob matches no tracked file
+
+WHAT IS NOT CHECKED, said plainly because the previous version of this file claimed it was. There
+is no proof that a non-empty, selective rule can actually FIRE. One was attempted and it was a
+tautology: every synthetic import target derived from a real file's PATH round-trips through the
+resolver's own path-mirroring reading, so the check certified every rule — including, MEASURED,
+under the pre-fix resolver whose blindness it had been written to catch. A vacuity check that is
+itself vacuous is worse than none, because it gets cited as coverage.
+
+What P3's correctness actually rests on is `resolve_import` plus fixtures written in the PRODUCTION
+shape — a hyphenated directory reached by a bare-stem import, which is the case the first
+implementation could not see and no path-shaped fixture would have caught. Those live in
+`selftest.py`. The general question is `memory/gotchas/armed-but-unreachable-rule.md`, and it is a
+REVIEW question: no predicate here can decide reachability for a rule type it has never seen.
 """
 
 import re
@@ -162,8 +172,20 @@ def load_waivers(kit: Path, kind: str) -> dict[str, str]:
 
 
 def _glob_match(path: str, pattern: str) -> bool:
+    """Fully ANCHORED. A `<dir>/*` pattern also matches anything nested under `<dir>/`.
+
+    The first cut fell back to an UNANCHORED `re.match(rx, path)`, which accepts any path merely
+    STARTING with the pattern's literal prefix — so `tools/codebase-map//codebase-map/conf` matched
+    `tools/codebase-map/*`. That is how the reachability arm certified itself: it fed the matcher a
+    mangled synthetic no import could ever spell, and the sloppy prefix accepted it.
+    """
     rx = re.escape(pattern).replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
-    return re.match(rx + "$", path) is not None or re.match(rx, path) is not None
+    if re.fullmatch(rx, path):
+        return True
+    if pattern.endswith("/*"):
+        prefix = re.escape(pattern[:-1])
+        return re.fullmatch(prefix + ".*", path) is not None
+    return False
 
 
 def build_module_index(files: list[str]) -> dict[str, list[str]]:
@@ -213,7 +235,21 @@ def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> l
     # And resolve the LAST segment as a module stem against the corpus. This is what catches the
     # flat `sys.path`-insert import — the commonest shape in this tree and in every kit here — where
     # the target is a bare name that shares no characters with its own directory.
-    out.extend(index.get(target.rsplit(".", 1)[-1], []))
+    #
+    # SCOPED TWO WAYS, because an unscoped stem lookup returns every tracked file sharing a
+    # basename and reds a perfectly local import as a layer crossing. Measured in this tree:
+    # `selftest`, `kit` and `README` each name files in several kits, so an unscoped lookup made a
+    # stdlib or sibling import resolve into a forbidden directory it never touches, and the only
+    # escape would be a waiver that then permanently silences the genuine violation it was hiding.
+    #
+    #   1. SAME EXTENSION as the importer. A `.py` import never denotes a `.md` or a `.toml`.
+    #   2. IMPORTER-LOCAL WINS. If the importer's own directory holds a file with that stem, that is
+    #      what the import resolves to, and no other candidate is offered — which is what the
+    #      language itself does.
+    ext = ext_of(importer)
+    hits = [p for p in index.get(target.rsplit(".", 1)[-1], []) if ext_of(p) == ext]
+    local = [p for p in hits if (p.rsplit("/", 1)[0] if "/" in p else "") == here]
+    out.extend(local or hits)
     return out
 
 
@@ -228,43 +264,31 @@ def check_layer_violation(rel: str, target: str, layers, index) -> tuple[str, st
     return None
 
 
-def scan_unmatchable_rules(layers, files: list[str], index) -> list[tuple[str, str, str]]:
-    """LAYERS rules that CANNOT fire, with the reason. The third vacuity defence.
+def scan_unselective_rules(layers, files: list[str], index) -> list[tuple[str, str, str]]:
+    """LAYERS rules whose globs SELECT NOTHING. States exactly that and no more.
 
-    `NOT ARMED` tests whether LAYERS is empty; `DEAD PROBE` tests whether an extractor selects
-    anything. Neither tests whether a NON-EMPTY rule is REACHABLE, and that gap shipped a rule that
-    could never match while its offender pin read a confident, unfalsifiable 0.
+    WHAT THIS IS NOT, stated first because the previous version claimed it. This does NOT prove a
+    rule is reachable. It cannot: any synthetic import target derived from the target's own PATH
+    round-trips through the resolver's path-mirroring reading, so a construction-based proof
+    certifies every rule — MEASURED, by restoring the pre-fix resolver, which this arm still
+    declared REACHABLE. The construction branch was a tautology dressed as a defence, and a
+    vacuity check that is itself vacuous is worse than none, because it is cited as coverage.
 
-    Reachability is proved by CONSTRUCTION, not by observation: for each rule, take a real tracked
-    file on the `to` side, derive the import target a real importer would write for it, and require
-    the matcher to flag it. A rule that survives its own synthetic violation is a rule that will
-    never see a real one.
+    What a rule's reachability actually rests on is the RESOLVER, and the only honest evidence for
+    that is an OBSERVED failing case plus fixtures in `selftest.py` written in the PRODUCTION shape
+    — a hyphenated directory reached by a bare-stem import. Those exist and are what this kit
+    stands on; see the `armed-but-unreachable-rule` class for the general question, which no
+    predicate here can answer for a rule type it has not seen.
+
+    What IS checkable is emptiness at both ends, and it does fire: it caught five of this kit's own
+    fixtures declaring a rule they had no files to express.
     """
     bad = []
     for frm, to in layers:
-        sources = [f for f in files if _glob_match(f, frm)]
-        targets = [f for f in files if _glob_match(f, to)]
-        if not sources:
+        if not any(_glob_match(f, frm) for f in files):
             bad.append((frm, to, f"the FROM glob {frm!r} matches no tracked file"))
-            continue
-        if not targets:
+        elif not any(_glob_match(f, to) for f in files):
             bad.append((frm, to, f"the TO glob {to!r} matches no tracked file"))
-            continue
-        probe_src = sources[0]
-        reachable = False
-        for t in targets:
-            base = t.rsplit("/", 1)[-1]
-            stem = base.rsplit(".", 1)[0] if "." in base else base
-            for synthetic in (stem, t.rsplit(".", 1)[0].replace("/", "."), "./" + t):
-                if check_layer_violation(probe_src, synthetic, [(frm, to)], index):
-                    reachable = True
-                    break
-            if reachable:
-                break
-        if not reachable:
-            bad.append((frm, to, f"no import of any file under {to!r} can be matched from {frm!r} — "
-                                 f"the rule is non-empty but UNREACHABLE, so its offender count is "
-                                 f"an unfalsifiable 0"))
     return bad
 
 
@@ -305,8 +329,8 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     else:
         # The THIRD vacuity defence. Emptiness and dead extractors were armed from the start; a
         # non-empty rule that cannot fire was not, and that is the gap a real rule shipped through.
-        for frm, to, why in scan_unmatchable_rules(layers, files, module_index):
-            problems.append(f"UNMATCHABLE LAYERS RULE `{frm} -> {to}` — {why}. A rule that cannot "
+        for frm, to, why in scan_unselective_rules(layers, files, module_index):
+            problems.append(f"UNSELECTIVE LAYERS RULE `{frm} -> {to}` — {why}. A rule whose globs "
                             f"fire is worse than no rule: it reports a confident 0 that no edit can "
                             f"ever move.")
 
