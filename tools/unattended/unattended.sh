@@ -75,7 +75,7 @@ PHASES_TERMINAL="LANDED ABORTED"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -1194,6 +1194,21 @@ dod_met() { # slug · run-state file · item · checker
         | diff -q - <(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null) >/dev/null 2>&1 ;;
     landed-via-lander)
       [ -n "$LANDER" ] && [ -n "$BYPASS_BAN" ] && ! grep -qF -- "$BYPASS_BAN" "$rel" ;;
+    build-complete)
+      # The owner's "merge and push only when the entire build is fully done", given a checker.
+      # FIVE terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
+      # see a planned unit nobody specced, because the generated region is rendered from the specs
+      # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
+      # `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so a run-state
+      # file spliced empty would satisfy "no unit row is non-terminal" by carrying no unit rows.
+      # No new fail branch: this reports through verb_close's fail 13, which already prints the
+      # exact --override spelling. A waiver on `land-once-done` relaxes the DIRECTIVE and never this
+      # item, so a run that waived it still owes --override build-complete at close.
+      region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1 \
+        && [ -n "$(roster_ids "$slug")" ] \
+        && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
+        && [ -n "$(unit_rows "$rel")" ] \
+        && [ -z "$(nonterminal_units "$rel")" ] ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)

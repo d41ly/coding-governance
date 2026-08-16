@@ -436,7 +436,7 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 fixture
 git push -q -f origin HEAD:main
-out=$(run --close tRun)
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
 miss "$out" "the recorded BASE equals HEAD"
 miss "$out" "an absent discriminator is a refusal"
 hit "$out" "close OK"
@@ -510,7 +510,7 @@ hit "$out" "--override requires --reason: an unrecorded override is indistinguis
 # ---- check 13, both branches, each ISOLATED so the arm names the right one. Agent-attested first:
 # ---- every machine item is satisfied, so only the attested pair can be unmet.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-out=$(run --close tRun)
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
 hit "$out" "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks"
 
@@ -523,7 +523,7 @@ hit "$out" "gates-green"
 
 # ---- the override PATH, end to end: the blocked item is overridden, the run closes, and the reason
 # ---- is written as a parked entry. A blocking gate with an override nobody can read is not a gate.
-out=$(run --close tRun --override gates-green --reason "the bar was run by hand at the pinned base")
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "the bar was run by hand at the pinned base")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned base"
 same "the phase advanced to LANDING" \
@@ -534,13 +534,13 @@ same "the phase advanced to LANDING" \
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 mkconf "false" "false"
-out=$(run --close tRun --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
 hit "$out" "close OK"
 hit "$out" "override recorded for 'gates-green'"
 hit "$out" "override recorded for 'records-current'"
 hit "$(cat memory/builds/tRun/RUN.md)" "bar run by hand"
 hit "$(cat memory/builds/tRun/RUN.md)" "index re-rendered by hand"
-same "two overrides parked, not one" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "2"
+same "three overrides parked, one per pair — the scalar form kept only the last" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "3"
 
 # ---- the non-overridable item refuses wherever it sits, not only last. The scalar form could only
 # ---- ever see the FINAL pair, so a first-position authorization-reachable was invisible to it.
@@ -554,6 +554,76 @@ miss "$out" "close OK"
 out=$(run --close tRun --override gates-green --reason "has one" --override records-current)
 hit "$out" "--override requires --reason: an unrecorded override is indistinguishable from a passing check"
 miss "$out" "close OK"
+
+# ---- TOOL-cBriefedPilot-7: `build-complete` — the owner's "merge and push only when the entire
+# ---- build is fully done", given a checker. FIVE terms, and the GREEN CONTROL comes FIRST: without
+# ---- a tree where the item is genuinely MET, every arm below would pass by finding nothing, which
+# ---- is the exact class this build kept meeting. Each arm then breaks exactly ONE term off it.
+# ---- Terms 4 and 5 are broken in BOTH the README and the run-state copy, so `records-current` stays
+# ---- met and the refusal is attributable to this item alone rather than to two at once.
+git checkout -qf main
+sed -i 's/| OPEN | rev-1 |/| CLOSED | rev-1 |/' memory/builds/tRun/README.md
+roster tRun "1. ARCH-tRun-1 — the unit"
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m bc-fixture --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+bcreset() { git reset -q --hard "$BCP"; git clean -qfd; mkconf; }
+bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md; }
+
+# GREEN CONTROL: a complete build closes with NO override at all. If this ever needs one, the item
+# has stopped being satisfiable and every arm below is measuring the wrong thing.
+bcopen
+out=$(run --close tRun)
+hit "$out" "close OK"
+miss "$out" "build-complete"
+
+# term 1 — no well-formed roster pair. A COMPLETENESS check cannot borrow check_authorization's
+# opt-in-by-presence disposition: on this tree 1 of 35 build READMEs carries the pair, so an opt-in
+# build-complete would be vacuously true for 34 of them and blind in the case it exists for.
+bcopen; sed -i "/roster:units/d" memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "build-complete"
+
+# term 2 — the pair is well-formed and names no id at all.
+bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. a plan with no id in it/' memory/builds/tRun/README.md
+hit "$(run --close tRun)" "build-complete"
+
+# term 3 — the roster names a unit nobody specced. This is the ONLY term that can see it: the
+# generated region is rendered from the specs that EXIST, so terms 4 and 5 are blind to a planned
+# unit with no spec file.
+bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. ARCH-tRun-1 — the unit\n2. ARCH-tRun-9 — never specced/' memory/builds/tRun/README.md
+hit "$(run --close tRun)" "build-complete"
+
+# term 4 — the generated region is spliced EMPTY. Term 5 is vacuously true over an empty selection,
+# so without this term a run-state file carrying no unit rows would satisfy "none is non-terminal"
+# by having none. Emptied in both files, so records-current stays met.
+bcopen
+sed -i '/^| \[ARCH-tRun-1/d' memory/builds/tRun/RUN.md
+sed -i '/^| \[ARCH-tRun-1/d' memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "build-complete"
+miss "$out" "records-current"
+
+# term 5 — one unit row is non-terminal. The case the owner actually asked for.
+bcopen
+sed -i 's/| CLOSED | rev-1 |/| OPEN | rev-1 |/' memory/builds/tRun/RUN.md
+sed -i 's/| CLOSED | rev-1 |/| OPEN | rev-1 |/' memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "build-complete"
+miss "$out" "records-current"
+
+# the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
+# afterwards. A blocking gate whose override nobody can read is not a gate.
+out=$(run --close tRun --override build-complete --reason "shipping 1 of 2 units deliberately")
+hit "$out" "close OK"
+hit "$(cat memory/builds/tRun/RUN.md)" "shipping 1 of 2 units deliberately"
+
+# restore main to the shared BASE so the later arms see the tree they were written against.
+git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
 
 # ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
 # ---- directive is a pointer into a section of that file, so a run without it is bound by a set
@@ -1135,7 +1205,7 @@ miss "$(sed -n '/^## Parked/,$p' memory/builds/tRun/RUN.md)" "override"
 # has simply relabelled every parked line rather than distinguishing two kinds.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
-run --close tRun --override records-current --reason "records lag" >/dev/null 2>&1
+run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override records-current --reason "records lag" >/dev/null 2>&1
 hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
 
 

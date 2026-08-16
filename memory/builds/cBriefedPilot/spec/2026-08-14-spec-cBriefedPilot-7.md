@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes
 
-**Status:** DEFERRED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
