@@ -216,7 +216,12 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
 
 
 def corpus_files(repo: pathlib.Path) -> list[str]:
-    """Tracked AND untracked-not-ignored ``$MEMORY_ROOT/**/*.md``.
+    """Tracked AND untracked-not-ignored ``$MEMORY_ROOT/**/*.md``, plus the DECLARED extra sources.
+
+    There are TWO corpus enumerators in this kit and this is the second. ``extract.corpus_files``
+    is the measurement path; this one is the query path. A widening honoured in only one of them
+    makes ``bench.py --rev`` narrower than a live run, and a benchmark measuring a different corpus
+    than the one it reports on is worse than none.
 
     A note written this session and not yet committed is exactly what a session needs to find, and
     ``extract.corpus_files`` is tracked-only on purpose -- it is the MEASUREMENT path and stays
@@ -299,6 +304,14 @@ def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict],
             continue
         records.extend(E.extract_records(path, text))
         chunks.extend(E.extract_chunks(path, text, CHUNK_MAX))
+    # The DECLARED extra sources, on the query path too. Honouring them in only one enumerator is
+    # how the measurement and the live corpus silently diverge.
+    for path in E.resolve_declared_sources(repo):
+        try:
+            text = (repo / path).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        chunks.extend(E.extract_declarations(path, text))
     # The SECOND call site of the alias join, and the one the merge bar cannot see
     # (ARCH-aGrittedFlagstone-3). `check_recall.py` grades a SUBPROCESS of `extract.py`; this CLI
     # never runs that entry point and never reads its output dir -- it re-extracts here and indexes
@@ -364,7 +377,11 @@ def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], t0: f
         "chunk_max": CHUNK_MAX,
         "n_files": len(files),
         "counts": {"records": len(records), "chunks": len(chunks)},
-        "digest": corpus_digest(repo, files),
+        # The declared sources join the digest: their COMMENT BLOCKS are corpus content now, and
+        # `CONF.digest()` deliberately hashes resolved conf VALUES rather than file bytes — so
+        # without this a justification edit in a declared conf leaves a warm cache serving prose
+        # that no longer exists.
+        "digest": corpus_digest(repo, files + E.resolve_declared_sources(repo)),
         "alias_digest": alias_digest(),
         # The join COUNTS beside the source digest: the digest keys freshness and cannot tell a
         # joined alias layer from a dead one. Here so the diagnosis fires on a cache hit too.

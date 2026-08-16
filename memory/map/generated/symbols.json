@@ -418,6 +418,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "declared_sources",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "declares",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -614,6 +619,11 @@
     },
     {
       "id": "extract_chunks",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_declarations",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
     },
@@ -1773,6 +1783,16 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "t_declared_source_absent_is_skipped",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "t_declared_sources_reach_the_corpus",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "t_detect_collisions_and_backlog",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -1921,6 +1941,11 @@
       "id": "t_symbols_render_deterministic_and_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "t_undeclared_file_stays_out",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "t_verbatim_files",

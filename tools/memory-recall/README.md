@@ -80,6 +80,12 @@ replacement exists):
    exists goes. A cache with **no readable manifest** is never evicted — that is the shape of a
    sibling mid-first-build.
 2. **the byte budget**, `RECALL_CACHE_BUDGET_MB` in `.memory-tree.conf`. **Absent** = the kit's
+
+`RECALL_EXTRA_SOURCES` — space-separated, repo-RELATIVE files whose `KEY=value` declarations join
+the corpus as chunks, each carrying the comment block above it. Blank or absent is the pre-widening
+corpus exactly; a declared file that does not exist is skipped with one line. **Declared, never
+globbed** — corpus membership is a decision about what counts as an answer. Note for adopters: a
+file you name here is INDEXED, so do not name one holding secrets.
    default, 512 MB; **blank** = uncapped. Eviction is least-recently-built first by `built_at`, and
    it stops the moment the tree is under budget. Three directories are never candidates: the current
    worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
