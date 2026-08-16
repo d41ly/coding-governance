@@ -128,7 +128,8 @@ requires the version bump at or after the last engine change in the pushed range
 - **AC6** — check 20's verdict on the REAL corpus is unchanged: row count, unkeyed count and duplicate
   set are identical before and after, measured and recorded in the build report.
 - **AC7** — every new branch has a positive arm naming its own text, and each arm FAILS against the
-  pre-change code; the negative control is run per branch and its output recorded.
+  pre-change code; the negative control is run per branch and its output recorded in the build report at
+  `build/2026-08-16-build-TOOL-aMouldedFolio-3-followups-controls.md` §3.
 - **AC8** — the false claim in `row_grammar.py`'s module docstring and in the dossier — that an
   undeclared pin is "its own refusal" — is corrected, since `pin_of` returns 0. Both copies move.
 
@@ -141,11 +142,16 @@ recurring-bug-class checklist runs over the diff before review.
 
 ## 8. Open questions
 
-- **RESOLVED (agent, 2026-08-11, delegated): the version value and landing order.** All three
-  follow-up units bump the same constant, and a bump is not a merge conflict — two branches setting
-  the same next value merge clean and the epoch gate is satisfied by a bump that did not happen for
-  the later change. So the units land SEQUENTIALLY on one branch, each bumping to the next value in
-  order: this unit takes **2.9**, and if another lands first this unit re-bumps rather than reusing.
+- **RESOLVED (agent, 2026-08-11, delegated): the version value and landing order.** The three
+  follow-up units bump one constant, and an identical bump on two branches merges clean while
+  the epoch gate stays satisfied, so they land SEQUENTIALLY on one branch.
+  **CORRECTED at the landing:** the value stated here (2.9) was wrong — the base already carried
+  a higher one, and main's own lineage reached 2.13 in parallel while this branch went to 3.0.
+  A 'next value' rule cannot be fixed in a spec at all: the next value is only knowable at the
+  merge, against whatever the other nodes landed. The landing took 2.14, then 2.15 when the
+  merge's own resolution read as a DECREASE from the branch side and the epoch gate refused it.
+  The standing rule is therefore: pick the value at the merge, above every lineage present, and
+  expect the post-merge audit to need one more.
 
 ## 9. Revision log
 

@@ -217,6 +217,11 @@ def do_check(root, conf):
                    f"it is invisible:")
         for p, n in open_fences:
             bad.append(f"    {p}: fence opened at line {n} and never closed")
+        # TERMINAL. The counts below are derived from a read that stopped early, so comparing
+        # them against the pin would turn a partial scan into a pin instruction — "lower it to
+        # N" where N omits everything the fence hid. Refuse first, count later.
+        print(chr(10).join(bad))
+        return 1
     if unkeyed:
         bad.append(f"check {CHECK}: {len(unkeyed)} dash-led line(s) carry an id the row grammar "
                    f"cannot key, so a key-merge would drop or duplicate them:")
@@ -254,7 +259,14 @@ def do_report(root, conf):
 
 
 def do_emit_pin(root, conf):
-    _rows, _unkeyed, dupes, _loose, _of = scan(root, conf)
+    _rows, _unkeyed, dupes, _loose, open_fences = scan(root, conf)
+    # A pin emitted from a partial read is worse than no pin: it is a NUMBER an operator will
+    # paste into the conf, derived from a corpus the scanner could not finish reading.
+    if open_fences:
+        for p, n in open_fences:
+            print(f"row-grammar: {p} ends inside a fence opened at line {n}; no pin is emitted "
+                  f"from a partial read")
+        return 1
     print(f'{PIN_KEY}="{len(dupes)}"')
     return 0
 
@@ -359,6 +371,16 @@ def do_selftest():
             "never closed", lambda: cap(t7d, c7d))
         arm("the unterminated fence names the line it opened on", "fence opened at line 3",
             lambda: cap(t7d, c7d))
+        # [14]/[15]: the refusal must be TERMINAL in both modes — a count or a pin derived from a
+        # read that stopped at an unclosed fence is a number an operator would act on.
+        t7e = os.path.join(base, "openfencepin"); os.makedirs(t7e)
+        c7e = _tree(t7e, chr(10).join(["- ARCH-tOne-1 . one", "", "```",
+                                       "- ARCH-tOne-1 . the duplicate the pin exists for", ""]),
+                    pin="1")
+        arm("an open fence stops --check before any pin comparison", "TERMINAL",
+            lambda: "LEAKED" if "lower it to" in cap(t7e, c7e) else "TERMINAL")
+        arm("--emit-pin refuses on a partial read instead of printing a number",
+            "no pin is emitted", lambda: cap(t7d, c7d, do_emit_pin))
         # A dash-led line holding an id the grammar cannot KEY is counted, not ignored.
         t8 = os.path.join(base, "unkeyed"); os.makedirs(t8)
         c8 = _tree(t8, "- ARCH-tOne-1 · one\n- see ARCH-tOne-9 for the rationale\n")

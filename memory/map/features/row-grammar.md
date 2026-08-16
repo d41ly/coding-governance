@@ -43,8 +43,7 @@ NAMED GAP: the live index and its rotated archive are two files, so a row that r
 re-minted is not caught here.
 
 THE PIN IS A COUNT, NOT A REGISTRY. A membership list would put the offending ids in a second place
-and let a deletion there pass unnoticed. An undeclared pin is a refusal, because omitting the key is
-the quietest way to disarm a gate.
+and let a deletion there pass unnoticed. An undeclared pin means ZERO — the strictest value, never a refusal and never off. Refusing one was the first design and it cost every hygiene fixture and every freshly scaffolded adopter a red bar: a default that can only TIGHTEN needs no ceremony.
 
 TWO PREDICATES, DELIBERATELY. The row grammar admits a revision suffix (`-9b`); the roster derivation
 in `gen_build_index.py` excludes it. A roster answers "which ids belong to this build", where an

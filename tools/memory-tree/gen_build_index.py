@@ -419,11 +419,28 @@ def strip_records_sentence(readme_text: str, readme: str) -> str:
     opens = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_OPEN]
     closes = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_CLOSE]
     inside = range(opens[0], closes[0] + 1) if opens and closes and closes[0] >= opens[0] else range(0)
-    fenced = {n for n, line in unfenced_lines(readme_text) if line is None}
     unfenced_no = {n for n, line in unfenced_lines(readme_text) if line is not None}
+    # FRONT MATTER IS NOT PROSE and is never edited here. `parse_front_matter` has already proved the
+    # block opens at line 1 and closes, so the index is available — and a key whose VALUE carries the
+    # anchor is legal input (the parser accepts arbitrary keys). Editing there would blank a
+    # structured value silently, and `--check` would then agree with the blanked file forever. A
+    # match inside the block is a refusal instead, because it means the anchor found something this
+    # remover was never reasoned about.
+    fm_end = 0
+    if lines and lines[0].rstrip("\r") == "---":
+        for i, l in enumerate(lines[1:], start=1):
+            if l.rstrip("\r") == "---":
+                fm_end = i
+                break
 
     hits, anchored = [], []
     for i, line in enumerate(lines):
+        if i <= fm_end and fm_end:
+            if RECORDS_ANCHOR in line:
+                raise Problem(f"{readme}:{i + 1}: the folder-claim anchor appears inside the front "
+                              f"matter, which this remover never edits — a structured value is not "
+                              f"prose, and blanking one silently is not a repair")
+            continue
         if i in inside or (i + 1) not in unfenced_no:
             continue
         if RECORDS_SENTENCE.search(line):
@@ -748,8 +765,32 @@ def do_selftest() -> int:
             lambda: str(plan(ta, ca)[0]["memory/builds/tOne/README.md"].count("Records live under")))
         tb = os.path.join(base, "recwhole"); os.makedirs(tb)
         cb = _rec(tb, "Records live under `spec/`.")
-        arm("a line that was ONLY the sentence is removed entirely", "1",
-            lambda: str(plan(tb, cb)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        # ASSERT THE SHAPE, NOT A COUNT. The count `1` is satisfied by the DERIVED sentence alone, so
+        # it holds whether the whole-line branch deletes the line or leaves it empty — collapsing
+        # `del lines[i]` to `lines[i] = rest` passed the entire selftest while changing the render.
+        # The residual blank line is the only observable difference, so that is what is asserted.
+        # The sentence line sat between two blanks, so deleting it leaves exactly those two and the
+        # marker follows. Collapsing the branch to `lines[i] = rest` leaves a THIRD blank — the only
+        # observable difference, and the one a count could never see.
+        arm("a line that was ONLY the sentence is removed entirely, leaving no extra blank",
+            "# tOne" + chr(10) * 3 + MARK_OPEN,
+            lambda: plan(tb, cb)[0]["memory/builds/tOne/README.md"])
+        # and the mid-line case keeps ONE space where the sentence was, which pins the `[ ]?`
+        tb2 = os.path.join(base, "recmid"); os.makedirs(tb2)
+        cb2 = _rec(tb2, "Prefix text. Records live under `spec/`. Suffix text.")
+        arm("removing a mid-line sentence leaves exactly one space, not two",
+            "Prefix text. Suffix text.",
+            lambda: plan(tb2, cb2)[0]["memory/builds/tOne/README.md"])
+        # [6] front matter is structured input, not prose: a key whose value carries the anchor
+        # was silently BLANKED, and --check then agreed with the blanked file forever.
+        tfm = os.path.join(base, "recfm"); os.makedirs(tfm)
+        cfm = _fixture(tfm, spec_status="INPROGRESS")
+        _q = os.path.join(tfm, "memory", "builds", "tOne", "README.md")
+        write_text(_q, read_text(_q).replace("ids: ARCH-tOne-1",
+                    "ids: ARCH-tOne-1" + chr(10) + "notes: Records live under `spec/`."))
+        run("git", "add", "-A", cwd=tfm); run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=tfm)
+        arm("the anchor inside FRONT MATTER is refused, never blanked",
+            "a structured value is not prose", lambda: plan(tfm, cfm))
         tc = os.path.join(base, "rectwice"); os.makedirs(tc)
         cc = _rec(tc, "Records live under `spec/`. one\n\nRecords live under `build/`. two")
         arm("the sentence appearing twice outside the region is a REFUSAL",
