@@ -4,7 +4,8 @@ Project-agnostic governance + tooling for running Claude Code (or any agent) acr
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
 gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
 itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
-keys not yet claimed by one are in the shrink-only `baseline.toml`. Both counts move as dossiers
+keys not yet claimed by one are in the `baseline.toml`, which shrinks except where a recorded
+decision says otherwise (`TOOL-aSiftedPlaybook-1` swapped one key in place; see the file's header). Both counts move as dossiers
 land, so neither is spelled here — `python tools/codebase-map/reuse_lookup.py` prints the live pair.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
@@ -13,8 +14,8 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 ## What ships here (the product)
 
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
-  ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh` — trim or externalize, never
-  raise the limit). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
+  ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`, which also prices every growth
+  against a recorded high-water — prefer externalizing to spending the headroom). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
   (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
   holding the kickoff-manifest merge exception the byte-gated template externalized, plus the
   kit-conditional unattended-run rules).
@@ -94,7 +95,13 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
-- template size ≤32 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
+- template size gate self-test — `tools/check-template-size.test.sh`: arms over a gate that had
+  none, with the branch/armed pair pinned in `.memory-tree.conf`'s `ARMS_FLOORS` rather than
+  claimed here — an earlier draft of this line said "every branch red-proved" when two were not.
+  A12 asserts the high-water record's KEY against a literal rather than the gate's own
+  derivation, because `--bump` writes that key and the ratchet reads it back through the same
+  code — the round trip is green whatever it says
+- template size ≤48 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
   MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
   positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
@@ -146,6 +153,25 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- playbook carrier parity — `tools/check-playbook-parity.sh` (+ `tools/check-playbook-parity.test.sh`):
+  the playbook's claims about THIS repo, machine-checked in three classes that have each recurred
+  after being fixed once — every tracked kit dir is named in the trio or carries a waiver row with a
+  reason; a value the playbook STATES equals the source that OWNS it (declared pairs, in-script);
+  and `customize.md`'s placeholder arithmetic equals the measured sets. STRUCTURAL only, and the
+  gate's own header says so — a fluent paraphrase that is subtly wrong still passes. Anti-vacuity is
+  the load-bearing constraint: a pair whose extraction matches NOTHING reds as unresolvable rather
+  than comparing empty to empty, and the kit derivation carries a frozen `memory-tree` sentinel so a
+  broken enumeration reds instead of reporting universal coverage. The waiver registry
+  `tools/playbook-kit-waivers.txt` is CONSUMED here and owned by the playbook build; absent, the
+  gate reds and stops rather than creating one. It is a declared exemption list rather than a
+  shrink-only one — a missing kit reds, so an experimental kit needs a row — and it drains through
+  two arms instead: a row whose kit is gone, and a row whose kit the playbook does document
+- gate-lint — `tools/gate-lint/`: `ps-hygiene.py` scans every `.ps1` under a root for two classes
+  that make a script misbehave SILENTLY — case-only identifier collisions (PowerShell names are
+  case-insensitive, so `$LEGS` and `$legs` are one variable) and BOM-less non-ASCII (5.1 decodes
+  CP1252, so an em dash closes a string early). Byte-level; carries `--selftest`. Despite the
+  name it does NOT lint gate logic — it is a source-hygiene scanner, and this line said otherwise
+  until the closing review ran the kit.
 - govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
   DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
   and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under
@@ -218,7 +244,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
 
 - **LF** on all `.sh` + the memory-tree data files (`.gitattributes`); verify staged bytes on Windows.
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
-- The template is the operating ruleset — keep it ≤32 KiB; anything activity-scoped or one-time goes
+- The template is the operating ruleset — keep it ≤48 KiB; anything activity-scoped or one-time goes
   in a companion, not the template.
 - Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.

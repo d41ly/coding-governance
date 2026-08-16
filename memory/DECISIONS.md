@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-aSiftedPlaybook-1 · ceiling 32768->49152 (owner); a high-water ratchet keyed by file replaces its forcing function; baseline.toml's shrink-only rule reversed in place, dated in-header. Falsifies: PLAY-aCandidStub-1 §3, TOOL-aGuardedTally-1, PLAY-aPrunedCeremony-1 RD7, aCandidStub review 19
 - TOOL-aMendedLedger-8 · U9 REPLACES the merge driver's algorithm rather than patching it a fourth time: two planes split by row SHAPE, structure delegated to `git merge-file`, only the row set key-merged, recombined via a token skeleton. The bar is a live control per case
 - TOOL-aMendedLedger-9 · a row one side MOVED and the other DELETED was dropped at rc 0 where git keeps it. The row plane is position-blind, so the SKELETON arbitrates: a surviving token for a deleted key means a move, and the disagreement becomes a scoped conflict
 - TOOL-aUnmannedHelm-1 · the unattended protocol becomes a kit, not a retyped chat block. The run-state file is load-bearing because a session cron dies with its session; agent-cap does NOT count — measured, a four-call burst overlapped its hooks and two of four read one counter value
@@ -47,6 +48,7 @@
 - TOOL-cFinalBerth-2 · the merge-base cannot tell a run that BUILT NOTHING from one FULLY LANDED — it equals HEAD in both; the recorded base can. The refusal keeps its verb and changes its question, accepting a run-written input and bounding it three ways
 - TOOL-cSteadyMetronome-1 · a gate asserts what the SUBJECT does, never what the NODE does. The canary's elapsed-time ratio measured the machine and blocked three pushes over a tree it had passed; a rendezvous measures dispatch and ignores load
 
+- TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
 ## DEPL — deployer
 
 *(none yet)*

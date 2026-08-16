@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** CLOSED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -12,7 +12,8 @@ source, so the operating ruleset and the code that enforces it agree.
 ## 2. Scope (IN)
 
 Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 come from the
-2026-08-16 audit; D6 and D7 were found while writing this spec.
+2026-08-16 audit; D6 and D7 were found while writing this spec; **D8 came from discovery
+`wf_4e13d9e7-550`** and is recorded as B2 in the audit report, not as an audit finding.
 
 - **S1 (D6) — the lens-array bound stops prescribing a denied script.** Template `:150` says "an
   array LITERAL of ≤6 elements (the lens fan) passes unmarked". The enforced bound is
@@ -74,15 +75,19 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 - **The `tools/workflows/tier2-review.js` path and the "install per WIRE §5" reference.** Both were
   suspected stale in the audit and both were REFUTED: the harness install genuinely sits inside
   WIRE §5 at lines 465-475, and `tools/<kit>/` is the declared install prefix. No edit.
-- **`WIRE-INTO-PROJECT.md:463`, which calls agent-cap "the review protocol's TWO rules".** Same
+- **`WIRE-INTO-PROJECT.md:464`, which calls agent-cap "the review protocol's TWO rules".** Same
   defect class, different file, outside the playbook trio this build scopes. Recorded as a follow-up
   row rather than fixed here.
 - **The two other carriers of the stale "19-check"** — `tools/memory-tree/README.md:6` and root
   `README.md:33`. Both verified stale against the true 20. Same number, different products;
   follow-up row for the kit README. Root `README.md` is the adopter-facing front door and
-  `TOOL-aSiftedPlaybook-1` S4 is separately editing it at `:12` in this same build, so **that unit
-  is the cheaper home for `:33`** — recorded here as the cut-line rather than left in a revision
-  log, which is nowhere a builder reads.
+  `TOOL-aSiftedPlaybook-1` S4 **now RECEIVES `:33`** on all three of the carriers that make a
+  hand-off real: it is named in that unit's scope item, it has its own §4 inventory row, and its
+  **AC13** observes it (`grep -nE '[0-9]+-check' README.md` reads 20 and nothing else). The AC is
+  the load-bearing one — AC3's alternation cannot match "19-check", so without it every criterion in
+  the receiving unit goes green with the defect shipped. Routing a carrier to a unit that does not
+  receive it is how round 2's B1 happened; this §3 sentence reproduced it twice, once by naming no
+  receiver and once by asserting an inventory row that did not exist.
 - **Making these claims machine-checked.** `TOOL-aSiftedPlaybook-3`.
 
 ## 4. Design
@@ -233,6 +238,22 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-8 · 2026-08-16 · folded the M8 closing review's **H4**. S4 deleted the template's hardcoded
+  hygiene check count and pointed adopters at the kit README — which said 19 at `:6` and 20 at
+  `:18`, disagreeing with itself. Delegating to a carrier without checking that carrier turned a
+  known follow-up into a defect this unit created; `tools/memory-tree/README.md:6` is corrected.
+- rev-7 · 2026-08-16 · folded round-4 H1. rev-6's fix asserted that `TOOL-aSiftedPlaybook-1` S4
+  received `README.md:33` "with a §4 inventory row" — the row did not exist, and no acceptance
+  criterion in the receiving unit could observe the carrier either, since AC3's alternation cannot
+  match "19-check". §3 now names all three carriers of a real hand-off (scope item, inventory row,
+  AC13) and each is now true; the AC is called out as the load-bearing one. This section had
+  reproduced round-2 B1 twice — once by naming no receiver, once by asserting an inventory row that
+  was never written — which is why it now cites what a reader can check rather than that it is
+  handled.
+- rev-6 · 2026-08-16 · folded round-3 H6, L6 and L8. §3 routed root `README.md:33` to a unit whose
+  scope item did not contain it — round-2 B1's exact shape, introduced by the fold meant to close
+  L4 — so `TOOL-aSiftedPlaybook-1` S4 now receives it and this section says so. §2's provenance
+  sentence claimed D1-D7 and covered eight items; D8 came from discovery `wf_4e13d9e7-550`.
 - rev-5 · 2026-08-16 · folded round-2 low L4. Root `README.md:33` carries the same stale "19-check"
   and had been declared out of scope only in a revision log — `memory/TEMPLATE-SPEC.md` makes §3 the
   cut-line, and a carrier cut nowhere a builder reads is not cut. Named in §3, and routed to

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 60 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4
+Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4
 
 ## gate-legs
 
@@ -46,6 +46,8 @@ Inventories: gate-legs: 60 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `method carriers (every pointer declared)` | build-method |
 | `method-carriers self-test` | build-method |
 | `placeholder-catalogue self-test` | lexicon |
+| `playbook parity` | playbook |
+| `playbook parity selftest` | playbook |
 | `playbook placeholder catalogue` | lexicon |
 | `pre-push self-test` | baseline |
 | `push-main self-test` | baseline |
@@ -59,7 +61,8 @@ Inventories: gate-legs: 60 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `run-gates canary` | baseline |
 | `run-gates evidence` | foundation |
 | `settings-merge selftest` | baseline |
-| `template size <=32KiB` | baseline |
+| `template size <=48KiB` | baseline |
+| `template size gate selftest` | playbook |
 | `unattended adopter e2e` | unattended |
 | `unattended driver selftest` | unattended |
 | `unattended gate selftest` | unattended |

@@ -1,0 +1,15 @@
+# playbook-kit-waivers.txt — kit dirs under tools/ that are deliberately NOT named in the three
+# shipped parallel-coding-governance*.md files, with the reason each is exempt.
+#
+# GRAMMAR: one bare kit directory name per row, exactly as the derivation yields it — no trailing
+# slash, no path prefix — then whitespace, then the reason. The consuming gate compares VERBATIM,
+# so a key spelled any other way joins nothing and leaves its kit unexcused.
+#
+# This is a DECLARED EXEMPTION LIST, not a shrink-only count: it must be able to gain a row for a
+# genuinely experimental kit, because a kit missing from the playbook REDS. It drains through the
+# gate's two arms instead — a row whose kit is gone reds as stale, and a row whose kit IS named in
+# the playbook reds as excusing nothing. That is the one deliberate divergence from
+# tools/install-prefix-waivers.txt, which is shrink-only and can only lose rows.
+
+lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
+hooks   not adopter-facing as a kit. It is reached through the agent-cap hook the playbook already names in §8.

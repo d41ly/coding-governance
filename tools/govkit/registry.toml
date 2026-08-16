@@ -160,6 +160,26 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/check-playbook-parity.sh"
+why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and reads this repo's customize.md arithmetic. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
+
+[[exempt]]
+path = "tools/check-playbook-parity.test.sh"
+why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
+path = "tools/playbook-kit-waivers.txt"
+why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the three shipped playbook files. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
+
+[[exempt]]
+path = "tools/check-template-size.test.sh"
+why = "gov's own red/green self-test for the template size gate, which is itself exempt: it gates gov's product template and is prescribed for copy nowhere in the runbook. Exemptions are exact-path, so the gate's row does not cover its sibling — the run-gates.sh / .test.sh / .evidence.test.sh trio is the precedent."
+
+[[exempt]]
+path = "tools/template-size-highwater.txt"
+why = "the size gate's high-water record, keyed by measured file. Travels with check-template-size.sh, which is exempt for the same reason: it gates gov's own product template and is prescribed for copy nowhere. Exemptions are exact-path, so the gate's row does not cover this one."
+
+[[exempt]]
 path = "tools/govkit"
 why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
 

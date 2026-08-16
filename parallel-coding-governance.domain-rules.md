@@ -1,15 +1,16 @@
 # Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
-<!-- governance-template: v2.8 -->
+<!-- governance-template: v2.9 -->
 
 Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a
 risky surface, runs a Tier-2 review, or runs with no human in the loop). Deploy this file alongside
 the playbook and re-pull it in lockstep — the marker above must read the same version as the
 template's. Numbering is one-to-one: companion §N extends template §N, and the template's §1, §4 and
-§7–§13 stubs each point at exactly one section here. Four are droppable-per-project (§4, §9, §11 and
-§13, per the customize companion) and §1's unattended block is a fifth, line-scoped one; §7, §8, §10
-and §12 are universal core.
+§7–§13 stubs each point at exactly one section here. Five are droppable-per-project, in two SHAPES
+(per the customize companion): §11 and §13 drop WHOLE, while §4, §9 and §1's unattended block are
+LINE-SCOPED — §4 loses its harness lines and §9 its outbound-call / stored-HTML lines, and the rest
+of each section stays. §7, §8, §10 and §12 are universal core.
 
 ## §1 — Work-unit lifecycle: the manifest merge exception, and unattended runs
 
@@ -84,7 +85,9 @@ matched its target population.
 - Never cache a degraded/failed response (rate-limit, 5xx, flag-off blip) as the permanent answer — mark degraded ≠ genuinely empty and skip caching it, or one transient failure suppresses the feature all session.
 - Stale async response race: guard success-path state writes with a request-identity check and abort superseded in-flight requests, or a late response clobbers fresher results.
 - Blocking/synchronous work on a hot path or event loop (I/O, DNS, heavy transforms) — find it and off-load it.
-- A parallel test runner can deadlock in its OWN distribution/IPC layer after a worker crash — a mode no per-test timeout can reach (it only arms while a test executes). Any `-n auto` suite needs a per-test timeout AND fail-fast on worker death (`--max-worker-restart=0`) AND a pre-kill stack dump (`faulthandler_timeout` below the per-test bound); on Windows a "worker crashed" is your own timeout's `os._exit` until proven otherwise, and a session budget only reds a slow-but-COMPLETING run — it bounds no hang.
+- A parallel test runner can deadlock in its OWN distribution/IPC layer after a worker crash — a mode no per-test timeout can reach (it only arms while a test executes). Any `-n auto` suite needs a per-test timeout AND fail-fast on worker death (`--max-worker-restart=0`) AND a pre-kill stack dump (`faulthandler_timeout` below the per-test bound); on Windows a "worker crashed" is your own timeout's `os._exit` until proven otherwise, and a session budget only reds a slow-but-COMPLETING run — it bounds no hang. The
+  `pytest-parallel-guardrails/` kit ships this as a four-knob ini recipe plus a worker-death
+  attribution plugin, so the failure names the test that caused it.
 - A helper THREAD posting a result to a per-test event loop that already closed must not die trying (the aiosqlite class: a double `call_soon_threadsafe` raise escapes the worker loop, the thread dies, every later op on that connection hangs forever) — loop-side drains cannot win the race, so guard the post at the seam (drop the undeliverable delivery, keep the thread alive) and gate it with a test that FORCES the race deterministically.
 - Verify the COMPUTED value, never the declaration: styling/config declarations can silently resolve to nothing (conflicting caps, percentage sizes against indefinite bases, no-op utility values) — measure the rendered result.
 - Scale-to-fit frames measure their container SYNCHRONOUSLY at first commit (layout-effect/callback ref), never defaulting until a resize observer fires (unreliable in throttled/preview contexts); a CSS max-width cap fights the scale model (double-shrinks) — rely on the container's overflow clip, verify rendered width ≤ container at a narrow viewport.

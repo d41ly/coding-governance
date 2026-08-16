@@ -12,28 +12,29 @@ isn't in the code (the *(ask user)* items below); propose-and-flag anything infe
 filled template to the project's governing doc (its agent-instruction file, e.g. `AGENTS.md` /
 `CLAUDE.md`, or `docs/PARALLEL.md`) and place the filled companion beside it under the name the
 template's §-stubs spell. Then run `grep -nE '\{\{[A-Z]'` over **both** written files to confirm no
-placeholder survived — a template-only grep passes green while the companion's own placeholders sit
-unfilled, and the §-stubs then point at a file the project never received. (The per-file counts are
-in the catalogue below and are GATED there; they are deliberately not repeated in this sentence,
-which carried a stale pair through two revisions.)
+placeholder survived — a template-only grep passes green while the companion's placeholders sit
+unfilled, and the §-stubs then point at a file the project never received.
 
 ## Placeholders
 
-37 in total as a UNION. The two groups are **not disjoint**: the per-file lists below hold 23 and 15,
-and the overlap is the one placeholder named on the next line. Fill a shared placeholder
-CONSISTENTLY in both files — a §-stub that resolves to one path in the template and another in the
-companion is worse than an unfilled one, because it looks filled.
+38 in total: 24 in the template and 15 in the companion, which sums to 39 because the groups are
+**not disjoint**. **1 shared: `{{MEMORY_ROOT}}`** — it appears in both files and must be filled
+IDENTICALLY in each. Every other placeholder is filled in exactly one place.
 
-Shared between both files: `{{MEMORY_ROOT}}`.
+The counts below are per-file and each is individually correct; the union is what the 38 counts.
+Do not read a per-file heading as a share of the total.
 
-*(This line is GATED by `tools/check-placeholders.sh`, which measures both files and reds if the
-overlap it finds is not declared here. The disjointness claim was wrong through at least one
-correction cycle before the gate existed, which is the argument for gating it rather than correcting
-the prose a third time.)*
-
-### In `parallel-coding-governance.template.md` — 23
+### In `parallel-coding-governance.template.md` — 24
 
 - `{{PROJECT_NAME}}` — the repo this governs (discoverable, not an ask).
+- `{{DEFAULT_BRANCH}}` — the shared integration branch (commonly `main`, but not always;
+  discoverable, not an ask). Derived from `git symbolic-ref`, the same derivation
+  `skills/session-kickoff/MANIFEST-TEMPLATE.md` states for the identically-named placeholder in
+  the kickoff manifest — one name, one spelling, across both halves of the product. It carries
+  MANY senses in the template, including two §16 micro-formats, so fill it before anything greps
+  those formats for byte-stability. No count is stated here: it read 17, and adding the v2.8
+  changelog clause that names the placeholder made it 18 in the same build. Derive it with
+  `grep -o '{{DEFAULT_BRANCH}}' … | wc -l`.
 - **Fleet** *(ask user)*: node-registry rows `{{TAG_A}}` / `{{MACHINE_A}}` / `{{PRIMARY_TREE_A}}` /
   `{{WORKTREE_ROOT_A}}` / `{{VARIANCES_A}}` (one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).
 - **Records & docs**: `{{ID_FAMILIES}}` · `{{DOC_ROUTING_TABLE}}` · `{{PRODUCT_PREAMBLE}}` ·
@@ -42,7 +43,8 @@ the prose a third time.)*
 - **Gates & git**: `{{GATE_COMMANDS}}` · `{{CI_FILE}}` · `{{GATE_RUNNER}}` · `{{COMMIT_TRAILER}}` ·
   `{{WORKTREE_SCRIPT}}`.
 - **Memory tree** — REQUIRED, not a choice: §5's work-state rules and §6's record protocol both
-  assume it. `{{MEMORY_ROOT}}` (default `memory`) · `{{MEMORY_DISCIPLINES}}`, which is a **closed
+  assume it. `{{MEMORY_ROOT}}` (default `memory`) — **SHARED: this is the one placeholder that
+  also appears in the companion group below, and both must be filled identically** · `{{MEMORY_DISCIPLINES}}`, which is a **closed
   enum of stream values**, space-separated — **not** a list of directories. The tree is flat: every
   build folder sits directly under `<MEMORY_ROOT>/builds/<slug>/` and each spec declares its own
   stream in its status header. The stream→FAMILY map is a **separate** `FAMILIES` key in the
@@ -55,7 +57,8 @@ the prose a third time.)*
 
 ### In `parallel-coding-governance.domain-rules.md` — 15
 
-- **§1 unattended runs**: `{{MEMORY_ROOT}}` — the memory tree's root, matching the memory-tree kit's
+- **§1 unattended runs**: `{{MEMORY_ROOT}}` — **SHARED with the template group above; fill both
+  identically.** The memory tree's root, matching the memory-tree kit's
   conf. It resolves the pointer to the unattended protocol; the block states no rule of its own.
 - **§4 runtime & verification**: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - **§11 toolchain**: `{{TOOLCHAIN_NOTES}}`.
@@ -71,7 +74,7 @@ the prose a third time.)*
   `codebase-map/` kit — else delete all four.
 - **Memory-recall line** (the §5 kit bullet): keep only if adopting the `memory-recall/` kit — which
   needs the memory tree, since the kit refuses without `.memory-tree.conf`.
-- **Unattended-run lines** (the `, or a committed build plan …` clause in §1's Landing block,
+- **Unattended-run lines** (the `, or a committed build folder …` clause in §1's Landing block,
   and companion §1's second block): keep only if adopting the `unattended/` kit — else delete the
   clause, restoring the unamended explicit-ask rule, and delete the companion block. §8 no longer
   carries a second spelling of the landing rule; it points at §1. Companion §1's FIRST block (the kickoff-manifest merge
@@ -79,6 +82,16 @@ the prose a third time.)*
   are written to stay true without the kit — they say the merge bar validates the mandate's shape,
   and a project with no such bar has no mandate — but a repo that keeps them without the kit is
   carrying a rule nothing can make true, which is the drift this row exists to prevent.
+- **§5's `drift-audit/` bullet** — drop if the project keeps no in-repo records for an audit to
+  compare reality against.
+- **§6's `agent-instructions/` bullet** — drop only if exactly one agent tool reads this repo. With
+  two, the kit is what stops the second reading a stale copy.
+- **§7's `pytest-parallel-guardrails/` bullet** — drop if the project is not Python, or does not run
+  `pytest -n auto`. The §10 bug-class bullets it refers to stay either way.
+- **§7's `gate-lint/` bullet** — drop if the project has no `.ps1` files. The scan is honest but
+  proves nothing where PowerShell does not exist.
+- **§7's `govkit/` bullet** — drop unless this repo DEPLOYS the kits into other repos; an adopter
+  that only consumes them has no population to declare.
 - **Naming-lexicon lines** (companion §12's five kit-conditional bullets, and the "naming included"
   clause in the template's §12 stub): keep only if adopting the `lexicon/` kit — else delete the five
   bullets and `{{LEXICON_CONF}}` with them, and trim the stub clause back to "gate layout
