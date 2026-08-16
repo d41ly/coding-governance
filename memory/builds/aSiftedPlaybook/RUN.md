@@ -8,23 +8,23 @@ README slice named by the same marker grammar; never hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-6 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-7 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-7 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-6 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-9 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-8 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-4 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-8 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-7 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-10 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d64c388c13ee763b875a2ce1a81aad4cadcab491
+witness: 3d98e858494dafea773a4b0c247d2b54a04daa78
 phase: FOLDING
 keepalive: 8d72ff45
 anchor-url: https://github.com/d41ly/coding-governance
-anchor-sha: f43a48c858dfbaf56dee113bbda8dce7b3740e12
+anchor-sha: 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
 anchor-ref: refs/heads/main
 base: f43a48c858dfbaf56dee113bbda8dce7b3740e12
 
