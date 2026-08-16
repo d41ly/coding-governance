@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** WONTDO · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · superseded by TOOL-aRuledFrontispiece-1
 
 ## 1. Goal
 
@@ -270,6 +270,15 @@ rather than defaulted.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-17 · SUPERSEDED into `TOOL-aRuledFrontispiece-1`. This unit and the slot
+  contract both write `tools/memory-tree/gen_build_index.py`, and their acceptance criteria
+  referenced each other's commit tips, so neither could be built, graded or reviewed alone.
+  Two review rounds each dissolved the previous round's cross-unit contradictions and produced
+  new ones — the second round's blocker that two documents both claimed to be where the new
+  regions first enter the corpus, with no document naming the loser, is this defect stated
+  exactly. The scope below is not withdrawn: it moves intact into the successor's generated
+  surface, which is one mechanism rendered by one commit. Nothing here is abandoned; the
+  DECOMPOSITION is.
 - rev-1 · 2026-08-16 · initial draft.
 - rev-2 · 2026-08-16 · folded the M4 spec audit. `plan` was to grow a second presence probe one commit
   after `TOOL-aRuledFrontispiece-2` lands a shared one; §4 Inventory and S3 now splice through that

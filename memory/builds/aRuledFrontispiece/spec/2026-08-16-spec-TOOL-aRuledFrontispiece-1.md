@@ -1,12 +1,18 @@
 # TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan
 
-**Status:** OPEN · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
-Give the build README a declared order of named slots, so that "authored" and "generated" become
-positions in a file rather than a convention an author remembers. Every later unit in this build
-renders into a slot this unit defines, and the gate in unit 6 checks the slots rather than the prose.
+Make the build README's GENERATED SURFACE one mechanism: a declared order of named slots, the verb
+that checks it, and the four regions that render into it. "Authored" and "generated" become positions
+in a file rather than a convention an author remembers, and everything the generator owns lands in
+one commit that can be reviewed as a whole.
+
+This unit absorbed three others at the second review round. They were separate because they are
+separate *affordances*; they could not be built separately because they are one *mechanism* — all
+four regions are rendered by one function in one file, and their acceptance criteria referenced each
+other's commit tips. The leg at the last position checks the slots rather than the prose.
 
 ## 2. Scope (IN)
 
@@ -50,6 +56,28 @@ renders into a slot this unit defines, and the gate in unit 6 checks the slots r
   presence, which is the branch `check_authorization` in the unattended kit already takes.
 - **S6** — the refusals in S1, S2 and S4 name the file and the line, never a count alone, so an
   operator can act on the message without re-deriving where the violation is.
+- **S7** — `plan()` takes a `create_missing` argument, default FALSE. `do_write` passes true and
+  `do_check` passes false. This is the MECHANISM for S1b and S1c, which an earlier revision asserted
+  without one: both verbs call `plan()` identically today, so a create-if-missing helper called from
+  inside it fires under `--check` too and reports every un-paired README stale — the exact outcome
+  S1c forbids.
+- **S8** — when `--write` meets a README that VIOLATES the slot sequence, it inserts a missing pair
+  immediately after the last existing generated close and moves no authored byte. That is the branch
+  every corpus write takes until the surgery unit lands, so it is the common case rather than an edge
+  one, and it is armed.
+- **S9** — the BUILD ORDER region. One status-header verb, `order <n>`, appended after `base`, where
+  units sharing a value are the parallel group. Rendered into `<!-- gen:build-order -->`. Absorbed
+  from `TOOL-aRuledFrontispiece-2`.
+- **S10** — the DEPENDENCY EDGE region. One front-matter key, `parents:`, valued as build slugs, with
+  the child set DERIVED by inverting it in `collect`. Rendered into `<!-- gen:build-edges -->`.
+  Absorbed from `TOOL-aRuledFrontispiece-3`.
+- **S11** — the DOCUMENT INVENTORY region: every record the build holds under `spec/`, `reviews/`,
+  `build/` and `prompts/`, linked. Rendered into `<!-- gen:build-docs -->`. Absorbed from
+  `TOOL-aRuledFrontispiece-4`.
+
+S9, S10 and S11 arrive here because all three wrote this same file and their acceptance criteria
+referenced each other's commit tips. Their specs carry the design reasoning and are superseded, not
+withdrawn — read them for the rejected alternatives, which are not repeated here.
 
 ## 3. Non-goals (OUT)
 
@@ -181,7 +209,28 @@ copy from the template, so editing the pair "together" inverts it.
 - **AC5** — When a README carries no `roster:units` pair, `--write` and `--check` behave exactly as
   they do at `base 96141aed`, proved by a fixture asserting byte equality against the current render.
 - **AC6** — When `python tools/memory-tree/gen_build_index.py --selftest` runs, it passes and its arm
-  count is strictly greater than at `base 96141aed`.
+  count is strictly greater than at this unit's PARENT commit, measured by running it at both rather
+  than against any figure written here.
+- **AC7** — When `--write` runs over a fixture README whose registered region pair is absent,
+  the pair is inserted at its canonical slot, a second `--write` is a fixed point, and
+  `--check` over that same fixture BEFORE the write reports clean rather than stale. The three
+  observations together are what make S1b and S1c true; the third is the one that fails if
+  `create_missing` leaks into the check path.
+- **AC8** — When `--write` runs over a fixture README that violates the slot sequence, the new pair
+  lands immediately after the last existing generated close and `git diff` shows no authored line
+  moved, proving S8 over the branch the whole corpus takes.
+- **AC9** — When `--write` runs over a build whose specs carry `order` verbs, the
+  `<!-- gen:build-order -->` region renders them in ascending order with units sharing a value
+  grouped, and a spec carrying no verb renders in a stated residual position.
+- **AC10** — When a build README declares `parents:`, its `<!-- gen:build-edges -->` region names
+  those builds AND the declaring build appears in each named build's child list, without any
+  `children:` key existing anywhere — the observation that proves the inversion.
+- **AC11** — When `--write` runs, each build's `<!-- gen:build-docs -->` region lists every tracked
+  record under that build's four record folders, and `bash tools/memory-tree/check-memory-hygiene.sh`
+  exits 0, which is check 2 resolving every generated link at corpus scale.
+- **AC12** — When `python tools/memory-tree/gen_build_index.py --check` runs at this unit's tip, it
+  is clean, and `bash tools/run-gates.sh` is green except for the legs the build README's accepted
+  red-leg window names.
 
 ## 7. Gates
 
@@ -218,6 +267,17 @@ resolved the two questions this unit would otherwise have had to ask.
   revision trusted a stale backlog row. Added AC2a for the second violation shape, which the single
   stated trigger missed, and AC2b to keep the predicate neither vacuous nor over-broad. Stated the
   canonical inter-region order, previously deferred in a closed loop.
+- rev-4 · 2026-08-17 · absorbed `TOOL-aRuledFrontispiece-2`, `-3` and `-4` as S9, S10 and S11, after
+  the second review round found six new blocker-grade defects whose single cause was that those three
+  units and this one all write one file with acceptance criteria pointing at each other's commit
+  tips. Two rounds had each dissolved the prior round's cross-unit contradictions and produced fresh
+  ones; the round-two blocker that two documents both claimed to be where the regions first enter the
+  corpus, with none naming the loser, is that coupling stated exactly. Added S7 giving S1b and S1c
+  the mechanism they asserted without — `plan()` takes a `create_missing` flag, default false, set
+  only on the write path — and S8 stating what `--write` does over a README that violates the
+  sequence, which is every README until the surgery unit lands. Rewrote the acceptance set: AC7 and
+  AC8 arm the two new scope items, AC9 through AC11 arm the absorbed regions, and AC6 and AC12 stop
+  comparing against the build's base, whose tree does not contain this build's folder.
 
 ## 10. Reuse audit
 

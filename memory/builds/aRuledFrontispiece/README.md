@@ -47,8 +47,9 @@ render the authored plan as derived output.
 
 `TOOL-aMouldedFolio-1` refused a front-matter SCHEMA and made `ids:` derived rather than validated,
 on the ground that parity and freshness gates are TRUTH-BLIND — both stay green over a
-self-consistent wrong render. `TOOL-aRuledFrontispiece-3` adds a front-matter key and must state why
-it is not the refused schema, or record a falsification.
+self-consistent wrong render. `TOOL-aRuledFrontispiece-1` adds a front-matter key as its S10,
+absorbed from the superseded `TOOL-aRuledFrontispiece-3`, and must state why it is not the refused
+schema, or record a falsification. The superseded spec carries that argument and is where to read it.
 
 **Below this line, every unit is named by ID, never as "unit N".** The `#` column of the Units table
 is build ORDER and the id sequence is MINT order, and they stopped agreeing the moment the audit
@@ -90,11 +91,11 @@ set, so fork 3's relaxed tier cannot be a global bump — it needs a per-class c
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | OPEN | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | OPEN | rev-4 | 2026-08-17 |
 | [TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | WONTDO | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | WONTDO | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | WONTDO | rev-3 | 2026-08-17 |
 | [TOOL-aRuledFrontispiece-5 — the build README joins the hygiene index set at its own cap tier](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md) | OPEN | rev-2 | 2026-08-16 |
 | [TOOL-aRuledFrontispiece-6 — the slot contract becomes a leg of its own on the merge bar](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md) | OPEN | rev-2 | 2026-08-16 |
 | [TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md) | OPEN | rev-2 | 2026-08-16 |
@@ -141,17 +142,31 @@ rather than forgotten.
 
 | # | Id | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the slot contract, the `--check-format` verb, and region auto-insertion |
+| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the generated surface — slot contract, `--check-format`, and all four regions |
 | 2 | `TOOL-aRuledFrontispiece-8` | 2 | the unattended check-8 terminal-phase carve-out |
-| 3 | `TOOL-aRuledFrontispiece-2` | 2 | build order — one status-header verb and its region |
-| 4 | `TOOL-aRuledFrontispiece-3` | 2 | dependency edges — one front-matter key and its region |
-| 5 | `TOOL-aRuledFrontispiece-4` | 2 | the document inventory region |
-| 6 | `TOOL-aRuledFrontispiece-5` | 2 | index-set membership at the relaxed cap tier, with its own re-render |
-| 7 | `TOOL-aRuledFrontispiece-7` | 1 | the status-file retirement |
-| 8 | `TOOL-aRuledFrontispiece-9` | 2 | the build method's roster and parallelism contract |
-| 9 | `TOOL-aRuledFrontispiece-11` | 2 | the corpus surgery — authored prose relocated, plans wrapped |
-| 10 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus re-render and the kit version bump |
-| 11 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg on the merge bar |
+| 3 | `TOOL-aRuledFrontispiece-5` | 2 | the cap tier, the roster wrap, and the curation disposition |
+| 4 | `TOOL-aRuledFrontispiece-7` | 1 | the status-file retirement |
+| 5 | `TOOL-aRuledFrontispiece-9` | 2 | the build method's roster and parallelism contract |
+| 6 | `TOOL-aRuledFrontispiece-11` | 2 | the corpus surgery — authored prose relocated, plans wrapped |
+| 7 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus re-render and the kit version bump |
+| 8 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg on the merge bar |
+
+**Three units were superseded at the second review round**, not abandoned. `TOOL-aRuledFrontispiece-2`,
+`-3` and `-4` are `WONTDO` with a successor pointer to `-1`, and their bodies stay on disk because
+they carry the design reasoning and the rejected alternatives for the three regions.
+
+They were separate because build order, dependency edges and the document inventory are separate
+AFFORDANCES. They could not be built separately because they are one MECHANISM: all four regions are
+rendered by one function in one file, and every one of their acceptance criteria referenced a sibling
+unit's commit tip. Two review rounds each dissolved the previous round's cross-unit contradictions
+and produced a comparable number of new ones. M2 warns that two mechanisms in one spec make a pass
+unreviewable; this build hit the inverse, where one mechanism split across four specs made every pass
+unbuildable. Splitting finer was making it worse, so the fix was to stop splitting.
+
+**Position 3 is after position 1 for a measured reason.** The cap tier cannot be installed before the
+regions exist, because the corpus it must hold is the corpus WITH them. Installed first it would pass
+over a compliant tree and red the moment the regions landed; installed after, it is measured against
+what actually ships and its curation disposition is taken once, against real numbers.
 
 **Unit 11 was created by the M4 spec audit, not planned.** The audit returned BLOCKED with seven
 blockers, five of them against the retrofit unit, which had accumulated four mechanisms: wrapping
@@ -218,8 +233,18 @@ and does not claim a parallel lane it cannot substantiate.
   carrying a per-file record because the diff alone is not reviewable. Unit 10 of the order is the
   re-render, and it IS reviewable as `--check` output, because by then nothing authored is moving.
 - **No unit hand-inserts a generated marker pair.** `--write` creates a missing pair at its canonical
-  slot. Without that, the three region units would each ship a renderer with no call site anywhere in
-  the corpus — the largest defect the spec audit found, and one no single spec owned.
+  slot. Without that, the region units would each have shipped a renderer with no call site anywhere
+  in the corpus — the largest defect the first spec audit found, and one no single spec owned.
+- **Two legs are RED for a declared window, and that is accepted rather than hidden.** The
+  verdict-epoch leg reds from position 1 until the kit version bump at position 7, and the
+  kickoff-manifest ratchet reds until its re-stamp at position 8. Both are structural: the
+  verdict-epoch gate's own header states the ONE-bump-per-range convention, so a multi-unit build
+  that moves the engine cannot be green on that leg at every tip, and the ratchet is discharged once
+  at the end by design. M6 says a pass whose gate is red is not followed by another; read literally
+  that forbids every multi-unit build this repo has ever run, which is the same over-strictness
+  `TOOL-aRuledFrontispiece-9` corrects in M6's parallelism clause. **The window is declared here with
+  its discharge point so a red leg inside it is expected and a red leg outside it is a defect.** No
+  other leg may be red at any tip.
 - **`memory/DECISIONS.md` is append-only.** A unit that reverses `TOOL-aMouldedFolio-1` or
   `TOOL-aMouldedFolio-2` mints a new id naming the record it supersedes; it never edits it.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
@@ -235,6 +260,19 @@ and does not claim a parallel lane it cannot substantiate.
 spec changes as a result; the parks stay recorded because a later reader needs to know these were
 decided rather than defaulted, and because P2 and P3 each authorise something wider than the words
 the original fork used.
+
+**P6 · position 6 — restructuring another node's roster table.** Fork 1's Option A split, applied at
+corpus scale, means moving derived columns out of roster tables inside build records owned by nodes
+`b` and `c`. The first spec audit named this an owner item; it was then answered by a spec rather
+than by an owner, which is how an unasked question becomes a decision nobody made. The surgery unit
+proceeds on the reading that Option A authorises it, and the owner may overrule.
+
+**P7 · position 3 — the byte tier's outlier.** The largest build README is 24715 bytes against the
+25600-byte tier the owner set, and the four regions add roughly 2200. No unit may raise a number the
+owner chose. The build uses the repo's existing mechanism for exactly this case — a row in the
+shrink-only `memory/project/curation-debt.txt`, which is empty today — so the tier holds and the
+outlier drains rather than being grandfathered by widening. Flagged because the owner set 25600
+before those regions were measurable.
 
 **P5 is still open.** It was raised and not put to the owner, so it must not be marked resolved. The
 `KIT_UNATTENDED_VERSION` bump stands as the spec author wrote it until the owner says otherwise, and
