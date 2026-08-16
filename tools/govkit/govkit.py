@@ -550,18 +550,20 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                     out.append({"kit": eid, "role": role, "kind": "order",
                                 "dest": resolved, "missing": missing, "src": ", ".join(srcs)})
                 continue
-            dests = rule_destinations(d, rule)
-            if not dests:
-                dests = [f"{{prefix}}/{{kit_id}}/{pathlib.PurePosixPath(s).name}" for s in srcs]
-            for dest in dests:
-                resolved, missing = resolve_tokens(dest, ctx)
-                for k in missing:
-                    r.fail(f"entry '{eid}' needs answer '{k}' to resolve destination '{dest}', and "
-                           f"the target descriptor supplies none — refusing before any write, and "
-                           f"naming the key rather than inventing a value")
-                out.append({"kit": eid, "role": role, "kind": "write",
-                            "dest": resolved, "missing": missing, "src": ", ".join(srcs),
-                            "commit": commit})
+            # THE SAME POOL `apply` WILL USE. This used to read `rule_destinations()`, which resolves
+            # sources through `rule_sources()` and therefore skips every glob — so a `**` rule
+            # produced no rows at all and the operator approved a plan describing a fraction of the
+            # write. Measured on the lexicon kit before this changed: plan 3, apply 12.
+            home = (d.get("home") or "").rstrip("/")
+            for src in resolve_rule_pool(root, d, rule, ctx, home):
+                for resolved, missing in resolve_dests(d, rule, src, ctx, home):
+                    for k in missing:
+                        r.fail(f"entry '{eid}' needs answer '{k}' to resolve a destination for "
+                               f"'{src}', and the target descriptor supplies none — refusing before "
+                               f"any write, and naming the key rather than inventing a value")
+                    out.append({"kit": eid, "role": role, "kind": "write",
+                                "dest": resolved, "missing": missing, "src": src,
+                                "commit": commit})
             for sfx in rule.get("side_effects", []):
                 resolved, _ = resolve_tokens(sfx, ctx)
                 out.append({"kit": eid, "role": role, "kind": "side-effect", "dest": resolved,
@@ -686,6 +688,87 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 LANDABLE_ROLES = ("engine", "seed")
 
 
+def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> list[tuple[str, list[str]]]:
+    """Where one source lands under a rule, as `(destination, unresolved-answer-keys)` pairs.
+
+    ONE spelling, called by `plan`, by the write loop, and by the wildcard exclusion — each has to
+    ask the same question the writer will answer, and two computations of one thing is the class this
+    repo keeps a record about.
+
+    THE `missing` LIST IS RETURNED, not dropped. An earlier cut called `resolve_tokens(...)[0]` and
+    discarded it, so `apply --kits kickoff-manifest` with no `manifest_path` answer wrote a file
+    named literally `{manifest_path}` and exited 0, while `plan` exited 1 refusing the same install.
+    A destination with an unresolved token is not a destination.
+
+    An explicit `to` WINS for every role. Defaulting engine files to the kit-relative form regardless
+    is how a flat entry — one with no kit directory at all — silently lands under a directory it does
+    not have. The default applies only where the rule declared no destination.
+    """
+    if rule.get("to"):
+        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)
+                for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
+    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
+        pathlib.PurePosixPath(src).name
+    return [(f"{ctx['kit']}/{rel}", [])]
+
+
+def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str) -> list[str]:
+    """The source paths a rule actually lands. ONE spelling for `plan` AND `apply`.
+
+    THIS SEAM EXISTS BECAUSE THE TWO DISAGREED. `plan` resolved sources through `rule_sources()`,
+    which skips any include containing a glob character — so a `**` rule produced ZERO plan rows
+    while `apply` pooled every tracked file under `home`. Measured on the lexicon kit: plan printed
+    3 writes, apply landed 12. Ten of this repo's nineteen descriptors carry a `**` engine rule, so
+    an operator approving a plan was approving a fraction of what would be written — and the files
+    that went unlisted are exactly the ones a re-apply overwrites.
+
+    A deployer whose preview disagrees with its action is worse than one that simply does the wrong
+    thing, because the wrong thing is at least visible.
+    """
+    inc = rule.get("include")
+    srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+    if any(s == "**" for s in srcs):
+        claimed = scan_claimed_paths(desc, rule, ctx, home)
+        return [f for f in tracked(root)
+                if home and f.startswith(home + "/")
+                and not ({d for d, _m in resolve_dests(desc, rule, f, ctx, home)} & claimed)]
+    return rule_sources(desc, rule)
+
+
+def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) -> set[str]:
+    """Every DESTINATION some other rule in this descriptor already owns.
+
+    A `**` include means "everything not otherwise claimed" — which is how every descriptor author
+    has read it, and what the engine did NOT implement. It pooled every tracked file under `home` and
+    wrote each one unconditionally, so a rule declared LATER never got the chance to protect its own
+    file. Measured against `drift-audit`: an adopter's edit to the `project-owned` `drift_signals.py`
+    was destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
+
+    CLAIMED BY DESTINATION, NOT BY SOURCE, and the distinction was measured rather than reasoned.
+    Excluding claimed SOURCES too is the obvious first cut and it UNDER-LANDS: `drift_signals.template.py`
+    is the seed rule's source, its `**` destination is `{kit}/drift_signals.template.py`, and nothing
+    else claims that path — so a source-based exclusion silently stopped shipping the adopter the
+    template their own re-seed depends on. Measured: 8 files landed before, 6 after, and the two
+    missing were not the two being protected.
+
+    A destination claim covers both real cases. `project-owned` names `drift_signals.py`, which
+    resolves to `{kit}/drift_signals.py` — the path it owns and, being non-landable, could not
+    otherwise defend. `seed` names a different source but lands ON that same path, so its "copied
+    ONCE, then the target owns it" guard is protected by the same test.
+    """
+    claimed: set[str] = set()
+    for other in desc.get("files", []):
+        if other is wildcard_rule:
+            continue
+        inc = other.get("include")
+        srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+        if any(s == "**" for s in srcs):
+            continue  # two wildcards claim nothing FROM each other; neither is more specific
+        for s in rule_sources(desc, other):
+            claimed.update(d for d, _m in resolve_dests(desc, other, s, ctx, home))
+    return claimed
+
+
 def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
     """Bytes from the gov git INDEX at a recorded commit — never from the working tree.
 
@@ -797,25 +880,16 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             role = rule.get("role", "engine")
             if role not in LANDABLE_ROLES or rule.get("scope") == "machine" or rule.get("link"):
                 continue
-            inc = rule.get("include")
-            srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
-            if any(s == "**" for s in srcs):
-                pool = [f for f in tracked(root) if home and f.startswith(home + "/")]
-            else:
-                pool = rule_sources(d, rule)
+            pool = resolve_rule_pool(root, d, rule, ctx, home)
             for src in pool:
-                # An explicit `to` WINS for every role. Defaulting engine files to the kit-relative
-                # form regardless is how a flat entry — one with no kit directory at all — silently
-                # lands under a directory it does not have. The default applies only where the rule
-                # declared no destination.
-                if rule.get("to"):
-                    dests = [resolve_tokens(x.replace("{relpath}",
-                                                      pathlib.PurePosixPath(src).name), ctx)[0]
-                             for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
-                else:
-                    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
-                        pathlib.PurePosixPath(src).name
-                    dests = [f"{ctx['kit']}/{rel}"]
+                pairs = resolve_dests(d, rule, src, ctx, home)
+                unresolved = sorted({k for _dst, miss in pairs for k in miss})
+                if unresolved:
+                    r.fail(f"entry '{eid}': {src} has no resolvable destination — the target "
+                           f"descriptor supplies no answer for {', '.join(unresolved)}. Refusing "
+                           f"rather than writing a path with the token still in it")
+                    continue
+                dests = [dst for dst, _miss in pairs]
                 data = blob_at(root, commit, src)
                 if data is None:
                     r.fail(f"entry '{eid}': {src} does not resolve at {commit[:8]}")
