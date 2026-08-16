@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -77,8 +77,12 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 - **`WIRE-INTO-PROJECT.md:463`, which calls agent-cap "the review protocol's TWO rules".** Same
   defect class, different file, outside the playbook trio this build scopes. Recorded as a follow-up
   row rather than fixed here.
-- **The kit README's own stale "19-check" intro line** (`tools/memory-tree/README.md:6`). Same
-  number, different product. Follow-up row.
+- **The two other carriers of the stale "19-check"** — `tools/memory-tree/README.md:6` and root
+  `README.md:33`. Both verified stale against the true 20. Same number, different products;
+  follow-up row for the kit README. Root `README.md` is the adopter-facing front door and
+  `TOOL-aSiftedPlaybook-1` S4 is separately editing it at `:12` in this same build, so **that unit
+  is the cheaper home for `:33`** — recorded here as the cut-line rather than left in a revision
+  log, which is nowhere a builder reads.
 - **Making these claims machine-checked.** `TOOL-aSiftedPlaybook-3`.
 
 ## 4. Design
@@ -229,6 +233,10 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-5 · 2026-08-16 · folded round-2 low L4. Root `README.md:33` carries the same stale "19-check"
+  and had been declared out of scope only in a revision log — `memory/TEMPLATE-SPEC.md` makes §3 the
+  cut-line, and a carrier cut nowhere a builder reads is not cut. Named in §3, and routed to
+  `TOOL-aSiftedPlaybook-1` S4, which already edits that file.
 - rev-4 · 2026-08-16 · owner resolved F1 (RULE 4's clause goes in §0), and the round-2 audit
   `wf_98677a7a-009` closed three findings. AC2 was **not runnable as written** — reproduced three
   ways: the hook exits 0 on unparseable stdin so piping script text passes the allow arm for the

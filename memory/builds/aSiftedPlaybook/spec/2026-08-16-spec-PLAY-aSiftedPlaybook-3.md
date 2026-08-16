@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -29,7 +29,9 @@ Give each a template placement and a conditional-section row.
   "project-agnostic", "drop-in", with "a two-line adoption step" and no gate legs of its own — an
   adopter-facing product by its own description. It is absent from the trio **and from `AGENTS.md`
   and `README.md` entirely**, so the charter does not know it ships. In scope: the template
-  placement, the customize row, and the charter's kit list.
+  placement, the customize row, the charter's kit list in `AGENTS.md`, **and the shipped-contents
+  list in root `README.md`** — that last one was named as part of the defect and then silently
+  dropped from scope, which is how a defect becomes lost rather than deferred.
 - **S5 — the customize conditional rows.** One per kit (~685 bytes total), in that file's existing
   voice, stating what to delete when the kit is declined.
 - **S7 — the exemption registry.** `tools/playbook-kit-waivers.txt`, seeded with the kits that are
@@ -135,6 +137,7 @@ blocking objection" would write a mischaracterization into a record the repo dec
 | `parallel-coding-governance.customize.md` | S5, and S3's fill instruction at `:12-13` |
 | `parallel-coding-governance.domain-rules.md` | S2's §10 append |
 | `AGENTS.md` | S4's charter kit list |
+| `README.md` | S4's adopter-facing shipped-contents list |
 | `WIRE-INTO-PROJECT.md` | S6's dead §2a reference |
 | `tools/gate-lint/README.md` | S6's dead §14 reference |
 | `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/` and `hooks/` only |
@@ -184,6 +187,11 @@ blocking objection" would write a mischaracterization into a record the repo dec
 - **AC5** — When `bash tools/check-template-size.sh` runs, it exits 0 against the raised ceiling and
   reports the measured size read FROM the gate.
 - **AC6** — When `bash tools/run-gates.sh` runs, every leg is green.
+- **AC8** — When `grep -n 'gate-lint' AGENTS.md README.md` runs, both carry a `gate-lint` entry in
+  their shipped-kit lists. Without this AC a builder can skip the charter half of S4 entirely and
+  pass: AC1 quantifies over the three playbook files and the waiver registry, AC2 over
+  `customize.md`, AC3 over kit READMEs, AC4 over cross-references, and the drift signal §7 leans on
+  matches gate-leg argv paths, not kit bullets in "What ships here".
 - **AC7** — When `grep -n 'governance-template:' parallel-coding-governance.template.md
   parallel-coding-governance.domain-rules.md` runs, both read `v2.8`, and
   `memory/archive/parallel-coding-governance.template-v-2-7.md` exists and is byte-identical to the
@@ -227,6 +235,11 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded round-2 medium M11. S4 named `README.md` as part of the gate-lint
+  defect and then scoped only `AGENTS.md`, dropping the adopter-facing half without a non-goal —
+  lost rather than deferred. Both are now in scope and Files touched, and AC8 observes them; without
+  it every existing AC could pass with the charter half skipped entirely. Fork F1's per-option cost
+  analysis is moot: the owner resolved it to inline.
 - rev-3 · 2026-08-16 · cleared blocker B1 and two findings from the round-2 audit
   `wf_98677a7a-009`, and the owner resolved F1 to inline. **S8 added**: the v2.8 marker bump and the
   v2.7 archive snapshot were assigned to this unit by the build README and appeared in no spec, so

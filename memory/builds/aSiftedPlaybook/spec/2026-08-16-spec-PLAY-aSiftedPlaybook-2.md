@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -40,9 +40,11 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
 
 ## 3. Non-goals (OUT)
 
-- **Parameterizing the companions.** Verified: `domain-rules.md`'s five `main` hits and
-  `customize.md`'s three are all other senses. Neither file needs a branch substitution, and adding
-  one would create a placeholder with no referent.
+- **Parameterizing the companions.** Verified: `domain-rules.md` has **four** `main` substrings and
+  `customize.md` three, all other senses. The four are `domain` at `:1` and `:5`, `maintained` at
+  `:33`, and **`push-main` at `:100`** — a script name, called out by name because it is exactly what
+  a careless global substitution corrupts. Neither file needs a branch substitution, and adding one
+  would create a placeholder with no referent.
 - **Changing the trunk-based rule.** §3's "merge small and often to LOCAL `<default>`" keeps its
   meaning exactly. Only the branch's NAME becomes a variable; the workflow does not.
 - **Fixing the disjointness sentence.** That is `PLAY-aSiftedPlaybook-4` S1, which corrects it for
@@ -203,6 +205,10 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-16 · folded round-2 lows. §3's companion count was five against a measured four,
+  and now names `push-main` at `domain-rules.md:100` explicitly, since a script name is what a
+  global substitution corrupts. §10's "no playbook dossier" is re-dated as a BASE-time observation
+  and no longer points at the rejected F1 option 3.
 - rev-4 · 2026-08-16 · folded round-2 audit finding H8. `WIRE-INTO-PROJECT.md:98` sat in §4's Files
   touched with no scope item and no AC, so every acceptance criterion would have gone green over a
   runbook still claiming 36 placeholders. Added as S5 with AC7, and noted the anchor collision with
@@ -232,9 +238,11 @@ falling back to `main` then `master`). The kickoff engine resolves it at Step 0,
 introducing one, and the customize entry should cite the manifest template's wording so the two do
 not drift into two derivations of one value.
 
-`python tools/codebase-map/reuse_lookup.py "governance playbook template companions"` returns no
-dossier for the playbook — the map has seven and none covers this product. Recorded as evidence for
-`TOOL-aSiftedPlaybook-1` F1 option 3, which would mint one.
+`python tools/codebase-map/reuse_lookup.py "governance playbook template companions"` returned no
+dossier for the playbook **at BASE `91ef1b05`** — the map had seven and none covered this product.
+A BASE-time observation, not a live one: the owner resolved `TOOL-aSiftedPlaybook-1` F1 against
+minting a dossier there, and `TOOL-aSiftedPlaybook-2` S5 mints
+`memory/map/features/playbook.md` instead, after which this paragraph's premise no longer holds.
 
 Recall terms used, recorded per M5: `playbook template companion customize domain-rules agnostic
 adopter stale externalize byte gate section stub kit wiring`. No prior record proposes

@@ -12,8 +12,16 @@ ids: PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-a
 Node `a` · opened 2026-08-16 · streams playbook+tooling.
 
 A read-only audit of the three shipped `parallel-coding-governance*.md` files at template v2.7
-confirmed eleven defects and refuted eight suspected ones. The owner then ordered two things: spec
-the fixes, and **raise the template size gate from 32 KiB to 48 KiB**.
+confirmed eleven defects and refuted **nine** suspected ones. The owner then ordered two things:
+spec the fixes, and **raise the template size gate from 32 KiB to 48 KiB**.
+
+The audit itself is committed at
+[`build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md`](build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md)
+with every defect and every refutation enumerated. It was previously summarised here and nowhere
+else, which made completeness against the commissioning input unfalsifiable — only five of the
+eleven carried ids anywhere, and a later session could not tell a dropped defect from one that never
+existed. (The count was "eight" until the enumeration forced it: three separate count-claims had
+been collapsed into one bullet. Exactly the class of summary figure the report replaces.)
 
 The second order reverses a rule this repo currently states in four carriers and calls
 non-negotiable. It is specced here as an explicit, recorded rule reversal rather than a constant
@@ -29,21 +37,21 @@ Both figures are BASE-time snapshots — every unit re-measures from the gate ra
 number out of this paragraph. `PLAY-aCandidStub-2` (externalize §14) is therefore **decoupled, not
 closed** — the owner kept it OPEN on 2026-08-16, re-justified on readability rather than bytes.
 
-Records live under `spec/` and `reviews/`. The table below is GENERATED from the status header of
-every spec in this folder — do not hand-edit it.
+Records live under `spec/`, `reviews/` and `build/`. The table below is GENERATED from the status
+header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-4 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-4 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-3 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-5 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-4 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-4 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-4 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-5 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-6 | 2026-08-16 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -75,6 +83,31 @@ PLAY-1, PLAY-3 and PLAY-4 all edit `customize.md`. An earlier version of this ta
 
 `TOOL-3` is last because every other unit changes values it would pin, and it now has a hard
 prerequisite: `PLAY-3` S7 seeds the waiver registry `TOOL-3` reads.
+
+## Coverage — every audit defect to the scope item that fixes it
+
+Derived from the committed audit report, not from recollection. `A*` are the eleven the audit
+confirmed; `B*` are four found after it closed and are NOT part of that count.
+
+| Defect | Sev | Fixed by |
+|---|---|---|
+| A1 the `agent-cap` matcher value | high | `PLAY-1` S2 |
+| A2 the hardcoded default branch, 17 sites | high | `PLAY-2` S1-S3 |
+| A3 the false disjointness guarantee | high | `PLAY-4` S1, S2 |
+| A4 two of four hook rules described | med | `PLAY-1` S3 |
+| A5 the "19-check" count | med | `PLAY-1` S4 |
+| A6 `drift-audit` named nowhere | med | `PLAY-3` S1 |
+| A7 "build plan" vs "build folder" | med | `PLAY-1` S5 |
+| A8 `pytest-parallel-guardrails` named nowhere | low-med | `PLAY-3` S2 |
+| A9 `agent-instructions` named nowhere | low-med | `PLAY-3` S3 |
+| A10 the §1→§8 circular landing reference | low | `PLAY-1` S6 |
+| A11 the companion header's drop-shape claim | low | `PLAY-4` S3 |
+| B1 the ≤6 lens array the hook denies | high | `PLAY-1` S1 |
+| B2 §157's pre-1.3 enforcement reach | med | `PLAY-1` S8 |
+| B3 §0's concurrency-only cap summary | low | `PLAY-1` S7 |
+| B4 `gate-lint`, a fourth unnamed kit | med | `PLAY-3` S4 |
+
+Nothing is unassigned, and no scope item claims an audit provenance it does not have.
 
 ## Build-level rules
 

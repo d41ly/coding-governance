@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -19,9 +19,11 @@ One new gate, `tools/check-playbook-parity.sh`, with three check families and a 
 
   **The match is a path segment, anchored and case-sensitive** — `tools/<kit>/` or a backticked
   `<kit>/` — never a bare substring. A naive substring search makes this check pass vacuously:
-  measured against the trio at BASE, the kit `lib` scores seven hits, every one of them the `lib`
-  inside "deliberate" and "deliberately". A gate that certifies `lib` as documented on that evidence
-  is the exact `vacuous-selector` shape this unit exists to prevent, committed by the unit itself.
+  measured against the trio at BASE, the kit `lib` scores seven substring hits — six inside
+  "deliberate"/"deliberately" and one inside **`stdlib`** at `parallel-coding-governance.template.md:109`.
+  Two unrelated false-positive words, neither of which has anything to do with `tools/lib/`. A gate
+  that certifies `lib` as documented on that evidence is the exact `vacuous-selector` shape this
+  unit exists to prevent, committed by the unit itself.
 - **S2 — value parity.** A declared pair list: each row names a value the playbook STATES and the
   source that OWNS it, plus the extraction for each side. The gate extracts both and compares.
   Seeded with the two pairs this build proved necessary — the lens-array bound against
@@ -39,8 +41,13 @@ One new gate, `tools/check-playbook-parity.sh`, with three check families and a 
   reds rather than skipping.
 - **S4 — the self-test.** `tools/check-playbook-parity.test.sh`, red and green observed per arm, plus
   an `ARMS_FLOORS` entry in `.memory-tree.conf`.
-- **S5 — the wiring.** A `tools/gate-legs.json` entry, the charter citation in `AGENTS.md`'s
-  gate-suite section, and the codebase-map dossier claim for the new leg key.
+- **S5 — the wiring, for TWO legs, not one.** This unit ships a gate AND a self-test, and the
+  charter's convention — which `TOOL-aSiftedPlaybook-2` §4 invokes to insist its own test be wired —
+  makes both merge-bar legs. So: **two** `tools/gate-legs.json` entries, **two** inventory keys
+  claimed in `memory/map/features/playbook.md`, and **two** script paths cited in `AGENTS.md`'s
+  gate-suite section, where `_charter_mentions_every_leg` runs at pin 0 with zero tolerance. An
+  earlier draft said one of each throughout, which would have left the self-test leg unclaimed and
+  uncited and redded two gates.
 
 ## 3. Non-goals (OUT)
 
@@ -215,6 +222,10 @@ future ones.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-6 · 2026-08-16 · folded round-2 mediums and lows. S5 wired ONE leg where this unit ships two
+  (the gate and its self-test), which would have left the self-test unclaimed in the map and uncited
+  in the charter — two reds, one of them zero-tolerance. S1's `lib` evidence corrected: six hits are
+  "deliberate", the seventh is `stdlib`, which makes the point better.
 - rev-5 · 2026-08-16 · folded round-2 audit finding H4. `tools/playbook-kit-waivers.txt` had TWO
   declared creators — this spec's Files-touched row and `PLAY-aSiftedPlaybook-3` S7 — and since the
   README lets this unit be deferred indefinitely, a re-seed here would have either overwritten

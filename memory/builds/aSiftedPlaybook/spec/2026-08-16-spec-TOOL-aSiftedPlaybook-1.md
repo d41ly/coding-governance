@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -65,6 +65,13 @@ records which relied on the old ceiling, because at least three of them cited it
 
   The warn line names the measured size, the recorded high-water, and the delta. The high-water file
   ships seeded with the size measured at the end of THIS build, so the ratchet starts quiet.
+- **S9 — the backlog row the raise falsifies.** `memory/backlog/PLAY.md:7` reads
+  "`PLAY-aCandidStub-2` · OPEN · the template is effectively FULL at v2.5 and the §11
+  externalization spent the cheap slack". The owner kept that row OPEN but re-justified it on
+  readability, so its stated rationale is now false. Rewrite it to the readability justification.
+  Not cosmetic: this spec's own §1 argues that a constant changed under records that cite it leaves
+  them "reading as current guidance", and leaving this row would be that exact failure inside the
+  unit whose purpose is to prevent it.
 
 ## 3. Non-goals (OUT)
 
@@ -86,7 +93,9 @@ records which relied on the old ceiling, because at least three of them cited it
 
 ### Inventory
 
-Twelve tracked lines outside historical records, in seven files. Verified negatives are as
+Twelve tracked lines outside historical records, across **eight** files plus the append-only
+`memory/DECISIONS.md` — the table is the inventory and the count is stated once here rather than
+being maintained in two places. Verified negatives are as
 load-bearing as the hits: the three `parallel-coding-governance*.md` files, `WIRE-INTO-PROJECT.md`,
 every kit `*.template.md` and every rendered `.claude/skills/**` state the limit **nowhere**, so the
 raise touches no shipped adopter artifact.
@@ -106,6 +115,7 @@ raise touches no shipped adopter artifact.
 | `memory/map/generated/inventories.json` | 46 | generated mirror of the key |
 | `memory/map/generated/MAP.md` | 53 | generated mirror of the key |
 | `memory/DECISIONS.md` | append | S6's reversal row — append-only, nothing edited |
+| `memory/backlog/PLAY.md` | 7 | S9 — the `PLAY-aCandidStub-2` row whose rationale this unit falsifies |
 
 ### The blast radius, measured rather than assumed
 
@@ -149,8 +159,14 @@ ratchet's own rule.
 - **Keep 32768 and externalize §14 to fund the fixes** (the audit's original sequencing). Rejected:
   the owner has ordered otherwise. Recorded here because it remains the alternative that preserves
   the forcing function, and F2 exists precisely because the raise removes it.
-- **Make the ceiling a `.memory-tree.conf`-style declared pin.** Rejected as out of scope: it is a
-  real improvement and it is `TOOL-aSiftedPlaybook-3`'s territory, not a number change's.
+- **Make the ceiling a `.memory-tree.conf`-style declared pin.** Rejected as out of scope, but
+  **recorded as a backlog row rather than deferred to a unit that declines it** — an earlier draft
+  sent it to `TOOL-aSiftedPlaybook-3`, whose §2 has no ceiling pin and whose §3 forecloses growth.
+  The prior art is live and directly on point: `.memory-tree.conf:43-50` declares
+  `READ_PATH_CEILING` for the charter's mandatory read path and records each of its three raises
+  with the reason beside it — "a session's mandatory reading is a budget, and two binding docs
+  growing at once spends from it visibly". That is this repo's established answer to exactly this
+  problem, and S8's ratchet is a weaker cousin of it. Worth a real comparison in a later unit.
 
 ## 5. Production-readiness checklist
 
@@ -211,6 +227,15 @@ ratchet's own rule.
   list are the same four; a mismatch between them was how RD7 nearly went unrecorded.
 - **AC6b** — When `memory/map/baseline.toml`'s header is read, it carries the dated exception for
   the in-place swap, so the file's own shrink-only claim is qualified where a reader meets it.
+- **AC10** — When `memory/backlog/PLAY.md:7` is read, the `PLAY-aCandidStub-2` row is still OPEN and
+  its justification names per-session readability, with no claim that the template is full.
+- **AC11** — When `python tools/drift-audit/drift_report.py --check` runs after S3's edits,
+  `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0. **The dangerous edit is
+  `AGENTS.md:97`, not the leg rename**: `_charter_mentions_every_leg`
+  (`tools/drift-audit/drift_signals.py:70-100`) credits a leg only when one of its argv paths appears
+  verbatim in the gate-suite section, and `:97` is that section's only carrier of
+  `tools/check-template-size.sh`. A rewrite that reflows the bullet away from the path reds a
+  zero-tolerance signal. §4's blast-radius analysis clears the RENAME and says nothing about this.
 
 ## 7. Gates
 
@@ -279,6 +304,14 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-16 · folded round-2 mediums and lows. **S9 added** for the
+  `memory/backlog/PLAY.md:7` rewrite, which the README and §8 both called a "landing task" belonging
+  to no scope item — the failure mode this unit's own §1 names. **AC11 added**: the edit that can
+  move the zero-tolerance charter signal is `AGENTS.md:97`, not the leg rename, and §4's blast-radius
+  analysis had cleared only the rename. The declared-conf-pin alternative now points at
+  `.memory-tree.conf`'s `READ_PATH_CEILING` as live prior art and becomes a backlog row instead of
+  being deferred to `TOOL-aSiftedPlaybook-3`, which declines it. Corrected "seven files" to eight
+  plus the append-only log.
 - rev-4 · 2026-08-16 · cleared blocker B2 and five findings from the round-2 audit
   `wf_98677a7a-009`. **S8 is now a HIGH-WATER RATCHET, not a threshold constant** (owner, 2026-08-16):
   the audit measured that every conventional fraction is silent through this whole build while
@@ -318,6 +351,13 @@ For F1 option 3 the extended seam is `memory/map/features/*.md`: a new dossier f
 heading contract in `tools/codebase-map/map_lib.py:58` (`## Constraints & why`, `## Shared seams`,
 `## Gaps`) plus the graced `## Reuse affordance`, modelled on
 `memory/map/features/codebase-map.md` (76 lines, the smallest of the seven).
+
+**Prior art the recall query did NOT surface, and should have.** `.memory-tree.conf:43-50`'s
+`READ_PATH_CEILING` is a declared byte budget over a mandatory read path, with each raise justified
+in the conf beside the number. It is structurally the same problem this unit solves and the same
+problem S8's ratchet approaches from the other side. No §10 recall terms in this build would have
+found it, because it lives in a conf file rather than a decision record — a real gap in what the
+retrieval corpus covers, and worth its own follow-up.
 
 Recall terms used, recorded per M5: `template size gate byte ceiling externalize companion
 domain-rules headroom strict limit raise refuse stub`. The query returned the three records this
