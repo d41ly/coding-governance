@@ -1,18 +1,15 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.8** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.7** · 2026-08-11. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.8 (2026-08-16):** the size ceiling moves 32→48 KiB with a
-high-water ratchet replacing it as the forcing function; the default branch becomes
-`{{DEFAULT_BRANCH}}` throughout; §0/§8 state both halves of the agent cap and the hook's real
-matcher; §5/§6/§7 name the five kits that shipped unmentioned. **v2.7 (2026-08-11):** companion §1's unattended block collapses to a
+`…-v-N-N.md` snapshots + git. **v2.7 (2026-08-11):** companion §1's unattended block collapses to a
 pointer at the protocol the kit installs, and §8's second spelling of the §1 landing rule becomes a
 pointer — re-pull §8 and the companion together. **v2.6 (2026-08-10):** §1 and §8 accept a committed
 standing mandate in place of the explicit ask; the kickoff-manifest merge exception moved into the
 new companion §1.*
 
-<!-- governance-template: v2.8 -->
+<!-- governance-template: v2.7 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -109,23 +106,10 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
 - **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
 - **Optional — a self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
-- **Optional — a records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of
-  its own state still matches the tree — stale claims, closed specs with no product commit, ids
-  cited from product source while non-terminal, hand-kept inventories disagreeing with what they
-  describe. Stdlib + git, seconds, no agents. Every signal carries a LIVENESS assertion, so a probe
-  that cannot move prints DEAD PROBE rather than a reassuring 0 — a green audit means the checks
-  ran, not merely that nothing was reported. Signals are pinned shrink-only, so drift can only be
-  paid down. Run it when the build 'feels' like it is drifting, before a planning session, or when
-  you want to know whether a green gate still means anything.
 - **Optional — retrieval over that tree** (`memory-recall/` kit, requires it): ask the decision corpus a question and get the records that answer it, ranked; an offline stdlib CLI reading `.memory-tree.conf`, so root + id families are declared once; writes nothing in the worktree; the rendered recall Skill's drift rides `{{GATE_RUNNER}}`.
 
 ## §6 — Decisions, backlogs & the governing doc
 
-- **Wire the governing doc so every tool actually reads it** (`agent-instructions/` kit): agents do
-  not all read the same filename. Writing the filled playbook to `AGENTS.md` alone ships a repo
-  Claude Code cannot read, because it does not read `AGENTS.md` natively; the kit makes one file
-  canonical and the others thin imports of it, so there is one text and no copy to drift. Verify
-  with its `--check` mode rather than by eye — an unwired pair fails silently and looks fine.
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; gaps fine).
 - Per-stream id families (`{{ID_FAMILIES}}`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
@@ -141,21 +125,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §7 — Quality gates = the merge bar
 
-- **A parallel test runner needs its own guardrails** (`pytest-parallel-guardrails/` kit, if you run
-  `pytest -n auto`): a four-knob ini recipe bounding the hang modes no per-test timeout can reach, a
-  worker-death ATTRIBUTION plugin (a crashed worker otherwise reports as an anonymous session
-  failure naming no test), and the aiosqlite closed-loop seam patch with a forced-race gate. §10's
-  own bullets already state these bug classes in full; this is the shipped fix for them.
 - Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- **Lint the gates themselves** (`gate-lint/` kit): project-agnostic, drop-in, two lines to adopt and
-  no gate legs of its own. It catches the failure a green suite cannot — a gate whose selector
-  matches the empty set, or that asserts between two values the same code derives, and therefore
-  passes while checking nothing.
-- **Deploy the kits as a declared population, not a directory listing** (`govkit/` kit): the set of
-  things installable into a target is a REGISTRY plus a descriptor each, asserted against the
-  tracked surface in both directions — a new moving part reds until a declaration claims it, and an
-  exemption naming a path that no longer exists reds too, because a stale one silently widens the
-  surface it was written to narrow. Its `plan` and `check` verbs are read-only and gated as such.
 - Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.

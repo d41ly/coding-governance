@@ -78,7 +78,8 @@ alongside — both then appear; pick by description.) Skip this step on a machin
    cp <gov>/parallel-coding-governance.domain-rules.md <project>/docs/parallel-coding-governance.domain-rules.md
    # the customize companion is deploy-time only — read it, don't ship it
    ```
-   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit — §2a.)
+   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit —
+   see its own install step below, §3c.)
    **Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
    fallback and the upstream-re-pull mechanism both read it.
 2. Fill every `{{PLACEHOLDER}}` per **`<gov>/parallel-coding-governance.customize.md`** (the deploy-time

@@ -78,6 +78,15 @@ Do not read a per-file heading as a share of the total.
   are written to stay true without the kit — they say the merge bar validates the mandate's shape,
   and a project with no such bar has no mandate — but a repo that keeps them without the kit is
   carrying a rule nothing can make true, which is the drift this row exists to prevent.
+- **§5's `drift-audit/` bullet** — drop if the project keeps no in-repo records for an audit to
+  compare reality against.
+- **§6's `agent-instructions/` bullet** — drop only if exactly one agent tool reads this repo. With
+  two, the kit is what stops the second reading a stale copy.
+- **§7's `pytest-parallel-guardrails/` bullet** — drop if the project is not Python, or does not run
+  `pytest -n auto`. The §10 bug-class bullets it refers to stay either way.
+- **§7's `gate-lint/` bullet** — drop if the project has no gates of its own to lint.
+- **§7's `govkit/` bullet** — drop unless this repo DEPLOYS the kits into other repos; an adopter
+  that only consumes them has no population to declare.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
 - **§11** — drop for single-OS teams.
 - **§4** harness lines and **§13** entirely — drop if the project has no UI.

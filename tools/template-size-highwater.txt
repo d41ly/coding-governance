@@ -1,2 +1,2 @@
-parallel-coding-governance.template.md	32682
+parallel-coding-governance.template.md	36529
 skills/session-kickoff/SKILL.md	18215

@@ -151,6 +151,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- gate-lint — `tools/gate-lint/`: project-agnostic, drop-in, two lines to adopt and no gate legs of
+  its own. It lints the GATES, catching the failure a green suite cannot — a selector matching the
+  empty set, or an assertion between two values the same code derives.
 - govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
   DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
   and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under

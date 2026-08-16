@@ -43,6 +43,9 @@ machines/sessions on the same repo.
   plugin (a dead worker names its victim test and death mode — timeout-kill vs native crash),
   and the aiosqlite closed-loop seam patch + deterministic forced-race regression gate. See
   `tools/pytest-parallel-guardrails/README.md`.
+- **`tools/gate-lint/`** — project-agnostic, drop-in linting for the GATES themselves: two lines to
+  adopt, no gate legs of its own. It catches what a green suite cannot — a selector that matches the
+  empty set, or an assertion between two values the same code derives. See `tools/gate-lint/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent` that caps fan-out in both
   modalities. A direct `Agent` spawn carries no script, so it is COUNTED at runtime — each claims a
   numbered slot with `O_EXCL` under a session+prompt-keyed dir in the git common dir, and the spawn
