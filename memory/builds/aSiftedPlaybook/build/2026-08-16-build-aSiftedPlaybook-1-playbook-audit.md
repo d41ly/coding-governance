@@ -20,35 +20,36 @@ Three defect classes were hunted, each requiring a reproduction rather than an a
 Cross-file convergence was checked in all three directions: template §-stub ↔ companion §-heading ↔
 customize placeholder and conditional-section lists.
 
-## The eleven confirmed defects, and where each is fixed
+## The eleven confirmed defects
 
-| # | Sev | Class | Where | Defect | Fixed by |
-|---|---|---|---|---|---|
-| A1 | high | stale | `template.md:150` | The `agent-cap.js` hook is described as `(matcher \`Workflow\`)`. The wired value is `Workflow\|Agent` (`.claude/settings.json:5`), and `REVIEW-PROTOCOL.md:58-60` records that `check-wiring.sh` asserts the VALUE precisely because a group left at `Workflow` alone still contains the string and used to report ok. An adopter wiring per this parenthetical gets a hook blind to the whole `Agent` modality. | `PLAY-1` S2 |
-| A2 | high | non-agnostic | `template.md`, 17 sites | The default branch is spelled as the literal `main` seventeen times with no placeholder, while `.githooks/pre-commit:16`, `tools/push-main.sh:20` and the kickoff engine all resolve it dynamically. Two of the seventeen sit inside §16 micro-formats the template declares MANDATORY and byte-stable, so a project on `master` must either violate a mandatory format or emit a false one. | `PLAY-2` S1-S3 |
-| A3 | high | stale | `customize.md:20-21` | "36 in total, and the two groups are **disjoint** — no placeholder appears in both files, so each one is filled in exactly one place." Measured: 23 + 14 = 37 while the union is 36, because `{{MEMORY_ROOT}}` appears in both files. The prose argues against running the both-files verification grep that would catch the resulting unfilled placeholder. | `PLAY-4` S1, S2 |
-| A4 | med | stale | `template.md:150` | `agent-cap.js` implements four rules; the template describes two. Missing: RULE 3 (`:346`, the hook resolves the bound wherever it is written) and RULE 4 (`:549`, direct `Agent` spawns counted at runtime, five per prompt) — the latter being the only enforcement that reaches a fan-out made outside a `Workflow` script. | `PLAY-1` S3 |
-| A5 | med | stale | `template.md:107` | "a **19-check** hygiene gate". The true count is 20. Notably the count is NOT derivable from the engine — `check-memory-hygiene.sh`'s own `fail` numbers stop at 12, with 13-16, 17-19 and 20 delegated — so its authority is `tools/gate-legs.json:3` and `tools/memory-tree/README.md:18`. | `PLAY-1` S4 |
-| A6 | med | missing wire | all three | The `drift-audit` kit is named nowhere in the trio, while `WIRE-INTO-PROJECT.md §3d` installs it as "optional, recommended". The adopter's instantiated ruleset never mentions records-vs-reality auditing, and the deletion checklist cannot tell them what to strip if they decline it. | `PLAY-3` S1 |
-| A7 | med | stale | `template.md:51` · `customize.md:61` | "a committed build **plan**". `UNATTENDED-PROTOCOL.md` says "build folder" five times and "build plan" zero; `AGENTS.md:182` and `domain-rules.md:25` agree. The template is what an agent reads at landing time and it names an artifact the protocol does not define. | `PLAY-1` S5 |
-| A8 | low-med | missing wire | all three | `pytest-parallel-guardrails` is never named, although `domain-rules.md:87-88` already encodes in full the two bug classes it exists to fix. The reader is told to solve a problem a shipped kit already solves. | `PLAY-3` S2 |
-| A9 | low-med | missing wire | `customize.md:12-13` | `agent-instructions` is never named, while the file instructs the deploying agent to write the filled template into "`AGENTS.md` / `CLAUDE.md`". An adopter who writes only `AGENTS.md` ships a repo Claude Code cannot read, which is the entire reason that kit exists. | `PLAY-3` S3 |
-| A10 | low | stale | `template.md:51` | The landing rule cites "(companion §1, §8)", but v2.7 turned §8 into a pointer back at §1 (`:159`: "landing is §1's rule, not restated here"). The edit changed one direction only, leaving a circular reference. | `PLAY-1` S6 |
-| A11 | low | stale | `domain-rules.md:10-12` | "Four are droppable-per-project (§4, §9, §11 and §13) and §1's unattended block is a fifth, **line-scoped** one" — asserting by contrast that the four are whole-section drops. `customize.md:69-71` drops only §9's outbound-call lines and only §4's harness lines. Two of the four are line-scoped too. | `PLAY-4` S3 |
+| # | Sev | Class | Where | Defect |
+|---|---|---|---|---|
+| A1 | high | stale | `template.md:150` | The `agent-cap.js` hook is described as `(matcher \`Workflow\`)`. The wired value is `Workflow\|Agent` (`.claude/settings.json:5`), and `REVIEW-PROTOCOL.md:58-60` records that `check-wiring.sh` asserts the VALUE precisely because a group left at `Workflow` alone still contains the string and used to report ok. An adopter wiring per this parenthetical gets a hook blind to the whole `Agent` modality. |
+| A2 | high | non-agnostic | `template.md`, 17 sites | The default branch is spelled as the literal `main` seventeen times with no placeholder, while `.githooks/pre-commit:16`, `tools/push-main.sh:20` and the kickoff engine all resolve it dynamically. Two of the seventeen sit inside §16 micro-formats the template declares MANDATORY and byte-stable, so a project on `master` must either violate a mandatory format or emit a false one. |
+| A3 | high | stale | `customize.md:20-21` | "36 in total, and the two groups are **disjoint** — no placeholder appears in both files, so each one is filled in exactly one place." Measured: 23 + 14 = 37 while the union is 36, because `{{MEMORY_ROOT}}` appears in both files. The prose argues against running the both-files verification grep that would catch the resulting unfilled placeholder. |
+| A4 | med | stale | `template.md:150` | `agent-cap.js` implements four rules; the template describes two. Missing: RULE 3 (`:346`, the hook resolves the bound wherever it is written) and RULE 4 (`:549`, direct `Agent` spawns counted at runtime, five per prompt) — the latter being the only enforcement that reaches a fan-out made outside a `Workflow` script. |
+| A5 | med | stale | `template.md:107` | "a **19-check** hygiene gate". The true count is 20. Notably the count is NOT derivable from the engine — `check-memory-hygiene.sh`'s own `fail` numbers stop at 12, with 13-16, 17-19 and 20 delegated — so its authority is `tools/gate-legs.json:3` and `tools/memory-tree/README.md:18`. |
+| A6 | med | missing wire | all three | The `drift-audit` kit is named nowhere in the trio, while `WIRE-INTO-PROJECT.md §3d` installs it as "optional, recommended". The adopter's instantiated ruleset never mentions records-vs-reality auditing, and the deletion checklist cannot tell them what to strip if they decline it. |
+| A7 | med | stale | `template.md:51` · `customize.md:61` | "a committed build **plan**". `UNATTENDED-PROTOCOL.md` says "build folder" five times and "build plan" zero; `AGENTS.md:182` and `domain-rules.md:25` agree. The template is what an agent reads at landing time and it names an artifact the protocol does not define. |
+| A8 | low-med | missing wire | all three | `pytest-parallel-guardrails` is never named, although `domain-rules.md:87-88` already encodes in full the two bug classes it exists to fix. The reader is told to solve a problem a shipped kit already solves. |
+| A9 | low-med | missing wire | `customize.md:12-13` | `agent-instructions` is never named, while the file instructs the deploying agent to write the filled template into "`AGENTS.md` / `CLAUDE.md`". An adopter who writes only `AGENTS.md` ships a repo Claude Code cannot read, which is the entire reason that kit exists. |
+| A10 | low | stale | `template.md:51` | The landing rule cites "(companion §1, §8)", but v2.7 turned §8 into a pointer back at §1 (`:159`: "landing is §1's rule, not restated here"). The edit changed one direction only, leaving a circular reference. |
+| A11 | low | stale | `domain-rules.md:10-12` | "Four are droppable-per-project (§4, §9, §11 and §13) and §1's unattended block is a fifth, **line-scoped** one" — asserting by contrast that the four are whole-section drops. `customize.md:69-71` drops only §9's outbound-call lines and only §4's harness lines. Two of the four are line-scoped too. |
 
-**All eleven are covered.** No audit defect is unassigned, and no scope item in the build claims an
-audit provenance it does not have.
+**Which scope item fixes each of these is BUILD STATE, not audit state**, so it lives in the build
+README's coverage table and deliberately not here. This file records what was found on 2026-08-16
+and does not move when the plan does.
 
 ## Four more, found after the audit closed
 
 Recorded separately because they are NOT part of the eleven and must not inflate that count:
 
-| # | Sev | Where | Defect | Found | Fixed by |
-|---|---|---|---|---|---|
-| B1 | high | `template.md:150` | "an array LITERAL of **≤6** elements (the lens fan) passes unmarked". `agent-cap.js:119` sets `MAX_LENSES = 5`, with a comment recording that 6 was a trailing-comma miscount the owner ratified away. The template prescribes a fan the hook DENIES. | while writing `PLAY-1` §2 | `PLAY-1` S1 |
-| B2 | med | `template.md:157` | "the ≤5 cap is enforced at the `Workflow` tool-call … never inside the script where no hook reaches" — the pre-`agent-cap`-1.3 description; RULE 4 enforces at the `Agent` call too. | discovery `wf_4e13d9e7-550` | `PLAY-1` S8 |
-| B3 | low | `template.md:24` | §0 says "Never run more than 5 agents **concurrently**", naming the weaker of the two rules as if it were the rule. `REVIEW-PROTOCOL.md:12-13` states plainly that concurrency is not a budget. | while writing `PLAY-1` §2 | `PLAY-1` S7 |
-| B4 | med | all three | `gate-lint` is a **fourth** shipped kit absent from the trio — and absent from `AGENTS.md` and `README.md` entirely, so the charter does not know it ships. | discovery `wf_4e13d9e7-550` | `PLAY-3` S4 |
+| # | Sev | Where | Defect | Found |
+|---|---|---|---|---|
+| B1 | high | `template.md:150` | "an array LITERAL of **≤6** elements (the lens fan) passes unmarked". `agent-cap.js:119` sets `MAX_LENSES = 5`, with a comment recording that 6 was a trailing-comma miscount the owner ratified away. The template prescribes a fan the hook DENIES. | while writing `PLAY-1` §2 |
+| B2 | med | `template.md:157` | "the ≤5 cap is enforced at the `Workflow` tool-call … never inside the script where no hook reaches" — the pre-`agent-cap`-1.3 description; RULE 4 enforces at the `Agent` call too. | discovery `wf_4e13d9e7-550` |
+| B3 | low | `template.md:24` | §0 says "Never run more than 5 agents **concurrently**", naming the weaker of the two rules as if it were the rule. `REVIEW-PROTOCOL.md:12-13` states plainly that concurrency is not a budget. | while writing `PLAY-1` §2 |
+| B4 | med | all three | `gate-lint` is a **fourth** shipped kit absent from the trio — and absent from `AGENTS.md` and `README.md` entirely, so the charter does not know it ships. | discovery `wf_4e13d9e7-550` |
 
 ## Refuted — nine suspected defects, disproved
 
