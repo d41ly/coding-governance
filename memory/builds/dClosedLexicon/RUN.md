@@ -16,13 +16,16 @@ Records live under `spec/` and `reviews/`.
 <!-- /run:generated -->
 
 ## Run facts
-witness: b06261529cd9e146ad6d2d07c563ca262085708d
-phase: VERIFYING
+witness: 365be1c7d48e74b75defb60e2b8fdbee8a917a89
+phase: ABORTED
 keepalive: 6d0f3c29
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 8e7eff82c3aca6305d4843de1901102563d0d4ca
 anchor-ref: refs/heads/main
 base: 8e7eff82c3aca6305d4843de1901102563d0d4ca
+
+keepalive-reaped: yes
+parked-surfaced: yes
 
 ## Parked
 
@@ -55,3 +58,5 @@ owner's call to review rather than mine to normalize silently.
 ceiling raise as landing "in a parallel build". It has not landed: the ceiling is still 32,768 and
 the template measures 32,682. That unit stays BLOCKED and correctly so, but nothing in the tree
 records how long it has been waiting or on which build, and this run did not go looking.
+
+2026-08-16T14:54:13Z abort · item dClosedLexicon · reason P3 did not converge across three adversarial rounds: four blockers in one predicate, the last two verified and unfixed (a <dir>/* nesting glob that escapes an earlier wildcard literally, and importer-local precedence applied to fully-qualified dotted imports). Both re-create the unfalsifiable-zero condition the unit exists to close. I set a stopping rule before the third round and it binds: my own assessment was wrong three consecutive times on this mechanism, so a fourth self-approved fix is not evidence of anything. REFUSED TO DECIDE: whether to ship P3 weakened, cut it from the ratified scope, or land the sound remainder (P1, P2, check-placeholders) without it -- all three are scope calls the standing mandate does not delegate. Nothing merged, nothing pushed; the branch carries the full record.
