@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
