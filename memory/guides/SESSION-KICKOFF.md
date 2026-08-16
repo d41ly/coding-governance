@@ -5,7 +5,7 @@
 last-audit: 2026-08-16T18:09:43+03:00 @ 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e99de5b6c3fa257277490eb19dcd05b4a137b855
+last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -147,7 +147,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
   assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
   signal — pinned at 0 with ZERO slack, so an uncited leg reds immediately. Read the leg count
-  from `drift_report.py --check`; this line said 53 against a live 55.
+  from `drift_report.py --check`, never from here: this line has now been wrong twice.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
