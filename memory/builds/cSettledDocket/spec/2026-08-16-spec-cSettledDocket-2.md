@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -61,8 +61,16 @@ which `DIRECTIVES_EXTRA` is usable at all.
 
 Arm A joins `DIRECTIVES_CORE + DIRECTIVES_EXTRA` to the table. Consequence: declaring any extra
 handle reds the bar immediately and permanently. `DIRECTIVES_EXTRA` becomes a key that exists, is
-documented, and cannot be used — which is honest about the current state of the design and costs
-four characters of code.
+documented, and cannot be used — honest about the design as it stands.
+
+It is NOT four characters, and rev-1 priced it as if it were. `core` is built ONCE above both guards
+and read TWICE: by arm A's two `comm` joins and by arm B's `for pair in $core` section-resolution
+loop. Widening the variable therefore also requires every project-declared extra to cite an `M<n>`
+section present in the KIT's `BUILD-METHOD.md` — a second, differently-worded refusal that fires
+even for a project whose extra directive points into its own method document. Branch A must either
+introduce a separate `effective` for arm A alone, or accept that arm B's rule extends to extras and
+say so. The audit rule this violated is worth keeping: cost a fork by its variable's READ SITES, not
+by the line the change lands on.
 
 Cost: a project that wants an extra directive has no route at all, and §10's promise that "the
 project may only EXTEND" becomes false. The key should then be deleted rather than left as a trap,
@@ -110,8 +118,10 @@ markdown parse to the driver.
 - **AC3** — under branch B only: `bash tools/unattended/adopt-unattended.sh` re-renders without
   destroying a project region, asserted by writing a region, re-rendering, and `git hash-object`
   comparison of the region's bytes.
-- **AC4** — `bash tools/unattended/check-unattended.sh` is silent on this repo, which declares
-  `DIRECTIVES_EXTRA=""`, so the change cannot red a project that uses no extras.
+- **AC4** — under BRANCH B: a project declaring an extra handle AND a matching row in its own region
+  closes clean, which is the branch's whole promise. (Stated per-branch because under A and C this
+  criterion is unfalsifiable — this repo declares `DIRECTIVES_EXTRA=""`, so "silent on a tree with no
+  extras" passes without the change.)
 - **AC5** — `memory/map/features/unattended.md` names the resolved contract.
 
 ## 7. Gates
@@ -122,7 +132,7 @@ markdown parse to the driver.
 
 ## 8. Open questions
 
-### Which branch? — RESOLVER: OWNER
+### Which branch? — RESOLVED (owner, 2026-08-16): BRANCH B, projects get a row source
 
 The three are costed in §4. Summarised: **A** makes the key unusable and honest, four characters,
 and then §10's "the project may only EXTEND" is false. **B** keeps the contract true and buys a
@@ -130,13 +140,18 @@ marker-region preservation problem this repo has already lost data to once. **C*
 makes the driver parse markdown at run time and turns the leg into a second opinion on the driver's
 own parse.
 
-Recommendation is **B**. It is left as a fork because all three change a published contract and
-because M3 reserves that to the owner.
+The owner took **B** on 2026-08-16. The build order follows from its one real risk: the
+marker-region preservation arm — write a project region, re-render, compare the region's bytes — is
+written BEFORE the region is introduced, because `TOOL-aMouldedFolio-4` records that this repo's
+four marker-region implementations disagree and that one of them deleted authored data.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-31`, which the M8 review raised and which
-  was filed rather than decided because it is a contract call.
+- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-31`.
+- rev-2 · 2026-08-16 · M4 audit fold, then OWNER RESOLUTION. Branch A was mis-costed at four
+  characters: `core` is read by arm B as well as arm A, so widening it extends the section-resolution
+  rule to extras. AC4 was unfalsifiable under two of three branches. **Owner took BRANCH B on
+  2026-08-16**; §8 records it and the marker-preservation arm is written first.
 
 ## 10. Reuse audit
 

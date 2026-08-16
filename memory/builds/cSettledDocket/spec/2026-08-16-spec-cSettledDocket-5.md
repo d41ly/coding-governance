@@ -1,101 +1,148 @@
-# TOOL-cSettledDocket-5 — the one self-test leg that reports no count at all
+# TOOL-cSettledDocket-5 — one leg: every self-test prints a count, in one shape, against a floor
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
-`skills/session-kickoff/manifest-check.test.sh` prints no assertion summary and carries no counter.
-Measured: zero `PASS`/`assertions` output, zero `n=$((n+1))` sites. It is the only self-test leg on
-the bar with no executed-count signal, so `TOOL-cBriefedPilot-23`'s floor cannot apply to it and the
-stranded-arm class it guards against is unobservable here.
+rev-1 of this spec said `skills/session-kickoff/manifest-check.test.sh` "prints no assertion summary
+and carries no counter". **That is false.** It declares `pass=0; fail=0` at line 9, increments at
+four sites, and prints `---- 62 passed, 0 failed ----`. rev-1 had grepped for the OTHER suites'
+spelling — `PASS (`, `assertions`, `n=$((n+1))` — and reported a missing CAPABILITY after measuring a
+missing CONVENTION. That is the vacuous-selector class, in a spec about counting.
 
-The gate it proves is the kickoff-manifest ratchet, which this session watched refuse three times in
-a row for three different reasons. A suite that can go quiet without anyone noticing is a poor proof
-of a gate that active.
+Measuring the whole population instead of one file gives the real defect, and it is bigger:
+
+- **27** tracked `*.test.sh` files.
+- **12** print no count at all.
+- **15** print one, in **four** different spellings: `$pass passed`, `PASS ($n`, `PASS ($ncase`, and
+  one bare `echo "PASS"` carrying no number.
+- **3** carry a `FLOOR_ASSERTIONS`.
+
+So `TOOL-cBriefedPilot-23`'s floor — the thing that catches a block of arms stranded past an `exit` —
+guards three suites out of twenty-seven, and there is no agreed shape for a leg to check.
 
 ## 2. Scope (IN)
 
-- **S1** — a counter in the suite's assertion helpers, incremented before the test.
-- **S2** — a summary line printing the executed count on success, in the same shape the other three
-  suites use, so an operator reading three legs reads one format.
-- **S3** — `FLOOR_ASSERTIONS`, pinned shrink-only at the measured count, refusing with the same
-  message the other suites use: the arms are UNREACHABLE rather than absent.
-- **S4** — an arm proving the floor fires: strand a block past an early exit and observe the refusal.
-- **S5** — `TOOL-cBriefedPilot-35` closed.
+- **S1** — a merge-bar leg asserting that every tracked `*.test.sh` reachable from
+  `tools/gate-legs.json` prints a count in one agreed shape on a green run, and declares a
+  `FLOOR_ASSERTIONS`.
+- **S2** — the agreed shape is `PASS (<n> assertions)`, because it is the majority spelling among
+  those that carry a number and the one `check-arms.py`'s siblings already use.
+- **S3** — a SHRINK-ONLY registry beside the other waiver lists, seeded from the measured
+  non-compliant population, so the leg lands green and the population drains. A leg with twelve
+  silent exceptions checks nothing; a leg with twelve NAMED ones ratchets. A registry row whose file
+  now complies REDS as stale, the way `install-prefix-waivers.txt` already does.
+- **S4** — the leg is DERIVED from `tools/gate-legs.json`, never a hand-kept list. A hand-maintained
+  second population is how `check-kit-versions.sh` grew the duplicate `TOOL-cBriefedPilot`'s review
+  found, and it is the same mistake one file over.
+- **S5** — `manifest-check.test.sh` converts to the agreed shape and gains a floor: it already
+  counts, so this is a rename and a constant, not a counter.
+- **S6** — a self-test for the leg: a suite printing no count reds; one printing a count with no
+  floor reds; a registry row naming a compliant file reds as stale; a compliant suite is silent.
 
 ## 3. Non-goals (OUT)
 
-- **Adding arms.** This unit makes the existing arms countable. Whether the suite covers
-  `manifest-check.sh` well enough is a different question, answered by `check-arms.py`, which already
-  reports 28 branches and 28 armed for that gate.
-- **A shared helper library across the four suites.** They are four files with four fixtures and one
-  is installed per-machine via a junction; a shared library is a cross-kit edge this repo declines
-  elsewhere for the same reason.
-- **Changing what any assertion asserts.**
+- **Converting all twelve silent suites.** That is the registry's job to force over time. Doing it
+  here is a twelve-file sweep with no evidence behind eleven of them, and this build has already
+  learned what an unmeasured sweep costs.
+- **Changing what any assertion asserts.** Counting is additive everywhere.
+- **A shared helper library.** Twenty-seven files, four fixtures, one installed per-machine via a
+  junction. The leg checks the OUTPUT shape, which is the contract; how each suite produces it is
+  its own business.
+- **Unit 4's inline-site sweep.** That makes one suite's count WHOLE; this makes every suite's count
+  EXIST. Different defects, and unit 4's file is already compliant on shape.
 
 ## 4. Design
 
-### Read the file before assuming a shape
+### Why a leg and not more per-suite edits
 
-Unlike the other three suites, this one is not known to route every assertion through helpers. The
-first build step is to enumerate its assertion sites and classify them helper-vs-inline, exactly the
-distinction unit 4 turns on. If they are all inline, this unit is unit 4's shape a second time and
-the two should be built together; if there are helpers, it is smaller. The spec deliberately does not
-guess, because guessing the shape is what produced unit 4's half-covered floor.
+rev-1 proposed editing one suite. The measurement says twelve are silent and four spellings are in
+use, so per-suite editing has no end and no ratchet: the twenty-eighth suite lands silent and nobody
+notices. A leg over a derived population is the only form that binds files nobody has written yet.
 
-### Why the same message text
+This is the M4 audit's own recommendation, and it closes three of its findings at once — the false
+premise here, the counter-name collision rev-1 would have caused, and the "only leg" claim that was
+wrong by twelve.
 
-`check-arms.py` keys an arm to its branch by the failure text. Three suites already share this
-refusal wording; a fourth copy keeps a future reader's grep over the phrase complete, and the phrase
-itself is the useful part — it tells the reader to look for a stranded block rather than a deleted
-arm, which is the distinction that cost this build a review cycle.
+### The shape, and why `PASS (<n> assertions)`
 
-### The junction wrinkle
+Among the fifteen that carry a number, `$pass passed` appears seven times and `PASS ($n` five, with
+`PASS ($ncase` and a numberless `echo "PASS"` making up the rest. Neither majority is large. `PASS
+(<n> assertions)` is chosen because the three suites that ALREADY have floors use it, so the shape
+and the floor arrive together rather than as two conventions to reconcile later.
 
-The kickoff skill is installed per-machine via a junction, and the suite runs from the tracked
-`skills/session-kickoff/` copy. Nothing here depends on the junction, but the floor constant lives in
-the tracked file so every machine's run reads the same pin.
+The leg asserts the shape by RUNNING nothing: it greps the file for the emitting line and for
+`FLOOR_ASSERTIONS`. Running twenty-seven suites to read their output would re-run the whole bar
+inside one leg, which §3 of `TOOL-cBriefedPilot-23` already rejected for the same reason.
+
+### The registry, seeded honestly
+
+Twelve rows on day one, each naming a file and nothing else. The count is not written into the spec
+or the leg — it is derived, after this build twice wrote a figure the tree then moved underneath,
+and after `govkit`'s spec did the same thing twice more.
 
 ### Files touched
 
-`skills/session-kickoff/manifest-check.test.sh` only.
+`tools/check-testsuite-counts.sh` (new) + its `.test.sh` · `tools/gate-legs.json` (two legs) ·
+`memory/project/testsuite-count-waivers.txt` (new registry) ·
+`skills/session-kickoff/manifest-check.test.sh` (S5) · `AGENTS.md` (the gate-suite bullet).
+
+### Alternatives rejected
+
+- **Deriving the population from `git ls-files '*.test.sh'`.** Twenty-seven files, but not all are
+  bar legs — a suite nobody runs has no count to check. The manifest is what the bar reads, so it is
+  what the leg reads.
+- **Enforcing a count without a floor.** A count nobody compares to anything is what
+  `check-memory-hygiene.test.sh` had for its whole life, at a hardcoded 130.
 
 ## 5. Production-readiness checklist
 
-No new dependency, no new leg — the suite is already on the bar. One counter, one summary line, one
-constant, one arm.
+One new leg, one new self-test, one new registry, one suite converted. No new dependency. The leg is
+grep-only, so it costs milliseconds on a bar whose legs cost minutes.
 
 ## 6. Acceptance criteria
 
-- **AC1** — the suite prints `PASS (` with its executed count on a green run, where today it prints
-  no count.
-- **AC2** — `FLOOR_ASSERTIONS` is present and equals the measured count at build time.
-- **AC3** — stranding a block of arms past an early `exit` makes the suite refuse with
-  `arms are UNREACHABLE rather than absent`.
-- **AC4** — `bash skills/session-kickoff/manifest-check.test.sh` exits 0, and
-  `python tools/memory-tree/check-arms.py` still reports every `manifest-check.sh` branch armed.
+- **AC1** — a bar suite printing no count and absent from the registry makes
+  `bash tools/check-testsuite-counts.sh` print a refusal naming that file.
+- **AC2** — a bar suite printing `PASS (<n> assertions)` but declaring no `FLOOR_ASSERTIONS` reds.
+- **AC3** — a row in `memory/project/testsuite-count-waivers.txt` naming a file that NOW complies
+  reds as stale, so the list shrinks.
+- **AC4** — the seeded registry makes `bash tools/check-testsuite-counts.sh` exit 0 over the real
+  tree on the day it lands, proving it was seeded from a measured population and not an assumption.
+- **AC5** — `skills/session-kickoff/manifest-check.test.sh` prints `PASS (<n> assertions)` with a
+  floor, and its own arms still pass — its existing `---- N passed, M failed ----` line is replaced,
+  not duplicated.
+- **AC6** — the leg's population is derived: adding a `*.test.sh` leg to `tools/gate-legs.json`
+  without a count makes the leg red with no edit to the leg itself.
 
 ## 7. Gates
 
-`bash skills/session-kickoff/manifest-check.test.sh` · `bash skills/session-kickoff/manifest-check.sh` ·
-`python tools/memory-tree/check-arms.py` · `bash tools/run-gates.sh`.
+`bash tools/check-testsuite-counts.sh` · `bash tools/check-testsuite-counts.test.sh` ·
+`bash skills/session-kickoff/manifest-check.test.sh` · `bash tools/run-gates.test.sh` ·
+`bash tools/run-gates.sh`.
 
 ## 8. Open questions
 
-none — the one thing this spec refuses to guess is whether the suite's assertions are helper-based or
-inline, and §4 makes reading that the first build step rather than an assumption baked into the
-design. That is a sequencing instruction, not an unresolved fork.
+none — the two decisions were the shape (§4, against the three suites that already have floors) and
+whether to convert the twelve now or ratchet them (§3, against an unmeasured twelve-file sweep). AC4
+is what proves the registry was seeded from the tree rather than from a guess, which is the failure
+rev-1 of this spec actually committed.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-35`, filed when unit 23 floored three suites
-  and found this one had nothing to floor.
+- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-35`.
+- rev-2 · 2026-08-16 · M4 audit fold, and a full re-scope. The named defect was NOT REAL: the suite
+  already counts and prints `---- 62 passed, 0 failed ----`; rev-1 had measured the absence of
+  another suite's spelling. Re-measuring the population found 12 silent suites, 4 spellings and 3
+  floors, so the unit became the leg the audit recommended. Tier moves 1 → 2: this is a new gate's
+  contract, not a mechanical edit.
 
 ## 10. Reuse audit
 
-The counter shape, the `FLOOR_ASSERTIONS` constant name and the refusal wording are all
-`TOOL-cBriefedPilot-23`'s, copied deliberately rather than varied: `check-arms.py` keys on failure
-text, and four suites sharing one phrase keeps a grep over it complete. `mutate` is NOT adopted here
-— it lives in the two unattended suites and copying it into a third file for one arm would be a third
-implementation of a five-line helper, which is worse than the arm doing its own `git hash-object`
-comparison inline.
+The shrink-only registry reuses the shape of `install-prefix-waivers.txt`, `unarmed-branches.txt` and
+the drift pins — same directory, same stale-row-reds rule — rather than inventing a list format. The
+derived population reuses `tools/gate-legs.json`, which `run-gates.test.sh` already treats as the
+single source for what the bar runs. `FLOOR_ASSERTIONS` and the `PASS (<n> assertions)` line are
+`TOOL-cBriefedPilot-23`'s, unchanged. `mutate` is NOT reused: it lives in the two unattended suites
+and copying a five-line helper into a third file for one arm is a third implementation — rev-1's
+reuse audit claimed the opposite of its sibling spec 4's, and both were wrong about where it lives.

@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -58,8 +58,9 @@ assertion each time.
 It is the proof that the hygiene gate can fail. A sweep that mis-edits one site can turn an arm into
 a no-op while the suite still prints PASS with a plausible number — the two-answers defect landing in
 the file whose subject is a count that was a lie. So S4's arm is written FIRST, and the sweep is
-verified by re-running the suite and checking that the count rose by the number of sites edited,
-which is a derived cross-check rather than an eyeball.
+verified by re-running the suite and checking the count against a derivation of site-EXECUTIONS —
+not site count: three inline sites sit inside five-iteration loops and contribute five each. A
+cross-check that gets its own arithmetic wrong is an eyeball with extra steps.
 
 ### The reconciliation with main's row
 
@@ -80,10 +81,14 @@ mis-edited assertion, and S4 plus the derived count cross-check are what bound i
 
 ## 6. Acceptance criteria
 
-- **AC1** — the suite prints `PASS (` with a count at or above its re-pinned `FLOOR_ASSERTIONS`, and
-  the count equals the previous count plus the number of inline sites edited.
+- **AC1** — the suite prints `PASS (` with a count at or above its re-pinned `FLOOR_ASSERTIONS`. The
+  rise is NOT the number of sites edited: three of them sit inside five-iteration loops, so each
+  contributes five. The expected total is derived by counting site-executions, and the derivation is
+  written into the commit message so a future reader can re-check it rather than trust it.
 - **AC2** — stranding a block of INLINE arms past an early `exit` makes the suite refuse with
-  `arms are UNREACHABLE rather than absent`, where today it passes.
+  `arms are UNREACHABLE rather than absent`. The stranded block must NOT contain the summary line
+  itself, or the suite prints nothing and the arm passes on absence rather than on the refusal —
+  the observable has to survive the mutation that is being observed.
 - **AC3** — no assertion changes meaning: `grep -c 'st=1'` is unchanged at 60 before and after.
 - **AC4** — the summary no longer says `helper assertions`, because the count is whole.
 - **AC5** — `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0.
@@ -101,13 +106,18 @@ stayed additive.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-34`, and folding in main's independently
-  filed `TOOL-cTracedPromise-4`.
+- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-34`, folding in main's independently filed
+  `TOOL-cTracedPromise-4`.
+- rev-2 · 2026-08-16 · M4 audit fold. §10 named `mutate`, which does not exist in the one file this
+  unit touches. AC1's arithmetic ignored that three inline sites sit inside five-iteration loops.
+  AC2's stranding mutation could kill its own observable.
 
 ## 10. Reuse audit
 
 The counter, the floor constant and the refusal message are all `TOOL-cBriefedPilot-23`'s, already in
-this file — this unit widens their population and changes no mechanism. `mutate` from the same unit
-is reused for S4's fixture edit, so a stranding mutation that silently matches nothing fails rather
-than passing. No new helper is added: the reason the inline sites are not converted to `hit`/`miss`
+this file — this unit widens their population and changes no mechanism. `mutate` is NOT available here: it lives in the two unattended suites and
+not in this file, which is the only one this unit touches — rev-1's reuse audit claimed otherwise
+and its sibling spec 5 claimed the opposite, so one of the two was always wrong. S4's fixture edit
+does its own `git hash-object` before-and-after comparison inline, which is the same three lines
+without a third copy of the helper. No new helper is added: the reason the inline sites are not converted to `hit`/`miss`
 is in §3, and converting them would be the larger diff, not the smaller one.

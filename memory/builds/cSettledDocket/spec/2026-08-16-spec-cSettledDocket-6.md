@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -84,14 +84,18 @@ Each row is one `mutate` plus a silence assertion plus its live twin.
 
 ## 5. Production-readiness checklist
 
-No new dependency and no new leg — it extends a suite already on the bar. It depends on unit 3 only
-in ordering: unit 3 moves a `next` in a different gate and both touch `ARMS_FLOORS`, so building them
-in sequence avoids two units racing one constant.
+No new dependency and no new leg — it extends a suite already on the bar. **It depends on nothing.**
+rev-1 claimed a unit-3 ordering dependency via `ARMS_FLOORS`; that constant pins GATE scripts and
+`check-arms.py` excludes `*.test.sh` from its population entirely, so this unit — which touches only
+a `.test.sh` — cannot move it. The roster cell is corrected with it.
 
 ## 6. Acceptance criteria
 
-- **AC1** — with a TERMINAL record, each of the five moves leaves `bash tools/unattended/check-unattended.sh`
-  silent and exiting 0.
+- **AC1** — with a TERMINAL record, each move leaves the check named in its own collision column
+  silent. NOT total leg silence: widening `DIRECTIVES_CORE` reds check 16 arm A by construction, and
+  adding a phase reds arm D, both correctly and with no run population involved. A builder chasing
+  total silence would exempt check 16 on terminal records, which is precisely the over-wide exemption
+  AC4 forbids — in the same unit.
 - **AC2** — with a LIVE record, each move that used to red still reds, naming the same `UNATTENDED check <n> FAILED` it named before.
 - **AC3** — every move goes through `mutate`, so a fixture edit changing no bytes fails the suite.
 - **AC4** — re-introducing unit 36's over-wide exemption in `tools/unattended/check-unattended.sh` —
@@ -112,8 +116,11 @@ about the difference between an exemption and a switch-off.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-38`, the class the M8 review named after
-  finding three separate instances of it in one diff.
+- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-38`.
+- rev-2 · 2026-08-16 · M4 audit fold. AC1 demanded total leg silence after moves that red check 16
+  and arm D by construction, which would have driven a builder to the over-wide exemption AC4
+  forbids. §10 named `core_of`, a seam the test suite cannot reach. The unit-3 dependency was false:
+  `ARMS_FLOORS` pins gate scripts and `check-arms.py` excludes `*.test.sh`.
 
 ## 10. Reuse audit
 
@@ -121,7 +128,9 @@ about the difference between an exemption and a switch-off.
 and S4 makes it mandatory rather than optional. The suite's existing `reset_tree`, `run`, `hit`,
 `miss` and `same` are reused unchanged; the `pedit` two-file helper from unit 22 is reused for the
 protocol moves so both copies stay in step and the parity leg does not fire instead of the check
-under test. `PHASES_TERMINAL` is read from the driver through the leg's existing `core_of`, not
-re-declared, so the fixture's idea of "terminal" cannot drift from the kit's. No new helper is
+under test. `PHASES_TERMINAL` cannot be read through `core_of`: that helper belongs to the LEG, not the test
+suite, and rev-1's reuse audit named a seam the fixture cannot reach. The fixture derives the
+terminal set the way the suite already derives `CORE_FLOOR_DERIVED` — by grepping the driver it
+copied in — so it still cannot drift from the kit, through a seam that exists. No new helper is
 introduced: if this fixture needed one, it would be evidence the moves are not the ones real builds
 make.

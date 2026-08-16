@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -16,17 +16,23 @@ document, read by different people, at a different time.
 
 ## 2. Scope (IN)
 
-- **S1** — `--park <slug> --item <handle> --reason <text>`, dispatched like the other verbs, writing
-  through the existing `park()` with kind `fork`.
-- **S2** — the reason is REQUIRED and non-empty, refused with the same argument unit 3 made for
-  `--waive`: an entry recording no reason is indistinguishable from one nobody meant.
-- **S3** — refused on a TERMINAL record, through the existing `refuse_if_terminal`. A finished run
-  parks nothing; `--abort` is the verb for a decision that stops the run.
+- **S1** — `--park <slug> --item <text> --reason <text>`, dispatched like the other verbs, writing
+  through the existing `park()` with kind **`decision`** — §2's first declared kind, and the one
+  `park()` has no caller for. rev-1 said `fork`, which §2 does not declare.
+- **S2** — the reason imports ALL THREE of `--waive`'s refusals, not the first: non-empty (an entry
+  recording no reason is indistinguishable from one nobody meant), no `BYPASS_BAN` spelling, and no
+  newline. The last is not optional here — `park()` appends one LINE and check 17 parses the region
+  line-wise, so a reason carrying a newline forges a second parked row.
+- **S3** — refused on a TERMINAL record through `refuse_if_terminal`, AND refused when no run-state
+  file exists. Those are two guards: `refuse_if_terminal` returns 0 on a missing record, so leaning
+  on it alone would let `--park` create a parked entry for a run that never started.
 - **S4** — the item is free text, NOT joined to the directive registry. A parked fork names a
   QUESTION, not a handle, and every other parked kind that names a handle has a registry to join to.
   §4 records why the join would be wrong here rather than merely absent.
-- **S5** — IDEMPOTENT on a byte-identical `(item, reason)` pair, matching `--waive`'s re-preflight
-  rule, so a resumed run that re-parks the same refusal does not duplicate the row.
+- **S5** — IDEMPOTENT on a byte-identical `(item, reason)` pair. This is NOT `--waive`'s rule and
+  the spec should not claim it is: `--waive` compares handle SETS and refuses a differing one, while
+  this compares one pair and no-ops on a match. Same purpose — a post-compaction re-run must not
+  duplicate — different mechanism.
 - **S6** — arms in `tools/unattended/unattended.test.sh`: the happy path writes one row; a missing
   reason refuses; a terminal record refuses; a repeat is a no-op; and the parked row is visible to
   `--status`.
@@ -34,8 +40,9 @@ document, read by different people, at a different time.
 
 ## 3. Non-goals (OUT)
 
-- **A fifth parked kind.** `fork` is already declared in §2 and already written by nothing. This unit
-  gives it a writer; inventing a kind would be answering a question §2 already answered.
+- **A fifth parked kind.** §2 declares exactly four — DECISION, ABORT, OVERRIDE, WAIVER — and `park()`
+  writes only the last three. The DECISION kind is already declared and has no writer; this unit is
+  that writer. rev-1 named a fifth kind, `fork`, that appears nowhere in the protocol.
 - **Blocking `--close` on unresolved forks.** A parked fork is a record for the wrap-up, not a gate.
   `build-complete` and the roster already decide what blocks a landing, and a second gate over the
   same question is the two-answers defect.
@@ -58,8 +65,8 @@ written.
 
 ### Why the item is NOT joined to the directive registry
 
-Check 17 joins a WAIVER's item to `DIRECTIVES_CORE` because a waiver names a rule being relaxed, and
-that rule has a registry. A fork names a question the agent refused — "do facts 5 through 7 pin with
+Check 17 joins a WAIVER's item to the EFFECTIVE set, `DIRECTIVES_CORE` plus `DIRECTIVES_EXTRA`,
+because a waiver names a rule being relaxed and that rule has a registry. A fork names a question the agent refused — "do facts 5 through 7 pin with
 fact 4?" — and there is no enumeration of questions a build might raise, nor should there be: the
 value of the record is that it captures something nobody anticipated. A join here would either refuse
 every honest park or need a registry that grows on every use, which is not a registry.
@@ -97,14 +104,16 @@ that pairs them is already on the bar.
 ## 6. Acceptance criteria
 
 - **AC1** — `--park tRun --item q --reason r` appends exactly one line matching the parked grammar
-  with kind `fork`, verified by `grep -c 'fork · item '` over the record.
+  with kind `decision`, verified by `grep -c 'decision · item '` over the record.
+- **AC1b** — a reason containing a newline is REFUSED, and the record gains no second row; a reason
+  spelling `BYPASS_BAN` is refused. Both asserted against the row count, not the message alone.
 - **AC2** — `--park` with no `--reason` prints a refusal naming `--park requires --reason` and the
   record is byte-identical afterwards, asserted with `git hash-object`.
-- **AC3** — `--park` on a record whose phase is `ABORTED` is refused by `refuse_if_terminal` and
-  writes nothing.
+- **AC3** — `--park` on a record whose phase is `ABORTED` is refused and writes nothing; and
+  `--park` against a slug with NO run-state file is refused rather than creating one.
 - **AC4** — a second `--park` with the same `(item, reason)` leaves the row count at 1.
 - **AC5** — `bash tools/unattended/check-unattended.sh` stays silent on a tree carrying a parked
-  fork, proving check 17's waiver selector does not mis-read the new kind.
+  `decision`, proving check 17's anchored waiver selector does not mis-read the new kind.
 - **AC6** — `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` stay byte-identical, per the existing parity leg.
 
 ## 7. Gates
@@ -121,8 +130,12 @@ the new kind does not disturb the one kind that IS joined.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-30`, filed when this gap was hit during
-  cBriefedPilot's fold and worked around with a backlog row.
+- rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-30`.
+- rev-2 · 2026-08-16 · M4 audit fold. The kind was `fork`, which the protocol does not declare — §2's
+  unwritten kind is DECISION. S2 imported one of `--waive`'s three reason refusals into a
+  line-oriented region where the newline one is load-bearing. S3 leaned on `refuse_if_terminal`,
+  which returns 0 for a record that does not exist. S5 mis-described `--waive`'s rule as a pair
+  compare when it is a set compare. §4 named the wrong registry.
 
 ## 10. Reuse audit
 

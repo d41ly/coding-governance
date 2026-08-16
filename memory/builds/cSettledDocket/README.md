@@ -24,25 +24,28 @@ it is specced with both branches costed rather than decided in the design pass.
 They are not a theme, they are a debt. But two pairs share a mechanism, and building them together
 is cheaper than building them apart:
 
-- Units 4 and 5 are the same missing thing in two suites: an assertion count nobody derives. Unit 4
-  finishes the count `TOOL-cBriefedPilot-23` started in the hygiene suite; unit 5 gives the one
-  remaining self-test leg a count at all. The helper shape is identical.
+- Units 4 and 5 both concern an assertion count nobody derives, at two scales. Unit 4 makes ONE
+  suite's count whole; unit 5 makes every bar suite HAVE one, behind a leg. The M4 audit is why unit
+  5 is a leg: its original premise — that one named suite had no counter — was false, and the real
+  population is 12 silent suites across 4 spellings.
 - Units 3 and 6 are both the frozen-versus-live class. Unit 3 is a gate that skips a whole document
   class; unit 6 is the standing fixture that would have caught all three instances cBriefedPilot met.
+  They share a theme and NOT a constant: the M4 audit refuted an `ARMS_FLOORS` dependency between
+  them, since that pin covers gate scripts and `check-arms.py` excludes `*.test.sh` outright.
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 6 unit(s) · node c · opened 2026-08-16 · streams tooling · ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once](spec/2026-08-16-spec-cSettledDocket-2.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two](spec/2026-08-16-spec-cSettledDocket-3.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file](spec/2026-08-16-spec-cSettledDocket-4.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-cSettledDocket-5 — the one self-test leg that reports no count at all](spec/2026-08-16-spec-cSettledDocket-5.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class](spec/2026-08-16-spec-cSettledDocket-6.md) | OPEN | rev-1 | 2026-08-16 |
+| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once](spec/2026-08-16-spec-cSettledDocket-2.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two](spec/2026-08-16-spec-cSettledDocket-3.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file](spec/2026-08-16-spec-cSettledDocket-4.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-5 — one leg: every self-test prints a count, in one shape, against a floor](spec/2026-08-16-spec-cSettledDocket-5.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class](spec/2026-08-16-spec-cSettledDocket-6.md) | OPEN | rev-2 | 2026-08-16 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units
@@ -54,8 +57,8 @@ Records live under `spec/`.
 | 2 | `TOOL-cSettledDocket-2` | 2 | `DIRECTIVES_EXTRA` is waivable and unshowable at once; the fork is whether the join covers EXTRA or projects get a row source | — |
 | 3 | `TOOL-cSettledDocket-3` | 2 | move hygiene check 12's `Tier-1` skip BELOW the terminal-fork and §9-rev assertions, so `TEMPLATE-SPEC`'s machine-checked claim is true for every tier | — |
 | 4 | `TOOL-cSettledDocket-4` | 1 | count the ~50 INLINE assertion sites in the hygiene suite, so its floor covers the whole file rather than its helpers | — |
-| 5 | `TOOL-cSettledDocket-5` | 1 | give `manifest-check.test.sh` a counter and a floor: it is the one self-test leg with no executed-count signal | — |
-| 6 | `TOOL-cSettledDocket-6` | 1 | a standing frozen-versus-live fixture: move the world around a terminal record and assert silence | 3 |
+| 5 | `TOOL-cSettledDocket-5` | 2 | one leg: every bar self-test prints a count in one shape against a floor, with a shrink-only registry seeded from the 12 that do not | — |
+| 6 | `TOOL-cSettledDocket-6` | 1 | a standing frozen-versus-live fixture: move the world around a terminal record and assert silence | — |
 <!-- /roster:units -->
 
 ## Provenance
@@ -66,17 +69,18 @@ Each unit is one cBriefedPilot backlog row, carried over with its measurement:
 |---|---|---|
 | 1 | `TOOL-cBriefedPilot-30` | the protocol declares four parked kinds and `park()` has three callers, none of them mid-run |
 | 2 | `TOOL-cBriefedPilot-31` | `directives()` composes EXTRA; check 16 arm A joins only CORE |
-| 3 | `TOOL-cBriefedPilot-32` | 4 of 15 Tier-1 terminal specs would fail the §8 rule if the skip were lifted |
+| 3 | `TOOL-cBriefedPilot-32` | with the skip neutralised and the REAL gate run: 2 fail §8, 2 fail the §9 rev-log, of 18 terminal Tier-1 specs |
 | 4 | `TOOL-cBriefedPilot-34` | 60 `st=1` sites, 8 of them behind counting helpers |
-| 5 | `TOOL-cBriefedPilot-35` | zero `PASS`/assertion output and zero counter increments in the file |
+| 5 | `TOOL-cBriefedPilot-35` | the row was WRONG — that suite counts. Re-measured over the population: 12 of 27 suites print no count, in 4 spellings, and 3 carry a floor |
 | 6 | `TOOL-cBriefedPilot-38` | three separate predicates joined a frozen historical value to a live present one |
 
 ## Risks
 
 1. **Unit 3 is the one that can red other people's work.** Lifting the Tier-1 skip subjects every
-   Tier-1 spec in the corpus to the terminal-fork and §9-rev assertions. Measured at 4 of 15 before
-   this build's own merge with main; the number is re-measured in the spec and again at build time,
-   because main added specs while cBriefedPilot ran.
+   Tier-1 spec to the terminal-fork and §9-rev assertions. Measured by RUNNING the gate with the cut
+   neutralised: 2 fail §8 and 2 fail the §9 rev-log, of 18 terminal Tier-1 specs, and the two groups
+   need DIFFERENT repairs. rev-1 of that spec reported 4-and-0 from a Python reimplementation and
+   had the attribution inverted for half the files — re-measured at build time, by running the gate.
 2. **Unit 2 has no safe default.** Both branches change a published contract. It is specced, not
    taken, and the build sequences it after the units that cannot block.
 3. **Unit 4 touches 60 call sites in a file that is itself a gate's proof.** A mechanical sweep that
