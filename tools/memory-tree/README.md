@@ -19,7 +19,7 @@ ARCH-bOrderlyAtlas-1.)
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; blank pins turn the unit off. |
-| `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
+| `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). |
@@ -163,7 +163,7 @@ LIVE to SHIPPED, which the source contradicts.
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
 method.
 
-- `skills/session-kickoff/SKILL.md` + `.claude/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
+- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
   the six interactive exits.
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.

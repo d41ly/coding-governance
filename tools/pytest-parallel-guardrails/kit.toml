@@ -1,0 +1,36 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "pytest-parallel-guardrails"
+home = "tools/pytest-parallel-guardrails"
+scope = "repo"
+version_from = { file = "crashprobe.py", pattern = "^KIT_PYTEST_GUARDRAILS_VERSION = " }
+requires = []
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["pyproject-snippet.toml"]
+role = "merged"
+to = "pyproject.toml"
+marker_style = "hash-comment"
+block_id = "govkit:pytest-guardrails"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the kit ships no adopter; adoption is merging its snippet into the target's ini and copying two test files"
+
+[[gate_leg]]
+name = "pytest guardrails selftest"
+argv = ["bash", "{kit}/pytest-parallel-guardrails.test.sh"]
+guard = ["{kit}/"]
+
+[[hole]]
+id = "pytest-ini-knobs"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "the knobs must be SIZED against the target's slowest test, not cargo-culted, and nothing the kit installs observes the target's ini — its own leg grades the SHIPPED snippet. The probe below proves PRESENCE and the ordering rule; it cannot prove sizing, and that limit is stated rather than implied."
+discharge = { command = ["python", "-c", "import sys, tomllib; ini = tomllib.load(open('pyproject.toml','rb'))['tool']['pytest']['ini_options']; need = ('timeout','timeout_method','session_timeout','faulthandler_timeout'); sys.exit(0 if all(k in ini for k in need) and '--max-worker-restart=0' in str(ini.get('addopts','')) and int(ini['faulthandler_timeout']) < int(ini['timeout']) else 1)"] }

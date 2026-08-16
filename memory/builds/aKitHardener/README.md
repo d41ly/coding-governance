@@ -23,4 +23,6 @@ Makes every kit **version-detectable** and every adopt script **re-run-safe**, s
 **Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-14 · streams deployer · ids DEPL-aKitHardener-1
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+
+Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->

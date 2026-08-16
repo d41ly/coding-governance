@@ -11,7 +11,7 @@ ids: TOOL-aLeasedGauntlet-1
 
 Node `a` · opened 2026-07-20 · streams tooling.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -20,4 +20,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | CLOSED | rev-4 | 2026-07-20 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

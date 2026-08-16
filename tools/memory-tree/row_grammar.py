@@ -24,8 +24,9 @@ decision index's own header prescribes is what covers that.
 
 THE PIN IS A COUNT, NOT A REGISTRY. A membership list would put the offending ids in a second place
 and let a deletion there pass unnoticed; a shrink-only count keeps the names single-sourced in the
-document and still reds when the number grows. An UNDECLARED pin is its own refusal, because
-omitting the key is the quietest way to disarm a gate.
+document and still reds when the number grows. An UNDECLARED pin means ZERO — the strictest value,
+never a refusal and never off: a default that can only tighten needs no ceremony, and refusing one
+cost every hygiene fixture and every freshly scaffolded adopter a red bar.
 
 CLI: --check (gate), --report (human), --emit-pin (the current count, for re-pinning), --selftest.
 """
@@ -33,6 +34,9 @@ import os
 import re
 import subprocess
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gen_build_index import unfenced_lines  # the kit's ONE fence reader; see scan()
 
 CHECK = 20
 PIN_KEY = "ROW_DUPLICATE_PIN"
@@ -136,22 +140,29 @@ def row_docs(root, m):
 
 
 def scan(root, conf):
-    """-> (rows, unkeyed, dupes) where dupes is [(path, id, [line numbers])]."""
+    """-> (rows, unkeyed, dupes, loose, open_fences).
+
+    `unkeyed` is [(path, line)] and `open_fences` is [(path, line)] — both carry LOCATIONS, because a
+    bare count tells an operator a rule was broken and not where, and the duplicate branch beside them
+    has always printed path and line.
+
+    Fence handling is DELEGATED to the index generator's reader, which already strips one trailing CR,
+    recognises `~~~`, and closes a fence only with the marker that opened it. This module shipped a
+    private boolean toggle that did none of the three; a second fence machine in one kit is the
+    two-answers class, and this one was the weaker copy.
+    """
     m = conf["MEMORY_ROOT"]
     idre = id_pattern(conf)
     # A ROW leads with a dash and then an id, optionally emphasised. Anything else on the line is
     # prose and is not this check's business.
     rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + idre.pattern + r")\b")
-    rows = unkeyed = loose = 0
-    dupes = []
+    rows = loose = 0
+    unkeyed, dupes, open_fences = [], [], []
     for p in row_docs(root, m):
         seen = {}
-        in_fence = False
-        for n, line in enumerate(read(os.path.join(root, p)).split("\n"), 1):
-            if line.lstrip().startswith("```"):
-                in_fence = not in_fence
-                continue
-            if in_fence:
+        for n, line in unfenced_lines(read(os.path.join(root, p))):
+            if line is None:          # the document ended inside a fence; n is where it opened
+                open_fences.append((p, n))
                 continue
             if GENERIC_ID.search(line):
                 loose += 1
@@ -161,14 +172,14 @@ def scan(root, conf):
                 # leads with a dash AND holds an id somewhere later is the shape that would silently
                 # drop out of a key-merge, so it is counted.
                 if re.match(r"^\s*[-*]\s+", line) and idre.search(line):
-                    unkeyed += 1
+                    unkeyed.append((p, n))
                 continue
             rows += 1
             seen.setdefault(mm.group(1), []).append(n)
         for i, lines in sorted(seen.items()):
             if len(lines) > 1:
                 dupes.append((p, i, lines))
-    return rows, unkeyed, dupes, loose
+    return rows, unkeyed, dupes, loose, open_fences
 
 
 def pin_of(conf):
@@ -190,16 +201,32 @@ def pin_of(conf):
 
 
 def do_check(root, conf):
-    rows, unkeyed, dupes, loose = scan(root, conf)
+    rows, unkeyed, dupes, loose, open_fences = scan(root, conf)
     pin = pin_of(conf)
     bad = []
     if rows == 0 and loose:
         bad.append(f"check {CHECK}: {loose} line(s) under the row documents carry id-shaped text but "
                    f"NOT ONE keyed as a row — the grammar is mis-segmented. (A tree with no ids at "
                    f"all is young, not broken, and stays silent.)")
+    # An open fence is checked BEFORE anything derived from the scan, because a document the reader
+    # could not finish is a document whose row set is unknown — reporting "0 duplicates" over it would
+    # be the silent skip this branch exists to replace.
+    if open_fences:
+        bad.append(f"check {CHECK}: {len(open_fences)} row document(s) end inside a fenced block that "
+                   f"is never closed, so every line after it was unreadable and any duplicate below "
+                   f"it is invisible:")
+        for p, n in open_fences:
+            bad.append(f"    {p}: fence opened at line {n} and never closed")
+        # TERMINAL. The counts below are derived from a read that stopped early, so comparing
+        # them against the pin would turn a partial scan into a pin instruction — "lower it to
+        # N" where N omits everything the fence hid. Refuse first, count later.
+        print(chr(10).join(bad))
+        return 1
     if unkeyed:
-        bad.append(f"check {CHECK}: {unkeyed} dash-led line(s) carry an id the row grammar cannot "
-                   f"key, so a key-merge would drop or duplicate them")
+        bad.append(f"check {CHECK}: {len(unkeyed)} dash-led line(s) carry an id the row grammar "
+                   f"cannot key, so a key-merge would drop or duplicate them:")
+        for p, n in unkeyed:
+            bad.append(f"    {p}:{n}")
     if len(dupes) > pin:
         bad.append(f"check {CHECK}: {len(dupes)} id(s) appear more than once within one row document "
                    f"(pin {pin}, shrink-only) — an index that answers to one id twice has two "
@@ -217,9 +244,14 @@ def do_check(root, conf):
 
 
 def do_report(root, conf):
-    rows, unkeyed, dupes, loose = scan(root, conf)
+    rows, unkeyed, dupes, loose, open_fences = scan(root, conf)
     print(f"rows keyed   : {rows}")
-    print(f"unkeyed rows : {unkeyed}")
+    print(f"unkeyed rows : {len(unkeyed)}")
+    for p, n in unkeyed:
+        print(f"  {p}:{n}")
+    print(f"open fences  : {len(open_fences)}")
+    for p, n in open_fences:
+        print(f"  {p}: opened at line {n}")
     print(f"duplicates   : {len(dupes)}")
     for p, i, lines in dupes:
         print(f"  {p}: {i} at lines {', '.join(str(x) for x in lines)}")
@@ -227,7 +259,14 @@ def do_report(root, conf):
 
 
 def do_emit_pin(root, conf):
-    _rows, _unkeyed, dupes, _loose = scan(root, conf)
+    _rows, _unkeyed, dupes, _loose, open_fences = scan(root, conf)
+    # A pin emitted from a partial read is worse than no pin: it is a NUMBER an operator will
+    # paste into the conf, derived from a corpus the scanner could not finish reading.
+    if open_fences:
+        for p, n in open_fences:
+            print(f"row-grammar: {p} ends inside a fence opened at line {n}; no pin is emitted "
+                  f"from a partial read")
+        return 1
     print(f'{PIN_KEY}="{len(dupes)}"')
     return 0
 
@@ -312,11 +351,48 @@ def do_selftest():
         c7 = _tree(t7, "- ARCH-tOne-1 · one\n\n```\n- ARCH-tOne-1 · an example in a fence\n```\n")
         arm("an id inside a fenced block is not a row", "row-grammar: clean (1 row(s)",
             lambda: cap(t7, c7))
+        # ---- the delegated fence reader. The private toggle this replaced recognised neither of the
+        # ---- first two shapes, and no reader in either kit had the third.
+        t7b = os.path.join(base, "tildefence"); os.makedirs(t7b)
+        c7b = _tree(t7b, "\n".join(["- ARCH-tOne-1 · one", "", "~~~",
+                                    "- ARCH-tOne-1 · an example inside a tilde fence", "~~~", ""]))
+        arm("a ~~~ fence is a fence", "row-grammar: clean (1 row(s)", lambda: cap(t7b, c7b))
+        t7c = os.path.join(base, "nested"); os.makedirs(t7c)
+        c7c = _tree(t7c, "\n".join(["- ARCH-tOne-1 · one", "", "~~~", "```",
+                                    "- ARCH-tOne-1 · content, not a toggle", "```", "~~~", ""]))
+        arm("a ``` marker inside a ~~~ block is content, not a toggle",
+            "row-grammar: clean (1 row(s)", lambda: cap(t7c, c7c))
+        # AC3: the fixture MUST hide a duplicate after the opener. A fixture whose unterminated fence
+        # conceals nothing cannot tell "refused" from "silently skipped" — both print clean.
+        t7d = os.path.join(base, "openfence"); os.makedirs(t7d)
+        c7d = _tree(t7d, "\n".join(["- ARCH-tOne-1 · one", "", "```",
+                                    "- ARCH-tOne-1 · a duplicate the open fence would hide", ""]))
+        arm("an unterminated fence REDS instead of silently hiding the rest",
+            "never closed", lambda: cap(t7d, c7d))
+        arm("the unterminated fence names the line it opened on", "fence opened at line 3",
+            lambda: cap(t7d, c7d))
+        # [14]/[15]: the refusal must be TERMINAL in both modes — a count or a pin derived from a
+        # read that stopped at an unclosed fence is a number an operator would act on.
+        t7e = os.path.join(base, "openfencepin"); os.makedirs(t7e)
+        c7e = _tree(t7e, chr(10).join(["- ARCH-tOne-1 . one", "", "```",
+                                       "- ARCH-tOne-1 . the duplicate the pin exists for", ""]),
+                    pin="1")
+        arm("an open fence stops --check before any pin comparison", "TERMINAL",
+            lambda: "LEAKED" if "lower it to" in cap(t7e, c7e) else "TERMINAL")
+        arm("--emit-pin refuses on a partial read instead of printing a number",
+            "no pin is emitted", lambda: cap(t7d, c7d, do_emit_pin))
         # A dash-led line holding an id the grammar cannot KEY is counted, not ignored.
         t8 = os.path.join(base, "unkeyed"); os.makedirs(t8)
         c8 = _tree(t8, "- ARCH-tOne-1 · one\n- see ARCH-tOne-9 for the rationale\n")
         arm("a dash-led line whose id is not in key position is counted unkeyed",
             "the row grammar cannot key", lambda: cap(t8, c8))
+        arm("an unkeyed line is reported with its path and line, not a bare count",
+            "memory/DECISIONS.md:2", lambda: cap(t8, c8))
+        # AC5: --report and --emit-pin unpack scan() too; rev-1 named neither as a consumer.
+        arm("--report survives the return-shape change", "open fences  : 0",
+            lambda: cap(t, c, do_report))
+        arm("--emit-pin survives the return-shape change", f'{PIN_KEY}="0"',
+            lambda: cap(t, c, do_emit_pin))
 
         # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
         # them executes the resolver — which is exactly how this module shipped a review blocker:

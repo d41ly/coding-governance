@@ -1,0 +1,24 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "check-wiring"
+scope = "repo"
+kind = "flat"
+home = "tools"
+version_from = { file = "check-wiring.sh", pattern = "^KIT_CHECK_WIRING_VERSION=" }
+requires = []
+
+[[files]]
+include = ["check-wiring.sh", "check-wiring.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/check-wiring.sh", "tools/check-wiring.test.sh"]
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a leg and explicitly warns against running the checker itself as a merge-bar leg"
+
+[[gate_leg]]
+name = "wiring-health self-test"
+argv = ["bash", "{prefix}/check-wiring.test.sh"]
+guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]

@@ -21,6 +21,15 @@
     ]
   },
   {
+    "name": "kickoff engine size <=18KiB",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "skills/session-kickoff/SKILL.md",
+      "18432"
+    ]
+  },
+  {
     "name": "kit version markers",
     "argv": [
       "bash",
@@ -194,6 +203,13 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "marker contract (4 readers)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/marker-contract.test.sh"
     ]
   },
   {
@@ -503,6 +519,24 @@
     "guard": [
       "tools/",
       "tools/lib/"
+    ]
+  },
+  {
+    "name": "govkit selfcheck",
+    "argv": [
+      "python",
+      "tools/govkit/govkit.py",
+      "selfcheck"
+    ]
+  },
+  {
+    "name": "govkit selftest",
+    "argv": [
+      "python",
+      "tools/govkit/selftest.py"
+    ],
+    "guard": [
+      "tools/govkit/"
     ]
   }
 ]

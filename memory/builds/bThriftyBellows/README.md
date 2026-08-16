@@ -12,7 +12,7 @@ status: CLOSED
 
 Node `b` · opened 2026-07-16 · streams tooling.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 This build shipped on 2026-07-16 without a spec, before the spec-format ratchet reached it, so its
@@ -23,4 +23,6 @@ the front matter above declares `status:` outright instead of leaving it to be d
 **Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+
+Records live under `build/`.
 <!-- /gen:build-index -->

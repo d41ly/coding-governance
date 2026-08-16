@@ -339,7 +339,63 @@ hit "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done
 # the check. This is the arm that would have caught the two halves disagreeing.
 sed -i 's/^phase: .*/phase: BUILDING/' memory/builds/tRun/RUN.md; git add -A
 miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done"
+
+# ...and ABORTED is NOT a work-claiming phase. It was listed with the other three, so a run that
+# aborted before its first commit — base pinned at HEAD through preflight's degenerate path — red the
+# bar with its own abort record, on the one exit that exists for a run which cannot meet its
+# obligations. The three that remain are the control: dropping ABORTED must not drop them too.
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; git add -A
+miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done"
+for ph in LANDING LANDED VERIFYING; do
+  sed -i "s/^phase: .*/phase: $ph/" memory/builds/tRun/RUN.md; git add -A
+  hit "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read"
+done
 git push -q -f origin "$ANCHOR0":main
+
+# ---- check 15, SECOND HALF: the LANDED witness lies on the history the anchor blesses. A record can
+# ---- claim LANDED with a witness that is a perfectly real commit on the run's own branch and never
+# ---- reached the remote at all - which is the claim this half exists to refuse, and the reason
+# ---- --landed observes rather than asserts.
+reset_tree
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i "s/^witness: .*/witness: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md; git add -A
+hit "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default"
+
+# ...and the GREEN CONTROL: the same record, the same phase, once the witness IS on the anchor.
+# Without this the arm above proves only that check 15 can fire, not that it distinguishes anything.
+sed -i "s/^witness: .*/witness: $ANCHOR0/" memory/builds/tRun/RUN.md; git add -A
+miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ...and a witness that resolves to nothing at all is CHECK 6's question, not check 15's. Asking it
+# twice is a second answer to one question, and check 15 stays silent so the record reds ONCE with
+# the sentence that fits.
+sed -i "s/^witness: .*/witness: 0000000000000000000000000000000000000000/" memory/builds/tRun/RUN.md; git add -A
+out=$(run)
+hit "$out" "a witness looks like a sha and resolves to no commit in this history"
+miss "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ...and the DOUBLE-RED control: a non-sha witness at LANDED reds the SHAPE half and must not also
+# reach the ancestry half, which `fail` not being `continue` used to let happen.
+sed -i 's/^witness: .*/witness: wf_deadbeef-000/' memory/builds/tRun/RUN.md; git add -A
+out=$(run)
+hit "$out" "a record claims LANDED with a witness that is not sha-shaped"
+miss "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ---- check 15, FIRST HALF: sha SHAPE, and it must fire with NO anchor available. This is the half
+# ---- that is deliberately outside check 9's loop: the loop needs a recorded BASE and a resolvable
+# ---- default branch, and on a clone with neither it runs zero times while looking like coverage.
+# ---- The fixture removes BOTH inputs, so a check placed inside the loop cannot pass this arm.
+reset_tree
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: wf_3c665f96-4ff/' memory/builds/tRun/RUN.md
+sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
+hit "$(GOV_DEFAULT_BRANCH= run)" "a record claims LANDED with a witness that is not sha-shaped, so the claim that the work reached the remote cannot be judged at all, and a terminal claim is exactly where an unjudgeable witness costs the most"
+
+# ...and the control that the SHAPE rule is scoped to LANDED. A non-terminal claim may carry a tag or
+# a workflow id — the binding protocol permits all three shapes, and section 3 narrows it for the
+# terminal phases only, because there the ancestry assertion IS the claim.
+sed -i 's/^phase: .*/phase: BUILDING/' memory/builds/tRun/RUN.md; git add -A
+miss "$(GOV_DEFAULT_BRANCH= run)" "a record claims LANDED with a witness that is not sha-shaped"
 
 # ---- check 13: THE AUTHORIZATION, asserted by the BAR. Before this the leg did not contain the
 # ---- marker string at all - it checked the driver's bookkeeping and never the thing the bookkeeping
@@ -481,6 +537,14 @@ reset_tree
 w=$(grep -nE '(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)' "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$w" ] || { echo "FAIL the leg contains a write: $w"; st=1; }
+
+# ---- SOURCE-level: the hot accessors must not fork. `fact_of`, `phase_of` and `core_of` run per
+# ---- run-state file per check, and as `sed | head | tr` they cost three processes each — measured
+# ---- 1094 sed/head/tr spawns across this suite, 278 after. Process spawn dominates on Windows.
+# ---- Comment lines are excluded, or this grep matches the comment that explains the ban — a trap
+# ---- this repo has hit twice and recorded.
+nf=$(grep -nE 'head -1 \| tr -d' "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' || true)
+n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

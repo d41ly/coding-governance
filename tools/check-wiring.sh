@@ -468,11 +468,85 @@ check_merge_rows() {
   fi
 }
 
+# --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------
+# CONTENT, not link-ness. The obvious check — is the install a junction or a symlink — cannot be
+# written portably here: under MSYS an NTFS junction is not reported by `test -L`, it presents as an
+# ordinary directory, so a link test calls every correctly-junctioned Windows node a copy. And
+# link-ness is only a proxy: a junction pointing at a STALE second checkout passes a link test and
+# fails the question this check exists to answer. Comparing bytes answers it directly.
+#
+# NOTHING here writes. The install lives outside every repository, and the deployer build's review
+# record establishes that the deployer's own security rule forbids an out-of-tree write — so `--fix`
+# prints the command and stops, and this arm never increments on the strength of being fixable.
+# (That record is paraphrased rather than cited by id. A non-terminal spec id named from product
+# source counts against the drift bar's shrink-only pin, and this file is inside that population —
+# the same trap the kickoff manifest records having hit once already.)
+check_skill_install() {
+  local inst="${HOME}/.claude/skills/session-kickoff"
+  local rel=skills/session-kickoff
+  local fix f a b bad=""
+
+  if [ ! -d "$inst" ]; then
+    echo "skip     skill     — /session-kickoff not installed on this machine (WIRE-INTO-PROJECT.md §1)"
+    return
+  fi
+  # The repo under inspection is usually an ADOPTER, which has the machine-global install and no
+  # tracked kit source — the skill is installed once per machine, never copied per project. Without
+  # this state the check reports UNWIRED at every SessionStart, forever, in every adopting repo, with
+  # a Fix line naming a command the operator has already run. `check_recall_opened`'s own comment
+  # records where that road ends: a permanent false alarm trains every node to ignore the verifier.
+  if ! git ls-files --error-unmatch -- "$rel/SKILL.md" >/dev/null 2>&1; then
+    echo "skip     skill     — the kickoff kit is not adopted in this repo; the install is machine-global"
+    return
+  fi
+
+  # THE TARGET IS THE PRIMARY WORKTREE, NEVER `$ROOT`. `$ROOT` is the CURRENT worktree, and this arm
+  # is content-keyed against the tracked engine — so it fires precisely on a branch that edits the
+  # engine, which by this project's convention is a linked worktree under `.claude/worktrees/`. That
+  # directory is disposable. An operator who followed a remedy naming it, landed the branch and ran
+  # `git worktree remove` would have a dangling junction and NO `/session-kickoff` on the whole
+  # machine — and this check returns early when the install directory is absent, so the verifier that
+  # caused the breakage could not report it. `git worktree list` puts the main worktree first.
+  local primary
+  primary=$(git worktree list 2>/dev/null | head -1 | sed 's/[[:space:]].*//')
+  [ -n "$primary" ] || primary="$ROOT"
+  case "$(uname -s 2>/dev/null || echo unknown)" in
+    MINGW*|MSYS*|CYGWIN*)
+      # PowerShell wants backslashes throughout; the path arrives forward-slashed under MSYS, so the
+      # whole target is converted rather than concatenated across two separator conventions.
+      fix="New-Item -ItemType Junction -Path \"\$env:USERPROFILE\\.claude\\skills\\session-kickoff\" -Target \"$(printf '%s\n' "$primary/$rel" | tr '/' '\\')\"" ;;
+    *)
+      fix="ln -sfn $primary/$rel ~/.claude/skills/session-kickoff" ;;
+  esac
+
+  for f in SKILL.md MANIFEST-TEMPLATE.md manifest-check.sh; do
+    if [ ! -f "$inst/$f" ]; then
+      echo "UNWIRED  skill     — the installed engine is missing $f, so /session-kickoff is running an incomplete kit. Fix: $fix"
+      unwired=$((unwired+1))
+      return
+    fi
+    # BOTH halves. `skills/session-kickoff/SKILL.md` carries an eol=lf pin and this fleet runs
+    # core.autocrlf=true, so a Windows checkout can hold CRLF on either side. Normalise both through
+    # the same filter or the comparison reports every line as drift on a file nobody touched.
+    a=$(LC_ALL=C tr -d '\r' < "$inst/$f" | cksum)
+    b=$(LC_ALL=C tr -d '\r' < "$ROOT/$rel/$f" | cksum)
+    [ "$a" = "$b" ] || bad="$bad $f"
+  done
+
+  if [ -n "$bad" ]; then
+    echo "UNWIRED  skill     — the installed engine differs from tracked in:${bad}; this session is running a different engine than this repo ships. Fix: $fix"
+    unwired=$((unwired+1))
+    return
+  fi
+  echo "ok       skill     — the installed /session-kickoff engine matches tracked"
+}
+
 check_hooks
 check_agentcap
 check_recall_opened
 check_merge_rows
 check_eol
+check_skill_install
 
 [ "$MODE" = session ] && exit 0
 [ "$unwired" = 0 ] && exit 0 || exit 1

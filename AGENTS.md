@@ -25,7 +25,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
   over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
   `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
-  five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
+  stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
   that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
   `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
@@ -51,7 +51,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
   `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
   `memory/archive/`.
-- `.memory-tree.conf` · `.claude/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
+- `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
 
 ## Node registry
 
@@ -94,7 +94,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
-- template size ≤32 KiB — `tools/check-template-size.sh`
+- template size ≤32 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
+  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
+  positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - verdict epoch — `tools/memory-tree/check-verdict-epoch.sh` (+ self-test): the kit version DATES the engine's verdicts, so a diff that moves a non-comment line of `check-memory-hygiene.sh` must move `KIT_MEMORY_TREE_VERSION` too — `hygiene-parity.test.sh` derives its baseline floor from that constant, and a stale one made the floor point before the change
 - row-keyed merge driver replay — `tools/memory-tree/merge-rows.test.sh` (the driver `tools/memory-tree/merge-rows.py`, launched through the kit's own `merge-rows.sh` (which carries the resolver inline, so a copy-installed kit can start it; `tools/lib/` is gov-internal and ships nothing), splits every line by SHAPE into ROW and STRUCTURE, hands structure to `git merge-file` positionally, key-merges only the row set, and recombines through a token skeleton — so `memory/DECISIONS.md` and `memory/backlog/*.md` auto-resolve an append-collision without duplicating, dropping or misfiling a row, and an unresolvable anchor grammar becomes a conflict rather than a silent take-ours). **The bar is mechanical: never worse than `git merge-file` on the same three blobs.** Every case runs a live control; conflicting where git resolves correctly is counted by name against a shrink-only constant (2 today: a row one side MOVED and the other DELETED, both directions), never hidden. Per-node: `bash tools/check-wiring.sh --fix` sets `merge.rows.driver`
@@ -124,7 +126,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   remote's own HEAD advertisement, never read from a local ref and never named by the environment —
   both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
   under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
-  (thirteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  (fifteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
   the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the
@@ -144,6 +146,20 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
+  DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
+  and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under
+  `tools/`, everything under `.githooks/` and `skills/session-kickoff/`, and the shipped root playbook
+  files is an entry, a member of exactly one entry's file rules, or an exemption carrying a reason. An
+  exemption naming a path that no longer exists reds, because a stale one silently widens the surface
+  it was written to narrow. **No population count is written in the spec or the registry** — the leg
+  derives every one, after the spec twice stated a figure the tree then moved underneath. Its first
+  run over the real tree found seven problems, three of them real, which is why a new predicate is run
+  before it is trusted rather than after. `plan` and `check` are READ-ONLY and their leg is
+  `python tools/govkit/selftest.py`, whose arms assert a specific MESSAGE or on-disk effect and
+  never an exit code alone — including the on-disk arm that `plan` leaves the target byte-identical
+  a read-only verb that writes is the whole risk of that verb. It found two real defects on its
+  first run, one of them a token regex matching the `{k}` inside a shell `${k}`
 
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
@@ -151,7 +167,10 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
   the engines carrying their arms in a `--selftest` mode rather than a sibling file —
   `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
-  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  `tools/memory-tree/row_grammar.py`. Beside them rides the marker-region contract itself,
+  `tools/memory-tree/marker-contract.test.sh`, which drives all four live readers of the
+  generated-region markers over one case table — the contract lives in that table, not in prose.
+  This is the list the charter-completeness signal reads, not a
   claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default

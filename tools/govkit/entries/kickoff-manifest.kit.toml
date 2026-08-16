@@ -1,0 +1,47 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "kickoff-manifest"
+scope = "repo"
+kind = "flat"
+home = "skills/session-kickoff"
+version_from = { file = "manifest-check.sh", pattern = "^KIT_MANIFEST_VERSION=" }
+requires = []
+
+[[files]]
+include = ["manifest-check.sh"]
+role = "engine"
+to = "{prefix}/manifest-check.sh"
+
+[[files]]
+include = ["MANIFEST-TEMPLATE.md"]
+role = "seed"
+to = "{manifest_path}"
+
+# Machine-scoped: the engine installs ONCE PER MACHINE as a junction outside the target repo, so
+# `apply` writes nothing for it and emits an order instead.
+[[files]]
+include = ["SKILL.md"]
+role = "engine"
+scope = "machine"
+link = true
+to = "{user_skills}/session-kickoff"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "installation is a copy plus a per-machine link; the manifest's own section B is the hole"
+
+[[gate_leg]]
+name = "kickoff-manifest ratchet"
+argv = ["bash", "{prefix}/manifest-check.sh"]
+guard = []
+history_depth = "full"
+red_after_land = true
+
+[[hole]]
+id = "manifest-section-b"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "MEASURED: the ratchet exits 1 on a copied-and-unfilled template, failing its placeholder check and its stamp check together, and exits 2 with no manifest at all. There is no install of this kit that leaves its leg at exit 0 without an authoring step. The probe is the WHOLE check, not the placeholder grep: filling every placeholder and stamping a well-formed but foreign sha passes the grep and still reds the leg."
+discharge = { command = ["bash", "{prefix}/manifest-check.sh"] }

@@ -1,0 +1,59 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "codebase-map"
+home = "tools/codebase-map"
+scope = "repo"
+version_from = { file = "map_lib.py", pattern = "^KIT_CODEBASE_MAP_VERSION = " }
+requires = ["memory-tree"]
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["map_extractors.py"]
+role = "project-owned"
+
+[[files]]
+include = ["map_extractors.template.py"]
+role = "seed"
+to = "{kit}/map_extractors.py"
+
+[[files]]
+include = [".codebase-map.conf.example"]
+role = "engine"
+
+[config]
+file = ".codebase-map.conf"
+owner = "codebase-map"
+required_keys_gate = ["MAP_ROOT", "GATE_FILE"]
+required_keys_render = ["MAP_ROOT"]
+optional_keys = ["MAP_DIFF_CMD"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-codebase-map.sh", "--scaffold"]
+mutates_index = false
+
+[[outcome]]
+code = 1
+probe = { must_exist = ".codebase-map.conf", must_not_exist = "{kit}/map_extractors.py" }
+means = "seeded-conf"
+
+[[outcome]]
+code = 1
+probe = { must_exist = "{kit}/map_extractors.py", must_not_exist = "{map_root}/generated" }
+means = "seeded-extractors-or-crashed"
+
+[[gate_leg]]
+name = "codebase-map coverage"
+argv = ["python", "{gate_file}"]
+guard = []
+history_depth = "full"
+
+[[hole]]
+id = "map-extractors"
+kind = "authoring"
+blocks_adopt = true
+blocks_gate = true
+why = "the template raises on an empty EXTRACTORS dict and gen_map calls inventory_ids() at module level, so the adopter exits 1 with no map tree, no baseline and no gate file. The leg is then ABSENT rather than red, which a runner that skips a missing leg would score green."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import map_extractors as e; sys.exit(0 if e.EXTRACTORS else 1)"] }

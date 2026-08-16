@@ -78,19 +78,35 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 [ "$out" = HALTED ] && [ "$rc" = 3 ] || bad "the caller could not halt on failure (out='$out' rc=$rc)"; ok
 
 # ---- 2. PARITY ----------------------------------------------------------------------------------
-# The canonical block, and every tracked file that carries a copy of it.
-blk() { awk '/^# >>> resolve_python/{f=1} f{print} /^# <<< resolve_python/{if(f)exit}' "$1"; }
-want=$(blk "$CANON")
-[ -n "$want" ] || bad "the canonical resolver has no marked block"; ok
-copies=$(cd "$ROOT" && git grep -l '^# >>> resolve_python' -- '*.sh' | grep -v '^tools/lib/resolve-python' || true)
-[ -n "$copies" ] || bad "no inline copy found — the parity arm would be judging an empty population"; ok
-while IFS= read -r rel; do
-  [ -n "$rel" ] || continue
-  if [ "$(blk "$ROOT/$rel")" != "$want" ]; then
-    bad "inline copy drifted from tools/lib/resolve-python.sh: $rel"
-  fi
-  ok
-done <<<"$copies"
+# A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly
+# one row for a long time and read as a population; it was not one — the marker was hardcoded in both
+# the extractor and the discovery grep, so a second shared predicate had nowhere to join. The kickoff
+# kit's `region()` is that second predicate: `tools/lib/` is gov-internal and ships nothing, so a
+# copy-installed kit cannot source a shared library and must carry the function inline. An inline copy
+# of a hard-won predicate with no parity gate is precisely what this arm exists to police.
+#
+# Each row is:  <marker-stem>|<canonical file>|<prefix excluded from the copy population>
+PARITY_ROWS="
+resolve_python|$CANON|tools/lib/resolve-python
+kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
+"
+blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2"; }
+while IFS='|' read -r stem canon excl; do
+  [ -n "$stem" ] || continue
+  want=$(blk "$stem" "$canon")
+  [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
+  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' | grep -v "^$excl" || true)
+  # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
+  # pass by judging nothing, which is the vacuity this whole file refuses.
+  [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    if [ "$(blk "$stem" "$ROOT/$rel")" != "$want" ]; then
+      bad "inline copy of '$stem' drifted from $canon: $rel"
+    fi
+    ok
+  done <<<"$copies"
+done <<<"$PARITY_ROWS"
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

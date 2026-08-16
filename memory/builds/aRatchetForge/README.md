@@ -21,4 +21,6 @@ coding-governance `main` and retrofitted into nicocares. Records:
 **Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-12 · streams kickoff · ids KICK-aRatchetForge-1
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

@@ -122,4 +122,6 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
 | [PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`](spec/2026-07-19-spec-PLAY-aPrunedCeremony-4.md) | CLOSED | rev-4 | 2026-07-19 |
 | [TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md) | CLOSED | rev-4 | 2026-07-19 |
 | [TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md) | CLOSED | rev-3 | 2026-07-19 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

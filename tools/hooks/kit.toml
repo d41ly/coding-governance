@@ -1,0 +1,28 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "agent-cap"
+home = "tools/hooks"
+scope = "repo"
+version_from = { file = "agent-cap.js", pattern = "KIT_AGENT_CAP_VERSION = " }
+requires = ["settings-merge"]
+
+# TWO destinations for ONE source. The kit copy AND the wired copy are both required: the parity arm
+# fails outright when the wired copy is absent, so a single-destination model reds it in every target.
+[[files]]
+include = ["agent-cap.js"]
+role = "engine"
+to = ["{prefix}/hooks/agent-cap.js", ".claude/hooks/agent-cap.js"]
+
+[[files]]
+include = ["agent-cap.test.sh"]
+role = "engine"
+to = "{prefix}/hooks/agent-cap.test.sh"
+
+[adopt]
+argv = ["python", "{prefix}/settings-merge.py"]
+mutates_index = false
+
+[[gate_leg]]
+name = "agent-cap selftest"
+argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
+guard = ["{prefix}/hooks/"]

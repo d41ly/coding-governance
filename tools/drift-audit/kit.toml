@@ -1,0 +1,78 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "drift-audit"
+home = "tools/drift-audit"
+scope = "repo"
+version_from = { file = "drift_report.py", pattern = "^KIT_DRIFT_AUDIT_VERSION = " }
+requires = ["memory-tree"]
+
+[[files]]
+include = "**"
+role = "engine"
+
+[[files]]
+include = ["drift_signals.py"]
+role = "project-owned"
+
+[[files]]
+include = ["drift_signals.template.py"]
+role = "seed"
+to = "{kit}/drift_signals.py"
+
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/drift-audit/SKILL.md"
+placeholders = ["KIT_DIR", "WORKFLOWS_DIR", "MEMORY_ROOT"]
+
+[config]
+file = ".memory-tree.conf"
+owner = "memory-tree"
+required_keys_render = ["MEMORY_ROOT"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-drift-audit.sh"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = "{kit}/drift_signals.py" }
+means = "adopted"
+
+[[gate_leg]]
+name = "drift-audit selftest"
+argv = ["python", "{kit}/selftest.py"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "drift-audit records"
+argv = ["python", "{kit}/drift_report.py", "--check"]
+guard = []
+history_depth = "full"
+
+[[hole]]
+id = "drift-product-globs"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "PRODUCT_GLOBS ships empty and the oracle then searches with no pathspec, so every non-terminal spec cites its own id. An unfilled hole here does not silence the signal, it INVENTS one: measured, same tree, same spec — empty globs report OVER PIN, one correct glob reports none."
+discharge = { command = ["python", "-c", "import subprocess, sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(1) if not d.PRODUCT_GLOBS else [sys.exit(1) for g in d.PRODUCT_GLOBS if not subprocess.run(['git','ls-files','--',g],capture_output=True,text=True).stdout.strip()] and sys.exit(0) or sys.exit(0)"] }
+
+[[hole]]
+id = "drift-trace-cutoff"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "TRACE_CUTOFF ships empty and the engine then returns gateable:False for closed_specs_with_no_product_commit — correct on day one, and permanently inert if nobody ever fills it. Unlike drift-product-globs an unfilled hole here INVENTS nothing, it just never speaks: the adopter keeps a signal that reads 0 of 0 forever while the gate stays green, which is the dead-instrument class this kit exists to refuse."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'TRACE_CUTOFF', '') or '').strip() else 1)"] }
+
+[[hole]]
+id = "drift-pins"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = true
+why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
+discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }

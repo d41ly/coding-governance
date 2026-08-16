@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-10
 streams: deployer+tooling
 roster: DEPL+TOOL
-ids: DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1
+ids: DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 ---
 
 # aSealedCaravan — one install prefix, and a deployer that lands the chain mechanically
@@ -20,14 +20,37 @@ reading the runbook.
 
 ## Start here
 
-**State.** Unit 1 is BUILT — three commits, full bar green at 41/41 — and green on
-`branch/governance-adoption-kit-9bc273`, not yet landed on `main`. Unit 2 is SPECCED at rev-4. Both
-were reviewed once (Tier-2, 5 lenses, 48 confirmed findings, 6 blockers — all folded).
+**State.** Unit 1 is CLOSED — built, reviewed, and landed on `main` at `82e6dcf`. Unit 2 is
+INPROGRESS at rev-7 and is the whole remaining build. It has been reviewed three times: at rev-1
+alongside unit 1, as an M4 spec audit at rev-5 that returned **BLOCKED** with seven blockers, and as a
+scoped re-audit of that fold at rev-6 that returned **BLOCKED** with two. Both folds are in.
 
-**Next action.** Merge unit 1 to `main`, then flip its spec to CLOSED — the status is INPROGRESS
-rather than CLOSED because "built" and "landed" are different claims. Unit 2
-(`DEPL-aSealedCaravan-2`) is unblocked the moment that lands: its install plan is written against
-the prefix unit 1 just made true. Its rollout commit 1 is the registry plus `selfcheck`.
+**Classification (M2), written before acting on it.** Unit 2 was FORKED — §8 carried three
+unresolved items — became READY at rev-5, and each audit then sent it back. It is READY at rev-7.
+§2, §6, §7 and §10 are all filled and name observable checks.
+
+**Next action.** Rollout commit 1 — `registry.toml`, a `kit.toml` per registry entry, and `selfcheck`.
+**Stop auditing this document.** Precision fell 0.50 → 0.25 across the two passes on a narrowing
+scope, every rev-7 edit was a repair between two paragraphs of one earlier pass rather than a design
+gap, and the re-audit's own closing advice is that a further pass finds prose about the design instead
+of defects in it.
+
+**LANDING IS BLOCKED, and not by this build.** The unattended driver tests the run's pinned BASE by
+EQUALITY where its own gate leg deliberately tests ANCESTRY, so reconciling `origin/main` — which the
+mandated lander does before the gate anyway — wedges `--preflight` and `--close`. The run-state file's
+generated region cannot be re-spliced, which reds the bar. Filed as a backlog row and parked in
+`RUN.md` with the options; deliberately NOT repaired here, because the protocol names a run editing
+this kit as the first bypass it cannot close.
+
+**What rev-6 changed, because four blockers land inside rollout commit 1.** The registry could not be
+written as specified: `[[files]]` carried no destination, so four entries had nowhere to land; two
+selectable kits have no version constant, which the completeness criterion assumed; that criterion
+quantified over `tools/*` directories and missed every single-file deployable the runbook already
+prescribes; and the unattended kit — a full kit on `main` with an adopter, a rendered Skill and five
+gate legs — appeared in no entry, no inventory row, no selection set and no exemption. Three more
+blockers made criteria unsatisfiable rather than merely incomplete. Every population count is gone
+from the spec: `selfcheck` derives them now, because both counts it previously stated were true when
+measured and false when read.
 
 **Nothing blocks either unit.** The one blocking pair — unit 1's F3 and unit 2's F5, both about
 `tools/lib/` — resolved on 2026-08-10: it is not a kit, it ships nothing, and it becomes a permanent
@@ -47,20 +70,27 @@ reasoning at rev-1 and by running it at rev-2: 95 hits across 37 files naive, 50
 That turned two invented scope items into two measured ones (S12, S13) and a guessed waiver list into
 a four-entry registry. Every number in both specs is now measured or marked.
 
-**Forks.** Six were open; four are resolved (2026-08-10) — the ratchet lands flat at
+**Forks.** All nine are resolved. Six on 2026-08-10 by the owner — the ratchet lands flat at
 `tools/manifest-check.sh`, the prefix gate polices the shipping surface only, the memory-tree kit
-ships its own `merge-rows.sh`, and `tools/govkit/` is ratified over the research's `deploy/`. Unit 1
-is fully resolved and carries the ratified pointer. Unit 2's F2, F3 and F4 stay open deliberately:
-none blocks a build, and each wants the read-only `plan`/`check` slice to exist first.
+ships its own `merge-rows.sh`, `tools/govkit/` is ratified over the research's `deploy/`, and
+`tools/lib/` is a permanent registry exemption. The last three on 2026-08-11 by the agent under this
+folder's standing mandate: the target descriptor lives in the target, `check-arms.py` stays
+shell-only with the guarantee moved to the test layer, and a pre-existing red gate in a target is
+measured as a baseline rather than treated as a refusal. Both specs carry the ratified pointer.
+Deferring the last three until the `plan`/`check` slice existed was rev-4's plan; it was abandoned
+because a fork resolved mid-build is a rewrite, and all three proved answerable from what the spec
+already stated.
 
-Records live under `spec/` and, once built, `build/` and `reviews/`. The table below is GENERATED
+The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 TOOL-aSealedCaravan-1
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | SPECCED | rev-4 | 2026-08-10 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-7 | 2026-08-11 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

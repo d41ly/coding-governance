@@ -1,0 +1,25 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+
+id = "gate-lint"
+home = "tools/gate-lint"
+scope = "repo"
+version_from = { none = "no version constant exists in this kit; measured 2026-08-11. --all-selectable, so AC8's predicate falls back to the sentinel path below." }
+requires = []
+sentinel = "tools/gate-lint/ps-hygiene.py"
+
+[[files]]
+include = "**"
+role = "engine"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the kit ships no adopter. Its README carries no copy or install instruction either, and the runbook's claim that the README hands leg wiring to the consuming project is not borne out by the README — recorded as a gap rather than papered over."
+
+[[hole]]
+id = "gate-lint-leg-wiring"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = false
+why = "the kit declares no legs of its own and no document says which lints a target should wire. Nothing in a target observes this, which is why it is declared as a hole rather than left as silence."
+discharge = { command = ["bash", "-c", "exit 1"] }

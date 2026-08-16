@@ -2,7 +2,6 @@
 # One '<repo-relative-path> · <why>' row each. The 'why' is the sentence a future author reads when
 # deciding whether their new carrier is the next pointer or the first summary.
 # Keyed on PATH alone, never <path>:<line> — that keying is what unpinned install-prefix-waivers.txt.
-.claude/SESSION-KICKOFF.md · the kickoff manifest's section B points a starting session at the method
 .claude/skills/unattended/SKILL.md · rendered; its step 0 tells an unattended run to read the method first
 AGENTS.md · the charter's Conventions row, the only carrier that reaches a session with no invocation
 skills/session-kickoff/SKILL.md · Step 5b's hand-back loads the method before the first pass
@@ -12,3 +11,5 @@ tools/unattended/SKILL.template.md · the source of the rendered Skill's step 0
 tools/unattended/unattended.sh · verb_resume echoes the method path to a resuming run
 tools/memory-tree/HYGIENE.template.md · the shipped hygiene rules describe this registry, and naming what it guards names the method
 .memory-tree.conf · its READ_PATH_CEILING comment names the method as the largest read-path member
+tools/memory-tree/kit.toml · the deployer descriptor names the method as a RENDERED artifact of this kit — a destination, never a restatement
+tools/drift-audit/drift_signals.py · TRACE_CUTOFF cites the commit that landed the method, because that commit is what dates the commit-subject convention this signal judges

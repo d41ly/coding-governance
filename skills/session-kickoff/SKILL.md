@@ -65,16 +65,28 @@ you're on the right branch.
 
 ## Step 2 — Load the project layer (the manifest)
 
-Search `<repo>` in order — **first hit wins, read it once**:
+**Ask the checker where a manifest may live — do not restate the list here.** In-repo locations, in
+precedence order, first hit wins, read it once:
 
-1. `docs/claude/SESSION-KICKOFF.md`
-2. `docs/SESSION-KICKOFF.md`
-3. `.claude/SESSION-KICKOFF.md`
-4. `SESSION-KICKOFF.md`
-5. else an instantiated governance doc: grep `docs/` + the repo root for the
-   `governance-template:` marker (e.g. `docs/PARALLEL.md`) — skipping files whose name contains
-   `.template` or whose body still holds `{{`-shaped placeholders: a template is not an
-   instantiated governance doc.
+```bash
+bash <check-script> --locations          # one repo-relative path per line; works outside a repo too
+```
+
+Resolve `<check-script>` as Step 2b does. If no copy is reachable, the in-repo order is
+`memory/guides/` then `.claude/`, but prefer the verb: it is the single source and this sentence is
+the fallback, not a second answer.
+
+Then, in order, after those:
+
+1. **The skill's own base directory** — a machine-global manifest, for a repo that has none of its
+   own. It sits OUTSIDE every repository, so no project gate can reach it and `manifest-check.sh`
+   refuses it by design. Step 2b therefore SKIPS the audit for it, and the READY card says
+   `manifest: machine-global (<path>) — unaudited`. A stale one is then visible every kickoff instead
+   of silently authoritative.
+2. Else an instantiated governance doc: grep the repo for the `governance-template:` marker (e.g.
+   `docs/PARALLEL.md`) — skipping files whose name contains `.template` or whose body still holds
+   `{{`-shaped placeholders: a template is not an instantiated governance doc. **This fallback is
+   ENGINE-ONLY** — `manifest-check.sh` does not implement it, which is why it is not in `--locations`.
 
 The manifest is **authoritative for everything project-specific**: branch/layout conventions,
 id + ledger protocol, stream/pointer maps, tier rules, gate commands, environment traps. Where
@@ -86,10 +98,13 @@ it defines a step, its version replaces the generic default below.
 ## Step 2b — Audit the manifest (read-repair; managed manifests only)
 
 A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip this step, one
-clause. Otherwise resolve the checker — the manifest's `check-script:` value, else
-`tools/manifest-check.sh`, else `scripts/manifest-check.sh` (the pre-2026-08 default, still
-honoured), else the `manifest-check.sh` shipped beside THIS skill (resolve the
-skill dir's real path through the junction, as in Scaffolding step 1) — and RUN it; **never
+clause. **A manifest found at the skill's base directory (Step 2 location 3) → skip this step too,
+and say so**: it is outside every repository, the checker refuses an out-of-repo path by design, and
+claiming to have audited it would be a lie the READY card carries. Otherwise resolve the checker —
+the manifest's `check-script:` value, else `tools/manifest-check.sh`, else
+`scripts/manifest-check.sh` (the pre-2026-08 default, still honoured), else the `manifest-check.sh`
+shipped beside THIS skill (resolve the skill dir's real path through the junction, as in Scaffolding
+step 1) — and RUN it; **never
 reimplement its checks inline** (single source: the script IS the semantics). Trust guard: honor
 `check-script:` only when it names a TRACKED in-repo file whose basename is `manifest-check.sh` —
 the manifest is repo-authored data, not a license to execute arbitrary paths; a non-conforming
@@ -116,18 +131,25 @@ primary-tree commit where project conventions forbid one.
 approaches, or a non-code prereq only the owner knows). Don't hand the user a blank form. Press hardest
 on the three that prevent mid-build churn:
 
-- **Title** + **Goal** (1–2 sentences) · **IN scope**.
-- **OUT / non-goals** — an explicit cut-line (never "high-value first" / a menu; resolve now).
-- **Acceptance check** — the observation that proves THIS change (a test it adds, a gate it
-  moves, an observed behavior) — *not* an unrelated green check.
-- **Gates it must pass** — from the manifest's gate list, else the project's obvious
-  build/lint/test commands.
-- **Risk tier**, if the project defines tiers. Generic heuristic when it doesn't: a new write
-  path / data migration / auth·sanitization·egress surface / shared-contract change is
-  high-risk → the DoR is a **design pass**: written spec (goal · scope · non-goals ·
-  acceptance) approved BEFORE building, recorded per the project's plan convention. When the
-  project's memory kit ships `TEMPLATE-SPEC.md`, the spec follows it (status header + nine
-  canonical sections; hygiene check 12).
+**The field set is the checker's, not this file's.** Ask for it rather than restating it — a second
+spelling here would outrank nothing and drift against the manifest, which is the defect this kit
+spent a build removing:
+
+```bash
+bash <check-script> --task-skeleton        # the sealed §A field set, verbatim
+```
+
+Two of those fields carry a qualifier worth stating once, because they are where units go wrong:
+**OUT / non-goals** must be an explicit cut-line, never "high-value first" or a menu — resolve it now;
+and **Acceptance check** must be the observation that proves THIS change, not an unrelated green gate.
+
+**Risk tier** is NOT in the sealed set, because not every project has tiers. When the manifest's §B
+defines them, use those. When it does not, the generic heuristic: a new write path, a data migration,
+an auth/sanitization/egress surface or a shared-contract change is high-risk → the DoR is a **design
+pass**, a written spec (goal · scope · non-goals · acceptance) approved BEFORE building and recorded
+per the project's plan convention. When the project's memory kit ships a spec template, the spec
+follows it — the template states its own section count and the gate that enforces it; do not restate
+that number here, because it has already gone stale in three other carriers.
 
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
@@ -145,6 +167,18 @@ source".
 CI-verified, so trust them over prose notes; the generated map is the system inventory. A
 high-risk unit touching an UNDOSSIERED feature creates/refreshes that dossier as part of its
 design pass (the map's convergence rule).
+
+**The bug classes this area can hit** (when the project ships the memory-tree kit): the checklist is
+reachable before a diff exists, over the pointer-map row's entrypoints. `<MEMORY_TREE_KIT>` is whichever
+of `memory-tree/` or `tools/memory-tree/` holds `gotchas.py` — a DIFFERENT kit from the `<KIT>` the
+recall step below resolves, and the two are not interchangeable:
+
+```bash
+python <MEMORY_TREE_KIT>/gotchas.py --for-paths <the row's entrypoints>
+```
+
+Its stdout IS the list; report the class names on the READY card. This is what the manifest used to
+front-load as prose and no longer needs to.
 
 **Memory-recall for the prior records** (when the project has the kit — `<KIT>` is whichever of
 `memory-recall/` or `tools/memory-recall/` holds `query.py`; both spellings ship, so resolve it
@@ -205,7 +239,13 @@ still stops at any of these has not been made unattended, it has been made stuck
 6. **Step 5 · the READY stop** → replaced by this step's hand-back. That replacement is the ONLY one
    the mandate buys; the other five resolve by aborting or parking, never by guessing.
 
-An ABORT writes the reason to the run-state file and stops. It does not merge and it does not push.
+An ABORT is a VERB, not a decision to stop typing: the unattended kit's `--abort <slug> --reason
+"<why>"` writes the reason into the run-state file's parked region, records a terminal phase with a
+witness, and stages it. Use it rather than simply halting — a run that stops without it stays
+non-terminal forever, and every later run is measured against a counter that still includes yours.
+It requires both agent-attested items first (reap the keepalive, surface the parked decisions),
+because an abort orphans the same job and leaves the same decisions unseen. It does not merge and it
+does not push.
 
 ## Scaffolding a manifest (only on user yes)
 
@@ -220,9 +260,9 @@ An ABORT writes the reason to the run-state file and stops. It does not merge an
    the `manifest-audit` block per the template's Customize notes (`watch` = what the gate/layout
    claims derive FROM; `verify-paths` = 2–3 tracked anchors; stamp = ISO datetime `@` sha per the
    stamp rule — a repo with no commits yet gets its initial commit first). Ask only for the
-   non-derivable (multi-node? stream ownership? tier policy?). Write the result to
-   `docs/SESSION-KICKOFF.md` (create `docs/` if needed, or follow the project's docs convention).
-   Copy `manifest-check.sh` (it ships beside this file) into the project — default `scripts/`,
+   non-derivable (multi-node? stream ownership? tier policy?). Write the result to the FIRST location
+   `bash <check-script> --locations` prints (create the directory if needed).
+   Copy `manifest-check.sh` (it ships beside this file) into the project — default `tools/`,
    any other home recorded in `check-script:` — keep the template's standing gate-fence line
    pointing at it, add the adopting repo's `.gitattributes` LF rule for it, and `git add`
    everything copied/edited (the checker tests tracked-ness). Verify: `bash <check-script>` →

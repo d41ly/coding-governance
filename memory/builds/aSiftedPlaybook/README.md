@@ -37,7 +37,7 @@ Both figures are BASE-time snapshots — every unit re-measures from the gate ra
 number out of this paragraph. `PLAY-aCandidStub-2` (externalize §14) is therefore **decoupled, not
 closed** — the owner kept it OPEN on 2026-08-16, re-justified on readability rather than bytes.
 
-Records live under `spec/`, `reviews/` and `build/`. The table below is GENERATED from the status
+The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -52,6 +52,8 @@ header of every spec in this folder — do not hand-edit it.
 | [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-4 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-7 | 2026-08-16 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)

@@ -11,11 +11,13 @@ terminal status. Nothing here is edited by hand.
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
-| [aMooredAnchor](builds/aMooredAnchor/README.md) | INPROGRESS | a | 2026-08-11 | tooling | 3 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
-| [aSealedCaravan](builds/aSealedCaravan/README.md) | SPECCED | a | 2026-08-10 | deployer+tooling | 2 |
+| [aSealedCaravan](builds/aSealedCaravan/README.md) | INPROGRESS | a | 2026-08-10 | deployer+tooling | 10 |
 | [aSiftedPlaybook](builds/aSiftedPlaybook/README.md) | SPECCED | a | 2026-08-16 | playbook+tooling | 7 |
 | [aTimedTurnstile](builds/aTimedTurnstile/README.md) | INPROGRESS | a | 2026-08-11 | tooling | 8 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
+| [cBriefedPilot](builds/cBriefedPilot/README.md) | OPEN | c | 2026-08-14 | tooling+playbook | 22 |
+| [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
+| [dClosedLexicon](builds/dClosedLexicon/README.md) | SPECCED | d | 2026-08-16 | playbook+tooling | 1 |

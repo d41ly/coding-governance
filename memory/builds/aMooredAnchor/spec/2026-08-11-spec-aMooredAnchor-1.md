@@ -1,6 +1,6 @@
 # TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips
 
-**Status:** INPROGRESS · rev-4 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · review wf_cc04b49a-8d3
+**Status:** CLOSED · rev-5 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · review wf_cc04b49a-8d3
 
 ## 1. Goal
 
@@ -300,11 +300,15 @@ Dissolved by A's withdrawal. Rev-1 could not have answered it anyway: its premis
 run-state files are "almost never", and they are the steady state of every adopter that has completed
 a run.
 
-### F5 — OPEN, for the owner
+### F5 — RESOLVED (superseded, 2026-08-11)
 
 `git ls-remote --symref origin HEAD` returned empty against a plain `git init --bare` origin in two
 independent fixtures. This does not block this unit, which asks no remote anything. It is recorded
 because F1's follow-up will want it and it is not automatic.
+
+RESOLVED elsewhere: `aStandingWrit` S0 hit exactly this while making the anchor an observation of
+the remote, and its fixture now sets the bare repo's HEAD symref explicitly before any arm runs.
+The answer is in `unattended.test.sh`, not here. Nothing for the owner to decide.
 
 ## 9. Revision log
 
@@ -334,6 +338,15 @@ because F1's follow-up will want it and it is not automatic.
   verified absent there before re-applying: the marker-line grammar, the terminal-record lifecycle,
   the word-split population loop, and the replace-ref/graft PRESENCE refusal. F1 is therefore moot
   for this unit — the anchor is `TOOL-aMooredAnchor-2` and now also `aStandingWrit`'s §9.
+
+- rev-5 · 2026-08-11 · CLOSED. Landed at `7890bec`. `TOOL-aMooredAnchor-4` built in the same
+  pass: the two sibling self-tests were costing 77s and 73s for ~1.4s of CPU apiece, and the cause
+  was NOT the git calls. `fact`, `fact_of`, `phase_of` and `core_of` were each `sed | head | tr` —
+  three processes per call, called per run-state file per check. Converted to pure bash, plus the
+  two `--plan` sites to a single awk: **1094 sed/head/tr spawns to 278, a 75% cut**, both suites
+  green at 74 and 103 assertions. Measured by process COUNT rather than wall clock, because ten
+  worktrees share this box and wall time moved 20% between two runs of identical code. Pinned by a
+  source-level arm in each suite; that arm immediately found the two `--plan` sites.
 
 ## 10. Reuse audit
 

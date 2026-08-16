@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. THIRTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. FIFTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -14,7 +14,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.2   # gov:kit unattended@1.2 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.4   # gov:kit unattended@1.4 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -57,7 +57,21 @@ done
 
 # The kit's CORE sets, read from the driver — the single source. Parsed rather than sourced, because
 # sourcing a script whose tail runs a verb would run the verb.
-core_of() { sed -n "s/^$1=\"\\(.*\\)\"[[:space:]]*$/\\1/p" "$DRIVER" | head -1; }
+# Pure bash for the same reason as the accessors below: this runs three times per leg invocation and
+# cost two processes each. Semantics preserved exactly — the line must be `KEY="…"` with only
+# whitespace after the closing quote, the first such line wins, and anything else (no quotes, a
+# truncated line) yields the empty string, which is the state check 1 refuses by name.
+core_of() { # KEY  ->  the quoted value from $DRIVER
+  local l p="$1=\"" v
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    while :; do case "$l" in *' '|*$'\t') l=${l%?} ;; *) break ;; esac; done
+    case "$l" in
+      "$p"*'"') v=${l#"$p"}; printf '%s\n' "${v%\"}"; return 0 ;;
+    esac
+  done < "$DRIVER"
+  return 0
+}
 PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
@@ -126,8 +140,23 @@ if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
 fi
 
-phase_of() { sed -n 's/^phase: *//p' "$1" | head -1 | tr -d '\r'; }
-fact_of()  { sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'; }
+# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
+# are called per run-state file per check, so the leg paid them dozens of times per invocation and
+# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
+# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
+# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
+# valueless key yields the empty string, and a trailing CR is stripped.
+fact_of() { # file · key
+  local l p="$2:"
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    case "$l" in
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+    esac
+  done < "$1"
+  return 0
+}
+phase_of() { fact_of "$1" phase; }
 # Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
 # pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
 # A marker line is the marker or it is malformed — the prefix test IDENTIFIES the line, equality
@@ -135,12 +164,14 @@ fact_of()  { sed -n "s/^$2: *//p" "$1" | head -1 | tr -d '\r'; }
 # both slices dropped the whole line, compared byte-equal, and the injected sentence sat inside the
 # block a human reads. Reproduced at gate exit 0 with no output. CR-normalised before comparing,
 # because the prefix test tolerated a CRLF worktree by accident and an equality test does not.
+# >>> kickoff_region
 region()   { awk -v o="$2" -v c="$3" '
                { ln=$0; sub(/\r$/,"",ln) }
                index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
                index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
                inside { print }
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
+# <<< kickoff_region
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
 # ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the
@@ -195,6 +226,22 @@ while IFS= read -r f; do
     esac
   fi
 
+  # ---- 15, FIRST HALF: a claim of LANDED carries a SHA. The protocol permits a sha, a tag or a
+  # ---- workflow id for a phase claim generally, and section 3 now narrows that for the TERMINAL
+  # ---- phases, because here the ancestry assertion below IS the claim — an unjudgeable witness at
+  # ---- LANDED is a landing nothing can check, which is the whole thing this check exists for.
+  # ----
+  # ---- OUTSIDE the anchor loop, deliberately. This half needs no anchor, no recorded BASE and no
+  # ---- remote-tracking ref; folding it in with the ancestry half below would gate it on three
+  # ---- preconditions it does not need, and on a clone with no default branch resolvable it would
+  # ---- run zero times while looking like coverage.
+  if [ "$ph" = LANDED ]; then
+    case "$w" in
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+      *) fail 15 "a record claims LANDED with a witness that is not sha-shaped, so the claim that the work reached the remote cannot be judged at all, and a terminal claim is exactly where an unjudgeable witness costs the most: $w in $f" ;;
+    esac
+  fi
+
   # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
   # ---- question the README already answers, differently — the whole class this build removes.
   rd=${f%/RUN.md}/README.md
@@ -239,9 +286,31 @@ while IFS= read -r f; do
         # phases the base legitimately equals HEAD - that is a run that has correctly built
         # nothing yet, and the driver blesses it there. Refusing it here made the two halves of one
         # kit disagree, each with its own green test.
+        # ABORTED IS NOT A WORK-CLAIMING PHASE, and it used to be listed here. An aborted run
+        # authorizes no landing, so the clause buys nothing on it — while a run that aborts before its
+        # first commit records a base equal to HEAD (the pin is taken through the degenerate path at
+        # preflight) and red the bar with its own abort record, on the one exit that exists for a run
+        # which cannot meet its obligations. Reachable for the first time now that a verb writes it.
         case "$ph" in
-          LANDING|LANDED|ABORTED|VERIFYING)
+          LANDING|LANDED|VERIFYING)
             [ "$rb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+        esac
+        # ---- 15, SECOND HALF: the LANDED witness lies on the history the ANCHOR blesses. The first
+        # ---- half above already refused a witness that is not sha-shaped, so reaching this with an
+        # ---- unjudgeable one is impossible and no skip is needed. This half is INSIDE the loop
+        # ---- because it needs the anchor, and it therefore inherits check 9's silent skip where no
+        # ---- default branch resolves — stated in the unit's own non-goals rather than implied.
+        # SHA-SHAPED ONLY, and RESOLVING only. `fail` does not `continue`, so without the shape guard
+        # this ran on the very witness the first half had just rejected and the record red TWICE with
+        # two sentences that contradict each other - one saying the witness is not a sha, the next
+        # reasoning about its ancestry. And resolvability is check 6's question, asked one loop up for
+        # every sha-shaped witness at any phase; asking it again here is a second answer to it, so this
+        # half stays silent on an unresolvable witness and lets check 6 own it.
+        case "$w" in
+          [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
+            if [ "$ph" = LANDED ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+              fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+            fi ;;
         esac
         break
       done
