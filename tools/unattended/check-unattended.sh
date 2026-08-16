@@ -520,6 +520,46 @@ else
          || fail 16 "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it: $ndir against $DIRECTIVES_FLOOR" ;;
   esac
 fi
+# Arms D and E: the CONTRACT's own two tables joined to the constants the driver enforces. Same
+# shape as arm A one document over — a shell constant against a hand-authored markdown table — and
+# the same reason: the protocol is what an outside reader is told, and a contract that publishes a
+# vocabulary the kit does not use is worse than one that publishes none.
+# The SHIPPED template is the side read. Check 10 already asserts the installed copy equals it after
+# prefix substitution, so reading both here would be a second answer to a question that check owns.
+proto="$HERE/PROTOCOL.template.md"
+if [ -f "$proto" ]; then
+  # §3's run-order PARAGRAPH, not the whole file. Measured: the same pattern over the document also
+  # returns `LANDER`, which is a conf key — the paragraph scope is load-bearing, not tidy.
+  pph=$(tr -d '\r' < "$proto" | awk '
+    /in run order:$/ { f = 1; next }
+    f && /^$/        { if (seen) exit; next }
+    f                { seen = 1; print }' | grep -oE '`[A-Z][A-Z_]*`' | tr -d '`' | sort -u)
+  # An EMPTY extraction is its own NAMED refusal, as arm A's is: a prose anchor that gets reworded
+  # otherwise empties the comparison and the join passes by finding nothing.
+  if [ -z "$pph" ]; then
+    fail 16 "the protocol's run-order paragraph yields no phase token, so the phase join would compare the driver's vocabulary against nothing and pass by finding nothing; the anchor is the line ending 'in run order:'"
+  else
+    pcore=$(printf '%s\n' $PHASES_CORE | sort -u)
+    pd1=$(comm -23 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
+    pd2=$(comm -13 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
+    [ -z "$pd1" ] || fail 16 "a CORE phase is enforced by the driver and absent from the protocol's run-order list, so the contract publishes a vocabulary the kit does not use: $pd1"
+    [ -z "$pd2" ] || fail 16 "the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy: $pd2"
+  fi
+  # Item NAMES only. The checker column is deliberately not joined: measured today three cells read
+  # `machine, PRE-LANDING` or `agent-attested` against the constant's `machine`/`agent`, and those
+  # spellings say something true the constant has no room for. Joining them would need a
+  # normalisation table, which is a third spelling of a two-value fact.
+  pdod=$(tr -d '\r' < "$proto" | sed -n 's/^| `\([a-z][a-z-]*\)` |.*/\1/p' | sort -u)
+  if [ -z "$pdod" ]; then
+    fail 16 "the protocol's Definition-of-Done table yields no item row, so the DoD join would compare the driver's set against nothing and pass by finding nothing"
+  else
+    dcore=$(printf '%s\n' $DOD_CORE | sed 's/:.*//' | sort -u)
+    ed1=$(comm -23 <(printf '%s\n' "$dcore") <(printf '%s\n' "$pdod"))
+    ed2=$(comm -13 <(printf '%s\n' "$dcore") <(printf '%s\n' "$pdod"))
+    [ -z "$ed1" ] || fail 16 "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about: $ed1"
+    [ -z "$ed2" ] || fail 16 "the protocol's Definition-of-Done table names an item the driver does not carry, so the contract publishes a gate nothing evaluates: $ed2"
+  fi
+fi
 
 # ---- 18: the kickoff step comes AFTER preflight in the Skill an agent reads. Invoked first,
 # ---- /session-kickoff halts at its READY card, which under a mandate nobody is present to answer.

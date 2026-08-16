@@ -154,6 +154,8 @@ something no machine could have checked:
 | `records-current` | machine | every unit's status header and every generated region match a fresh render |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
+| `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
+| `closing-review-recorded` | machine | a TRACKED review record under this build names the BASE the run pinned once. It measures that the review covers what shipped, never what the review concluded |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up |
 

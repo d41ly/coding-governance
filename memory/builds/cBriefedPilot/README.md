@@ -330,7 +330,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | CLOSED | rev-1 | 2026-08-16 |
 | [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | DEFERRED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | CLOSED | rev-6 | 2026-08-16 |
 | [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | BLOCKED | rev-1 | 2026-08-16 |

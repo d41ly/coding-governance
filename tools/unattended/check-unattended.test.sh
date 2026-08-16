@@ -757,5 +757,54 @@ sed -i '2i Invoke /session-kickoff before anything else.' tools/unattended/SKILL
 same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
 reset_tree
 
+# ---- check 16 arms D and E: the CONTRACT's two tables joined to the constants the driver enforces.
+# ---- Both edits go to BOTH protocol copies, or check 15's parity fires and the arm would be
+# ---- satisfied by a refusal that has nothing to do with the join it is testing.
+pedit() { sed -i "$1" tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md; }
+
+# GREEN CONTROL: the shipped contract already agrees with the driver in both tables.
+reset_tree
+same "the shipped protocol's two tables join clean" "$(run)" ""
+
+# D, driver -> protocol: a core phase the contract never publishes.
+reset_tree; pedit 's/`SPECCING` · //'   # mid-line: VERIFYING ends a line, so it has no trailing space to match
+out=$(run)
+hit "$out" "a CORE phase is enforced by the driver and absent from the protocol's run-order list, so the contract publishes a vocabulary the kit does not use"
+miss "$out" "names a phase the driver does not carry"
+
+# D, protocol -> driver: a published position no run can occupy.
+reset_tree; pedit 's/`PREFLIGHT` · /`PREFLIGHT` · `INVENTED` · /'
+out=$(run)
+hit "$out" "the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy"
+miss "$out" "absent from the protocol's run-order list"
+
+# D, the locator itself: rewording the prose anchor empties the extraction. Without this refusal the
+# join would compare against nothing and pass — silently, and on a document edit nobody reviews as code.
+reset_tree; pedit 's/in run order:$/in this order:/'
+out=$(run)
+hit "$out" "the protocol's run-order paragraph yields no phase token, so the phase join would compare the driver's vocabulary against nothing and pass by finding nothing; the anchor is the line ending 'in run order:'"
+miss "$out" "absent from the protocol's run-order list"
+
+# E, driver -> protocol: --close blocks on an item the contract never mentions.
+reset_tree; pedit '/^| `build-complete` |/d'
+out=$(run)
+hit "$out" "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about"
+miss "$out" "names an item the driver does not carry"
+
+# E, protocol -> driver: a published gate nothing evaluates.
+# `a` rather than an `s` with a newline in its replacement: a raw newline there is a sed syntax
+# error, and the edit silently did nothing while the arm read as written.
+reset_tree; pedit '/^| `parked-decisions-surfaced` /a | `invented-item` | machine | nothing evaluates this |'
+out=$(run)
+hit "$out" "the protocol's Definition-of-Done table names an item the driver does not carry, so the contract publishes a gate nothing evaluates"
+
+# E, the locator itself: every row gone empties the extraction, and the EMPTY refusal is what fires
+# rather than eight absent-item refusals — the guard is ordered ahead of the comparison on purpose.
+reset_tree; pedit '/^| `[a-z][a-z-]*` |/d'
+out=$(run)
+hit "$out" "the protocol's Definition-of-Done table yields no item row, so the DoD join would compare the driver's set against nothing and pass by finding nothing"
+miss "$out" "absent from the protocol's table"
+reset_tree
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

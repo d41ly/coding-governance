@@ -132,7 +132,8 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the
   mandate at that BASE is asserted by the bar and not only by the driver, every parked WAIVER names
   a declared handle and was there in the record's FIRST committed blob, the Skill orders its kickoff
-  step AFTER preflight, and the shipped protocol
+  step AFTER preflight, the protocol's OWN run-order list and DoD table join both ways to the
+  driver's constants, and the shipped protocol
   equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
