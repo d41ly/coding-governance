@@ -11,27 +11,41 @@ records which relied on the old ceiling, because at least three of them cited it
 
 ## 2. Scope (IN)
 
-- **S1 — the constant.** `tools/check-template-size.sh:14`: `MAX_BYTES=${MAX_BYTES:-32768}` becomes
-  `49152`, and the trailing `never raise to fit new prose` comment is rewritten. This line is both
-  the constant and a rule statement.
+- **S1 — the constant, and ONLY the innermost default.** `tools/check-template-size.sh:19` now reads
+  `MAX_BYTES=${2:-${MAX_BYTES:-32768}}`. **Only the `32768` moves to `49152`**; the positional and
+  environment layers are untouched, and the trailing rule comment at `:19-20` is rewritten.
+
+  **This gate has a SECOND consumer and the raise must not reach it.** `tools/gate-legs.json` carries
+  `kickoff engine size <=18KiB`, which runs
+  `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` — the positional exists
+  precisely because a leg cannot set an environment variable. That consumer passes its own limit, so
+  it is insulated by construction: raising the default cannot move it. Verified rather than assumed,
+  because the alternative reading — that the default is the ceiling for everything riding the
+  script — would have silently raised the kickoff engine's cap from 18 KiB to 48 KiB.
 - **S2 — the gate's own prose.** Same file: the header rule statement at `:2-5` ("never inflating
-  the template"), the usage echo `MAX_BYTES=32768` at `:8`, and the FAILURE MESSAGE at `:25-26`
+  the template"), the usage echo `MAX_BYTES=32768` at `:8`, and the FAILURE MESSAGE at `:31-32`
   ("Do NOT raise the limit"). The failure message is the string an agent reads at the exact moment
-  it is over budget, so it is the highest-value line in the file to get right.
+  it is over budget, so it is the highest-value line in the file to get right — and it is now shared
+  by two consumers, so its wording must stay true for the kickoff engine at 18 KiB as well as the
+  playbook at 48.
 - **S3 — the charter.** `AGENTS.md:16-17` (the most emphatic never-raise carrier — the sentence
   SPANS the line break, "…trim or externalize, never" / "raise the limit)", so an edit scoped to
-  `:16` alone orphans the rest), `:97` (the gate-suite leg bullet), `:178` (the Conventions
-  restatement), and `:7` (which calls `baseline.toml` shrink-only — see S6). Note `:97` spells
-  `≤32 KiB` with a unicode `≤` while the leg itself spells `<=32KiB`, so a grep for the leg name
-  alone misses it.
+  `:16` alone orphans the rest), `:97` (the gate-suite leg bullet, which now also names the kickoff
+  engine riding the same script — that clause stays true and must survive the edit), `:197` (the
+  Conventions restatement), and `:7` (which calls `baseline.toml` shrink-only — see S6). Note `:97`
+  spells `≤32 KiB` with a unicode `≤` while the leg itself spells `<=32KiB`, so a grep for the leg
+  name alone misses it.
 - **S4 — the adopter-facing README.** `README.md:12`.
-- **S5 — the kickoff manifest trap.** `.claude/SESSION-KICKOFF.md:99` (the rule) and `:100-106`
-  (the measured 32682/32768/86-free figure plus the scarcity-funding policy the raise makes
-  obsolete). The paragraph actually runs to `:109`, and **`:107-109` SURVIVES the rewrite**: it is
-  the parenthetical explaining why the trap paraphrases rather than citing a non-terminal spec id,
-  which is still true and still load-bearing — see §7's landmine. Scoping the edit to `:99-109`
-  without saying that would delete the warning that keeps this very unit from redding the bar.
-  This is the largest single edit and the one an agent reads at every kickoff.
+- **S5 — the kickoff manifest trap, at its NEW path.** The manifest moved to
+  `memory/guides/SESSION-KICKOFF.md` (commit `24f3991`, `KICK-cKeyedLaunchpad-2`); the old
+  `memory/guides/SESSION-KICKOFF.md` no longer exists. The trap is now three lines at `:121-123`:
+  "The template is under a STRICT 32 KiB gate. Never raise it; externalize into … Read the current
+  margin FROM `bash tools/check-template-size.sh`, never from prose."
+
+  **The edit is much smaller than it was.** The measured-figure-plus-funding-policy paragraph this
+  unit was scoped to delete is already gone — main trimmed it and replaced it with the
+  read-the-margin-from-the-gate instruction, which is CORRECT and stays. What remains is the ceiling
+  sentence and the never-raise clause, plus a line naming the ratchet from S8.
 - **S6 — the decision record, covering BOTH reversals.** A new `memory/DECISIONS.md` row minting the
   ceiling reversal and naming the four records that relied on the old ceiling —
   `PLAY-aCandidStub-1` §3, `TOOL-aGuardedTally-1`, `PLAY-aPrunedCeremony-1` RD7, and the
@@ -93,7 +107,7 @@ records which relied on the old ceiling, because at least three of them cited it
 
 ### Inventory
 
-Twelve tracked lines outside historical records, across **eight** files plus the append-only
+Tracked lines outside historical records, across the files below plus the append-only
 `memory/DECISIONS.md` — the table is the inventory and the count is stated once here rather than
 being maintained in two places. Verified negatives are as
 load-bearing as the hits: the three `parallel-coding-governance*.md` files, `WIRE-INTO-PROJECT.md`,
@@ -102,13 +116,11 @@ raise touches no shipped adopter artifact.
 
 | File | Lines | Class |
 |---|---|---|
-| `tools/check-template-size.sh` | 14 | the constant |
-| `tools/check-template-size.sh` | 2-5, 8, 25-26 | rule statements + usage echo |
-| `AGENTS.md` | 16, 97, 178 | rule statements |
+| `tools/check-template-size.sh` | 19 | the constant — innermost default of `${2:-${MAX_BYTES:-32768}}` only |
+| `tools/check-template-size.sh` | 2-5, 8, 31-32 | rule statements + usage echo |
+| `AGENTS.md` | 16-17, 97, 197, 7 | rule statements (`:97` also names the second consumer; `:7` the baseline claim) |
 | `README.md` | 12 | rule statement |
-| `.claude/SESSION-KICKOFF.md` | 99 | rule statement |
-| `.claude/SESSION-KICKOFF.md` | 100 → mid-107 | measured figure + funding policy — DELETE, from "It sits at 32682/32768" through "…are the next candidate." |
-| `.claude/SESSION-KICKOFF.md` | mid-107 → 109 | the drift-signal parenthetical, from "(Paraphrased" onward — **SURVIVES**, and §7's landmine depends on it |
+| `memory/guides/SESSION-KICKOFF.md` | 121-123 | rule statement — the file MOVED (`24f3991`) |
 | `tools/template-size-highwater.txt` | new | S8's ratchet record, seeded at the landed size |
 | `tools/gate-legs.json` | 17 | the leg label — see F1 |
 | `memory/map/baseline.toml` | 35 | the label as an inventory key — see F1 |
@@ -123,7 +135,7 @@ The charter's documented trap says "Adding ONE gate leg trips FOUR gates at once
 an ADDED leg and false here, in both directions:
 
 - **A bytes-only change trips exactly ONE gate** — the kickoff-manifest ratchet, because
-  `tools/check-template-size.sh` is a watched pathspec at `.claude/SESSION-KICKOFF.md:6`, forcing a
+  `tools/check-template-size.sh` is a watched pathspec at `memory/guides/SESSION-KICKOFF.md:6`, forcing a
   `last-audit` re-stamp with a delta line.
 - **Renaming the leg label trips TWO MORE** — codebase-map coverage (the old key reds as
   `stale_baseline` AND the new key reds as `unclaimed`, both at once) and codebase-map freshness
@@ -200,12 +212,12 @@ ratchet's own rule.
   inflating the template" and `:25` says "Do NOT raise the limit", and neither matches the original
   three-token pattern. Without them S2 could be skipped in its entirety and every AC would still
   pass, shipping a gate that tells an over-budget agent not to raise a limit the owner just raised.
-- **AC3b** — When the gate is run against a deliberately over-limit file, the emitted failure
+- **AC3b** — When `bash tools/check-template-size.sh <over-limit-file>` is run, the emitted failure
   message is read and contains no instruction not to raise the limit. AC3 observes the ABSENCE of
   old strings; this observes the PRESENCE of the correct one, and S2 calls that message the
   highest-value line in the file.
 - **AC4** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0, and
-  `.claude/SESSION-KICKOFF.md`'s `last-audit` carries a stamp newer than BASE with a delta line in
+  `memory/guides/SESSION-KICKOFF.md`'s `last-audit` carries a stamp newer than BASE with a delta line in
   the commit message.
 - **AC5** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage reports neither an
   `unclaimed` key nor a `stale_baseline` entry for the size leg, and the freshness byte-compare is
@@ -215,8 +227,9 @@ ratchet's own rule.
   the warn line** naming H, H+1 and the delta; a file of 49153 bytes still exits 1. The middle case
   is what proves the ratchet is advisory rather than a second ceiling, and it is the case a
   hand-written check omits. `--bump` rewrites the file to the measured size and reports the delta.
-- **AC9** — When the gate runs on the tracked template at the end of this build, it prints no warn
-  line, because S8 seeds the high-water at the landed size. A ratchet that ships already firing is
+- **AC9** — When `bash tools/check-template-size.sh` runs on the tracked template at the end of this
+  build, it prints no warn line, because S8 seeds `tools/template-size-highwater.txt` at the landed
+  size. A ratchet that ships already firing is
   the permanently-red shape S8 exists to avoid.
 - **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, both
   spell `<=48KiB` and neither still spells `<=32KiB`.
@@ -249,9 +262,10 @@ ratchet's own rule.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
 - `bash tools/run-gates.sh` at the push boundary.
 
-**A live landmine for this unit specifically.** `.claude/` is in the drift signal's `PRODUCT_GLOBS`
+**A live landmine for this unit specifically.** `memory/guides/SESSION-KICKOFF.md` is named BY FILE
+PATH in the drift signal's `PRODUCT_GLOBS`
 and `non_terminal_specs_cited_by_product_source` sits AT its pin of 2 with tolerance 0. S5 rewrites
-a paragraph in `.claude/SESSION-KICKOFF.md`; if that rewrite names this spec's id while its status
+that manifest's trap; if that rewrite names this spec's id while its status
 is non-terminal, the `drift-audit records` leg goes red. The paragraph being replaced documents
 having been bitten by exactly this. Reference the change without an id, or land the citation after
 the spec closes.

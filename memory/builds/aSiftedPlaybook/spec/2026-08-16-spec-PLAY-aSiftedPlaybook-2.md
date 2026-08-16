@@ -14,7 +14,7 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
 - **S1 — the placeholder.** `{{DEFAULT_BRANCH}}` becomes the 37th placeholder. **The name is not
   invented**: `skills/session-kickoff/MANIFEST-TEMPLATE.md:60,126` already defines it with identical
   semantics and documents its derivation from `git symbolic-ref`, and this repo's own filled
-  manifest carries the result at `.claude/SESSION-KICKOFF.md:39`. This unit adopts the existing name
+  manifest carries the result at `memory/guides/SESSION-KICKOFF.md:39`. This unit adopts the existing name
   and can copy its fill instruction verbatim, which also makes the two halves of the product agree
   on one spelling.
 - **S2 — the seventeen substitutions.** Anchored on verified (line, column) pairs, never a global
@@ -178,7 +178,7 @@ than being written twice against two different totals.
 - **AC7** — When `grep -n '36\|37' WIRE-INTO-PROJECT.md` runs, the restated placeholder claim reads
   37 and its "13" is unchanged.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0. Its `{{[A-Z]`
-  ban is scoped to `.claude/SESSION-KICKOFF.md` and never reads the playbook, so a 37th placeholder
+  ban is scoped to `memory/guides/SESSION-KICKOFF.md` and never reads the playbook, so a 37th placeholder
   cannot trip it — confirmed, and stated so the build does not go looking for a red that cannot
   happen.
 

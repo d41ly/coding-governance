@@ -42,21 +42,22 @@ constant change is exactly when an unproven gate is most likely to be silently w
   a scratch copy of that file, never the tracked one.
 
   **How the harness learns `MAX_BYTES` decides whether these arms mean anything.** The gate reads
-  `MAX_BYTES=${MAX_BYTES:-49152}`, so a harness that simply exports its own value tests the
-  override path five times and never once observes the SHIPPED ceiling — the arms would stay green
+  `MAX_BYTES=${2:-${MAX_BYTES:-49152}}` — a positional, then the environment, then the default — so a
+  harness that simply exports its own value tests the override path every time and never once
+  observes the SHIPPED ceiling — the arms would stay green
   through any edit to the default. A1, A2 and A4 therefore run the gate with **no override** and
-  read the limit back out of its own OK line (`printf … %d / %d bytes`, `:29`); only A5 sets the
+  read the limit back out of its own OK line (`printf … %d / %d bytes`, `:35`); only A5 sets the
   environment, because exercising the override is its whole purpose.
 
   A4 is the one that matters most and the one a hand-written test would omit. The gate normalizes
-  CR before measuring (`:17-19`) precisely so a Windows `autocrlf` smudge cannot inflate the count
+  CR before measuring (`:23-25`) precisely so a Windows `autocrlf` smudge cannot inflate the count
   and spuriously fail; on this fleet that smudge is the normal state, so the arm guards the
   behaviour the gate was actually written for.
 - **S3 — the merge-bar leg.** An entry in `tools/gate-legs.json` so the harness rides the bar rather
   than being a file somebody remembers to run — the charter's own standard for its self-tests.
 - **S4 — the charter citation.** The new leg's script path added to `AGENTS.md`'s gate-suite section.
   This is not bookkeeping: the drift-audit signal `handkept_inventories_disagreeing_with_source`
-  measures 0 of 51 at pin 0 with **zero tolerance**, so an uncited leg reds the bar immediately.
+  measures 0 at pin 0 with **zero tolerance**, so an uncited leg reds the bar immediately.
 - **S5 — the map dossier.** `memory/map/features/playbook.md`, minted by this unit (§8 F2), claiming
   the new leg key. Follows the pinned heading contract in `tools/codebase-map/map_lib.py:58`
   (`## Constraints & why`, `## Shared seams`, `## Gaps`) plus the graced `## Reuse affordance`,
@@ -123,7 +124,7 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 | `AGENTS.md` | one gate-suite bullet |
 | `memory/map/features/playbook.md` | new or extended, per the coupling above |
 | `memory/map/generated/*` | regenerated, never hand-edited |
-| `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
 ### Alternatives rejected
 

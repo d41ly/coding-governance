@@ -104,7 +104,9 @@ Either order is correct; this order avoids writing the sentence twice.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the placeholder sets are recomputed, the file's stated arithmetic holds. The recipe:
+- **AC1** — When the placeholder sets of `parallel-coding-governance.template.md` and
+  `parallel-coding-governance.domain-rules.md` are recomputed, the arithmetic stated in
+  `parallel-coding-governance.customize.md` holds. The recipe:
 
   ```bash
   grep -oE '\{\{[A-Z_]+\}\}' parallel-coding-governance.template.md | sort -u > /tmp/t.txt

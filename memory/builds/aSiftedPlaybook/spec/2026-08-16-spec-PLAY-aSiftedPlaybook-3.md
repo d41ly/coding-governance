@@ -149,7 +149,7 @@ blocking objection" would write a mischaracterization into a record the repo dec
 | `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/` and `hooks/` only |
 | `parallel-coding-governance.template.md` `:12` · `.domain-rules.md` `:3` | S8, the v2.8 marker in lockstep |
 | `memory/archive/parallel-coding-governance.template-v-2-7.md` | S8, new — the pre-bump snapshot |
-| `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec |
 
 ### Alternatives rejected
 
@@ -186,8 +186,10 @@ blocking objection" would write a mischaracterization into a record the repo dec
   declared only in this spec's prose would be unobservable.
 - **AC2** — When `parallel-coding-governance.customize.md`'s conditional-sections list is read,
   every kit named in the template has a row saying what to delete when it is declined.
-- **AC3** — When each new bullet is read against its kit's own README, every claim it makes is
-  present there. Checked per kit, by reading the README.
+- **AC3** — When each new bullet is read against its kit's own README — `tools/drift-audit/README.md`,
+  `tools/pytest-parallel-guardrails/README.md`, `tools/agent-instructions/README.md`,
+  `tools/gate-lint/README.md` — every claim it makes is present there. Checked per kit, by reading
+  the README rather than the draft.
 - **AC4** — When `grep -n '§2a' WIRE-INTO-PROJECT.md` runs it returns nothing, and when
   `tools/gate-lint/README.md:35` is read it cites §7 rather than §14.
 - **AC5** — When `bash tools/check-template-size.sh` runs, it exits 0 against the raised ceiling and

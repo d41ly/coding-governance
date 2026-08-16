@@ -111,7 +111,7 @@ None. No adopter data, no generated artifact, no config key changes shape. An ad
 |---|---|
 | `parallel-coding-governance.template.md` | S1, S2, S3 at `:150`; S8 at `:157`; S4 at `:107`; S5, S6 at `:51`; S7 at `:24` |
 | `parallel-coding-governance.customize.md` | S5 only, at `:61`, which quotes the template's clause |
-| `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec, so §7's re-stamp is a file this unit touches, not a side effect |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec, so §7's re-stamp is a file this unit touches, not a side effect |
 
 ### Rollout
 
@@ -170,8 +170,8 @@ exceeds 86, the unit depends on `TOOL-aSiftedPlaybook-1` and must say so.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When each corrected value is re-derived from its source file at build time, it equals
-  the value written into the template. The derivations are the §4 Inventory table's third column;
+- **AC1** — When each corrected value is re-derived from its source file at build time with a
+  single `grep`, it equals the value written into `parallel-coding-governance.template.md`. The derivations are the §4 Inventory table's third column;
   each is a single grep and none may be taken from this spec. **S4 is exempt** — its fix is a
   DELETION, so there is no value to re-derive; AC5 is its observation.
 - **AC1b** — When template `:157` is read, it names both the `Workflow` and the `Agent` tool-call as
