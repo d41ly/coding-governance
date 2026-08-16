@@ -53,13 +53,14 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
 | [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | SPECCED | rev-1 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -75,6 +76,7 @@ Each cell is a label, not a description. The unit's §1 Goal owns the full state
 | 1 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
 | 2 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
 | 3 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
+| 4 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
 
 **The order is TOTAL and units 1 and 2 are the reason.** Unit 2's whole argument is that the eol
 arm's exit status is unfunded — that no gate reds on CR any more. That becomes true only when unit 1
