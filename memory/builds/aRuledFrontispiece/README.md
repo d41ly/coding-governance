@@ -207,7 +207,16 @@ and does not claim a parallel lane it cannot substantiate.
 - **Every unit that changes a renderer re-runs `python tools/memory-tree/gen_build_index.py --check`
   and reads the artifact count from the gate**, never from this file.
 
-## Parked — five scope forks for the owner
+## Parked — four RESOLVED by the owner, one still open
+
+**P1 through P4 are RESOLVED (owner, 2026-08-16), each to the option the spec already builds.** No
+spec changes as a result; the parks stay recorded because a later reader needs to know these were
+decided rather than defaulted, and because P2 and P3 each authorise something wider than the words
+the original fork used.
+
+**P5 is still open.** It was raised and not put to the owner, so it must not be marked resolved. The
+`KIT_UNATTENDED_VERSION` bump stands as the spec author wrote it until the owner says otherwise, and
+it is the cheapest of the five to reverse.
 
 Each spec author reached a decision whose options differ in WHAT GETS BUILT, not in how. M3 puts
 those outside a resolver's authority with no standing mandate, so each is parked with its question,
@@ -219,6 +228,7 @@ naming a build's parents and DERIVES the child set by inverting it. Authoring bo
 two answers to one question in two files that no leg on this bar reconciles, and `TOOL-aMouldedFolio-1`
 refused exactly that shape. Refused to author both because the decision it contradicts is recorded and
 binding; the author asked that an overrule be explicit rather than taken from silence.
+RESOLVED (owner, 2026-08-16): one authored key, children derived. No spec changes.
 
 **P2 · unit 6 of the order — whether front matter is measured at all.** Fork 3 set a 350-character
 line cap. The `ids:` line cannot be wrapped without changing `parse_front_matter` and every reader of
@@ -226,6 +236,8 @@ it, so the spec excludes the whole front-matter block from check 7's measurement
 scoping within a file, which check 7 already does for fenced blocks, and it changes no current
 verdict because no index-set member opens with front matter today. Refused to treat it as settled
 because it is wider than the words the fork used.
+RESOLVED (owner, 2026-08-16): exclude the front-matter block from check 7's measurement. This
+widens fork 3 deliberately and the owner was told so before deciding.
 
 **P3 · unit 10 of the order — one script or two.** The leg's argv reuses
 `gen_build_index.py --check-format` rather than a new `check-build-readme.sh`. A new tracked shell
@@ -234,12 +246,14 @@ arm and an `ARMS_FLOORS` row, and would shell out to the same Python anyway. It 
 satisfy the drift-audit inventory pin for free, since that path is already named in the charter's gate
 suite. Refused to call this "standalone" without asking, because fork 2's word was standalone and this
 is a new LEG on an existing script.
+RESOLVED (owner, 2026-08-16): reuse the existing script. "Standalone" binds the LEG, not the file.
 
 **P4 · unit 3 of the order — one verb or two.** The spec ships `order <n>` alone and makes units
 sharing an order value the parallel group. A separate `group` verb creates a contradiction class —
 one label spanning two steps, two labels inside one step — needing its own refusal branches to render
 an identical region. Refused to ship the second verb because it buys no output; flagged because unit
 8 of the order edits the build-method contract these verbs live under, and the two would conflict.
+RESOLVED (owner, 2026-08-16): one `order` verb. Unit 8 of the order must not introduce a second.
 
 **P5 · unit 2 of the order — a kit version nothing compels.** The spec bumps
 `KIT_UNATTENDED_VERSION`. No gate requires it: the version check only asserts the constant and the
