@@ -43,6 +43,10 @@ that angle needs the authored line anyway; the render is worth building on top o
 Ids resolve against **the set defined by a spec H1** — measured 113 today — and never against a
 build README's `ids:` roster, which is a reservation range: 66 of its 179 ids have no spec at all.
 
+Every count on this page is a BASE-time snapshot, and the design-pass record is the dated source for
+all of them. A unit re-measures from the tree rather than carrying a number out of this paragraph —
+the corpus moves, and a figure quoted forward is how the two-answers class gets in.
+
 Enforcement is check 21 in `tools/memory-tree/check-memory-hygiene.sh`, three armed `fail` branches.
 Resolution costs no new machinery: any id written into a record is already a citation, and check 14
 already reds a citation that resolves to nothing.
