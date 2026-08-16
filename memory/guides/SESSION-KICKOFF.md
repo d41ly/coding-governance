@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-16T19:29:54+03:00 @ 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
+last-audit: 2026-08-17T01:55:00+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
@@ -176,3 +176,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
+- The full bar can TIME OUT on a node whose `TMPDIR` holds tens of thousands of stale scratch dirs:
+  every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
+  >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
+  dir before blaming the diff, and do not delete the shared one.
