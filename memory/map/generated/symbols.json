@@ -328,6 +328,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "check_entry_producer",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_layer_violation",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -424,6 +429,11 @@
     },
     {
       "id": "default_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -621,6 +631,11 @@
       "id": "extract_declarations",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_plan_writes",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "extract_records",
@@ -1011,6 +1026,11 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "measure_plan_marks",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "merge",
@@ -1578,9 +1598,19 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_produced_destinations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "scan_unselective_rules",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_written_destinations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "score",

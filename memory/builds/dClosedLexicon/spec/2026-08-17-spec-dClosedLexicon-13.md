@@ -177,10 +177,13 @@ returns only `entries/*.kit.toml`, `govkit.py`, `registry.toml`, `selftest.py` �
   write, and the summary line reports 0 write(s).
 - **AC2** — When `plan` runs over an entry carrying a `merged` rule (`--kits push-main`), that row is
   marked BLOCKED, and `apply` over the same entry refuses — the two agree.
-- **AC3** — When `plan` runs over the DEFAULT selection, the non-write rows are exactly **4 SIDE**
-  (memory-tree 3, memory-recall 1), **2 ORDER** (playbook) and **1 COVER** (codebase-map's
-  `map_extractors.py`, covered by its sibling seed) — counted by mark, so an implementation emitting
-  all seven under one mark fails.
+- **AC3** — When `plan` runs over the DEFAULT selection, the non-write rows counted by
+  `MARK|role` PAIR are exactly `SIDE|rendered` **4** (memory-tree 3, memory-recall 1),
+  `ORDER|project-owned` **2** (playbook) and `COVER|project-owned` **1** (codebase-map's
+  `map_extractors.py`, covered by its sibling seed), with no `write|project-owned` row at all — so an
+  implementation emitting all seven under one mark fails. Keyed on the PAIR because a mark-only tally
+  is not stable: `ORDER` also covers the holes and the machine-scoped link rule, so its total moves
+  with which answers a descriptor supplies.
 - **AC4** — When `plan` runs over `--kits review-harness` and over `--kits check-install-prefix`, the
   `rendered` and `generated` rows are marked ORDER and not SIDE, because neither entry declares an
   adopter; and a fixture descriptor with a `blocks_adopt` hole is marked ORDER too.
