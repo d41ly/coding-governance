@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -338,19 +338,28 @@ different-shell` is live — this unit launches a target's runner and git's hook
 
 ## 8. Open questions
 
-- **F1 — does the first-apply baseline confirmation block an unattended install?**
-  RECOMMENDATION: the committed target descriptor IS the approval, and `apply` records the argv and
-  the descriptor commit it approved; a CHANGE to either re-prompts, and an unattended run with a
-  changed command refuses rather than prompting. That keeps the standing-authorization property the
-  descriptor exists for while making a silent change to what runs on the operator's machine impossible.
-  Owner call, because it is a security posture rather than a mechanism.
-- **F2 — should `check --observe` be the default?** RECOMMENDATION: no. It runs the target's whole
-  bar, and a verb whose cost is the target's full test suite should be asked for. The default's message
-  says what it measured, which is the honest limit; a hurried reader can still misread it and that is
-  stated rather than designed away.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — does the first-apply baseline confirmation block an unattended install?** RESOLVED (agent,
+  2026-08-16, delegated): the committed target descriptor IS the approval, `apply` records the argv and
+  the descriptor commit it approved, and a CHANGE to either re-prompts — an unattended run with a
+  changed command REFUSES rather than prompting. Veto 3 was checked: §5 already prices the
+  code-execution surface in this unit's own risk tier. **Flagged for the wrap-up as an owner-review
+  item**, because it is a security posture rather than a mechanism, and a delegated resolution of a
+  posture deserves to be visible rather than buried.
+- **F2 — should `check --observe` be the default?** RESOLVED (agent, 2026-08-16, delegated): no. It
+  runs the target's whole bar, and a verb whose cost is the target's full test suite should be asked
+  for. The default's message says what it measured, which is the honest limit.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
+  execute-the-build delegation. F1 is FLAGGED for the wrap-up — it is a security posture, and a
+  delegated resolution of a posture belongs in the owner's turn rather than only in a §8 mark.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit that measured the declaration
   absent from every shipped file, the baseline phase absent from `apply` and from BOTH of the engine's
   own lists of what it cannot do, and the runner's skip-on-absent-guard behaviour reproduced at exit 0.

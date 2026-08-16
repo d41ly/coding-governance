@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -52,9 +52,9 @@ and one execution close all five.
   read; it reads none of them at apply time.
 - **Extending the arms-checker to a Python population.** Already an open backlog row, already reserved
   for the owner as a governance-carrier change. Unit 7's cross-check is where that guarantee lives.
-- **A second harness.** S5's leg is per-registry-entry and unit 7's matrix is per-fixture-variant.
-  Unit 7's spec folds S5's sweep in as one fixture family rather than shipping a second builder; the
-  decision is recorded in BOTH specs so it cannot be re-decided by whichever lands second.
+- **A second harness asserting the same facts.** S5's leg is per-registry-entry and unit 7's matrix is
+  per-repo-shape. Unit 7 CITES this leg for plan-equals-apply and apply-twice rather than re-asserting
+  either; the decision is recorded in BOTH specs so it cannot be re-decided by whichever lands second.
 
 **Assumes:** unit 1 (S5's plan-equals-apply assertion is unit 1's AC4 quantified over every entry) and
 unit 2 (S1 of that unit's role-completeness arm lives in the same `selfcheck`).
@@ -250,20 +250,25 @@ Before review: `python tools/memory-tree/gotchas.py --for-diff 0f0a121d..HEAD`.
 
 ## 8. Open questions
 
-- **F1 — does S5's leg fold into unit 7's matrix, or stay its own?** RECOMMENDATION: stay its own, and
-  unit 7 CITES it rather than re-asserting anything. The two answer different questions — every ENTRY
-  deploys, versus the deployer behaves correctly across repo SHAPES — and the two assertions they would
-  otherwise share, plan-equals-apply and apply-twice, stay here. The leg is bash and data-driven; the
-  matrix must be Python for its source join, so neither can call the other. Deciding after both land
-  costs a leg deletion, a charter edit, a drift re-drain and a map re-render. Recorded identically in
-  unit 7's §3.
-- **F2 — should S3 quantify over files a descriptor's rules match but that are UNTRACKED?**
-  RECOMMENDATION: no. The population is `git ls-files`, matching every other predicate here, and an
-  untracked file is not something gov ships. Stated because the natural implementation walks the
-  filesystem and would then red on an operator's scratch file inside a kit directory.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — does the deployability leg fold into unit 7's matrix?** RESOLVED (agent, 2026-08-16,
+  delegated): no. It stays its own, and unit 7 CITES it rather than re-asserting anything. The two
+  answer different questions, the leg is bash and data-driven while the matrix must be Python for its
+  source join, and neither can call the other. Recorded identically in unit 7's §3.
+- **F2 — does the per-file claim quantify over UNTRACKED files?** RESOLVED (agent, 2026-08-16,
+  delegated): no. The population is `git ls-files`, matching every other predicate here; an untracked
+  file is not something gov ships, and walking the filesystem would red on an operator's scratch file.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
+  execute-the-build delegation. F1's resolution is recorded identically in unit 7's §3, so the two
+  cannot re-decide it independently.
 - rev-1 · 2026-08-16 · split out of the first unit's rev-1, which bundled the ratchet with the update
   verb and the prerequisite repairs. Two changes came out of the adversarial pass and are folded here:
   S6, because an exemption and a claim for one fact is the defect class arriving through its own escape

@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -296,23 +296,29 @@ than only an assertion.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
 - **F1 — does `project-owned` join the landable set, or does the playbook entry simply become
-  `seed`?** RECOMMENDATION: both, as written. Retagging the playbook alone fixes the measured symptom
-  and leaves three other `project-owned` rules silently skipped, which is the class this unit exists
-  to close. Write-if-absent-never-overwrite is what the role means and is one branch. Owner call
-  because it changes what a first apply writes into a target.
-- **F2 — should this unit MIGRATE an existing install's wrong roles, or only stop producing them?**
-  RECOMMENDATION: only stop producing them, and have unit 2 treat a schema-1 role as untrusted. A
-  migration would rewrite records describing an install this unit cannot inspect, and the next apply
-  corrects them anyway. The cost is that a target that never re-applies keeps a wrong role until it
-  updates; that is stated in §5 rather than silently accepted.
-- **F3 — thirteen `[check] = { none }` blocks in this unit's diff, or a grace period?**
-  RECOMMENDATION: in this diff. A grace period is an undeclared absence by another name, and the
-  arm that would enforce it later has no way to tell a pending block from a forgotten one.
-  Agent-resolvable under a standing mandate if one is in force.
+  `seed`?** RESOLVED (agent, 2026-08-16, delegated): BOTH, as recommended. Veto 3 was checked and does
+  not fire — §5 already prices the widened write surface in this unit's own risk tier, in the sentence
+  saying a first apply now writes files it previously did not. Retagging the playbook alone would leave
+  three other rules silently skipped, which is the class this unit exists to close.
+- **F2 — does this unit MIGRATE an existing install's wrong roles?** RESOLVED (agent, 2026-08-16,
+  delegated): no; it only stops producing them, and unit 2 treats a schema-1 role as untrusted. A
+  migration would rewrite records describing an install this unit cannot inspect.
+- **F3 — the declared-absence blocks in this diff, or a grace period?** RESOLVED (agent, 2026-08-16,
+  delegated): in this diff. A grace period is an undeclared absence by another name, and the arm that
+  would enforce it later cannot tell a pending block from a forgotten one.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · M3 fork sweep: F1, F2 and F3 resolved in place under the owner's
+  execute-the-build delegation. F1 was checked against M3's veto 3 and passes, because §5 already
+  prices the widened write surface in this unit's own risk tier.
 - rev-1 · 2026-08-16 · initial draft, as a single unit covering the update verb, a convergence
   ratchet and the prerequisite repairs. Grounded by driving `govkit` end to end into a throwaway repo
   and by comparing the descriptor leg declarations against the leg manifest.

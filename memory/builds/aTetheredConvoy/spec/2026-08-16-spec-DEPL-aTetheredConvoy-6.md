@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -339,22 +339,29 @@ several arms.
 
 ## 8. Open questions
 
-- **F1 — does the second gov-owned hook the settings adopter wires become a merged rule, or a named
-  non-goal?** RECOMMENDATION: a named non-goal in this unit, with a backlog row. The one-block-per-rule
-  model cannot represent two blocks in one destination, and widening the model to carry a list is a
-  change to the shape every other consumer dispatches on — for one hook whose adopter already manages
-  it correctly. Name it, do not model it.
-- **F2 — are gov's own pins declared per-entry only, or does the registry table carry the remainder?**
-  RECOMMENDATION: both, as written. Several pins belong to no deployable — the shell-script pin, the
-  leg manifest, the deployer's own directory — and forcing them into an entry would attribute a
-  gov-internal rule to a kit an adopter receives. The registry table carries them on the same reason
-  and staleness rule as the existing exemptions.
-- **F3 — should the override report be a refusal instead?** RECOMMENDATION: a report. Refusing would
-  make gov undeployable into any repository with an opinion about line endings, and the override is
-  legitimate more often than not. Saying nothing is the silent direction and is not on the table.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — does the settings adopter's SECOND gov-owned hook become a merged rule?** RESOLVED (agent,
+  2026-08-16, delegated): no — a named non-goal with a backlog row. The one-block-per-rule model cannot
+  represent two blocks in one destination, and widening it to carry a list changes the shape every
+  other consumer dispatches on, for one hook whose adopter already manages it correctly.
+- **F2 — per-entry pins only, or a registry table for the remainder?** RESOLVED (agent, 2026-08-16,
+  delegated): both, as written. Several pins belong to no deployable, and forcing them into an entry
+  would attribute a gov-internal rule to a kit an adopter receives.
+- **F3 — is the attribute-override report a refusal instead?** RESOLVED (agent, 2026-08-16, delegated):
+  a report. Refusing would make gov undeployable into any repository with an opinion about line
+  endings. **Flagged for the wrap-up as an owner-review item**: it is the one place this build
+  knowingly overrides a target's own declared rule and answers with a message rather than a stop.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1, F2 and F3 resolved in place under the owner's
+  execute-the-build delegation. F3 is FLAGGED for the wrap-up: it is the one place this build
+  knowingly overrides a target's own declared rule and answers with a message rather than a stop.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit and adversarial pass. Four of
   this spec's load-bearing decisions came from the adversary rather than the designer, each reproduced
   in a scratch repository: the trailing-newline guard, without which the first apply into an ordinary

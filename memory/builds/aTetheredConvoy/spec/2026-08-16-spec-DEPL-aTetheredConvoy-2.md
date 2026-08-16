@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -222,18 +222,24 @@ paths through shell in at least one arm.
 
 ## 8. Open questions
 
-- **F1 — does `update --write` stage what it writes?** RECOMMENDATION: yes, matching `apply`. Every
-  gate in this suite reads the index, so an unstaged update is invisible to the verification that
-  follows it, and the deletion half must be staged or the target's next commit silently resurrects
-  the file. The cost is that `update` mutates an index gov does not own, which `apply` already does
-  and which §5 prices.
-- **F2 — should `update` refuse when the target has uncommitted changes anywhere, or only in the
-  paths it will touch?** RECOMMENDATION: only in the paths it will touch, named individually. A
-  whole-tree cleanliness demand makes the verb unusable in exactly the situation it is for — an
-  operator part-way through adopting a change — and the per-path check is the same `git diff` cost.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — does `update --write` stage what it writes?** RESOLVED (agent, 2026-08-16, delegated): yes,
+  matching `apply`. Every gate in this suite reads the index, so an unstaged update is invisible to the
+  verification that follows it, and the deletion half must be staged or the target's next commit
+  silently resurrects the file.
+- **F2 — refuse on uncommitted changes anywhere, or only in the paths it will touch?** RESOLVED
+  (agent, 2026-08-16, delegated): only in the paths it will touch, named individually. A whole-tree
+  cleanliness demand makes the verb unusable in exactly the situation it is for.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
+  execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · split out of the first unit's rev-1, which bundled this verb with the
   convergence ratchet and the prerequisite repairs. The split was forced by an adversarial pass that
   found the combined scope re-deciding four shared facts. Two design changes came out of that pass

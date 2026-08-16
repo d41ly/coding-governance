@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -229,17 +229,24 @@ tree before it is trusted, not after.
 
 ## 8. Open questions
 
-- **F1 — do the two new legs get exemptions, or descriptors?** RECOMMENDATION: exemptions with
-  reasons. They are gov-internal harnesses over gov's own deployer; an adopter receives neither the
-  matrix nor the runbook. The asymmetry with the two self-tests the runbook DOES prescribe for copy is
-  the reason the exemption must carry, rather than being left as a silent omission.
-- **F2 — should the join's pins be shrink-only, or exact?** RECOMMENDATION: shrink-only, matching every
-  other pin in this repo, and with the weakening-move convention this repo already enforces: a pin that
-  moves in the weakening direction must name both values beside it. An exact pin turns every legitimate
-  refusal addition into a red bar and would be waived within a week.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — do the two new legs get exemptions, or descriptors?** RESOLVED (agent, 2026-08-16,
+  delegated): exemptions with reasons. They are gov-internal harnesses over gov's own deployer, and an
+  adopter receives neither. The asymmetry with the two self-tests the runbook DOES prescribe for copy
+  is what the exemption reason must carry.
+- **F2 — shrink-only pins, or exact?** RESOLVED (agent, 2026-08-16, delegated): shrink-only, matching
+  every other pin in this repo and carrying the weakening-move convention it already enforces. An exact
+  pin turns every legitimate refusal addition into a red bar and would be waived within a week.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
+  execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit and adversarial pass. Three of
   this spec's decisions came from the adversary: the enumerator's population is discovered with TWO
   shrink-only pins rather than one hardcoded filename, because this build makes a refactor into new

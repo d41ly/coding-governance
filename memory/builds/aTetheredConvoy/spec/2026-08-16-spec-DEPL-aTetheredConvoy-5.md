@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -224,18 +224,24 @@ engine composes.
 
 ## 8. Open questions
 
-- **F1 — do the two kits with no check arm get one wired to their existing verifiers, or a declared
-  absence?** RECOMMENDATION: a declared absence in this unit, and a backlog row per kit. Both ship
-  runnable verifiers whose default mode is a check, so wiring is tempting — and each is that kit's own
-  gate leg, so wiring it into `check` makes `check` run a gate, which is a different verb's job. Name
-  the option, take the smaller one.
-- **F2 — should S3's provenance loop run by default, or behind a flag?** RECOMMENDATION: by default. It
-  is one `git show` per engine row against a local object database, and it is the arm that catches the
-  case the contract calls the receipt's whole provenance claim. A flag would make the default `check` a
-  weaker verb than its own docstring promises, which is the state this unit exists to end.
+none — the forks below are RESOLVED. Authority: the owner's instruction to execute this build
+delegates resolver authority for THIS build only, and every fork here is one the spec already stated,
+which is exactly M3's condition. Each was taken through M3's veto order; none was discarded by a veto,
+and the two that touch a write or security surface are called out in the wrap-up as owner-review items
+rather than treated as settled by silence.
+
+- **F1 — do the two kits with no check arm get one wired, or a declared absence?** RESOLVED (agent,
+  2026-08-16, delegated): a declared absence in this unit, plus a backlog row per kit. Each kit's
+  runnable verifier IS that kit's own gate leg, so wiring it into `check` would make `check` run a
+  gate, which is a different verb's job.
+- **F2 — does the provenance loop run by default or behind a flag?** RESOLVED (agent, 2026-08-16,
+  delegated): by default. It is one object read per engine row against a local database, and it is the
+  arm that catches the case the contract calls the receipt's whole provenance claim.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
+  execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit that measured the
   delete-everything-and-corrupt-the-receipt fixture exiting 0, the sidecar read by nothing, and the
   check code path carrying no selftest coverage at all. Two decisions came from the adversarial pass:
