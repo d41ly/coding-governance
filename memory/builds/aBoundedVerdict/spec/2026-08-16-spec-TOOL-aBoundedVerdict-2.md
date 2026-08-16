@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -32,26 +32,37 @@ stopped without reading prose.
   the wrong answer for a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
   takes the park-kind route for exactly that reason, so this build uses both shapes deliberately and
   moves the pin exactly once.
-- **S4** — a project may APPEND members through a new `.unattended.conf` key and may not delete a
-  core member. The core set's size is pinned shrink-only by its OWN new conf key. Both keys are
-  NAMED in the design, and both are added to the adopter's seed conf as well as this repo's, because
-  the seed is what a real adopter copies and a gate-required key missing from it reds the unattended
-  leg's first check on install with no gate here noticing.
+- **S4** — two new `.unattended.conf` keys, spelled here rather than described, in the shape the
+  existing `PHASES_EXTRA` / `DOD_EXTRA` / `CORE_FLOOR` trio already sets:
+  - `HALT_CODES_EXTRA` — OPTIONAL, empty legal, the project's appended members.
+  - `HALT_FLOOR` — REQUIRED, a single integer, the shrink-only size of the kit's core set. Undeclared
+    or malformed is a refusal, not a defaulted value, matching how the existing floor key behaves.
+
+  Both are added to the adopter's seed conf as well as this repo's, because the seed is what a real
+  adopter copies and a gate-required key missing from it reds the unattended leg's first check on
+  install with no gate here noticing. Rev-2 asserted both were named and named neither, which is the
+  defect round 1 raised, restated rather than fixed.
 - **S5** — three readers, because a vocabulary with no reader is decoration and this kit says so
   about its own phase writer: `--status` names the code on its single line; `--resume` names it and
   states that the run is finished rather than resumable; and a new leg check asserts that every
   tracked run-state file whose phase is the aborted terminal carries a code in the effective
   vocabulary.
-- **S6** — the wrap-up derivation gains the code as a derived row, so the one turn the owner gets
-  opens with why the run stopped.
+- **S6** — the wrap-up gains the code, so the one turn the owner gets opens with why the run stopped.
+  It lands in the PROTOCOL's wrap-up rows, which are already in this unit's write set, and NOT in the
+  build method's derivation table — F3 recommends leaving the method alone on its own pointer rule,
+  and rev-2 pre-applied that recommendation to the files list while leaving the scope item pointing
+  at the method. If F3 is resolved the other way, `memory/guides/BUILD-METHOD.md` and its kit
+  template join Files touched, and the manifest re-stamp and read-path clauses apply with them.
 - **S7** — the SEVEN-FACT PIN moves to eight, in every place it is spelled, because it has moved
   twice before and left a stale reader each time. All four: the "exactly seven facts and nothing
   else" sentence in `tools/unattended/PROTOCOL.template.md` and the installed
   `memory/guides/UNATTENDED-PROTOCOL.md`; the closed enumeration beneath it, which gains the code as
   its eighth entry; the driver comment in `unattended.sh`'s resume path, which today still says the
-  region carries FIVE and was already stale before this unit; and the count in
-  `memory/map/features/unattended.md`. Nothing counts the facts, so no leg catches a missed one —
-  which is why the list is enumerated here rather than left to the builder.
+  region carries FIVE and was already stale before this unit; and **BOTH** count statements in
+  `memory/map/features/unattended.md` — the dossier spells it twice, once as a bare numeral before
+  "of them" and once as a numeral before "facts", and rev-2 said "the count", singular. Nothing
+  counts the facts, so no leg catches a missed one — which is why the list is enumerated here rather
+  than left to the builder.
 - **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
   rendered Skill, and the kit version constants.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
@@ -111,7 +122,7 @@ owner turn it needs:
 |---|---|---|
 | review budget exhausted | unit 1's cap refusal | the unit's design is not converging; re-scope or split it |
 | fork unresolvable | the method's vetoes 2 and 3, and a scope fork | decide the fork |
-| awaiting scope approval | a unit whose status says it awaits the owner's scope approval | approve or amend the scope |
+| awaiting scope approval | a unit at the awaiting-approval status that is NEITHER reachable at the pinned base NOR authored by this run — the residual `TOOL-aBoundedVerdict-3` S1's three cases do not cover, reached when a spec arrives on the run's own branch from elsewhere | approve or amend the scope |
 | blocked on an external prerequisite | a unit whose status names a prerequisite outside the run | clear the prerequisite |
 | acceptance underivable | the kickoff engine's fifth interactive exit | supply the acceptance check, or split the unit |
 | precondition unmet | the kickoff engine's first three interactive exits | repair the repository state |
@@ -123,12 +134,16 @@ vocabulary already is.
 
 ### Migration
 
-Existing terminal records carry no code. The leg check must not red them, and must not be written so
-loosely that it never fires either. The disposition: the check applies to a record whose aborted
-phase claim was written at or after the kit version this unit ships, which the record already
-carries no field for — so the check keys instead on the presence of the code fact, with the
-currently-tracked codeless aborted records enumerated once and registered. The enumeration is
-mechanical and small; it is committed under this build's `build/` folder rather than asserted.
+**There is nothing to migrate, measured rather than assumed.** The only two tracked run-state files
+both claim the LANDED terminal, so the population of codeless ABORTED records is ZERO. The leg check
+therefore needs no exemption, no registry and no enumeration, and rev-2's plan for all three was
+answering a question the tree does not ask — worse, it would have "registered" them in a recording
+under this build's `build/` folder, which no gate reads, so the exemption would have exempted
+nothing.
+
+The consequence is that the corpus does not exercise the new check, which is this repo's own vacuity
+class. Its red arm therefore lives entirely in `tools/unattended/check-unattended.test.sh` fixtures,
+the same disposition every other ratchet in this tree takes for the same reason.
 
 ### Rollout
 
@@ -184,9 +199,12 @@ validates against the required-key set · `tools/unattended/kit.toml` ·
 `tools/unattended/PROTOCOL.template.md` and the installed protocol (the verb section, the phase
 section, and the seven-fact pin with its enumeration) · `tools/unattended/SKILL.template.md` and the
 rendered Skill · `skills/session-kickoff/SKILL.md` (the exits' abort disposition names the code) ·
-`memory/map/features/unattended.md` (the fact count) · `memory/guides/SESSION-KICKOFF.md` (the
-manifest re-stamp; `.unattended.conf` and the kickoff engine are both on its watch list) · the kit
-version constants.
+`memory/map/features/unattended.md` (BOTH fact counts) · `tools/unattended/check-unattended.sh`'s
+header check COUNT and the matching count in `AGENTS.md`'s gate-suite bullet, which S5 moves by one
+and which no gate observes — `TOOL-aBoundedVerdict-1` moves it again, so the two units state their
+moves one apart rather than both writing the same number ·
+`memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; `.unattended.conf` and the kickoff engine
+are both on its watch list) · the kit version constants.
 
 ## 5. Production-readiness checklist
 
@@ -219,8 +237,8 @@ version constants.
 - **AC3** — When a run aborts with a code, `bash tools/unattended/unattended.sh --status <slug>` and
   `--resume <slug>` both name it, and resume states the run is finished rather than resumable.
 - **AC4** — When a tracked run-state file claims the aborted terminal and carries no code fact,
-  `bash tools/unattended/check-unattended.sh` reds naming the file, except for the records §4's
-  enumeration registered. Arm in `tools/unattended/check-unattended.test.sh`.
+  `bash tools/unattended/check-unattended.sh` reds naming the file. No exemption clause: the measured
+  population is zero, so both arms live in `tools/unattended/check-unattended.test.sh` fixtures.
 - **AC5** — When the core vocabulary shrinks below its declared floor,
   `bash tools/unattended/check-unattended.sh` reds; when the floor key is absent or malformed, it
   refuses rather than passing with the pin disarmed.
@@ -233,9 +251,11 @@ version constants.
 - **AC7** — When every tracked file spelling the abort invocation is greped, each also spells the
   code argument — all three documented call sites — and the arm that asserts it lives in
   `tools/unattended/unattended.test.sh`.
-- **AC8** — When the region's fact count is greped across the four places it is spelled, none still
-  says seven or five: `grep -rn 'seven facts\|five facts' tools/unattended/ memory/guides/ memory/map/`
-  returns nothing.
+- **AC8** — When the region's fact count is greped across the FIVE statements it is spelled in, none
+  still says seven or five. The pattern must catch the dossier's bare-numeral form as well as the
+  "N facts" form — `grep -rniE '(seven|five)[[:space:]]+(facts|of them)' tools/unattended/ memory/guides/ memory/map/`
+  returns nothing. The narrower two-alternative pattern rev-2 proposed misses one of the dossier's
+  two statements, which is the whole class this criterion exists to catch.
 - **AC9** — When `skills/session-kickoff/SKILL.md` is edited,
   `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` is green, re-measured
   rather than assumed.
@@ -254,6 +274,9 @@ version constants.
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
 `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` — the hard leg on the kickoff
 engine, at 98.8% of its ceiling · `skills/session-kickoff/manifest-check.sh` ·
+`tools/memory-tree/check-memory-hygiene.sh` — this unit edits two files under the memory root and
+grows a read-path member, and rev-2's gate list omitted it ·
+`python tools/memory-tree/corpus_ids.py --report` for the read-path share ·
 `python tools/memory-tree/check-arms.py` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `python tools/drift-audit/drift_report.py
 --check` · `bash tools/run-gates.sh`.
@@ -295,6 +318,18 @@ engine, at 98.8% of its ceiling · `skills/session-kickoff/manifest-check.sh` ·
   and the manifest re-stamp. The floor-key rationale rested on a false claim about the existing
   parser and is restated on grounds that hold. AC6's prefix grep would have broken under the unit
   that lands after this one and is replaced by the complement assertion.
+- rev-3 · 2026-08-16 · folded round 2. S4 asserted "Both keys are NAMED in the design" and named
+  neither — round 1's finding restated rather than fixed — so both are now spelled, with which is
+  required and which optional. The migration's exemption, its registry and its enumeration all
+  answered a question the tree does not ask: the measured population of codeless aborted records is
+  ZERO, both tracked run-state files being landed, and the recording the enumeration would have gone
+  into is read by no gate. The pin's dossier statement is TWO statements, not one, and the completeness
+  grep as written misses the bare-numeral form. The wrap-up scope item still pointed at the build
+  method after the files list had already dropped it on this spec's own recommendation; it now lands
+  in the protocol and says what changes if the fork resolves the other way. The awaiting-approval
+  member had lost its last routing site to the stall unit's three cases and is narrowed to the
+  residual they leave. Added the hygiene gate and the read-path reporter to §7, and the leg's own
+  check count to Files touched, sequenced against the other unit that moves it.
 
 ## 10. Reuse audit
 

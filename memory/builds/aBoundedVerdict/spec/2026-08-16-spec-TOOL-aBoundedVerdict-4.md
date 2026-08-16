@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -20,9 +20,22 @@ actually enforceable.
   build currently running.
 - **S2** — the same predicate in `tools/memory-tree/check-memory-hygiene.sh` check 12, at both the
   per-item count and the first-line short circuit, gated by a new cutoff (S6). The two spellings are
-  joined by ONE CASE TABLE driving both, in the shape `tools/memory-tree/marker-contract.test.sh`
-  already uses for the generated-region markers — not by a byte-comparison of two dissimilar
-  languages.
+  joined by ONE CASE TABLE driving both — an EXTENSION of `tools/memory-tree/marker-contract.test.sh`,
+  whose display name and header move to cover two contracts, not a byte-comparison of two dissimilar
+  languages and not a new leg.
+- **S2a** — the table's MECHANISM, because that harness's existing shape does not transfer and rev-2
+  cited it as a precedent without saying so. Three obstacles, each measured: the existing harness
+  slices a NAMED shell function out of the shipped bytes by line range, and check 12's §8 predicate
+  is inline inside one long single-quoted awk program with no function boundary to slice; the two
+  readers grade DISJOINT status populations, since check 12's §8 block runs only under a terminal
+  status while the planning verb discards its own classification for exactly those statuses; and S6's
+  cutoff gates only the hygiene side, so an unresolved case legitimately gives the two readers
+  different answers. So the table holds inputs plus a PER-READER expected verdict, the hygiene side
+  is driven through a fixture repo the way its own sibling test already does, and the table records
+  each side's fixture requirements — a terminal status and a filename date at or after the cutoff for
+  check 12, a non-terminal status with non-empty scope, acceptance and gates sections for the
+  planning verb. Lifting the hygiene predicate into a sliceable function first is the alternative and
+  is left to the builder, named here so the choice is visible.
 - **S3** — both readers stop deciding on the first non-blank line alone. The none form ends the
   section only when the section has ZERO items; with any item present, the per-item walk decides and
   no first line suppresses it.
@@ -48,7 +61,12 @@ actually enforceable.
   unit changes only how a machine recognises the mark.
 - No repair of any landed spec. S6's cutoff is what makes that unnecessary, and rewriting a ratified
   record is against the memory tree's own rule.
-- No new gate leg. Both readers already exist and both already run on the bar.
+- No new gate LEG, and S2's case table therefore EXTENDS `tools/memory-tree/marker-contract.test.sh`
+  rather than landing beside it. Rev-2 offered both and they are not interchangeable: a new sibling
+  is either a row in `tools/gate-legs.json` — which pulls in the run-gates canary and the
+  codebase-map leg inventory, whose baseline is closed to new keys, so the key reds until a dossier
+  claims it — or it is a test nothing runs. Extending needs neither. The cost of extending is that
+  the leg's display name and header must move to cover two contracts, and S2 says so.
 - No enforcement that a delegated resolution is signed as delegated rather than as the owner. The
   attribution SHAPE is checked; whether the named resolver really decided is not checkable here.
 - No repair of the planning verb's other known blindness beyond what S3 incidentally closes. The
@@ -118,9 +136,13 @@ which is the same disposition the streams ratchet took for the same reason and r
   already mandatory in the authoring contract and checking a rule nobody enforces is how that rule
   rotted.
 - **Grade the item's opening line only.** Cheaper in both readers and needs no block extraction.
-  Rejected on the corpus: the dominant convention puts the mark on a continuation line, so the
-  opening-line reading measures 33 of 41 item-bearing terminal specs newly red against 13 for the
-  block reading — a 2.5x swing that is an artifact of the reading, not of the specs.
+  Rejected on the corpus, which measures 33 of 41 item-bearing terminal specs failing the
+  opening-line reading against 13 for the block reading. **That is evidence about the AUTHORING
+  CONVENTION, not a prediction about this unit** — S6's cutoff grandfathers every one of those specs,
+  so neither reading reds anything landed, and rev-2's "newly red" phrasing described an outcome this
+  unit cannot produce. The convention is what matters: it is what future specs will follow, so
+  opening-line grading would red correct authoring from the cutoff forward, at roughly the same 2.5x
+  rate.
 - **Repair or waive the affected specs instead of a cutoff.** Rejected in §4 Migration, on measurement.
 - **Fix only one reader.** The planning verb is what an unattended run consults before building a
   unit, and the hygiene gate is what holds the merge bar. Leaving either blind leaves half the rule
@@ -132,7 +154,8 @@ which is the same disposition the streams ratchet took for the same reason and r
 
 `tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` ·
 `tools/memory-tree/check-memory-hygiene.sh` · `tools/memory-tree/check-memory-hygiene.test.sh` ·
-`tools/memory-tree/marker-contract.test.sh` or a new sibling beside it, for the shared case table ·
+`tools/memory-tree/marker-contract.test.sh`, EXTENDED with the shared case table, its display name
+and header moving to cover two contracts ·
 `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md` ·
 `memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` ·
 `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md` — marker-only, because the kit
@@ -229,6 +252,16 @@ conf are both on its watch list).
   the green-bar criterion and is replaced by the pin-or-arm rule that actually binds. Added M3 as a
   carrier, the kit-version gate and its four marker files, the shared case table in place of a
   byte-compare, the manifest re-stamp, and the real output of the recorded reuse probe.
+- rev-3 · 2026-08-16 · folded round 2. The rejection of the opening-line reading argued from specs
+  going "newly red" under a unit whose own cutoff grandfathers all of them — the measurement is
+  evidence about the authoring convention, and is now framed as that. The non-goal "no new gate leg"
+  sat beside a files list offering a new sibling test as an alternative; the two carry different
+  costs (a leg row, the run-gates canary, and a codebase-map key whose baseline is closed to new
+  ones), so the extension is chosen and the alternative is priced rather than left open. S2a is new:
+  the harness rev-2 cited as a precedent works by slicing a named function out of shipped bytes, and
+  the hygiene predicate has no function to slice, the two readers grade disjoint status populations,
+  and the cutoff makes their answers legitimately differ — so the table now carries a per-reader
+  expected verdict and each side's fixture requirements.
 
 ## 10. Reuse audit
 

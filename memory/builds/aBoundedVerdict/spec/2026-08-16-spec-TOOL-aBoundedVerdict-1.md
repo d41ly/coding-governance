@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -27,19 +27,27 @@ its own rule that a rev-moved spec is unreviewed means folding one round's fixes
   `TOOL-aBoundedVerdict-2` takes the FACT route for the halt code, which is a per-run singleton read
   by key, and the two shapes are chosen deliberately rather than for consistency. The helper's output
   leads with a timestamp, so the region's anchor ban is satisfied by construction.
-- **S4a** — the `review` kind is a NON-DECISION kind, and `TOOL-aBoundedVerdict-5` owns that
-  taxonomy. Its surfaced-count refusal and the method's wrap-up derivation both count DECISION kinds
-  only, so review rounds do not inflate the count of decisions the owner must be shown. This is an
-  interface both specs spell, and it is spelled identically in both.
+- **S4a** — the `review` kind is a **record** kind — the class `TOOL-aBoundedVerdict-5` S7 names and
+  owns. Its surfaced-count refusal counts DECISION kinds only, so review rounds do not inflate the
+  count of decisions the owner must be shown. The two class names are `decision` and `record`, taken
+  verbatim from the owning spec rather than paraphrased here.
 - **S5** — the SUBJECT is the spec document for a method spec-audit round, and the BUILD SLUG for the
   method's closing diff review. One counter, one cap, two denominators, because the two review kinds
   have two denominators and a single per-unit cap would price a build-level event on a unit-level
   count.
-- **S6** — a leg check in `check-unattended.sh`: every round-count fact in every tracked run-state
-  file parses as an integer and is at or under the cap read FROM the driver.
+- **S6** — a leg check in `check-unattended.sh`: for every tracked run-state file, the `review` lines
+  in the parked region are grouped by their `item` field and no group exceeds the cap read FROM the
+  driver. **There is no round-count fact to parse** — the count is derived from the line set, and the
+  only grammar the leg splits is the park helper's own output.
 - **S7** — the build method's spec-audit section gains a stated disposition for a blocked verdict,
   and the clarification that folding a round's own fixes does not make the spec unreviewed for the
   purpose of the round count. Both are method rules binding on any run; neither is machine-checked.
+- **S7a** — the method's WRAP-UP derivation row is narrowed to DECISION-kind parked entries, handed
+  to this unit by `TOOL-aBoundedVerdict-5` S7c because this unit already has the method in its write
+  set and lands after the taxonomy exists. The row today says every parked entry with its question,
+  options and reason — a shape a `review` line does not carry — so without the narrowing the wrap-up
+  would demand three fields of a line that has two. This is the only place in the set that edits that
+  row, and no other spec may claim it.
 - **S8** — at the cap with a subject still not clean, the run does not review it again. It parks the
   subject and continues when the remaining units do not depend on it, and otherwise halts with the
   review-budget halt code. Both mechanisms are other units' and this unit only names the disposition.
@@ -68,7 +76,7 @@ One appended line per round, in the PARKED region, under a new `review` kind:
 
 | Field | Value |
 |---|---|
-| kind | `review` — a non-decision kind, per `TOOL-aBoundedVerdict-5`'s taxonomy |
+| kind | `review` — a `record` kind, per `TOOL-aBoundedVerdict-5`'s taxonomy |
 | item | the subject: a spec document for a spec-audit round, the build slug for the closing round |
 | reason | the verdict, one of the three kit-owned tokens |
 
@@ -116,8 +124,8 @@ no rule for what to do next. S7 is that rule and S8 is where it disposes.
 
 ### Migration
 
-None on disk. No existing run-state file carries either fact, and the leg check is a bound on values
-that are present rather than an assertion that they exist — so today's corpus passes it unchanged.
+None on disk. No existing run-state file carries a `review` parked line, and the leg check bounds the
+groups that are present rather than asserting any exist — so today's corpus passes it unchanged.
 That makes the check VACUOUS over the current tree, which this repo names as its own bug class, so
 the arm is not the corpus: it is explicit red and green fixtures in the leg's sibling test, which is
 the same disposition the streams ratchet already took for the same reason and recorded in the conf.
@@ -148,7 +156,11 @@ the same disposition the streams ratchet already took for the same reason and re
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/PROTOCOL.template.md` and the installed protocol ·
 `tools/unattended/SKILL.template.md` and the rendered Skill · `memory/guides/BUILD-METHOD.md` and
-its kit template · `.memory-tree.conf` (arms floors) · the kit version constants.
+`tools/memory-tree/BUILD-METHOD.template.md` · `tools/memory-tree/README.md`, receiving the
+displaced paragraph · `tools/unattended/check-unattended.sh`'s header check COUNT and the matching
+count in `AGENTS.md`'s gate-suite bullet, which S6 moves by one and which no gate observes ·
+`.memory-tree.conf` (arms floors) · `memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; the
+conf and the build method are both on its watch list) · the kit version constants.
 
 ### The method document's size budget — measured, and not what rev-1 said
 
@@ -164,21 +176,23 @@ by nothing, and it exists because the file is re-read whole at every pass bounda
 it and says plainly that no gate will catch a failure to.
 
 The budget that IS mechanical is the charter read-path ceiling, measured at 70262 bytes against a
-ceiling of 86476 — **16214 bytes of headroom, shared** between the method and the unattended
-protocol, both of which this build grows. This unit's share is the method prose S7 adds;
-`TOOL-aBoundedVerdict-3` is the other spender and names the same figure. Neither carries the number
-as authority: the builder re-measures with the corpus reporter before spending.
+ceiling of 86476 — **16214 bytes of headroom**. It is shared by FOUR units, not two: this unit and
+`TOOL-aBoundedVerdict-3` grow the method, and `TOOL-aBoundedVerdict-2`, `TOOL-aBoundedVerdict-3` and
+`TOOL-aBoundedVerdict-5` grow the unattended protocol, which is a read-path member at 18214 bytes.
+The spender set is stated ONCE, in the README's cross-unit rules, rather than in each spec. This
+unit's share is the method prose S7 adds, and the builder re-measures with the corpus reporter before
+spending rather than treating either figure as authority.
 
 ## 5. Production-readiness checklist
 
 - security — N/A as a surface. The trust boundary is stated in §4 rather than left implicit.
-- perf / scale — N/A. Two fact writes per review round.
+- perf / scale — N/A. One appended line per review round.
 - a11y — N/A.
 - i18n — the verdict tokens are identifiers.
 - error / empty / loading states — a review on a slug with no run-state file, an unlisted verdict, a
   missing subject, a count already at the cap, and a terminal record are five distinct refusals.
 - observability — the refusal at the cap is the observation, and it names the subject and the count.
-  A run that hits it and then parks leaves both facts on the record.
+  A run that hits it and then parks leaves the round's line and the park's line on the record.
 - risks — the highest is that the cap is met and the disposition is not taken, leaving a unit
   silently unbuilt. S8 names the disposition and the halt code names it again at the terminal; the
   residual is that neither is machine-enforced, which §4 states.
@@ -200,7 +214,12 @@ as authority: the builder re-measures with the corpus reporter before spending.
 - **AC3** — When the verdict is outside the three kit-owned tokens,
   `bash tools/unattended/unattended.sh --review <slug> --subject <id> --verdict MAYBE` refuses naming
   the legal set.
-- **AC4** — When a tracked run-state file carries a round count above the cap,
+- **AC3a** — When a run-state file carries `review` lines for one subject and `park` lines for
+  another, `bash tools/unattended/unattended.sh --close <slug>` counts only the DECISION-kind lines
+  against the attestation — the fixture carries at least one line of each class, so the arm fails
+  under a count of all parked lines and passes only under the taxonomy-aware one.
+- **AC4** — When a tracked run-state file carries more than the cap's worth of `review` lines for one
+  subject,
   `bash tools/unattended/check-unattended.sh` reds naming the file and the subject; both the red and
   the green fixture live in `tools/unattended/check-unattended.test.sh`, because the corpus exercises
   neither.
@@ -257,6 +276,17 @@ as authority: the builder re-measures with the corpus reporter before spending.
   budget is the read-path headroom, now allocated explicitly against the other unit that spends it.
   The floor-key rejection rested on a false claim about the existing parser and is restated on
   grounds that hold.
+- rev-3 · 2026-08-16 · folded round 2, which found that the rev-2 fold had not reached the whole
+  spec. S6 still specified the leg check over a round-count FACT that rev-2's own data model had
+  deleted — two scope items describing mutually exclusive on-disk shapes, the same class round 1
+  filed against the predicate unit — and four further sites still described the fact shape: the
+  migration paragraph, the perf line, the observability line and the reuse audit's named seam, which
+  is `park()` and not the fact writer. The park kind's class was called `non-decision` here and
+  `record` in the spec that owns the taxonomy, under a sentence claiming the two were spelled
+  identically. Added the arm that actually exercises the taxonomy, the four-unit read-path spender
+  set, and the Files-touched entries the rev-2 acceptance criteria had already started depending on:
+  the displacement's receiving file, the manifest re-stamp, and the leg's own check count, which this
+  unit moves and which no gate observes.
 
 ## 10. Reuse audit
 
@@ -264,8 +294,9 @@ as authority: the builder re-measures with the corpus reporter before spending.
 returns the review protocol, the review harness and the fan-out leg, and no counter of any kind —
 consistent with the repo-wide grep for a numeric review bound returning nothing. Three existing
 seams are extended rather than duplicated: the driver's core-constant idiom with the leg reading it
-through the same helper that already reads the core phase and Definition-of-Done sets; the authored
-fact writer, unchanged, which is what makes S4's per-subject key shape free; and the driver's shared
+through the same helper that already reads the core phase and Definition-of-Done sets; `park()`,
+unchanged — its kind argument and its two existing callers are what make S4 free, and taking a kind
+rather than a field is what keeps the authored region's fact pin still; and the driver's shared
 terminal-record refusal. No existing seam fits the counting itself, and the evidence for that is the
 absence above rather than a failure to look.
 

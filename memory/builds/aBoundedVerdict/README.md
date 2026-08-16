@@ -73,11 +73,11 @@ it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | OPEN | rev-3 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | OPEN | rev-3 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | OPEN | rev-3 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | OPEN | rev-3 | 2026-08-16 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | OPEN | rev-3 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -135,8 +135,19 @@ concurrently — and their write sets intersect in the protocol document, so the
   it and re-stamps the manifest in the same commit.** Every unit in this build touches at least one:
   the hygiene engine and `.memory-tree.conf`, `.unattended.conf`, the kickoff engine, and the build
   method are all watched, and the manifest ratchet is a merge-bar leg that reds on a watched file
-  changed with no re-stamp at or after the change. `memory/guides/SESSION-KICKOFF.md` is in each
-  affected unit's Files-touched list for that reason.
+  changed with no re-stamp at or after the change. `memory/guides/SESSION-KICKOFF.md` is in all five
+  units' Files-touched lists for that reason — it was in three when this rule was written, which is
+  the rule asserting its own compliance rather than having it.
+- **The charter read-path budget is shared by four of the five units, and the spender set is stated
+  HERE and nowhere else.** Measured at base: 70262 bytes against a ceiling of 86476, so 16214 bytes
+  of headroom. `TOOL-aBoundedVerdict-1` and `TOOL-aBoundedVerdict-3` grow the build method;
+  `TOOL-aBoundedVerdict-2`, `TOOL-aBoundedVerdict-3` and `TOOL-aBoundedVerdict-5` grow the unattended
+  protocol, which is itself a read-path member at 18214 bytes. Two specs previously each named the
+  total and named only each other as the other spender, which is how a shared budget gets spent
+  twice. No spec carries the figure as authority: the builder re-measures with the corpus reporter.
+- **Two units move the unattended leg's own check count**, which is stated in the leg's header and
+  again in the charter's gate-suite bullet and observed by no gate. They state their moves one apart
+  rather than both writing the same number.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.

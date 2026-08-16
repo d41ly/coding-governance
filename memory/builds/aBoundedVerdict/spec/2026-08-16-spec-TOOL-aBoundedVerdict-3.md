@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -132,9 +132,11 @@ rules and will not fit in the 14 lines M1's own budget leaves, so the displaceme
 made in the same commit.
 
 The MECHANICAL budget is the charter read-path ceiling: 70262 bytes measured against 86476, so
-**16214 bytes of headroom, shared** with `TOOL-aBoundedVerdict-1`, which grows the same method file,
-and with the unattended protocol, which this unit also grows. That unit names the same figure. The
-builder re-measures with the corpus reporter before spending rather than trusting either spec.
+**16214 bytes of headroom**. This unit spends from it twice, growing both the method and the
+unattended protocol, and it is not the only spender — the full set is stated ONCE in the build
+README's cross-unit rules rather than in each spec, because two specs each naming the total and each
+other is how a shared budget gets spent twice. The builder re-measures with the corpus reporter
+before spending.
 
 ## 5. Production-readiness checklist
 
@@ -247,6 +249,11 @@ builder re-measures with the corpus reporter before spending rather than trustin
   read-path headroom, with the share this unit spends named against the other unit that spends it.
   S1's third case routed an externally-blocked unit into the scope-approval code, whose owner turn is
   the wrong one; it now names the member `TOOL-aBoundedVerdict-2` adds for it.
+- rev-3 · 2026-08-16 · folded round 2. No finding landed against this unit's rules. The read-path
+  paragraph named itself and one sibling as the budget's only spenders when there are four; the
+  spender set moves to the build README so it is stated once, and this spec names only its own
+  double share. `TOOL-aBoundedVerdict-2`'s awaiting-approval member was narrowed in the same round to
+  the residual S1's three cases leave, so the two now cite each other in both directions.
 
 ## 10. Reuse audit
 
