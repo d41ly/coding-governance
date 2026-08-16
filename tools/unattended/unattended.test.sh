@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Fixture self-test for unattended.sh — every refusal branch armed by a POSITIVE assertion naming
 # its own failure text (which is what check-arms.py reads), plus the behavioural arms no message
-# test can cover: that a refusal writes NOTHING, that the generated region is a COPY rather than a
-# re-derivation, and that --status and --resume agree.
+# test can cover: that a refusal writes NOTHING, that the generated region holds NO copy (the unit
+# list is derived from the build README), and that --status and --resume agree.
 #
 #   bash tools/unattended/unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
@@ -839,6 +839,16 @@ out=$(run --landed tRun)
 hit "$out" "phase LANDED"
 same "--landed wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDED"
 same "--landed witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
+# THE ROSTER IS FROZEN AT LANDING. The unit list is derived from a MUTABLE README while a run is
+# live, which is right — but a finished record must still answer which units it covered, and a later
+# build touching that README would otherwise change a landed run's answer retroactively.
+same "--landed froze the roster into the record" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+# ...and it survives the README moving underneath it, which is the whole point.
+printf '%s\n' '| [ARCH-tRun-2 — a unit added later](spec/two.md) | OPEN | rev-1 | 2026-08-02 |' >> memory/builds/tRun/README.md
+same "the frozen roster does not follow a later README edit" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+git checkout -q -- memory/builds/tRun/README.md 2>/dev/null || true
 n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main

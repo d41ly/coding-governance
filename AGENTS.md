@@ -152,7 +152,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (ten inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 - playbook carrier parity — `tools/check-playbook-parity.sh` (+ `tools/check-playbook-parity.test.sh`):
   the playbook's claims about THIS repo, machine-checked in three classes that have each recurred
   after being fixed once — every tracked kit dir is named in the trio or carries a waiver row with a

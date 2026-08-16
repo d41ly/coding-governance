@@ -564,21 +564,35 @@ def _resolve_lexicon_conf(ctx):
 
 
 def _load_lexicon(ctx):
-    """`(VERBS, ratified, LANGS)` through the lexicon's own reader — never a second parser."""
+    """`(VERBS, ratified, LANGS)` through the lexicon's own reader, or None if it is unreachable.
+
+    RETURNS None RATHER THAN RAISING, and that is load-bearing. `main()` evaluates every signal in
+    one unguarded comprehension, so an exception here does not degrade THIS signal — it kills all
+    eight and takes the `--check` gate leg with it, on a repo that may not even use the lexicon.
+    A conf can exist without the kit importable at this prefix in at least three real states: a
+    root-prefix adopter, a mid-teardown tree, and a malformed conf (`ConfError`). The docstring above
+    promised "never a raise and never a red"; this is what keeps that true.
+    """
     import sys as _sys
     kit = str(ctx.root / "tools" / "lexicon")
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
-    from lexicon_conf import load_conf
-    conf = load_conf(_resolve_lexicon_conf(ctx))
+    try:
+        from lexicon_conf import load_conf
+        conf = load_conf(_resolve_lexicon_conf(ctx))
+    except Exception:
+        return None
     return (conf.get("VERBS") or {}), (conf.get("ratified") or "").strip(), (conf.get("LANGS") or "")
 
 
 def _build_not_asked(name, why):
-    """NOT ASKED is neither clean nor dead. `--check` reds a GATEABLE signal whose population is
-    empty, so a question nobody asked must say so rather than report a reassuring zero."""
+    """NOT ASKED is neither clean nor dead — and it must not RENDER as dead either.
+
+    `live: False` alone made the human table print "DEAD PROBE — signal cannot move" for every
+    adopter who simply does not use the lexicon, which is a false alarm reported as a defect. The
+    `not_asked` flag is what the renderer branches on so the three states stay three."""
     return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
-            "live": False, "unjudgeable": 0, "detail": [{"note": why}]}
+            "live": False, "not_asked": True, "unjudgeable": 0, "detail": [{"note": why}]}
 
 
 def signal_lexicon_verbs_unused(ctx) -> dict:
@@ -598,14 +612,21 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
     name = "lexicon_verbs_declared_but_unused"
     if not _resolve_lexicon_conf(ctx):
         return _build_not_asked(name, "no .lexicon.conf at the repo root; the lexicon kit is not adopted")
+    loaded = _load_lexicon(ctx)
+    if loaded is None:
+        return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here "
+                                      "(root-prefix install, mid-teardown, or an unparseable conf)")
     import sys as _sys
     kit = str(ctx.root / "tools" / "lexicon")
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
-    import lexicon as lex
-    from lexicon_conf import langs as _langs
+    try:
+        import lexicon as lex
+        from lexicon_conf import langs as _langs
+    except Exception:
+        return _build_not_asked(name, "the lexicon engine is not importable here; nothing judged")
 
-    verbs, _ratified, _l = _load_lexicon(ctx)
+    verbs, _ratified, _l = loaded
     if not verbs:
         return _build_not_asked(name, ".lexicon.conf declares no VERBS; nothing to judge")
 
@@ -647,20 +668,30 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
     conf = _resolve_lexicon_conf(ctx)
     if not conf:
         return _build_not_asked(name, "no .lexicon.conf at the repo root; the lexicon kit is not adopted")
-    _verbs, ratified, _l = _load_lexicon(ctx)
+    loaded = _load_lexicon(ctx)
+    if loaded is None:
+        return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here "
+                                      "(root-prefix install, mid-teardown, or an unparseable conf)")
+    _verbs, ratified, _l = loaded
     if not ratified:
         return _build_not_asked(name, ".lexicon.conf carries no ratified stamp; adopt-lexicon.sh --check owns that")
 
     stamp = ratified.split()[0]
-    langs_at = ctx.git.run("log", "-1", "--format=%cI", "-S", "LANGS=", "--", ".lexicon.conf").stdout.strip()
+    # `-G`, not `-S`. `-S` counts OCCURRENCES of the string: `LANGS=` appears exactly once before
+    # and once after a value is widened, so an in-place edit is invisible and this lookup froze at the
+    # adoption commit forever — a permanent, reassuring zero on a GATEABLE signal. Measured on a
+    # two-commit fixture: -S sees only `add`, -G sees `widen` and `add`.
+    found = ctx.git.run("log", "-1", "--format=%cI %H", "-G", "LANGS=", "--", ".lexicon.conf").stdout.strip()
+    langs_at, _, langs_sha = found.partition(" ")
     if not langs_at:
         return _build_not_asked(name, "no commit yet touches the LANGS declaration; nothing to compare")
     stale = langs_at[:10] > stamp
     return {"signal": name, "value": 1 if stale else 0, "of": 1, "tolerance": 0,
-            "gateable": True, "live": True, "unjudgeable": 0,
-            "detail": ([{"ratified": stamp, "langs_changed": langs_at[:10],
+            "gateable": True, "live": bool(langs_at and stamp), "unjudgeable": 0,
+            "detail": ([{"ratified": stamp, "langs_changed": langs_at[:10], "langs_commit": langs_sha,
                          "note": "the declared language surface moved after the table was ratified"}]
-                       if stale else [])}
+                       if stale else []),
+            "langs_commit": langs_sha}
 
 
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
@@ -771,7 +802,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"# drift-report at {head} (base {base_ref}) · kit {KIT_DRIFT_AUDIT_VERSION}")
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
-            if not s["live"]:
+            if s.get("not_asked"):
+                status = "not asked — this repo does not adopt what the signal reads"
+            elif not s["live"]:
                 status = ("empty by declaration — nothing to measure here yet"
                           if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
                           else "DEAD PROBE — signal cannot move, ignore its value")

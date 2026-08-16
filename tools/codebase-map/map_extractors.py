@@ -151,12 +151,19 @@ def _read_lexicon_verbs() -> list[str]:
     conf = ROOT / ".lexicon.conf"
     if not conf.is_file():
         return []
+    # A conf can exist while the kit is NOT importable at this prefix: a root-prefix install, a
+    # mid-teardown tree, or an unparseable conf. Raising there would take out `all_inventories()`
+    # and every leg that calls it, on account of an OPTIONAL kit. Fail to the empty inventory, which
+    # is the same answer the absent-conf case gives and is what the dossier ratchet then reports.
     import sys as _sys
     kit = str(ROOT / "tools" / "lexicon")
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
-    from lexicon_conf import load_conf  # noqa: E402
-    return sorted((load_conf(conf).get("VERBS") or {}).keys())
+    try:
+        from lexicon_conf import load_conf  # noqa: E402
+        return sorted((load_conf(conf).get("VERBS") or {}).keys())
+    except Exception:
+        return []
 
 
 # --------------------------------------------------------------------------------------

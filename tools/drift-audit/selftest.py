@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.2
+gov:kit drift-audit@1.4
 
     python drift-audit/selftest.py
 
@@ -581,6 +581,26 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
 # ---------------------------------------------------------------------------------------------
 
 
+def test_no_signal_hardcodes_live(tmp: pathlib.Path) -> None:
+    """No signal may return a LITERAL `live: True`.
+
+    `live` is the field that makes DEAD PROBE possible — the kit's central claim is that a metric
+    which cannot move is worse than none, and `live` is how a probe admits it cannot. A literal True
+    asserts the opposite by construction: it says "this probe can move" without consulting anything,
+    which is the armed-but-unreachable-rule class landing on the very field that exists to refuse it.
+    One signal shipped that way and reported a permanent, reassuring, GATEABLE zero.
+
+    Grep-able and shrink-only, deliberately. It cannot tell a well-derived `live` from a badly
+    derived one — only that SOMETHING was consulted — which is a smaller claim than it looks and is
+    stated here rather than implied.
+    """
+    print("no signal hardcodes live:True")
+    src = (KIT / "drift_report.py").read_text(encoding="utf-8")
+    hits = [f"{i}: {l.strip()}" for i, l in enumerate(src.splitlines(), 1)
+            if '"live": True' in l and not l.lstrip().startswith("#")]
+    check("no signal returns a literal live:True", not hits, "; ".join(hits))
+
+
 def test_lexicon_signals(tmp: pathlib.Path) -> None:
     """These are the only two signals in this shipped engine that name an OPTIONAL kit, so the
     absent-conf case is the load-bearing arm: an adopter who never took the lexicon must inherit
@@ -628,19 +648,34 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     check("violated: a declared-but-unused verb fires the signal", fired["value"] == 1, f"{fired}")
     check("violated: it names the verb", "vanish" in str(fired["detail"]), f"{fired['detail']}")
 
-    # The staleness signal compares the ratified DATE against the commit date of the last LANGS
-    # change. The stamp above is 2999, so it cannot be stale; move it back and the same edit fires.
+    # THE LANGS LOOKUP, ARMED DIRECTLY. The first version of this arm rolled the stamp back AND
+    # widened LANGS in ONE commit, so it fired off the stamp alone and would have stayed green with
+    # the widening deleted — which is exactly how a `-S` pickaxe shipped here. `-S` counts
+    # OCCURRENCES of the string, and `LANGS=` appears once before and once after an in-place
+    # widening, so the lookup froze at the adoption commit forever while reporting a confident 0.
+    # Asserting the COMMIT the lookup found is what makes the two implementations distinguishable;
+    # a DATE cannot, because a same-day fixture gives both the same answer.
+    before = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser js:js-regex:probe"'),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "widen the language surface IN PLACE", "--no-verify"], r)
+    after = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    check("the LANGS lookup SEES an in-place widening (a -S pickaxe cannot)",
+          bool(after) and after != before, f"before={before} after={after}")
+
+    # ...and only THEN the end-to-end arm, on a stamp that predates it.
     conf.write_text(conf.read_text(encoding="utf-8").replace('ratified="2999-01-01 node t"',
                                                              'ratified="1999-01-01 node t"'),
                     encoding="utf-8", newline="\n")
-    conf.write_text(conf.read_text(encoding="utf-8").replace('LANGS="py:python-ast:parser"',
-                                                             'LANGS="py:python-ast:parser js:js-regex:probe"'),
-                    encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
-    run(["git", "commit", "-q", "-m", "widen the language surface without re-ratifying", "--no-verify"], r)
+    run(["git", "commit", "-q", "-m", "roll the stamp back", "--no-verify"], r)
     stale = report(r)["lexicon_ratified_older_than_language_surface"]
     check("violated: a language surface widened after ratification fires the staleness signal",
           stale["value"] == 1, f"{stale}")
+    check("...and the signal is LIVE by derivation, not a hardcoded True",
+          stale["live"] is True, f"{stale}")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -852,6 +887,7 @@ def main() -> int:
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
+        test_no_signal_hardcodes_live(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
     print()

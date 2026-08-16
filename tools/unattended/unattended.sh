@@ -26,7 +26,7 @@
 #   * It delegates wiring to the project's NON-repairing check. The repairing mode sets git config
 #     and rewrites tracked bytes; the run's first act is not that.
 #
-# It also derives NOTHING. The generated region is a COPY of the build README's already-derived,
+# The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
 KIT_UNATTENDED_VERSION=1.5   # gov:kit unattended@1.5 — kit identity; set HERE, never from .unattended.conf
@@ -114,6 +114,12 @@ region() { # file · open · close   (reads stdin when file is `-`)
 
 # Replace the slice between the markers with the payload, keeping both markers. Same contract, and
 # the same order check — this is the copy whose absence destroyed data rather than merely lying.
+#
+# NO LIVE CALLER since the unit list became derived rather than copied. KEPT, deliberately and with
+# the reason in place rather than left to be rediscovered: it is the marker-region WRITE half of a
+# contract whose read half (`region`) is still load-bearing, the two are gated together by
+# `marker-contract.test.sh`'s case table, and deleting it would leave that contract with only a
+# reader. A function retained for a stated reason is not the same thing as one nobody noticed.
 splice() { # file · open · close · payload-file
   awk -v o="$2" -v c="$3" -v pf="$4" '
     { ln = $0; sub(/\r$/, "", ln) }
@@ -738,6 +744,15 @@ verb_landed() { # slug
   fi
   set_fact "$rel" phase LANDED || return 1
   set_fact "$rel" witness "$head" || return 1
+  # THE ROSTER AT LANDING, frozen here and nowhere else. Deriving the unit list from the build README
+  # is right while a run is LIVE — it cannot go stale between reads — but a FINISHED record must
+  # still answer "which units did this run actually cover", and the README is mutable: a later build
+  # adding a unit would retroactively change what this landed run appears to have carried. Freezing
+  # the ids at the moment of landing is what keeps a terminal record a record. It is written as an
+  # authored FACT because nothing else in the tree holds it once the README moves on.
+  set_fact "$rel" units-at-landing \
+    "$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null \
+       | grep -E '^\| \[' | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
   return 0
@@ -979,10 +994,16 @@ dod_met() { # slug · run-state file · item · checker
       [ -n "$GATE_CMD" ] && $GATE_CMD >/dev/null 2>&1 ;;
     records-current)
       # The unit list is DERIVED from the build README, so "current" is not a comparison between two
-      # copies — it is the ABSENCE of a second copy, plus the README's own markers being readable.
-      # This used to diff the region against that slice, which made an ordinary spec rev bump block
-      # the close with no reachable repair.
-      [ -z "$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | tr -d '[:space:]')" ] \
+      # copies — it is the ABSENCE of a second copy, plus BOTH marker pairs being well-formed. This
+      # used to diff the region against that slice, which made an ordinary spec rev bump block the
+      # close with no reachable repair.
+      #
+      # `region`'s EXIT STATUS is checked, not just its stdout. A malformed pair makes it print
+      # nothing and exit non-zero, so testing emptiness alone would score a broken marker pair as a
+      # SATISFIED DoD item — the item passing loudest exactly when the file is least readable. The
+      # leg spells this the same way; the two must not diverge.
+      region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1 \
+        && [ -z "$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | tr -d '[:space:]')" ] \
         && region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1 ;;
     landed-via-lander)
       [ -n "$LANDER" ] && [ -n "$BYPASS_BAN" ] && ! grep -qF -- "$BYPASS_BAN" "$rel" ;;

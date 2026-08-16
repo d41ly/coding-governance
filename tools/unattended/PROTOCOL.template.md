@@ -64,7 +64,7 @@ naming a path no verb walks. A run that hit it could only hand-edit an artifact 
 generated. Deriving removes the class instead of adding a verb to service it, and the invariant is
 the same one stated as emptiness: one fact, one home.
 
-**Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
+**Authored**, carrying exactly eight facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
@@ -77,6 +77,11 @@ which is the test for belonging here:
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
 6. **The anchor tip sha**, from that same advertisement.
 7. **The endpoint URL** it was observed from.
+8. **The roster AT LANDING**, frozen by `--landed` and by nothing else. While a run is LIVE the unit
+   list is derived from the build README, which cannot go stale between reads. But a FINISHED record
+   must still answer which units the run covered, and that README is mutable: a later build adding a
+   unit would otherwise change a landed run's answer retroactively. Freezing the ids at the moment of
+   landing is what keeps a terminal record a record rather than a live query.
 
 Facts 5 through 7 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
 so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is

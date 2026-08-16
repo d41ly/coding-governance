@@ -1998,6 +1998,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_no_signal_hardcodes_live",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_patch_is_installed",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
