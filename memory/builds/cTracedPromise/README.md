@@ -57,34 +57,6 @@ filename date reaches `SPEC_WITNESS_CUTOFF`, every acceptance bullet must name s
 backticks. Both tiers, a forward ratchet, four fixtures. Added on the owner's instruction after D1
 below was put to them.
 
-<!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling
-ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | CLOSED | rev-3 | 2026-08-15 |
-| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | CLOSED | rev-4 | 2026-08-15 |
-
-Records live under `spec/`.
-<!-- /gen:build-index -->
-
-<!-- gen:build-order -->
-
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
-<!-- /gen:build-order -->
-
-<!-- gen:build-edges -->
-
-*This build declares no parent and no build declares it as one.*
-<!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-14-spec-cTracedPromise-1.md](spec/2026-08-14-spec-cTracedPromise-1.md)
-  - [2026-08-15-spec-cTracedPromise-2.md](spec/2026-08-15-spec-cTracedPromise-2.md)
-<!-- /gen:build-docs -->
 
 ## The owner decision menu
 
@@ -114,3 +86,33 @@ A build that cites its unit correctly and then implements something else entirel
 mechanical in this repo measures how closely a build followed its spec; that judgement is the M4 spec
 audit and the M8 closing adversarial review, and it stays there. The signal narrows the blind spot
 from "no measurement at all" to "the link is measured, the content is reviewed".
+
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling
+ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | CLOSED | rev-3 | 2026-08-15 |
+| [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | CLOSED | rev-4 | 2026-08-15 |
+
+Records live under `spec/`.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-14-spec-cTracedPromise-1.md](spec/2026-08-14-spec-cTracedPromise-1.md)
+  - [2026-08-15-spec-cTracedPromise-2.md](spec/2026-08-15-spec-cTracedPromise-2.md)
+<!-- /gen:build-docs -->

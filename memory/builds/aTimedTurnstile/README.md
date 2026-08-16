@@ -21,6 +21,22 @@ SELF-TESTS holding 96.7% of the wall, while the 18 legs that actually check this
 This build makes them run together. A scratchpad prototype completed all 47 legs in 79.9s at width 8
 with `fails=0`, which is the number this unit is built to reproduce.
 
+
+### The specs
+
+| Spec | Item | Tier | Edit site | One-liner |
+|------|------|------|-----------|-----------|
+| [TOOL-aTimedTurnstile-5](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | the bounded pool | 2 | `tools/run-gates.sh` + its sibling self-test | Legs run through a bounded worker pool, report in manifest order, and dispatch longest-first from a cache the runner writes itself. |
+
+### What this build does NOT do
+
+Widening `guard` coverage to the 29 self-tests is `TOOL-aTimedTurnstile-2` and is held for an owner
+decision, because guards honoured at the push boundary would make the authoritative run diff-scoped
+while `AGENTS.md` calls that run the full bar. Making individual legs cheaper is
+`TOOL-aTimedTurnstile-3`, and it only becomes the binding constraint after this unit lands, since the
+floor stops being the sum and becomes the longest leg under load.
+
+
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
@@ -51,17 +67,3 @@ Records live under `spec/` and `reviews/`.
 - **`reviews/`**
   - [2026-08-11-review-aTimedTurnstile-1.md](reviews/2026-08-11-review-aTimedTurnstile-1.md)
 <!-- /gen:build-docs -->
-
-### The specs
-
-| Spec | Item | Tier | Edit site | One-liner |
-|------|------|------|-----------|-----------|
-| [TOOL-aTimedTurnstile-5](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | the bounded pool | 2 | `tools/run-gates.sh` + its sibling self-test | Legs run through a bounded worker pool, report in manifest order, and dispatch longest-first from a cache the runner writes itself. |
-
-### What this build does NOT do
-
-Widening `guard` coverage to the 29 self-tests is `TOOL-aTimedTurnstile-2` and is held for an owner
-decision, because guards honoured at the push boundary would make the authoritative run diff-scoped
-while `AGENTS.md` calls that run the full bar. Making individual legs cheaper is
-`TOOL-aTimedTurnstile-3`, and it only becomes the binding constraint after this unit lands, since the
-floor stops being the sum and becomes the longest leg under load.

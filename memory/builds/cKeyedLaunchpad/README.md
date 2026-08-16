@@ -198,6 +198,23 @@ bare "parked" is indistinguishable from "forgotten".
 The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
+
+## Method
+
+`memory/guides/BUILD-METHOD.md`, multi-pass. The M5 reuse probes were run at kickoff and their
+results belong in each spec's §10.
+
+```bash
+python tools/codebase-map/reuse_lookup.py "gate a document's size and line length"
+python tools/memory-recall/query.py "why does the kickoff manifest live where it does and what gates its prose" --terms "kickoff manifest ratchet last-audit watch verify-paths SESSION-KICKOFF discovery order traps accretion size gate prose"
+```
+
+The size-gate probe returned `tools/check-template-size.sh` as the nearest seam. It is the wrong one
+to extend: it is a gov-only gate leg over a single file, and these checks must ride
+`manifest-check.sh` so that adopters inherit them when they re-pull the kit. That is a recorded miss,
+not a skipped audit.
+
+
 <!-- gen:build-index -->
 **Build status:** OPEN · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling
 ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
@@ -239,18 +256,3 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-13-review-cKeyedLaunchpad-1.md](reviews/2026-08-13-review-cKeyedLaunchpad-1.md)
   - [2026-08-14-review-cKeyedLaunchpad-2.md](reviews/2026-08-14-review-cKeyedLaunchpad-2.md)
 <!-- /gen:build-docs -->
-
-## Method
-
-`memory/guides/BUILD-METHOD.md`, multi-pass. The M5 reuse probes were run at kickoff and their
-results belong in each spec's §10.
-
-```bash
-python tools/codebase-map/reuse_lookup.py "gate a document's size and line length"
-python tools/memory-recall/query.py "why does the kickoff manifest live where it does and what gates its prose" --terms "kickoff manifest ratchet last-audit watch verify-paths SESSION-KICKOFF discovery order traps accretion size gate prose"
-```
-
-The size-gate probe returned `tools/check-template-size.sh` as the nearest seam. It is the wrong one
-to extend: it is a gov-only gate leg over a single file, and these checks must ride
-`manifest-check.sh` so that adopters inherit them when they re-pull the kit. That is a recorded miss,
-not a skipped audit.

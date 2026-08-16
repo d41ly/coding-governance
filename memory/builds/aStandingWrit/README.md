@@ -87,21 +87,6 @@ One spec, scope items `S0`–`S8`. The rows below are the reading order, not a d
 sub-specs — and they sit inside the roster marker pair S8 added, which is what makes this table the
 thing a run's authorization is compared against.
 
-<!-- roster:units -->
-
-| Area | What changes |
-|---|---|
-| **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
-| **S1** | BUILT — authorization reads the build README at BASE; the mandate block and its marker pair retire |
-| **S2** | BUILT — `--preflight` CREATES and stages the run-state file; staging is what the gate leg can see |
-| **S3** | BUILT — merge-base-equals-HEAD is legal at preflight, still a refusal at close |
-| **S4** | BUILT — `--plan` mechanises BUILD-METHOD M2's four states, and names the two things it cannot see |
-| **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
-| **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
-| **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
-| **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
-
-<!-- /roster:units -->
 
 ## Owner decision menu — all eight RESOLVED 2026-08-11
 
@@ -202,6 +187,23 @@ with this build's file list, and the rev-1 spec was machine-clean against the fo
 
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
+
+<!-- roster:units -->
+
+| Area | What changes |
+|---|---|
+| **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
+| **S1** | BUILT — authorization reads the build README at BASE; the mandate block and its marker pair retire |
+| **S2** | BUILT — `--preflight` CREATES and stages the run-state file; staging is what the gate leg can see |
+| **S3** | BUILT — merge-base-equals-HEAD is legal at preflight, still a refusal at close |
+| **S4** | BUILT — `--plan` mechanises BUILD-METHOD M2's four states, and names the two things it cannot see |
+| **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
+| **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
+| **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
+| **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
+
+<!-- /roster:units -->
+
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
