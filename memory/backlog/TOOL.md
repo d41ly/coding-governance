@@ -62,3 +62,9 @@
 - TOOL-cBriefedPilot-22 · OPEN · check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table, which are joined to PHASES_CORE and DOD_CORE by no leg today
 - TOOL-dClosedLexicon-1 · SPECCED · an opt-in lexicon kit gating three declared naming predicates, with the seed table derived-then-frozen, coverage modes per language, and the pin-direction guard CUT on two independent defects → `builds/dClosedLexicon/`
 - TOOL-dClosedLexicon-2 · SPECCED · wires the verb table into the codebase-map ratchet and two drift-audit signals; adds no new gate leg, and records that the ratchet DELETION direction is the load-bearing half → `builds/dClosedLexicon/`
+- TOOL-aTetheredRecord-1 · SPECCED · mint the five missing spec H1 ids so they resolve, and drain `id-orphan-waiver.txt` to empty with `ORPHAN_ID_PIN` 5 -> 0 → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-2 · SPECCED · the record-to-spec binding grammar and its read-only parser in `gen_build_index.py`; raises nothing, so an unannotated record cannot brick the render → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-3 · SPECCED · the retrofit: every record under a build's non-spec folders gains a binding line, by a stated precedence in which the filename ordinal is never evidence → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-4 · SPECCED · check 21 — three armed fail branches over an extension-agnostic population; branch 2 narrows check 14's any-anchor resolution to spec-defined ids → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-5 · SPECCED · the generated region renders each record under the ids it serves and derives the ids no record names — the two-sided join no grep can compute → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-6 · SPECCED · the adopter path: the pin is measured against the adopter's own corpus from the scaffolder's next-steps block, and the runbook carries their migration → `builds/aTetheredRecord/`

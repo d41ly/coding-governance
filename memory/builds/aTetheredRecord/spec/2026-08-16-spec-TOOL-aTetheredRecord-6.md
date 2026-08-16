@@ -1,0 +1,126 @@
+# TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it
+
+**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+
+## 1. Goal
+
+Make check 21 adoptable by a repo whose corpus nobody here can read. This repo satisfies the rule by
+retrofitting 76 records because the owner put that in scope; an adopter has their own corpus, their
+own budget, and no such decision. The kit must ship the rule together with the step that measures
+their pin and the runbook section that describes their migration.
+
+## 2. Scope (IN)
+
+- **S1** — A step in `tools/memory-tree/adopt-memory-tree.sh`'s next-steps block instructing the
+  adopter to MEASURE their own unbound-record pin against their own corpus by running the gate, never
+  to inherit this repo's number. Every path it prints is built from the script's own derived install
+  prefix.
+- **S2** — A migration section in `WIRE-INTO-PROJECT.md`, in the shape the existing kit-version
+  section uses: the kit version boundary, a plain statement that an untouched tree holding records
+  reds on first run, the numbered migration, and a worked example with a measured figure.
+- **S3** — `AGENTS.md`'s gate-suite section names check 21 and what it enforces.
+
+## 3. Non-goals (OUT)
+
+- **No cutoff, and no shipped waiver seeded from this repo's population.** A registry seeded from
+  gov's rows would name paths an adopter's tree does not have — the same reasoning the method-carrier
+  registry already ships under, where the kit deliberately ships none.
+- **No automatic retrofit tool.** Binding a record to a spec is a judgement about what a document was
+  about. A script that guessed it would fabricate provenance at scale, which is the one failure the
+  retrofit's precedence rule exists to prevent.
+- **No `--check` verb for the adopter script.** It lacks one, alone among the kits, and adding it is
+  a real fix with a real blast radius. Recommended separately.
+
+## 4. Design
+
+### The asymmetry, stated plainly
+
+For this repo the pin is measured after a full retrofit and is small. For an adopter the pin is
+measured BEFORE any retrofit and equals their whole record count — which makes their tree green on
+day one and leaves the ratchet pointing down. That is not a cutoff: a cutoff exempts by date and
+never mentions the exempted files again, while the pin is a single number that reds when it rises and
+drains as they bind records. They can retrofit at their own pace, and the gate reports the remaining
+count every run.
+
+This is the honest reading of "no cutoffs" applied to a repo the owner does not own. The owner's
+decision binds this corpus, which is retrofitted in full by `TOOL-aTetheredRecord-3`.
+
+### Rollout
+
+The step lands with the check, not after it. Every content ratchet this kit ships is armed from the
+scaffolder's next-steps block, and all three candidate designs in the design pass forgot it — which
+is the evidence that it is easy to forget and therefore belongs in scope rather than in a follow-up.
+
+### Files touched (estimate)
+
+`tools/memory-tree/adopt-memory-tree.sh`, `WIRE-INTO-PROJECT.md`, `AGENTS.md`, and the shipped
+example conf.
+
+### Alternatives rejected
+
+**Ship the pin with this repo's measured value as a default.** Every pin in this kit is measured
+against the adopting corpus and never inherited, because a pin copied from a larger tree is either
+vacuous or permanently red. The shipped example carries a blank, which is the strictest value and
+forces the measurement.
+
+**Let an existing adopter discover the rule on their next gate run.** The scaffolder exits early for
+an already-adopted tree, so a rule added after their adoption never reaches them through the script
+at all. The runbook section is how it reaches them, and this is a known gap in the kit rather than
+one this unit introduces.
+
+## 5. Production-readiness checklist
+
+- security — N/A.
+- perf / scale — N/A; documentation and one scaffolder step.
+- a11y — N/A.
+- i18n — N/A.
+- error / empty / loading states — a scaffolded tree with no records has a blank pin and a check that
+  skips on its population guard; that is the state the acceptance criteria assert.
+- observability — the gate reports the adopter's remaining unbound count on every run.
+- risks — the install-prefix class: a kit path spelled rather than derived lands a dead path in the
+  adopter's committed tree, and the byte-compare guarding that file agrees with it. Every path this
+  unit adds is derived, and the gate for that is a named acceptance criterion.
+- testing + left-shift gates — the install-prefix gate and the scaffold-into-an-empty-repo case.
+- migration / rollback — documentation; revertible.
+- user docs — this unit IS the user docs.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `bash tools/check-install-prefix.sh` runs, it is green: nothing this unit adds
+  spells a root-install kit path.
+- **AC2** — When the adopter script scaffolds into an empty scratch repo and
+  `bash tools/memory-tree/check-memory-hygiene.sh` is run there with a blank pin, it exits 0.
+- **AC3** — When the next-steps block emitted by `tools/memory-tree/adopt-memory-tree.sh` is read,
+  its measurement step names the gate command built from the script's derived prefix, and states that
+  the pin is measured rather than inherited.
+- **AC4** — When `python tools/drift-audit/drift_report.py --check` runs, it is green.
+- **AC5** — When `AGENTS.md`'s gate-suite section is read, check 21 is named there, satisfying the
+  charter-names-every-leg signal for the renamed leg.
+- **AC6** — When `bash tools/run-gates.sh` runs, every leg is green.
+
+## 7. Gates
+
+`install prefix` · `drift-audit records` · `memory hygiene` · `agent-instructions wiring` ·
+`bash tools/run-gates.sh` at the push boundary.
+
+## 8. Open questions
+
+none — the asymmetry in §4 is a design decision recorded there, not a fork. It follows directly from
+the owner's no-cutoff ruling applying to this corpus and from the kit's standing rule that every pin
+is measured against the adopting tree.
+
+## 9. Revision log
+
+- rev-1 · 2026-08-16 · initial draft, from the adversarial design pass recorded under this build's
+  `build/` folder.
+
+## 10. Reuse audit
+
+Three shipped patterns carry this unit unchanged: the scaffolder's next-steps block, which is where
+every other content ratchet in this kit is armed; the per-repo measured-pin convention, which the
+repo conf documents for each of its existing pins; and the runbook's kit-version section, whose shape
+S2 copies. The one thing deliberately NOT reused is the seeded-registry pattern from the
+method-carrier gate — that gate ships no registry and scaffolds the adopter's from their own measured
+population, and a seeded registry was rejected here in favour of a scalar pin. Recall terms:
+`build slug spec artifact filename header adversarial review closeout journal bookkeeping convergence
+naming hygiene`.
