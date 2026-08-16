@@ -82,12 +82,12 @@ are constants in the files they govern, so a copy-installed kit carries its own.
 
 ## 6. Acceptance criteria
 
-- **AC1** — lowering any suite's executed assertion count below its floor makes that suite exit 1,
-  demonstrated by moving an arm above the summary and observing the refusal.
-- **AC2** — the refusal names the observed count, the floor, and unreachability.
+- **AC1** — lowering a suite's executed count below its `FLOOR_ASSERTIONS` makes that suite exit 1:
+  move an arm below the summary in `tools/unattended/check-unattended.test.sh` and observe the refusal.
+- **AC2** — the refusal names the observed count, the floor, and says `arms are UNREACHABLE rather than absent`, so the reader is pointed at a stranded block rather than a deleted one.
 - **AC3** — `mutate` with a sed script that matches nothing fails the suite naming the file.
 - **AC4** — `mutate` with a sed script that matches leaves the suite green.
-- **AC5** — every suite touched still reports PASS, with a count at or above its floor.
+- **AC5** — every suite touched still prints `PASS (` with a count at or above its own `FLOOR_ASSERTIONS`.
 
 ## 7. Gates
 

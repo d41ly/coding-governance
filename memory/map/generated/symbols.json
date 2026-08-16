@@ -1138,6 +1138,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "ratchet_findings",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1513,6 +1518,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "signal_closed_specs_untraceable",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "signal_dangling_pointers",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -1561,6 +1571,11 @@
       "id": "stems",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "strip_records_sentence",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "structure_identity",
@@ -1888,6 +1903,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_ratchet_guard",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1919,6 +1939,11 @@
     },
     {
       "id": "unfenced",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "unfenced_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },

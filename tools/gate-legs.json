@@ -206,6 +206,13 @@
     ]
   },
   {
+    "name": "marker contract (4 readers)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/marker-contract.test.sh"
+    ]
+  },
+  {
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",

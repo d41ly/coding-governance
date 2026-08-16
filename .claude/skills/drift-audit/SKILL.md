@@ -24,7 +24,7 @@ python tools/drift-audit/drift_report.py --json     # full detail per signal
 python tools/drift-audit/drift_report.py --check    # exit 1 if a gateable signal is over its pin
 ```
 
-Five signals, stdlib and git only, no cache:
+The signals, stdlib and git only, no cache:
 
 | Signal | Asks |
 |---|---|
@@ -33,6 +33,7 @@ Five signals, stdlib and git only, no cache:
 | `shrink_only_lists_not_shrinking` | are the lists that promise to shrink actually shrinking? |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? |
 | `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? |
+| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? |
 
 **Read the `status` column, not just the value.** A signal that cannot move prints `DEAD PROBE` and
 its number means nothing. That column exists because the upstream adopter's convergence tool shipped

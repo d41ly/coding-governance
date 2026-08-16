@@ -340,4 +340,6 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | CLOSED | rev-4 | 2026-08-16 |
 | [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | CLOSED | rev-2 | 2026-08-16 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

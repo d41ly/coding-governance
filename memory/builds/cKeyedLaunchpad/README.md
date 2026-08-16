@@ -195,7 +195,7 @@ bare "parked" is indistinguishable from "forgotten".
 
 ## Unit index
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATED from the status
+The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -210,6 +210,8 @@ header of every spec in this folder — do not hand-edit it.
 | [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-3 | 2026-08-13 |
 | [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-3 | 2026-08-13 |
 | [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-3 | 2026-08-13 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Method

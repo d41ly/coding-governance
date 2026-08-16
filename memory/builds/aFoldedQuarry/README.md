@@ -49,4 +49,6 @@ then U5.
 | [TOOL-aFoldedQuarry-5 — U3: one id grammar, one walk, every consumer](spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-6 — U4: the bug-class corpus and its per-diff checklist](spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aFoldedQuarry-7 — U5: the harness disciplines, made mechanical](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md) | CLOSED | rev-1 | 2026-08-08 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

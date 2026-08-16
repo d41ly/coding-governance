@@ -51,6 +51,7 @@
 - TOOL-cBriefedPilot-18 · the contract names ZERO handles. The list an agent reads is the Skill's table, joined to the registry by leg check 16 in both directions; naming it twice is the drift a pointer design exists to avoid
 - TOOL-cBriefedPilot-21 · `parallelism route: none` — D6 does not ship. Measured: R3 dies on a PATH lookup, R1 on a budget key an unattended run cannot mint. And the claim that BLOCKED it — a sidechain inherits no hooks and no CLAUDE.md — is FALSE in both halves
 
+- TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
 ## DEPL — deployer
 
 *(none yet)*

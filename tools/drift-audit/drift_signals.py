@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.1
+gov:kit drift-audit@1.3
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -25,6 +25,34 @@ PRODUCT_GLOBS: list[str] = [
     # is product CONFIGURATION that moved into the tree, not a record. Naming the DIRECTORY would let
     # every spec cite its own id through the corpus and certify all of them at once.
     "memory/guides/SESSION-KICKOFF.md",
+    "parallel-coding-governance.template.md",
+    "parallel-coding-governance.customize.md",
+    "parallel-coding-governance.domain-rules.md",
+    "WIRE-INTO-PROJECT.md",
+]
+
+# --------------------------------------------------------------------------------------------
+# TRACE_CUTOFF / TRACE_GLOBS — signal 6 (`closed_specs_with_no_product_commit`).
+#
+# The cutoff is the date THIS repo's "unit id in the commit subject" rule became binding: 2026-08-11,
+# when `memory/guides/BUILD-METHOD.md` landed at a383375. It is judged against each spec's
+# STATUS-HEADER date, which TEMPLATE-SPEC defines as the last-change date and which on a CLOSED spec
+# is therefore the close date.
+#
+# It is a grandfather, not a knob to tune until the number looks good. Before that commit the subjects
+# were `feat(memory-tree)!: U1 — …` and `fix(aStandingWrit): …` — the unit number or the slug, never
+# the id — so 36 CLOSED specs are correctly unjudgeable. A cutoff of 2026-08-12 would read 0 misses
+# instead of 1, by dropping ten specs from the population to avoid investigating three entries; that
+# is the vacuous-selector class, and it is why this date is the convention's and not the tidiest.
+TRACE_CUTOFF: str = "2026-08-11"
+
+# NARROWER than PRODUCT_GLOBS, deliberately. `.claude/` and the kickoff manifest are product
+# CONFIGURATION that a records or kickoff commit routinely touches, so leaving them in lets the
+# house's own bookkeeping certify the bookkeeping — the exact hole the path restriction exists to
+# close. Today the narrowing changes no verdict; it is taken before it costs something, not after.
+TRACE_GLOBS: list[str] = [
+    "tools",
+    "skills",
     "parallel-coding-governance.template.md",
     "parallel-coding-governance.customize.md",
     "parallel-coding-governance.domain-rules.md",
@@ -147,6 +175,49 @@ PINS: dict[str, int] = {
     # DRAINED to 0: all seven were SELF-TESTS whose parent gate was cited but whose own script
     # path was not; the charter now names them in one bullet, so every leg on the bar is spelled there.
     "handkept_inventories_disagreeing_with_source": 0,
+    # 1 — TOOL-aMooredAnchor-1, the oracle's known residual. Its build commits are 59b4710 and its
+    # siblings, whose subjects name neither its id nor its slug: it closed on 2026-08-11, hours after
+    # the convention it is judged by landed the same day. Read it before lowering this pin.
+    #
+    # SEEDED AT 1, NOT 0, and the difference is the whole reason the pin is trustworthy. Counting
+    # merge commits this signal reads 0 — but the only commits naming aMooredAnchor are two reconcile
+    # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
+    # that way is a number, not a measurement.
+    "closed_specs_with_no_product_commit": 1,
 }
+
+# --------------------------------------------------------------------------------------------
+# RATCHETS — the shrink-only NUMBERS whose weakening direction must be justified in place.
+#
+# TOOL-aNumeralWarden-3: every gate that owns one of these compares only `value > pin`, so RAISING
+# the pin and DRAINING the population look identical from the outside. `ORPHAN_ID_PIN` 4 -> 5 and
+# `handkept` 1 -> 7 both landed unchallenged that way.
+#
+# The fix reads a marker that was ALREADY being written by hand. `.memory-tree.conf` says, in prose,
+# "RAISED 2 -> 3 at the merge with main, and this is a RAISE, not a drain — the distinction the
+# drift-audit backlog row warns is invisible to every gate." The convention existed; nothing read it.
+# So a weakening move now REQUIRES a nearby comment naming both numbers in `<old> -> <new>` form,
+# and the marker goes stale visibly because it spells the values.
+#
+# `weakens` is the direction that makes the guarantee WEAKER, and it differs by kind: a pin, ceiling
+# or budget weakens UPWARD, a floor weakens DOWNWARD. Getting that backwards would make the guard
+# refuse every legitimate ratchet and wave through every regression, so it is declared per entry
+# rather than inferred from the name.
+#
+# SCALARS ONLY, stated rather than implied. The compound floors — `ARMS_FLOORS` and `CORE_FLOOR`,
+# both `<name>:<n>:<n>` sets — are NOT covered here: they need a per-member diff, which is a
+# different parse and a different message. They keep their own gates' one-sided checks. Naming the
+# gap is the point; a guard whose coverage is guessed at is the class this repo keeps finding.
+RATCHETS: list[dict] = [
+    {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
+    {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
+    {"file": ".memory-tree.conf", "key": "READ_PATH_CEILING", "weakens": "up"},
+    {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
+    {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
+    {"file": "tools/drift-audit/drift_signals.py",
+     "key": "non_terminal_specs_cited_by_product_source", "weakens": "up"},
+    {"file": "tools/drift-audit/drift_signals.py",
+     "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
+]
 
 CHARTER = "AGENTS.md"

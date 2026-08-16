@@ -25,7 +25,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
   over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
   `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
-  five signals, stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
+  stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
   that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
   `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
@@ -170,7 +170,10 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
   the engines carrying their arms in a `--selftest` mode rather than a sibling file —
   `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
-  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  `tools/memory-tree/row_grammar.py`. Beside them rides the marker-region contract itself,
+  `tools/memory-tree/marker-contract.test.sh`, which drives all four live readers of the
+  generated-region markers over one case table — the contract lives in that table, not in prose.
+  This is the list the charter-completeness signal reads, not a
   claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default

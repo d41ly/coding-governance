@@ -107,7 +107,7 @@ red for an unrelated reason. Rebuilt with `git commit-tree` preserving parents, 
 as reported, and that same parent-preservation is now a comment in the arm so the next person does
 not repeat it.
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is GENERATED from the status
+The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -116,4 +116,6 @@ header of every spec in this folder — do not hand-edit it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | CLOSED | rev-5 | 2026-08-11 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

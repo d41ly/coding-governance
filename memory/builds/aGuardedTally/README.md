@@ -11,7 +11,7 @@ ids: TOOL-aGuardedTally-1
 
 Node `a` · opened 2026-08-03 · streams tooling.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -20,4 +20,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | INPROGRESS | rev-4 | 2026-08-03 |
+
+Records live under `spec/`, `reviews/` and `prompts/`.
 <!-- /gen:build-index -->

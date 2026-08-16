@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.1` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.3` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -62,9 +62,9 @@ Then, in order:
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: five signal implementations, `--json`, `--check` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, optional `CHARTER` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -80,6 +80,7 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `shrink_only_lists_not_shrinking` | are the lists that promise to shrink actually shrinking? | no |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
 | `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? | no |
+| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's
