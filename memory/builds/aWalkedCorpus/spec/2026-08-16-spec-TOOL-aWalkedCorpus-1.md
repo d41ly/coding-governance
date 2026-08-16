@@ -1,6 +1,6 @@
 # TOOL-aWalkedCorpus-1 — the two corpus enumerators become one
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
@@ -17,9 +17,19 @@ recorded as a follow-up.
   exactly what a session needs to find" while the measurement path stays pinnable to a rev. That
   difference is REAL and is preserved: the surviving function takes it as a parameter rather than
   being duplicated for it.
-- **S2 — the declared extra sources move with it.** `aDeclaredCeiling` added
-  `resolve_declared_sources` and had to call it from both walks and from the digest. After S1 there
-  is one call site inside the enumerator, and the callers stop knowing about it.
+- **S2 — the declared extra sources move INTO the enumerator, which is not where they are today.**
+  A first draft of this item said `resolve_declared_sources` "had to be called from both walks".
+  Measured: it is called from NEITHER. The sites are `extract.py`'s extraction body, `query.py`'s
+  `_docs`, and `query.py`'s `build_cache` — three callers OUTSIDE the two walks, which is why the
+  widening had to be repeated in each. S1 gives the enumerator the responsibility, and the callers
+  stop knowing about it.
+- **S6 — the fourth site is LIVE-BROKEN and this unit is the one that can see it.**
+  `build_cache` writes its digest over `files + resolve_declared_sources(repo)` while
+  `ensure_cache` compares one computed over `files` alone. The two never agree, so the query
+  cache can NEVER hit and every run rebuilds — measured, two consecutive runs both report
+  "rebuilt". `aDeclaredCeiling` introduced it when it taught the digest about declared sources and
+  taught only the writing half. S1 removes the asymmetry by construction: one enumerator means one
+  file list, and both halves take it from the same call.
 - **S3 — the false claim is corrected at its source.**
   `memory/builds/aDeclaredCeiling/spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md:98` says
   "Recorded as the follow-up it is." It is amended in place to say what actually happened: the
@@ -78,6 +88,10 @@ untracked file, visible to one caller and not the other.
 | `tools/memory-recall/selftest.py` | S5 |
 | `memory/builds/aDeclaredCeiling/spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md` | S3 + rev bump |
 | `memory/backlog/TOOL.md` | S4 |
+| `memory/builds/aDeclaredCeiling/README.md` · `memory/LIVE.md` · `memory/ledger/2026-08.md` | REGENERATED — S3's rev bump moves the build index, and hygiene check 9 byte-compares it. Simulated: the rev bump alone turns it stale |
+| `memory/map/generated/symbols.json` | REGENERATED — deleting a `corpus_files` definition changes the symbol inventory, and the freshness leg byte-compares it. Simulated: STALE without a re-render |
+| `.memory-tree.conf` · `memory/HYGIENE.md` · `memory/TEMPLATE-SPEC.md` · `memory/guides/BUILD-METHOD.md` · `tools/memory-tree/*.template.md` · `tools/memory-tree/check-memory-hygiene.sh` | every carrier of `KIT_MEMORY_TREE_VERSION`, which §4 already commits to moving — check-kit-versions.sh asserts the marker/constant pair across all of them |
+| `tools/memory-recall/recall_conf.py` · `tools/memory-recall/README.md` | `KIT_MEMORY_RECALL_VERSION` and its marker |
 
 No depth-1 `tools/` path is created, so no `govkit` row is owed. `extract.py` is in the
 verdict-epoch gate's DELEGATE set, so `KIT_MEMORY_TREE_VERSION` moves with this commit, and
@@ -103,8 +117,11 @@ verdict-epoch gate's DELEGATE set, so `KIT_MEMORY_TREE_VERSION` moves with this 
   indexes it and the MEASUREMENT path at a rev does not. Both halves observed, because a refactor
   that quietly unified them would pass a one-sided check.
 - **AC3** — When a caller passes both `rev` and `include_untracked`, it is refused by name.
-- **AC4** — When `python tools/memory-recall/query.py` runs before and after this change on the same
-  tree, the index reports the same record and chunk counts. The refactor moves no document.
+- **AC4** — The refactor moves no document: the index reports the same record and chunk counts
+  before and after. The invocation needs a QUESTION and terms —
+  `python tools/memory-recall/query.py` bare prints usage and exits 2 — so the count is read from
+  the `index N records + M chunks` line of a real query, and the BEFORE number is taken at BASE
+  and written into this criterion's fold note rather than recalled.
 - **AC5** — When `python tools/memory-recall/selftest.py` runs it exits 0, and inverting S5's arm
   reds it naming that arm.
 - **AC6** — When `memory/builds/aDeclaredCeiling/spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md:98`
@@ -112,6 +129,12 @@ verdict-epoch gate's DELEGATE set, so `KIT_MEMORY_TREE_VERSION` moves with this 
 - **AC7** — When `grep -n "aWalkedCorpus-1" memory/backlog/TOOL.md` runs, the row is CLOSED.
 - **AC8** — When `bash tools/memory-tree/check-verdict-epoch.sh` runs it exits 0, so
   `KIT_MEMORY_TREE_VERSION` moved with the delegate.
+- **AC10** — When `grep -c resolve_declared_sources tools/memory-recall/query.py` runs it returns 0:
+  the callers no longer know about declared sources, which is S2's whole content and what no
+  criterion in the first draft observed. S2 could have been abandoned entirely with every AC green.
+- **AC11** — **The query cache HITS.** Two consecutive `python tools/memory-recall/query.py` runs
+  on an unchanged tree report `rebuilt` then `cached`. It reports `rebuilt` twice at BASE — the S6
+  defect — so this criterion is RED before the unit and is the only one that observes it.
 - **AC9** — When `bash tools/run-gates.sh` runs, it is green.
 
 ## 7. Gates
@@ -129,6 +152,16 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · folded the round-1 spec audit. **F7**: S2's premise was wrong in both halves
+  — `resolve_declared_sources` is called from NEITHER walk but from three sites outside them, which
+  is exactly why the widening had to be repeated. **F10** promoted to **S6**: `build_cache` and
+  `ensure_cache` compute their digests over different file sets, so the query cache can never hit
+  and every run rebuilds — a live defect `aDeclaredCeiling` introduced by teaching only the writing
+  half, and one this unit removes by construction. **F13**: S2 had no AC and could have been
+  abandoned with every criterion green; **AC10** and **AC11** observe it, and AC11 is RED at BASE.
+  **F12**: AC4 named an invocation that prints usage and exits 2. **F8/F9**: Files touched omitted
+  two byte-compared generated artifacts and every carrier of the two version bumps §4 commits to.
+  **F16**: the §10 reuse claim named the wrong symbol, and the true one is a better argument.
 - rev-1 · 2026-08-16 · initial draft. The cleanup was deferred by `TOOL-aDeclaredCeiling-2` §4 with
   the words "Recorded as the follow-up it is", and no row was minted — found when the build was
   asked what it had left, not by a review. S3 exists because a deferral nobody recorded and a
@@ -137,8 +170,12 @@ none.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "enumerate the corpus of documents an index is built
-from"` — the seam this unit collapses is `extract.corpus_files`, which the codebase map already
-surfaces as the measurement path. There is no new seam; the unit REMOVES one.
+from"` returns `corpus_files [function | tools/memory-recall/query.py | fan-in 1]` — **query.py's,
+not extract.py's**, and the map surfaces no `extract.corpus_files` symbol at all. A first draft of
+this paragraph asserted the opposite. The correction is not cosmetic: the map's fan-in of 1 is
+precisely the evidence that the duplicated walk has almost no callers and is safe to collapse,
+which is a better argument than the one it replaced. The unit REMOVES a seam rather than adding
+one.
 
 `python tools/memory-recall/query.py "why does the query path see files the measurement path does
 not" --terms "corpus enumerator tracked untracked ignored rev pinnable measurement query walk index

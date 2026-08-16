@@ -1,8 +1,42 @@
 # TOOL-aWalkedCorpus-2 — the corpus gets something that grades it
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** DEFERRED · rev-2 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
+
+> **DEFERRED 2026-08-16, and the reason is a measurement rather than a preference.** The round-1
+> spec audit was asked directly whether a fixture-plus-floor is buildable against `bench.py` AS IT
+> EXISTS, and answered no, with four facts it verified by running them:
+>
+> 1. **`bench.py` always exits 0.** `main()` ends `return 0`; over an all-miss fixture it prints
+>    `ceiling 0.00` and `0.00` on every metric and still succeeds. A leg calling it cannot fail.
+> 2. **Its flag set is closed.** `KNOWN_FLAGS` rejects unknown arguments, so `--floor` aborts.
+> 3. **It needs a data dir nothing commits.** `load()` reads `<dir>/<set>.jsonl` plus
+>    `anchors.json`, and no gate leg produces one.
+> 4. **It cannot be extended.** `verbatim.json` pins `bench.py` byte-for-byte, asserted by a
+>    selftest arm — a leg THIS unit's own §7 and AC5 require green. Editing it reds the unit.
+>
+> So the unit needs two executables it never names: a data-dir producer and a floor comparator.
+> That is a different and larger unit, not a fold.
+>
+> **Three more findings say the design underneath is wrong too, and they are the useful part:**
+>
+> - **The red proof cannot fire.** Removing every declared source moves chunks 4439 → 4408, leaves
+>   `records` byte-identical at every k, and moves chunk MRR the WRONG way (fts5 0.150 → 0.160).
+>   S4 called that arm "the whole unit".
+> - **`RECALL_FLOOR` is a scalar over a matrix.** `bench.py` emits `r@k`, `f@k`, `MRR`, `b@k` and
+>   `ceiling` per set across 4 substrates × 6 ks, spanning 0.00–1.00 in one run. One number names
+>   no cell.
+> - **The provenance pool is nearly empty.** 125 specs, 104 with a §10, **8** citing a recall
+>   probe, **3** carrying ids — and 2 of those 3 cite the id as a recorded MISS. S1's stated source
+>   for the fixture barely exists, and AC8 binds the unit to it.
+>
+> **What a real successor needs**, so this is a deferral and not a loss: a data-dir producer and a
+> comparator as their own executables; a fixture whose provenance rule is something other than
+> "§10 probes", because that pool is 3 usable questions; a floor that names a CELL of the matrix;
+> and a degradation that actually moves the chosen metric — removing records, not declared sources.
+> The audit measured all four, and those measurements are the successor's starting point.
+
 
 The recall corpus can widen, narrow or be re-walked and nothing measures whether retrieval got
 worse. `aDeclaredCeiling` widened it and said so in its own §5: "unfalsifiable against precision by
@@ -130,6 +164,11 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · **DEFERRED, on the round-1 audit's measurement rather than on judgement.**
+  The convening question — is a fixture-plus-floor buildable against `bench.py` as it exists —
+  was answered no with four verified facts, and three further findings show the design beneath
+  is wrong independently of the harness. §1 carries all seven and what a successor needs. The
+  unit does not close: a blocker unfixable inside this build's scope is a park, not a waiver.
 - rev-1 · 2026-08-16 · initial draft. The gap was stated by `TOOL-aDeclaredCeiling-2` as a non-goal
   and again in its §5 risks, and left unrecorded outside a closed spec. The design pass found that
   the instrument already exists — `bench.py` computes recall@k, full@k, MRR and a ceiling — so the

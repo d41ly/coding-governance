@@ -29,10 +29,10 @@ hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | SPECCED | rev-1 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
