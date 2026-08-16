@@ -10,10 +10,24 @@ is repaired in the same commit as the move that broke it.
 
 ## 2. Scope (IN)
 
-- **S1** — Derive the rename map from the committed bindings, never by hand: for each record, the
-  target name is its kind, the family and ordinal of the lowest id its binding line lists, and a tail
-  distinguishing records that would otherwise collide. Commit the map as a record before moving
-  anything.
+- **S1** — Derive the rename map from the committed bindings, never by hand. For each record the
+  target is `<date>-<kind>-<FAMILY>-<slug>-<seq>[-<tail>]<ext>`, every field derived:
+
+  | Field | Derivation |
+  |---|---|
+  | `<date>` | the record's existing date; for a dateless record, its add-commit author date (`git log --diff-filter=A --format=%ad --date=short -- <path>`) |
+  | `<kind>` | the token check 5 derives from the SUBFOLDER — `build`, `review`, `prompt`. NEVER the Fork E relation kind, which is header-only: `spec-audit` in a filename reds check 5 and branch 4 at once |
+  | `<FAMILY>` `<slug>` `<seq>` | the family, build slug and ordinal of the LOWEST id the binding line lists. LOWEST is a TOTAL order: family by its position in `.memory-tree.conf`'s `FAMILIES`, then slug bytewise, then ordinal numerically. A cross-build record takes the SERVED id's slug, not its housing build's — the filename spells a whole id or it spells nothing |
+  | `<tail>` | the record's existing ordinal, preserved verbatim as a disambiguator carrying no binding meaning. The only field an author may override, and an override is noted in the map |
+  | `<ext>` | the record's own extension |
+
+  Two worked targets settle the cases the corpus actually has, and both go in the map:
+  `memory/builds/aSiftedPlaybook/reviews/2026-08-16-review-aSiftedPlaybook-1.md` serves a
+  seven-id, two-family set, so it takes `PLAY` (first in the declared family order) and that id's
+  ordinal. `memory/builds/aDrainedSluice/reviews/2026-08-08-review-aDrainedSluice-3.md` is scoped
+  over two builds, so its slug is the served id's build, which is NOT the folder it lives in.
+
+  Commit the map as a record before moving anything.
 - **S2** — Move the records with `git mv`, in build-sized batches.
 - **S3** — Repair every reference in the same commit as its move. Measured at BASE: 107 referencing
   lines across 65 citing files, of which 5 carry markdown links `check 2` validates and the rest are
@@ -120,6 +134,14 @@ option set and the reasoning live; this unit is its execution and states no fork
 
 - rev-1 · 2026-08-17 · initial draft, created by the owner's Fork A resolution. The unit did not
   exist at rev-1 of the set: the design pass recommended against renaming, and the owner overrode it.
+- rev-2 · 2026-08-17 · folded the M4 audit, which held this unit BLOCKED. S1 supplied ONE of the
+  filename grammar's five fields and forbade the builder from filling the rest, so five decisions
+  would have been invented and baked permanently into 77 names: the slug slot (housing build or
+  served id's build — the corpus has a live cross-build case), the total order behind "lowest" (the
+  declared family order disagrees with lexicographic, and five builds are multi-family), which
+  vocabulary "kind" means now that Fork E added a second one, the date rule for the one dateless
+  record, and the extension rule for the one non-markdown record. All five are now derived in S1,
+  with two worked targets. §10 records that check 5 does not grade the `.sh` record at all.
 
 ## 10. Reuse audit
 
@@ -127,5 +149,11 @@ The rename derives its targets from `TOOL-aTetheredRecord-2`'s binding parser ra
 second naming convention, so there is exactly one place that decides which spec a record belongs to.
 The recording-name grammar it renames INTO is the one `check 5` already enforces, unchanged — see
 `TOOL-aTetheredRecord-4` §4 for why the ordinal's redefinition needs no grammar edit. No new seam.
+
+One record is outside that grammar and the spec says so rather than implying coverage it lacks:
+`memory/builds/aMooredAnchor/build/2026-08-11-build-aMooredAnchor-1-repro.sh` is not markdown, so
+check 5's selector never sees it. It is in check 21's population, which is extension-agnostic by
+design, so **branch 4 is the only gate that grades that record's name.** Renaming it is still in
+scope; nothing but branch 4 will notice if the rename is wrong.
 Recall terms: `build slug spec artifact filename header adversarial review closeout journal
 bookkeeping convergence naming hygiene`.

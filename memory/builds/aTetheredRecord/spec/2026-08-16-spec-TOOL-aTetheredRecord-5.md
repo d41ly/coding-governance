@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -10,8 +10,8 @@ beside them. This unit renders each record under the ids it serves and derives t
 
 ## 2. Scope (IN)
 
-- **S1** — The generated region gains a records table, below the existing sentence that names the
-  three record folders, listing each record with the ids it serves and its recorded rev where one is
+- **S1** — The generated region gains a records table, below the existing `Records live under …`
+  sentence (whose folder list is DERIVED from the record kinds present, so it is not always three), listing each record with the ids it serves and its recorded rev where one is
   present. Rows are sorted by path; links use the build-relative form the region already emits.
 - **S2** — Two derived lines, computed from the same two functions `TOOL-aTetheredRecord-2` supplies:
   the spec ids no record of ANY kind names, and — now that Fork E ratified the kind vocabulary — the
@@ -20,6 +20,8 @@ beside them. This unit renders each record under the ids it serves and derives t
   closing diff review without opening either.
 - **S4** — `--selftest` arms covering a build with records, a build with none, and the population
   assertion that keeps the table from silently rendering empty.
+- **S5** — Bump `KIT_MEMORY_TREE_VERSION` and the `gov:kit memory-tree@` markers, re-rendering the
+  three doc pairs: `gen_build_index.py` is in the verdict-epoch delegate set and §4 changes it.
 
 ## 3. Non-goals (OUT)
 
@@ -108,7 +110,8 @@ are enumerated at authoring time.
 ## 7. Gates
 
 `memory hygiene (20 checks)` — check 9's byte-compare · `build-index selftest` ·
-`marker-region contract` · `bash tools/run-gates.sh` at the push boundary.
+`marker-region contract` · `verdict epoch` · `kit version markers` ·
+`bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
 
@@ -135,6 +138,11 @@ is the interaction.
 - rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork B ratified BUILD-IT. Fork E ratified
   ADD-NOW against this spec's recommendation, adding the kind column, the second derived line, and
   the §3 statement of what the two resolutions together still cannot answer.
+- rev-3 · 2026-08-17 · folded the M4 audit. S5 adds the kit-version bump this unit's own edit to
+  `gen_build_index.py` obliges, and §7 gains the two gates that date it. The "three-folder sentence"
+  S1 anchored to does not exist — that sentence's folder list is DERIVED from the record kinds, and
+  this build's own README renders two folders, not three — so S1 now anchors to the sentence by name
+  rather than by a count that varies per build.
 
 ## 10. Reuse audit
 

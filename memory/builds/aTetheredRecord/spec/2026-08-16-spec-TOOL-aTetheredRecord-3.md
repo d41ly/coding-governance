@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -47,11 +47,6 @@ onto a corpus already proven conformant by the gate's own predicate.
 Every binding value comes from exactly one of these, tried in order, and the rule that produced it is
 recorded inline on the line itself when it is not rule 1:
 
-Each authored line also carries the KIND token from `TOOL-aTetheredRecord-2` §4. The kind is read
-from the same evidence as the ids and by the same precedence: a record that calls itself a pre-code
-pass over a spec is a `spec-audit`, one that names a commit range is a `diff-review`, and the
-filename is not evidence for the kind either.
-
 1. **The record's own body.** It names a spec id, a spec path, or a unit label the build README maps
    to an id. Authoritative.
 2. **The build README's authored unit table**, where the record names a wave, a group or a phase that
@@ -65,6 +60,18 @@ a binding is the precise defect this build exists to remove.
 
 A value from rule 2 or 3 carries an inline note saying so, so a reviewer grades the inference in the
 file rather than in a commit body no gate reads.
+
+Each authored BOUND line also carries the KIND token from `TOOL-aTetheredRecord-2` §4; the unbound
+form takes none, because there is no relation for a kind to describe and the parser classifies a
+kind-bearing `none` line as malformed. The kind is read from the same evidence and by the same
+precedence: a record calling itself a pre-code pass over a spec is a `spec-audit`, one naming a
+commit range is a `diff-review`, and the filename is not evidence for the kind either. A
+COMMISSIONING brief takes `research` whatever its H1 says — it precedes the specs, so it cannot be a
+pass over one, and letting its phrasing make it a `spec-audit` would manufacture review coverage.
+
+*(AC2 was deleted at rev-3 and the numbering deliberately keeps its gap: the template numbers
+acceptance items so reviews can cite them stably, and renumbering would silently repoint every
+citation already written against this set.)*
 
 ### Inventory — the classes and their handling
 
@@ -123,11 +130,8 @@ that asymmetry is `TOOL-aTetheredRecord-6`'s subject.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs after the final
-  batch, it reports zero unbound-classification rows and zero malformed rows, and its unbound-form
-  count equals the number `TOOL-aTetheredRecord-4` pins.
-- **AC2** — When `git grep -c 'Serves:' -- memory/builds` runs, it counts every record in the
-  population `git ls-files 'memory/builds/*/build/*' 'memory/builds/*/prompts/*'
-  'memory/builds/*/reviews/*'` returns.
+  batch, it prints zero `A` rows (absent plus malformed) and zero `B` rows, and its `N` count equals
+  the number `TOOL-aTetheredRecord-4` pins.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --check` runs after each retrofit
   commit, it is clean.
 - **AC4** — When `python tools/memory-tree/corpus_ids.py --check` runs, it is green — no authored
@@ -153,6 +157,12 @@ none.
 - rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork E ratified ADD-NOW, so every
   authored line now carries a kind token derived by the same precedence as the ids; Fork A ratified
   RENAME-ALL, so §3 hands the filenames to `TOOL-aTetheredRecord-7` and says why they stay separate.
+- rev-3 · 2026-08-17 · folded the M4 audit. §4 had instructed authors to put a kind on EVERY line,
+  which the landed parser classifies malformed on the unbound form. AC1 reworded onto the four-class
+  vocabulary, and AC2 DELETED: its witness emits per-file rows rather than a total, counts two
+  non-records, and cannot skip a fenced example — AC1 already asserts the same thing through the
+  gate's own predicate. §4 also now fixes the commissioning-brief case, which would otherwise have
+  manufactured spec-audit coverage from an H1's phrasing.
 
 ## 10. Reuse audit
 

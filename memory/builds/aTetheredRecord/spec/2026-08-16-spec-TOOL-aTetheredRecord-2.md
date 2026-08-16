@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -12,8 +12,11 @@ so an unannotated record can never brick the index render.
 
 - **S1** — `read_bindings(root, tracked)` in `tools/memory-tree/gen_build_index.py`: over each
   tracked record, scan the unfenced head for the binding line and the optional inverse line, parse
-  the grammar in §4, expand ranges, and return per-path results classified as bound, unbound-with-
-  reason, or malformed.
+  the grammar in §4, expand ranges, and return per-path results in FOUR classes — `bound` · `unbound`
+  (the authored escape, a `none` token with its mandatory reason) · `malformed` (a line that is
+  present and does not parse) · `absent` (no line at all). `absent` and `unbound` are DISJOINT and
+  the distinction is load-bearing downstream: only `unbound` is a deliberate declaration, so only it
+  is what a pin may bound. Collapsing them would let a pin excuse a record nobody ever annotated.
 - **S2** — `spec_ids(root, tracked)` in the same module: the first H1 id per file at any depth under
   a build's `spec/` folder. This is the resolution set, carrying a docstring that records why it is
   not the build README roster.
@@ -79,9 +82,14 @@ slug, and the unit ordinal. Two optional extensions:
 
 - **A reviewed rev.** An id may carry a trailing at-sign and rev token. It is recorded and never
   validated — see Fork C in §8.
-- **A contiguous run.** A run of ordinals within one family and slug may be written with a range
-  separator. It EXPANDS at authoring time to a fixed set, so unlike a wildcard it cannot rot when the
-  build gains a unit.
+- **A contiguous run.** A run of ordinals within ONE family and ONE slug is written `FAM-slug-N..M`
+  and expands at parse time to the closed set N through M inclusive — `TOOL-aMouldedFolio-2..5` is
+  the four ids `-2 -3 -4 -5`. Unlike a wildcard it names a fixed set, so it cannot rot when the build
+  later gains a unit. It is a convenience only: the largest enumeration this corpus needs is seven.
+
+**The kind token is required on the bound form, and absent from the other two.** An unbound record
+names no ids, so there is no relation for a kind to describe; a `Commissions` line is the inverse
+relation already and takes ids alone. This ratifies what the parser does.
 
 Ids are fully qualified rather than bare ordinals precisely so a record can name a spec in another
 build. The corpus needs this: one review filed under `aDrainedSluice` covers a second build's units.
@@ -90,9 +98,9 @@ build. The corpus needs this: one review filed under `aDrainedSluice` covers a s
 
 | Element | Value | Why |
 |---|---|---|
-| head window | the first 12 unfenced lines | The deepest existing metadata line in the corpus sits at line 4; 12 is generous without admitting body prose. Fence-skipping reuses the module's existing helper, which is what keeps a fenced EXAMPLE of the grammar — in a spec like this one — from parsing as a real binding. |
+| head window | the first 12 unfenced lines | The parse is ANCHORED to the `**Serves:**` key, so body prose inside the window cannot parse as a binding — the window bounds the read, it does not disambiguate it. Fence-skipping reuses the module's existing helper, which is what keeps a fenced EXAMPLE of the grammar — in a spec like this one — from parsing as a real binding. |
 | line prefix | optional leading whitespace and an optional comment marker | The one non-markdown record in the corpus is a shell script, where the line must be a comment. An extension-scoped rule would structurally exclude it. |
-| resolution set | ids defined by a spec H1 | Measured 113 today, 118 after `TOOL-aTetheredRecord-1`. |
+| resolution set | ids defined by a spec H1 | Measured at BASE `96141aed` as 113. A unit re-measures rather than carrying the figure forward: this build's own specs moved it the same day. |
 | NOT the resolution set | a build README `ids:` roster | Measured 179 ids of which 66 have no spec. The roster is a reservation range generated from citations anywhere, and it admits backlog and decision rows as if they were units. |
 
 ### Rollout
@@ -143,8 +151,8 @@ that.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs on the live
-  tree, it exits 0, and its unbound-classification row count equals the record count before the
-  retrofit and zero after it.
+  tree, it exits 0, and its `A`-row count (absent plus malformed) equals the record count minus the
+  records already carrying a line — measured 76 of 77 when this landed — and zero after the retrofit.
 - **AC2** — When `python tools/memory-tree/gen_build_index.py --print-bindings` has run,
   `git status --porcelain` is empty — the mode wrote nothing.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --selftest` runs, it covers every parse
@@ -190,6 +198,12 @@ four-token vocabulary in §4 is derived from the measured corpus. It does not re
 - rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork E ratified ADD-NOW, so the grammar
   gains the closed four-token kind vocabulary in §4 and §3 gains the standing limit that the token
   must not imply a coverage claim Fork C cannot support. Fork C resolved by elimination.
+- rev-3 · 2026-08-17 · folded the M4 audit. S1 now names FOUR classes, RATIFYING the `absent` state
+  the builder had to invent, and AC1 counts `A` rows rather than a class the output never emitted.
+  **The `--print-bindings` contract this unit shipped is AMENDED by `TOOL-aTetheredRecord-4` S2b**,
+  which adds an `S` row per bound record: a conformant record is not a finding, so nothing in the
+  original output described one, and Fork A's branch 4 needs exactly that set. The amendment is
+  recorded there and pointed at from here so the two documents cannot drift.
 
 ## 10. Reuse audit
 

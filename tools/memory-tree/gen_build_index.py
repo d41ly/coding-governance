@@ -380,6 +380,13 @@ def do_print_bindings(root: str, conf: dict) -> int:
             continue
         if rec["state"] == "unbound":
             unbound += 1
+        # One S row per BOUND record, carrying the resolved SET. A conformant record is not a
+        # finding, so the A/B/N rows say nothing about it — and check 21's filename-vs-header
+        # branch needs exactly this set to test membership against. Without it that branch would
+        # have to parse every record a second time, which is the two-answers class in the one
+        # place this build exists to remove it.
+        if rec["state"] == "bound":
+            print(f"S\t{rel}\t{rec['kind']}\t{' '.join(rec['ids'])}")
         for tok in rec["bad"]:
             print(f"B\t{rel}\t{tok} is not a family-qualified id or range")
         for i in rec["ids"] + rec["commissions"]:
@@ -1118,6 +1125,27 @@ def do_selftest() -> int:
         do_print_bindings(t12, conf12)
         arm("--print-bindings leaves every generated artifact byte-identical", "True",
             lambda: str(all(read_text(os.path.join(t12, p)) == v for p, v in _before.items())))
+
+        # The S row: a BOUND record is not a finding, so nothing else in this output mentions it,
+        # and check 21's filename-vs-header branch has no input without it.
+        def _rows(tree, cf):
+            import io as _io, contextlib as _cl
+            buf = _io.StringIO()
+            with _cl.redirect_stdout(buf):
+                do_print_bindings(tree, cf)
+            return buf.getvalue()
+
+        t13 = os.path.join(base, "srow"); os.makedirs(t13)
+        conf13 = _fixture(t13)
+        p13 = os.path.join(t13, "memory/builds/tOne/reviews/2026-08-01-review-tOne-1.md")
+        os.makedirs(os.path.dirname(p13), exist_ok=True)
+        write_text(p13, "# r\n\n**Serves:** spec-audit ARCH-tOne-1\n")
+        run("git", "add", "-A", cwd=t13)
+        arm("a bound record emits an S row carrying kind and the resolved ids",
+            "S\tmemory/builds/tOne/reviews/2026-08-01-review-tOne-1.md\tspec-audit\tARCH-tOne-1",
+            lambda: _rows(t13, conf13))
+        arm("--print-bindings still exits 0 with an S row present", "0",
+            lambda: str(do_print_bindings(t13, conf13)))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
