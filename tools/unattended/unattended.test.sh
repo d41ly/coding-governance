@@ -142,6 +142,17 @@ run() { bash "$SCRIPT" "$@" 2>&1; }
 fixture() { git add -A >/dev/null && git commit -q -m fixture --no-verify; }
 sum() { git hash-object memory/builds/tRun/RUN.md; }
 
+# A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
+# real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
+# raw newline (a sed syntax error that edits nothing while reading as written), and a `git fetch` by
+# PATH that moved no remote-tracking ref. Each looked correct and each mutated zero bytes.
+mutate() { # file · sed-script
+  local f="$1" before; before=$(git hash-object "$f")
+  sed -i "$2" "$f"
+  n=$((n+1))
+  [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
+}
+
 # ---- check 1: the slug is validated against hygiene check 4's OWN folder grammar, so a traversal
 # ---- argument is refused by the rule that would have refused the folder. Paired with the no-write
 # ---- arm, because "it printed a refusal" and "it changed nothing" are two claims.
@@ -1333,5 +1344,11 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL the driver reaches the repairing wiring
 nf=$(grep -nE 'head -1 \| tr -d' "$HERE/unattended.sh" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
 
+# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
+# shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
+# grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
+# which nothing compared to anything. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=249
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

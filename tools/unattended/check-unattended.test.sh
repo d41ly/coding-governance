@@ -112,6 +112,17 @@ reset_tree() {
 }
 run() { bash "$SCRIPT" 2>&1; }
 
+# A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
+# real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
+# raw newline (a sed syntax error that edits nothing while reading as written), and a `git fetch` by
+# PATH that moved no remote-tracking ref. Each looked correct and each mutated zero bytes.
+mutate() { # file · sed-script
+  local f="$1" before; before=$(git hash-object "$f")
+  sed -i "$2" "$f"
+  n=$((n+1))
+  [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
+}
+
 # ---- THE GREEN CONTROL, first. Every red arm below is worthless if the clean tree is not clean:
 # ---- a leg that reds on everything arms every branch and checks nothing.
 out=$(run); rc=$?
@@ -736,31 +747,34 @@ same "the shipped Skill template orders kickoff after preflight" "$(run)" ""
 
 # ...TRANSPOSED. The deadlock: kickoff invoked first halts at its READY card with nobody under a
 # mandate to answer it. Judged on the FIRST occurrence of each, which is the one the agent reads.
-sed -i '2i Invoke /session-kickoff before anything else.' tools/unattended/SKILL.template.md
+mutate tools/unattended/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
 hit "$(run)" "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line"
 
 # ...kickoff never named at all. ABSENCE IS A REFUSAL rather than the safe side, because a template
 # that never names kickoff and one that names it too early read identically on any count.
 reset_tree; kick_engine
-sed -i '\|/session-kickoff|d' tools/unattended/SKILL.template.md
+mutate tools/unattended/SKILL.template.md '\|/session-kickoff|d'
 hit "$(run)" "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check"
 
 # ...no --preflight invocation to order anything against.
 reset_tree; kick_engine
-sed -i '/unattended.sh --preflight/d' tools/unattended/SKILL.template.md
+mutate tools/unattended/SKILL.template.md '/unattended.sh --preflight/d'
 hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
 
 # ...a blank engine turns the check off, and the arm proves it by leaving the lines TRANSPOSED —
 # silent because the project ships no kickoff skill, not because the template is conforming.
 reset_tree
-sed -i '2i Invoke /session-kickoff before anything else.' tools/unattended/SKILL.template.md
+mutate tools/unattended/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
 same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
 reset_tree
 
 # ---- check 16 arms D and E: the CONTRACT's two tables joined to the constants the driver enforces.
 # ---- Both edits go to BOTH protocol copies, or check 15's parity fires and the arm would be
 # ---- satisfied by a refusal that has nothing to do with the join it is testing.
-pedit() { sed -i "$1" tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md; }
+# Through `mutate`, so a locator that stops matching after a document reword FAILS here instead of
+# silently turning six arms into six no-ops that still read as tests.
+pedit() { mutate tools/unattended/PROTOCOL.template.md "$1"
+          mutate memory/guides/UNATTENDED-PROTOCOL.md "$1"; }
 
 # GREEN CONTROL: the shipped contract already agrees with the driver in both tables.
 reset_tree
@@ -806,5 +820,22 @@ hit "$out" "the protocol's Definition-of-Done table yields no item row, so the D
 miss "$out" "absent from the protocol's table"
 reset_tree
 
+# ---- `mutate` itself, both ways. The failing direction runs in a SUBSHELL, or the FAIL it is
+# ---- supposed to emit would fail this suite instead of being observed by it.
+reset_tree
+mout=$(n=0; st=0; mutate .unattended.conf 's/__matches_nothing_at_all__/x/'; echo "st=$st n=$n")
+hit "$mout" "FAIL fixture no-op on .unattended.conf"
+hit "$mout" "st=1 n=1"
+gout=$(n=0; st=0; mutate .unattended.conf 's/^MEMORY_ROOT=.*/MEMORY_ROOT=mem2/'; echo "st=$st n=$n")
+miss "$gout" "FAIL fixture no-op"
+hit "$gout" "st=0 n=1"
+reset_tree
+
+# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
+# shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
+# grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
+# which nothing compared to anything. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=144
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -313,12 +313,12 @@ git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
 out=$(bash "$SCRIPT" 2>/dev/null)
-st=0
-hit()  { grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
-miss() { if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
-hitl() { grep -qxF "$1" <<<"$out" || { echo "FAIL missing exact line: $1"; st=1; }; }
+st=0; n=0
+hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
+miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
+hitl() { n=$((n+1)); grep -qxF "$1" <<<"$out" || { echo "FAIL missing exact line: $1"; st=1; }; }
 lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
-before()  { local a b; a=$(lineno "$1"); b=$(lineno "$2")
+before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
 
@@ -364,10 +364,10 @@ cblock() { awk -v n="$2" '
     index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }
     g && index($0, "HYGIENE check") == 1 && index($0, "HYGIENE check " n " FAILED") != 1 { g = 0 }
     g' <<<"$1"; }
-chit()  { cblock "$out" "$1" | grep -qF "$2" || { echo "FAIL check $1 did not report: $2"; st=1; }; }
-cnot()  { cblock "$out" "$1" | grep -qF "$2" && { echo "FAIL check $1 reported: $2"; st=1; }; }
-c5hit()  { c5block "$out" | grep -qF "$1" || { echo "FAIL check 5 did not report: $1"; st=1; }; }
-c5miss() { c5block "$out" | grep -qF "$1" && { echo "FAIL check 5 reported: $1"; st=1; }; }
+chit()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" || { echo "FAIL check $1 did not report: $2"; st=1; }; }
+cnot()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" && { echo "FAIL check $1 reported: $2"; st=1; }; }
+c5hit()  { n=$((n+1)); c5block "$out" | grep -qF "$1" || { echo "FAIL check 5 did not report: $1"; st=1; }; }
+c5miss() { n=$((n+1)); c5block "$out" | grep -qF "$1" && { echo "FAIL check 5 reported: $1"; st=1; }; }
 
 c5hit  "$D/spec/units/scratch-notes.md"
 c5miss "$D/spec/units/2026-08-01-spec-tFixture-30-u1-nested-ok.md"
@@ -761,5 +761,15 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
-[ "$st" = 0 ] && echo "PASS (130 assertions)"
+# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. This printed a hardcoded 130 for as long as the file
+# has existed: a summary that cannot move reports the same number whether every arm ran or none
+# did. It is the EXECUTED count now, floored shrink-only, because an arm stranded past an
+# `exit` stays in the file and only a runtime total can see it go dark.
+# It counts the HELPER assertions and says so. Roughly fifty more sites in this file assert
+# inline (`<test> || { echo FAIL...; st=1; }`) and are NOT counted — counting them needs an
+# increment before each test rather than inside its failure brace. Labelled honestly rather
+# than replacing one wrong number with a second; the gap is filed as TOOL-cBriefedPilot-34.
+FLOOR_ASSERTIONS=76
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+[ "$st" = 0 ] && echo "PASS ($n helper assertions)"
 exit "$st"
