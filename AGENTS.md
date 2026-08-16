@@ -92,6 +92,15 @@ absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at
 output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
 `gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
 - `memory/` hygiene (20 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
+- build README slot contract — `python tools/memory-tree/gen_build_index.py --check-format`: a build
+  README's top level is a fixed slot sequence — front matter, title, ONE authored prose block, the
+  authored `roster:units` plan, then the generated regions — and authored content anywhere after the
+  first generated marker is a named failure. Deliberately UNGUARDED: it grades the CORPUS, not the
+  kit, so a guard naming `tools/memory-tree/` would skip it on exactly the records-only commit that
+  can violate it. The refusal is NOT reachable from `--write` or `--check`, because the generator
+  must keep rendering a tree it would refuse to grade — `--write` CREATES a missing generated pair at
+  its canonical slot and `--check` never demands one, which is what lets a new region ship without
+  forcing a corpus re-render into its own commit
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)

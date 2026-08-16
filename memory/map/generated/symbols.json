@@ -438,6 +438,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "do_check_format",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "do_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -656,6 +661,11 @@
       "id": "inert_only",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "insert_region",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "inventory_ids",
@@ -1253,6 +1263,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_docs",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_edges",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_inventories_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1266,6 +1286,11 @@
       "id": "render_map_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_order",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_region",
@@ -1561,6 +1586,11 @@
       "id": "skip",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "slot_violations",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "snippet_bytes",
