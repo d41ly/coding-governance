@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/memory-tree/BUILD-METHOD.template.md",

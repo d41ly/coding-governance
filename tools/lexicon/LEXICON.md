@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.0 -->
+<!-- gov:kit lexicon@1.1 -->
 # LEXICON.md — how to write the table this gate reads
 
 The engine grades against `.lexicon.conf`. This file is how a human decides what goes in it. It is
