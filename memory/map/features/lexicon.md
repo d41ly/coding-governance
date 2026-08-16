@@ -8,7 +8,13 @@ streams = ["tooling", "playbook"]
 decisions = []
 
 [claims]
-gate-legs = []
+gate-legs = [
+  "lexicon naming predicates",
+  "lexicon selftest",
+  "lexicon wiring",
+  "playbook placeholder catalogue",
+  "placeholder-catalogue self-test",
+]
 kits = ["lexicon"]
 git-hooks = []
 workflow-scripts = []

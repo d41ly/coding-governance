@@ -279,7 +279,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (≤5 verify agents per review)",
+    "name": "verifier fan-out (\u22645 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
@@ -537,6 +537,57 @@
     ],
     "guard": [
       "tools/govkit/"
+    ]
+  },
+  {
+    "name": "lexicon naming predicates",
+    "argv": [
+      "python",
+      "tools/lexicon/lexicon.py"
+    ],
+    "guard": [
+      "tools/",
+      "skills/session-kickoff/",
+      ".githooks/",
+      ".claude/"
+    ]
+  },
+  {
+    "name": "lexicon selftest",
+    "argv": [
+      "python",
+      "tools/lexicon/selftest.py"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "lexicon wiring",
+    "argv": [
+      "bash",
+      "tools/lexicon/adopt-lexicon.sh",
+      "--check"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "playbook placeholder catalogue",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.sh"
+    ]
+  },
+  {
+    "name": "placeholder-catalogue self-test",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.test.sh"
+    ],
+    "guard": [
+      "tools/check-placeholders.sh"
     ]
   }
 ]

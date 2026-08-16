@@ -161,6 +161,26 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   a read-only verb that writes is the whole risk of that verb. It found two real defects on its
   first run, one of them a token regex matching the `{k}` inside a shell `${k}`
 
+- naming lexicon — `tools/lexicon/lexicon.py` (three predicates over the `.lexicon.conf` DECLARATION:
+  a closed verb table every definition leads with, banned type suffixes at DEFINITION sites only, and
+  forbidden import DIRECTIONS between layers). OPT-IN: with no conf it reports NOT ADOPTED and exits
+  0, which is the whole off switch. Vacuity is armed on both sides — a declared `parser`/`probe`
+  language whose definition population is empty against a corpus containing that extension prints
+  `DEAD PROBE` and reds, and `tools/lexicon/selftest.py` freezes a SENTINEL per shipped pattern set,
+  because the corpus-side arm is defeated by an empty corpus. An empty `LAYERS` is `NOT ARMED` and
+  REDS rather than passing. Waivers key on the matched TEXT, never `<path>:<line>`, so an edit above a
+  waived line cannot unpin it; a waiver whose text is gone reds as stale. Wiring:
+  `tools/lexicon/adopt-lexicon.sh --check`. The three offender pins are MEASURED against this corpus
+  and are honestly non-zero on day one
+- playbook placeholder catalogue — `tools/check-placeholders.sh` (+ `tools/check-placeholders.test.sh`):
+  the shipped playbook files here ARE the un-instantiated sources and carry placeholders permanently,
+  so the bar-side question is whether `customize.md`'s CATALOGUE still agrees with them — every
+  measured placeholder listed, per-file tallies equal to the measurement, a placeholder appearing in
+  BOTH files declared SHARED rather than disjoint, and the TWO marker-carrying files agreeing on
+  `governance-template: vN.N` (`customize.md` carries no marker and is not in that population). The
+  "no placeholder survived" predicate is a separate `--check <a> <b>` mode over FIXTURES only; the
+  render-side owner of it is govkit's `playbook-placeholders` hole. It landed red on the live
+  `{{MEMORY_ROOT}}`-in-both-files defect the catalogue called disjoint
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
   `tools/memory-tree/check-verdict-epoch.test.sh` · `skills/session-kickoff/manifest-check.test.sh` ·

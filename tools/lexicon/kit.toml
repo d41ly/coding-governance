@@ -34,10 +34,16 @@ code = 0
 probe = { must_exist = "{kit}/lexicon.py" }
 means = "adopted"
 
+# The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
+# classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level
+# conf falls into none of them, so declaring one reds `selfcheck` rather than scoping anything.
+# Widening that taxonomy is a change to a different kit's contract. The cost of the narrower guard is
+# an early signal on a conf-only diff, never a merge verdict: the pre-push hook sets GATE_FULL=1,
+# which bypasses every guard, so the authoritative run stays total.
 [[gate_leg]]
 name = "lexicon naming predicates"
 argv = ["python", "{kit}/lexicon.py"]
-guard = ["tools/", "skills/", ".githooks/"]
+guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
 
 [[gate_leg]]
 name = "lexicon selftest"
