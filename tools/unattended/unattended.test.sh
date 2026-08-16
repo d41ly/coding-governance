@@ -758,7 +758,14 @@ groot=$(git -C "$gtmp" rev-parse main); gz=$(git -C "$gtmp" rev-parse side)
 mkdir -p "$gtmp/.git/info"
 printf '%s %s
 ' "$groot" "$gz" > "$gtmp/.git/info/grafts"
-same "graft-control: the graft gives two unrelated histories a merge-base"      "$(git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
+# `env -u GIT_GRAFT_FILE`, and the -u is load-bearing. This arm's meaning is "a graft is
+# effective BY DEFAULT", so it must control the one variable that decides that rather than
+# inherit it. The driver `export`s GIT_GRAFT_FILE=/dev/null as deliberate hardening, and that
+# export reaches every child — so when `--close` ran the merge bar, which runs this selftest,
+# the control got an empty merge-base and the leg redded. The gate could not pass in a state
+# that was entirely legitimate: a branch touching tools/unattended/ un-skips this leg, and
+# --close is exactly where it then runs.
+same "graft-control: the graft gives two unrelated histories a merge-base"      "$(env -u GIT_GRAFT_FILE git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
 same "graft-arm: GIT_GRAFT_FILE suppresses it, which is what the driver exports"      "$(GIT_GRAFT_FILE=/dev/null git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" ""
 rm -rf "$gtmp"
 
