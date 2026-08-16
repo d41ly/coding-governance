@@ -538,5 +538,15 @@
     "guard": [
       "tools/govkit/"
     ]
+  },
+  {
+    "name": "govkit refusal join",
+    "argv": [
+      "python",
+      "tools/govkit/refusal_join.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
   }
 ]

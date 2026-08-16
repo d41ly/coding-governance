@@ -160,6 +160,13 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   never an exit code alone — including the on-disk arm that `plan` leaves the target byte-identical
   a read-only verb that writes is the whole risk of that verb. It found two real defects on its
   first run, one of them a token regex matching the `{k}` inside a shell `${k}`
+- refusal join — `python tools/govkit/refusal_join.py`: every refusal branch in the deployer is
+  reached by an arm that asserts it. `check-arms.py` is shell-only by a resolved fork, so the
+  strongest write path in this repo would otherwise be its least armed. A branch is a call site of
+  either refusal channel; its ANCHOR is module-function-ordinal, so it survives edits above it where
+  a line number would not. TWO shrink-only pins, because they catch different things: the branch pin
+  sees a matcher that stopped matching, the FILE pin sees a module that stopped being scanned — and
+  neither sees a branch MOVED into a new module, which the enumerated anchor set catches instead
 
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·

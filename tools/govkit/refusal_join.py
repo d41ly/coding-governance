@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""The refusal join — every refusal branch in the deployer is reached by an arm that asserts it.
+
+WHY THIS IS NOT `check-arms.py`. That engine's population is tracked `*.sh`, repo-wide, and the
+deployer unit resolved deliberately that it stays shell-only: admitting Python either demands an arm
+from every tracked `*.py` or needs a scoping rule, and either is a change to a governance carrier.
+The guarantee moved to the test layer instead, and this is it.
+
+WHAT A REFUSAL BRANCH IS, stated rather than assumed. A call site of either of the engine's two
+refusal channels — the exception it raises to abort a verb, and the finding it appends to a report.
+Its ANCHOR is `(module, enclosing function, ordinal within that function)`, computed from the same
+walk that finds it, so the engine gains no argument and no decoration and an anchor survives the file
+being edited above it. A line number would not.
+
+THE POPULATION IS DISCOVERED, never named: the tracked Python under the deployer's own directory,
+minus the harness files. TWO shrink-only pins, because they catch different things and only one of
+them survives the refactor this build makes likely — a branch moved into a NEW module makes the file
+set GROW and leaves the branch count unchanged, so both pins pass and neither grades it. What grades
+that is the enumerated anchor SET, which is a membership assertion rather than a count.
+
+REUSE, and the correction it carries. `tools/memory-tree/corpus_ids.py` already walks a parsed Python
+source for a statement shape, records which lines were REACHED at runtime with a trace hook, and
+joins the two — AST enumeration plus an execution-observed join, both liveness halves, already on the
+bar. This extends that doctrine: the matcher changes from one statement kind to two call shapes, and
+the join key becomes the anchor rather than the line number.
+"""
+
+from __future__ import annotations
+
+import ast
+import json
+import pathlib
+import subprocess
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
+
+# Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
+# must name both values beside it, which is the convention this repo already enforces on every pin.
+BRANCH_PIN = 135    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+FILE_PIN = 1        # 1 -> current: the deployer is one module today; a refactor may only grow this
+
+
+def population(root: pathlib.Path) -> list[pathlib.Path]:
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "tools/govkit/*.py"],
+                         capture_output=True, text=True)
+    return [root / p for p in out.stdout.split("\n")
+            if p.strip() and pathlib.PurePosixPath(p).name not in HARNESS]
+
+
+def _is_refusal(node: ast.AST) -> str | None:
+    """The two channels, by call SHAPE. Named here so the matcher is a stated rule, not a guess."""
+    if isinstance(node, ast.Raise) and isinstance(node.exc, ast.Call):
+        f = node.exc.func
+        if isinstance(f, ast.Name) and f.id == "Refusal":
+            return "raise"
+    if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+        f = node.value.func
+        if isinstance(f, ast.Attribute) and f.attr == "fail":
+            return "fail"
+    return None
+
+
+def enumerate_branches(root: pathlib.Path) -> list[dict]:
+    found: list[dict] = []
+    for path in population(root):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for fn in [n for n in ast.walk(tree)
+                   if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            k = 0
+            for node in ast.walk(fn):
+                kind = _is_refusal(node)
+                if kind:
+                    k += 1
+                    found.append({"module": path.name, "function": fn.name, "ordinal": k,
+                                  "kind": kind, "line": getattr(node, "lineno", 0)})
+    return found
+
+
+def main(argv: list[str]) -> int:
+    root = HERE.parents[1]
+    branches = enumerate_branches(root)
+    files = population(root)
+    problems: list[str] = []
+
+    # Both pins, shrink-only, and each with its own scenario. Reporting only one is what let a
+    # single-pin design pass comfortably while grading a shrinking fraction of the engine.
+    if len(branches) < BRANCH_PIN:
+        problems.append(f"refusal branches: {len(branches)} < pin {BRANCH_PIN} — the matcher found "
+                        f"fewer than the seeded population, so either branches were removed (lower "
+                        f"the pin and say so) or the matcher stopped matching")
+    if len(files) < FILE_PIN:
+        problems.append(f"scanned files: {len(files)} < pin {FILE_PIN} — a module stopped being "
+                        f"scanned, which no branch count can see: a branch moved into a new module "
+                        f"leaves the count unchanged while the file set grows")
+
+    reached_path = pathlib.Path(argv[0]) if argv else None
+    if reached_path and reached_path.is_file():
+        reached = {tuple(x) for x in json.loads(reached_path.read_text(encoding="utf-8"))}
+        for b in branches:
+            key = (b["module"], b["function"], b["ordinal"])
+            if key not in reached:
+                problems.append(f"refusal branch {b['module']}:{b['function']}#{b['ordinal']} "
+                                f"({b['kind']}, line {b['line']}) was reached by NO arm")
+
+    for p in problems:
+        print(f"refusal-join: {p}")
+    print(f"refusal-join: {len(branches)} branch(es) across {len(files)} module(s)"
+          + ("" if reached_path else " — enumeration only; pass a reached-set to join"))
+    if problems:
+        print(f"refusal-join: {len(problems)} problem(s)")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

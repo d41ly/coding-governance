@@ -568,6 +568,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "enumerate_branches",
+      "kind": "function",
+      "file": "tools/govkit/refusal_join.py"
+    },
+    {
       "id": "enumerate_exports",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -905,6 +910,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/refusal_join.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
     {
@@ -1156,6 +1166,11 @@
       "id": "planned_writes",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "population",
+      "kind": "function",
+      "file": "tools/govkit/refusal_join.py"
     },
     {
       "id": "pytest_configure",

@@ -219,3 +219,9 @@ name = "template size <=32KiB"
 why = """
 gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
 """
+
+[[exempt_leg]]
+name = "govkit refusal join"
+why = """
+a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.
+"""

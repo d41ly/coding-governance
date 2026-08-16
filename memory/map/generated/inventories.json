@@ -18,6 +18,7 @@
       "drift-audit selftest",
       "drift-audit wiring",
       "gotchas selftest",
+      "govkit refusal join",
       "govkit selfcheck",
       "govkit selftest",
       "harness arms (fail branches armed or pinned)",
