@@ -92,9 +92,12 @@ its own revision — the taxonomy another unit depends on.
 
 Not defects — work the specs deliberately leave to the pass that builds them.
 
-- Twelve open forks across the five specs, each with a recommendation. Two are owner turns and say
-  so: whether committing a build folder should be read as approving the scope of every spec inside
-  it, and whether the vacuous-selector class record gains a build-method anchor.
+- Fourteen open forks across the five specs — three, three, four, two, two, in the roster's order —
+  each with a recommendation. Two are owner turns and say so: whether committing a build folder
+  should be read as approving the scope of every spec inside it, and whether the vacuous-selector
+  class record gains a build-method anchor. Derive the count with
+  `awk '/^## 8\./,/^## 9\./' memory/builds/aBoundedVerdict/spec/*.md | grep -cE '^- \*\*F[0-9]'`
+  rather than reading it here; this line said twelve until that command was run.
 - Six unknowns carried from the research record, chiefly whether any producer-verb change keeps the
   driver's sibling test green — every candidate that adds a verb is unmeasured against a leg that
   took eighteen minutes on the probe host — and whether the two legs red at baseline in a clone are
