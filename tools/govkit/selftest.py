@@ -356,6 +356,7 @@ def main() -> int:
 
             # AC3 FIRST, and it is not ceremony: the cheapest way to pass the two arms below is to
             # stop landing files, so the coverage claim has to be pinned BEFORE the protection ones.
+            first_receipt = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
             landed_before = sorted(p.name for p in (t / "tools" / "drift-audit").iterdir() if p.is_file())
             check("a ** rule still lands what nothing else claims — the template included",
                   "drift_signals.template.py" in landed_before and "drift_report.py" in landed_before,
@@ -363,7 +364,12 @@ def main() -> int:
 
             owned.write_text(owned.read_text(encoding="utf-8") + "\n# ADOPTER EDIT\n", encoding="utf-8")
             seeded = t / "tools" / "drift-audit" / "drift_signals.py"
-            run("apply", "--target", str(t), "--kits", "drift-audit")
+            second = run("apply", "--target", str(t), "--kits", "drift-audit")
+            # THE RE-APPLY MUST HAVE SUCCEEDED. Both protection arms are satisfied by an apply that
+            # REFUSED and wrote nothing — "the edit survived" is trivially true when nothing ran —
+            # so the exit code is asserted FIRST. Demonstrated by injecting a refusal and watching
+            # the suite still print "all arms held".
+            check("the re-apply actually ran", second.returncode == 0, second.stdout + second.stderr)
             check("a re-apply PRESERVES an adopter's edit to a project-owned/seeded file",
                   "ADOPTER EDIT" in seeded.read_text(encoding="utf-8"),
                   "the wildcard rule clobbered a path another rule owns")
@@ -371,6 +377,27 @@ def main() -> int:
             landed_after = sorted(p.name for p in (t / "tools" / "drift-audit").iterdir() if p.is_file())
             check("...and the re-apply still lands the same file set",
                   landed_after == landed_before, f"{landed_before} -> {landed_after}")
+
+            # PLAN AND APPLY MUST DESCRIBE THE SAME WRITE, compared as SETS over a `**` kit.
+            # `plan` used to resolve sources through `rule_sources()`, which skips every glob, so a
+            # wildcard rule produced ZERO plan rows while apply landed every tracked file under
+            # `home` — the operator approving a preview of a fraction of the install. Ten of this
+            # repo's nineteen descriptors carry a `**` rule. A deployer whose preview disagrees with
+            # its action is worse than one that simply does the wrong thing: the wrong thing is
+            # visible, and this was not.
+            # Compared against the FIRST receipt: a `seed` rule legitimately skips a destination the
+            # target already has, so a re-apply's receipt is the wrong operand. Restricted to
+            # LANDABLE roles for the same reason — plan lists a `rendered` row that apply reports as
+            # SKIPPED, which is a real but SEPARATE preview/action gap (TOOL-dClosedLexicon-13); this
+            # arm is about the wildcard pool, and an arm that fails for two reasons pins neither.
+            plan_out = run("plan", "--target", str(t), "--kits", "drift-audit")
+            planned = {ln.split("]", 1)[1].split("<-")[0].strip()
+                       for ln in plan_out.stdout.splitlines()
+                       if "]" in ln and "<-" in ln
+                       and any(f"[{role}" in ln.split("]")[0] for role in ("engine", "seed"))}
+            applied = {f["path"] for f in first_receipt.get("files", [])}
+            check("plan's write set equals apply's receipt for a ** kit", planned == applied,
+                  f"planned-only={sorted(planned - applied)} applied-only={sorted(applied - planned)}")
 
     print()
     if FAILURES:

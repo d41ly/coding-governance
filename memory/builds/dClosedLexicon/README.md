@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-16
 streams: playbook+tooling
 roster: PLAY+TOOL
-ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12
+ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13
 ---
 
 # dClosedLexicon — a declared naming lexicon, gated, and portable into an unknown repo
@@ -77,14 +77,14 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12
+**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | CLOSED | rev-11 | 2026-08-16 |
 | [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | CLOSED | rev-5 | 2026-08-16 |
-| [TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns](spec/2026-08-16-spec-dClosedLexicon-4.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns](spec/2026-08-16-spec-dClosedLexicon-4.md) | CLOSED | rev-3 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

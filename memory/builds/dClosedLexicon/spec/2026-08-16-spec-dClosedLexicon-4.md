@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns
 
-**Status:** CLOSED · rev-2 · 2026-08-16 · node d · Tier-2 · base f7306f35 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node d · Tier-2 · base f7306f35 · streams tooling
 
 ## 1. Goal
 
@@ -28,9 +28,10 @@ The declaration reads as "everything not otherwise claimed". This unit makes it 
 - **S1** — a `**` include resolves to every tracked file under `home` MINUS anything whose
   DESTINATION another rule in the same descriptor claims. Destination, and NOT source: see §4, where
   the source half was built, measured to under-land, and cut.
-- **S2** — ONE spelling of destination resolution. The write loop computes destinations inline
-  today; S1 needs the same answer before the loop runs, and two computations of one thing is the
-  class this repo has a record about. Extract it, call it twice.
+- **S2** — ONE spelling of destination resolution AND of the source pool. The write loop computed
+  both inline; S1 needs the same answers before the loop runs, and `plan` needed them too — see
+  rev-3, where the preview and the action were found to disagree. `resolve_dests` and
+  `resolve_rule_pool` are extracted and called by `plan`, by `apply`, and by the exclusion itself.
 - **S3** — `tools/drift-audit/kit.toml` keeps its `**` rule, now correct by the engine's semantics
   rather than by enumeration. `tools/lexicon/kit.toml` — which enumerates its engine files precisely
   to dodge this defect — reverts to `**`, because the workaround's own cost is filed as
@@ -122,6 +123,12 @@ had as a workaround.
   run, both are green, and `tools/lexicon/kit.toml`'s reverted `**` lands the same file set the
   enumeration did.
 - **AC5** — When `bash tools/run-gates.sh` runs on the landing commit, it is green.
+- **AC6** — When `plan` and `apply` run over a `**` descriptor, plan's landable-role write SET equals
+  apply's receipt paths. Added at rev-3: the two disagreed, and a preview that under-reports what
+  will be written is worse than the clobber this unit began with, because the clobber is at least
+  visible afterwards.
+- **AC7** — When a destination still carries an unresolved answer token, `apply` REFUSES it by name
+  rather than writing a file whose path contains the token.
 
 ## 7. Gates
 
@@ -137,6 +144,21 @@ no leg; it adds arms to one that already rides the bar.
   descriptor rather than only on the one that motivated it.
 
 ## 9. Revision log
+
+- rev-3 · 2026-08-17 · folded review-dClosedLexicon-8 (PASS WITH FINDINGS; the fix itself confirmed
+  correct across all 19 descriptors, no shape clobbering or under-landing). The HIGH was a
+  plan/apply divergence this unit WIDENED: `plan` resolved sources through `rule_sources()`, which
+  skips globs, so a `**` rule emitted zero plan rows while `apply` landed every tracked file under
+  `home` — and reverting lexicon to `**` moved the one accurately-planned kit into the blind class
+  shared by nine others. Measured: plan 3, apply 12. Fixed at the seam rather than per descriptor —
+  `resolve_rule_pool` is now the single pool both verbs read, so all ten wildcard descriptors are
+  repaired together; plan and apply now both report 12. Also folded: `resolve_dests` stops dropping
+  `resolve_tokens`' missing list, so `apply --kits kickoff-manifest` with no answer refuses (rc 2)
+  instead of writing a file literally named `{manifest_path}`; the two protection arms now assert the
+  re-apply's EXIT CODE, since both were satisfied by an apply that refused and wrote nothing; and
+  `scan_claimed_paths`' summary line stated the rejected source-based design. The new parity arm
+  immediately found a SEPARATE preview/action gap — `plan` calls a non-landable `rendered` row a
+  WRITE — filed as `TOOL-dClosedLexicon-13` rather than absorbed here.
 
 - rev-2 · 2026-08-16 · BUILT and CLOSED. S1 narrowed from "source or destination" to DESTINATION
   ONLY: the source half was implemented, measured to under-land by two files, and cut — §4 carries
