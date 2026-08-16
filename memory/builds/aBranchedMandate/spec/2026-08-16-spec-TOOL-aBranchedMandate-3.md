@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -24,8 +24,10 @@ document that already states what the first one costs.
   shape at it; the fallback changes which commit it is handed, not what it asks.
 - **S4** — the run-state file records `anchor-kind`, plus the branch ref and tip that were observed.
   Protocol section 2's authored-fact count moves from seven to eight in both copies of the document.
-- **S5** — a new declaration in `.unattended.conf` selects the scope, defaulting to today's
-  behaviour. An adopter who declares nothing keeps the strict anchor.
+- **S5** — a new declaration `ANCHOR_SCOPE` in `.unattended.conf`, over the closed value set
+  `default-branch` and `published`, selects the scope. Absent, blank, or any value outside the set is
+  a REFUSAL to widen: an adopter who declares nothing keeps the strict anchor, and a misspelling
+  cannot silently select either behaviour.
 - **S6** — check 9 of `tools/unattended/check-unattended.sh` stops asking "is the recorded BASE an
   ancestor of the anchor" and asks "is the recorded BASE **published on the remote**": an ancestor of
   the advertised HEAD tip, or equal to a tip the remote advertises for any ref. The leg does **not**
@@ -36,7 +38,13 @@ document that already states what the first one costs.
   `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` in lockstep.
 - **S9** — the two sibling self-tests gain arms for the fallback: it fires only when declared, it
   refuses an unadvertised branch, it refuses a tip that is not an ancestor of HEAD, and the leg
-  accepts a branch-anchored record while still refusing a BASE that is on no advertised history.
+  accepts a branch-anchored record while still refusing a BASE that is on no advertised history. One
+  further arm covers S5's refusal set: a blank and a misspelled `ANCHOR_SCOPE` both keep the strict
+  anchor, because a value-set guard whose failing case is untested is the guard that silently admits.
+- **S10** — `TOOL-aStandingWrit-6`'s backlog row is rewritten to name what S6 leaves unrepaired,
+  rather than closed. S6 makes the leg observe along this predicate's path only; every other
+  consumer of the leg's `GOV_DEFAULT_BRANCH` derivation in that file is untouched, and a row closed
+  on a partial repair is how a known gap stops being tracked.
 
 ## 3. Non-goals (OUT)
 
@@ -49,11 +57,12 @@ document that already states what the first one costs.
 - Repairing the gate leg's anchor generally. `TOOL-aStandingWrit-6` is the tracked OPEN row for the
   leg computing BASE from `GOV_DEFAULT_BRANCH` and a remote-tracking ref rather than an observation.
   S6 makes the leg observe **for its own predicate**; it does not repair every other consumer of that
-  derivation in the same file.
+  derivation in the same file, and S10 keeps the row open naming the remainder.
 - Changing `--landed`, the lander, or the pre-push hook. Landing still happens on the default branch
   and is still gated exactly as today.
 - Changing the phase vocabulary or the Definition-of-Done set. `CORE_FLOOR` does not move.
-- Bumping `KIT_UNATTENDED_VERSION` independently of node `c`'s in-flight move to 1.5. See §8 F3.
+- Bumping `KIT_UNATTENDED_VERSION`. Resolved in §8 F3: the version moves once, in node `c`'s build,
+  and this one lands without waiting on it.
 
 ## 4. Design
 
@@ -188,6 +197,7 @@ bar on the next push, on the one path the run is required to take.
 | `.unattended.conf` + `tools/unattended/.unattended.conf.example` | S5 |
 | `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` | S9 |
 | `.memory-tree.conf` | the `ARMS_FLOORS` pairs for both files, re-measured |
+| `memory/backlog/TOOL.md` | S10, the `TOOL-aStandingWrit-6` row rewritten to name what remains |
 | `AGENTS.md` | the leg's check count, if S6 adds an ordinal rather than changing one |
 
 ### Alternatives rejected
@@ -285,37 +295,43 @@ bar on the next push, on the one path the run is required to take.
 
 ## 8. Open questions
 
+none — all four forks below are RESOLVED, and the build-level decision that precedes them is recorded
+in this build's README.
+
 - **F1 — the declaration's name and value set.** Options: a boolean-ish key naming the behaviour
   (`ALLOW_BRANCH_ANCHOR=1`), or a scope key with a closed value set
-  (`ANCHOR_SCOPE=default-branch|published`). **Recommendation: the scope key.** It names the property
-  rather than the mechanism, it leaves room for a third scope without a second boolean, and a closed
-  value set means a typo is a refusal instead of a falsy string that silently selects the strict path.
-  A boolean whose absence and whose misspelling produce the same behaviour is the shape that hides a
-  misconfiguration.
+  (`ANCHOR_SCOPE=default-branch|published`). **RESOLVED (owner, 2026-08-16): the scope key.** It
+  names the property rather than the mechanism, it leaves room for a third scope without a second
+  boolean, and a closed value set means a typo is a refusal instead of a falsy string that silently
+  selects the strict path. A boolean whose absence and whose misspelling produce the same behaviour
+  is the shape that hides a misconfiguration. S5 carries the refusal set and S9 carries its arm.
 - **F2 — does S6 need `TOOL-aStandingWrit-6` first?** That row records that the leg's anchor is not
   observed. S6 makes the leg observe for its own predicate, which repairs that gap along the path
-  this unit uses and leaves it open elsewhere in the file. Options: land S6 as specified and close
-  the row partially, or block on the row and land the leg's anchor wholesale. **Recommendation: land
-  S6 as specified, and update the row to name what remains rather than closing it.** Blocking couples
-  this unit to an unspecced one, and a partially observed leg is strictly better than a wholly
-  unobserved one. This is a scope question and therefore an owner turn.
+  this unit uses and leaves it open elsewhere in the file. Options: land S6 as specified and narrow
+  the row, or block on the row and land the leg's anchor wholesale. **RESOLVED (owner, 2026-08-16):
+  land S6 as specified, and rewrite the row to name what remains.** Blocking couples this unit to an
+  unspecced one, and a partially observed leg is strictly better than a wholly unobserved one. S10
+  carries the row rewrite, and it is a rewrite rather than a close on purpose.
 - **F3 — the kit version.** Node `c`'s in-flight `cBriefedPilot` takes this kit to 1.5 across the
   driver literal, the leg literal and the shipped doc marker, and it holds twenty-two open rows on
-  the same files this unit edits. Options: bump here, ride theirs, or coordinate an order.
-  **Recommendation: do not bump, and sequence this build after theirs if both are live.** Two builds
-  moving one version literal is a conflict in the value whose entire purpose is to be unambiguous,
-  and the file overlap is large enough that the merge cost dominates either way. This is an owner
-  turn because it is a cross-node sequencing decision.
+  the same files this unit edits. Options: bump here, ride theirs, or sequence behind them.
+  **RESOLVED (owner, 2026-08-16): do not bump, and land without waiting on node `c`.** The version
+  moves once, in the build that owns the move. The owner took the merge cost on the shared files
+  rather than sequencing this build behind an unrelated one; whichever lands second reconciles, and
+  the value that must stay unambiguous is moved by exactly one build either way.
 - **F4 — should a branch-anchored run be allowed to reach `LANDED` at all?** A defensible stricter
   position is that the weaker anchor authorizes building and merging but not the final landing
   observation. Against it: `--landed` already requires HEAD to be an ancestor of the advertised
   default tip, so the work IS on the default branch by the time it is claimed, and refusing there
-  would strand a run that has already landed its work. **Recommendation: no additional restriction.**
-  Recorded because it is the first thing a reviewer will ask.
+  would strand a run that has already landed its work in a non-terminal phase no verb can close.
+  **RESOLVED (owner, 2026-08-16): no additional restriction.**
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
+- rev-2 · 2026-08-16 · all four forks resolved by the owner. F1's pick folded into S5 as a closed
+  value set with its refusals, and into S9 as an arm; F2's into the new S10 and §3's non-goal; F3's
+  into §3. F4 changed no scope item, which is what "no additional restriction" means.
 
 ## 10. Reuse audit
 

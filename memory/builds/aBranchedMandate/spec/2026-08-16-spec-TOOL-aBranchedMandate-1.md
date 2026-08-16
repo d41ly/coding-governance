@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -16,7 +16,8 @@ nobody edited. Give it the normalising half its two sibling adopters already hav
 - **S2** — CR-normalise the same side of the truncated diff this script prints on failure, so the
   reported hunks are the real drift rather than every line of the file.
 - **S3** — one runnable arm that fails if S1 regresses: render, write a CRLF copy of the rendered
-  Skill, assert `--check` still exits 0. Its home is F1.
+  Skill, assert `--check` still exits 0. It lives in `tools/memory-recall/selftest.py`, which is
+  already a gate leg, so this unit adds no leg.
 - **S4** — the header comment gains the rule the other two adopters state in their own headers, so
   the next reader of this file learns why the normalisation is there rather than deleting it as
   redundant.
@@ -66,7 +67,7 @@ None. The committed bytes do not move — the index already normalises on commit
 | Path | Change |
 |---|---|
 | `tools/memory-recall/adopt-memory-recall.sh` | S1, S2, S4 |
-| F1's chosen host | S3 |
+| `tools/memory-recall/selftest.py` | S3 |
 
 ### Alternatives rejected
 
@@ -117,13 +118,15 @@ None. The committed bytes do not move — the index already normalises on commit
 
 - `bash tools/run-gates.sh` — the whole bar, and specifically the leg `memory-recall skill wiring`
   which is the one this unit turns green.
-- `python tools/memory-recall/selftest.py` — must stay green whether or not F1 puts S3 inside it.
-- `python tools/codebase-map/test_codebase_map.py` — reds if F1's resolution adds a gate leg that no
-  dossier claims. Named here because the cost is invisible until the bar runs.
-- `python tools/drift-audit/drift_report.py --check` — its hand-kept leg-count signal sits at a pin
-  with zero slack, so an added leg reds it.
+- `python tools/memory-recall/selftest.py` — the leg that hosts S3.
+- `python tools/codebase-map/test_codebase_map.py` and `python tools/drift-audit/drift_report.py --check`
+  — both must stay green, and both are the reason S3 went where it did: each reds on an ADDED gate
+  leg, the second at a pin with zero slack. Named here so a later reader does not move S3 into a new
+  sibling test file without paying for it.
 
 ## 8. Open questions
+
+none — the fork below is RESOLVED.
 
 - **F1 — where does S3's arm live?** Two options. **(a) Fold it into
   `tools/memory-recall/selftest.py`**, which is already a leg, so no new leg is created and none of
@@ -131,14 +134,16 @@ None. The committed bytes do not move — the index already normalises on commit
   that today exercises only the retrieval engine. **(b) A new
   `tools/memory-recall/adopt-memory-recall.test.sh`**, matching how `tools/unattended/` tests its own
   adopter, at the cost of a new gate leg plus the dossier claim, the map re-render, the manifest
-  re-stamp and the drift-signal pin it drags with it. **Recommendation: (a).** The arm is four lines
-  and the shape it proves is not adopter-specific; option (b) spends four gate movements on file
-  placement. Revisit if a second adopter-level arm appears, at which point a sibling test file is
-  earning its keep.
+  re-stamp and the drift-signal pin it drags with it. **RESOLVED (owner, 2026-08-16): (a).** The arm
+  is four lines and the shape it proves is not adopter-specific; option (b) spends four gate
+  movements on file placement. Revisit if a second adopter-level arm appears, at which point a
+  sibling test file is earning its keep.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
+- rev-2 · 2026-08-16 · F1 resolved by the owner; S3, §4's file table and §7's gate list now name
+  `tools/memory-recall/selftest.py` instead of deferring to the fork.
 
 ## 10. Reuse audit
 

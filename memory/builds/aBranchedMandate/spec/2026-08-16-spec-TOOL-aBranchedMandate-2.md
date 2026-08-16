@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -13,14 +13,16 @@ driver's refusal name its remedy for the cases that still gate.
 ## 2. Scope (IN)
 
 - **S1** — the eol arm of `tools/check-wiring.sh` no longer contributes to the exit status of
-  `--check`. It keeps its line, under a label distinct from `UNWIRED`, because the condition is a
-  working-copy artifact and not dormant wiring.
+  `--check`. It keeps its line under the label `note`, distinct from `UNWIRED`, because the condition
+  is a working-copy artifact and not dormant wiring.
 - **S2** — `--fix` still rewrites those bytes, and `--session` still does not. Neither behaviour
   moves; only the exit status of `--check` does.
 - **S3** — the arm at `tools/check-wiring.test.sh:248` moves from "eol alone gives rc 1 and an
-  UNWIRED line" to "eol alone gives rc 0 and the advisory line", and a sibling arm asserts that a
+  UNWIRED line" to "eol alone gives rc 0 and a `note` line", and a sibling arm asserts that a
   genuinely dormant item in the same run still gives rc 1. Without the sibling, S1 is
-  indistinguishable from having deleted the arm.
+  indistinguishable from having deleted the arm. The arms also establish whether any consumer greps
+  for the literal `UNWIRED` on this path, which is the one fact that would have argued for keeping
+  the word.
 - **S4** — check 4's refusal in `tools/unattended/unattended.sh` names the repair command, so an
   attended operator who meets a wiring refusal is told what to run. The remedy goes BEFORE the
   interpolation, because a literal word after it lands inside the branch signature `check-arms.py`
@@ -40,7 +42,7 @@ driver's refusal name its remedy for the cases that still gate.
 - Changing the protocol text. The contract — delegate to a non-repairing check — is unchanged, so
   `PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` do not move and their parity
   check is not in play.
-- Bumping `KIT_UNATTENDED_VERSION`. See §8 F2.
+- Bumping `KIT_UNATTENDED_VERSION`. Resolved in §8 F2: the version moves once, in node `c`'s build.
 
 ## 4. Design
 
@@ -87,8 +89,21 @@ observe a case where CRLF means something is broken, which is precisely what mak
 
 ### Data model
 
-The script's report vocabulary today is `ok` / `skip` / `UNWIRED` / `fixed`. This unit adds one
-member for a condition that is true, worth printing, and not a refusal. The label is F1.
+The script's report vocabulary today is `ok` / `skip` / `UNWIRED` / `fixed`. This unit adds `note`
+for a condition that is true, worth printing, and not a refusal. `UNWIRED` is the only member that
+gates, and reusing it here would make the one word that means "this gates" stop meaning it.
+
+`skip` is NOT the answer for this condition and must not be reached for. It means the population was
+empty — no `eol=lf`-pinned file under `.claude/` — and a population of zero and a population that is
+all-CRLF are different answers the script already distinguishes.
+
+### The declaration does not move
+
+`.unattended.conf` keeps `WIRING_CHECK="bash tools/check-wiring.sh --check"` unchanged. With the eol
+arm advisory, `--check` reports only gating items, so the declaration is correct as written and the
+driver still delegates to the same non-repairing mode protocol section 7 requires. This is recorded
+because it is the first thing an adopter will ask after reading S1, not because anything about it is
+undecided.
 
 ### Files touched (estimate)
 
@@ -170,28 +185,35 @@ member for a condition that is true, worth printing, and not a refusal. The labe
 
 ## 8. Open questions
 
+none — both forks below are RESOLVED, and a third was reclassified out of this section.
+
 - **F1 — the label for the advisory line.** The report vocabulary is `ok` / `skip` / `UNWIRED` /
   `fixed`, all lowercase except the one that gates. Options: `note`, or `advisory`, or keeping
-  `UNWIRED` and relying on the exit status alone. **Recommendation: `note`.** It is short enough to
-  keep the existing column alignment, and reusing `UNWIRED` for a non-gating condition makes the one
-  word that means "this gates" stop meaning it, which is how a report trains its readers to skip it.
-  Keeping `UNWIRED` is the option to pick only if some consumer greps for that literal, which S3's
-  arms will reveal.
+  `UNWIRED` and relying on the exit status alone. **RESOLVED (owner, 2026-08-16): `note`.** It is
+  short enough to keep the existing column alignment, and reusing `UNWIRED` for a non-gating
+  condition makes the one word that means "this gates" stop meaning it, which is how a report trains
+  its readers to skip it. S3's arms still establish whether any consumer greps for the literal, which
+  is the fact that would have argued the other way.
 - **F2 — does this unit bump `KIT_UNATTENDED_VERSION`?** The gate asserts only that the driver's and
   the leg's literals agree, not that a change bumps them, so nothing forces it. Against bumping:
   node `c`'s in-flight build takes this kit to 1.5 across both literals and the shipped doc marker,
   and two builds moving one version is a merge conflict in a value whose whole purpose is to be
-  unambiguous. **Recommendation: do not bump here.** Let the version move once, in the build that
-  owns the move, and note in this build's README that the driver changed under 1.4. Revisit if this
-  unit lands after that one, in which case it rides 1.5 and this fork is moot.
-- **F3 — is `.unattended.conf`'s `WIRING_CHECK` still the right declaration afterwards?** With the
-  eol arm advisory, `--check` in this repo reports only gating items, so the declaration is correct
-  as written. Recorded rather than resolved because it is the question an adopter will ask when they
-  read S1 and then read their own conf. **Recommendation: no change.**
+  unambiguous. **RESOLVED (owner, 2026-08-16): do not bump, and land without waiting on node `c`.**
+  The version moves once, in the build that owns the move; this build's README records that the
+  driver changed under 1.4. The owner accepted the merge cost on the shared files rather than
+  sequencing behind an unrelated build.
+
+**F3 was not a fork and has been reclassified.** It asked whether `WIRING_CHECK` is still the right
+declaration afterwards. It presented no options and no trade — the answer is entailed by F1 — so it
+belonged in §4 as a stated consequence rather than here as a decision. It now sits under "The
+declaration does not move". Recorded rather than silently deleted, because a fork that disappears
+between revisions is indistinguishable from one that was answered off the record.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
+- rev-2 · 2026-08-16 · F1 and F2 resolved by the owner; the label `note` folded into S1, S3 and §4's
+  data model; F3 reclassified out of §8 into §4 with the reclassification recorded in place.
 
 ## 10. Reuse audit
 

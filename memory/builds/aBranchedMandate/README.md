@@ -47,9 +47,9 @@ it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-1 | 2026-08-16 |
+| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->
@@ -71,12 +71,14 @@ arm's exit status is unfunded — that no gate reds on CR any more. That becomes
 lands. Landing unit 2 first would silence a signal that is still correctly predicting a red leg,
 which is the opposite of what unit 2 claims to be doing.
 
-Unit 3 is independent of both and is sequenced last because it is the one that needs an owner
-decision before any code is written.
+Unit 3 is independent of both and is sequenced last because it is the one that changes a ratified
+rule. That decision has now been made — see the resolutions below — so the ordering is a build
+ordering rather than a gate on approval.
 
 ## What each unit is worth on its own
 
-Stated because the owner may take a subset, and a subset is a legitimate outcome here.
+Stated when a subset was still on the table. The owner took all three, so this is now the record of
+what was weighed rather than a menu.
 
 - **Units 1 and 2 alone** fix every worktree failure that is not the authorization rule. After them,
   a run started from a worktree on a build that IS on the default branch works, and the merge bar is
@@ -98,23 +100,42 @@ Stated because the owner may take a subset, and a subset is a legitimate outcome
 - **The two protocol copies move together or not at all.** The kit's `PROTOCOL.template.md` and the
   installed `memory/guides/UNATTENDED-PROTOCOL.md` are byte-compared by the kit gate.
 - **Node `c` has a live build on these exact files.** `cBriefedPilot` holds twenty-two open rows on
-  the unattended kit and takes it to version 1.5 across three literals. No unit here bumps that
-  version; the sequencing question is unit 3's §8 F3 and it is an owner turn.
+  the unattended kit and takes it to version 1.5 across three literals. **No unit here bumps that
+  version**, and this build does not sequence behind theirs — unit 2 §8 F2 and unit 3 §8 F3. Whoever
+  lands second reconciles. A unit that finds itself needing to move the version literal has hit a
+  changed premise and stops rather than moving it.
 
-## Owner decisions needed before any code
+## Owner decisions — RESOLVED 2026-08-16
 
-Every fork is unresolved. Four of the seven are genuine owner turns rather than agent picks.
+The decision prior to every fork, because it is not a fork in any spec: **is the price in unit 3's
+§4 worth paying** — the price being that a run stops being able to authorize only its successor and
+becomes able to authorize itself. **Answered: build all three.** The alternative on the table was
+units 1 and 2 alone, which fixes every worktree failure except the authorization rule and spends no
+security property. It was declined in favour of answering the report as written.
 
-| Fork | Question | Recommendation | Whose call |
-|---|---|---|---|
-| unit 1 F1 | where the CR regression arm lives | fold into the existing selftest leg | agent |
-| unit 2 F1 | the advisory label in the wiring report | `note` | agent |
-| unit 2 F2 | bump the kit version here | no | owner, cross-node |
-| unit 3 F1 | the declaration's name and value set | a closed scope key | agent |
-| unit 3 F2 | block on the tracked row for the leg's anchor | land as specified, narrow the row | owner, scope |
-| unit 3 F3 | the kit version, against node `c`'s in-flight bump | do not bump; sequence after theirs | owner, cross-node |
-| unit 3 F4 | may a branch-anchored run reach the terminal landing phase | no extra restriction | owner |
+All eight forks are resolved and marked in place in each spec's §8. **Eight, not seven** — an earlier
+version of this table listed seven and omitted unit 2's F3, which is exactly the completeness defect
+this repo has paid for before. F3 turned out not to be a fork at all: it carried no options and no
+trade, its answer was entailed by F1, and it has been reclassified into unit 2's §4 with the
+reclassification recorded rather than the row silently vanishing.
 
-The one decision that is not a fork in any spec, because it is prior to all of them: **is the price
-in unit 3's §4 worth paying.** If it is not, units 1 and 2 still land and the answer to the report is
-that a build must be published on the default branch before a run may use it.
+| Fork | Question | Resolution |
+|---|---|---|
+| unit 1 F1 | where the CR regression arm lives | fold into `tools/memory-recall/selftest.py`; no new leg |
+| unit 2 F1 | the label for the non-gating eol line | `note` |
+| unit 2 F2 | bump the kit version here | no, and land without waiting on node `c` |
+| unit 2 F3 | — | not a fork; reclassified into §4 |
+| unit 3 F1 | the declaration's name and value set | `ANCHOR_SCOPE`, closed value set, absent or misspelled refuses to widen |
+| unit 3 F2 | block on the tracked row for the leg's anchor | land S6 as specified; rewrite the row to name what remains |
+| unit 3 F3 | the kit version, against node `c`'s in-flight bump | do not bump; land regardless of order |
+| unit 3 F4 | may a branch-anchored run reach the terminal landing phase | no extra restriction |
+
+Two resolutions created work that was not in the specs when the forks were put, and both are carried
+as scope items rather than left implicit. Unit 3 gains **S10**, the rewrite of the tracked row for
+the leg's anchor — a rewrite and not a close, because S6 repairs that gap only along its own
+predicate's path. Unit 3's S9 gains an arm for the new declaration's refusal set, because a
+value-set guard whose failing case is untested is the guard that silently admits.
+
+**F2 and F3 both chose to land without sequencing behind node `c`.** The merge cost on the shared
+files is accepted; whichever build lands second reconciles. The version literal is still moved by
+exactly one build.
