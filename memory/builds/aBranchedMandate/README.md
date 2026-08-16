@@ -41,10 +41,13 @@ exactly as recorded; only their cause was misattributed, and four acceptance cri
 false cause have been re-keyed to constructed fixtures.
 
 **C3 is not a defect.** `memory/guides/UNATTENDED-PROTOCOL.md` section 1 states it as ratified
-design, with four costs the owner enumerated and accepted. Unit 3 is therefore a **rule change**
-priced as one, and its §4 states plainly what the change spends: today a run can authorize its
-successor, and afterwards it can authorize itself. Units 1 and 2 carry no such trade — they are a
-missing normalisation and a report severity.
+design, with four costs the owner enumerated and accepted. Unit 3 is therefore a **rule change**,
+and its §4 prices **three** spent properties: a run gains the ability to authorize ITSELF rather than
+only its successor; the leg-side widening is unconditional, so the bar weakens for adopters who never
+opt in; and roster integrity becomes satisfiable by construction on the branch anchor. The first
+revision priced only the first and called it the whole price — the spec audit found the other two, and
+the owner re-confirmed the change against the complete list on 2026-08-17. Units 1 and 2 carry no such
+trade: they are a missing normalisation and a report severity.
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
 it.
@@ -55,8 +58,8 @@ it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -171,14 +174,22 @@ shape `check-unattended.sh` records the kit being moved off after a reproduced p
 the conf. A fourth finding, C9, established that the price list the owner accepted was **incomplete** —
 roster integrity is a second ratified property this unit spends, and §10 had asserted the opposite.
 
-**Three forks are now OPEN**, all opened by the audit after the owner's resolutions, so units 2 and 3
-are FORKED under M2 and may not go terminal until they are answered:
+The audit opened three further forks, all after the owner's earlier resolutions and none of them a
+re-litigation. **All three were put to the owner and answered on 2026-08-17**, so no spec in this
+build is FORKED any more:
 
-| Fork | Question | Recommendation |
+| Fork | Question | Resolution |
 |---|---|---|
-| unit 2 F4 | the CRLF writer is unidentified; may a severity downgrade rest on that | land as specified; the report survives, only the gating goes |
-| unit 3 F5 | how the anchor selection is kept stable without reading a run-written value | make the derivation monotone rather than reading `anchor-kind` |
-| unit 3 F6 | costs 2 and 3 were not on the price list the owner accepted | re-confirm explicitly; the unit cannot deliver what was asked without cost 2 |
+| unit 2 F4 | the CRLF writer is unidentified; may a severity downgrade rest on that | land as specified — the report survives, only the gating goes; the residual stays written down |
+| unit 3 F5 | how the anchor selection is kept stable without reading a run-written value | a MONOTONE derivation: accept a BASE that is an ancestor of EITHER anchor, so nothing selects |
+| unit 3 F6 | costs 2 and 3 were not on the price list the owner accepted | re-confirmed against the complete list; S8 must now write all three into the protocol |
+
+Two of the three created obligations rather than merely ratifying, and both are scope items now, not
+implications. F5's monotone derivation WIDENS `fail 18`, so unit 3 gains an arm and AC18 — a widened
+guard with no failing-case arm is indistinguishable from a deleted one, and this build widens two
+guards. F6's re-confirmation binds S8 to put all three costs and the per-anchor roster qualification
+into the binding document, because a cost recorded only in a spec is one the next reader of the
+protocol never sees.
 
 **The fold itself is unreviewed**, by M4's stop rule: fixes are folded once and reviewing resumes only
 if the design moves again. A second audit is a decision, not an obligation.

@@ -249,6 +249,12 @@ printf '%s
 sed -i "/<!-- run:generated -->/r /tmp/_copy.$$" memory/builds/tRun/RUN.md; rm -f /tmp/_copy.$$
 hit "$(run)" "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers"
 
+# ---- TOOL-aDeclaredCeiling-3's four arms lived here and are SUPERSEDED. They asserted that a
+# ---- terminal run's region is skipped from the EQUALITY comparison; dClosedLexicon r2 removed the
+# ---- copy entirely, so the region is empty by contract and there is nothing to compare at any
+# ---- phase. That is the same invariant with the failure mode designed out rather than scoped
+# ---- around, and the arms above already cover it.
+
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"

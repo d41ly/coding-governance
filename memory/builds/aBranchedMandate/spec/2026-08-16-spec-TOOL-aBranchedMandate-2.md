@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -225,9 +225,7 @@ undecided.
 
 ## 8. Open questions
 
-F4 is OPEN. F1 and F2 are RESOLVED below, and a third was reclassified out of this section. F4 was
-opened by the spec audit after those resolutions, so this spec is FORKED under M2 until it is
-answered, and its status may not go terminal before then.
+none — all three forks below are RESOLVED, and a fourth was reclassified out of this section.
 
 - **F1 — the label for the advisory line.** The report vocabulary is `ok` / `skip` / `UNWIRED` /
   `fixed`, all lowercase except the one that gates. Options: `note`, or `advisory`, or keeping
@@ -251,19 +249,23 @@ belonged in §4 as a stated consequence rather than here as a decision. It now s
 declaration does not move". Recorded rather than silently deleted, because a fork that disappears
 between revisions is indistinguishable from one that was answered off the record.
 
-- **F4 — UNRESOLVED, opened by the spec audit.** The CRLF writer is unidentified. Measurement
-  establishes that it is not `git worktree add`, that it is confined to `.claude/`, that it is
-  systematic across all five harness-created worktrees, and that the committed bytes are correct
-  everywhere. It does not establish WHAT writes it. S1 removes the exit status that reports the
-  condition, so if the writer is later found to be a renderer emitting wrong bytes, this unit will
-  have silenced a real signal. Options: **(a) land S1 as specified** and accept that the report
-  remains and only the gating goes, on the grounds that the committed bytes are measured correct;
-  **(b) identify the writer first**, which is an unscoped investigation into tooling outside this
-  repo; **(c) land S1 but keep the exit status non-zero in the PRIMARY checkout only**, where no
-  harness writer operates — a special case whose premise nothing enforces, and the shape §4 already
-  rejects. **Recommendation: (a).** The report survives, the gotcha class stays visible, and the
-  alternative blocks a fix for a live deadlock on an investigation with no bounded end. This is an
-  owner turn because it decides how much unexplained mechanism a severity downgrade may rest on.
+- **F4 — opened by the spec audit.** The CRLF writer is unidentified. Measurement establishes that it
+  is not `git worktree add`, that it is confined to `.claude/`, that it is systematic across all five
+  harness-created worktrees, and that the committed bytes are correct everywhere. It does not
+  establish WHAT writes it. S1 removes the exit status that reports the condition, so if the writer is
+  later found to be a renderer emitting wrong bytes, this unit will have silenced a real signal.
+  Options: **(a) land S1 as specified** and accept that the report remains and only the gating goes,
+  on the grounds that the committed bytes are measured correct; **(b) identify the writer first**,
+  which is an unscoped investigation into tooling outside this repo; **(c) land S1 but keep the exit
+  status non-zero in the PRIMARY checkout only**, where no harness writer operates — a special case
+  whose premise nothing enforces, and the shape §4 already rejects.
+  **RESOLVED (owner, 2026-08-17): (a).** The report survives, the gotcha class stays visible, and the
+  alternative blocks a fix for a live deadlock on an investigation with no bounded end.
+
+  **The residual is live and stays written down**, because a resolution is not a refutation: §4's
+  artifact argument rests on the committed bytes being correct, not on a known mechanism. If the
+  writer is ever identified as something that emits wrong bytes, S1 is reopened. That sentence is the
+  reason this fork existed and it does not get deleted along with the fork.
 
 ## 9. Revision log
 
@@ -279,6 +281,10 @@ between revisions is indistinguishable from one that was answered off the record
   and AC3 were keyed to `git worktree add`, which does not produce the condition; all three re-keyed
   to a constructed fixture, and §4's artifact argument re-derived after its premise was refuted. F4
   opened for the unidentified writer.
+- rev-4 · 2026-08-17 · F4 resolved by the owner: land S1 as specified. No scope item moved — the
+  resolution ratifies what S1 already said — and both §4's "what is NOT claimed" paragraph and F4's
+  own residual stay in place, because an unexplained mechanism does not become explained by being
+  accepted. The spec is no longer FORKED.
 
 ## 10. Reuse audit
 

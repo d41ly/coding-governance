@@ -48,7 +48,7 @@ header of every spec in this folder — do not hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | CLOSED | rev-8 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | CLOSED | rev-9 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | CLOSED | rev-7 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | CLOSED | rev-10 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | CLOSED | rev-4 | 2026-08-16 |

@@ -30,6 +30,9 @@ python3 tools/memory-recall/query.py "<the question, in plain English>" --terms 
 Run it from the root of the tree you are **working in** — your worktree, not the primary tree.
 The corpus is the tracked `memory/` of `git rev-parse --show-toplevel` from the cwd, so
 it includes notes you have staged but not committed, and the cache is keyed per worktree. It
+ALSO carries the declarations of any file named in `RECALL_EXTRA_SOURCES` — a constraint set in
+a conf is an answer, and confs sit outside `memory` by construction, so a question about
+a declared budget used to return everything that mentioned it and never the declaration itself. It
 writes nothing inside the worktree: the index, the query log and every aggregate live under the
 common git dir.
 

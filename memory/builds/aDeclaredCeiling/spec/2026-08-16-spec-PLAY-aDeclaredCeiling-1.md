@@ -1,6 +1,6 @@
 # PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams playbook
+**Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams playbook
 
 ## 1. Goal
 

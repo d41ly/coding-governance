@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -49,9 +49,16 @@ document that already states what the first one costs.
   the FIRST anchor starts firing, the freshly derived base moves to the default branch, and the
   recorded branch tip is not an ancestor of it, so `fail 18` refuses at `--close`. That verb is the
   one the mandate requires, `authorization-reachable` is explicitly not overridable, and `LANDING` is
-  close-only, so the run wedges in a non-terminal phase with `--abort` as its only exit. The
-  discriminator cannot be the run-written `anchor-kind`; how it is made stable without reading a
-  run-written value is F5.
+  close-only, so the run wedges in a non-terminal phase with `--abort` as its only exit.
+
+  **The mechanism is a MONOTONE derivation, not a discriminator** (F5, resolved). `trusted_base`
+  accepts a recorded BASE that is an ancestor of EITHER derivation — the default-branch merge-base or
+  the advertised branch tip — so nothing has to select, nothing has to remember which anchor fired,
+  and `anchor-kind` never reaches the decision path. That is the property this kit keeps paying to
+  preserve: the run writes `anchor-kind`, and a verb that branched on it would be the
+  inputs-inside-the-subject's-reach defect wearing a new key. The cost is that `fail 18` widens — it
+  now fires only for a BASE on NEITHER history — so S9 carries an arm proving it still has a failing
+  case. A guard whose widening is untested is a guard nobody notices going vacuous.
 - **S4** — the run-state file records `anchor-kind`, plus the branch ref and tip that were observed.
   Protocol section 2 enumerates its authored facts individually, counting one anchor observation as
   three, so at that granularity the count moves from **seven to ten** — not the eight an earlier
@@ -101,13 +108,20 @@ document that already states what the first one costs.
   driver.
 - **S7** — the rendered Skill states the new precondition, so an operator starting a run on an
   unlanded build is told to publish the branch first rather than meeting a refusal.
-- **S8** — protocol sections 1, 2, 8 and 9 gain the second anchor, its declaration, and its cost, in
-  `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` in lockstep.
+- **S8** — protocol sections 1, 2, 8 and 9 gain the second anchor, its declaration, and **all three**
+  costs from §4's price list, in `tools/unattended/PROTOCOL.template.md` and
+  `memory/guides/UNATTENDED-PROTOCOL.md` in lockstep. Section 1's four mechanical properties become
+  qualified per anchor — the roster one does not hold on the branch anchor — rather than left standing
+  unconditionally. A cost the owner accepted that appears only in this spec is a cost the next reader
+  of the binding document never sees.
 - **S9** — the two sibling self-tests gain arms for the fallback: it fires only when declared, it
   refuses an unadvertised branch, it refuses a tip that is not an ancestor of HEAD, and the leg
   accepts a branch-anchored record while still refusing a BASE that is on no advertised history. One
   further arm covers S5's refusal set: a blank and a misspelled `ANCHOR_SCOPE` both keep the strict
   anchor, because a value-set guard whose failing case is untested is the guard that silently admits.
+  A second further arm covers S12's widened `fail 18`: a recorded BASE on NEITHER derivation still
+  refuses. Both arms exist for the same reason — this unit widens two guards, and a widened guard with
+  no failing-case arm is indistinguishable from a deleted one.
 - **S10** — `TOOL-aStandingWrit-6`'s backlog row is rewritten to name what S6 leaves unrepaired,
   rather than closed. S6 makes the leg observe along this predicate's path only; every other
   consumer of the leg's `GOV_DEFAULT_BRANCH` derivation in that file is untouched, and a row closed
@@ -267,7 +281,7 @@ version literal on the build README's stop-and-reconsider list.
 | Site | Change |
 |---|---|
 | `unattended.sh` `resolve_base` | S1, S2, S11 — gains the README path as a parameter, the silent existence probe, and the preserved `rc=2` contract |
-| `unattended.sh` `trusted_base` | gains the same parameter and passes it through; the equality cross-check needs NO change, since a commit is its own ancestor. What it does need is S12 — it re-derives the anchor at every later verb, and the selection must not flip mid-run |
+| `unattended.sh` `trusted_base` | gains the same parameter and passes it through; the equality cross-check needs NO change, since a commit is its own ancestor. What it does need is S12 — its ancestry test becomes "ancestor of EITHER derivation", which is what makes the anchor selection irrelevant instead of merely stable |
 | `unattended.sh` `check_authorization` | body unchanged (S3); signature moves with S1's plumbing |
 | `unattended.sh` `verb_preflight` | records the new facts |
 | `unattended.sh` `dod_met` → `authorization-reachable` | re-derives through `trusted_base`, so it inherits S12. Not "none" |
@@ -417,6 +431,10 @@ bar on the next push, on the one path the run is required to take.
 - **AC14** — When a branch-anchored run's build folder reaches the default branch mid-run and the run
   then calls `--close`, it does NOT refuse. This is S12's observation and the wedge has no attacker in
   it.
+- **AC18** — When a run-state file records a BASE that lies on NEITHER derivation, `--close` still
+  refuses with `fail 18`. This is the failing case S12's widening owes: the guard now fires on a
+  strictly smaller set, and without this criterion "monotone" and "deleted" look identical from
+  outside.
 - **AC15** — When the run pushes its branch a SECOND time after preflight, `bash
   tools/unattended/check-unattended.sh` still passes over that record. This is S6's reachability
   form; under the equality form it reds, permanently.
@@ -446,11 +464,10 @@ bar on the next push, on the one path the run is required to take.
 
 ## 8. Open questions
 
-F5 and F6 are OPEN. F1 through F4 are RESOLVED below, and the build-level decision that precedes them
-is recorded in this build's README. Both new forks were opened by the spec audit AFTER those
-resolutions, so this spec is FORKED under M2 until they are answered, and its status may not go
-terminal before then. Neither is a re-litigation of a resolved fork: F5 is a mechanism the first
-revision did not know it needed, and F6 is a cost the owner was not shown when they priced the unit.
+none — all six forks below are RESOLVED, and the build-level decision that precedes them is recorded
+in this build's README. F5 and F6 were opened by the spec audit AFTER the first four were answered,
+and neither was a re-litigation: F5 was a mechanism the first revision did not know it needed, and F6
+was a cost the owner was not shown when they priced the unit.
 
 - **F1 — the declaration's name and value set.** Options: a boolean-ish key naming the behaviour
   (`ALLOW_BRANCH_ANCHOR=1`), or a scope key with a closed value set
@@ -490,9 +507,10 @@ revision did not know it needed, and F6 is a cost the owner was not shown when t
   no discriminator is needed — for instance by having `trusted_base` accept a recorded BASE that is an
   ancestor of EITHER derivation, which keeps `fail 18` reachable only for a base on neither history.
   Cheaper to reason about, but it widens `fail 18` and needs its own arm to show the guard still has a
-  failing case. **Recommendation: (b).** It keeps the run-written value off the decision path, which
-  is the property this kit keeps paying to preserve, and the widening it costs is one this spec can
-  measure. This is an owner turn because the options differ in what gets built.
+  failing case. **RESOLVED (owner, 2026-08-17): (b).** It keeps the run-written value off the decision
+  path, which is the property this kit keeps paying to preserve, and the widening it costs is one this
+  spec can measure. Folded into S12 as the stated mechanism, into §4's `trusted_base` Inventory row,
+  into S9 as an arm and into AC18 as the failing case the widening owes.
 - **F6 — OPEN. Costs 2 and 3 in §4 were not on the price list the owner accepted.** The owner
   ratified the rule change against "a run can authorize itself". The audit found two more spent
   properties: the leg-side widening applies to adopters who never opt in and cannot be gated on the
@@ -502,9 +520,15 @@ revision did not know it needed, and F6 is a cost the owner was not shown when t
   still refuses, which needs a discriminator outside the run's reach and may not exist; **(c) stop
   here** and take units 1 and 2 only, which was the alternative on the table when the owner chose to
   build all three and which fixes every worktree failure that is not the authorization rule.
-  **Recommendation: (a), re-confirmed explicitly.** The unit cannot deliver what was asked without
-  cost 2, and cost 3 is a property the branch anchor cannot carry. But the owner priced this once
-  already on incomplete information, and re-confirming is cheaper than discovering it after landing.
+  **RESOLVED (owner, 2026-08-17): (a), re-confirmed against the complete price list.** The unit cannot
+  deliver what was asked without cost 2, and cost 3 is a property the branch anchor structurally
+  cannot carry.
+
+  **What this resolution obliges, beyond saying yes.** S8 writes all THREE costs into the protocol,
+  not the one the first revision knew about — §1's cost list grows by the leg-side widening and by the
+  roster-integrity qualification, and §1's fourth mechanical property is qualified per anchor rather
+  than left standing unconditionally. AC10's content half checks for them. An accepted cost that only
+  this spec records is an accepted cost the next reader of the binding document never sees.
 
 ## 9. Revision log
 
@@ -527,6 +551,12 @@ revision did not know it needed, and F6 is a cost the owner was not shown when t
   branch-anchored run past `--preflight`. The authored-fact count corrected from eight to ten, with
   the `cBriefedPilot` collision named. §7's claimed backstop for the AGENTS.md count does not read
   AGENTS.md. F5 and F6 opened.
+- rev-4 · 2026-08-17 · F5 and F6 resolved by the owner. F5 picks the MONOTONE derivation over reading
+  `anchor-kind` back, so S12 states the mechanism, `trusted_base`'s Inventory row becomes
+  "ancestor of EITHER derivation", S9 gains the widened-guard arm and AC18 carries its failing case.
+  F6 re-confirms the rule change against the complete three-cost price list, which obliges S8 to write
+  all three into the protocol and qualify §1's roster property per anchor rather than only recording
+  them here. The spec is no longer FORKED; every fork in it is resolved.
 
 ## 10. Reuse audit
 
