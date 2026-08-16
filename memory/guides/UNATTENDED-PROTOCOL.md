@@ -54,7 +54,17 @@ override on the authorization check is the authorization check.
 
 **Generated**, delimited by a marker pair and rendered by the driver: the unit list and per-unit
 status, both derived from build front matter and spec status headers. The gate byte-compares it
-against a fresh render. Never hand-edit it.
+against a fresh render **while the run is non-terminal**. Never hand-edit it.
+
+At a terminal phase the comparison STOPS, and the reason is not convenience. The region is a
+snapshot of what the build looked like when the run ended; the build README stays live, and its
+`ids:` key is an OUTPUT derived from every id carrying the slug — so a single backlog row minted
+under that slug afterwards moves the README, and the frozen copy cannot follow. `--preflight` is
+the only verb that re-splices the region and it refuses to reopen a finished record, correctly.
+Comparing the two forever therefore made a class of correct record impossible to write: the
+obligation and the gate contradicted each other with no legitimate exit. The skip is silent,
+because this kit's gate prints nothing on a clean run and every terminal file would otherwise
+print on every run; the evidence that it skips is an arm in the gate's self-test.
 
 **Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,

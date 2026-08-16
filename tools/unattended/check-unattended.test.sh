@@ -247,6 +247,35 @@ hit "$(run)" "a build README's generated markers are malformed, so the copy has 
 reset_tree; sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it"
 
+# ---- check 8 is scoped to NON-TERMINAL runs, and the first arm is the one that matters: it proves
+# ---- the scoping did not make the check vacuous. Both real run-state files in this tree are already
+# ---- terminal, so without this arm check 8 could compare nothing forever and still look alive.
+reset_tree; sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+
+# A LANDED run's region is a historical snapshot; the README it was copied from stays live. Drifting
+# it must be SILENT, because this gate's contract is that a clean run prints nothing.
+reset_tree
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: '"$(git rev-parse HEAD)"'/' memory/builds/tRun/RUN.md
+sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
+miss "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+
+# ABORTED is the other terminal member. An arm for one of two proves nothing about the other.
+reset_tree
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: '"$(git rev-parse HEAD)"'/' memory/builds/tRun/RUN.md
+sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
+miss "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+
+# Scoping the CHECK, not the LOOP: a terminal file must still reach the checks BELOW check 8.
+# Check 9's BASE pin is one of them, and it reds here or six checks silently stopped running.
+reset_tree
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: '"$(git rev-parse HEAD)"'/' memory/builds/tRun/RUN.md
+sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
+hit "$(run)" "a recorded BASE does not resolve to a commit in this history"
+
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"

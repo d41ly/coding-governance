@@ -244,8 +244,20 @@ while IFS= read -r f; do
 
   # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
   # ---- question the README already answers, differently — the whole class this build removes.
+  # ---- NON-TERMINAL RUNS ONLY. For a live run the region is a cache and a divergence means someone
+  # ---- hand-edited a generated artifact. For a TERMINAL one it is a historical snapshot of what the
+  # ---- build looked like at landing, while the README stays live: `ids:` is an OUTPUT derived from
+  # ---- every id carrying the slug, so any later row minted under that slug moves the README and the
+  # ---- frozen copy cannot follow — and `--preflight` rightly refuses to reopen a finished record.
+  # ---- Comparing them forever made a correct record impossible to write. Scoped to the CHECK and
+  # ---- not the loop on purpose: six other checks below still run on a terminal file.
+  # ---- The skip is SILENT. This gate's own header contract is "Exit 0 + no output = clean. Anything
+  # ---- printed is a violation", and both run-state files in this tree are terminal, so a per-file
+  # ---- skip line would make every clean run non-silent. The evidence that the skip is real lives in
+  # ---- the sibling self-test, not in this output.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ]; then
+  case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
+  if [ -n "$rd" ] && [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
       fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
     b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
