@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-12 — the census question, measured: refuse the coupling, close the real hole
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
@@ -173,7 +173,7 @@ regenerated `memory/map/generated/symbols.json`, the kit version pair, and the t
 
 ## 8. Open questions
 
-None open. F1's consumption question is ANSWERED — refused, with the measurement in §1 as the reason
+none open. F1's consumption question is ANSWERED — refused, with the measurement in §1 as the reason
 — rather than deferred again. The one judgement a reviewer should press is the OUT on a shared
 pattern module (§3), where the cheaper arm was chosen over the repo's inline-and-gate idiom. Pressed
 once in `review-dClosedLexicon-9` and REFUTED there: S5 is drift protection rather than a second

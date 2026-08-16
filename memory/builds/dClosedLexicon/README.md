@@ -86,8 +86,8 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | CLOSED | rev-5 | 2026-08-16 |
 | [TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns](spec/2026-08-16-spec-dClosedLexicon-4.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-dClosedLexicon-11 — a build may have more than one unattended run](spec/2026-08-17-spec-dClosedLexicon-11.md) | SPECCED | rev-2 | 2026-08-17 |
-| [TOOL-dClosedLexicon-12 — the census question, measured: refuse the coupling, close the real hole](spec/2026-08-17-spec-dClosedLexicon-12.md) | SPECCED | rev-2 | 2026-08-17 |
-| [TOOL-dClosedLexicon-13 — govkit's preview promises writes `apply` will not perform](spec/2026-08-17-spec-dClosedLexicon-13.md) | SPECCED | rev-2 | 2026-08-17 |
+| [TOOL-dClosedLexicon-12 — the census question, measured: refuse the coupling, close the real hole](spec/2026-08-17-spec-dClosedLexicon-12.md) | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-dClosedLexicon-13 — govkit's preview promises writes `apply` will not perform](spec/2026-08-17-spec-dClosedLexicon-13.md) | CLOSED | rev-2 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

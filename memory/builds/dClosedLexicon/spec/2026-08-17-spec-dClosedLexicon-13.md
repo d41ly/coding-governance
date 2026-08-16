@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-13 — govkit's preview promises writes `apply` will not perform
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
@@ -208,12 +208,14 @@ No new leg.
 
 ## 8. Open questions
 
-- **F1 — is `project-owned` the right role for the playbook's two files?** The entry's own
+- **F1 — is `project-owned` the right role for the playbook's two files?** RESOLVED (agent,
+  2026-08-17): OUT of this unit and filed as `TOOL-dClosedLexicon-15`. The entry's own
   `why_no_adopter` says "installation is a copy to an owner-chosen path", which describes a `seed`,
-  not a file the target already owns. If that comment is right, govkit installs no playbook today and
-  the honest preview this unit ships will say so out loud. OWNER-FACING; filed as
-  `TOOL-dClosedLexicon-15` rather than decided here, because it changes what the default install DOES
-  rather than what it claims. This unit is correct under either answer.
+  not a file the target already owns. If that comment is right, govkit installs no playbook today —
+  and the honest preview this unit ships now says so out loud, in the two `ORDER [project-owned]`
+  rows AC1 pins. That is a change to what the default install DOES rather than to what it claims, so
+  it is owner-facing and not a resolver call. This unit is correct under either answer, and its
+  output is what makes the question visible.
 
 ## 9. Revision log
 

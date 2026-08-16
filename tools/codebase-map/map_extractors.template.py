@@ -82,7 +82,18 @@ SYMBOL_EXTRACTORS: dict[str, object] = {
     # --- TS/JS layer: the stdlib enumeration floor (RAISES on an export form no rule models).
     #     Prefer a real parser (tsc/tree-sitter) if one is available in your gate env; extend
     #     m.JS_EXPORT_RULES (e.g. map a PascalCase const to "component") rather than loosening.
+    #
+    #     PAIR IT WITH m.scan_js_definitions IF YOUR LAYER IS NOT ALL EXPORTS. The export scan is
+    #     complete over export FORMS and blind to a file with no `export` line at all — measured on
+    #     gov's own kit hooks, that layer had 30 definitions and 3 indexed rows, disjoint, and the
+    #     comment covering it read "few exports, not a hole". scan_js_definitions carries a per-file
+    #     liveness floor (a scanned file yielding zero symbols RAISES) for exactly that reason.
+    #     Dedupe the union on (id, file): a form that is both is emitted by both.
     # "web-ts": lambda: m.enumerate_exports(
+    #     ROOT / "web" / "src",
+    #     "web-ts",
+    #     extensions=frozenset({".ts", ".tsx", ".js", ".jsx", ".mjs"}),
+    # ) + m.scan_js_definitions(
     #     ROOT / "web" / "src",
     #     "web-ts",
     #     extensions=frozenset({".ts", ".tsx", ".js", ".jsx", ".mjs"}),
