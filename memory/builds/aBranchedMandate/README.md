@@ -60,7 +60,7 @@ it.
 | [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
 | [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | SPECCED | rev-1 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | SPECCED | rev-3 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -73,19 +73,25 @@ Each cell is a label, not a description. The unit's §1 Goal owns the full state
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
-| 2 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
-| 3 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
-| 4 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
+| 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
+| 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
+| 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
+| 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
 
-**The order is TOTAL and units 1 and 2 are the reason.** Unit 2's whole argument is that the eol
-arm's exit status is unfunded — that no gate reds on CR any more. That becomes true only when unit 1
-lands. Landing unit 2 first would silence a signal that is still correctly predicting a red leg,
-which is the opposite of what unit 2 claims to be doing.
+**The order is TOTAL, and it changed when unit 4 arrived.** Two constraints fix it.
 
-Unit 3 is independent of both and is sequenced last because it is the one that changes a ratified
-rule. That decision has now been made — see the resolutions below — so the ordering is a build
-ordering rather than a gate on approval.
+`TOOL-aBranchedMandate-4` goes FIRST. The `unattended adopter e2e` leg is guarded in
+`tools/gate-legs.json` on `tools/lib/` and `tools/unattended/`, and both `TOOL-aBranchedMandate-2` and
+`TOOL-aBranchedMandate-3` edit files under `tools/unattended/`. So their own diff-scoped gate runs
+execute the leg unit 4 exists to repair, and M6's pass loop does not continue past a red gate. Every
+later unit inherits that red until unit 4 lands.
+
+`TOOL-aBranchedMandate-1` still precedes `TOOL-aBranchedMandate-2`. Unit 2's whole argument is that
+the eol arm's exit status is unfunded — that no gate reds on CR any more — and that becomes true only
+when unit 1 lands. Landing unit 2 first would silence a signal still correctly predicting a red leg.
+
+`TOOL-aBranchedMandate-3` is last because it is the one that changes a ratified rule. That decision
+has been made, so its position is a build ordering rather than a gate on approval.
 
 ## What each unit is worth on its own
 
@@ -103,7 +109,7 @@ what was weighed rather than a menu.
 ## Build-level rules
 
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
-  The drift signal for that sits at a pin with zero tolerance, and `tools/` — which all three units
+  The drift signal for that sits at a pin with zero tolerance, and `tools/` — which all four units
   edit — is inside its globs. Provenance goes in the commit message, not in a source comment.
 - **Every unit that edits a `fail` branch re-measures `ARMS_FLOORS`** in `.memory-tree.conf` rather
   than assuming its pair is unchanged. Both unattended files carry a pinned pair, and a message edit
