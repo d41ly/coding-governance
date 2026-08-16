@@ -24,3 +24,23 @@ coding-governance `main` and retrofitted into nicocares. Records:
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [manifest-ratchet-spec.md](spec/manifest-ratchet-spec.md)
+- **`build/`**
+  - [manifest-ratchet-build-report.md](build/manifest-ratchet-build-report.md)
+- **`reviews/`**
+  - [2026-07-12-tier2-cumulative-main.md](reviews/2026-07-12-tier2-cumulative-main.md)
+<!-- /gen:build-docs -->

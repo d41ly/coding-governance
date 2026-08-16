@@ -49,3 +49,21 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-07-22-spec-bConvergentLodestar-1.md](spec/2026-07-22-spec-bConvergentLodestar-1.md)
+- **`reviews/`**
+  - [2026-07-22-review-bConvergentLodestar-1.md](reviews/2026-07-22-review-bConvergentLodestar-1.md)
+<!-- /gen:build-docs -->

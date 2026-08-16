@@ -26,3 +26,19 @@ the front matter above declares `status:` outright instead of leaving it to be d
 
 Records live under `build/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`build/`**
+  - [2026-07-16-build-bThriftyBellows-1.md](build/2026-07-16-build-bThriftyBellows-1.md)
+<!-- /gen:build-docs -->

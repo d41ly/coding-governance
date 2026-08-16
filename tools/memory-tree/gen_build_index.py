@@ -45,6 +45,26 @@ CR = chr(13)   # one carriage return; see _is() and _one_cr()
 RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
+
+# The AUTHORED plan region. This generator NEVER writes between these two markers: the unattended
+# kit's check_authorization byte-compares that slice across a run's pinned BASE, so a renderer that
+# touched it would silently invalidate every run authorized against the file. It is listed here so
+# the slot walk can FIND it, not so anything can render into it.
+PLAN_OPEN = "<!-- roster:units -->"
+PLAN_CLOSE = "<!-- /roster:units -->"
+
+# Every generated region, in CANONICAL SLOT ORDER. `--write` creates a missing pair at its position
+# here; `--check` never demands one (TOOL-aRuledFrontispiece-1 S1c). The order is a property of this
+# list rather than of whoever edited a README last.
+#
+# The renderer is looked up by name at call time rather than stored, so this stays a plain data
+# declaration and a region cannot be half-registered.
+GEN_REGIONS = (
+    ("build-index", MARK_OPEN, MARK_CLOSE),
+    ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
+    ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
+    ("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),
+)
 # The stamped header names THIS install's prefix, derived from the module's own location rather
 # than spelled. It is written INTO the adopter's generated artifacts and committed there, so a
 # hardcoded prefix does not merely mislead — it lands a dead path in their tree, and the byte-compare
@@ -77,6 +97,10 @@ HDR_RE = re.compile(
     r" · Tier-(?P<tier>[12]) · base (?P<base>[0-9a-f]{8,})"
 )
 H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?)\s*$")
+# The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
+# the parallel group; the owner resolved against a second `group` verb, which would have needed its
+# own contradiction refusals to render an identical region.
+ORDER_RE = re.compile(r"·\s*order\s+(\d+)(?![0-9])")
 SHARD_RE = re.compile(r"^\d{4}-\d{2}\.md$")
 REQUIRED_KEYS = ("slug", "node", "opened", "streams", "roster", "ids")
 
@@ -225,6 +249,9 @@ def parse_spec(path: str) -> dict | None:
         "status": hdr.group("token"),
         "rev": hdr.group("rev"),
         "date": hdr.group("date"),
+        # PERMITTED, never required (fork 5). HDR_RE has no end anchor, so a header carrying this
+        # verb parses identically with or without it and no landed spec goes retroactively red.
+        "order": (lambda mo: int(mo.group(1)) if mo else None)(ORDER_RE.search(hdr.string)),
     }
 
 
@@ -347,6 +374,12 @@ def collect(root: str, conf: dict) -> list:
                 "fm": fm,
                 "roster": roster,
                 "kinds": kinds,
+                # Every tracked record, for the document-inventory region. The filename grammar is
+                # NOT parsed: five files under legacy-files.txt carry grandfathered names, and a
+                # renderer that parsed names would have to waive them or render them degraded.
+                "docs": sorted(t for t in tracked
+                               if any(t.startswith(f"{m}/builds/{slug}/{k}/") for k in RECORD_KINDS)),
+                "parents": [s.strip() for s in fm.get("parents", "").split() if s.strip()],
                 "units": [u for u in units if u],
                 "status": derive_status(units, fm, readme),
             }
@@ -382,6 +415,85 @@ def render_region(build: dict) -> str:
         out += ["", f"Records live under {joined}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+def render_order(build: dict) -> str:
+    """The BUILD ORDER region. Units sharing an `order` value are the parallel group."""
+    mo, mc = GEN_REGIONS[1][1], GEN_REGIONS[1][2]
+    out = [mo, ""]
+    steps = {}
+    for u in build["units"]:
+        if u.get("order") is not None:
+            steps.setdefault(u["order"], []).append(u)
+    if not steps:
+        out.append("*No spec under this build declares an `order` verb; the build order is whatever "
+                   "its authored plan states.*")
+    else:
+        out += ["| Step | Units | Parallel |", "|---|---|---|"]
+        for n in sorted(steps):
+            us = sorted(steps[n], key=lambda x: x["id"])
+            ids = ", ".join(f"`{u['id']}`" for u in us)
+            out.append(f"| {n} | {ids} | {'yes' if len(us) > 1 else 'no'} |")
+        # RESIDUAL, stated rather than silently dropped: a unit with no verb is not ordered, and a
+        # region that omitted it would read as a complete order while hiding a unit.
+        rest = sorted((u["id"] for u in build["units"] if u.get("order") is None))
+        if rest:
+            out += ["", "Unordered: " + ", ".join(f"`{i}`" for i in rest) + "."]
+    out.append(mc)
+    return "\n".join(out)
+
+
+def render_edges(build: dict) -> str:
+    """The DEPENDENCY EDGE region. `parents:` is AUTHORED; the child set is DERIVED by inverting it.
+
+    Slugs, never ids (fork 4). `rosters()` keys on an id's own slug component, so a slug joins no
+    roster and this region leaves LIVE.md and both ledger shards byte-neutral. A bare id in a leading
+    table cell would additionally ANCHOR via the extractor and rewrite the other build's `ids:` line.
+    """
+    mo, mc = GEN_REGIONS[2][1], GEN_REGIONS[2][2]
+    out = [mo, ""]
+    parents, children = build["parents"], build.get("children", [])
+    if not parents and not children:
+        out.append("*This build declares no parent and no build declares it as one.*")
+    else:
+        for label, vals in (("Parent", parents), ("Child", children)):
+            if vals:
+                links = ", ".join(f"[{s}](../{s}/README.md)" for s in sorted(vals))
+                out.append(f"- **{label} builds:** {links}")
+    out.append(mc)
+    return "\n".join(out)
+
+
+def render_docs(build: dict) -> str:
+    """The DOCUMENT INVENTORY region: every tracked record the build holds, linked."""
+    mo, mc = GEN_REGIONS[3][1], GEN_REGIONS[3][2]
+    out = [mo, ""]
+    if not build["docs"]:
+        out.append("*This build holds no records yet.*")
+    else:
+        by_kind = {}
+        for p in build["docs"]:
+            # index 3, not 4: memory / builds / <slug> / <kind> / <file>. Bucketing on 4 keyed every
+            # record by its own FILENAME, so no kind ever matched and the region rendered empty —
+            # between two markers, which reads as "this build holds nothing" rather than as a fault.
+            by_kind.setdefault(p.split("/")[3], []).append(p)
+        for kind in RECORD_KINDS:
+            if kind not in by_kind:
+                continue
+            out.append(f"- **`{kind}/`**")
+            for p in by_kind[kind]:
+                rel = p.split(f"/builds/{build['slug']}/", 1)[1]
+                out.append(f"  - [{os.path.basename(p)}]({rel})")
+    out.append(mc)
+    return "\n".join(out)
+
+
+REGION_RENDERERS = {
+    "build-index": render_region,
+    "build-order": render_order,
+    "build-edges": render_edges,
+    "build-docs": render_docs,
+}
 
 
 # A period ends the sentence only when whitespace or end-of-line follows it. A dot INSIDE the claim
@@ -490,7 +602,8 @@ def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
     raise Problem(f"{readme}: front matter has no 'ids:' line to rewrite")
 
 
-def apply_region(readme_text: str, region: str, readme: str) -> str:
+def apply_region(readme_text: str, region: str, readme: str,
+                 mark_open: str = MARK_OPEN, mark_close: str = MARK_CLOSE) -> str:
     """Replace the marked slice EXACTLY. Never a regex substitution over the whole file: this
     generator owns a region inside an AUTHORED file, and getting it wrong eats prose."""
     lines = readme_text.split("\n")
@@ -507,16 +620,19 @@ def apply_region(readme_text: str, region: str, readme: str) -> str:
         # demonstrated on an MSYS node, where the runtime strips CR before awk sees a byte, so it is
         # asserted at SOURCE level here rather than by a fixture that would pass either way.
         return (line[:-1] if line.endswith(CR) else line) == mark
-    opens = [i for i, l in enumerate(lines) if _is(l, MARK_OPEN)]
-    closes = [i for i, l in enumerate(lines) if _is(l, MARK_CLOSE)]
+    opens = [i for i, l in enumerate(lines) if _is(l, mark_open)]
+    closes = [i for i, l in enumerate(lines) if _is(l, mark_close)]
     if not opens and not closes:
-        raise Problem(f"{readme}: no '{MARK_OPEN}' / '{MARK_CLOSE}' marker pair — the generated "
+        # NAMES THE PAIR IT WAS CALLED WITH, not the module constants. "Preserved verbatim per named
+        # pair" is impossible for a message built from the constants: it would be both unchanged and
+        # wrong about a different region (TOOL-aRuledFrontispiece-1 S3a).
+        raise Problem(f"{readme}: no '{mark_open}' / '{mark_close}' marker pair — the generated "
                       f"region has nowhere to go, and a README without one leaves the index silently")
     if len(opens) != 1 or len(closes) != 1:
-        raise Problem(f"{readme}: expected exactly one marker pair, found {len(opens)} open and "
-                      f"{len(closes)} close")
+        raise Problem(f"{readme}: expected exactly one '{mark_open}' marker pair, found "
+                      f"{len(opens)} open and {len(closes)} close")
     if closes[0] < opens[0]:
-        raise Problem(f"{readme}: the closing marker precedes the opening one")
+        raise Problem(f"{readme}: the '{mark_close}' marker precedes its opening one")
     return "\n".join(lines[: opens[0]] + region.split("\n") + lines[closes[0] + 1 :])
 
 
@@ -571,16 +687,109 @@ def render_shards(builds: list, m: str) -> dict:
     return out
 
 
-def plan(root: str, conf: dict) -> tuple:
-    """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk."""
+def _marker_index(lines: list, mark: str):
+    """The index of a marker line, or None. Same COLUMN-0, one-trailing-CR contract as apply_region."""
+    for i, l in enumerate(lines):
+        if (l[:-1] if l.endswith(CR) else l) == mark:
+            return i
+    return None
+
+
+def slot_violations(readme_text: str, readme: str) -> list:
+    """Authored content sitting where the slot contract forbids it (TOOL-aRuledFrontispiece-1 S4).
+
+    TWO triggers, not one. An earlier draft of the owning spec named only the first, which would have
+    passed the one README in the corpus that already carries a plan pair — the exact file the surgery
+    unit exists to relocate.
+    """
+    lines = readme_text.split("\n")
+    spans = []            # (open_index, close_index) of every registered generated region present
+    for _name, mo, mc in GEN_REGIONS:
+        o, c = _marker_index(lines, mo), _marker_index(lines, mc)
+        if o is not None and c is not None and c > o:
+            spans.append((o, c))
+    if not spans:
+        return []
+    first_open = min(o for o, _c in spans)
+    inside = {i for o, c in spans for i in range(o, c + 1)}
+    out = []
+    # Trigger 1 — authored prose AFTER the first generated marker, outside every generated region.
+    for i, l in enumerate(lines):
+        if i > first_open and i not in inside and l.strip():
+            out.append((i + 1, "authored content after the first generated marker"))
+    # Trigger 2 — authored prose BETWEEN the plan pair's close and the first generated open.
+    pc = _marker_index(lines, PLAN_CLOSE)
+    if pc is not None and pc < first_open:
+        for i in range(pc + 1, first_open):
+            if lines[i].strip():
+                out.append((i + 1, "authored content between the plan pair and the generated region"))
+    return sorted(set(out))
+
+
+def insert_region(readme_text: str, mark_open: str, mark_close: str) -> str:
+    """Create a missing pair at its CANONICAL slot, moving no authored byte (S1b, S8).
+
+    Canonical means the order GEN_REGIONS declares, so the position is a property of that list and
+    not of whoever edited the file last. Over a README that violates the slot sequence there is no
+    well-defined 'after the prose' point, which is why this anchors on sibling REGIONS only — that is
+    the branch every corpus write takes until the surgery unit lands.
+    """
+    lines = readme_text.split("\n")
+    names = [mo for _n, mo, _mc in GEN_REGIONS]
+    here = names.index(mark_open)
+    for mo, mc in ((GEN_REGIONS[j][1], GEN_REGIONS[j][2]) for j in range(here - 1, -1, -1)):
+        c = _marker_index(lines, mc)
+        if c is not None:
+            return "\n".join(lines[: c + 1] + ["", mark_open, mark_close] + lines[c + 1 :])
+    for j in range(here + 1, len(GEN_REGIONS)):
+        o = _marker_index(lines, GEN_REGIONS[j][1])
+        if o is not None:
+            return "\n".join(lines[:o] + [mark_open, mark_close, ""] + lines[o:])
+    tail = lines if lines and lines[-1].strip() else lines[:-1] if lines else []
+    return "\n".join(tail + ["", mark_open, mark_close, ""])
+
+
+def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
+    """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk.
+
+    `create_missing` is the ONE asymmetry between the two verbs (S7). `--write` passes true and adds
+    a registered region a README lacks; `--check` passes false and stays silent about it. Both verbs
+    call this function, so without the flag a create-if-missing step would fire under `--check` and
+    report every un-paired README stale — which would force a corpus-wide re-render into the commit
+    of every unit that registers a region, and is the outcome S1c exists to forbid.
+    """
     m = conf["MEMORY_ROOT"]
     builds = collect(root, conf)
+    # DERIVE the child set by inverting `parents:`. Authoring both directions would put two answers
+    # to one question in two files with no gate on this bar able to reconcile them — the defect
+    # TOOL-aMouldedFolio-1 recorded one relation over, when it refused a front-matter schema.
+    known = {b["slug"] for b in builds}
+    children = {}
+    for b in builds:
+        for p in b["parents"]:
+            if p not in known:
+                raise Problem(f"{b['readme']}: parents: names '{p}', which is not a build folder "
+                              f"under {m}/builds/ — an edge to nothing is a typo, not a relation")
+            children.setdefault(p, []).append(b["slug"])
+    for b in builds:
+        b["children"] = sorted(children.get(b["slug"], []))
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
         text = strip_records_sentence(read_text(path), b["readme"])
         text = apply_front_matter_ids(text, b["roster"], b["readme"])
-        artifacts[b["readme"]] = apply_region(text, render_region(b), b["readme"])
+        if create_missing:
+            for _name, mo, mc in GEN_REGIONS:
+                lines = text.split("\n")
+                if _marker_index(lines, mo) is None and _marker_index(lines, mc) is None:
+                    text = insert_region(text, mo, mc)
+        for name, mo, mc in GEN_REGIONS:
+            renderer = REGION_RENDERERS[name]
+            lines = text.split("\n")
+            if _marker_index(lines, mo) is None and _marker_index(lines, mc) is None:
+                continue  # not present and not being created — S1c
+            text = apply_region(text, renderer(b), b["readme"], mo, mc)
+        artifacts[b["readme"]] = text
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
@@ -617,8 +826,31 @@ def do_check(root: str, conf: dict) -> int:
     return 0
 
 
+def do_check_format(root: str, conf: dict) -> int:
+    """The SLOT CONTRACT verb — deliberately NOT reachable from plan(), --write or --check (S1a).
+
+    Build READMEs violate the sequence at this unit's base, so a refusal on the render path would red
+    hygiene check 9 across the corpus on this unit's own commit. The leg at the last build position
+    is what makes this binding; the surgery unit before it is what makes it pass.
+    """
+    m = conf["MEMORY_ROOT"]
+    tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
+               if p.endswith("/README.md")]
+    bad = []
+    for rel in sorted(tracked):
+        for line, why in slot_violations(read_text(os.path.join(root, rel)), rel):
+            bad.append(f"    {rel}:{line} — {why}")
+    if bad:
+        print("build-index FORMAT — authored content outside the slot contract:")
+        for line in bad:
+            print(line)
+        return 1
+    print(f"build-index: slot contract clean ({len(tracked)} build README(s))")
+    return 0
+
+
 def do_write(root: str, conf: dict) -> int:
-    artifacts, orphans, unmanaged = plan(root, conf)
+    artifacts, orphans, unmanaged = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
     for p in orphans:
@@ -694,7 +926,10 @@ def do_selftest() -> int:
         # AC2 — an unpaired marker is a NAMED error, not a silent departure.
         t3 = os.path.join(base, "nomark"); os.makedirs(t3)
         conf3 = _fixture(t3, marker=False)
-        arm("unpaired marker is named", "expected exactly one marker pair, found 1 open and 0 close",
+        # The message now NAMES the pair. With four registered regions, "expected exactly one marker
+        # pair" was no longer actionable — an operator could not tell which region was malformed.
+        arm("unpaired marker is named",
+            "expected exactly one '<!-- gen:build-index -->' marker pair, found 1 open and 0 close",
             lambda: plan(t3, conf3))
 
         # The derived roster. Each arm names one branch of `rosters()`. (The owning spec is
@@ -882,6 +1117,77 @@ def do_selftest() -> int:
         do_write(t11, conf11)
         arm("write then check is a fixed point", "0", lambda: str(do_check(t11, conf11)))
 
+        # ---- TOOL-aRuledFrontispiece-1: the slot contract, region creation, and the ASYMMETRY.
+        # A fixture whose README carries ONLY the build-index pair: the other three are absent.
+        t12 = os.path.join(base, "regions"); os.makedirs(t12)
+        conf12 = _fixture(t12, spec_status="OPEN")
+        rd12 = os.path.join(t12, "memory", "builds", "tOne", "README.md")
+
+        # S1c — the ASYMMETRY. --check must be SILENT about the three absent pairs. This is the arm
+        # that fails if create_missing ever leaks into the check path, and its failure mode is a
+        # corpus-wide re-render forced into every unit that registers a region.
+        do_write(t12, conf12)
+        arm("check is silent about an absent region pair", "0", lambda: str(do_check(t12, conf12)))
+        arm("write CREATED the three absent pairs", "3",
+            lambda: str(sum(GEN_REGIONS[i][1] in read_text(rd12) for i in (1, 2, 3))))
+        arm("created pairs land in CANONICAL order", "True", lambda: str(
+            read_text(rd12).index(GEN_REGIONS[1][1]) < read_text(rd12).index(GEN_REGIONS[2][1])
+            < read_text(rd12).index(GEN_REGIONS[3][1])))
+
+        # S8 — over a README that VIOLATES the sequence, the pair still lands and no authored byte
+        # moves. This is the branch the whole corpus takes until the surgery unit lands, so it is the
+        # common case rather than an edge one.
+        t13 = os.path.join(base, "violator"); os.makedirs(t13)
+        conf13 = _fixture(t13, spec_status="OPEN")
+        rd13 = os.path.join(t13, "memory", "builds", "tOne", "README.md")
+        write_text(rd13, read_text(rd13) + "\n## Afterword\n\nauthored prose below the region.\n")
+        do_write(t13, conf13)
+        arm("a violating README keeps its authored tail", "authored prose below the region.",
+            lambda: read_text(rd13))
+        arm("a violating README still gains its pairs", "True",
+            lambda: str(all(GEN_REGIONS[i][1] in read_text(rd13) for i in (1, 2, 3))))
+
+        # S4 — BOTH triggers. The second one is the arm an earlier draft of the spec had no rule for,
+        # and it is the one the single corpus README carrying a plan pair actually trips.
+        arm("slot walk names prose after the first generated marker",
+            "authored content after the first generated marker",
+            lambda: str(slot_violations(read_text(rd13), "x")))
+        t14 = os.path.join(base, "planprose"); os.makedirs(t14)
+        conf14 = _fixture(t14, spec_status="OPEN")
+        rd14 = os.path.join(t14, "memory", "builds", "tOne", "README.md")
+        write_text(rd14, read_text(rd14).replace(
+            MARK_OPEN, PLAN_OPEN + "\n| # | unit |\n" + PLAN_CLOSE + "\n\nstray prose.\n\n" + MARK_OPEN))
+        arm("slot walk names prose between the plan pair and the region",
+            "authored content between the plan pair and the generated region",
+            lambda: str(slot_violations(read_text(rd14), "x")))
+        # S2 — the generator NEVER writes between the plan markers.
+        do_write(t14, conf14)
+        arm("the authored plan region survives a write verbatim", "| # | unit |",
+            lambda: read_text(rd14))
+
+        # A conforming README yields NO violations — the arm that keeps the walk from being vacuous.
+        arm("a conforming README trips no trigger", "[]",
+            lambda: str(slot_violations(read_text(rd12), "x")))
+
+        # S11 — the document inventory NAMES a record. This arm exists because the first cut bucketed
+        # each record by its own filename rather than by its kind folder, so no kind ever matched and
+        # the region rendered EMPTY between its two markers — which reads as "this build holds no
+        # records", not as a fault. A region whose population selector silently matches nothing is the
+        # vacuous-selector class, and only a positive arm catches it.
+        arm("the document inventory names a real record", "2026-08-01-spec-tOne-1.md",
+            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
+        arm("the document inventory buckets under its KIND folder", "**`spec/`**",
+            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
+
+        # S10 — an edge to a build that does not exist is a typo, not a relation.
+        t15 = os.path.join(base, "badedge"); os.makedirs(t15)
+        conf15 = _fixture(t15, spec_status="OPEN")
+        rd15 = os.path.join(t15, "memory", "builds", "tOne", "README.md")
+        write_text(rd15, read_text(rd15).replace("ids: ARCH-tOne-1", "ids: ARCH-tOne-1\nparents: tGhost"))
+        run("git", "add", "-A", cwd=t15)
+        arm("an edge to a nonexistent build is named", "which is not a build folder",
+            lambda: plan(t15, conf15))
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -893,8 +1199,8 @@ def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return do_selftest()
-    if mode not in ("--check", "--write"):
-        print("usage: gen_build_index.py [--check|--write|--selftest]")
+    if mode not in ("--check", "--write", "--check-format"):
+        print("usage: gen_build_index.py [--check|--write|--check-format|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -903,6 +1209,8 @@ def main(argv: list) -> int:
         return 2
     conf = load_conf(root)
     try:
+        if mode == "--check-format":
+            return do_check_format(root, conf)
         return do_check(root, conf) if mode == "--check" else do_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

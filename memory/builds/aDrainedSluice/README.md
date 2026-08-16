@@ -54,3 +54,31 @@ branch work and of each other.
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-08-spec-aDrainedSluice-1.md](spec/2026-08-08-spec-aDrainedSluice-1.md)
+  - [2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md](spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md)
+  - [2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md](spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md)
+  - [2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md](spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md)
+  - [2026-08-08-spec-aDrainedSluice-5-v2-arm-the-branches.md](spec/units/2026-08-08-spec-aDrainedSluice-5-v2-arm-the-branches.md)
+  - [2026-08-08-spec-aDrainedSluice-6-v5-python-resolver.md](spec/units/2026-08-08-spec-aDrainedSluice-6-v5-python-resolver.md)
+  - [2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md](spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md)
+  - [2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md)
+  - [2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md)
+- **`reviews/`**
+  - [2026-08-08-review-aDrainedSluice-1.md](reviews/2026-08-08-review-aDrainedSluice-1.md)
+  - [2026-08-08-review-aDrainedSluice-2.md](reviews/2026-08-08-review-aDrainedSluice-2.md)
+  - [2026-08-08-review-aDrainedSluice-3.md](reviews/2026-08-08-review-aDrainedSluice-3.md)
+<!-- /gen:build-docs -->

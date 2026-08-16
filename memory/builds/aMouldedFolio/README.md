@@ -54,3 +54,25 @@ do not hand-edit it.
 
 Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md)
+- **`build/`**
+  - [2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md)
+  - [2026-08-16-build-TOOL-aMouldedFolio-3-followups-controls.md](build/2026-08-16-build-TOOL-aMouldedFolio-3-followups-controls.md)
+<!-- /gen:build-docs -->

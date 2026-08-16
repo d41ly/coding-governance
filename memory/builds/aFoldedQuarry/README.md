@@ -52,3 +52,35 @@ then U5.
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-08-spec-aFoldedQuarry-1.md](spec/2026-08-08-spec-aFoldedQuarry-1.md)
+  - [2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md](spec/units/2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md)
+  - [2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md](spec/units/2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md)
+  - [2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md](spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md)
+  - [2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md](spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md)
+  - [2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md](spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md)
+  - [2026-08-08-spec-aFoldedQuarry-7-u5-harness.md](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md)
+- **`build/`**
+  - [2026-08-08-build-aFoldedQuarry-1.md](build/2026-08-08-build-aFoldedQuarry-1.md)
+- **`reviews/`**
+  - [2026-08-08-review-aFoldedQuarry-1.md](reviews/2026-08-08-review-aFoldedQuarry-1.md)
+  - [2026-08-08-review-aFoldedQuarry-2.md](reviews/2026-08-08-review-aFoldedQuarry-2.md)
+  - [2026-08-08-review-aFoldedQuarry-3.md](reviews/2026-08-08-review-aFoldedQuarry-3.md)
+  - [2026-08-08-review-aFoldedQuarry-4.md](reviews/2026-08-08-review-aFoldedQuarry-4.md)
+  - [2026-08-08-review-aFoldedQuarry-5.md](reviews/2026-08-08-review-aFoldedQuarry-5.md)
+  - [2026-08-08-review-aFoldedQuarry-6.md](reviews/2026-08-08-review-aFoldedQuarry-6.md)
+  - [2026-08-08-review-aFoldedQuarry-7.md](reviews/2026-08-08-review-aFoldedQuarry-7.md)
+<!-- /gen:build-docs -->

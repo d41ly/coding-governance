@@ -94,3 +94,26 @@ from the status header of every spec in this folder — do not hand-edit it.
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-10-spec-DEPL-aSealedCaravan-2.md](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md)
+  - [2026-08-10-spec-TOOL-aSealedCaravan-1.md](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md)
+- **`build/`**
+  - [2026-08-10-build-aSealedCaravan-1.md](build/2026-08-10-build-aSealedCaravan-1.md)
+- **`reviews/`**
+  - [2026-08-10-review-aSealedCaravan-1.md](reviews/2026-08-10-review-aSealedCaravan-1.md)
+  - [2026-08-11-review-aSealedCaravan-2.md](reviews/2026-08-11-review-aSealedCaravan-2.md)
+  - [2026-08-11-review-aSealedCaravan-3.md](reviews/2026-08-11-review-aSealedCaravan-3.md)
+<!-- /gen:build-docs -->

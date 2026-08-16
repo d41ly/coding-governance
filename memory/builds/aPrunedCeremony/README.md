@@ -125,3 +125,29 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-07-19-spec-PLAY-aPrunedCeremony-1.md](spec/2026-07-19-spec-PLAY-aPrunedCeremony-1.md)
+  - [2026-07-19-spec-PLAY-aPrunedCeremony-2.md](spec/2026-07-19-spec-PLAY-aPrunedCeremony-2.md)
+  - [2026-07-19-spec-PLAY-aPrunedCeremony-3.md](spec/2026-07-19-spec-PLAY-aPrunedCeremony-3.md)
+  - [2026-07-19-spec-PLAY-aPrunedCeremony-4.md](spec/2026-07-19-spec-PLAY-aPrunedCeremony-4.md)
+  - [2026-07-19-spec-TOOL-aPrunedCeremony-1.md](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md)
+  - [2026-07-19-spec-TOOL-aPrunedCeremony-2.md](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md)
+- **`build/`**
+  - [2026-07-19-build-PLAY-aPrunedCeremony-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1.md)
+- **`reviews/`**
+  - [2026-07-19-review-TOOL-aPrunedCeremony-1.md](reviews/2026-07-19-review-TOOL-aPrunedCeremony-1.md)
+  - [2026-07-19-review-TOOL-aPrunedCeremony-2.md](reviews/2026-07-19-review-TOOL-aPrunedCeremony-2.md)
+<!-- /gen:build-docs -->

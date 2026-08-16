@@ -23,3 +23,27 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-03-spec-aQuarriedLantern-1.md](spec/2026-08-03-spec-aQuarriedLantern-1.md)
+- **`build/`**
+  - [2026-08-03-build-aQuarriedLantern-1.md](build/2026-08-03-build-aQuarriedLantern-1.md)
+  - [2026-08-03-build-aQuarriedLantern-2.md](build/2026-08-03-build-aQuarriedLantern-2.md)
+  - [2026-08-03-build-aQuarriedLantern-3.md](build/2026-08-03-build-aQuarriedLantern-3.md)
+  - [2026-08-03-build-aQuarriedLantern-4.md](build/2026-08-03-build-aQuarriedLantern-4.md)
+- **`reviews/`**
+  - [2026-08-03-review-aQuarriedLantern-1.md](reviews/2026-08-03-review-aQuarriedLantern-1.md)
+  - [2026-08-03-review-aQuarriedLantern-2.md](reviews/2026-08-03-review-aQuarriedLantern-2.md)
+<!-- /gen:build-docs -->

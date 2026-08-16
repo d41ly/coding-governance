@@ -140,3 +140,31 @@ spec in this folder — do not hand-edit it.
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-aWrittenMethod-1.md](spec/2026-08-11-spec-aWrittenMethod-1.md)
+  - [2026-08-11-spec-aWrittenMethod-2.md](spec/2026-08-11-spec-aWrittenMethod-2.md)
+  - [2026-08-11-spec-aWrittenMethod-3.md](spec/2026-08-11-spec-aWrittenMethod-3.md)
+  - [2026-08-11-spec-aWrittenMethod-4.md](spec/2026-08-11-spec-aWrittenMethod-4.md)
+  - [2026-08-11-spec-aWrittenMethod-5.md](spec/2026-08-11-spec-aWrittenMethod-5.md)
+  - [2026-08-11-spec-aWrittenMethod-6.md](spec/2026-08-11-spec-aWrittenMethod-6.md)
+- **`build/`**
+  - [2026-08-11-build-aWrittenMethod-1-enforcement-pass.md](build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md)
+  - [2026-08-11-build-aWrittenMethod-1-method-pass.md](build/2026-08-11-build-aWrittenMethod-1-method-pass.md)
+- **`reviews/`**
+  - [2026-08-11-review-aWrittenMethod-1.md](reviews/2026-08-11-review-aWrittenMethod-1.md)
+  - [2026-08-11-review-aWrittenMethod-2.md](reviews/2026-08-11-review-aWrittenMethod-2.md)
+  - [2026-08-11-review-aWrittenMethod-3.md](reviews/2026-08-11-review-aWrittenMethod-3.md)
+<!-- /gen:build-docs -->

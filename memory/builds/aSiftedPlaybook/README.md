@@ -59,6 +59,37 @@ header of every spec in this folder — do not hand-edit it.
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
 
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-1.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-2.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-3.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-4.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-1.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-2.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-3.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md)
+- **`build/`**
+  - [2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md](build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md)
+- **`reviews/`**
+  - [2026-08-16-review-aSiftedPlaybook-1.md](reviews/2026-08-16-review-aSiftedPlaybook-1.md)
+  - [2026-08-16-review-aSiftedPlaybook-2.md](reviews/2026-08-16-review-aSiftedPlaybook-2.md)
+  - [2026-08-16-review-aSiftedPlaybook-3.md](reviews/2026-08-16-review-aSiftedPlaybook-3.md)
+  - [2026-08-16-review-aSiftedPlaybook-4.md](reviews/2026-08-16-review-aSiftedPlaybook-4.md)
+  - [2026-08-16-review-aSiftedPlaybook-5.md](reviews/2026-08-16-review-aSiftedPlaybook-5.md)
+  - [2026-08-16-review-aSiftedPlaybook-6.md](reviews/2026-08-16-review-aSiftedPlaybook-6.md)
+<!-- /gen:build-docs -->
+
 ## Units — the authored roster (M2)
 
 One mechanism per unit. The `ids:` key above is a reservation range, not this roster.

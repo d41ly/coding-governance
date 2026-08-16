@@ -41,3 +41,23 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-09-spec-aBatchedTribunal-1.md](spec/2026-08-09-spec-aBatchedTribunal-1.md)
+  - [2026-08-09-spec-aBatchedTribunal-6.md](spec/2026-08-09-spec-aBatchedTribunal-6.md)
+  - [2026-08-09-spec-aBatchedTribunal-8.md](spec/2026-08-09-spec-aBatchedTribunal-8.md)
+- **`reviews/`**
+  - [2026-08-09-review-aBatchedTribunal-7.md](reviews/2026-08-09-review-aBatchedTribunal-7.md)
+<!-- /gen:build-docs -->

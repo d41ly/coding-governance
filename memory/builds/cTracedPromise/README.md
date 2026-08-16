@@ -68,6 +68,23 @@ below was put to them.
 Records live under `spec/`.
 <!-- /gen:build-index -->
 
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-14-spec-cTracedPromise-1.md](spec/2026-08-14-spec-cTracedPromise-1.md)
+  - [2026-08-15-spec-cTracedPromise-2.md](spec/2026-08-15-spec-cTracedPromise-2.md)
+<!-- /gen:build-docs -->
+
 ## The owner decision menu
 
 **D1 — RESOLVED (owner, 2026-08-15): build it. Shipped as `TOOL-cTracedPromise-2`.** The record of

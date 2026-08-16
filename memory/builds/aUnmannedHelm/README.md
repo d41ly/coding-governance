@@ -158,3 +158,28 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-10-spec-aUnmannedHelm-1.md](spec/2026-08-10-spec-aUnmannedHelm-1.md)
+  - [2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md)
+  - [2026-08-10-spec-aUnmannedHelm-5-u3-driver.md](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md)
+  - [2026-08-10-spec-aUnmannedHelm-6-u4-gate.md](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md)
+  - [2026-08-10-spec-aUnmannedHelm-7-u5-skill.md](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md)
+  - [2026-08-10-spec-aUnmannedHelm-8-u6-handback.md](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md)
+  - [2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md)
+- **`reviews/`**
+  - [2026-08-10-review-aUnmannedHelm-1.md](reviews/2026-08-10-review-aUnmannedHelm-1.md)
+  - [2026-08-10-review-aUnmannedHelm-2.md](reviews/2026-08-10-review-aUnmannedHelm-2.md)
+<!-- /gen:build-docs -->

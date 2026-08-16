@@ -214,6 +214,31 @@ header of every spec in this folder — do not hand-edit it.
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-13-spec-cKeyedLaunchpad-1.md](spec/2026-08-13-spec-cKeyedLaunchpad-1.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-2.md](spec/2026-08-13-spec-cKeyedLaunchpad-2.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-3.md](spec/2026-08-13-spec-cKeyedLaunchpad-3.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-4.md](spec/2026-08-13-spec-cKeyedLaunchpad-4.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-5.md](spec/2026-08-13-spec-cKeyedLaunchpad-5.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-6.md](spec/2026-08-13-spec-cKeyedLaunchpad-6.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-7.md](spec/2026-08-13-spec-cKeyedLaunchpad-7.md)
+- **`reviews/`**
+  - [2026-08-13-review-cKeyedLaunchpad-1.md](reviews/2026-08-13-review-cKeyedLaunchpad-1.md)
+  - [2026-08-14-review-cKeyedLaunchpad-2.md](reviews/2026-08-14-review-cKeyedLaunchpad-2.md)
+<!-- /gen:build-docs -->
+
 ## Method
 
 `memory/guides/BUILD-METHOD.md`, multi-pass. The M5 reuse probes were run at kickoff and their

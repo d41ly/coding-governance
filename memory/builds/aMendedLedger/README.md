@@ -34,3 +34,33 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-09-spec-aMendedLedger-1.md](spec/2026-08-09-spec-aMendedLedger-1.md)
+  - [2026-08-09-spec-aMendedLedger-2-u1-journal-relocation.md](spec/units/2026-08-09-spec-aMendedLedger-2-u1-journal-relocation.md)
+  - [2026-08-09-spec-aMendedLedger-3-u2-ledger-retirement.md](spec/units/2026-08-09-spec-aMendedLedger-3-u2-ledger-retirement.md)
+  - [2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md](spec/units/2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md)
+  - [2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md](spec/units/2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md)
+  - [2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md](spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md)
+  - [2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md](spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md)
+  - [2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md)
+- **`build/`**
+  - [2026-08-10-build-aMendedLedger-1-driver-repro-corpus.md](build/2026-08-10-build-aMendedLedger-1-driver-repro-corpus.md)
+- **`reviews/`**
+  - [2026-08-09-review-aMendedLedger-1-closing-diff.md](reviews/2026-08-09-review-aMendedLedger-1-closing-diff.md)
+  - [2026-08-09-review-aMendedLedger-2-repair.md](reviews/2026-08-09-review-aMendedLedger-2-repair.md)
+  - [2026-08-09-review-aMendedLedger-3-regression.md](reviews/2026-08-09-review-aMendedLedger-3-regression.md)
+  - [2026-08-10-review-aMendedLedger-4-u9-redesign.md](reviews/2026-08-10-review-aMendedLedger-4-u9-redesign.md)
+<!-- /gen:build-docs -->
