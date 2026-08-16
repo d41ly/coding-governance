@@ -1024,17 +1024,19 @@ verb_preflight() { # slug · keepalive-id
   # Protocol section 2 calls the base a runtime observation pinned ONCE at run start. This is the
   # line that makes that sentence true rather than aspirational.
   #
-  # The anchor triple below is deliberately NOT frozen with it. Freezing it is behaviour-neutral
-  # today and probably right, but it widens this unit past its scoped line and section 2's wording
-  # belongs to another unit; the fork is parked in the run-state file rather than taken.
+  # The anchor triple is frozen WITH it, resolving the fork this unit parked (owner, 2026-08-16).
+  # Protocol section 2 describes all four as observed at PIN TIME, existing so an outside party can
+  # re-derive the pin. Left moving, the triple dated a different moment from the value it is evidence
+  # for, and evidence for a pinned value that moves is evidence for nothing. Three more conditions of
+  # the same shape as the base's, and no new branch.
   [ -n "$(fact "$rel" base)" ] || set_fact "$rel" base "$base" || return 1
   # Re-read, so the echo below reports what is ON the record rather than what was just derived. A
   # second preflight that printed a base it did not write would be the same lie in the operator's
   # face that the unconditional write was on disk.
   base=$(fact "$rel" base)
-  set_fact "$rel" anchor-ref "$AREF" || return 1
-  set_fact "$rel" anchor-sha "$ASHA" || return 1
-  set_fact "$rel" anchor-url "$AURL" || return 1
+  [ -n "$(fact "$rel" anchor-ref)" ] || set_fact "$rel" anchor-ref "$AREF" || return 1
+  [ -n "$(fact "$rel" anchor-sha)" ] || set_fact "$rel" anchor-sha "$ASHA" || return 1
+  [ -n "$(fact "$rel" anchor-url)" ] || set_fact "$rel" anchor-url "$AURL" || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
   # ONLY when the file carries no phase yet. Preflight used to rewrite this unconditionally, so a
   # resumed run that had reached BUILDING was silently moved back to RUNNING by the verb it is told

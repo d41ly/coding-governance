@@ -715,15 +715,29 @@ reset_tree
 run --preflight tRun --keepalive-id k1 >/dev/null
 base1=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
 same "the first preflight wrote a base" "$([ -n "$base1" ] && echo yes || echo no)" "yes"
+asha1=$(sed -n "s/^anchor-sha: //p" memory/builds/tRun/RUN.md)
 # advance the anchor and reconcile it, which is exactly what the lander does before the gate
 git -C "$ORIGIN" --work-tree=. --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main 2>/dev/null || true
 git checkout -q main && echo advance >> advance.txt && git add -A && git commit -q -m advance --no-verify
 git push -q "$ORIGIN" main 2>/dev/null || true
 git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1 || true
 git fetch -q "$ORIGIN" 2>/dev/null || true
+# ...and again by REMOTE NAME. Fetching by PATH updates no `refs/remotes/origin/*`, so the anchor
+# this fixture spends four lines advancing never actually moved, and both pinned-once arms below
+# were comparing a value against itself. The freeze arm's control is what exposed it.
+git fetch -q origin 2>/dev/null || true
 out=$(run --preflight tRun --keepalive-id k1)
 base2=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
 same "the base did not move on the second preflight" "$base2" "$base1"
+# TOOL-cBriefedPilot-5, the fork the owner resolved: the anchor TRIPLE freezes with the base.
+# Protocol section 2 describes all four as observed at pin time so an outside party can re-derive
+# the pin; a triple that keeps moving dates a different moment from the value it is evidence for.
+# The CONTROL first — without it this arm passes whenever the anchor happens not to have moved, and
+# the whole point of the fixture above is that it did.
+asha2=$(sed -n "s/^anchor-sha: //p" memory/builds/tRun/RUN.md)
+now=$(git rev-parse refs/remotes/origin/main)
+same "the anchor really did move, so the freeze has something to resist"   "$([ "$now" != "$asha1" ] && echo moved || echo stayed)" "moved"
+same "the anchor sha did not move on the second preflight" "$asha2" "$asha1"
 hit "$out" "base $base1"
 
 # ---- TOOL-cBriefedPilot-2: the directive registry. AC1 is exercised by every arm in this file -

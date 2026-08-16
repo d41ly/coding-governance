@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims
 
-**Status:** BLOCKED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -126,7 +126,9 @@ fixture rather than a detail of it.
 
 ## 8. Open questions
 
-**Do facts 5 through 7 pin with fact 4?** The anchor ref, the anchor tip sha and the endpoint URL are
+### Do facts 5 through 7 pin with fact 4? — RESOLVED (owner, 2026-08-16): yes, guard all four
+
+The reasoning that produced the recommendation is kept below, because it is what the owner ruled on. The anchor ref, the anchor tip sha and the endpoint URL are
 written unguarded at `:853-855`, immediately after the base. Protocol §2 describes all three as
 observed "at pin time" and existing so an outside party can re-derive the pin. If the base freezes
 and the triple keeps moving, the record's own evidence stops reproducing its own pin.
@@ -138,7 +140,9 @@ leave the triple as a fresh observation each preflight and accept that the evide
 moment from the value it is evidence for. Recommendation: guard all four — evidence for a pinned
 value that moves is evidence for nothing. It is left as a fork rather than taken because it widens
 this unit past the one line the design pass scoped, and because protocol §2's wording is unit 18's to
-touch. Resolver: owner.
+touch. Resolver: owner — TAKEN 2026-08-16, option one. The triple now freezes with the base, and the
+re-preflight arm carries a control asserting the anchor actually moved, so the freeze has something
+to resist rather than passing whenever the fixture happens to hold still.
 
 ## 9. Revision log
 
