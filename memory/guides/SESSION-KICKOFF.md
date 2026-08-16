@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-16T19:29:54+03:00 @ 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
+last-audit: 2026-08-16T21:03:26+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
@@ -173,6 +173,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
+- A FRESH WORKTREE starts with a RED bar and a refusing `--preflight`: the checkout lands CRLF on the
+  `eol=lf`-pinned `.claude/skills/*/SKILL.md` renders, which reds the `memory-recall skill wiring`
+  leg and makes `check-wiring.sh --check` exit 1. Run `bash tools/check-wiring.sh --fix` first.
+  Prune when the memory-recall adopter CR-normalises its comparison.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
