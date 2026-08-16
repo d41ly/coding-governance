@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -13,9 +13,12 @@ recurrences of defects a previous build already fixed. Add one gate that holds t
 One new gate, `tools/check-playbook-parity.sh`, with three check families and a sibling self-test.
 
 - **S1 — kit coverage.** Every tracked kit dir under `tools/` is named in at least one of the three
-  playbook files, or listed in a shrink-only `tools/playbook-kit-waivers.txt` with a reason. The kit
-  set is DERIVED from the tree, never hand-listed. A waiver whose kit no longer exists reds as
-  stale, so the file cannot outlive what it excuses.
+  playbook files, or listed in `tools/playbook-kit-waivers.txt` with a reason. The kit set is
+  DERIVED from the tree, never hand-listed. **The registry is a declared exemption list, not a
+  shrink-only count** (see §8 F2): it must be able to gain a row for a genuinely experimental kit,
+  and it drains through AC6's two arms instead — a row whose kit is gone reds as stale, and a row
+  whose kit IS named in the playbook reds as redundant. A waiver therefore disappears when it stops
+  excusing something.
 
   **The match is a path segment, anchored and case-sensitive** — `tools/<kit>/` or a backticked
   `<kit>/` — never a bare substring. A naive substring search makes this check pass vacuously:
@@ -182,8 +185,9 @@ future ones.
   missing sentinel rather than reporting universal coverage.
 - **AC6** — When a waiver row names a kit that no longer exists, the gate reds as stale. When a
   waiver row names a kit that IS present in the playbook, it also reds — otherwise a waiver that
-  excuses nothing sits in a shrink-only registry forever, which is how `workflows/` nearly shipped
-  one.
+  excuses nothing would otherwise sit in the registry forever, which is how `workflows/` nearly
+  shipped one. This arm is also what lets the registry accept a new row safely (§8 F2) — it can
+  grow, but only for a kit that genuinely needs excusing.
 - **AC9** — When `tools/playbook-kit-waivers.txt` is absent, the gate reds naming it and stops. It
   never creates or extends the file; `PLAY-aSiftedPlaybook-3` S7 owns its contents.
 - **AC7** — When `bash tools/check-playbook-parity.test.sh` runs it exits 0; when any single arm's
@@ -203,25 +207,58 @@ future ones.
 
 ## 8. Open questions
 
-- **F1 — should S2's pair list live in the gate, or in a declared data file?** In-script is simpler
-  and keeps the extraction beside its pair. A data file (`tools/playbook-parity-pairs.tsv`) is
-  editable without touching a merge-bar gate and matches the `gate-legs.json` precedent.
-  **Recommendation: in-script.** The extractions are regexes, not data; a pair is a regex on each
-  side plus a comparison, and splitting the regex from its pair puts half a mechanism in each file.
-  Revisit if the list passes roughly ten rows.
-- **F2 — does S1 red on a kit missing from the playbook, or only warn?** Redding means a new kit
-  cannot land until the playbook mentions it, which is the forcing function the ceiling used to
-  provide and is arguably the point. It also means an experimental kit cannot sit in `tools/`
-  unmentioned even briefly.
-  **Recommendation: red, with the waiver file as the escape hatch** — an experimental kit takes a
-  one-line waiver, which is a visible, shrink-only, reviewable act rather than silence. This is the
-  owner's call because it changes what it costs to add a kit.
+none — both forks below are RESOLVED (agent, 2026-08-16, delegated). The owner delegated resolver
+authority for these two on 2026-08-16; neither needed a §3 non-goal changed, a new dependency or
+install location, or any widening of a write surface, so M3's vetoes 2 and 3 do not reach them and
+they did not have to go back.
+
+- **F1 — should S2's pair list live in the gate, or in a declared data file?**
+  **RESOLVED (agent, 2026-08-16, delegated): IN-SCRIPT.** Neither option is more feature-rich —
+  both satisfy every stated AC and leave the same follow-ups — so M3's tie-break decides it, and its
+  second clause is "reuse of a seam M5 found". §10 already names that seam:
+  `kit-dogfood-parity.PAIRS` at `tools/memory-tree/kit-dogfood-parity.test.sh:53` is an in-script,
+  space-separated pair list iterated with per-pair diagnostics, and this unit was already going to
+  copy its shape. Extracting the pairs to `tools/playbook-parity-pairs.tsv` would reuse nothing and
+  split one mechanism across two files: a pair here is a regex per side plus a comparison, and a
+  regex is not data.
+
+  **Revisit trigger, so this is a decision and not a permanent posture:** if the pair list passes
+  ten rows, or if a pair is ever needed by a second consumer, the data-file option becomes the
+  better one and this fork reopens.
+- **F2 — does S1 red on a kit missing from the playbook, or only warn?**
+  **RESOLVED (agent, 2026-08-16, delegated): RED, by veto — this fork was never actually open.**
+  M3's veto 1 discards any option that "fails an acceptance criterion or gate already written in the
+  spec", and **AC1 already reads "the gate reds naming that kit"**. The warn-only option contradicts
+  this unit's own acceptance criterion, so it was disqualified from the moment AC1 was written and
+  the fork should have been closed then. A fork whose options are already decided by the spec that
+  states them is not a fork; leaving it open invited an answer the spec would then have refused.
+
+  The escape hatch stands: an experimental kit takes a one-line row in
+  `tools/playbook-kit-waivers.txt`, which is a visible and reviewable act rather than silence.
+
+  **One consequence, and it corrects a real contradiction this resolution exposed.** The registry
+  was described as *shrink-only* in S1, in §10 and in `PLAY-aSiftedPlaybook-3` S7 — but a
+  shrink-only file cannot GAIN the row the escape hatch depends on. Both cannot be true. The
+  registry is therefore **not a shrink-only count**; it is a declared exemption list with two
+  draining arms, already specced as AC6: a row whose kit no longer exists reds as stale, and a row
+  whose kit IS named in the playbook reds as redundant. Those drain it without a count pin, and they
+  drain it for the right reason — a waiver disappears when it stops excusing something, not when a
+  number says so. This is where it diverges from `tools/install-prefix-waivers.txt`, whose entries
+  can only ever be removed.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-7 · 2026-08-16 · both forks RESOLVED under delegated authority, per M3. F1 → in-script, on
+  the tie-break's "reuse of a seam M5 found" — §10 already named `kit-dogfood-parity.PAIRS` and a
+  data file would reuse nothing; a revisit trigger is stated so it is a decision, not a posture.
+  F2 → red, by veto 1: AC1 already read "the gate reds naming that kit", so the warn-only option
+  contradicted this spec's own acceptance criterion and the fork had been closed since AC1 was
+  written. Resolving it exposed a contradiction now fixed in S1, §10 and `PLAY-3` S7 — the waiver
+  registry cannot be BOTH shrink-only and the escape hatch a red requires, so it is a declared
+  exemption list that drains through AC6's two arms instead of through a count.
 - rev-6 · 2026-08-16 · folded round-2 mediums and lows. S5 wired ONE leg where this unit ships two
   (the gate and its self-test), which would have left the self-test unclaimed in the map and uncited
   in the charter — two reds, one of them zero-tolerance. S1's `lib` evidence corrected: six hits are
@@ -256,8 +293,10 @@ future ones.
 `python tools/codebase-map/reuse_lookup.py "template size ceiling gate enforcement"`:
 
 - `tools/install-prefix-waivers.txt` is the model for S1's waiver file: one `<key>` per row with a
-  reason after whitespace, shrink-only, and a row whose target is gone reds as stale. Its header
-  prose is the template for the new file's.
+  reason after whitespace, and a row whose target is gone reds as stale. Its header prose is the
+  template for the new file's. **One deliberate divergence** (§8 F2): `install-prefix-waivers.txt`
+  is shrink-only and can only lose rows, while this registry must be able to gain one for an
+  experimental kit, so it drains through AC6's two arms rather than through a count.
 - `kit-dogfood-parity.PAIRS` (`tools/memory-tree/kit-dogfood-parity.test.sh:53`) is the model for
   S2's declared pair list — a space-separated `a:b` pair set iterated with per-pair diagnostics.
   The SHAPE is reused; the comparison is not, for the reason in §4 Alternatives rejected.

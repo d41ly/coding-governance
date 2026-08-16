@@ -47,11 +47,11 @@ header of every spec in this folder — do not hand-edit it.
 |---|---|---|---|
 | [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-5 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-4 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-5 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-2 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-4 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-6 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-7 | 2026-08-16 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -166,10 +166,22 @@ owner. All three withheld ones were put and answered, alongside a blocker the au
 | `TOOL-2` F1 — the `fail()` refactor | **Yes.** The gate enters `check-arms.py`'s population, with a mandatory `ARMS_FLOORS` entry. |
 | `PLAY-1` F1 — RULE 4's clause | **§0**, where every session reads it. RULE 4 binds any fan-out, not only a review. |
 
-**Two forks remain OPEN, both in `TOOL-aSiftedPlaybook-3`** — F1 (whether the value-parity pair list
-lives inside the gate or in a declared data file) and F2 (whether a kit missing from the playbook
-reds or only warns). They are not withheld: that unit is sequenced last, is the one the owner may
-defer indefinitely, and both forks are about the gate's own design rather than anything the other
-six units depend on. **`TOOL-3` is therefore classified FORKED, not READY**, per `BUILD-METHOD.md`
-M2, and cannot be built until they are answered. The other six specs' §8 all read `none` with their
-items marked RESOLVED in place.
+### The last two, resolved under delegated authority 2026-08-16
+
+The owner delegated resolver authority for `TOOL-aSiftedPlaybook-3`'s two forks. Both are marked
+`RESOLVED (agent, 2026-08-16, delegated)` — never `(owner, …)`, since the owner made the delegation
+and not the picks, and the two must stay distinguishable afterwards.
+
+| Fork | Resolution | On what grounds |
+|---|---|---|
+| `TOOL-3` F1 — pair list in the gate or in a data file | **In-script** | M3 tie-break, clause two: reuse of a seam M5 found. §10 already names `kit-dogfood-parity.PAIRS`; a data file would reuse nothing and split one mechanism across two files. Revisit trigger stated. |
+| `TOOL-3` F2 — does a missing kit red or warn | **Red** | M3 veto 1: AC1 already read "the gate reds naming that kit", so warn-only contradicted the spec's own acceptance criterion. The fork had been closed since AC1 was written. |
+
+Resolving F2 exposed a contradiction across three places: the waiver registry was described as
+shrink-only while a red makes it the escape hatch, and a shrink-only file cannot gain the row an
+experimental kit needs. It is now a declared exemption list draining through `TOOL-3` AC6's two
+arms — kit gone, or kit named in the playbook — which is also the one deliberate divergence from
+`tools/install-prefix-waivers.txt`.
+
+**Every fork in this build is now resolved.** All seven specs' §8 read `none` with their items
+marked in place, so no unit is classified FORKED.

@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -45,8 +45,14 @@ Give each a template placement and a conditional-section row.
   hits are the substring inside "deliberate"), `hooks` scores 0 (its one mention is the English
   word), but **`workflows` scores 1** — `parallel-coding-governance.template.md:150` spells
   `tools/workflows/tier2-review.js`. A waiver for a kit that already passes excuses nothing, and
-  the registry's shrink-only contract only reds a row whose kit is GONE, so it would sit there
-  forever.
+  the stale-row arm only reds a row whose kit is GONE, so a redundant one would sit there until
+  `TOOL-aSiftedPlaybook-3` AC6's second arm reds it as excusing nothing.
+
+  **The registry is a declared exemption list, not a shrink-only count.** It must be able to gain a
+  row for a genuinely experimental kit — that is the escape hatch `TOOL-aSiftedPlaybook-3` §8 F2
+  depends on now that a missing kit REDS. It drains through that unit's two AC6 arms instead: a row
+  whose kit is gone, and a row whose kit is named in the playbook, both red. This is the one place
+  it diverges from `tools/install-prefix-waivers.txt`, which is shrink-only and can only lose rows.
 - **S8 — the version marker and the archive snapshot.** Both deploy files carry
   `<!-- governance-template: vN.N -->` and are re-pulled in lockstep:
   `parallel-coding-governance.template.md:12` and `parallel-coding-governance.domain-rules.md:3`
@@ -235,6 +241,11 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-16 · corrected S7's waiver-registry contract, exposed by resolving
+  `TOOL-aSiftedPlaybook-3` F2 to RED. The registry cannot be both shrink-only and the escape hatch a
+  red requires — a shrink-only file cannot gain the row an experimental kit needs. It is a declared
+  exemption list that drains through that unit's two AC6 arms, and the divergence from
+  `tools/install-prefix-waivers.txt` is now stated rather than implied by the word "modelled on".
 - rev-4 · 2026-08-16 · folded round-2 medium M11. S4 named `README.md` as part of the gate-lint
   defect and then scoped only `AGENTS.md`, dropping the adopter-facing half without a non-goal —
   lost rather than deferred. Both are now in scope and Files touched, and AC8 observes them; without
