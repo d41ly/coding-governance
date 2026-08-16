@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -17,9 +17,15 @@ graded against a document it can no longer track.
   each run-state file's `phase` and compares the region only when that phase is non-terminal. The
   terminal members are the kit's own `LANDED` and `ABORTED`; they are read from the same place every
   other check reads the vocabulary, never re-spelled in the loop.
-- **S2 — the skip is REPORTED, not silent.** A skipped file prints one line naming the file and the
-  terminal phase that excused it. A check that quietly stops checking is indistinguishable from one
-  that has nothing to check, and this kit's own protocol §9 is built on refusing that equivalence.
+- **S2 — the skip is OBSERVABLE, and it is not a print.** `check-unattended.sh`'s own header states
+  the contract: "Exit 0 + no output = clean. Anything printed is a violation." A per-file skip line
+  would break that on every clean run — both real run-state files in this tree are `LANDED`, so the
+  gate would print two lines and exit 0 from the day this lands, which is precisely the ambiguity
+  the contract exists to remove. The skip is therefore SILENT in the gate, and its observability is
+  S4's arms: a terminal file whose region drifts is proved skipped by a fixture, not by a message.
+  Stated at length because "a silent skip is indistinguishable from nothing to check" is a real
+  objection and the answer is that the distinguishing evidence belongs in the harness, not in the
+  output of a gate whose contract is silence.
 - **S3 — the protocol says so.** `memory/guides/UNATTENDED-PROTOCOL.md` §2 describes the generated
   region as byte-compared against a fresh render with no phase qualification. It gains the
   qualification and the reason: at a terminal phase the region is a HISTORICAL SNAPSHOT of what the
@@ -27,9 +33,10 @@ graded against a document it can no longer track.
 - **S4 — the arms.** `tools/unattended/check-unattended.test.sh` gains two: a NON-terminal run whose
   region drifts still reds (the check did not become vacuous), and a TERMINAL run whose region
   drifts is skipped with its line printed. Both are fixtures, not assertions about the source.
-- **S5 — the kit/dogfood parity.** The shipped `UNATTENDED-PROTOCOL.template.md` and the installed
-  `memory/guides/UNATTENDED-PROTOCOL.md` are gate-compared, so S3's edit lands in both or the parity
-  leg reds. Named as a scope item because it is a second file, not a formatting detail.
+- **S5 — the kit/dogfood parity.** The shipped `tools/unattended/PROTOCOL.template.md` and the
+  installed `memory/guides/UNATTENDED-PROTOCOL.md` are gate-compared, so S3's edit lands in both or
+  the parity leg reds. **The shipped file is `PROTOCOL.template.md`** — the `UNATTENDED-` prefix is
+  the INSTALLED name only, and a first draft of this item spelled a path that does not exist.
 
 ## 3. Non-goals (OUT)
 
@@ -40,9 +47,12 @@ graded against a document it can no longer track.
 - **A driver verb that refreshes a terminal record.** Considered and rejected in §4 — it is the
   option that reopens a finished record, which is the one thing the protocol's own check 26 exists
   to prevent.
-- **The other three checks that iterate run-state files.** They ask different questions and none of
-  them compares against a moving source. Widening this unit to "audit every check for terminality"
-  is a different mechanism and would make the diff unreviewable.
+- **The other checks in the same loop.** There is ONE per-run-state-file loop and seven distinct
+  `fail` ordinals inside it — an earlier draft of this bullet said three, which both undercounts
+  them and invites an implementation that scopes the LOOP instead of the CHECK. **S1 gates check 8
+  and nothing else**: the phase read must not become a `continue` for the whole iteration, or six
+  other checks silently stop running on every terminal file. Widening this unit to "audit every
+  check for terminality" is a different mechanism and would make the diff unreviewable.
 
 ## 4. Design
 
@@ -88,8 +98,9 @@ from the same source the rest of the file does.
 |---|---|
 | `tools/unattended/check-unattended.sh` | check 8 gains the phase scope + the skip line |
 | `tools/unattended/check-unattended.test.sh` | two arms (S4) |
+| `.memory-tree.conf` | `ARMS_FLOORS` — AC6 requires the pair to equal the measured value; the pin is one-sided, so a floor left stale passes |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | §2's qualification (S3) |
-| `tools/unattended/UNATTENDED-PROTOCOL.template.md` | the same edit, or the parity leg reds (S5) |
+| `tools/unattended/PROTOCOL.template.md` | the same edit, or the parity leg reds (S5) |
 
 No depth-1 `tools/` path is created, so no `govkit/registry.toml` row is owed. Stated rather than
 omitted, because the build-level rule requires every unit to answer that question.
@@ -105,12 +116,19 @@ One commit. The gate change and its arms cannot land separately: an unarmed new 
 - perf / scale — N/A. One extra `phase` read per run-state file, of which the tree has few.
 - a11y / i18n — N/A.
 - error / empty / loading states — a run-state file with NO readable phase is the interesting empty
-  case: it must be treated as NON-terminal and still compared, because "unreadable" and "finished"
-  are not the same and only one of them is a reason to stop checking. Armed in S4.
-- observability — S2's skip line is the observability, and it is why the skip is not silent.
-- risks — the real risk is scoping the check into vacuity: if every run-state file in a tree is
-  terminal, check 8 compares nothing and prints only skips. That is correct but indistinguishable
-  from a broken loop, which is why S2 prints per file rather than a summary.
+  case, and it is already handled: check 4 refuses it and `continue`s before check 8 sees it, so
+  "unreadable" cannot be mistaken for "finished" by construction. S1 must not weaken that — a
+  phase read that treats an unreadable phase as terminal would turn a refusal into a skip. AC4
+  observes the refusal where it lives.
+- observability — deliberately NOT in the gate's output, per S2. The gate's contract is that a clean
+  run is silent, and a skip line would make every clean run in this tree non-silent. The evidence
+  that the skip is real lives in S4's arms.
+- risks — **the real risk is scoping the check into vacuity, and it is live rather than
+  hypothetical**: both run-state files in this tree are already `LANDED`, so on the day this lands
+  check 8 compares NOTHING. The check is correct and exercises nothing, which is the
+  `fixture-passes-by-finding-nothing` class. It is answered by AC1 — a non-terminal file whose
+  region drifts must still red — which is the only criterion here that proves the check still has
+  teeth, and it is why that AC is first.
 - testing + left-shift gates — S4 is the left-shift, and its first arm exists to prove the check did
   not become vacuous rather than to prove the new behaviour.
 - migration / rollback — revert the commit; no state format changes and no record is rewritten.
@@ -122,19 +140,28 @@ One commit. The gate change and its arms cannot land separately: an unarmed new 
   `bash tools/unattended/check-unattended.sh` reds naming check 8 and that file. The check is not
   vacuous.
 - **AC2** — When a run-state file at `LANDED` has its generated region altered, the gate exits 0 and
-  prints one line naming the file and the phase that excused it.
+  prints NOTHING, honouring its own "anything printed is a violation" contract.
 - **AC3** — Same as AC2 for `ABORTED`, because the terminal set has two members and an arm for one
   of them proves nothing about the other.
-- **AC4** — When a run-state file carries no readable `phase`, the region IS compared and a drift
-  reds. Unreadable is not terminal.
+- **AC4** — When a run-state file carries no readable `phase`, `bash tools/unattended/check-unattended.sh`
+  reds at **check 4**, not check 8. **This replaces a criterion that could never pass.** The draft
+  required the region to be COMPARED for a phase-less file, on the reasoning that "unreadable is
+  not terminal". Measured: check 4 already refuses a file with no phase and `continue`s to the next
+  file, so such a file never reaches check 8 today and S1 does not change that. The property the
+  draft wanted is real and is enforced UPSTREAM — a phase-less file is refused outright rather than
+  quietly skipped — so this AC observes where it actually lives.
 - **AC5** — When `bash tools/unattended/check-unattended.test.sh` runs it exits 0; inverting any
   single arm's expectation reds naming that arm.
 - **AC6** — When `python tools/memory-tree/check-arms.py --report` runs, every new `fail` branch in
   `check-unattended.sh` is ARMED and the `ARMS_FLOORS` pair in `.memory-tree.conf` equals the
   measured `<branches>:<armed>`. An undeclared floor is silently skipped, not refused, so this AC
   reads the report rather than trusting the gate to complain.
-- **AC7** — When `bash tools/unattended/adopt-unattended.sh --check` runs it exits 0, and the
-  shipped protocol template equals the installed protocol, so S3's edit landed in both.
+- **AC7** — When `bash tools/unattended/adopt-unattended.sh --check` runs it exits 0: the shipped
+  template and the installed protocol AGREE.
+- **AC7b** — When the INSTALLED `memory/guides/UNATTENDED-PROTOCOL.md` §2 is read, it states that
+  the generated region is compared only while the run is non-terminal, and why. **AC7 cannot
+  substitute:** `adopt-unattended.sh --check` is a symmetric diff of template against render, so it
+  proves the two agree and is blind to both being stale. An edit made in neither file passes AC7.
 - **AC8** — **The reproduction is closed, end to end.** With `aSiftedPlaybook`'s run-state file at
   `LANDED`, a backlog row carrying the slug `aSiftedPlaybook` is minted, `gen_build_index --write` is
   run, and `bash tools/run-gates.sh` is GREEN. This is the exact sequence that had no legitimate
@@ -159,6 +186,18 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · folded the round-1 spec audit. **B3**: AC4 required a phase-less run-state
+  file to reach check 8; check 4 refuses one and `continue`s, so it never does and the criterion
+  could not pass. It now observes the refusal where it lives, and §5's error-states bullet with it.
+  **H5**: AC7 inferred that a symmetric `--check` diff proves an edit landed — it proves the two
+  copies agree and is blind to both being stale; **AC7b** reads the installed protocol. **H8**:
+  S2's per-file skip line falsifies the gate's own "anything printed is a violation" contract on
+  every clean run, both real run-state files being LANDED. The skip is silent and S4's arms are the
+  evidence. **M2**: the shipped template is `PROTOCOL.template.md`; the draft named a path that
+  does not exist. **M3**: seven `fail` ordinals share one loop, not three, and S1 must scope the
+  CHECK rather than the iteration or six other checks stop running on terminal files. **M1**:
+  `.memory-tree.conf` added to Files touched. The vacuity risk is restated as live rather than
+  hypothetical: both files here are already terminal, so AC1 is the only thing proving teeth.
 - rev-1 · 2026-08-16 · initial draft. The defect was found by hitting it during `aSiftedPlaybook`'s
   landing rather than by review: a landing-time obligation the build had recorded for itself could
   not be discharged without redding the bar. Three fixes were weighed against the tree and the two

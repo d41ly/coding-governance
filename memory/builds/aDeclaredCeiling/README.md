@@ -35,12 +35,12 @@ hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | SPECCED | rev-1 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | SPECCED | rev-1 | 2026-08-16 |
+| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | SPECCED | rev-2 | 2026-08-16 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -54,19 +54,24 @@ One mechanism per unit. The `ids:` key above is an OUTPUT, not this roster.
 | 3 | `TOOL-aDeclaredCeiling-1` | 2 | the ceiling as a declared pin |
 | 4 | `TOOL-aDeclaredCeiling-2` | 2 | the recall corpus reaches conf declarations |
 
-**The order is TOTAL and unit 1 is first for a reason that is not sequencing convenience.** Unit 1
-fixes the check that a slug-carrying row minted after landing reds forever. This build has ALREADY
-minted four such rows — under its own new slug, which is why nothing reds today — but unit 3 edits
-`.memory-tree.conf` and unit 4 edits the recall corpus definition, and both are the kind of change
-a later unattended run would want to make while a landed record exists. Landing the fix first means
-the rest of this build is the first thing to prove it.
+**The order is TOTAL, and unit 2 is the reason — not unit 1.** An earlier version of this section
+called unit 2 "a records-only correction with no dependency" and justified unit 1 going first by
+pointing at units 3 and 4. Both halves were wrong, and the spec audit reproduced it in an isolated
+clone.
 
-Unit 2 is second because it is a records-only correction with no dependency, and putting a Tier-1
-unit between two Tier-2 ones keeps the two conf-touching units from landing in one diff.
+`PLAY-aDeclaredCeiling-1` rev-bumps a CLOSED `aSiftedPlaybook` spec. That moves the spec's status
+header, `gen_build_index` re-renders that build's README table from it, and `aSiftedPlaybook`'s
+`RUN.md` — frozen at `LANDED` — no longer matches its source. `UNATTENDED` check 8 reds, and
+`--preflight` refuses to refresh a finished record. **Unit 2 has the hard dependency, and it is on
+unit 1**: it is not merely convenient for `TOOL-aDeclaredCeiling-3` to land first, it is the only
+thing that makes unit 2 landable at all. Units 3 and 4 touch no landed record and would have been
+fine in any order.
 
-Unit 4 is last: it changes what the recall index READS, and unit 3 creates the first declaration
-that the change is supposed to make reachable. Sequenced the other way, unit 4's acceptance would
-have to quantify over a declaration that does not exist yet.
+Unit 4 is last because unit 3 creates a declaration unit 4 must be able to reach. That reason was
+also empty in its first form: unit 3's declaration lands at `tools/template-size-limits.txt`, and
+unit 4 as first drafted admitted only repo-ROOT confs, so the two units would not have met.
+`TOOL-aDeclaredCeiling-2` S1 now takes repo-RELATIVE paths and seeds the limits file among them,
+which is what makes the dependency real rather than asserted.
 
 ## Coverage — every follow-up to the unit that discharges it
 

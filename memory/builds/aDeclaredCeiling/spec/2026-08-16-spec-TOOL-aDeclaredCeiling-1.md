@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -13,15 +13,31 @@ one declared, per-subject pin whose movements are justified beside the number, o
 ## 2. Scope (IN)
 
 - **S1 — the declaration.** A new `tools/template-size-limits.txt`: `<path>\t<bytes>` rows keyed by
-  measured file, comments carrying each value's justification and every movement of it. Seeded with
+  measured file, resolved like the high-water record — a positional, then an environment variable,
+  then the tracked default — so the self-test can point the gate at a scratch copy instead of
+  mutating a tracked file while the bar runs its legs CONCURRENTLY. The high-water record already
+  solved exactly this and the same shape is reused rather than re-invented. Comments carry each
+  value's justification and every movement of it. Seeded with
   the two subjects that exist — the playbook template at 49152 and the kickoff engine at 18432 —
-  and with the ceiling reversal's history, which today survives only in `memory/DECISIONS.md` and a
-  spec nobody reads at the gate.
-- **S2 — the resolution order.** `MAX_BYTES` becomes: positional `$2`, then the environment, then
-  **the declared row for this subject**, then the existing hard default. The two override layers are
-  untouched — `TOOL-aSiftedPlaybook-2`'s A5 arms them and the self-test needs them — so this inserts
-  one layer and removes none. A subject with no declared row falls through to the default exactly as
-  today.
+  and with the ceiling reversal's history. That history survives today in `memory/DECISIONS.md`, in
+  a closed spec, and in two places a reader AT the gate does see — the gate's own header comment and
+  the playbook dossier. What it does NOT have is a home beside the number, which is the whole of
+  what `READ_PATH_CEILING` demonstrates and the only claim this item makes.
+- **S2 — the resolution order.** `MAX_BYTES` becomes: positional `$2`, then **the declared row for
+  this subject**, then the environment, then the existing hard default.
+
+  **The declaration sits ABOVE the environment, and that ordering is forced.** Today the kickoff
+  engine's 18432 is a POSITIONAL, which beats the environment: measured,
+  `MAX_BYTES=999999 bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` still
+  gates at 18432. `TOOL-aSiftedPlaybook-1` S1 built that insulation deliberately and verified it
+  rather than assuming it. S3 drops the positional, so with the declaration BELOW the environment
+  the same command would gate at 999999 — this unit would silently undo a property a landed unit
+  established. Putting the declared row above the environment preserves it: a declared per-subject
+  pin is policy, and an env var is a local override for a subject nobody declared.
+
+  A subject with NO declared row falls through to the environment and then the default exactly as
+  today, which is why `TOOL-aSiftedPlaybook-2`'s A5 — whose subject is a scratch file with no row —
+  keeps arming the env layer unchanged.
 - **S3 — the kickoff leg stops carrying its limit in argv.** With the declaration keyed by subject,
   `tools/gate-legs.json`'s `kickoff engine size <=18KiB` leg becomes
   `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` and the number comes from the
@@ -30,20 +46,31 @@ one declared, per-subject pin whose movements are justified beside the number, o
   positional in place would declare one and hardcode the other.
 - **S4 — the carriers that spell the argv.** `AGENTS.md`'s gate-suite bullet spells
   `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` verbatim and moves with S3.
-  The leg NAME (`<=18KiB`) is an inventory key claimed by `memory/map/features/playbook.md`; it is
-  NOT renamed, because renaming a leg key trips the codebase-map coverage gate in both directions
-  and this unit has no reason to pay that.
+  The leg NAME (`<=18KiB`) is an inventory key claimed by **`memory/map/features/session-kickoff.md`**,
+  not by the playbook dossier — checked, because a first draft named the wrong owner and S7 would
+  then have edited a dossier that does not hold the key. It is NOT renamed either way: renaming a
+  leg key trips the codebase-map coverage gate in both directions and this unit has no reason to
+  pay that.
+- **S4b — the LF pin.** `.gitattributes` pins `tools/template-size-limits.txt` to `eol=lf`. Its
+  sibling `tools/template-size-highwater.txt` carries that pin with a written reason — the gate
+  PARSES it and every unpinned path smudges to CRLF on this fleet — and a new tracked data file the
+  same gate parses inherits the same reason. Unpinned, `git check-attr` resolves it to `text: auto`.
 - **S5 — the govkit declaration.** `tools/template-size-limits.txt` is a new depth-1 path under
   `tools/`, which `tools/govkit/registry.toml` asserts. An `[[exempt]]` row lands in the same
   commit, beside the sibling rows for the gate, its self-test and the high-water record.
-- **S6 — the arms.** `tools/check-template-size.test.sh` gains: the declared row is what a subject
-  with no positional and no env resolves to; a subject with NO row still resolves to the hard
-  default; the positional still beats the declaration; the environment still beats the declaration.
-  Four arms, because a resolution order with four layers is exactly where an off-by-one layer hides.
-- **S7 — the map dossier.** `memory/map/features/playbook.md`'s `[paths].globs` gains the new file,
-  and its "Constraints & why" gains the declaration as the ceiling's home. The dossier currently
-  says "The ceiling is a shell constant, not a declared pin" in its Gaps section — that gap closes
-  here and the sentence moves out of Gaps rather than being deleted.
+- **S6 — the arms**, every one against a SCRATCH limits file via S1's override, never the tracked
+  one: the declared row is what a subject with no positional and no env resolves to; a subject with
+  NO row falls through to the hard default; the positional beats the declaration; the declaration
+  beats the environment; and a subject with no row still lets the environment beat the default.
+  Five arms, because a four-layer order is exactly where an off-by-one layer hides, and each pins
+  WHICH layer won rather than merely that some limit applied.
+- **S7 — the map dossier, three edits and one of them a REPLACEMENT.**
+  `memory/map/features/playbook.md`'s `[paths].globs` gains the new file; its Gaps bullet "The
+  ceiling is a shell constant, not a declared pin" closes and moves out of Gaps rather than being
+  deleted; and — the one an earlier draft missed — its "Constraints & why" bullet stating that the
+  kickoff engine's limit is "18432, passed POSITIONALLY" is FALSE after S3 and is rewritten. That
+  bullet is the last live carrier of the claim this unit falsifies, and adding a new constraint
+  beside a stale one is how a dossier acquires two answers to one question.
 
 ## 3. Non-goals (OUT)
 
@@ -106,12 +133,14 @@ exactly when the arm is written.
 | File | Change |
 |---|---|
 | `tools/template-size-limits.txt` | new — S1 |
+| `.gitattributes` | `eol=lf` for the new record, on the sibling's precedent |
 | `tools/check-template-size.sh` | S2's layer, and its header's usage block |
 | `tools/check-template-size.test.sh` | S6's four arms |
 | `tools/gate-legs.json` | S3 — the kickoff leg's argv |
 | `AGENTS.md` | S4 — the spelled command |
 | `tools/govkit/registry.toml` | S5 |
 | `memory/map/features/playbook.md` | S7 |
+| `.memory-tree.conf` | `ARMS_FLOORS` — AC10 requires the pair to equal the measured value, and the pin is one-sided so a stale floor passes silently |
 | `memory/guides/SESSION-KICKOFF.md` | the mandatory `last-audit` re-stamp |
 
 ### Rollout
@@ -145,14 +174,22 @@ land apart gates `SKILL.md` at 48 KiB.
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash tools/check-template-size.sh` runs with no positional and no environment
-  override, it reports a limit of 49152, and that value comes from the declared row: deleting the
-  row changes the reported limit to the hard default. **Two observations, because they are equal
-  today** — the second is what proves the declaration is read at all.
+  override, it reports 49152. **And the declaration is proved to be what supplied it, using a value
+  that is NOT the default**: with a scratch limits file whose row for the template reads 40000, the
+  gate reports 40000. The draft's second observation — "deleting the row changes the limit to the
+  hard default" — is a no-op, because the declared value and the default are both 49152 and
+  49152 -> 49152 proves nothing. This is the `assertion-between-two-derived-values` class one step
+  removed, and it is exactly the trap this unit's own §4 warns about.
 - **AC2** — When `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` runs with NO
   positional limit, it reports 18432. This is S3's whole point and it fails today.
-- **AC3** — When a positional limit is passed, it wins over the declared row; when `MAX_BYTES` is
-  set and no positional is given, it wins over the declared row. The two existing override layers
-  are unmoved.
+- **AC3** — When a positional limit is passed it wins over the declared row. When `MAX_BYTES` is set
+  for a subject with NO declared row, it wins over the hard default. Both existing override paths
+  still work.
+- **AC3b** — **The kickoff engine's env insulation survives S3.** With no positional,
+  `MAX_BYTES=999999 bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` still
+  reports 18432. Measured green TODAY via the positional and it must stay green after the positional
+  is gone; without this criterion S3 removes a property a landed unit built and verified, and
+  nothing in this spec would have noticed.
 - **AC4** — When `tools/template-size-limits.txt` is absent, the gate exits 0 using the hard default
   and says nothing alarming. An adopter's copy has no limits file.
 - **AC5** — When the declared row for the subject is non-numeric, `bash tools/check-template-size.sh`
@@ -189,6 +226,19 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · folded the round-1 spec audit. **H1**: S3 drops the kickoff engine's
+  positional, and with the declaration BELOW the environment that silently undoes the env
+  insulation `TOOL-aSiftedPlaybook-1` S1 built and verified — measured, `MAX_BYTES=999999` with the
+  positional still gates at 18432. The declared row now sits ABOVE the environment and **AC3b**
+  observes it. **H2**: the limits FILE gained the same positional/env override the high-water
+  record has, because without it four arms could only run by mutating a tracked file while the bar
+  runs its legs concurrently. **H4**: S7 now REPLACES the dossier's "18432, passed POSITIONALLY"
+  constraint bullet — the last live carrier of the claim this unit falsifies. **M1**:
+  `.memory-tree.conf` added to Files touched. **M4**: the leg key is claimed by
+  `session-kickoff.md`, not the playbook dossier. **M5**: AC1's second observation was 49152 ->
+  49152, a no-op; it now uses a scratch row of 40000. **M6**: the new tracked data file gets the
+  `eol=lf` pin its sibling carries with a written reason. **L2**: the gap S1 closes is stated
+  without overclaiming what the history lacks.
 - rev-1 · 2026-08-16 · initial draft. The follow-up as `TOOL-aSiftedPlaybook-1` §4 recorded it was
   "make the ceiling a declared pin". The design pass found the better framing: there are TWO
   ceilings and they live in two unrelated places, so the unit is not "move a constant" but "stop

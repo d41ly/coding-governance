@@ -1,6 +1,6 @@
 # PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams playbook
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams playbook
 
 ## 1. Goal
 
@@ -10,7 +10,7 @@ exist. Record the refutation in both, so the next reader does not mint the follo
 ## 2. Scope (IN)
 
 - **S1 — the audit report.** `memory/builds/aSiftedPlaybook/build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md`
-  files the line under "what this audit did not cover" as a follow-up: "`WIRE-INTO-PROJECT.md:464`
+  files the line under "what this audit did not cover" as a follow-up: "`WIRE-INTO-PROJECT.md:463`
   calls `agent-cap` 'the review protocol's TWO rules' against four". The bullet is replaced with the
   measurement that refutes it, marked the way that report already marks its withdrawn `R2`
   ("REFUTATION WITHDRAWN"), so the file keeps one convention for a verdict that moved.
@@ -25,9 +25,11 @@ exist. Record the refutation in both, so the next reader does not mint the follo
 
 - **Editing `WIRE-INTO-PROJECT.md:464`.** There is nothing wrong with it. This unit exists because
   two records say otherwise.
-- **Auditing the rest of the audit report.** Round 4 already re-adjudicated one of its rows and
-  round 6 corrected a commit citation in another; a third pass over a landed report is a different
-  unit and would have no acceptance criterion short of re-running the whole audit.
+- **Auditing the rest of the audit report.** Earlier rounds already re-adjudicated one of its rows
+  and corrected a commit citation in another — the round numbers are deliberately not spelled here,
+  because a first draft of this line got both wrong in the spec whose subject is provenance drift.
+  A third pass over a landed report is a different unit and would have no acceptance criterion
+  short of re-running the whole audit.
 - **Making the protocol's rule count machine-checked.** `tools/check-playbook-parity.sh`'s S2 pair
   list is where a claim like this would be pinned, and adding a pair whose extraction is "count the
   `##` sections of a protocol document" is a real design question, not a records fix. Recorded as a
@@ -37,7 +39,7 @@ exist. Record the refutation in both, so the next reader does not mint the follo
 
 ### The measurement
 
-`WIRE-INTO-PROJECT.md:464-466` reads, in full: "This is the mechanical enforcement of the review
+`WIRE-INTO-PROJECT.md:465-467` reads, in full: "This is the mechanical enforcement of the review
 protocol's TWO rules: route fan-out through the cap-5 helpers, AND a review's verify stage spawns at
 most 5 agents TOTAL."
 
@@ -99,12 +101,24 @@ error states, observability, migration — all N/A, three markdown records and n
   defect at `:464`.
 - **AC2** — When `PLAY-aSiftedPlaybook-1` §3 is read, the `:464` bullet carries the refutation, and
   the spec's `rev` and §9 have both moved.
-- **AC3** — When `grep -n "TWO rules" WIRE-INTO-PROJECT.md` runs it returns exactly one hit at
-  `:464`, and the file is unchanged in this diff (`git diff --stat` names it nowhere). The claim is
-  correct, so the acceptance is that the subject was NOT edited.
+- **AC3** — When `grep -n "TWO rules" WIRE-INTO-PROJECT.md` runs it returns exactly ONE hit, that
+  hit's text names the two rules the protocol binds, and `git diff --stat` names
+  `WIRE-INTO-PROJECT.md` nowhere in this diff. The claim is correct, so the acceptance is that the
+  subject was NOT edited.
+
+  **This criterion deliberately pins no LINE NUMBER, and that is the finding it was rewritten
+  from.** It read `:464`, which was wrong: the line sits at `:465` at HEAD and at BASE, having moved
+  `464 -> 465` at `d3bd21b` one commit after a review round corrected the same anchor `463 -> 464`.
+  A criterion that pins a line number in a file its own §3 forbids editing can only ever go stale,
+  and this one had gone stale twice before it was written. The unit's whole deliverable is a
+  measurement about that line; it is anchored by CONTENT so the record survives the next insertion
+  above it.
 - **AC4** — When `grep -c "## The hard cap\|## Concurrency" memory/guides/REVIEW-PROTOCOL.md` runs
-  it returns 2, which is the measurement both records now cite. If a later build adds a third
-  protocol rule this AC is what makes the refutation re-checkable rather than merely archived.
+  it returns 2, which is the measurement both records now cite. **Its reach is limited and stated:**
+  it is pinned to two literal headings, so a THIRD rule added under a new heading passes it
+  unnoticed, and a rewording of either existing heading reds it for the wrong reason. It makes the
+  refutation re-checkable, not future-proof, and a real guard is the `check-playbook-parity.sh`
+  pair §4 declines to build.
 - **AC5** — When `memory/backlog/PLAY.md` is read, `PLAY-aDeclaredCeiling-1` is CLOSED.
 - **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs it exits 0, so the edited
   records still satisfy the row grammar and the index caps.
@@ -123,6 +137,11 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · folded the round-1 spec audit. **B1**: AC3 pinned `:464` — the line is at
+  `:465` and has moved twice under two separate corrections, so the criterion is now anchored by
+  CONTENT and says why. The unit whose only deliverable is a measurement had shipped a draft with a
+  wrong one. **L1**: the round numbers in §3 were both wrong and are now stated without them.
+  **L3**: AC4's caveat records what a two-heading grep cannot protect against.
 - rev-1 · 2026-08-16 · initial draft. Written after the design pass measured the claim instead of
   inheriting it. The follow-up had been carried by two landed records and named in a wrap-up, and no
   reader had opened `WIRE-INTO-PROJECT.md:464` — including me, until this pass.

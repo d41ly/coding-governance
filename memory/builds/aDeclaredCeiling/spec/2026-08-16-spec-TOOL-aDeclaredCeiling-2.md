@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -13,10 +13,15 @@ document source.
 ## 2. Scope (IN)
 
 - **S1 — a DECLARED source list.** `.memory-tree.conf` gains `RECALL_EXTRA_SOURCES`, a
-  space-separated list of repo-root-relative files whose declarations join the corpus. Declared, not
-  globbed: a glob over the repo root would sweep every dotfile a project happens to keep, and the
-  kit's habit — `watch:`, `verify-paths:`, `PRODUCT_GLOBS` — is an enumerated list whose membership
-  is a decision. Seeded with `.memory-tree.conf` and `.unattended.conf`.
+  space-separated list of **repo-relative** files whose declarations join the corpus. Declared, not
+  globbed: a glob would sweep whatever a project happens to keep, and the kit's habit — `watch:`,
+  `verify-paths:`, `PRODUCT_GLOBS` — is an enumerated list whose membership is a decision.
+
+  Seeded with `.memory-tree.conf`, `.unattended.conf` **and `tools/template-size-limits.txt`**, the
+  declaration `TOOL-aDeclaredCeiling-1` creates. The paths are repo-RELATIVE and not repo-ROOT for
+  exactly that reason: a first draft said root-only, which would have left this build's own newest
+  declaration outside the corpus this unit widens, and made the README's "unit 4 last because unit 3
+  creates the first declaration" an empty sentence.
 - **S2 — the extraction.** For each declared file, each `KEY=value` assignment becomes one chunk:
   the key, its value, and the **contiguous comment block immediately above it**, which is where this
   tree puts the justification. `READ_PATH_CEILING` is fourteen lines of movement history above one
@@ -74,23 +79,36 @@ that kind of membership explicit everywhere else it matters. A declared list als
 file named in the list and absent from disk gets a line (S4), where a glob that matches nothing says
 nothing — the vacuous-selector shape.
 
-### Where it hooks
+### Where it hooks — there are TWO enumerators, not one
 
-`corpus_files()` (`tools/memory-recall/extract.py:166`) is the single place the corpus is
-enumerated, and it takes an optional `rev` so the same walk works against a git revision. Both
-branches gain the declared paths — a source list honoured only in the worktree branch would make
-`bench.py --rev` silently narrower than a live run, and a benchmark measuring a different corpus
-than the one it reports on is worse than no benchmark.
+`extract.corpus_files(repo, rev)` walks tracked files under the root and takes an optional `rev`,
+so the same walk serves a live tree and a git revision. **It is not the only one.** `query.py`
+defines a second corpus walk of its own and calls it on the query path, and its local re-extraction
+sits under a comment naming the dead-plumbing class this kind of duplication produces. An earlier
+draft of this section called `corpus_files()` "the single place the corpus is enumerated", which is
+false and would have shipped a widening that every one of this unit's ACs — all of which shell out
+to `query.py` — could not see.
+
+Both enumerators gain the declared paths, and `tools/memory-recall/query.py` is in Files touched
+below. Honouring the list in only one would make `bench.py --rev` silently narrower than a live
+run, and a benchmark measuring a different corpus than the one it reports on is worse than none.
+
+**Unifying the two walks is explicitly NOT this unit's job** — it is a real cleanup with its own
+blast radius across the query path, and doing it inside a corpus widening would make both
+unreviewable. Recorded as the follow-up it is.
 
 ### Files touched
 
 | File | Change |
 |---|---|
 | `tools/memory-recall/extract.py` | S1's conf read, S2's extraction, S3's routing, S4 |
+| `tools/memory-recall/query.py` | the SECOND enumerator, which every AC here exercises |
 | `tools/memory-recall/recall_conf.py` | `RECALL_EXTRA_SOURCES` joins the resolved conf object |
 | `tools/memory-recall/selftest.py` | S5's arms and S6's reproduction |
 | `.memory-tree.conf` | the declaration, seeded with two files |
 | `tools/memory-recall/README.md` | the new conf key and what it admits |
+| `tools/memory-recall/SKILL.template.md` | its corpus-membership sentence, which this unit falsifies |
+| `.claude/skills/memory-recall/SKILL.md` | the render, or `adopt-memory-recall.sh --check` reds |
 
 No depth-1 `tools/` path is created, so no `govkit` row is owed. `.memory-tree.conf` is a watched
 pathspec, so a `last-audit` re-stamp rides this commit.
@@ -118,13 +136,21 @@ adopter's tree.
   ranking is still good. The non-goal above records the missing floor as a real gap.
 - testing + left-shift gates — S5, plus S6 which is the original miss turned into an arm.
 - migration / rollback — revert; the index is a derived cache and rebuilds.
-- user docs — the kit README, and the rendered recall Skill is unaffected because it documents the
-  CLI's arguments, not the corpus membership. Verified by reading `SKILL.template.md`, not assumed.
+- user docs — the kit README **and the rendered recall Skill**, which DOES state corpus membership:
+  `tools/memory-recall/SKILL.template.md` tells the reader the corpus is the tracked
+  `{{MEMORY_ROOT}}/` of the repo root. That sentence is false the moment this unit lands, so the
+  template and the render both move. An earlier draft of this bullet claimed the opposite and said
+  "Verified by reading SKILL.template.md, not assumed" — the assertion-as-read failure that the
+  predecessor build's closing blocker was, one kit over. AC10 observes the rendered file.
 
 ## 6. Acceptance criteria
 
-- **AC1** — **The recorded miss is closed.** The §4 query, run unchanged, returns
-  `READ_PATH_CEILING` among its hits. This is the criterion the unit exists for.
+- **AC1** — **The recorded miss is closed.** The §4 query, run unchanged, returns a hit whose body
+  is `.memory-tree.conf`'s `READ_PATH_CEILING` declaration. **This is RED at BASE** — measured, 40
+  hits and none of them that key — which is the point: it is the criterion the unit exists for, and
+  an AC that were already green would prove nothing. Read as "the string appears somewhere in the
+  output" it IS already green, because this build's own backlog rows quote the key; the criterion
+  is the DECLARATION being retrievable, not the token being present.
 - **AC2** — A term appearing ONLY in a declaration's justification comment retrieves that
   declaration: `python tools/memory-recall/query.py` with a term drawn from `.memory-tree.conf`'s
   READ_PATH_CEILING comment block — and absent from its key and value — returns it. This is what proves S2 captured the comment block rather than the
@@ -141,6 +167,11 @@ adopter's tree.
   naming that arm.
 - **AC8** — `bash tools/memory-recall/adopt-memory-recall.sh --check` exits 0: the rendered Skill
   still matches its template and the conf.
+- **AC10** — When the RENDERED `.claude/skills/memory-recall/SKILL.md` is read, its description of
+  the corpus names the declared extra sources and no longer says the corpus is only the tracked
+  `MEMORY_ROOT`. AC8's `--check` is a symmetric diff of template against render: it proves they
+  AGREE and cannot notice that both are stale, so this AC reads the content and AC8 does not
+  substitute for it.
 - **AC9** — `bash tools/run-gates.sh` is green.
 
 ## 7. Gates
@@ -157,6 +188,18 @@ none.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-16 · folded the round-1 spec audit. **B2**: §4 called `extract.corpus_files` "the
+  single place the corpus is enumerated" and there are two — `query.py` defines and calls its own,
+  and every AC in this unit shells out to `query.py`, which was in no Files-touched row. Both
+  enumerators are now in scope and unifying them is recorded as the separate cleanup it is.
+  **H3**: §5 asserted "the rendered Skill … documents the CLI's arguments, not the corpus
+  membership. Verified by reading SKILL.template.md" — the template states corpus membership
+  explicitly, so the sentence asserted as read the one thing it had not read. That is the
+  predecessor's closing blocker in a different kit; the template and its render are now in scope
+  and **AC10** reads the rendered file, which AC8's symmetric diff cannot. **H6**: S1 takes
+  repo-RELATIVE paths and seeds `tools/template-size-limits.txt`, so unit 3's declaration is
+  actually reachable and the README's ordering reason stops being empty. **L4**: AC1 says plainly
+  that it is RED at BASE and what would make it falsely green.
 - rev-1 · 2026-08-16 · initial draft. The gap was recorded by `TOOL-aSiftedPlaybook-1` §10 as "a real
   gap in what the retrieval corpus covers" and reproduced live during this build's design pass —
   the same query, run again, still missing the same key. S6 turns that reproduction into an arm so
