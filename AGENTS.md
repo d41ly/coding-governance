@@ -102,7 +102,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   derivation, because `--bump` writes that key and the ratchet reads it back through the same
   code — the round trip is green whatever it says
 - template size ≤48 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
-  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
+  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md` (its ceiling is DECLARED in
+  `tools/template-size-limits.txt` with its history beside it, and outranks the environment so the
+  engine keeps the insulation a positional used to give it; the limit is a
   positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - verdict epoch — `tools/memory-tree/check-verdict-epoch.sh` (+ self-test): the kit version DATES the engine's verdicts, so a diff that moves a non-comment line of `check-memory-hygiene.sh` must move `KIT_MEMORY_TREE_VERSION` too — `hygiene-parity.test.sh` derives its baseline floor from that constant, and a stale one made the floor point before the change

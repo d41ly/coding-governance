@@ -88,6 +88,33 @@ else
     "the gate reports $LIMIT — the ceiling moved and no other arm in this file would notice"
 fi
 
+# --- A14-A18 · the four-layer resolution, each arm pinning WHICH layer won -----------------------
+# Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
+# its legs concurrently, so an arm that mutates a tracked file races every other leg.
+LIM="$TMP/limits"
+printf '%s	%d
+' "parallel-coding-governance.template.md" 40000 > "$LIM"
+# 40000 is deliberately NOT the hard default. The declared value and the default are both 49152 in
+# the shipped tree, so an arm using 49152 would pass whether or not the declaration is read at all —
+# 49152 -> 49152 proves nothing. That is the assertion-between-two-derived-values class one step
+# removed, and it is what the first draft of this arm did.
+expect_out "A14 the DECLARED row supplies the limit"   "/ 40000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
+expect_out "A15 a positional beats the declaration"   "/ 45000 bytes" 0 bash "$GATE" "$TEMPLATE" 45000 "" "$LIM"
+# The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
+out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
+case "$out" in
+  */\ 40000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
+  *) say_fail "A16 the declaration beats the environment" "expected 40000; got: $out" ;;
+esac
+# A subject with NO row falls through to the environment, then to the default.
+mkfile 100 "$TMP/undeclared"
+expect_out "A17 an undeclared subject still honours the environment"   "/ 4242 bytes" 0 env MAX_BYTES=4242 bash "$GATE" "$TMP/undeclared" "" "" "$LIM"
+expect_out "A18 an undeclared subject with no env falls to the hard default"   "/ 49152 bytes" 0 bash "$GATE" "$TMP/undeclared" "" "" "$LIM"
+# A19 · a non-numeric declared row is a NAMED failure, not a shell error.
+printf '%s	%s
+' "$TMP/undeclared" "not-a-number" > "$TMP/limits-bad"
+expect_out "A19 a non-numeric declared limit is a NAMED failure"   "the declared size limit for this subject is not a number: '" 5   bash "$GATE" "$TMP/undeclared" "" "" "$TMP/limits-bad"
+
 # --- A1 · a file of exactly MAX_BYTES ----------------------------------------------------------
 mkfile "$LIMIT" "$TMP/at"
 expect_out "A1 at the limit exits 0" "template-size OK" 0 bash "$GATE" "$TMP/at"
