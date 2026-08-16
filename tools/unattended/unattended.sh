@@ -1057,7 +1057,11 @@ verb_preflight() { # slug · keepalive-id
     done
   fi
   stage_or_fail "$rel" || return 1
-  echo "unattended: preflight OK — base $base · anchor $AREF at $ASHA · keepalive $kid · region copied from $src"
+  # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
+  # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
+  # Printing the observation would be the same lie in the operator's face that the unconditional
+  # base write was on disk, one field over.
+  echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
   return 0
 }
 
@@ -1230,9 +1234,15 @@ dod_met() { # slug · run-state file · item · checker
       # review said, and no verdict grammar is anchored: `^## Verdict: CLEAN` matches zero of this
       # corpus's 46 records, so anchoring one would make the item unsatisfiable against every review
       # this repo has ever written.
+      # SEVEN characters, not eight. Git's default abbreviation here is seven, so that is how records
+      # spell it: measured, 29 of 48 tracked records use seven and an eight-char needle matched NONE
+      # of them, this build's own record included. The item was therefore UNMEETABLE and clearable
+      # only by a self-authored override, which is the one shape this kit exists to refuse. Seven is
+      # a floor rather than a lucky number: a shorter prefix is a prefix of every longer spelling, so
+      # it still matches a record written at eight, ten or forty.
       rb=$(fact "$rel" base)
-      [ ${#rb} -ge 8 ] \
-        && GIT grep --cached -qF -- "${rb:0:8}" -- "$M/builds/$slug/reviews/*.md" ;;
+      [ ${#rb} -ge 7 ] \
+        && GIT grep --cached -qF -- "${rb:0:7}" -- "$M/builds/$slug/reviews/*.md" ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)

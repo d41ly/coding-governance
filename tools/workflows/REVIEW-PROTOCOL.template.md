@@ -172,6 +172,6 @@ on one unescaped backslash and regenerating whole.
   `system-reminder` holding `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, and a
   `SubagentStart` hook fired and was obeyed, arriving with its own verbatim header. No
   `SessionStart`-shaped injection was observed — recorded as not-observed rather than as absent.
-  Evidence: the parallelism-routes recording under `memory/builds/cBriefedPilot/build/`.
+  Measured by dispatching a probe and asking it to report what arrived before it read anything.
   The cap is still enforced at the tool call rather than inside the script, but because the
   orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.

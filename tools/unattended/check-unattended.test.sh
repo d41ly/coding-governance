@@ -832,6 +832,17 @@ hit "$out" "the protocol's Definition-of-Done table yields no item row, so the D
 miss "$out" "absent from the protocol's table"
 reset_tree
 
+# E, the COUNT SENTENCE: the rows can all be right while the prose above them miscounts, which is
+# exactly what shipped — an eight-row table under a sentence saying six, in both copies, parity green.
+reset_tree; pedit 's/^Eight kit-owned core items\./Six kit-owned core items./'
+hit "$(run)" "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '"
+
+# ...and the sentence gone entirely. Absence is its own refusal for the reason every locator here
+# has one: a summary nobody can find is a summary nobody can join.
+reset_tree; pedit 's/^Eight kit-owned core items\. //'
+hit "$(run)" "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
+reset_tree
+
 # ---- `mutate` itself, both ways. The failing direction runs in a SUBSHELL, or the FAIL it is
 # ---- supposed to emit would fail this suite instead of being observed by it.
 reset_tree
@@ -847,7 +858,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=148
+FLOOR_ASSERTIONS=154
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

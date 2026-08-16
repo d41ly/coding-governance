@@ -22,6 +22,17 @@ hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
+# A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
+# real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
+# raw newline (a sed syntax error that edits nothing while reading as written), and a `git fetch` by
+# PATH that moved no remote-tracking ref. Each looked correct and each mutated zero bytes.
+mutate() { # file · sed-script
+  local f="$1" before; before=$(git hash-object "$f")
+  sed -i "$2" "$f"
+  n=$((n+1))
+  [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
+}
+
 cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
@@ -95,7 +106,7 @@ printf 'not front matter at all
 # tNoFm
 ' > memory/builds/tNoFm/README.md
 readme tWrongSlug
-sed -i 's/^slug: tWrongSlug$/slug: someoneElse/' memory/builds/tWrongSlug/README.md
+mutate memory/builds/tWrongSlug/README.md 's/^slug: tWrongSlug$/slug: someoneElse/'
 # A build whose README is on MAIN and which never had a run-state file - S2's subject. Deleting
 # tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
 # would have tested the dirty-tree refusal while claiming to test creation.
@@ -142,16 +153,6 @@ run() { bash "$SCRIPT" "$@" 2>&1; }
 fixture() { git add -A >/dev/null && git commit -q -m fixture --no-verify; }
 sum() { git hash-object memory/builds/tRun/RUN.md; }
 
-# A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
-# real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
-# raw newline (a sed syntax error that edits nothing while reading as written), and a `git fetch` by
-# PATH that moved no remote-tracking ref. Each looked correct and each mutated zero bytes.
-mutate() { # file · sed-script
-  local f="$1" before; before=$(git hash-object "$f")
-  sed -i "$2" "$f"
-  n=$((n+1))
-  [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
-}
 
 # ---- check 1: the slug is validated against hygiene check 4's OWN folder grammar, so a traversal
 # ---- argument is refused by the rule that would have refused the folder. Paired with the no-write
@@ -260,7 +261,7 @@ miss "$out" "rewrote the scope"
 
 # ...the run EDITS its own scope. Same tree, one line changed.
 rreset
-sed -i 's|^1\. the first unit$|1. a unit the owner never wrote|' memory/builds/tRun/README.md
+mutate memory/builds/tRun/README.md 's|^1\. the first unit$|1. a unit the owner never wrote|'
 hit "$(run --preflight tRun --keepalive-id k1)" "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
@@ -425,7 +426,7 @@ hit "$out" "the recorded BASE equals HEAD, so this run built nothing on top of t
 # BRANCH 2 — an ABSENT discriminator FAILS CLOSED. Deleting one line from a run-written file must not
 # be the way past this refusal; the kit's recorded scar is a deleted base line degenerating a
 # comparison to the git index, and this is the same shape one verb over.
-sed -i '/^base: /d' memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/RUN.md '/^base: /d'
 hit "$(run --close tRun)" "the merge-base equals HEAD and the record pins no BASE to tell a landed run from one that built nothing, and an absent discriminator is a refusal rather than a pass"
 
 # BRANCH 3 — a base off the history the anchor blesses. The early return this replaces SKIPPED the
@@ -651,7 +652,21 @@ crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
 
 # GREEN CONTROL: a TRACKED record naming the pinned base, abbreviated to eight, satisfies the item.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "close OK"
+miss "$out" "closing-review-recorded"
+
+# ...and a record spelling the base at EXACTLY SEVEN, the shortest abbreviation git produces here.
+# The join shipped at eight and matched none of this corpus's seven-char records, so the item could
+# only ever be cleared by an override the run wrote for itself. Pinned by name, not by whatever
+# `git rev-parse --short` returns on the machine running this suite.
+cropen; rb=$(crbase)
+printf '# closing review
+
+range %s...HEAD
+' "${rb:0:7}" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 out=$(run --close tRun $crbc)
 hit "$out" "close OK"
@@ -667,7 +682,7 @@ hit "$out" "closing-review-recorded"
 # arm 2 — the record exists in the WORKING TREE and is not tracked. `--cached` reads the index, so
 # this is excluded by construction rather than by a filter; without --cached it would pass.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
 
 # arm 3 — a tracked record that names a DIFFERENT sha. The record exists and the join still refuses,
@@ -682,7 +697,7 @@ hit "$(run --close tRun $crbc)" "closing-review-recorded"
 # every file, so without the >=8 test this arm would SELECT that record and the item would pass by
 # finding anything — the same degeneration an empty base once caused in check_authorization.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
@@ -690,7 +705,7 @@ hit "$(run --close tRun $crbc)" "closing-review-recorded"
 # arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
 # because "absent" and "too short to be a needle" reach the guard by different routes.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
@@ -1348,7 +1363,7 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=249
+FLOOR_ASSERTIONS=254
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

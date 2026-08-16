@@ -146,15 +146,22 @@ section rots silently and is worth re-deriving whenever the feature is touched.*
   and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
   above, and it was owned by nobody until this dossier row.
 
-- **The DIRECTIVE LAYER is half-gated, and the ungated half is the enforcement.** The registry is
-  joined to the Skill's table in both directions by check 16, and every cited method section is
-  resolved. What is NOT gated is the parked waiver record: check 17 was built, proven on three
-  forgeries, and PARKED unbuilt because its arms need a harness this build damaged. So a waiver's
-  shape and its provenance are unchecked on the bar today.
-- **Two Definition-of-Done items are specced and absent.** `build-complete` and
-  `closing-review-recorded` are both parked, because each needs every close-path arm to run against
-  a fixture the shared one cannot supply. `--close` therefore still blocks on nothing where
-  completeness is concerned, which is the half of D8 that did not ship.
+- **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
+  both directions by check 16, every cited method section resolves, and the protocol's own §3 phase
+  list, §4 DoD table and the count sentence above it are joined to the driver's constants by arms D
+  and E. Check 17 grades the parked waiver record: a declared handle, a non-empty reason, and the
+  whole line present in the run-state file's FIRST committed blob. Its green control's waiver is
+  written by `--preflight --waive` rather than by hand, which is the cross-component arm
+  `TOOL-aStandingWrit-8` asked for. Two exemptions are deliberate and each carries its reason in
+  source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
+  against a moving directive set is a red wedge no verb can repair, and the git join is silent when
+  the record has no committed blob.
+- **Both Definition-of-Done items shipped.** `build-complete` is a five-term conjunction over the
+  authored roster and the run-state file's copied region; `closing-review-recorded` joins the pinned
+  BASE to a tracked review record. `CORE_FLOOR` is `10:8`. The base needle is SEVEN characters, not
+  eight: git abbreviates to seven here, 29 of 48 tracked records spell it that way, and the
+  eight-char form shipped briefly and matched none of them — an item clearable only by an override
+  the run wrote for itself.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.

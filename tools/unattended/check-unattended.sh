@@ -252,12 +252,17 @@ while IFS= read -r f; do
   # ---- build after its own run aborted. A finished record is a SNAPSHOT of what that run saw, not
   # ---- a live view, and demanding it track a moving README is demanding the edit check 26 forbids.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ] && ! case " $PHASES_TERMINAL " in *" $ph "*) true ;; *) false ;; esac; then
+  if [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
       fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
     b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
       fail 8 "a build README's generated markers are malformed, so the copy has no source to be compared with: $rd"
-    [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f"
+    # Only the EQUALITY is exempt on a terminal record. The two marker-shape refusals above are NOT:
+    # a malformed marker is malformed whatever the phase says, and scoping the exemption to the whole
+    # block left this kit's only marker validator guarding zero files the moment a run ended.
+    case " $PHASES_TERMINAL " in *" $ph "*) ;;
+      *) [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f" ;;
+    esac
   fi
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
@@ -386,9 +391,11 @@ while IFS= read -r f; do
     # separator would make this parse ambiguous, which is why unit 3 refuses a newline in one.
     wh=${wl#* waiver · item }; wh=${wh%% · reason *}
     wr=${wl#* · reason }
-    case " $DIRECTIVES_CORE $DIRECTIVES_EXTRA " in
-      *" $wh:"*) ;;
-      *) fail 17 "a parked waiver names a handle outside the effective directive set, so the record claims a relaxation of a rule no verb would have accepted: $wh in $f" ;;
+    case " $PHASES_TERMINAL " in *" $ph "*) ;;
+      *) case " $DIRECTIVES_CORE $DIRECTIVES_EXTRA " in
+           *" $wh:"*) ;;
+           *) fail 17 "a parked waiver names a handle outside the effective directive set, so the record claims a relaxation of a rule no verb would have accepted: $wh in $f" ;;
+         esac ;;
     esac
     [ -n "$wr" ] \
       || fail 17 "a parked waiver carries an empty reason, and a waiver recording no reason is indistinguishable from one nobody meant: $wh in $f"
@@ -403,7 +410,7 @@ while IFS= read -r f; do
         || fail 17 "a parked waiver line is absent from the run-state file's FIRST committed blob, so it was appended after the record was created and the claim that the owner took it at preflight is not what landed: $wh in $f"
     fi
   done <<WAIVERS
-$(grep -F ' waiver · item ' "$f" 2>/dev/null | grep -F ' · reason ' || true)
+$(tr -d '' < "$f" 2>/dev/null | grep -E '^[0-9][0-9-]*T[0-9:]*Z waiver · item [^ ]* · reason ' || true)
 WAIVERS
 done <<EOF
 $RUNS
@@ -564,6 +571,23 @@ if [ -f "$proto" ]; then
     ed2=$(comm -13 <(printf '%s\n' "$dcore") <(printf '%s\n' "$pdod"))
     [ -z "$ed1" ] || fail 16 "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about: $ed1"
     [ -z "$ed2" ] || fail 16 "the protocol's Definition-of-Done table names an item the driver does not carry, so the contract publishes a gate nothing evaluates: $ed2"
+    # ...and the COUNT SENTENCE above the table, joined to the same set. This is the finding that
+    # earned the arm: the table grew to eight rows while the sentence directly above it still said
+    # six, in BOTH copies, so the parity leg was green over a document contradicting itself. A row
+    # join cannot see a miscount, because the rows were right and only the prose was wrong.
+    cw=$(tr -d '\r' < "$proto" | sed -n 's/^\([A-Za-z]*\) kit-owned core items\..*/\1/p' | head -1)
+    if [ -z "$cw" ]; then
+      fail 16 "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
+    else
+      case "$(printf '%s' "$cw" | tr 'A-Z' 'a-z')" in
+        one) cn=1 ;; two) cn=2 ;; three) cn=3 ;; four) cn=4 ;; five) cn=5 ;; six) cn=6 ;;
+        seven) cn=7 ;; eight) cn=8 ;; nine) cn=9 ;; ten) cn=10 ;; eleven) cn=11 ;; twelve) cn=12 ;;
+        *) cn=-1 ;;
+      esac
+      ndod=$(printf '%s
+' "$dcore" | grep -c . || true)
+      [ "$cn" = "$ndod" ]         || fail 16 "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '$cw', driver carries $ndod"
+    fi
   fi
 fi
 

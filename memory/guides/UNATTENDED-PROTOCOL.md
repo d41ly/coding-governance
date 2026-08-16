@@ -145,7 +145,7 @@ deny) or pick one arbitrarily (nondeterminism, which is the worst property a gat
 
 ## 4. The Definition of Done
 
-Six kit-owned core items. Each names its checker, because an override budget must not be spent on
+Eight kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
