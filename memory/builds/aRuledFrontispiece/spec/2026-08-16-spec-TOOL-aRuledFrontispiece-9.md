@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -48,6 +48,12 @@ template the live file renders from.
 - Changing the fan-out and concurrency caps. `memory/guides/REVIEW-PROTOCOL.md` owns HOW MANY;
   M6 owns WHICH, and the pointer between them stays exactly as it is.
 - Retrofitting build READMEs whose Units tables were authored under the old M2 reading.
+- **Absorbing, pre-empting or restating `TOOL-cBriefedPilot-15`.** That spec is OPEN on node `c` and
+  rewrites the SAME M6 paragraph: its branch A replaces M6's opening sentence, `**Sequence is the
+  default; parallelism is a claim you substantiate.**`, in the same template, and re-renders the same
+  live copy. Its own S3 holds M6's three conditions byte-identical — which is precisely the half S3
+  here rewrites — so the two changes are disjoint in content and neither may carry the other. §4
+  Migration prices the collision, which is positional and not resolvable by any driver on this bar.
 
 ## 4. Design
 
@@ -91,11 +97,54 @@ two edits to the run-state file. What stops being a collision is an artifact nei
 because the render is a function of the authored set and running it once after the join is both
 cheaper and the only way to get a correct answer.
 
+**The correction does not retroactively falsify this build's own order declaration**, and that was
+checked pair by pair rather than assumed. The build README declares a TOTAL order with no parallel
+lane, at the eleven positions of its `#` column. Corrected clause 1 still refuses the pairs that
+order actually contains, because the correction removes only DERIVED artifacts from the write set
+and this build's units collide on AUTHORED source: the three region units at orders 3, 4 and 5 all
+write `tools/memory-tree/gen_build_index.py`, which the README already names as the reason they
+sequence. Where corrected clause 1 stops refusing a pair, corrected clause 2 still does — orders 9
+and 10 write the authored and the derived halves of the same READMEs, and order 10 re-renders what
+order 9 restructured, so it depends on order 9's output and clause 2's dependency half sequences
+them. The corrected M6 also keeps `Sequence is the default`, so declaring a total order can never be
+a violation of it.
+
+What the correction retires is the README's SECOND reason, not its declaration. That reason — under
+M6 as written no two passes of any build in this repo can run concurrently — stops being why this
+build is sequential once S3 lands; the authored write-set intersection is. The README hands this unit
+the vacuity as its subject and calls this build its first evidence, so the record already anticipates
+the change, and stating it here is what keeps the record right for the reason that survives.
+
 ### Migration
 
 Edit the template, re-render, re-stamp the manifest. Nothing else in the corpus reads these rules
 mechanically, and `tools/memory-tree/check-method-carriers.sh` is structural: it catches a copied
 `## M<n>` section in a file outside the memory root, and this unit creates none.
+
+**The sibling on node `c`.** `TOOL-cBriefedPilot-15` is OPEN, Tier-2, `base 37c05e1b`, and its
+backlog row at `memory/backlog/TOOL.md:55` is OPEN. The two edits are disjoint in content and collide
+in POSITION: at `base 96141aed` M6's opening sentence and the start of clause 1 share ONE line — line
+148 of `tools/memory-tree/BUILD-METHOD.template.md` and line 148 of `memory/guides/BUILD-METHOD.md`,
+the same bytes in both — so the sibling's replacement and this unit's clause rewrite land in the same
+hunk of the same line of both halves of the rendered pair.
+
+`git check-attr merge` reports `unspecified` for both files. The row-keyed driver that auto-resolves
+`memory/DECISIONS.md` and `memory/backlog/*.md` does not cover this pair, so the fallback is
+`git merge-file` and a conflict on line 148 is the failure mode. Neither edit can be merged into the
+other's text mechanically.
+
+**This unit lands first**, as a scheduling fact rather than a preference.
+`TOOL-cBriefedPilot-15` picks its branch from `TOOL-cBriefedPilot-21`'s verdict token — `parallelism
+route: <R-id>` or `parallelism route: none` — so it cannot land in either branch until that unit
+records one, and neither has landed. This unit has no such precondition. Whoever lands second
+re-applies one sentence by hand against the other's text, in the TEMPLATE, and re-renders:
+`kit-dogfood-parity.test.sh` reds a half-merged pair, and the live copy is never the merge target.
+
+Order matters for a second reason. The sibling's branch A makes concurrency OWED under a standing
+mandate for any pair meeting the three conditions, and this unit widens which pairs meet them. Landed
+in that order, the inversion applies to the corrected conditions and obliges concurrency for pairs
+the conditions refuse today. That composition is the sibling's to price against whatever this unit
+has already landed, which is another reason the loser of the race re-derives rather than replays.
 
 M1's rule that nothing here is stated anywhere else was checked against source for all three edits.
 `memory/guides/REVIEW-PROTOCOL.md` states agent counts and concurrency ceilings and no write-set
@@ -159,12 +208,19 @@ spending the cap to explain the cap inverts the reason for it.
   it admits them, whereas at `base 96141aed` clause 3 refuses them on the build README alone.
 - **AC5** — When M6's parallelism test is applied to two passes both appending to
   `memory/backlog/TOOL.md`, it still refuses them.
-- **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, checks 6 and 16 are clean and
-  `python tools/memory-tree/corpus_ids.py` reports a read-path total no higher than 70268 bytes.
+- **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, checks 6 and 16 are clean
+  against `READ_PATH_CEILING`, which is `86476` in `.memory-tree.conf` and is the only number check 16
+  asserts, and the read-path total `python tools/memory-tree/corpus_ids.py` reports is no higher than
+  at this unit's own PARENT commit. The total is not this unit's to pin: `memory/DECISIONS.md` and
+  `memory/LIVE.md` are members of the same read set and grow with every unit of this build, so the
+  70268 B measured at `base 96141aed` is stale by order 8 through no act of this unit.
 - **AC7** — When `bash skills/session-kickoff/manifest-check.sh` runs after the edit, C5 is clean,
   which it is not if `memory/guides/BUILD-METHOD.md` moved without a `last-audit` re-stamp.
 - **AC8** — When `bash tools/check-kit-versions.sh` runs, it is clean and the `gov:kit memory-tree@`
   marker on both files is unchanged from `base 96141aed`.
+- **AC9** — When `git diff 96141aed -- tools/memory-tree/BUILD-METHOD.template.md` is read at this
+  unit's tip, the sentence `**Sequence is the default; parallelism is a claim you substantiate.**` is
+  byte-unchanged, so `TOOL-cBriefedPilot-15`'s branch A still has the exact string its S2 replaces.
 
 ## 7. Gates
 
@@ -183,6 +239,17 @@ records M6's vacuity as this unit's subject and this build as its first evidence
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft.
+- rev-2 · 2026-08-16 · folded the M4 spec audit. The HIGH row "rewrites the same M6 paragraph as an
+  OPEN spec on another node, and never names it": `TOOL-cBriefedPilot-15` is now cited in §3, §4
+  Migration and §10, with the collision measured — both edits land on line 148 of both halves of the
+  rendered pair, `git check-attr merge` is `unspecified` there, and this unit lands first because the
+  sibling is gated on `TOOL-cBriefedPilot-21`'s verdict token. AC9 pins the sentence the sibling
+  replaces as byte-unchanged. §4 Data model adds the check that the correction does not falsify this
+  build's own total-order declaration under owner decision 4's `#` column, verified pair by pair.
+  Found while folding, same class as the set-level MEDIUM the audit raised against other specs: AC6
+  pinned the read-path TOTAL at the 70268 B measured at `base 96141aed`, a shared figure that grows
+  with `memory/DECISIONS.md` and `memory/LIVE.md` through every unit of this build and that check 16
+  does not assert. It now names `READ_PATH_CEILING` and this unit's own parent commit.
 
 ## 10. Reuse audit
 
@@ -196,6 +263,7 @@ budget`.
 | know what `ids:` actually holds | `apply_front_matter_ids` at `gen_build_index.py:473` and `rosters` at `:260` | REUSE unchanged — this unit describes it, never changes it |
 | keep the live copy under a read budget | hygiene checks 6 and 16 | REUSE unchanged — S5 keeps the file inside both without moving either |
 | re-stamp a watched manifest | `manifest-check.sh` C5 and the stamp rule in the manifest's own ratchet section | REUSE unchanged |
+| edit M6 without colliding with the open sibling that also edits it | `TOOL-cBriefedPilot-15` branch A, over line 148 of both halves of the pair | NO SEAM — `git check-attr merge` is `unspecified` for both files, so the collision is hand-resolved by whoever lands second |
 
 The map probe for "render a governance document from a shipped template" returned
 `kit-dogfood-parity.PAIRS` under the `build-method` dossier as the only seam for this pair, and the

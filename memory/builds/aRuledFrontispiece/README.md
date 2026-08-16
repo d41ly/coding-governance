@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10
+ids: TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
 ---
 
 # aRuledFrontispiece — the build README becomes a generated, gated surface
@@ -47,13 +47,18 @@ render the authored plan as derived output.
 
 `TOOL-aMouldedFolio-1` refused a front-matter SCHEMA and made `ids:` derived rather than validated,
 on the ground that parity and freshness gates are TRUTH-BLIND — both stay green over a
-self-consistent wrong render. Unit 3 adds front-matter keys and must state why they are not the
-refused schema, or record a falsification.
+self-consistent wrong render. `TOOL-aRuledFrontispiece-3` adds a front-matter key and must state why
+it is not the refused schema, or record a falsification.
+
+**Below this line, every unit is named by ID, never as "unit N".** The `#` column of the Units table
+is build ORDER and the id sequence is MINT order, and they stopped agreeing the moment the audit
+reordered the build. An earlier version of this file used the bare word for both.
 
 `TOOL-aMouldedFolio-2` S4 renders the FULL roster in the build README and only its COUNT in
 `LIVE.md` and the ledger shards. That decision is what makes the `**Build status:**` line the widest
-in the corpus, and it is the line fork 3's cap now refuses. Unit 5 keeps the full roster and wraps
-it; replacing it with a count would reverse a recorded decision and belongs in a spec that says so.
+in the corpus, and it is the line fork 3's cap now refuses. `TOOL-aRuledFrontispiece-5` keeps the
+full roster and wraps it; replacing it with a count would reverse a recorded decision and belongs in
+a spec that says so.
 `render_region`'s own comment says `unit(s)` and `ids` answer different questions and are
 deliberately not reconciled, which is the same decision stated in the code.
 
@@ -71,31 +76,33 @@ The remedy is NOT symmetric between the two, and an earlier revision of this sec
 Wrapping the `**Build status:**` line is a renderer change. Wrapping the `ids:` line is not: front
 matter is parsed as `key: value` at column 0 by `parse_front_matter`, which refuses an indented
 continuation, and `check-unattended.sh` check 13 parses the same block. That makes it a parser change
-touching every reader. Unit 5 takes a third route instead — excluding the front-matter block from
-check 7's measurement, which is scoping WITHIN a file of the kind check 7 already does for fenced
-blocks. That route is wider than fork 3's literal words and is parked for the owner below.
+touching every reader. `TOOL-aRuledFrontispiece-5` takes a third route instead — excluding the
+front-matter block from check 7's measurement, which is scoping WITHIN a file of the kind check 7
+already does for fenced blocks. That route is wider than fork 3's literal words, which is why it was
+parked; the owner RESOLVED it on 2026-08-16 as P2, having been told it was wider before deciding.
 
 Check 7's 300-character budget is a single hardcoded literal in one `awk` pass over the whole index
 set, so fork 3's relaxed tier cannot be a global bump — it needs a per-class cap, the same way
 `guides/` already carries its own byte and line budget.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 10 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10
+**Build status:** OPEN · 11 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | OPEN | rev-2 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-5 — the build README joins the hygiene index set at its own cap tier](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-6 — the slot contract becomes a leg of its own on the merge bar](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md) | OPEN | rev-1 | 2026-08-16 |
-| [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | OPEN | rev-1 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | OPEN | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-5 — the build README joins the hygiene index set at its own cap tier](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-6 — the slot contract becomes a leg of its own on the merge bar](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | OPEN | rev-2 | 2026-08-16 |
+| [TOOL-aRuledFrontispiece-11 — the corpus is conformed to the slot contract, by hand](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md) | OPEN | rev-1 | 2026-08-17 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -134,16 +141,23 @@ rather than forgotten.
 
 | # | Id | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the slot contract — the plan pair and the one bounded prose block |
+| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the slot contract, the `--check-format` verb, and region auto-insertion |
 | 2 | `TOOL-aRuledFrontispiece-8` | 2 | the unattended check-8 terminal-phase carve-out |
 | 3 | `TOOL-aRuledFrontispiece-2` | 2 | build order — one status-header verb and its region |
 | 4 | `TOOL-aRuledFrontispiece-3` | 2 | dependency edges — one front-matter key and its region |
 | 5 | `TOOL-aRuledFrontispiece-4` | 2 | the document inventory region |
-| 6 | `TOOL-aRuledFrontispiece-5` | 2 | index-set membership at the relaxed cap tier |
+| 6 | `TOOL-aRuledFrontispiece-5` | 2 | index-set membership at the relaxed cap tier, with its own re-render |
 | 7 | `TOOL-aRuledFrontispiece-7` | 1 | the status-file retirement |
 | 8 | `TOOL-aRuledFrontispiece-9` | 2 | the build method's roster and parallelism contract |
-| 9 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus retrofit and the kit version bump |
-| 10 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg on the merge bar |
+| 9 | `TOOL-aRuledFrontispiece-11` | 2 | the corpus surgery — authored prose relocated, plans wrapped |
+| 10 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus re-render and the kit version bump |
+| 11 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg on the merge bar |
+
+**Unit 11 was created by the M4 spec audit, not planned.** The audit returned BLOCKED with seven
+blockers, five of them against the retrofit unit, which had accumulated four mechanisms: wrapping
+rosters, relocating prose, re-rendering, and the version bump. It also claimed authored bytes the leg
+unit claimed, with no document naming the loser. Splitting the authored surgery out resolves four of
+the seven and restores M2's one-mechanism-per-spec rule.
 
 **The `#` column is BUILD ORDER and the id sequence is MINT order.** They are different questions and
 this build is the case that separates them: `TOOL-aRuledFrontispiece-8` was minted eighth and builds
@@ -195,9 +209,17 @@ and does not claim a parallel lane it cannot substantiate.
 - **`KIT_MEMORY_TREE_VERSION` moves once, in unit 10.** The verdict-epoch leg requires the constant
   to move whenever a non-comment line of the hygiene engine moves, and seven spellings mirror it. A
   unit bumping it mid-build would date the engine's verdicts against a partial change.
-- **The version bump and the corpus retrofit are the same unit but not the same commit.** The
-  generator, its arms and the leg land before any README is re-rendered, so the retrofit commit is a
-  pure re-render reviewable as `--check` output rather than as a 38-file diff.
+- **The corpus is touched twice, by two units, and only one of those is a re-render.** An earlier
+  version of this rule said the retrofit commit is "a pure re-render reviewable as `--check` output
+  rather than as a 38-file diff". That stopped being true when the owner chose the position-bound
+  prose contract on 2026-08-16: conforming the corpus means MOVING authored sections in a double-digit
+  number of build READMEs, which no `--check` output can review and which belongs to other nodes'
+  build records. Unit 9 of the order does that surgery, in one commit, touching no generated byte and
+  carrying a per-file record because the diff alone is not reviewable. Unit 10 of the order is the
+  re-render, and it IS reviewable as `--check` output, because by then nothing authored is moving.
+- **No unit hand-inserts a generated marker pair.** `--write` creates a missing pair at its canonical
+  slot. Without that, the three region units would each ship a renderer with no call site anywhere in
+  the corpus — the largest defect the spec audit found, and one no single spec owned.
 - **`memory/DECISIONS.md` is append-only.** A unit that reverses `TOOL-aMouldedFolio-1` or
   `TOOL-aMouldedFolio-2` mints a new id naming the record it supersedes; it never edits it.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**

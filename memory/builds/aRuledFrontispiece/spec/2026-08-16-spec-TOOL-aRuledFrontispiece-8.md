@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -19,19 +19,30 @@ terminal phase, keep the two shape refusals at every phase, and price the escape
   property of the file on disk, not of the run that wrote it, and a terminal record with an unpaired
   marker is a defect whoever is asked to read it next.
 - **S3** — a new refusal guards the carve-out against widening: `PHASES_TERMINAL` must be non-empty
-  and a PROPER subset of the effective vocabulary. A terminal set equal to the vocabulary makes every
-  run terminal, which disables check 8 for the whole population and is the failure mode this unit is
-  most exposed to. Check 2 today refuses a terminal phase OUTSIDE the vocabulary and refuses neither
-  the empty set nor the total one.
+  and a PROPER subset of `PHASES_CORE`. **The denominator is the CORE set, never the effective one,
+  and the two are not interchangeable.** The leg composes `PHASES="$PHASES_CORE $PHASES_EXTRA"` at
+  `tools/unattended/check-unattended.sh:82` from the project's `.unattended.conf`, so a proper-subset
+  test against the effective vocabulary is satisfied by declaring one extra phase while
+  `PHASES_TERMINAL` covers every core phase — the project-defeatable shape §4 rejects for the conf
+  key, reached through the denominator instead. It looks equivalent here only because this repo
+  declares `PHASES_EXTRA=""`, which is the accident that makes a vacuous arm score green. The
+  refusal is ONE branch carrying both conditions, so S5's floor moves by one and not two. Check 2 is
+  the other question and keeps the other denominator: it asks whether a run could ever REACH a
+  terminal phase, and a run's phase is validated against the effective set at
+  `check-unattended.sh:208`, so `check-unattended.sh:121` is right to read `$PHASES`.
+  Neither refusal is vacuous, because `PHASES_CORE` and `PHASES_TERMINAL` are declared independently
+  at `tools/unattended/unattended.sh:73` and `:74` and neither is composed from the other — the same
+  falsifiability argument the comment above check 2 already makes.
 - **S4** — both directions are armed in `tools/unattended/check-unattended.test.sh`: the existing
   drift fixture still HITS its message at a non-terminal phase, and MISSES it once the same fixture's
   phase is moved to a terminal one. A one-directional arm here proves the skip fires and proves
   nothing about what survives it.
 - **S5** — `ARMS_FLOORS` in `.memory-tree.conf` is re-measured for this gate. The pair is
   `tools/unattended/check-unattended.sh:39:39` today and becomes `40:40` with S3's branch.
-- **S6** — `KIT_UNATTENDED_VERSION` moves in both literals, `tools/unattended/unattended.sh:17` and
-  `tools/unattended/check-unattended.sh:17`. The kit is copy-installed, so two adopters holding the
-  same version string must hold the same refusals.
+- **S6** — `KIT_UNATTENDED_VERSION` moves in both literals, `tools/unattended/unattended.sh:32` and
+  `tools/unattended/check-unattended.sh:17`. The two are not at the same line and an earlier revision
+  of this item said they were; both read `1.4` today. The kit is copy-installed, so two adopters
+  holding the same version string must hold the same refusals.
 - **S7** — the reason for the carve-out, and its residual, are written at the branch in
   `check-unattended.sh`. That file's own convention is that an honest limit belongs beside the code
   rather than in a document nobody reads at the same time, and check 13's comment block says so.
@@ -143,8 +154,13 @@ Reading `PHASES_TERMINAL` from the driver keeps the set where the refusals that 
   longer emits that message, and the fixture differs from the green case in `phase:` alone.
 - **AC4** — When a terminal run-state file's `<!-- /run:generated -->` marker is deleted, the run
   still fails naming that file, so the carve-out did not take the shape refusals with it.
-- **AC5** — When the driver's `PHASES_TERMINAL` is set to the whole of `PHASES_CORE` in a fixture,
-  `bash tools/unattended/check-unattended.sh` fails rather than passing a tree it no longer compares.
+- **AC5** — When a fixture sets the driver's `PHASES_TERMINAL` to the whole of `PHASES_CORE` AND
+  declares a `PHASES_EXTRA` phase in `.unattended.conf`, `bash tools/unattended/check-unattended.sh`
+  fails rather than passing a tree it no longer compares. That combination is the arm that
+  discriminates the two denominators: the terminal set is then a proper subset of the effective
+  vocabulary and equal to the core one, so an implementation reading `$PHASES` passes a tree in which
+  every reachable run is terminal. A second fixture setting `PHASES_TERMINAL=""` fails on the same
+  branch.
 - **AC6** — When `python tools/memory-tree/check-arms.py --check` runs at this unit's tip, it is clean
   with `ARMS_FLOORS` reading `tools/unattended/check-unattended.sh:40:40`.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it is clean, and `KIT_UNATTENDED_VERSION`
@@ -165,9 +181,24 @@ none — fork 7 at the build README resolved the two LANDED run-state files to a
 carve-out in this check, and §4's rejected alternatives record the two options it beat rather than
 re-opening them.
 
+The one park this unit raised is now closed. **P5 at the build README — `KIT_UNATTENDED_VERSION`
+moves although no gate compels it.** RESOLVED (owner, 2026-08-16): the bump stands as S6 writes it.
+The owner accepted the author's reason rather than the cheapness of the reversal — the kit is
+copy-installed, so without the bump two adopters can hold one version string over different
+refusals, and nothing on the bar can tell them apart. `tools/check-kit-versions.sh` asserts only that
+the driver's literal and the leg's literal agree with each other; it cannot assert that a given
+version means one set of behaviours, which is exactly what an adopter reads it as.
+
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft.
+- rev-2 · 2026-08-16 · folded the M4 spec audit. The MEDIUM row "S3's denominator and AC5's differ":
+  S3 now names ONE denominator, `PHASES_CORE`, states why the effective set is project-defeatable
+  through `PHASES_EXTRA` and therefore falls to §4's own rejection, and records that the two look
+  equivalent here only because this repo declares no extra phases. AC5 gains the `PHASES_EXTRA` leg
+  that actually discriminates the two readings. The LOW row "S6 cites the driver's line 17": the
+  literal is at `tools/unattended/unattended.sh:32`, re-measured. P5 is marked RESOLVED (owner,
+  2026-08-16) in §8 with the reason the owner accepted.
 
 ## 10. Reuse audit
 
