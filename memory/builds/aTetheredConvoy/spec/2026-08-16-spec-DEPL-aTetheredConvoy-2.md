@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -30,10 +30,12 @@ already carries everything an update needs, a record nothing reads.
   never touched, and every schema-1 ROLE is treated as untrusted: unit 1 measured that a schema-1
   receipt stamps `engine` on a file its descriptor declares `project-owned`, so `update` re-resolves
   the role from the descriptor at the receipt's commit and refuses the row when the two disagree.
-- **S6 — the verdict table is COMPLETE over the role enum, and a gate says so.** A `selfcheck` arm
-  asserts every role in unit 1's frozen table has a row in `update`'s dispatch — refusal counts as a
-  row, silence does not. This is what makes later units' new roles impossible to leave behind: unit 5
-  fills `rendered`, unit 6 fills `merged`, and each reds this arm until it does.
+- **S6 — the dispatch is COMPLETE over BOTH enumerations, and a gate says so.** One `selfcheck` arm
+  asserts every role in unit 1's frozen table has a row in `update`'s role dispatch; a second asserts
+  every CELL of §4's two-comparison verdict grid has a verdict. Refusal counts as a row, silence does
+  not. The second arm exists because the first structurally cannot see a missing grid cell — which is
+  how rev-1 shipped a grid with no answer for a file deleted on both sides. Unit 6 fills `merged`, and
+  reds this arm until it does.
 - **S7 — the receipt is rewritten after a write**, recording what each row was before and after, so a
   rollback is the receipt's own inverse rather than a guess.
 
@@ -65,20 +67,28 @@ this unit carries and must fill the `merged` verdict row in the same diff.
 
 All comparisons on sha256.
 
+`theirs absent` is evaluated FIRST, as its own column-2 value, across every column-1 state. rev-1 put
+it on the `equal` row only, which routed an edited-and-withdrawn file to `diverged` — contradicting
+the prose below it — and sent a doubly-deleted file to `missing`, which would have tried to restore a
+blob that does not exist.
+
 | ours vs receipt | theirs vs base | verdict | `--write` action |
 |---|---|---|---|
+| equal | `theirs` absent | `withdrawn` | delete, and stage the deletion |
+| differs | `theirs` absent | `patched` | leave untouched; REPORT — gov withdrew it and the target changed it |
+| absent on disk | `theirs` absent | `converged` | nothing; both sides agree it is gone |
 | equal | equal | `current` | nothing |
 | equal | differs | `stale` | write `theirs` |
-| equal | `theirs` absent | `withdrawn` | delete, and stage the deletion |
 | differs | equal | `patched` | leave untouched; REPORT the path and both hashes |
 | differs | differs | `diverged` | three-way; clean merge writes, a conflict leaves and reds |
-| absent on disk | any | `missing` | restore `theirs` |
+| absent on disk | equal or differs | `missing` | restore `theirs` |
 | in no receipt row | — | `unrecorded` | leave untouched; REPORT |
 
 `withdrawn` is the only verdict that deletes, and it deletes only where `ours` still equals the
-receipt. A file gov no longer ships that the target has since edited is `patched`, not `withdrawn`.
-Getting that backwards is how an updater destroys work it did not write, and the asymmetry is why the
-verdict is derived from two comparisons rather than one.
+receipt. A file gov no longer ships that the target has since edited is `patched`, which is now a row
+of the table rather than a sentence under it. Getting that backwards is how an updater destroys work
+it did not write, and the asymmetry is why the verdict is derived from two comparisons rather than
+one.
 
 `unrecorded` conflates two states that are indistinguishable from inside the target — "gov wrote this
 and the receipt lost the row" and "the target authored this at a path gov also uses" — and only one
@@ -238,6 +248,13 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit. The verdict grid had `theirs absent` as a value on
+  ONE row, so an edited-and-withdrawn file routed to `diverged` against the prose below it, and a file
+  deleted on both sides routed to `missing` — a restore of a blob that does not exist. It is now a
+  column evaluated first, across every state, with a named no-op verdict for the doubly-deleted case.
+  S6's completeness arm gained the verdict grid alongside the role enum, because an arm quantifying
+  over roles structurally cannot see a missing grid cell, and an obligation assigned to unit 5 that
+  unit 5 never took was struck.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
   execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · split out of the first unit's rev-1, which bundled this verb with the

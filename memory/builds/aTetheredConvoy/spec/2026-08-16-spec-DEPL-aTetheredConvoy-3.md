@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -19,26 +19,47 @@ and one execution close all five.
   the same staleness rule as the existing path exemptions.
 - **S2 — version correspondence, both directions, as a FAILURE.** The cross-check between each
   descriptor's `version_from` and the version gate's own list becomes a problem rather than a note.
-  `version_from` accepts a LIST of tables, because one entry versions three files. A constant claimed
-  by no entry is carried by an `[[exempt_version]]` row with a reason, on the same staleness rule.
-- **S3 — per-file claim inside a kit home.** Every tracked file under an entry's `home` is matched by
-  at least one of that entry's file rules. Derived from `git ls-files`; no new population. This is the
-  arm that catches a file added to a kit whose includes are a literal list.
-- **S4 — the surface widens to `skills/*`.** The deployer's own Skill becomes an exemption carrying
-  its reason. A future skill then reds until a declaration claims it, which is the state every other
+  `version_from` accepts a LIST of tables, because one entry versions three files; a list member
+  resolves against the entry's `home` exactly as the single form does, with `root_relative` as the
+  escape where a member's file sits outside it. **The shape change has a reader nobody would think to
+  look for:** `foreign_kit_present` reads `version_from` as a dict and runs unconditionally before any
+  write, so a list crashes every `apply` with an uncaught attribute error. One normalization helper
+  returns a list of tables and is called by that function AND by the new arms, so the two cannot
+  disagree. A constant claimed by no entry is carried by an `[[exempt_version]]` row with a reason, on
+  the same staleness rule.
+- **S3 — per-file claim inside a kit home, over NON-FLAT entries only.** Every tracked file under a
+  directory-shaped entry's `home` is matched by at least one of that entry's file rules, or by an
+  existing `[[exempt]]` path. Derived from `git ls-files`; no new population. The flat exclusion is a
+  DECISION with a measured reason, not an oversight: five `kind = "flat"` entries declare
+  `home = "tools"` as a source-resolution base, and quantifying over that home would red on every
+  tracked file under `tools/` — hundreds — rather than on the one real exposure. A flat entry's `home`
+  resolves sources; it is not an ownership boundary, and the engine already treats it that way.
+- **S4 — the surface widens to `skills/*`.** That adds TWO depth-1 paths, not one. The deployer's own
+  Skill becomes an exemption carrying its reason; the kickoff engine's tree is claimed by the
+  kickoff-manifest entry, which is `kind = "flat"` and therefore claims no `home` — so it gains an
+  explicit `claims` row instead, and S7 records that this is what `flat` means for the other four flat
+  entries too. A future skill then reds until a declaration claims it, which is the state every other
   tracked deployable surface is already in.
 - **S5 — the deployability leg.** One new gate leg drives `plan` and two `apply` runs for EVERY
   registry entry into a hermetic scratch repo and asserts three things per entry: an entry declaring a
   landable role lands at least one byte; `plan`'s promised destination set equals the receipt's path
-  set; and the second `apply` changes no path and no hash. Every other arm in this build compares a
-  declaration against a declaration. This one executes the product.
+  set; and the second `apply` changes no path and no hash. Three exclusions are STATED rather than
+  discovered — an entry whose adopter is expected to fail is asserted on the land phase only; an entry
+  declaring no landable rule must carry `lands_nothing = "<reason>"` and is asserted on that printed
+  reason; and the three entries carrying a `merged` rule land ZERO bytes until unit 6, because the
+  refusal is entry-scoped and pre-write, so they are asserted on their printed refusal with the target
+  byte-identical. Every other arm in this build compares a declaration against a declaration. This one
+  executes the product.
 - **S6 — an `[[exempt_leg]]` may not name a leg a descriptor also claims**, and the same for
   `[[exempt_version]]`. An exemption and a claim for one fact is the two-spellings class arriving
   through the escape hatch built to prevent it.
-- **S7 — the repairs S1 and S2 surface at base**, listed in §4 rather than discovered by the builder:
-  two version constants absent from the gate's list, three constants no entry claims, two entries that
-  own a file a gov leg runs while declaring no leg, and one prose count inside the file whose own
-  header bans prose counts.
+- **S7 — the repairs S1 through S4 surface at base**, listed in §4 rather than discovered by the
+  builder: two version constants absent from the gate's list; three constants no entry claims, one of
+  which forces a sibling descriptor's own `why_two_ids` sentence to be rewritten in the same diff;
+  two entries that own a file a gov leg runs while declaring no leg; SEVEN descriptor-declared leg
+  names that exist in no manifest leg, repaired in the direction §4 states; the one file under a
+  non-flat home that no rule claims; the kickoff-manifest `claims` row S4 needs; and one prose count
+  inside the file whose own header bans prose counts.
 
 ## 3. Non-goals (OUT)
 
@@ -55,6 +76,10 @@ and one execution close all five.
 - **A second harness asserting the same facts.** S5's leg is per-registry-entry and unit 7's matrix is
   per-repo-shape. Unit 7 CITES this leg for plan-equals-apply and apply-twice rather than re-asserting
   either; the decision is recorded in BOTH specs so it cannot be re-decided by whichever lands second.
+- **Deciding whether a leg SHOULD be red.** S5's merged-rule exclusion asserts a refusal, not a
+  success. Unit 6's SUPERSEDES clause deletes that carve-out and flips those three entries to the
+  land-a-byte assertion in its own diff — the carve-out is a dated statement of the tree, not a
+  permanent exemption, and it is written to expire.
 
 **Assumes:** unit 1 (S5's plan-equals-apply assertion is unit 1's AC4 quantified over every entry) and
 unit 2 (S1 of that unit's role-completeness arm lives in the same `selfcheck`).
@@ -207,7 +232,14 @@ runner ignores. The registry is already the home of "who owns this and why is th
 
 - **AC1** When `python tools/govkit/govkit.py selfcheck` runs, it reds naming the offender for a
   descriptor `[[gate_leg]]` whose name is in no `tools/gate-legs.json` leg, and separately for a
-  manifest leg claimed by no descriptor and carried by no `[[exempt_leg]]`.
+  manifest leg claimed by no descriptor and carried by no `[[exempt_leg]]`. After S7's repairs it is
+  silent over gov: measured at base the first direction fires SEVEN times, so the repair is part of
+  this unit's diff and not a later discovery.
+- **AC1b** When a leg name is emitted into a target by unit 4, it carries no digit-bearing
+  parenthetical, asserted by `python tools/govkit/govkit.py selfcheck` over every descriptor
+  `[[gate_leg]]` name. Gov's manifest names two legs with a count in the name, which unit 6 is separately
+  removing from one of them; a portable leg name is the reason both moves happen in the same
+  direction rather than against each other.
 - **AC2** When an `[[exempt_leg]]` names a leg that no longer exists in the manifest, `selfcheck`
   reds calling it stale; and when a leg is BOTH exempted and claimed by a descriptor, it reds naming
   both sides.
@@ -215,16 +247,25 @@ runner ignores. The registry is already the home of "who owns this and why is th
   gate asserts a constant no entry claims and no `[[exempt_version]]` carries, `selfcheck` exits
   non-zero — measured today the same conditions exit 0 as notes.
 - **AC4** When an entry declares `version_from` as a LIST, every member is resolved and cross-checked
-  independently, asserted against the review-harness entry claiming its three constants.
-- **AC5** When a tracked file under an entry's `home` is matched by none of that entry's file rules,
-  `selfcheck` reds naming the file and the entry.
+  independently, asserted against the review-harness entry claiming its three constants — and
+  `python tools/govkit/govkit.py apply` runs to completion against a selection containing that entry.
+  The second half is not decoration: `foreign_kit_present` reads the field as a dict before any write,
+  so without the normalization helper a list crashes every apply, including ones for other kits.
+- **AC5** When a tracked file under a NON-FLAT entry's `home` is matched by none of that entry's file
+  rules and by no `[[exempt]]` path, `selfcheck` reds naming the file and the entry. Liveness, and the
+  half that matters: a `kind = "flat"` entry contributes ZERO rows to this arm, asserted directly —
+  measured, five flat entries declare `home = "tools"`, and an unscoped predicate reds on every tracked
+  file under it.
 - **AC6** When a tracked directory under `skills/` is claimed by no entry and no exemption,
   `selfcheck` reds; with the exemption row present it is silent; and removing the directory while
   leaving the row reds as stale.
 - **AC7** When `bash tools/govkit/deployability.test.sh` runs, every registry entry declaring at least
-  one landable role lands at least one byte into its own scratch fixture, and the leg prints a DERIVED
-  count of entries examined. Liveness: a run over a registry with zero entries reds rather than
-  passing.
+  one landable role AND carrying no `merged` rule lands at least one byte into its own scratch fixture;
+  an entry declaring no landable rule prints its `lands_nothing` reason; and an entry carrying a
+  `merged` rule prints its refusal with the fixture byte-identical. The leg prints a DERIVED count of
+  entries examined. Liveness, two halves: a run over a registry with zero entries reds rather than
+  passing, and an entry with no landable rule and NO `lands_nothing` reason reds — which is what makes
+  the second exclusion a declaration rather than a hole.
 - **AC8** When that leg runs, `plan`'s promised destination set equals the receipt's path set for
   every entry, and a second `apply` changes no path and no hash. Liveness: an entry retagged so no
   rule is landable makes the leg RED, which is the playbook defect reproduced deliberately.
@@ -266,6 +307,14 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit, which returned four blockers here. S3's per-file
+  claim was unscoped, and five flat entries declare the same `home`, so it would have red on hundreds
+  of files rather than the one real exposure — it is now scoped to non-flat entries as a stated
+  decision. S1's first direction fires SEVEN times at base and S7 repaired none of them; the repair is
+  now in scope with its direction. S5's land-a-byte assertion was false for the three entries a
+  pre-write merged refusal strands, and that exclusion is now stated and written to expire in unit 6's
+  diff. S4 widens the surface by TWO paths, not one. And `version_from` becoming a list crashes every
+  apply through a reader nobody would look for, so the normalization helper is named in scope.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
   execute-the-build delegation. F1's resolution is recorded identically in unit 7's §3, so the two
   cannot re-decide it independently.

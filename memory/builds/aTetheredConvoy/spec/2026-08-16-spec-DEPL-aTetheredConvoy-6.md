@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -33,10 +33,13 @@ this repo writes or performs.
   git report an invalid attribute name on every attribute query in that repository, and leaves the
   block's open marker off column 0 — so every later apply refuses forever while the receipt claims a
   block that can never be found again.
-- **S5 — the structural destination is DELEGATION, not a second writer.** The deployer does not write
-  the settings document; it stops refusing the rule, runs the entry's existing adopter, FAILS the run
-  on a non-zero exit, and computes the block hash itself over the marker-carrying entries only. Exit 0
-  is not the write signal: the adopter returns unchanged when a matching marker substring is already
+- **S5 — the structural destination is DELEGATION, not a second writer, and the rule SAYS SO.** A new
+  rule key — `delegate = true` — declares that gov supplies no source bytes for this destination and
+  an adopter writes it. That key is what makes the settings rule's empty include list a DECLARATION
+  rather than the fixture-passes-by-finding-nothing shape it currently resembles, and it is the repair
+  unit 1's S9 defers here. The deployer does not write the settings document; it stops refusing the
+  rule, runs the entry's existing adopter, FAILS the run on a non-zero exit, and computes the block
+  hash itself over the marker-carrying entries only. Exit 0 is not the write signal: the adopter returns unchanged when a matching marker substring is already
   present, so the delegation is followed by that adopter's own check arm AND an assertion that the
   extracted block is non-empty and its command equals the path the descriptor declares — not merely
   contains the marker.
@@ -61,16 +64,24 @@ this repo writes or performs.
   selection must not un-pin files whose kit is still installed; that would be invisible until someone
   re-checks-out on a foreign platform and a byte-comparing gate reds for reasons nothing records.
 - **S10 — every artifact this unit writes is a `files` row through unit 1's single expansion**, so
-  `plan` names the attributes destination and the renormalized set, and unit 2's verdict table can see
-  them. A gov-owned artifact recorded as a top-level block is invisible to a per-row consumer forever.
+  unit 2's verdict table can see them. `plan` names the attributes destination and ONE row per declared
+  pin PATTERN — never the resolved path list, which does not exist at plan time: the population is
+  derived by asking git which tracked paths resolve to the pinned setting, and before the block is
+  written that answer is empty. The resolved list is asserted receipt-versus-post-condition instead, so
+  the plan-equals-apply criterion stays true rather than being broken by a set that is empty on one
+  side by construction. A gov-owned artifact recorded as a top-level block is invisible to a per-row
+  consumer forever.
 - **S11 — merged-block drift in `check`**, which unit 5 deferred here because its precondition cannot
   occur until this writer exists: gone, removed, refused, drifted, or silent — and an edit OUTSIDE the
   block asserted POSITIVELY as not-a-finding rather than left as an omission.
-- **S12 — the deployer becomes the fifth reader of the marker contract**, enrolled in BOTH halves of
-  that harness: the behavioural case table, and the source-level assertion that its predicate carries
-  the exact one-carriage-return literal. The behavioural half alone is CR-blind on this host, which the
-  harness itself records, so a plausible-but-wrong predicate would pass all ten cases. The harness's
-  reader count becomes derived rather than spelled in two places.
+- **S12 — the deployer becomes the fifth reader of the marker contract, GOV-SIDE ONLY**, enrolled in
+  BOTH halves of that harness: the behavioural case table, and the source-level assertion that its
+  predicate carries the exact one-carriage-return literal. The behavioural half alone is CR-blind on
+  this host, which the harness itself records, so a plausible-but-wrong predicate would pass all ten
+  cases. The gov-only scoping is forced: the deployer is a registry EXEMPTION whose stated reason is
+  that it never travels into a target, so a fifth reader cannot exist in an adopter tree and a harness
+  that assumed one would grade a population of four there and say five. The harness therefore probes
+  for the deployer's presence and reports a DERIVED reader count, and its leg name stops spelling one.
 
 ## 3. Non-goals (OUT)
 
@@ -88,6 +99,10 @@ this repo writes or performs.
 - **A three-way merge on a merged region.** Unit 2's verdict table gains a `merged` row here, and it
   caps at report-and-refuse rather than reaching the three-way. A gov-owned region has an owner; a
   conflict in it is a decision, not a merge.
+- **Leaving unit 3's carve-out in place.** Unit 3 excludes the three merged-rule entries from its
+  land-a-byte assertion because the refusal is entry-scoped and pre-write. This unit removes the
+  refusal, so it removes the carve-out in the SAME diff and flips those three entries to the
+  land-at-least-one-byte assertion. A carve-out written to expire that does not expire is an exemption.
 
 **Assumes:** units 1 (the expansion, the reserved `merged` and `attributes` receipt rows), 2 (the
 verdict table this unit fills a row of) and 5 (`check`'s per-row dispatch, which this extends rather
@@ -246,9 +261,12 @@ from a path list. Declared, with the derivation used for the renormalize's popul
   Second risk: a target with the platform's line-ending conversion enabled and a foreign-ending history
   sees a large staged diff on the first apply; bounded by never renormalizing the whole tree, disclosed
   by a printed count, and never committed — and it must be priced in the operator-facing text, not only
-  in the receipt. Third: an adopter installed without the memory-tree kit gets no marker-contract
-  coverage at all, because that harness skips loudly when a sibling kit is absent; a deployer-side arm
-  fails if the contract leg was skipped for the run that graded it.
+  in the receipt. Third, stated correctly here after the audit caught rev-1 stating its causality
+  backwards: the marker-contract harness TRAVELS WITH the memory-tree kit, so an adopter that does not
+  take that kit receives no contract coverage at all — and the harness's loud skip is keyed on a
+  different sibling entirely. The deployer's own reader is GOV-SIDE ONLY by S12, so none of this
+  reaches an adopter; what it costs is that a gov run which skipped the contract leg has graded the
+  fifth reader with nothing, and a deployer-side arm fails when that happens.
 - testing + left-shift gates — every arm has a liveness half, and three of them were reproduced in
   scratch repositories while this spec was written.
 - migration / rollback — a target that already pasted the packaging snippet by hand receives the
@@ -304,14 +322,20 @@ from a path list. Declared, with the derivation used for the renormalize's popul
 - **AC12** When `python tools/govkit/govkit.py selfcheck` runs, it reds when a block-matching
   declaration's literals do not appear in the engine file the entry's adopter names, and reds on a
   marker style outside the enum, on a merged source carrying zero or more than one pair for its block,
-  and on a rule declaring a block with an empty include list.
+  and on a rule declaring a block with an empty include list AND no `delegate = true`. The last
+  conjunct is load-bearing: gov's own settings rule declares an empty include list CORRECTLY, and an
+  arm without it would make a correct descriptor permanently red — which is the same defect as an arm
+  that can never fire, wearing the opposite sign.
 - **AC13** When `bash tools/memory-tree/marker-contract.test.sh` runs, it drives the deployer's
   predicate over the whole case table AND asserts at SOURCE level that the predicate carries the exact
   one-carriage-return literal, and prints a reader count DERIVED from the reader list. Liveness: the
   behavioural half alone is carriage-return-blind on this host — the harness records that measurement
   — so a plausible-but-wrong predicate passes all ten cases and must fail the source half.
-- **AC14** When `plan` runs, the attributes destination and the renormalized path set appear as rows,
-  and `apply` produces exactly that set — through unit 1's single expansion, asserted as sets.
+- **AC14** When `plan` runs, the attributes destination appears as a row and each declared pin PATTERN
+  appears as its own row, and `apply` produces exactly that set — through unit 1's single expansion,
+  asserted as sets. The RESOLVED renormalized path list is asserted separately, receipt against the
+  post-condition re-probe, never plan against apply: at plan time the block is unwritten, so git
+  resolves no path to the pinned setting and the two sides would differ by construction.
 - **AC15** When `apply --all` runs, it lands the engine files of the three entries a merged rule
   strands today. Liveness: measured, the same command exits 1 with three refusals and lands ZERO
   files, so each named path provably does not exist before this unit.
@@ -359,6 +383,15 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit. `plan` cannot name the resolved renormalized path
+  set, because the population is derived by asking git which paths resolve to the pin and at plan time
+  the block is unwritten — so the plan rows are the attributes destination plus one row per PATTERN,
+  and the resolved list is asserted receipt-versus-post-condition. The delegation key is introduced
+  here rather than left implicit, because gov's own settings rule declares an empty include list
+  CORRECTLY and the arm as written would have made a correct descriptor permanently red. The fifth
+  marker-contract reader is scoped GOV-SIDE ONLY, since the deployer is a registry exemption that never
+  travels, and the risk paragraph's causality is corrected. The clause deleting unit 3's carve-out in
+  this diff is added, so a carve-out written to expire actually expires.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1, F2 and F3 resolved in place under the owner's
   execute-the-build delegation. F3 is FLAGGED for the wrap-up: it is the one place this build
   knowingly overrides a target's own declared rule and answers with a message rather than a stop.

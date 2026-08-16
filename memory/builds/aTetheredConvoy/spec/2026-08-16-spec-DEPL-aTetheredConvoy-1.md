@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -12,22 +12,27 @@ not own.
 
 ## 2. Scope (IN)
 
-- **S1 — rule precedence, the way the contract already states it.** Later `[[files]]` rules win. A
-  file matched by more than one rule takes the LAST matching rule's role, so an explicit
-  `role = "project-owned"` list carves out of an `include = "**"` engine glob, which is exactly what
-  the contract's precedence paragraph says and what no code does. Plus a `selfcheck` arm: no tracked
-  file under an entry's home may be claimed by two rules whose roles differ without the later one
-  being the one that applies — asserted by running the resolver, never by reading the descriptor.
+- **S1 — rule precedence, with ONE reduction key, stated once.** Two things happen and they have
+  different keys, which is the distinction rev-3 collapsed and the audit caught. A `project-owned`
+  rule is a SOURCE-level carve-out: it removes its matched sources from every earlier glob's
+  contribution, and gov supplies no bytes for them ever. Among the rules that remain, the WRITER for
+  each destination is the LAST landable rule resolving to it. Reducing by destination alone elects
+  the seed template over the carve-out and makes the carve-out unobservable; reducing by source alone
+  cannot express one source legitimately reaching two destinations under two roles, which two shipped
+  descriptors do. Both `selfcheck` arms follow from the split: one reports every destination whose
+  winning writer is not the first rule that matched it, and one reds when a source excluded by a
+  carve-out is nonetheless written.
 - **S2 — the role-landing closure.** Every role either lands, is written by a named other party, or
-  REFUSES BY NAME. `project-owned` joins the landable set with write-if-absent-never-overwrite
-  semantics, which is what the role means and what the playbook entry needs. `generated` and
-  `rendered` are skipped with a printed reason naming the party that does produce them. `merged`
-  keeps its named refusal until unit 6. The silent skip that swallows thirteen rules across the tree
-  today is deleted; there is no path out of the land loop that says nothing.
+  REFUSES BY NAME. `generated`, `rendered` and `project-owned` are skipped with a PRINTED reason
+  naming the party that does produce them — `project-owned` is not landable and does not become so,
+  because after S3 no rule in the tree needs write-if-absent and adding the branch would be a widening
+  nothing exercises. `merged` keeps its named refusal until unit 6. The silent skip that swallows
+  thirteen rules across the tree today is deleted; there is no path out of the land loop that says
+  nothing.
 - **S3 — the playbook entry's rules are retagged `seed`.** Gov supplies those bytes once and the
-  target owns them afterwards. Under S1 and S2 the entry could also land as `project-owned`, and
-  `seed` is still the correct tag: the operator is expected to edit the copy, and `seed` is the role
-  whose re-apply contract is "never rewritten".
+  target owns them afterwards, which is exactly `seed`'s re-apply contract. This is the whole of what
+  the playbook needed, and it is why S2 does not widen the landable set: the entry was mistagged, not
+  under-served by the role enum.
 - **S4 — receipt schema 2, and it is FROZEN here.** A `schema` integer; a per-file `version` carrying
   the kit's version constant as resolved at install; and a row for EVERY file gov is responsible for,
   derived from the resolved file set rather than serialized from the write log — which is what makes
@@ -48,17 +53,20 @@ not own.
   for unit 5's machine-scoped entries). The thirteen descriptors that declare no `[check]` gain the
   declared-absence form in this unit's diff, budgeted rather than discovered by a later one.
 - **S7 — the step-id vocabulary, reserved ONCE and owned here.** A module-level ordered tuple naming
-  all nine steps of the hard order, including the ones this unit does not implement; every phase print
+  every step of the hard order, including the ones this unit does not implement; every phase print
   reads it, and a `selfcheck` arm asserts the printed ids are exactly that tuple in that order.
-  Reserving a name costs nothing and printing one is not required. Later units FILL steps and may
-  never rename them.
+  §4 carries the table with an owning unit per id, and no count of it appears in prose anywhere in
+  this build. Reserving a name costs nothing and printing one is not required. Later units FILL steps
+  and may never rename them.
 - **S8 — the adopter's exit code stops being swallowed.** A non-zero adopter exit is a finding. The
   `[[outcome]]` evaluator that would interpret WHICH failure it is belongs to unit 5; until then the
   code is reported as an unclassified failure rather than printed and passed over.
 - **S9 — the repairs S1–S8 surface at base**, listed in §4 rather than discovered by the builder:
-  two entries carrying an empty adopter with no stated reason, one file rule declaring an empty
-  include list, one rule whose destination template resolves to a repo-root basename while its own
-  `claims` spells the correct path, and one dead double-resolve in the check path.
+  two entries carrying an empty adopter with no stated reason, one merged rule whose empty include
+  list needs the delegation key unit 6 defines (restated from rev-3's "declare it a defect", because
+  that rule is CORRECT and an arm reddening on it would make gov's own descriptor permanently red),
+  one rule whose destination template resolves to a repo-root basename while its own `claims` spells
+  the correct path, and one dead double-resolve in the check path.
 
 ## 3. Non-goals (OUT)
 
@@ -67,9 +75,13 @@ not own.
   `[[outcome]]` evaluator (unit 5), the `merged` writer and the `.gitattributes` phase (unit 6), the
   acceptance matrix and the refusal cross-check (unit 7). This unit lands the substrate they dispatch
   on and nothing else.
-- **Claiming any clause of the hard-order criterion.** S7 reserves the step names; it implements
-  three of the nine steps. The spec states which clauses stay VACUOUS after this unit rather than
-  letting a criterion be claimed on a token that is merely printed.
+- **Claiming any clause of the hard-order criterion.** S7 reserves the step names; §4's table says
+  which steps this unit implements. **ALL FOUR clauses of the contract's ordering criterion stay
+  VACUOUS after this unit** — baseline-before-any-write, attributes-and-renormalize-before-the-first-
+  content-write, staging-before-any-leg-runs, and gate-runner-wiring-last — because this unit
+  implements neither the baseline, nor the attributes phase, nor the emitter. What it CAN assert is
+  that the ids it prints appear in tuple order, which is a different and smaller claim, and §6 states
+  it as one.
 - **Rendering anything.** The adopters render; a second renderer racing the real one is the defect the
   contract already refuses. This unit makes a missing rendered destination a FINDING and stops there.
 - **Repairing what S1 reveals beyond S9's list.** If precedence turning on surfaces a descriptor
@@ -77,9 +89,9 @@ not own.
   predicate finds has no bounded diff.
 
 **Superseded by later units, recorded here so nothing is silently invalidated:** unit 6 deletes the
-`merged` refusal S2 preserves and fills that role's reserved receipt row; unit 5 fills the `rendered`
-and `undischargeable` rows and turns S8's unclassified failure into a classified one; unit 4 fills six
-of S7's nine step ids.
+`merged` refusal S2 preserves, fills that role's reserved receipt row, and defines the delegation key
+S9's repair needs; unit 5 fills the `rendered` and `undischargeable` rows and turns S8's unclassified
+failure into a classified one; units 4, 5 and 6 fill the step ids §4's table assigns them.
 
 ## 4. Design
 
@@ -126,20 +138,60 @@ print unconditionally, before any selection is examined, so they are true of a s
 none of what they describe. Their only arm asserts the strings are present, with no position and no
 negative half — it would keep passing after the steps are implemented.
 
-### Precedence, and the arm that keeps it honest
+### Precedence — two operations, two keys, stated once
 
-The resolver produces, per entry, an ordered list of (source, destination, role, rule-index) and then
-reduces by destination keeping the LAST rule that matched. That is the contract's own sentence made
-executable, and it is deliberately a reduction over the resolved set rather than a check on the
-descriptor: a descriptor-level assertion cannot see that a glob and a literal list overlap.
+rev-3 said "later rules win" and left the KEY ambiguous; the audit found the two halves of this spec
+using different ones. The resolution is that there are genuinely two operations.
 
-The `selfcheck` arm is the resolver's own output, not a second implementation: for every entry, run
-the resolver and report any destination whose winning role differs from the role of the FIRST rule
-that matched it. That set is non-empty today and naming it is the arm's first-run value; it stays as a
-reported note rather than a failure, because overlap is legal and is how a carve-out is spelled. What
-DOES fail is a destination claimed by two rules where neither is later — an impossible state under an
-ordered list, and therefore the arm's own liveness half, asserted against a scratch descriptor built
-to produce it.
+**Carve-out is keyed on SOURCE.** A `project-owned` rule declares that gov supplies no bytes for the
+sources it names, ever. Resolution removes those sources from every earlier rule's contribution. This
+is the only thing that rule does, and it is why `project-owned` is not landable.
+
+**Writer election is keyed on DESTINATION.** Among the rules that survive the carve-out, the writer
+for a destination is the LAST landable rule resolving to it.
+
+Worked on the two shipped descriptors that need it. `tools/codebase-map/kit.toml` declares a `**`
+engine glob, then `map_extractors.py` as `project-owned`, then `map_extractors.template.py` as `seed`
+writing to `{kit}/map_extractors.py`. The carve-out removes gov's own filled module from the glob's
+contribution — that is the byte an adopter must never receive. The seed rule then elects the TEMPLATE
+as the writer of that destination. `tools/drift-audit/kit.toml` is identical in shape. So the file the
+target ends up with is the template's, its receipt role is `seed`, and gov's filled copy is in no
+receipt at all — which is what both descriptors have always meant and what no reduction key on its own
+can express.
+
+The template ALSO lands at its own kit-relative path through the glob, as `engine`. One source, two
+destinations, two roles; a source-keyed reduction would have to pick one and lose the other.
+
+**Two `selfcheck` arms follow, and neither is the other's restatement.** The first reports every
+destination whose winning writer is not the first rule that matched it — the carve-out census, a NOTE
+rather than a failure, because overlap is legal and is how a carve-out is spelled. The second FAILS
+when a source a carve-out excluded is nonetheless written, which is A1 stated as a predicate. rev-3's
+liveness half was a destination claimed by two rules "with no ordering between them", which a TOML
+array of tables cannot express — the arm had no red state. §6 replaces it with one a descriptor can
+actually produce.
+
+### The step-id table
+
+Owned here, filled by the units named. No count of these appears in prose anywhere in this build.
+
+| # | step id | owning unit | what it does |
+|---|---|---|---|
+| 1 | `BASELINE` | unit 4 | read the target's own runner before any write |
+| 2 | `ATTRIBUTES` | unit 6 | write the line-ending pin block |
+| 3 | `LAND` | this unit | copy kit content from the gov index |
+| 4 | `STAGE` | this unit | stage everything written |
+| 5 | `HOOKPROBE` | unit 4 | would the operator's landing commit be refused |
+| 6 | `CONFIGURE` | this unit | run each kit's adopter |
+| 7 | `OBSERVE` | unit 5 | record the rendered destinations the adopters produced |
+| 8 | `RENORMALIZE` | unit 6 | probe, renormalize, post-condition — deliberately AFTER configure |
+| 9 | `LEGS` | unit 4 | emit legs into the target's runner, then CI |
+| 10 | `AFTER` | unit 4 | the second runner read |
+| 11 | `RECEIPT` | this unit | write the receipt and its sidecar |
+
+`RENORMALIZE` sits after `CONFIGURE` rather than beside `ATTRIBUTES`, which DEPARTS from the contract's
+stated hard order. Unit 6 carries the measurement that forces it: on a first install the pinned
+population does not exist until the adopters have run. The departure is recorded here, in the table
+every unit reads, rather than only in the unit that makes it.
 
 ### Receipt schema 2, frozen here
 
@@ -228,8 +280,9 @@ them using different names for the same boolean.
 - risks — the role values in an EXISTING install's receipt are wrong and this unit does not migrate
   them; a re-apply corrects them and `update` (unit 2) must treat a schema-1 role as untrusted. Stated
   here because the alternative is a silent reinterpretation of records already on disk. Second risk:
-  adding `project-owned` to the landable set means a first apply now writes files it previously did
-  not, which is correct and is still a behaviour change an adopter will see.
+  the carve-out changes what a first apply DELIVERS for two destinations — an adopter now receives the
+  template's extractors and signals rather than gov's filled ones. That is the correction, and it is
+  still a behaviour change, so an adopter re-applying after this unit sees those two files replaced.
 - testing + left-shift gates — every arm carries a liveness half; the precedence arm's negative
   fixture is A1 reproduced deliberately.
 - migration / rollback — receipt schema 1 is READ by unit 2 and never rewritten in place; the next
@@ -238,13 +291,23 @@ them using different names for the same boolean.
 
 ## 6. Acceptance criteria
 
-- **AC1** When `python tools/govkit/govkit.py apply --target <fixture> --kits codebase-map` runs,
-  the receipt row for `map_extractors.py` carries `role = "project-owned"`, and a fixture where that
-  file was edited before the apply has it byte-identical afterwards. Both halves: the role, and the
-  bytes it protects.
-- **AC2** When `python tools/govkit/selftest.py` runs the precedence arm against a scratch descriptor
-  whose two rules claim one destination with no ordering between them, the arm reds; against gov's
-  own descriptors it is silent and prints a DERIVED count of carve-outs it resolved.
+- **AC1** When `python tools/govkit/govkit.py apply --target <fixture> --kits codebase-map` runs, the
+  landed `map_extractors.py` is byte-identical to `map_extractors.template.py` and NOT to gov's own
+  filled copy, and its receipt row carries `role = "seed"` with the template as `source`. The same arm
+  runs over `drift-audit`/`drift_signals.py`, so the fixture is not one-descriptor-shaped. Liveness:
+  measured today the same command lands gov's FILLED copy and records `role = "engine"`, so the arm
+  reds before this unit.
+- **AC1b** When a fixture's `map_extractors.py` is edited before a SECOND apply, it is byte-identical
+  afterwards — the `seed` contract — and gov's filled copy appears in no receipt row, asserted as an
+  absence over the whole receipt rather than over one row.
+- **AC2** When `python tools/govkit/selftest.py` runs the carve-out arm against gov's own descriptors
+  it is silent and prints a DERIVED count of carve-outs resolved, non-zero. Liveness: a scratch
+  descriptor whose LATER explicit rule must beat an earlier `include = "**"` glob is resolved
+  correctly, and a mutated resolver that takes the FIRST match instead reds the arm — the mutation is
+  the red state, because an ordered array of tables cannot express two rules with no ordering.
+- **AC2b** When a source excluded by a `project-owned` carve-out is nonetheless written to any
+  destination, `selfcheck` FAILS naming the source and the rule that wrote it. This is A1 as a
+  predicate; the fixture reproduces A1 by removing the carve-out from the resolver.
 - **AC3** When `apply` runs twice against a fixture with no gov change, the receipt's path set and
   every row's hash are identical between the runs, INCLUDING every `seed` row, and
   `.governance/install.sums` is byte-identical. The fixture selection must contain a `seed` rule, or
@@ -265,11 +328,16 @@ them using different names for the same boolean.
   declared reason; against a kit declaring neither argv nor a reason it REDS; and against a kit whose
   declared arm exits non-zero it prints `landed-but-inert`. Three distinct strings for three distinct
   measurements, asserted separately.
-- **AC8** When a fixture's landed files are all deleted, `check` reports that kit `not-landed` rather
-  than reporting the whole target not landed and returning early.
+- **AC8** When a fixture's receipt CLAIMS a kit whose descriptor declares at least one landable rule
+  and holds zero rows for it — a schema-1 receipt, or one deliberately row-stripped —
+  `python tools/govkit/govkit.py check --target <fixture>` reports that kit `not-landed`. A target
+  whose FILES were deleted while the receipt is intact is NOT this state: it is unit 5's per-row
+  integrity failure, and this arm asserts `check` does not call it `not-landed`.
 - **AC9** When `python tools/govkit/govkit.py selfcheck` runs, it asserts that the step ids `apply`
   prints are exactly the module-level tuple, in that order, and reds on an id printed out of order or
-  absent from the tuple. Liveness: a scratch run with two ids transposed reds.
+  absent from the tuple. Liveness: a scratch run with two ids transposed reds. The arm asserts ORDER
+  among the ids this unit prints and claims NO clause of the contract's hard-order criterion — §3
+  names all four as vacuous after this unit.
 - **AC10** When `apply` runs against the default set, both playbook destinations exist on disk and
   are recorded with `role = "seed"`, and the `playbook-placeholders` hole probe runs against files
   that exist. Measured today the entry lands zero bytes and the probe names two absent paths.
@@ -303,10 +371,14 @@ and the two that touch a write or security surface are called out in the wrap-up
 rather than treated as settled by silence.
 
 - **F1 — does `project-owned` join the landable set, or does the playbook entry simply become
-  `seed`?** RESOLVED (agent, 2026-08-16, delegated): BOTH, as recommended. Veto 3 was checked and does
-  not fire — §5 already prices the widened write surface in this unit's own risk tier, in the sentence
-  saying a first apply now writes files it previously did not. Retagging the playbook alone would leave
-  three other rules silently skipped, which is the class this unit exists to close.
+  `seed`?** RE-RESOLVED (agent, 2026-08-16, delegated, after the M4 audit): **the playbook retag
+  ALONE.** The first resolution took both and was wrong on a fact neither option had checked: after
+  S3 retags the playbook's two rules, the only remaining `project-owned` rules are the two carve-outs
+  in the codebase-map and drift-audit descriptors, and those name sources gov must never supply. So
+  a landable `project-owned` would have won zero destinations — a widened write surface with an empty
+  domain, which is veto 3's shape wearing a helpful face. The role stays a SOURCE-level carve-out,
+  which is observable, non-vacuous, and what both shipped descriptors have always meant. The audit
+  finding that forced this is the reason a spec set gets audited before its code.
 - **F2 — does this unit MIGRATE an existing install's wrong roles?** RESOLVED (agent, 2026-08-16,
   delegated): no; it only stops producing them, and unit 2 treats a schema-1 role as untrusted. A
   migration would rewrite records describing an install this unit cannot inspect.
@@ -316,6 +388,16 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the M4 spec audit, which returned BLOCKED over the whole set with four
+  blockers landing here. The reduction key was spelled two ways in one document — destination in §4
+  and source in S1 — and the flagship criterion asserted a role the stated key could not elect;
+  precedence is now TWO operations with two keys, and the worked example is in §4. F1 is RE-RESOLVED
+  as a consequence: a landable `project-owned` would have won zero destinations after S3, so the role
+  stays a source-level carve-out and S2 no longer widens the landable set. AC2's liveness half was a
+  state a TOML array of tables cannot express and is replaced by a resolver mutation. The hard-order
+  step ids are enumerated in §4 with an owning unit each, and §3 now names ALL FOUR ordering clauses
+  as vacuous after this unit rather than promising a list it did not carry. AC8 was rewritten: its
+  fixture could not reach the state it graded, and it collided with unit 5's integrity arm.
 - rev-3 · 2026-08-16 · M3 fork sweep: F1, F2 and F3 resolved in place under the owner's
   execute-the-build delegation. F1 was checked against M3's veto 3 and passes, because §5 already
   prices the widened write surface in this unit's own risk tier.

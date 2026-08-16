@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -12,8 +12,11 @@ calls no hash function. Everything the contract asks it to verify is absent.
 
 ## 2. Scope (IN)
 
-- **S1 — receipt integrity, role-scoped.** An `engine` row must exist on disk and hash to its recorded
-  value. A `seed` row carries an EXISTENCE claim only, because the role's whole contract is that the
+- **S1 — receipt integrity, role-scoped, and this is where a deleted install is caught.** An `engine`
+  row must exist on disk and hash to its recorded value. A target whose files were deleted while the
+  receipt is intact is THIS unit's integrity failure, not unit 1's `not-landed` — that state is a
+  receipt holding zero rows for a kit, and the two must not be conflated by a criterion on either
+  side. A `seed` row carries an EXISTENCE claim only, because the role's whole contract is that the
   target owns the file after one copy — hashing it reds every target that did what the role permits.
   `project-owned` and `generated` likewise, and reported AS their role rather than as drift.
 - **S2 — the sidecar and the receipt are asserted against EACH OTHER.** They are two spellings
@@ -37,22 +40,31 @@ calls no hash function. Everything the contract asks it to verify is absent.
 - **S6 — a rendered difference is REPORTED and fails nothing on its own.** A rendered artifact
   legitimately changes when the target edits its conf. The recorded output hash exists so an update can
   separate an adopter-written change from a hand edit, not so `check` can call it drift.
-- **S7 — machine-scoped entries: an order at apply, `undischargeable` at check.** `apply` writes an
-  order for every machine-scoped or linked rule, reusing the planner's own predicate so the planner's
-  order set and the outbox become the same set by construction — measured, they differ today. The link
-  command is DERIVED from the platform, printing the host's form first and the other labelled beneath.
-  `check` prints `undischargeable` naming the destination and the reason, and reds only on the order's
-  ABSENCE, because there is no probe for a destination outside the repository.
+- **S7 — machine-scoped RULES: an order at apply, `undischargeable` at check.** The population is the
+  RULE, not the entry: every descriptor declares an entry-level scope of `repo` and exactly one RULE
+  in the whole tree is machine-scoped, so keying `undischargeable` on the entry would give it no
+  instance while `apply` writes orders per rule — the two sides would quantify over different
+  populations and the state would be permanently unreachable. `apply` writes an order per
+  machine-scoped or linked rule, reusing the planner's own predicate so the planner's order set and
+  the outbox become the same set by construction; measured, they differ today. A machine order's file
+  is named `<entry-id>-<destination-slug>.md`, because a machine-scoped rule has no hole id and the
+  outbox's existing names are hole ids — and `plan` prints THAT outbox path for those rows, carrying
+  the link destination inside the order rather than as the row. The link command is DERIVED from the
+  platform, printing the host's form first and the other labelled beneath. `check` prints
+  `undischargeable` naming the destination and the reason, and reds only on the order's ABSENCE,
+  because there is no probe for a destination outside the repository.
 - **S8 — `check` READS the outbox.** The contract names it and the verb never opens it. Every order the
   receipt records must exist; an order for a hole no selected kit declares is stale and is a finding.
 - **S9 — the `[[outcome]]` evaluator.** Nine outcome blocks across six descriptors are read by zero
   code. An adopter's exit code plus a filesystem probe yields the declared meaning, which is what lets
   a fixture assert a MEANING rather than an integer — a distinction unit 7's arms require and cannot
   otherwise satisfy.
-- **S10 — entry-level `scope` becomes derived.** Every descriptor declares it and the engine reads only
-  the rule-level spelling. Derive the entry scope (machine iff every rule is) and add a `selfcheck` arm
-  asserting the declared value equals the derived one, so the contract's machine-scoped criterion has a
-  referent instead of eighteen dead declarations.
+- **S10 — entry-level `scope` becomes derived, as a SEPARATE question from S7.** Every descriptor
+  declares it and the engine reads only the rule-level spelling. Derive the entry scope (machine iff
+  every rule is) and add a `selfcheck` arm asserting the declared value equals the derived one. This
+  is a declaration-versus-derived arm and nothing else — it does NOT decide which rules get an order,
+  which is S7's rule-keyed population. No count of the declaring entries is spelled here; the arm
+  reports a derived one and reds at zero.
 - **S11 — every loop prints a DERIVED count and reds when that count is zero over a population the
   DESCRIPTORS say is non-empty.** The expectation comes from the descriptors, not from the receipt: a
   receipt that lost its rows and a target that is clean are otherwise the same output.
@@ -191,12 +203,17 @@ own conf, and calling it drift makes `check` red on a correctly-configured targe
   hash it REPORTS and exits 0 on that row alone; and the finding text names a temporary render or the
   adopter and NEVER a path inside the gov checkout — the forbidden correctness comparison, asserted as
   an absence.
-- **AC10** When `plan` and `apply` run over one fixture, the ORDER destinations `plan` prints equal the
-  set of files in `.governance/outbox` afterwards, asserted as SETS. Liveness: measured today they
-  differ, so the arm reds before the fix.
-- **AC11** When a machine-scoped entry is selected, `check` prints `undischargeable` naming the
-  destination and the reason, reds when that order file is deleted, and the order carries the host
-  platform's link command first with the other labelled beneath.
+- **AC10** When `plan` and `apply` run over one fixture, the outbox PATHS `plan` prints equal the set
+  of files in `.governance/outbox` afterwards, asserted as SETS. Both sides are outbox paths: a hole
+  order is `<hole-id>.md` and a machine order is `<entry-id>-<destination-slug>.md`, and `plan` prints
+  the outbox path for both rather than a link destination for one and a file name for the other.
+  Liveness: measured today the two sides are different KINDS of string and the counts differ, so the
+  arm reds before the fix.
+- **AC11** When a selection contains a machine-scoped RULE, `check` prints `undischargeable` naming
+  the destination and the reason, reds when that order file is deleted, and the order carries the host
+  platform's link command first with the other labelled beneath. The live fixture is the kickoff
+  engine's junction rule, which is the one machine-scoped rule in the tree — keyed on the entry
+  instead, this criterion would have no instance to grade.
 - **AC12** When the outbox holds an order for a hole no selected kit declares, `check` reds calling it
   stale.
 - **AC13** When an adopter exits non-zero and its descriptor declares matching `[[outcome]]` probes,
@@ -204,8 +221,9 @@ own conf, and calling it drift makes `check` red on a correctly-configured targe
   matching no outcome probe is reported as unclassified and names the code, so the evaluator cannot
   invent a meaning.
 - **AC14** When a descriptor's declared entry-level scope differs from the value derived from its
-  rules, `selfcheck` reds naming both. Liveness: gov's own eighteen declarations must be silent after
-  the derivation lands.
+  rules, `selfcheck` reds naming both. Liveness: over gov's own descriptors the arm is silent and
+  reports a DERIVED count of entries examined, reddening at zero — no count is spelled in this
+  criterion or in S10.
 
 ## 7. Gates
 
@@ -240,6 +258,13 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit. `undischargeable` was keyed on the ENTRY while
+  `apply` writes orders per RULE, and every descriptor declares a repo-scoped entry — so the state was
+  unreachable and the two sides quantified over different populations; it is rule-keyed now, which also
+  gives the criterion its one live fixture. The machine-order file gained a naming rule, without which
+  the plan-versus-outbox set equality compared two different kinds of string. A spelled count of
+  declaring entries is gone. And S1 now states that an all-files-deleted target is THIS unit's
+  integrity failure, pairing with unit 1's rewritten criterion rather than colliding with it.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
   execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit that measured the

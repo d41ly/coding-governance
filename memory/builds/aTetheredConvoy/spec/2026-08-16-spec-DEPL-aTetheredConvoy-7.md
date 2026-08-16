@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -22,16 +22,22 @@ settled population rather than re-keyed after every unit.
   vanishing while the destination bytes stay identical is exactly the measured seed-row loss, and a
   destination-byte arm cannot see it; a destination rewritten with identical content the receipt still
   records is the reverse. Both, and each cites the other.
-- **S3 — the refusal cross-check.** Enumerate the engine's refusal branches from source, and join them
-  against the branch-anchor and fixture triples the arms ACTUALLY registered while running — so the
-  join observes execution rather than source text and has no stale-file surface. A branch no arm
-  reached reds naming it.
+- **S3 — the refusal cross-check, with both halves DEFINED.** A REFUSAL BRANCH is a call site of
+  either of the engine's two refusal channels — the exception it raises to abort a verb, and the
+  finding it appends to a report — enumerated by walking the parsed source for those two call shapes.
+  Its ANCHOR is the stable call-site identifier `(module, enclosing function, ordinal within that
+  function)`, computed from the same walk, so the engine gains no argument and no decoration. The join
+  compares the enumerated anchor set against the anchors the arms ACTUALLY registered while running,
+  which is why it observes execution rather than source text and has no stale-file surface. A branch no
+  arm reached reds naming its anchor.
 - **S4 — the enumerator's population is DISCOVERED, never named.** It is the tracked Python files under
   the deployer's own directory minus the harness files, and BOTH the branch count and the FILE count
-  are shrink-only pins. A hardcoded filename sees a broken matcher and not a shrinking file set — and
-  this build adds a region writer, a pin phase, a leg emitter and a baseline reader to a file already
-  past a thousand lines, so the natural refactor moves refusals into new modules that a one-file scan
-  would silently stop grading.
+  are shrink-only pins whose base values are DERIVED on the first run and written beside the pin with
+  the weakening-move convention this repo already enforces — not spelled in this spec, which would be a
+  count in prose about a population the gate derives. A hardcoded filename sees a broken matcher and
+  not a shrinking file set — and this build adds a region writer, a pin phase, a leg emitter and a
+  baseline reader to a file already past a thousand lines, so the natural refactor moves refusals into
+  new modules that a one-file scan would silently stop grading.
 - **S5 — every refusal also carries a NEGATIVE arm, and the negative arm must PROVE it reached the
   branch.** A negative arm that merely runs the same verb on an unrelated fixture asserts an absence
   that is true for the wrong reason: the guard's precondition is never evaluated, so an always-firing
@@ -186,11 +192,18 @@ legs, not steps. The entry id is the only identifier both sides genuinely share.
   bytes of every landed path are identical between runs. This arm cites unit 1's receipt-side criterion rather than replacing it: the
   measured seed-row loss is invisible to a destination-byte arm, because the file exists both times and
   only the receipt row vanishes.
-- **AC3** When the matrix runs, the refusal join enumerates every refusal branch in the tracked
-  `tools/govkit/*.py` population and reds naming any branch no arm registered during that run.
+- **AC3** When the matrix runs, the refusal join enumerates every refusal branch — both channels, by
+  the call-shape matcher S3 names — in the tracked `tools/govkit/*.py` population, and reds naming the
+  `(module, function, ordinal)` anchor of any branch no arm registered during that run. Liveness:
+  deleting one arm's registration reds the join naming exactly that anchor.
 - **AC4** When a refusal branch is moved into a NEW module matching `tools/govkit/*.py`, the
-  enumerator still finds it — asserted by the FILE-count pin, which reds when the scanned file set
-  shrinks. Liveness: the branch-count pin alone passes in that state, which is why there are two.
+  enumerator still finds it — asserted by the enumerated anchor SET containing that branch's new
+  anchor and by the derived file count INCREASING. The pins are not what grades this: in that scenario
+  the file set grows and the branch count is unchanged, so both shrink-only pins pass and a criterion
+  resting on them would have no red state, inside the arm written to close exactly that class.
+- **AC4b** When the discovery rule in `python tools/govkit/matrix.py` is narrowed so a previously
+  scanned file is dropped, the FILE-count pin REDS. This is the pin's own scenario and it is a different fixture from AC4's — one arm cannot
+  grade both directions, which is why rev-1's single criterion could not fail.
 - **AC5** When an arm registers a `negative=` half without a precondition assertion,
   `python tools/govkit/matrix.py` refuses the registration naming it — the same shape as a registration with no expected message. Liveness: a
   negative arm whose precondition IS asserted and whose branch does not fire passes, and one whose
@@ -245,6 +258,14 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit. The unit's central mechanism had no shape: neither
+  "refusal branch" nor "branch anchor" was defined, so the pin could have counted any of three
+  populations. Both are defined now — two call shapes, and a module-function-ordinal anchor that needs
+  no change to the engine. AC4 was split, because in its own stated scenario the file set GROWS and the
+  branch count is unchanged, so both shrink-only pins passed and the criterion had no red state inside
+  the arm written to close that class. And §10's "no seam exists" was FALSE: this repo already ships
+  AST enumeration joined to an execution trace, with both liveness halves, on the merge bar — the reuse
+  audit now names it and says precisely what manual registration adds that the trace cannot.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
   execute-the-build delegation. No veto fired.
 - rev-1 · 2026-08-16 · initial draft. Grounded on a twelve-agent audit and adversarial pass. Three of
@@ -281,5 +302,16 @@ set. The closest in spirit is the method-carrier registry — structural only, p
 this gate copies word for word — but its registry is a hand-kept path list rather than a derived
 population, so the parity gate is new.
 
-No seam exists for parsing Python to find control-flow branches: the one place this repo parses Python
-walks modules for exports and has no notion of a message string. The enumerator is new and small.
+**The seam exists and rev-1 said it did not.** `tools/memory-tree/corpus_ids.py` already walks a
+parsed Python source for a specific statement shape, records which lines were REACHED at runtime with
+an interpreter trace hook, and joins the two sets — AST enumeration plus an execution-observed join,
+carrying both liveness halves, already on the merge bar. That is this unit's mechanism, one statement
+shape away. S3 and S5 extend it rather than reinventing it: the matcher changes from one statement
+kind to the two refusal call shapes, and the join key becomes the anchor rather than the line number,
+because a line number moves when the file is edited and an anchor does not.
+
+Manual registration is kept ALONGSIDE the trace join rather than instead of it, for one reason the
+trace cannot supply: a reached branch does not tell you WHICH arm reached it or what message that arm
+expected, and S5's negative half needs both. The trace answers "was it reached"; the registration
+answers "by whom, and asserting what". Recording that here rather than claiming no seam exists is the
+correction the spec audit forced.

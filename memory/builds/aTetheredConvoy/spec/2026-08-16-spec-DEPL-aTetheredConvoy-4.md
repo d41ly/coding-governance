@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -15,18 +15,31 @@ its consumers is what produced two incompatible spellings of it inside one desig
 
 - **S1 — the `[gate_runner]` table, ONE vocabulary, owned here.** `kind` is `manifest` or `none`.
   `file`, `grammar` (`json-array`), `dedupe_key` (`name`), `command` (an argv ARRAY, never a shell
-  string), `observed_ran`, `observed_failed` and optional `observed_skipped` (literal templates
-  carrying the leg name). Plus `[gate_runner.ci]` with `system` (`github-actions`), `file` and `job`.
+  string), `run_all_env` (the environment assignment that makes the runner ignore every guard, e.g.
+  gov's own full-bar variable — declared as a table, or as `{ none = "<reason>" }`, and REFUSED when
+  `kind = "manifest"` declares neither, because an escape spelled in argv cannot express an env var
+  and the baseline needs one), `observed_ran`, `observed_failed` and optional `observed_skipped`
+  (line-anchored PREFIX templates carrying the leg name). Plus `[gate_runner.ci]` with `system`
+  (`github-actions`), `file` and `job`.
   `make`, `npm` and `shell` are REFUSED BY NAME with a backlog pointer. `anchor` is refused: it is
   meaningful only for a line grammar this unit does not implement, and a key that parses and is
   ignored looks exactly like one that works.
-- **S2 — `intake` writes it and refuses to invent it.** A partial promotion refuses naming the
-  missing key. An ABSENT table in a pre-existing descriptor is treated as `none` but prints a
-  DIFFERENT line, so "declared none" and "never declared" are two observable states.
-- **S3 — the baseline read, twice, under ONE guard regime.** One function parses the runner's output
-  into a leg-name-to-verdict map; it runs once before any write and once after the emitter, BOTH with
-  the runner's run-everything escape set, because a guarded-unchanged leg scored in one read and not
-  the other makes the two maps incomparable.
+- **S2 — `intake` writes it and refuses to invent it.** PROMOTION is the act of moving a target from
+  `kind = "none"` to `kind = "manifest"`, and a COMPLETE promotion supplies `file`, `grammar`,
+  `dedupe_key`, `command`, `run_all_env`, `observed_ran` and `observed_failed`. A PARTIAL promotion —
+  one or more of those present and the rest absent — refuses, naming every missing key. `command` is
+  an argv ARRAY and a string is REFUSED rather than split, because splitting a shell string is a
+  guess about quoting that this tool has no way to check. An ABSENT table in a pre-existing descriptor
+  is treated as `none` but prints a DIFFERENT line, so "declared none" and "never declared" are two
+  observable states.
+- **S3 — the baseline read, twice, under ONE guard regime, and the regime is NO-ESCAPE.** One function
+  parses the runner's output into a leg-name-to-verdict map; it runs once before any write and once
+  after the emitter, BOTH without the run-everything escape, and the state machine compares only the
+  INTERSECTION of legs scored in both maps plus the names present in one and absent from the other.
+  Running both with the escape was the other candidate and is rejected: it doubles the target's full
+  bar twice over, and it makes the dead-probe liveness half unreachable, because with every guard
+  overridden no leg can report skipped. `run_all_env` is still declared, because `check --observe`
+  needs it to prove an emitted leg executes at all.
 - **S4 — the three-valued table falls out rather than being declared.** `absent` is "a name in the
   after-map that was not in the before-map". §4 carries the (before, after) decision table and states
   exactly when `apply` FAILS.
@@ -49,7 +62,10 @@ its consumers is what produced two incompatible spellings of it inside one desig
 - **S9 — the emission's ownership record is written BEFORE the write it authorizes.** An intent
   record naming the legs about to be written, promoted to owned after. A crash between the write and
   the receipt otherwise leaves gov's rows in the target with no receipt claiming them, and the next
-  `apply` refuses forever.
+  `apply` refuses forever. The intent record is a `check` INPUT as well as an `apply` one: `check`
+  reads it when the receipt is absent and reports a RECOVERABLE PARTIAL INSTALL, which is a new
+  per-target state and is added to unit 1's vocabulary in this unit's diff. Without that, a
+  half-written target and a virgin repository produce the identical not-landed verdict.
 - **S10 — a leg row the target EDITED is drift, not something to overwrite.** Ownership of the NAME
   is not ownership of the ROW: before replacing, compare against the argv and guard the receipt
   recorded; a difference reports drift and refuses the replacement.
@@ -58,11 +74,18 @@ its consumers is what produced two incompatible spellings of it inside one desig
   never edited — there is no YAML parser in the standard library and none anywhere in this repo — and
   an order is written instead. Full history is DERIVED from the emitted legs and only ASSERTED
   against any declaration.
-- **S12 — `check --observe`.** Runs the declared command once and asserts each owned leg matched an
-  `observed_ran` template; a leg matching `observed_failed` REDS, and one matching
-  `observed_skipped` reds as WIRED BUT SKIPPED. Default `check` reports presence and says in its own
-  message that presence is not execution.
-- **S13 — six of unit 1's nine step ids are filled here**, and none is renamed.
+- **S12 — `check --observe`.** Runs the declared command once, with `run_all_env` applied, and asserts
+  each owned leg matched an `observed_ran` template; a leg matching `observed_failed` REDS, and one
+  matching `observed_skipped` reds as WIRED BUT SKIPPED. Matching is line-anchored PREFIX, not
+  whole-line equality: measured, the runner's failure and skip lines carry a variable tail — an exit
+  code, a branch name, or a no-result marker — so a whole-line literal matches NOTHING and both
+  liveness halves become unreachable. The leg name is substituted into the template by the observer
+  itself, not through the descriptor token substituter, because a leg name is data and not a
+  configuration answer. Default `check` reports presence and says in its own message that presence is
+  not execution.
+- **S13 — the step ids unit 1's table assigns to this unit are filled here**, and none is renamed. No
+  count of them appears here: unit 1's table is the enumeration, and a number repeated in a second
+  document is the defect this build spends a unit closing.
 
 ## 3. Non-goals (OUT)
 
@@ -251,16 +274,19 @@ outbox and the receipt instead.
 ## 6. Acceptance criteria
 
 - **AC1** When `python tools/govkit/govkit.py intake --target <fixture>` runs without the gate-runner
-  answers, it writes `kind = "none"` with its comment; with a partial promotion it REFUSES naming the
-  missing key; and a pre-existing descriptor with no table makes `apply` print a line distinct from
-  the declared-none line, asserted separately.
+  answers, it writes `kind = "none"` with its comment; with a PARTIAL promotion — any proper subset of
+  S2's complete key set — it REFUSES naming every missing key; with `command` supplied as a string it
+  REFUSES rather than splitting it; and a pre-existing descriptor with no table makes `apply` print a
+  line distinct from the declared-none line, asserted separately.
 - **AC2** When `apply` runs against a fixture whose declared command is a real runner over a
   throwaway leg manifest, `.governance/install.json` records a baseline map containing exactly that
   manifest's leg names with their verdicts. Liveness: a sibling fixture whose templates match no line
   makes `apply` exit 2 saying the read matched no leg.
 - **AC3** When the before-map contains zero legs in green-or-red, `apply` refuses calling it a DEAD
-  PROBE — asserted with a fixture whose guards are all unchanged, which is the state an emptiness
-  check passes.
+  PROBE — asserted with a fixture whose every leg is guarded on a path the install does not touch, so
+  the runner reports them all skipped. This fixture is reachable ONLY because S3 runs both reads
+  without the escape; under the rejected escape-on regime no leg can report skipped and this criterion
+  would have no red state at all.
 - **AC4** When a fixture leg is green at baseline and red after the install, `apply` exits non-zero
   and names it. Liveness: the same fixture left green exits 0 AND the arm asserts the leg name was
   present in the recorded baseline — a pass that never saw the leg is not a pass.
@@ -290,8 +316,11 @@ outbox and the receipt instead.
   observed SKIPPED at exit 0, reproducing the silent-green this prevents.
 - **AC12** When a dropped guard's pathspec is a destination the same entry declares, `apply` reports
   a FINDING naming the leg and the destination rather than dropping it quietly.
-- **AC13** When `prefix` and `memory_root` are non-default, every emitted guard renders under
-  them and no emitted string in the runner file contains a brace.
+- **AC13** When `prefix` and `memory_root` are non-default, every TOKEN-SPELLED guard renders under
+  them, every VERBATIM repo-root guard is emitted unchanged, and no emitted string in the runner file
+  contains a brace. Both classes in one arm: measured, one shipped leg declares a bare repo-root
+  pathspec alongside a token-spelled one, so a criterion asserting only substitution would grade a
+  population that does not exist.
 - **AC14** When `apply` runs twice, the runner file is BYTE-IDENTICAL and the row count unchanged.
   Liveness: the first apply strictly INCREASED the row count over the seed manifest — otherwise
   byte-identical is satisfied by an emitter that does nothing. A target leg name carrying non-ASCII
@@ -302,7 +331,9 @@ outbox and the receipt instead.
   disk, `apply` reports drift and refuses the replacement.
 - **AC16** When `apply` is killed between the runner write and the receipt write, the NEXT `apply`
   recovers rather than refusing — asserted with an env-gated abort — and `check` on that half-written
-  target does not report it NOT LANDED.
+  target reads the intent record and reports RECOVERABLE PARTIAL INSTALL, naming the legs it found
+  claimed. Liveness: a virgin repository with no intent record still reports not-landed through the
+  same code path, so the two states are distinguishable rather than one string covering both.
 - **AC17** When a selection contains a `history_depth = "full"` leg, the created workflow's checkout carries the
   full-history setting; a selection with none produces a workflow without it; and a declaration
   contradicting the derived value REFUSES naming the leg that decided it.
@@ -313,8 +344,11 @@ outbox and the receipt instead.
   separately.
 - **AC20** When `python tools/govkit/govkit.py check --observe --target <fixture>` runs, it exits
   non-zero naming any owned leg that matched an `observed_failed` or `observed_skipped` template, and
-  0 only when every owned leg matched `observed_ran`. Liveness: a fixture where every emitted leg
-  fails exits non-zero and names each — the arm that a single combined template would pass.
+  0 only when every owned leg matched `observed_ran`. Liveness, and it is only reachable under
+  prefix matching: a fixture where every emitted leg FAILS produces the runner's failure line with its
+  variable tail, and the arm asserts that line matched `observed_failed` and that the verb exited
+  non-zero naming each leg. A whole-line literal would have matched none of them and the arm would
+  have passed by finding nothing.
 - **AC21** When each refused value is supplied — the three refused kinds, a wrong grammar, a wrong
   dedupe key, a present anchor, a wrong CI system, a full-history value outside its vocabulary — the
   message carries the offending VALUE and `.governance/install.json` was not created. Liveness: the
@@ -357,6 +391,16 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded the M4 spec audit, which returned two blockers here. The baseline
+  demanded a run-everything escape the frozen declaration had no key for — gov's is an environment
+  variable and `command` is an argv array — so the key is declared, and S3 now states the regime is
+  NO-ESCAPE with the state machine comparing the intersection, which is also what makes the dead-probe
+  fixture reachable at all. The observation templates were whole-line literals against a runner that
+  prints a variable tail, so they matched nothing and both liveness halves were unreachable; matching
+  is line-anchored prefix. Promotion is defined with its complete key set and its string-to-argv
+  refusal, the guard measurement is corrected to name the one verbatim repo-root exception, the step
+  count is deleted in favour of unit 1's table, and the intent record is named as a `check` input so a
+  half-written target stops reporting the same verdict as a virgin one.
 - rev-2 · 2026-08-16 · M3 fork sweep: F1 and F2 resolved in place under the owner's
   execute-the-build delegation. F1 is FLAGGED for the wrap-up — it is a security posture, and a
   delegated resolution of a posture belongs in the owner's turn rather than only in a §8 mark.
