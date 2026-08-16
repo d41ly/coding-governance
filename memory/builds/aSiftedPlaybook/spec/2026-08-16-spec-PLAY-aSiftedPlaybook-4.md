@@ -1,12 +1,15 @@
 # PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
-Correct three self-description defects in the two companion files, where each file makes a
-mechanically false claim about its own structure. All three are measurable against the files
-themselves, none changes a rule, and none is byte-gated — neither companion is under a size gate.
+Correct four self-description defects across the two companion files and the adopter runbook, where
+each carrier makes a mechanically false claim about its own structure or about the companions'
+contents. All four are measurable against the files themselves, none changes a rule, and none is
+byte-gated — no file this unit touches is under a size gate. **The runbook is the third file**: S4
+corrects the placeholder arithmetic in `WIRE-INTO-PROJECT.md` as well as in `customize.md`, because
+the same undercount is spelled in both and fixing one leaves the pair disagreeing.
 
 ## 2. Scope (IN)
 
@@ -76,10 +79,13 @@ carefully, and it is the only sentence in the file that describes the fill proce
 
 | File | Change |
 |---|---|
-| `parallel-coding-governance.customize.md` | S1 at `:20-21`, S2 at `:33-42` and `:47-48` |
+| `parallel-coding-governance.customize.md` | S1 at `:20-21`, S2 at `:33-42` and `:47-48`, **S4 at `:15`** |
 | `parallel-coding-governance.domain-rules.md` | S3 at `:10-12` |
+| `WIRE-INTO-PROJECT.md` | **S4 at `:98`** — the same 13-vs-14 undercount as `customize.md:15`, in the adopter's runbook. AC5 greps both by name |
 
-Neither file is under a size gate; `tools/check-template-size.sh` gates only the template.
+None of the three files is under a size gate; `tools/check-template-size.sh` gates only the
+template. Stated over three rather than two because S4 reaches outside the companions, and an
+inventory that under-describes its own unit is the defect class this unit exists to correct.
 
 ### Rollout
 
@@ -151,6 +157,14 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded round-4 M4. rev-3's S4 reached outside the two companions into
+  `WIRE-INTO-PROJECT.md` and neither §1 nor §4 was extended to say so: §1 still read "three
+  self-description defects in the two companion files" against four scope items across three files,
+  §4 Files touched had no runbook row and attributed `customize.md` to S1/S2 but not S4's `:15`, and
+  its closing sentence quantified "neither file" over two where three are edited. Nothing shipped
+  wrong — AC5 greps both files by name, so the runbook cannot silently be left out — but a unit
+  whose subject is false self-description was under-describing itself, which is why it is corrected
+  rather than waived.
 - rev-3 · 2026-08-16 · folded round-3 H10 as new S4 and AC5. The companion CARRIES 14 placeholders,
   not 13 — 13 is the exclusive count — so `customize.md:15` and `WIRE-INTO-PROJECT.md:98` are both
   wrong, and the 2026-08-16 audit's R2 refuted this incorrectly. It is also the second clause of the

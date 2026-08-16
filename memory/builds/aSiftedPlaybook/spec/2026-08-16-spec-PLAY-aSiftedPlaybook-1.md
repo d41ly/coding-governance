@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -81,10 +81,13 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 - **The two other carriers of the stale "19-check"** — `tools/memory-tree/README.md:6` and root
   `README.md:33`. Both verified stale against the true 20. Same number, different products;
   follow-up row for the kit README. Root `README.md` is the adopter-facing front door and
-  `TOOL-aSiftedPlaybook-1` S4 **now RECEIVES `:33`** — it is named in that unit's scope item with a
-  §4 inventory row, not merely pointed at from here. Routing a carrier to a unit that does not
-  receive it is how round 2's B1 happened, and this §3 sentence reproduced it once before being
-  fixed on both ends.
+  `TOOL-aSiftedPlaybook-1` S4 **now RECEIVES `:33`** on all three of the carriers that make a
+  hand-off real: it is named in that unit's scope item, it has its own §4 inventory row, and its
+  **AC13** observes it (`grep -nE '[0-9]+-check' README.md` reads 20 and nothing else). The AC is
+  the load-bearing one — AC3's alternation cannot match "19-check", so without it every criterion in
+  the receiving unit goes green with the defect shipped. Routing a carrier to a unit that does not
+  receive it is how round 2's B1 happened; this §3 sentence reproduced it twice, once by naming no
+  receiver and once by asserting an inventory row that did not exist.
 - **Making these claims machine-checked.** `TOOL-aSiftedPlaybook-3`.
 
 ## 4. Design
@@ -235,6 +238,14 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-7 · 2026-08-16 · folded round-4 H1. rev-6's fix asserted that `TOOL-aSiftedPlaybook-1` S4
+  received `README.md:33` "with a §4 inventory row" — the row did not exist, and no acceptance
+  criterion in the receiving unit could observe the carrier either, since AC3's alternation cannot
+  match "19-check". §3 now names all three carriers of a real hand-off (scope item, inventory row,
+  AC13) and each is now true; the AC is called out as the load-bearing one. This section had
+  reproduced round-2 B1 twice — once by naming no receiver, once by asserting an inventory row that
+  was never written — which is why it now cites what a reader can check rather than that it is
+  handled.
 - rev-6 · 2026-08-16 · folded round-3 H6, L6 and L8. §3 routed root `README.md:33` to a unit whose
   scope item did not contain it — round-2 B1's exact shape, introduced by the fold meant to close
   L4 — so `TOOL-aSiftedPlaybook-1` S4 now receives it and this section says so. §2's provenance
