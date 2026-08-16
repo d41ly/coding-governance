@@ -854,11 +854,63 @@ miss "$gout" "FAIL fixture no-op"
 hit "$gout" "st=0 n=1"
 reset_tree
 
+# ---- TOOL-cSettledDocket-6: the STANDING frozen-versus-live fixture. cBriefedPilot's closing review
+# ---- found one root three times — a predicate joining a FROZEN historical value to a LIVE present
+# ---- one — and each instance was found by hand, filed separately, fixed locally. The rule this
+# ---- encodes is general: once a run is TERMINAL its record is immutable through the kit
+# ---- (`refuse_if_terminal` refuses all six verbs), so ANY leg check that can red on a terminal
+# ---- record is a wedge by construction, whatever it is checking.
+# ----
+# ---- AC1 is scoped PER MOVE to the check named in that move's collision column, NOT to total leg
+# ---- silence. Two moves — widening DIRECTIVES_CORE and adding a phase — red check 16 and arm D by
+# ---- construction, with no run population involved and no terminal exemption possible. A builder
+# ---- chasing total silence would exempt check 16 on terminal records, which is exactly the
+# ---- over-wide exemption the last arm here forbids.
+frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; }
+
+# MOVE 1 — the build index is re-rendered, which every unit close does. Collides with check 8: the
+# run-state file's copied generated region.
+reset_tree; frozen
+mutate memory/builds/tRun/README.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
+out=$(run)
+miss "$out" "a run-state file's generated region differs from the build README slice it is a COPY of"
+same "move 1 leaves a terminal record green" "$(run; echo $?)" "0"
+
+# ...LIVE control. Without it, move 1's silence is satisfiable by deleting check 8.
+reset_tree
+mutate memory/builds/tRun/README.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
+hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+
+# MOVE 2 — the kit gains a directive, which a later version does. Collides with check 17: a frozen
+# waiver's handle graded against today's set. The waiver is written by the DRIVER, so the row is real
+# rather than hand-authored, and then the world moves around it.
+reset_tree
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
+frozen
+out=$(run)
+miss "$out" "a parked waiver names a handle outside the effective directive set"
+
+# ...LIVE control for move 2: the same tree with a RUNNING record must still red, or the exemption
+# has switched the check off rather than scoped it.
+reset_tree
+printf '\n2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it\n' >> memory/builds/tRun/RUN.md
+mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
+hit "$(run)" "a parked waiver names a handle outside the effective directive set"
+
+# THE ANTI-OVER-EXEMPTION ARM. Unit 36 scoped check 8's terminal exemption to the whole block rather
+# than to its equality, which left this kit's only marker validator guarding zero files the moment a
+# run ended. A malformed marker is malformed whatever the phase says.
+reset_tree; frozen
+mutate memory/builds/tRun/RUN.md '/<!-- \/run:generated -->/d'
+hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=154
+FLOOR_ASSERTIONS=165
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

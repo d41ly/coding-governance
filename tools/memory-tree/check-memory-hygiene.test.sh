@@ -116,7 +116,11 @@ good > "$D/spec/2026-08-01-spec-tFixture-1.md"                                  
 good | sed 's/$/\r/' > "$D/spec/2026-08-01-spec-tFixture-2.md"                   # CRLF twin -> silent
 printf '# nested\nno header here\n## Wrong\nbody\n' > "$D/spec/subspecs/2026-08-01-spec-tFixture-3.md"  # nested+headerless -> red
 good | sed 's/^## 4\. Design$/## 4. Blueprint/' > "$D/spec/2026-08-01-spec-tFixture-4.md"               # wrong canon -> red
-printf '# t1\n\n**Status:** OPEN · rev-1 · 2026-08-01 · node a · Tier-1 · base 0123abcd\n\n## Whatever\n\nfree-form body\n' \
+printf '# t1\n\n**Status:** OPEN · rev-1 · 2026-08-01 · node a · Tier-1 · base 0123abcd\n\n## Whatever\n\nfree-form body
+
+## 9. Revision log
+
+- rev-1 · first\n' \
   > "$D/spec/2026-08-01-spec-tFixture-5.md"                                      # Tier-1 light profile -> silent
 good | sed 's/^A goal\.$/Ship on YYYY-MM-DD./' > "$D/spec/2026-08-01-spec-tFixture-6.md"                # placeholder -> red
 good | sed '/^The design\.$/d' > "$D/spec/2026-08-01-spec-tFixture-7.md"          # empty section body -> red
@@ -196,6 +200,75 @@ wit | unbold > "$D/spec/2026-08-10-spec-tFixture-53.md"   # post-cutoff, UNBOLDE
 # guard to Tier-2 left this harness byte-identical until this fixture existed.
 printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 6. Acceptance criteria\n\n- **AC1** When run, it passes with nothing named.\n' \
   > "$D/spec/2026-08-10-spec-tFixture-54.md"
+# ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
+# ---- Before the hoist every one of these was silent, because `next` cut the record first.
+printf '# t60
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 8. Open questions
+
+**RESOLVED: prose, which the gate does not count as an item.**
+
+## 9. Revision log
+
+- rev-1 · first
+' \
+  > "$D/spec/2026-08-10-spec-tFixture-60.md"                                   # Tier-1 terminal, unresolved -> REDS
+printf '# t61
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 8. Open questions
+
+### Q — RESOLVED at authoring
+
+body
+
+## 9. Revision log
+
+- rev-1 · first
+' \
+  > "$D/spec/2026-08-10-spec-tFixture-61.md"                                   # Tier-1 terminal, resolved -> silent
+printf '# t62
+
+**Status:** CLOSED · rev-2 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-1 · only this one
+' \
+  > "$D/spec/2026-08-10-spec-tFixture-62.md"                                   # Tier-1, header rev-2 unlogged -> REDS
+printf '# t63
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 7. Open questions
+
+**RESOLVED: prose, numbered 7 because Tier-1 is canon-exempt.**
+
+## 9. Revision log
+
+- rev-1 · first
+' \
+  > "$D/spec/2026-08-10-spec-tFixture-63.md"                                   # §8 at ## 7. -> REDS only if keyed on TITLE
+printf '# t64
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 1. Goal
+
+no open-questions section at all
+
+## 9. Revision log
+
+- rev-1 · first
+' \
+  > "$D/spec/2026-08-10-spec-tFixture-64.md"                                   # no such section -> must SAY SO, not pass
 # The witness sits on a CONTINUATION line. The accumulator that folds continuations into their
 # bullet had no fixture: deleting it left this harness unchanged while the real gate went red.
 wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash tools/memory-tree/check-memory-hygiene.sh`|' \
@@ -348,6 +421,7 @@ hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1;
 miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
 hitl() { n=$((n+1)); grep -qxF "$1" <<<"$out" || { echo "FAIL missing exact line: $1"; st=1; }; }
 lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
+n=$((n+1))
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
@@ -371,6 +445,17 @@ miss 'tFixture-43.md ('                       # every §8 item RESOLVED satisfie
 hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'
 miss 'tFixture-45.md ('                       # a ### sub-head fork, RESOLVED, satisfies a terminal status
 hit  'tFixture-46.md (terminal Status with unresolved §8 Open questions'
+hit  'tFixture-60.md (terminal Status with unresolved §8 Open questions'
+miss 'tFixture-61.md ('                      # resolved on Tier-1 is as green as resolved on Tier-2
+hit  'tFixture-62.md (header rev-2 not logged in the §9 Revision log)'
+# THE ARM THAT SEPARATES the fix from a half-fix: Tier-1 is canon-exempt, so a Tier-1 spec may
+# legally number Open questions anything. Keyed on the NUMBER this is silent and the rule stays
+# bypassable by doing exactly what the same gate permits; keyed on the TITLE it reds.
+hit  'tFixture-63.md (terminal Status with unresolved §8 Open questions'
+# ...and a range that never opens must SAY SO: silence and a resolved fork were the same byte.
+hit  'tFixture-64.md (terminal Status and no Open questions section found'
+# ...while the canon check STAYS Tier-2-only. tFixture-5's `## Whatever` and its miss arm are that
+# control, and it is what the cut still guards.
 hit  'tFixture-16.md (## sections differ'
 miss 'tFixture-16.md (terminal Status'
 # Emission ORDER inside one file: a per-file loop got it for free, one awk over a driver does not.
@@ -404,6 +489,7 @@ c5miss "$D/spec/units/2026-08-01-spec-tFixture-30-u1-nested-ok.md"
 c5miss "$D/spec/units/2026-08-01-spec-tFixture-31-u2-tail-ok.md"
 # the conforming-nested arm is load-bearing for the KIND derivation: the kind comes from the
 # SUBFOLDER (`spec`), not from the file's immediate parent (`units`). Do not delete it as redundant.
+n=$((n+1))
 grep -qF 'nesting is fine' <<<"$out" || { echo "FAIL the check-5 message does not say depth is allowed"; st=1; }
 
 # ---- streams arms. Each asserts the branch's OWN text, not merely "check 12 fired": a bare
@@ -424,11 +510,14 @@ miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head
 # the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
 # cutoff for this violation and would misdirect the first author who hits it.
+n=$((n+1))
 grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08" <<<"$out" || { echo "FAIL the witness rejection does not name its own cutoff"; st=1; }
 # and the offending LABEL, not merely the file
+n=$((n+1))
 grep -qE "tFixture-5[03][.]md .*AC1" <<<"$out" || { echo "FAIL the witness rejection does not name the bullet label"; st=1; }
 
 # the legal set rides the message — a rejection that does not say what IS legal is a riddle
+n=$((n+1))
 grep -qF 'legal values: architecture' <<<"$out" || { echo "FAIL the streams rejection does not name the legal set"; st=1; }
 
 # ---- FAMILY qualifier + flat folder naming + backlog shard naming
@@ -451,6 +540,7 @@ chit 3 'memory/project/tstray.md'
 # the depth the path expression expects, so check 3's population is non-empty and the
 # empty-population report must NOT name it. Silence from check 3 itself would prove nothing — a
 # mis-segmented selector is silent for the same reason a clean one is.
+n=$((n+1))
 grep -qE '^    check 3: ' <<<"$out" \
   && { echo "FAIL check 3 tripped the empty-population guard on a tree whose registries sit at the expected depth"; st=1; }
 hit  'build-folder naming/shape'
@@ -487,6 +577,7 @@ cnot 6 'memory/builds/tRunOk/RUN.md'
 # ---- (c) check 7 EXEMPTS it — asserted on the SAME file check 6 just named, so membership is
 # ----     already established and only the exemption is under test. The file carries a 340-char
 # ----     unfenced row: without the ex7 alternative this line fires.
+n=$((n+1))
 cblock "$out" 7 | grep -qF 'memory/builds/tRunBig/RUN.md' \
   && { echo "FAIL check 7 reported the run-state file's 340-char row — RUN.md lost its ex7 exemption"; st=1; }
 # ---- (d) check 8 does NOT grow a RUN.md population. The run-phase vocabulary is deliberately not
@@ -515,18 +606,22 @@ hit  'spec files dated >='
 # ---- excerpt afterwards with the original `diff | head -6 | sed`, so BOTH halves need pinning: it
 # ---- is a real diff, indented four spaces, capped at six lines, and the sentinel byte itself never
 # ---- reaches the output. Without these, deleting the sentinel or shrinking the cap is invisible.
+n=$((n+1))
 hit  'tFixture-17.md (## sections differ'
 hitl '    < ## 4. Design'
 hitl '    > ## 4. Blueprint'
 hitl '    ---'
 case "$out" in *$'\001'*) echo "FAIL the check-12 diff sentinel leaked into the output"; st=1;; esac
+n=$((n+1))
 n17=$(awk '/tFixture-17\.md \(## sections differ/{g=1; next} g && /^    /{c++; next} g{exit} END{print c+0}' <<<"$out")
 [ "$n17" = 6 ] || { echo "FAIL the diff excerpt for a wholly-renamed spec is $n17 lines, expected the head -6 cap"; st=1; }
 
 # ---- CHECK 7: unfenced line NUMBERING and the three exemptions.
+n=$((n+1))
 hit  'HYGIENE check 7 FAILED'
 n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars\)$' <<<"$out")
 [ "$n7" = 2 ] || { echo "FAIL check 7 emitted $n7 findings, expected exactly 2 (fence, comment and separator are exempt; the 300-byte row is under the cap)"; st=1; }
+n=$((n+1))
 hitl 'memory/backlog/ARCH.md:7 (301 chars)'
 miss 'memory/backlog/ARCH.md:6 ('
 c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars\)$' <<<"$out" | head -1)
@@ -535,23 +630,28 @@ case "$c7line" in 'memory/backlog/ARCH.md:5 ('*) ;;
 
 # ---- --staged: `in_scope` is the ONLY thing deciding selection there, so no full-mode arm above can
 # ---- see a scoping regression. A red must be the committer's own file, never another stream's debt.
+n=$((n+1))
 git reset -q
 printf 'x\n' >> "$D/spec/2026-08-01-spec-tFixture-4.md"
 git add "$D/spec/2026-08-01-spec-tFixture-4.md"
 outs=$(bash "$SCRIPT" --staged 2>/dev/null)
 grep -qF 'tFixture-4.md (## sections differ' <<<"$outs" \
   || { echo "FAIL --staged missed the staged file's own finding"; st=1; }
+n=$((n+1))
 grep -qF 'tFixture-10.md (' <<<"$outs" \
   && { echo "FAIL --staged reported an UNSTAGED file's finding"; st=1; }
 # check 7 carries its own `in_scope` filter, and the arm above stages only a SPEC — so an unstaged
 # over-cap index file must stay silent. Without this, dropping check 7's in_scope is invisible.
+n=$((n+1))
 grep -qF 'HYGIENE check 7' <<<"$outs" \
   && { echo "FAIL --staged reported check 7 for an UNSTAGED index file"; st=1; }
 # the empty-population guard must NOT fire in --staged mode: an empty staged set is the normal case.
+n=$((n+1))
 grep -qF 'selected an EMPTY population' <<<"$outs" \
   && { echo "FAIL --staged tripped the empty-population guard, which is the normal staged case"; st=1; }
 git reset -q && git checkout -q -- "$D/spec/2026-08-01-spec-tFixture-4.md"
 # ...and the other direction: staging the index file DOES surface its own over-cap row.
+n=$((n+1))
 printf '\n' >> memory/backlog/ARCH.md
 git add memory/backlog/ARCH.md
 outs7=$(bash "$SCRIPT" --staged 2>/dev/null)
@@ -566,6 +666,7 @@ git reset -q && git checkout -q -- memory/backlog/ARCH.md
 #    the fence toggle and every compare break. On a Cygwin node the C runtime strips CR BEFORE awk
 #    sees a byte — measured through a filename argument, through `getline line < f` AND through a
 #    pipe — so the CRLF fixture above passes identically with and without the guard.
+n=$((n+1))
 ncr=$(awk '
   index($0, "while ((getline line < f) > 0)") { open[++n] = NR; guarded[n] = 0 }
   n > 0 && NR > open[n] && NR <= open[n] + 2 && index($0, "sub(/\\r$/, \"\", line)") { guarded[n] = 1 }
@@ -578,12 +679,14 @@ ncr=$(awk '
 #    reds with "missing/invalid **Status:** header" — a loud break of a check that works today.
 #    The predicate matches `{` followed by a DIGIT, not a bare `{` — every one of these lines ends in
 #    the `) {` that opens its own if-block, so a bare-brace ban flags the innocent and passes nothing.
+n=$((n+1))
 ivl=$(grep -nE 'hdr [!=]~ /' "$SCRIPT" | grep -E '\{[0-9]' || true)
 [ -z "$ivl" ] || { echo "FAIL an interval expression survives in a batched-awk regex: $ivl"; st=1; }
 # 3. The §9 range CLOSES. `check-arms` cannot help here: check 12's per-spec findings are awk `print`
 #    statements funnelled into one `fail 12` that is already armed, so deleting the reset moves no
 #    branch, no floor and — measured — no corpus verdict. The fixtures above and this line are the
 #    whole of the protection.
+n=$((n+1))
 r9=$(awk '/in9 = 1/{f=1} f&&/else if \(in9 && L ~ \/\^## \/\) in9 = 0/{ok=1} END{print ok+0}' "$SCRIPT")
 [ "$r9" = 1 ] || { echo "FAIL the §9 rev-scan range no longer closes on the next ## heading"; st=1; }
 # 4. Check 7 takes NO locale prefix. `length()` decides its verdict and its character-versus-byte
@@ -591,6 +694,7 @@ r9=$(awk '/in9 = 1/{f=1} f&&/else if \(in9 && L ~ \/\^## \/\) in9 = 0/{ok=1} END
 #    lines below sorts, it does not measure, and is not the pattern to copy here.
 #    Comment lines are stripped first: the region carries prose explaining exactly this ban, and a
 #    predicate that fires on the comment documenting the fix is the classic self-inflicted red.
+n=$((n+1))
 lc7=$(awk '/^# 7 — /{f=1} /^# 8 — /{f=0} f && $0 !~ /^[[:space:]]*#/ && /LC_ALL/{print NR ": " $0}' "$SCRIPT")
 [ -z "$lc7" ] || { echo "FAIL check 7 carries a locale prefix — length() must stay locale-dependent: $lc7"; st=1; }
 # 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
@@ -598,36 +702,46 @@ lc7=$(awk '/^# 7 — /{f=1} /^# 8 — /{f=0} f && $0 !~ /^[[:space:]]*#/ && /LC_
 #    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
 #    moved. The fixture below catches today's shape; this catches the RESHAPE that would lose it
 #    again, which no fixture can, because the second spelling would still be a valid expression.
+n=$((n+1))
 ex7asg=$(grep -nE 'ex7=' "$SCRIPT")
 ex7g=$(printf '%s\n' "$ex7asg" | grep -cF '/guides/')
 [ "$ex7g" = 1 ] || { echo "FAIL the ex7 exemption carries $ex7g spellings of the guides/ alternative, expected exactly 1"; st=1; }
+n=$((n+1))
 ex7bad=$(printf '%s\n' "$ex7asg" | tail -n +2 | grep -vF '$ex7' || true)
 [ -z "$ex7bad" ] || { echo "FAIL an ex7 re-assignment rebuilds the expression instead of appending to \$ex7: $ex7bad"; st=1; }
 
 # disabled-when-blank contracts: same tree, each cutoff removed in turn.
+n=$((n+1))
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 out2=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'HYGIENE check 12' <<<"$out2"; then echo "FAIL: check 12 ran with blank SPEC_FORMAT_CUTOFF"; st=1; fi
+n=$((n+1))
 if ! grep -qF 'HYGIENE check 12' <<<"$out"; then echo "FAIL: check 12 never fired with cutoff armed"; st=1; fi
+n=$((n+1))
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
 out3=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'on/after STREAMS_CUTOFF' <<<"$out3"; then echo "FAIL: the streams requirement fired with a blank STREAMS_CUTOFF"; st=1; fi
+n=$((n+1))
 if grep -qF 'no backticked witness' <<<"$out3"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
+n=$((n+1))
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
 # an ILLEGAL value is still illegal with the cutoff blank — validation and the ratchet are separate
+n=$((n+1))
 grep -qF 'tFixture-20.md (streams value(s) outside the enum' <<<"$out3" \
   || { echo "FAIL: an illegal streams value went unchecked with a blank STREAMS_CUTOFF"; st=1; }
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
 # ---- is silent for exactly the same file. Listed -> silent; the line removed -> the same file reds.
+n=$((n+1))
 printf '# legacy\n%s\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
 git add -A >/dev/null 2>&1; git commit -q -m legacy --no-verify
 outl=$(bash "$SCRIPT" 2>/dev/null)
 awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$outl" \
   | grep -qF "$D/spec/units/scratch-notes.md" \
   && { echo "FAIL a legacy-listed nested file still reds check 5"; st=1; }
+n=$((n+1))
 printf '# legacy\n' > memory/project/legacy-files.txt
 git add -A >/dev/null 2>&1; git commit -q -m unlegacy --no-verify
 outu=$(bash "$SCRIPT" 2>/dev/null)
@@ -639,21 +753,26 @@ awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5
 # ---- tracks is a permanent silent exemption — the exempted file is gone, so nothing ever reds and
 # ---- nothing ever says why. Each list gets a dead line AND a live one in the same run: the live one
 # ---- must stay unreported, or the guard is merely "the list is non-empty".
+n=$((n+1))
 printf '# legacy\n%s\nmemory/project/gone-forever.md\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
 printf '# debt\nmemory/backlog/ARCH.md\nmemory/project/also-gone.md\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m stale --no-verify
 outst=$(bash "$SCRIPT" 2>/dev/null)
 grep -qF 'legacy-files.txt lists paths that no longer exist (stale-line guard)' <<<"$outst" \
   || { echo "FAIL the legacy-files stale-line guard did not fire on a dead entry"; st=1; }
+n=$((n+1))
 grep -qF 'memory/project/gone-forever.md' <<<"$outst" \
   || { echo "FAIL the legacy-files stale-line guard did not name the dead entry"; st=1; }
+n=$((n+1))
 grep -qF 'curation-debt.txt lists paths that no longer exist (stale-line guard)' <<<"$outst" \
   || { echo "FAIL the curation-debt stale-line guard did not fire on a dead entry"; st=1; }
+n=$((n+1))
 grep -qF 'memory/project/also-gone.md' <<<"$outst" \
   || { echo "FAIL the curation-debt stale-line guard did not name the dead entry"; st=1; }
 # the LIVE debt entry is exempted, not reported: it is the over-cap arm's own file, and check 6
 # branch 1 must now stay silent about it. That is the grandfather working and the guard not
 # over-firing, in one assertion.
+n=$((n+1))
 awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outst" \
   | grep -qF 'memory/backlog/ARCH.md (' \
   && { echo "FAIL a curation-debt-listed file was still capped by check 6"; st=1; }
@@ -677,14 +796,18 @@ mkdir -p "$H/memory/project" "$H/memory/architecture/project" "$H/memory/archite
   # the un-segmented count asks "does a registry exist anywhere under the memory root?" and answers
   # yes, while the flat selector `memory/project/*.txt` matches none — which is exactly the
   # mis-segmented shape the guard exists to catch, and is silent without it.
+  n=$((n+1))
   printf '# legacy\n' > memory/architecture/project/legacy-files.txt
   git add -A && git commit -q -m half --no-verify )
 outh=$(cd "$H" && bash "$SCRIPT" 2>/dev/null); rch=$?
 [ "$rch" = 0 ] && { echo "FAIL a half-migrated tree exited 0 — every flat selector matched nothing and the gate was green"; st=1; }
+n=$((n+1))
 grep -qF 'selected an EMPTY population' <<<"$outh" || { echo "FAIL no empty-population report on a half-migrated tree"; st=1; }
+n=$((n+1))
 for c in 3 4 5 8 12; do
   grep -qE "^    check $c: " <<<"$outh" || { echo "FAIL check $c did not report its empty population on a half-migrated tree"; st=1; }
 done
+n=$((n+1))
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
 #
 # (b) A FRESHLY SCAFFOLDED tree: no builds at all, nothing mis-segmented. The guard MUST stay quiet,
@@ -699,6 +822,7 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   # the generator reads `git ls-files`, so stage first, render, then stage the render — the same
   # order `adopt-memory-tree.sh --scaffold` uses, because this arm is standing in for its output
+  n=$((n+1))
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && git add -A
   git commit -q -m young --no-verify )
 outy=$(cd "$Y" && bash "$SCRIPT" 2>/dev/null); rcy=$?
@@ -708,6 +832,7 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 # run-state file is OPTIONAL, and a whitelist entry that quietly became a requirement would red here
 # and in the scaffolder arm below. RUN.md joins no pop_guard population, deliberately — a young tree
 # has no run to record, so there is no precondition that could make its absence a mis-segmentation.
+n=$((n+1))
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
@@ -717,6 +842,7 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 # ----     alternative — a LOOSENING, which nothing here could have seen: every guide silently
 # ----     entered the entry-budget population and the gate stayed green. Three over-cap rows, one
 # ----     per exemption state, so the arm cannot be satisfied by a check 7 that reports nothing.
+n=$((n+1))
 G=$TMP/mapped
 mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/memory/backlog"
 ( cd "$G" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
@@ -734,8 +860,10 @@ mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/mem
 outm=$(cd "$G" && bash "$SCRIPT" 2>/dev/null)
 cblock "$outm" 7 | grep -qF 'memory/map/README.md:' \
   || { echo "FAIL check 7 did not report the over-cap row in the map index, which carries no exemption"; st=1; }
+n=$((n+1))
 cblock "$outm" 7 | grep -qF 'memory/guides/tguide.md' \
   && { echo "FAIL check 7 reported a guide's over-cap row — the MAP_SUB branch dropped the guides/ exemption again"; st=1; }
+n=$((n+1))
 cblock "$outm" 7 | grep -qF 'memory/map/features/tdoss.md' \
   && { echo "FAIL check 7 reported a codebase-map dossier's over-cap row — dossiers are detail files"; st=1; }
 
@@ -759,6 +887,7 @@ mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/bu
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   rr() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tOwner-1\n---\n\n# %s\n' "$1" "$1"; }
+  n=$((n+1))
   rr tOwner > memory/builds/tOwner/README.md
   rr tRunBig > memory/builds/tRunBig/README.md
   rr tRunOk > memory/builds/tRunOk/README.md
@@ -770,8 +899,10 @@ mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/bu
 outr=$(cd "$R" && bash "$SCRIPT" 2>/dev/null)
 grep -qF 'check 13: id ARCH-tOwner-1 is claimed by 2 build folders' <<<"$outr" \
   || { echo "FAIL a RUN.md dash row did not make its build folder a second claimant of the id"; st=1; }
+n=$((n+1))
 grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunBig' \
   || { echo "FAIL check 13 did not name the run-state file's build folder as a claimant"; st=1; }
+n=$((n+1))
 grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunOk' \
   && { echo "FAIL check 13 named tRunOk, whose RUN.md cites the id INLINE IN PROSE — prose is not an anchor"; st=1; }
 
@@ -784,6 +915,7 @@ grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunOk' \
 # ---- git repo, a .memory-tree.conf (absent -> it copies the example and exits 1), and NO existing
 # ---- memory/ (present -> exit 0 "already scaffolded" over an unwritten tree, which would be a green
 # ---- rc proving nothing).
+n=$((n+1))
 A=$TMP/scaffolded
 mkdir -p "$A"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
@@ -794,14 +926,17 @@ mkdir -p "$A"
 # of them would hand every new adopter a red tree on their first run. The prefix is interpolated
 # rather than spelled into each entry, so this arm cannot itself be mistaken for a surviving fixture
 # by a sweep looking for the old paths.
+n=$((n+1))
 for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do
   [ -e "$A/memory/project/$p" ] && { echo "FAIL adopt-memory-tree.sh still scaffolds memory/project/$p, which check 3 now rejects"; st=1; }
 done
 # ...and all FIVE registries, not two. Three of them are NAMED by gates and were created by nothing;
 # "absent" and "present and empty" read identically to every consumer, which is what hid it.
+n=$((n+1))
 for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt; do
   [ -f "$A/memory/project/$r" ] || { echo "FAIL adopt-memory-tree.sh did not scaffold memory/project/$r"; st=1; }
 done
+n=$((n+1))
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 [ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
 
@@ -813,14 +948,17 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 # that a tally which cannot be derived is the two-answers-to-one-question defect wearing a reassuring
 # number — correct about the authored form, and exactly why this one is DERIVED instead: `n`
 # increments in the assertion helpers, so nobody maintains it.
-# It counts the HELPER assertions and says so. main measured a static call-site count of 115 that
-# "reconciles with nothing"; the reason is that roughly fifty sites here assert INLINE
-# (`<test> || { echo FAIL...; st=1; }`) and are not counted — that needs an increment before each
-# test rather than inside its failure brace, and is filed as TOOL-cBriefedPilot-34. Labelled
-# honestly rather than replacing one wrong number with a second.
+# TOOL-cSettledDocket-4 made the count WHOLE: the 52 inline sites (`<test> || { echo FAIL...; st=1; }`)
+# now increment too, at each statement's start rather than inside its failure brace — inside, it
+# would count failures and a green run would report near zero. main's static call-site count of 115
+# "reconciled with nothing" for exactly this reason. Derivation, so a reader can re-check rather than
+# trust: 88 helper-only -> 137 whole, i.e. +49 against 52 sites inserted. The three-site gap is NOT
+# arithmetic error — three sites sit on paths this run does not take, which is the very signal the
+# floor exists to surface, so it is written down instead of smoothed away.
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
-FLOOR_ASSERTIONS=83
+n=$((n+1))
+FLOOR_ASSERTIONS=137
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
-[ "$st" = 0 ] && echo "PASS ($n helper assertions)"
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

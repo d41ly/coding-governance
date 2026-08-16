@@ -1077,11 +1077,11 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
-for v in --preflight --plan --phase --status --resume --close --landed --abort; do
+for v in --preflight --plan --phase --status --resume --close --landed --park --abort; do
   n=$((n+1))
   [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
     || { echo "FAIL the header docstring omits $v"; st=1; }
@@ -1359,11 +1359,75 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL the driver reaches the repairing wiring
 nf=$(grep -nE 'head -1 \| tr -d' "$HERE/unattended.sh" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
 
+# ---- TOOL-cSettledDocket-1: `--park`, the fourth writer of a parked entry and the first available
+# ---- MID-RUN. §2 declares four kinds; park() had callers for three, and DECISION — the kind §2
+# ---- names first — had none. GREEN CONTROL first, then one arm per refusal.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+
+# GREEN CONTROL: the happy path writes exactly one row, of the declared kind.
+out=$(run --park tRun --item "do facts 5-7 pin with fact 4" --reason "widens the unit; owner call")
+hit "$out" "decision parked"
+same "exactly one decision row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "1"
+hit "$(cat memory/builds/tRun/RUN.md)" "decision · item do facts 5-7 pin with fact 4 · reason widens the unit; owner call"
+
+# ...and it is IDEMPOTENT on the same pair. The protocol's post-compaction recovery re-runs the run's
+# own steps, so a re-derived refusal must not duplicate. NOT --waive's rule: that compares handle
+# SETS, this compares one pair, because there is no set here to compare.
+out=$(run --park tRun --item "do facts 5-7 pin with fact 4" --reason "widens the unit; owner call")
+hit "$out" "already parked, unchanged"
+same "the repeat added no row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "1"
+
+# ...a DIFFERENT question is a second row, not a no-op.
+run --park tRun --item "second question" --reason "also owner" >/dev/null
+same "a different item parks its own row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "2"
+
+# ...and --status surfaces it, which is the whole point of writing it somewhere a reader reaches.
+hit "$(run --status tRun)" "tRun"
+
+# refusal: no --item.
+before=$(git hash-object memory/builds/tRun/RUN.md)
+out=$(run --park tRun --reason "r")
+hit "$out" "--park requires --item, because a parked entry with no question recorded is the bare 'parked' the protocol calls indistinguishable from 'forgotten'"
+same "a refused park wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# refusal: no --reason.
+out=$(run --park tRun --item "q")
+hit "$out" "--park requires --reason, because an entry recording no reason is indistinguishable from one nobody meant - the same argument --waive already makes"
+
+# refusal: a reason spelling the declared bypass flag. park() writes it verbatim and leg check 11
+# greps the file WHOLE, so recording it would red the bar on a record no verb can rewrite.
+out=$(run --park tRun --item "q" --reason "the lander wanted --no-verify")
+hit "$out" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar; say it without the literal flag"
+
+# refusal: a NEWLINE in the reason. This is the one --waive refusal rev-1 of the spec left out, and
+# it is the load-bearing one here: park() appends ONE line and check 17 parses the region line-wise,
+# so a reason carrying a newline forges a second parked row that no verb wrote.
+out=$(run --park tRun --item "q" --reason "$(printf 'first\nsecond')")
+hit "$out" "a parked item or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+same "the forged row was not written" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "2"
+
+# refusal: an item spelling the record's own field separator, which would make its row unparseable
+# by the very check that grades it.
+hit "$(run --park tRun --item 'a · reason b' --reason r)" "a parked item spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"
+
+# refusal: a TERMINAL record. Two guards, not one — see the next arm for why.
+run --phase tRun LANDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1 || true
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+hit "$(run --park tRun --item q --reason r)" "ABORTED via --park"
+
+# refusal: NO RECORD AT ALL. `refuse_if_terminal` returns 0 for a file that does not exist, so a
+# design leaning on it alone would let --park mint a parked entry for a run that never started.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+out=$(run --park tRun --item q --reason r)
+hit "$out" "no run-state file, so there is no run to park a decision against"
+same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=254
+FLOOR_ASSERTIONS=273
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

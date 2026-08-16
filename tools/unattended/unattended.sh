@@ -9,6 +9,7 @@
 #   unattended.sh --resume <slug>                          # the same line, plus the next action
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
+#   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -59,6 +60,7 @@ CONF="$ROOT/.unattended.conf"
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""
+PK_ITEM=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -1261,6 +1263,48 @@ park() { # file · kind · item · reason
   printf '\n%s %s · item %s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$4" >> "$1"
 }
 
+# TOOL-cSettledDocket-1 - the fourth writer of a parked entry, and the first one available MID-RUN.
+# Protocol §2 declares four parked kinds and park() had callers for three: --close --override,
+# --abort and --preflight --waive. DECISION - the kind §2 names first, "the question, the options
+# seen, and the reason the run refused" - had no writer at all, so an agent that refused a decision
+# at pass four had nowhere to put it that any gate reads. Hit during cBriefedPilot's own fold, where
+# the workaround was a backlog row: a different document, read by different people, at a later time.
+verb_park() { # slug · item · reason
+  local slug="$1" item="$2" reason="$3" rel
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  # TWO guards and not one. `refuse_if_terminal` returns 0 for a record that does not EXIST, so
+  # leaning on it alone would let --park mint a parked entry for a run that never started.
+  [ -f "$rel" ] || { fail 43 "no run-state file, so there is no run to park a decision against: $rel"; return 1; }
+  [ -n "$item" ] || { fail 43 "--park requires --item, because a parked entry with no question recorded is the bare 'parked' the protocol calls indistinguishable from 'forgotten'"; return 1; }
+  [ -n "$reason" ] || { fail 43 "--park requires --reason, because an entry recording no reason is indistinguishable from one nobody meant - the same argument --waive already makes"; return 1; }
+  # ALL THREE of --waive's reason refusals, not the first. park() appends one LINE and check 17 parses
+  # the parked region line-wise, so the NEWLINE refusal is load-bearing here rather than tidy: a
+  # reason carrying one forges a second parked row that no verb wrote.
+  if [ "$(printf '%s' "$reason$item" | wc -l)" -ne 0 ]; then
+    fail 43 "a parked item or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  # The item is read back as the token between ' · item ' and ' · reason ', so an item spelling the
+  # separator makes its own record unparseable - by the very check that grades it.
+  case "$item" in *" · "*) fail 43 "a parked item spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 43 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --park || return 1
+  # IDEMPOTENT, and deliberately NOT by --waive's rule: that one compares handle SETS and refuses a
+  # differing one; this compares ONE pair and no-ops on a match. Same purpose - the protocol's
+  # post-compaction recovery re-runs the run's own steps, and a re-derived refusal must not
+  # duplicate - reached by a different mechanism, because there is no set here to compare.
+  if grep -qF -- " decision · item $item · reason $reason" "$rel"; then
+    echo "unattended: decision already parked, unchanged — $item"
+    return 0
+  fi
+  park "$rel" decision "$item" "$reason"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: decision parked — $item"
+  return 0
+}
+
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -1296,7 +1340,8 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; WV_PEND=""; shift 2 || shift ;;
     --waive)        WAIVE_ITEMS+=("${2:-}"); WAIVE_REASONS+=(""); WV_PEND=wv; OV_PEND=""; shift 2 || shift ;;
@@ -1310,7 +1355,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -1318,7 +1363,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text>"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text>"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -1327,5 +1372,6 @@ case "$VERB" in
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
+  --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
 esac
 exit "$status"

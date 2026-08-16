@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.16   # gov:kit memory-tree@2.16 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.17   # gov:kit memory-tree@2.17 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -229,7 +229,7 @@ bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$b3b" "$b3c")
 # admitted-but-never-written entry would be a third answer to a question this list is closing.
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 # The precondition is deliberately UN-SEGMENTED (see pop_guard): `project/` is drained of session
-# machinery, not emptied — the six registries stay — so the population is 6 on a real tree and 0
+# machinery, not emptied — the registries stay — so the population is non-zero on a real tree and 0
 # only when the path expression is mis-segmented, which is the one shape that silently disarms this
 # sub-lint. A tree with no `.txt` anywhere is a young tree and stays silent.
 PRE_REGISTRY=$(printf '%s\n' "$FILES" | grep -cE '\.txt$')
@@ -238,7 +238,7 @@ pop_guard 3 "no registry under $M/project/" \
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:legacy-files.txt|F:curation-debt.txt) ;;
   F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
-  F:method-carriers.txt) ;;
+  F:method-carriers.txt|F:testsuite-count-waivers.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then
@@ -623,6 +623,69 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       if (nwb > 0)
         print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
     }
+    # ---- TOOL-cSettledDocket-3: these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut.
+    # ---- TEMPLATE-SPEC calls the fork rule machine-checked; it was checked on Tier-2 alone because
+    # ---- `next` is a PREFIX cut and both assertions sat behind it. Moving the cut cannot fix that:
+    # ---- the two blocks that must STAY Tier-2-only (the section canon, the empty-body test) sit
+    # ---- between the cut and these, so no placement runs these two while skipping those. Hoisted.
+    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
+    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
+    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
+    # ---- anywhere further down. Reproduced at 99 against a true 1.
+    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
+    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
+    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
+    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
+    k = "· rev-"; p = index(hdr, k); hrev = ""
+    if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
+    in9 = 0; seen = 0; mx = 0
+    for (i = 1; i <= n; i++) {
+      L = body[i]
+      if (L ~ /^## [0-9]+\. Revision log/) in9 = 1
+      else if (in9 && L ~ /^## /) in9 = 0
+      if (in9) while (match(L, /rev-[0-9]+/)) {
+        v = substr(L, RSTART + 4, RLENGTH - 4) + 0
+        if (!seen || v > mx) mx = v
+        seen = 1; L = substr(L, RSTART + RLENGTH)
+      }
+    }
+    if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
+    # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
+    # ---- when shorter than three lines because both deletes land inside it.
+    if (hdr ~ /^\*\*Status:\*\* CLOSED/ || hdr ~ /^\*\*Status:\*\* WONTDO/) {
+      q = 0; inr = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (!inr) { if (L ~ /^## [0-9]+\. Open questions/) { inr = 1; rng[++q] = L } }
+        else { rng[++q] = L; if (L ~ /^## [0-9]+\. /) inr = 0 }
+      }
+      # TEMPLATE-SPEC promises TWO ways for a terminal spec to satisfy §8: it reads `none`, OR every
+      # question is marked RESOLVED in place. Only the first was ever implemented, so the documented
+      # second option was unreachable and a fully-resolved spec could not go CLOSED — a rule the doc
+      # states and the gate does not enforce is the same false-claim class this catalogue exists for.
+      q8 = ""; items = 0; resolved = 0
+      for (i = 2; i <= q - 1; i++) {
+        if (rng[i] ~ /^[[:space:]]*$/) continue
+        if (q8 == "") q8 = rng[i]
+        # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
+        # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
+        # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
+        # items, could never satisfy `items == resolved`, and could never go terminal no matter how
+        # thoroughly its forks were answered. That is the same false-claim class as the note directly
+        # above, one level down: the doc offered two shapes and the gate implemented one.
+        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/ || rng[i] ~ /^###[[:space:]]/) {
+          items++
+          if (rng[i] ~ /RESOLVED/) resolved++
+        }
+      }
+      if (q == 0)
+        print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
+      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
+        print f " (terminal Status with unresolved §8 Open questions)"
+    }
+
     if (hdr ~ /Tier-1/) next
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""
@@ -648,61 +711,6 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
     if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
     if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
-    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
-    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
-    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
-    # ---- anywhere further down. Reproduced at 99 against a true 1.
-    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
-    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
-    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
-    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
-    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
-    k = "· rev-"; p = index(hdr, k); hrev = ""
-    if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
-    in9 = 0; seen = 0; mx = 0
-    for (i = 1; i <= n; i++) {
-      L = body[i]
-      if (L ~ /^## 9\. Revision log/) in9 = 1
-      else if (in9 && L ~ /^## /) in9 = 0
-      if (in9) while (match(L, /rev-[0-9]+/)) {
-        v = substr(L, RSTART + 4, RLENGTH - 4) + 0
-        if (!seen || v > mx) mx = v
-        seen = 1; L = substr(L, RSTART + RLENGTH)
-      }
-    }
-    if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
-    # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
-    # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
-    # ---- when shorter than three lines because both deletes land inside it.
-    if (hdr ~ /^\*\*Status:\*\* CLOSED/ || hdr ~ /^\*\*Status:\*\* WONTDO/) {
-      q = 0; inr = 0
-      for (i = 1; i <= n; i++) {
-        L = body[i]
-        if (!inr) { if (L ~ /^## 8\. Open questions/) { inr = 1; rng[++q] = L } }
-        else { rng[++q] = L; if (L ~ /^## 9\. /) inr = 0 }
-      }
-      # TEMPLATE-SPEC promises TWO ways for a terminal spec to satisfy §8: it reads `none`, OR every
-      # question is marked RESOLVED in place. Only the first was ever implemented, so the documented
-      # second option was unreachable and a fully-resolved spec could not go CLOSED — a rule the doc
-      # states and the gate does not enforce is the same false-claim class this catalogue exists for.
-      q8 = ""; items = 0; resolved = 0
-      for (i = 2; i <= q - 1; i++) {
-        if (rng[i] ~ /^[[:space:]]*$/) continue
-        if (q8 == "") q8 = rng[i]
-        # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
-        # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
-        # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
-        # items, could never satisfy `items == resolved`, and could never go terminal no matter how
-        # thoroughly its forks were answered. That is the same false-claim class as the note directly
-        # above, one level down: the doc offered two shapes and the gate implemented one.
-        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/ || rng[i] ~ /^###[[:space:]]/) {
-          items++
-          if (rng[i] ~ /RESOLVED/) resolved++
-        }
-      }
-      if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
-        print f " (terminal Status with unresolved §8 Open questions)"
-    }
   }')
 fi
 # The section-canon excerpt keeps a REAL `diff`: reproducing its normal-format output inside awk

@@ -122,7 +122,8 @@ must not turn it into a copy) · the full bar.
 
 ## 8. Open questions
 
-**RESOLVED at authoring: keep the derived glob, and give `SKILL.template.md` the marker it implies.**
+### RESOLVED at authoring: keep the derived glob, and give `SKILL.template.md` the marker it implies
+
 The alternative was to narrow the population to `PROTOCOL.template.md`, which is what the design pass
 described and what the backlog row asks for literally. It is rejected on `TOOL-aSealedCaravan-3`'s
 recorded evidence: a named population is the defect, and a shipped doc that self-identifies as

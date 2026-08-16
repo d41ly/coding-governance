@@ -538,5 +538,19 @@
     "guard": [
       "tools/govkit/"
     ]
+  },
+  {
+    "name": "testsuite counts (every bar self-test prints one)",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.sh"
+    ]
+  },
+  {
+    "name": "testsuite counts self-test",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.test.sh"
+    ]
   }
 ]

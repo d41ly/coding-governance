@@ -104,8 +104,9 @@ the full bar.
 
 ## 8. Open questions
 
-**RESOLVED (owner, 2026-08-14): yes, the naming is required.** S4's second clause is unconditional.
-The reasoning is kept below because it is what changed the answer.
+### P4 — RESOLVED (owner, 2026-08-14): yes, the naming is required
+
+S4's second clause is unconditional. The reasoning is kept below because it is what changed the answer.
 
 **P4 — does a waived `reuse-first` have to say so in §10?** The refusal option is off the table: it
 rested on the claim that this waiver reds the bar, and that was measured false (hygiene check 12
