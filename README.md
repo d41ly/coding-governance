@@ -43,9 +43,27 @@ machines/sessions on the same repo.
   plugin (a dead worker names its victim test and death mode — timeout-kill vs native crash),
   and the aiosqlite closed-loop seam patch + deterministic forced-race regression gate. See
   `tools/pytest-parallel-guardrails/README.md`.
-- **`tools/gate-lint/`** — project-agnostic, drop-in linting for the GATES themselves: two lines to
-  adopt, no gate legs of its own. It catches what a green suite cannot — a selector that matches the
-  empty set, or an assertion between two values the same code derives. See `tools/gate-lint/README.md`.
+- **`tools/drift-audit/`** — does this repo's RECORD of its state still match reality: stale claims,
+  closed specs with no product commit, hand-kept inventories disagreeing with their source. Stdlib +
+  git, seconds, no agents; every signal carries a liveness assertion, so a probe that cannot move
+  prints DEAD PROBE rather than a reassuring 0. See `tools/drift-audit/README.md`.
+- **`tools/memory-recall/`** — offline, conf-driven retrieval over the memory tree, plus the rendered
+  recall Skill and its opt-in hook. Asks the decision corpus a question and ranks the records that
+  answer it. See `tools/memory-recall/README.md`.
+- **`tools/unattended/`** — the unattended-run kit: the binding protocol, the four-verb driver, and
+  the gate leg that reads a project's `.unattended.conf` rather than restating it. A run that merges
+  and pushes with no owner turn replaces the explicit-ask checkpoint with a committed standing
+  mandate it ASSERTS and cannot have written. See `tools/unattended/README.md`.
+- **`tools/govkit/`** — the deployer. The installable population is a DECLARATION (a registry plus a
+  descriptor per entry), asserted against the tracked surface in both directions, so a new moving
+  part reds until something claims it. Runs on the deployer machine; never installed into a target.
+- **`tools/lib/`** — gov-internal, ships nothing: the one python-launcher resolver, carried INLINE and
+  byte-identical by every copy-installed kit (a gate holds the copies together).
+- **`tools/gate-lint/`** — drop-in source-hygiene scans, not gate-logic linting. `ps-hygiene.py`
+  reads every `.ps1` under a root at BYTE level for two silent-failure classes: case-only
+  identifier collisions, and BOM-less scripts containing non-ASCII that PowerShell 5.1 decodes as
+  CP1252. Two lines to adopt, no gate legs of its own, `--selftest` included. See
+  `tools/gate-lint/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent` that caps fan-out in both
   modalities. A direct `Agent` spawn carries no script, so it is COUNTED at runtime — each claims a
   numbered slot with `O_EXCL` under a session+prompt-keyed dir in the git common dir, and the spawn

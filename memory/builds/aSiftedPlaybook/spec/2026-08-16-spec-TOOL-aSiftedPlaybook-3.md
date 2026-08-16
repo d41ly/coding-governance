@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-11 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-12 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -261,6 +261,15 @@ they did not have to go back.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-12 · 2026-08-16 · folded the M8 closing review. **H1**: the S2 value-parity stage crossed a
+  subshell boundary through an UNCHECKED temp file, so an unwritable TMPDIR made the whole stage
+  no-op while the gate printed "pairs in agreement" and exited 0 over injected drift — this gate
+  passing by finding nothing, which is the class it exists to catch. Both ends are now checked and
+  the stage emits a completion SENTINEL, so lost results cannot read as "nothing disagreed".
+  **M4**: no arm pinned the anchored path-segment matcher the header calls load-bearing —
+  loosening it to a bare substring left all sixteen arms green. A fixture naming a kit only inside
+  an unrelated word now reds. **L3**: the header's own `lib` measurement had gone stale (7 → 9) and
+  is de-numbered.
 - rev-11 · 2026-08-16 · folded round-5 L3. §4's new registry row asserted "all three receivers of
   that obligation match" — stale in the commit that wrote it, since the same fold made
   `TOOL-aSiftedPlaybook-2` a fourth receiver, and it re-introduced two sections from

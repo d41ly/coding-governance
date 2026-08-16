@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -299,6 +299,15 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-16 · folded the M8 closing review. **H2**: no arm anywhere pinned the 48 KiB
+  ceiling this unit's sibling was convened to raise — A1/A2/A4 derive the fixture size AND the
+  expectation from the gate's own OK line, so mutating the default to 131072 or 40000 left every
+  arm green in both directions. **A0** pins the literal, and is deliberately the only arm that
+  does. **M5**: A10 asserted `TEMPLATE-SIZE no-ratchet`, a prefix SHARED by the record-absent and
+  row-absent branches, so it did not distinguish the branch it named; split into A10/A10b on
+  their unique clauses. **L2**: the ratchet arms matched the marker substring where S2's rows
+  require the line to NAME H, the size and the delta; they now assert the numbers. **M1/M2/M3**
+  are gate defects this unit's harness did not catch and now does — see `TOOL-aSiftedPlaybook-1`.
 - rev-9 · 2026-08-16 · **A12 added by left-shift from the `TOOL-aSiftedPlaybook-1` build pass**, per
   M8. The recurring-bug-class checklist selected `assertion-between-two-derived-values` over that
   pass's diff, and it named a real hole: `--bump` writes the record key and the ratchet reads it

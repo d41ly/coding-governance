@@ -28,12 +28,19 @@ fail() { printf 'TEMPLATE-SIZE check %s FAILED — %s\n' "$1" "$2"; exit "$FAIL_
 # (subject, limit, record path) and a mode sharing a slot with a path is how one of them silently
 # becomes the other. Strip it wherever it appears, then read the positionals from what is left.
 BUMP=0
-ARGS=""
-for a in "$@"; do
-  if [ "$a" = "--bump" ]; then BUMP=1; else ARGS="$ARGS $a"; fi
-done
-# shellcheck disable=SC2086
-set -- $ARGS
+# Rebuild the positional list THROUGH "$@" rather than through a string: an `ARGS="$ARGS $a"`
+# accumulator followed by an unquoted `set -- $ARGS` word-splits any path containing whitespace,
+# glob-expands a `*`/`?`/`[`, and drops an empty positional — sliding every later argument one
+# slot left. That loop also ran on invocations with no --bump at all, so it was a regression on
+# the ordinary path, not just the bump one.
+if [ "$#" -gt 0 ]; then
+  _n=$#
+  for _i in $(seq 1 "$_n"); do
+    _a=$1; shift
+    if [ "$_a" = "--bump" ]; then BUMP=1; else set -- "$@" "$_a"; fi
+  done
+  unset _n _i _a
+fi
 
 FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
 # The limit, in precedence order: positional $2, then the environment, then the playbook's own 48 KiB.
@@ -87,16 +94,41 @@ if [ -f "$HIGHWATER" ]; then
   recorded=$(awk -F'\t' -v k="$key" '$1 == k { print $2 }' "$HIGHWATER" | tr -d '[:space:]')
 fi
 
+# The non-numeric contract is enforced BEFORE the bump branch, not only on the read path. It used
+# to sit in the read chain below, so `--bump` over a corrupt record reached $((bytes - recorded))
+# and died with a set -u unbound-variable error — the exact "shell error rather than a named
+# failure" this gate promises not to do, on the one path that also WRITES.
+if [ -n "$recorded" ] && ! printf '%s' "$recorded" | grep -qE '^[0-9]+$'; then
+  FAIL_CODE=3
+  fail 3 "the high-water record holds a non-numeric value for $key in $HIGHWATER: '$recorded'"
+fi
+
 if [ "$BUMP" = 1 ]; then
-  tmp="${HIGHWATER}.tmp.$$"
-  if [ -f "$HIGHWATER" ]; then
-    awk -F'\t' -v k="$key" '$1 != k' "$HIGHWATER" > "$tmp"
-  else
-    : > "$tmp"
+  # The DIRECTORY is checked before anything is opened. A failed  redirection is reported by
+  # the shell itself, so a 2>/dev/null on the command does not suppress it and the caller sees a
+  # raw "No such file or directory" instead of this gate naming its own failure.
+  _hwdir=$(dirname "$HIGHWATER")
+  if [ ! -d "$_hwdir" ] || [ ! -w "$_hwdir" ]; then
+    FAIL_CODE=4
+    fail 4 "the high-water record cannot be written because its directory is missing or not writable, so no bump was recorded: $HIGHWATER"
   fi
-  printf '%s\t%d\n' "$key" "$bytes" >> "$tmp"
-  LC_ALL=C sort -o "$tmp" "$tmp"
-  mv "$tmp" "$HIGHWATER"
+  tmp="${HIGHWATER}.tmp.$$"
+  # EVERY step is checked. Unchecked, this sequence printed "TEMPLATE-SIZE BUMP …" and exited 0
+  # after all four of its writes had failed — a gate reporting a successful write it did not make.
+  _w=0
+  if [ -f "$HIGHWATER" ]; then
+    awk -F'\t' -v k="$key" '$1 != k' "$HIGHWATER" > "$tmp" 2>/dev/null || _w=1
+  else
+    : > "$tmp" 2>/dev/null || _w=1
+  fi
+  [ "$_w" = 0 ] && { printf '%s\t%d\n' "$key" "$bytes" >> "$tmp" 2>/dev/null || _w=1; }
+  [ "$_w" = 0 ] && { LC_ALL=C sort -o "$tmp" "$tmp" 2>/dev/null || _w=1; }
+  [ "$_w" = 0 ] && { mv "$tmp" "$HIGHWATER" 2>/dev/null || _w=1; }
+  if [ "$_w" != 0 ]; then
+    rm -f "$tmp" 2>/dev/null
+    FAIL_CODE=4
+    fail 4 "the high-water record could not be written, so no bump was recorded: $HIGHWATER"
+  fi
   if [ -n "$recorded" ]; then
     echo "TEMPLATE-SIZE BUMP — $key high-water $recorded -> $bytes ($((bytes - recorded)) bytes)."
   else

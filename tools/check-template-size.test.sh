@@ -75,6 +75,19 @@ case "$LIMIT" in
 esac
 printf 'harness    shipped limit read from the gate: %s\n' "$LIMIT"
 
+# --- A0 · the SHIPPED ceiling, pinned to a literal ------------------------------------------
+# Deriving the limit (above) is right for the boundary arms — it keeps them honest about the
+# override paths — but it means NO arm pins the number itself. Mutating the default to 131072 or
+# to 40000 leaves every other arm green in both directions, on the one constant this whole build
+# was convened to change. This arm is the literal, and it is deliberately the only one.
+EXPECT_LIMIT=49152
+if [ "$LIMIT" = "$EXPECT_LIMIT" ]; then
+  say_ok "A0 the shipped ceiling is $EXPECT_LIMIT"
+else
+  say_fail "A0 the shipped ceiling is $EXPECT_LIMIT" \
+    "the gate reports $LIMIT — the ceiling moved and no other arm in this file would notice"
+fi
+
 # --- A1 · a file of exactly MAX_BYTES ----------------------------------------------------------
 mkfile "$LIMIT" "$TMP/at"
 expect_out "A1 at the limit exits 0" "template-size OK" 0 bash "$GATE" "$TMP/at"
@@ -109,12 +122,14 @@ bash "$GATE" "$TMP/subj" 49152 "$HW" --bump >/dev/null 2>&1
 expect_absent "A7 at the recorded high-water: no warn" "TEMPLATE-SIZE WARN" 0 \
   bash "$GATE" "$TMP/subj" 49152 "$HW"
 mkfile 1001 "$TMP/subj"
+# S2's A6 row requires the line to NAME H, the size and the delta — not merely to carry the
+# marker. Matching the marker alone left the arm green when the numbers were removed.
 expect_out "A6 one byte past the high-water warns AND exits 0" \
-  "TEMPLATE-SIZE WARN" 0 bash "$GATE" "$TMP/subj" 49152 "$HW"
+  "1000 -> 1001 (+1)" 0 bash "$GATE" "$TMP/subj" 49152 "$HW"
 
 # --- A8 · --bump rewrites the subject's row and reports the delta -----------------------------------
 expect_out "A8 --bump re-records and names the delta" \
-  "TEMPLATE-SIZE BUMP" 0 bash "$GATE" "$TMP/subj" 49152 "$HW" --bump
+  "high-water 1000 -> 1001 (1 bytes)" 0 bash "$GATE" "$TMP/subj" 49152 "$HW" --bump
 bumped=$(awk -F'\t' -v k="$TMP/subj" '$1 == k { print $2 }' "$HW" | tr -d '[:space:]')
 if [ "$bumped" = "1001" ]; then
   say_ok "A8b the row now holds the measured size"
@@ -140,8 +155,14 @@ else
 fi
 
 # --- A10 · the record is absent ----------------------------------------------------------------------
-expect_out "A10 an absent record says so and exits 0" \
-  "TEMPLATE-SIZE no-ratchet" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/definitely-absent"
+# The two ratchet-degenerate branches share the `TEMPLATE-SIZE no-ratchet` prefix, so asserting
+# that alone does not distinguish the branch each arm names — deleting either branch left the
+# other arm green. Each now asserts the clause unique to its own branch.
+expect_out "A10 an absent RECORD says so and exits 0" \
+  "no high-water record at" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/definitely-absent"
+printf '%s\t%d\n' "some/other/subject.md" 123 > "$TMP/hw-norow"
+expect_out "A10b a record with no ROW for this subject says so and exits 0" \
+  "has no row in" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/hw-norow"
 
 # --- A11 · the record exists but this subject's row is not a number --------------------------------------
 printf '%s\tnot-a-number\n' "$TMP/subj" > "$TMP/hw-bad"

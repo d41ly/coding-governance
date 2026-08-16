@@ -95,10 +95,12 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
-- template size gate self-test — `tools/check-template-size.test.sh`: twelve arms over a gate that
-  had none. Every branch red-proved by mutation, and A12 asserts the high-water record's KEY
-  against a literal rather than the gate's own derivation, because `--bump` writes that key and
-  the ratchet reads it back through the same code — the round trip is green whatever it says
+- template size gate self-test — `tools/check-template-size.test.sh`: arms over a gate that had
+  none, with the branch/armed pair pinned in `.memory-tree.conf`'s `ARMS_FLOORS` rather than
+  claimed here — an earlier draft of this line said "every branch red-proved" when two were not.
+  A12 asserts the high-water record's KEY against a literal rather than the gate's own
+  derivation, because `--bump` writes that key and the ratchet reads it back through the same
+  code — the round trip is green whatever it says
 - template size ≤48 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
   MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
   positional because a leg cannot set an env var: the runner execs argv with no shell)
@@ -164,9 +166,12 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   gate reds and stops rather than creating one. It is a declared exemption list rather than a
   shrink-only one — a missing kit reds, so an experimental kit needs a row — and it drains through
   two arms instead: a row whose kit is gone, and a row whose kit the playbook does document
-- gate-lint — `tools/gate-lint/`: project-agnostic, drop-in, two lines to adopt and no gate legs of
-  its own. It lints the GATES, catching the failure a green suite cannot — a selector matching the
-  empty set, or an assertion between two values the same code derives.
+- gate-lint — `tools/gate-lint/`: `ps-hygiene.py` scans every `.ps1` under a root for two classes
+  that make a script misbehave SILENTLY — case-only identifier collisions (PowerShell names are
+  case-insensitive, so `$LEGS` and `$legs` are one variable) and BOM-less non-ASCII (5.1 decodes
+  CP1252, so an em dash closes a string early). Byte-level; carries `--selftest`. Despite the
+  name it does NOT lint gate logic — it is a source-hygiene scanner, and this line said otherwise
+  until the closing review ran the kit.
 - govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
   DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
   and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under

@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -238,6 +238,10 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-8 · 2026-08-16 · folded the M8 closing review's **H4**. S4 deleted the template's hardcoded
+  hygiene check count and pointed adopters at the kit README — which said 19 at `:6` and 20 at
+  `:18`, disagreeing with itself. Delegating to a carrier without checking that carrier turned a
+  known follow-up into a defect this unit created; `tools/memory-tree/README.md:6` is corrected.
 - rev-7 · 2026-08-16 · folded round-4 H1. rev-6's fix asserted that `TOOL-aSiftedPlaybook-1` S4
   received `README.md:33` "with a §4 inventory row" — the row did not exist, and no acceptance
   criterion in the receiving unit could observe the carrier either, since AC3's alternation cannot

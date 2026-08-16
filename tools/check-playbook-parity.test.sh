@@ -77,6 +77,15 @@ arm() {
 # --- the control. Without it, every red proof below could be redding for an unrelated reason. -----
 arm "control · a valid fixture passes" ok "" true
 
+# --- the anchored matcher itself ---------------------------------------------------------------
+# The gate's header calls a bare substring match "the vacuous-selector shape this gate exists to
+# prevent, committed by the gate itself" — and nothing pinned it: loosening `named_in_playbook`
+# to `grep -qF` left every other arm green. This fixture names a kit ONLY as a substring inside an
+# unrelated word, so a loosened matcher certifies it documented and the arm goes red.
+arm "S1 a kit named only as a substring is NOT documented" red \
+  "a kit ships and the playbook never names it, with no waiver row to excuse it: ape" \
+  sh -c 'mkdir -p tools/ape && : > tools/ape/x.sh && printf "the shape of a landscape\n" >> parallel-coding-governance.template.md'
+
 # --- AC1 · a kit named nowhere and waived nowhere --------------------------------------------------
 arm "AC1 an undocumented kit reds by name" red \
   "a kit ships and the playbook never names it, with no waiver row to excuse it: orphankit" \

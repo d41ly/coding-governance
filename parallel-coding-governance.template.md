@@ -147,10 +147,13 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
   failure naming no test), and the aiosqlite closed-loop seam patch with a forced-race gate. §10's
   own bullets already state these bug classes in full; this is the shipped fix for them.
 - Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- **Lint the gates themselves** (`gate-lint/` kit): project-agnostic, drop-in, two lines to adopt and
-  no gate legs of its own. It catches the failure a green suite cannot — a gate whose selector
-  matches the empty set, or that asserts between two values the same code derives, and therefore
-  passes while checking nothing.
+- **Scan PowerShell for the two classes that break it silently** (`gate-lint/` kit, if the project
+  has `.ps1` files): case-only identifier collisions, because PowerShell variable names are
+  case-INSENSITIVE and `$LEGS`/`$legs` are one variable; and BOM-less scripts containing
+  non-ASCII, which PowerShell 5.1 decodes as CP1252 so an em dash closes a string early and
+  desynchronises the parser. Byte-level, because every text-mode read hides the second. Drop-in,
+  two lines to adopt, no gate legs of its own. A repo with no `.ps1` gets `0 files clean`, which
+  is honest and proves nothing — adopt it only where PowerShell exists.
 - **Deploy the kits as a declared population, not a directory listing** (`govkit/` kit): the set of
   things installable into a target is a REGISTRY plus a descriptor each, asserted against the
   tracked surface in both directions — a new moving part reds until a declaration claims it, and an

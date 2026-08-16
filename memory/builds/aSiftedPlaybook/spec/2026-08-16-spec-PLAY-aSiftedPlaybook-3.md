@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -226,6 +226,14 @@ blocking objection" would write a mischaracterization into a record the repo dec
   declared only in this spec's prose would be unobservable.
 - **AC2** — When `parallel-coding-governance.customize.md`'s conditional-sections list is read,
   every kit named in the template has a row saying what to delete when it is declined.
+- **AC3b** — For EACH kit this unit names, the bullet's description is checked against that kit's
+  own README **by reading it**, and the check is recorded per kit. AC3 as written was satisfied by
+  a bullet existing; the closing review found the `gate-lint` bullet described gate-logic linting
+  inferred from the kit's NAME, where the kit is a PowerShell source-hygiene scanner
+  (`ps-hygiene.py`, two byte-level classes). One fabricated description shipped into four carriers
+  — the template, `AGENTS.md`, root `README.md` and a customize drop row — inside the build whose
+  subject is claims that drifted from their source. A description no one checked against the thing
+  it describes is the defect this unit exists to fix, committed by this unit.
 - **AC3** — When each new bullet is read against its kit's own README — `tools/drift-audit/README.md`,
   `tools/pytest-parallel-guardrails/README.md`, `tools/agent-instructions/README.md`,
   `tools/gate-lint/README.md` — every claim it makes is present there. Checked per kit, by reading
@@ -251,15 +259,21 @@ blocking objection" would write a mischaracterization into a record the repo dec
 - **AC7** — When `grep -n 'governance-template:' parallel-coding-governance.template.md
   parallel-coding-governance.domain-rules.md` runs, both read `v2.8`, and
   `memory/archive/parallel-coding-governance.template-v-2-7.md` exists and is byte-identical to
-  **the template at the parent of the bump commit** — observed as
-  `git show <bump>^:parallel-coding-governance.template.md`. That is the **pre-bump** blob S8
-  specifies, NOT the template as it stood before this build's first template edit: this is unit 6,
-  after `PLAY-aSiftedPlaybook-1` and `PLAY-aSiftedPlaybook-2` have both edited the template, so the
-  two readings name blobs ~2.3 KB apart and the earlier wording archived the BASE blob under a v2.7
-  label while the content actually labelled v2.7 was never archived. Precedent measured and
-  decisive: the v-2-6 archive was added by `5ed9b4b` and
-  `git show 5ed9b4b^:parallel-coding-governance.template.md` is byte-identical to it. Checking only
-  one of the two markers is the drift the lockstep re-pull rule exists to prevent.
+  **the template at this build's BASE** — the FINISHED v2.7 content, observed as
+  `git show <BASE>:parallel-coding-governance.template.md`.
+
+  **This reverses what rev-8 said, and the reversal is the interesting part.** Round 4 settled AC7
+  on `<bump>^` — the parent of the bump commit — citing `5ed9b4b`, where
+  `git show 5ed9b4b^:…` is byte-identical to the `-v-2-6` archive. That observation is true and
+  the inference from it was wrong. Measured at close: `5ed9b4b` moved the marker v2.6 → v2.7 with
+  only two other content lines changed, i.e. it was a marker-only commit at the END of its build,
+  so its parent WAS the finished v2.6. This build's bump sits at unit 6 of 7, after two units have
+  already written v2.8 content, so `<bump>^` is a mid-build state. Applying the rule mechanically
+  produced an archive labelled `-v-2-7` that hashes to the `PLAY-aSiftedPlaybook-2` blob and
+  carries v2.8 work. The precedent's PRINCIPLE is "archive the finished content of the version you
+  are leaving"; `<bump>^` was only ever a proxy for it, and the proxy fails whenever the bump is
+  not last. Checking only one of the two markers is the drift the lockstep re-pull rule exists to
+  prevent.
 
 ## 7. Gates
 
@@ -307,6 +321,13 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-16 · folded the M8 closing review. **H5**: AC7 named `<bump>^` and the artifact
+  built from it was wrong — the archive hashed to the PLAY-2 blob and carried v2.8 content under a
+  v2.7 label. Re-measuring the `5ed9b4b` precedent showed round 4 had inferred a rule from a case
+  where the bump was LAST in its build; here it is unit 6 of 7. AC7 now names the BASE blob, which
+  is the finished v2.7 content, and says why the proxy failed. **B1**: S4's gate-lint bullet
+  described a kit that does not exist — this spec's AC3 demanded a per-kit README check and the
+  build did not perform it; the bullet now states what `ps-hygiene.py` actually scans.
 - rev-9 · 2026-08-16 · folded round-5 L3. §7's new `govkit selfcheck` line said "the three units
   receiving this obligation", which the same fold made four. De-numbered to the derivation, the
   policy this build adopted everywhere else in the same pass.

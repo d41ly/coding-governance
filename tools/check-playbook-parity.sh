@@ -64,10 +64,12 @@ fi
 waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 
 # The match is an anchored PATH SEGMENT, case-sensitive — `tools/<kit>/` or a backticked `<kit>/` —
-# never a bare substring. Measured: a substring search scores the kit `lib` seven times across the
-# trio, six inside "deliberate"/"deliberately" and one inside `stdlib`, and would certify it as
-# documented on that evidence. That is the vacuous-selector shape this gate exists to prevent,
-# committed by the gate itself.
+# never a bare substring. A substring search scores the kit `lib` many times over the trio — every
+# hit inside "deliberate"/"deliberately" or "stdlib", none of them about `tools/lib/` — and would
+# certify it documented on that evidence. That is the vacuous-selector shape this gate exists to
+# prevent, committed by the gate itself. No count is written here: the figure was measured at 7
+# when this comment was drafted and was 9 by the time the build landed, which is the same
+# stale-count defect one file over.
 named_in_playbook() { # <kit>
   grep -qE "tools/$1/|\`$1/\`" "$TEMPLATE" "$CUSTOMIZE" "$DOMAIN" 2>/dev/null
 }
@@ -105,7 +107,18 @@ lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.
 agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
 "
 
+# The pair loop runs in a subshell (it is the right-hand side of a pipe), so its findings have to
+# cross a process boundary. That crossing is now CHECKED at both ends: unchecked, an unwritable
+# TMPDIR made both redirections fail silently and the gate reported "pairs in agreement" with
+# rc=0 over injected drift — this stage passing by finding nothing, which is the exact class the
+# gate exists to catch, in the gate.
 PPTMP="${TMPDIR:-/tmp}/pp.$$"
+if ! : > "$PPTMP" 2>/dev/null || [ ! -w "$PPTMP" ]; then
+  fail 14 "the value-parity stage could not create its results file, so no pair was compared and this gate must not report agreement: $PPTMP"
+  printf 'PLAYBOOK-PARITY: stopping — S2 cannot be evaluated without a writable results file.\n'
+  exit 1
+fi
+{
 printf '%s\n' "$PAIRS" | while IFS='~' read -r label sfile sx ofile ox; do
   [ -n "${label:-}" ] || continue
   [ -f "$ofile" ] || { printf 'PAIRFAIL~%s~the owning source does not exist: %s\n' "$label" "$ofile"; continue; }
@@ -118,7 +131,15 @@ printf '%s\n' "$PAIRS" | while IFS='~' read -r label sfile sx ofile ox; do
   elif [ "$sval" != "$oval" ]; then
     printf 'PAIRFAIL~%s~the playbook states %s where %s owns %s\n' "$label" "$sval" "$ofile" "$oval"
   fi
-done > "$PPTMP" 2>/dev/null
+done
+printf 'PAIRSTAGE-RAN\n'
+} > "$PPTMP"
+# A SENTINEL proves the stage actually ran. The loop always emits it, so an empty results file
+# means the subshell died or its output was lost — indistinguishable, from here, from "no pair
+# disagreed", which is why it cannot be allowed to read as success.
+if ! grep -q '^PAIRSTAGE-RAN$' "$PPTMP" 2>/dev/null; then
+  fail 15 "the value-parity stage produced no completion sentinel, so its results were lost rather than empty and no pair was actually compared"
+fi
 while IFS='~' read -r tag label msg; do
   [ "$tag" = "PAIRFAIL" ] || continue
   fail 7 "a declared value pair disagrees with the source that owns it. Pair $label, detail: $msg"

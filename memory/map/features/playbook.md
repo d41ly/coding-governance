@@ -72,7 +72,9 @@ map had no playbook dossier until now.
   became a numbered `fail()` helper. The `ARMS_FLOORS` entry in `.memory-tree.conf` is what makes
   the pin real: an UNDECLARED floor is silently skipped, not refused.
 - `tools/govkit/registry.toml` — every depth-1 path under `tools/` must be a declared entry member
-  or an exact-path `[[exempt]]` row. This feature contributes three such paths.
+  or an exact-path `[[exempt]]` row. Every path in this dossier's `[paths].globs` above carries
+  one; the globs list is the enumeration and no count is repeated here, having gone stale once
+  already when this feature grew from three paths to six inside one build.
 - `memory/guides/SESSION-KICKOFF.md` — `tools/check-template-size.sh` is a watched pathspec, so any
   change to the gate forces a manifest re-stamp.
 

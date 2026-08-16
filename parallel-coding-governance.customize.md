@@ -12,7 +12,7 @@ isn't in the code (the *(ask user)* items below); propose-and-flag anything infe
 filled template to the project's governing doc (its agent-instruction file, e.g. `AGENTS.md` /
 `CLAUDE.md`, or `docs/PARALLEL.md`) and place the filled companion beside it under the name the
 template's §-stubs spell. Then run `grep -nE '\{\{[A-Z]'` over **both** written files to confirm no
-placeholder survived — a template-only grep passes green while 14 of the 36 placeholders sit
+placeholder survived — a template-only grep passes green while 14 of the 37 placeholders sit
 unfilled in the companion, and the §-stubs then point at a file the project never received.
 
 ## Placeholders
@@ -31,8 +31,10 @@ Do not read a per-file heading as a share of the total.
   discoverable, not an ask). Derived from `git symbolic-ref`, the same derivation
   `skills/session-kickoff/MANIFEST-TEMPLATE.md` states for the identically-named placeholder in
   the kickoff manifest — one name, one spelling, across both halves of the product. It carries
-  17 senses in the template, including two §16 micro-formats, so fill it before anything greps
-  those formats for byte-stability.
+  MANY senses in the template, including two §16 micro-formats, so fill it before anything greps
+  those formats for byte-stability. No count is stated here: it read 17, and adding the v2.8
+  changelog clause that names the placeholder made it 18 in the same build. Derive it with
+  `grep -o '{{DEFAULT_BRANCH}}' … | wc -l`.
 - **Fleet** *(ask user)*: node-registry rows `{{TAG_A}}` / `{{MACHINE_A}}` / `{{PRIMARY_TREE_A}}` /
   `{{WORKTREE_ROOT_A}}` / `{{VARIANCES_A}}` (one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).
 - **Records & docs**: `{{ID_FAMILIES}}` · `{{DOC_ROUTING_TABLE}}` · `{{PRODUCT_PREAMBLE}}` ·
@@ -84,7 +86,8 @@ Do not read a per-file heading as a share of the total.
   two, the kit is what stops the second reading a stale copy.
 - **§7's `pytest-parallel-guardrails/` bullet** — drop if the project is not Python, or does not run
   `pytest -n auto`. The §10 bug-class bullets it refers to stay either way.
-- **§7's `gate-lint/` bullet** — drop if the project has no gates of its own to lint.
+- **§7's `gate-lint/` bullet** — drop if the project has no `.ps1` files. The scan is honest but
+  proves nothing where PowerShell does not exist.
 - **§7's `govkit/` bullet** — drop unless this repo DEPLOYS the kits into other repos; an adopter
   that only consumes them has no population to declare.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
