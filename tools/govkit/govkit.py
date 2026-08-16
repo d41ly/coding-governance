@@ -686,6 +686,57 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 LANDABLE_ROLES = ("engine", "seed")
 
 
+def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> list[str]:
+    """Where one source lands under a rule. ONE spelling, called by the write loop AND by the
+    wildcard exclusion below — the exclusion has to ask the same question the writer will answer, and
+    two computations of one thing is the class this repo keeps a record about.
+
+    An explicit `to` WINS for every role. Defaulting engine files to the kit-relative form regardless
+    is how a flat entry — one with no kit directory at all — silently lands under a directory it does
+    not have. The default applies only where the rule declared no destination.
+    """
+    if rule.get("to"):
+        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)[0]
+                for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
+    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
+        pathlib.PurePosixPath(src).name
+    return [f"{ctx['kit']}/{rel}"]
+
+
+def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) -> set[str]:
+    """Every source and destination some OTHER rule in this descriptor already owns.
+
+    A `**` include means "everything not otherwise claimed" — which is how every descriptor author
+    has read it, and what the engine did NOT implement. It pooled every tracked file under `home` and
+    wrote each one unconditionally, so a rule declared LATER never got the chance to protect its own
+    file. Measured against `drift-audit`: an adopter's edit to the `project-owned` `drift_signals.py`
+    was destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
+
+    CLAIMED BY DESTINATION, NOT BY SOURCE, and the distinction was measured rather than reasoned.
+    Excluding claimed SOURCES too is the obvious first cut and it UNDER-LANDS: `drift_signals.template.py`
+    is the seed rule's source, its `**` destination is `{kit}/drift_signals.template.py`, and nothing
+    else claims that path — so a source-based exclusion silently stopped shipping the adopter the
+    template their own re-seed depends on. Measured: 8 files landed before, 6 after, and the two
+    missing were not the two being protected.
+
+    A destination claim covers both real cases. `project-owned` names `drift_signals.py`, which
+    resolves to `{kit}/drift_signals.py` — the path it owns and, being non-landable, could not
+    otherwise defend. `seed` names a different source but lands ON that same path, so its "copied
+    ONCE, then the target owns it" guard is protected by the same test.
+    """
+    claimed: set[str] = set()
+    for other in desc.get("files", []):
+        if other is wildcard_rule:
+            continue
+        inc = other.get("include")
+        srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+        if any(s == "**" for s in srcs):
+            continue  # two wildcards claim nothing FROM each other; neither is more specific
+        for s in rule_sources(desc, other):
+            claimed.update(resolve_dests(desc, other, s, ctx, home))
+    return claimed
+
+
 def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
     """Bytes from the gov git INDEX at a recorded commit — never from the working tree.
 
@@ -800,22 +851,14 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             inc = rule.get("include")
             srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
             if any(s == "**" for s in srcs):
-                pool = [f for f in tracked(root) if home and f.startswith(home + "/")]
+                claimed = scan_claimed_paths(d, rule, ctx, home)
+                pool = [f for f in tracked(root)
+                        if home and f.startswith(home + "/")
+                        and not (set(resolve_dests(d, rule, f, ctx, home)) & claimed)]
             else:
                 pool = rule_sources(d, rule)
             for src in pool:
-                # An explicit `to` WINS for every role. Defaulting engine files to the kit-relative
-                # form regardless is how a flat entry — one with no kit directory at all — silently
-                # lands under a directory it does not have. The default applies only where the rule
-                # declared no destination.
-                if rule.get("to"):
-                    dests = [resolve_tokens(x.replace("{relpath}",
-                                                      pathlib.PurePosixPath(src).name), ctx)[0]
-                             for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
-                else:
-                    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
-                        pathlib.PurePosixPath(src).name
-                    dests = [f"{ctx['kit']}/{rel}"]
+                dests = resolve_dests(d, rule, src, ctx, home)
                 data = blob_at(root, commit, src)
                 if data is None:
                     r.fail(f"entry '{eid}': {src} does not resolve at {commit[:8]}")
