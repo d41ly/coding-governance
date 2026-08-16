@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** DEFERRED · rev-4 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -14,6 +14,10 @@ document that survives translation out of one Python/Qt application.
 This unit is the KIT and the playbook edits. Wiring the verb table into the `codebase-map` ratchet
 and the `drift-audit` signal set is `TOOL-dClosedLexicon-2`, split out at rev-3 because §1 does not
 let one unit carry a cross-stream contract change. Unit 2 depends on this one; this one stands alone.
+
+Nothing blocks it. At rev-4 it was parked on a byte-freeing predecessor; the ceiling moves to 48 KiB
+in a parallel build, and the predecessor is dropped. Its playbook edits measure ~69 B and fit at the
+PRESENT ceiling anyway, at 32,751 of 32,768, so this unit never needed the raise.
 
 ## 2. Scope (IN)
 
@@ -71,8 +75,9 @@ let one unit carry a cross-stream contract change. Unit 2 depends on this one; t
   than this kit's private mechanism. Consequence stated in §4 F-A14.
 - A new `memory/gotchas/` class for naming violations. Companion §7 requires a failing case OBSERVED
   before a gate lands. The first confirmed P1 or P2 finding becomes one, per §7's left-shift rule.
-- A §0 constitution line naming the fallback for uncovered cases. Ratified to the §14 externalization
-  unit instead, which is the only landing that can afford its ~120 B; see §8 fork F2.
+- A §0 constitution line naming the fallback for uncovered cases. It belongs to
+  `PLAY-dClosedLexicon-1`, which is BLOCKED on the ceiling raise because the line measures 157 B
+  against 86 B of present headroom; see §8 fork F2.
 - Any claim that this kit catches defects. Its value is seam detection, which is not measurable, and
   that is exactly why S13 lands it as OPT-IN rather than required.
 
@@ -152,9 +157,12 @@ is honestly non-zero on day one.
 
 **F-A5 — the benefit is unmeasurable, so the kit must be optional.**
 
-**F-A6 — the template has 86 bytes of headroom and this build spends most of them.** Measured 32,682 B
-against the 32,768 B ceiling. The §12 stub edit costs roughly 78 B and the §5 count fix returns 9 B.
-`{{LEXICON_CONF}}` is hosted in the companion (S13), so it costs the ledger nothing.
+**F-A6 — the byte ledger stopped binding at rev-5, and the arithmetic is kept because it is what
+proves the unit was never blocked.** Measured 32,682 B against the then-32,768 B ceiling. The §12
+stub edit costs roughly 78 B and the §5 count fix returns 9 B; `{{LEXICON_CONF}}` is hosted in the
+companion (S13), so it costs the ledger nothing. Net ~69 B, landing at 32,751 — inside the OLD
+ceiling with 17 B to spare. The raise to 48 KiB removes the constraint entirely and removes the
+reason this unit was ever sequenced behind another.
 
 **F-A7 — the version note is itself a byte cost nobody budgets.** The template header carries exactly
 two changelog entries, and the convention is drop-oldest-add-newest.
@@ -210,8 +218,10 @@ A new `tools/<kit>/` in this repo lands red without all of the following.
 ### Migration
 
 The three shipped files move together or the lockstep marker lies.
-`parallel-coding-governance.template.md` gets the §12 stub clause, the §5 count fix, the v2.8 header
-entry and the v2.6 drop. `parallel-coding-governance.domain-rules.md` gets the §12 lexicon rules,
+`parallel-coding-governance.template.md` gets the §12 stub clause, the §5 count fix, one new header
+changelog entry and the oldest one dropped. The version NUMBER is not named here: two playbook units
+are in flight and whichever lands first takes the next one, so a number written into a spec that has
+not landed rots exactly the way this repo has already recorded twice. The landing commit assigns it. `parallel-coding-governance.domain-rules.md` gets the §12 lexicon rules,
 `{{LEXICON_CONF}}`, and the marker bump. `parallel-coding-governance.customize.md` gets the new
 conditional-section row, the corrected disjointness sentence, and the placeholder tally.
 
@@ -302,15 +312,16 @@ New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexico
 
 ## 8. Open questions
 
-- **F1 — sequencing against the template budget.** This unit leaves roughly 17 B of template
-  headroom. `PLAY-aCandidStub-2` names the fix, moving §14 behind a §-stub for about 1.5 KB.
-  RESOLVED (owner, 2026-08-16): the §14 externalization lands FIRST as its own unit, then this one.
-  That unit is not yet specced and has no id; this spec is DEFERRED — approved, parked on a
-  predecessor — rather than INPROGRESS, and the token is what a resuming session reads.
-- **F2 — the §0 constitution line.** The source document opens by naming itself the fallback for
-  situations no rule covers, and §0 has no such line. It is worth roughly 120 B that do not exist.
-  RESOLVED (owner, 2026-08-16): add it, in §0 rather than the companion, carried by the §14 unit F1
-  ratified. It is a §3 non-goal HERE, and that unit's scope is now two items, not one.
+- **F1 — sequencing against the template budget.** RESOLVED (owner, 2026-08-16), then SUPERSEDED at
+  rev-5. The ratified answer was to land a §14 externalization first for the bytes. The ceiling moves
+  to 48 KiB in a parallel build, so there is no budget to sequence against, and measurement showed
+  this unit fits at the OLD ceiling regardless. The predecessor is dropped and the status returns to
+  SPECCED. The fork is recorded rather than deleted because a resuming session that read rev-4 needs
+  to know why the parking it saw is gone.
+- **F2 — the §0 constitution line.** RESOLVED (owner, 2026-08-16): add it, in §0 rather than the
+  companion. It stays a §3 non-goal HERE and lives in `PLAY-dClosedLexicon-1`, which is BLOCKED on
+  the raise — its 157 B do not fit at the present ceiling, where this unit's 69 B do. The two units
+  are therefore independent, and this one may land first.
 - **F3 — symbol extraction overlaps `codebase-map`, narrowly.** RESOLVED (agent, 2026-08-16,
   delegated): the splitter is ported and lexicon-owned per S5, and the parser is not reusable because
   `map_lib.python_symbols` indexes only public symbols. Whether `codebase-map` should later CONSUME a
@@ -341,6 +352,11 @@ New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexico
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-5 · 2026-08-16 · reworked for the 48 KiB ceiling landing in a parallel build. F1's ratified
+  sequencing is SUPERSEDED and the predecessor dropped, so DEFERRED returns to SPECCED — measurement
+  showed this unit's ~69 B fit at the OLD ceiling, so it was never the unit that needed room. F-A6
+  keeps the arithmetic as the proof of that. §4 Migration stops naming a version number, because two
+  playbook units are now in flight and the landing order decides it.
 
 ## 10. Reuse audit
 
