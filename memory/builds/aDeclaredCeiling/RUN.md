@@ -18,7 +18,7 @@ Records live under `spec/` and `reviews/`.
 
 ## Run facts
 witness: ad4521f437a5fd3d0dfd5284a90efbde40c76ab1
-phase: BUILDING
+phase: LANDING
 keepalive: 1172e651
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 0321df66f4800e9845429d7205e5876e51997d16
