@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** CLOSED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** CLOSED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -75,9 +75,16 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 - **The `tools/workflows/tier2-review.js` path and the "install per WIRE §5" reference.** Both were
   suspected stale in the audit and both were REFUTED: the harness install genuinely sits inside
   WIRE §5 at lines 465-475, and `tools/<kit>/` is the declared install prefix. No edit.
-- **`WIRE-INTO-PROJECT.md:464`, which calls agent-cap "the review protocol's TWO rules".** Same
-  defect class, different file, outside the playbook trio this build scopes. Recorded as a follow-up
-  row rather than fixed here.
+- **`WIRE-INTO-PROJECT.md`, which calls agent-cap "the review protocol's TWO rules".** Recorded here
+  as a follow-up in the belief that the true count was four.
+  **REFUTED 2026-08-16 (`PLAY-aDeclaredCeiling-1`), and nothing was wrong with the line.** It names
+  the review protocol's two rules and `memory/guides/REVIEW-PROTOCOL.md` binds exactly two — its
+  `## The hard cap` and `## Concurrency` sections. The four are `agent-cap.js`'s numbered
+  IMPLEMENTATION rules, a different population: they are how the hook enforces the protocol's two.
+  This bullet compared a sentence about the protocol to a count in the hook. No edit was ever owed
+  and none was made; the refutation is recorded here because a deleted follow-up is
+  indistinguishable from one that was never written, and this claim survived an eleven-defect
+  audit, five spec-review rounds and a closing review without anyone opening the sentence.
 - **The two other carriers of the stale "19-check"** — `tools/memory-tree/README.md:6` and root
   `README.md:33`. Both verified stale against the true 20. Same number, different products;
   follow-up row for the kit README. Root `README.md` is the adopter-facing front door and
@@ -238,6 +245,11 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-9 · 2026-08-16 · **§3's `WIRE-INTO-PROJECT.md` follow-up is REFUTED and marked in place**
+  (`PLAY-aDeclaredCeiling-1`). The line it filed as defective is correct; this spec had compared a
+  sentence about the review protocol to the count of `agent-cap.js`'s implementation rules. Nothing
+  this unit BUILT changes — the entry appends a verdict to a deferral and does not restate scope,
+  because a terminal record that revises what it did is worse than a stale follow-up.
 - rev-8 · 2026-08-16 · folded the M8 closing review's **H4**. S4 deleted the template's hardcoded
   hygiene check count and pointed adopters at the kit README — which said 19 at `:6` and 20 at
   `:18`, disagreeing with itself. Delegating to a carrier without checking that carrier turned a

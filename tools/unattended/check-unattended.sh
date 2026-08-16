@@ -252,7 +252,8 @@ while IFS= read -r f; do
   # reader to "re-run the driver", naming a path no verb walks. Asserting EMPTINESS is the same
   # invariant with the copy removed: one fact, one home, and nothing to go stale between reads.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ]; then
+  case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
+  if [ -n "$rd" ] && [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
       fail 8 "a run-state file's generated markers are malformed: $f"
     [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \

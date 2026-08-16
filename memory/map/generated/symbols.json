@@ -618,6 +618,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_declarations",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1393,6 +1398,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_declared_sources",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "resolve_dests",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1988,6 +1998,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_declared_source_absent_is_skipped",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_declared_sources_reach_the_corpus",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_dossier_affordance_present_or_graced",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -2036,6 +2056,11 @@
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_undeclared_file_stays_out",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",

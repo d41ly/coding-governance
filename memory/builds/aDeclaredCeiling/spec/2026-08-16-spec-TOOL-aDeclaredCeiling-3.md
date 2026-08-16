@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -186,6 +186,19 @@ none.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · **S1's MECHANISM is SUPERSEDED, and the better solution is not mine.**
+  `dClosedLexicon` r2 landed on main while this build ran and removed the COPY entirely: the
+  run-state file's generated region is now EMPTY by contract and the unit list is derived from
+  the build README on every read. That is the same invariant with the failure mode designed out
+  rather than scoped around — this unit made a stale copy legal at terminal phases; theirs makes
+  a stale copy impossible at any phase. Taken at the reconcile, and S1's four arms retired with
+  their reason recorded in the self-test.
+
+  **What this unit still contributed, and it is not nothing.** The defect was FOUND here, by
+  hitting it during `aSiftedPlaybook`'s landing and recording it as a row rather than working
+  around it; and the fix for `GIT_GRAFT_FILE` leaking from the driver into its own selftest
+  stands on its own — that one was found by `--close` blocking on a bar that was green, and
+  nothing in the superseding change touches it.
 - rev-2 · 2026-08-16 · folded the round-1 spec audit. **B3**: AC4 required a phase-less run-state
   file to reach check 8; check 4 refuses one and `continue`s, so it never does and the criterion
   could not pass. It now observes the refusal where it lives, and §5's error-states bullet with it.
