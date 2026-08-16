@@ -436,7 +436,7 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 fixture
 git push -q -f origin HEAD:main
-out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
 miss "$out" "the recorded BASE equals HEAD"
 miss "$out" "an absent discriminator is a refusal"
 hit "$out" "close OK"
@@ -510,7 +510,7 @@ hit "$out" "--override requires --reason: an unrecorded override is indistinguis
 # ---- check 13, both branches, each ISOLATED so the arm names the right one. Agent-attested first:
 # ---- every machine item is satisfied, so only the attested pair can be unmet.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override closing-review-recorded --reason "fixture build records no review")
 hit "$out" "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks"
 
@@ -523,7 +523,7 @@ hit "$out" "gates-green"
 
 # ---- the override PATH, end to end: the blocked item is overridden, the run closes, and the reason
 # ---- is written as a parked entry. A blocking gate with an override nobody can read is not a gate.
-out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "the bar was run by hand at the pinned base")
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "the bar was run by hand at the pinned base")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned base"
 same "the phase advanced to LANDING" \
@@ -534,13 +534,13 @@ same "the phase advanced to LANDING" \
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 mkconf "false" "false"
-out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
 hit "$out" "close OK"
 hit "$out" "override recorded for 'gates-green'"
 hit "$out" "override recorded for 'records-current'"
 hit "$(cat memory/builds/tRun/RUN.md)" "bar run by hand"
 hit "$(cat memory/builds/tRun/RUN.md)" "index re-rendered by hand"
-same "three overrides parked, one per pair — the scalar form kept only the last" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "3"
+same "four overrides parked, one per pair — the scalar form kept only the last" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "4"
 
 # ---- the non-overridable item refuses wherever it sits, not only last. The scalar form could only
 # ---- ever see the FINAL pair, so a first-position authorization-reachable was invisible to it.
@@ -576,7 +576,7 @@ bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 # GREEN CONTROL: a complete build closes with NO override at all. If this ever needs one, the item
 # has stopped being satisfiable and every arm below is measuring the wrong thing.
 bcopen
-out=$(run --close tRun)
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
 hit "$out" "close OK"
 miss "$out" "build-complete"
 
@@ -618,12 +618,72 @@ miss "$out" "records-current"
 
 # the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
 # afterwards. A blocking gate whose override nobody can read is not a gate.
-out=$(run --close tRun --override build-complete --reason "shipping 1 of 2 units deliberately")
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "shipping 1 of 2 units deliberately")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "shipping 1 of 2 units deliberately"
 
 # restore main to the shared BASE so the later arms see the tree they were written against.
 git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# ---- TOOL-cBriefedPilot-8: `closing-review-recorded` — a tracked review record under this build
+# ---- names the base the run pinned once. GREEN CONTROL first for the same reason as unit 7: every
+# ---- arm below asserts the item is UNMET, and without a tree where it is genuinely MET they would
+# ---- all pass against an item that can never be satisfied.
+# NOTE: expanded UNQUOTED on purpose, so it must word-split into exactly four arguments. A
+# reason with spaces does not survive that: quotes inside a variable are literal characters,
+# not shell quoting, and the tail becomes stray argv the driver rejects.
+crbc='--override build-complete --reason fixture-build-is-one-open-unit'
+cropen() { reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           mkdir -p memory/builds/tRun/reviews; }
+crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
+
+# GREEN CONTROL: a TRACKED record naming the pinned base, abbreviated to eight, satisfies the item.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "close OK"
+miss "$out" "closing-review-recorded"
+
+# arm 1 — the build records no review at all. The empty directory is the ordinary case at the start
+# of a run, and it must block rather than pass by selecting over nothing.
+cropen
+out=$(run --close tRun $crbc)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "closing-review-recorded"
+
+# arm 2 — the record exists in the WORKING TREE and is not tracked. `--cached` reads the index, so
+# this is excluded by construction rather than by a filter; without --cached it would pass.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 3 — a tracked record that names a DIFFERENT sha. The record exists and the join still refuses,
+# which is the difference between "a review was written" and "the review covers what shipped".
+cropen
+printf '# closing review\n\nrange deadbee1...HEAD\n' > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 4 — THE LENGTH GUARD, and the reason it is not defensive decoration. The record here is a
+# perfectly good tracked review; only the recorded base is gone. `grep -F ""` matches every line of
+# every file, so without the >=8 test this arm would SELECT that record and the item would pass by
+# finding anything — the same degeneration an empty base once caused in check_authorization.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
+# because "absent" and "too short to be a needle" reach the guard by different routes.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "${rb:0:8}" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+reset_tree
 
 # ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
 # ---- directive is a pointer into a section of that file, so a run without it is bound by a set
@@ -1205,7 +1265,7 @@ miss "$(sed -n '/^## Parked/,$p' memory/builds/tRun/RUN.md)" "override"
 # has simply relabelled every parked line rather than distinguishing two kinds.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
-run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override records-current --reason "records lag" >/dev/null 2>&1
+run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override records-current --reason "records lag" >/dev/null 2>&1
 hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
 
 

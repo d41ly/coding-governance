@@ -75,7 +75,7 @@ PHASES_TERMINAL="LANDED ABORTED"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -1179,7 +1179,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
-  local slug="$1" rel="$2" item="$3" ck="$4"
+  local slug="$1" rel="$2" item="$3" ck="$4" rb
   case "$item" in
     authorization-reachable)
       # RE-DERIVED, never read out of the run-state file. That file is written by the subject of the
@@ -1209,6 +1209,28 @@ dod_met() { # slug · run-state file · item · checker
         && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
         && [ -n "$(unit_rows "$rel")" ] \
         && [ -z "$(nonterminal_units "$rel")" ] ;;
+    closing-review-recorded)
+      # A tracked review record under this build NAMES the base the run pinned once. The join is the
+      # sha because every filename and sequence join was measured wrong on 7 of 7 multi-unit builds
+      # in this corpus. Eight characters, because a sha spelled in prose is spelled abbreviated: 15
+      # of 46 tracked records carry an eight-hex token and NONE carries a full forty.
+      #
+      # The length guard is not decoration. `grep -F ""` matches every line of every file, so an
+      # absent or truncated `base:` would select the FIRST review record in the build and the item
+      # would pass by finding anything - the same degeneration an empty base once caused in
+      # check_authorization, where it turned a provenance test into a read of the git index.
+      #
+      # --cached reads the INDEX, which is this kit's stated per-run population and the reason
+      # --preflight stages the run-state file, so an untracked review is excluded by construction
+      # rather than by a filter. Through GIT() so the object-substitution lever stays inert.
+      #
+      # It measures that a record EXISTS and names the pinned base. It does not judge what the
+      # review said, and no verdict grammar is anchored: `^## Verdict: CLEAN` matches zero of this
+      # corpus's 46 records, so anchoring one would make the item unsatisfiable against every review
+      # this repo has ever written.
+      rb=$(fact "$rel" base)
+      [ ${#rb} -ge 8 ] \
+        && GIT grep --cached -qF -- "${rb:0:8}" -- "$M/builds/$slug/reviews/*.md" ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)
