@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-5 — one leg: every self-test prints a count, in one shape, against a floor
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 

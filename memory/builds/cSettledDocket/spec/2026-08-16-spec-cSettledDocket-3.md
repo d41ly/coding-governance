@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -26,8 +26,8 @@ bold-prose §8 and a third with the identical shape passed, because it was Tier-
 - **S3** — a terminal spec whose Open-questions range never OPENS prints
   `no Open questions section found` rather than nothing. Silence and pass are the same byte today,
   which is why the hole below survived its own acceptance set.
-- **S4** — repair the four Tier-1 specs the change reds, each by the repair its OWN failure needs —
-  which is not one recipe. Two fail §8 and two fail the §9 rev-log; see §4.
+- **S4** — repair the Tier-1 specs the change reds, each by the repair its OWN failure needs, which
+  is not one recipe. Measured against the SHIPPED mechanism: three, all §8, in two shapes; see §4.
 - **S5** — arms, each paired with its Tier-2 twin so the arm proves the assertion MOVED rather than
   vanished: a Tier-1 terminal spec with an unresolved §8 reds; one with a resolved §8 is silent; one
   whose header rev is missing from §9 reds; one with non-canonical `## ` sections stays silent; and
@@ -70,14 +70,24 @@ the four.
 rev-1 reported "4 of 18 fail §8, 0 fail §9-rev" from a Python reimplementation of the gate's logic.
 Re-taken by copying the real script, neutralising line 626's cut, and running it over the corpus:
 
-| Spec | Fails | Repair it needs |
+| Spec | Fails | Repair it needed |
 |---|---|---|
-| `cBriefedPilot-9` | terminal §8 | bold-prose resolution → `###` sub-head |
-| `cBriefedPilot-17` | terminal §8 | bold-prose resolution → `###` sub-head |
-| `aWrittenMethod-3` | §9 rev-log | header `rev-3` absent from §9 — add the log line |
-| `aWrittenMethod-5` | §9 rev-log | header `rev-3` absent from §9 — add the log line |
+| `cBriefedPilot-9` | terminal §8 | bold prose with no sub-head → `###` sub-head |
+| `cBriefedPilot-17` | terminal §8 | bold prose with no sub-head → `###` sub-head |
+| `aWrittenMethod-3` | terminal §8 | a `###` sub-head that carried no RESOLVED → put it in the head |
+| `aWrittenMethod-5` | — | nothing: its §9 became findable once the range keyed on the title |
 
-Two and two, not four and zero. The count was right by accident and **the attribution was inverted
+Two and two, not four and zero — measured with the cut neutralised and the ranges still keyed on
+NUMBER. **The shipped mechanism gives a third answer: three, all §8.** Title-keying made
+`aWrittenMethod-5`'s Revision log findable, which cleared it outright, and moved `-3` from §9 to §8
+by making its Open-questions section visible for the first time. The three repairs are TWO shapes,
+not one: a sub-head that carries no RESOLVED is a different defect from prose with no sub-head.
+
+Three measurements, and only the last was taken with the mechanism that shipped. The first came from
+a Python reimplementation of the gate; the second from the real gate with half the change; the third
+from the whole of it. The lesson the repo already has a name for — a reimplementation of a checker is
+not a second opinion on it — extends one step further: a measurement taken against half a mechanism
+is not a measurement of that mechanism. The count was right by accident and **the attribution was inverted
 for half the files**, so rev-1's single repair recipe could not have cleared two of them and its AC4
 was unreachable. The lesson is the one this repo already has a name for: a reimplementation of a
 checker is not a second opinion on it. The number is re-taken this way again at build time.
@@ -126,7 +136,7 @@ measured by running the gate, enumerated by filename WITH its required repair, a
 - **AC5** — a Tier-1 spec with non-canonical `## ` sections stays SILENT, proving the cut still
   guards the canon.
 - **AC6** — `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 over the real corpus after the
-  four repairs, and each repair matches the row §4's table assigns it.
+  repairs, and each repair matches the row §4's table assigns it.
 - **AC7** — `bash tools/memory-tree/check-verdict-epoch.sh` passes, proving
   `KIT_MEMORY_TREE_VERSION` moved with the engine.
 
@@ -145,6 +155,10 @@ are taken and both have an AC that fails if the other choice were made.
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-32`.
+- rev-3 · 2026-08-16 · built. §4's table corrected to the measurement the SHIPPED mechanism gives —
+  three specs, all §8, in two repair shapes — and the unplanned consequence recorded: hoisting §9-rev
+  means a Tier-1 spec carrying a rev must log it, so Tier-1's light profile now includes a Revision
+  log. The live corpus already complied.
 - rev-2 · 2026-08-16 · M4 audit fold. Two blockers and a high: the measurement was taken from a
   Python reimplementation and had the §8/§9 attribution inverted for two of four files; the `next`
   is a prefix cut so the stated mechanism could not produce the stated behaviour; and the §8 range is

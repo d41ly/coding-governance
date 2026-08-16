@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 

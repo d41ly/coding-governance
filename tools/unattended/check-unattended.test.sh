@@ -38,6 +38,7 @@ PHASES_EXTRA="${1-}"
 DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
+DIRECTIVES_EXTRA_TABLE=""
 EOF
 }
 
@@ -906,11 +907,53 @@ mutate memory/builds/tRun/RUN.md '/<!-- \/run:generated -->/d'
 hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
 reset_tree
 
+# ---- TOOL-cSettledDocket-2: DIRECTIVES_EXTRA was waivable and unshowable at once. `--waive` accepts
+# ---- any handle `directives()` composes — core PLUS extra — while check 16 arm A joined CORE alone,
+# ---- so a project could relax a rule the agent was never shown and could not fix it by adding a
+# ---- table row, because the Skill is rendered from a kit template.
+# ----
+# ---- Branch B, owner-resolved: the project gets a ROW SOURCE. Built as a conf-declared FILE rather
+# ---- than a region inside the render — the render has a recorded zero-byte write that `--check`
+# ---- then certified, and a file nobody renders has no adopter bytes to lose.
+
+# GREEN CONTROL: undeclared is the empty set, which is every adopter today. This is also the arm
+# that keeps the change from reddening anyone who uses no extras.
+reset_tree
+same "an undeclared row source changes nothing" "$(run)" ""
+
+# ...an extra handle with NO row source is now REFUSED, where before it was silently waivable. This
+# is the defect closing.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+hit "$(run)" "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: house-style:M9"
+
+# ...and with a row source that CARRIES it, the project is whole again: declared, shown, waivable.
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+same "declared + shown is silent" "$(run)" ""
+
+# ...a row source naming a handle the registry does NOT declare reds the other way, so the join stays
+# two-directional across the union rather than one-directional over it.
+printf '| `never-declared` | nothing declares this | M9 | P2 |\n' >> memory/project/extra-directives.md
+hit "$(run)" "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: never-declared"
+
+# ...a DECLARED path that does not exist is a named refusal, not an empty union. Silently, every
+# extra handle would land back on the absent-from-table branch with nothing saying why.
+reset_tree
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/nope.md"|'
+hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in: memory/project/nope.md"
+
+# ...and a declared file carrying no readable row is its own refusal, for the reason every locator in
+# this leg has one: a source that contributes nothing is indistinguishable from no source at all.
+mkdir -p memory/project && printf 'no rows here, just prose\n' > memory/project/nope.md
+hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty: memory/project/nope.md"
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=165
+FLOOR_ASSERTIONS=174
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

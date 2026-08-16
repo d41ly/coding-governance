@@ -149,7 +149,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
-- testsuite counts — `tools/check-testsuite-counts.sh` (+ its self-test): every `*.test.sh` the BAR
+- testsuite counts — `tools/check-testsuite-counts.sh` (+ `tools/check-testsuite-counts.test.sh`): every `*.test.sh` the BAR
   runs prints an executed assertion count in one agreed shape against a shrink-only floor. The
   population is DERIVED from `tools/gate-legs.json`, never hand-kept, and the non-compliant set is a
   shrink-only registry beside the other waiver lists — a row naming a suite that now complies reds

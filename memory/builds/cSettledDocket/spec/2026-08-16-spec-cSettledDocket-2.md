@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -140,7 +140,22 @@ marker-region preservation problem this repo has already lost data to once. **C*
 makes the driver parse markdown at run time and turns the leg into a second opinion on the driver's
 own parse.
 
-The owner took **B** on 2026-08-16. The build order follows from its one real risk: the
+The owner took **B** on 2026-08-16, and the MECHANISM changed at build time — same branch, same
+promise, a different way of keeping it.
+
+rev-2 put the project's rows in a region INSIDE the rendered Skill, which made
+`adopt-unattended.sh` responsible for preserving adopter bytes across a re-render. Reading that
+render before writing the arm: it is a pure template substitution whose own comments record a
+zero-byte write that `--check` then certified, and two failed attempts at escaping conf values.
+Adding byte-preservation to it is the highest-risk change available in this kit, for a feature
+no project uses yet.
+
+**Built instead as a conf-declared table file.** `.unattended.conf` gains an optional
+`DIRECTIVES_EXTRA_TABLE` naming a project-owned markdown file; check 16 arm A joins the
+EFFECTIVE set against the kit table UNION that file's rows. The file is never rendered, so
+there is nothing to preserve and the data-loss class does not arise. Undeclared, it is the
+empty set and every existing adopter is unaffected — which is also what makes the change safe
+to land before anyone uses it. The build order follows from its one real risk: the
 marker-region preservation arm — write a project region, re-render, compare the region's bytes — is
 written BEFORE the region is introduced, because `TOOL-aMouldedFolio-4` records that this repo's
 four marker-region implementations disagree and that one of them deleted authored data.
@@ -148,6 +163,9 @@ four marker-region implementations disagree and that one of them deleted authore
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-31`.
+- rev-3 · 2026-08-16 · build-time mechanism change WITHIN branch B: a conf-declared table file
+  rather than a region inside the rendered Skill, because the render is the one mechanism here with a
+  recorded data-loss incident and the file form has nothing to preserve. §4 carries the reasoning.
 - rev-2 · 2026-08-16 · M4 audit fold, then OWNER RESOLUTION. Branch A was mis-costed at four
   characters: `core` is read by arm B as well as arm A, so widening it extends the section-resolution
   rule to extras. AC4 was unfalsifiable under two of three branches. **Owner took BRANCH B on

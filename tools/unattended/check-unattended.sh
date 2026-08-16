@@ -46,7 +46,7 @@ if [ ! -f "$CONF" ]; then
 fi
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
-KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""
+KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -479,7 +479,12 @@ tmpl="$HERE/SKILL.template.md"
 # A template present but carrying no readable row left `core` unset, and under `set -u` arm B then
 # died on it — so the refusal for an unreadable table took arm C and this leg's own exit code down
 # with it, reporting one problem where there were two.
-core=$(printf '%s\n' $DIRECTIVES_CORE | sort -u)
+# TOOL-cSettledDocket-2: the EFFECTIVE set, core plus whatever the project declared. `--waive` has
+# always accepted an extra handle — the driver composes both — while this join covered CORE alone,
+# so an extra was waivable by a verb and invisible to the agent, and the project could not fix that
+# by adding a table row because the Skill is rendered from a kit template. It has a row source now.
+core=$(printf '%s
+' $DIRECTIVES_CORE $DIRECTIVES_EXTRA | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -499,6 +504,35 @@ else
       if (h != "" && n == 1) print h ":" c
       else if (h != "" && n != 1) print h ":AMBIGUOUS"
     }' | sort -u)
+  # TOOL-cSettledDocket-2 — the PROJECT's own rows, if it declared a source. Same row grammar as the
+  # kit table, read with the same awk, so the two cannot disagree about what a row IS.
+  #
+  # A declared path that does not EXIST is a named refusal, never an empty union: silent, every
+  # project-declared directive would land back on the "declared and absent from the table" branch
+  # with nothing saying why. Undeclared is the empty set, which is every adopter today.
+  if [ -n "$DIRECTIVES_EXTRA_TABLE" ]; then
+    if [ ! -f "$ROOT/$DIRECTIVES_EXTRA_TABLE" ]; then
+      fail 16 "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in: $DIRECTIVES_EXTRA_TABLE"
+    else
+      xtra=$(tr -d '\r' < "$ROOT/$DIRECTIVES_EXTRA_TABLE" | awk -F'|' '
+        /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+          h = ""; c = ""; nm = 0
+          for (i = 2; i <= NF; i++) {
+            cell = $i
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+            if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+            if (cell ~ /^M[0-9]+$/) { c = cell; nm++ }
+          }
+          if (h != "" && nm == 1) print h ":" c
+          else if (h != "" && nm != 1) print h ":AMBIGUOUS"
+        }' | sort -u)
+      if [ -z "$xtra" ]; then
+        fail 16 "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty: $DIRECTIVES_EXTRA_TABLE"
+      else
+        tblpairs=$(printf '%s\n%s\n' "$tblpairs" "$xtra" | grep . | sort -u)
+      fi
+    fi
+  fi
   if [ -z "$tblpairs" ]; then
     fail 16 "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
   else

@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-1 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
