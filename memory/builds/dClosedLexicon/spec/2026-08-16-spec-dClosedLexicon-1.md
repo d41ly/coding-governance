@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** INPROGRESS · rev-7 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** BLOCKED · rev-8 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -446,6 +446,21 @@ dogfood-only and must not ship.
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-8 · 2026-08-16 · folded review-dClosedLexicon-4 and -5, and the unit does NOT close. S3's P3 is
+  the only unsound part and it did not converge: three adversarial rounds produced four blockers in
+  that one predicate. Round 1 found the namespace-versus-path comparison; round 2 measured the
+  reachability proof that fixed it to be a TAUTOLOGY (it certified the pre-fix blind resolver) and it
+  was removed; round 3 found two more, both VERIFIED here — a `<dir>/*` glob containing an earlier
+  wildcard escapes that wildcard literally so nesting stops below depth 1, and importer-local
+  precedence is applied to fully-qualified dotted imports where the language grants none, missing a
+  genuine crossing beside a same-stem sibling. Both restore the unfalsifiable-zero condition this
+  unit exists to close, so P3 is not fit to rely on and the status is BLOCKED rather than CLOSED.
+  The ROOT CAUSE is process: `_glob_match` and `resolve_import` carry P3's whole correctness and have
+  no direct arms — reverting the `_glob_match` rewrite verbatim leaves all 48 fixture arms green. The
+  left-shift is a CASE TABLE per function, not another end-to-end fixture, and that is the first
+  thing a resuming session should build. S1, S2 and S12 are unaffected: no round implicated P1, P2 or
+  the placeholder gate, and the latter found a live defect on its first run. rev-7 also committed
+  review-4 without a rev bump, which this entry repairs.
 - rev-7 · 2026-08-16 · BUILT, then folded review-dClosedLexicon-3, the Tier-2 closing review, which
   came back BLOCKED on the one mechanism this spec did not describe precisely enough to build right.
   S3's P3 matched an import NAMESPACE against a PATH glob, so the only rule this repo declares —

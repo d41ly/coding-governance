@@ -43,6 +43,25 @@ shape — a hyphenated directory reached by a bare-stem import, which is the cas
 implementation could not see and no path-shaped fixture would have caught. Those live in
 `selftest.py`. The general question is `memory/gotchas/armed-but-unreachable-rule.md`, and it is a
 REVIEW question: no predicate here can decide reachability for a rule type it has never seen.
+
+*** KNOWN DEFECTS IN P3 — DO NOT RELY ON A ZERO LAYER PIN ***
+
+Two are VERIFIED and UNFIXED. They are recorded here rather than in a tracker alone because this
+docstring is what an operator reads before trusting the number:
+
+  1. `_glob_match`'s `<dir>/*` nesting branch escapes the RAW pattern, so a wildcard EARLIER in the
+     pattern becomes a literal asterisk and nesting stops matching below depth 1. Measured:
+     `apps/*/internal/*` reds an import at depth 1 and passes it GREEN at depth 2.
+  2. `resolve_import` applies importer-local precedence to FULLY-QUALIFIED dotted imports, where the
+     language grants the importer's directory no precedence. A genuine crossing sitting beside a
+     same-stem local sibling resolves to the sibling and is missed.
+
+Both re-create the unfalsifiable-zero condition the predicate exists to prevent. The root cause is
+that these two functions carry P3's whole correctness and have no DIRECT arms: reverting the
+`_glob_match` rewrite verbatim leaves all 48 fixture arms green. The left-shift is a case table per
+function, not another end-to-end fixture.
+
+P1, P2 and `tools/check-placeholders.sh` are unaffected — no review round implicated them.
 """
 
 import re
@@ -327,12 +346,12 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
                         "green run: declare a forbidden import direction, or remove the conf to "
                         "un-adopt the kit entirely.")
     else:
-        # The THIRD vacuity defence. Emptiness and dead extractors were armed from the start; a
-        # non-empty rule that cannot fire was not, and that is the gap a real rule shipped through.
+        # EMPTINESS ONLY. This does NOT establish that a selective rule can fire — see the module
+        # docstring for the tautology that claim rode on, and the KNOWN DEFECTS note there.
         for frm, to, why in scan_unselective_rules(layers, files, module_index):
             problems.append(f"UNSELECTIVE LAYERS RULE `{frm} -> {to}` — {why}. A rule whose globs "
-                            f"fire is worse than no rule: it reports a confident 0 that no edit can "
-                            f"ever move.")
+                            f"select nothing cannot fire, so its offender count is a 0 no edit "
+                            f"can move.")
 
     # --- extraction, with the vacuity arm ----------------------------------------------------
     offenders: dict[str, list[Offender]] = {"verb": [], "suffix": [], "layer": []}

@@ -136,7 +136,17 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
   `exports` maps, or re-export barrels, so an aliased import into a forbidden layer is not caught.
   The earlier version compared the raw namespace against a path glob and was structurally incapable:
   the first real rule declared — naming a HYPHENATED directory no module name can contain — could
-  never match, and P3 reported an unfalsifiable 0. That is why the reachability arm exists.
+  never match, and P3 reported an unfalsifiable 0.
+- **P3 IS NOT FIT TO RELY ON, and the unit does not close because of it.** Three adversarial rounds
+  produced four blockers in this one predicate, the last two VERIFIED and unfixed: a `<dir>/*` glob
+  containing an earlier wildcard escapes that wildcard literally, so nesting silently stops matching
+  below depth 1 (`apps/*/internal/*` reds at depth 1 and passes at depth 2); and importer-local
+  precedence is applied to FULLY-QUALIFIED dotted imports, where the language grants the importer's
+  directory none, so a genuine crossing beside a same-stem local sibling is missed. Both restore the
+  unfalsifiable-zero condition this build was opened to close. The root cause is process, not
+  cleverness: `_glob_match` and `resolve_import` carry the predicate's whole correctness and had NO
+  direct arms — reverting the `_glob_match` rewrite verbatim leaves every one of the 48 fixture arms
+  green. P1, P2 and the placeholder gate are unaffected and were not implicated in any round.
 - **The benefit is unmeasurable by construction**, which is why the kit is opt-in and why the
   retirement condition is written down rather than left to argument: retire P1 if it goes unused
   across two adopters.
