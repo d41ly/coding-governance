@@ -6,24 +6,15 @@ home = "tools/lexicon"
 scope = "repo"
 version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 
-# The engine files are ENUMERATED rather than globbed with `**`, and that is load-bearing. `apply`
-# iterates file rules IN ORDER and an `include = "**"` engine rule pools every tracked file under
-# `home`, writing each unconditionally — so it would overwrite the adopter's waiver registries with
-# this repo's empty ones BEFORE the project-owned rule below is ever reached. A later rule cannot
-# un-clobber what an earlier one wrote. Enumerating costs a line per file and is the only shape that
-# keeps the split real.
+# `**` means "everything not otherwise claimed", and since TOOL-dClosedLexicon-4 the engine means it:
+# a wildcard rule's pool excludes any file whose DESTINATION another rule in this descriptor owns.
+# This list used to be enumerated by hand precisely because it did not — an `include = "**"` rule
+# overwrote the adopter's waiver registries with this repo's empty ones before the seed rule below
+# was ever reached. The enumeration was a workaround with its own cost (a new kit file stayed
+# silently undeployed until someone remembered to add a line), tracked as TOOL-dClosedLexicon-5 and
+# closed by reverting to this.
 [[files]]
-include = [
-  "lexicon.py",
-  "lexicon_conf.py",
-  "subtokens.py",
-  "scaffold_lexicon.py",
-  "selftest.py",
-  "adopt-lexicon.sh",
-  "kit.toml",
-  "README.md",
-  "LEXICON.md",
-]
+include = "**"
 role = "engine"
 
 # The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
