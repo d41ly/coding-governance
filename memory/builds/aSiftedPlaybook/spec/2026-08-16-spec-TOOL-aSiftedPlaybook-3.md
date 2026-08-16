@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -192,8 +192,13 @@ future ones.
   never creates or extends the file; `PLAY-aSiftedPlaybook-3` S7 owns its contents.
 - **AC7** — When `bash tools/check-playbook-parity.test.sh` runs it exits 0; when any single arm's
   assertion is inverted it exits non-zero naming that arm.
-- **AC8** — When `python tools/memory-tree/check-arms.py` runs, the new gate is in its population
-  with a declared `ARMS_FLOORS` entry, and an undeclared floor is its own refusal.
+- **AC8** — When `python tools/memory-tree/check-arms.py --report` runs, the new gate is in its
+  population with a NUMERIC `ARMS_FLOORS` floor rather than `unset`. **An undeclared floor is not a
+  refusal** — `check-arms.py` skips a gate it finds no entry for — so this AC reads the report
+  directly rather than trusting the gate to complain.
+- **AC10** — When `python tools/govkit/govkit.py selfcheck` runs, it is green with both new depth-1
+  paths (`tools/check-playbook-parity.sh` and its `.test.sh`) declared in
+  `tools/govkit/registry.toml`.
 
 ## 7. Gates
 
@@ -203,6 +208,7 @@ future ones.
 - `python tools/drift-audit/drift_report.py --check` — the charter citation, pin 0, zero tolerance.
 - `bash skills/session-kickoff/manifest-check.sh` — `tools/gate-legs.json` is watched.
 - `bash tools/run-gates.test.sh` — the canary over the changed manifest.
+- `python tools/govkit/govkit.py selfcheck` — two new depth-1 paths must be declared.
 - `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -251,6 +257,11 @@ they did not have to go back.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-8 · 2026-08-16 · folded round-3 H2, M2 and B2. AC8 repeated the false "an undeclared floor is
+  its own refusal" premise — `check-arms.py` silently skips one — so it now reads `--report`
+  directly. The waiver key grammar is pinned (bare kit name, verbatim), because S1 derived bare names
+  while `PLAY-3` S7 spelled them with a trailing slash and nothing said which joins. Both new depth-1
+  `tools/` paths need `govkit/registry.toml` declarations or the `govkit selfcheck` leg reds.
 - rev-7 · 2026-08-16 · both forks RESOLVED under delegated authority, per M3. F1 → in-script, on
   the tie-break's "reuse of a seam M5 found" — §10 already named `kit-dogfood-parity.PAIRS` and a
   data file would reuse nothing; a revisit trigger is stated so it is a decision, not a posture.
@@ -293,7 +304,12 @@ they did not have to go back.
 `python tools/codebase-map/reuse_lookup.py "template size ceiling gate enforcement"`:
 
 - `tools/install-prefix-waivers.txt` is the model for S1's waiver file: one `<key>` per row with a
-  reason after whitespace, and a row whose target is gone reds as stale. Its header prose is the
+  reason after whitespace, and a row whose target is gone reds as stale. **The key grammar is pinned
+  here and nowhere else**: the BARE kit directory name exactly as the derivation yields it (`lib`,
+  `hooks` — no trailing slash, no path prefix), compared verbatim. `install-prefix-waivers.txt`'s own
+  keys are `<path>:<line>`, a different shape, so "modelled on" settles the row layout and not the
+  key; a waiver whose key does not join leaves its kit unexcused and reds AC1, which is the
+  vacuous-selector class S1 exists to prevent. Its header prose is the
   template for the new file's. **One deliberate divergence** (§8 F2): `install-prefix-waivers.txt`
   is shrink-only and can only lose rows, while this registry must be able to gain one for an
   experimental kit, so it drains through AC6's two arms rather than through a count.

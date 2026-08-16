@@ -1,10 +1,10 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
-Four of the eleven kits under `tools/` are named nowhere in the three shipped playbook files, so an
+Several kits under `tools/` are named nowhere in the three shipped playbook files, so an
 adopter's instantiated ruleset never mentions capabilities the deploy runbook installs for them, and
 the customize companion's deletion checklist cannot tell them what to remove if they decline one.
 Give each a template placement and a conditional-section row.
@@ -53,6 +53,15 @@ Give each a template placement and a conditional-section row.
   depends on now that a missing kit REDS. It drains through that unit's two AC6 arms instead: a row
   whose kit is gone, and a row whose kit is named in the playbook, both red. This is the one place
   it diverges from `tools/install-prefix-waivers.txt`, which is shrink-only and can only lose rows.
+- **S9 — `govkit`, the twelfth kit.** It arrived from main after this unit was drafted and is the
+  deployer — arguably the most adopter-facing kit in the tree. It gets the same treatment as S1-S4:
+  a template placement in the section that owns its concern, plus a customize conditional row.
+  Without a disposition, AC1 is false at this unit's own DoD and `TOOL-aSiftedPlaybook-3` AC1 reds
+  the merge bar the day unit 7 lands.
+- **S10 — the closing `--bump`** (`TOOL-aSiftedPlaybook-1` B3). This is the last template-touching
+  unit, so it owns returning the size ratchet to quiet: run the gate's `--bump` after S1-S4 and S8
+  have landed, so `tools/template-size-highwater.txt` records the template's final size. Units 5 and
+  6 are expected to fire the warn before this; that is the ratchet working, not a defect.
 - **S8 — the version marker and the archive snapshot.** Both deploy files carry
   `<!-- governance-template: vN.N -->` and are re-pulled in lockstep:
   `parallel-coding-governance.template.md:12` and `parallel-coding-governance.domain-rules.md:3`
@@ -96,13 +105,17 @@ for kits whose concern is not memory, and would have been wrong for two of the f
 
 ### The population is machine-enumerable, so the acceptance criterion quantifies over it
 
-`tools/` holds eleven tracked kit dirs. The same derivation is already used twice —
+The kit population is DERIVED, never spelled: at HEAD
+`git ls-files -- 'tools/*/*' | awk -F/ 'NF>2 {print $2}' | sort -u` returns **twelve**, one more than
+when this unit was drafted — `govkit` arrived with the merge at `8712ac0`. A hardcoded count inside
+the unit that exists to close hardcoded counts is the same defect, so no count is stated here. The same derivation is already used twice —
 `tools/codebase-map/map_extractors.py` (feeding the `kits` inventory in `inventories.json`) and
 `check-install-prefix.sh:38`'s kit-name alternation — so AC1 quantifies over that enumeration rather
-than over a list of four, which would go stale the moment a twelfth kit lands. Three kits are
-legitimately not adopter-facing and belong on the exemption side: `lib/` (gov-internal, ships
-nothing, per `AGENTS.md`), `hooks/` (reached through §8's `agent-cap.js`) and `workflows/` (reached
-through §8's `tier2-review.js`).
+than over a list of four, which would go stale the moment a twelfth kit lands. **Two** kits are legitimately not adopter-facing and belong on the exemption side: `lib/`
+(gov-internal, ships nothing, per `AGENTS.md`) and `hooks/` (reached through §8's `agent-cap.js`).
+`workflows/` is NOT among them — measured, it already scores a path-segment hit at
+`parallel-coding-governance.template.md:150` (`tools/workflows/tier2-review.js`), so a waiver for it
+would excuse nothing and `TOOL-aSiftedPlaybook-3` AC6's second arm would red it as redundant.
 
 ### Cost, and why this unit alone needs the ceiling raise
 
@@ -146,7 +159,9 @@ blocking objection" would write a mischaracterization into a record the repo dec
 | `README.md` | S4's adopter-facing shipped-contents list |
 | `WIRE-INTO-PROJECT.md` | S6's dead §2a reference |
 | `tools/gate-lint/README.md` | S6's dead §14 reference |
-| `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/` and `hooks/` only |
+| `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib` and `hooks` only |
+| `tools/govkit/registry.toml` | + row — S7's new depth-1 path must be declared or `govkit selfcheck` reds |
+| `tools/template-size-highwater.txt` | S10's closing `--bump` rewrites it |
 | `parallel-coding-governance.template.md` `:12` · `.domain-rules.md` `:3` | S8, the v2.8 marker in lockstep |
 | `memory/archive/parallel-coding-governance.template-v-2-7.md` | S8, new — the pre-bump snapshot |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec |
@@ -195,6 +210,14 @@ blocking objection" would write a mischaracterization into a record the repo dec
 - **AC5** — When `bash tools/check-template-size.sh` runs, it exits 0 against the raised ceiling and
   reports the measured size read FROM the gate.
 - **AC6** — When `bash tools/run-gates.sh` runs, every leg is green.
+- **AC9** — When the kit population is re-derived with
+  `git ls-files -- 'tools/*/*' | awk -F/ 'NF>2 {print $2}' | sort -u`, every member is either named
+  in a playbook file or present in `tools/playbook-kit-waivers.txt`. Quantified over the derivation,
+  never over a count — a twelfth kit arrived mid-build and a spelled number would not have noticed.
+- **AC10** — When `python tools/govkit/govkit.py selfcheck` runs, it is green with
+  `tools/playbook-kit-waivers.txt` declared in `tools/govkit/registry.toml`.
+- **AC11** — When `bash tools/check-template-size.sh` runs after S10's `--bump`, it prints no warn
+  line. This is the observation `TOOL-aSiftedPlaybook-1` AC9 could not make from unit 1.
 - **AC8** — When `grep -n 'gate-lint' AGENTS.md README.md` runs, both carry a `gate-lint` entry in
   their shipped-kit lists. Without this AC a builder can skip the charter half of S4 entirely and
   pass: AC1 quantifies over the three playbook files and the waiver registry, AC2 over
@@ -243,6 +266,13 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-16 · folded round-3 blockers B1/B2/B3 and highs H4/H7. **B1**: `govkit` arrived
+  from main as a TWELFTH kit and was in no scope item, waiver or non-goal; both spelled counts are
+  deleted and the population is derived (AC9), with `govkit` given a disposition as S9. **B2**:
+  `govkit selfcheck` reds on any undeclared depth-1 `tools/` path and S7 creates one. **B3**: this
+  unit takes the closing `--bump` as S10, which unit 1 could not perform. **H4**: S8 and AC7 named
+  two archive blobs ~2.3 KB apart; AC7 now matches S8 and the v-2-6 precedent. **H7**: §4 still
+  listed `workflows/` as exempt against S7's two-row seed.
 - rev-5 · 2026-08-16 · corrected S7's waiver-registry contract, exposed by resolving
   `TOOL-aSiftedPlaybook-3` F2 to RED. The registry cannot be both shrink-only and the escape hatch a
   red requires — a shrink-only file cannot gain the row an experimental kit needs. It is a declared

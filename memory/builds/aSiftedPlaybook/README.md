@@ -12,7 +12,8 @@ ids: PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-a
 Node `a` · opened 2026-08-16 · streams playbook+tooling.
 
 A read-only audit of the three shipped `parallel-coding-governance*.md` files at template v2.7
-confirmed eleven defects and refuted **nine** suspected ones. The owner then ordered two things:
+confirmed eleven defects and refuted **eight** suspected ones (nine were listed as refuted; round 3
+withdrew one). The owner then ordered two things:
 spec the fixes, and **raise the template size gate from 32 KiB to 48 KiB**.
 
 The audit itself is committed at
@@ -20,8 +21,10 @@ The audit itself is committed at
 with every defect and every refutation enumerated. It was previously summarised here and nowhere
 else, which made completeness against the commissioning input unfalsifiable — only five of the
 eleven carried ids anywhere, and a later session could not tell a dropped defect from one that never
-existed. (The count was "eight" until the enumeration forced it: three separate count-claims had
-been collapsed into one bullet. Exactly the class of summary figure the report replaces.)
+existed. The figure has now moved twice for the same reason: it read "eight" until enumeration
+forced it to nine (three count-claims collapsed into one bullet), then back to eight when round 3
+withdrew R2 — the companion carries 14 placeholders, not 13, so that suspicion was correct all
+along. Exactly the class of summary figure the report replaces.
 
 The second order reverses a rule this repo currently states in four carriers and calls
 non-negotiable. It is specced here as an explicit, recorded rule reversal rather than a constant
@@ -46,12 +49,12 @@ header of every spec in this folder — do not hand-edit it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-5 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-5 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-5 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-4 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-7 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-6 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-6 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-6 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-5 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-8 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -108,6 +111,12 @@ confirmed; `B*` are four found after it closed and are NOT part of that count.
 | B2 §157's pre-1.3 enforcement reach | med | `PLAY-1` S8 |
 | B3 §0's concurrency-only cap summary | low | `PLAY-1` S7 |
 | B4 `gate-lint`, a fourth unnamed kit | med | `PLAY-3` S4 |
+| B5 `govkit`, a twelfth kit arriving from main mid-build | med | `PLAY-3` S9 |
+| B6 the companion carries 14 placeholders, not 13 | med | `PLAY-4` S4 |
+
+`B5` and `B6` post-date the audit report. `B6` also closes the second clause of the tracked OPEN
+backlog row `PLAY-aSealedCaravan-1`, whose first clause is `A3`; that row was never cited by this
+build until round 3 found it, and it needs a disposition at landing.
 
 Nothing is unassigned, and no scope item claims an audit provenance it does not have.
 
@@ -128,10 +137,13 @@ Nothing is unassigned, and no scope item claims an audit provenance it does not 
   a new id that names them; it never edits them.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal `non_terminal_specs_cited_by_product_source` sits AT its pin of 2 with tolerance
-  0. Its `PRODUCT_GLOBS` are `tools/`, `skills/`, `.claude/`, the three playbook files and
-  `WIRE-INTO-PROJECT.md` — which means the very files these units edit are product source, and a
-  spec id written into the template as provenance reds the bar. `AGENTS.md` and `memory/` are
-  outside the globs and may cite freely.
+  0. Its `PRODUCT_GLOBS` are `tools/`, `skills/`, `.claude/`, **`memory/guides/SESSION-KICKOFF.md`
+  by FILE path**, the three playbook files and `WIRE-INTO-PROJECT.md` — which means the very files
+  these units edit are product source, and a spec id written into the template as provenance reds the
+  bar. `AGENTS.md` and `memory/` are outside the globs **except that one manifest file**, which five
+  of seven units re-stamp. An earlier version of this rule omitted it and said `memory/` was wholly
+  outside, which would have let a unit write a non-terminal spec id into a file sitting at a
+  zero-tolerance pin.
 
 ## Owner decisions — RESOLVED 2026-08-16
 

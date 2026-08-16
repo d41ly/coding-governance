@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -63,12 +63,21 @@ constant change is exactly when an unproven gate is most likely to be silently w
   (`## Constraints & why`, `## Shared seams`, `## Gaps`) plus the graced `## Reuse affordance`,
   modelled on the 76-line `memory/map/features/codebase-map.md`. It appeared in §4, §4's Files
   touched and AC6 but never in Scope, which is the same defect this build fixed in `PLAY-3`.
-- **S6 — the `fail()` refactor** (F1, resolved). `tools/check-template-size.sh`'s three
-  `echo`+`exit` sites become a `fail()` helper, which pulls the gate into `check-arms.py`'s
-  population automatically and therefore demands an `ARMS_FLOORS` entry in `.memory-tree.conf`
-  alongside the positive arms S2 already supplies. **An undeclared floor is its own refusal**, so
-  the conf entry is not optional. Trap to respect while writing it: a bare positional inside a
-  `fail` message cannot be armed — bind the value to a name and put it after the literal sentence.
+- **S6 — the `fail()` refactor** (F1, resolved). `tools/check-template-size.sh`'s exit paths become
+  a `fail()` helper, which pulls the gate into `check-arms.py`'s population. The source is the count;
+  no number is spelled here.
+
+  **The refactor must satisfy the discovery predicate, which imposes more than a rename.**
+  `check-arms.py`'s `FAIL_RE` matches `fail <n> "…`, so every call site needs a CHECK NUMBER this
+  gate has never had; `branches()` raises unless each message carries a literal run of at least
+  twelve characters; and a bare positional inside a `fail` message cannot be armed, so bind the
+  value to a name and put it after the literal sentence.
+
+  **An `ARMS_FLOORS` entry is required, and NOT because an undeclared floor refuses.** It does not:
+  `check-arms.py` reads `want = floors.get(gate_rel)` and `continue`s when it is absent, so a
+  discovered gate with no entry is **silently skipped** — §4 of this spec states that correctly two
+  sections earlier. The entry is what makes the pin real, and its grammar is
+  `<gate>:<branches>:<armed>`, values read from `--report` after the refactor.
 
 ## 3. Non-goals (OUT)
 
@@ -167,6 +176,10 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 - **AC5** — When `python tools/drift-audit/drift_report.py --check` runs,
   `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0 — i.e. S4's charter
   citation landed. A red here means the leg was added and the charter was not told.
+- **AC7** — When `python tools/memory-tree/check-arms.py --report` runs, it names
+  `tools/check-template-size.sh` with a NUMERIC floor rather than `unset`; when the floor is lowered
+  by hand, `--check` reds. Without this the whole S6 half can be skipped with every other AC and
+  `bash tools/run-gates.sh` green, because nothing else reads `.memory-tree.conf`.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage and freshness are
   both green, with the new key claimed in a dossier and NOT in `baseline.toml`.
 
@@ -177,8 +190,9 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 - `python tools/codebase-map/test_codebase_map.py` — coverage + freshness.
 - `python tools/drift-audit/drift_report.py --check` — the zero-slack citation signal.
 - `bash skills/session-kickoff/manifest-check.sh` — `tools/gate-legs.json` is watched.
-- `python tools/memory-tree/check-arms.py` — only if F1 resolves to the `fail()` refactor, in which
-  case an `ARMS_FLOORS` entry is mandatory and an undeclared floor is its own refusal.
+- `python tools/memory-tree/check-arms.py` — F1 resolved to the refactor, so this is mandatory. Note
+  it CANNOT catch a missing `ARMS_FLOORS` entry: an undeclared floor is skipped, not refused. AC7 is
+  what observes the entry.
 - `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -223,6 +237,12 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-16 · folded round-3 H2, H3 and M1. **H2**: "an undeclared floor is its own
+  refusal" is FALSE — `check-arms.py` skips a gate with no `ARMS_FLOORS` entry — and that false
+  premise was the entire justification for S6's mandatory conf entry, with no AC reading the conf at
+  all. Replaced with the refusals that exist, plus AC7 observing the entry directly. S6 also now
+  states the discovery predicate's real requirements: numbered checks, a twelve-character literal
+  run per message, and the floor grammar. The exit-site count is deleted; the source is the count.
 - rev-4 · 2026-08-16 · owner resolved F1 (refactor) and the round-2 audit `wf_98677a7a-009` closed
   three findings. **S5 and S6 added**: the map dossier mint appeared in §4, Files touched and AC6
   but never in Scope, and the `fail()` refactor had no scope item at all. A6/A7 rewritten against

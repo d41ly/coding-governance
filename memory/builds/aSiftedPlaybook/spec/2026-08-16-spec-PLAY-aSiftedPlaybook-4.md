@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 
@@ -23,6 +23,13 @@ themselves, none changes a rule, and none is byte-gated — neither companion is
 - **S2 — the shared placeholder is named where it is filled.** The template group at `:33-42` and
   the companion group at `:47-48` both list `{{MEMORY_ROOT}}`. Neither says the other one exists.
   Mark it in both places as the shared key, so an agent filling either group learns of the other.
+- **S4 — the companion's SHARE is 14, not 13.** `customize.md:15` says "13 of the 36 placeholders
+  sit unfilled in the companion" and `WIRE-INTO-PROJECT.md:98` says the companion "carries 13 of the
+  36". Measured: `parallel-coding-governance.domain-rules.md` holds **14** unique placeholders — 13
+  companion-exclusive plus the shared `{{MEMORY_ROOT}}`. "Carries" is simply false, and after a
+  template-only fill all 14 are unfilled, so the other spelling undercounts by one too. Correct both
+  to 14. This is the second clause of the tracked OPEN row `PLAY-aSealedCaravan-1`, which this build
+  had not cited; its first clause is the audit's A3, fixed by S1.
 - **S3 — the companion header's drop-shape claim matches the drop list.**
   `parallel-coding-governance.domain-rules.md:10-12` says "Four are droppable-per-project (§4, §9,
   §11 and §13, per the customize companion) and §1's unattended block is a fifth, line-scoped one",
@@ -50,7 +57,11 @@ The measurement, reproducible with the commands in §6:
 | Unique placeholders in `parallel-coding-governance.template.md` | 23 |
 | Unique placeholders in `parallel-coding-governance.domain-rules.md` | 14 |
 | Intersection | 1 (`{{MEMORY_ROOT}}`) |
+| Companion-EXCLUSIVE | 13 |
 | Union | 36 |
+
+The 14-vs-13 distinction is the whole of S4: the companion CARRIES 14 and only 13 are exclusive to
+it, and two shipped files state the exclusive count as though it were the carried one.
 
 The stated total of 36 is therefore correct and the two group headings are correct. Only the
 disjointness sentence is false, and it is false in the direction that causes harm: it tells an
@@ -117,6 +128,8 @@ Either order is correct; this order avoids writing the sentence twice.
 
 - **AC2** — When `parallel-coding-governance.customize.md` is read, no sentence claims the two
   placeholder groups are disjoint, and `{{MEMORY_ROOT}}` is marked as shared in both group listings.
+- **AC5** — When `grep -c '13 of the 36' parallel-coding-governance.customize.md WIRE-INTO-PROJECT.md`
+  runs, it returns 0 for both, and each states 14.
 - **AC3** — When `parallel-coding-governance.domain-rules.md:10-12` is read against
   `customize.md:69-71`, every section the header calls droppable carries the same drop shape
   (whole-section or line-scoped) in both files.
@@ -138,6 +151,10 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · folded round-3 H10 as new S4 and AC5. The companion CARRIES 14 placeholders,
+  not 13 — 13 is the exclusive count — so `customize.md:15` and `WIRE-INTO-PROJECT.md:98` are both
+  wrong, and the 2026-08-16 audit's R2 refuted this incorrectly. It is also the second clause of the
+  tracked OPEN backlog row `PLAY-aSealedCaravan-1`, which this build had not cited at all.
 - rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S1 now requires the intersection to
   be stated by name, because `TOOL-aSiftedPlaybook-3` S3 was written to compare against a value the
   file never stated — a compare-against-nothing that would have passed vacuously.

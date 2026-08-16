@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -32,7 +32,11 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
   `{{DEFAULT_BRANCH}}` in the template group with its fill instruction, and the counts move
   **36 → 37 and 23 → 24 only**.
 - **S5 — the runbook's restated count.** `WIRE-INTO-PROJECT.md:98` reads "the companion carries 13
-  of the 36 placeholders" and is that file's only `36`; it becomes **37**, and the **13 stays 13**.
+  of the 36 placeholders" and is that file's only `36`; the **36 becomes 37** here. The **13 is
+  separately wrong and is NOT this unit's to fix** — the companion carries 14 — and
+  `PLAY-aSiftedPlaybook-4` S4 corrects it at position 3, before this unit runs at position 5. An
+  earlier draft of this item asserted "the 13 stays 13", which was true only under the audit's
+  mistaken R2.
   It appeared in §4's Files touched but in no scope item and no acceptance criterion, so a builder
   working §2 and §6 would ship a correct template and companion while the runbook still said 36,
   with every AC green — the same shape as `PLAY-aSiftedPlaybook-1`'s S8 defect, one unit over.
@@ -65,15 +69,17 @@ wrong:
 | total | the sentence stating the total | 36 | **37** |
 | in the template | the template group heading | 23 | **24** |
 | in the companion | the companion group heading | 14 | 14 — unchanged |
-| "13 of the 36 … unfilled in the companion" | the fill-procedure sentence | 13 | 13 — the phrasing's `36` moves, the `13` does not |
-| the same claim, restated | `WIRE-INTO-PROJECT.md` | 13 | 13 — same treatment |
+| "13 of the 36 … unfilled in the companion" | the fill-procedure sentence | 13 | **14** via `PLAY-4` S4; the `36` moves here |
+| the same claim, restated | `WIRE-INTO-PROJECT.md` | 13 | **14** via `PLAY-4` S4; the `36` moves here |
 
 Cited by stated VALUE rather than by line number on purpose: at BASE these sit at `customize.md:20`,
 `:23`, `:45`, `:15` and `WIRE-INTO-PROJECT.md:98`, but §4 Rollout sequences this unit AFTER
 `PLAY-aSiftedPlaybook-4`, which rewrites the first and fourth of those sentences. Line anchors
 written here would be stale by the time this unit is built.
 
-A template-only placeholder cannot change a companion-only count. A spec that "fixed all four
+A template-only placeholder cannot change a companion-EXCLUSIVE count — and 13 was never the
+companion's carried count in the first place (it carries 14), which `PLAY-aSiftedPlaybook-4` S4
+fixes before this unit runs. A spec that "fixed all four
 numbers uniformly" would introduce a fresh error into the very file it was correcting, which is
 worth stating because that is the natural mistake here.
 
@@ -176,7 +182,8 @@ than being written twice against two different totals.
   there is no `adopt-playbook.sh` — so that observation names a step a builder cannot perform, and
   an AC nobody can run is not an AC.
 - **AC7** — When `grep -n '36\|37' WIRE-INTO-PROJECT.md` runs, the restated placeholder claim reads
-  37 and its "13" is unchanged.
+  37. Its companion figure is 14, corrected by `PLAY-aSiftedPlaybook-4` S4 at position 3 — this unit
+  moves the total and must not re-introduce 13.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0. Its `{{[A-Z]`
   ban is scoped to `memory/guides/SESSION-KICKOFF.md` and never reads the playbook, so a 37th placeholder
   cannot trip it — confirmed, and stated so the build does not go looking for a red that cannot
@@ -205,6 +212,9 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-16 · folded round-3 H10. S5 preserved "the 13 stays 13", which was true only under
+  the 2026-08-16 audit's mistaken R2 — the companion carries 14, not 13. The correction belongs to
+  `PLAY-aSiftedPlaybook-4` S4, which lands two positions earlier; this unit now moves only the total.
 - rev-5 · 2026-08-16 · folded round-2 lows. §3's companion count was five against a measured four,
   and now names `push-main` at `domain-rules.md:100` explicitly, since a script name is what a
   global substitution corrupts. §10's "no playbook dossier" is re-dated as a BASE-time observation

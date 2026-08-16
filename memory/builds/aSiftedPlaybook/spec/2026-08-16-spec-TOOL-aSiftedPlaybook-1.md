@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -35,7 +35,10 @@ records which relied on the old ceiling, because at least three of them cited it
   Conventions restatement), and `:7` (which calls `baseline.toml` shrink-only — see S6). Note `:97`
   spells `≤32 KiB` with a unicode `≤` while the leg itself spells `<=32KiB`, so a grep for the leg
   name alone misses it.
-- **S4 — the adopter-facing README.** `README.md:12`.
+- **S4 — the adopter-facing README.** `README.md:12` (the ceiling claim) **and `README.md:33`**,
+  which still reads "a 19-check hygiene gate" against the true 20. `PLAY-aSiftedPlaybook-1` §3 routes
+  that carrier here because this unit already edits the file; it is received here rather than merely
+  pointed at, which is the defect that shape produced once already.
 - **S5 — the kickoff manifest trap, at its NEW path.** The manifest moved to
   `memory/guides/SESSION-KICKOFF.md` (commit `24f3991`, `KICK-cKeyedLaunchpad-2`); the old
   `memory/guides/SESSION-KICKOFF.md` no longer exists. The trap is now three lines at `:121-123`:
@@ -72,13 +75,32 @@ records which relied on the old ceiling, because at least three of them cited it
   **Why not a constant.** Measured: this build lands the template near 34963 bytes, 71% of 49152.
   Every conventional fraction is silent through the whole build and several KiB beyond it (80% =
   39321, 90% = 44236), while any constant low enough to price these edits sits at or below 32768 and
-  fires on every run forever — the permanently-red decoration `tools/drift-audit/drift_signals.py:76-80`
+  fires on every run forever — the permanently-red decoration `tools/drift-audit/drift_signals.py:113`
   names as an anti-pattern. A ratchet has neither failure mode: it is silent until something grows,
   and it prices EVERY growth, which is the forcing function the 32 KiB ceiling was actually
   providing and the one F2 set out to replace.
 
-  The warn line names the measured size, the recorded high-water, and the delta. The high-water file
-  ships seeded with the size measured at the end of THIS build, so the ratchet starts quiet.
+  **The record is KEYED BY MEASURED FILE**, one `<path>	<bytes>` row per subject. This gate has two
+  consumers (S1), and a single un-keyed number cannot serve both: `skills/session-kickoff/SKILL.md`
+  is 18215 bytes against a template of 32682, so under a template-sized high-water the kickoff leg
+  could never warn, and a `--bump` on that leg's argv would rewrite the record to ~18215 — after
+  which the template leg prints WARN on every run forever.
+
+  **The record's PATH resolves like `MAX_BYTES` does** — a third positional, then an environment
+  variable, then the tracked default — because a gate leg cannot set an environment variable and
+  `TOOL-aSiftedPlaybook-2`'s arms must point the gate at a scratch copy without writing the tracked
+  one. `--bump` writes to the same resolved path.
+
+  **Absent or malformed record.** An absent file means no ratchet plus one explicit line saying so —
+  never a silent pass, and never a `set -u` explosion on an empty operand at the numeric comparison.
+  Non-numeric content is a named failure. Both are armed in `TOOL-aSiftedPlaybook-2` S2.
+
+  **Seeding is NOT this unit's act** (B3). This is unit 1 of 7 and the template is not edited until
+  units 4-6, so a value seeded here is either the pre-build 32682 — which makes every run from
+  `PLAY-aSiftedPlaybook-2` onward print WARN forever, the permanently-red shape this section exists
+  to avoid — or a forecast, which carries a number out of a spec paragraph. This unit seeds at the
+  size it measures when it lands and **states that units 5 and 6 are expected to fire the warn**;
+  `PLAY-aSiftedPlaybook-3`, the last template-touching unit, owns the closing `--bump`.
 - **S9 — the backlog row the raise falsifies.** `memory/backlog/PLAY.md:7` reads
   "`PLAY-aCandidStub-2` · OPEN · the template is effectively FULL at v2.5 and the §11
   externalization spent the cheap slack". The owner kept that row OPEN but re-justified it on
@@ -121,7 +143,8 @@ raise touches no shipped adopter artifact.
 | `AGENTS.md` | 16-17, 97, 197, 7 | rule statements (`:97` also names the second consumer; `:7` the baseline claim) |
 | `README.md` | 12 | rule statement |
 | `memory/guides/SESSION-KICKOFF.md` | 121-123 | rule statement — the file MOVED (`24f3991`) |
-| `tools/template-size-highwater.txt` | new | S8's ratchet record, seeded at the landed size |
+| `tools/template-size-highwater.txt` | new | S8's ratchet record, keyed by measured file |
+| `tools/govkit/registry.toml` | + row | S8's new depth-1 path must be DECLARED or `govkit selfcheck` reds — see below |
 | `tools/gate-legs.json` | 17 | the leg label — see F1 |
 | `memory/map/baseline.toml` | 35 | the label as an inventory key — see F1 |
 | `memory/map/generated/inventories.json` | 46 | generated mirror of the key |
@@ -227,9 +250,10 @@ ratchet's own rule.
   the warn line** naming H, H+1 and the delta; a file of 49153 bytes still exits 1. The middle case
   is what proves the ratchet is advisory rather than a second ceiling, and it is the case a
   hand-written check omits. `--bump` rewrites the file to the measured size and reports the delta.
-- **AC9** — When `bash tools/check-template-size.sh` runs on the tracked template at the end of this
-  build, it prints no warn line, because S8 seeds `tools/template-size-highwater.txt` at the landed
-  size. A ratchet that ships already firing is
+- **AC9** — When `bash tools/check-template-size.sh` runs immediately after THIS unit lands, it
+  prints no warn line, because S8 seeds the record at the size measured then. It is EXPECTED to warn
+  during units 5 and 6; `PLAY-aSiftedPlaybook-3`'s closing `--bump` is what returns the tree to
+  quiet, and that unit owns the observation. A ratchet that ships already firing is
   the permanently-red shape S8 exists to avoid.
 - **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, both
   spell `<=48KiB` and neither still spells `<=32KiB`.
@@ -242,13 +266,17 @@ ratchet's own rule.
   the in-place swap, so the file's own shrink-only claim is qualified where a reader meets it.
 - **AC10** — When `memory/backlog/PLAY.md:7` is read, the `PLAY-aCandidStub-2` row is still OPEN and
   its justification names per-session readability, with no claim that the template is full.
+- **AC12** — When `python tools/govkit/govkit.py selfcheck` runs, it is green with
+  `tools/template-size-highwater.txt` declared. A new depth-1 path under `tools/` reds this leg by
+  design, and three units in this build create one.
 - **AC11** — When `python tools/drift-audit/drift_report.py --check` runs after S3's edits,
   `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0. **The dangerous edit is
-  `AGENTS.md:97`, not the leg rename**: `_charter_mentions_every_leg`
-  (`tools/drift-audit/drift_signals.py:70-100`) credits a leg only when one of its argv paths appears
-  verbatim in the gate-suite section, and `:97` is that section's only carrier of
-  `tools/check-template-size.sh`. A rewrite that reflows the bullet away from the path reds a
-  zero-tolerance signal. §4's blast-radius analysis clears the RENAME and says nothing about this.
+  the `AGENTS.md` gate-suite rewrite, not the leg rename**: `_charter_mentions_every_leg`
+  (`tools/drift-audit/drift_signals.py:104-136`, the argv-path match at `:132-136`) credits a leg
+  only when one of its argv paths appears verbatim in that section. **At least one surviving line
+  must still spell `tools/check-template-size.sh` after S3's edits** — not `:97` specifically, since
+  the merge added `:98` spelling it too for the kickoff-engine leg. §4's blast-radius analysis clears
+  the RENAME and says nothing about this.
 
 ## 7. Gates
 
@@ -260,6 +288,11 @@ ratchet's own rule.
 - `python tools/drift-audit/drift_report.py --check` — expected unaffected by the rename per §4; run it to
   confirm that rather than trust the analysis. Also guards the landmine below.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
+- `python tools/govkit/govkit.py selfcheck` — **mandatory, and new since the merge.**
+  `tools/govkit/registry.toml` asserts a depth-1 `tools/*` surface and fails on any tracked path
+  that is "neither an entry member nor an exemption". S8 creates one such path, so the declaration
+  lands in the same commit. An `[[exempt]]` row is the right shape: `tools/check-template-size.sh`
+  is already exempt and exemptions are per-path.
 - `bash tools/run-gates.sh` at the push boundary.
 
 **A live landmine for this unit specifically.** `memory/guides/SESSION-KICKOFF.md` is named BY FILE
@@ -318,6 +351,15 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-16 · folded round-3 blockers B2/B3 and highs H1/H3/H6/H8/H9 plus M3.
+  **B3**: AC9 quantified over a state unit 1 cannot reach — the template is not edited until units
+  4-6 — so S8 now seeds at ITS landed size, says units 5 and 6 are expected to warn, and hands the
+  closing `--bump` to `PLAY-aSiftedPlaybook-3`. **H1**: the record is keyed by measured file, because
+  one number cannot serve two consumers 14 KB apart. **H3/M3**: the record's path resolves like
+  `MAX_BYTES`, and absent/malformed is a stated contract rather than a `set -u` explosion.
+  **B2**: `govkit selfcheck` arrived with the merge and reds on any undeclared depth-1 `tools/` path;
+  S8 creates one. **H8**: AC11's two citations were both wrong and its uniqueness premise false —
+  the merge added a second carrier at `AGENTS.md:98`. **H6**: `README.md:33` is now RECEIVED by S4.
 - rev-5 · 2026-08-16 · folded round-2 mediums and lows. **S9 added** for the
   `memory/backlog/PLAY.md:7` rewrite, which the README and §8 both called a "landing task" belonging
   to no scope item — the failure mode this unit's own §1 names. **AC11 added**: the edit that can
@@ -374,7 +416,7 @@ found it, because it lives in a conf file rather than a decision record — a re
 retrieval corpus covers, and worth its own follow-up.
 
 Recall terms used, recorded per M5: `template size gate byte ceiling externalize companion
-domain-rules headroom strict limit raise refuse stub`. The query returned the three records this
+domain-rules headroom strict limit raise refuse stub`. The query returned the records this
 unit's §2 S6 must name — `PLAY-aCandidStub-1` §3 ("Raising the 32 KiB template gate. The limit is
 not the variable"), `TOOL-aGuardedTally-1` (a §-stub parked unlandable, writing "the gate is right
 to refuse"), and `PLAY-aPrunedCeremony-1` RD7 ("template edits are byte-neutral in-place rewords or

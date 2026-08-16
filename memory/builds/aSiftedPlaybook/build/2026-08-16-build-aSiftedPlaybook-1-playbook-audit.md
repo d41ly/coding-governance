@@ -51,7 +51,7 @@ Recorded separately because they are NOT part of the eleven and must not inflate
 | B3 | low | `template.md:24` | §0 says "Never run more than 5 agents **concurrently**", naming the weaker of the two rules as if it were the rule. `REVIEW-PROTOCOL.md:12-13` states plainly that concurrency is not a budget. | while writing `PLAY-1` §2 |
 | B4 | med | all three | `gate-lint` is a **fourth** shipped kit absent from the trio — and absent from `AGENTS.md` and `README.md` entirely, so the charter does not know it ships. | discovery `wf_4e13d9e7-550` |
 
-## Refuted — nine suspected defects, disproved
+## Refuted — eight disproved, one withdrawn
 
 Recorded so a later audit does not re-spend the tokens, and because a refuted finding is evidence
 about the files' quality just as a confirmed one is.
@@ -59,7 +59,7 @@ about the files' quality just as a confirmed one is.
 | # | Suspicion | Disproof |
 |---|---|---|
 | R1 | `customize.md`'s "four codebase-map lines" is wrong | Exactly four: template `:40`, `:46`, `:108`, `:137`. |
-| R2 | "13 of the 36 … unfilled in the companion" is wrong | Correct — 13 is the companion-only count, and it stays 13 when a template-only placeholder is added. |
+| R2 | "13 of the 36 … unfilled in the companion" is wrong | **REFUTATION WITHDRAWN 2026-08-16** (round-3 H10). 13 is the companion-EXCLUSIVE count; the companion CARRIES 14, and after a template-only fill all 14 are unfilled. The suspicion was correct and this row is a confirmed defect, fixed by `PLAY-aSiftedPlaybook-4` S4. The tracked OPEN row `PLAY-aSealedCaravan-1` had already recorded it. |
 | R3 | The template header's "nine domain checklists" is wrong | Exact: §1, §4, §7-§13. |
 | R4 | The companion header's "nine activity-scoped domain sections" is wrong | Exact, same nine. |
 | R5 | Template §10's "25 generic classes" is wrong | Exactly 25 bullets in `domain-rules.md` §10. |
@@ -68,9 +68,10 @@ about the files' quality just as a confirmed one is.
 | R8 | `adopt-memory-tree.sh --scaffold` does not exist as documented | It exists. |
 | R9 | `gate-lint`'s absence from the map is an undetected coverage gap | Its key is baselined at `memory/map/baseline.toml:43` — a tracked unclaimed key, not an undetected gap, and not a playbook defect. (Its absence from `AGENTS.md` IS real and is recorded above as B4.) |
 
-**Nine, not eight.** The build README originally said "refuted eight suspected ones", counting the
-three separate count-claims R3/R4/R5 as one bullet. Corrected here and in the README; the exact
-kind of unfalsifiable summary figure this file exists to replace.
+**Nine listed, EIGHT actually refuted.** The build README originally said "eight", counting the
+three separate count-claims R3/R4/R5 as one bullet; enumerating them forced the true figure to nine.
+Round 3 then withdrew R2, so eight stand. Both corrections came from writing the list out rather than
+summarising it — twice over, this file has caught a number that a summary sentence could not.
 
 ## What this audit did not cover
 
