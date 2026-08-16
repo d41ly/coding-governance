@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set
 
-**Status:** BLOCKED · rev-3 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams tooling
 
 ## 1. Goal
 
@@ -25,16 +25,18 @@ This unit depends on unit 1 landing first and is inert without it.
 - **S2** — a dossier under `memory/map/features/` claiming the `lexicon-verbs` keys, ratified over
   the `baseline.toml` route at rev-2 (§8 F2). Every verb is claimed in prose that says why the table
   carries it, and the both-directions ratchet applies from the first landing.
-- **S3** — two `drift-audit` questions, each carrying the clean-and-violating fixture pair
-  `selftest.py` requires: a verb DECLARED in `VERBS` but used by no definition in the corpus, and a
-  `ratified` stamp older than the last change to the declared language surface. **The MECHANISM is
-  PARKED at F3 and this scope item cannot be built until it is decided.** rev-2 said "two signals in
-  `tools/drift-audit/drift_signals.py`, each seeded at a MEASURED pin"; that file is the project-owned
-  DATA layer and cannot declare a signal — `SIGNALS` is a hardcoded engine list at
-  `drift_report.py:488`, the project surface is validated for exactly four attrs at `:117`, and `PINS`
-  is keyed by the name the ENGINE emits, so a key naming a project-invented signal is silently inert.
-  Built literally it produces two probe functions nothing calls: a green gate over a dead instrument,
-  which is the class this kit exists to prevent.
+- **S3** — two `drift-audit` signals, appended to the shipped `drift_report.py:SIGNALS` per F3's
+  owner-resolved ENGINE route, each with its own `PINS` key in `drift_signals.py` and each carrying
+  the clean-and-violating fixture pair `selftest.py` requires: a verb DECLARED in `VERBS` but used by
+  no definition in the corpus, and a `ratified` stamp older than the last change to the declared
+  language surface. With `.lexicon.conf` ABSENT both return `gateable: False` with a "not asked"
+  reason, so an adopter without the lexicon inherits nothing live.
+  *(rev-2 said "two signals in `drift_signals.py`, each seeded at a MEASURED pin". That file is the
+  project-owned DATA layer and cannot declare a signal — `SIGNALS` is a hardcoded engine list, the
+  project surface is validated for exactly four attrs, and `PINS` is keyed by the name the ENGINE
+  emits, so a key naming a project-invented signal is silently inert. Built literally it produced two
+  probe functions nothing calls. The correction is recorded rather than deleted because the wrong
+  version was specific enough to look buildable.)*
 - **S4** — teardown as an ORDERED PROCEDURE, not a goal. "Removing an optional kit must not red a
   different optional kit's gate" is unachievable as a property once S2 chooses the dossier route: all
   three degradation routes red the map leg — an extractor returning `[]` makes every dossier claim
@@ -104,11 +106,11 @@ a failed build, and the pin comment says so.
 `tools/drift-audit/selftest.py`, `tools/lexicon/adopt-lexicon.sh`, `tools/lexicon/README.md`, one
 dossier under `memory/map/features/`, and `memory/map/generated/` as a re-render.
 
-F3's engine route would add `tools/drift-audit/drift_report.py`, `tools/drift-audit/README.md` and
-the whole `drift-audit` kit-version bump — the `KIT_DRIFT_AUDIT_VERSION` constant, every
+F3's ratified engine route ADDS `tools/drift-audit/drift_report.py`, `tools/drift-audit/README.md`
+and the whole `drift-audit` kit-version bump — the `KIT_DRIFT_AUDIT_VERSION` constant, every
 `gov:kit drift-audit@` marker, and both `tools/workflows/drift-audit-{code,state}.js` `meta.version`
-fields. That the two routes have different Files-touched sets is itself the evidence that F3 is a
-scope fork rather than an implementation detail.
+fields. That the two routes had different Files-touched sets is itself why F3 was a scope fork rather
+than an implementation detail.
 
 ### Alternatives rejected
 
@@ -176,36 +178,55 @@ continuation lines are never scanned. rev-2 carried F2's resolution three lines 
 items=2 resolved=0 and would have made this spec unable to go terminal at wrap-up with no owner turn
 available to fix it.*
 
-- **F1 — should `codebase-map` consume a lexicon-owned definition census?** DEFERRED (agent,
-  2026-08-16, delegated): leave inverted, reopen with numbers. `map_lib.python_symbols` indexes only
-  public symbols and `TOOL-aNumeralWarden-4` records that the JavaScript side indexes no non-exported
-  function, so the map's recall corpus has a known hole a lexicon census would fill. It cannot be
-  decided without a measured corpus in at least one adopter. At close this is marked in place as
-  `RESOLVED (agent, <date>, delegated)` with the deferral tracked as a `memory/backlog/TOOL.md` row
-  filed in the same commit; the mark lands on this line.
+- **F1 — should `codebase-map` consume a lexicon-owned definition census?** RESOLVED (agent,
+  2026-08-16, delegated): leave the dependency as it is, tracked as `TOOL-dClosedLexicon-12`. The
+  condition rev-2 set — "reopen with numbers once the lexicon has a measured corpus" — is now
+  HALF met: this repo has one (485 tracked files, 22 verbs, 417 graded definitions), but one adopter
+  is not two, and inverting the dependency would make the lexicon a PREREQUISITE of a fuller map,
+  which is a scope call this unit's §3 already puts out. What the measurement adds is that the census
+  is now cheap to produce, so the follow-up is smaller than when it was parked. `map_lib.python_symbols`
+  indexes only public symbols and `TOOL-aNumeralWarden-4` records the JavaScript side indexing no
+  non-exported function; a census would close both.
 - **F2 — dossier or baseline for S2?** RESOLVED (owner, 2026-08-16): dossier. A dossier makes each
   verb claimable in prose and costs a real authoring pass; `baseline.toml` is shrink-only and costs
   nothing now but records nothing either. The whole value of the addition direction is that a claim
   exists to be read, and a baseline entry is exactly the silent growth this unit is here to prevent.
   The cost lands on whoever curates the table, which is the correct place for it.
-- **F3 — how are S3's two questions actually declared?** PARKED (agent, 2026-08-16): **this is a
-  SCOPE decision and the standing mandate does not delegate scope.** rev-2's answer was mechanically
-  impossible (see S3). Two options survive and they differ in what gets built. **(a) The engine
-  route:** append two signal functions to the SHIPPED `drift_report.py:SIGNALS`, each with its own
-  `PINS` key and each reporting `gateable: False` with a "not asked" reason when `.lexicon.conf` is
-  absent, on the `signal_closed_specs_untraceable` model. It works, and the absent-conf guard means no
-  adopter inherits a dead gateable signal — but it makes a generic shipped engine NAME an optional
-  kit, which is the coupling this spec's own §4 Alternatives rejects for `map_extractors.template.py`,
-  and it changes what every `drift-audit` adopter receives. **(b) The project-layer route:** declare
-  both as `HANDKEPT` rows. No engine edit, but every row folds into the single
-  `handkept_inventories_disagreeing_with_source` signal with ONE shared pin — currently drained to 0
-  — so §4's own prediction that the day-one seed is non-zero forces that pin up, blinding the
-  charter-completeness ratchet that rides the same signal and which unit 1 depends on staying at 0.
-  **Refused because** (a) changes a shipped kit's public surface and reverses a doctrine this spec
-  states, and (b) degrades an existing gate to buy a new one. Neither is a resolver call, and there is
-  no third option that is merely the least bad. The owner decides; this unit does not build until then.
+- **F3 — how are S3's two questions actually declared?** RESOLVED (owner, 2026-08-16): the ENGINE
+  route. Two signal functions are appended to the shipped `drift_report.py:SIGNALS`, each with its own
+  `PINS` key in `drift_signals.py`, and each returns `gateable: False` with a "not asked" reason when
+  `.lexicon.conf` is absent — the shape `signal_closed_specs_untraceable` already uses for an unset
+  `TRACE_CUTOFF`, and for the same reason: NOT ASKED is neither clean nor dead, and doing it in the
+  ENGINE rather than through the project layer's `DECLARED_EMPTY` keeps the distinction reaching an
+  adopter who has edited nothing. The project-layer alternative was refused because both questions
+  would fold into `handkept_inventories_disagreeing_with_source`'s single shared pin, currently
+  drained to 0, and this spec's own §4 predicts a non-zero day-one seed — buying a new signal by
+  blinding the charter-completeness ratchet that rides the same signal.
+
+  What the route COSTS, recorded because §3 rejects the same coupling for `map_extractors.template.py`:
+  a generic shipped engine now names an optional kit. The absent-conf guard is what makes that
+  acceptable here and not there — an adopter without the lexicon inherits two signals that report
+  "not asked" and gate nothing, whereas a template extractor would RAISE on `all_inventories()`. The
+  asymmetry is the guard, not the intent.
 
 ## 9. Revision log
+
+- rev-5 · 2026-08-16 · BUILT and CLOSED. All five scope items land: the `lexicon-verbs` inventory in
+  `EXTRACTORS` reading through unit 1's single reader; the dossier claiming all 22 verbs (and every
+  OTHER dossier gaining an empty `lexicon-verbs` list, because a new inventory id must appear in every
+  `[claims]` block); two engine signals with measured pins; the uninstall ORDER in the kit README with
+  its mid-teardown orphan arm; and the `EXTRACTORS`-vs-`SYMBOL_EXTRACTORS` reasoning recorded at the
+  declaration. drift-audit 1.3 -> 1.4, lexicon 1.0 -> 1.1. The unused-verb pin seeds at 3 — `measure`,
+  `print` and `set`, aspirational verbs curation added — which is the non-zero day-one seed §4
+  predicted, and its comment says so in place so a reader does not mistake it for debt.
+
+- rev-4 · 2026-08-16 · owner ratified F3 to the ENGINE route, and the unit BUILDS. S3 becomes two
+  signal functions on the shipped `drift_report.py:SIGNALS`, each with its own `PINS` key and each
+  returning `gateable: False` with a "not asked" reason when `.lexicon.conf` is absent — the shape
+  `signal_closed_specs_untraceable` already uses, so an adopter without the lexicon inherits nothing
+  live. The project-layer route was refused because both questions would have folded into one shared
+  pin that is drained to 0, buying a signal by blinding the charter ratchet unit 1 depends on. S3's
+  rev-2 text is kept as a correction rather than deleted: it was specific enough to look buildable.
 
 - rev-3 · 2026-08-16 · folded review-dClosedLexicon-2, the M4 audit at rev-2. S3's mechanism is
   PARKED as F3 and the status moves SPECCED to BLOCKED (R2): `drift_signals.py` is the project-owned

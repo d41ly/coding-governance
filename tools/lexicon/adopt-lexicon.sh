@@ -60,6 +60,20 @@ case "$MODE" in --scaffold|--check) ;; *) echo "usage: $(basename "$0") [--scaff
 if [ "$MODE" = "--check" ]; then
   fail=0
   if [ ! -f "$CONF" ]; then
+    # THE MID-TEARDOWN ARM. An absent conf is normally just "not adopted" — but if this repo still
+    # declares the `lexicon-verbs` inventory, the conf was deleted BEFORE the extractor was removed,
+    # which is step 4 done before step 2 of the uninstall order. The map gate does red on that state,
+    # but it reds as a stale dossier claim, which reads like a map problem rather than a half-removed
+    # kit. Naming it here is the difference between a confusing red and an actionable one.
+    if [ -f "$ROOT/tools/codebase-map/map_extractors.py" ] \
+       && grep -q '"lexicon-verbs"' "$ROOT/tools/codebase-map/map_extractors.py" 2>/dev/null; then
+      echo "lexicon-adopt: ORPHANED EXTRACTOR — .lexicon.conf is gone but map_extractors.py still"
+      echo "lexicon-adopt: declares the \`lexicon-verbs\` inventory, so the map's dossier claims now"
+      echo "lexicon-adopt: name keys nothing produces. This is the uninstall order run backwards."
+      echo "lexicon-adopt: Remove the dossier claims, then the EXTRACTORS entry, then re-render"
+      echo "lexicon-adopt: memory/map/generated/ — tools/lexicon/README.md carries the full order."
+      exit 1
+    fi
     echo "lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root. The kit is opt-in; this is"
     echo "lexicon-adopt: a legal state, not a defect. Run --scaffold to adopt it."
     exit 0

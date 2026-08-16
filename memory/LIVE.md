@@ -9,6 +9,7 @@ terminal status. Nothing here is edited by hand.
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
+| [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
@@ -19,4 +20,3 @@ terminal status. Nothing here is edited by hand.
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [cBriefedPilot](builds/cBriefedPilot/README.md) | OPEN | c | 2026-08-14 | tooling+playbook | 22 |
 | [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
-| [dClosedLexicon](builds/dClosedLexicon/README.md) | BLOCKED | d | 2026-08-16 | playbook+tooling | 11 |

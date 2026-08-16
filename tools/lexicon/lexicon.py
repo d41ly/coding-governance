@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.0
+# gov:kit lexicon@1.1
 """lexicon.py — three naming predicates over a DECLARED vocabulary.
 
     python tools/lexicon/lexicon.py            # assert; non-zero on an unwaived offender
@@ -81,7 +81,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lexicon_conf import ConfError, langs, load_conf  # noqa: E402
 from subtokens import leading_verb, subtokens  # noqa: E402
 
-KIT_LEXICON_VERSION = "1.0"
+KIT_LEXICON_VERSION = "1.1"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
