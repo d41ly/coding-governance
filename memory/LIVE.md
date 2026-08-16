@@ -19,4 +19,5 @@ terminal status. Nothing here is edited by hand.
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
+| [cSettledDocket](builds/cSettledDocket/README.md) | OPEN | c | 2026-08-16 | tooling | 7 |
 | [dClosedLexicon](builds/dClosedLexicon/README.md) | BLOCKED | d | 2026-08-16 | playbook+tooling | 3 |
