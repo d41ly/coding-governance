@@ -143,6 +143,7 @@ done
 
 need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
 need "KIT_GOVKIT_VERSION"          tools/govkit/govkit.py                    "^KIT_GOVKIT_VERSION = \"$V\""
+need "KIT_LEXICON_VERSION"         tools/lexicon/lexicon.py                  "^KIT_LEXICON_VERSION = \"$V\""
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
 # hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each

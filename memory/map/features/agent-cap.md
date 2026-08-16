@@ -22,6 +22,7 @@ rendered-skills = []
 gotcha-classes = ["trailing-comma-counted-as-an-element.md"]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/hooks/*",

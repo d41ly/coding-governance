@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = []
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/memory-tree/row_grammar.py",

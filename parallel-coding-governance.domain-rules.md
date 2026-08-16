@@ -1,6 +1,6 @@
 # Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
-<!-- governance-template: v2.8 -->
+<!-- governance-template: v2.10 -->
 
 Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a
@@ -122,6 +122,13 @@ matched its target population.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
 - Gate the layout conventions you can (naming, layer boundaries); the "where things live" map lives in the always-loaded doc (§6) so every feature has an obvious home.
+*The five naming bullets below are kit-conditional — drop them if the project does not adopt the lexicon kit, the same way §1's unattended block is dropped. The rest of §12 is universal core.*
+
+- **Naming is one of those conventions, and it is gateable.** Declare it in `{{LEXICON_CONF}}`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and forbidden import DIRECTIONS between layers (the machine-checkable form of "one shared core, thin adapters" above). A repo that declares none of these has a naming convention it asks people to remember.
+- The verb table's value is NOT spelling — it is scoping. "Which verb is this?" is answerable only when a function does ONE thing, so a name that will not fit the table is reporting an unclear responsibility or a seam in the wrong place. If the reflex on a refusal is to add a verb, the table has become a synonym list and is buying nothing.
+- Write the NEGATIVE definitions or do not bother: `build` not `create`, `load` not `fetch`, `remove` not `delete`, `set` not `update`. A row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
+- DERIVE the initial table from the repo's own corpus, then FREEZE it and mark that a human curated it — a derived table nobody edited is a mirror of the code, which is the one shape a naming gate must not have (§7's rule against a gate whose vocabulary tracks its subject). Measure every offender pin against THIS corpus; a pin copied from a larger tree is either vacuous or permanently red.
+- Declare a COVERAGE MODE per language — a real parser, a regex probe (incomplete by construction, and reported as such on every run), or explicitly dark. An undeclared language must be a named refusal, never a silent skip: a regex that quietly misses what it forgot looks exactly like coverage. An unarmed predicate REDS rather than passing green (§7).
 
 ## §13 — Visual consistency (design system FIRST, before screens)
 

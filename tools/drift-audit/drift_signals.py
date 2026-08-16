@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.3
+gov:kit drift-audit@1.4
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -184,6 +184,19 @@ PINS: dict[str, int] = {
     # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
     # that way is a number, not a measurement.
     "closed_specs_with_no_product_commit": 1,
+    # 3 — MEASURED on the day the table was ratified, and non-zero BY CONSTRUCTION rather than as
+    # tolerated rot. `--scaffold` derives the verb table by leading-token frequency and a human then
+    # curates it, and curation ADDS aspirational verbs the corpus does not use yet: `measure`, `print`
+    # and `set` are declared because that is what this repo should call those operations, not because
+    # anything is already called that. Reading this 3 as debt inverts what it records.
+    #
+    # It is the DELETION direction that earns the signal: a verb outliving the code that justified it
+    # is the one thing neither the map ratchet nor the lexicon gate can see. Lower the pin when a verb
+    # genuinely comes into use — never raise it to admit a new aspirational one without saying which.
+    "lexicon_verbs_declared_but_unused": 3,
+    # 0, and it can move: the stamp is a date and the language surface is a commit date, so adding a
+    # LANGS entry without re-ratifying turns this to 1 the same day.
+    "lexicon_ratified_older_than_language_surface": 0,
 }
 
 # --------------------------------------------------------------------------------------------
