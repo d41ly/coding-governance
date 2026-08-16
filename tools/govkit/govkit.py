@@ -40,7 +40,7 @@ RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
 # ORDER, and before this there was nothing stable to order. Later units FILL steps and may never
-# rename one. The owning unit per id is the table in DEPL-aTetheredConvoy-1 section 4; no count of
+# rename one. The owning unit per id is a table in this build's spec set; no count of
 # them is written anywhere, because a count in prose is what this build spends a unit removing.
 STEP_BASELINE = "BASELINE"
 STEP_ATTRIBUTES = "ATTRIBUTES"
@@ -677,7 +677,7 @@ def selfcheck(root: pathlib.Path) -> int:
     if len(set(STEPS)) != len(STEPS):
         r.fail("the step-id tuple repeats an id, so an ordinal does not identify a step")
 
-    # ---- 7f: PRECEDENCE, both halves, over gov's own descriptors (DEPL-aTetheredConvoy-1 S1).
+    # ---- 7f: PRECEDENCE, both halves, over gov's own descriptors.
     #          The census is a NOTE: an overlap is legal and is how a carve-out is spelled. What
     #          FAILS is a source a carve-out excluded that is nonetheless written — A1 as a predicate.
     later_wins = carves = carves_that_change = 0
@@ -728,7 +728,7 @@ def selfcheck(root: pathlib.Path) -> int:
                 r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
                        f"name a verdict, including the one where both sides are gone")
 
-    # ---- 7h: LEG correspondence, BOTH directions (DEPL-aTetheredConvoy-3 S1). The descriptors and
+    # ---- 7h: LEG correspondence, BOTH directions. The descriptors and
     #          gov's own leg manifest are two spellings of one fact, and before this nothing asserted
     #          they agree — the deployer's whole thesis, unapplied to the deployer. An exemption is
     #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
@@ -940,8 +940,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
 
 # ---------------------------------------------------------------------------------------- check
 def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
-    """Read-only verification of an installed target, over the state vocabulary DEPL-aTetheredConvoy-1
-    owns.
+    """Read-only verification of an installed target, over one owned state vocabulary.
 
     Every state is a MEASUREMENT and none is a placeholder. `not-landed` is a kit the receipt claims
     with zero rows for it while its descriptor declares a landable rule. `landed-unmeasured` is legal
@@ -968,7 +967,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
 
-    # ---- EVIDENCE, role-scoped (DEPL-aTetheredConvoy-5 S1-S3). Before this, `check` contained ONE
+    # ---- EVIDENCE, role-scoped. Before this, `check` contained ONE
     # ---- filesystem test — on the receipt's own path — and never opened the file list, never read
     # ---- the sidecar it writes, and called no hash function. Measured: a target whose landed files
     # ---- were all deleted, whose every recorded commit was rewritten to zeros and whose every hash

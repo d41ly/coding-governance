@@ -50,16 +50,39 @@ is the declared-and-dead class this build spent unit 3 closing.
 dependency is not violated, only unused. The remaining halves of unit 5 (adopter fan-out, rendered
 rows, machine-scoped orders, the `[[outcome]]` evaluator, the outbox reader) are unbuilt.
 
-## Parked — the full bar is unconfirmed
+## Parked — the full bar is unconfirmed, and what a failed run of it DID surface
 
-`GATE_FULL=1 bash tools/run-gates.sh` was started and had produced no output after roughly forty
-minutes on this node; the charter records ~95s at width 8 on node `a`, so this node is far slower
-rather than the bar being wedged by this diff. **The full bar is therefore NOT confirmed green for
-this branch.** What IS confirmed, per pass: `govkit selfcheck`, `govkit selftest` (all arms),
-`check-kit-versions`, `check-install-prefix`, the codebase-map coverage and freshness gate, the
-memory-tree hygiene gate, the build-index render, the kickoff-manifest ratchet (including its
-`--staged` leg, which blocked a commit until the audit block was re-stamped), and `git diff --cached
---check` for line endings.
+A background `GATE_FULL=1 bash tools/run-gates.sh` exited 255 and its `gate-last-failure.txt` named
+six red legs. **That verdict is unusable and was discarded**: the run started while this session was
+still editing the tree, so it read files mid-write, and its leg names are the pre-rename spellings —
+it was grading a tree that no longer exists. Recorded rather than deleted, because a discarded gate
+result is exactly the kind of thing a later reader finds and believes.
+
+Each of the six was then re-run individually against the COMMITTED tree, and two were real:
+
+- **`drift-audit records` was genuinely RED, and the cause was this build.** The signal
+  `non_terminal_specs_cited_by_product_source` is pinned at 2 and read 5: three comments in
+  `tools/govkit/govkit.py` cited OPEN specs of this very build by id. That is the drift this signal
+  exists to catch — product source pointing at a spec that has not closed — and the repair is to
+  state the RULE in the comment and let the build folder hold the reasoning. Back to 2, green.
+- **Three skill-wiring legs were red from a PRE-EXISTING condition, not from this diff.** The
+  SessionStart hook reported CRLF on three `eol=lf`-pinned `.claude/skills/*/SKILL.md` renders before
+  this session touched anything, and `git log` over this branch shows it never touched that tree. It
+  is the worktree-checkout half of this repo's own `gate-green-by-accident-on-generated-bytes` class.
+  Fixed with the documented remedy, `bash tools/check-wiring.sh --fix`; the index was already
+  normalised, so the repair is worktree-only and there is nothing to commit for it.
+
+The other three (`memory hygiene`, `codebase-map coverage + freshness`, and `check-wiring self-test`)
+re-ran green or were progressing green when the node's time budget ran out.
+
+**The full bar is still NOT confirmed green for this branch.** This node is far slower than the
+charter's measured node — a single heavy shell leg exceeds several minutes and the suite exceeds the
+session's budget — so the gap is an environment limit rather than a known failure. What IS confirmed,
+per pass and re-confirmed against the committed tree: `govkit selfcheck`, `govkit selftest` (all
+arms), `check-kit-versions`, `check-install-prefix`, `codebase-map coverage + freshness`, memory-tree
+hygiene, the build-index render, `drift-audit records`, the three skill-wiring `--check` legs, the
+kickoff-manifest ratchet (including its `--staged` leg, which blocked a commit until the audit block
+was re-stamped), and `git diff --cached --check`.
 
 This is a DoD gap, not a claim of green. It leads the wrap-up for that reason.
 
