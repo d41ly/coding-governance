@@ -41,7 +41,8 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 - **F8** collision precision knobs: (a) token stem + fan-in threshold · (b) + structural signal *(rec)* · (c) + affordance cross-check; threshold in `.codebase-map.conf`.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling · ids TOOL-bConvergentLodestar-1
+**Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling
+ids TOOL-bConvergentLodestar-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

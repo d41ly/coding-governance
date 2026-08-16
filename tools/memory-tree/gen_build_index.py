@@ -397,9 +397,18 @@ def render_region(build: dict) -> str:
         # aUnmannedHelm is 7 and 10 because three of its ids never got a spec. Rendering them as one
         # number would re-create, inverted, the defect this derivation removes.
         f"**Build status:** {build['status']} · {len(build['units'])} unit(s) · node {fm['node']} · "
-        f"opened {fm['opened']} · streams {fm['streams']} · ids {' '.join(build['roster'])}",
-        "",
+        f"opened {fm['opened']} · streams {fm['streams']}",
     ]
+    # THE FULL ROSTER STAYS, WRAPPED. Replacing it with a count would reverse TOOL-aMouldedFolio-2 S4,
+    # which deliberately renders the full roster HERE and only the count in LIVE.md and the ledger —
+    # and render_region's own comment above says `unit(s)` and `ids` answer different questions.
+    #
+    # WRAPPED AT 300, one tier BELOW the 350 this class is capped at. `length()` in the entry-budget
+    # awk counts bytes or characters depending on the awk build and the ambient locale, which that
+    # check's own comment refuses to pin — and this line carries six two-byte middots. A render
+    # sitting exactly at the cap would pass on one node and red on another.
+    out += _wrap_ids(build["roster"])
+    out.append("")
     if build["units"]:
         out += ["| Unit | Status | Rev | Last change |", "|---|---|---|---|"]
         for u in sorted(build["units"], key=lambda x: x["path"]):
@@ -415,6 +424,23 @@ def render_region(build: dict) -> str:
         out += ["", f"Records live under {joined}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+IDS_WRAP = 300
+
+
+def _wrap_ids(roster: list) -> list:
+    """`ids` as one or more lines, none wider than IDS_WRAP. Empty roster renders no line at all."""
+    if not roster:
+        return []
+    lines, cur = [], "ids"
+    for i in roster:
+        if len(cur) + 1 + len(i) > IDS_WRAP and cur != "ids":
+            lines.append(cur)
+            cur = "ids"
+        cur += " " + i
+    lines.append(cur)
+    return lines
 
 
 def render_order(build: dict) -> str:

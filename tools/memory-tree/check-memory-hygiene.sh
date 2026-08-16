@@ -329,6 +329,12 @@ index_set() {
     fi
     printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
+    # A BUILD README is ROWS, not prose — TOOL-aWidenedGuide-1 split the cap by CLASS on exactly that
+    # distinction, and after the generated surface landed this file is four rendered regions plus one
+    # bounded authored block. It carries its OWN tier below (25600 B, 350 chars, and no independent
+    # line cap), because the 20480/250 tier was measured against a corpus in which these files were
+    # not members at all.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/README\.md$"
     # RUN.md (2.3): the run-state file is capped like every other index. It is designed to GROW —
     # a parked entry per refused decision — so the cap is the point, not an accident: the protocol
     # spills the oldest parked entries into the build's own build/ folder as a dated recording
@@ -360,14 +366,20 @@ if [ -n "$sel6" ]; then
   # not relaxed here. So guides carry 3x and every row document keeps the original cap: tripling the
   # allowance for a backlog shard or a map dossier would loosen a curation discipline nobody asked to
   # loosen, and the two classes fail for different reasons.
-  bad6=$(awk -v gp="$M/guides/" '
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" '
     FNR==NR { if ($NF!="total") b[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
             cb = 20480; cl = 250
             if (index(f, gp) == 1) { cb = 61440; cl = 750 }
-            if (b[f]+0>cb || l[f]+0>cl) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl } }
+            # A build README: its own tier, and cl=0 means NO independent line cap. The line count is
+            # whatever fits the byte budget at the per-line width, so there is no third number to
+            # drift against the other two.
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = 25600; cl = 0 }
+            if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
+              if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
+              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
 fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
@@ -398,11 +410,25 @@ sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
 done)
 bad7=""
 if [ -n "$sel7" ]; then
-  bad7=$(awk '
+  bad7=$(awk -v bp="$M/builds/" '
     { f = $0; if (f == "") next
-      fence = ""; uln = 0
+      # PER-CLASS WIDTH. A build README is four rendered regions plus one authored block, and its
+      # widest authored lines sit between 300 and 331 — the tier is what buys those.
+      cap = 300
+      if (index(f, bp) == 1 && f ~ /\/README\.md$/) cap = 350
+      fence = ""; uln = 0; fm = 0; nl = 0
       while ((getline line < f) > 0) {
         sub(/\r$/, "", line)
+        nl++
+        # THE FRONT-MATTER BLOCK IS NOT MEASURED. It is machine-written, not read prose: `--write`
+        # rewrites `ids:` from the derived roster, and that one line is 479 characters in the largest
+        # build. It cannot be wrapped — parse_front_matter refuses an indented continuation and
+        # check-unattended.sh check 13 parses the same block — so measuring it would cap a value no
+        # author controls and no renderer may reflow. This is scoping WITHIN a file, which is what
+        # the fence handling below already does. Measured: no index-set member opens with front
+        # matter today, so this changes no current verdict.
+        if (nl == 1 && line == "---") { fm = 1; continue }
+        if (fm) { if (line == "---") fm = 0; continue }
         if (line ~ /^[[:space:]]*(```|~~~)/) {
           mk = (line ~ /^[[:space:]]*```/) ? "```" : "~~~"
           if (fence == "") { fence = mk; continue }
@@ -410,8 +436,8 @@ if [ -n "$sel7" ]; then
         }
         if (fence != "") continue
         uln++
-        if (length(line) > 300 && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
-          print f ":" uln " (" length(line) " chars)"
+        if (length(line) > cap && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
+          print f ":" uln " (" length(line) " chars > " cap ")"
       }
       close(f)
     }' <<<"$sel7")

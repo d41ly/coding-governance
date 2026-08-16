@@ -18,7 +18,8 @@ branches reconciled; the spec's own content is unchanged, and its front matter i
 because the generated index needs it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-05 · streams tooling · ids TOOL-cSightedPlumb-1
+**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-05 · streams tooling
+ids TOOL-cSightedPlumb-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

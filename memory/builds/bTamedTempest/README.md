@@ -15,7 +15,8 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bTamedTempest-1
+**Build status:** CLOSED · 1 unit(s) · node b · opened 2026-07-16 · streams tooling
+ids TOOL-bTamedTempest-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

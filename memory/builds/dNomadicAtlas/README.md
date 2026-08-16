@@ -18,7 +18,8 @@ a full gate cycle: a red leg inside a push piped through `tail -45`, unidentifia
 the reflexive re-run passed, so the evidence was gone for good.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-11 · streams tooling · ids TOOL-dNomadicAtlas-1
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-11 · streams tooling
+ids TOOL-dNomadicAtlas-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

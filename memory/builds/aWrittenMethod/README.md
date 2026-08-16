@@ -127,7 +127,8 @@ The table below is GENERATED from the status header of every
 spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
+ids TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

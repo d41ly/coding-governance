@@ -62,7 +62,8 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** BLOCKED · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
+**Build status:** BLOCKED · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling
+ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

@@ -85,7 +85,8 @@ The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling
+ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

@@ -31,7 +31,8 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | W6 | `-8` | the epoch gate's endpoint hole; the per-commit trade measured, not guessed |
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling
+ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

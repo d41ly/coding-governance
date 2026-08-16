@@ -43,7 +43,8 @@ The table below is GENERATED from this folder's spec status headers —
 do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-11 · streams tooling
+ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

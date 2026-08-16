@@ -111,7 +111,8 @@ The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling · ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling
+ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

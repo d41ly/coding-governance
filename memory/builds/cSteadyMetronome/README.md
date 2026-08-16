@@ -86,7 +86,8 @@ The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cSteadyMetronome-1
+**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling
+ids TOOL-cSteadyMetronome-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

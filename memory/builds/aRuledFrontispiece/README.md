@@ -51,21 +51,16 @@ self-consistent wrong render. `TOOL-aRuledFrontispiece-1` adds a front-matter ke
 absorbed from the superseded `TOOL-aRuledFrontispiece-3`, and must state why it is not the refused
 schema, or record a falsification. The superseded spec carries that argument and is where to read it.
 
-**Below this line, every unit is named by ID, never as "unit N".** The `#` column of the Units table
-is build ORDER and the id sequence is MINT order, and they stopped agreeing the moment the audit
-reordered the build. An earlier version of this file used the bare word for both.
+**Below this line, every unit is named by ID, never as "unit N"** — the `#` column is build ORDER and
+the id sequence is MINT order, and they stopped agreeing when the audit reordered the build.
 
-`TOOL-aMouldedFolio-2` S4 renders the FULL roster in the build README and only its COUNT in
-`LIVE.md` and the ledger shards. That decision is what makes the `**Build status:**` line the widest
-in the corpus, and it is the line fork 3's cap now refuses. `TOOL-aRuledFrontispiece-5` keeps the
-full roster and wraps it; replacing it with a count would reverse a recorded decision and belongs in
-a spec that says so.
-`render_region`'s own comment says `unit(s)` and `ids` answer different questions and are
-deliberately not reconciled, which is the same decision stated in the code.
+`TOOL-aMouldedFolio-2` S4 renders the FULL roster here and only its COUNT in `LIVE.md` and the
+ledger. That is what makes the `**Build status:**` line the widest in the corpus, and it is the line
+fork 3's cap refuses. The roster is WRAPPED rather than counted; counting it would reverse a recorded
+decision, and `render_region`'s own comment says `unit(s)` and `ids` answer different questions.
 
-**No width is quoted here on purpose.** Two independent measurements of that line during this build
-disagreed by five characters, which is exactly the drift a restated number produces. Every unit reads
-it from the file.
+**No width is quoted here on purpose.** Two measurements of that line during this build disagreed by
+five characters, which is the drift a restated number produces. Every unit reads it from the file.
 
 ## Where the sources actually are
 
@@ -87,7 +82,8 @@ set, so fork 3's relaxed tier cannot be a global bump — it needs a per-class c
 `guides/` already carries its own byte and line budget.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 11 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
+**Build status:** OPEN · 11 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

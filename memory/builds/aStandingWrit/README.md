@@ -204,7 +204,8 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
+ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

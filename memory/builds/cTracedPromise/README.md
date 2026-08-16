@@ -58,7 +58,8 @@ backticks. Both tiers, a forward ratchet, four fixtures. Added on the owner's in
 below was put to them.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling · ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling
+ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

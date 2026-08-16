@@ -111,7 +111,8 @@ The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling
+ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

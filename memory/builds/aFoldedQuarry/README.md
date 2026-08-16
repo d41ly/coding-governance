@@ -38,7 +38,8 @@ U1 (it changes every path the rest operate on), U2, then U3 and U4 (independent 
 then U5.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-08 · streams tooling · ids TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7 TOOL-aFoldedQuarry-8 TOOL-aFoldedQuarry-9
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-08 · streams tooling
+ids TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7 TOOL-aFoldedQuarry-8 TOOL-aFoldedQuarry-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
