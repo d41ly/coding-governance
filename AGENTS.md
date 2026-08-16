@@ -126,7 +126,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - memory-recall skill wiring — `tools/memory-recall/adopt-memory-recall.sh --check` (the rendered `.claude/skills/memory-recall/SKILL.md` still matches `.memory-tree.conf`)
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
-- drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
+- drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`). Two of them name an OPTIONAL kit — `lexicon_verbs_declared_but_unused` and `lexicon_ratified_older_than_language_surface` — and with no `.lexicon.conf` both report NOT ASKED rather than a clean zero, so an adopter without the lexicon inherits nothing live. The unused-verb pin is honestly non-zero: curation adds aspirational verbs, and it is the DELETION direction (a verb outliving the code that justified it) the signal exists for
 - **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
   mandate it ASSERTS and cannot have written. The BASE that mandate hangs on is OBSERVED from the

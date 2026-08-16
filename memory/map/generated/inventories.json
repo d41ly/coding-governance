@@ -129,6 +129,30 @@
       "KICK.md",
       "PLAY.md",
       "TOOL.md"
+    ],
+    "lexicon-verbs": [
+      "add",
+      "arm",
+      "build",
+      "check",
+      "derive",
+      "extract",
+      "init",
+      "load",
+      "main",
+      "measure",
+      "parse",
+      "print",
+      "read",
+      "remove",
+      "render",
+      "resolve",
+      "run",
+      "scan",
+      "seed",
+      "set",
+      "test",
+      "write"
     ]
   }
 }

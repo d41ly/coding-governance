@@ -23,6 +23,30 @@ rendered-skills = []
 gotcha-classes = ["armed-but-unreachable-rule.md"]
 guides = []
 backlog-shards = []
+lexicon-verbs = [
+  "add",
+  "arm",
+  "build",
+  "check",
+  "derive",
+  "extract",
+  "init",
+  "load",
+  "main",
+  "measure",
+  "parse",
+  "print",
+  "read",
+  "remove",
+  "render",
+  "resolve",
+  "run",
+  "scan",
+  "seed",
+  "set",
+  "test",
+  "write",
+]
 [paths]
 globs = [
   "tools/lexicon/*",
@@ -98,9 +122,10 @@ a review fold and was caught only by measuring.
 
 ## Shared seams
 
-`tools/lexicon/lexicon_conf.py` is the ONE reader of `.lexicon.conf`. Three consumers need the file —
-the engine, the bash adopter, and (when its unit unparks) `map_extractors.py` — and the bash side
-calls `--print-verbs` rather than reimplementing the grammar. The grammar is the sibling
+`tools/lexicon/lexicon_conf.py` is the ONE reader of `.lexicon.conf`. FOUR consumers now need the
+file — the engine, the bash adopter, `map_extractors.py`'s `lexicon-verbs` inventory, and the two
+`drift-audit` signals — and every one of them reaches it through this reader: the bash side calls
+`--print-verbs`, and both Python consumers `sys.path`-insert the kit rather than growing a parser. The grammar is the sibling
 `KEY=VALUE` form PLUS indented block keys, because a closed verb table with prose meanings cannot fit
 a line-based conf and `map_lib.load_conf()` has no multi-line support.
 

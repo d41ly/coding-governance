@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.0 -->
+<!-- gov:kit lexicon@1.1 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates three naming predicates against a per-repo DECLARATION. It is inert until
@@ -70,11 +70,24 @@ an uncurated seed cannot reach the merge bar disguised as a vocabulary.
 Pins are MEASURED against the adopting corpus at scaffold and are never inherited: a pin copied from
 a larger tree is either vacuous or permanently red.
 
-## Uninstalling
+## Uninstalling — the ORDER matters
 
-Delete `.lexicon.conf` and remove the kit's legs from the gate manifest. The engine then reports
-`NOT ADOPTED` and exits 0.
+Once the verb table is declared as a `codebase-map` inventory, "removing an optional kit must not red
+a different optional kit's gate" is not achievable as a property, only as a PROCEDURE. Every
+degradation route reds the map leg on its own: an extractor returning `[]` makes every dossier claim
+stale, removing the `EXTRACTORS` entry makes the dossier claim an id outside `inventory_ids()` and
+`map_lib` raises, and the generated artifacts move either way. So the order is the mechanism:
 
-*(An integration that declares the verb table as a `codebase-map` inventory adds a teardown ORDER to
-this section. That integration is a separate, currently blocked unit — see the build record — so the
-order is not written here yet, and the kit as it stands has no cross-kit coupling to unwind.)*
+1. **Remove the dossier's `lexicon-verbs` claims** — `memory/map/features/lexicon.md`, the
+   `gate-legs`/`kits` block. Claims first, or the next step orphans them.
+2. **Remove the `lexicon-verbs` entry** from `map_extractors.py:EXTRACTORS`.
+3. **Re-render** `memory/map/generated/` (`python tools/codebase-map/gen_map.py --write`).
+4. **Delete `.lexicon.conf`** and drop the kit's legs from the gate manifest.
+
+Between steps 2 and 4 the engine reports `NOT ADOPTED` and exits 0, and the two `drift-audit` signals
+report NOT ASKED rather than a clean zero.
+
+**The mid-teardown safety arm.** `bash tools/lexicon/adopt-lexicon.sh --check` NAMES an orphaned
+`lexicon-verbs` extractor — a conf deleted while the extractor remains, i.e. step 4 done before
+step 2. That is the state a hurried uninstall actually lands in, and it is the one the map gate
+reports least legibly.

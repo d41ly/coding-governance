@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = ["SESSION-KICKOFF.md"]
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "memory/guides/SESSION-KICKOFF.md",

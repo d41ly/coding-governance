@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.3
+gov:kit drift-audit@1.4
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.3"
+KIT_DRIFT_AUDIT_VERSION = "1.4"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -555,8 +555,117 @@ def signal_closed_specs_untraceable(ctx) -> dict:
     }
 
 
+def _resolve_lexicon_conf(ctx):
+    """The lexicon's declaration, or None. The two signals below are the ONLY place this shipped
+    engine names an optional kit, and the guard is what makes that acceptable: an adopter without
+    the lexicon gets `gateable: False`, never a raise and never a red."""
+    p = ctx.root / ".lexicon.conf"
+    return p if p.is_file() else None
+
+
+def _load_lexicon(ctx):
+    """`(VERBS, ratified, LANGS)` through the lexicon's own reader — never a second parser."""
+    import sys as _sys
+    kit = str(ctx.root / "tools" / "lexicon")
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    from lexicon_conf import load_conf
+    conf = load_conf(_resolve_lexicon_conf(ctx))
+    return (conf.get("VERBS") or {}), (conf.get("ratified") or "").strip(), (conf.get("LANGS") or "")
+
+
+def _build_not_asked(name, why):
+    """NOT ASKED is neither clean nor dead. `--check` reds a GATEABLE signal whose population is
+    empty, so a question nobody asked must say so rather than report a reassuring zero."""
+    return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+            "live": False, "unjudgeable": 0, "detail": [{"note": why}]}
+
+
+def signal_lexicon_verbs_unused(ctx) -> dict:
+    """Verbs DECLARED in the table that no definition in the corpus leads with.
+
+    The closure question from the OUTLIVING side: `codebase-map`'s ratchet catches the table growing,
+    and nothing else catches a verb surviving the code that justified it. This is a
+    record-versus-reality question, which is why it is a drift SIGNAL and not a gate predicate — a
+    declared-but-unused verb violates nothing, and it is the sort of fact that is true for weeks
+    before anyone should act on it.
+
+    THE DAY-ONE SEED IS NOT ZERO, and that is correct rather than a failed build. `--scaffold` derives
+    the table by frequency and a human then curates it; curation ADDS aspirational verbs the corpus
+    does not use yet. Same shape as `non_terminal_specs_cited_by_product_source`, whose pin comment
+    records a known residual rather than proven rot.
+    """
+    name = "lexicon_verbs_declared_but_unused"
+    if not _resolve_lexicon_conf(ctx):
+        return _build_not_asked(name, "no .lexicon.conf at the repo root; the lexicon kit is not adopted")
+    import sys as _sys
+    kit = str(ctx.root / "tools" / "lexicon")
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    import lexicon as lex
+    from lexicon_conf import langs as _langs
+
+    verbs, _ratified, _l = _load_lexicon(ctx)
+    if not verbs:
+        return _build_not_asked(name, ".lexicon.conf declares no VERBS; nothing to judge")
+
+    declared = {ext: (pset, mode) for ext, pset, mode in _langs({"LANGS": _l})}
+    used: set[str] = set()
+    for rel in lex.tracked_files(ctx.root):
+        ext = lex.ext_of(rel)
+        if ext not in declared:
+            continue
+        pset, mode = declared[ext]
+        if mode == "dark" or (mode == "probe" and pset not in lex.PATTERN_SETS):
+            continue
+        try:
+            got = lex.extract(ctx.root / rel, mode, pset)
+        except (SyntaxError, OSError):
+            continue
+        if not got:
+            continue
+        for nm, _ln in got[0]:
+            v = lex.leading_verb(nm)
+            if v:
+                used.add(v)
+
+    unused = sorted(v for v in verbs if v not in used)
+    return {"signal": name, "value": len(unused), "of": len(verbs), "tolerance": 0,
+            "gateable": True, "live": bool(used), "unjudgeable": 0,
+            "detail": [{"verb": v, "note": "declared in VERBS, used by no definition"} for v in unused]}
+
+
+def signal_lexicon_ratified_stale(ctx) -> dict:
+    """Has the declared LANGUAGE SURFACE moved since a human last ratified the table?
+
+    `ratified` is the checkable form of "a human curated this". It says nothing about WHEN, so a
+    table ratified before a language was added is a curated vocabulary certifying a corpus it never
+    saw. Compared by COMMIT DATE rather than by the stamp's own text: the stamp is authored and the
+    thing it must outlive is not.
+    """
+    name = "lexicon_ratified_older_than_language_surface"
+    conf = _resolve_lexicon_conf(ctx)
+    if not conf:
+        return _build_not_asked(name, "no .lexicon.conf at the repo root; the lexicon kit is not adopted")
+    _verbs, ratified, _l = _load_lexicon(ctx)
+    if not ratified:
+        return _build_not_asked(name, ".lexicon.conf carries no ratified stamp; adopt-lexicon.sh --check owns that")
+
+    stamp = ratified.split()[0]
+    langs_at = ctx.git.run("log", "-1", "--format=%cI", "-S", "LANGS=", "--", ".lexicon.conf").stdout.strip()
+    if not langs_at:
+        return _build_not_asked(name, "no commit yet touches the LANGS declaration; nothing to compare")
+    stale = langs_at[:10] > stamp
+    return {"signal": name, "value": 1 if stale else 0, "of": 1, "tolerance": 0,
+            "gateable": True, "live": True, "unjudgeable": 0,
+            "detail": ([{"ratified": stamp, "langs_changed": langs_at[:10],
+                         "note": "the declared language surface moved after the table was ratified"}]
+                       if stale else [])}
+
+
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
-           signal_dangling_pointers, signal_closed_specs_untraceable]
+           signal_dangling_pointers, signal_closed_specs_untraceable,
+           signal_lexicon_verbs_unused, signal_lexicon_ratified_stale]
 
 
 # --------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -576,6 +577,73 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
 
 
 # ---------------------------------------------------------------------------------------------
+# 3b — the two LEXICON signals: NOT ASKED without the kit, and falsifiable with it
+# ---------------------------------------------------------------------------------------------
+
+
+def test_lexicon_signals(tmp: pathlib.Path) -> None:
+    """These are the only two signals in this shipped engine that name an OPTIONAL kit, so the
+    absent-conf case is the load-bearing arm: an adopter who never took the lexicon must inherit
+    `gateable: False` — not a clean 0, which would read as "asked and fine", and not a red."""
+    print("lexicon signals (not-asked without the kit; falsifiable with it)")
+    r = make_repo(tmp / "lexsig")
+
+    base = report(r)
+    for name in ("lexicon_verbs_declared_but_unused", "lexicon_ratified_older_than_language_surface"):
+        s = base[name]
+        check(f"no .lexicon.conf: {name} is NOT ASKED, not a clean zero",
+              s["gateable"] is False and s["value"] == 0, f"{s}")
+        check(f"no .lexicon.conf: {name} says why", "not adopted" in str(s["detail"]),
+              f"{s['detail']}")
+
+    # Adopt the kit INTO the fixture: the engine reaches it by `sys.path`, so the reader has to be
+    # present exactly where an installed kit puts it.
+    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
+    shutil.copytree(kit_src, r / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    src = r / "src" / "thing.py"
+    src.write_text("def build_thing():\n    pass\n", encoding="utf-8", newline="\n")
+    conf = r / ".lexicon.conf"
+    conf.write_text(
+        'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
+
+    clean = report(r)["lexicon_verbs_declared_but_unused"]
+    check("clean fixture: every declared verb is used, so the signal is silent",
+          clean["value"] == 0 and clean["gateable"] is True, f"{clean}")
+    check("clean fixture: ...and LIVE over a non-empty population", clean["live"] is True, f"{clean}")
+
+    # VIOLATE: declare a verb nothing is called. This is the OUTLIVING direction — the half no other
+    # mechanism here can see.
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        "VERBS:\n  build  make a thing\n", "VERBS:\n  build  make a thing\n  vanish  used by nothing\n"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "declare an unused verb", "--no-verify"], r)
+    fired = report(r)["lexicon_verbs_declared_but_unused"]
+    check("violated: a declared-but-unused verb fires the signal", fired["value"] == 1, f"{fired}")
+    check("violated: it names the verb", "vanish" in str(fired["detail"]), f"{fired['detail']}")
+
+    # The staleness signal compares the ratified DATE against the commit date of the last LANGS
+    # change. The stamp above is 2999, so it cannot be stale; move it back and the same edit fires.
+    conf.write_text(conf.read_text(encoding="utf-8").replace('ratified="2999-01-01 node t"',
+                                                             'ratified="1999-01-01 node t"'),
+                    encoding="utf-8", newline="\n")
+    conf.write_text(conf.read_text(encoding="utf-8").replace('LANGS="py:python-ast:parser"',
+                                                             'LANGS="py:python-ast:parser js:js-regex:probe"'),
+                    encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "widen the language surface without re-ratifying", "--no-verify"], r)
+    stale = report(r)["lexicon_ratified_older_than_language_surface"]
+    check("violated: a language surface widened after ratification fires the staleness signal",
+          stale["value"] == 1, f"{stale}")
+
+
+# ---------------------------------------------------------------------------------------------
 # 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (three directions)
 # ---------------------------------------------------------------------------------------------
 
@@ -783,6 +851,7 @@ def main() -> int:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
+        test_lexicon_signals(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
     print()
