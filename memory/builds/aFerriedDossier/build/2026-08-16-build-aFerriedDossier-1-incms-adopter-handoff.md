@@ -68,7 +68,7 @@ still cheap to change.
 |---|---|---|---|
 | 1 | `intake` accepts `--answer prefix=scripts` and silently discards it. `prefix` sits in the `derived` set so `needed_answers()` filters it, and `cmd_intake` writes the literal `prefix = "tools"`. Measured: "2 answer(s) recorded", not 3, and the written descriptor says `tools`. `intake` then refuses to rewrite the file. | `govkit.py:884, 947, 951` (refusal at `:927-932`) | **Unit 4 AC13 requires a fixture where "the install prefix and memory root are non-default". That fixture cannot be built until this is fixed.** |
 | 2 | The foreign-kit detection probe iterates the literal `for prefix in ("tools", "")`. Measured against inCMS's real tree it returns 2 of the 9 kits present; with `("tools","","scripts")` it also finds check-wiring, codebase-map, kickoff-manifest and settings-merge. | `govkit.py:722` | Unit 2 S5 arbitrates a row's role through descriptor resolution at the target's prefix. This is one of two places that resolution is literal, so S5 would refuse a non-default-prefix target's rows spuriously. |
-| 3 | `sentinel` is appended unresolved — `if d.get("sentinel"): probes.append(d["sentinel"])` — never through `resolve_tokens`. Five descriptors carry `tools/` literals. | `govkit.py:734`; `agent-instructions/kit.toml:8`, `gate-lint/kit.toml:8`, `entries/check-kit-versions.kit.toml:9`, `entries/check-install-prefix.kit.toml:11`, `entries/push-main.kit.toml:9` | Same class as #2, one layer down, and it is the **sole** fallback for the three entries with `version_from = {none}`. Fixing `:722` alone does not reach them. Unit 1 S9's repair list does not contain it. |
+| 3 | `sentinel` is appended unresolved — `if d.get("sentinel"): probes.append(d["sentinel"])` — never through `resolve_tokens`. Five descriptors carry `tools/` literals. | `govkit.py:735` (the guard is `:734`); `agent-instructions/kit.toml:8`, `gate-lint/kit.toml:8`, `entries/check-kit-versions.kit.toml:9`, `entries/check-install-prefix.kit.toml:11`, `entries/push-main.kit.toml:9` | Same class as #2, one layer down, and it is the **sole** fallback for the three entries with `version_from = {none}`. Fixing `:722` alone does not reach them. Unit 1 S9's repair list does not contain it. |
 | 4 | `apply`'s write loop has one existence check — `if role == "seed" and dp.exists(): continue` — then an unconditional `dp.write_bytes(data)`. No hash of the destination's pre-state is read anywhere. Every `role = "engine"` kit with `include = "**"` is clobbered. | `govkit.py:823-838` | Unit 2 §4 already cites this behaviour as an argument for a separate verb: "`apply`'s contract is 'land what is not there' and its re-run path already overwrites `engine` files without comparing." Whoever fixes it must **exempt receipt rows**, or unit 3 AC8's "a second `apply` changes no path and no hash" turns red. |
 | 5 | `gov_source` is a machine-local absolute path written in two separator conventions — `root.as_posix()` by `intake`, `str(root)` by `apply`. Measured: `"C:/projects/coding-governance"` in `deploy.toml` against `"C:\\projects\\coding-governance"` in `install.json`. | `govkit.py:868, 945` | Unit 1 S4 freezes the receipt schema. Every field frozen wrong needs a migration to fix. inCMS runs six nodes across Windows and Linux; this field is wrong on arrival at five of six. Suggested shape: `gov_remote` + `gov_commit`, one convention. |
 | 6 | Unit 2's verdict table iterates receipt rows only ("For each receipt row"), with one non-row cell for `unrecorded`. So a **gov-side rename** scores the old path `withdrawn` and deletes it while the new path lands nowhere; `blob_at` returns `None` on the old path. There is also no cell for a file gov ADDS, and none for a `moved` destination. | unit 2's verdict table | Follow renames with `git diff -M --name-status <base>..<to> -- <kit home>`. inCMS budgeted this at ~20 lines. Under `--write`, `withdrawn` deletes — so this is a data-loss path, not a reporting gap. |
@@ -128,3 +128,20 @@ Named so they are not read into the list above:
   `gov_source` is one of its fields.
 - **Items 1, 2 and 3 want to land before unit 4**, which needs a fixture at a non-default prefix.
 - Everything else can follow.
+
+---
+
+## Addendum — 2026-08-16, after reconciling with `origin/main`
+
+Two corrections, both measured after this dossier was first written. It had been prepared against a
+LOCAL `coding-governance` checkout that was 14 commits behind its remote; that has since been merged.
+
+1. **Item 3's line number was off by one.** `govkit.py:734` is the guard `if d.get("sentinel"):`.
+   The unresolved append is `govkit.py:735` — `probes.append(d["sentinel"])`. The defect is
+   unchanged; only the citation moves. `govkit.py` itself is **byte-identical** between the commit
+   this dossier was measured at and `origin/main`, so every other line number in it still resolves.
+
+2. **The registry population is NINETEEN entries, not seventeen.** `dClosedLexicon` added `lexicon`
+   and `check-placeholders` after inCMS's cross-review ran. **Neither was reviewed**, and nothing in
+   this dossier should be read as covering them. inCMS has no opinion on either kit yet; the absence
+   is a gap in the review, not a verdict of "nothing to say".
