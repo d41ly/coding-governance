@@ -2,6 +2,7 @@
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
 
+- PLAY-aDeclaredCeiling-1 · OPEN · two aSiftedPlaybook records assert a defect at WIRE-INTO-PROJECT.md:464 that does not exist: the line says "the review protocol's TWO rules" and the protocol binds exactly two. The audit conflated them with agent-cap.js's four hook rules
 - PLAY-aCandidStub-1 · CLOSED · fifteen confirmed convergence defects across the three `parallel-coding-governance*.md` files, all built at template v2.5 with the mandatory memory-tree promotion; the orphaned companion §14 became §7 behind a real stub → `builds/aCandidStub/`
 - PLAY-aPrunedCeremony-5 · WONTDO · subject retired with the authored ledger (aMendedLedger U2): the shards moved to `memory/archive/ledger/` and work state is the GENERATED build index, so node b has no rows to migrate → `builds/aPrunedCeremony/`
 - PLAY-aCandidStub-2 · OPEN · §14 (session execution hygiene) is the strongest candidate to move behind a §-stub, per the v2.3 pattern — justified on PER-SESSION READING COST, not bytes: TOOL-aSiftedPlaybook-1 raised the ceiling to 48 KiB, so the row's original full-at-v2.5 rationale is false
