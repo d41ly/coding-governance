@@ -165,3 +165,57 @@ why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring 
 [[exempt]]
 path = "parallel-coding-governance.customize.md"
 why = "the deploy-time placeholder catalog. The runbook's own words are 'read it, don't ship it'. Counting it as a playbook member is how the spec over-stated that entry's file count for four revisions."
+
+# ------------------------------------------------------------------------- leg exemptions
+# A leg an adopter does NOT receive, each with its reason, on the same staleness rule as the
+# path exemptions above: a row naming a leg that is no longer in the manifest reds, and a leg
+# that is BOTH exempted and claimed by a descriptor reds too — an exemption and a claim for
+# one fact is the two-spellings class arriving through the escape hatch built to prevent it.
+
+[[exempt_leg]]
+name = "branch-guard self-test"
+why = """
+gov's own red/green proof of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file, and the path it drives is already a registry exemption for that reason.
+"""
+
+[[exempt_leg]]
+name = "govkit selfcheck"
+why = """
+the deployer grading its own declarations. It runs on the deployer machine and is never installed into a target, so there is nothing in an adopter for it to check.
+"""
+
+[[exempt_leg]]
+name = "govkit selftest"
+why = """
+the deployer's own arms. Same reason as its selfcheck: the deployer does not travel.
+"""
+
+[[exempt_leg]]
+name = "manifest-check self-test"
+why = """
+gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is claimed by the kickoff-manifest entry; this self-test is not prescribed for copy anywhere in the runbook, and that asymmetry is deliberate.
+"""
+
+[[exempt_leg]]
+name = "python resolver (behaviour + inline parity + idiom ban)"
+why = """
+grades tools/lib/, the permanently exempt gov-internal directory, plus the inline copies every kit already carries. Nothing here travels, and the parity it asserts is asserted before the kits ship rather than after.
+"""
+
+[[exempt_leg]]
+name = "run-gates canary"
+why = """
+gov's own gate runner's canary; the runner is a registry exemption and the canary travels with it.
+"""
+
+[[exempt_leg]]
+name = "run-gates evidence"
+why = """
+gov's own gate runner's evidence arm; travels with the runner, which is exempt.
+"""
+
+[[exempt_leg]]
+name = "template size <=32KiB"
+why = """
+gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
+"""

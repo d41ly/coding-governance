@@ -76,3 +76,8 @@ blocks_adopt = false
 blocks_gate = true
 why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
+
+[[gate_leg]]
+name = "drift-audit wiring"
+argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
+guard = []

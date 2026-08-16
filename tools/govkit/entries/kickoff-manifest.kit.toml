@@ -52,3 +52,8 @@ discharge = { command = ["bash", "{prefix}/manifest-check.sh"] }
 none = """
 installation is a copy. The ratchet is this entry's gate LEG and grading it from `check` would run a gate; the authoring step it needs is the declared hole, and the hole's probe is what observes it
 """
+
+[[gate_leg]]
+name = "kickoff engine size <=18KiB"
+argv = ["bash", "{prefix}/check-template-size.sh", "skills/session-kickoff/SKILL.md", "18432"]
+guard = []

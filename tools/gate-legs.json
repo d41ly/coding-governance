@@ -1,6 +1,6 @@
 [
   {
-    "name": "memory hygiene (20 checks)",
+    "name": "memory hygiene",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
@@ -206,7 +206,7 @@
     ]
   },
   {
-    "name": "marker contract (4 readers)",
+    "name": "marker contract",
     "argv": [
       "bash",
       "tools/memory-tree/marker-contract.test.sh"
@@ -279,7 +279,7 @@
     ]
   },
   {
-    "name": "verifier fan-out (≤5 verify agents per review)",
+    "name": "verifier fan-out",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"

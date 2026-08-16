@@ -728,6 +728,86 @@ def selfcheck(root: pathlib.Path) -> int:
                 r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
                        f"name a verdict, including the one where both sides are gone")
 
+    # ---- 7h: LEG correspondence, BOTH directions (DEPL-aTetheredConvoy-3 S1). The descriptors and
+    #          gov's own leg manifest are two spellings of one fact, and before this nothing asserted
+    #          they agree — the deployer's whole thesis, unapplied to the deployer. An exemption is
+    #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
+    #          refuses a leg that is BOTH claimed and exempted.
+    legs_path = root / "tools" / "gate-legs.json"
+    if legs_path.is_file():
+        manifest = {leg.get("name") for leg in json.loads(legs_path.read_text(encoding="utf-8"))}
+        claimed_legs: dict[str, str] = {}
+        for eid, (d, _dpath) in descs.items():
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                if not nm:
+                    r.fail(f"entry '{eid}' declares a gate leg with no name")
+                    continue
+                if nm in claimed_legs:
+                    r.fail(f"leg '{nm}' is claimed by both '{claimed_legs[nm]}' and '{eid}'")
+                claimed_legs[nm] = eid
+                if nm not in manifest:
+                    r.fail(f"entry '{eid}' declares gate leg '{nm}', which is in no leg of "
+                           f"tools/gate-legs.json — a descriptor and the manifest are two spellings "
+                           f"of one fact and this is the direction that deploys a leg a target's "
+                           f"runner will never match")
+                # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
+                # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
+                if re.search(r"\([^)]*\d[^)]*\)", nm):
+                    r.fail(f"entry '{eid}' declares leg name '{nm}', which carries a digit-bearing "
+                           f"parenthetical; the emitter writes this name into a target, where a "
+                           f"count nobody maintains is worse than no name at all")
+
+        exempt_legs: dict[str, str] = {}
+        for x in reg.get("exempt_leg", []):
+            nm, why = x.get("name"), str(x.get("why", "")).strip()
+            if not nm:
+                r.fail(f"an exempt_leg row carries no name: {x!r}")
+                continue
+            if not why:
+                r.fail(f"exempt_leg '{nm}' carries an empty reason — an exemption without one is an "
+                       f"omission wearing a label")
+            if nm not in manifest:
+                r.fail(f"exempt_leg '{nm}' names a leg that is no longer in the manifest — a stale "
+                       f"exemption silently widens the surface it was written to narrow")
+            if nm in claimed_legs:
+                r.fail(f"leg '{nm}' is exempted AND claimed by entry '{claimed_legs[nm]}' — an "
+                       f"exemption and a claim for one fact is the two-spellings class arriving "
+                       f"through the escape hatch built to prevent it")
+            exempt_legs[nm] = why
+        for nm in sorted(manifest - set(claimed_legs) - set(exempt_legs)):
+            r.fail(f"gate leg '{nm}' is claimed by no descriptor and carried by no [[exempt_leg]] — "
+                   f"a new leg must red until a declaration says whether an adopter receives it")
+        r.note(f"legs: {len(manifest)} in the manifest · {len(claimed_legs)} claimed · "
+               f"{len(exempt_legs)} exempt")
+
+    # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
+    #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
+    #          that home would red on every tracked file under it — hundreds — rather than on the one
+    #          real exposure. A flat entry's home resolves sources; it is not an ownership boundary.
+    exempt_paths_pre = {x.get("path") for x in exempts if x.get("path")}
+    files_all = tracked(root)
+    unclaimed_in_home = 0
+    for eid, (d, _dpath) in descs.items():
+        home = (d.get("home") or "").rstrip("/")
+        if not home or d.get("kind") == "flat":
+            continue
+        named = set()
+        for rule in d.get("files", []):
+            inc = rule.get("include")
+            srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+            if any(s == "**" for s in srcs):
+                named.update(f for f in files_all if f.startswith(home + "/"))
+            else:
+                named.update(rule_sources(d, rule))
+        for f in files_all:
+            if f.startswith(home + "/") and f not in named and f not in exempt_paths_pre:
+                unclaimed_in_home += 1
+                r.fail(f"entry '{eid}' has '{f}' under its home and no file rule claims it — a file "
+                       f"added inside a kit whose includes are a literal list is otherwise invisible "
+                       f"to the surface predicate, which is depth-1")
+    r.note(f"per-file claim: {unclaimed_in_home} unclaimed file(s) under a non-flat home")
+
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.
     globs = reg.get("surface", {}).get("globs", [])

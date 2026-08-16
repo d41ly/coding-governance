@@ -19,7 +19,7 @@ mutates_index = false
 why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a leg and explicitly warns against running the checker itself as a merge-bar leg"
 
 [[gate_leg]]
-name = "wiring-health self-test"
+name = "check-wiring self-test"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 

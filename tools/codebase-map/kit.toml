@@ -45,7 +45,7 @@ probe = { must_exist = "{kit}/map_extractors.py", must_not_exist = "{map_root}/g
 means = "seeded-extractors-or-crashed"
 
 [[gate_leg]]
-name = "codebase-map coverage"
+name = "codebase-map coverage + freshness"
 argv = ["python", "{gate_file}"]
 guard = []
 history_depth = "full"
@@ -64,3 +64,13 @@ discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'
 none = """
 the adopter accepts only `--scaffold`, measured. The kit ships runnable verifiers, but each is already this kit's own gate leg, so pointing `check` at one would make `check` run a gate. Wiring one anyway is a backlog row, not a silence
 """
+
+[[gate_leg]]
+name = "codebase-map kit selftest"
+argv = ["python3", "{kit}/selftest.py"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "codebase-map adopter e2e"
+argv = ["bash", "{kit}/adopt-codebase-map.test.sh"]
+guard = ["{kit}/"]

@@ -36,3 +36,8 @@ discharge = { command = ["bash", "{prefix}/check-kit-versions.sh"] }
 none = """
 this entry IS a gate, and it lands as a `seed` the target is expected to edit down to its own kit subset — so gov can verify neither its content nor its verdict from outside
 """
+
+[[gate_leg]]
+name = "kit version markers"
+argv = ["bash", "{prefix}/check-kit-versions.sh"]
+guard = []

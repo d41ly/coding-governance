@@ -18,12 +18,20 @@ include = ["agent-cap.test.sh"]
 role = "engine"
 to = "{prefix}/hooks/agent-cap.test.sh"
 
+# The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
+# this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
+# surface predicate, which is depth-1 and sees only `tools/hooks`.
+[[files]]
+include = ["kit.toml"]
+role = "engine"
+to = "{prefix}/hooks/kit.toml"
+
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
 
 [[gate_leg]]
-name = "agent-cap selftest"
+name = "agent-cap self-test"
 argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
 guard = ["{prefix}/hooks/"]
 

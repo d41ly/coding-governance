@@ -75,3 +75,18 @@ blocks_adopt = false
 blocks_gate = true
 why = "undeclared or malformed reds the kit gate. For a faithful copy install the correct value is the driver's own core set sizes, so this is a transcription hole rather than a corpus measurement."
 discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
+
+[[gate_leg]]
+name = "unattended gate selftest"
+argv = ["bash", "{kit}/check-unattended.test.sh"]
+guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
+
+[[gate_leg]]
+name = "unattended driver selftest"
+argv = ["bash", "{kit}/unattended.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "unattended adopter e2e"
+argv = ["bash", "{kit}/adopt-unattended.test.sh"]
+guard = ["{kit}/"]

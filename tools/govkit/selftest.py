@@ -477,6 +477,101 @@ def main() -> int:
         check("selfcheck asserts update's dispatch covers the role enum and the verdict grid",
               ps.returncode == 0, ps.stdout + ps.stderr)
 
+        # ===== unit 3: the convergence ratchet =====
+        # Every arm is a CORRESPONDENCE between two populations that already exist, so its liveness
+        # half is a SCRATCH GOV TREE where the two sides disagree. A correspondence that is silent on
+        # a clean tree and cannot be made to speak is indistinguishable from one that is broken, and
+        # over gov these arms are silent by construction once the repairs land.
+        NL = chr(10)
+
+        def scratch_gov(kit_toml: str) -> subprocess.CompletedProcess:
+            g = tmp / ("sg%d" % scratch_gov.n)
+            scratch_gov.n += 1
+            shutil.copytree(HERE, g / "tools" / "govkit")
+            mt = g / "tools" / "memory-tree"
+            mt.mkdir(parents=True, exist_ok=True)
+            (mt / "engine.sh").write_text("#!/bin/sh" + NL, encoding="utf-8", newline=NL)
+            (mt / "extra.sh").write_text("#!/bin/sh" + NL, encoding="utf-8", newline=NL)
+            (g / "tools" / "gate-legs.json").write_text(
+                json.dumps([{"name": "demo leg",
+                             "argv": ["bash", "tools/memory-tree/engine.sh"],
+                             "guard": []}], indent=2) + NL,
+                encoding="utf-8", newline=NL)
+            (mt / "kit.toml").write_text(kit_toml, encoding="utf-8", newline=NL)
+            (g / "tools" / "govkit" / "registry.toml").write_text(NL.join([
+                "version = 1",
+                "[surface]",
+                'globs = ["tools/*"]',
+                "[selection]",
+                'default = ["memory-tree"]',
+                "[[entry]]",
+                'id = "memory-tree"',
+                'descriptor = "tools/memory-tree/kit.toml"',
+                "[[exempt]]",
+                'path = "tools/govkit"',
+                'why = "the deployer itself"',
+                "[[exempt]]",
+                'path = "tools/gate-legs.json"',
+                'why = "gov\'s own manifest"',
+                "",
+            ]), encoding="utf-8", newline=NL)
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "s")
+            return subprocess.run(
+                [sys.executable, str(g / "tools" / "govkit" / "govkit.py"), "selfcheck"],
+                capture_output=True, text=True)
+
+        scratch_gov.n = 0
+
+        def kit(leg_name=None, include_all=True):
+            lines = ['id = "memory-tree"', 'home = "tools/memory-tree"', 'scope = "repo"',
+                     'version_from = { none = "demo" }', "[check]", 'none = "demo"',
+                     "[[files]]"]
+            lines.append('include = "**"' if include_all
+                         else 'include = ["engine.sh", "kit.toml"]')
+            lines.append('role = "engine"')
+            if leg_name is not None:
+                lines += ["[[gate_leg]]", 'name = "%s"' % leg_name,
+                          'argv = ["bash", "{kit}/engine.sh"]', "guard = []"]
+            return NL.join(lines) + NL
+
+        r0 = scratch_gov(kit("demo leg"))
+        check("LIVENESS: a scratch gov whose leg names AGREE is silent",
+              r0.returncode == 0, r0.stdout + r0.stderr)
+
+        r1 = scratch_gov(kit("typo leg"))
+        check("a descriptor leg absent from the manifest REDS",
+              "is in no leg of tools/gate-legs.json" in r1.stdout, r1.stdout)
+        check("and the manifest leg it left unclaimed reds too — both directions, one fixture",
+              "claimed by no descriptor and carried by no [[exempt_leg]]" in r1.stdout, r1.stdout)
+
+        r2 = scratch_gov(kit("demo leg (3 checks)"))
+        check("a leg name carrying a digit-bearing parenthetical REDS",
+              "digit-bearing parenthetical" in r2.stdout, r2.stdout)
+
+        r3 = scratch_gov(kit("demo leg", include_all=False))
+        check("a file under a non-flat home that no rule claims REDS",
+              "under its home and no file rule claims it" in r3.stdout, r3.stdout)
+        check("and it NAMES the file rather than reporting a count",
+              "extra.sh" in r3.stdout, r3.stdout)
+
+        # Over gov itself both correspondences are COMPLETE, and every figure in the notes is
+        # derived. The positive halves matter as much as the negatives: without them these arms
+        # could be silent because the predicate is broken rather than because the tree is clean.
+        ps = run("selfcheck")
+        check("over gov, every manifest leg is claimed or exempted",
+              "claimed by no descriptor" not in ps.stdout, ps.stdout)
+        check("over gov, no descriptor leg is missing from the manifest",
+              "is in no leg of tools/gate-legs.json" not in ps.stdout, ps.stdout)
+        check("the leg note reports all three figures, derived",
+              "in the manifest" in ps.stdout and "claimed" in ps.stdout
+              and "exempt" in ps.stdout, ps.stdout)
+        check("the per-file note reports its own derived figure",
+              "unclaimed file(s) under a non-flat home" in ps.stdout, ps.stdout)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)
@@ -560,11 +655,16 @@ def main() -> int:
                 '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n\n'
                 '[[exempt]]\npath = "tools/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
                 encoding="utf-8", newline="\n")
+            # The descriptor DECLARES the manifest's leg. Without it the fixture is a gov tree whose
+            # leg is claimed by nobody, which the leg correspondence reds on — correctly, and the
+            # fixture's own premise is that both facts agree.
             (g / "tools" / "demo" / "kit.toml").write_text(
                 'id = "demo"\nhome = "tools/demo"\n'
                 'version_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n',
+                f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n\n'
+                '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n',
                 encoding="utf-8", newline="\n")
             # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
             # the distinction that made this assertion necessary in the first place.

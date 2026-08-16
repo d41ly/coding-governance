@@ -20,7 +20,7 @@ gate-legs = [
   "kit version markers",
   "kit/dogfood doc parity",
   "manifest-check self-test",
-  "memory hygiene (20 checks)",
+  "memory hygiene",
   "memory-hygiene self-test",
   "memory-recall kit selftest",
   "memory-recall skill wiring",

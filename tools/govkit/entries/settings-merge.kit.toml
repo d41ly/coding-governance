@@ -32,3 +32,8 @@ mutates_index = false
 none = """
 the shipped engine DOES carry a check arm and this entry deliberately does not wire it yet: the arm exits non-zero whenever the hook is unwired, and the precondition that makes that legal is declared by the merged-region unit. Wiring it before then would make `check` permanently red for a target that selected this entry alone
 """
+
+[[gate_leg]]
+name = "settings-merge selftest"
+argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
+guard = ["{prefix}/"]

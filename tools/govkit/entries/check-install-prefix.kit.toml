@@ -39,3 +39,8 @@ guard = ["{prefix}/check-install-prefix.sh"]
 none = """
 this entry IS a gate. Its self-test is the leg, and running a gate from `check` would make `check` a second merge bar rather than a verifier of the install
 """
+
+[[gate_leg]]
+name = "install-prefix (shipped surface)"
+argv = ["bash", "{prefix}/check-install-prefix.sh"]
+guard = []
