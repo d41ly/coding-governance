@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan
 
-**Status:** OPEN · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -12,7 +12,12 @@ renders into a slot this unit defines, and the gate in unit 6 checks the slots r
 
 - **S1** — the README's top level is a fixed slot sequence: front matter, the `#` title, ONE authored
   prose block, the `roster:units` pair, then the generated regions. `gen_build_index.py` learns the
-  sequence and refuses a file that violates it.
+  sequence and refuses a file that violates it, under a NEW `--check-format` verb.
+- **S1a** — the slot refusal is NOT reachable from `plan()`, `--write` or `--check`. Five build
+  READMEs violate the sequence at this unit's base and a sixth orders its plan pair wrongly, so a
+  refusal wired into the render path would red hygiene check 9 across the corpus the moment this unit
+  lands. `--check-format` is the only caller until unit 6 makes it a leg and unit 10 conforms the
+  corpus.
 - **S2** — a second marker pair, `<!-- roster:units -->` and `<!-- /roster:units -->`, holds the
   AUTHORED unit plan. The generator never writes between those markers and refuses when asked to.
 - **S3** — `apply_region` is generalised to take the marker pair as an argument instead of closing
@@ -65,9 +70,26 @@ duplicating.
 
 ### Migration
 
-None for the corpus. Every build README today has the front matter, title, prose and index slots in
-the required order, and none has a `roster:units` pair, so S5's opt-in branch is the live case for
-all of them. Unit 10 verifies that claim over the whole corpus rather than trusting this sentence.
+None for the corpus in THIS unit, and S1a is what makes that true rather than an assumption.
+
+An earlier revision of this spec claimed every build README already satisfies the sequence and that
+none carries a plan pair. Both were false, and both were falsified by measurement rather than by
+argument. At this unit's base:
+
+| Fact | Measured |
+|---|---|
+| build READMEs tracked | 39 — read the live number from `gen_build_index.py --check`, never from here |
+| carrying a real `roster:units` marker pair | 1, `memory/builds/aStandingWrit/README.md` at its lines 90 and 104 |
+| with authored prose after the closing generated marker | 5, the largest being `memory/builds/aSiftedPlaybook/README.md` |
+| with the plan pair ordered before its prose | 1, the same `aStandingWrit`, whose prose sits between the plan close and the generated open |
+
+The plan pair was added by `TOOL-aStandingWrit-1`, which is SPECCED and not landed, so S5's opt-in
+branch is the live case for 38 of 39 rather than for all of them. `aStandingWrit` is therefore a real
+fixture for S2 and AC3 and is used as one: an authored region that a naive renderer would rewrite
+already exists in the tree, and no synthetic fixture can prove more than it does.
+
+Unit 10 conforms the corpus; unit 6 makes the refusal binding. Neither is this unit's work, and the
+ordering between them is stated in the build README rather than here.
 
 ### Alternatives rejected
 
@@ -104,13 +126,17 @@ commit, and a heading is not a delimiter it can address.
 
 - **AC1** — When `python tools/memory-tree/gen_build_index.py --check` runs over the corpus at this
   unit's tip, it reports clean at the same artifact count it reports at `base 96141aed`.
-- **AC2** — When a README places prose after its first generated marker, `--check` fails naming that
-  file and the line number of the offending prose.
-- **AC3** — When a README carries a `roster:units` pair, `--write` leaves every byte between those
-  two markers unchanged, proved by a fixture whose plan block contains text that a naive renderer
-  would rewrite.
-- **AC4** — When a README carries two `roster:units` opening markers, `--check` fails with the same
-  wording `apply_region` already uses for a duplicated pair.
+- **AC2** — When a README places prose after its first generated marker,
+  `python tools/memory-tree/gen_build_index.py --check-format` fails naming that file and the line
+  number of the offending prose. Run over the corpus at this unit's tip it names exactly the five
+  files listed in §4 Migration and no others, which is the arm that proves the predicate is neither
+  vacuous nor over-broad.
+- **AC3** — When `--write` runs over `memory/builds/aStandingWrit/README.md`, every byte between its
+  `roster:units` markers is unchanged, compared with `git diff --exit-code` on that path. This is a
+  LIVE case rather than a fixture: the region already contains an authored table that a renderer
+  walking the file blind would rewrite.
+- **AC4** — When a README carries two `roster:units` opening markers, `--check-format` fails with the
+  same wording `apply_region` already uses for a duplicated pair.
 - **AC5** — When a README carries no `roster:units` pair, `--write` and `--check` behave exactly as
   they do at `base 96141aed`, proved by a fixture asserting byte equality against the current render.
 - **AC6** — When `python tools/memory-tree/gen_build_index.py --selftest` runs, it passes and its arm
@@ -132,6 +158,13 @@ resolved the two questions this unit would otherwise have had to ask.
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft.
+- rev-2 · 2026-08-16 · §4 Migration asserted that every build README already satisfies the slot
+  sequence and that none carries a plan pair. Both were false: five carry prose after the closing
+  generated marker and `aStandingWrit` carries a real pair, ordered after its prose. Measured while
+  authoring the sibling specs. Added S1a scoping the refusal to a new `--check-format` verb, because
+  a refusal on the render path would have redded hygiene check 9 across the corpus on this unit's own
+  commit; retargeted AC2 and AC4 onto that verb; rewrote AC3 to use `aStandingWrit` as a live case
+  instead of a fixture.
 
 ## 10. Reuse audit
 
