@@ -79,9 +79,13 @@ for pair in $PAIRS; do
   case "$MODE" in
     --render) render "$ship" > "$live"; echo "kit-parity: rendered $live from $ship" ;;
     --check)
-      if ! diff -q <(sed 's/\r$//' "$live") <(render "$ship") >/dev/null; then
+      # CR is stripped from BOTH sides. The live copy is pinned `eol=lf` and the template now is
+      # too, but a gate that byte-compares needs the comparison right as well as the bytes: with
+      # only the live side normalised, a CRLF-smudged template reds every line and goes green again
+      # the moment someone re-renders — green-by-accident, not a gate.
+      if ! diff -q <(sed 's/\r$//' "$live") <(render "$ship" | sed 's/\r$//') >/dev/null; then
         echo "kit-parity: DRIFT — $live does not match $ship rendered for this install ('$KITREL')"
-        diff <(sed 's/\r$//' "$live") <(render "$ship") | head -30 | sed 's/^/    /'
+        diff <(sed 's/\r$//' "$live") <(render "$ship" | sed 's/\r$//') | head -30 | sed 's/^/    /'
         echo "    fix: bash $KITREL/kit-dogfood-parity.test.sh --render"
         st=1
       fi

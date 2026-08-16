@@ -115,6 +115,15 @@ tools/unattended/.unattended.conf.example text eol=lf
 # red every line — and the shipped half had only the second.
 tools/unattended/*.md text eol=lf
 
+# The memory-tree kit's three shipped templates, pinned for the IDENTICAL reason as the line above
+# and found the same way: `kit-dogfood-parity.test.sh` renders the template and byte-compares it to
+# the installed copy under `memory/`, which `memory/**/*.md` already pins — so the gate had one
+# pinned half and one unpinned half. Both were LF when this landed, and `git add` warned that the
+# next checkout would smudge the template to CRLF, at which point the render emits CRLF, the live
+# side is CR-stripped, and the leg reds on every line while passing whenever a render just ran. The
+# comparison now strips CR on both sides too; the pin is what keeps the committed bytes right.
+tools/memory-tree/*.template.md text eol=lf
+
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf
 memory/map/affordance-exempt.toml text eol=lf

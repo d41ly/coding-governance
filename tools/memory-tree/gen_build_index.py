@@ -228,6 +228,167 @@ def parse_spec(path: str) -> dict | None:
     }
 
 
+# ------------------------------------------------------------------------------ record -> spec bindings
+# TOOL-aTetheredRecord-2. Every record under a build's non-spec folders names the spec(s) it is
+# evidence about, in its own head. This parser READS that and CLASSIFIES; it never raises, because
+# `collect()` is reached by both --check and --write through one call site, so a raising parser would
+# let one unannotated record refuse to render every artifact.
+BIND_HEAD_LINES = 12
+RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research")
+# Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
+# (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
+# exclude the one file most easily forgotten.
+BIND_RE = re.compile(
+    r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
+)
+UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
+
+
+def _id_alternation(conf: dict) -> str:
+    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    return "|".join(sorted(fams)) or "(?!)"
+
+
+def spec_ids(root: str, tracked: list, conf: dict) -> set:
+    """The resolution set: ids DEFINED by a spec H1, one per file, at any depth under a build's spec/.
+
+    Deliberately NOT the build README `ids:` roster. That roster is a reservation RANGE generated from
+    citations anywhere, and it admits backlog and decision rows as if they were units — measured on
+    this corpus, two thirds of its ids had no spec at all. Resolving a record against it would let a
+    binding name something no spec ever defined.
+    """
+    m = conf["MEMORY_ROOT"]
+    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + _id_alternation(conf) + r")-[A-Za-z0-9]+-\d+)\b")
+    sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/spec/")
+    out = set()
+    for rel in tracked:
+        if not sel.match(rel):
+            continue
+        try:
+            for line in unfenced(read_text(os.path.join(root, rel))):
+                mm = pat.match(line)
+                if mm:
+                    out.add(mm.group("id"))
+                    break
+        except OSError:
+            continue
+    return out
+
+
+def record_paths(tracked: list, m: str) -> list:
+    """Every tracked record: any depth, ANY extension, under a build's non-spec kind folders."""
+    kinds = "|".join(k for k in RECORD_KINDS if k != "spec")
+    sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/(?:" + kinds + r")/")
+    return [p for p in tracked if sel.match(p)]
+
+
+def _expand_ids(rest: str, alt: str) -> tuple:
+    """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
+    time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit."""
+    ids, bad = [], []
+    one = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-\d+)?$")
+    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
+    for tok in rest.split():
+        mo = one.match(tok)
+        if mo:
+            ids.append(f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}")
+            continue
+        mr = rng.match(tok)
+        if mr and int(mr.group("lo")) <= int(mr.group("hi")):
+            for n in range(int(mr.group("lo")), int(mr.group("hi")) + 1):
+                ids.append(f"{mr.group('fam')}-{mr.group('slug')}-{n}")
+            continue
+        bad.append(tok)
+    return ids, bad
+
+
+def read_bindings(root: str, tracked: list, conf: dict) -> dict:
+    """path -> {state, kind, ids, commissions, reason, bad}. Never raises.
+
+    state is one of: bound · unbound · malformed · absent.
+    """
+    m = conf["MEMORY_ROOT"]
+    alt = _id_alternation(conf)
+    out = {}
+    for rel in record_paths(tracked, m):
+        rec = {"state": "absent", "kind": None, "ids": [], "commissions": [], "reason": None,
+               "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
+        try:
+            text = read_text(os.path.join(root, rel))
+        except OSError as exc:
+            rec["why"] = f"unreadable: {exc}"
+            out[rel] = rec
+            continue
+        for line in list(unfenced(text))[:BIND_HEAD_LINES]:
+            mo = BIND_RE.match(line)
+            if not mo:
+                continue
+            rest = mo.group("rest")
+            if mo.group("key") == "Commissions":
+                cids, bad = _expand_ids(rest, alt)
+                rec["commissions"] = cids
+                rec["bad"] += bad
+                continue
+            if rec["state"] != "absent":
+                continue                      # first Serves line wins
+            un = UNBOUND_RE.match(rest)
+            if un:
+                # The kind is OPTIONAL here and required below: an unbound record names no ids, so
+                # there is no relation for a kind token to describe. The REASON is mandatory either
+                # way — a bare `none` is malformed, because "no gate named" and "gate not yet
+                # written" are indistinguishable from outside and only one of them is acceptable.
+                rec["state"] = "unbound"
+                rec["reason"] = un.group("reason")
+                rec["why"] = ""
+                continue
+            toks = rest.split()
+            if toks and toks[0] in RECORD_KIND_TOKENS:
+                ids, bad = _expand_ids(" ".join(toks[1:]), alt)
+                rec["kind"] = toks[0]
+                rec["ids"] = ids
+                rec["bad"] += bad
+                if not ids:
+                    rec["state"] = "malformed"
+                    rec["why"] = "kind token with no resolvable id"
+                else:
+                    rec["state"] = "bound"
+                    rec["why"] = ""
+            else:
+                rec["state"] = "malformed"
+                got = toks[0] if toks else "(empty)"
+                rec["why"] = (f"first token {got} is not one of "
+                              + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
+        out[rel] = rec
+    return out
+
+
+def do_print_bindings(root: str, conf: dict) -> int:
+    """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
+
+    It is the retrofit's own checklist AND the predicate the gate reads, so a seed list and a gate
+    that disagree is structurally impossible here.
+    """
+    m = conf["MEMORY_ROOT"]
+    tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
+    defined = spec_ids(root, tracked, conf)
+    binds = read_bindings(root, tracked, conf)
+    unbound = 0
+    for rel in sorted(binds):
+        rec = binds[rel]
+        if rec["state"] in ("absent", "malformed"):
+            print(f"A\t{rel}\t{rec['why']}")
+            continue
+        if rec["state"] == "unbound":
+            unbound += 1
+        for tok in rec["bad"]:
+            print(f"B\t{rel}\t{tok} is not a family-qualified id or range")
+        for i in rec["ids"] + rec["commissions"]:
+            if i not in defined:
+                print(f"B\t{rel}\t{i} is named but no spec H1 in this tree defines it")
+    print(f"N\t{unbound}")
+    return 0
+
+
 def derive_status(units: list, fm: dict, readme: str) -> str:
     parsed = [u for u in units if u]
     if not parsed:
@@ -882,6 +1043,82 @@ def do_selftest() -> int:
         do_write(t11, conf11)
         arm("write then check is a fixed point", "0", lambda: str(do_check(t11, conf11)))
 
+        # ---- TOOL-aTetheredRecord-2 — the record->spec binding parser.
+        # Every arm is a POSITIVE assertion on a classification, because the failure mode of a
+        # head-scan is silence: a boundary set one line short reports "absent" for a conformant
+        # record and nothing anywhere says so.
+        tb = os.path.join(base, "bind"); os.makedirs(tb)
+        bconf = {"MEMORY_ROOT": "memory", "FAMILIES": "tooling:TOOL playbook:PLAY"}
+
+        def _rec(rel, body):
+            p = os.path.join(tb, rel)
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            write_text(p, body)
+            return rel
+
+        def _bind(rel):
+            return read_bindings(tb, [rel], bconf)[rel]
+
+        r1 = _rec("memory/builds/tOne/reviews/r.md",
+                  "# t\n\n**Serves:** spec-audit TOOL-tOne-1 TOOL-tOne-2\n")
+        arm("binding parses kind + ids", "bound", lambda: _bind(r1)["state"])
+        arm("binding keeps both ids", "['TOOL-tOne-1', 'TOOL-tOne-2']", lambda: str(_bind(r1)["ids"]))
+
+        r2 = _rec("memory/builds/tOne/reviews/r2.md",
+                  "# t\n\n**Serves:** none — the build shipped before any spec existed\n")
+        arm("none form with a reason is unbound", "unbound", lambda: _bind(r2)["state"])
+
+        r3 = _rec("memory/builds/tOne/reviews/r3.md", "# t\n\n**Serves:** none\n")
+        arm("bare none with no reason is malformed", "malformed", lambda: _bind(r3)["state"])
+
+        r4 = _rec("memory/builds/tOne/reviews/r4.md", "# t\n\n**Serves:** postmortem TOOL-tOne-1\n")
+        arm("an unknown kind token is malformed", "is not one of", lambda: _bind(r4)["why"])
+
+        r5 = _rec("memory/builds/tOne/build/r5.md", "# t\n\n**Serves:** journal TOOL-tOne-2..4\n")
+        arm("a range EXPANDS at authoring time", "['TOOL-tOne-2', 'TOOL-tOne-3', 'TOOL-tOne-4']",
+            lambda: str(_bind(r5)["ids"]))
+
+        r6 = _rec("memory/builds/tOne/reviews/r6.md",
+                  "\n" * 13 + "**Serves:** spec-audit TOOL-tOne-1\n")
+        arm("a Serves line past the head window is not read", "absent", lambda: _bind(r6)["state"])
+
+        r7 = _rec("memory/builds/tOne/reviews/r7.md",
+                  "# t\n\n```\n**Serves:** spec-audit TOOL-tOne-1\n```\n")
+        arm("a FENCED example never parses as a binding", "absent", lambda: _bind(r7)["state"])
+
+        r8 = _rec("memory/builds/tOne/build/r8.sh",
+                  "#!/bin/sh\n# **Serves:** journal TOOL-tOne-1\n")
+        arm("a non-markdown record binds through a comment marker", "bound", lambda: _bind(r8)["state"])
+
+        r9 = _rec("memory/builds/tOne/reviews/r9.md",
+                  "# t\n\n**Serves:** diff-review TOOL-tOne-1@rev-3 PLAY-tTwo-9\n")
+        arm("a rev qualifier is accepted and normalised away",
+            "['TOOL-tOne-1', 'PLAY-tTwo-9']", lambda: str(_bind(r9)["ids"]))
+        arm("an id may reach into another build", "PLAY-tTwo-9", lambda: str(_bind(r9)["ids"]))
+
+        r10 = _rec("memory/builds/tOne/reviews/r10.md", "# t\n\n**Serves:** journal TOOL-tOne-x\n")
+        arm("a malformed id token is reported, not silently dropped", "TOOL-tOne-x",
+            lambda: str(_bind(r10)["bad"]))
+
+        _rec("memory/builds/tOne/spec/s.md", "# TOOL-tOne-1 — the unit\n")
+        _rec("memory/builds/tOne/spec/units/s2.md", "# PLAY-tTwo-9 — nested, any depth\n")
+        arm("spec_ids resolves an H1 id at any depth under spec/", "PLAY-tTwo-9",
+            lambda: str(sorted(spec_ids(tb, ["memory/builds/tOne/spec/s.md",
+                                             "memory/builds/tOne/spec/units/s2.md"], bconf))))
+        arm("a record is NOT a definition source", "[]",
+            lambda: str(sorted(spec_ids(tb, [r1], bconf))))
+
+        # The read-only property, asserted as an ON-DISK effect rather than an exit code: a
+        # read-only verb that writes is the whole risk of that verb.
+        t12 = os.path.join(base, "ro"); os.makedirs(t12)
+        conf12 = _fixture(t12)
+        do_write(t12, conf12)
+        _before = {p: read_text(os.path.join(t12, p)) for p in
+                   ("memory/LIVE.md", "memory/builds/tOne/README.md")}
+        do_print_bindings(t12, conf12)
+        arm("--print-bindings leaves every generated artifact byte-identical", "True",
+            lambda: str(all(read_text(os.path.join(t12, p)) == v for p, v in _before.items())))
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -893,8 +1130,8 @@ def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return do_selftest()
-    if mode not in ("--check", "--write"):
-        print("usage: gen_build_index.py [--check|--write|--selftest]")
+    if mode not in ("--check", "--write", "--print-bindings"):
+        print("usage: gen_build_index.py [--check|--write|--print-bindings|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -902,6 +1139,8 @@ def main(argv: list) -> int:
         print("build-index: not a git repo")
         return 2
     conf = load_conf(root)
+    if mode == "--print-bindings":
+        return do_print_bindings(root, conf)
     try:
         return do_check(root, conf) if mode == "--check" else do_write(root, conf)
     except Problem as exc:
