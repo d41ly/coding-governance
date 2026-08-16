@@ -1,7 +1,7 @@
 # playbook backlog
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
-
+- PLAY-aDeclaredCeiling-1 · OPEN · two aSiftedPlaybook records assert a defect at WIRE-INTO-PROJECT.md:464 that does not exist: the line says "the review protocol's TWO rules" and the protocol binds exactly two. The audit conflated them with agent-cap.js's four hook rules
 - PLAY-aCandidStub-1 · CLOSED · fifteen confirmed convergence defects across the three `parallel-coding-governance*.md` files, all built at template v2.5 with the mandatory memory-tree promotion; the orphaned companion §14 became §7 behind a real stub → `builds/aCandidStub/`
 - PLAY-aPrunedCeremony-5 · WONTDO · subject retired with the authored ledger (aMendedLedger U2): the shards moved to `memory/archive/ledger/` and work state is the GENERATED build index, so node b has no rows to migrate → `builds/aPrunedCeremony/`
 - PLAY-aCandidStub-2 · WONTDO · §14 must NOT go behind a §-stub: every stub carries an ACTIVITY trigger, and §14's is every call, so a stub reading "LOAD always" moves bytes without saving any and makes always-on rules dark — refuted by PLAY-dClosedLexicon-1 §4
