@@ -3,8 +3,8 @@ slug: dClosedLexicon
 node: d
 opened: 2026-08-16
 streams: playbook+tooling
-roster: TOOL
-ids: TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
+roster: PLAY+TOOL
+ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
 ---
 
 # dClosedLexicon — a declared naming lexicon, gated, and portable into an unknown repo
@@ -27,18 +27,25 @@ domain they have not read. Vacuity is armed twice, since the corpus-side arm is 
 empty corpus. The kit chassis — the version pair, the govkit entry, the leg guards, the install-prefix
 compliance, the map claim — turned out to be the bulk of the work rather than the predicates.
 
-The build carries TWO units, split at unit 1's rev-3 after the review found §1 does not let one unit
-carry a cross-stream contract change. `TOOL-dClosedLexicon-1` is the kit and the playbook edits and
-stands alone. `TOOL-dClosedLexicon-2` wires the verb table into the `codebase-map` ratchet and the
-`drift-audit` signal set, depends on unit 1, and is inert without it.
+The build carries THREE units and they land in a fixed order. `PLAY-dClosedLexicon-1` goes first: it
+frees the template bytes the other two would otherwise spend. `TOOL-dClosedLexicon-1` is the lexicon
+kit and the playbook edits that route to it. `TOOL-dClosedLexicon-2` wires the verb table into the
+`codebase-map` ratchet and the `drift-audit` signal set, and is inert without unit 1. The two TOOL
+units were one until unit 1's rev-3, when the review found §1 does not let a single unit carry a
+cross-stream contract change.
 
-The owner ratified the scope menu on 2026-08-16. All five of unit 1's forks are resolved and unit 1
-is DEFERRED, parked on a predecessor: the §14 externalization named by `PLAY-aCandidStub-2` lands
-first and frees the template bytes this build would otherwise spend, and it also carries the §0
-constitution line unit 1 could not afford. All three predicates ship behind one opt-in kit, with the
-retirement condition for P1 written into F4 so a later session can act on it without reargument.
-Unit 2 keeps one fork open by design — whether `codebase-map` should consume a lexicon-owned
-definition census cannot be settled without a measured corpus.
+The owner ratified the scope menu on 2026-08-16. All five of the lexicon spec's forks are resolved
+and it is DEFERRED, parked on the §14 predecessor. All three predicates ship behind one opt-in kit,
+with the retirement condition for P1 written into F4 so a later session can act on it without
+reargument. `TOOL-dClosedLexicon-2` keeps one fork open by design — whether `codebase-map` should
+consume a lexicon-owned definition census cannot be settled without a measured corpus.
+
+The §14 unit then corrected the plan it was ratified under. Measuring the section showed it is the
+one externalization candidate with no activity trigger, because per-call token discipline has no
+activity to trigger on. It SPLITS instead: three always-on bullets stay inline and five situational
+ones move. The saving falls from the ratified ~1,480 B to a measured ~738 B, which still funds both
+remaining units with roughly 598 B left over, and that correction is recorded in the spec rather than
+absorbed quietly.
 
 One mechanism was CUT rather than built — a pin-direction guard, on two independent defects — and
 unit 1's F-A14 records what that costs, because a coverage mode nothing enforces is weaker than the
@@ -53,10 +60,11 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
+**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
+| [PLAY-dClosedLexicon-1 — §14 splits, not externalizes, and §0 gains a fallback rule](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | SPECCED | rev-1 | 2026-08-16 |
 | [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | DEFERRED | rev-4 | 2026-08-16 |
 | [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | SPECCED | rev-2 | 2026-08-16 |
 
