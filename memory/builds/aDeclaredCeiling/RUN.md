@@ -24,5 +24,15 @@ anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 0321df66f4800e9845429d7205e5876e51997d16
 anchor-ref: refs/heads/main
 base: a00b065f93cef4e17db0e7518b8088c579fc572c
+keepalive-reaped: yes
+parked-surfaced: yes
 
 ## Parked
+
+No decision was parked. Every fork in the spec set read `none` before the first code pass, and the
+round-1 audit's 21 findings were folded rather than deferred. Three judgement calls the run made are
+recorded where they bind rather than here: the declaration outranking the environment
+(`TOOL-aDeclaredCeiling-1` S2, forced by a property a landed unit had verified), the three selftest
+arms named `test_*` against their siblings' `t_*` (the lexicon pin is shrink-only and `t` is not a
+declared verb), and the one-character `.gitattributes` fix taken from main's tree rather than
+deferred. Recorded explicitly because an empty parked region and a forgotten one look identical.
