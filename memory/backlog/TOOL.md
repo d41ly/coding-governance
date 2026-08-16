@@ -60,5 +60,5 @@
 - TOOL-cBriefedPilot-20 · OPEN · records: two dossiers re-derived, the rows this build closes, and the stale `aStandingWrit` row on the instruction layer
 - TOOL-cBriefedPilot-21 · OPEN · does ANY route dispatch a build pass concurrently without voiding the directive layer? Direct spawns exhaust a per-prompt budget that never resets in a run; a sidechain inherits no hooks. Decides unit 15's shape, and "no route" is a legitimate answer
 - TOOL-cBriefedPilot-22 · OPEN · check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table, which are joined to PHASES_CORE and DOD_CORE by no leg today
-- TOOL-dClosedLexicon-1 · SPECCED · an opt-in lexicon kit gating three declared naming predicates, with the seed table derived-then-frozen, coverage modes per language, and the pin-direction guard CUT on two independent defects → `builds/dClosedLexicon/`
+- TOOL-dClosedLexicon-1 · DEFERRED · an opt-in lexicon kit gating three declared naming predicates, with the seed table derived-then-frozen, coverage modes per language, and the pin-direction guard CUT on two independent defects → `builds/dClosedLexicon/`
 - TOOL-dClosedLexicon-2 · SPECCED · wires the verb table into the codebase-map ratchet and two drift-audit signals; adds no new gate leg, and records that the ratchet DELETION direction is the load-bearing half → `builds/dClosedLexicon/`

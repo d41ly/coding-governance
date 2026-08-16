@@ -32,11 +32,17 @@ carry a cross-stream contract change. `TOOL-dClosedLexicon-1` is the kit and the
 stands alone. `TOOL-dClosedLexicon-2` wires the verb table into the `codebase-map` ratchet and the
 `drift-audit` signal set, depends on unit 1, and is inert without it.
 
-The owner decision menu is unit 1's §8. Four forks remain open there, of which F1 is the one that
-changes sequencing: this build spends the template's last usable bytes, so the §14 externalization
-named by `PLAY-aCandidStub-2` is the recommended predecessor. One mechanism was CUT rather than
-built — a pin-direction guard, on two independent defects — and unit 1's F-A14 records what that
-costs, because a coverage mode nothing enforces is weaker than the spec first claimed.
+The owner ratified the scope menu on 2026-08-16. All five of unit 1's forks are resolved and unit 1
+is DEFERRED, parked on a predecessor: the §14 externalization named by `PLAY-aCandidStub-2` lands
+first and frees the template bytes this build would otherwise spend, and it also carries the §0
+constitution line unit 1 could not afford. All three predicates ship behind one opt-in kit, with the
+retirement condition for P1 written into F4 so a later session can act on it without reargument.
+Unit 2 keeps one fork open by design — whether `codebase-map` should consume a lexicon-owned
+definition census cannot be settled without a measured corpus.
+
+One mechanism was CUT rather than built — a pin-direction guard, on two independent defects — and
+unit 1's F-A14 records what that costs, because a coverage mode nothing enforces is weaker than the
+spec first claimed.
 
 Two of the three findings that opened this build were already tracked: `PLAY-aSealedCaravan-1` owns
 the `{{MEMORY_ROOT}}` disjointness error and `PLAY-aCandidStub-2` owns the byte budget. The unit
@@ -51,8 +57,8 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | SPECCED | rev-1 | 2026-08-16 |
+| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | DEFERRED | rev-4 | 2026-08-16 |
+| [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | SPECCED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

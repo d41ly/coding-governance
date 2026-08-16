@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams tooling
 
 ## 1. Goal
 
@@ -18,9 +18,9 @@ This unit depends on unit 1 landing first and is inert without it.
 - **S1** — `lexicon-verbs` declared as an inventory in this repo's `map_extractors.py:EXTRACTORS`,
   reading the `VERBS` keys from `.lexicon.conf`. The declaration is project-owned code and is
   therefore per-adopter; it is never added to `map_extractors.template.py`.
-- **S2** — a dossier under `memory/map/features/` claiming the `lexicon-verbs` keys, or the keys
-  entered in the shrink-only `baseline.toml` with the same effect. Whichever route, the table's rows
-  become claimable and the both-directions ratchet applies.
+- **S2** — a dossier under `memory/map/features/` claiming the `lexicon-verbs` keys, ratified over
+  the `baseline.toml` route at rev-2 (§8 F2). Every verb is claimed in prose that says why the table
+  carries it, and the both-directions ratchet applies from the first landing.
 - **S3** — two `drift-audit` signals in `tools/drift-audit/drift_signals.py`, each seeded at a
   MEASURED pin and each carrying the clean-and-violating fixture pair `selftest.py` requires: a verb
   DECLARED in `VERBS` but used by no definition in the corpus, and a `ratified` stamp older than the
@@ -149,14 +149,18 @@ is the point — an integration that needs its own gate has not integrated.
   adopter, then reopen with numbers rather than with an argument.
 - **F2 — dossier or baseline for S2?** A dossier makes each verb claimable in prose and costs a real
   authoring pass; `baseline.toml` is shrink-only and costs nothing now but records nothing either.
-  RECOMMENDATION: dossier, because the whole value of the addition direction is that a claim exists
-  to be read, and a baseline entry is exactly the silent growth this unit is here to prevent.
+  RESOLVED (owner, 2026-08-16): dossier. The whole value of the addition direction is that a claim
+  exists to be read, and a baseline entry is exactly the silent growth this unit is here to prevent.
+  The cost lands on whoever curates the table, which is the correct place for it.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · split from `TOOL-dClosedLexicon-1` rev-3 per review-dClosedLexicon-1 R7,
   carrying that spec's S14 and the record-versus-reality half of its S6, plus R1's correction and
   R2's teardown gap.
+- rev-2 · 2026-08-16 · owner ratified F2 to the dossier route; S2 drops the baseline alternative.
+  F1 stays open by design — it cannot be decided without a measured corpus, so this spec stays
+  SPECCED while `TOOL-dClosedLexicon-1` moves to DEFERRED.
 
 ## 10. Reuse audit
 

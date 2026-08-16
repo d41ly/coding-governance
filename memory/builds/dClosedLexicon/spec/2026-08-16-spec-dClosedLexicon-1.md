@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling
+**Status:** DEFERRED · rev-4 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -71,7 +71,8 @@ let one unit carry a cross-stream contract change. Unit 2 depends on this one; t
   than this kit's private mechanism. Consequence stated in §4 F-A14.
 - A new `memory/gotchas/` class for naming violations. Companion §7 requires a failing case OBSERVED
   before a gate lands. The first confirmed P1 or P2 finding becomes one, per §7's left-shift rule.
-- A §0 constitution line naming the fallback for uncovered cases; see §8 fork F2.
+- A §0 constitution line naming the fallback for uncovered cases. Ratified to the §14 externalization
+  unit instead, which is the only landing that can afford its ~120 B; see §8 fork F2.
 - Any claim that this kit catches defects. Its value is seam detection, which is not measurable, and
   that is exactly why S13 lands it as OPT-IN rather than required.
 
@@ -303,17 +304,22 @@ New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexico
 
 - **F1 — sequencing against the template budget.** This unit leaves roughly 17 B of template
   headroom. `PLAY-aCandidStub-2` names the fix, moving §14 behind a §-stub for about 1.5 KB.
-  RECOMMENDATION: land the §14 externalization FIRST as its own unit, then this one.
+  RESOLVED (owner, 2026-08-16): the §14 externalization lands FIRST as its own unit, then this one.
+  That unit is not yet specced and has no id; this spec is DEFERRED — approved, parked on a
+  predecessor — rather than INPROGRESS, and the token is what a resuming session reads.
 - **F2 — the §0 constitution line.** The source document opens by naming itself the fallback for
   situations no rule covers, and §0 has no such line. It is worth roughly 120 B that do not exist.
-  RECOMMENDATION: defer to the unit that resolves F1, and put it in §0 rather than the companion.
+  RESOLVED (owner, 2026-08-16): add it, in §0 rather than the companion, carried by the §14 unit F1
+  ratified. It is a §3 non-goal HERE, and that unit's scope is now two items, not one.
 - **F3 — symbol extraction overlaps `codebase-map`, narrowly.** RESOLVED (agent, 2026-08-16,
   delegated): the splitter is ported and lexicon-owned per S5, and the parser is not reusable because
   `map_lib.python_symbols` indexes only public symbols. Whether `codebase-map` should later CONSUME a
   lexicon-owned definition census, which would also close `TOOL-aNumeralWarden-4`, moves to
   `TOOL-dClosedLexicon-2` §8.
-- **F4 — does P1 earn its adoption cost?** Unmeasurable by construction. RECOMMENDATION: ship all
-  three predicates behind one opt-in kit, and retire P1 if it goes unused across two adopters.
+- **F4 — does P1 earn its adoption cost?** Unmeasurable by construction. RESOLVED (owner,
+  2026-08-16): ship all three predicates behind one opt-in kit, and retire P1 if it goes unused
+  across two adopters. The retirement condition is the record, not an intention — a later session
+  reading this is entitled to close P1 on that evidence without reopening the argument.
 - **F5 — has rev-2 made the unit too big to land as one?** RESOLVED (owner, 2026-08-16): split. The
   integration is `TOOL-dClosedLexicon-2`; the pin-direction guard is cut to a shared follow-up rather
   than moved, per F-A14.
@@ -331,6 +337,10 @@ New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexico
   lexicon-owned with a gov-internal parity leg (R5). S6 is re-scoped to the live rule-5 assertion
   after F-A15 found rev-2 had over-assigned it. S12 gains the marker-lockstep assertion (R8) and S13
   names the companion as `{{LEXICON_CONF}}`'s host (R9).
+- rev-4 · 2026-08-16 · owner ratified the scope menu. F1, F2 and F4 resolved in place, so §8 is now
+  fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
+  happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
+  predecessor this unit is parked on rather than an external prereq.
 
 ## 10. Reuse audit
 
