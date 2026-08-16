@@ -20,8 +20,8 @@ Records live under `spec/`, `build/` and `reviews/`.
 <!-- /run:generated -->
 
 ## Run facts
-witness: ee96746156aae44fbaf8732376b00a7fb02dc64a
-phase: LANDING
+witness: 027504e295084b8393c21cce62ab715bf95510ff
+phase: LANDED
 keepalive: 8d72ff45
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
