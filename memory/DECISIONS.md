@@ -43,6 +43,9 @@
 - TOOL-aWrittenMethod-4 · `out=$(cat X; printf Y) || return 1` can never fire: a substitution reports the LAST command's status. The unreachable-branch class was deleted in one unit and reintroduced by the next unit's fix
 
 - TOOL-aWidenedGuide-2 · check 12 graded only BULLET forks in a spec's Open questions, while TEMPLATE-SPEC sanctions a bullet OR a ### sub-head. A spec using sub-heads scored zero items and could never go terminal however completely answered — the doc offered two shapes, the gate one
+- TOOL-cFinalBerth-1 · a terminal phase is written by a verb that EVALUATES what it claims, never by a phase move. `LANDING` becomes close-only with it: without that, the precondition gating `--landed` is satisfiable by one `--phase` call, which is the hole being closed
+- TOOL-cFinalBerth-2 · the merge-base cannot tell a run that BUILT NOTHING from one FULLY LANDED — it equals HEAD in both; the recorded base can. The refusal keeps its verb and changes its question, accepting a run-written input and bounding it three ways
+- TOOL-cSteadyMetronome-1 · a gate asserts what the SUBJECT does, never what the NODE does. The canary's elapsed-time ratio measured the machine and blocked three pushes over a tree it had passed; a rendezvous measures dispatch and ignores load
 
 - TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
 ## DEPL — deployer

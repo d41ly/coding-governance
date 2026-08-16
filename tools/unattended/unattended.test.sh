@@ -393,12 +393,48 @@ git replace -d "$BASE" >/dev/null 2>&1
 # ---- nothing yet, and a refusal at --close, where a run that built nothing has nothing to land. Both
 # ---- arms run against the SAME fixture one command apart, which is the only way to show it is the
 # ---- VERB that differs and not the tree.
+# ---- ...and after unit 2 the split SURVIVES but --close's refusal is CONDITIONAL. All four branches
+# ---- run against one fixture, which is still the only way to show the verb differs and not the tree.
 reset_tree; git push -q -f origin unit:main
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "preflight OK"
-miss "$out" "the merge-base equals HEAD"
+miss "$out" "the recorded BASE equals HEAD"
+# BRANCH 1 — the run that built NOTHING. preflight pinned the base AT HEAD through the degenerate
+# path, so the recorded value still equals HEAD and there is nothing to land. This is the property
+# the old unconditional refusal bought, and it is the one that had to survive the narrowing.
 out=$(run --close tRun)
-hit "$out" "the merge-base equals HEAD, so the run authored every byte the authorization comparison would read; nothing was built on top of the anchor"
+hit "$out" "the recorded BASE equals HEAD, so this run built nothing on top of the anchor and has nothing to land; that is the state the merge-base could not distinguish from a landed one"
+
+# BRANCH 2 — an ABSENT discriminator FAILS CLOSED. Deleting one line from a run-written file must not
+# be the way past this refusal; the kit's recorded scar is a deleted base line degenerating a
+# comparison to the git index, and this is the same shape one verb over.
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the merge-base equals HEAD and the record pins no BASE to tell a landed run from one that built nothing, and an absent discriminator is a refusal rather than a pass"
+
+# BRANCH 3 — a base off the history the anchor blesses. The early return this replaces SKIPPED the
+# cross-check entirely, so --close now runs a comparison on this path that no caller used to run.
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+# An ORPHAN commit — a real object in this repo that is on no history HEAD reaches. `commit-tree`
+# with no parent is the cheapest way to get one, and it is a genuine commit rather than a
+# rev-parse failure, so this arm tests ANCESTRY and not resolvability.
+ALIEN=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m alien </dev/null)
+sed -i "s/^base: .*/base: $ALIEN/" memory/builds/tRun/RUN.md
+hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
+
+# BRANCH 4 — THE POINT OF THE UNIT: a run whose work is fully LANDED can close. Same degenerate
+# merge-base as branch 1, and the only difference is that the recorded base is no longer HEAD —
+# which is exactly the discriminator the merge-base cannot express.
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main
+out=$(run --close tRun)
+miss "$out" "the recorded BASE equals HEAD"
+miss "$out" "an absent discriminator is a refusal"
+hit "$out" "close OK"
+same "the landed run reached LANDING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
 git push -q -f origin "$BASE":main
 
 # ---- check 9, both branches: the marker pair is malformed in the SOURCE and in the TARGET. The
@@ -513,8 +549,28 @@ hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there i
 # a run that could set LANDED through this verb would skip the entire Definition-of-Done gate, and
 # the two agent-attested items are enforced in no other place.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --phase tRun LANDED --witness abc)" "a terminal phase is --close's to write and not this verb's, because reaching it through here would skip the whole Definition-of-Done gate"
-miss "$(run --phase tRun BUILDING --witness abc)" "a terminal phase is --close's to write"
+hit "$(run --phase tRun LANDED --witness abc)" "a terminal phase is written by --landed or --abort, which evaluate what it claims, and not by this verb, because reaching it through here would skip the whole Definition-of-Done gate"
+miss "$(run --phase tRun BUILDING --witness abc)" "a terminal phase is written by --landed or --abort"
+
+# ---- S9: LANDING is CLOSE-ONLY, and this branch is what makes --landed's precondition mean
+# ---- anything. LANDING is an ordinary non-terminal vocabulary member, so before this refusal
+# ---- `--phase tRun LANDING` wrote it and `--landed` then reached LANDED with dod_met never invoked
+# ---- — the exact hole the terminal refusal above exists to close, reachable in one command. The
+# ---- GREEN CONTROL is the line below it: an ordinary phase move is untouched, or this arm proves
+# ---- only that --phase can refuse.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+before=$(sum)
+hit "$(run --phase tRun LANDING --witness abc)" "LANDING is written by --close alone, because it is the record that the Definition-of-Done set was evaluated; a phase move into it would be that claim without the evaluation"
+same "the refused LANDING move wrote nothing" "$(sum)" "$before"
+miss "$(run --phase tRun BUILDING --witness abc)" "LANDING is written by --close alone"
+
+# ---- F6: a FINISHED run cannot be re-opened. This is the third of the three fixes the aStandingWrit
+# ---- review's F2 asked for and the only one never built — because before the producers below, no
+# ---- record could BE terminal. Without it, one --phase call returns a LANDED run to the single-live
+# ---- counter that leg check 7 reds on.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+hit "$(run --phase tRun BUILDING --witness abc)" "the run is already finished and a finished record is not something to move, re-open or re-pin; every later run is measured against the counter this record left, and the verb that would rewrite it names itself here"
 
 # ...and the run-state file cannot be staged. A DIRECTORY at the index path is the cheapest failure
 # that needs no permissions this node may not honour.
@@ -591,7 +647,18 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume and --close: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed and --abort: --frobnicate"
+# ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
+# ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
+# ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
+for v in --preflight --plan --phase --status --resume --close --landed --abort; do
+  n=$((n+1))
+  [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
+    || { echo "FAIL the header docstring omits $v"; st=1; }
+  n=$((n+1))
+  [ "$(sed -n '/^\[ -n "\$VERB" \]/p' "$SCRIPT" | grep -cF -- "$v")" -ge 1 ] \
+    || { echo "FAIL the usage line omits $v"; st=1; }
+done
 
 # ---- check 18: the recorded BASE is EVIDENCE, never the input. --close used to read it straight
 # ---- out of the run-state file — a file the run writes — and an absent line degenerated the
@@ -719,6 +786,135 @@ done <<<"$ug"
 # ---- in it later would be an un-resolved launcher rather than a resolved one.
 np=$(grep -nE '(^|[^-[:alnum:]])(python3?|py) ' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
+
+# ============================================================ S1/S2 — the terminal producers
+# The two verbs that let a run FINISH. Before them the vocabulary's last two members were
+# unreachable, so every completed run stayed non-terminal and the single-live counter grew forever.
+
+# ---- 31: LANDED is reached from LANDING and nowhere else. Preflight leaves the record at RUNNING,
+# ---- so this is the ordinary state of a run that never closed. The refusal fires BEFORE the clean
+# ---- and anchor checks, so no fixture commit is needed to reach it.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+before=$(sum)
+hit "$(run --landed tRun)" "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time"
+same "the refused --landed wrote nothing" "$(sum)" "$before"
+hit "$(run --landed tBare)" "no run-state file, so there is no run to mark landed"
+
+# ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
+# ---- exactly the state of a run that has built but not landed — so HEAD is not an ancestor of the
+# ---- advertised tip and the claim is refused. This is the branch that makes LANDED an observation
+# ---- rather than a phase the run picks.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+before=$(sum)
+hit "$(run --landed tRun)" "HEAD is not an ancestor of the tip the remote advertises, so the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it"
+same "the unlanded --landed wrote nothing" "$(sum)" "$before"
+
+# ---- AC18: an unobservable anchor is FATAL here and reports in the OBSERVATION's own words. --close
+# ---- suppresses that message and prints only the downstream unmet item, which is the message-channel
+# ---- scar this kit already carries; the arm pins that this verb does not repeat it.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git remote set-url origin "$TMP/no-such-origin.git"
+hit "$(run --landed tRun)" "the remote did not answer, and the anchor is an observation of it rather than of any local ref"
+git remote set-url origin "$ORIGIN"
+
+# ---- AC3 + AC13: the SUCCESS path, standing ON the default branch. That is not incidental — the
+# ---- mandated lander refuses to run anywhere but the default branch, so --landed is invoked exactly
+# ---- where check_branch would fire, and S3 omits that guard on purpose. A feature-branch fixture
+# ---- cannot tell a guard that was omitted from one that was never reached, which is why this arm
+# ---- checks the default branch out rather than taking the easier fixture.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main
+git checkout -q -B main HEAD
+out=$(run --landed tRun)
+hit "$out" "phase LANDED"
+same "--landed wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDED"
+same "--landed witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
+n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
+  || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
+git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
+
+# ---- 33/34/35: --abort. It is deliberately NOT symmetric with --landed: an aborted run landed
+# ---- nothing, so the four machine items assert obligations it does not have — but it owes BOTH
+# ---- agent-attested items, and a first cut of this unit dropped the second.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+before=$(sum)
+hit "$(run --abort tRun)" "--abort requires --reason, because an abort with no recorded reason is indistinguishable from a run that simply stopped, and the reason is the only thing the owner gets in place of the turn nobody took"
+same "the reasonless --abort wrote nothing" "$(sum)" "$before"
+hit "$(run --abort tBare --reason r)" "no run-state file, so there is no run to abort"
+
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+hit "$(run --abort tRun --reason "second thoughts")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+
+# ...both attestations, one at a time, so the arm distinguishes them. Attesting only the keepalive
+# still refuses, which is the half a first cut of this unit let through.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
+printf 'keepalive-reaped: yes\n' >> memory/builds/tRun/RUN.md
+hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
+
+# ...and the success path. AC19: the parked entry names itself an ABORT. Routed through the old
+# hardcoded `park` it would have read "override · item …", and the build method derives the owner's
+# open/parked row from parked entries "plus any recorded DoD override" — so an abort would have
+# arrived in the one turn the owner gets wearing the label of an override that never happened.
+printf 'parked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+out=$(run --abort tRun --reason "the remote never answered")
+hit "$out" "phase ABORTED"
+same "--abort wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "ABORTED"
+same "--abort witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
+hit "$(cat memory/builds/tRun/RUN.md)" "abort · item tRun · reason the remote never answered"
+miss "$(sed -n '/^## Parked/,$p' memory/builds/tRun/RUN.md)" "override"
+
+# ...and the OTHER caller of the same helper still writes an override entry, or the kind argument
+# has simply relabelled every parked line rather than distinguishing two kinds.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+run --close tRun --override records-current --reason "records lag" >/dev/null 2>&1
+hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
+
+
+# ============================================================ the phase-writer population
+# THE LEFT-SHIFT for this build's own worst finding. Two verbs wrote a phase with no terminal guard
+# because the rule had been spelled at each call site instead of once, and the closing review found
+# both: --close re-opened a LANDED record to LANDING printing "close OK", and --landed then re-pointed
+# the witness check 15 judges, with the bar green throughout.
+#
+# So the population is DERIVED from source rather than listed here, and every member is driven against
+# a finished record. A sixth phase writer reds this arm until it is added to the drive list, which is
+# the property a hand-written list cannot have.
+writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
+n=$((n+1)); [ "$writers" = 5 ]   || { echo "FAIL the driver has $writers phase writer(s), and this arm drives 5 — add the new verb to the drive list below, or the terminal guard is unproven for it"; st=1; }
+
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+fixture
+before=$(sum)
+for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--preflight tRun --keepalive-id k2" "--landed tRun"; do
+  # shellcheck disable=SC2086
+  out=$(run $v)
+  hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+  same "the finished record survived $v" "$(sum)" "$before"
+done
+
+# ---- F5: a TRUTHFUL abort reason may not spell the bypass flag, because park() writes it verbatim
+# ---- into the file leg check 11 greps WHOLE — so the honest sentence would red the bar permanently,
+# ---- on a terminal record no verb can rewrite. The control is that an ordinary reason is accepted.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+before=$(sum)
+hit "$(run --abort tRun --reason "the lander refused and I would not reach for --no-verify")" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag"
+same "the refused abort wrote nothing" "$(sum)" "$before"
+out=$(run --abort tRun --reason "the lander refused and I would not bypass it")
+hit "$out" "phase ABORTED"
+miss "$(cat memory/builds/tRun/RUN.md)" "--no-verify"
 
 # ---- SOURCE-level: no verb may reach the repairing wiring mode, whatever the conf says. The runtime
 # ---- arm above covers a project that DECLARES `--fix`; this covers the driver calling it directly.

@@ -7,6 +7,7 @@ Hand a reviewer the classes their diff can hit:
 
 ```bash
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>
+python tools/memory-tree/gotchas.py --for-paths <path>...
 ```
 
 <!-- BEGIN GENERATED -->
@@ -20,6 +21,7 @@ python tools/memory-tree/gotchas.py --for-diff <base>..<head>
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
+| [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
 | [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 1 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
@@ -27,6 +29,6 @@ python tools/memory-tree/gotchas.py --for-diff <base>..<head>
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 6 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-13 record(s): 13 class, 0 note, 0 superseded · 3 universal · 0 unanchored
+14 record(s): 14 class, 0 note, 0 superseded · 3 universal · 0 unanchored
 
 <!-- END GENERATED -->

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.10 -->
+<!-- gov:kit memory-tree@2.16 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -152,6 +152,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     placeholders and a bare WONTDO tail (`TEMPLATE-SPEC.md`). Older specs grandfathered by filename date.
     A `streams` segment is validated against the `DISCIPLINES` enum whenever present, on either tier,
     and is REQUIRED once the filename date reaches `STREAMS_CUTOFF`.
+    Every acceptance bullet must name a witness in backticks once the filename date reaches
+    `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
+    that the named thing exists.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so

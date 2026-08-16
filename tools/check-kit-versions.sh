@@ -22,6 +22,23 @@ need "KIT_MEMORY_TREE_VERSION"    tools/memory-tree/check-memory-hygiene.sh "^KI
 need "KIT_CODEBASE_MAP_VERSION"   tools/codebase-map/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
 need "KIT_AGENT_CAP_VERSION"      tools/hooks/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
 need "tier2-review meta.version"  tools/workflows/tier2-review.js           "version: '$V'"
+need "KIT_MANIFEST_VERSION"       skills/session-kickoff/manifest-check.sh  "^KIT_MANIFEST_VERSION=\"$V\""
+
+# The kickoff manifest format: the constant in the checker, and the marker in the SEED an adopter
+# instantiates from. Nothing forced these to agree before — this file had no entry for the constant
+# and the verdict-epoch gate is hardcoded to the memory-tree engine — so the checker could demand a
+# key the shipped template did not carry, with the full bar green. That is the same hole this file's
+# own header describes for the doc templates, which went three bumps behind and shipped the wrong
+# number into every adopting tree.
+mv_c=$(grep -oE "^KIT_MANIFEST_VERSION=\"$V\"" skills/session-kickoff/manifest-check.sh | head -1 | grep -oE "$V")
+mv_t=$(grep -oE "kickoff-manifest: v$V" skills/session-kickoff/MANIFEST-TEMPLATE.md | head -1 | grep -oE "$V")
+if [ -z "$mv_c" ]; then
+  echo "kit-versions: KIT_MANIFEST_VERSION is unreadable, so the shipped manifest seed cannot be compared against it"
+  fails=$((fails+1))
+elif [ "$mv_c" != "$mv_t" ]; then
+  echo "kit-versions: MANIFEST-TEMPLATE.md marker (${mv_t:-unreadable}) != KIT_MANIFEST_VERSION ($mv_c) — an adopter would instantiate a seed the checker rejects"
+  fails=$((fails+1))
+fi
 
 # agent-cap: constant and marker sit on ONE line, which is why this pair was presence-checked only —
 # and a half-bumped pair therefore passed. Assert they agree like every other pair; "same line" is
@@ -42,13 +59,41 @@ if [ -z "$sm" ] || [ "$(grep -cE "gov:kit settings-merge@$sm([^0-9.]|\$)" tools/
   fails=$((fails+1))
 fi
 
-# memory-tree is the only kit whose version lives in TWO hand-kept literals (engine constant + the
-# marker in HYGIENE.template.md it ships verbatim). Assert they agree — a stale marker makes the
-# deployer read the wrong installed version. (Token is mid-line, so CRLF working trees are fine.)
+# memory-tree's version lives in the engine constant AND in a marker on every doc the kit SHIPS and
+# an adopter RENDERS. Assert they all agree — a stale marker makes the deployer, and the adopter
+# reading its own installed rule-set, believe a version the kit disagrees with.
+#
+# ENUMERATED, NOT NAMED. This block used to name HYGIENE.template.md alone, and the two siblings it
+# did not name drifted exactly as you would expect: BUILD-METHOD.template.md sat three bumps behind
+# and shipped that number into every adopting tree, and SPEC-TEMPLATE.template.md carried no marker
+# at all, which is the same hole one level down — a shipped doc that self-identifies as nothing
+# cannot be caught by any comparison. Naming one file is why the hole reopened at every bump. The
+# population is DERIVED from the tree, so the next shipped template is covered by existing.
+#
+# The decoy fixtures in check-verdict-epoch.test.sh are excluded by construction rather than by a
+# special case: they are not `*.template.md`, so this glob never sees them.
+# (The token is mid-line, so a CRLF working tree is fine.)
 c=$(grep -oE "^KIT_MEMORY_TREE_VERSION=$V" tools/memory-tree/check-memory-hygiene.sh | head -1 | cut -d= -f2)
-if [ -z "$c" ] || ! grep -qE "gov:kit memory-tree@$c([^0-9.]|\$)" tools/memory-tree/HYGIENE.template.md; then
-  echo "kit-versions: HYGIENE.template.md marker != KIT_MEMORY_TREE_VERSION (${c:-unreadable})"
+if [ -z "$c" ]; then
+  echo "kit-versions: KIT_MEMORY_TREE_VERSION is unreadable, so no marker can be compared against it"
   fails=$((fails+1))
+else
+  mt_templates=$(git ls-files 'tools/memory-tree/*.template.md' 2>/dev/null)
+  if [ -z "$mt_templates" ]; then
+    # An empty population would make every assertion below vacuously true, which is the failure this
+    # repo names `vacuous-selector-empty-population`. It is a refusal, not a pass.
+    echo "kit-versions: no tracked tools/memory-tree/*.template.md — the marker assertion would be vacuous"
+    fails=$((fails+1))
+  fi
+  for t in $mt_templates; do
+    if ! grep -qE "gov:kit memory-tree@$V" "$t"; then
+      echo "kit-versions: $t ships with NO gov:kit memory-tree@ marker — an adopter renders it and cannot tell which kit version they hold"
+      fails=$((fails+1))
+    elif ! grep -qE "gov:kit memory-tree@$c([^0-9.]|\$)" "$t"; then
+      echo "kit-versions: $t marker != KIT_MEMORY_TREE_VERSION ($c)"
+      fails=$((fails+1))
+    fi
+  done
 fi
 
 need "KIT_UNATTENDED_VERSION"     tools/unattended/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"

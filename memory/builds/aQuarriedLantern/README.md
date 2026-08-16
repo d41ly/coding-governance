@@ -11,7 +11,7 @@ ids: TOOL-aQuarriedLantern-1 TOOL-aQuarriedLantern-2 TOOL-aQuarriedLantern-3
 
 Node `a` · opened 2026-08-03 · streams tooling.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -20,4 +20,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aQuarriedLantern-1 — memory-recall: the retrieval CLI as a project-agnostic kit](spec/2026-08-03-spec-aQuarriedLantern-1.md) | INPROGRESS | rev-2 | 2026-08-03 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

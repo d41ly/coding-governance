@@ -43,7 +43,7 @@ record the design correction the build made against the spec (slots, not a count
 instances of one root cause — a trailing comma read as an element — which bit the call-site walk, the
 lens counter, and this spec's own non-goal.
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -52,4 +52,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to](spec/2026-08-10-spec-aNumeralWarden-1.md) | CLOSED | rev-6 | 2026-08-10 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

@@ -69,15 +69,29 @@ stamp_line() {
 }
 
 write_manifest() { # $1=repo $2=sha $3=watch $4=vpaths [$5=marker] [$6=extra-body]
-  local marker="${5:-kickoff-manifest: v1.1}"
-  cat > "$1/SESSION-KICKOFF.md" <<EOF
+  local marker="${5:-kickoff-manifest: v1.3}"
+  # The FIRST location `--locations` prints. The repo-root spelling this helper used to write is no
+  # longer a discovery location, and most cases here call the checker with no path argument.
+  mkdir -p "$1/memory/guides"
+  cat > "$1/memory/guides/SESSION-KICKOFF.md" <<EOF
 # Kickoff manifest — test
 <!-- $marker · test instance -->
 <!-- manifest-audit
 $(stamp_line "$2")
 watch: $3
 verify-paths: $4
+last-body-change: ${7:-$2}
 -->
+## §A
+<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->
 ## §B
 gate fence:
 \`\`\`bash
@@ -89,7 +103,7 @@ EOF
 
 restamp() { # $1=repo $2=sha — rewrite the last-audit line (datetime always advances)
   local nl; nl=$(stamp_line "$2")
-  sed -i "s|^last-audit: .*|$nl|" "$1/SESSION-KICKOFF.md"
+  sed -i "s|^last-audit: .*|$nl|" "$1/memory/guides/SESSION-KICKOFF.md"
 }
 
 commit_all() { git -C "$1" add -A; git -C "$1" commit -qm "$2"; }
@@ -115,7 +129,7 @@ run "\${{ secrets }} / {{.Go}} in fence → 0" "$R" 0 -
 
 # ---- 4 missing block (v1.1 marker) → C2 ---------------------------------
 mkrepo noblock
-cat > "$R/SESSION-KICKOFF.md" <<'EOF'
+mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 # manifest
 <!-- kickoff-manifest: v1.1 · test -->
 body only
@@ -273,7 +287,7 @@ run "watch matches 101 files → WARN + 0" "$R" 0 "WARN: watch pathspec"
 
 # ---- 22 unmanaged manifest (no marker) → NOTE + 0 -----------------------
 mkrepo unmanaged
-cat > "$R/SESSION-KICKOFF.md" <<'EOF'
+mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 # Session kickoff template (prototype — deliberately unmanaged)
 No marker here; stable preamble; stream map.
 EOF
@@ -282,13 +296,13 @@ run "unmanaged manifest → NOTE + 0" "$R" 0 "NOTE:"
 
 # ---- 23 v1.0 marker, no block → C2 with retrofit ------------------------
 mkrepo v10
-cat > "$R/SESSION-KICKOFF.md" <<'EOF'
+mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 # manifest
 <!-- kickoff-manifest: v1.0 · instantiated from coding-governance -->
 old body
 EOF
 commit_all "$R" manifest
-run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.1 LAST"
+run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.3 LAST"
 
 # ---- 24 v1.0 marker WITH valid block → version WARN, 0 ------------------
 mkrepo v10block
@@ -316,7 +330,7 @@ mkrepo rename
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nrn:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
-mkdir -p "$R/docs/claude"; git -C "$R" mv SESSION-KICKOFF.md docs/claude/SESSION-KICKOFF.md
+git -C "$R" mv memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md 2>/dev/null   || { mkdir -p "$R/.claude"; git -C "$R" mv memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md; }
 commit_all "$R" "pure rename of the manifest"
 run "manifest renamed after drift → C5 RED (no laundering)" "$R" 1 "check 5 FAILED"
 
@@ -325,7 +339,7 @@ mkrepo decoy
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" 'last-audit: decoy @ 0000000000000000000000000000000000000000'
 commit_all "$R" manifest
 printf 'all:\n\ttrue\ndc:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
-sed -i 's/^last-audit: decoy @ 0\{40\}/last-audit: decoy2 @ 0000000000000000000000000000000000000000/' "$R/SESSION-KICKOFF.md"
+sed -i 's/^last-audit: decoy @ 0\{40\}/last-audit: decoy2 @ 0000000000000000000000000000000000000000/' "$R/memory/guides/SESSION-KICKOFF.md"
 commit_all "$R" "edit only the body decoy line"
 run "body decoy edit after drift → C5 RED" "$R" 1 "check 5 FAILED"
 
@@ -369,7 +383,7 @@ resolve_python() {
 }
 # <<< resolve_python
 PYBIN=$(resolve_python) || { echo "manifest-check.test: no usable python"; exit 2; }
-"$PYBIN" - "$R/SESSION-KICKOFF.md" <<'PY'
+"$PYBIN" - "$R/memory/guides/SESSION-KICKOFF.md" <<'PY'
 import sys
 p = sys.argv[1]; lines = open(p, encoding='utf-8').read().split('\n')
 la = next(i for i,l in enumerate(lines) if l.startswith('last-audit:'))
@@ -377,7 +391,7 @@ w  = next(i for i,l in enumerate(lines) if l.startswith('watch:'))
 lines[la], lines[w] = lines[w], lines[la]      # swap the two lines, values untouched
 open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(lines))
 PY
-if git -C "$R" diff --quiet -- SESSION-KICKOFF.md; then
+if git -C "$R" diff --quiet -- memory/guides/SESSION-KICKOFF.md; then
   echo "FAIL block reorder after drift → C5 RED (mutation never landed — python missing?)"; fail=$((fail+1))
 else
   commit_all "$R" "reorder block lines only"
@@ -409,7 +423,7 @@ run "unborn HEAD → C3 'no commits', no fatal" "$R" 1 "HEAD has no commits on t
 # ---- 33 malformed datetime → C2 ------------------------------------------
 mkrepo baddate
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
-sed -i 's/^last-audit: [^@]*@/last-audit: banana breakfast @/' "$R/SESSION-KICKOFF.md"
+sed -i 's/^last-audit: [^@]*@/last-audit: banana breakfast @/' "$R/memory/guides/SESSION-KICKOFF.md"
 commit_all "$R" manifest
 run "malformed datetime → C2" "$R" 1 "') — want '<ISO-8601 datetime with offset> @ <full 40-hex sha>'."
 
@@ -417,7 +431,7 @@ run "malformed datetime → C2" "$R" 1 "') — want '<ISO-8601 datetime with off
 mkrepo subdir
 mkdir -p "$R/docs"
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
-mv "$R/SESSION-KICKOFF.md" "$R/docs/SESSION-KICKOFF.md"
+mv "$R/memory/guides/SESSION-KICKOFF.md" "$R/docs/SESSION-KICKOFF.md"
 commit_all "$R" manifest
 run "relative arg from subdir resolves" "$R/docs" 0 - "SESSION-KICKOFF.md"
 
@@ -434,7 +448,7 @@ rm -f "$TMP/SESSION-KICKOFF.md"
 # that grew a second block during a merge would enforce against half of itself.
 mkrepo twoblocks
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
-cat >> "$R/SESSION-KICKOFF.md" <<'EOF'
+cat >> "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 <!-- manifest-audit
 last-audit: 2026-07-12T13:00:00+00:00 @ 0000000000000000000000000000000000000000
 watch: Makefile
@@ -450,7 +464,7 @@ run "two audit blocks → C2 'exactly one'" "$R" 1 "— exactly one is allowed; 
 # part of the gate: no watch is a silent false-green on drift, no verify-paths is a dead anchor set,
 # no last-audit is no anchor at all.
 mkrepo nokeys
-cat > "$R/SESSION-KICKOFF.md" <<'EOF'
+mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 # manifest
 <!-- kickoff-manifest: v1.1 · test -->
 <!-- manifest-audit
@@ -487,6 +501,162 @@ n=$(git -C "$R" rev-list --count HEAD)
 if [ "$n" -ne 4 ]; then echo "FAIL branch same-anchor re-stamps (want 4 commits, got $n — a re-stamp no-oped)"; fail=$((fail+1)); else
   run "unit branch: merge-base bundle + same-anchor re-stamp → 0" "$R" 0 -
 fi
+
+# ---- C7 size, C8 line length, C9 maintenance stall ---------------------------------------------
+# Every arm below asserts the branch's OWN failure sentence, which is what the harness meta-gate
+# counts. The sentences lead with literal prose and put the measured values LAST, because an
+# interpolation splits a message into runs and a run under twelve characters cannot be asserted on.
+
+# C7 — the limit arrives by environment so the fixture need not be 25 KiB. That override exists for
+# this arm and says so in the failure text; it is not an adopter escape hatch.
+mkrepo c7; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+out=$(cd "$R" && MAX_MANIFEST_BYTES=200 bash "$CHECK" 2>&1); got=$?
+{ [ "$got" = 1 ] && printf '%s' "$out" | grep -qF "the manifest is over its size limit and must be trimmed, not have the limit raised"; } \
+  && { echo "ok   C7 oversize manifest → check 7"; pass=$((pass+1)); } \
+  || { echo "FAIL C7 oversize manifest → check 7"; printf '%s\n' "$out" | sed 's/^/    /'; fail=$((fail+1)); }
+# and the same manifest passes under the real limit — the arm above is not passing by finding nothing
+run "C7 a normal manifest is under the limit" "$R" 0 -
+
+# C8 — a long BODY line reds; the audit block and fenced blocks do not. The exemption arm is the one
+# that matters: the watch list is one machine-maintained line that grows as pathspecs are added.
+mkrepo c8
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "$(printf 'x%.0s' $(seq 1 450))"
+commit_all "$R" manifest
+run "C8 an over-long body line → check 8" "$R" 1 "a manifest line is over the 400-byte limit; wrap the prose or move the detail out"
+mkrepo c8b
+LONGWATCH="Makefile$(printf '; docs/GOV.md%.0s' $(seq 1 40))"
+write_manifest "$R" "$(head_sha "$R")" "$LONGWATCH" "docs/GOV.md"; commit_all "$R" manifest
+run "C8 exempts the audit block's own long watch line" "$R" 0 -
+
+# C2 — the fourth key. Absent is a NAMED failure carrying the retrofit instruction, never a skip.
+mkrepo c2k; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+sed -i '/^last-body-change:/d' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "drop the key"
+run "C2 a missing last-body-change is named" "$R" 1 "manifest-audit block lacks a last-body-change value — add the full sha of the commit where this manifest's BODY was last genuinely revised; it is what check 9 measures the stall against."
+
+# C9 — the four ways a recorded baseline can be unusable, then the two thresholds.
+mkrepo c9a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "" "not-a-sha"
+commit_all "$R" manifest
+run "C9 a malformed baseline sha is named" "$R" 1 "last-body-change is not a full 40-hex sha, so the stall check has no baseline to measure from: '"
+
+mkrepo c9b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "" "0000000000000000000000000000000000000000"
+commit_all "$R" manifest
+run "C9 a baseline unknown to the repo is named" "$R" 1 "last-body-change names a commit unknown to this repository, so the stall baseline is foreign or predates a history rewrite"
+
+# THE ARM THE PREVIOUS DESIGN COULD NOT SATISFY. A path-scoped log reports a `git mv` as an ADD, so a
+# history walk read a relocated manifest as freshly created. A recorded baseline is indifferent to
+# the rename, and this asserts that indifference rather than asserting the walk was fixed.
+mkrepo c9r; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+mkdir -p "$R/.claude"; git -C "$R" mv memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md
+commit_all "$R" "relocate the manifest"
+run "C9 survives a git mv of the manifest" "$R" 0 -
+
+# A baseline on a side branch is real but unreachable from HEAD — the squash-merge shape.
+mkrepo c9anc
+git -C "$R" checkout -qb side2; echo s2 > "$R/s2.txt"; commit_all "$R" side2; SIDE2=$(head_sha "$R")
+git -C "$R" checkout -q main
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "" "$SIDE2"
+commit_all "$R" manifest
+run "C9 a non-ancestor baseline is named" "$R" 1 "last-body-change is not an ancestor of HEAD, so the stall baseline was squash-merged or rewritten and measures nothing"
+
+# THE COMMIT THRESHOLD. Ten non-merge commits touching a watched pathspec since the baseline. The
+# manifest is re-stamped each time so C5 stays green and C9 is the only thing this fixture measures.
+mkrepo c9n
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+commit_all "$R" manifest
+BASE9=$(head_sha "$R")
+sed -i "s|^last-body-change: .*|last-body-change: $BASE9|" "$R/memory/guides/SESSION-KICKOFF.md"
+commit_all "$R" rebaseline
+for i in $(seq 1 11); do
+  printf 'all:\n\ttrue\nr%s:\n\ttrue\n' "$i" > "$R/Makefile"
+  restamp "$R" "$(head_sha "$R")"
+  commit_all "$R" "watched churn $i"
+done
+run "C9 ten or more watched commits since the baseline" "$R" 1 "the manifest body has not changed across ten or more watched commits, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha"
+
+# THE ELAPSED-TIME THRESHOLD, with fewer than ten commits so only the age arm can fire. The fixture
+# AGES the baseline commit rather than waiting: committer date is what C9 reads, because a rebase
+# preserves author date and the question is when this history last moved.
+mkrepo c9age
+export GIT_COMMITTER_DATE="2025-01-01T00:00:00 +0000" GIT_AUTHOR_DATE="2025-01-01T00:00:00 +0000"
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+commit_all "$R" "aged manifest"
+AGED=$(head_sha "$R")
+unset GIT_COMMITTER_DATE GIT_AUTHOR_DATE
+sed -i "s|^last-body-change: .*|last-body-change: $AGED|" "$R/memory/guides/SESSION-KICKOFF.md"
+restamp "$R" "$AGED"; commit_all "$R" rebaseline
+run "C9 three months or more since the baseline" "$R" 1 "the manifest body has not changed in three months or more, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha"
+
+# ---- C10 the sealed task region -----------------------------------------------------------------
+# Absence is a NAMED failure, never a skip: every manifest written before this format version has no
+# region at all, so a skip would make the seal dormant in exactly the population it exists for.
+mkrepo c10a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+python_del() { grep -v '<!-- kickoff:task -->' "$1" | grep -v '<!-- /kickoff:task -->' > "$1.t" && mv "$1.t" "$1"; }
+python_del "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "strip the markers"
+run "C10 an absent sealed region is named" "$R" 1 "the manifest carries no sealed task region, so its §A field set is prose that any edit can silently change; paste the region printed by this script's --task-skeleton verb into §A of"
+
+# ONE CHARACTER inside the region. This is the whole point of the unit: §A used to be prose that any
+# edit could change silently.
+mkrepo c10b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+sed -i 's/\*\*IN scope:\*\*/**IN SCOPE:**/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "edit the sealed region"
+run "C10 a one-character edit inside the region is caught" "$R" 1 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in"
+
+# A TRANSPOSED pair satisfies a count-only check. The lifted region() refuses it; this asserts that.
+mkrepo c10c; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+sed -i 's|<!-- /kickoff:task -->|<!-- KICKOFF-CLOSE-PLACEHOLDER -->|; s|<!-- kickoff:task -->|<!-- /kickoff:task -->|; s|<!-- KICKOFF-CLOSE-PLACEHOLDER -->|<!-- kickoff:task -->|' "$R/memory/guides/SESSION-KICKOFF.md"
+commit_all "$R" "transpose the markers"
+run "C10 a transposed marker pair is named" "$R" 1 "the sealed task region's markers are malformed, so the region cannot be compared with the contract it copies; the pair must be exactly one open and one close, close after open, each alone on its line in"
+
+# A CRLF manifest must not read as drift — the region() lifted here CR-normalises, and this is the
+# arm that fails if that half is dropped.
+mkrepo c10d; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+sed -i 's/$/\r/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" manifest
+run "C10 a CRLF manifest is not reported as region drift" "$R" 0 -
+
+# THE SHIPPED SEED. gov-only: the template an adopter instantiates must carry the same region the
+# checker enforces, or the seed produces a manifest the gate rejects on arrival.
+SEED="$(cd "$(dirname "$CHECK")" && pwd)/MANIFEST-TEMPLATE.md"
+if [ -f "$SEED" ]; then
+  if diff -q <(bash "$CHECK" --task-skeleton) \
+             <(awk '/<!-- kickoff:task -->/{f=1} f{print} /<!-- \/kickoff:task -->/{if(f)exit}' "$SEED") >/dev/null; then
+    echo "ok   the shipped seed's region equals the constant"; pass=$((pass+1))
+  else
+    echo "FAIL the shipped seed's region equals the constant"; fail=$((fail+1))
+  fi
+fi
+
+# ---- C11 the per-bullet traps cap ---------------------------------------------------------------
+TRAPS_OK='
+### Environment traps worth front-loading
+
+- a short trap, well under the cap.
+- another short one.
+'
+TRAPS_BIG="
+### Environment traps worth front-loading
+
+- a short trap, well under the cap.
+- $(printf 'y%.0s' $(seq 1 450))
+"
+mkrepo c11a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "$TRAPS_OK"
+commit_all "$R" manifest
+run "C11 short traps bullets pass" "$R" 0 -
+
+mkrepo c11b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "$TRAPS_BIG"
+commit_all "$R" manifest
+run "C11 an over-cap traps bullet is named" "$R" 1 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs"
+
+# The cap is scoped to the traps SECTION. A long bullet elsewhere in §B is C8's business (per LINE),
+# not C11's (per BULLET) — without the section scope C11 would silently police the whole document.
+mkrepo c11c
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "
+### Some other section
+
+- $(printf 'z%.0s' $(seq 1 200))
+  $(printf 'z%.0s' $(seq 1 200))
+  $(printf 'z%.0s' $(seq 1 200))
+"
+commit_all "$R" manifest
+run "C11 does not police bullets outside the traps section" "$R" 0 -
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

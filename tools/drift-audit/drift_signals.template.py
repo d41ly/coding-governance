@@ -1,11 +1,11 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.2
+gov:kit drift-audit@1.3
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.
 
-The engine (`drift_report.py`) owns the five signal IMPLEMENTATIONS. This file owns only what is
+The engine (`drift_report.py`) owns the signal IMPLEMENTATIONS. This file owns only what is
 genuinely repo-shaped. The corpus root and disciplines are NOT here — they come from
 `.memory-tree.conf`, which the memory-tree kit owns. Do not restate them; a second declaration of
 the same value is the defect this kit exists to detect.
@@ -18,6 +18,9 @@ Rules, each of which was a wrong number once:
   exactly those values. A pin above the measured value hides a live regression on day one.
 - A HANDKEPT probe returns `(claims, actual)` and must read the GENERATED side from its real source,
   not from a second copy of it.
+- TRACE_CUTOFF is a GRANDFATHER, not a tuning knob. Set it to the date your repo's "unit id in the
+  commit subject" rule became binding, and never to whichever date makes the number smallest — a
+  cutoff chosen to read zero is the vacuous-selector defect, not a clean signal.
 """
 
 from __future__ import annotations
@@ -70,6 +73,27 @@ HANDKEPT: list[dict] = [
     # {"record": "charter gate-leg count", "source": "tools/gate-legs.json",
     #  "probe": _example_gate_leg_count},
 ]
+
+# --------------------------------------------------------------------------------------------
+# TRACE_CUTOFF / TRACE_GLOBS — signal `closed_specs_with_no_product_commit`, which asks whether a
+# spec claiming CLOSED is backed by any commit that both names it and changed the product.
+#
+# BOTH ARE OPTIONAL AND BOTH SHIP UNSET. With TRACE_CUTOFF empty the signal reports
+# `gateable: False` and judges nothing, so adopting this kit never reds your first run over specs
+# that closed before you had a convention for the engine to check.
+#
+# TRACE_CUTOFF: the date, `YYYY-MM-DD`, from which your repo's commit subjects reliably name the
+# unit. It is compared against each spec's STATUS-HEADER date (the last-change date, so on a CLOSED
+# spec the close date), never the filename date — keying on the filename exempts every spec AUTHORED
+# before the cutoff even when it closes long after, which on the reference repo was 18 live units.
+#
+# TRACE_GLOBS: the pathspecs that count as evidence a build shipped. Defaults to PRODUCT_GLOBS.
+# Narrow it when PRODUCT_GLOBS holds paths your RECORD-keeping commits routinely touch (rendered
+# skills, a kickoff manifest, generated config) — otherwise a bookkeeping commit certifies the
+# bookkeeping, which is the hole the path restriction exists to close.
+TRACE_CUTOFF: str = ""
+
+TRACE_GLOBS: list[str] = []
 
 # --------------------------------------------------------------------------------------------
 # PINS — shrink-only ceilings per GATEABLE signal, seeded at the values the report actually measured.

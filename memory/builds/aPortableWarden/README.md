@@ -21,4 +21,6 @@ Still SPECCED and awaiting adversarial review plus owner approval, exactly as it
 **Build status:** SPECCED · 0 unit(s) · node a · opened 2026-07-13 · streams tooling · ids TOOL-aPortableWarden-1
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+
+Records live under `spec/`.
 <!-- /gen:build-index -->

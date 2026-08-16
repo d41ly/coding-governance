@@ -23,10 +23,12 @@
       "harness arms (fail branches armed or pinned)",
       "install-prefix (shipped surface)",
       "install-prefix self-test",
+      "kickoff engine size <=18KiB",
       "kickoff-manifest ratchet",
       "kit version markers",
       "kit/dogfood doc parity",
       "manifest-check self-test",
+      "marker contract (4 readers)",
       "memory hygiene (20 checks)",
       "memory-hygiene self-test",
       "memory-recall kit selftest",
@@ -98,6 +100,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
+      "inputs-inside-the-subjects-reach.md",
       "pin-copied-from-another-corpus.md",
       "second-implementation-is-not-a-second-opinion.md",
       "subprocess-resolves-a-different-shell.md",
@@ -108,6 +111,7 @@
     "guides": [
       "BUILD-METHOD.md",
       "REVIEW-PROTOCOL.md",
+      "SESSION-KICKOFF.md",
       "UNATTENDED-PROTOCOL.md"
     ],
     "backlog-shards": [

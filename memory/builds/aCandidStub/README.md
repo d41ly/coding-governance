@@ -20,7 +20,7 @@ playbook had not followed. That premise did not survive the audit: the two corpo
 construction. The real drift sits one level up, in the wiring between the three files — the deploy
 chain never names the companion, and §8 prescribes a fan-out the repo's own hook denies.
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -29,4 +29,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs](spec/2026-08-10-spec-aCandidStub-1.md) | CLOSED | rev-3 | 2026-08-10 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

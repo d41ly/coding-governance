@@ -18,4 +18,6 @@ The one-line-per-directive rework + 80-finding gap-analysis wiring that produced
 **Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-03 · streams playbook · ids PLAY-aLeanRework-1
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+
+Records live under `spec/`.
 <!-- /gen:build-index -->

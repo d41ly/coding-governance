@@ -34,6 +34,9 @@ SPEC_FORMAT_CUTOFF=""
 # spec goes retroactively red — which also means your corpus does not exercise the required arm, and
 # the kit's self-test carries explicit red/green fixtures for it instead.
 STREAMS_CUTOFF=""
+# Acceptance-witness ratchet (check 12): specs dated >= this must give every acceptance bullet a
+# backticked token. Set it AHEAD of your corpus so nothing lands retroactively red. Blank = off.
+SPEC_WITNESS_CUTOFF=""
 
 # The document a session is pointed at before it touches code; check 16 derives the mandatory read
 # path from it. Usually AGENTS.md or CLAUDE.md.
