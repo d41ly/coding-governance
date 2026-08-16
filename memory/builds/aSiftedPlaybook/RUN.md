@@ -8,19 +8,19 @@ README slice named by the same marker grammar; never hand-edit it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-7 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-8 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-9 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-10 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-4 | 2026-08-16 |
 | [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-10 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-9 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-11 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-10 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-12 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 6636edba19f234aa3dd66ff2047e846f7e7a4532
+witness: 5324eb35900d175cdb73903d4e8d918c23a953bb
 phase: VERIFYING
 keepalive: 8d72ff45
 anchor-url: https://github.com/d41ly/coding-governance
