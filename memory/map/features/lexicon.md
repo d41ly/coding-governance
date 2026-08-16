@@ -137,16 +137,15 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
   The earlier version compared the raw namespace against a path glob and was structurally incapable:
   the first real rule declared — naming a HYPHENATED directory no module name can contain — could
   never match, and P3 reported an unfalsifiable 0.
-- **P3 IS NOT FIT TO RELY ON, and the unit does not close because of it.** Three adversarial rounds
-  produced four blockers in this one predicate, the last two VERIFIED and unfixed: a `<dir>/*` glob
-  containing an earlier wildcard escapes that wildcard literally, so nesting silently stops matching
-  below depth 1 (`apps/*/internal/*` reds at depth 1 and passes at depth 2); and importer-local
-  precedence is applied to FULLY-QUALIFIED dotted imports, where the language grants the importer's
-  directory none, so a genuine crossing beside a same-stem local sibling is missed. Both restore the
-  unfalsifiable-zero condition this build was opened to close. The root cause is process, not
-  cleverness: `_glob_match` and `resolve_import` carry the predicate's whole correctness and had NO
-  direct arms — reverting the `_glob_match` rewrite verbatim leaves every one of the 48 fixture arms
-  green. P1, P2 and the placeholder gate are unaffected and were not implicated in any round.
+- **P3 took three adversarial rounds and four blockers to get right, all in two helper functions.**
+  Every one lived in `_glob_match` or `resolve_import`, and none was visible to an end-to-end
+  fixture — reverting the `_glob_match` rewrite verbatim left all 48 fixture arms green while the
+  live gate stayed at exit 0. The last two were a `<dir>/*` glob whose earlier wildcard was escaped
+  literally, so nesting stopped below depth 1, and importer-local precedence applied to
+  fully-qualified dotted imports where the language grants none. Both are fixed and each is pinned
+  by a CASE TABLE row keyed to the defect. The transferable finding is that a predicate's
+  correctness concentrates in its helpers, and fixtures do not reach them: extend the tables, not
+  just the fixtures. P1, P2 and the placeholder gate were never implicated.
 - **The benefit is unmeasurable by construction**, which is why the kit is opt-in and why the
   retirement condition is written down rather than left to argument: retire P1 if it goes unused
   across two adopters.

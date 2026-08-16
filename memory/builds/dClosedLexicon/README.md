@@ -82,7 +82,7 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | BLOCKED | rev-2 | 2026-08-16 |
-| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | BLOCKED | rev-8 | 2026-08-16 |
+| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | CLOSED | rev-9 | 2026-08-16 |
 | [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | BLOCKED | rev-3 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.

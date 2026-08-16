@@ -254,6 +254,75 @@ for pset, src in SENTINELS.items():
     check(f"sentinel {pset}: types found", len(types_) >= 1, f"{types_}")
     check(f"sentinel {pset}: imports found", len(imports) >= 2, f"{imports}")
 
+# ---- CASE TABLES over the two helpers that carry P3's whole correctness --------------------------
+# THIS IS THE LEFT-SHIFT, and it is the arm whose absence let three review rounds through. Every P3
+# defect so far lived in `_glob_match` or `resolve_import`, and NOT ONE was visible to an end-to-end
+# fixture: reverting the `_glob_match` rewrite verbatim left all 48 fixture arms green while the live
+# gate stayed at exit 0. A fixture exercises a PATH through the engine; a case table exercises the
+# FUNCTION. Both are needed and only one of them was here.
+import lexicon as _lex  # noqa: E402
+
+GLOB_CASES = [
+    # (path, pattern, expected, why this row exists)
+    ("tools/lexicon/a.py", "tools/lexicon/*", True, "the plain depth-1 case"),
+    ("tools/lexicon/deep/a.py", "tools/lexicon/*", True, "a `<dir>/*` pattern covers nesting"),
+    ("tools/other/a.py", "tools/lexicon/*", False, "a sibling directory must not match"),
+    # THE B2 ROW. A wildcard EARLIER in the pattern used to be escaped literally by the nesting
+    # branch, so this pair red at depth 1 and passed GREEN at depth 2.
+    ("apps/a/internal/x.py", "apps/*/internal/*", True, "wildcard before the trailing /*, depth 1"),
+    ("apps/a/internal/deep/x.py", "apps/*/internal/*", True, "the same pattern must still nest"),
+    ("apps/a/public/x.py", "apps/*/internal/*", False, "the earlier wildcard is not a free pass"),
+    # THE ANCHORING ROWS. The unanchored fallback accepted any path sharing a literal PREFIX, with
+    # no path boundary required — this is the pair that catches it, and it is a real corpus shape.
+    ("tools/lexicon-extra/a.py", "tools/lexicon/*", False, "a prefix that is not a path boundary"),
+    ("tools/lexicon-extra", "tools/lexicon*", True, "a single * matches within one segment"),
+    ("tools/lexicon-extra/a.py", "tools/lexicon*", False, "and a single * never crosses a slash"),
+    # NOT a row: a doubled-slash path. `git ls-files` never emits one and the only thing that ever
+    # produced it here was the deleted reachability synthetic. Treating it as nested is correct and
+    # asserting otherwise would be testing malformed input the corpus cannot contain. Written down
+    # because the first draft of this table DID assert it, and the table caught the author.
+    ("tools/lexicon", "tools/lexicon/*", False, "the bare directory is not a member of `<dir>/*`"),
+]
+for path, pattern, want, why in GLOB_CASES:
+    got = _lex._glob_match(path, pattern)
+    check(f"glob: {path} vs {pattern} -> {want} ({why})", got == want, f"got {got}")
+
+# `resolve_import` — what an import target may DENOTE. The index is a small fixed corpus so each row
+# states the whole world it resolves against.
+RI_INDEX = _lex.build_module_index([
+    "src/pkg/consumer/a.py",
+    "src/pkg/consumer/helper.py",
+    "src/pkg/shared_core/helper.py",
+    "src/pkg/shared_core/only_there.py",
+    "src/pkg/shared_core/notes.md",
+    "web/consumer/a.js",
+    "web/shared/thing.js",
+])
+IMPORTER_PY = "src/pkg/consumer/a.py"
+TARGET_GLOB = "src/pkg/shared_core/*"
+
+
+def _check_reaches(target, importer=IMPORTER_PY, glob=TARGET_GLOB):
+    return any(_lex._glob_match(c, glob) for c in _lex.resolve_import(target, importer, RI_INDEX))
+
+
+# THE B1 ROW. Importer-local precedence was applied to a FULLY-QUALIFIED dotted import, where the
+# language grants the importer's directory none — so the genuine crossing resolved to the local
+# sibling and vanished.
+check("resolve: a FULLY-QUALIFIED dotted import reaches the forbidden layer even with a same-stem "
+      "local sibling", _check_reaches("pkg.shared_core.helper"), "the B1 false negative is back")
+check("resolve: a BARE import prefers the importer-local sibling",
+      not _check_reaches("helper"), "importer-local precedence lost")
+check("resolve: a bare import with NO local sibling still resolves across",
+      _check_reaches("only_there"), "the stem lookup stopped working")
+check("resolve: a same-stem file of a DIFFERENT extension is not a resolution",
+      not _check_reaches("notes"), "extension scoping lost")
+check("resolve: a relative js specifier resolves against the importer's dir",
+      _check_reaches("../shared/thing.js", "web/consumer/a.js", "web/shared/*"),
+      "relative resolution lost")
+check("resolve: an unresolvable/external target denotes nothing",
+      not _check_reaches("json"), "an external import must not resolve into the corpus")
+
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf

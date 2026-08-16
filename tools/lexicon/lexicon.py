@@ -44,24 +44,13 @@ implementation could not see and no path-shaped fixture would have caught. Those
 `selftest.py`. The general question is `memory/gotchas/armed-but-unreachable-rule.md`, and it is a
 REVIEW question: no predicate here can decide reachability for a rule type it has never seen.
 
-*** KNOWN DEFECTS IN P3 — DO NOT RELY ON A ZERO LAYER PIN ***
-
-Two are VERIFIED and UNFIXED. They are recorded here rather than in a tracker alone because this
-docstring is what an operator reads before trusting the number:
-
-  1. `_glob_match`'s `<dir>/*` nesting branch escapes the RAW pattern, so a wildcard EARLIER in the
-     pattern becomes a literal asterisk and nesting stops matching below depth 1. Measured:
-     `apps/*/internal/*` reds an import at depth 1 and passes it GREEN at depth 2.
-  2. `resolve_import` applies importer-local precedence to FULLY-QUALIFIED dotted imports, where the
-     language grants the importer's directory no precedence. A genuine crossing sitting beside a
-     same-stem local sibling resolves to the sibling and is missed.
-
-Both re-create the unfalsifiable-zero condition the predicate exists to prevent. The root cause is
-that these two functions carry P3's whole correctness and have no DIRECT arms: reverting the
-`_glob_match` rewrite verbatim leaves all 48 fixture arms green. The left-shift is a case table per
-function, not another end-to-end fixture.
-
-P1, P2 and `tools/check-placeholders.sh` are unaffected — no review round implicated them.
+HOW P3's DEFECTS WERE FOUND, because the pattern is the lesson. Three adversarial rounds produced
+four blockers, ALL of them in `_glob_match` or `resolve_import`, and NOT ONE was visible to an
+end-to-end fixture — reverting the `_glob_match` rewrite verbatim once left all 48 fixture arms
+green while the live gate stayed at exit 0. A fixture exercises a PATH through the engine; a CASE
+TABLE exercises the function. `selftest.py` now carries one per helper, and each row names the
+defect it exists to catch. When extending either function, add rows there first: that table caught
+two wrong expectations from its own author on the day it was written.
 """
 
 import re
@@ -190,20 +179,29 @@ def load_waivers(kit: Path, kind: str) -> dict[str, str]:
     return out
 
 
+def _build_glob_rx(pattern: str) -> str:
+    """Glob -> regex source. ONE spelling of the conversion, because there were two and they
+    disagreed: the nesting branch below escaped the RAW pattern, so any wildcard EARLIER in it
+    became a literal asterisk and nesting silently stopped matching below depth 1. Measured, under
+    `apps/*/internal/*`: the identical import red at depth 1 and passed GREEN at depth 2."""
+    return re.escape(pattern).replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
+
+
 def _glob_match(path: str, pattern: str) -> bool:
     """Fully ANCHORED. A `<dir>/*` pattern also matches anything nested under `<dir>/`.
 
-    The first cut fell back to an UNANCHORED `re.match(rx, path)`, which accepts any path merely
+    An earlier cut fell back to an UNANCHORED `re.match(rx, path)`, which accepts any path merely
     STARTING with the pattern's literal prefix — so `tools/codebase-map//codebase-map/conf` matched
-    `tools/codebase-map/*`. That is how the reachability arm certified itself: it fed the matcher a
-    mangled synthetic no import could ever spell, and the sloppy prefix accepted it.
+    `tools/codebase-map/*`. That is how a since-removed reachability arm certified itself: it fed the
+    matcher a mangled synthetic no import could ever spell, and the sloppy prefix accepted it.
+
+    Both defects lived here, and neither was visible to any end-to-end fixture. The arms are a direct
+    CASE TABLE in `selftest.py`.
     """
-    rx = re.escape(pattern).replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
-    if re.fullmatch(rx, path):
+    if re.fullmatch(_build_glob_rx(pattern), path):
         return True
     if pattern.endswith("/*"):
-        prefix = re.escape(pattern[:-1])
-        return re.fullmatch(prefix + ".*", path) is not None
+        return re.fullmatch(_build_glob_rx(pattern[:-1]) + ".*", path) is not None
     return False
 
 
@@ -267,8 +265,18 @@ def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> l
     #      language itself does.
     ext = ext_of(importer)
     hits = [p for p in index.get(target.rsplit(".", 1)[-1], []) if ext_of(p) == ext]
-    local = [p for p in hits if (p.rsplit("/", 1)[0] if "/" in p else "") == here]
-    out.extend(local or hits)
+
+    # Importer-local precedence applies ONLY to a BARE target. A fully-qualified dotted import names
+    # its own package from the root, and the language grants the importer's directory no precedence
+    # over it — so preferring a same-stem local sibling there MISSES the genuine crossing. Measured:
+    # `import pkg.shared_core.helper` from `src/pkg/consumer/a.py`, with a `helper.py` sibling,
+    # resolved to the sibling alone and the offender vanished. That is the unfalsifiable zero
+    # returning by a different door.
+    if "." in target:
+        out.extend(hits)
+    else:
+        local = [p for p in hits if (p.rsplit("/", 1)[0] if "/" in p else "") == here]
+        out.extend(local or hits)
     return out
 
 

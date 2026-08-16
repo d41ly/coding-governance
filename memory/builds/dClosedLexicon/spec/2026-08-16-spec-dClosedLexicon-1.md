@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** BLOCKED · rev-8 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** CLOSED · rev-9 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -446,6 +446,15 @@ dogfood-only and must not ship.
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-9 · 2026-08-16 · owner turn on the aborted run: ratified "fix P3 now, then land". Both rev-8
+  blockers are FIXED and each is verified by REVERT — reverting either makes a named case-table row
+  red. `_glob_match`'s two branches now share one glob-to-regex conversion, so a wildcard earlier in
+  a `<dir>/*` pattern no longer goes literal (`apps/*/internal/*` matches at depth 1 AND depth 2);
+  importer-local precedence applies only to a BARE target, since a fully-qualified dotted import
+  gets no directory precedence from the language. The LEFT-SHIFT, and the thing whose absence let
+  all three rounds through, is a CASE TABLE per helper in `selftest.py`: every P3 defect lived in
+  `_glob_match` or `resolve_import` and none was visible to an end-to-end fixture. The table caught
+  two wrong expectations from its own author the day it was written. Status CLOSED, 64 selftest arms.
 - rev-8 · 2026-08-16 · folded review-dClosedLexicon-4 and -5, and the unit does NOT close. S3's P3 is
   the only unsound part and it did not converge: three adversarial rounds produced four blockers in
   that one predicate. Round 1 found the namespace-versus-path comparison; round 2 measured the
