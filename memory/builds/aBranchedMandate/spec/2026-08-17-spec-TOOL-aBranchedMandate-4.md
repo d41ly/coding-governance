@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -282,6 +282,13 @@ none — the fork below is RESOLVED.
   the defective file (C7); S5's premise, since `ln -s` succeeds here and produces a COPY so the skip
   comes from `[ -L ]` (C8); and the `-e` boundary test for a worktree's `.git` FILE (C9). AC3, AC5 and
   AC7 rewritten; §5's security and risks lines re-priced; §10 gains the seam's inode-compare half.
+- rev-4 · 2026-08-17 · BUILT. Measured after: the suite goes from 28 assertions with one FAIL and one
+  SKIP to **36 assertions, zero skips** — arm 3b runs on the NATIVE spelling divergence (`pwd` gives
+  the mount-point flavor, git the Windows one, for one directory, so no link is needed and the
+  symlink path is only a fallback), and arm 4's junction fallback fires, which removes the skip that
+  had left the junction contract uncovered. AC5 proven by reverting the adopter and re-running: arm 3b
+  fails four ways (`expected [0], got [2]`, the artifact missing, the content missing) and arms 2 and
+  3 fail on their literals. Status moves to CLOSED when this lands, not before.
 
 ## 10. Reuse audit
 
