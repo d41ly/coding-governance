@@ -107,23 +107,27 @@ if [ "$BUMP" = 1 ]; then
   # The DIRECTORY is checked before anything is opened. A failed  redirection is reported by
   # the shell itself, so a 2>/dev/null on the command does not suppress it and the caller sees a
   # raw "No such file or directory" instead of this gate naming its own failure.
+  # ONE fail site for "could not write". The directory is tested BEFORE anything is opened, because
+  # a failed `>` redirection is reported by the shell itself and a 2>/dev/null on the command does
+  # not suppress it — the caller would see a raw "No such file or directory" instead of this gate
+  # naming its failure. That test and every write below converge here: a second fail site would be a
+  # second branch, and the mid-sequence one is unreachable from any fixture on this fleet (the
+  # directory test shadows every permission case, and chmod does not deny the owner here). An
+  # unarmable branch is either a standing pin or a design smell, and this one was the smell.
   _hwdir=$(dirname "$HIGHWATER")
-  if [ ! -d "$_hwdir" ] || [ ! -w "$_hwdir" ]; then
-    FAIL_CODE=4
-    fail 4 "the high-water record cannot be written because its directory is missing or not writable, so no bump was recorded: $HIGHWATER"
-  fi
-  tmp="${HIGHWATER}.tmp.$$"
-  # EVERY step is checked. Unchecked, this sequence printed "TEMPLATE-SIZE BUMP …" and exited 0
-  # after all four of its writes had failed — a gate reporting a successful write it did not make.
   _w=0
-  if [ -f "$HIGHWATER" ]; then
-    awk -F'\t' -v k="$key" '$1 != k' "$HIGHWATER" > "$tmp" 2>/dev/null || _w=1
-  else
-    : > "$tmp" 2>/dev/null || _w=1
+  { [ -d "$_hwdir" ] && [ -w "$_hwdir" ]; } || _w=1
+  tmp="${HIGHWATER}.tmp.$$"
+  if [ "$_w" = 0 ]; then
+    if [ -f "$HIGHWATER" ]; then
+      awk -F'\t' -v k="$key" '$1 != k' "$HIGHWATER" > "$tmp" 2>/dev/null || _w=1
+    else
+      : > "$tmp" 2>/dev/null || _w=1
+    fi
+    [ "$_w" = 0 ] && { printf '%s\t%d\n' "$key" "$bytes" >> "$tmp" 2>/dev/null || _w=1; }
+    [ "$_w" = 0 ] && { LC_ALL=C sort -o "$tmp" "$tmp" 2>/dev/null || _w=1; }
+    [ "$_w" = 0 ] && { mv "$tmp" "$HIGHWATER" 2>/dev/null || _w=1; }
   fi
-  [ "$_w" = 0 ] && { printf '%s\t%d\n' "$key" "$bytes" >> "$tmp" 2>/dev/null || _w=1; }
-  [ "$_w" = 0 ] && { LC_ALL=C sort -o "$tmp" "$tmp" 2>/dev/null || _w=1; }
-  [ "$_w" = 0 ] && { mv "$tmp" "$HIGHWATER" 2>/dev/null || _w=1; }
   if [ "$_w" != 0 ]; then
     rm -f "$tmp" 2>/dev/null
     FAIL_CODE=4

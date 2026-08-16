@@ -164,6 +164,11 @@ printf '%s\t%d\n' "some/other/subject.md" 123 > "$TMP/hw-norow"
 expect_out "A10b a record with no ROW for this subject says so and exits 0" \
   "has no row in" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/hw-norow"
 
+# --- A13 · --bump cannot write, and says so instead of reporting a bump it did not make -------
+expect_out "A13 an unwritable record is a named failure, not a false BUMP" \
+  "the high-water record could not be written, so no bump was recorded" 4 \
+  bash "$GATE" "$TMP/subj" 49152 "$TMP/no-such-dir/hw" --bump
+
 # --- A11 · the record exists but this subject's row is not a number --------------------------------------
 printf '%s\tnot-a-number\n' "$TMP/subj" > "$TMP/hw-bad"
 expect_out "A11 a non-numeric row is a NAMED failure, not a shell error" \

@@ -127,6 +127,17 @@ arm "AC9 an absent waiver registry reds and stops" red \
   "the kit waiver registry is absent and this gate never creates it: expected " \
   sh -c 'git rm -q --cached tools/playbook-kit-waivers.txt >/dev/null 2>&1; rm -f tools/playbook-kit-waivers.txt'
 
+# --- the two S2-stage integrity guards ----------------------------------------------------------
+# Both mutate the fixture's OWN copy of the gate, which is what a red proof of THIS kind of guard
+# looks like: the guard exists to notice that the stage did not run, so the fixture has to be a
+# stage that did not run.
+arm "S2 an uncreatable results file reds instead of reporting agreement" red \
+  "the value-parity stage could not create its results file, so no pair was compared and this gate must not report agreement" \
+  sh -c 'sed -i "s|^PPTMP=.*|PPTMP=/nonexistent-dir-for-the-arm/pp|" tools/check-playbook-parity.sh'
+arm "S2 a lost results file reds rather than reading as no-disagreement" red \
+  "the value-parity stage produced no completion sentinel, so its results were lost rather than empty and no pair was actually compared" \
+  sh -c "sed -i \"/^printf 'PAIRSTAGE-RAN/d\" tools/check-playbook-parity.sh"
+
 # --- the structural intersection check must not pass vacuously ---------------------------------------------
 arm "S3 a catalogue naming no shared placeholder reds" red \
   "the catalogue names no shared placeholder, so the structural intersection check had nothing to compare and would have passed vacuously" \
