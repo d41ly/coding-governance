@@ -172,6 +172,68 @@ def corpus_files(repo: pathlib.Path, rev: str | None) -> list[str]:
     return sorted(p for p in out.splitlines() if p.endswith(".md"))
 
 
+def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list[str]:
+    """The DECLARED extra sources, from ``RECALL_EXTRA_SOURCES``.
+
+    Repo-relative, not repo-root-only: the first design admitted root confs alone, which would have
+    left ``tools/template-size-limits.txt`` -- a declaration created in the same build -- outside
+    the corpus this widening exists to reach.
+
+    Declared, never globbed. A glob would sweep whatever a project happens to keep, and the
+    membership of a retrieval corpus is a decision about what counts as an answer. A declared file
+    that is absent is SKIPPED and reported; a glob matching nothing says nothing, which is the
+    vacuous-selector shape.
+    """
+    out = []
+    for rel in CONF.extra_sources:
+        if rev:
+            try:
+                git(repo, "cat-file", "-e", f"{rev}:{rel}")
+            except subprocess.CalledProcessError:
+                print(f"recall: declared source absent at {rev}, skipped: {rel}", file=sys.stderr)
+                continue
+        elif not (repo / rel).is_file():
+            print(f"recall: declared source absent, skipped: {rel}", file=sys.stderr)
+            continue
+        out.append(rel)
+    return sorted(out)
+
+
+_DECL_RE = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=(.*)$")
+
+
+def extract_declarations(path: str, text: str) -> list[dict]:
+    """One chunk per ``KEY=value`` assignment, carrying the comment block ABOVE it.
+
+    The comment block is the whole point. This tree puts a constraint's justification in the lines
+    above the number -- ``READ_PATH_CEILING`` is fourteen of them for one value -- and a chunk of
+    just ``READ_PATH_CEILING="86476"`` would be reachable and worthless.
+
+    These are CHUNKS, not records: a record is keyed by a corpus id in this tree's
+    ``FAMILY-slug-seq`` grammar, and a declaration has a KEY. Admitting them to ``records`` would
+    put un-id'd rows into the set ``anchors.json`` is built from.
+    """
+    lines = text.split("\n")
+    out = []
+    for i, line in enumerate(lines):
+        m = _DECL_RE.match(line)
+        if not m:
+            continue
+        key, value = m.group(1), m.group(2).strip()
+        j = i - 1
+        while j >= 0 and lines[j].lstrip().startswith("#"):
+            j -= 1
+        why = "\n".join(lines[j + 1:i]).strip()
+        body = f"{key} = {value}"
+        if why:
+            body += "\n" + why
+        out.append({
+            "path": path, "line": i + 1, "heading": key,
+            "text": body[:CHUNK_MAX], "kind": "declaration",
+        })
+    return out
+
+
 def read(repo: pathlib.Path, path: str, rev: str | None) -> str:
     if rev:
         try:
@@ -508,6 +570,15 @@ def main() -> int:
             records.append(d)
             anchors[d["id"]].append(path)
         chunks.extend(extract_chunks(path, text, chunk_max, overlap))
+
+    # The DECLARED extra sources. Chunks only, and separate from the loop above because these are
+    # not markdown: a conf swept as prose would put shell syntax and section banners into
+    # retrieval, where the unit of value is the declaration plus its justification.
+    for path in resolve_declared_sources(repo, rev):
+        text = read(repo, path, rev)
+        if not text:
+            continue
+        chunks.extend(extract_declarations(path, text))
 
     # COPIES, and BEFORE the join: spine is a filter over the same dict objects and `dump()` writes
     # every key, so a join applied first would silently alias 2 505 of spine's 2 959 documents --

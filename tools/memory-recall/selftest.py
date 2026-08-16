@@ -1110,6 +1110,85 @@ def t_adopter_layout():
 # ------------------------------------------------------------------------------------ the runner
 
 
+# These three are `test_*` where every sibling is `t_*`, and the inconsistency is deliberate.
+# The lexicon gate pins verb offenders shrink-only, `t` is not in the declared VERBS table and
+# `test` is, so the existing arms sit UNDER the pin as legacy and three more would push it over.
+# Renaming the siblings is that kit's shrink work, not this unit's.
+@check("a DECLARED conf source reaches the corpus as chunks, and un-declaring returns it")
+def test_declared_sources_reach_the_corpus():
+    """S6's reproduction, as an arm. The corpus is rooted at MEMORY_ROOT, so a constraint DECLARED in
+    a conf was unreachable by construction — a query for a declared budget returned everything that
+    mentioned it and never the declaration. Both directions must MOVE the chunk count, because
+    "declared" and "not declared" resolving to the same number is the whole defect.
+    """
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    (root / "extra.conf").write_text(
+        "# A budget with its justification ABOVE it, which is where this tree puts one.\n"
+        "# It was raised once, deliberately, when two binding documents grew in one merge.\n"
+        'WIDGET_CEILING="4242"\n', encoding="utf-8", newline="\n")
+    try:
+        base = index_of(run(root, kitdir, *Q))
+        assert base[2] == "rebuilt", base
+        conf.write_text(CONF + '\nRECALL_EXTRA_SOURCES="extra.conf"\n', encoding="utf-8", newline="\n")
+        wide = index_of(run(root, kitdir, *Q))
+        assert wide[2] == "rebuilt", f"declaring a source did not invalidate the cache: {wide}"
+        assert wide[1] > base[1], f"chunks did not grow: {base[1]} -> {wide[1]}"
+        assert wide[0] == base[0], f"records MOVED; declarations must be chunks only: {wide[0]}"
+        conf.write_text(CONF, encoding="utf-8", newline="\n")
+        back = index_of(run(root, kitdir, *Q))
+        assert back[2] == "rebuilt", f"un-declaring did not invalidate the cache: {back}"
+        assert back[1] == base[1], f"the corpus did not return to its pre-widening size: {back[1]}"
+        return f"chunks {base[1]} -> {wide[1]} -> {back[1]}, records held at {base[0]}"
+    finally:
+        cleanup(root)
+
+
+@check("a declared source that does not exist is skipped with a line, not a crash")
+def test_declared_source_absent_is_skipped():
+    """A declared file that does not exist is SKIPPED with a line, not a crash. An adopter renames a
+    conf and the index must keep building; a glob would have said nothing at all, which is the
+    vacuous-selector shape a declared list exists to avoid.
+    """
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    try:
+        conf.write_text(CONF + '\nRECALL_EXTRA_SOURCES="no/such/file.conf"\n',
+                        encoding="utf-8", newline="\n")
+        proc = run(root, kitdir, *Q)
+        got = index_of(proc)
+        assert got[2] in ("rebuilt", "cached"), got
+        # The skip goes to STDERR: it is a diagnostic about the corpus, not part of an answer.
+        assert "absent, skipped" in proc.stderr, f"the skip was silent: {proc.stderr[:400]}"
+        return f"index built with an absent declared source ({got[1]} chunks)"
+    finally:
+        cleanup(root)
+
+
+@check("an UNDECLARED repo-root file stays out of the corpus")
+def test_undeclared_file_stays_out():
+    """A repo-root file NOT named in RECALL_EXTRA_SOURCES is absent from the corpus. Without this the
+    widening could be a glob wearing a declared list's name, and nobody would notice.
+    """
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    (root / "declared.conf").write_text('# declared\nALPHA="1"\n', encoding="utf-8", newline="\n")
+    (root / "undeclared.conf").write_text('# undeclared\nBETA="2"\n', encoding="utf-8", newline="\n")
+    try:
+        conf.write_text(CONF + '\nRECALL_EXTRA_SOURCES="declared.conf"\n',
+                        encoding="utf-8", newline="\n")
+        one = index_of(run(root, kitdir, *Q))
+        conf.write_text(CONF + '\nRECALL_EXTRA_SOURCES="declared.conf undeclared.conf"\n',
+                        encoding="utf-8", newline="\n")
+        two = index_of(run(root, kitdir, *Q))
+        assert two[1] > one[1], (
+            f"naming a second file did not add its declaration: {one[1]} -> {two[1]} — "
+            "so membership is not actually driven by the declared list")
+        return f"declared-only {one[1]} chunks, both {two[1]}"
+    finally:
+        cleanup(root)
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -1130,6 +1209,8 @@ def main() -> int:
         t_python3_only,
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
+        test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
+        test_undeclared_file_stays_out,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
 

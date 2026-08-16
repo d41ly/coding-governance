@@ -51,8 +51,7 @@
     "argv": [
       "bash",
       "tools/check-template-size.sh",
-      "skills/session-kickoff/SKILL.md",
-      "18432"
+      "skills/session-kickoff/SKILL.md"
     ]
   },
   {

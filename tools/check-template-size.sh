@@ -9,10 +9,14 @@
 #
 #   tools/check-template-size.sh            # gate the tracked template
 #   MAX_BYTES=49152 tools/check-template-size.sh <file>   # override target / limit
-#   tools/check-template-size.sh --bump [<file> [<limit> [<record>]]]   # re-record the high-water
+#   tools/check-template-size.sh --bump [<file> [<limit> [<record> [<limits>]]]]  # re-record
+#
+# The ceiling for each subject is DECLARED in tools/template-size-limits.txt with its history
+# beside it; this script carries only a hard default for a subject that file does not name.
 #
 # Exit 0 = within budget (prints one line). Exit 1 = over budget. Exit 2 = file missing.
 # Exit 3 = the high-water record exists but this subject's row is not a number.
+# Exit 5 = the DECLARED limit for this subject is not a number.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
 
@@ -43,14 +47,48 @@ if [ "$#" -gt 0 ]; then
 fi
 
 FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
-# The limit, in precedence order: positional $2, then the environment, then the playbook's own 48 KiB.
+
+# The DECLARED limits file, resolved the same three ways every other path here is — positional,
+# then environment, then the tracked default — so the self-test can point the gate at a scratch copy
+# instead of mutating a tracked file while `run-gates.sh` runs its legs CONCURRENTLY.
+LIMITS=${4:-${LIMITS:-"$ROOT/tools/template-size-limits.txt"}}
+
+# `key` is needed by BOTH the declared-limit lookup and the high-water lookup, so it is derived once
+# here rather than twice. Repo-RELATIVE, with both sides normalized through the same `cd && pwd`:
+# `git rev-parse --show-toplevel` answers a drive-letter form on this fleet while `pwd` answers the
+# POSIX one, so comparing them raw never matches and every key lands machine-absolute — which a
+# TRACKED record cannot survive. A subject outside the repo keeps its absolute path, correctly.
+_name=$(basename "$FILE")
+if [ -e "$FILE" ]; then
+  root_p=$(cd "$ROOT" 2>/dev/null && pwd) || root_p=$ROOT
+  key=$(cd "$(dirname "$FILE")" 2>/dev/null && pwd)/$_name
+  case "$key" in "$root_p"/*) key=${key#"$root_p"/} ;; esac
+else
+  key=$FILE
+fi
+
+# The DECLARED ceiling for this subject, if the file names one.
+declared=""
+if [ -f "$LIMITS" ]; then
+  declared=$(awk -F'\t' -v k="$key" '$1 == k { print $2 }' "$LIMITS" | tr -d '[:space:]')
+  if [ -n "$declared" ] && ! printf '%s' "$declared" | grep -qE '^[0-9]+$'; then
+    FAIL_CODE=5
+    fail 5 "the declared size limit for this subject is not a number: '$declared' for $key in $LIMITS"
+  fi
+fi
+
+# The limit, in precedence order: positional $2, then THE DECLARATION, then the environment, then
+# the gate's hard default.
 # The POSITIONAL exists because a gate leg cannot set an environment variable: `run-gates.sh` execs
 # its argument vector directly with no shell, and the canary pins argv[0] to a known interpreter, so
-# neither `env MAX_BYTES=… bash …` nor a variable assignment is a legal leg. This one line is what
-# lets a second file ride this script instead of a sibling script being written for it.
-MAX_BYTES=${2:-${MAX_BYTES:-49152}}   # 48 KiB default — the ceiling for the playbook template.
-                                      # Raised from 32768 by owner order; prefer externalizing to
-                                      # spending it, and expect the ratchet below to price growth.
+# neither `env MAX_BYTES=… bash …` nor a variable assignment is a legal leg.
+# THE DECLARATION OUTRANKS THE ENVIRONMENT, and that ordering is forced rather than tidy. The
+# kickoff engine's 18432 used to be a positional in the leg's argv, which beat the environment;
+# TOOL-aSiftedPlaybook-1 S1 built that insulation deliberately and verified it. Moving the number
+# into the declaration while leaving the declaration BELOW the environment would have made
+# `MAX_BYTES=999999` lift the engine to 48 KiB — silently undoing a landed property. A declared
+# per-subject pin is policy; the environment is a local override for a subject nobody declared.
+MAX_BYTES=${2:-${declared:-${MAX_BYTES:-49152}}}   # 48 KiB hard default, for a subject with no row.
 
 # The high-water record, resolved the same three ways MAX_BYTES is — positional $3, then the
 # environment, then the tracked default — because a gate leg cannot set an environment variable and
@@ -84,11 +122,7 @@ fi
 # machine-absolute path — which would make a TRACKED record differ per machine and per worktree.
 # A subject outside the repo (the self-test's scratch files) keeps its absolute path, which is
 # correct: it has no repo-relative name to have.
-root_p=$(cd "$ROOT" 2>/dev/null && pwd) || root_p=$ROOT
-key=$(cd "$(dirname "$FILE")" && pwd)/$name
-case "$key" in
-  "$root_p"/*) key=${key#"$root_p"/} ;;
-esac
+# `key` was derived once, above, where the declared-limit lookup also needs it.
 recorded=""
 if [ -f "$HIGHWATER" ]; then
   recorded=$(awk -F'\t' -v k="$key" '$1 == k { print $2 }' "$HIGHWATER" | tr -d '[:space:]')
