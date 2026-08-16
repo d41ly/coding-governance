@@ -33,7 +33,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.3"  # gov:kit govkit@1.3 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.4"  # gov:kit govkit@1.4 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -1513,9 +1513,33 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
     changed, deleted, conflicts = [], [], 0
+    withdrawn_rows: list[dict] = []
     for a in acted:
         row, c, v = a["row"], a["c"], a["verdict"]
-        dp = target / row["path"]
+
+        # A receipt path is TARGET-SUPPLIED data. Joining it onto the target root and writing is a
+        # traversal away from the repository the operator named, which is the one boundary this whole
+        # tool is built around. Resolve and contain before any write.
+        dp = (target / row["path"]).resolve()
+        try:
+            dp.relative_to(target.resolve())
+        except ValueError:
+            r.fail(f"receipt row '{row['path']}' resolves outside the target repository — refusing "
+                   f"it: a path that escapes the tree the operator named is not a path this verb "
+                   f"may write, whatever the verdict says")
+            continue
+
+        # THE ROLE DECIDES, not the verdict. `how` is what the role dispatch computed; branching on
+        # the verdict alone writes gov's RAW bytes for a role declared never-written — measured, a
+        # `rendered` row on a `missing` verdict landed an unrendered template, placeholders and all,
+        # into an adopter tree at exit 0, and a `seed` the target had deleted was silently restored
+        # from gov rather than left to the target that owns it.
+        if a["how"] != "table":
+            if v in ("missing", "stale", "withdrawn", "diverged"):
+                print(f"  reported only   [{row.get('role')}] {row['path']} — {v}; this role is "
+                      f"never written by `update`")
+            continue
+
         if v == "stale" or v == "missing":
             dp.parent.mkdir(parents=True, exist_ok=True)
             dp.write_bytes(c["theirs"])
@@ -1526,6 +1550,10 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
             if dp.is_file():
                 dp.unlink()
             deleted.append(row["path"])
+            # And DROP the row. Keeping it leaves the receipt and the sidecar claiming a file gov no
+            # longer ships and the target no longer has, which unit 5's integrity loop then reports
+            # forever — every updated target permanently red, from a successful update.
+            withdrawn_rows.append(row)
         elif v == "diverged":
             merged, how = three_way(c["ours"], c["base"] or b"", c["theirs"])
             if merged is None:
@@ -1551,6 +1579,23 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
     if deleted:
         subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
                        capture_output=True, check=False)
+    if withdrawn_rows:
+        receipt["files"] = [f for f in receipt["files"] if f not in withdrawn_rows]
+
+    # The receipt is re-stamped ONLY on a clean run. Stamping it on a run that REFUSED rows is how a
+    # schema-1 receipt whose role-distrust arm fired gets promoted to schema 2 — and the next run then
+    # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
+    # A partial update leaves the receipt describing what it did, at the commit it came from.
+    if r.problems:
+        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (target / ".governance" / "install.sums").write_text(
+            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
+            encoding="utf-8", newline="\n")
+        print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+              f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
+              f"stamp would tell the next run that guards which fired here have already been passed")
+        return r.emit()
+
     receipt["schema"] = RECEIPT_SCHEMA
     receipt["gov_commit"] = to_commit
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
