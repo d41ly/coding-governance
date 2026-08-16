@@ -13,19 +13,59 @@ Everything below was executed. No claim here is inferred from reading source alo
 
 | # | Where | Fires when | Named by the report? |
 |---|---|---|---|
-| C1 | `tools/check-wiring.sh` eol arm → driver check 4 | any fresh worktree on this fleet | no |
-| C2 | `tools/memory-recall/adopt-memory-recall.sh --check`, a merge-bar leg | any fresh worktree on this fleet | no |
+| C1 | `tools/check-wiring.sh` eol arm → driver check 4 | a worktree carries CRLF on the pinned `.claude/` renders | no |
+| C2 | `tools/memory-recall/adopt-memory-recall.sh --check`, a merge-bar leg | the same condition | no |
 | C3 | `check_authorization` in `tools/unattended/unattended.sh` → driver check 6 | the build README is not on the default branch | yes |
+
+**The "fires when" column for C1 and C2 was wrong in the first revision of this record and is
+corrected here.** It read "any fresh worktree on this fleet", attributing the CRLF to `git worktree
+add`. That is false, and the correction is in the measured section below. The refusals themselves were
+observed exactly as written; only their cause was misattributed.
 
 C1 refuses `--preflight` before C3 is ever evaluated. C2 does not block the start; it blocks
 `--close`, because the `gates-green` Definition-of-Done item runs the declared `GATE_CMD`. So a run
 that got past C1 and C3 would still be unable to finish.
 
-## C1 — the wiring check reds on a checkout artifact, and the driver may not repair it
+## The CRLF writer — measured, and NOT what the first revision claimed
 
-`git worktree add` lands CRLF on paths that `.gitattributes` pins `eol=lf`, and `git status` stays
-clean because the index normalises on commit. `tools/check-wiring.sh:194` states this in its own
-source. The eol arm then reports UNWIRED and `--check` exits non-zero.
+The first revision of this record said `git worktree add` lands CRLF on `eol=lf`-pinned paths, citing
+`tools/check-wiring.sh:194`. That source line says a worktree checkout **can** land CRLF; this record
+upgraded "can" to "always" and did not test it. The spec audit challenged the claim and it does not
+hold. Re-measured on node `a` at BASE `96141aed`:
+
+| Tree | How it was created | CR bytes in `.claude/skills/memory-recall/SKILL.md` |
+|---|---|---|
+| primary checkout | ordinary clone | 0 |
+| a scratch worktree | `git worktree add --detach <tmp> 96141aed` | 0 |
+| all five live worktrees | the agent harness's worktree creation | 89 each |
+
+In the scratch worktree `bash tools/check-wiring.sh --check` printed
+`ok       eol       — every eol=lf-pinned .claude/ file is LF in the worktree` and exited 0, and
+`bash tools/memory-recall/adopt-memory-recall.sh --check` exited 0 **despite still carrying no CR
+normalisation**. So `git worktree add` is not the writer.
+
+The writer is scoped, which is the useful part. In a live worktree the CRLF is confined to `.claude/`
+— the three pinned Skill renders and `.claude/settings.json`. Every other `eol=lf`-pinned path
+measured LF in the same tree: `tools/run-gates.sh`, `tools/gate-legs.json`, `.memory-tree.conf`,
+`.unattended.conf`, `skills/session-kickoff/SKILL.md`, `memory/HYGIENE.md`. Two candidate writers were
+tested and both cleared: the adopters' own `--scaffold` render wrote LF, and the pins all predate
+every live worktree by days, so a pre-pin checkout is not the explanation either.
+
+**The writer is therefore the agent harness's worktree creation, and it is UNVERIFIED beyond that
+scope.** No process was caught in the act. What is established is the population it touches
+(`.claude/`), that it is systematic across all five live worktrees, and that it is not git. The
+consequence for the fix stands and is if anything sharper: `tools/check-wiring.sh`'s eol population is
+derived from tracked `.claude/` paths carrying the pin, which is exactly the writer's scope.
+
+What this does NOT change: the committed bytes are correct on every node, so a CRLF working copy is
+still a working-copy condition rather than a repository defect. What it DOES change: the reason. The
+first revision derived that from "the index normalises on commit, so CRLF can only come from the
+checkout filter", and the checkout filter is not where this came from.
+
+## C1 — the wiring check reds on that CRLF, and the driver may not repair it
+
+With the pinned `.claude/` renders carrying CRLF, the eol arm reports UNWIRED and `--check` exits
+non-zero.
 
 Observed in this worktree, unmodified:
 
@@ -79,8 +119,16 @@ memory-recall: .claude/skills/memory-recall/SKILL.md has DRIFTED from .memory-tr
 ```
 
 `memory-recall skill wiring` is a leg in `tools/gate-legs.json` and carries **no `guard`**, so it
-runs on every invocation of the bar including a records-only diff. In a fresh worktree the merge bar
-is therefore red before any work is done, which makes `gates-green` unmeetable and `--close` blocked.
+runs on every invocation of the bar including a records-only diff. In a worktree carrying the CRLF the
+merge bar is therefore red before any work is done, which makes `gates-green` unmeetable and `--close`
+blocked. Measured: `bash tools/run-gates.sh` here reported `gates RED — 1/58 legs failed`, and that
+one leg is this one; the same bar in the primary checkout is green.
+
+The defect in the adopter is REAL and independent of what writes the CRLF. It is the only one of the
+three pinned Skill adopters lacking the normalising half its own gotcha record requires, so it reds
+whenever the condition appears — as it does in all five live worktrees today — while its two siblings
+tolerate it. What the corrected measurement changes is that the scratch worktree does not exercise it,
+so a fixture has to CONSTRUCT the CRLF rather than expect a checkout to supply it.
 
 This is a defect in one adopter, not in the unattended kit. It reaches the unattended kit because the
 kit declares that adopter's bar as its Definition of Done.

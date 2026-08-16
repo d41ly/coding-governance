@@ -1,14 +1,14 @@
 # TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
-`tools/check-wiring.sh --check` exits non-zero when a `git worktree` checkout lands CRLF on an
-`eol=lf`-pinned Skill render, and `.unattended.conf` declares that command as `WIRING_CHECK`, so
-`--preflight` refuses in every fresh worktree and — because the protocol forbids the driver from
-running the repairing mode — cannot recover. Make the eol arm report without gating, and make the
-driver's refusal name its remedy for the cases that still gate.
+`tools/check-wiring.sh --check` exits non-zero when a worktree carries CRLF on an `eol=lf`-pinned
+`.claude/` Skill render, and `.unattended.conf` declares that command as `WIRING_CHECK`, so
+`--preflight` refuses there and — because the protocol forbids the driver from running the repairing
+mode — cannot recover. Make the eol arm report without gating, and make the driver's refusal surface
+the declared check's own output for the cases that still gate.
 
 ## 2. Scope (IN)
 
@@ -23,13 +23,26 @@ driver's refusal name its remedy for the cases that still gate.
   indistinguishable from having deleted the arm. The arms also establish whether any consumer greps
   for the literal `UNWIRED` on this path, which is the one fact that would have argued for keeping
   the word.
-- **S4** — check 4's refusal in `tools/unattended/unattended.sh` names the repair command, so an
-  attended operator who meets a wiring refusal is told what to run. The remedy goes BEFORE the
-  interpolation, because a literal word after it lands inside the branch signature `check-arms.py`
-  matches and no assertion can then arm the branch.
-- **S5** — the corresponding arm in `tools/unattended/unattended.test.sh` is updated to the new
-  literal signature in full, and `ARMS_FLOORS` in `.memory-tree.conf` is re-measured for
-  `tools/unattended/unattended.sh` rather than assumed unchanged.
+- **S4** — `check_wiring` in `tools/unattended/unattended.sh` **surfaces the declared check's own
+  output** on failure instead of discarding it. Today the call is
+  `$WIRING_CHECK >/dev/null 2>&1` (`:419`), and the output it throws away already carries the remedy:
+  `tools/check-wiring.sh:277` prints `Fix: bash tools/check-wiring.sh --fix`. The refusal message
+  itself is unchanged.
+
+  **S4 previously said the refusal should NAME the repair command, and that was wrong twice over.**
+  Nothing the kit may read holds one — `.unattended.conf` declares no repairing counterpart, the
+  protocol's key table has none, and `check_wiring`'s own allow-list refuses any `WIRING_CHECK` token
+  outside `--check|--dry-run|--verify|-n`, so it cannot be derived from the declaration either. And
+  `tools/unattended/unattended.test.sh:921` carries a source-level arm that FAILS the driver
+  self-test if the driver source spells that command at all. A builder implementing the old S4 would
+  have red a leg this spec's own §7 lists. Surfacing the declared check's output is the route §4
+  never considered: it works for any adopter, needs no new declaration, and spells nothing.
+- **S5** — the corresponding arm in `tools/unattended/unattended.test.sh` is CHECKED, and rewritten
+  only if it actually moved. `signature()` in `tools/memory-tree/check-arms.py:104-113` splits on
+  every interpolation and returns `max(parts, key=len)` — the longest surviving literal run — and S4
+  no longer touches the message at all, so the existing signature and its arm at
+  `unattended.test.sh:188` stand. `ARMS_FLOORS` in `.memory-tree.conf` is re-measured rather than
+  assumed, but the expected outcome is now "unchanged", not "moved".
 
 ## 3. Non-goals (OUT)
 
@@ -48,9 +61,12 @@ driver's refusal name its remedy for the cases that still gate.
 
 The chain, each link measured in this worktree:
 
-1. `git worktree add` lands CRLF on paths `.gitattributes` pins `eol=lf`. `tools/check-wiring.sh:194`
-   states this in its own source, and `git status` stays clean because the index normalises on
-   commit.
+1. A live worktree carries CRLF on the `eol=lf`-pinned `.claude/` renders, and `git status` stays
+   clean because the index normalises on commit. **The writer is not `git worktree add`** — a scratch
+   worktree made that way measures CR=0 and both checks green. It is the agent harness's worktree
+   creation; all five live worktrees carry it, the primary checkout does not, and the condition is
+   confined to `.claude/`. The measurement and what remains UNVERIFIED about the writer are in the
+   reproduction record under this build's `build/`.
 2. The eol arm reports UNWIRED for the three pinned `.claude/skills/*/SKILL.md` renders and
    `--check` exits 1.
 3. `.unattended.conf` declares `WIRING_CHECK="bash tools/check-wiring.sh --check"`.
@@ -81,11 +97,24 @@ treats as a refusal.
 `TOOL-aBranchedMandate-1` would silence a signal that is still predicting a real red leg, which is
 the opposite of this unit's argument.
 
-### Why a working-copy CRLF is always an artifact and never a defect
+### Why a working-copy CRLF is a working-copy condition and not a repository defect
 
-Committed blobs are normalised by the index on commit, so a pinned path's committed bytes are LF on
-every node. A CRLF working copy therefore only ever comes from the checkout filter. The arm cannot
-observe a case where CRLF means something is broken, which is precisely what makes it a diagnostic.
+**This argument was re-made after the spec audit refuted its first version**, which reasoned that
+committed blobs are normalised on commit and therefore "a CRLF working copy only ever comes from the
+checkout filter". Measurement refuted the premise: the checkout filter is not where this CRLF comes
+from, so the derivation was unsound even though its conclusion survives.
+
+What holds, and why: the committed bytes are LF on every node — verified in the primary checkout and
+in a scratch `git worktree add` — so no repository state is wrong, no consumer reading the tracked
+blob sees CRLF, and the condition is confined to the working copy of `.claude/` in harness-created
+worktrees. `--fix` rewrites those bytes with no other effect. It is a condition worth reporting and
+not worth refusing a run over.
+
+**What is NOT claimed, because the writer is unidentified.** This does not assert that CRLF can never
+signal a defect. If the unidentified writer is ever found to be a renderer emitting wrong bytes, this
+argument is reopened, and S1 would have removed the exit status that reported it. That residual is
+carried as F4 in §8 rather than argued away here — it is the honest cost of acting on a measurement
+whose mechanism is only partly known.
 
 ### Data model
 
@@ -141,8 +170,9 @@ undecided.
 - error / empty / loading states — the arm's existing `skip` path (no `eol=lf`-pinned file under
   `.claude/`) must remain a `skip` and must not become the new advisory label. A population of zero
   and a population that is all-CRLF are different answers and the script already distinguishes them.
-- observability — improved on both sides: the wiring report stops crying wolf, and the driver's
-  refusal starts naming a remedy.
+- observability — improved on both sides: the wiring report stops crying wolf, and the driver stops
+  discarding the declared check's diagnostics, which already carry a remedy the driver may not spell
+  itself.
 - risks — the real one is that S1 makes a future adopter's un-normalised byte-compare invisible in
   the wiring report. It does not: the report still prints. What is lost is the exit status, and the
   red would come from that adopter's own leg, which is where it belongs.
@@ -156,15 +186,25 @@ undecided.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/check-wiring.sh --check` runs in a fresh worktree whose only finding is
-  CRLF on pinned Skill renders, it exits 0 and still prints one line per affected path.
-- **AC2** — When the same command runs with `core.hooksPath` unset in that same worktree, it exits 1
-  and names the hooks item. This is S3's sibling arm and it is what proves AC1 is a severity change
-  rather than a deleted arm.
+- **AC1** — When `bash tools/check-wiring.sh --check` runs in a tree whose pinned `.claude/` renders
+  have been given CRLF **deliberately** and nothing else is unwired, it exits 0 and still prints one
+  line per affected path. The fixture is constructed: a `git worktree add` tree measures CR=0, so the
+  earlier wording named a fixture that does not produce the condition.
+- **AC2** — When the same command runs with `core.hooksPath` unset in that same constructed tree, it
+  exits 1 and names the hooks item. This is S3's sibling arm and it is what proves AC1 is a severity
+  change rather than a deleted arm.
 - **AC3** — When `bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id <id>` runs in
-  a fresh worktree against a build that is on the default branch, it no longer refuses at check 4.
+  that constructed tree against a build that is on the default branch, it no longer refuses at
+  check 4. Re-keyed for the same reason as AC1: against a plain `git worktree add` tree this was
+  already true at BASE and observed nothing.
 - **AC4** — When the declared `WIRING_CHECK` fails for a reason that is not the eol arm, check 4
-  still refuses, and its message names the repair command.
+  still refuses, **and the declared check's own output appears in the driver's output**. Proven with
+  a `WIRING_CHECK` whose failure message is a distinctive literal, asserting that literal reaches the
+  operator. The earlier wording — that the message names the repair command — is not implementable:
+  see S4.
+- **AC8** — When `grep -nE 'check-wiring[^"]*--fix'` runs over `tools/unattended/unattended.sh`
+  excluding comments, it finds nothing, so `tools/unattended/unattended.test.sh:921` stays green.
+  This is an explicit non-regression on the arm the earlier S4 would have broken.
 - **AC5** — When `bash tools/check-wiring.test.sh` runs, both the changed arm and its sibling pass,
   and the sibling fails if S1 is applied to the hooks item by mistake.
 - **AC6** — When `python tools/memory-tree/check-arms.py` runs, every branch of
@@ -185,7 +225,9 @@ undecided.
 
 ## 8. Open questions
 
-none — both forks below are RESOLVED, and a third was reclassified out of this section.
+F4 is OPEN. F1 and F2 are RESOLVED below, and a third was reclassified out of this section. F4 was
+opened by the spec audit after those resolutions, so this spec is FORKED under M2 until it is
+answered, and its status may not go terminal before then.
 
 - **F1 — the label for the advisory line.** The report vocabulary is `ok` / `skip` / `UNWIRED` /
   `fixed`, all lowercase except the one that gates. Options: `note`, or `advisory`, or keeping
@@ -209,18 +251,50 @@ belonged in §4 as a stated consequence rather than here as a decision. It now s
 declaration does not move". Recorded rather than silently deleted, because a fork that disappears
 between revisions is indistinguishable from one that was answered off the record.
 
+- **F4 — UNRESOLVED, opened by the spec audit.** The CRLF writer is unidentified. Measurement
+  establishes that it is not `git worktree add`, that it is confined to `.claude/`, that it is
+  systematic across all five harness-created worktrees, and that the committed bytes are correct
+  everywhere. It does not establish WHAT writes it. S1 removes the exit status that reports the
+  condition, so if the writer is later found to be a renderer emitting wrong bytes, this unit will
+  have silenced a real signal. Options: **(a) land S1 as specified** and accept that the report
+  remains and only the gating goes, on the grounds that the committed bytes are measured correct;
+  **(b) identify the writer first**, which is an unscoped investigation into tooling outside this
+  repo; **(c) land S1 but keep the exit status non-zero in the PRIMARY checkout only**, where no
+  harness writer operates — a special case whose premise nothing enforces, and the shape §4 already
+  rejects. **Recommendation: (a).** The report survives, the gotcha class stays visible, and the
+  alternative blocks a fix for a live deadlock on an investigation with no bounded end. This is an
+  owner turn because it decides how much unexplained mechanism a severity downgrade may rest on.
+
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
 - rev-2 · 2026-08-16 · F1 and F2 resolved by the owner; the label `note` folded into S1, S3 and §4's
   data model; F3 reclassified out of §8 into §4 with the reclassification recorded in place.
+- rev-3 · 2026-08-16 · folded the spec audit recorded under this build's `reviews/`. C10: S4 demanded
+  a repair-command literal the kit cannot hold and that `unattended.test.sh:921` reds the driver for
+  spelling — S4 now surfaces the declared check's own output instead, with AC4 re-keyed and AC8 added
+  as an explicit non-regression on that arm. C13: the placement rule in S4 and the claim in §10 both
+  inverted what `check-arms.py` does — it takes the LONGEST literal run, not the run before the first
+  interpolation — so S5 becomes a check rather than a forced rewrite. C1: §4's chain step 1 and AC1
+  and AC3 were keyed to `git worktree add`, which does not produce the condition; all three re-keyed
+  to a constructed fixture, and §4's artifact argument re-derived after its premise was refuted. F4
+  opened for the unidentified writer.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py` surfaced no seam for a report-severity change, which is
 the honest answer: this unit adds no mechanism. It reuses two that exist. The report vocabulary and
 its column layout are `tools/check-wiring.sh`'s own, and S1 adds a member rather than a second
-reporting path. The refusal-message shape in S4 reuses the driver's established rule that a branch's
-literal signature ends before its first interpolation — stated in `tools/unattended/unattended.sh` at
-`check_slug` and at `stage_or_fail`, and enforced by `tools/memory-tree/check-arms.py`. No new file
-is created by this unit, which is the strongest available evidence that nothing needed inventing.
+reporting path. S4 reuses the driver's own `$WIRING_CHECK` invocation, dropping the `>/dev/null 2>&1`
+that discards a diagnostic the declared check already produces — the smallest possible change, and
+the one that needs no new declaration.
+
+**An earlier revision of this section stated a rule that is false**, and it is corrected here rather
+than deleted because it was the stated basis for a scope item. It claimed "a branch's literal
+signature ends before its first interpolation". `signature()` at
+`tools/memory-tree/check-arms.py:104-113` splits the message on EVERY interpolation and returns
+`max(parts, key=len)` — the longest surviving literal run, wherever it sits. The real trap the
+driver's own comments describe at `check_slug` and `stage_or_fail` is a different one: a bare
+positional is not matched as an interpolation and so stays inside the literal run, which is why those
+messages bind their values to names. This unit no longer edits the message at all, so neither rule
+binds it.

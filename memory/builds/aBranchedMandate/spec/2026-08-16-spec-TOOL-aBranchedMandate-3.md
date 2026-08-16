@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -15,23 +15,90 @@ document that already states what the first one costs.
 - **S1** — `resolve_base` in `tools/unattended/unattended.sh` gains a fallback: when the build README
   does not resolve at the default-branch merge-base, and the project declares the wider scope, the
   BASE is pinned to the tip the remote advertises for the run's current branch. The observation uses
-  the same `ls-remote --symref --exit-code` discipline and the same `GIT()` dereference pin as the
-  existing one.
+  the same `ls-remote --symref --exit-code` discipline, the same `GIT()` dereference pin and the same
+  `GIT_TERMINAL_PROMPT=0` as the existing one.
+
+  **The trigger's mechanism is stated, because the first revision left it unimplementable.**
+  `resolve_base` takes no arguments, knows no slug and never reads a README, and its only caller
+  reads its value through `fresh=$(resolve_base)`. So: `resolve_base` and `trusted_base` both gain
+  the resolved README path as a parameter, and the trigger is a SILENT existence probe —
+  `GIT show "$base:$rel" >/dev/null 2>&1` — evaluated inside `resolve_base`. It must NOT be evaluated
+  by calling `check_authorization`: that function answers by calling `fail 6`, which prints a numbered
+  refusal an operator reads as a failure and sets the global `status`, which has no reset in the file.
+  Every successful branch-anchored preflight would emit `UNATTENDED check 6 FAILED` on its way to
+  succeeding.
 - **S2** — the fallback tip must be an ancestor of HEAD. A tip that is not is a branch the run is not
   building on, and pinning to it would measure the authorization against history this run does not
   contain.
-- **S3** — `check_authorization` is unchanged. It already takes the base as an argument and asserts
-  shape at it; the fallback changes which commit it is handed, not what it asks.
+- **S3** — `check_authorization`'s BODY is unchanged; only its signature moves with S1's plumbing. It
+  already takes the base as an argument and asserts shape at it, so the fallback changes which commit
+  it is handed, not what it asks. The silent probe in S1 is deliberately NOT a second spelling of it:
+  it answers existence only, and the shape assertions stay in one place.
+- **S11** — `resolve_base`'s RETURN CONTRACT is preserved across both anchors. `rc=2` means "the
+  derived base equals HEAD" and is the sole gate on both `fail 16` branches — "the record pins no
+  BASE" and "the recorded BASE equals HEAD, so this run built nothing and has nothing to land" —
+  whose cost is a recorded owner-accepted fork. On the fallback path the base is reached through
+  `rc=0` after the merge-base test has already returned a non-HEAD value, so without this item both
+  refusals stop firing for every branch-anchored run, and `check-arms.py` stays green because the
+  branches remain reachable on the default-branch path. The fallback tip is re-tested against HEAD and
+  returns `rc=2` when equal.
+- **S12** — the anchor KIND is pinned at preflight and does not change for the life of the run.
+  `trusted_base` re-derives the anchor at every later verb and refuses unless the recorded BASE is an
+  ancestor of the freshly derived one. With two anchors that derivation is no longer monotone: if the
+  build folder reaches the default branch mid-run — another node lands it, or the run merges origin —
+  the FIRST anchor starts firing, the freshly derived base moves to the default branch, and the
+  recorded branch tip is not an ancestor of it, so `fail 18` refuses at `--close`. That verb is the
+  one the mandate requires, `authorization-reachable` is explicitly not overridable, and `LANDING` is
+  close-only, so the run wedges in a non-terminal phase with `--abort` as its only exit. The
+  discriminator cannot be the run-written `anchor-kind`; how it is made stable without reading a
+  run-written value is F5.
 - **S4** — the run-state file records `anchor-kind`, plus the branch ref and tip that were observed.
-  Protocol section 2's authored-fact count moves from seven to eight in both copies of the document.
+  Protocol section 2 enumerates its authored facts individually, counting one anchor observation as
+  three, so at that granularity the count moves from **seven to ten** — not the eight an earlier
+  revision wrote. S4 maps each new key to a numbered item and states how the two conditional ones are
+  admitted when absent, since section 2's "nothing else" clause is unconditional today. The count
+  lives in one place and moves in both copies of the protocol together.
 - **S5** — a new declaration `ANCHOR_SCOPE` in `.unattended.conf`, over the closed value set
   `default-branch` and `published`, selects the scope. Absent, blank, or any value outside the set is
   a REFUSAL to widen: an adopter who declares nothing keeps the strict anchor, and a misspelling
   cannot silently select either behaviour.
 - **S6** — check 9 of `tools/unattended/check-unattended.sh` stops asking "is the recorded BASE an
   ancestor of the anchor" and asks "is the recorded BASE **published on the remote**": an ancestor of
-  the advertised HEAD tip, or equal to a tip the remote advertises for any ref. The leg does **not**
-  read `anchor-kind` and does **not** read a branch name.
+  the advertised HEAD tip, **or an ancestor of a tip the remote advertises for any ref**. The leg does
+  **not** read `anchor-kind` and does **not** read a branch name.
+
+  **REACHABILITY, NOT EQUALITY.** The first revision wrote clause 2 as "equal to a tip the remote
+  advertises", justified as "equality is exactly published on the remote". It is not — equality is a
+  strict subset. Under S1 the BASE is pinned to the advertised branch tip; the run then commits and
+  pushes that same branch again, which is precisely what S7's Skill precondition trains an operator to
+  do, and the advertised tip moves past BASE. The recorded BASE is then neither an ancestor of the
+  advertised HEAD tip nor equal to any advertised tip, and check 9 reds — permanently, and worse after
+  a branch delete or a squash-merge landing, on a leg that iterates every tracked run-state file. This
+  is the exact wedge `tools/unattended/check-unattended.sh:271-277` records the kit having already
+  been moved off once ("Equality wedged the bar permanently … Reproduced on an honest fixture with no
+  attacker"), and `trusted_base` carries the same lesson. Reachability is the form that survives the
+  run doing the thing the design tells it to do.
+- **S6b** — S6 states, item by item, the disposition of everything else inside the loop it rewrites.
+  `tools/unattended/check-unattended.sh:269-316` is ONE `for b in refs/remotes/...` loop carrying
+  five things: the not-a-commit refusal, the ancestor-of-anchor test S6 replaces, the
+  ancestor-of-HEAD test, the phase-keyed `rb != HEAD` refusal, and — nested inside the same loop —
+  check 15's SECOND HALF, which compares the LANDED witness against that loop's `$b` and whose own
+  comment says it is inside the loop because it needs the anchor. S6's replacement predicate needs no
+  `$b`, so the loop cannot survive as written. Deletion would be loud, because the sibling self-test
+  arms both check 15's second half and the phase-keyed clause. RE-ANCHORING would be silent:
+  `ARMS_FLOORS` counts branches and textual arms, so a `fail 15` left comparing against the wrong
+  anchor stays green. Each of the five is named with the anchor it uses once the loop is gone, and if
+  ancestor-of-HEAD is dropped, §4's price list says so — clause 2 has no relation to this run's
+  history, so a BASE published on a wholly unrelated ref would otherwise satisfy the check.
+- **S6c** — S6 states the leg's OFFLINE behaviour. `check-unattended.sh` makes zero network calls
+  today; both of S6's clauses are stated against the remote's advertisement, and AC8 forbids the leg
+  from reading `anchor-kind`, so it cannot know which records need the observation and must observe
+  for every one. It is an UNGUARDED merge-bar leg that runs under the pre-push hook. Fail-closed reds
+  the bar on every offline or credential-less run, including over records that are already terminal;
+  fail-open disarms the only BASE check on the bar and matches the silent-skip shape the same check's
+  own comment refuses by name. One advertisement is fetched per leg run, not per record, and
+  `GIT_TERMINAL_PROMPT=0` is carried into the leg as a stated requirement rather than left to the
+  driver.
 - **S7** — the rendered Skill states the new precondition, so an operator starting a run on an
   unlanded build is told to publish the branch first rather than meeting a refusal.
 - **S8** — protocol sections 1, 2, 8 and 9 gain the second anchor, its declaration, and its cost, in
@@ -108,21 +175,44 @@ and are not duplicated.
 reproduced offline forgeries stay inert by construction. The recorded observation still lets a party
 off this machine re-derive the pin without trusting a byte the run wrote.
 
-**Spent, and this is the whole price of the unit.** Under the default-branch anchor the authorizing
-commit had passed the pre-push hook, which runs the full bar. `.githooks/pre-push` classifies on the
-remote ref and runs the bar only for a default-branch push, so **a branch push is an ungated
-publish**. The consequence, stated flatly:
+**Spent — THREE things, not one.** The first revision priced only the first and called it "the whole
+price of the unit". The spec audit found the other two.
+
+**1. Self-authorization gets cheaper.** Under the default-branch anchor the authorizing commit had
+passed the pre-push hook, which runs the full bar. `.githooks/pre-push` classifies on the remote ref
+and runs the bar only for a default-branch push, so **a branch push is an ungated publish**:
 
 > Today a run can authorize its SUCCESSOR — protocol section 1, cost 4, already accepted. Under the
 > second anchor a run can authorize ITSELF, in two ordinary commands: commit a build folder on its
 > branch, push the branch, preflight.
 
-Nothing in this design closes that, and no wording in the protocol may imply otherwise. What the
-design does instead is make it visible: `anchor-kind: run-branch` is on the record, the branch ref
-and tip are on the record, and an off-machine verifier sees which anchor a run leaned on. That is
-section 9's stated posture applied rather than abandoned — but applying it here is a real reduction
-in the price of self-authorization, and the owner is the one who gets to decide whether it is worth
-being able to run a build from a branch.
+**2. The BAR weakens for adopters who never opt in.** `ANCHOR_SCOPE` gates the DRIVER. It cannot gate
+the leg: the conf is a working-tree file the run can commit, so it sits inside the subject's reach
+exactly as `anchor-kind` does, and a leg branching on it would be the same defect wearing a different
+key. So S6's predicate is unconditional, and after it a run-state record whose BASE is a tip the run
+itself published passes check 9 **in every repo**, including one that declares `default-branch` and
+one that declares nothing. Check 13 then resolves the README at that same BASE and passes too. That
+is a widening of the half protocol section 9 identifies as the thing that actually binds — the leg
+re-run in a clone by a party the run cannot execute code as — and it is paid by adopters who get none
+of the benefit. **§5's "defaulted off in S5" applied only to the driver, and this states the rest.**
+
+**3. Roster integrity becomes satisfiable by construction on one anchor.** Protocol section 1 lists
+four mechanical properties, the fourth being that a Units table inside a roster marker pair may not
+move under the run. `check_authorization` takes the roster region at BASE and compares it against the
+WORKING COPY's README. Under the default-branch anchor BASE is a commit the run cannot advance
+without a gated landing, so the comparison really does catch a roster rewritten mid-flight. Under the
+branch anchor BASE is a tip the run committed and pushed, and `trusted_base` requires only that the
+recorded base be an ANCESTOR of the derived one — so the run re-satisfies the comparison against its
+own new bytes in two commands. The property is not lost on the default-branch anchor and is not
+enforceable on the branch anchor, so S8 qualifies protocol section 1's claim per anchor rather than
+leaving it standing unconditionally. **This one matters beyond the spec: the owner accepted cost 1 on
+a price list that did not include costs 2 or 3.**
+
+Nothing in this design closes any of the three, and no wording in the protocol may imply otherwise.
+What the design does instead is make the first visible: `anchor-kind: run-branch` is on the record,
+the branch ref and tip are on the record, and an off-machine verifier sees which anchor a run leaned
+on. That is section 9's stated posture applied rather than abandoned. Costs 2 and 3 are not made
+visible by anything, which is why they are stated here and put back to the owner as F6.
 
 Two guards were considered for the gap and both rejected as theatre: requiring the advertised branch
 tip to differ from HEAD (defeated by one empty commit) and requiring a minimum commit distance
@@ -137,11 +227,13 @@ discriminator is supplied by its subject, which is the class
 authorization defects belonged to. So S6 gives the leg a single predicate that covers both anchors
 and needs no discriminator:
 
-> the recorded BASE is an ancestor of the advertised HEAD tip, **or** it equals a tip the remote
+> the recorded BASE is an ancestor of the advertised HEAD tip, **or** an ancestor of a tip the remote
 > advertises for some ref.
 
-Equality against an advertised tip is exactly "this commit is published on the remote", which is the
-property both anchors are trying to express. It also keeps the leg free of any branch NAME: route 2
+Ancestry of an advertised tip is "this commit is published on the remote". The first revision wrote
+EQUALITY here and justified it with that same sentence, which was wrong: equality is a strict subset
+of published, and it wedges the moment the run pushes its branch a second time. S6 carries the
+reproduction path. It also keeps the leg free of any branch NAME: route 2
 of the reproduced bypass was a branch name supplied through the environment, and a leg that never
 reads one cannot be walked through that way. `anchor-kind` stays in the record as EVIDENCE for a
 human and for an off-machine verifier, exactly as the anchor ref, tip and URL already do.
@@ -159,26 +251,49 @@ a conforming build README to resolve there.
 | `anchor-kind` | absent | `default-branch` or `run-branch` |
 | `branch-ref` · `branch-sha` | absent | the second observation, when it was used |
 
-Protocol section 2 states an authored-fact count. It moves, and it moves in both copies.
+Protocol section 2 states the authored region carries "exactly seven facts and nothing else", and
+enumerates them 1..7 — counting one anchor observation as THREE separately numbered facts. At that
+same granularity this table's three new keys make the count **ten**, not the eight an earlier
+revision of S4 claimed. S4 now states the real count and maps each new key to a numbered item,
+including how the two conditional ones are admitted when absent, because section 2's "nothing else"
+clause is unconditional today. The count appears in one place only, and both protocol copies move
+together — check 10 byte-compares them against each other, so a wrong count is identical in both and
+passes. **`memory/builds/cBriefedPilot/README.md` states "No eighth authored fact" as the premise for
+routing its own waiver through fact 3**, so this is a live fleet collision and belongs beside the kit
+version literal on the build README's stop-and-reconsider list.
 
 ### Inventory — every consumer of the authorization
 
 | Site | Change |
 |---|---|
-| `unattended.sh` `resolve_base` | S1, S2 |
-| `unattended.sh` `trusted_base` | the recorded-BASE cross-check must accept a base equal to the derived one on the branch path |
-| `unattended.sh` `check_authorization` | none (S3) |
+| `unattended.sh` `resolve_base` | S1, S2, S11 — gains the README path as a parameter, the silent existence probe, and the preserved `rc=2` contract |
+| `unattended.sh` `trusted_base` | gains the same parameter and passes it through; the equality cross-check needs NO change, since a commit is its own ancestor. What it does need is S12 — it re-derives the anchor at every later verb, and the selection must not flip mid-run |
+| `unattended.sh` `check_authorization` | body unchanged (S3); signature moves with S1's plumbing |
 | `unattended.sh` `verb_preflight` | records the new facts |
-| `unattended.sh` `dod_met` → `authorization-reachable` | none; it re-derives through `trusted_base` |
-| `unattended.sh` `verb_landed` | none; landing is still measured against the default-branch tip |
-| `check-unattended.sh` check 9 | S6 |
-| `check-unattended.sh` check 13 | none; it reads the README at the recorded BASE, which S6 has already validated |
+| `unattended.sh` `dod_met` → `authorization-reachable` | re-derives through `trusted_base`, so it inherits S12. Not "none" |
+| `unattended.sh` `verb_landed` | landing is still measured against the default-branch tip; AC13 observes it on a branch-anchored run rather than asserting it |
+| `check-unattended.sh` check 9 | S6, S6b, S6c |
+| `check-unattended.sh` check 15, second half | S6b — it is nested INSIDE the loop S6 rewrites and compares the LANDED witness against that loop's anchor |
+| `check-unattended.sh` the phase-keyed `rb != HEAD` clause | S6b — same loop |
+| `check-unattended.sh` check 13 | reads the README at the recorded BASE, which S6 has already validated |
+
+The four rows this table previously marked "none" were assertions about code whose behaviour changes
+under S1, and no acceptance criterion observed any of them. That is what let S12's wedge sit inside a
+spec with twelve green criteria.
 
 ### Migration
 
-None for an existing record. A run-state file with no `anchor-kind` is a default-branch run, and S6's
-predicate accepts its BASE by the first clause exactly as check 9 does today. No committed record is
-retroactively red, which is the property that lets this land without a sweep.
+**Existing records.** A run-state file with no `anchor-kind` is a default-branch run, and S6's
+predicate accepts its BASE by the first clause exactly as check 9 does today, so no committed record
+is retroactively red.
+
+**Durability of a branch-anchored record**, which the first revision did not consider at all. The
+recorded BASE must keep passing check 9 after: the run pushes its branch again (S6's reachability
+form covers it; equality did not), the branch is deleted after landing, and the work is
+squash-merged rather than fast-forwarded. The last two both leave a BASE that is an ancestor of no
+advertised tip. AC6's red case — "a BASE on no advertised history" — is indistinguishable from the
+state a legitimate branch-anchored record decays into, which is why S6c's offline behaviour and this
+paragraph's cases need their own criteria rather than being read off that one.
 
 ### Rollout
 
@@ -190,15 +305,15 @@ bar on the next push, on the one path the run is required to take.
 
 | Path | Change |
 |---|---|
-| `tools/unattended/unattended.sh` | S1, S2, S4 |
-| `tools/unattended/check-unattended.sh` | S6 |
+| `tools/unattended/unattended.sh` | S1, S2, S4, S11, S12 |
+| `tools/unattended/check-unattended.sh` | S6, S6b, S6c |
 | `tools/unattended/SKILL.template.md` + the rendered Skill | S7 |
 | `tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` | S8 |
 | `.unattended.conf` + `tools/unattended/.unattended.conf.example` | S5 |
 | `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` | S9 |
 | `.memory-tree.conf` | the `ARMS_FLOORS` pairs for both files, re-measured |
 | `memory/backlog/TOOL.md` | S10, the `TOOL-aStandingWrit-6` row rewritten to name what remains |
-| `AGENTS.md` | the leg's check count, if S6 adds an ordinal rather than changing one |
+| `AGENTS.md` | **conditional and unbacked.** S6 changes ordinals rather than adding one, so the "fifteen checks" claim at `AGENTS.md:136` is expected to stand — verified: the leg carries exactly `fail 1` through `fail 15` today. If S6b's dispositions add an ordinal, this row becomes mandatory. No gate enforces it either way; see the §7 correction |
 
 ### Alternatives rejected
 
@@ -220,26 +335,34 @@ bar on the next push, on the one path the run is required to take.
 
 ## 5. Production-readiness checklist
 
-- security — this is the unit's entire subject. The change is a deliberate reduction in the cost of
-  self-authorization, priced in §4, defaulted off in S5, recorded in S4, and stated in the protocol
-  in S8. The one hard rule it must not break: no input to the authorization may come from inside the
-  run's reach, which is why S6 refuses to read `anchor-kind`.
-- perf / scale — one additional `ls-remote` per preflight, and one per leg run, both only on the
-  fallback path. The leg's existing per-record loop does not gain a network call per record; the
-  advertisement is fetched once.
+- security — this is the unit's entire subject, and §4 now prices THREE spent properties where the
+  first revision priced one. **Only the DRIVER half is defaulted off by S5.** The leg-side widening in
+  S6 is unconditional and cannot be gated on `ANCHOR_SCOPE`, because the conf is a working-tree file
+  the run can commit and would therefore be the same inside-the-subject's-reach defect as reading
+  `anchor-kind`. So adopters who never opt in still get the weaker bar. The one hard rule this unit
+  must not break: no input to the authorization may come from inside the run's reach.
+- perf / scale — one additional `ls-remote` per preflight on the fallback path. **The leg is
+  different and the first revision was wrong about it**: the leg has one predicate, not a fallback
+  path, and AC8 forbids it from reading `anchor-kind`, so it cannot know which records need the
+  observation and observes once per leg RUN regardless. The leg makes zero network calls today.
 - a11y — N/A.
 - i18n — N/A.
 - error / empty / loading states — a remote that answers but advertises nothing for the branch is a
   refusal naming the branch, distinct from a remote that does not answer at all, which the existing
   `--exit-code` discipline already distinguishes. An empty declaration must select the strict anchor,
   never the wide one: protocol section 8's rule is that an empty declaration is a refusal rather than
-  a pass, and the safe reading of a blank scope key is today's behaviour.
+  a pass, and the safe reading of a blank scope key is today's behaviour. **The leg's offline
+  behaviour belongs here and not in perf**: S6c decides it, it is an unguarded merge-bar leg running
+  under the pre-push hook, and neither fail-closed nor fail-open is free.
 - observability — the run-state file gains the three facts that make the weaker anchor legible, and
   the wrap-up surfaces `anchor-kind` because an owner reading a landed run should not have to
   reconstruct which anchor it used.
-- risks — the named one is self-authorization, above. The second is the leg and the driver drifting
-  into two different predicates, which is what wedged this kit twice before; S6 answers it by giving
-  both one property (published on the remote) rather than two spellings of one procedure.
+- risks — three named. Self-authorization and the two further spent properties, all in §4. The leg
+  and the driver drifting into two different predicates, which is what wedged this kit twice before;
+  S6 answers it by giving both one property (published on the remote) rather than two spellings of one
+  procedure. And the ANCHOR SELECTION FLIPPING mid-run, which S12 exists for — it is a wedge with no
+  attacker, reachable by another node simply landing the build folder, and it ends with the run stuck
+  in a non-terminal phase because the verb that would move it is the one that refuses.
 - testing + left-shift gates — S9, and the fixture must build a real bare origin that advertises a
   HEAD symref. `build/repro-c3.sh` under this build is the working fixture shape and the arms reuse
   it. An arm keyed on the exit code alone would pass on any refusal, which is the
@@ -270,15 +393,39 @@ bar on the next push, on the one path the run is required to take.
 - **AC7** — When the leg runs over an existing default-branch record that carries no `anchor-kind`,
   it passes unchanged, proving no committed record is retroactively red.
 - **AC8** — When `grep` is run over `tools/unattended/check-unattended.sh` for `anchor-kind`, there is
-  no hit, proving the leg branches on nothing the run wrote.
+  no hit, proving the leg gains **no new** run-written discriminator. The earlier wording concluded
+  "the leg branches on nothing the run wrote", which is false — it reads `phase`, `witness` and `base`
+  from the run-state file on every iteration, and the leg's own comment concedes it. An overstated
+  boundary claim is exactly what this unit's S8 exists to stop the protocol from making.
 - **AC9** — When `bash tools/unattended/adopt-unattended.sh --check` runs, the rendered Skill matches
   the template plus the conf and carries no surviving placeholder, with S7's precondition present.
-- **AC10** — When `bash tools/unattended/check-unattended.sh` runs its shipped-equals-installed check,
-  `PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` agree after S8.
+- **AC10** — When the leg's shipped-equals-installed check runs, `PROTOCOL.template.md` and
+  `memory/guides/UNATTENDED-PROTOCOL.md` agree after S8, **and both contain an `ANCHOR_SCOPE` row in
+  section 8's key table and a fifth cost in section 1**. The byte-comparison alone is green today,
+  green if S8 is skipped entirely, and green if both copies are edited to omit exactly those two
+  things — so it observed nothing about the unit's headline deliverable. The content half follows the
+  shape AC9 already uses.
 - **AC11** — When `python tools/memory-tree/check-arms.py` runs, both unattended files are fully
   armed and the `ARMS_FLOORS` pairs in `.memory-tree.conf` match a fresh measurement.
 - **AC12** — When `bash tools/unattended/adopt-unattended.test.sh` runs, the adopter e2e is green,
   including its junction arm, proving S5's new key did not break the render for an adopter.
+- **AC13** — When a branch-anchored run is carried through `--close`, the `authorization-reachable`
+  DoD item is met without an override, and `--landed` then reaches the terminal phase. Every
+  driver-side criterion above stops at `--preflight`, so F4's ratified resolution — that such a run
+  does reach the terminal phase — had no observation at all, and §4's Inventory rows asserting
+  downstream consumers are unaffected were untested claims.
+- **AC14** — When a branch-anchored run's build folder reaches the default branch mid-run and the run
+  then calls `--close`, it does NOT refuse. This is S12's observation and the wedge has no attacker in
+  it.
+- **AC15** — When the run pushes its branch a SECOND time after preflight, `bash
+  tools/unattended/check-unattended.sh` still passes over that record. This is S6's reachability
+  form; under the equality form it reds, permanently.
+- **AC16** — When `bash tools/unattended/check-unattended.sh` runs with the remote unreachable, it
+  behaves as S6c specifies, and the arm names which behaviour that is rather than accepting either.
+- **AC17** — When the leg runs in a repo declaring `ANCHOR_SCOPE=default-branch` over a
+  branch-anchored record, the verdict is the one §4's price list states. This is the observation the
+  unconditional leg-side widening owes; without it nothing in the spec set notices that the bar moved
+  for adopters who never opted in.
 
 ## 7. Gates
 
@@ -290,13 +437,20 @@ bar on the next push, on the one path the run is required to take.
 - `python tools/memory-tree/check-arms.py` with the `ARMS_FLOORS` pins in `.memory-tree.conf`.
 - `python tools/codebase-map/test_codebase_map.py` — the unattended dossier under `memory/map/features/`
   must be re-derived for the new anchor, and the generated artifacts re-rendered.
-- `bash tools/check-playbook-parity.sh` — reds if a value the playbook STATES stops equalling the
-  source that owns it, which the leg's check count is.
+- `bash tools/check-playbook-parity.sh` — must stay green. **It is NOT a backstop for the leg's check
+  count**, which an earlier revision of this line claimed. That gate opens only the three
+  `parallel-coding-governance.*` files and carries two declared pairs, neither about a leg check
+  count; it never reads `AGENTS.md`, where the count lives. So the `AGENTS.md` row in §4's
+  Files-touched has no gate behind it and is a manual obligation — stated plainly rather than left
+  looking mechanised, with node `c` concurrently moving the same number.
 
 ## 8. Open questions
 
-none — all four forks below are RESOLVED, and the build-level decision that precedes them is recorded
-in this build's README.
+F5 and F6 are OPEN. F1 through F4 are RESOLVED below, and the build-level decision that precedes them
+is recorded in this build's README. Both new forks were opened by the spec audit AFTER those
+resolutions, so this spec is FORKED under M2 until they are answered, and its status may not go
+terminal before then. Neither is a re-litigation of a resolved fork: F5 is a mechanism the first
+revision did not know it needed, and F6 is a cost the owner was not shown when they priced the unit.
 
 - **F1 — the declaration's name and value set.** Options: a boolean-ish key naming the behaviour
   (`ALLOW_BRANCH_ANCHOR=1`), or a scope key with a closed value set
@@ -325,6 +479,32 @@ in this build's README.
   default tip, so the work IS on the default branch by the time it is claimed, and refusing there
   would strand a run that has already landed its work in a non-terminal phase no verb can close.
   **RESOLVED (owner, 2026-08-16): no additional restriction.**
+- **F5 — OPEN. How is the anchor SELECTION kept stable for the life of a run?** S12 states the
+  requirement; it does not state the mechanism, because both candidates have a real cost. **(a) Read
+  `anchor-kind` back from the record** and let it select which derivation `trusted_base` performs.
+  Simple, and it works — but the value is run-written, and AC8 plus §4's whole "why the leg must not
+  read `anchor-kind`" argument exist to keep run-written values off this path. The mitigation is that
+  the DRIVER already trusts the record for `base` as evidence and re-derives the commit itself, so
+  reading a KIND is arguably the same class of trust; the objection is that this kit has been burned
+  three times by exactly that reasoning. **(b) Make the derivation monotone across both anchors**, so
+  no discriminator is needed — for instance by having `trusted_base` accept a recorded BASE that is an
+  ancestor of EITHER derivation, which keeps `fail 18` reachable only for a base on neither history.
+  Cheaper to reason about, but it widens `fail 18` and needs its own arm to show the guard still has a
+  failing case. **Recommendation: (b).** It keeps the run-written value off the decision path, which
+  is the property this kit keeps paying to preserve, and the widening it costs is one this spec can
+  measure. This is an owner turn because the options differ in what gets built.
+- **F6 — OPEN. Costs 2 and 3 in §4 were not on the price list the owner accepted.** The owner
+  ratified the rule change against "a run can authorize itself". The audit found two more spent
+  properties: the leg-side widening applies to adopters who never opt in and cannot be gated on the
+  conf, and the roster-integrity comparison becomes satisfiable by construction on the branch anchor.
+  Options: **(a) accept all three and land** — the unit does what was asked and the protocol states
+  all three costs; **(b) accept 1 and 3, and narrow S6's clause 2** to something a non-opted-in repo
+  still refuses, which needs a discriminator outside the run's reach and may not exist; **(c) stop
+  here** and take units 1 and 2 only, which was the alternative on the table when the owner chose to
+  build all three and which fixes every worktree failure that is not the authorization rule.
+  **Recommendation: (a), re-confirmed explicitly.** The unit cannot deliver what was asked without
+  cost 2, and cost 3 is a property the branch anchor cannot carry. But the owner priced this once
+  already on incomplete information, and re-confirming is cheaper than discovering it after landing.
 
 ## 9. Revision log
 
@@ -332,6 +512,21 @@ in this build's README.
 - rev-2 · 2026-08-16 · all four forks resolved by the owner. F1's pick folded into S5 as a closed
   value set with its refusals, and into S9 as an arm; F2's into the new S10 and §3's non-goal; F3's
   into §3. F4 changed no scope item, which is what "no additional restriction" means.
+- rev-3 · 2026-08-16 · folded the spec audit recorded under this build's `reviews/`, which returned
+  BLOCKED with three blockers, two of them here. S6's clause 2 moved from EQUALITY to REACHABILITY —
+  equality wedges the moment the run pushes its branch a second time, which is the shape this kit's
+  own source records being moved off after a reproduced wedge. §4's price list went from one spent
+  property to three: the leg-side widening is unconditional and hits adopters who never opt in, and
+  roster integrity becomes satisfiable by construction on the branch anchor. S1 gained the trigger's
+  actual mechanism, since `resolve_base` takes no slug and never reads a README and the obvious
+  implementation would print a numbered refusal on every successful preflight. New S6b (the four other
+  assertions inside the loop S6 rewrites, plus check 15's second half nested in it), S6c (the leg's
+  offline behaviour, and it is an unguarded merge-bar leg), S11 (the `rc=2` return contract that gates
+  both `fail 16` branches) and S12 (the anchor selection can flip mid-run and wedge `--close`). AC8
+  and AC10 were green regardless of the work; AC13-AC17 added, including the first observation of a
+  branch-anchored run past `--preflight`. The authored-fact count corrected from eight to ten, with
+  the `cBriefedPilot` collision named. §7's claimed backstop for the AGENTS.md count does not read
+  AGENTS.md. F5 and F6 opened.
 
 ## 10. Reuse audit
 
@@ -346,9 +541,16 @@ object-substitution lever, and the `GIT()` dereference pin — so S1 extends tha
 rather than opening a second, differently-guarded path to the remote. Reusing it is what keeps the
 new observation from becoming the weaker of two spellings.
 
-`check_authorization` is reused verbatim (S3): it already takes the base as a parameter and asserts
-shape at it, which is why a second anchor needs no second authorization predicate. The region and
-roster comparisons inside it apply to the branch anchor unchanged.
+`check_authorization`'s BODY is reused (S3): it already takes the base as a parameter and asserts
+shape at it, which is why a second anchor needs no second authorization predicate. Its signature moves
+only to carry S1's plumbing.
+
+**An earlier revision of this section said the region and roster comparisons "apply to the branch
+anchor unchanged". They do not, and the correction is in §4's price list as cost 3.** The comparisons
+still RUN, but the roster one stops being an integrity check: it compares the region at BASE against
+the working copy, and on the branch anchor BASE is a tip the run itself pushed, so the run can
+re-satisfy it against its own new bytes. Protocol section 1 lists that as a mechanical property, which
+is why S8 qualifies it per anchor instead of leaving it standing.
 
 The fixture shape is reused from `build/repro-c3.sh` under this build, which itself follows the bare
 origin with an advertised HEAD symref that `tools/unattended/unattended.test.sh` established. No new
