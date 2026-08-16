@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -31,7 +31,10 @@ onto a corpus already proven conformant by the gate's own predicate.
 - **No content edit beyond the binding line.** A record is an account of a moment. Correcting its
   prose, its verdict line or its findings is not this unit, and would make the retrofit unreviewable
   by mixing a mechanical insertion with judgement.
-- **No filename changes.** Fork A is unresolved and owned by `TOOL-aTetheredRecord-4`.
+- **No filename changes.** Fork A resolved to rename every record, and that is
+  `TOOL-aTetheredRecord-7`, which runs after this unit because it DERIVES each target name from the
+  binding line this unit authors. Keeping them separate also keeps two judgements apart: which spec a
+  record is about, and what the file should therefore be called.
 - **No verdict-line backfill.** Measured 12 of 53 review records carry the line M4 requires. That is
   a real gap in the same head region of the same files, and folding it in here would smuggle a second
   rule into a mechanical pass. It is a recommendation with its own unit.
@@ -43,6 +46,11 @@ onto a corpus already proven conformant by the gate's own predicate.
 
 Every binding value comes from exactly one of these, tried in order, and the rule that produced it is
 recorded inline on the line itself when it is not rule 1:
+
+Each authored line also carries the KIND token from `TOOL-aTetheredRecord-2` §4. The kind is read
+from the same evidence as the ids and by the same precedence: a record that calls itself a pre-code
+pass over a spec is a `spec-audit`, one that names a commit range is a `diff-review`, and the
+filename is not evidence for the kind either.
 
 1. **The record's own body.** It names a spec id, a spec path, or a unit label the build README maps
    to an id. Authoritative.
@@ -142,6 +150,9 @@ none.
 
 - rev-1 · 2026-08-16 · initial draft, from the adversarial design pass recorded under this build's
   `build/` folder.
+- rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork E ratified ADD-NOW, so every
+  authored line now carries a kind token derived by the same precedence as the ids; Fork A ratified
+  RENAME-ALL, so §3 hands the filenames to `TOOL-aTetheredRecord-7` and says why they stay separate.
 
 ## 10. Reuse audit
 

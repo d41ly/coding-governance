@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -36,8 +36,10 @@ so an unannotated record can never brick the index render.
   `TOOL-aTetheredRecord-5` and is forked.
 - **No id-resolution logic.** Whether a cited id resolves is already check 14's question and this
   unit does not re-answer it. See §10.
-- **No relation vocabulary.** A record states which ids it serves, never which KIND of relation it
-  holds to them. That is Fork E, deferred.
+- **No coverage CLAIM from the kind token.** The vocabulary lands (Fork E, owner-resolved), but a
+  `spec-audit` record still answers coverage-EVER, not coverage-at-rev, because the reviewed rev is
+  optional under Fork C. `TOOL-aTetheredRecord-5` states that limit where the derived line renders;
+  this unit must not let the token imply a claim the data cannot support.
 - **No new module and no new gate leg.** The parse rides a module that is already a delegate, already
   carries a self-test, and already rides a leg.
 
@@ -53,6 +55,19 @@ A record carries, in its unfenced head, one line of either shape:
   prose. The reason is mandatory and unparsed: a bare `none` is malformed. This follows the rule the
   hygiene catalog already applies to bug-class records, where declaring no gate is acceptable and
   silence is not.
+
+The line opens with a KIND token before the ids, from a closed vocabulary of four, DERIVED by
+classifying the measured corpus rather than invented:
+
+| Kind | What it is | A record that reads this way today |
+|---|---|---|
+| `spec-audit` | a pre-code adversarial pass over a spec or spec set (the M4 obligation) | "Tier-2 adversarial pass over TOOL-aNumeralWarden-1 at rev-1" |
+| `diff-review` | a pass over BUILT code — a closing or cumulative diff (the M8 obligation) | "Closing Tier-2 review — TOOL-aGuardedTally-1 as BUILT" |
+| `journal` | evidence of what was built: a build ledger, an AC transcript, a reproduction | "TOOL-aQuarriedLantern — build ledger" |
+| `research` | a report that PRECEDES the specs — a commissioning input, census or design pass | "The playbook audit — the commissioning input" |
+
+The vocabulary is closed and the check rejects an unknown token, because an open kind field is a
+free-text column that stops being groupable the first time two authors spell one relation differently.
 
 An optional second line carries the key `Commissions` and the same id list. It expresses the inverse
 relation — this record PRODUCED those specs — and exists because the corpus contains records that
@@ -149,24 +164,32 @@ markers` · `verdict epoch` · `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED and kept for the record.
+
 **Fork C — is the reviewed rev mandatory?** M4 selects specs whose rev moved since their last review,
-so a binding without a rev answers coverage-ever rather than coverage-at-rev, and the criticism that
-this under-delivers M4 is correct.
+so a binding without a rev answers coverage-ever rather than coverage-at-rev.
 
-- *Option 1 (RECOMMENDED)* — optional, recorded, never validated. The rev at review time is
-  unrecoverable for most of the 76 existing records, so mandatory forces a fabricated number, and a
-  fabricated provenance value is worse than an absent one.
+- *Option 1* — optional, recorded, never validated.
 - *Option 2* — mandatory on all records. Unsatisfiable against the corpus without invention.
-- *Option 3* — mandatory on new records only. This is a cutoff by another name and the owner ruled
-  cutoffs out.
+- *Option 3* — mandatory on new records only, which is a cutoff by another name.
 
-Under option 1 the M4 coverage claim is struck rather than softened: this build does not claim to
-make M4 computable, and `TOOL-aTetheredRecord-5`'s derived line is labelled by what it computes.
+RESOLVED (owner, 2026-08-17): option 1, by elimination rather than by preference. The owner's
+no-cutoff ruling removes option 3, and option 2 cannot be satisfied for records whose review-time rev
+is unrecoverable without fabricating one. The consequence is carried rather than hidden: the M4
+coverage claim is STRUCK from this build, and the derived line in `TOOL-aTetheredRecord-5` is
+labelled by what it computes.
+
+**Fork E — does a record declare the KIND of relation?** RESOLVED (owner, 2026-08-17): yes, now. The
+four-token vocabulary in §4 is derived from the measured corpus. It does not rescue Fork C — a
+`spec-audit` token still answers coverage-ever — and §3 forbids letting the token imply otherwise.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the adversarial design pass recorded under this build's
   `build/` folder.
+- rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork E ratified ADD-NOW, so the grammar
+  gains the closed four-token kind vocabulary in §4 and §3 gains the standing limit that the token
+  must not imply a coverage claim Fork C cannot support. Fork C resolved by elimination.
 
 ## 10. Reuse audit
 

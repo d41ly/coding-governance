@@ -68,3 +68,4 @@
 - TOOL-aTetheredRecord-4 · SPECCED · check 21 — three armed fail branches over an extension-agnostic population; branch 2 narrows check 14's any-anchor resolution to spec-defined ids → `builds/aTetheredRecord/`
 - TOOL-aTetheredRecord-5 · SPECCED · the generated region renders each record under the ids it serves and derives the ids no record names — the two-sided join no grep can compute → `builds/aTetheredRecord/`
 - TOOL-aTetheredRecord-6 · SPECCED · the adopter path: the pin is measured against the adopter's own corpus from the scaffolder's next-steps block, and the runbook carries their migration → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-7 · SPECCED · the rename Fork A ratified: every record filename names a spec via a REDEFINED ordinal (no grammar change), with 107 referencing lines repaired in the same commits → `builds/aTetheredRecord/`

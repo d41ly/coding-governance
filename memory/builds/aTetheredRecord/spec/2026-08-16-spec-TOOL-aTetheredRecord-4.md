@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -17,16 +17,19 @@ line, that every id it names resolves to a SPEC, and that the unbound escape sta
   under a build's `build/`, `prompts/` or `reviews/` folder, with NO extension filter. It carries the
   population guard, skips under the staged-diff mode, and delegates the parse to the module from
   `TOOL-aTetheredRecord-2` in the shape check 9 already uses.
-- **S3** — Three `fail 21` branches, each with a distinctive longest literal run so the sibling test
-  can assert it verbatim.
+- **S3** — Four `fail 21` branches, each with a distinctive longest literal run so the sibling test
+  can assert it verbatim. The fourth binds the filename to the header and exists because Fork A
+  ratified the rename.
 - **S4** — `RECORD_UNBOUND_PIN` in `.memory-tree.conf`, MEASURED against this corpus by
   `TOOL-aTetheredRecord-3`, with its measurement note; blank in the shipped example conf; and a
   ratchet row in `tools/drift-audit/drift_signals.py` declaring that raising it is the weakening
   direction.
-- **S5** — `ARMS_FLOORS` for the hygiene engine moves from its current pair to three more branches,
+- **S5** — `ARMS_FLOORS` for the hygiene engine moves from its current pair to four more branches,
   all armed.
-- **S6** — Fixtures and three arms in `tools/memory-tree/check-memory-hygiene.test.sh`, each asserted
-  inside check 21's own output block rather than against a global hit.
+- **S6** — Fixtures and four arms in `tools/memory-tree/check-memory-hygiene.test.sh`, each asserted
+  inside check 21's own output block rather than against a global hit. Branch 4's fixture must carry
+  a filename whose ordinal names a REAL id the header omits — an ordinal naming nothing would red on
+  branch 2 instead and arm the wrong branch.
 - **S7** — Rename the leg and every carrier of its check count. Measured: eight spellings across
   seven files, of which six are authored and two re-render.
 - **S8** — Correct `memory/project/unarmed-branches.txt`'s header, which declares the file empty
@@ -62,6 +65,35 @@ gap. This is the whole of the delta between the free check and the needed one.
 shrink-only scalar. The reason prose is mandatory at parse time, so the escape is never silent; the
 pin is what stops it becoming the default.
 
+**Branch 4 — the filename agrees with the header.** Fork A ratified renaming every record, so the
+filename now carries a binding too and two carriers can disagree. This branch is what keeps that from
+being a second answer: the filename is a PROJECTION of the header, and the check asserts the
+projection is a member of the set it projects from.
+
+### The ordinal is REDEFINED, not widened — and that is what makes the rename safe
+
+The design pass killed the filename carrier partly on a real blocker: widening check 5's ordinal slot
+to admit an id LIST would make the closed family alternation vacuous for the whole non-spec
+population, flipping a live fixture from red to green. That blocker is avoided rather than accepted,
+because the rename does not widen anything.
+
+The recording-name grammar keeps its exact shape. What changes is what the ordinal MEANS: today it is
+a per-kind round counter, and after the rename it is the sequence number of a spec the record serves.
+The family qualifier, already optional in the grammar, becomes REQUIRED for a record in a build whose
+specs span more than one family — which is precisely where today's ordinals collide.
+
+Three cases follow, and none needs a grammar change:
+
+| Case | Filename | Why it is unambiguous |
+|---|---|---|
+| serves one spec | family and seq of that spec, with the existing optional tail distinguishing several records on one spec | the projection is the whole set |
+| serves several specs | family and seq of the LOWEST id in the header's list, tail distinguishing | the header is authoritative for the set; the filename names its least member, and branch 4 asserts membership |
+| serves none | the build-scoped ordinal it has today | branch 4 skips a record whose header says `none`, because there is no id to project |
+
+This is a projection with a gate, not two answers to one question. The header remains the single
+authored source; the filename is derived from it and mechanically checked against it, which is the
+same relationship the generated index has to the specs.
+
 ### The literal messages
 
 `check-arms.py:104-113` takes a branch's signature as the LONGEST literal run between interpolations,
@@ -71,6 +103,7 @@ the interpolated list follows it:
 - `records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:`
 - `Serves or Commissions lines naming an id that no spec in this tree defines:`
 - `records carrying the unbound Serves form outnumber RECORD_UNBOUND_PIN — bind them, or move the pin recording the old and new values beside it:`
+- `record filenames whose family and ordinal name an id their own Serves line does not list:`
 
 None contains a positional parameter, which `check-arms.py` would read as literal text inside the
 signature and no assertion could ever emit.
@@ -139,7 +172,9 @@ mirrors, the memory root's own index, the copy the adopter script writes, plus h
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/memory-tree/check-arms.py --report` runs, the hygiene engine shows
-  three more branches than today and all of them armed, and `ARMS_FLOORS` matches.
+  four more branches than today and all of them armed, and `ARMS_FLOORS` matches.
+- **AC1b** — When a record is renamed so its ordinal names a real id its own `Serves` line omits,
+  `bash tools/memory-tree/check-memory-hygiene.sh` reds on branch 4 and not on branch 2.
 - **AC2** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, it is green, and each of
   the three arms asserts inside check 21's own output block rather than against a global hit.
 - **AC3** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs against a scratch tree holding
@@ -161,26 +196,36 @@ push boundary.
 
 ## 8. Open questions
 
-**Fork A — does the filename carry the binding?** The owner's ask named filenames first, and today
-`2026-08-09-review-aBatchedTribunal-7.md` keeps spelling a 7 that is not the id it serves.
+none — the forks below are RESOLVED and kept for the record.
 
-- *Option 1 (RECOMMENDED)* — filenames stay ordinals, and one sentence in the hygiene doc says so
-  plainly. Cost: the ordinal keeps disagreeing until a reader opens the file or reads the build
-  README table.
-- *Option 2* — rename all 76. Delivers the literal ask. Costs 103 cross-referring lines in 62 files,
-  eight tracked spellings of the name grammar, collapse of the closed family alternation for the
-  whole non-spec population, and a permanent rename discipline no gate enforces.
-- *Option 3 (second choice)* — a narrow follow-up renaming ONLY the ordinals that collide with a real
-  different id in the same build. Most of the glanceability, a fraction of the blast radius. This is
-  the better backlog row if option 1 leaves the owner unsatisfied.
+**Fork A — does the filename carry the binding?** Today `2026-08-09-review-aBatchedTribunal-7.md`
+spells a 7 that is not the id it serves.
 
-**Fork D — bound the unbound form by a count or a registry?** RECOMMENDED: the count, per §4's
-rejected alternative. A registry buys information already visible inline.
+- *Option 1* — filenames stay ordinals, documented as such.
+- *Option 2* — rename every record so the filename names a spec.
+- *Option 3* — rename only the ordinals that collide with a real different id in the same build.
+
+RESOLVED (owner, 2026-08-17): option 2, against the recommendation on this spec, which argued for
+option 1. The owner's original ask named filenames first and the resolution holds them to it.
+
+Two consequences are absorbed rather than argued with. The blocker that killed this carrier in the
+design pass is DESIGNED AROUND by §4's redefinition — the ordinal changes meaning, the grammar does
+not change shape, so the closed family alternation never goes vacuous. The residual cost is real and
+is now `TOOL-aTetheredRecord-7`: 107 referencing lines across 65 citing files, measured, none of them
+in an append-only area, so every one is legally repairable. The permanent rename discipline that
+option 1 warned had no gate now HAS one — branch 4.
+
+**Fork D — bound the unbound form by a count or a registry?** RESOLVED (owner, 2026-08-17): the
+count, per §4's rejected alternative. A registry buys information already visible inline and costs
+the six-file sweep a prior unit measured and rejected.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the adversarial design pass recorded under this build's
   `build/` folder.
+- rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork A ratified RENAME-ALL against this
+  spec's recommendation, adding branch 4, its arm, the ordinal redefinition in §4 that avoids the
+  alternation blocker, and the rename itself as `TOOL-aTetheredRecord-7`. Fork D ratified the count.
 
 ## 10. Reuse audit
 

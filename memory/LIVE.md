@@ -14,7 +14,7 @@ terminal status. Nothing here is edited by hand.
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aSealedCaravan](builds/aSealedCaravan/README.md) | INPROGRESS | a | 2026-08-10 | deployer+tooling | 10 |
-| [aTetheredRecord](builds/aTetheredRecord/README.md) | SPECCED | a | 2026-08-16 | tooling | 6 |
+| [aTetheredRecord](builds/aTetheredRecord/README.md) | SPECCED | a | 2026-08-16 | tooling | 7 |
 | [aTimedTurnstile](builds/aTimedTurnstile/README.md) | INPROGRESS | a | 2026-08-11 | tooling | 8 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |

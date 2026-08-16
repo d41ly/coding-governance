@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -13,17 +13,22 @@ beside them. This unit renders each record under the ids it serves and derives t
 - **S1** — The generated region gains a records table, below the existing sentence that names the
   three record folders, listing each record with the ids it serves and its recorded rev where one is
   present. Rows are sorted by path; links use the build-relative form the region already emits.
-- **S2** — A derived line naming the spec ids that no record in the build names, computed from the
-  same two functions `TOOL-aTetheredRecord-2` supplies.
-- **S3** — `--selftest` arms covering a build with records, a build with none, and the population
+- **S2** — Two derived lines, computed from the same two functions `TOOL-aTetheredRecord-2` supplies:
+  the spec ids no record of ANY kind names, and — now that Fork E ratified the kind vocabulary — the
+  spec ids no `spec-audit` record names, which is the closest this build gets to the M4 question.
+- **S3** — The table carries the kind as its own column, so a reader can tell a spec audit from a
+  closing diff review without opening either.
+- **S4** — `--selftest` arms covering a build with records, a build with none, and the population
   assertion that keeps the table from silently rendering empty.
 
 ## 3. Non-goals (OUT)
 
-- **The derived line is NOT labelled "unreviewed".** It reports ids no record names. Whether a record
-  is a spec audit or a cumulative-diff review is Fork E, deferred, and a coverage claim this build
-  cannot support is worse than an honest gap. `memory/guides/BUILD-METHOD.md` M4 selects on rev too,
-  and this build's rev is optional.
+- **Neither derived line is labelled "unreviewed".** With the kind token the second line can restrict
+  to `spec-audit` records, which is much closer to M4 — but M4 also selects on REV, and the reviewed
+  rev is optional under Fork C. So the line reports ids no spec-audit record names EVER, not ids
+  whose current rev is unreviewed. A spec reviewed at rev-1 and since bumped to rev-4 does not appear.
+  The rendered label says exactly that; an "unreviewed" label would be a coverage claim the data
+  cannot support, which is worse than an honest gap.
 - **The existing sentence is not replaced.** It is kept, because the strip helper that manages it
   drives nine existing arms; replacing it removes the thing a mis-segmentation arm detects the
   absence of.
@@ -90,6 +95,9 @@ are enumerated at authoring time.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --write` renders a build whose records
   leave a spec id unnamed, the derived line names that id, and the line is absent from a build whose
   every id is named.
+- **AC3b** — When a build holds a `diff-review` record but no `spec-audit` record for a given id, the
+  second derived line names that id while the first does not, and its rendered label says it reports
+  ids never spec-audited rather than ids unreviewed at their current rev.
 - **AC4** — When `bash tools/memory-tree/marker-contract.test.sh` runs, it is green — the table sits
   inside the single existing generated-region pair.
 - **AC5** — When `python tools/memory-tree/gen_build_index.py --selftest` runs, the existing arms over
@@ -104,27 +112,29 @@ are enumerated at authoring time.
 
 ## 8. Open questions
 
-**Fork B — does this unit land at all?** It is separable: cutting it leaves units 1 through 4 and 6
-unchanged, because it is a subtraction rather than a rewrite.
+none — the forks below are RESOLVED and kept for the record.
 
-- *Option 1 (RECOMMENDED)* — build it, after check 21. It buys the coverage join and converts the
-  authored line into a byte-compared one, which is what stops a stale binding from sitting unnoticed.
-- *Option 2* — cut it, and reach the same information with a query the reader must know to run. The
-  owner's ask was for convergence at a glance, and a command nobody runs is not a glance.
+**Fork B — does this unit land at all?** RESOLVED (owner, 2026-08-17): build it, after check 21. It
+buys the coverage join and converts the authored binding into a byte-compared one, which is what
+stops a stale binding from sitting unnoticed.
 
-**Fork E — does a record declare a relation KIND?** A cumulative-diff review and a spec audit are
-different relations and this build binds ids without distinguishing them.
+**Fork E — does a record declare a relation KIND?** RESOLVED (owner, 2026-08-17): yes, now, against
+this spec's recommendation to defer. The vocabulary is DERIVED from the measured corpus rather than
+invented under time pressure — the four tokens and their evidence are in `TOOL-aTetheredRecord-2` §4
+— which answers the recommendation's actual objection.
 
-- *Option 1 (RECOMMENDED)* — defer, and meanwhile do not claim M4 coverage anywhere. The vocabulary
-  is a real design question and inventing it under time pressure is how a closed enum acquires a
-  value nobody can define.
-- *Option 2* — add a kind token now. It would make the derived line a true review-coverage report,
-  and it would need the rev from Fork C to be honest, which is unsatisfiable across this corpus.
+What the resolution does NOT buy is stated in §3 rather than left implied: the kind token sharpens
+the derived line from "no record" to "no spec audit", and it cannot reach M4's rev-keyed question,
+because Fork C left the reviewed rev optional. Two of the owner's resolutions interact here, and this
+is the interaction.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, from the adversarial design pass recorded under this build's
   `build/` folder.
+- rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork B ratified BUILD-IT. Fork E ratified
+  ADD-NOW against this spec's recommendation, adding the kind column, the second derived line, and
+  the §3 statement of what the two resolutions together still cannot answer.
 
 ## 10. Reuse audit
 
