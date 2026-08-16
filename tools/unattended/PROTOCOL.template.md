@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.4 -->
+<!-- gov:kit unattended@1.5 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -52,9 +52,17 @@ override on the authorization check is the authorization check.
 
 `<MEMORY_ROOT>/builds/<slug>/RUN.md`, split mechanically rather than by discipline.
 
-**Generated**, delimited by a marker pair and rendered by the driver: the unit list and per-unit
-status, both derived from build front matter and spec status headers. The gate byte-compares it
-against a fresh render. Never hand-edit it.
+**Generated** — and the marker pair is now EMPTY by contract. The unit list and per-unit status are
+DERIVED from the build README on every read, never copied here, and the gate asserts the region holds
+no copy.
+
+This inverted an earlier design in which the region WAS a copy the gate byte-compared against its
+source. That equality was unmaintainable in the ordinary case: folding a review bumps a spec rev,
+which moves the build index, which makes the copy stale — and the region's only writer was
+`--preflight`, which refuses once a run is live. The refusal told the reader to "re-run the driver",
+naming a path no verb walks. A run that hit it could only hand-edit an artifact this document calls
+generated. Deriving removes the class instead of adding a verb to service it, and the invariant is
+the same one stated as emptiness: one fact, one home.
 
 **Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,

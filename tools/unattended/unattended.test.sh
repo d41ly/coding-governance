@@ -442,7 +442,7 @@ git push -q -f origin "$BASE":main
 # ---- pair upstream is a refusal rather than something to guess around.
 reset_tree; sed -i '/<!-- \/gen:build-index -->/d' memory/builds/tRun/README.md; fixture; before=$(sum)
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the build README's generated markers are malformed, and the region is COPIED from there, so an unpaired marker is not something to guess around"
+hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
 same "check 9.1 wrote nothing" "$(sum)" "$before"
 
 reset_tree; sed -i '/<!-- \/run:generated -->/d' memory/builds/tRun/RUN.md; fixture
@@ -459,11 +459,15 @@ hit "$out" "cannot record a run fact — the file carries neither that key's lin
 reset_tree
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "preflight OK"
-# the region is a COPY: byte-identical to the README's slice, not a re-render of the same data
+# The region holds NO COPY. It used to be byte-identical to the README's slice, and that equality
+# was unmaintainable in the ordinary case: a spec rev bump moves the build index and preflight — the
+# only writer — refuses once a run is live. The unit list is DERIVED at read time instead, so the
+# region is empty and there is nothing here to keep fresh.
 slice() { awk -v o="$2" -v c="$3" 'index($0,o)==1{i=1;next} index($0,c)==1{i=0;next} i' "$1"; }
-same "the generated region is a byte copy of the README slice" \
-  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | git hash-object --stdin)" \
-  "$(slice memory/builds/tRun/README.md '<!-- gen:build-index -->' '<!-- /gen:build-index -->' | git hash-object --stdin)"
+same "the generated region holds no copy of the unit list" \
+  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | tr -d '[:space:]')" ""
+# ...and --status DERIVES the unit from the README rather than from the file it just wrote.
+hit "$(run --status tRun)" "tRun"
 same "the recorded BASE is the merge-base" \
   "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)" "$BASE"
 same "the keepalive id is recorded verbatim" \
