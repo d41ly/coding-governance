@@ -572,6 +572,83 @@ def main() -> int:
         check("the per-file note reports its own derived figure",
               "unclaimed file(s) under a non-flat home" in ps.stdout, ps.stdout)
 
+        # ===== unit 5: check carries evidence =====
+        # THE MEASURED HOLE, reproduced first so the arms below are graded against it: before this,
+        # a target whose landed files were ALL deleted, whose every recorded commit was rewritten to
+        # zeros and whose every hash was rewritten to nonsense, exited 0. `check` contained exactly
+        # one filesystem test — on the receipt's own path — and never opened the file list, never
+        # read the sidecar it writes, and called no hash function.
+        ev = make_target(tmp / "u5a", DEPLOY_FULL)
+        run("apply", "--target", str(ev), "--kits", "check-wiring")
+        pc = run("check", "--target", str(ev))
+        check("a clean install reports a DERIVED integrity count, non-zero",
+              "integrity: 2/2" in pc.stdout, pc.stdout)
+        check("and a derived provenance count", "provenance: 2/2" in pc.stdout, pc.stdout)
+        check("and compares the sidecar against the receipt, both counts named",
+              "sidecar: 2 line(s) compared against 2 hashed row(s)" in pc.stdout, pc.stdout)
+        check("a clean install exits 0 through those loops", pc.returncode == 0,
+              pc.stdout + pc.stderr)
+
+        # AC2 — one modified engine file is a finding naming the path and BOTH hashes.
+        ev2 = make_target(tmp / "u5b", DEPLOY_FULL)
+        run("apply", "--target", str(ev2), "--kits", "check-wiring")
+        tgt = ev2 / "tools" / "check-wiring.sh"
+        tgt.write_bytes(tgt.read_bytes() + b"\n# drift\n")
+        pc = run("check", "--target", str(ev2))
+        check("a modified engine file reds naming the path", pc.returncode == 1
+              and "check-wiring.sh" in pc.stdout, pc.stdout)
+        check("and names what it expected and what it found",
+              "expected" in pc.stdout and "found" in pc.stdout, pc.stdout)
+
+        # AC5 — provenance at check time, plus the DEAD PROBE half. A loop that resolved zero of a
+        # non-zero population measured nothing, and reporting that as clean is the failure direction
+        # this repo names.
+        ev3 = make_target(tmp / "u5c", DEPLOY_FULL)
+        run("apply", "--target", str(ev3), "--kits", "check-wiring")
+        rp = ev3 / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            f["commit"] = "0" * 40
+        rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+        pc = run("check", "--target", str(ev3))
+        check("an unresolvable recorded commit reds naming the gov checkout consulted",
+              "does not resolve at commit" in pc.stdout and "gov checkout at" in pc.stdout, pc.stdout)
+        check("and a provenance loop that resolved NOTHING says DEAD PROBE",
+              "DEAD PROBE" in pc.stdout, pc.stdout)
+
+        # AC4 — the sidecar and the receipt are asserted against EACH OTHER. The sidecar is the
+        # artifact a target verifies with bash alone and nothing in this repo read it before.
+        ev4 = make_target(tmp / "u5d", DEPLOY_FULL)
+        run("apply", "--target", str(ev4), "--kits", "check-wiring")
+        sp = ev4 / ".governance" / "install.sums"
+        lines = sp.read_text(encoding="utf-8").splitlines()
+        h, _, pth = lines[0].partition("  ")
+        sp.write_text(("0" * 64 + "  " + pth + "\n") + "\n".join(lines[1:]) + "\n",
+                      encoding="utf-8", newline="\n")
+        pc = run("check", "--target", str(ev4))
+        check("a hand-edited sidecar hash reds, naming which side carries which value",
+              pc.returncode == 1 and "install.sums carries" in pc.stdout
+              and "the receipt carries" in pc.stdout, pc.stdout)
+
+        # THE WHOLE HOLE, end to end. This is the fixture that exited 0 before this unit.
+        ev5 = make_target(tmp / "u5e", DEPLOY_FULL)
+        run("apply", "--target", str(ev5), "--kits", "check-wiring")
+        rp = ev5 / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            fp = ev5 / f["path"]
+            if fp.exists():
+                fp.unlink()
+            f["commit"] = "0" * 40
+            f["sha256"] = "deadbeef"
+        rec["gov_commit"] = "0" * 40
+        rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+        pc = run("check", "--target", str(ev5))
+        check("the delete-everything-and-corrupt-the-receipt fixture now REDS",
+              pc.returncode == 1, pc.stdout + pc.stderr)
+        check("and it names the missing files rather than reporting a bare count",
+              "is in the receipt and not on disk" in pc.stdout, pc.stdout)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)

@@ -33,7 +33,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.2"  # gov:kit govkit@1.2 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.3"  # gov:kit govkit@1.3 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -967,6 +967,73 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
+
+    # ---- EVIDENCE, role-scoped (DEPL-aTetheredConvoy-5 S1-S3). Before this, `check` contained ONE
+    # ---- filesystem test — on the receipt's own path — and never opened the file list, never read
+    # ---- the sidecar it writes, and called no hash function. Measured: a target whose landed files
+    # ---- were all deleted, whose every recorded commit was rewritten to zeros and whose every hash
+    # ---- was rewritten to nonsense, exited 0.
+    rows = receipt.get("files") or []
+    n_engine = n_ok = n_prov = n_prov_ok = 0
+    for row in rows:
+        role, path = row.get("role", "engine"), row.get("path")
+        dp = target / path
+        if role in ("engine", "seed", "project-owned", "generated") and not dp.exists():
+            if row.get("written") is False and role in ("project-owned", "generated"):
+                continue          # gov never wrote it; its absence is the target's business
+            r.fail(f"'{path}' is in the receipt and not on disk")
+            continue
+        if role != "engine":
+            # A `seed` carries an EXISTENCE claim only: the role's whole contract is that the target
+            # owns the file after one copy, so hashing it would red every target that did what the
+            # role exists to permit. That scoping is the contract's own unscoped-quantifier mistake,
+            # not repeated here.
+            continue
+        n_engine += 1
+        want = row.get("sha256")
+        if want and _sha(dp.read_bytes()) != want:
+            r.fail(f"'{path}' does not match the receipt: expected {want[:12]}, "
+                   f"found {_sha(dp.read_bytes())[:12]}")
+        else:
+            n_ok += 1
+        src, commit = row.get("source"), row.get("commit")
+        if src and commit:
+            n_prov += 1
+            blob = blob_at(root, commit, src)
+            if blob is None:
+                r.fail(f"'{path}': its recorded source '{src}' does not resolve at commit "
+                       f"{commit[:12]} in the gov checkout at {root.as_posix()} — either this is a "
+                       f"different clone than the receipt recorded, or that commit is not fetched here")
+            elif want and _sha(blob) != want:
+                r.fail(f"'{path}': the receipt's hash does not match gov's own bytes at "
+                       f"{commit[:12]} — recorded {want[:12]}, gov has {_sha(blob)[:12]}")
+            else:
+                n_prov_ok += 1
+
+    # A DERIVED count, and a zero over a population the DESCRIPTORS say is non-empty is itself a
+    # finding — a receipt that lost its rows and a target that is clean are otherwise the same output.
+    r.note(f"integrity: {n_ok}/{n_engine} engine row(s) verified · "
+           f"provenance: {n_prov_ok}/{n_prov} resolved")
+    if n_prov and n_prov_ok == 0:
+        r.fail("DEAD PROBE: every engine row failed to resolve in this gov checkout, so the "
+               "provenance loop measured nothing — a probe that cannot move is not a green one")
+
+    # The sidecar and the receipt are asserted against EACH OTHER. They are two spellings written
+    # from one list, and the sidecar — the artifact a target verifies with bash alone — is read by
+    # nothing in this repo. Verifying one and trusting the other leaves it unasserted forever.
+    sums_path = target / ".governance" / "install.sums"
+    if sums_path.is_file():
+        sums = set()
+        for ln in sums_path.read_text(encoding="utf-8").splitlines():
+            if ln.strip():
+                h, _, pth = ln.partition("  ")
+                sums.add((h.strip(), pth.strip()))
+        want_pairs = {(f["sha256"], f["path"]) for f in rows if "sha256" in f}
+        for extra in sorted(sums - want_pairs):
+            r.fail(f"install.sums carries {extra[1]} ({extra[0][:12]}) which the receipt does not")
+        for missing in sorted(want_pairs - sums):
+            r.fail(f"the receipt carries {missing[1]} ({missing[0][:12]}) which install.sums does not")
+        r.note(f"sidecar: {len(sums)} line(s) compared against {len(want_pairs)} hashed row(s)")
 
     for eid in selection:
         if eid not in descs:
