@@ -26,8 +26,16 @@ note = "MEASURED optional: the gate is green with the file absent and with it em
 [adopt]
 argv = []
 mutates_index = false
+why_no_adopter = "installation is a copy of a gate script plus its self-test; the waiver registry beside it is target-authored and gov never seeds it"
 
 [[gate_leg]]
 name = "install-prefix self-test"
 argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
 guard = ["{prefix}/check-install-prefix.sh"]
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+this entry IS a gate. Its self-test is the leg, and running a gate from `check` would make `check` a second merge bar rather than a verifier of the install
+"""

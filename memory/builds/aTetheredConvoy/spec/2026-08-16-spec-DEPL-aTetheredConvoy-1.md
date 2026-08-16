@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion
 
-**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-6 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -45,13 +45,16 @@ not own.
   into (source, destination, role) triples; both verbs call it. `plan` marks a role `apply` cannot
   land as `SKIP` with the reason and never as `write`, and every artifact `apply` produces — including
   the ones later units add — gets a plan row through the same function.
-- **S6 — the check-state vocabulary, settled ONCE and owned here.** Five states, each a measurement
-  rather than a placeholder: `not-landed` (a kit with zero receipt rows whose descriptor declares at
-  least one landable rule — today the no-receipt verdict is whole-target and early-returns),
-  `landed-unmeasured` (legal only where the descriptor declares `[check] = { none = "<reason>" }`),
-  `landed-but-inert` (reserved for a MEASURED failure), `adopted`, and `undischargeable` (reserved
-  for unit 5's machine-scoped entries). The thirteen descriptors that declare no `[check]` gain the
-  declared-absence form in this unit's diff, budgeted rather than discovered by a later one.
+- **S6 — the check-state vocabulary, settled ONCE and owned here.** Each state is a measurement
+  rather than a placeholder, and no count of them is spelled — later units ADD states and a number
+  here would be stale on arrival. `not-landed`: a kit with zero receipt rows whose descriptor
+  declares at least one landable rule. `landed-unmeasured`: legal only where the descriptor declares
+  `[check] = { none = "<reason>" }`. `landed-but-inert`: reserved for a MEASURED failure. `adopted`.
+  `undischargeable`: reserved for unit 5's machine-scoped RULES — rule-keyed, because no entry in the
+  tree is machine-scoped and an entry-keyed state would have no instance.
+  `recoverable-partial-install`: reserved for unit 4, for a target carrying an emission intent record
+  and no receipt. The thirteen descriptors that declare no `[check]` gain the declared-absence form in
+  this unit's diff, budgeted rather than discovered by a later one.
 - **S7 — the step-id vocabulary, reserved ONCE and owned here.** A module-level ordered tuple naming
   every step of the hard order, including the ones this unit does not implement; every phase print
   reads it, and a `selfcheck` arm asserts the printed ids are exactly that tuple in that order.
@@ -90,8 +93,10 @@ not own.
 
 **Superseded by later units, recorded here so nothing is silently invalidated:** unit 6 deletes the
 `merged` refusal S2 preserves, fills that role's reserved receipt row, and defines the delegation key
-S9's repair needs; unit 5 fills the `rendered` and `undischargeable` rows and turns S8's unclassified
-failure into a classified one; units 4, 5 and 6 fill the step ids §4's table assigns them.
+S9's repair needs; unit 5 fills the `rendered` row, keys `undischargeable` on the RULE, and turns S8's
+unclassified failure into a classified one; unit 4 adds `recoverable-partial-install` to S6's
+vocabulary; units 4, 5 and 6 fill the step ids §4's table assigns them. A later unit ADDING a state is
+expected — what S6 forbids is a later unit spelling a second vocabulary for the same question.
 
 ## 4. Design
 
@@ -152,23 +157,29 @@ for a destination is the LAST landable rule resolving to it.
 
 Worked on the two shipped descriptors that need it. `tools/codebase-map/kit.toml` declares a `**`
 engine glob, then `map_extractors.py` as `project-owned`, then `map_extractors.template.py` as `seed`
-writing to `{kit}/map_extractors.py`. The carve-out removes gov's own filled module from the glob's
-contribution — that is the byte an adopter must never receive. The seed rule then elects the TEMPLATE
-as the writer of that destination. `tools/drift-audit/kit.toml` is identical in shape. So the file the
-target ends up with is the template's, its receipt role is `seed`, and gov's filled copy is in no
-receipt at all — which is what both descriptors have always meant and what no reduction key on its own
-can express.
+writing to `{kit}/map_extractors.py`. The winner of that destination is the seed rule, so the file the
+target ends up with is the TEMPLATE's, its receipt role is `seed`, and gov's own filled module is in
+no receipt row that carries bytes. `tools/drift-audit/kit.toml` is identical in shape.
 
 The template ALSO lands at its own kit-relative path through the glob, as `engine`. One source, two
-destinations, two roles; a source-keyed reduction would have to pick one and lose the other.
+destinations, two roles; a source-keyed reduction would have to pick one and lose the other, which is
+why writer election is destination-keyed.
 
-**Two `selfcheck` arms follow, and neither is the other's restatement.** The first reports every
-destination whose winning writer is not the first rule that matched it — the carve-out census, a NOTE
-rather than a failure, because overlap is legal and is how a carve-out is spelled. The second FAILS
-when a source a carve-out excluded is nonetheless written, which is A1 stated as a predicate. rev-3's
-liveness half was a destination claimed by two rules "with no ordering between them", which a TOML
-array of tables cannot express — the arm had no red state. §6 replaces it with one a descriptor can
-actually produce.
+**On today's tree the carve-out changes NO write, and saying otherwise was the first fold's mistake.**
+MEASURED, by resolving both descriptors with and without their `project-owned` rule: the writes map is
+identical, because destination-keyed last-wins already elects the seed template over the glob. The
+carve-out is therefore an ABSENCE claim — gov supplies no bytes for that source, ever — that is
+currently redundant with the election, and it is kept for the reason the role exists rather than for a
+byte it moves: a descriptor declaring a `**` glob and a `project-owned` rule with NO later landable
+rule for that destination would otherwise land gov's own filled file, and nothing but the carve-out
+stops it. That shape has no instance in gov today, which is exactly why its arm needs a scratch
+fixture rather than a real descriptor.
+
+**Two `selfcheck` arms follow, and neither is the other's restatement.** The first is a NOTE reporting
+both figures — carve-outs declared, and carve-outs that CHANGE a write — because reporting only the
+first hides the redundancy above, and reddening on the second being zero would red gov's own tree for
+a state that is true. The second FAILS when a source a carve-out excluded is nonetheless written,
+which is A1 stated as a predicate; §6 gives it the scratch descriptor that makes it reachable.
 
 ### The step-id table
 
@@ -205,7 +216,7 @@ Reserved per-role shapes, so no later unit invents a fourth:
 |---|---|---|
 | `engine` | whole-file `sha256`, `source`, `commit`, `version` | this unit |
 | `seed` | the same, plus `written: false` on any re-apply | this unit |
-| `project-owned` | existence and `version` only; no gov hash, because gov supplied no bytes after the first | this unit |
+| `project-owned` | the SOURCE, `version`, `written: false`, and NO hash — gov supplies no bytes for it at all. Reserved with no instance that carries bytes; its only observable is the carve-out census and AC1b's whole-receipt absence | this unit |
 | `generated` | path only | this unit |
 | `rendered` | template, substitution inputs with their hashes, output hash; no source commit | unit 5 |
 | `merged` | `block_id`, `marker_style`, `block_sha256`, and deliberately NO whole-file `sha256` | unit 6 |
@@ -300,22 +311,35 @@ them using different names for the same boolean.
 - **AC1b** When a fixture's `map_extractors.py` is edited before a SECOND apply, it is byte-identical
   afterwards — the `seed` contract — and gov's filled copy appears in no receipt row, asserted as an
   absence over the whole receipt rather than over one row.
-- **AC2** When `python tools/govkit/selftest.py` runs the carve-out arm against gov's own descriptors
-  it is silent and prints a DERIVED count of carve-outs resolved, non-zero. Liveness: a scratch
-  descriptor whose LATER explicit rule must beat an earlier `include = "**"` glob is resolved
-  correctly, and a mutated resolver that takes the FIRST match instead reds the arm — the mutation is
-  the red state, because an ordered array of tables cannot express two rules with no ordering.
-- **AC2b** When a source excluded by a `project-owned` carve-out is nonetheless written to any
-  destination, `selfcheck` FAILS naming the source and the rule that wrote it. This is A1 as a
-  predicate; the fixture reproduces A1 by removing the carve-out from the resolver.
+- **AC2** When `python tools/govkit/govkit.py selfcheck` runs, its precedence NOTE reports BOTH
+  derived figures — carve-outs declared, and carve-outs that CHANGE a write. On gov's tree the second
+  is zero and the note says so; it does NOT red, because reddening on a true state is how a gate
+  teaches people to waive it. Liveness for the election itself: a scratch descriptor whose LATER
+  explicit rule must beat an earlier `include = "**"` glob resolves to the later rule, and a resolver
+  mutated to take the FIRST match reds the arm — the mutation is the red state, because an ordered
+  array of tables cannot express two rules with no ordering between them.
+- **AC2b** When a `project-owned` carve-out's source reaches a destination NO later landable rule
+  reaches, that destination is not written and `selfcheck` FAILS if it is. The fixture is a scratch
+  descriptor, not a shipped one, and the spec says why: MEASURED, resolving both shipped carve-out
+  descriptors with and without their `project-owned` rule yields an identical writes map, so on gov's
+  tree this arm has no red state at all. Its liveness half is the same scratch descriptor with the
+  carve-out deleted, which then lands gov's own file — A1 reproduced in the one shape that can still
+  reach it.
 - **AC3** When `apply` runs twice against a fixture with no gov change, the receipt's path set and
   every row's hash are identical between the runs, INCLUDING every `seed` row, and
   `.governance/install.sums` is byte-identical. The fixture selection must contain a `seed` rule, or
   the arm passes by finding nothing.
-- **AC4** When `python tools/govkit/govkit.py plan --target <fixture> --all` and then `apply` run
-  against the same fixture, the set of destinations `plan` marks `write` equals the set of paths the
-  receipt records with `written: true`, exactly. The fixture selection must include at least one
-  unlandable role, asserted as a `SKIP` row naming its reason.
+- **AC4** When `python tools/govkit/govkit.py plan --target <fixture>` and then `apply` run against
+  the same fixture, the set of destinations `plan` marks `write` equals the set of receipt rows
+  CARRYING GOV BYTES, and the set `plan` marks `SKIP` equals the rows carrying none — both exactly,
+  both as sets. The fixture selection must include at least one unlandable role, or the second
+  equality holds vacuously.
+
+  Not `written: true`. That was rev-4's predicate and running it found it wrong: `written` is a
+  per-RUN fact, so on a re-apply a `seed` whose destination already exists is a row gov is
+  responsible for and did not write this time, and the equality failed by exactly the seed count
+  while both verbs were correct. `plan` promises the file set gov OWNS in the target; the flag
+  records what one invocation did.
 - **AC5** When `apply` encounters a rule whose role it cannot land, it prints a line naming the role,
   the destination and the party that does produce it; the arm asserts NO rule leaves the land loop
   without a line. Liveness: a scratch descriptor carrying a role outside the enum makes `apply`
@@ -388,6 +412,20 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-16 · folded the scoped fold re-audit, which returned BLOCKED with two blockers
+  here — both the shape this repo's history predicts, a fold edit disagreeing with a §4 paragraph the
+  same fold left alone. The worked precedence example claimed the carve-out stops gov's filled module
+  travelling; MEASURED, it does not — destination last-wins already elects the seed template, and the
+  writes map is identical with and without the carve-out on both shipped descriptors. The carve-out is
+  restated as an ABSENCE claim kept for a shape gov does not have, AC2b is re-keyed on a scratch
+  descriptor that can actually reach it, and AC2's note reports both figures rather than one. The
+  receipt's `project-owned` row is restated as reserved-with-no-instance, and S6 drops its spelled
+  state count and gains the two states units 4 and 5 add.
+- rev-5 · 2026-08-16 · one correction found by RUNNING the unit rather than reading it. AC4 keyed its
+  set equality on the receipt's per-row `written` flag, and against a real fixture the two sides
+  differed by exactly the seed count on a re-apply — because `written` records what ONE invocation
+  did while `plan` promises the file set gov owns. Re-keyed on rows carrying gov bytes, with the
+  `SKIP` half asserted against the rows carrying none; both hold exactly, measured.
 - rev-4 · 2026-08-16 · folded the M4 spec audit, which returned BLOCKED over the whole set with four
   blockers landing here. The reduction key was spelled two ways in one document — destination in §4
   and source in S1 — and the flagship criterion asserted a role the stated key could not elect;

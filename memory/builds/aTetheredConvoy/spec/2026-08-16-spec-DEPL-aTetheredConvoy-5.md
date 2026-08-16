@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -13,7 +13,9 @@ calls no hash function. Everything the contract asks it to verify is absent.
 ## 2. Scope (IN)
 
 - **S1 — receipt integrity, role-scoped, and this is where a deleted install is caught.** An `engine`
-  row must exist on disk and hash to its recorded value. A target whose files were deleted while the
+  row must exist on disk and hash to its recorded value. `project-owned` is NOT in this dispatch:
+  after unit 1's re-resolution no receipt row under that role carries bytes, so a loop over it would
+  quantify over nothing. A target whose files were deleted while the
   receipt is intact is THIS unit's integrity failure, not unit 1's `not-landed` — that state is a
   receipt holding zero rows for a kit, and the two must not be conflated by a criterion on either
   side. A `seed` row carries an EXISTENCE claim only, because the role's whole contract is that the
@@ -258,6 +260,10 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit. `project-owned` is struck from the
+  role-scoped integrity dispatch: after unit 1's re-resolution no receipt row under that role carries
+  bytes, so a loop over it would quantify over nothing — the vacuity class, arriving through a role
+  that was correct when the dispatch was written.
 - rev-3 · 2026-08-16 · folded the M4 spec audit. `undischargeable` was keyed on the ENTRY while
   `apply` writes orders per RULE, and every descriptor declares a repo-scoped entry — so the state was
   unreachable and the two sides quantified over different populations; it is rule-keyed now, which also

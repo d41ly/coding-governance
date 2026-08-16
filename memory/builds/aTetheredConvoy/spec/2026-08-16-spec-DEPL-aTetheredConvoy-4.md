@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -18,7 +18,7 @@ its consumers is what produced two incompatible spellings of it inside one desig
   string), `run_all_env` (the environment assignment that makes the runner ignore every guard, e.g.
   gov's own full-bar variable — declared as a table, or as `{ none = "<reason>" }`, and REFUSED when
   `kind = "manifest"` declares neither, because an escape spelled in argv cannot express an env var
-  and the baseline needs one), `observed_ran`, `observed_failed` and optional `observed_skipped`
+  and `check --observe` needs one — the baseline deliberately does NOT, per S3), `observed_ran`, `observed_failed` and optional `observed_skipped`
   (line-anchored PREFIX templates carrying the leg name). Plus `[gate_runner.ci]` with `system`
   (`github-actions`), `file` and `job`.
   `make`, `npm` and `shell` are REFUSED BY NAME with a backlog pointer. `anchor` is refused: it is
@@ -56,7 +56,9 @@ its consumers is what produced two incompatible spellings of it inside one desig
 - **S7 — `red_after_land` as a WINDOW, both consumers scoped.** Exempt between land and configure,
   and asserted GREEN after configure. Either consumer alone is the permanent-exemption regression the
   contract already records shipping once.
-- **S8 — the leg emitter**, as the last step of the hard order: guards RENDERED against the target's
+- **S8 — the leg emitter**, as step `LEGS` in unit 1's table — the last CONTENT step, not the last
+  step: the table brackets the sequence with the baseline before it and the receipt after it, so
+  "last" without the qualifier is false of both ends. Guards are handled thus: guards RENDERED against the target's
   prefix and memory root, a dropped guard recorded with its reason, a leg whose guard set empties
   emitted with the guard key OMITTED rather than empty, and idempotency by the declared dedupe key.
 - **S9 — the emission's ownership record is written BEFORE the write it authorizes.** An intent
@@ -134,8 +136,16 @@ forgiving branch.
 
 The liveness half is therefore: refuse when the before-map contains zero legs in green-or-red. A map
 that is entirely skipped is a DEAD PROBE, which is the doctrine this repo's drift audit already
-applies to a signal that cannot move. Both reads run with the run-everything escape set, and the
-doubled wall clock is priced in §5 rather than avoided by scoring the two reads differently.
+applies to a signal that cannot move.
+
+**Both reads run WITHOUT the run-everything escape**, and the state machine compares the INTERSECTION
+of legs scored in both maps, plus the names present in one and absent from the other. The alternative
+— both reads with the escape — was considered and REJECTED for two reasons, and the second is fatal:
+it runs the target's whole bar twice with every guard overridden, and with no guard in force no leg
+can report skipped, which makes the dead-probe fixture above unreachable. A liveness half that the
+regime forbids is not a liveness half. The cost of the no-escape regime is that a guarded-unchanged
+leg is scored in neither map and therefore carries no verdict, which the intersection makes explicit
+instead of silently reading as `absent`.
 
 ### The state machine
 
@@ -184,8 +194,11 @@ collision for the dangerous one.
 
 Guards are rendered by the existing token substituter — the one whose negative lookbehind was bought
 by a failing arm — against the existing target context, which already supplies the install prefix, the
-kit path and the memory root. Measured across every shipped leg, every non-empty guard is ALREADY
-token-spelled, so rendering is substitution plus a drop test.
+kit path and the memory root. Measured across every shipped leg, every non-empty guard is token-spelled
+EXCEPT the verbatim repo-root pathspecs, of which there is exactly one: the git hooks directory, on the
+lander's self-test leg. Those are emitted UNCHANGED — the identity substitution — and the drop test
+below applies to both classes alike, because a verbatim path can be absent from a target just as a
+rendered one can.
 
 The drop test is TRACKED-NESS, not existence, and it runs AFTER the stage step. The runner's own
 predicate is a diff over a pathspec, and a pathspec matching nothing diffs clean and exits 0 — so a
@@ -213,8 +226,14 @@ An emitted leg's execution is proved by a declared literal template carrying the
 for gov's runner the strings are measured and for any other runner they are unknowable to gov.
 `observed_ran` and `observed_failed` are SEPARATE keys: folding the failure template into the
 execution template makes the only product-side observation exit 0 when every emitted leg failed.
-Matching is anchored to a whole line, because an unanchored substring is satisfied by a target's own
-longer line and by the indented per-leg output a failing runner prints.
+Matching is a line-anchored PREFIX, not whole-line equality. Whole-line was the first fold's rule and
+it is wrong for a measured reason: the runner's failure and skip lines carry a variable tail — an exit
+code, a branch name, a no-result marker — so a whole-line literal matches NOTHING and every liveness
+half that depends on it becomes unreachable. The anchor is kept because it is what defeats a target's
+own longer line and the indented per-leg body a failing runner prints; only the right-hand end is
+released. Prefix matching re-opens one case the whole-line rule closed — a leg whose name is a prefix
+of another leg's — and the observer resolves it by preferring the longest matching template and
+reporting a tie rather than picking one.
 
 ### Rollout
 
@@ -252,8 +271,9 @@ outbox and the receipt instead.
 - security — this unit EXECUTES target-authored code, twice per apply plus the hook, and that is the
   sharpest thing in the build. S5's confirmation, its recorded approval and its non-muting decline are
   the controls; the operator-facing docs carry it, not a postmortem.
-- perf / scale — the target's full bar runs twice per apply. That is the price of the criterion; the
-  decline flag is the escape and it is never green.
+- perf / scale — the target's own bar runs twice per apply, both times WITH its guards in force, so
+  each read costs what a guard-scoped run costs rather than a full one. That is the price of the
+  criterion; the decline flag is the operator's escape and it is never green.
 - a11y — N/A: a command-line tool.
 - i18n — N/A for the interface; NOT N/A for the data — the runner-file serializer preserves non-ASCII
   in a target's own leg names.
@@ -391,6 +411,12 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit, which returned two blockers here — both §4
+  paragraphs the previous fold left standing while rewriting the scope items derived from them. §4's
+  baseline section still described the escape-on regime S3 had already rejected, and §4's observation
+  section still mandated the whole-line matching S12 had measured as matching nothing. Both now say
+  what their scope items say. S8's "last step of the hard order" is corrected to the last CONTENT
+  step, because unit 1's table brackets the sequence at both ends.
 - rev-3 · 2026-08-16 · folded the M4 spec audit, which returned two blockers here. The baseline
   demanded a run-everything escape the frozen declaration had no key for — gov's is an environment
   variable and `command` is an argv array — so the key is declared, and S3 now states the regime is

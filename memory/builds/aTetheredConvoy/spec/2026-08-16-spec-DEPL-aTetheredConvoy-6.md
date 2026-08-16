@@ -1,14 +1,14 @@
 # DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
 Build the one shape the deployer has always refused by name: writing a gov-owned region into a file
 the target owns. That unlocks the three declared `merged` rules, which today strand their whole
 entries and make an all-kits install land zero files, and it is the mechanism the first step of the
-hard order needs — the line-ending pin block and the renormalize that follows it, which nothing in
-this repo writes or performs.
+hard order needs — step `ATTRIBUTES` in unit 1's table, the first step of the contract's LAND
+sequence, and the renormalize that follows it, neither of which anything in this repo performs.
 
 ## 2. Scope (IN)
 
@@ -383,6 +383,9 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit. The goal called the attributes block "the
+  first step of the hard order", which unit 1's step table makes false — the baseline precedes it.
+  Restated as the first step of the contract's LAND sequence, naming the step id.
 - rev-3 · 2026-08-16 · folded the M4 spec audit. `plan` cannot name the resolved renormalized path
   set, because the population is derived by asking git which paths resolve to the pin and at plan time
   the block is unwritten — so the plan rows are the attributes destination plus one row per PATTERN,

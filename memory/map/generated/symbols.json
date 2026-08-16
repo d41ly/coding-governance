@@ -278,6 +278,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "canonical_ctx",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "case_collisions",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
@@ -406,6 +411,11 @@
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "destinations_for",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "detect_collisions",
@@ -538,6 +548,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "entry_version",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "enumerate_exports",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -551,6 +566,11 @@
       "id": "evict_over_budget",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "expand_rules",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "expect_maperror",
@@ -626,6 +646,11 @@
       "id": "glob_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "govkit_steps",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "grammar",
@@ -1328,6 +1353,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_entry",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1384,6 +1414,11 @@
     },
     {
       "id": "rule_destinations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "rule_relpath",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -1571,6 +1606,11 @@
       "id": "stems",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "step",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "strip_records_sentence",

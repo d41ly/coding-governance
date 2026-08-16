@@ -20,6 +20,7 @@ claims = ["tools/check-kit-versions.sh"]
 [adopt]
 argv = []
 mutates_index = false
+why_no_adopter = "installation is a copy of a gate script the target then edits down to its own kit subset; there is nothing to configure and no render to perform"
 
 [[hole]]
 id = "kit-versions-need-list"
@@ -28,3 +29,10 @@ blocks_adopt = false
 blocks_gate = true
 why = "MEASURED: copied verbatim into a repo holding none of the kits it names, the gate reds immediately. The runbook's own instruction is to edit its need list to the target's kit subset, which makes this a seed-then-own file rather than an engine file."
 discharge = { command = ["bash", "{prefix}/check-kit-versions.sh"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+this entry IS a gate, and it lands as a `seed` the target is expected to edit down to its own kit subset — so gov can verify neither its content nor its verdict from outside
+"""

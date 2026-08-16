@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -18,7 +18,8 @@ already carries everything an update needs, a record nothing reads.
   be the destructive one. `--to <rev>` overrides the default target commit of gov `HEAD`.
 - **S2 — the per-file verdict, DERIVED from three blobs.** For each receipt row: `base` is the blob
   at the receipt's recorded commit, `theirs` is the blob at the new commit, `ours` is the bytes on
-  disk. Seven verdicts, §4's table. `ours` is compared against the receipt's recorded hash rather
+  disk. The verdicts ARE §4's table — no count of them is written here, because the fold that added
+  the doubly-deleted row left a spelled figure behind describing the table before it. `ours` is compared against the receipt's recorded hash rather
   than against `base`, because for a `rendered` row those differ by construction.
 - **S3 — roles gate which rows the table sees at all**, per §4's role table, and the role dispatch
   reads unit 1's frozen schema. A role whose receipt row unit 1 RESERVED but no unit has filled yet
@@ -100,7 +101,7 @@ of them is safe to touch. It is reported and never acted on.
 |---|---|---|
 | `engine` | the full table | gov owns the bytes |
 | `seed` | never written; a moved template is REPORTED as a re-seed available | copied once, then owned |
-| `project-owned` | never compared | gov supplied no bytes, so there is no `base` |
+| `project-owned` | never compared, and after unit 1's re-resolution NO receipt row carries bytes under it — so no loop is written over this role, only the absence assertion | gov supplied no bytes, so there is no `base` |
 | `generated` | never compared | produced in the target |
 | `rendered` | re-run the adopter, compare against the fresh render, CAP at report | gov does not write these; a second writer races the real one |
 | `merged` | refused by name until unit 6 | no writer exists; a half-written region is worse than a named refusal |
@@ -208,6 +209,12 @@ positionally, and is already the primitive the row driver delegates to.
 - **AC9** When `python tools/govkit/govkit.py selfcheck` runs, it reds if any role in unit 1's frozen
   role table has no row in `update`'s dispatch. Liveness: removing one row from the dispatch reds the
   arm, and a refusal row satisfies it while silence does not.
+- **AC9b** When one CELL is removed from §4's verdict grid, `python tools/govkit/govkit.py selfcheck`
+  reds naming the missing (ours, theirs) pair. The role arm structurally cannot see this — which is
+  how the grid shipped with no answer for a file deleted on both sides.
+- **AC9c** When a recorded file is deleted BOTH in the target and at the new gov commit,
+  `update --write` reports `converged`, writes nothing, and never attempts a restore — asserted on the
+  target's bytes and on the absence of any new path, not on the printed word alone.
 - **AC10** When `update` runs against a schema-1 receipt, every installed file the receipt omits is
   reported `unrecorded` and none is written, deleted or merged — asserted on the on-disk bytes of a
   fixture whose receipt had a `seed` row deliberately dropped. And a row whose descriptor-resolved
@@ -248,6 +255,11 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit. The previous fold added a verdict row and a
+  completeness arm and gave neither an acceptance criterion — the only two things it added to this
+  unit were the only two nothing graded. Both have one now. A spelled verdict count left over from
+  before the new row is deleted, and the role table records that `project-owned` has no
+  byte-carrying instance after unit 1's re-resolution, so no loop is written over it.
 - rev-3 · 2026-08-16 · folded the M4 spec audit. The verdict grid had `theirs absent` as a value on
   ONE row, so an edited-and-withdrawn file routed to `diverged` against the prose below it, and a file
   deleted on both sides routed to `missing` — a restore of a blob that does not exist. It is now a

@@ -17,12 +17,24 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re as _re
 import shutil
 import subprocess
 import sys
 import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
+
+
+def govkit_steps() -> tuple:
+    """The engine's OWN step tuple, imported rather than restated.
+
+    A second copy of this vocabulary in the harness is the two-spellings class inside the arm that
+    exists to grade it: the harness would keep passing against its own idea of the order.
+    """
+    sys.path.insert(0, str(HERE))
+    import govkit  # noqa: E402
+    return govkit.STEPS
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -156,8 +168,15 @@ def main() -> int:
         # --- built so the probe genuinely CANNOT pass: memory-tree's measured pins are absent, which
         # --- is the state a fresh install leaves. An arm whose fixture cannot trigger the rule
         # --- passes and proves nothing, so this one is asserted on the message, not the code.
+        # The receipt carries a ROW, because a kit the receipt claims with NO rows is the separate
+        # `not-landed` state and check reports that and stops — the hole loop is unreachable there.
+        # Before unit 1 this fixture used an empty file list, so the arm graded hole behaviour on a
+        # receipt shape no apply can produce.
         (full / ".governance" / "install.json").write_text(
-            json.dumps({"gov_source": "local", "kits": ["memory-tree"], "files": []}, indent=2),
+            json.dumps({"schema": 2, "gov_source": "local", "kits": ["memory-tree"],
+                        "files": [{"path": "tools/memory-tree/check-memory-hygiene.sh",
+                                   "role": "engine", "kit": "memory-tree", "written": True}]},
+                       indent=2),
             encoding="utf-8", newline="\n")
         (full / ".memory-tree.conf").write_text('MEMORY_ROOT=memory\n', encoding="utf-8", newline="\n")
         p = run("check", "--target", str(full))
@@ -166,6 +185,18 @@ def main() -> int:
               "measured-pins' is UNDISCHARGED" in p.stdout, p.stdout)
         check("check reports a per-kit state line",
               "govkit check — memory-tree:" in p.stdout, p.stdout)
+
+        # --- unit 1 AC8: a kit the receipt CLAIMS with zero rows, while its descriptor declares a
+        # --- landable rule, is `not-landed` — a per-KIT verdict. The whole-target verdict it replaces
+        # --- early-returned on an ABSENT receipt, so this state had no way to be reported at all.
+        (full / ".governance" / "install.json").write_text(
+            json.dumps({"schema": 2, "gov_source": "local", "kits": ["memory-tree"], "files": []},
+                       indent=2),
+            encoding="utf-8", newline="\n")
+        p = run("check", "--target", str(full))
+        check("a claimed kit with zero receipt rows is reported not-landed",
+              "memory-tree: not-landed" in p.stdout, p.stdout)
+        check("and it is a finding, not a state printed at exit 0", p.returncode == 1, p.stdout)
 
         # --- a receipt naming a kit the registry does not carry is a refusal, not a skip.
         (full / ".governance" / "install.json").write_text(
@@ -192,10 +223,24 @@ def main() -> int:
                   ["git", "-C", str(ap), "diff", "--cached", "--name-only"],
                   capture_output=True, text=True).stdout, "")
         check("apply reports the steps it could NOT perform rather than skipping silently",
-              "SKIPPED (no writer exists yet; reported, not silent)" in p.stdout and
               "gate-runner and CI legs: SKIPPED" in p.stdout, p.stdout)
 
+        # --- unit 1 AC9: the phase lines carry their reserved step id, and the ids appear in TUPLE
+        # --- order. The ordering claim is over the ids this run prints and NOTHING else: all four
+        # --- clauses of the contract's hard-order criterion stay vacuous until the baseline, the
+        # --- attributes phase and the emitter exist.
+
+        seen = [m.group(1) for m in _re.finditer(r"— \[\d+/([A-Z]+)\]", p.stdout)]
+        check("apply's phase lines carry reserved step ids", bool(seen), p.stdout)
+        check("the step ids appear in the tuple's order",
+              seen == sorted(seen, key=lambda s: govkit_steps().index(s)), str(seen))
+        check("every printed step id is IN the reserved tuple",
+              all(s in govkit_steps() for s in seen), str(seen))
+
         rec1 = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("the receipt declares its schema", rec1.get("schema") == 2, str(rec1.get("schema")))
+        check("every receipt row carries the kit version resolved at install",
+              all("version" in f for f in rec1["files"]), "")
 
         # --- AC3 provenance: the bytes are the INDEX's at the recorded commit, not the working
         # --- tree's. Asserted by comparing against `git show`, which is the receipt's whole claim.
@@ -212,8 +257,128 @@ def main() -> int:
               p.stdout + p.stderr)
         rec2 = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("apply twice changes no path and no hash",
-              {(f["path"], f["sha256"]) for f in rec1["files"]} ==
-              {(f["path"], f["sha256"]) for f in rec2["files"]}, "")
+              {(f["path"], f.get("sha256")) for f in rec1["files"]} ==
+              {(f["path"], f.get("sha256")) for f in rec2["files"]}, "")
+
+        # ===== unit 1: the truthful core =====
+        # AC1 — the carve-out. codebase-map declares a `**` engine glob, a project-owned carve-out
+        # over gov's FILLED extractors, and a seed rule writing the TEMPLATE to the same destination.
+        # Before precedence existed, gov's filled module landed byte-identical in the target and the
+        # receipt called it `engine`. The arm asserts the BYTES, not just the role: a role that is
+        # right about the wrong file is the failure this replaces.
+        cm = make_target(tmp / "u1a", DEPLOY_FULL)
+        p = run("apply", "--target", str(cm), "--kits", "codebase-map")
+        rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
+        govroot = HERE.parents[1]
+        idx_of = lambda q: subprocess.run(["git", "-C", str(govroot), "show", f"HEAD:{q}"],
+                                          capture_output=True).stdout
+        landed = (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
+        check("the carved destination carries the TEMPLATE's bytes",
+              landed == idx_of("tools/codebase-map/map_extractors.template.py"), "")
+        check("and NOT gov's own filled module — the measured data-loss path",
+              landed != idx_of("tools/codebase-map/map_extractors.py"), "")
+        rows = {f["path"]: f for f in rec["files"]}
+        check("its winning row is the seed, sourced from the template",
+              rows["tools/codebase-map/map_extractors.py"]["role"] == "seed" and
+              rows["tools/codebase-map/map_extractors.py"]["source"].endswith("template.py"),
+              str(rows.get("tools/codebase-map/map_extractors.py")))
+        check("gov's filled module is recorded as project-owned and NOT written",
+              any(f["role"] == "project-owned" and f.get("written") is False
+                  and f["source"] == "tools/codebase-map/map_extractors.py"
+                  for f in rec["files"]), "")
+
+        # AC1b — a `seed` the target has since edited survives a re-apply, and the receipt row for it
+        # is still there. The row surviving is the half that used to fail: serializing the receipt
+        # from the write log dropped every seed row on the second run.
+        (cm / "tools" / "codebase-map" / "map_extractors.py").write_bytes(b"# TARGET EDITED\n")
+        p = run("apply", "--target", str(cm), "--kits", "codebase-map")
+        check("a re-apply leaves an edited seed byte-identical",
+              (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
+              == b"# TARGET EDITED\n", "")
+        rec2b = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("and its receipt row SURVIVES the re-apply",
+              any(f["path"].endswith("codebase-map/map_extractors.py") and f["role"] == "seed"
+                  for f in rec2b["files"]), "")
+        check("the row count did not shrink between the two applies",
+              len(rec["files"]) == len(rec2b["files"]),
+              f"{len(rec['files'])} -> {len(rec2b['files'])}")
+
+        # AC2b — the carve-out's own arm, on a SCRATCH descriptor. MEASURED: resolving either shipped
+        # carve-out descriptor with and without its project-owned rule yields an identical writes map,
+        # because destination last-wins already elects the seed template. So on gov's tree this arm
+        # has no red state at all, and a fixture built from a real descriptor would pass by finding
+        # nothing — inside the arm written to close the data-loss path.
+        sys.path.insert(0, str(HERE))
+        import govkit as _G
+        _root = _G.repo_root()
+        CARVED = {"id": "scratch", "home": "tools/memory-tree", "files": [
+            {"include": "**", "role": "engine"},
+            {"include": ["corpus_ids.py"], "role": "project-owned"},
+        ]}
+        with_co = _G.resolve_entry(_root, CARVED, _G.canonical_ctx("scratch"))
+        bare = dict(CARVED, files=[CARVED["files"][0]])
+        without = _G.resolve_entry(_root, bare, _G.canonical_ctx("scratch"))
+        dest = "tools/scratch/corpus_ids.py"
+        check("a carved source whose destination no later rule reaches is NOT written",
+              dest not in with_co["writes"], str(sorted(with_co["writes"])[:3]))
+        check("LIVENESS: without the carve-out the same destination IS written",
+              dest in without["writes"], str(sorted(without["writes"])[:3]))
+        check("the carve-out is recorded as an unlanded row rather than vanishing",
+              any(u["dest"] == dest and u["role"] == "project-owned"
+                  for u in with_co["unlanded"]), "")
+
+        # AC2 — the precedence note reports BOTH figures. Zero carve-outs-that-change is the true
+        # state of gov today and must NOT red; hiding it behind a single number is what let the first
+        # fold claim a byte-level effect the resolver does not have.
+        ps = run("selfcheck")
+        check("selfcheck's precedence note reports carve-outs declared AND how many change a write",
+              "carve-out source(s) declared, of which" in ps.stdout, ps.stdout)
+        check("and reporting zero of them changing a write does not red",
+              ps.returncode == 0, ps.stdout + ps.stderr)
+
+        # AC5 — no rule leaves the land loop without a line. The silent skip this replaces swallowed
+        # every rendered, project-owned and generated rule in the tree.
+        check("an unlanded rule prints its role, its destination and who does produce it",
+              "not landed [project-owned]" in p.stdout and
+              "gov supplies no bytes for this source, ever" in p.stdout, p.stdout)
+
+        # AC4 — plan promises exactly the file set gov owns. NOT keyed on `written`: that flag is a
+        # per-RUN fact, and on a re-apply a seed that exists is a row gov owns and did not write.
+        pl = run("plan", "--target", str(cm), "--kits", "codebase-map")
+        plan_writes, plan_skips = set(), set()
+        for line in pl.stdout.splitlines():
+            m = _re.match(r"^  (write|SKIP)\s+\[[^\]]+\]\s+(\S+)", line)
+            if m:
+                (plan_writes if m.group(1) == "write" else plan_skips).add(m.group(2))
+        check("plan's write set equals the receipt rows carrying gov bytes",
+              plan_writes == {f["path"] for f in rec2b["files"] if "sha256" in f},
+              str(sorted(plan_writes ^ {f["path"] for f in rec2b["files"] if "sha256" in f})))
+        check("plan's SKIP set equals the rows carrying none",
+              plan_skips == {f["path"] for f in rec2b["files"] if "sha256" not in f},
+              str(sorted(plan_skips ^ {f["path"] for f in rec2b["files"] if "sha256" not in f})))
+        check("the fixture actually HAS an unlandable role, or the SKIP half is vacuous",
+              len(plan_skips) > 0, str(plan_skips))
+
+        # AC10 — the playbook lands BYTES. It sits first in the default selection and, tagged
+        # project-owned, landed nothing at all while its placeholder hole probed two absent paths.
+        pb = make_target(tmp / "u1b", DEPLOY_FULL)
+        run("apply", "--target", str(pb), "--kits", "playbook")
+        recpb = json.loads((pb / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("the playbook entry lands its two files",
+              (pb / "docs" / "PARALLEL.md").is_file()
+              and (pb / "docs" / "parallel-coding-governance.domain-rules.md").is_file(),
+              str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
+        check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
+              all(f["role"] == "seed" for f in recpb["files"]), str(recpb["files"]))
+
+        # AC7 — three distinct strings for three distinct measurements. A kit declaring a reason is
+        # `landed-unmeasured` and says why; before this, one string covered "nothing was measured"
+        # and "measured and broken" alike.
+        pc = run("check", "--target", str(pb))
+        check("a declared-absence kit reports landed-unmeasured", "landed-unmeasured" in pc.stdout,
+              pc.stdout)
+        check("and prints the declared reason rather than the bare state",
+              "installation is a copy to an owner-chosen path" in pc.stdout, pc.stdout)
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)

@@ -57,3 +57,10 @@ blocks_adopt = true
 blocks_gate = true
 why = "the template raises on an empty EXTRACTORS dict and gen_map calls inventory_ids() at module level, so the adopter exits 1 with no map tree, no baseline and no gate file. The leg is then ABSENT rather than red, which a runner that skips a missing leg would score green."
 discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import map_extractors as e; sys.exit(0 if e.EXTRACTORS else 1)"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the adopter accepts only `--scaffold`, measured. The kit ships runnable verifiers, but each is already this kit's own gate leg, so pointing `check` at one would make `check` run a gate. Wiring one anyway is a backlog row, not a silence
+"""

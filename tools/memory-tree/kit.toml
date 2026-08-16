@@ -73,3 +73,10 @@ blocks_adopt = false
 blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-16 are simply OFF, so the hygiene leg exits 0 with the hole wide open."
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN READ_PATH_CEILING; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the adopter accepts only `--scaffold`, measured. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
+"""

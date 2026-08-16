@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -92,11 +92,14 @@ reading.
 
 ### Discovering the population
 
-Two shrink-only pins, not one. The branch count catches a matcher that stopped matching; the FILE count
-catches a module that stopped being scanned. Only the second survives the refactor this build makes
-likely, and the adversarial pass found the single-pin version passing comfortably while grading a
-shrinking fraction of the engine. The discovery rule follows the shell arms-checker's own doctrine —
-discover the population, never name it.
+Two shrink-only pins, not one, and NEITHER of them catches the refactor — that is the correction the
+fold re-audit forced, because the first fold claimed the file pin did while the criterion it wrote
+said the opposite. The branch pin catches a matcher that stopped matching. The FILE pin catches a
+DISCOVERY RULE that was narrowed so a previously scanned file is dropped. A branch MOVED into a new
+module makes the file set GROW and leaves the branch count unchanged, so both pins pass — what catches
+that is the enumerated anchor SET still containing the branch, which is an assertion about membership
+rather than about a count. Three mechanisms, three scenarios, and §6 gives each its own fixture. The
+discovery rule follows the shell arms-checker's own doctrine — discover the population, never name it.
 
 ### Negative arms that provably reach their branch
 
@@ -258,6 +261,10 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit. §4 still claimed the file-count pin catches a
+  branch moved into a new module while the criterion the same fold wrote said both pins pass in that
+  scenario. Corrected: three mechanisms for three scenarios, and the one that catches the refactor is
+  the enumerated anchor SET, which is a membership assertion rather than a count.
 - rev-3 · 2026-08-16 · folded the M4 spec audit. The unit's central mechanism had no shape: neither
   "refusal branch" nor "branch anchor" was defined, so the pin could have counted any of three
   populations. Both are defined now — two call shapes, and a module-function-ordinal anchor that needs

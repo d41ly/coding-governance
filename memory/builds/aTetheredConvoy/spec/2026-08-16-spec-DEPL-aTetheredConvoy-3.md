@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable
 
-**Status:** OPEN · rev-3 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 
@@ -25,8 +25,11 @@ and one execution close all five.
   look for:** `foreign_kit_present` reads `version_from` as a dict and runs unconditionally before any
   write, so a list crashes every `apply` with an uncaught attribute error. One normalization helper
   returns a list of tables and is called by that function AND by the new arms, so the two cannot
-  disagree. A constant claimed by no entry is carried by an `[[exempt_version]]` row with a reason, on
-  the same staleness rule.
+  disagree. FOUR call sites read the field and every one is routed through that helper — the foreign-kit
+  probe, the receipt's version resolver, and both halves of the existing version cross-check — because
+  normalizing only the probe moves the crash from before the first write to the middle of it. A
+  constant claimed by no entry is carried by an `[[exempt_version]]` row with a reason, on the same
+  staleness rule.
 - **S3 — per-file claim inside a kit home, over NON-FLAT entries only.** Every tracked file under a
   directory-shaped entry's `home` is matched by at least one of that entry's file rules, or by an
   existing `[[exempt]]` path. Derived from `git ls-files`; no new population. The flat exclusion is a
@@ -36,9 +39,10 @@ and one execution close all five.
   resolves sources; it is not an ownership boundary, and the engine already treats it that way.
 - **S4 — the surface widens to `skills/*`.** That adds TWO depth-1 paths, not one. The deployer's own
   Skill becomes an exemption carrying its reason; the kickoff engine's tree is claimed by the
-  kickoff-manifest entry, which is `kind = "flat"` and therefore claims no `home` — so it gains an
-  explicit `claims` row instead, and S7 records that this is what `flat` means for the other four flat
-  entries too. A future skill then reds until a declaration claims it, which is the state every other
+  kickoff-manifest entry, which DECLARES a `home` that the member resolver does not claim as a surface
+  path because the entry is `kind = "flat"` — so it gains an explicit `claims` row instead. Flat
+  entries come in two shapes and S7 records both: one declares a `home` used purely to resolve
+  sources, and one declares no `home` key at all. A future skill then reds until a declaration claims it, which is the state every other
   tracked deployable surface is already in.
 - **S5 — the deployability leg.** One new gate leg drives `plan` and two `apply` runs for EVERY
   registry entry into a hermetic scratch repo and asserts three things per entry: an entry declaring a
@@ -237,7 +241,11 @@ runner ignores. The registry is already the home of "who owns this and why is th
   this unit's diff and not a later discovery.
 - **AC1b** When a leg name is emitted into a target by unit 4, it carries no digit-bearing
   parenthetical, asserted by `python tools/govkit/govkit.py selfcheck` over every descriptor
-  `[[gate_leg]]` name. Gov's manifest names two legs with a count in the name, which unit 6 is separately
+  `[[gate_leg]]` name. The predicate is a parenthetical CONTAINING a digit, not any digit anywhere —
+  stated because gov's manifest carries both shapes and only the first travels badly. §4 names the
+  legs and the unit that repairs each. Liveness: no descriptor leg name carries one today, so the arm
+  is graded on a scratch descriptor that does; without it the criterion is silent for a reason
+  unrelated to the rule. Gov's manifest names two legs with a count in the name, which unit 6 is separately
   removing from one of them; a portable leg name is the reason both moves happen in the same
   direction rather than against each other.
 - **AC2** When an `[[exempt_leg]]` names a leg that no longer exists in the manifest, `selfcheck`
@@ -307,6 +315,13 @@ rather than treated as settled by silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded the scoped fold re-audit. S2's normalization named one reader; there
+  are four, and normalizing only the first moves the crash from before the first write into the middle
+  of it. S4 described the kickoff entry as claiming no `home` when it declares one, and counted flat
+  entries wrongly; both are restated on the property that actually matters, which is whether the
+  member resolver treats that `home` as a surface claim. AC1b's leg-name figure is deleted in favour
+  of naming the legs and the predicate's boundary, and it gains the scratch-descriptor liveness half
+  it needed because no descriptor carries the shape today.
 - rev-3 · 2026-08-16 · folded the M4 spec audit, which returned four blockers here. S3's per-file
   claim was unscoped, and five flat entries declare the same `home`, so it would have red on hundreds
   of files rather than the one real exposure — it is now scoped to non-flat entries as a stated

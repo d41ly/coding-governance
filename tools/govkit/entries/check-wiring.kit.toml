@@ -22,3 +22,10 @@ why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a
 name = "wiring-health self-test"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+it IS the wiring checker. The runbook explicitly warns against running it as a merge-bar leg; running it from `check` is the same mistake through a different door. Its self-test is the leg
+"""

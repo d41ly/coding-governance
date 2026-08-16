@@ -45,3 +45,10 @@ blocks_adopt = false
 blocks_gate = true
 why = "MEASURED: the ratchet exits 1 on a copied-and-unfilled template, failing its placeholder check and its stamp check together, and exits 2 with no manifest at all. There is no install of this kit that leaves its leg at exit 0 without an authoring step. The probe is the WHOLE check, not the placeholder grep: filling every placeholder and stamping a well-formed but foreign sha passes the grep and still reds the leg."
 discharge = { command = ["bash", "{prefix}/manifest-check.sh"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+installation is a copy. The ratchet is this entry's gate LEG and grading it from `check` would run a gate; the authoring step it needs is the declared hole, and the hole's probe is what observes it
+"""

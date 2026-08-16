@@ -8,15 +8,20 @@ requires = []
 
 # TWO files, not three. The customize companion is a deploy-time catalog the runbook says to read and
 # not ship, and counting it is how the spec over-stated this entry for four revisions.
+#
+# ROLE: `seed`, not `project-owned`. Gov SUPPLIES these bytes once and the target owns them
+# afterwards, which is what `seed` means. Tagged `project-owned` the entry landed zero bytes while
+# sitting first in the default selection, and the placeholder hole below probed two paths nothing
+# had written.
 [[files]]
 include = ["parallel-coding-governance.template.md"]
-role = "project-owned"
+role = "seed"
 to = "{playbook_path}"
 claims = ["parallel-coding-governance.template.md"]
 
 [[files]]
 include = ["parallel-coding-governance.domain-rules.md"]
-role = "project-owned"
+role = "seed"
 to = "{playbook_dir}/parallel-coding-governance.domain-rules.md"
 claims = ["parallel-coding-governance.domain-rules.md"]
 
@@ -32,3 +37,10 @@ blocks_adopt = false
 blocks_gate = false
 why = "the placeholders span BOTH deployed files, and nothing in a target observes them — no leg reads the playbook. A probe naming only the main file was MEASURED going false-green while the companion sat unfilled, which is why both operands are named."
 discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\" \"$2\"", "--", "{playbook_path}", "{playbook_dir}/parallel-coding-governance.domain-rules.md"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+installation is a copy to an owner-chosen path and there is no adopter. What needs observing is the placeholders, and that is the declared hole with its own probe
+"""
