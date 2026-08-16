@@ -1,0 +1,41 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the unit spec under
+# memory/builds/dClosedLexicon/spec/.
+#
+# The contract is cited by FOLDER, not by spec id. Product source naming a NON-TERMINAL spec id is a
+# gateable drift signal here, pinned shrink-only, and a descriptor that cited its own in-flight unit
+# would raise that pin for nothing.
+#
+# A FLAT entry, on the check-install-prefix model, because the declared surface glob `tools/*` is
+# depth-1 and includes FILES. Both of this gate's files are therefore unclaimed surface paths the
+# moment they are tracked, and each unclaimed one is its own `selfcheck` failure — an entry naming
+# only the directory kits live in would not have covered them.
+
+id = "check-placeholders"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+why_conditional = "it grades the playbook's own placeholder CATALOGUE against the two shipped template sources, so it is for a target that ships the playbook onward; a target that merely consumes a filled copy has no catalogue to police"
+version_from = { none = "no version constant exists; the gate is a single predicate over two tracked files, measured 2026-08-16." }
+requires = []
+sentinel = "tools/check-placeholders.sh"
+
+[[files]]
+include = ["check-placeholders.sh", "check-placeholders.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/check-placeholders.sh", "tools/check-placeholders.test.sh"]
+
+[adopt]
+argv = []
+mutates_index = false
+
+[[gate_leg]]
+name = "playbook placeholder catalogue"
+argv = ["bash", "{prefix}/check-placeholders.sh"]
+guard = []
+
+[[gate_leg]]
+name = "placeholder-catalogue self-test"
+argv = ["bash", "{prefix}/check-placeholders.test.sh"]
+guard = ["{prefix}/check-placeholders.sh"]

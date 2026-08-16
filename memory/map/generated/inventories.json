@@ -66,6 +66,7 @@
       "gate-lint",
       "govkit",
       "hooks",
+      "lexicon",
       "lib",
       "memory-recall",
       "memory-tree",

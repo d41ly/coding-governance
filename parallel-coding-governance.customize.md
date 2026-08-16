@@ -12,13 +12,24 @@ isn't in the code (the *(ask user)* items below); propose-and-flag anything infe
 filled template to the project's governing doc (its agent-instruction file, e.g. `AGENTS.md` /
 `CLAUDE.md`, or `docs/PARALLEL.md`) and place the filled companion beside it under the name the
 template's §-stubs spell. Then run `grep -nE '\{\{[A-Z]'` over **both** written files to confirm no
-placeholder survived — a template-only grep passes green while 13 of the 36 placeholders sit
-unfilled in the companion, and the §-stubs then point at a file the project never received.
+placeholder survived — a template-only grep passes green while the companion's own placeholders sit
+unfilled, and the §-stubs then point at a file the project never received. (The per-file counts are
+in the catalogue below and are GATED there; they are deliberately not repeated in this sentence,
+which carried a stale pair through two revisions.)
 
 ## Placeholders
 
-36 in total, and the two groups are **disjoint** — no placeholder appears in both files, so each one
-is filled in exactly one place.
+37 in total as a UNION. The two groups are **not disjoint**: the per-file lists below hold 23 and 15,
+and the overlap is the one placeholder named on the next line. Fill a shared placeholder
+CONSISTENTLY in both files — a §-stub that resolves to one path in the template and another in the
+companion is worse than an unfilled one, because it looks filled.
+
+Shared between both files: `{{MEMORY_ROOT}}`.
+
+*(This line is GATED by `tools/check-placeholders.sh`, which measures both files and reds if the
+overlap it finds is not declared here. The disjointness claim was wrong through at least one
+correction cycle before the gate existed, which is the argument for gating it rather than correcting
+the prose a third time.)*
 
 ### In `parallel-coding-governance.template.md` — 23
 
@@ -42,13 +53,15 @@ is filled in exactly one place.
   including the pins that are MEASURED per corpus and never inherited from another repo.
 - **Output discipline**: `{{PROSE_AUDIT}}` (the audit-script location, or "none yet — thresholds still bind").
 
-### In `parallel-coding-governance.domain-rules.md` — 14
+### In `parallel-coding-governance.domain-rules.md` — 15
 
 - **§1 unattended runs**: `{{MEMORY_ROOT}}` — the memory tree's root, matching the memory-tree kit's
   conf. It resolves the pointer to the unattended protocol; the block states no rule of its own.
 - **§4 runtime & verification**: `{{PORT_OFFSET}}` · `{{BUILD_TIME_BAKES}}` · `{{VERIFY_RECIPE}}`.
 - **§11 toolchain**: `{{TOOLCHAIN_NOTES}}`.
-- **§12 architecture**: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}`.
+- **§12 architecture**: `{{KIND_FACTORY_MAP}}` · `{{SHARED_PRIMITIVES_LOCATION}}` ·
+  `{{LEXICON_CONF}}` — the naming declaration's path (the `lexicon/` kit's conf, `.lexicon.conf` at
+  the repo root by default). Only needed if the five kit-conditional naming bullets are kept.
 - **§13 design system**: `{{TOKENS_LOCATION}}` · `{{SPACING_SCALE}}` · `{{TYPE_SCALE}}` ·
   `{{BREAKPOINTS}}` · `{{MIN_TOUCH_TARGET}}` · `{{GALLERY_ROUTE}}` · `{{VISUAL_CONTRACT_DOC}}`.
 
@@ -66,6 +79,11 @@ is filled in exactly one place.
   are written to stay true without the kit — they say the merge bar validates the mandate's shape,
   and a project with no such bar has no mandate — but a repo that keeps them without the kit is
   carrying a rule nothing can make true, which is the drift this row exists to prevent.
+- **Naming-lexicon lines** (companion §12's five kit-conditional bullets, and the "naming included"
+  clause in the template's §12 stub): keep only if adopting the `lexicon/` kit — else delete the five
+  bullets and `{{LEXICON_CONF}}` with them, and trim the stub clause back to "gate layout
+  conventions". The bullets are the only consumer of that placeholder, so keeping them without the
+  kit leaves a rule the project has nothing to enforce with.
 - **§9** lines about outbound calls / stored HTML — drop if there's no such surface.
 - **§11** — drop for single-OS teams.
 - **§4** harness lines and **§13** entirely — drop if the project has no UI.

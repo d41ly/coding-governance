@@ -1,0 +1,74 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the unit spec under
+# memory/builds/dClosedLexicon/spec/.
+
+id = "lexicon"
+home = "tools/lexicon"
+scope = "repo"
+version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
+
+[[files]]
+include = "**"
+role = "engine"
+
+# The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
+# fresh install has somewhere to record its first deliberate exception, but their CONTENT is
+# per-repo and must never be overwritten by an upgrade — a waiver list copied from a larger tree is
+# the same defect as a pin copied from one.
+[[files]]
+include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"]
+role = "project-owned"
+
+[config]
+file = ".lexicon.conf"
+owner = "lexicon"
+
+[adopt]
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--scaffold"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = "{kit}/lexicon.py" }
+means = "adopted"
+
+[[gate_leg]]
+name = "lexicon naming predicates"
+argv = ["python", "{kit}/lexicon.py"]
+guard = ["tools/", "skills/", ".githooks/"]
+
+[[gate_leg]]
+name = "lexicon selftest"
+argv = ["python", "{kit}/selftest.py"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "lexicon wiring"
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
+guard = ["{kit}/"]
+
+[[hole]]
+id = "lexicon-ratified"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "`--scaffold` DERIVES the verb table from the adopter's own corpus, which for one moment is exactly the hand-kept mirror of the codebase that companion §12 bans a gate from having. The seed ships marked PROPOSED with an empty `ratified` key, and an unedited seed reaching the merge bar would be a naming gate whose vocabulary is the code it grades. The stamp is the checkable form of `a human curated this`."
+discharge = { command = ["bash", "{kit}/adopt-lexicon.sh", "--check"] }
+
+[[hole]]
+id = "lexicon-layers"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "LAYERS ships EMPTY because a frequency count cannot observe intended architecture, so there is no derived proposal for P3. An empty declaration makes the engine report NOT ARMED and red rather than green: an unarmed predicate that exits 0 is indistinguishable from a satisfied one, and this is the hole where that distinction is bought."
+discharge = { command = ["python", "{kit}/lexicon.py"] }
+
+[[hole]]
+id = "lexicon-pins"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = true
+why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
+discharge = { command = ["python", "{kit}/lexicon.py"] }
