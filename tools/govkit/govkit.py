@@ -33,7 +33,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.1"  # gov:kit govkit@1.1 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.2"  # gov:kit govkit@1.2 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -713,6 +713,21 @@ def selfcheck(root: pathlib.Path) -> int:
     r.note(f"precedence: {later_wins} destination(s) won by a later rule than the first match · "
            f"{carves} carve-out source(s) declared, of which {carves_that_change} change a write")
 
+    # ---- 7g: `update`'s dispatch is COMPLETE over BOTH enumerations. Two arms, because the role arm
+    #          structurally cannot see a missing GRID cell — which is how the grid shipped with no
+    #          answer for a file deleted on both sides, and the verdict routed to a restore of a blob
+    #          that does not exist. A refusal counts as a row; silence does not.
+    known_roles = set(UNLANDED_REASON) | set(LANDABLE_ROLES) | {"attributes", "gate-leg", "ci"}
+    for role in sorted(known_roles):
+        if role not in UPDATE_ROLE:
+            r.fail(f"role '{role}' has no row in `update`'s dispatch — a role a later unit adds and "
+                   f"leaves out of the table is one `update` will meet and cannot classify")
+    for o in OURS_STATES:
+        for t in THEIRS_STATES:
+            if (o, t) not in VERDICT_GRID:
+                r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
+                       f"name a verdict, including the one where both sides are gone")
+
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.
     globs = reg.get("surface", {}).get("globs", [])
@@ -1155,6 +1170,252 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     return r.emit()
 
 
+# ---------------------------------------------------------------------------------------- update
+# The verdict GRID, as data so `selfcheck` can assert it is complete. Keyed
+# (ours-vs-receipt, theirs-vs-base); `absent` on the THEIRS axis is evaluated as its own value across
+# every OURS state, which is the correction the spec audit bought: as a value on the `equal` row only,
+# an edited-and-withdrawn file routed to `diverged` and a file deleted on both sides routed to
+# `missing` — a restore of a blob that does not exist.
+OURS_STATES = ("equal", "differs", "absent")
+THEIRS_STATES = ("equal", "differs", "absent")
+VERDICT_GRID = {
+    ("equal", "equal"): "current",
+    ("equal", "differs"): "stale",
+    ("equal", "absent"): "withdrawn",
+    ("differs", "equal"): "patched",
+    ("differs", "differs"): "diverged",
+    ("differs", "absent"): "patched",
+    ("absent", "equal"): "missing",
+    ("absent", "differs"): "missing",
+    ("absent", "absent"): "converged",
+}
+
+# What `update` does per ROLE. A role whose row is a refusal is still a ROW: silence is what lets a
+# later unit add a role and leave it behind, and `selfcheck` asserts this covers the role enum.
+UPDATE_ROLE = {
+    "engine": "table",          # the full verdict table
+    "seed": "report-reseed",    # never written; a moved template is reported
+    "project-owned": "skip",    # gov supplied no bytes, so there is no base to compare
+    "generated": "skip",
+    "rendered": "adopter",      # re-run the adopter, compare, CAP at report
+    "merged": "refuse",         # unit 6 fills this
+    "attributes": "refuse",     # unit 6
+    "gate-leg": "refuse",       # unit 4
+    "ci": "refuse",             # unit 4
+}
+
+
+def _sha(b: bytes | None) -> str | None:
+    return hashlib.sha256(b).hexdigest() if b is not None else None
+
+
+def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str) -> dict:
+    """One receipt row's verdict, from three blobs. `ours` is compared to the RECEIPT's hash.
+
+    Not to `base`: for a rendered row those differ by construction, and for every row the receipt's
+    hash is what gov actually wrote.
+    """
+    src, base_commit = row.get("source"), row.get("commit")
+    theirs = blob_at(root, to_commit, src) if src else None
+    base = blob_at(root, base_commit, src) if (src and base_commit) else None
+    dp = target / row["path"]
+    ours = dp.read_bytes() if dp.is_file() else None
+
+    t_state = "absent" if theirs is None else ("equal" if _sha(theirs) == _sha(base) else "differs")
+    if ours is None:
+        o_state = "absent"
+    elif _sha(ours) == row.get("sha256"):
+        o_state = "equal"
+    else:
+        o_state = "differs"
+    return {"verdict": VERDICT_GRID[(o_state, t_state)], "ours": ours, "theirs": theirs,
+            "base": base, "o_state": o_state, "t_state": t_state}
+
+
+def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, str]:
+    """Delegate to `git merge-file`, which is this repo's structural merge primitive.
+
+    The row-keyed merge driver already hands its structure lines to exactly this call. A wrong
+    argument order does NOT error here — it emits a plausible file with one side silently dropped —
+    which is why every arm asserts merged CONTENT and never the exit code.
+    """
+    import tempfile as _tf
+    with _tf.TemporaryDirectory() as td:
+        d = pathlib.Path(td)
+        (d / "ours").write_bytes(ours)
+        (d / "base").write_bytes(base)
+        (d / "theirs").write_bytes(theirs)
+        out = subprocess.run(["git", "merge-file", "-p",
+                              str(d / "ours"), str(d / "base"), str(d / "theirs")],
+                             capture_output=True, check=False)
+        if out.returncode == 0:
+            return out.stdout, "merged"
+        return None, "conflict"
+
+
+def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
+    """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
+
+    The default is read-only because this verb's failure mode is silent data loss in a repository the
+    operator owns and gov does not, and the muscle-memory invocation must not be the destructive one.
+    """
+    r = Report()
+    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    descs = read_descriptors(root, reg, r)
+    if r.problems:
+        return r.emit()
+    if pathlib.Path(root).resolve() == target.resolve():
+        raise Refusal("--target resolves to the gov checkout itself")
+
+    receipt_path = target / ".governance" / "install.json"
+    if not receipt_path.is_file():
+        raise Refusal(f"no receipt at {receipt_path.as_posix()} — `update` moves an install forward "
+                      f"and there is no record of one here")
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    schema = receipt.get("schema", 1)
+    base_commit = receipt.get("gov_commit")
+
+    out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", f"{to_rev}^{{commit}}"],
+                         capture_output=True, text=True)
+    if out.returncode != 0:
+        raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
+    to_commit = out.stdout.strip()
+
+    if base_commit:
+        chk = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{base_commit}^{{commit}}"],
+                             capture_output=True)
+        if chk.returncode != 0:
+            raise Refusal(
+                f"the receipt records gov commit {base_commit}, which does not resolve in this "
+                f"checkout. REFUSING rather than treating the target as a fresh install: that "
+                f"fallback classifies every file as missing and overwrites every local edit in a "
+                f"repository gov does not own"
+            )
+
+    claimed = receipt.get("kits") or []
+    for eid in claimed:
+        if eid not in descs:
+            raise Refusal(f"the receipt claims kit '{eid}', which is no longer a registry entry — "
+                          f"refusing rather than dropping it, which would leave its files owned by "
+                          f"nobody")
+    available = [e for e in all_kits(descs) if e not in claimed]
+
+    print(f"govkit update — {target.as_posix()}")
+    print(f"govkit update — {base_commit[:8] if base_commit else '(none)'} -> {to_commit[:8]} · "
+          f"receipt schema {schema} · {'WRITE' if write else 'read-only'}")
+
+    deploy = load_deploy(target)
+    tally: dict[str, int] = {}
+    acted: list[dict] = []
+    for row in receipt.get("files", []):
+        role = row.get("role", "engine")
+        how = UPDATE_ROLE.get(role)
+        if how is None:
+            r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
+                   f"update dispatch — refusing rather than classifying it from an absent field")
+            continue
+
+        # A schema-1 receipt's ROLE is untrusted: unit 1 measured that such a receipt stamps
+        # `engine` on a file its descriptor declares project-owned. Re-resolve and refuse a
+        # disagreement rather than acting on either answer.
+        if schema < 2 and row.get("kit") in descs:
+            d, _ = descs[row["kit"]]
+            ctx = target_context(target, deploy, row["kit"], d)
+            res = resolve_entry(root, d, ctx)
+            w = res["writes"].get(row["path"])
+            now = w["role"] if w else next(
+                (u["role"] for u in res["unlanded"] if u["dest"] == row["path"]), None)
+            if now and now != role:
+                r.fail(f"row '{row['path']}' is recorded as '{role}' and its descriptor now resolves "
+                       f"it as '{now}' — refusing this row rather than acting on a role a schema-1 "
+                       f"receipt cannot be trusted about")
+                continue
+
+        if how in ("skip",):
+            tally[role + ":skipped"] = tally.get(role + ":skipped", 0) + 1
+            continue
+        if how == "refuse":
+            r.fail(f"row '{row['path']}' has role '{role}', which no unit has taught `update` to "
+                   f"move yet — refusing by name rather than guessing")
+            continue
+
+        c = classify_row(root, target, row, to_commit)
+        v = c["verdict"]
+        if how == "seed" or how == "report-reseed":
+            if c["t_state"] == "differs":
+                v = "reseed-available"
+            elif v not in ("missing",):
+                v = "current" if c["o_state"] == "equal" else "patched"
+        if how == "adopter" and v in ("diverged", "stale"):
+            v = "re-rendered"          # CAP at report; the adopter owns these bytes
+        tally[v] = tally.get(v, 0) + 1
+        print(f"  {v:<18} [{role:<13}] {row['path']}")
+        acted.append({"row": row, "c": c, "verdict": v, "how": how})
+
+    for line in (f"  available (not installed): {e}" for e in available):
+        print(line)
+    if available:
+        print("govkit update — the entries above are registry entries this receipt does not claim. "
+              "`update` does not install them: widening a target's governance surface is an owner "
+              "decision, and `--add-kits` is the flag that would")
+    print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+
+    if not write:
+        print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
+        return r.emit()
+
+    outbox = target / ".governance" / "outbox"
+    outbox.mkdir(parents=True, exist_ok=True)
+    changed, deleted, conflicts = [], [], 0
+    for a in acted:
+        row, c, v = a["row"], a["c"], a["verdict"]
+        dp = target / row["path"]
+        if v == "stale" or v == "missing":
+            dp.parent.mkdir(parents=True, exist_ok=True)
+            dp.write_bytes(c["theirs"])
+            row["sha256"] = _sha(c["theirs"])
+            row["commit"] = to_commit
+            changed.append(row["path"])
+        elif v == "withdrawn":
+            if dp.is_file():
+                dp.unlink()
+            deleted.append(row["path"])
+        elif v == "diverged":
+            merged, how = three_way(c["ours"], c["base"] or b"", c["theirs"])
+            if merged is None:
+                conflicts += 1
+                (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
+                    f"# update conflict — {row['path']}\n\n"
+                    f"base   {base_commit} sha {_sha(c['base'])}\n"
+                    f"ours   on disk       sha {_sha(c['ours'])}\n"
+                    f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
+                    f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n",
+                    encoding="utf-8", newline="\n")
+                r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
+                       f"order written")
+            else:
+                dp.write_bytes(merged)
+                row["sha256"] = _sha(merged)
+                row["commit"] = to_commit
+                changed.append(row["path"])
+
+    if changed:
+        subprocess.run(["git", "-C", str(target), "add", "--"] + changed,
+                       capture_output=True, check=False)
+    if deleted:
+        subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
+                       capture_output=True, check=False)
+    receipt["schema"] = RECEIPT_SCHEMA
+    receipt["gov_commit"] = to_commit
+    receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+    (target / ".governance" / "install.sums").write_text(
+        "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
+        encoding="utf-8", newline="\n")
+    print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+          f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+    return r.emit()
+
+
 # ---------------------------------------------------------------------------------------- intake
 def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> list[str]:
     """Every token a selected kit's destinations and probes need that is not derived.
@@ -1266,20 +1527,26 @@ USAGE = """usage:
   govkit.py plan  --target <path> [--kits a,b | --all]
   govkit.py check --target <path>
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
+  govkit.py update --target <path> [--to <rev>] [--write]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
-`plan` and `check` are READ-ONLY and neither writes a byte. `intake` writes the target descriptor
+`plan`, `check` and `update` are READ-ONLY and none writes a byte; `update --write` performs what
+`update` printed. The default is read-only because that verb's failure mode is silent data loss in a
+repository the operator owns and gov does not, and the muscle-memory invocation must not be the
+destructive one. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
 nothing looks exactly like one that works, from the outside, and this unit exists because that class
 of silence ships broken installs.
 """
 
 
-def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str], bool, dict[str, str]]:
+def parse_args(argv: list[str]) -> tuple:
     verb = argv[0]
     target: pathlib.Path | None = None
     mode, kits = "default", []
     resume = False
+    write = False
+    to_rev = "HEAD"
     answers: dict[str, str] = {}
     i = 1
     while i < len(argv):
@@ -1296,6 +1563,12 @@ def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str
         elif a == "--resume":
             resume = True
             i += 1
+        elif a == "--write":
+            write = True
+            i += 1
+        elif a == "--to" and i + 1 < len(argv):
+            to_rev = argv[i + 1]
+            i += 2
         elif a == "--all":
             mode = "all"
             i += 1
@@ -1304,7 +1577,7 @@ def parse_args(argv: list[str]) -> tuple[str, pathlib.Path | None, str, list[str
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits, resume, answers
+    return verb, target, mode, kits, resume, answers, write, to_rev
 
 
 def main(argv: list[str]) -> int:
@@ -1312,13 +1585,13 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits, RESUME, ANSWERS = parse_args(argv)
+        verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             if len(argv) != 1:
                 raise Refusal("selfcheck takes no arguments")
             return selfcheck(root)
-        if verb in ("plan", "check", "apply", "intake"):
+        if verb in ("plan", "check", "apply", "intake", "update"):
             if target is None:
                 raise Refusal(
                     f"{verb} needs an explicit --target. Refusing to default it to the process cwd: "
@@ -1332,6 +1605,8 @@ def main(argv: list[str]) -> int:
                 return cmd_check(root, target)
             if verb == "intake":
                 return cmd_intake(root, target, mode, kits, ANSWERS)
+            if verb == "update":
+                return cmd_update(root, target, TO_REV, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

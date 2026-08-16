@@ -333,6 +333,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "classify_row",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "cleanup",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -354,6 +359,11 @@
     },
     {
       "id": "cmd_plan",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -1961,6 +1971,11 @@
       "id": "text_merge",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "three_way",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "tracked",

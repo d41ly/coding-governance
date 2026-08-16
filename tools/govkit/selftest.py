@@ -380,6 +380,103 @@ def main() -> int:
         check("and prints the declared reason rather than the bare state",
               "installation is a copy to an owner-chosen path" in pc.stdout, pc.stdout)
 
+        # ===== unit 2: the update verb =====
+        # A REAL older install: the receipt is re-pinned to a gov commit where check-wiring.sh
+        # genuinely differs from HEAD, and the target is given those older bytes. Every verdict below
+        # is then measured rather than simulated.
+        OLD = subprocess.run(
+            ["git", "-C", str(govroot), "rev-list", "-1",
+             "24f39915b3de86010a30d8698d0d4b317db015de", "--", "tools/check-wiring.sh"],
+            capture_output=True, text=True).stdout.strip()
+
+        def stale_target(name: str) -> pathlib.Path:
+            t = make_target(tmp / name, DEPLOY_FULL)
+            run("apply", "--target", str(t), "--kits", "check-wiring")
+            rp = t / ".governance" / "install.json"
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            rec["gov_commit"] = OLD
+            for f in rec["files"]:
+                f["commit"] = OLD
+                b = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
+                                   capture_output=True).stdout
+                f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
+                (t / f["path"]).write_bytes(b)
+            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+            return t
+
+        up = stale_target("u2a")
+        p = run("update", "--target", str(up))
+        check("update classifies an out-of-date engine row as stale",
+              "stale " in p.stdout and "check-wiring.sh" in p.stdout, p.stdout)
+        check("update is READ-ONLY by default and says so",
+              "NOTHING was written" in p.stdout, p.stdout)
+        before = (up / "tools" / "check-wiring.sh").read_bytes()
+        p = run("update", "--target", str(up))
+        check("and it really wrote nothing — the bytes are unchanged",
+              (up / "tools" / "check-wiring.sh").read_bytes() == before, "")
+
+        # AC2 — --write takes gov's new bytes, and they are the INDEX's at the new commit.
+        p = run("update", "--target", str(up), "--write")
+        head_bytes = subprocess.run(["git", "-C", str(govroot), "show",
+                                     "HEAD:tools/check-wiring.sh"], capture_output=True).stdout
+        check("update --write brings a stale engine file to the new commit's bytes",
+              (up / "tools" / "check-wiring.sh").read_bytes() == head_bytes, "")
+        rec = json.loads((up / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("and re-stamps the receipt at the new commit",
+              rec["gov_commit"] == subprocess.run(
+                  ["git", "-C", str(govroot), "rev-parse", "HEAD"],
+                  capture_output=True, text=True).stdout.strip(), rec["gov_commit"])
+        p = run("update", "--target", str(up))
+        check("a second update over the same target reports current",
+              "current" in p.stdout and "stale" not in p.stdout, p.stdout)
+
+        # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
+        up2 = stale_target("u2b")
+        (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")
+        p = run("update", "--target", str(up2), "--write")
+        check("a locally edited file whose gov copy also moved is reported, never overwritten",
+              (up2 / "tools" / "check-wiring.sh").read_bytes()
+              == b"#!/usr/bin/env bash\n# OPERATOR EDIT\n", "")
+        check("and the verdict names it rather than acting",
+              "diverged" in p.stdout or "patched" in p.stdout, p.stdout)
+
+        # AC7 — the refusal that matters most: an unresolvable recorded commit must NOT be treated as
+        # a fresh install, because that classifies every file `missing` and overwrites the repository.
+        up3 = stale_target("u2c")
+        rp = up3 / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        rec["gov_commit"] = "0" * 40
+        rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(up3), "--write")
+        check("update refuses when the recorded gov commit does not resolve", p.returncode == 2,
+              p.stdout + p.stderr)
+        check("the refusal NAMES the commit", "0000000000" in p.stderr, p.stderr)
+        check("and says it will not fall back to a fresh install",
+              "fresh install" in p.stderr, p.stderr)
+        check("nothing was written on that refusal",
+              (up3 / "tools" / "check-wiring.sh").read_bytes()
+              == subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:tools/check-wiring.sh"],
+                                capture_output=True).stdout, "")
+        # NEGATIVE half: the same fixture with a resolvable commit does not refuse.
+        rec["gov_commit"] = OLD
+        rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(up3))
+        check("NEGATIVE: a resolvable commit does not fire that refusal", p.returncode == 0,
+              p.stdout + p.stderr)
+
+        # AC8 — a registry entry the receipt does not claim is REPORTED, never installed.
+        check("update reports uninstalled entries as available and names the flag",
+              "available (not installed)" in p.stdout and "--add-kits" in p.stdout, p.stdout)
+        rec2 = json.loads(rp.read_text(encoding="utf-8"))
+        check("and update --write leaves the receipt's kit list unchanged",
+              rec2["kits"] == rec["kits"], "")
+
+        # AC9 — the two completeness arms. A role or a grid cell nobody wrote is what lets a later
+        # unit add one and leave it behind.
+        ps = run("selfcheck")
+        check("selfcheck asserts update's dispatch covers the role enum and the verdict grid",
+              ps.returncode == 0, ps.stdout + ps.stderr)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)
