@@ -6,17 +6,35 @@ home = "tools/lexicon"
 scope = "repo"
 version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 
+# The engine files are ENUMERATED rather than globbed with `**`, and that is load-bearing. `apply`
+# iterates file rules IN ORDER and an `include = "**"` engine rule pools every tracked file under
+# `home`, writing each unconditionally — so it would overwrite the adopter's waiver registries with
+# this repo's empty ones BEFORE the project-owned rule below is ever reached. A later rule cannot
+# un-clobber what an earlier one wrote. Enumerating costs a line per file and is the only shape that
+# keeps the split real.
 [[files]]
-include = "**"
+include = [
+  "lexicon.py",
+  "lexicon_conf.py",
+  "subtokens.py",
+  "scaffold_lexicon.py",
+  "selftest.py",
+  "adopt-lexicon.sh",
+  "kit.toml",
+  "README.md",
+  "LEXICON.md",
+]
 role = "engine"
 
 # The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
 # fresh install has somewhere to record its first deliberate exception, but their CONTENT is
 # per-repo and must never be overwritten by an upgrade — a waiver list copied from a larger tree is
-# the same defect as a pin copied from one.
+# the same defect as a pin copied from one. `seed` is the role that expresses "copied ONCE, then the
+# target owns it"; `project-owned` alone would still be written on every apply.
 [[files]]
 include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"]
-role = "project-owned"
+role = "seed"
+to = "{kit}/{relpath}"
 
 [config]
 file = ".lexicon.conf"

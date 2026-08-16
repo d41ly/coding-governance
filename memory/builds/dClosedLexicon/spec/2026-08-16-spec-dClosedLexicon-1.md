@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** INPROGRESS · rev-7 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -55,8 +55,8 @@ PRESENT ceiling anyway, at 32,751 of 32,768, so this unit never needed the raise
   frozen SENTINEL fixture per shipped pattern set, so a pattern set going inert fails here.
 - **S12** — `tools/check-placeholders.sh` plus its self-test. The gate's SUBJECT is split, because in
   THIS repo the shipped playbook files are the un-instantiated template SOURCES and carry placeholders
-  permanently and by design — 23 in the template and 14 in the companion, measured, with S13 adding one
-  more. A leg asserting "no placeholder survives" over those files reds on its own landing commit.
+  permanently and by design — the counts are MEASURED by the gate and deliberately not restated here.
+  A leg asserting "no placeholder survives" over those files reds on its own landing commit.
   - **S12a — the gov-side leg**, run bare on the merge bar, asserts only what is true of the SOURCES:
     the `{{X}}` union over `parallel-coding-governance.template.md` and
     `parallel-coding-governance.domain-rules.md` is exactly the set catalogued in
@@ -446,6 +446,24 @@ dogfood-only and must not ship.
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-7 · 2026-08-16 · BUILT, then folded review-dClosedLexicon-3, the Tier-2 closing review, which
+  came back BLOCKED on the one mechanism this spec did not describe precisely enough to build right.
+  S3's P3 matched an import NAMESPACE against a PATH glob, so the only rule this repo declares —
+  naming the hyphenated `tools/codebase-map/`, which no module name can contain — could never fire,
+  and `LAYER_OFFENDER_PIN="0"` was unfalsifiable. P3 now RESOLVES an import to candidate paths (the
+  namespace reading, a stem lookup against the tracked corpus, and relative specifiers normalised
+  against the importer), and S3 gains a THIRD vacuity arm: a non-empty rule that cannot fire is an
+  `UNMATCHABLE LAYERS RULE` refusal, proved by constructing the rule's own synthetic violation.
+  `NOT ARMED` tested emptiness and `DEAD PROBE` tested extractors; neither tested REACHABILITY, and
+  that gap is now a `memory/gotchas/` class with an observed instance. S11 gains the production-shaped
+  fixture that would have caught it — the original used a namespace that happened to spell a path —
+  plus arms for the scaffold path end to end, which nothing had exercised and which was writing a
+  CRLF conf that INVERTED the unratified-seed refusal. Also folded: P2 no longer exempts a type named
+  exactly the banned suffix, the scaffolder filters non-alphabetic verbs its own reader would refuse,
+  a `--measure` verb re-measures the pins after curation, S12a gains marker PRESENCE (counting
+  distinct markers alone read an absent one as agreement), both-directions catalogue coverage and the
+  UNION total, and the kit's file rules are enumerated rather than globbed so `apply` cannot clobber
+  an adopter's waivers.
 - rev-6 · 2026-08-16 · folded review-dClosedLexicon-2, the M4 audit at rev-5. S12 splits by SUBJECT
   (R1): the gov-side leg checks the source-side catalogue, and the survival predicate moves to a
   fixture-only `--check <a> <b>` mode, because this repo's shipped playbook files carry 23 and 14

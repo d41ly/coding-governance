@@ -38,4 +38,4 @@ guard = []
 [[gate_leg]]
 name = "placeholder-catalogue self-test"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]
-guard = ["{prefix}/check-placeholders.sh"]
+guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"]

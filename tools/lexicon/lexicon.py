@@ -4,6 +4,7 @@
 
     python tools/lexicon/lexicon.py            # assert; non-zero on an unwaived offender
     python tools/lexicon/lexicon.py --list     # print every offender, waived or not (authoring aid)
+    python tools/lexicon/lexicon.py --measure  # print the three pins THIS conf produces; decide nothing
 
 WHAT THIS IS FOR, since it is not typo-catching. A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility, so a name that will not fit the table is
@@ -21,10 +22,17 @@ in the corpus carries a DECLARED mode and an undeclared one is a named refusal:
     dark    none, declared explicitly     named every run, never silently absent
 
 VACUITY IS THE DOMINANT FAILURE MODE, not false positives — a predicate that selects an empty
-population passes green forever and tells you nothing. It is armed on both sides: here, by the
-DEAD PROBE assertion (a parser/probe language whose definition population is empty against a corpus
-that contains that extension is a refusal, not a pass), and in `selftest.py`, by a frozen sentinel
-fixture per shipped pattern set, because the corpus-side arm is itself defeated by an empty corpus.
+population passes green forever and tells you nothing. It is armed THREE ways, and the third was
+added after the first two proved insufficient in this file's own first landing:
+
+  DEAD PROBE          a parser/probe language whose definition population is empty against a corpus
+                      containing that extension — an extractor that has gone inert
+  frozen SENTINELS    a fixture per shipped pattern set in `selftest.py`, because the corpus-side
+                      arm above is itself defeated by an empty corpus
+  UNMATCHABLE RULE    a LAYERS rule that is NON-EMPTY but cannot fire. `NOT ARMED` tests emptiness
+                      and DEAD PROBE tests extractors; neither tests REACHABILITY, and a real rule
+                      shipped through that gap reporting an unfalsifiable 0. Reachability is proved
+                      by CONSTRUCTION: the rule must flag its own synthetic violation.
 """
 
 import re
@@ -158,7 +166,109 @@ def _glob_match(path: str, pattern: str) -> bool:
     return re.match(rx + "$", path) is not None or re.match(rx, path) is not None
 
 
-def run(root: Path, list_mode: bool = False) -> int:
+def build_module_index(files: list[str]) -> dict[str, list[str]]:
+    """`{module-stem: [repo paths]}` over the tracked corpus, for P3's resolver.
+
+    A LAYERS glob is spelled as a repo PATH. An import target is a NAMESPACE. Turning one into the
+    other by swapping dots for slashes only works when the two happen to coincide, and it silently
+    fails whenever they do not — most importantly when a directory name contains a character no
+    module name may contain. `tools/codebase-map/` is exactly that case: no Python import can ever
+    produce the hyphen, so a rule naming it was unmatchable by construction and P3 reported a clean
+    zero over a population it could not select. That is the vacuous-selector class this kit's own
+    docstring names as its dominant failure mode.
+    """
+    index: dict[str, list[str]] = {}
+    for rel in files:
+        base = rel.rsplit("/", 1)[-1]
+        stem = base.rsplit(".", 1)[0] if "." in base else base
+        index.setdefault(stem, []).append(rel)
+    return index
+
+
+def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> list[str]:
+    """Candidate repo paths an import target may denote. Empty means EXTERNAL or unresolvable, which
+    is not a violation — a rule can only forbid what it can locate."""
+    out: list[str] = []
+    here = importer.rsplit("/", 1)[0] if "/" in importer else ""
+
+    # A relative JS/TS specifier resolves against the IMPORTER's directory. Swapping dots for
+    # slashes mangles these into `///adapters/db` and matches nothing.
+    if target.startswith("."):
+        parts = [p for p in (here + "/" + target).split("/") if p not in ("", ".")]
+        stack: list[str] = []
+        for p in parts:
+            if p == "..":
+                if stack:
+                    stack.pop()
+            else:
+                stack.append(p)
+        cand = "/".join(stack)
+        out.append(cand)
+        out.extend(p for p in index.get(cand.rsplit("/", 1)[-1], []) if p.startswith(cand))
+        return out
+
+    # A dotted namespace MAY mirror a path; keep that reading, it is right when packages mirror dirs.
+    out.append(target.replace(".", "/"))
+
+    # And resolve the LAST segment as a module stem against the corpus. This is what catches the
+    # flat `sys.path`-insert import — the commonest shape in this tree and in every kit here — where
+    # the target is a bare name that shares no characters with its own directory.
+    out.extend(index.get(target.rsplit(".", 1)[-1], []))
+    return out
+
+
+def check_layer_violation(rel: str, target: str, layers, index) -> tuple[str, str] | None:
+    """The `(from, to)` rule this import breaks, or None."""
+    for frm, to in layers:
+        if not _glob_match(rel, frm):
+            continue
+        for cand in resolve_import(target, rel, index):
+            if _glob_match(cand, to):
+                return (frm, to)
+    return None
+
+
+def scan_unmatchable_rules(layers, files: list[str], index) -> list[tuple[str, str, str]]:
+    """LAYERS rules that CANNOT fire, with the reason. The third vacuity defence.
+
+    `NOT ARMED` tests whether LAYERS is empty; `DEAD PROBE` tests whether an extractor selects
+    anything. Neither tests whether a NON-EMPTY rule is REACHABLE, and that gap shipped a rule that
+    could never match while its offender pin read a confident, unfalsifiable 0.
+
+    Reachability is proved by CONSTRUCTION, not by observation: for each rule, take a real tracked
+    file on the `to` side, derive the import target a real importer would write for it, and require
+    the matcher to flag it. A rule that survives its own synthetic violation is a rule that will
+    never see a real one.
+    """
+    bad = []
+    for frm, to in layers:
+        sources = [f for f in files if _glob_match(f, frm)]
+        targets = [f for f in files if _glob_match(f, to)]
+        if not sources:
+            bad.append((frm, to, f"the FROM glob {frm!r} matches no tracked file"))
+            continue
+        if not targets:
+            bad.append((frm, to, f"the TO glob {to!r} matches no tracked file"))
+            continue
+        probe_src = sources[0]
+        reachable = False
+        for t in targets:
+            base = t.rsplit("/", 1)[-1]
+            stem = base.rsplit(".", 1)[0] if "." in base else base
+            for synthetic in (stem, t.rsplit(".", 1)[0].replace("/", "."), "./" + t):
+                if check_layer_violation(probe_src, synthetic, [(frm, to)], index):
+                    reachable = True
+                    break
+            if reachable:
+                break
+        if not reachable:
+            bad.append((frm, to, f"no import of any file under {to!r} can be matched from {frm!r} — "
+                                 f"the rule is non-empty but UNREACHABLE, so its offender count is "
+                                 f"an unfalsifiable 0"))
+    return bad
+
+
+def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     kit = Path(__file__).resolve().parent
     conf_path = root / CONF_NAME
     if not conf_path.exists():
@@ -186,10 +296,19 @@ def run(root: Path, list_mode: bool = False) -> int:
         problems.append("UNDECLARED EXTENSIONS (declare each in LANGS, `dark` if nothing extracts it): "
                         + ", ".join(missing))
 
+    module_index = build_module_index(files)
+
     if not layers:
         problems.append("P3 NOT ARMED — LAYERS is empty. An unarmed predicate is a refusal, never a "
                         "green run: declare a forbidden import direction, or remove the conf to "
                         "un-adopt the kit entirely.")
+    else:
+        # The THIRD vacuity defence. Emptiness and dead extractors were armed from the start; a
+        # non-empty rule that cannot fire was not, and that is the gap a real rule shipped through.
+        for frm, to, why in scan_unmatchable_rules(layers, files, module_index):
+            problems.append(f"UNMATCHABLE LAYERS RULE `{frm} -> {to}` — {why}. A rule that cannot "
+                            f"fire is worse than no rule: it reports a confident 0 that no edit can "
+                            f"ever move.")
 
     # --- extraction, with the vacuity arm ----------------------------------------------------
     offenders: dict[str, list[Offender]] = {"verb": [], "suffix": [], "layer": []}
@@ -226,19 +345,21 @@ def run(root: Path, list_mode: bool = False) -> int:
 
         for name, lineno in types_:
             for suf in banned:
-                if name.endswith(suf) and name != suf:
+                # No `name != suf` exemption. A type named exactly `Manager` is the PUREST instance
+                # of "a type nobody scoped", and exempting it made the predicate weakest precisely
+                # where the offence is strongest.
+                if name.endswith(suf):
                     offenders["suffix"].append(Offender(
                         "P2 suffix", rel, lineno, name,
                         f"type name ends with the banned suffix {suf!r}"))
                     break
 
         for target, lineno in imports:
-            for frm, to in layers:
-                if _glob_match(rel, frm) and _glob_match(target.replace(".", "/"), to):
-                    offenders["layer"].append(Offender(
-                        "P3 layer", rel, lineno, f"{rel}->{target}",
-                        f"forbidden import direction {frm} -> {to}"))
-                    break
+            hit = check_layer_violation(rel, target, layers, module_index)
+            if hit:
+                offenders["layer"].append(Offender(
+                    "P3 layer", rel, lineno, f"{rel}->{target}",
+                    f"forbidden import direction {hit[0]} -> {hit[1]}"))
 
     # S6 — the live non-empty assertion. HYGIENE rule 5 applied to this gate: a check must not
     # select an empty population. A declared parser/probe language with NO definitions, against a
@@ -251,6 +372,24 @@ def run(root: Path, list_mode: bool = False) -> int:
                             + (f" ({pset})" if pset else "")
                             + " and the corpus contains it, but the extractor found NO definitions. "
                               "An extractor that selects an empty population passes green forever.")
+
+    # `--measure` — print the three counts THIS conf produces and decide nothing.
+    #
+    # `--scaffold` measures against the DERIVED seed, and the whole point of the seed is that a human
+    # then rewrites it. Every pin it wrote was therefore a pre-curation number, and without this verb
+    # the only way to re-measure after curating was to read the failure output of a red gate. That is
+    # how a pin ends up asserted rather than measured — and two of these three shipped as a hardcoded
+    # `"0"` under a comment that called them MEASURED.
+    if measure_mode:
+        for kind in ("verb", "suffix", "layer"):
+            waivers = load_waivers(kit, kind)
+            unwaived = [o for o in offenders[kind] if o.text not in waivers]
+            print(f'{PIN_KEYS[kind]}="{len(unwaived)}"')
+        if problems:
+            print("# NOTE: the run also reported problems that are not pin-counted:")
+            for p in problems:
+                print(f"#   {p}")
+        return 0
 
     # --- waivers, pins, verdict ---------------------------------------------------------------
     exit_code = 0
@@ -296,14 +435,14 @@ def run(root: Path, list_mode: bool = False) -> int:
 
 def main(argv: list[str]) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list"):
-        sys.stderr.write("usage: python tools/lexicon/lexicon.py [--check|--list]\n")
+    if mode not in ("--check", "--list", "--measure"):
+        sys.stderr.write("usage: python tools/lexicon/lexicon.py [--check|--list|--measure]\n")
         return 2
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")
         return 2
-    return run(Path(out.stdout.strip()), list_mode=(mode == "--list"))
+    return run(Path(out.stdout.strip()), list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["armed-but-unreachable-rule.md"]
 guides = []
 backlog-shards = []
 [paths]
@@ -47,11 +47,16 @@ moment it IS the banned shape. The resolution is procedural: mark it `PROPOSED`,
 empty, and red until a human stamps it. Without that arm an unedited seed reaches the merge bar
 disguised as a curated vocabulary.
 
-**Vacuity is armed on BOTH sides, because each arm defeats the other's blind spot.** The corpus-side
-arm is `DEAD PROBE`: a `parser` or `probe` language whose definition population is empty against a
-corpus containing that extension is a refusal. That arm is itself defeated by an empty corpus, so the
-kit-side arm is a frozen SENTINEL fixture per shipped pattern set in `selftest.py`. A pattern set that
-goes inert fails there rather than passing green over a real repo forever.
+**Vacuity is armed THREE ways, and the third exists because the first two were not enough.** The
+corpus-side arm is `DEAD PROBE`: a `parser` or `probe` language whose definition population is empty
+against a corpus containing that extension is a refusal. That arm is itself defeated by an empty
+corpus, so the kit-side arm is a frozen SENTINEL fixture per shipped pattern set in `selftest.py`.
+The third is `UNMATCHABLE LAYERS RULE`, added after the closing review: `NOT ARMED` tests whether
+`LAYERS` is EMPTY and `DEAD PROBE` tests whether an extractor selects anything, and **neither tests
+whether a non-empty rule can ever FIRE**. The kit's first real declaration went through that gap —
+it named a hyphenated directory, no import could resolve into it, and the offender pin read a
+confident 0 that no edit could move. Reachability is now proved by CONSTRUCTION rather than
+observation: each rule must flag its own synthetic violation, or the run reds.
 
 **Coverage is DECLARED per extension, and an undeclared one is a named refusal.**
 `map_extractors.py` refuses to ship a regex extractor for shell and declares that language dark
@@ -119,10 +124,14 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
 - **No `memory/gotchas/` class for naming violations.** Companion §7 requires a failing case OBSERVED
   before a gate lands, and a class authored ahead of its first instance is the gate-discipline error
   this repo names. The first confirmed P1 or P2 finding becomes one.
-- **P3's import matching is glob-and-prefix, not a resolver.** It compares a dotted import path
-  rewritten to slashes against the declared globs, so a relative import or an aliased path is not
-  resolved to its target file. Adequate for the layer directions declared here; it would need a real
-  module resolver to police an aliased build.
+- **P3 resolves an import to candidate PATHS, but it is not a full module resolver.** It tries the
+  dotted-namespace-as-path reading, the last segment as a module stem against the tracked corpus, and
+  relative specifiers normalised against the importer's directory. That covers the shapes this tree
+  and its adopters actually write. It does NOT follow build-tool path aliases, `package.json`
+  `exports` maps, or re-export barrels, so an aliased import into a forbidden layer is not caught.
+  The earlier version compared the raw namespace against a path glob and was structurally incapable:
+  the first real rule declared — naming a HYPHENATED directory no module name can contain — could
+  never match, and P3 reported an unfalsifiable 0. That is why the reachability arm exists.
 - **The benefit is unmeasurable by construction**, which is why the kit is opt-in and why the
   retirement condition is written down rather than left to argument: retire P1 if it goes unused
   across two adopters.

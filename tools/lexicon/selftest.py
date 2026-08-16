@@ -79,8 +79,14 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None):
         return r.returncode, r.stdout + r.stderr
 
 
+# BOTH sides of the declared layer rule exist in every BASE_CONF fixture. The reachability arm reds a
+# rule whose globs select nothing, and these fixtures declared `core/* -> adapters/*` while supplying
+# only one side — so they were unreachable too, and the arm caught its own test data first.
+LAYER_SIDES = {"adapters/db.py": "def build_db():\n    pass\n",
+               "core/thing.py": "def build_thing():\n    pass\n"}
+
 # ---- P1: the verb predicate ---------------------------------------------------------------------
-code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, BASE_CONF)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, BASE_CONF)
 check("P1 green: a declared verb passes", code == 0, out)
 
 code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF)
@@ -97,7 +103,7 @@ check("P2 red: a type DEFINITION ending in a banned suffix reds", code != 0 and 
 # DEFINITION sites only, so neither of these is an offender.
 code, out = run_case(
     {"core/a.py": "from elsewhere import ThingManager\n\n\ndef build_x(widget_manager, other: ThingManager):\n"
-                  "    return ThingManager\n"},
+                  "    return ThingManager\n", **LAYER_SIDES},
     BASE_CONF)
 check("P2 green: an IMPORTED type and a parameter carrying the suffix do not red", code == 0, out)
 
@@ -105,7 +111,7 @@ check("P2 green: an IMPORTED type and a parameter carrying the suffix do not red
 code, out = run_case({"core/a.py": "import adapters.db\n\n\ndef build_x():\n    pass\n"}, BASE_CONF)
 check("P3 red: a forbidden import direction reds", code != 0 and "P3 layer" in out, out)
 
-code, out = run_case({"adapters/a.py": "import core.thing\n\n\ndef build_x():\n    pass\n"}, BASE_CONF)
+code, out = run_case({"adapters/a.py": "import core.thing\n\n\ndef build_x():\n    pass\n", **LAYER_SIDES}, BASE_CONF)
 check("P3 green: the ALLOWED direction passes", code == 0, out)
 
 # AC3 — an empty LAYERS block must report NOT ARMED and RED, never pass green over an absent
@@ -114,6 +120,47 @@ code, out = run_case({"core/a.py": "def build_x():\n    pass\n"},
                      BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n")
 check("P3 unarmed: an empty LAYERS reds", code != 0, out)
 check("P3 unarmed: it says NOT ARMED", "NOT ARMED" in out, out)
+
+# AC3b — THE PRODUCTION SHAPE. The arms above use `core/*` -> `adapters/*` with `import adapters.db`,
+# where the namespace happens to spell the path. That coincidence is what let a DEAD rule ship: this
+# repo's real declaration names `tools/codebase-map/`, a directory whose hyphen NO module name can
+# contain, and the flat `sys.path`-insert import that actually reaches it is a bare stem sharing no
+# characters with its directory. Both arms below reproduce that shape, because a fixture easier than
+# production certifies coverage the production rule does not have.
+HYPHEN_CONF = BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  pkg/consumer/* -> pkg/shared-core/*\n"
+code, out = run_case(
+    {"pkg/consumer/a.py": "import shared_thing\n\n\ndef build_x():\n    pass\n",
+     "pkg/shared-core/shared_thing.py": "def build_y():\n    pass\n"},
+    HYPHEN_CONF)
+check("P3 red: a BARE-STEM import into a HYPHENATED directory is caught", code != 0 and "P3 layer" in out, out)
+
+code, out = run_case(
+    {"pkg/consumer/a.py": "import unrelated_thing\n\n\ndef build_x():\n    pass\n",
+     "pkg/consumer/unrelated_thing.py": "def build_z():\n    pass\n",
+     "pkg/shared-core/shared_thing.py": "def build_y():\n    pass\n"},
+    HYPHEN_CONF)
+check("P3 green: a bare-stem import NOT under the forbidden dir is silent", code == 0, out)
+
+# The reachability arm — the third vacuity defence. `NOT ARMED` tests whether LAYERS is EMPTY and
+# DEAD PROBE tests whether an extractor selects anything; neither tests whether a NON-EMPTY rule can
+# ever fire. A rule naming a directory that does not exist is the checkable form of that.
+code, out = run_case({"core/a.py": "def build_x():\n    pass\n"},
+                     BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  core/* -> nowhere/at-all/*\n")
+check("P3 unreachable: a rule whose TO glob matches no tracked file reds", code != 0, out)
+check("P3 unreachable: it says UNMATCHABLE", "UNMATCHABLE" in out, out)
+
+# H1 — a RELATIVE specifier must resolve against the IMPORTER's directory. Swapping dots for slashes
+# mangles `../shared-core/x.js` into `///shared-core/x/js` and matches nothing, which made the
+# predicate structurally incapable for the commonest JS import shape.
+JS_CONF = ('BANNED_SUFFIXES="Manager"\nLANGS="js:js-regex:probe conf::dark"\n'
+           'VERB_OFFENDER_PIN="9"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
+           'ratified="2026-08-16 node d"\n\nVERBS:\n  build  make a thing\n\n'
+           'LAYERS:\n  pkg/consumer/* -> pkg/shared-core/*\n')
+code, out = run_case(
+    {"pkg/consumer/a.js": "import x from '../shared-core/thing.js'\nexport function buildA(){}\n",
+     "pkg/shared-core/thing.js": "export function buildB(){}\n"},
+    JS_CONF)
+check("P3 red: a RELATIVE js specifier resolves against the importer's dir", code != 0 and "P3 layer" in out, out)
 
 # ---- S6 / AC4: the DEAD PROBE arm ---------------------------------------------------------------
 # A declared parser/probe language whose definition population is EMPTY, against a corpus that
@@ -129,13 +176,13 @@ check("undeclared extension reds by name", code != 0 and "md" in out, out)
 check("undeclared extension says UNDECLARED", "UNDECLARED EXTENSIONS" in out, out)
 
 # ---- S8 / AC8: waivers key on matched TEXT ------------------------------------------------------
-code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF,
+code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n", **LAYER_SIDES}, BASE_CONF,
                      {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})
 check("a waiver on the matched TEXT silences its offender", code == 0, out)
 
 # The whole reason for text keying: `install-prefix-waivers.txt` keys on <path>:<line>, so any edit
 # ABOVE a waived line unpins it and reds a merge that touched nothing the waiver guards.
-code, out = run_case({"core/a.py": "# a new comment line added above\n# and another\ndef frobnicate_index():\n    pass\n"},
+code, out = run_case({"core/a.py": "# a new comment line added above\n# and another\ndef frobnicate_index():\n    pass\n", **LAYER_SIDES},
                      BASE_CONF, {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})
 check("an edit ABOVE a waived occurrence does NOT unpin it", code == 0, out)
 
@@ -177,6 +224,46 @@ for pset, src in SENTINELS.items():
     check(f"sentinel {pset}: functions found", len(funcs) >= 2, f"{funcs}")
     check(f"sentinel {pset}: types found", len(types_) >= 1, f"{types_}")
     check(f"sentinel {pset}: imports found", len(imports) >= 2, f"{imports}")
+
+# ---- the --scaffold path, end to end -------------------------------------------------------------
+# Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
+# refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
+# reader requires an alphabetic verb. A kit whose first command writes a file its second command
+# rejects has no working adoption path at all.
+with tempfile.TemporaryDirectory() as td:
+    root = Path(td)
+    shutil.copytree(KIT, root / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (root / "src").mkdir()
+    (root / "src" / "a.py").write_text(
+        "def build_x():\n    pass\n\n\ndef load_y():\n    pass\n\n\ndef 十_bad():\n    pass\n"
+        .replace("十_bad", "_2fa_check"), encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "--", "src/a.py"], cwd=root, check=True, capture_output=True)
+    r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
+                       cwd=root, capture_output=True, text=True)
+    check("scaffold: exits 0", r.returncode == 0, r.stdout + r.stderr)
+    conf_text = (root / ".lexicon.conf").read_text(encoding="utf-8")
+    check("scaffold: marks the seed PROPOSED", "PROPOSED" in conf_text, conf_text[:200])
+    check("scaffold: leaves ratified EMPTY", 'ratified=""' in conf_text, conf_text[:200])
+
+    sys.path.insert(0, str(KIT))
+    from lexicon_conf import ConfError, load_conf  # noqa: E402
+    try:
+        parsed = load_conf(root / ".lexicon.conf")
+        check("scaffold: the file it wrote PARSES through its own reader", True)
+        check("scaffold: every seeded verb is alphabetic, as the reader requires",
+              all(v.isalpha() for v in parsed["VERBS"]), f"{sorted(parsed['VERBS'])}")
+        check("scaffold: a non-alphabetic leading token is FILTERED, not emitted",
+              "2" not in parsed["VERBS"], f"{sorted(parsed['VERBS'])}")
+    except ConfError as e:
+        check("scaffold: the file it wrote PARSES through its own reader", False, str(e))
+
+    r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+                       capture_output=True, text=True)
+    out = r.stdout + r.stderr
+    check("scaffold: --check REDS on the unratified seed", r.returncode != 0, out)
+    check("scaffold: and says the seed is unratified", "ratified" in out, out)
 
 # ---- verdict ------------------------------------------------------------------------------------
 if FAILURES:

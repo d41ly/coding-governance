@@ -46,7 +46,7 @@ mkfixture() { # $1 = dir, $2 = catalogue body
 }
 
 GOOD_CAT='## Placeholders
-The two groups are not disjoint.
+4 in total as a UNION. The two groups are not disjoint.
 
 Shared between both files: `{{MEMORY_ROOT}}`.
 
@@ -94,6 +94,24 @@ printf '<!-- governance-template: v9.9 -->\nno placeholders here at all\n' \
 ( cd "$TMPROOT/empty" && git add -A && git -c user.email=t@t -c user.name=t commit -qm e ) >/dev/null 2>&1
 arm "red: an empty measurement refuses rather than passing" 1 "Refusing to pass" -- \
   bash -c "cd '$TMPROOT/empty' && bash '$GATE'"
+
+# 8. the UNION total, which the catalogue states in prose
+mkfixture "$TMPROOT/union" "${GOOD_CAT/4 in total as a UNION./9 in total as a UNION.}"
+arm "red: a wrong UNION total" 1 "claims 9 in total as a UNION" -- \
+  bash -c "cd '$TMPROOT/union' && bash '$GATE'"
+
+# 9. coverage the OTHER direction — a catalogue entry no shipped file uses
+mkfixture "$TMPROOT/ghost" "${GOOD_CAT/\`{{GAMMA}}\` /\`{{GAMMA}}\` \`{{NEVER_USED}}\` }"
+arm "red: a catalogue entry appearing in NEITHER shipped file" 1 "appears in NEITHER shipped file" -- \
+  bash -c "cd '$TMPROOT/ghost' && bash '$GATE'"
+
+# 10. marker PRESENCE, not just distinctness. Counting distinct markers alone reads "one file has a
+# marker and the other has none" as agreement — a comparison over a population of one.
+mkfixture "$TMPROOT/nomarker" "$GOOD_CAT"
+sed -i '/governance-template/d' "$TMPROOT/nomarker/parallel-coding-governance.domain-rules.md"
+( cd "$TMPROOT/nomarker" && git add -A && git -c user.email=t@t -c user.name=t commit -qm n ) >/dev/null 2>&1
+arm "red: a shipped file carrying NO marker at all" 1 "carries NO governance-template marker" -- \
+  bash -c "cd '$TMPROOT/nomarker' && bash '$GATE'"
 
 # ---- AC10 — the survival predicate, fixtures ONLY ------------------------------------------------
 printf 'all filled in here\n' > "$TMPROOT/filled-a.md"

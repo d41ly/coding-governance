@@ -5,7 +5,9 @@
 #   bash tools/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
 #
 # THE SUBJECT SPLIT, which is the whole design. In this repo the shipped playbook files ARE the
-# un-instantiated template sources: they carry 23 and 14 placeholders permanently and by design. A
+# un-instantiated template sources: they carry placeholders permanently and by design (the counts
+# live in the catalogue, which this gate MEASURES — writing them here too is the drift this gate
+# exists to catch, one level up). A
 # gate asserting "no placeholder survives" over them would red on its own landing commit and could
 # never go green here, so the bare mode asserts only what is true of a SOURCE:
 #
@@ -71,10 +73,31 @@ fi
 
 rc=0
 
-# 1. catalogue coverage — every measured placeholder is listed somewhere in the catalogue.
-for p in $t_set $c_set; do
+# 1. catalogue coverage, BOTH directions. One-directional coverage lets the catalogue accumulate
+# placeholders no file uses — a deploy-time instruction to fill something that does not exist, which
+# is the same rot as an unlisted one and is invisible to a used-are-listed check.
+union=$(printf '%s\n%s\n' "$t_set" "$c_set" | sort -u | grep . || true)
+for p in $union; do
   grep -qF -- "$p" "$CATALOGUE" || { echo "check-placeholders: $p is used but is NOT listed in $CATALOGUE"; rc=1; }
 done
+for p in $(grep -oE '\{\{[A-Z][A-Z0-9_]*\}\}' "$CATALOGUE" | sort -u); do
+  printf '%s\n' "$union" | grep -qxF -- "$p" || {
+    echo "check-placeholders: $CATALOGUE lists $p, which appears in NEITHER shipped file — a"
+    echo "check-placeholders: catalogue entry for a placeholder nobody uses is an instruction to fill nothing"
+    rc=1
+  }
+done
+
+# 1b. the UNION total the catalogue states in prose. It was written as a sentence five lines below
+# another sentence explaining why counts should not be written twice; a stated number that nothing
+# measures is exactly the class this gate exists for.
+u_n=$(printf '%s\n' "$union" | grep -c . || true)
+u_claim=$(grep -oE '^[0-9]+ in total as a UNION' "$CATALOGUE" | grep -oE '^[0-9]+' | head -1)
+if [ -n "$u_claim" ]; then
+  [ "$u_claim" = "$u_n" ] || { echo "check-placeholders: $CATALOGUE claims $u_claim in total as a UNION; measured $u_n"; rc=1; }
+else
+  echo "check-placeholders: $CATALOGUE states no \`<n> in total as a UNION\` line to check"; rc=1
+fi
 
 # 2. the per-file tallies. The catalogue writes them as `### In \`<file>\` — <n>`.
 tally_for() { grep -oE "^### In \`$1\` — [0-9]+" "$CATALOGUE" | grep -oE '[0-9]+$' | head -1; }
@@ -110,6 +133,17 @@ fi
 # 4. the marker lockstep. TWO files carry the marker, not three: the catalogue is the deploy-time
 # document and is exempt from the shipped surface — its only `vN.N` is prose, and a grep that
 # counted it would compare a literal against a real version and red forever.
+# PRESENCE FIRST, then agreement. Counting DISTINCT markers alone reads "one file has v2.8 and the
+# other has none" as agreement — the same vacuity this file refuses elsewhere: a comparison over a
+# population of one is not a comparison.
+for f in "$TEMPLATE" "$COMPANION"; do
+  grep -qE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$f" || {
+    echo "check-placeholders: $f carries NO governance-template marker — the lockstep comparison"
+    echo "check-placeholders: needs both carriers present, or it compares one file against itself"
+    rc=1
+  }
+done
+
 markers=$(grep -hoE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE" "$COMPANION" | sort -u)
 n_markers=$(printf '%s\n' "$markers" | grep -c . || true)
 if [ "$n_markers" -ne 1 ]; then

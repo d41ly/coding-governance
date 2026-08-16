@@ -71,7 +71,10 @@ if [ "$MODE" = "--check" ]; then
     fail=1
   fi
   # S10 — the unratified-seed refusal. This is the arm that makes "the human curated it" checkable.
-  ratified=$(grep -E '^ratified=' "$CONF" | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
+  # `tr -d '\r'` FIRST. Both halves of this are needed and the pin alone is not enough: an anchored
+  # `s/"$//` cannot strip a quote that a carriage return follows, so a CRLF conf yields `"\r` — a
+  # NON-EMPTY value — and the unratified-seed refusal passes exactly when it should fire.
+  ratified=$(tr -d '\r' < "$CONF" | grep -E '^ratified=' | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
   if [ -z "${ratified// /}" ]; then
     echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold DERIVES the verb"
     echo "lexicon-adopt: table from your corpus and marks it PROPOSED; a derived table that nobody"

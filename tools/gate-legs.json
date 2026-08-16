@@ -587,7 +587,8 @@
       "tools/check-placeholders.test.sh"
     ],
     "guard": [
-      "tools/check-placeholders.sh"
+      "tools/check-placeholders.sh",
+      "tools/check-placeholders.test.sh"
     ]
   }
 ]

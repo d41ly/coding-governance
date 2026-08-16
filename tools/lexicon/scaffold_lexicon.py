@@ -81,7 +81,10 @@ def main(argv: list[str]) -> int:
             if v:
                 counts[v] += 1
 
-    seeded = [v for v, _n in counts.most_common(SEED_VERBS)]
+    # ALPHABETIC only. `leading_verb` can return a digit run (`2fa_check` -> `2`), and the conf
+    # reader REFUSES a non-alphabetic verb row — so an unfiltered seed could write a file its own
+    # reader rejects, which is the worst possible first experience of a kit.
+    seeded = [v for v, _n in counts.most_common() if v.isalpha()][:SEED_VERBS]
     total_defs = sum(counts.values())
     verb_offenders = sum(n for v, n in counts.items() if v not in set(seeded))
 
@@ -118,7 +121,13 @@ def main(argv: list[str]) -> int:
     body.append("LAYERS:")
     body.append("")
 
-    dest.write_text("\n".join(body), encoding="utf-8")
+    # newline="" — write LF, never the platform default. `write_text` translates `\n` to `\r\n` on
+    # Windows, and a CRLF conf INVERTS the unratified-seed refusal: `adopt-lexicon.sh` strips the
+    # trailing quote with an anchored `s/"$//` that a carriage return defeats, leaving `"\r`, which
+    # reads as a non-empty `ratified` value. The seed then passes the one check that exists to stop
+    # an uncurated table reaching the merge bar. Caught by the scaffold arm in selftest.py.
+    with open(dest, "w", encoding="utf-8", newline="") as fh:
+        fh.write("\n".join(body))
     print(f"scaffold: {len(seeded)} verb(s) proposed from {total_defs} definition(s); "
           f"VERB_OFFENDER_PIN={verb_offenders}; {types_seen} type definition(s) scanned")
     return 0

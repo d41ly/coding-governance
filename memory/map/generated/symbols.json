@@ -273,6 +273,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_module_index",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "build_reference_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -321,6 +326,11 @@
       "id": "check",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_layer_violation",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "checks",
@@ -1378,6 +1388,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_import",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1531,6 +1546,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scan_unmatchable_rules",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "score",

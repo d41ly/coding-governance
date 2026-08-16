@@ -20,4 +20,4 @@ terminal status. Nothing here is edited by hand.
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [cBriefedPilot](builds/cBriefedPilot/README.md) | OPEN | c | 2026-08-14 | tooling+playbook | 22 |
 | [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
-| [dClosedLexicon](builds/dClosedLexicon/README.md) | BLOCKED | d | 2026-08-16 | playbook+tooling | 4 |
+| [dClosedLexicon](builds/dClosedLexicon/README.md) | INPROGRESS | d | 2026-08-16 | playbook+tooling | 5 |
