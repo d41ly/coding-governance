@@ -151,6 +151,19 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
 - codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- playbook carrier parity — `tools/check-playbook-parity.sh` (+ `tools/check-playbook-parity.test.sh`):
+  the playbook's claims about THIS repo, machine-checked in three classes that have each recurred
+  after being fixed once — every tracked kit dir is named in the trio or carries a waiver row with a
+  reason; a value the playbook STATES equals the source that OWNS it (declared pairs, in-script);
+  and `customize.md`'s placeholder arithmetic equals the measured sets. STRUCTURAL only, and the
+  gate's own header says so — a fluent paraphrase that is subtly wrong still passes. Anti-vacuity is
+  the load-bearing constraint: a pair whose extraction matches NOTHING reds as unresolvable rather
+  than comparing empty to empty, and the kit derivation carries a frozen `memory-tree` sentinel so a
+  broken enumeration reds instead of reporting universal coverage. The waiver registry
+  `tools/playbook-kit-waivers.txt` is CONSUMED here and owned by the playbook build; absent, the
+  gate reds and stops rather than creating one. It is a declared exemption list rather than a
+  shrink-only one — a missing kit reds, so an experimental kit needs a row — and it drains through
+  two arms instead: a row whose kit is gone, and a row whose kit the playbook does document
 - gate-lint — `tools/gate-lint/`: project-agnostic, drop-in, two lines to adopt and no gate legs of
   its own. It lints the GATES, catching the failure a green suite cannot — a selector matching the
   empty set, or an assertion between two values the same code derives.

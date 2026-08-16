@@ -35,6 +35,8 @@
       "memory-recall skill wiring",
       "method carriers (every pointer declared)",
       "method-carriers self-test",
+      "playbook parity",
+      "playbook parity selftest",
       "pre-push self-test",
       "push-main self-test",
       "pytest-guardrails self-test",

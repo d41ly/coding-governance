@@ -21,6 +21,25 @@
     ]
   },
   {
+    "name": "playbook parity",
+    "argv": [
+      "bash",
+      "tools/check-playbook-parity.sh"
+    ]
+  },
+  {
+    "name": "playbook parity selftest",
+    "guard": [
+      "tools/check-playbook-parity.sh",
+      "tools/check-playbook-parity.test.sh",
+      "tools/playbook-kit-waivers.txt"
+    ],
+    "argv": [
+      "bash",
+      "tools/check-playbook-parity.test.sh"
+    ]
+  },
+  {
     "name": "template size gate selftest",
     "argv": [
       "bash",

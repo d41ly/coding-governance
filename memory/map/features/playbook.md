@@ -8,7 +8,7 @@ streams = ["playbook", "tooling"]
 decisions = ["TOOL-aSiftedPlaybook-1"]
 
 [claims]
-gate-legs = ["template size gate selftest"]
+gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -22,6 +22,9 @@ globs = [
   "tools/check-template-size.sh",
   "tools/check-template-size.test.sh",
   "tools/template-size-highwater.txt",
+  "tools/check-playbook-parity.sh",
+  "tools/check-playbook-parity.test.sh",
+  "tools/playbook-kit-waivers.txt",
 ]
 ```
 

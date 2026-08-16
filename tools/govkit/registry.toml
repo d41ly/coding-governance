@@ -151,6 +151,14 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/check-playbook-parity.sh"
+why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and reads this repo's customize.md arithmetic. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
+
+[[exempt]]
+path = "tools/check-playbook-parity.test.sh"
+why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
 path = "tools/playbook-kit-waivers.txt"
 why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the three shipped playbook files. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
 
