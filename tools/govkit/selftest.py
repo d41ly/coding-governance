@@ -222,8 +222,8 @@ def main() -> int:
               "tools/check-wiring.sh" in subprocess.run(
                   ["git", "-C", str(ap), "diff", "--cached", "--name-only"],
                   capture_output=True, text=True).stdout, "")
-        check("apply reports the steps it could NOT perform rather than skipping silently",
-              "gate-runner and CI legs: SKIPPED" in p.stdout, p.stdout)
+        check("apply names its gate-leg outcome rather than printing a fixed SKIPPED line",
+              "gate legs:" in p.stdout or "/LEGS]" in p.stdout, p.stdout)
 
         # --- unit 1 AC9: the phase lines carry their reserved step id, and the ids appear in TUPLE
         # --- order. The ordering claim is over the ids this run prints and NOTHING else: all four
@@ -715,6 +715,172 @@ user_skills = "/tmp/gk-fake-skills"
               "check wiring:" in ps.stdout and "shipped script(s) read" in ps.stdout, ps.stdout)
         check("and how many entry scopes it checked against their derived value",
               "entry scope:" in ps.stdout, ps.stdout)
+
+        # ===== unit 4: the gate-runner declaration, end to end =====
+        # The interpreter is spelled by PATH, never by name. A bare `python` inside the fixture's
+        # bash resolves to nothing here — this repo's own resolver exists because that name lands on
+        # a stub that answers `command -v` and then fails — so the fixture runner is written with the
+        # interpreter that is demonstrably running this harness.
+        RUNNER = (
+            "#!/usr/bin/env bash\n"
+            "'" + sys.executable.replace("\\", "/") + "' - \"$@\" <<'PY'\n"
+            "import json, subprocess\n"
+            "legs = json.load(open('tools/legs.json'))\n"
+            "rc = 0\n"
+            "for l in legs:\n"
+            "    try:\n"
+            "        code = subprocess.run(l['argv'], capture_output=True, timeout=15).returncode\n"
+            "    except Exception:\n"
+            "        code = 99\n"
+            "    if code == 0:\n"
+            "        print('GATE ok    %s' % l['name'])\n"
+            "    else:\n"
+            "        print('GATE FAIL  %s (exit %d)' % (l['name'], code)); rc = 1\n"
+            "raise SystemExit(rc)\n"
+            "PY\n")
+
+        def runner_target(name: str, kind: str = "manifest", extra: str = "") -> pathlib.Path:
+            g = tmp / name
+            (g / "tools").mkdir(parents=True, exist_ok=True)
+            # NO SHELL in the loop. The declaration takes an argv ARRAY — that is its own rule, and
+            # it is why a shell string is refused — so the fixture's runner is a python file the
+            # interpreter running this harness invokes directly. A bare `python` does not resolve
+            # inside the fixture's bash on this host, and handing that bash a Windows path is the
+            # two-spellings trap this repo already records; taking the shell out avoids both.
+            (g / "tools" / "runner.py").write_text(
+                RUNNER.split("<<'PY'\n", 1)[1].rsplit('PY\n', 1)[0],
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "legs.json").write_text(
+                json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+                encoding="utf-8", newline="\n")
+            (g / ".governance").mkdir(exist_ok=True)
+            decl = ('\n[gate_runner]\nkind = "manifest"\nfile = "tools/legs.json"\n'
+                    'grammar = "json-array"\ndedupe_key = "name"\n'
+                    'command = ["bash", "tools/runner.sh"]\n'
+                    'run_all_env = { GATE_FULL = "1" }\n'
+                    'observed_ran = ["GATE ok    {name}"]\n'
+                    'observed_failed = ["GATE FAIL  {name}"]\n') if kind == "manifest" else (
+                    '\n[gate_runner]\nkind = "none"\n')
+            (g / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "tools"\nkits = ["check-wiring"]\n\n'
+                '[answers]\nmemory_root = "memory"\n' + decl + extra,
+                encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "b")
+            return g
+
+        def run_runner(g: pathlib.Path) -> str:
+            # BOUNDED, and stderr is kept: an unbounded fixture runner executing a real kit
+            # self-test takes minutes, and a runner that never returned would make every assertion
+            # about its output vacuous rather than failing loudly.
+            try:
+                q = subprocess.run([sys.executable, "tools/runner.py"], cwd=str(g),
+                                   capture_output=True, text=True, timeout=180)
+                return q.stdout + q.stderr
+            except subprocess.TimeoutExpired:
+                return "<runner timed out>"
+
+        gt = runner_target("u4a")
+        before_out = run_runner(gt)
+        check("LIVENESS: the emitted leg is ABSENT from the runner's output before apply",
+              "check-wiring self-test" not in before_out, before_out)
+        pa = run("apply", "--target", str(gt), "--kits", "check-wiring")
+        check("apply runs the BASELINE step against the target's own runner",
+              "/BASELINE] reading the target's own runner" in pa.stdout, pa.stdout)
+        check("apply probes the target's pre-commit hook without committing",
+              "/HOOKPROBE]" in pa.stdout, pa.stdout)
+        check("apply emits the leg as the LEGS step", "gate legs: emitted" in pa.stdout, pa.stdout)
+        check("and re-reads the runner afterwards", "/AFTER]" in pa.stdout, pa.stdout)
+        after_out = run_runner(gt)
+        # EXECUTION, not success: a leg that fails has still executed, and `observed_failed` is a
+        # separate template for exactly that reason.
+        check("AC17: the emitted leg is observed EXECUTING, by name",
+              "check-wiring self-test" in after_out, after_out)
+        check("and the CONTROL leg is observed in BOTH runs — without it every absence assertion "
+              "above could pass because the runner itself did nothing",
+              "GATE ok    control" in before_out and "GATE ok    control" in after_out, after_out)
+
+        # Idempotency by the declared dedupe key, and the row count must have GROWN first —
+        # 'byte-identical' alone is satisfied by an emitter that does nothing.
+        legs1 = json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+        check("the first apply strictly increased the runner's row count", len(legs1) == 2,
+              str(legs1))
+        run("apply", "--target", str(gt), "--kits", "check-wiring")
+        legs2 = json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+        check("a second apply leaves the runner file byte-identical", legs1 == legs2, str(legs2))
+
+        # A guard that renders to a path matching nothing TRACKED is dropped, and the leg is emitted
+        # with NO guard key — never `[]`. The runner's own predicate is a diff over a pathspec, and a
+        # pathspec matching nothing diffs clean, so an existence test would keep it and skip forever.
+        emitted_leg = next(l for l in legs2 if l["name"] == "check-wiring self-test")
+        check("a guard rendering to a path this apply STAGED is kept, not dropped",
+              emitted_leg.get("guard") == ["tools/check-wiring.sh", "tools/check-wiring.test.sh"],
+              str(emitted_leg))
+        vals = [v for l in legs2 for v in ([l["name"]] + l["argv"] + l.get("guard", []))]
+        check("and no emitted VALUE still carries a brace", not any("{" in v for v in vals),
+              str(vals))
+
+        # The drop case, on a fixture where the guard genuinely names nothing tracked. The runner's
+        # own predicate is a diff over a pathspec and a pathspec matching nothing diffs CLEAN, so an
+        # existence test would keep such a guard and skip its leg forever at exit 0.
+        tracked_after = set(subprocess.run(["git", "-C", str(gt), "ls-files"],
+                                           capture_output=True, text=True).stdout.split("\n"))
+        check("every guard that SURVIVED names a path tracked in the target — the drop test is "
+              "tracked-ness, not existence, because a pathspec matching nothing diffs clean and "
+              "would skip its leg forever at exit 0",
+              all(any(t2 == g.rstrip("/") or t2.startswith(g.rstrip("/") + "/")
+                      for t2 in tracked_after if t2)
+                  for l in legs2 for g in l.get("guard", [])), str(legs2))
+        check("and no leg carries an EMPTY guard list — the key is omitted instead",
+              all(l.get("guard") != [] for l in legs2), str(legs2))
+        # NOT ARMED, and said rather than implied: the pure DROP path — a guard rendering to a path
+        # no apply creates — has no fixture here. Every shipped guard resolves to something apply
+        # stages, and a fixture that pre-writes one trips the foreign-kit refusal instead. Recorded
+        # so the gap is visible rather than looking covered.
+
+        # Ownership: a name the target already owns is refused, not overwritten.
+        own = runner_target("u4b")
+        lj = own / "tools" / "legs.json"
+        lj.write_text(json.dumps([{"name": "control", "argv": ["true"]},
+                                  {"name": "check-wiring self-test", "argv": ["echo", "theirs"]}],
+                                 indent=2) + "\n", encoding="utf-8", newline="\n")
+        git(own, "add", "-A"); git(own, "commit", "-qm", "theirs")
+        before_bytes = lj.read_bytes()
+        pa = run("apply", "--target", str(own), "--kits", "check-wiring")
+        check("a leg name the target owns and the receipt does not is REFUSED", pa.returncode == 2,
+              pa.stdout + pa.stderr)
+        check("that refusal says overwriting it would delete the target's own coverage",
+              "deletes their own coverage" in pa.stderr, pa.stderr)
+        check("and the runner file is byte-identical after the refusal",
+              lj.read_bytes() == before_bytes, "")
+
+        # kind = "none" ORDERS rather than emitting, and says so in its own words.
+        nt = runner_target("u4c", kind="none")
+        pa = run("apply", "--target", str(nt), "--kits", "check-wiring")
+        check("kind = none ORDERS the legs instead of emitting them",
+              "ORDERED, not emitted" in pa.stdout, pa.stdout)
+        order = nt / ".governance" / "outbox" / "gate-legs.md"
+        check("and the order names the specific leg and its rendered argv",
+              order.is_file() and "check-wiring self-test" in order.read_text(encoding="utf-8"),
+              order.read_text(encoding="utf-8") if order.is_file() else "absent")
+
+        # Every refused value, by NAME, before any write.
+        for bad, needle in ((('kind = "make"'), "implements ONE grammar"),
+                            (('kind = "manifest"\nfile = "x.json"\ngrammar = "toml"\n'
+                              'dedupe_key = "name"\ncommand = ["true"]\nrun_all_env = {}\n'
+                              'observed_ran = ["a{name}"]\nobserved_failed = ["b{name}"]'),
+                             "only 'json-array' is implemented")):
+            bt = make_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
+            (bt / ".governance").mkdir(exist_ok=True)
+            (bt / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "tools"\nkits = ["check-wiring"]\n'
+                '[answers]\nmemory_root = "memory"\n[gate_runner]\n' + bad + "\n",
+                encoding="utf-8", newline="\n")
+            pa = run("apply", "--target", str(bt), "--kits", "check-wiring")
+            check("a refused [gate_runner] value is named: " + needle[:34],
+                  needle in pa.stdout + pa.stderr, pa.stdout + pa.stderr)
+            check("and nothing was installed on that refusal: " + needle[:20],
+                  not (bt / ".governance" / "install.json").exists(), "")
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)

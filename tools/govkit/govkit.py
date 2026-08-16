@@ -34,7 +34,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.5"  # gov:kit govkit@1.5 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.6"  # gov:kit govkit@1.6 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -1193,6 +1193,140 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 # the resolution, not of the apply verb, and spelling it twice is the defect this file exists to end.
 
 
+# ------------------------------------------------------------------- the gate runner declaration
+# ONE vocabulary, owned here. `make`, `npm` and `shell` are REFUSED BY NAME: refusing three and doing
+# one well beats half-writing four, because a splice into a Makefile that half-works ships a target a
+# leg that never runs while this tool exits 0 — the silent-green direction.
+GR_KINDS = ("none", "manifest")
+GR_REQUIRED = ("file", "grammar", "dedupe_key", "command", "run_all_env",
+               "observed_ran", "observed_failed")
+
+
+def validate_gate_runner(deploy: dict, r: Report) -> dict:
+    """Validate the declaration in the PRE-WRITE pass. Legs are emitted last, so a bad declaration
+    discovered at emission time would refuse after everything else had landed."""
+    gr = deploy.get("gate_runner") or {}
+    if not gr:
+        return {"kind": "absent"}
+    kind = gr.get("kind")
+    if kind in ("make", "npm", "shell"):
+        r.fail(f"[gate_runner].kind = '{kind}' — this unit implements ONE grammar and refuses the "
+               f"others by name rather than half-writing them; a splice that half-works ships a leg "
+               f"that never runs while this tool exits 0")
+        return gr
+    if kind not in GR_KINDS:
+        r.fail(f"[gate_runner].kind = '{kind}' is outside the vocabulary {GR_KINDS}")
+        return gr
+    if "anchor" in gr:
+        r.fail("[gate_runner].anchor is refused: it is meaningful only for a line grammar this unit "
+               "does not implement, and a key that parses and is ignored looks exactly like one "
+               "that works")
+    if kind == "none":
+        return gr
+    missing = [k for k in GR_REQUIRED if not gr.get(k)]
+    if missing:
+        r.fail(f"[gate_runner] declares kind = 'manifest' and is a PARTIAL promotion: "
+               f"{', '.join(missing)} absent. A complete promotion supplies {', '.join(GR_REQUIRED)}")
+    if gr.get("grammar") not in (None, "json-array"):
+        r.fail(f"[gate_runner].grammar = '{gr.get('grammar')}' — only 'json-array' is implemented")
+    if gr.get("dedupe_key") not in (None, "name"):
+        r.fail(f"[gate_runner].dedupe_key = '{gr.get('dedupe_key')}' — only 'name' is implemented")
+    if isinstance(gr.get("command"), str):
+        r.fail("[gate_runner].command is a STRING; it must be an argv array. Splitting a shell "
+               "string is a guess about quoting this tool has no way to check, so it refuses "
+               "rather than splits")
+    ci = gr.get("ci") or {}
+    if ci and ci.get("system") != "github-actions":
+        r.fail(f"[gate_runner.ci].system = '{ci.get('system')}' — the only CI grammar this repo has "
+               f"ever measured is github-actions")
+    return gr
+
+
+def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
+    """Parse the target's runner output into leg name -> green|red|skipped.
+
+    Run WITHOUT the run-everything escape, deliberately. Running both reads with it doubles the
+    target's whole bar AND makes the dead-probe check unreachable, because with every guard
+    overridden no leg can report skipped — a liveness half the regime forbids is not one.
+    """
+    cmd = gr.get("command") or []
+    if not cmd:
+        return {}
+    out = subprocess.run(list(cmd), cwd=str(target), capture_output=True, text=True)
+    verdicts: dict[str, str] = {}
+    for state, key in (("green", "observed_ran"), ("red", "observed_failed"),
+                       ("skipped", "observed_skipped")):
+        for tmpl in (gr.get(key) or []):
+            head = tmpl.split("{name}")[0]
+            for line in (out.stdout + out.stderr).splitlines():
+                # Line-anchored PREFIX, never whole-line equality: the runner's failure and skip
+                # lines carry a variable tail — an exit code, a branch name — so a whole-line
+                # literal matches NOTHING and every liveness half that rests on it is unreachable.
+                if line.startswith(head) and len(line) > len(head):
+                    verdicts.setdefault(line[len(head):].strip().split("  ")[0].strip(), state)
+    return verdicts
+
+
+def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
+               configure_skipped: set[str]) -> bool:
+    """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
+
+    The exemption is granted by RUNNING the hole's discharge probe, never by reading its flag. The
+    measured defect next door is exactly that: `blocks_adopt` is read statically, so a kit is
+    reported inert while its own hole's probe exits 0 in the landed tree.
+
+    `red_after_land` is a WINDOW, scoped in BOTH consumers: it exempts only while that kit's
+    configure phase was skipped THIS RUN. Unscoped it is a permanent exemption, under which an
+    all-kits install can land a kit with its legs red forever and every criterion still pass.
+    """
+    for eid in selection:
+        d, _p = descs[eid]
+        for leg in d.get("gate_leg", []):
+            if leg.get("name") != name:
+                continue
+            for h in d.get("hole", []):
+                if not h.get("blocks_gate"):
+                    continue
+                cmd = (h.get("discharge") or {}).get("command")
+                if not cmd:
+                    continue
+                ctx = {"kit": f"tools/{eid}", "prefix": "tools", "kit_id": eid,
+                       "memory_root": "memory"}
+                resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
+                try:
+                    if subprocess.run(resolved, cwd=str(target),
+                                      capture_output=True).returncode != 0:
+                        return True          # the hole is genuinely undischarged, right now
+                except OSError:
+                    return False
+            if leg.get("red_after_land") and eid in configure_skipped:
+                return True
+    return False
+
+
+def hook_probe(target: pathlib.Path) -> tuple[str, str]:
+    """Would the OPERATOR's landing commit be refused? Answered without creating a commit.
+
+    Three-valued because two states share an exit code: git's hook runner exits non-zero BOTH when
+    the hook refuses and when no hook exists. `--ignore-missing` is refused — it maps missing onto
+    the same code as PASS, trading a visible collision for the dangerous one.
+    """
+    ver = subprocess.run(["git", "-C", str(target), "version"], capture_output=True, text=True)
+    m = re.search(r"(\d+)\.(\d+)", ver.stdout or "")
+    if m and (int(m.group(1)), int(m.group(2))) < (2, 36):
+        return "unsupported", "git predates `git hook run`; nothing was probed"
+    p = subprocess.run(["git", "-C", str(target), "rev-parse", "--git-path", "hooks/pre-commit"],
+                       capture_output=True, text=True)
+    hp = (target / p.stdout.strip()) if p.returncode == 0 else None
+    if not hp or not hp.exists():
+        return "no-hook", "the target has no pre-commit hook"
+    out = subprocess.run(["git", "-C", str(target), "hook", "run", "pre-commit"],
+                         capture_output=True, text=True)
+    if out.returncode == 0:
+        return "pass", ""
+    return "block", (out.stdout + out.stderr).strip()
+
+
 def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> str | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
@@ -1324,6 +1458,39 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     if r.problems:
         return r.emit()
 
+    gr = validate_gate_runner(deploy, r)
+    if r.problems:
+        return r.emit()
+
+    # ---- BASELINE. The target's OWN runner, read before any write. It EXECUTES target-authored
+    # ---- code: the command comes from a file committed in the target repo, so anyone with commit
+    # ---- access there chooses what runs on the operator's machine. The argv and the descriptor it
+    # ---- came from are printed and recorded, and a CHANGE to either re-prompts.
+    before_map: dict[str, str] = {}
+    baseline = {"kind": gr.get("kind", "absent")}
+    if gr.get("kind") == "manifest":
+        print(f"govkit apply — the baseline will RUN, from this target's own .governance/deploy.toml:"
+              f"\n                 {' '.join(gr.get('command') or [])}")
+        step(STEP_BASELINE, "reading the target's own runner")
+        before_map = read_gate_verdicts(target, gr)
+        baseline["legs"] = before_map
+        if before_map and not any(v in ("green", "red") for v in before_map.values()):
+            raise Refusal(
+                "DEAD PROBE: the baseline read parsed legs but not one of them is green or red — a "
+                "map that is entirely skipped carries no information, and every leg after the "
+                "install would land in the row that carries the exemptions. Refusing rather than "
+                "rerouting the whole install into its most forgiving branch")
+        reds = [n for n, v in before_map.items() if v == "red"]
+        if reds and (deploy.get("policy") or {}).get("on_baseline_red") == "refuse":
+            raise Refusal(f"on_baseline_red = refuse and these legs are already red before this "
+                          f"install: {', '.join(sorted(reds))}")
+        if reds:
+            print(f"govkit apply — {len(reds)} leg(s) were ALREADY red before this install: "
+                  f"{', '.join(sorted(reds))} — reported, not fatal")
+    else:
+        step(STEP_BASELINE, "no runner declared" if gr.get("kind") == "none"
+             else "this target's descriptor declares no [gate_runner] at all")
+
     rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 2
     staged: list[str] = []      # only what this run actually wrote
     # ---- LAND. Kit content from the index at `commit`, through the ONE resolver `plan` also calls.
@@ -1384,12 +1551,27 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         subprocess.run(["git", "-C", str(target), "add", "--"] + staged,
                        capture_output=True, check=False)
     step(STEP_STAGE, f"{len(staged)} path(s)")
-    print("govkit apply — gate-runner and CI legs: SKIPPED (no emitter yet; reported, not silent)")
+
+    # ---- HOOK PROBE. After the stage, because the question is whether the OPERATOR's landing commit
+    # ---- is refused, and a staged-scope hook leg sees nothing until the install is staged.
+    hook_state, hook_out = hook_probe(target)
+    step(STEP_HOOKPROBE, hook_state)
+    if hook_state == "block":
+        (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
+        (target / ".governance" / "outbox" / "hook-block.md").write_text(
+            "# the target's pre-commit hook would refuse the landing commit\n\n"
+            "`apply` never commits, so no hook fired during the install itself. This is a warning "
+            "about the commit YOU are about to make, captured so you meet it here rather than by "
+            "hand.\n\n```\n" + hook_out + "\n```\n", encoding="utf-8", newline="\n")
+        if (deploy.get("policy") or {}).get("on_hook_block") == "refuse":
+            r.fail("on_hook_block = refuse and the target's pre-commit hook refuses; the install is "
+                   "on disk and staged, and nothing was rolled back")
 
     # ---- CONFIGURE. A kit with a blocks_adopt hole lands and is NOT configured.
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
     orders: list[dict] = []
+    configure_skipped: set[str] = set()
     for eid in selection:
         d, _p = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -1435,6 +1617,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         if blocked and not resume:
             print(f"govkit apply — CONFIGURE {eid}: skipped, blocked by hole "
                   f"'{blocked[0].get('id')}' — landed but inert")
+            configure_skipped.add(eid)
             continue
         argv = d.get("adopt", {}).get("argv") or []
         if not argv:
@@ -1481,12 +1664,128 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                               "sha256": hashlib.sha256((target / conf).read_bytes()).hexdigest()}]
     print(f"govkit apply — observed {n_rendered} rendered destination(s)")
 
+    # ---- LEGS. The last CONTENT step of the hard order. Guards are RENDERED against the target's
+    # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:
+    # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
+    # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
+    emitted: list[dict] = []
+    step(STEP_LEGS, gr.get("kind", "absent"))
+    if gr.get("kind") == "manifest":
+        rf = target / gr["file"]
+        try:
+            existing = json.loads(rf.read_text(encoding="utf-8")) if rf.is_file() else []
+        except json.JSONDecodeError:
+            raise Refusal(f"the declared runner file {gr['file']} is not valid JSON")
+        if not isinstance(existing, list):
+            raise Refusal(f"the declared runner file {gr['file']} is not a JSON list")
+        owned = {e["name"] for e in ((receipt or {}).get("gate_runner") or {}).get("emitted", [])}
+        by_name = {e.get("name"): i for i, e in enumerate(existing)}
+        tracked_target = set(subprocess.run(["git", "-C", str(target), "ls-files"],
+                                            capture_output=True, text=True).stdout.split("\n"))
+        for eid in selection:
+            d, _p = descs[eid]
+            ctx = target_context(target, deploy, eid, d)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                argv, miss = [], []
+                for a in leg.get("argv", []):
+                    s, m = resolve_tokens(a, ctx)
+                    argv.append(s)
+                    miss += m
+                if miss:
+                    r.fail(f"leg '{nm}' argv still carries {miss[0]} after rendering — a leg wired "
+                           f"to an unresolved token is broken forever; a dropped GUARD only costs "
+                           f"an unnecessary run, which is why the two are not symmetric")
+                    continue
+                guards, dropped = [], []
+                for g in leg.get("guard", []) or []:
+                    s, m = resolve_tokens(g, ctx)
+                    if m:
+                        dropped.append((g, f"unresolved token '{m[0]}'"))
+                    elif not any(t == s.rstrip("/") or t.startswith(s.rstrip("/") + "/")
+                                 for t in tracked_target if t):
+                        dropped.append((s, "matches no tracked path in the target"))
+                    else:
+                        guards.append(s)
+                if nm in by_name and nm not in owned:
+                    raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
+                                  f"target's receipt does not claim it — overwriting a leg the "
+                                  f"target wrote silently deletes their own coverage")
+                row = {"name": nm, "argv": argv}
+                if guards:
+                    row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
+                if nm in by_name:
+                    prev = next((e for e in owned and
+                                 ((receipt or {}).get("gate_runner") or {}).get("emitted", [])
+                                 if e["name"] == nm), None)
+                    if prev and (prev.get("argv") != argv or prev.get("guard", []) != guards):
+                        r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
+                               f"reporting drift rather than replacing it; ownership of the NAME is "
+                               f"not ownership of the ROW")
+                        continue
+                    existing[by_name[nm]] = row
+                else:
+                    existing.append(row)
+                emitted.append({"name": nm, "kit": eid, "argv": argv, "guard": guards,
+                                "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
+                                "history_depth": leg.get("history_depth")})
+                if dropped and not guards:
+                    print(f"govkit apply — gate leg '{nm}': UNGUARDED "
+                          f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
+        if not r.problems:
+            rf.parent.mkdir(parents=True, exist_ok=True)
+            rf.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
+                          encoding="utf-8", newline="\n")
+            subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
+                           capture_output=True, check=False)
+            print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
+    else:
+        (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
+        lines = ["# gate legs — ORDERED, not emitted", ""]
+        for eid in selection:
+            d, _p = descs[eid]
+            ctx = target_context(target, deploy, eid, d)
+            for leg in d.get("gate_leg", []):
+                lines.append(f"- {leg.get('name')}: "
+                             f"{' '.join(resolve_tokens(a, ctx)[0] for a in leg.get('argv', []))}")
+        lines += ["", "Nothing in this target runs these yet."]
+        (target / ".governance" / "outbox" / "gate-legs.md").write_text(
+            "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+        orders.append({"kind": "gate-legs", "id": "gate-legs",
+                       "path": ".governance/outbox/gate-legs.md"})
+        print("govkit apply — gate legs: ORDERED, not emitted — "
+              + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
+                 else "this target's deploy.toml declares no [gate_runner]")
+              + " (see .governance/outbox/gate-legs.md)")
+
+    # ---- AFTER. The same function, the same regime, so the two maps are comparable.
+    after_map: dict[str, str] = {}
+    if gr.get("kind") == "manifest":
+        step(STEP_AFTER, "re-reading the target's runner")
+        after_map = read_gate_verdicts(target, gr)
+        for nm in sorted(set(before_map) | set(after_map)):
+            b, a2 = before_map.get(nm), after_map.get(nm)
+            if b == "green" and a2 == "red":
+                r.fail(f"leg '{nm}' was green before this install and is red after")
+            elif b == "green" and a2 == "skipped":
+                r.fail(f"leg '{nm}' was green before and did not execute after — the install broke "
+                       f"its guard")
+            elif b == "green" and a2 is None:
+                r.fail(f"leg '{nm}' was green before this install and is gone after — a leg that "
+                       f"vanished is not a leg that passed")
+            elif b is None and a2 == "red" and not exempt_leg(descs, selection, target, nm,
+                                                              configure_skipped):
+                r.fail(f"leg '{nm}' did not exist before this install and is red after")
+
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
     (target / ".governance").mkdir(exist_ok=True)
     receipt_path.write_text(json.dumps(
         {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
          "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows,
-         "orders": orders},
+         "orders": orders, "baseline": baseline, "after": after_map,
+         "hook_block": {"state": hook_state},
+         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
+                         "emitted": emitted}},
         indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),

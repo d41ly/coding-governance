@@ -583,6 +583,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "exempt_leg",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "expand_rules",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -681,6 +686,11 @@
       "id": "heading_level",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "hook_probe",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "id_pattern",
@@ -1214,6 +1224,11 @@
     },
     {
       "id": "read_descriptors",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_gate_verdicts",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -2006,6 +2021,11 @@
       "id": "unfenced_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "validate_gate_runner",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "walk",
