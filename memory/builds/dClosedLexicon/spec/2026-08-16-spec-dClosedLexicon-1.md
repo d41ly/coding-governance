@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-6 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -53,10 +53,22 @@ PRESENT ceiling anyway, at 32,751 of 32,768, so this unit never needed the raise
   an unedited `PROPOSED` seed cannot reach the merge bar disguised as a curated vocabulary.
 - **S11** — `tools/lexicon/selftest.py`, red and green fixtures per predicate, per case style, and a
   frozen SENTINEL fixture per shipped pattern set, so a pattern set going inert fails here.
-- **S12** — `tools/check-placeholders.sh` plus its self-test, asserting three things over the shipped
-  playbook files: no `{{`-shaped placeholder survives, any placeholder appearing in BOTH carries the
-  same filled value, and the three `governance-template: vN.N` markers agree. This funds
-  `PLAY-aSealedCaravan-1` mechanically instead of correcting its prose again.
+- **S12** — `tools/check-placeholders.sh` plus its self-test. The gate's SUBJECT is split, because in
+  THIS repo the shipped playbook files are the un-instantiated template SOURCES and carry placeholders
+  permanently and by design — 23 in the template and 14 in the companion, measured, with S13 adding one
+  more. A leg asserting "no placeholder survives" over those files reds on its own landing commit.
+  - **S12a — the gov-side leg**, run bare on the merge bar, asserts only what is true of the SOURCES:
+    the `{{X}}` union over `parallel-coding-governance.template.md` and
+    `parallel-coding-governance.domain-rules.md` is exactly the set catalogued in
+    `parallel-coding-governance.customize.md`; the catalogue's per-file tally equals the measurement;
+    a placeholder appearing in BOTH files is declared SHARED rather than disjoint; and the two
+    marker-carrying files agree on `governance-template: vN.N`. This is what funds
+    `PLAY-aSealedCaravan-1` mechanically — `{{MEMORY_ROOT}}` is in both files today while the
+    catalogue calls the two groups disjoint, which is the live falsehood.
+  - **S12b — the survival predicate** becomes an explicit `--check <target> <target>` mode over a
+    NAMED target pair, exercised only by fixtures in `tools/check-placeholders.test.sh`, never over
+    the tracked sources. The render-side owner of that predicate already exists and stays where it is
+    (`tools/govkit/entries/playbook.kit.toml`'s `playbook-placeholders` hole).
 - **S13** — the playbook edits, in lockstep across all three shipped files, per §4 Migration.
   `{{LEXICON_CONF}}` is hosted in the COMPANION, which carries no byte gate, and the template's §12
   stub only routes to it.
@@ -124,6 +136,41 @@ while silently skipping what it forgot. That law binds here. Each declared langu
 | `SUFFIX_OFFENDER_PIN` | Measured at scaffold, shrink-only. |
 | `LAYER_OFFENDER_PIN` | Measured at scaffold, shrink-only. |
 | `ratified` | The date and node that curated the seed. `--check` reds while it is empty. |
+
+**The container grammar, and the one reader.** The sibling confs are a RESTRICTED line-based
+`KEY=VALUE` — `.codebase-map.conf` documents it and `map_lib.load_conf()` implements it with no
+multi-line support. `VERBS` is a multi-row block whose values contain prose, so that grammar cannot
+carry it, and three readers need the file: `lexicon.py` (S1), `adopt-lexicon.sh` in bash (S9), and
+unit 2's `map_extractors.py`. Two or three hand-written parsers for one file is the
+two-answers-to-one-question class. So the kit owns **one** reader, `tools/lexicon/lexicon_conf.py`,
+with a `--print-verbs` mode the bash side calls rather than reimplementing. Single-line keys keep the
+sibling grammar; block keys are fenced by a `<KEY>:` line and terminated by the first non-indented
+line:
+
+```
+# .lexicon.conf — single-line keys use the sibling KEY=VALUE grammar; block keys are indented.
+BANNED_SUFFIXES="Manager Helper Util Utils Handler Processor Data Info"
+LANGS="py:python-ast:parser sh::dark"
+VERB_OFFENDER_PIN="0"
+SUFFIX_OFFENDER_PIN="0"
+LAYER_OFFENDER_PIN="0"
+ratified=""
+
+VERBS:
+  build   create a new value and return it — NOT `create`, which is reserved for side-effecting
+  load    read from a store into memory — NOT `fetch`, which implies a network call
+  remove  detach without destroying — NOT `delete`, which is irreversible
+
+LAYERS:
+  tools/lexicon/* -> tools/codebase-map/*
+```
+
+**Gov's own `LAYERS` value**, stated here because S3 makes an undeclared `LAYERS` a hard red and §3
+removes the scaffold escape, so an unstated value would make the landing commit unbuildable. The
+declaration is one direction and this spec already contains it: S5 requires the lexicon to be
+self-contained and to import nothing from `codebase-map`, so `tools/lexicon/* -> tools/codebase-map/*`
+is the forbidden direction the landing commit ratifies. It is a real constraint this repo already
+relies on, not a policy invented to fill a slot.
 
 ### Portability: what makes this land in an unknown repo
 
@@ -207,6 +254,9 @@ A new `tools/<kit>/` in this repo lands red without all of the following.
 | `KIT_LEXICON_VERSION` constant | `tools/lexicon/lexicon.py` | `tools/check-kit-versions.sh` needs a `need()` row |
 | `gov:kit lexicon@X.Y` marker | same file | the version pair gate compares marker to constant |
 | registry entry | `tools/govkit/registry.toml` | the `tools/*` surface glob makes an unregistered dir a `selfcheck` failure |
+| kit DESCRIPTOR | `tools/lexicon/kit.toml` | an `[[entry]]` row without its descriptor file is a hard refusal, not a warning; `version_from` must resolve to exactly one line |
+| flat entry for the two new depth-1 FILES | `tools/govkit/entries/check-placeholders.kit.toml` | `tools/*` is depth-1 including files, so `check-placeholders.sh` and its `.test.sh` are two unclaimed surface paths — claim both, or write an `[[exempt]]` reason per file |
+| charter gate-suite bullet | `AGENTS.md` | the `drift-audit` handkept signal counts legs whose argv SCRIPT PATH the charter's gate-suite section does not cite, and it is pinned at 0 (live: 0 of 55). Five unnamed legs take it to 5 and red the bar |
 | gate legs | `tools/gate-legs.json` | the run-gates canary asserts legs are single-sourced there |
 | leg guards | same | a records-only commit must skip the kit's self-tests |
 | `--check` wiring mode | `adopt-lexicon.sh` | every adopter kit here carries one |
@@ -217,7 +267,15 @@ A new `tools/<kit>/` in this repo lands red without all of the following.
 
 ### Migration
 
-The three shipped files move together or the lockstep marker lies.
+**TWO files carry the marker, not three**, and the count is spelled once here so it cannot drift
+again: `parallel-coding-governance.template.md` and `parallel-coding-governance.domain-rules.md` are
+the marker carriers and move in lockstep. `parallel-coding-governance.customize.md` is the
+deploy-time catalogue — it is EDITED by this unit but carries no marker, it is exempt from the
+shipped surface (`tools/govkit/registry.toml`, "read it, don't ship it"), and its own prose already
+says "Both files carry". rev-3 folded review R8's "three shipped files that carry" verbatim and
+imported the miscount; a gate built to it would grep customize.md's literal `vN.N`, which can never
+equal a real version.
+
 `parallel-coding-governance.template.md` gets the §12 stub clause, the §5 count fix, one new header
 changelog entry and the oldest one dropped. The version NUMBER is not named here: two playbook units
 are in flight and whichever lands first takes the next one, so a number written into a spec that has
@@ -227,15 +285,33 @@ conditional-section row, the corrected disjointness sentence, and the placeholde
 
 ### Rollout
 
-Land the kit with its predicates OFF for this repo, measure the three pins over this corpus, ratify
-the derived table, then arm the legs in a second commit whose message carries the measured numbers.
-Arming and measuring in one commit hides which of the two produced the number.
+Two commits, stated mechanically rather than as narrative — "predicates OFF" named no mechanism, and
+the only mechanism the design actually has is whether the legs are on the manifest.
+
+1. **Commit 1 lands `tools/lexicon/` with NO leg rows in `tools/gate-legs.json`.** The kit is inert
+   because nothing invokes it. This is the OFF state; there is no separate off switch.
+2. **Commit 2 arms it**, adding together: the leg rows, `.lexicon.conf` carrying the three measured
+   pins, the `LAYERS` value above, and the `ratified` stamp. Its message carries the measured numbers.
+
+Measuring and arming stay in one commit here on purpose — the pins cannot be measured before the
+engine exists, and a conf with empty pins and an armed leg is a red bar between the two commits.
+What commit 2 must NOT also do is change the corpus it measures.
 
 ### Files touched (estimate)
 
-Twelve new files under `tools/lexicon/`, one new `tools/check-placeholders.sh` with its self-test,
-three edited playbook files, `tools/gate-legs.json`, `tools/check-kit-versions.sh`,
-`tools/govkit/registry.toml`, `.memory-tree.conf`, and one codebase-map dossier.
+New: the files under `tools/lexicon/` (engine, `subtokens.py`, `lexicon_conf.py`, `selftest.py`,
+`adopt-lexicon.sh`, the three waiver registries, `README.md`, `LEXICON.md`, and `kit.toml` — the
+govkit DESCRIPTOR, which is a separate artifact from the registry row), `tools/check-placeholders.sh`
+with its self-test, `tools/govkit/entries/check-placeholders.kit.toml` (a flat single-file entry on
+the `check-install-prefix.kit.toml` model, claiming BOTH new depth-1 files — `tools/*` is a depth-1
+surface glob that includes FILES, so each unclaimed one is its own `selfcheck` failure), and the
+root `.lexicon.conf`.
+
+Edited: the three playbook files, `tools/gate-legs.json`, `tools/check-kit-versions.sh`,
+`tools/govkit/registry.toml`, `.memory-tree.conf`, one codebase-map dossier under
+`memory/map/features/`, `memory/map/generated/` as a re-render, and **`AGENTS.md`** — whose
+`## The gate suite` section must SPELL the script path of every new leg. That last one is not
+cosmetic: see the Inventory row below.
 
 ### Alternatives rejected
 
@@ -284,17 +360,31 @@ three edited playbook files, `tools/gate-legs.json`, `tools/check-kit-versions.s
   exits non-zero naming the unratified seed.
 - **AC8** — When a waiver's matched text no longer appears in the corpus, the run reds as stale, and
   an edit ABOVE a waived occurrence does NOT unpin it, both fixtured in `selftest.py`.
-- **AC9** — When `{{MEMORY_ROOT}}` is filled with different values in the two shipped files,
-  `bash tools/check-placeholders.sh` exits non-zero naming the placeholder and both values.
-- **AC10** — When any `{{`-shaped placeholder survives in either shipped file, `tools/check-placeholders.sh` reds.
-- **AC11** — When the three shipped files carry disagreeing `governance-template` markers,
+- **AC9** — When `parallel-coding-governance.customize.md`'s catalogue disagrees with the `{{X}}` set
+  MEASURED from the two marker-carrying files — a placeholder in neither list, a wrong per-file tally,
+  or a placeholder present in BOTH files while the catalogue calls the two groups disjoint —
+  `bash tools/check-placeholders.sh` exits non-zero naming the placeholder and both files. Run over
+  the tracked sources as they stand today, it reds on `{{MEMORY_ROOT}}`, which is the
+  `PLAY-aSealedCaravan-1` defect; after this unit's `customize.md` edit it is green.
+- **AC10** — When a `{{`-shaped placeholder survives in a FILLED target pair,
+  `bash tools/check-placeholders.sh --check <a> <b>` reds naming the file and the placeholder. Both
+  arms are fixtured in `tools/check-placeholders.test.sh` over a rendered pair the test writes; the
+  bare leg never runs this predicate over the tracked sources, which carry placeholders by design.
+- **AC11** — When the two marker-carrying files — `parallel-coding-governance.template.md` and
+  `parallel-coding-governance.domain-rules.md` — carry disagreeing `governance-template` markers,
   `bash tools/check-placeholders.sh` reds naming each file and its version.
+  `parallel-coding-governance.customize.md` is not in the population and is not read for a marker.
 - **AC12** — When the playbook edits are staged, `bash tools/check-template-size.sh` is green and the
   reported size is at or under 32768 bytes.
 - **AC13** — When `python tools/govkit/govkit.py selfcheck` runs after the kit lands, it is green,
   proving `tools/lexicon/` is a declared entry rather than an unclaimed surface path.
-- **AC14** — When `bash tools/run-gates.sh` runs on the landing commit, every new leg appears in the
-  green line by name and `tools/check-kit-versions.sh` reports the `KIT_LEXICON_VERSION` pair.
+- **AC14** — When `bash tools/run-gates.sh` runs on the ARMING commit (Rollout commit 2, the first one
+  on which the legs exist), every new leg appears in the green line by name and
+  `tools/check-kit-versions.sh` exits 0 with the `KIT_LEXICON_VERSION` pair present. Commit 1 adds no
+  leg rows, so there is nothing to observe there.
+- **AC16** — When `python tools/drift-audit/drift_report.py --check` runs on the arming commit, it is
+  green: the charter's `## The gate suite` section names the script path of every leg the manifest
+  gained, so `handkept_inventories_disagreeing_with_source` stays at its pin of 0.
 - **AC15** — When `tools/lexicon/subtokens.py` diverges from `map_lib.subtokens()`, the gov-internal
   parity leg reds; when the kit is installed into a tree with no `codebase-map`,
   `python tools/lexicon/lexicon.py` still runs green, proving the kit is self-contained.
@@ -303,12 +393,16 @@ three edited playbook files, `tools/gate-legs.json`, `tools/check-kit-versions.s
 
 Existing legs that must stay green: `tools/check-template-size.sh`, `tools/check-kit-versions.sh`,
 `tools/check-install-prefix.sh`, `python tools/govkit/govkit.py selfcheck`,
-`tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-arms.py`, and
-`python tools/codebase-map/test_codebase_map.py`.
+`tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-arms.py`,
+`python tools/codebase-map/test_codebase_map.py`, and
+`python tools/drift-audit/drift_report.py --check` — which carries NO guard, so it runs on every
+invocation including the authoritative pre-push one, and which this unit can red through the charter
+signal above.
 
 New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexicon/selftest.py`,
-`bash tools/lexicon/adopt-lexicon.sh --check`, `bash tools/check-placeholders.sh`, and
-`bash tools/check-placeholders.test.sh`.
+`bash tools/lexicon/adopt-lexicon.sh --check`, `bash tools/check-placeholders.sh`,
+`bash tools/check-placeholders.test.sh`, and the gov-internal splitter-parity leg (S5), which is
+dogfood-only and must not ship.
 
 ## 8. Open questions
 
@@ -352,6 +446,17 @@ New legs this unit adds: `python tools/lexicon/lexicon.py`, `python tools/lexico
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-6 · 2026-08-16 · folded review-dClosedLexicon-2, the M4 audit at rev-5. S12 splits by SUBJECT
+  (R1): the gov-side leg checks the source-side catalogue, and the survival predicate moves to a
+  fixture-only `--check <a> <b>` mode, because this repo's shipped playbook files carry 23 and 14
+  placeholders permanently and the leg as specced reds on its own landing commit. The marker
+  population drops from three to TWO and is now spelled once (R5) — rev-3 had folded that miscount
+  verbatim from its own review. §4 Data model gains the container grammar, a worked example and the
+  single reader `lexicon_conf.py` (R8), and gov's own `LAYERS` value (R3), without which the landing
+  commit could not be green. Rollout becomes two mechanical commits (R3). `AGENTS.md` enters Files
+  touched with an Inventory row (R4): the charter signal is pinned at 0 and five unnamed legs red it.
+  The registry row splits into descriptor, entry and the two depth-1 FILES (R6). §10's "no existing
+  seam" claim is deleted (R1).
 - rev-5 · 2026-08-16 · reworked for the 48 KiB ceiling landing in a parallel build. F1's ratified
   sequencing is SUPERSEDED and the predecessor dropped, so DEFERRED returns to SPECCED — measurement
   showed this unit's ~69 B fit at the OLD ceiling, so it was never the unit that needed room. F-A6
@@ -369,5 +474,15 @@ ported rather than imported per S5 — the S5 mechanism rev-1 wrongly called new
 
 One seam the query did not surface: `tools/lib/resolve-python.sh` is the precedent for a
 gov-internal-only parity gate over a copy that ships, which is the shape S5 settled on after review
-R5 showed the shipped-parity version was un-runnable in an adopter tree. No existing seam covers the
-three predicates themselves, which is the whole of what this kit owns.
+R5 showed the shipped-parity version was un-runnable in an adopter tree.
+
+**A second seam the query missed, and rev-5 wrongly denied.** rev-5 closed this section with "No
+existing seam covers the three predicates themselves". That is true of the three NAMING predicates
+and false of S12: `tools/govkit/entries/playbook.kit.toml` already carries the
+`playbook-placeholders` hole, which IS the placeholder-survival predicate, discharged render-side
+over the deployed pair. S12b therefore does not build it — it stays where it is, and this unit builds
+only the source-side catalogue check, which
+`memory/builds/aCandidStub/reviews/2026-08-10-review-aCandidStub-1.md` had already designed as "Gate
+A1 — placeholder-coverage check" and "Gate A2 — version-marker parity". Finding a designed-but-unbuilt
+gate in a review record is the cheapest reuse available here, and the query did not surface it because
+review records are not in the map's inventory set.
