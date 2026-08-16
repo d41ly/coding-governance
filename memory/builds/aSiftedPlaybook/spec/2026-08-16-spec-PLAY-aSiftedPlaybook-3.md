@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** CLOSED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -40,13 +40,22 @@ Give each a template placement and a conditional-section row.
   AC1 quantifies over a "declared exempt set" that exists only as prose inside this spec, which no
   builder can observe and no later gate can read.
 
-  **Seed with `lib/` and `hooks/` ONLY — not `workflows/`.** Measured against the trio under
-  `TOOL-aSiftedPlaybook-3` S1's own anchored path-segment rule: `lib` scores 0 (all seven apparent
-  hits are the substring inside "deliberate"), `hooks` scores 0 (its one mention is the English
-  word), but **`workflows` scores 1** — `parallel-coding-governance.template.md:150` spells
-  `tools/workflows/tier2-review.js`. A waiver for a kit that already passes excuses nothing, and
-  the stale-row arm only reds a row whose kit is GONE, so a redundant one would sit there until
-  `TOOL-aSiftedPlaybook-3` AC6's second arm reds it as excusing nothing.
+  **Seed with `lib` and `hooks` ONLY — not `workflows`.** The row grammar is pinned by
+  `TOOL-aSiftedPlaybook-3` §10 and is NOT restated here: bare kit directory name exactly as the
+  derivation yields it, no trailing slash, no path prefix, compared verbatim. That unit's gate reads
+  this file, so a key spelled any other way joins nothing, leaves its kit unexcused and reds
+  `TOOL-aSiftedPlaybook-3` AC1 — a mis-seeded waiver is the vacuous-selector failure the pin exists
+  to prevent, and this sentence carried the trailing-slash spelling through two review rounds.
+
+  Which kits, measured against the trio under `TOOL-aSiftedPlaybook-3` S1's own anchored
+  path-segment rule: `lib` scores 0 and `hooks` scores 0 (its one mention is the English word), but
+  **`workflows` scores 1** — `parallel-coding-governance.template.md:150` spells
+  `tools/workflows/tier2-review.js`. **`TOOL-aSiftedPlaybook-3` S1 owns the `lib` measurement** and
+  states which of its apparent hits are `deliberate*` and which is `stdlib`; it is not copied here,
+  because the two spellings of it already disagreed once inside the build that exists to close that
+  class. A waiver for a kit that already passes excuses nothing, and the stale-row arm only reds a
+  row whose kit is GONE, so a redundant one would sit there until `TOOL-aSiftedPlaybook-3` AC6's
+  second arm reds it as excusing nothing.
 
   **The registry is a declared exemption list, not a shrink-only count.** It must be able to gain a
   row for a genuinely experimental kit — that is the escape hatch `TOOL-aSiftedPlaybook-3` §8 F2
@@ -69,6 +78,12 @@ Give each a template placement and a conditional-section row.
   `memory/archive/parallel-coding-governance.template-v-2-7.md` (the archive holds `-v-2-0` through
   `-v-2-6` and no v-2-7 today). The template's own header paragraph gains the v2.8 line describing
   what changed.
+
+  **The v2.6 entry is NOT dropped when v2.8 lands.** The header paragraph keeps all three, which is
+  what the ~230-byte row in §4's cost table prices; dropping the oldest to hold the paragraph at a
+  fixed length is a rule nothing in the tree states and would silently discard the only in-template
+  record of what v2.6 changed. Stated because §4's row is a net cost only under this answer, and the
+  question was left open through two review rounds.
 
   **This unit owns it because it is the last template-touching unit in the build order**, per the
   README's ordering. The obligation was previously stated only as a build-level rule in the README
@@ -111,9 +126,10 @@ when this unit was drafted — `govkit` arrived with the merge at `8712ac0`. A h
 the unit that exists to close hardcoded counts is the same defect, so no count is stated here. The same derivation is already used twice —
 `tools/codebase-map/map_extractors.py` (feeding the `kits` inventory in `inventories.json`) and
 `check-install-prefix.sh:38`'s kit-name alternation — so AC1 quantifies over that enumeration rather
-than over a list of four, which would go stale the moment a twelfth kit lands. **Two** kits are legitimately not adopter-facing and belong on the exemption side: `lib/`
-(gov-internal, ships nothing, per `AGENTS.md`) and `hooks/` (reached through §8's `agent-cap.js`).
-`workflows/` is NOT among them — measured, it already scores a path-segment hit at
+than over a list of four, which would go stale the moment a twelfth kit lands. **Two** kits are legitimately not adopter-facing and belong on the exemption side: `lib`
+(gov-internal, ships nothing, per `AGENTS.md`) and `hooks` (reached through §8's `agent-cap.js`) —
+spelled bare here as S7 seeds them, per the grammar `TOOL-aSiftedPlaybook-3` §10 pins.
+`workflows` is NOT among them — measured, it already scores a path-segment hit at
 `parallel-coding-governance.template.md:150` (`tools/workflows/tier2-review.js`), so a waiver for it
 would excuse nothing and `TOOL-aSiftedPlaybook-3` AC6's second arm would red it as redundant.
 
@@ -130,7 +146,14 @@ would excuse nothing and `TOOL-aSiftedPlaybook-3` AC6's second arm would red it 
 | S8 the v2.8 header entry | ~230, measured against the v2.7 entry | yes — template |
 | S9 govkit bullet | measure at build time | yes — template |
 
-The gated subtotal is roughly **2043 bytes against 86 free at BASE**. Unlike
+**The table IS the gated total and no subtotal is spelled here.** The figure this line used to
+carry — 2043 — was exactly the sum of the four S1-S4 rows, and it survived the fold that ADDED the
+S8 and S9 rows: it understated the draw by at least 230 plus an unmeasured item, while
+`TOOL-aSiftedPlaybook-1` §3 defers to this table as the owner of the figure and its S8 forecast was
+derived from the stale value. Sum the gated rows at build time, measuring S9 then; that is the same
+de-numbering `TOOL-aSiftedPlaybook-1` §4 applied to its own inventory, for the same reason.
+
+Against 86 free at BASE the conclusion holds whatever the exact sum. Unlike
 `PLAY-aSiftedPlaybook-2`, there is no cheaper naming that makes this fit: the content IS the cost.
 **This unit is the one that genuinely requires `TOOL-aSiftedPlaybook-1` to land first**, and it is
 the clearest single justification for the owner's raise.
@@ -203,6 +226,14 @@ blocking objection" would write a mischaracterization into a record the repo dec
   declared only in this spec's prose would be unobservable.
 - **AC2** — When `parallel-coding-governance.customize.md`'s conditional-sections list is read,
   every kit named in the template has a row saying what to delete when it is declined.
+- **AC3b** — For EACH kit this unit names, the bullet's description is checked against that kit's
+  own README **by reading it**, and the check is recorded per kit. AC3 as written was satisfied by
+  a bullet existing; the closing review found the `gate-lint` bullet described gate-logic linting
+  inferred from the kit's NAME, where the kit is a PowerShell source-hygiene scanner
+  (`ps-hygiene.py`, two byte-level classes). One fabricated description shipped into four carriers
+  — the template, `AGENTS.md`, root `README.md` and a customize drop row — inside the build whose
+  subject is claims that drifted from their source. A description no one checked against the thing
+  it describes is the defect this unit exists to fix, committed by this unit.
 - **AC3** — When each new bullet is read against its kit's own README — `tools/drift-audit/README.md`,
   `tools/pytest-parallel-guardrails/README.md`, `tools/agent-instructions/README.md`,
   `tools/gate-lint/README.md` — every claim it makes is present there. Checked per kit, by reading
@@ -227,17 +258,39 @@ blocking objection" would write a mischaracterization into a record the repo dec
   matches gate-leg argv paths, not kit bullets in "What ships here".
 - **AC7** — When `grep -n 'governance-template:' parallel-coding-governance.template.md
   parallel-coding-governance.domain-rules.md` runs, both read `v2.8`, and
-  `memory/archive/parallel-coding-governance.template-v-2-7.md` exists and is byte-identical to the
-  template as it stood before this build's first template edit. Checking only one of the two markers
-  is the drift the lockstep re-pull rule exists to prevent.
+  `memory/archive/parallel-coding-governance.template-v-2-7.md` exists and is byte-identical to
+  **the template at this build's BASE** — the FINISHED v2.7 content, observed as
+  `git show <BASE>:parallel-coding-governance.template.md`.
+
+  **This reverses what rev-8 said, and the reversal is the interesting part.** Round 4 settled AC7
+  on `<bump>^` — the parent of the bump commit — citing `5ed9b4b`, where
+  `git show 5ed9b4b^:…` is byte-identical to the `-v-2-6` archive. That observation is true and
+  the inference from it was wrong. Measured at close: `5ed9b4b` moved the marker v2.6 → v2.7 with
+  only two other content lines changed, i.e. it was a marker-only commit at the END of its build,
+  so its parent WAS the finished v2.6. This build's bump sits at unit 6 of 7, after two units have
+  already written v2.8 content, so `<bump>^` is a mid-build state. Applying the rule mechanically
+  produced an archive labelled `-v-2-7` that hashes to the `PLAY-aSiftedPlaybook-2` blob and
+  carries v2.8 work. The precedent's PRINCIPLE is "archive the finished content of the version you
+  are leaving"; `<bump>^` was only ever a proxy for it, and the proxy fails whenever the bump is
+  not last. Checking only one of the two markers is the drift the lockstep re-pull rule exists to
+  prevent.
 
 ## 7. Gates
 
-- `bash tools/check-template-size.sh` — this unit spends ~2 KB of the new headroom.
+- `bash tools/check-template-size.sh` — this unit is the build's largest spender of the new
+  headroom; §4's cost table enumerates the gated rows and no subtotal is carried out of it. Run
+  again after S10's `--bump` (AC11), which is what returns the ratchet to quiet.
 - `bash skills/session-kickoff/manifest-check.sh` — the template is watched; re-stamp.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
 - `python tools/drift-audit/drift_report.py --check` — `AGENTS.md` gains a kit; confirm no hand-kept
   inventory signal moves.
+- `python tools/govkit/govkit.py selfcheck` — **mandatory.** S7 creates the depth-1 path
+  `tools/playbook-kit-waivers.txt`, and the registry asserts a `tools/*` surface on which any
+  undeclared tracked path reds. AC10 already observes the leg; the gate line was missing, so the
+  units receiving this obligation each carried it in a different subset of sections. The rule is
+  derived, never counted: **every unit that creates a depth-1 `tools/` path carries it in §4, §7 and
+  an AC.** A spelled count here said three and went stale in the same commit that made a fourth unit
+  a receiver.
 - `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -268,7 +321,33 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
-- rev-7 · 2026-08-16 · folded round-3 L4 and L5. The cost table priced S1-S5 only while
+- rev-10 · 2026-08-16 · folded the M8 closing review. **H5**: AC7 named `<bump>^` and the artifact
+  built from it was wrong — the archive hashed to the PLAY-2 blob and carried v2.8 content under a
+  v2.7 label. Re-measuring the `5ed9b4b` precedent showed round 4 had inferred a rule from a case
+  where the bump was LAST in its build; here it is unit 6 of 7. AC7 now names the BASE blob, which
+  is the finished v2.7 content, and says why the proxy failed. **B1**: S4's gate-lint bullet
+  described a kit that does not exist — this spec's AC3 demanded a per-kit README check and the
+  build did not perform it; the bullet now states what `ps-hygiene.py` actually scans.
+- rev-9 · 2026-08-16 · folded round-5 L3. §7's new `govkit selfcheck` line said "the three units
+  receiving this obligation", which the same fold made four. De-numbered to the derivation, the
+  policy this build adopted everywhere else in the same pass.
+- rev-8 · 2026-08-16 · folded round-4 H2, H5, M2, L3 and L4. **H2**: AC7 still required the archive
+  byte-identical to the template "before this build's first template edit" while S8 copies the
+  PRE-BUMP blob — this is unit 6, after two other units have edited the template, so the two name
+  blobs ~2.3 KB apart and the builder would have archived the BASE blob under a v2.7 label. AC7 now
+  matches S8 and names `git show <bump>^:…` as the observation. The rev-6 entry below said this was
+  already done; it was not. **H5**: S7's bolded seeding sentence still spelled the waiver keys
+  `lib/` and `hooks/` with trailing slashes against the grammar `TOOL-aSiftedPlaybook-3` §10 pins as
+  bare and verbatim — S7 is that gate's hard prerequisite, so the mis-seeded file would have left
+  both kits unexcused and red `TOOL-aSiftedPlaybook-3` AC1. S7 and §4 now point at §10 rather than
+  restating it. **M2**: the gated subtotal (2043) was the sum of four rows in a table that now has
+  six; it is deleted rather than corrected, matching the de-numbering `TOOL-aSiftedPlaybook-1` §4
+  adopted, and S8 now answers whether the v2.6 header entry is dropped (it is not). **L3**: S7's
+  `lib` measurement now points at `TOOL-aSiftedPlaybook-3` S1 instead of carrying a second, stale
+  copy of it; the rev-7 entry below claimed this too. **L4**: `govkit selfcheck` added to §7, which
+  had AC10 and a §4 row but no gate line.
+- rev-7 · 2026-08-16 · folded round-3 L4 and L5. **Round 4 measured the L5 clause as unearned** —
+  S7:44 still carried the pre-fold `lib` evidence; corrected at rev-8. The cost table priced S1-S5 only while
   `TOOL-aSiftedPlaybook-1` §3 defers to it as the owning figure for the whole gated draw, so S8 and
   S9 now have rows. S7's `lib` evidence disagreed with `TOOL-3` S1's on the same measurement — two
   answers to one question, inside the build that exists to close it — and now points at the owner.
@@ -276,8 +355,9 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
   from main as a TWELFTH kit and was in no scope item, waiver or non-goal; both spelled counts are
   deleted and the population is derived (AC9), with `govkit` given a disposition as S9. **B2**:
   `govkit selfcheck` reds on any undeclared depth-1 `tools/` path and S7 creates one. **B3**: this
-  unit takes the closing `--bump` as S10, which unit 1 could not perform. **H4**: S8 and AC7 named
-  two archive blobs ~2.3 KB apart; AC7 now matches S8 and the v-2-6 precedent. **H7**: §4 still
+  unit takes the closing `--bump` as S10, which unit 1 could not perform. **H4** — *this clause was
+  WRONG and round 4 measured it so: AC7 was not touched by this rev at all and still named a
+  different blob from S8. Folded for real at rev-8.* **H7**: §4 still
   listed `workflows/` as exempt against S7's two-row seed.
 - rev-5 · 2026-08-16 · corrected S7's waiver-registry contract, exposed by resolving
   `TOOL-aSiftedPlaybook-3` F2 to RED. The registry cannot be both shrink-only and the escape hatch a

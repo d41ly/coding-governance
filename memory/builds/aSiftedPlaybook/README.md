@@ -44,17 +44,17 @@ The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-6 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-7 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-6 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-9 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | CLOSED | rev-8 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | CLOSED | rev-7 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | CLOSED | rev-10 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | CLOSED | rev-4 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | CLOSED | rev-10 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | CLOSED | rev-10 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | CLOSED | rev-12 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -92,7 +92,10 @@ prerequisite: `PLAY-3` S7 seeds the waiver registry `TOOL-3` reads.
 ## Coverage — every audit defect to the scope item that fixes it
 
 Derived from the committed audit report, not from recollection. `A*` are the eleven the audit
-confirmed; `B*` are four found after it closed and are NOT part of that count.
+confirmed; `B*` were found or re-adjudicated after it closed and are NOT part of that count. **The
+rows below ARE the `B*` enumeration and no count of them is stated** — the number said four while
+the table carried six, one line apart, in the section this build declares authoritative for
+completeness.
 
 | Defect | Sev | Fixed by |
 |---|---|---|
@@ -114,9 +117,11 @@ confirmed; `B*` are four found after it closed and are NOT part of that count.
 | B5 `govkit`, a twelfth kit arriving from main mid-build | med | `PLAY-3` S9 |
 | B6 the companion carries 14 placeholders, not 13 | med | `PLAY-4` S4 |
 
-`B5` and `B6` post-date the audit report. `B6` also closes the second clause of the tracked OPEN
-backlog row `PLAY-aSealedCaravan-1`, whose first clause is `A3`; that row was never cited by this
-build until round 3 found it, and it needs a disposition at landing.
+`B5` post-dates the audit report. **`B6` does not** — it is the report's own `R2`, carried there as
+a REFUTED suspicion and re-adjudicated in place ("REFUTATION WITHDRAWN 2026-08-16", round-3 H10), so
+it is a report row whose verdict moved rather than a post-audit find. `B6` also closes the second
+clause of the tracked OPEN backlog row `PLAY-aSealedCaravan-1`, whose first clause is `A3`; that row
+was never cited by this build until round 3 found it, and it needs a disposition at landing.
 
 Nothing is unassigned, and no scope item claims an audit provenance it does not have.
 

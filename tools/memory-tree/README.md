@@ -3,7 +3,7 @@
 A project-agnostic kit that turns the governance playbook's §5/§6 memory-and-decisions *principles*
 into a concrete, gated folder structure: one `memory/` tree organised by development discipline, with
 per-feature `builds/` folders, index budgets + rotation, a status vocabulary, a GENERATED work-state
-index, and a 19-check hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
+index, and a 20-check hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
 re-deriving what memory already records.
 
 Opt-in. Everything project-specific lives in one repo-root `.memory-tree.conf`; the scripts and rules
