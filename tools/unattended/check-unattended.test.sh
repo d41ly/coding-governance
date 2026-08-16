@@ -247,6 +247,21 @@ hit "$(run)" "a build README's generated markers are malformed, so the copy has 
 reset_tree; sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it"
 
+# ---- check 8's TERMINAL carve-out, BOTH directions. The equality refusal is scoped to a live run,
+# ---- because a terminal one has no supported route back to equality: only --preflight re-copies the
+# ---- region, and verb_preflight calls refuse_if_terminal before it reaches that splice.
+# ---- The first arm is the carve-out; the second is what stops it becoming a blanket disable.
+reset_tree
+sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+miss "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+# A TERMINAL run must still be READABLE: the two malformed-marker refusals are NOT carved out, or a
+# landed file could rot into unparseability and the check would report nothing at all.
+reset_tree
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+sed -i '/<!-- \/run:generated -->/d' memory/builds/tRun/RUN.md
+hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
+
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"

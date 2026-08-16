@@ -250,7 +250,29 @@ while IFS= read -r f; do
       fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
     b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
       fail 8 "a build README's generated markers are malformed, so the copy has no source to be compared with: $rd"
-    [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f"
+    # THE EQUALITY REFUSAL IS SCOPED TO A NON-TERMINAL RUN. Both malformed-marker refusals above
+    # still fire on every phase: a terminal run's file must still be READABLE, and skipping those
+    # would let a file rot into unparseability once it landed.
+    #
+    # Why the equality cannot bind a terminal run: the copy is refreshed by `--preflight` and by
+    # nothing else, and `verb_preflight` calls `refuse_if_terminal` before it reaches that splice.
+    # So a LANDED run has no supported route back to equality — the driver refuses to re-copy, and
+    # the check's own message ("re-run the driver") names a remedy that does not exist for it. The
+    # only ways to satisfy it were to hand-edit a file this same message calls generated, or to
+    # freeze the README the copy was taken from, which would have made the corpus permanently
+    # unrenderable.
+    #
+    # What the copy MEANS also differs by phase. For a live run it is a mirror, and drift means the
+    # run is working from a stale roster — a real defect. For a landed one it is a historical record
+    # of what the README said when the run finished, and the README moving afterwards is ordinary.
+    # Judging a record against a source that legitimately moved is not a check, it is a countdown.
+    #
+    # Section 9 of the protocol governs what a check running under the run's own uid can buy; this
+    # carve-out narrows a check that could not be satisfied rather than one that was inconvenient.
+    case " $PHASES_TERMINAL " in
+      *" $ph "*) ;;
+      *) [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f" ;;
+    esac
   fi
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
