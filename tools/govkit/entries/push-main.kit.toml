@@ -32,6 +32,11 @@ root_relative = true
 to = ".githooks/pre-commit"
 marker_style = "hash-comment"
 block_id = "govkit:branch-guard"
+# Its position is SEMANTIC — the guard reads `rc` and `top` set at the top of the
+# hook and must precede the legs — so an unmarked destination REFUSES rather than
+# appending. A wrong guess is a hook that exits 1 on every commit, or a guard that
+# never fires; both are silent.
+insert = "refuse"
 claims = [".githooks/pre-commit"]
 
 [adopt]

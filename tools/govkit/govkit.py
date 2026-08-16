@@ -1092,6 +1092,38 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
             r.fail(f"the receipt carries {missing[1]} ({missing[0][:12]}) which install.sums does not")
         r.note(f"sidecar: {len(sums)} line(s) compared against {len(want_pairs)} hashed row(s)")
 
+    # ---- MERGED-BLOCK DRIFT. The receipt hashes the BLOCK, never the file, so an edit OUTSIDE the
+    # ---- block is invisible here BY CONSTRUCTION — the extractor only ever reads the marked lines.
+    # ---- That is both of the contract's clauses satisfied by one mechanism rather than two.
+    n_blocks = n_blocks_ok = 0
+    for row in rows:
+        if row.get("role") != "merged" or row.get("marker_style") == "json-pointer":
+            continue
+        n_blocks += 1
+        dp = target / row["path"]
+        if not dp.is_file():
+            r.fail(f"the file carrying gov block '{row.get('block_id')}' is GONE: {row['path']}")
+            continue
+        om, cm = marker_pair(row.get("marker_style"), row["block_id"])
+        try:
+            span = find_block(dp.read_text(encoding="utf-8", errors="replace"), om, cm)
+        except Refusal as e:
+            r.fail(f"{row['path']}: {e}")
+            continue
+        if span is None:
+            r.fail(f"gov block '{row['block_id']}' has been REMOVED from {row['path']}")
+            continue
+        i, j = span
+        got = "\n".join(dp.read_text(encoding="utf-8", errors="replace").split("\n")[i:j + 1])
+        h = hashlib.sha256(got.replace(CR, "").encode("utf-8")).hexdigest()
+        if h != row.get("block_sha256"):
+            r.fail(f"DRIFT: gov block '{row['block_id']}' in {row['path']} was edited "
+                   f"(expected {str(row.get('block_sha256'))[:8]}, found {h[:8]})")
+        else:
+            n_blocks_ok += 1
+    if n_blocks:
+        r.note(f"merged blocks: {n_blocks_ok}/{n_blocks} intact")
+
     # ---- THE OUTBOX. The contract names it as an arm and the verb never opened it. Every order the
     # ---- receipt records must exist; an order for a hole no selected kit declares is stale.
     declared_holes = {h.get("id") for eid in selection if eid in descs
@@ -1191,6 +1223,79 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 # ----------------------------------------------------------------------------------------- apply
 # LANDABLE_ROLES and UNLANDED_REASON live with the resolver, above: which roles land is a property of
 # the resolution, not of the apply verb, and spelling it twice is the defect this file exists to end.
+
+
+# ------------------------------------------------------------------------ the merged-region writer
+CR = "\r"
+
+
+def marker_pair(style: str, block_id: str) -> tuple[str, str]:
+    """The ONE function that knows what a marker pair looks like.
+
+    Neither merged SOURCE carries the markers its rule names — measured — so the pair cannot be
+    found, only SYNTHESIZED, and the writer and the checker must synthesize the identical pair.
+    Spelling it in two places is this repo's named defect class, so it is spelled here and nowhere.
+    """
+    if style != "hash-comment":
+        raise Refusal(f"marker_style '{style}' has no synthesizer; the value is refused rather than "
+                      f"defaulted, because a block written under a grammar the checker cannot "
+                      f"reproduce is a block gov wrote and can never find again")
+    return f"# {block_id}", f"# /{block_id}"
+
+
+def find_block(text: str, open_m: str, close_m: str) -> tuple[int, int] | None:
+    """Locate a marked region. REPRODUCES the shipped splice's refusal table, deliberately.
+
+    Column 0, exact equality after stripping exactly ONE trailing CR; exactly one open and one
+    close; close after open. It is REPRODUCED and not imported: the marker contract's own harness
+    names a cross-kit edge as the forbidden shape and says the deliverable is agreement, proven.
+
+    The ONE divergence: zero opens AND zero closes returns None rather than raising, because that is
+    the first-apply case the shipped splice has no reason to support and this writer must.
+    """
+    lines = text.split("\n")
+
+    def _is(line: str, mark: str) -> bool:
+        # ONE trailing CR, not all of them — `rstrip("\r")` would accept a line ending in two CRs
+        # that the other readers refuse. Asserted at SOURCE by the contract harness, because on an
+        # MSYS node the runtime strips CR before a fixture can observe it.
+        return (line[:-1] if line.endswith(CR) else line) == mark
+
+    opens = [i for i, l in enumerate(lines) if _is(l, open_m)]
+    closes = [i for i, l in enumerate(lines) if _is(l, close_m)]
+    if not opens and not closes:
+        return None
+    if len(opens) != 1 or len(closes) != 1:
+        raise Refusal(f"expected exactly one marker pair, found {len(opens)} open and "
+                      f"{len(closes)} close")
+    if closes[0] < opens[0]:
+        raise Refusal("the closing marker precedes the opening one")
+    return opens[0], closes[0]
+
+
+def write_block(text: str | None, open_m: str, close_m: str, block: str,
+                insert: str) -> tuple[str, str]:
+    """Splice, append or create. Returns (new text, mode).
+
+    The APPEND never joins two lines. MEASURED: appending to a file whose last line lacks a trailing
+    newline produces a concatenated line that destroys the target's own final rule, makes git report
+    an invalid attribute name on every attribute query in that repository, and leaves the block's
+    open marker off column 0 — so every later apply refuses forever while the receipt claims a block
+    that can never be found again.
+    """
+    if text is None:
+        return block + "\n", "created"
+    span = find_block(text, open_m, close_m)
+    if span is not None:
+        lines = text.split("\n")
+        i, j = span
+        return "\n".join(lines[:i] + block.split("\n") + lines[j + 1:]), "spliced"
+    if insert == "refuse":
+        raise Refusal("the destination exists and carries no marker pair, and this rule declares "
+                      "insert = \"refuse\": its position is SEMANTIC, and guessing one in a file the "
+                      "target owns is a behavioural change to their tooling")
+    sep = "" if (not text or text.endswith("\n")) else "\n"
+    return text + sep + block + "\n", "appended"
 
 
 # ------------------------------------------------------------------- the gate runner declaration
@@ -1398,6 +1503,12 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
             ctx = {"prefix": prefix, "kit_id": eid,
                    "kit": f"{prefix}/{eid}" if prefix else eid, "memory_root": "memory"}
             for rule in d.get("files", []):
+                # A `merged` destination is a file the TARGET owns and gov writes a region of, so its
+                # existing is the normal case and not evidence of a foreign kit. Probing it made the
+                # git hooks directory — which almost every repo has — read as a kit already
+                # installed, and refused the install before writing anything.
+                if rule.get("role") == "merged":
+                    continue
                 for dest in rule_destinations(d, rule):
                     resolved, missing = resolve_tokens(dest, ctx)
                     if missing:
@@ -1447,14 +1558,39 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             "non-goal; refusing before writing anything"
         )
 
-    # ---- refuse a role this commit cannot honour, BEFORE writing. Naming it beats half-landing it.
+    # ---- validate every merged rule BEFORE writing. A source that cannot yield exactly one pair,
+    # ---- or a marker style with no synthesizer, is a refusal — a block gov writes and can never
+    # ---- find again is worse than one it never wrote.
     for eid in selection:
-        for rule in descs[eid][0].get("files", []):
-            role = rule.get("role", "engine")
-            if role == "merged":
-                r.fail(f"entry '{eid}' declares a `merged` rule, and no verb here can write a "
-                       f"gov-owned region into a target-owned file yet — nothing in this repo does "
-                       f"it, so there is no seam to extend. Refusing rather than half-landing it")
+        d0 = descs[eid][0]
+        for rule in d0.get("files", []):
+            if rule.get("role", "engine") != "merged":
+                continue
+            style, bid = rule.get("marker_style"), rule.get("block_id")
+            if not bid:
+                r.fail(f"entry '{eid}' declares a merged rule with no block_id")
+                continue
+            if style == "json-pointer":
+                if not (d0.get("adopt") or {}).get("argv"):
+                    r.fail(f"entry '{eid}' declares a json-pointer merged rule and no adopter to "
+                           f"delegate to — govkit does not write that document itself")
+                continue
+            try:
+                om, cm = marker_pair(style, bid)
+            except Refusal as e:
+                r.fail(f"entry '{eid}': {e}")
+                continue
+            for src in rule_sources(d0, rule):
+                blob = blob_at(root, commit, src)
+                if blob is None:
+                    continue
+                try:
+                    if find_block(blob.decode("utf-8", "replace"), om, cm) is None:
+                        r.fail(f"entry '{eid}': its merged SOURCE {src} carries no '{bid}' marker "
+                               f"pair, so there is no block to take — refusing rather than splicing "
+                               f"the whole file into somebody's hook")
+                except Refusal as e:
+                    r.fail(f"entry '{eid}': merged source {src}: {e}")
     if r.problems:
         return r.emit()
 
@@ -1503,7 +1639,52 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
 
         # Every rule that does NOT land says so, by role, naming who does produce it. The silent
         # skip this replaces swallowed thirteen rules across the shipped descriptors.
+        # ---- MERGED. A gov-owned region inside a file the target owns. The block is taken from the
+        # ---- SOURCE's own pair and written through the one region writer; an edit OUTSIDE it
+        # ---- survives by construction, because replacement is by line index and never a regex.
+        for rule in d.get("files", []):
+            if rule.get("role", "engine") != "merged":
+                continue
+            style = rule.get("marker_style")
+            if style == "json-pointer":
+                continue          # delegated at CONFIGURE, below
+            om, cm = marker_pair(style, rule["block_id"])
+            for src in rule_sources(d, rule):
+                blob = blob_at(root, commit, src)
+                if blob is None:
+                    continue
+                st = blob.decode("utf-8", "replace")
+                i, j = find_block(st, om, cm)
+                block = "\n".join(st.split("\n")[i:j + 1])
+                for dest_t in (rule.get("to") if isinstance(rule.get("to"), list)
+                               else [rule.get("to")]):
+                    dest, miss = resolve_tokens(dest_t, ctx)
+                    if miss:
+                        r.fail(f"entry '{eid}' merged destination needs answer '{miss[0]}'")
+                        continue
+                    dp = target / dest
+                    cur = dp.read_text(encoding="utf-8", errors="replace") if dp.is_file() else None
+                    try:
+                        new, mode = write_block(cur, om, cm, block, rule.get("insert", "append"))
+                    except Refusal as e:
+                        r.fail(f"entry '{eid}' -> {dest}: {e}")
+                        continue
+                    dp.parent.mkdir(parents=True, exist_ok=True)
+                    dp.write_text(new, encoding="utf-8", newline="\n")
+                    staged.append(dest)
+                    rows.append({"path": dest, "role": "merged", "kit": eid, "version": vers,
+                                 "block_id": rule["block_id"], "marker_style": style,
+                                 # The BLOCK's hash, never the file's, and normalized so a
+                                 # re-checkout on another platform does not read as drift.
+                                 "block_sha256": hashlib.sha256(
+                                     block.replace(CR, "").encode("utf-8")).hexdigest(),
+                                 "normalized": "lf", "mode": mode, "source": src,
+                                 "commit": commit, "written": True})
+                    print(f"govkit apply — merged [{mode}] {dest} <- block '{rule['block_id']}'")
+
         for u in res["unlanded"]:
+            if u["role"] == "merged":
+                continue          # written above, or delegated at configure
             why = UNLANDED_REASON.get(u["role"])
             if why is None:
                 r.fail(f"entry '{eid}' declares role '{u['role']}', which is not in the role enum — "
@@ -1822,7 +2003,7 @@ UPDATE_ROLE = {
     "project-owned": "skip",    # gov supplied no bytes, so there is no base to compare
     "generated": "skip",
     "rendered": "adopter",      # re-run the adopter, compare, CAP at report
-    "merged": "refuse",         # unit 6 fills this
+    "merged": "block",          # compare the BLOCK hash; never a three-way
     "attributes": "refuse",     # unit 6
     "gate-leg": "refuse",       # unit 4
     "ci": "refuse",             # unit 4
@@ -1955,6 +2136,16 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                        f"receipt cannot be trusted about")
                 continue
 
+        if how == "block":
+            # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports
+            # whether gov's block MOVED, and never merges: a gov-owned region has an owner.
+            src2 = row.get("source")
+            theirs2 = blob_at(root, to_commit, src2) if src2 else None
+            base2 = blob_at(root, row.get("commit"), src2) if (src2 and row.get("commit")) else None
+            v = "current" if _sha(theirs2) == _sha(base2) else "block-moved"
+            tally[v] = tally.get(v, 0) + 1
+            print(f"  {v:<18} [{role:<13}] {row['path']}")
+            continue
         if how in ("skip",):
             tally[role + ":skipped"] = tally.get(role + ":skipped", 0) + 1
             continue

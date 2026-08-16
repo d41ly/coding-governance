@@ -17,6 +17,7 @@ claims = ["tools/settings-merge.py"]
 include = []
 role = "merged"
 to = ".claude/settings.json"
+delegate = true
 marker_style = "json-pointer"
 block_id = "hooks.PreToolUse[matcher]/hooks[command~agent-cap.js]"
 side_effects = [".claude/settings.json.bak"]
