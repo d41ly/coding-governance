@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. SEVENTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. EIGHTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -519,6 +519,31 @@ else
        [ "$ndir" -ge "$DIRECTIVES_FLOOR" ] \
          || fail 16 "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it: $ndir against $DIRECTIVES_FLOOR" ;;
   esac
+fi
+
+# ---- 18: the kickoff step comes AFTER preflight in the Skill an agent reads. Invoked first,
+# ---- /session-kickoff halts at its READY card, which under a mandate nobody is present to answer.
+# ---- Two line numbers and a comparison — the shape region() already uses here and in the driver,
+# ---- for the reason recorded there: a TRANSPOSED pair satisfies a count-only check, and the
+# ---- driver's copy of that function truncated a file on exactly that.
+# ---- Keyed on a non-blank KICKOFF_ENGINE, matching check 12: an adopter may not ship the kickoff
+# ---- skill at all. ABSENCE IS A REFUSAL rather than the safe side, because a template that never
+# ---- names kickoff and a template that names it too early read identically on any count.
+# ---- It asserts the ORDER OF TWO LINES in a document and nothing more. Whether the sequence WORKS
+# ---- is unexecuted and is carried as a residual in the build README, not implied away here.
+if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
+  # First match of each, so a template naming either twice is judged on the occurrence the agent
+  # reads first. Anchored on the fenced invocation and the literal skill name — neither is a
+  # heading, which a reword survives while gutting the body.
+  pfl=$(awk '{ sub(/$/,"") } index($0, "unattended.sh --preflight") { print NR; exit }' "$tmpl")
+  kol=$(awk '{ sub(/$/,"") } index($0, "/session-kickoff") { print NR; exit }' "$tmpl")
+  if [ -z "$pfl" ]; then
+    fail 18 "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated: $tmpl"
+  elif [ -z "$kol" ]; then
+    fail 18 "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check: $tmpl"
+  elif [ "$kol" -lt "$pfl" ]; then
+    fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
+  fi
 fi
 
 exit "$status"

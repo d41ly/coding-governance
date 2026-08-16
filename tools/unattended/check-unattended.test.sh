@@ -717,5 +717,45 @@ miss "$out" "absent from the run-state file's FIRST committed blob"
 # restore: main back to the shared anchor, or every later arm inherits tWaive and the method file.
 git checkout -q main; git reset -q --hard "$ANCHOR0"; git push -q -f origin main; git checkout -qf unit; reset_tree
 
+# ---- check 18: the kickoff step is ORDERED after preflight in the Skill an agent reads. Keyed on a
+# ---- non-blank KICKOFF_ENGINE like check 12, because an adopter may ship no kickoff skill at all.
+kick_engine() { # stage a conforming engine + declare it, so check 12 stays silent and only 18 speaks
+  mkdir -p skills/session-kickoff
+  cat > skills/session-kickoff/SKILL.md <<'ENG'
+## Step 5 — READY card, then stop
+control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building.
+## Step 5b — the unattended hand-back
+ENG
+  printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\n' >> .unattended.conf
+  git add -A && git commit -q -m engine --no-verify
+}
+
+# GREEN CONTROL: the template this kit actually ships orders the two correctly.
+reset_tree; kick_engine
+same "the shipped Skill template orders kickoff after preflight" "$(run)" ""
+
+# ...TRANSPOSED. The deadlock: kickoff invoked first halts at its READY card with nobody under a
+# mandate to answer it. Judged on the FIRST occurrence of each, which is the one the agent reads.
+sed -i '2i Invoke /session-kickoff before anything else.' tools/unattended/SKILL.template.md
+hit "$(run)" "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line"
+
+# ...kickoff never named at all. ABSENCE IS A REFUSAL rather than the safe side, because a template
+# that never names kickoff and one that names it too early read identically on any count.
+reset_tree; kick_engine
+sed -i '\|/session-kickoff|d' tools/unattended/SKILL.template.md
+hit "$(run)" "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check"
+
+# ...no --preflight invocation to order anything against.
+reset_tree; kick_engine
+sed -i '/unattended.sh --preflight/d' tools/unattended/SKILL.template.md
+hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
+
+# ...a blank engine turns the check off, and the arm proves it by leaving the lines TRANSPOSED —
+# silent because the project ships no kickoff skill, not because the template is conforming.
+reset_tree
+sed -i '2i Invoke /session-kickoff before anything else.' tools/unattended/SKILL.template.md
+same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
+reset_tree
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

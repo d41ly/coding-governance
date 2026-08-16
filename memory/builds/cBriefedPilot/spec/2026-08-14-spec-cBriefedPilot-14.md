@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention
 
-**Status:** DEFERRED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
