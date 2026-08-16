@@ -72,11 +72,11 @@ with every candidate, every blocker and every refuted finding enumerated.
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md) | SPECCED | rev-1 | 2026-08-16 |
+| [TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md) | INPROGRESS | rev-2 | 2026-08-17 |
 | [TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser](spec/2026-08-16-spec-TOOL-aTetheredRecord-2.md) | SPECCED | rev-2 | 2026-08-17 |
 | [TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line](spec/2026-08-16-spec-TOOL-aTetheredRecord-3.md) | SPECCED | rev-2 | 2026-08-17 |
 | [TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md) | SPECCED | rev-2 | 2026-08-17 |

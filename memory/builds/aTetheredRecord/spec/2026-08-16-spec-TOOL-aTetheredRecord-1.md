@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver
 
-**Status:** SPECCED · rev-1 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -94,8 +94,10 @@ forever and would make the check-14 resolution that unit 4 depends on unreliable
 
 - **AC1** — When `python tools/memory-tree/corpus_ids.py --check` runs with `ORPHAN_ID_PIN="0"` and
   an empty `memory/project/id-orphan-waiver.txt`, it exits 0.
-- **AC2** — When a first-match H1 id scan runs over `git ls-files 'memory/builds/*/spec/*'`, the
-  count of distinct ids reads 118, up from a measured 113, and all five minted ids appear.
+- **AC2** — When a first-match H1 id scan runs over `git ls-files 'memory/builds/*/spec/*'`, all five
+  minted ids appear, and the count of distinct ids is exactly five higher than the same scan on the
+  parent commit. The assertion is RELATIVE on purpose: an absolute figure here was wrong within the
+  hour, because this build's own seven specs moved the number the same day it was written.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --check` runs after S3, it is clean,
   and `git diff --stat` over the build READMEs shows no change — the citations moved, the rosters
   did not.
@@ -113,6 +115,9 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · initial draft, authored in the design pass this build opened with.
+- rev-2 · 2026-08-17 · AC2 made RELATIVE during the build. It asserted an absolute count of 118,
+  derived as a measured 113 plus five; the live scan read 125, because the baseline predated this
+  build's own seven specs. The criterion, not the tree, was wrong.
 
 ## 10. Reuse audit
 

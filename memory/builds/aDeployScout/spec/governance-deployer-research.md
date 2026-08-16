@@ -1,4 +1,4 @@
-# The governance deployer ("one ratchet to wire them all") — research & recommendation
+# DEPL-aDeployScout-1 — the governance deployer ("one ratchet to wire them all"): research & recommendation
 
 *2026-07-12. Research record for: one mechanism that deploys any subset — or all — of this repo's
 kits (including future ones) into one or more target repos, executing every step and installing
