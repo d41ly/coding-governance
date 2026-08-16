@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-16T18:30:00+03:00 @ 709d260da8c81551e59da769aceca47202bb5923
+last-audit: 2026-08-16T19:20:00+03:00 @ 2fcccb3fc2d5b829f90401d19fc24af6e4df1882
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e99de5b6c3fa257277490eb19dcd05b4a137b855
+last-body-change: 2fcccb3fc2d5b829f90401d19fc24af6e4df1882
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -123,6 +123,10 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
 
+- Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
+  grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
+  running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
+  (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
 - The template is under a STRICT 32 KiB gate. Never raise it; externalize into
   `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
   `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
