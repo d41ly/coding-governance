@@ -297,12 +297,18 @@ RI_INDEX = _lex.build_module_index([
     "src/pkg/shared_core/notes.md",
     "web/consumer/a.js",
     "web/shared/thing.js",
+    # These three exist so the rows below can FAIL. Without them the arms passed because the corpus
+    # held nothing to match, not because the code was right — a vacuous row is worse than no row,
+    # and three of these were vacuous when first written.
+    "web/shared/debounce.js",
+    "web/shared/thingamajig/thing.js",
+    "outside/thing.js",
 ])
 IMPORTER_PY = "src/pkg/consumer/a.py"
 TARGET_GLOB = "src/pkg/shared_core/*"
 
 
-def _check_reaches(target, importer=IMPORTER_PY, glob=TARGET_GLOB):
+def _check_reaches(target, importer=IMPORTER_PY, glob=TARGET_GLOB):  # noqa: E302
     return any(_lex._glob_match(c, glob) for c in _lex.resolve_import(target, importer, RI_INDEX))
 
 
@@ -322,6 +328,75 @@ check("resolve: a relative js specifier resolves against the importer's dir",
       "relative resolution lost")
 check("resolve: an unresolvable/external target denotes nothing",
       not _check_reaches("json"), "an external import must not resolve into the corpus")
+
+# ---- round-4 rows. Written BEFORE the code that satisfies them. -----------------------------------
+# The rev-9 fix keyed precedence on `"." in target`, which is a PYTHON namespace rule applied to
+# every language, and gave a dotted target no directory scoping at all. It fixed one false negative
+# and bought two false positives. These rows pin the design that replaces it: a dotted target
+# resolves only to a candidate whose path is CONSISTENT with the dots.
+
+# B1 — `from <pkg> import <name>`. The parser kept only `node.module`, discarding the imported NAME,
+# so the commonest Python crossing spelling resolved to nothing.
+_frm = _lex._python_defs("from pkg.shared_core import helper\n")[2]
+check("extract: `from a.b import c` yields a target naming c, not just a.b",
+      any(t.endswith("helper") for t, _ln in _frm), f"{_frm}")
+check("resolve: `from pkg.shared_core import helper` reaches the forbidden layer",
+      any(_check_reaches(t) for t, _ln in _frm), f"{_frm}")
+
+# H1/H2 — the false positives that fix bought. Neither import touches this repo.
+check("resolve: a dotted target whose PATH does not match is NOT a crossing (concurrent.helper)",
+      not _check_reaches("concurrent.helper"), "false positive: any same-stem file matched")
+check("resolve: nor thirdparty.helper", not _check_reaches("thirdparty.helper"),
+      "false positive: any same-stem file matched")
+check("resolve: a dotted target whose path DOES match is still a crossing",
+      _check_reaches("pkg.shared_core.helper"), "path-consistent dotted resolution lost")
+
+# H2 — a JS specifier is not a Python namespace. NOTE ON WHAT THIS ROW PINS: it is satisfied by the
+# path-consistency rule as well as by the language branch, so it does NOT on its own prove the branch
+# exists — verified by reverting the branch and watching this row stay green. It is kept because the
+# behaviour is worth pinning; the row BELOW is the one that distinguishes the branch.
+check("resolve: a JS bare specifier containing a dot does not resolve into the corpus",
+      not _check_reaches("lodash.debounce", "web/consumer/a.js", "web/shared/*"),
+      "a dotted JS specifier resolved onto a same-stem file")
+
+# THE ROW THAT PINS THE LANGUAGE BRANCH. A leading dot means RELATIVE-TO-PACKAGE in Python and
+# nothing of the sort elsewhere, and only the Python branch decodes `node.level`. `from . import
+# helper` must resolve to the importer's OWN package, never to a same-stem file in the forbidden one.
+_rel = _lex._python_defs("from . import helper\n")[2]
+check("extract: a relative `from . import x` keeps its level as leading dots",
+      any(t.startswith(".") for t, _ln in _rel), f"{_rel}")
+check("resolve: `from . import helper` stays in the importer's own package",
+      not any(_check_reaches(t) for t, _ln in _rel), f"{_rel}")
+check("resolve: and it DOES resolve locally rather than to nothing",
+      any(_check_reaches(t, IMPORTER_PY, "src/pkg/consumer/*") for t, _ln in _rel), f"{_rel}")
+
+# A relative specifier that walks ABOVE the repo root is EXTERNAL, not clamped back in — clamping
+# fabricates a candidate inside the repo and can invent a violation.
+check("resolve: a relative specifier escaping the repo root denotes nothing",
+      not _check_reaches("../../../outside/thing.js", "web/consumer/a.js", "outside/*"),
+      "the walk was clamped at the root instead of failing")
+
+# H3 — the relative branch matched on a bare `startswith`, with no path boundary: the exact defect
+# class the glob anchoring removed, alive in the sibling helper.
+# The exploit needs a DIRECTORY sharing the prefix, not a same-stem sibling: the stem index already
+# constrains candidates to an exact basename, so `thingamajig.js` could never reach the comparison.
+# The first version of this row asserted the wrong shape and passed under both implementations —
+# caught by reverting the fix and seeing the suite stay green.
+check("resolve: a relative specifier matches on a PATH BOUNDARY, not a prefix",
+      not _check_reaches("../shared/thing", "web/consumer/a.js", "web/shared/thingamajig/*"),
+      "boundary-free prefix match in the relative branch")
+
+# H4 — `**` collapsed to `[^/]*[^/]*`, so it could not cross a slash and `<dir>/**` selected
+# strictly LESS than `<dir>/*`.
+for path, pattern, want, why in [
+    ("a/b/c.py", "a/**", True, "** crosses slashes"),
+    ("a/b.py", "a/**", True, "and still matches at depth 1"),
+    ("z/b/c.py", "a/**", False, "but not another tree"),
+    ("a/bc.py", "a/b?.py", True, "? matches exactly one character"),
+    ("a/bcd.py", "a/b?.py", False, "and not two"),
+]:
+    got = _lex._glob_match(path, pattern)
+    check(f"glob: {path} vs {pattern} -> {want} ({why})", got == want, f"got {got}")
 
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader

@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** BLOCKED · rev-10 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** CLOSED · rev-11 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -446,6 +446,18 @@ dogfood-only and must not ship.
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-11 · 2026-08-16 · owner ratified a FIFTH attempt, on the design rather than the symptom, and
+  it is done. Import resolution is now LANGUAGE-FIRST: the importer's extension decides what a dot
+  means, `node.level` is preserved so a Python relative import resolves against its own package, a
+  dotted target must be PATH-CONSISTENT with its dots (which is what stops a third-party import
+  reddening against any same-stem file), a bare Python name keeps importer-local precedence, and a
+  specifier escaping the repo root yields nothing rather than being clamped back in. `**` now crosses
+  segments and every candidate matches at a PATH BOUNDARY. Each fix is verified by REVERT against a
+  named row. The tables also corrected themselves: three rows did not red when their fix was
+  reverted — one asserted a shape the stem index makes unreachable, one needed a corpus entry it
+  could fail against, and one was relabelled because a neighbouring rule already satisfied it. That
+  is the instrument working, and it is why this attempt closes where four did not. Status CLOSED,
+  80 selftest arms, full bar 60/60.
 - rev-10 · 2026-08-16 · folded review-dClosedLexicon-6, the owner-sanctioned helper-only pass, and
   the unit REOPENS. The two rev-9 fixes are correct — each verified by revert — but incomplete, and
   one of them REGRESSED. Verified here: `from <pkg> import <name>` resolves to nothing (the parser

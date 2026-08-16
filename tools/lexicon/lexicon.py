@@ -44,30 +44,31 @@ implementation could not see and no path-shaped fixture would have caught. Those
 `selftest.py`. The general question is `memory/gotchas/armed-but-unreachable-rule.md`, and it is a
 REVIEW question: no predicate here can decide reachability for a rule type it has never seen.
 
-*** P3 IS NOT FIT TO RELY ON. DO NOT TRUST A ZERO LAYER PIN. ***
+HOW IMPORT RESOLUTION WORKS, and why it is shaped this way. Four review rounds each found a blocker
+here, so the rules are written down rather than left to be re-derived:
 
-FOUR adversarial rounds, a blocker in every one, all of them in `_glob_match` or `resolve_import`.
-The most recent round found that the previous round's fix INTRODUCED two regressions while leaving
-the commonest crossing spelling unhandled. All three are verified and open:
+  LANGUAGE FIRST      the importer's extension decides what a dot MEANS. An earlier cut branched on
+                      `"." in target`, a Python namespace rule, and applied it to JavaScript.
+  RELATIVE            `./` and `../` resolve against the importer's directory; in Python a LEADING
+                      DOT is relative-to-package and `node.level` carries the depth. Escaping the
+                      repo root yields NOTHING — clamping it back in can fabricate a crossing.
+  DOTTED (python)     names its package from the root, so the importer's directory gets no
+                      precedence — but a candidate must be PATH-CONSISTENT with the dots, or the
+                      stem lookup degenerates into "any file with this basename" and third-party
+                      imports red as crossings.
+  BARE (python)       the flat `sys.path`-insert shape, and the only one where the importer's own
+                      directory legitimately wins.
+  EVERY OTHER LANG    a bare specifier is a package PATH; its dots are part of a name.
 
-  1. `from <pkg> import <name>` resolves to NOTHING. The parser records only `node.module`, so the
-     imported NAME is discarded and only the last dotted segment is looked up as a file stem. This
-     is the commonest Python crossing spelling and P3 cannot see it.
-  2. A dotted target gets NO directory scoping, so `concurrent.helper` and `thirdparty.helper` —
-     imports touching nothing in this repo — resolve onto any same-stem file and RED as crossings.
-     A false positive whose only escape is a waiver that then permanently silences the genuine
-     violation it hides. Measured False before the last fix, True after.
-  3. `"." in target` is a PYTHON namespace rule applied to every language, so a JS `lodash.debounce`
-     loses importer-local precedence the same way.
+Candidates are matched at PATH BOUNDARIES throughout. A bare `startswith` was the same defect class
+the glob anchoring removed, living on in the sibling helper.
 
-Also open: a boundary-free `startswith` in the relative branch — the exact class the glob anchoring
-removed, alive in the sibling helper — and `**` collapsing to `[^/]*[^/]*`, so `<dir>/**` selects
-strictly LESS than `<dir>/*`.
-
-P1, P2 and `tools/check-placeholders.sh` are unaffected: no round has implicated them, and P1 has
-now caught its own author four times. The CASE TABLES in `selftest.py` are the right instrument and
-they hold — every fix above was verified by reverting it and watching a named row red. What they
-cannot supply is a design for import resolution, which is what this predicate actually needs.
+THE CASE TABLES IN `selftest.py` ARE THE INSTRUMENT. Every defect in this file's history lived in
+`_glob_match` or `resolve_import` and NONE was visible to an end-to-end fixture — reverting one fix
+verbatim once left all 48 fixture arms green while the live gate stayed at exit 0. Each fix is
+verified by reverting it and watching a NAMED row red; three rows that did not do so were rewritten
+or relabelled, and one row's stated property is documented as weaker than its neighbour's. When
+extending either function, add rows FIRST.
 """
 
 import re
@@ -152,8 +153,19 @@ def _python_defs(src: str):
         elif isinstance(node, ast.Import):
             imports.extend((a.name, node.lineno) for a in node.names)
         elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                imports.append((node.module, node.lineno))
+            # `from a.b import c` touches BOTH `a.b` and `a.b.c`, and `c` may itself be a module.
+            # Keeping only `node.module` discarded the imported NAME, which made the commonest
+            # crossing spelling in Python invisible to P3. `node.level` carries the leading dots of
+            # a relative import and is preserved here rather than silently flattened.
+            dots = "." * (node.level or 0)
+            mod = node.module or ""
+            if dots or mod:
+                imports.append((dots + mod, node.lineno))
+            for a in node.names:
+                if a.name == "*":
+                    continue
+                sep = "." if mod else ""
+                imports.append((dots + mod + sep + a.name, node.lineno))
     return funcs, types_, imports
 
 
@@ -200,8 +212,30 @@ def _build_glob_rx(pattern: str) -> str:
     """Glob -> regex source. ONE spelling of the conversion, because there were two and they
     disagreed: the nesting branch below escaped the RAW pattern, so any wildcard EARLIER in it
     became a literal asterisk and nesting silently stopped matching below depth 1. Measured, under
-    `apps/*/internal/*`: the identical import red at depth 1 and passed GREEN at depth 2."""
-    return re.escape(pattern).replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
+    `apps/*/internal/*`: the identical import red at depth 1 and passed GREEN at depth 2.
+
+    THE DIALECT, stated because it is a choice and not a standard: `*` matches within one segment,
+    `**` crosses segments, `?` is exactly one non-separator character. `**` is substituted FIRST —
+    left to the single-star rule it collapsed to `[^/]*[^/]*`, so `<dir>/**` selected strictly LESS
+    than `<dir>/*`, which is the opposite of what every reader expects.
+    """
+    out = re.escape(pattern).replace(r"\*\*", "\x00")
+    out = out.replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
+    return out.replace("\x00", ".*")
+
+
+def _check_path_suffix(path: str, suffix: str) -> bool:
+    """Does `path`, minus its extension, end with `suffix` AT A PATH BOUNDARY?
+
+    This is what makes a dotted import target mean something. Without it, `concurrent.helper` and
+    `thirdparty.helper` — imports touching nothing in the repo — resolved onto any file whose stem
+    happened to be `helper` and RED as layer crossings. A false positive there is worse than the
+    false negative it replaced: the only escape is a waiver, and that waiver then permanently
+    silences the genuine violation it is hiding.
+    """
+    base = path.rsplit("/", 1)[-1]
+    stem_path = path[: -(len(base) - base.rfind("."))] if "." in base else path
+    return stem_path == suffix or stem_path.endswith("/" + suffix)
 
 
 def _glob_match(path: str, pattern: str) -> bool:
@@ -241,59 +275,77 @@ def build_module_index(files: list[str]) -> dict[str, list[str]]:
     return index
 
 
+def _resolve_relative(spec: str, here: str, index, ext: str) -> list[str]:
+    """A `./`-or-`../` specifier against the importer's directory. `[]` means it escapes the repo.
+
+    ESCAPING IS EXTERNAL, NOT CLAMPED. The first cut silently ignored a `..` with nothing left to
+    pop, so `../../../outside/thing.js` landed back inside the tree and could FABRICATE a crossing
+    against a path the import never names.
+    """
+    stack: list[str] = [p for p in here.split("/") if p]
+    for part in [p for p in spec.split("/") if p not in ("", ".")]:
+        if part == "..":
+            if not stack:
+                return []
+            stack.pop()
+        else:
+            stack.append(part)
+    cand = "/".join(stack)
+    out = [cand]
+    # BOUNDARY, not prefix: a bare `startswith` is the same defect the glob anchoring removed, and
+    # it let `../shared/thing` resolve onto `web/shared/thingamajig.js`.
+    out.extend(p for p in index.get(cand.rsplit("/", 1)[-1], [])
+               if ext_of(p) == ext and _check_path_suffix(p, cand))
+    return out
+
+
 def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> list[str]:
     """Candidate repo paths an import target may denote. Empty means EXTERNAL or unresolvable, which
-    is not a violation — a rule can only forbid what it can locate."""
-    out: list[str] = []
+    is not a violation — a rule can only forbid what it can locate.
+
+    LANGUAGE-AWARE, and that is the correction. An earlier cut branched on `"." in target`, which is
+    a PYTHON namespace rule: it treated the JS package specifier `lodash.debounce` as a dotted module
+    path and stripped its importer-local precedence. A dot means different things in different
+    languages and the importer's extension is what says which.
+    """
     here = importer.rsplit("/", 1)[0] if "/" in importer else ""
-
-    # A relative JS/TS specifier resolves against the IMPORTER's directory. Swapping dots for
-    # slashes mangles these into `///adapters/db` and matches nothing.
-    if target.startswith("."):
-        parts = [p for p in (here + "/" + target).split("/") if p not in ("", ".")]
-        stack: list[str] = []
-        for p in parts:
-            if p == "..":
-                if stack:
-                    stack.pop()
-            else:
-                stack.append(p)
-        cand = "/".join(stack)
-        out.append(cand)
-        out.extend(p for p in index.get(cand.rsplit("/", 1)[-1], []) if p.startswith(cand))
-        return out
-
-    # A dotted namespace MAY mirror a path; keep that reading, it is right when packages mirror dirs.
-    out.append(target.replace(".", "/"))
-
-    # And resolve the LAST segment as a module stem against the corpus. This is what catches the
-    # flat `sys.path`-insert import — the commonest shape in this tree and in every kit here — where
-    # the target is a bare name that shares no characters with its own directory.
-    #
-    # SCOPED TWO WAYS, because an unscoped stem lookup returns every tracked file sharing a
-    # basename and reds a perfectly local import as a layer crossing. Measured in this tree:
-    # `selftest`, `kit` and `README` each name files in several kits, so an unscoped lookup made a
-    # stdlib or sibling import resolve into a forbidden directory it never touches, and the only
-    # escape would be a waiver that then permanently silences the genuine violation it was hiding.
-    #
-    #   1. SAME EXTENSION as the importer. A `.py` import never denotes a `.md` or a `.toml`.
-    #   2. IMPORTER-LOCAL WINS. If the importer's own directory holds a file with that stem, that is
-    #      what the import resolves to, and no other candidate is offered — which is what the
-    #      language itself does.
     ext = ext_of(importer)
-    hits = [p for p in index.get(target.rsplit(".", 1)[-1], []) if ext_of(p) == ext]
 
-    # Importer-local precedence applies ONLY to a BARE target. A fully-qualified dotted import names
-    # its own package from the root, and the language grants the importer's directory no precedence
-    # over it — so preferring a same-stem local sibling there MISSES the genuine crossing. Measured:
-    # `import pkg.shared_core.helper` from `src/pkg/consumer/a.py`, with a `helper.py` sibling,
-    # resolved to the sibling alone and the offender vanished. That is the unfalsifiable zero
-    # returning by a different door.
-    if "." in target:
-        out.extend(hits)
-    else:
+    if target.startswith("./") or target.startswith("../"):
+        return _resolve_relative(target, here, index, ext)
+
+    if ext == "py":
+        # A leading dot is a RELATIVE package import: one dot is this package, each extra dot walks
+        # up one. `node.level` is preserved by the extractor precisely so this is decidable.
+        if target.startswith("."):
+            level = len(target) - len(target.lstrip("."))
+            rest = target[level:].replace(".", "/")
+            up = "../" * (level - 1)
+            return _resolve_relative("./" + up + rest, here, index, ext)
+
+        if "." in target:
+            # A dotted target names its own package FROM THE ROOT, so the importer's directory gets
+            # no precedence — but the candidate must be PATH-CONSISTENT with the dots, or the stem
+            # lookup degenerates into "any file with this basename".
+            dotted = target.replace(".", "/")
+            out = [dotted]
+            out.extend(p for p in index.get(target.rsplit(".", 1)[-1], [])
+                       if ext_of(p) == ext and _check_path_suffix(p, dotted))
+            return out
+
+        # A BARE name is the flat `sys.path`-insert shape — the commonest one in this tree, and the
+        # only one where the importer's own directory legitimately wins.
+        hits = [p for p in index.get(target, []) if ext_of(p) == ext]
         local = [p for p in hits if (p.rsplit("/", 1)[0] if "/" in p else "") == here]
-        out.extend(local or hits)
+        return local or hits
+
+    # Every other language: a bare specifier is a PACKAGE PATH, and its dots are part of a name
+    # rather than separators. Resolve it as a path and by its final segment's stem; anything that
+    # denotes nothing tracked is external, which is not a violation.
+    out = [target]
+    tail = target.rsplit("/", 1)[-1]
+    stem = tail.rsplit(".", 1)[0] if "." in tail else tail
+    out.extend(p for p in index.get(stem, []) if ext_of(p) == ext and _check_path_suffix(p, target))
     return out
 
 
