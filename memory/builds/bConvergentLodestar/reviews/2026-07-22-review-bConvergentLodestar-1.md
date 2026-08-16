@@ -1,5 +1,7 @@
 # Adversarial review — TOOL-bConvergentLodestar-1 (rev-1)
 
+**Serves:** spec-audit TOOL-bConvergentLodestar-1
+
 **Reviewed:** 2026-07-22 · node b · 4 lenses (convergence-efficacy · portability · soundness ·
 production-scope) + skeptic verify · `wf_69de6d2e-926`. 33 findings; skeptic verdicts: 5 blockers
 CONFIRMED (+1 blocker design-judgment, accepted), ~15 majors CONFIRMED, 1 major REFUTED (stale), rest

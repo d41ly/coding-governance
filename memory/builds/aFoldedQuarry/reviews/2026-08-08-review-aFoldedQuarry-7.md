@@ -1,5 +1,7 @@
 # Review 7 — closing adversarial pass over the whole build diff
 
+**Serves:** diff-review TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7  <!-- inferred: closing pass over the whole build diff -->
+
 **Scope:** `42c3f4dc..HEAD` — 140 files, +6404 / -584, six units.
 **Method:** the build's own tool first. `python tools/memory-tree/gotchas.py --for-diff 42c3f4dc..HEAD`
 selected six anchored classes plus three universal ones out of nine, and each was walked against the

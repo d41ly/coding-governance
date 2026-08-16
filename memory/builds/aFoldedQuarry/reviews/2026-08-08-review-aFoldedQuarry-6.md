@@ -1,5 +1,7 @@
 # Review 6 — adversarial pass over the U5 harness meta-gate
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-7  <!-- inferred: U5, the harness meta-gate, per the build README's unit table -->
+
 **Scope:** `tools/memory-tree/check-arms.py` as implemented, plus the arms added to
 `tools/memory-tree/check-memory-hygiene.test.sh`.
 **Order note:** this unit was built before its spec was written, because the design is a function of

@@ -1,5 +1,7 @@
 # Review 5 — adversarial pass over the U4 gotchas sub-spec
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-6  <!-- inferred: U4, the gotchas sub-spec, per the build README's unit table -->
+
 **Scope:** `spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md` at rev-1, before any code.
 **Method:** the catalogue's whole subject is gates that look green and are not, so the question is
 what makes THIS unit look green and not be.

@@ -1,5 +1,7 @@
 # Closing review — aMendedLedger, `663ca42..bde0de8`
 
+**Serves:** diff-review TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8  <!-- inferred: closing review over a commit range, not a spec -->
+
 - **subject** — seven build commits (`dc5ae99` U1 … `bde0de8` U7) plus two spec commits, 59 files,
   +7418/-182: the journals relocate into their builds, the per-node session ledger retires to
   `memory/archive/ledger/`, the hygiene kit moves to 1.8, a **row-keyed three-way merge driver** is

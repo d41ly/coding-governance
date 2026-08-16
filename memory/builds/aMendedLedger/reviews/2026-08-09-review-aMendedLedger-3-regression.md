@@ -1,5 +1,7 @@
 # Regression check — aMendedLedger round 3, `1a22f1d..HEAD`
 
+**Serves:** diff-review TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8  <!-- inferred: regression check over a commit range -->
+
 - **subject** — one commit (`68b90fe`, "round 3 — the driver stops being worse than the merge it
   replaces"), 10 files, +658/-94. The engine change is `tools/memory-tree/merge-rows.py`: `lead()`'s
   lead-in dedup narrows from file-wide to adjacency-scoped, `census()` narrows from every non-blank

@@ -1,5 +1,7 @@
 # TOOL-aQuarriedLantern — build ledger
 
+**Serves:** journal TOOL-aQuarriedLantern-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 One entry per build unit. Every number below came from a command run in-session, not from the spec.
 
 ## U1 — `tools/memory-recall/` — the kit itself

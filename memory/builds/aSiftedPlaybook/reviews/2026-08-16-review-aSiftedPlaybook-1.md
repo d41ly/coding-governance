@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook spec set (M4 spec audit)
 
+**Serves:** spec-audit PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3  <!-- inferred: M4 pass over the whole spec set -->
+
 ## Verdict: CLEAN WITH FIXES
 
 **This review is INCOMPLETE and must not be read as a clean adversarial pass.** The workflow

@@ -1,5 +1,7 @@
 # TOOL-aMouldedFolio-3 — the three follow-up units: control transcripts and AC evidence
 
+**Serves:** journal TOOL-aMouldedFolio-3
+
 *2026-08-16 · node a · the build record for units 3, 4 and 5, landed across `1edceeb`, `de4611c`,
 `4981193`, `826b133` and the post-review fix pass.*
 

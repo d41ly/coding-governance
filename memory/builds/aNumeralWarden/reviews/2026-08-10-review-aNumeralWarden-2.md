@@ -1,5 +1,7 @@
 # Review 2 — scoped Tier-2 pass over S14 of TOOL-aNumeralWarden-1 at rev-3
 
+**Serves:** spec-audit TOOL-aNumeralWarden-1
+
 **Scope: S14 ONLY.** This review reads exactly one scope item — S14, the `Agent`-matcher modality
 refusal folded into the spec on 2026-08-10 when the consuming build's owner ratified its F2 as a
 FOLD — plus every section of the spec that S14 falsifies, contradicts, or leaves uncovered (§1, §3,

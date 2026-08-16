@@ -1,5 +1,7 @@
 # Adversarial review — aMendedLedger U9, the driver redesign, `a851e85..e03ac48`
 
+**Serves:** diff-review TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8  <!-- inferred: U9 driver redesign over a commit range -->
+
 - **subject** — one commit (`e03ac48`, "the merge driver stops guessing at structure — two planes,
   kit 2.0"), 15 files, +1599/-663. `tools/memory-tree/merge-rows.py` is rewritten around a two-plane
   skeleton pipeline; `merge-rows.test.sh` is rebuilt on a never-worse-than-`git merge-file` bar;

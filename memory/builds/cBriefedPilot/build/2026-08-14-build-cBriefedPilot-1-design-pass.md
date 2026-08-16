@@ -1,5 +1,7 @@
 # Design pass 1 — the directive layer, panelled and folded
 
+**Serves:** none — a design pass that PRECEDES and produced this build's spec set
+
 A nine-agent `Workflow`: three independent design candidates (minimal-mechanism, checkability-first,
 agent-read-path), one judge synthesis under M3's ratification rule, four adversarial lenses
 (contradiction, forgeability, drift, decomposition), one folding pass. 51 raw findings; 47 folded,

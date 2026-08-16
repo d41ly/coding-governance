@@ -1,5 +1,7 @@
 # Build journal — TOOL-aFoldedQuarry
 
+**Serves:** journal TOOL-aFoldedQuarry-2
+
 Node `a` · branch `branch/port-ledger-ttrove-governance-8b6ea4` · base `42c3f4dc`.
 One section per unit, appended as it lands.
 

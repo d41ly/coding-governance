@@ -3,6 +3,8 @@
      in the tree rather than a scratchpad because a session that did not run those rounds
      cannot rebuild it. Assembled 2026-08-10 from the three reports under ../reviews/. -->
 
+**Serves:** journal TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8  <!-- inferred: the merge driver's reproduction corpus, evidence across the build -->
+
 # Reproduction corpus — row-keyed merge driver (`tools/memory-tree/merge-rows.py`)
 
 Acceptance suite for the redesign. Every case below was reproduced by execution in one of three

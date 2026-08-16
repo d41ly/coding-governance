@@ -1,5 +1,7 @@
 # Review 1 — Tier-2 pass over both aSealedCaravan specs
 
+**Serves:** spec-audit TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+
 **Targets:** `memory/builds/aSealedCaravan/spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md` and
 `memory/builds/aSealedCaravan/spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md`, both at rev-1, both
 grounded on base `16aeb5ef`, before any code.

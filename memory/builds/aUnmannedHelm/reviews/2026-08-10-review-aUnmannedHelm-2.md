@@ -1,5 +1,7 @@
 # Review 2 — Tier-2 adversarial pass over the built unattended-run kit
 
+**Serves:** diff-review TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9  <!-- inferred: pass over the BUILT kit, not its specs -->
+
 **Scope:** all seven units of the aUnmannedHelm build as built on `branch/aunmannedhelm-build-setup-38f3a9`
 (43 files, +4058/−61), tip `f1ad6e9`. Code, gate leg, protocol pair, adopter, rendered Skill, kickoff
 Step 5b, and the four new test scripts.

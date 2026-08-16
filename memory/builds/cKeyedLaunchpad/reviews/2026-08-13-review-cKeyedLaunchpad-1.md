@@ -1,3 +1,5 @@
+**Serves:** spec-audit KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-6
+
 ## Verdict: BLOCKED
 
 **Target:** the full seven-spec set under `memory/builds/cKeyedLaunchpad/spec/`, all rev-1, all

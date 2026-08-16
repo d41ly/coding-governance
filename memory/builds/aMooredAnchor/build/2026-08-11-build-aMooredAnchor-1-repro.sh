@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aMooredAnchor-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
 # Reproduction harness for the residual half of D3 (unattended BASE anchor).
 # Fixture mirrors check-unattended.test.sh exactly, then runs four defeats, each with a control.
 set -u

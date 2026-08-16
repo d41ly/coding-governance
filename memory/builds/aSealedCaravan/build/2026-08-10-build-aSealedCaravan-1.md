@@ -1,5 +1,7 @@
 # TOOL-aSealedCaravan-1 — build record
 
+**Serves:** journal TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2
+
 **Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling
 
 ## 1. Goal

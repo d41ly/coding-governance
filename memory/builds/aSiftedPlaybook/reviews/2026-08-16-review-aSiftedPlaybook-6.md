@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook, round 6 (M8 closing review)
 
+**Serves:** diff-review PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-2
+
 ## Verdict: BLOCKED
 
 *Synthesis pass over the cumulative `0f0a121..HEAD` diff (36 files, +1726/-142), HEAD `262d07e`.

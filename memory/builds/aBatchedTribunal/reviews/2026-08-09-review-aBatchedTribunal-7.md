@@ -1,5 +1,7 @@
 # Tier-2 review — W4, the four rows the closing review left open
 
+**Serves:** diff-review TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8  <!-- inferred: scoped to W4, the rows the closing review left open; that build's whole spec-defined set -->
+
 - **subject** — `9b0f42f fix(tools): W4 — the four rows the closing review left open` (one commit,
   22 files, +721/-40), closing four backlog rows: the memory-recall BUILD MARKER, the
   `KIT_MEMORY_TREE_VERSION` 1.5 → 1.6 epoch gate, the `corpus_ids.py` STRUCTURAL reachability arm,

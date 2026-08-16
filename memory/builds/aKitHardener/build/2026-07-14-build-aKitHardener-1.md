@@ -1,5 +1,7 @@
 # govkit Phase 0 — kit hardening (build report)
 
+**Serves:** journal DEPL-aKitHardener-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 *2026-07-14 · DEPL-aKitHardener · node `a` · branch `main`, BASE `c78958c`. Tier 2. Spec:
 [../spec/2026-07-14-spec-aKitHardener-1.md](../spec/2026-07-14-spec-aKitHardener-1.md).*
 

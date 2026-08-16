@@ -1,5 +1,7 @@
 # Pre-code review — TOOL-aBatchedLintel (port the check-12/check-7 fork collapse into memory-tree)
 
+**Serves:** spec-audit TOOL-aBatchedLintel-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Reviewed:** `memory/tooling/builds/2026-08-03-TOOL-aBatchedLintel/spec/2026-08-03-spec-aBatchedLintel-1.md`
 **Base:** `e8d046cc` (coding-governance, clean tree) · upstream source `C:/projects/incms/main` at `7e169b796`
 **Verdict:** ready after the edits below — plus one hard precondition (next section)

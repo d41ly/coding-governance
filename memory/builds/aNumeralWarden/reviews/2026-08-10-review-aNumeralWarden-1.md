@@ -1,5 +1,7 @@
 # Review 1 — Tier-2 adversarial pass over TOOL-aNumeralWarden-1 at rev-1
 
+**Serves:** spec-audit TOOL-aNumeralWarden-1
+
 **Scope:** `spec/2026-08-10-spec-aNumeralWarden-1.md` at rev-1, before any code, at base
 `289daf72`.
 **Method:** four primed lenses — does the fix close the hole, is the cut-line right, are the

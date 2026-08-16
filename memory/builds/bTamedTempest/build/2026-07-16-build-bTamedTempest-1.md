@@ -1,5 +1,7 @@
 # Build summary — TOOL-bTamedTempest-1 (pytest-parallel-guardrails kit 1.0)
 
+**Serves:** journal TOOL-bTamedTempest-1
+
 Landed `c2f608e7` (direct commit on `main`, node b). Spec CLOSED at rev-2.
 
 ## What shipped vs spec

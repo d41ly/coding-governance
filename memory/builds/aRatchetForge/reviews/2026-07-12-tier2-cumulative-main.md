@@ -1,5 +1,7 @@
 # Tier-2 Review — Cumulative Diff Landing on main
 
+**Serves:** diff-review KICK-aRatchetForge-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 - **Date:** 2026-07-12
 - **Scope:** `a9e8744..04dc139` — manifest-ratchet spec + Units A–E (manifest-check gate C1–C6/C5s, 38-scenario suite, manifest template v1.1, engine Step 2b read-repair, playbook v2.2, wire docs)
 - **Findings:** 0 blockers · 0 high · 0 medium · 3 low

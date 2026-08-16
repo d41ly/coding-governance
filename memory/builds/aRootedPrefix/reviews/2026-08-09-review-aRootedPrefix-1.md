@@ -1,5 +1,7 @@
 # TOOL-aRootedPrefix-1 — Tier-2 review: codebase-map at any install prefix
 
+**Serves:** spec-audit TOOL-aRootedPrefix-1
+
 **Status:** REVIEWED · rev-1 · 2026-08-09 · node a · Tier-2 · streams tooling
 **Under review:** `1d8097a` (the kit is correct at any install prefix) + `63e2643`
 (TOOL-aRootedPrefix-2 — every printed path resolves), against base `663ca42`.

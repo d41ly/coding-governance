@@ -1,5 +1,7 @@
 # Review aTimedTurnstile-1 — Tier-2 on TOOL-aTimedTurnstile-5, the merge bar's bounded worker pool
 
+**Serves:** spec-audit TOOL-aTimedTurnstile-5
+
 **Date:** 2026-08-11 · **Tier:** 2 · **Streams:** tooling · **Base:** `f638d8b` → `b1baf71`
 **Targets:** `tools/run-gates.sh` (+142/−27) · `tools/run-gates.test.sh` (+110)
 **Question asked:** does the bar still report exactly what it checks, now that 47 legs run through a

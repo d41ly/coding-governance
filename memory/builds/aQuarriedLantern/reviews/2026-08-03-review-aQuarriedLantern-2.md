@@ -1,5 +1,7 @@
 # Closing review — TOOL-aQuarriedLantern (memory-recall port)
 
+**Serves:** diff-review TOOL-aQuarriedLantern-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Scope:** the cumulative diff landing on `main` for the memory-recall port — U1 (kit), U2 (invocation
 surfaces), U3 (registrations) — 33 files, +5581/-40.
 **Base:** 9368d1e8 · **Head:** 20f2337 (`f564109` spec, `aedf8e3` U1, `3e427de` manifest re-stamp,

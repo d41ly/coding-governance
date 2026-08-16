@@ -1,5 +1,7 @@
 # review-aStandingWrit-2 — Tier-2 over the cumulative diff landing on main
 
+**Serves:** diff-review TOOL-aStandingWrit-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Subject:** `a21a150..HEAD` — 18 files, +636/-285. The six commits that build S1+S2+S3 (the build
 folder IS the authorization), S7 (every statement of the rule follows the rule), S6 (the phase
 vocabulary gets pass names and a producer), S4 (the gap list, mechanised from M2) and the closing

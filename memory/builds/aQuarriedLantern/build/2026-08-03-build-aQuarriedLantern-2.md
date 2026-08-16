@@ -1,5 +1,7 @@
 # TOOL-aQuarriedLantern — closing-review fixes, group G1 (the adoption surface)
 
+**Serves:** journal TOOL-aQuarriedLantern-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 Items F1 (blocker), F2, F5, F6, F8 from
 `memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/reviews/2026-08-03-review-aQuarriedLantern-2.md`.
 Every number below came from a command run in-session.

@@ -1,5 +1,7 @@
 # Review 4 — adversarial pass over the U3 corpus-ids sub-spec
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-5  <!-- inferred: U3, the corpus-ids sub-spec, per the build README's unit table -->
+
 **Scope:** `spec/units/2026-08-08-spec-aFoldedQuarry-5-u3-corpus-ids.md` at rev-1, before any code.
 **Method:** ask of each rule "what makes this permanently red, or permanently green, on a tree that
 is behaving correctly?" Two findings are that shape and one is a cross-kit dependency the spec did

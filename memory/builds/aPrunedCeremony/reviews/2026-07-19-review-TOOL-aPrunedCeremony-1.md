@@ -1,5 +1,7 @@
 # Pre-code build-readiness review — aPrunedCeremony (wf_539c5419)
 
+**Serves:** spec-audit PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2  <!-- inferred: pre-code build-readiness review over the set -->
+
 **Status:** pre-code review · 2026-07-19 · 3 code/new-scope specs (PLAY-4, TOOL-1, TOOL-2) × review →
 skeptic · 8 raw, 7 confirmed (2 HIGH, 4 MED, 1 LOW), all folded before any code was written.
 

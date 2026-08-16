@@ -1,5 +1,7 @@
 # Design pass 1 — the enforcement layer, mis-aimed and kept
 
+**Serves:** none — a design pass the build README grades REJECTED for scope; it warranted no spec and none was minted
+
 **What this pass was aimed at:** proving that an unattended run did not tamper with its own
 instructions. It produced a provenance-and-evidence system.
 

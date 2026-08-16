@@ -1,5 +1,7 @@
 # Review 1 — adversarial pass over the master spec and the U6 sub-spec
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2  <!-- inferred: the master spec plus the U6 sub-spec, resolved through the build README's unit table -->
+
 **Scope:** `spec/2026-08-08-spec-aFoldedQuarry-1.md` and
 `spec/units/2026-08-08-spec-aFoldedQuarry-2-u6-indexed-join.md`, both at rev-1, before any code.
 **Method:** read each claim as a hostile reader would, then RUN the ones that make a claim about a

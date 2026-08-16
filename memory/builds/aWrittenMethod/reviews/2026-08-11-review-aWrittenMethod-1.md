@@ -1,5 +1,7 @@
 # Review aWrittenMethod-1 — Tier-2 on the cumulative diff landing on main
 
+**Serves:** diff-review TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6  <!-- inferred: cumulative diff landing on the default branch -->
+
 **Date:** 2026-08-11 · **Tier:** 2 · **Streams:** tooling, playbook
 **Subject:** `git diff main...HEAD` @ `5ed9b4b` — 31 files, +1739/-40. The build-method document
 (`tools/memory-tree/BUILD-METHOD.template.md` + its rendered `memory/guides/BUILD-METHOD.md`), the

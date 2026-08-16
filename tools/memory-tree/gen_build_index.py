@@ -323,7 +323,13 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             mo = BIND_RE.match(line)
             if not mo:
                 continue
-            rest = mo.group("rest")
+            # A trailing HTML comment is a NOTE, not a token. The retrofit records the adjudication
+            # rule that produced an inferred binding on the line itself, so a reviewer grades it in
+            # the file rather than in a commit body no gate reads — and without this the note's
+            # every word parsed as a malformed id.
+            rest = mo.group("rest").split("<!--", 1)[0].strip()
+            if not rest:
+                continue
             if mo.group("key") == "Commissions":
                 cids, bad = _expand_ids(rest, alt)
                 rec["commissions"] = cids
@@ -1106,6 +1112,11 @@ def do_selftest() -> int:
         r10 = _rec("memory/builds/tOne/reviews/r10.md", "# t\n\n**Serves:** journal TOOL-tOne-x\n")
         arm("a malformed id token is reported, not silently dropped", "TOOL-tOne-x",
             lambda: str(_bind(r10)["bad"]))
+
+        r11 = _rec("memory/builds/tOne/reviews/r11.md",
+                   "# t\n\n**Serves:** journal TOOL-tOne-1  <!-- inferred: single-spec build -->\n")
+        arm("a trailing comment is a note, not a token", "['TOOL-tOne-1']", lambda: str(_bind(r11)["ids"]))
+        arm("a trailing comment contributes no malformed token", "[]", lambda: str(_bind(r11)["bad"]))
 
         _rec("memory/builds/tOne/spec/s.md", "# TOOL-tOne-1 — the unit\n")
         _rec("memory/builds/tOne/spec/units/s2.md", "# PLAY-tTwo-9 — nested, any depth\n")

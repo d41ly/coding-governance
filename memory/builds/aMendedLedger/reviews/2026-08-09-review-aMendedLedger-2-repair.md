@@ -1,5 +1,7 @@
 # Re-review — aMendedLedger repair, `bde0de8..HEAD`
 
+**Serves:** diff-review TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8  <!-- inferred: re-review of the repair, over a commit range -->
+
 - **subject** — one commit (`f0335c9`), 8 files: `rows()` splits lead-in from anchor, `%B`-only keys
   splice instead of append, a `no_new_duplicates()` postcondition arms every clean verdict,
   `check-wiring.sh` runs a smoke three-way before printing `ok`, the drift selftest gains its second

@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook spec set, round 3 (M4 spec audit)
 
+**Serves:** spec-audit PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
+
 ## Verdict: BLOCKED
 
 *Workflow `wf_bcdc00bc-ef1`, scoped to the `4b38e39..HEAD` delta. Four lenses -> three batched skeptics -> one synthesis; all 8 agents completed. **60 raw, 46 confirmed, 14 refuted, 0 unverified.** Per lens: new-material 14, factual 14, cross-unit 16, premise 16.*

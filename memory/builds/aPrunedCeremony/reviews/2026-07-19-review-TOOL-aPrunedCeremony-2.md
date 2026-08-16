@@ -1,5 +1,7 @@
 # Closing adversarial review — full aPrunedCeremony build diff (wf_3c0f6fa3)
 
+**Serves:** diff-review PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2  <!-- inferred: closing pass over the full build diff -->
+
 **Status:** closing review · 729a1ee3..HEAD · 2026-07-19 · 3 lenses (enforce/runner/integration) →
 skeptic · 5 raw, 5 confirmed (0 HIGH, 3 MED, 2 LOW). The enforcement model held (no red-slip, no
 code-as-non-main mis-classification, no manifest green-by-absence on the committed manifest). Folds:

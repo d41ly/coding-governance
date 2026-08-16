@@ -1,5 +1,7 @@
 # TOOL-aMooredAnchor-1 — reproduction transcript, the anchor defeats
 
+**Serves:** journal TOOL-aMooredAnchor-1
+
 Ran 2026-08-11 at base `af6de23`, before the spec was written. Harness:
 `2026-08-11-build-aMooredAnchor-1-repro.sh`, invoked as
 `bash <harness> "$(pwd)/tools/unattended"`. It builds the same scratch fixture

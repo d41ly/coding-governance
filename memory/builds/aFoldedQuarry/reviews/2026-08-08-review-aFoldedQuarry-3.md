@@ -1,5 +1,7 @@
 # Review 3 — adversarial pass over the U2 build-index sub-spec
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-4  <!-- inferred: U2, the build-index sub-spec, per the build README's unit table -->
+
 **Scope:** `spec/units/2026-08-08-spec-aFoldedQuarry-4-u2-build-index.md` at rev-1, before any code.
 **Method:** walk the generator's inputs against the CORPUS THAT EXISTS, not the corpus the design
 assumes. Three of the six findings come from a build folder in this repo that the design would have

@@ -1,5 +1,7 @@
 # aPrunedCeremony build log
 
+**Serves:** journal PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2  <!-- inferred: the build log for the whole build -->
+
 Build of the 6 aPrunedCeremony specs into `coding-governance`, worktree
 `C:\projects\coding-governance-pc` on `feature/pruned-ceremony-build-a` off `729a1ee3`, node `a`.
 Unattended, owner-authorized 2026-07-19. Merge+push only when fully done.

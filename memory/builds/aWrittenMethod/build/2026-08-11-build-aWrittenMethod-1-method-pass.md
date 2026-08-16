@@ -1,5 +1,7 @@
 # Design pass 2 — the method draft, before trimming
 
+**Serves:** journal TOOL-aWrittenMethod-1
+
 **What this is:** the draft build-method text produced by design pass 2, kept verbatim as the CONTENT
 SOURCE for `TOOL-aWrittenMethod-1` S1. The spec's job is to trim this to the S1 budget and render it;
 this file is what "trimmed to budget" is measured against, and the spec's AC0 grades the rendered

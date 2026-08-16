@@ -1,5 +1,7 @@
 # Pre-code review — TOOL-aQuarriedLantern-1 (memory-recall kit port), rev-1
 
+**Serves:** spec-audit TOOL-aQuarriedLantern-1
+
 **Reviewed:** `memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/spec/2026-08-03-spec-aQuarriedLantern-1.md`
 (483 lines, SPECCED · rev-1 · node a · Tier-2 · base 9368d1e8) — the port of the inCMS retrieval CLI
 into this repo as a copy-in kit reading `.memory-tree.conf`.

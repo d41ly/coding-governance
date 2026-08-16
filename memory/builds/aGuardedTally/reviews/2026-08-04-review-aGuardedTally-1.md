@@ -1,5 +1,7 @@
 # Closing Tier-2 review — TOOL-aGuardedTally-1 as BUILT
 
+**Serves:** diff-review TOOL-aGuardedTally-1
+
 **Review root:** `C:/projects/coding-governance` (resolved `git rev-parse --show-toplevel`)
 **Head:** `02b1af4` — *feat(memory-tree): adopt the reuse audit as spec section 10, date-gated and enforced*
 **Diff reviewed:** `c47b5d2..02b1af4` — the cumulative aGuardedTally landing (spec c47b5d2, rev-2 2f2d122, target pin 1baf679, port cab03ee, reuse-audit adoption 02b1af4)

@@ -1,5 +1,7 @@
 # review-dClosedLexicon-1 — adversarial pass over the spec at rev-2
 
+**Serves:** spec-audit TOOL-dClosedLexicon-1  <!-- inferred: its Subject line names that spec file, whose H1 defines this id -->
+
 **Subject:** `spec/2026-08-16-spec-dClosedLexicon-1.md` at rev-2 · base a9bd87d5 · node d · 2026-08-16
 
 Single-reviewer pass, not a Tier-2 multi-agent run. Nine findings, ordered by severity. Findings R7,

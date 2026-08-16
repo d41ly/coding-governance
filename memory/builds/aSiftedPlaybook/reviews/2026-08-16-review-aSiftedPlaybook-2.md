@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook spec set, round 2 (M4 spec audit)
 
+**Serves:** spec-audit PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 PLAY-aCandidStub-1 TOOL-aGuardedTally-1 PLAY-aPrunedCeremony-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-1
+
 ## Verdict: BLOCKED
 
 *Workflow `wf_98677a7a-009`, run against `4b38e39` (post owner fork-resolution). Four lenses -> three batched skeptics -> one synthesis, all 8 agents completed. **64 raw findings, 52 confirmed, 12 refuted, 0 unverified.** Per lens: factual 16, decomposition 14, premise 15, underspec 19. This is the coverage round 1 could not buy — it lost 7 of 8 agents to a usage limit and ran the underspecification lens only.*

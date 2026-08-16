@@ -1,3 +1,5 @@
+**Serves:** spec-audit TOOL-cSteadyMetronome-1
+
 ## Verdict: BLOCKED
 
 Three lenses ran over `TOOL-cSteadyMetronome-1` rev-1 (Tier-2 spec audit, M4 synthesis). 19 raw

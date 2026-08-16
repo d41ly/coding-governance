@@ -1,5 +1,7 @@
 # Review 1 — pre-code adversarial review of spec rev-1 (wf_d878c8a9-bb3)
 
+**Serves:** spec-audit TOOL-bTamedTempest-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 3 primed finder lenses (truthfulness · house-integration · portability) + 1 batched skeptic,
 boundedParallel ≤3+1. 15 raw findings → **11 confirmed, 4 refuted**. All 11 folded into spec rev-2.
 

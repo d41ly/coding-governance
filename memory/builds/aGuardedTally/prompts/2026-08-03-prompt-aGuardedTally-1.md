@@ -1,5 +1,7 @@
 # Review brief — TOOL-aGuardedTally-1 spec, pre-code adversarial pass
 
+**Serves:** research TOOL-aGuardedTally-1
+
 Target spec: `C:/projects/coding-governance/memory/tooling/builds/2026-08-03-TOOL-aGuardedTally/spec/2026-08-03-spec-aGuardedTally-1.md`
 Repo root: `C:/projects/coding-governance`. Base `57d9b54`.
 

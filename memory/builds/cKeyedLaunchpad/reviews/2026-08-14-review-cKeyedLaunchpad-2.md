@@ -1,3 +1,5 @@
+**Serves:** spec-audit KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5  <!-- inferred: verdict-bearing pass over the set -->
+
 ## Verdict: CHANGES REQUESTED
 
 **Target:** the cumulative diff landing on `main` — `main..HEAD` on

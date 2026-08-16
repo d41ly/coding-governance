@@ -1,3 +1,5 @@
+**Serves:** spec-audit DEPL-aSealedCaravan-2
+
 ## Verdict: BLOCKED
 
 **Target:** `memory/builds/aSealedCaravan/spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md`

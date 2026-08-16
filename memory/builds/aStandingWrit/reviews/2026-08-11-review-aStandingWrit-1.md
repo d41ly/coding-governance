@@ -1,5 +1,7 @@
 # review-aStandingWrit-1 — Tier-2 over the rev-1 spec
 
+**Serves:** spec-audit TOOL-aStandingWrit-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Verdict: do not build.** Five lenses, five cold-start agents, at the review protocol's cap of five
 total. Every lens returned findings; none was dead. The most severe finding is not about this spec.
 

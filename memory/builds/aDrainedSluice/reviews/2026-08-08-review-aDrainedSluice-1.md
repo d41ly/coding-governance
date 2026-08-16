@@ -1,5 +1,7 @@
 # Review 1 — adversarial pass over the wave-1 sub-specs (V1, V3, V4)
 
+**Serves:** spec-audit TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4  <!-- inferred: wave-1 labels V1/V3/V4 resolved through the build README's unit table -->
+
 **Scope:** the three sub-specs whose units change the `fail`-branch set, reviewed before any code.
 **Method:** three independent reviewers, one per spec, each told to hunt the two shapes this repo
 cares about — a gate that would be VACUOUS and a change that would make a gate PERMANENTLY RED — and

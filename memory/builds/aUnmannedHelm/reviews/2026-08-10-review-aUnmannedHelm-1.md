@@ -1,5 +1,7 @@
 # Review 1 — Tier-2 adversarial pass over the unattended-run kit spec at rev-2
 
+**Serves:** spec-audit TOOL-aUnmannedHelm-1  <!-- inferred: the kit's master spec at rev-2; the sub-specs did not yet exist at review time -->
+
 **Scope:** `memory/builds/aUnmannedHelm/spec/2026-08-10-spec-aUnmannedHelm-1.md` at rev-2, before any
 code, at base `e7ec3365`.
 **Method:** five primed lenses over the master spec and the tree it claims — does the design survive

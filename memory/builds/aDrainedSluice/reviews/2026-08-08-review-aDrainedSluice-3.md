@@ -1,5 +1,7 @@
 # Review 3 — Tier-2 pass over the landed diff (aDrainedSluice V1-V9 + aBatchedTribunal W1-W2)
 
+**Serves:** diff-review TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8  <!-- inferred: the landed diff spans two builds; both id sets named, which is why an id is family-qualified -->
+
 **Scope:** `76fcd09..HEAD` — the nine aDrainedSluice units that drained the TOOL backlog, and the
 two aBatchedTribunal units that ported inCMS's review protocol into a gate.
 

@@ -1,5 +1,7 @@
 # Review aWrittenMethod-2 — Tier-2 on the cumulative diff landing on main
 
+**Serves:** diff-review TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6  <!-- inferred: cumulative diff landing on the default branch -->
+
 **Date:** 2026-08-11 · **Tier:** 2 · **Streams:** tooling
 **Subject:** `git diff 7f614a1...HEAD` @ `d0c0485` — 25 files, +1306/-133. The unattended kit's
 authorization hardening (`unattended.sh`, `check-unattended.sh` and both test siblings), the

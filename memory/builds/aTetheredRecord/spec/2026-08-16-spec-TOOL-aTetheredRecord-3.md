@@ -85,11 +85,12 @@ citation already written against this set.)*
 | the record's build has no spec at all | the unbound form, reason citing the build README |
 | the record's work was rejected and no spec was minted | the unbound form, reason citing the disposition |
 
-Three records are expected to take the unbound form on the measured tree: one whose build shipped
-before the spec-format ratchet reached it and has no spec, one design pass whose scope the build
-README records as rejected, and one census that commissioned specs rather than serving them. The
-exact count is measured in S1, not asserted here, and it becomes the pin
-`TOOL-aTetheredRecord-4` sets.
+MEASURED after the pass: **six** records take the unbound form — a build that shipped before the
+spec-format ratchet reached it and holds no spec at all; two design passes whose scope the build
+README records as rejected or as preceding the set; two commissioning censuses that produced specs
+rather than serving them; and this build's own design-pass record. That six is the number
+`TOOL-aTetheredRecord-4` pins. An earlier draft predicted three, which is why the spec says the count
+is measured here rather than asserted in advance.
 
 ### Migration
 

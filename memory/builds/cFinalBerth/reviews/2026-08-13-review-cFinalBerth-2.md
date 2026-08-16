@@ -1,5 +1,7 @@
 # Tier-2 code review — cFinalBerth units 1 + 2 (the two terminal phases)
 
+**Serves:** diff-review TOOL-cFinalBerth-1 TOOL-cFinalBerth-2  <!-- inferred: code review of units 1 and 2 as built -->
+
 **Verdict: CHANGES REQUESTED.** No blocker. Two HIGH, three MEDIUM, one LOW.
 
 **Review shape.** Raw 13, confirmed 9, refuted 4, unverified 0, precision 0.69. The nine confirmed

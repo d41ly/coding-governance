@@ -1,5 +1,7 @@
 # TOOL-aMouldedFolio-1 — enforceable templates and generated documents: census, routes, recommendation
 
+**Serves:** none — this census PRECEDES the specs it produced; TOOL-aMouldedFolio-1 has no spec, so there is no id to serve
+
 *2026-08-11 · node a · Tier 2 design pass, stage 1 (research) · base `af6de23` · stream tooling.*
 
 *Research record for: can every load-bearing authored document be put under an ENFORCEABLE

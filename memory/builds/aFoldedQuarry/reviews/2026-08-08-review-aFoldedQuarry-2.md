@@ -1,5 +1,7 @@
 # Review 2 — adversarial pass over the U1 flatten sub-spec
 
+**Serves:** spec-audit TOOL-aFoldedQuarry-3  <!-- inferred: U1, the flatten sub-spec, per the build README's unit table -->
+
 **Scope:** `spec/units/2026-08-08-spec-aFoldedQuarry-3-u1-flatten.md` at rev-1, before any code.
 **Method:** for each check the unit retargets, ask what happens if the retarget is WRONG rather than
 absent — a path regex that stops matching prints nothing, and nothing is what a passing gate prints.

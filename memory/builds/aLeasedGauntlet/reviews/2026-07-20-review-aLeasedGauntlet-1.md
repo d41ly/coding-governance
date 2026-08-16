@@ -1,5 +1,7 @@
 # Closing adversarial review — TOOL-aLeasedGauntlet-1 (coding-governance port)
 
+**Serves:** diff-review TOOL-aLeasedGauntlet-1
+
 **Date:** 2026-07-20 · **Node:** a · **Base:** `d5ada669..HEAD` (branch `feature/leased-gauntlet-a`)
 **Harness:** shared with the inCMS closing review (2 lenses over BOTH diffs → skeptic verify); 7
 confirmed. Skeptics were told the lighter reconcile-before-gate design + block + no-lease are ratified.

@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook spec set, round 5 (M4 spec audit)
 
+**Serves:** spec-audit TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-4
+
 ## Verdict: CLEAN WITH FIXES
 
 *Synthesis pass over the `d64c388..HEAD` fold delta — the round-4 fold (`3d98e85`), the post-fold

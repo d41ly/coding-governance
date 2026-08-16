@@ -1,5 +1,7 @@
 # Review 2 — adversarial pass over the wave-2 sub-specs (V2, V5, V6, V7, V8)
 
+**Serves:** spec-audit TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9  <!-- inferred: wave-2 labels V2/V5/V6/V7/V8 resolved through the build README's unit table -->
+
 **Scope:** the five remaining sub-specs, reviewed before any code.
 **Method:** five independent reviewers, one per spec, then a skeptic per finding. **42 findings.**
 Six blockers, and every one was produced by RUNNING something — a probe on this box, a patched copy

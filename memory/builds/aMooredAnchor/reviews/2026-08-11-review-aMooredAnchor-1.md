@@ -1,5 +1,7 @@
 # Review 1 — Tier-2 adversarial pass over the aMooredAnchor spec (design, no code)
 
+**Serves:** spec-audit TOOL-aMooredAnchor-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Verdict: FOLD AND REBUILD THE SPEC.**
 
 **Scope:** `spec/2026-08-11-spec-aMooredAnchor-1.md` rev-1, its build README decision menu, and the

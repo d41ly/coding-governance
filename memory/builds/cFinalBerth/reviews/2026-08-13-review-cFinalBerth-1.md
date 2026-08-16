@@ -1,3 +1,5 @@
+**Serves:** spec-audit TOOL-cFinalBerth-1 TOOL-cFinalBerth-2  <!-- inferred: three lenses over BOTH Tier-2 specs, per the record's own opening paragraph -->
+
 ## Verdict: BLOCKED
 
 Three lenses over the two Tier-2 specs and the build README, 34 raw findings, 23 confirmed and 11

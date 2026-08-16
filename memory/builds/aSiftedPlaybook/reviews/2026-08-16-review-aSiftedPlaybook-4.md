@@ -1,5 +1,7 @@
 # Review — aSiftedPlaybook spec set, round 4 (M4 spec audit)
 
+**Serves:** spec-audit TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-3 PLAY-aCandidStub-1 TOOL-aGuardedTally-1 PLAY-aPrunedCeremony-1 PLAY-aSiftedPlaybook-4 KICK-cKeyedLaunchpad-4 TOOL-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1
+
 ## Verdict: BLOCKED
 
 *Synthesis pass over the `2c9d833..f43a48c` fold delta — the two commits that folded round 3. Four lenses -> batched skeptics -> one synthesis; **4/4 lenses live, 0 dead, 0 dead skeptic batches, 0 spurious / duplicate / conflicting verdicts**. **55 raw judged — 40 confirmed, 15 refuted, 0 unverified.** The 40 confirmed collapse to **14 findings** after merging (four lenses filed the same PLAY-3 AC7 defect independently, and three filed the same README count). Every anchor below was re-derived by this pass against the working tree at `f43a48c`; the corrections that re-verification forced are listed in Coverage.*

@@ -1,5 +1,7 @@
 # The playbook audit — the commissioning input for aSiftedPlaybook
 
+**Serves:** none — the commissioning input: it PRECEDES the spec set and warranted it
+
 *Read-only audit of the three shipped `parallel-coding-governance*.md` files at template **v2.7**,
 run 2026-08-16 against BASE `91ef1b05`. Every finding below was reproduced against source before
 inclusion; a suspected defect that could not be reproduced was dropped, and the ones that were

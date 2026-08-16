@@ -1,5 +1,7 @@
 # Review aCandidStub-1 — convergence audit of the three governance playbook files
 
+**Serves:** spec-audit PLAY-aCandidStub-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
+
 **Date:** 2026-08-10 · **Tier:** 2 · **Streams:** playbook
 **Targets:** `parallel-coding-governance.template.md` (v2.4, 32083 / 32768 B — **685 B free**) ·
 `parallel-coding-governance.customize.md` · `parallel-coding-governance.domain-rules.md`
