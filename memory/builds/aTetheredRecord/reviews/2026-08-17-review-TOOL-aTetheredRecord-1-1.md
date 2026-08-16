@@ -113,7 +113,7 @@ tree:
 
 - **The slug slot is never assigned.** Neither unit 7 S1 nor unit 4 §4:87-92 says whether it carries
   the record's housing build or the served id's build. The corpus makes this live:
-  `memory/builds/aDrainedSluice/reviews/2026-08-08-review-aDrainedSluice-3.md:1` is scoped over
+  `memory/builds/aDrainedSluice/reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md:1` is scoped over
   "aDrainedSluice V1-V9 + aBatchedTribunal W1-W2". Both answers pass check 5 (`[A-Za-z0-9]+`), and
   branch 4 reconstructs an id from that slot — so the wrong choice reds a correctly-renamed record.
 - **"The lowest id" has no total order.** `.memory-tree.conf:15` declares
@@ -125,8 +125,8 @@ tree:
   (unit 2 §4:59-68, landed as `RECORD_KIND_TOKENS`), while check 5 derives the filename's kind from the
   SUBFOLDER (`check-memory-hygiene.sh:311-312`). `spec-audit` in a filename reds twice over.
 - **No date rule.** S1 omits the mandatory `YYYY-MM-DD-` prefix. One in-scope record has no date to
-  keep: `memory/builds/aRatchetForge/build/manifest-ratchet-build-report.md`.
-- **No extension rule.** `memory/builds/aMooredAnchor/build/2026-08-11-build-aMooredAnchor-1-repro.sh`
+  keep: `memory/builds/aRatchetForge/build/2026-08-08-build-KICK-aRatchetForge-1-manifest-ratchet-build-report.md`.
+- **No extension rule.** `memory/builds/aMooredAnchor/build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh`
   is in check 21's deliberately extension-agnostic population but outside check 5's `\.md$` selector,
   so §10's "the grammar it renames INTO is the one `check 5` already enforces" is false for it.
 
@@ -257,7 +257,7 @@ mis-segmented-population report.*
   treatment (`RECORD_UNBOUND_PIN="0"` shipped with a comment naming it a policy refusal) — and drop the
   "strictest" clause from unit 6 §4.
 - **M6 — the sole `prompts/` record has no kind token that fits.**
-  `aGuardedTally/prompts/2026-08-03-prompt-aGuardedTally-1.md:1` is the brief that COMMISSIONED an
+  `aGuardedTally/prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md:1` is the brief that COMMISSIONED an
   audit; unit 3 §4:52-53's precedence classifies it `spec-audit` on its own H1, which lets a brief count
   as audit coverage in unit 5 S2's second derived line — the exact claim unit 2 §3:39-42 forbids. *Fix:*
   in unit 2 §4, state that a commissioning brief classifies `research` regardless of its H1 phrasing,

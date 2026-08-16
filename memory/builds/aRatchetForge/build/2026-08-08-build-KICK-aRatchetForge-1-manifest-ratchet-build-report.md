@@ -3,7 +3,7 @@
 **Serves:** journal KICK-aRatchetForge-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
 
 The durable record of the unattended build that implemented `manifest-ratchet-spec.md`. Companion
-to the spec (design history) and `reviews/2026-07-12-tier2-cumulative-main.md` (closing review).
+to the spec (design history) and `reviews/2026-07-12-review-KICK-aRatchetForge-1-tier2-cumulative-main.md` (closing review).
 Process per the owner's standing order: sub-spec each unit → adversarial review (≤4 concurrent
 agents) before code → ratify decisions → build → commit per step → closing adversarial review →
 merge + push only at the end.

@@ -64,7 +64,7 @@ there and in a carrier it points at is a defect THERE, so the four classificatio
 exactly as M2 spells them and their definitions stay in M2.
 
 **Read before reviewing:** `memory/guides/UNATTENDED-PROTOCOL.md` (binding, and this build amends
-it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`, whose three
+it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`, whose three
 reproduced blockers are the reason the current authorization is shaped the way it is. A review of
 this build that does not re-derive those three attacks against the NEW surface has not reviewed it.
 
@@ -191,7 +191,7 @@ this says which step remains.
 
 ## Review record
 
-`reviews/2026-08-11-review-aStandingWrit-1.md` — Tier-2 over the rev-1 spec. Five lenses, five
+`reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md` — Tier-2 over the rev-1 spec. Five lenses, five
 cold-start agents, at the review protocol's cap of five total; no lens dead. Verdict: **do not
 build**. Seven blockers, thirteen highs, seven verified factual errors, and one reproduced bypass in
 landed code that outranks the spec entirely. Three findings were independently confirmed by two

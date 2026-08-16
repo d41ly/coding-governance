@@ -239,7 +239,7 @@ is implementable. A repo whose remote is not `origin` sets `origin/HEAD` or does
   §1 and §5 restated to claim narrowing rather than closure, and S6 grew from one edit to three
   because the protocol's "exactly five facts" bars the sixth.
 - rev-1 · 2026-08-11 · initial draft. Implements fixes 3 and 4 of `D3` from
-  `../../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`, which specified four and landed
+  `../../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`, which specified four and landed
   two. The hole the unapplied two leave was reproduced end to end during unit 1 and recorded in this
   build's README.
 
@@ -256,7 +256,7 @@ values derived from the same steered input is not an assertion.
 `python tools/memory-recall/query.py "what did the review decide about anchoring the mandate base on a
 ref the run cannot move" --terms "mandate base anchor remote-tracking ref update-ref default branch
 env var provenance merge-base forge authorization gate leg"` returned the binding prior art directly:
-`D3` at `../../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md:173` with its four numbered
+`D3` at `../../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md:173` with its four numbered
 fixes, and two decision rows — `TOOL-aUnmannedHelm-5` ("every input to the mandate comparison must lie
 OUTSIDE the run's reach") and `TOOL-aUnmannedHelm-6` ("a gate that verifies the PAPERWORK of a claim
 without verifying the claim is a second signature, not defence in depth"). This unit is the second of

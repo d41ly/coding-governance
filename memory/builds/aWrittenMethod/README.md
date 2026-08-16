@@ -41,7 +41,7 @@ The roster. This table is the roster, not the `ids:` key — M2 says so and this
 | `TOOL-aWrittenMethod-6` | 2 | escaping conf values before substitution | OPEN |
 
 **Unit 2 is the blocker and leads.** It is the unapplied half of `D3` from
-`../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`: fixes 1 and 2 landed with that
+`../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`: fixes 1 and 2 landed with that
 build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end during unit 1.
 
 ## State of this pass
@@ -109,7 +109,7 @@ Three findings, each verified against source rather than inherited from the pass
   staying unequal to HEAD, so the degenerate guard does not fire, and `check_mandate` compares
   run-authored bytes against run-authored bytes. The driver's own comment asserts the opposite
   defense. This was already filed as D3/BLOCKER in
-  `../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md` and no backlog row tracked it.
+  `../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md` and no backlog row tracked it.
   Now `TOOL-aWrittenMethod-2`, and it is **not** in this build's scope.
 - **Four project declarations are delivery, not enforcement**, and carry into pass 2: the recall
   entrypoint, the reuse entrypoint, the review harness, and the keepalive interval.

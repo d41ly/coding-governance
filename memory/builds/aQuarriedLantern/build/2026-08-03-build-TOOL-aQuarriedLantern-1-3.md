@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-aQuarriedLantern-1  <!-- inferred: this build defines exactly one spec id, so the record can serve nothing else -->
 
 Items F4, F3, F9, F10, F11, F12, F13 from
-`memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/reviews/2026-08-03-review-aQuarriedLantern-2.md`.
+`memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-2.md`.
 Every number below came from a command run in-session, against a GREEN baseline of
 `python tools/memory-recall/selftest.py` **19/19, exit 0** at `b3b800b`.
 

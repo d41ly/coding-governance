@@ -236,7 +236,7 @@ fires.
 
 ### B6 — the merge bar is RED at HEAD; the commit message asserts it is green
 
-`memory/builds/aMendedLedger/reviews/2026-08-09-review-aMendedLedger-1-closing-diff.md:200-201`
+`memory/builds/aMendedLedger/reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md:200-201`
 
 **Failing scenario.** `f0335c9` adds the previous closing review, whose B5 transcript quotes two
 invented fixture ids — `TOOL-aNewOurs-<n>` and `PLAY-bNewTheirs-<n>`, with the trailing numeral

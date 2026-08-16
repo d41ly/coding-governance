@@ -96,7 +96,7 @@ information `base:` does not, so its disagreement branch would compare a constan
 
 ## Review record
 
-`reviews/2026-08-11-review-aMooredAnchor-1.md` — Tier-2 over the rev-1 spec. Five lenses, 38 raw, 32
+`reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md` — Tier-2 over the rev-1 spec. Five lenses, 38 raw, 32
 confirmed, 6 refuted, precision 0.84, no dead lens. 17 distinct defects: 4 blockers, 6 highs, 4
 mediums, 3 lows. Verdict: **fold and rebuild the spec**, which rev-2 is.
 

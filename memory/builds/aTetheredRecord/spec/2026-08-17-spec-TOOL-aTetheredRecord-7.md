@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-7 — the rename: every record filename names a spec
 
-**Status:** SPECCED · rev-1 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -22,16 +22,15 @@ is repaired in the same commit as the move that broke it.
   | `<ext>` | the record's own extension |
 
   Two worked targets settle the cases the corpus actually has, and both go in the map:
-  `memory/builds/aSiftedPlaybook/reviews/2026-08-16-review-aSiftedPlaybook-1.md` serves a
+  `memory/builds/aSiftedPlaybook/reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md` serves a
   seven-id, two-family set, so it takes `PLAY` (first in the declared family order) and that id's
-  ordinal. `memory/builds/aDrainedSluice/reviews/2026-08-08-review-aDrainedSluice-3.md` is scoped
+  ordinal. `memory/builds/aDrainedSluice/reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md` is scoped
   over two builds, so its slug is the served id's build, which is NOT the folder it lives in.
 
   Commit the map as a record before moving anything.
 - **S2** — Move the records with `git mv`, in build-sized batches.
-- **S3** — Repair every reference in the same commit as its move. Measured at BASE: 107 referencing
-  lines across 65 citing files, of which 5 carry markdown links `check 2` validates and the rest are
-  backticked path or bare-name citations.
+- **S3** — Repair every reference in the same commit as its move. MEASURED on execution: 72 records
+  moved and 38 files repaired. A record whose body is an ACCOUNT OF A MOMENT is exempt — see §4.
 - **S4** — Update the two rows of `memory/project/legacy-files.txt` whose paths this rename moves,
   and re-measure whether either record still needs its exemption once it carries a conforming name.
 - **S5** — Records whose binding line reads `none` keep their build-scoped ordinal; the map records
@@ -49,6 +48,15 @@ is repaired in the same commit as the move that broke it.
   edited, and the discrepancy is recorded rather than silently fixed.
 
 ## 4. Design
+
+### A dated account is exempt from the repair
+
+A first execution of this unit was REVERTED because the blanket repair rewrote a measurement table
+explicitly headed with a BASE sha, so the table cited a filename that did not exist at that BASE. A
+link must resolve; a dated measurement must stay true, and a string replace cannot tell them apart.
+Records under this build's own `build/` folder are therefore excluded from the repair pass, and the
+exclusion is stated rather than silent. The residue is visible and correct: the design-pass record
+still names the pre-rename filename, because that is what the tree held at the moment it describes.
 
 ### Ordering, and why the moves and the repairs share a commit
 
@@ -151,7 +159,7 @@ The recording-name grammar it renames INTO is the one `check 5` already enforces
 `TOOL-aTetheredRecord-4` §4 for why the ordinal's redefinition needs no grammar edit. No new seam.
 
 One record is outside that grammar and the spec says so rather than implying coverage it lacks:
-`memory/builds/aMooredAnchor/build/2026-08-11-build-aMooredAnchor-1-repro.sh` is not markdown, so
+`memory/builds/aMooredAnchor/build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh` is not markdown, so
 check 5's selector never sees it. It is in check 21's population, which is extension-agnostic by
 design, so **branch 4 is the only gate that grades that record's name.** Renaming it is still in
 scope; nothing but branch 4 will notice if the rename is wrong.

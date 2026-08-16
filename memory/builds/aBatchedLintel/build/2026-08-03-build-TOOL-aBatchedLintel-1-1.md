@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-aBatchedLintel-1
 
 Node `a`, 2026-08-03, base `e8d046cc`. Ports inCMS `PERF-aSlothfulCapstan-1` into the memory-tree
-kit. Spec: `../spec/2026-08-03-spec-aBatchedLintel-1.md`. Review: `../reviews/2026-08-03-review-aBatchedLintel-1.md`.
+kit. Spec: `../spec/2026-08-03-spec-aBatchedLintel-1.md`. Review: `../reviews/2026-08-03-review-TOOL-aBatchedLintel-1-1.md`.
 
 ## Result
 

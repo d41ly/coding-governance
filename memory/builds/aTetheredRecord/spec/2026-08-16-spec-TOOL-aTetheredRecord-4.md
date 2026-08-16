@@ -238,7 +238,7 @@ push boundary.
 
 none — the forks below are RESOLVED and kept for the record.
 
-**Fork A — does the filename carry the binding?** Today `2026-08-09-review-aBatchedTribunal-7.md`
+**Fork A — does the filename carry the binding?** Today `2026-08-09-review-TOOL-aBatchedTribunal-1-7.md`
 spells a 7 that is not the id it serves.
 
 - *Option 1* — filenames stay ordinals, documented as such.

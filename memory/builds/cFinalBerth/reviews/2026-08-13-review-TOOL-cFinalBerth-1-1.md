@@ -32,7 +32,7 @@ fire, and `set_fact "$rel" phase LANDING` runs at `unattended.sh:599`. `verb_clo
 at `unattended.sh:762`, but it is one writer, not the only one. The skipped gate is `dod_met`
 (`unattended.sh:769-792`), including `keepalive-reaped` (`unattended.sh:785-786`) and
 `parked-decisions-surfaced` (`unattended.sh:787-788`) — the two items
-`memory/builds/aStandingWrit/reviews/2026-08-11-review-aStandingWrit-2.md:100-105` establishes are
+`memory/builds/aStandingWrit/reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md:100-105` establishes are
 enforced in no other place. Check 15 as specced does not close the path either: S4 grades witness
 shape and ancestry, both satisfied by a genuinely published HEAD. Lens 3 reproduced the transition
 in a throwaway fixture: `--phase tRun LANDED` refuses, `--phase tRun LANDING --witness <sha>` exits
@@ -51,7 +51,7 @@ refuses naming `--close` as its sole producer, and the record is byte-identical 
 fold the branch into S8's raised arms floor, which unit 2's S6 nets against. If instead
 `--phase LANDING` is to stay legal, `--landed` must key on a close OUTCOME (a `closed-at` /
 `close-witness` fact `--close` writes) rather than on the phase, per F2's left-shift recommendation
-at `memory/builds/aStandingWrit/reviews/2026-08-11-review-aStandingWrit-2.md:119-123`, and §4 must
+at `memory/builds/aStandingWrit/reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md:119-123`, and §4 must
 say so.
 
 ### F2 - HIGH - S3 has no acceptance criterion, and no AC as written can distinguish a build that honours it
@@ -93,7 +93,7 @@ default-branch name resolves (`check-unattended.sh:246-248`, from `GOV_DEFAULT_B
 (`check-unattended.sh:251-252`, `|| continue`). The `if [ -n "$d" ]` block has no `else`, and the
 `for b in …` loop falls off the end with no refusal, so on a clone with `origin/HEAD` unset and the
 variable unset check 15 runs zero times, silently. That state is measured and ordinary for this
-kit's own harness: `memory/builds/aMooredAnchor/reviews/2026-08-11-review-aMooredAnchor-1.md` D7
+kit's own harness: `memory/builds/aMooredAnchor/reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md` D7
 records that the leg fixture never runs `git remote set-head` and that its only default-branch input
 is the suite-level `export GOV_DEFAULT_BRANCH=main`, and D11 calls the `origin/HEAD`-absent state
 ordinary. `memory/builds/aMooredAnchor/spec/2026-08-11-spec-aMooredAnchor-1.md:26-28` (its S4 and
@@ -169,7 +169,7 @@ and the binding document disagreeing.
 builds two of its three recommendations. The third — refuse moving a run that is already terminal —
 is neither built nor named as deferred, and this unit is the one that makes it reachable.
 
-**Evidence.** `memory/builds/aStandingWrit/reviews/2026-08-11-review-aStandingWrit-2.md:117` ends
+**Evidence.** `memory/builds/aStandingWrit/reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md:117` ends
 the fix with "Also refuse moving a run that is already terminal." `verb_phase`
 (`tools/unattended/unattended.sh:582-603`) validates the slug, the file's existence, vocabulary
 membership, the terminality of the TARGET phase and witness presence — it never reads the record's
@@ -297,7 +297,7 @@ omission; §3 names no such non-goal, and `unattended.sh` is already in Files to
 (`tools/unattended/unattended.sh:5-10`); the `fail 14` unknown-argument message lists six
 (`unattended.sh:812`) and is pinned verbatim by an arm in `tools/unattended/unattended.test.sh`; the
 `usage:` line lists FOUR (`unattended.sh:815` — `--plan` and `--phase` are already missing). This is
-the class `memory/builds/aStandingWrit/reviews/2026-08-11-review-aStandingWrit-2.md:451-470` (F11)
+the class `memory/builds/aStandingWrit/reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md:451-470` (F11)
 named and asked to be fixed in both the usage string and the header comment; only the header landed.
 
 **Spec edit.** Add to §2:

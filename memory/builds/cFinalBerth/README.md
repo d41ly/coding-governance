@@ -23,14 +23,14 @@ This README is the master overview and the owner decision menu, per `memory/TEMP
 **How the hole opened, verified rather than inferred.** Two builds landed half a fix each, days
 apart, and neither saw the other.
 
-The review record `reviews/2026-08-11-review-aStandingWrit-2.md` finding F2 established that
+The review record `reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md` finding F2 established that
 `--phase` could reach `LANDED` from any phase, skipping the entire Definition of Done — including
 the two items enforced nowhere else, the keepalive reap and the parked-decision surfacing. Its
 recommended fix opens with the words *a precondition, not a blanket rejection*, and then supplies a
 code snippet that is a blanket rejection whose message names `--close` as the producer. **The
 snippet shipped; the precondition did not.** The message it carries is false today.
 
-The review record `reviews/2026-08-11-review-aMooredAnchor-1.md` finding D5, a BLOCKER, reached the
+The review record `reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md` finding D5, a BLOCKER, reached the
 same lifecycle from the gate side: a landed record red the bar forever because check 9 compared the
 recorded base for equality. That spec's S3 changed check 9's question to ancestry, and its AC4 reads
 *when a run-state record is LANDED and the merge-base has moved past the recorded base, the gate is
@@ -92,7 +92,7 @@ this kit has a recorded scar in. Unit 2's section 4 accounts for what bounds it.
 
 ## Review record
 
-`reviews/2026-08-13-review-cFinalBerth-1.md` — M4 spec audit over both rev-1 specs and this README.
+`reviews/2026-08-13-review-TOOL-cFinalBerth-1-1.md` — M4 spec audit over both rev-1 specs and this README.
 Four lenses, 34 raw, 23 confirmed, 11 refuted, precision 0.68, no dead lens; 16 distinct confirmed
 findings — 2 blockers, 8 highs, 4 mediums, 2 lows. Verdict: **BLOCKED**, and rev-2 of both specs is
 the fold.

@@ -7,7 +7,7 @@ refusal folded into the spec on 2026-08-10 when the consuming build's owner rati
 FOLD — plus every section of the spec that S14 falsifies, contradicts, or leaves uncovered (§1, §3,
 §4, §5, §6, §7, §9). **S1 through S13 were reviewed separately at rev-2** and are not re-opened
 here; that pass is recorded in this build's reviews folder as
-`2026-08-10-review-aNumeralWarden-1.md`, and per `memory/guides/REVIEW-PROTOCOL.md:95-96` a spec is
+`2026-08-10-review-TOOL-aNumeralWarden-1-1.md`, and per `memory/guides/REVIEW-PROTOCOL.md:95-96` a spec is
 not re-reviewed once the judge calls the design clean. S14 is the exception the protocol
 contemplates: it is scope added by a non-owner AFTER that Tier-2 closed, so nothing has ever
 reviewed it.

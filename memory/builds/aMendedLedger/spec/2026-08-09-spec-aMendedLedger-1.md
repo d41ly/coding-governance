@@ -154,7 +154,7 @@ spec must carry a per-file map, not a count: "no migration can derive a destinat
 | path | unit | destination | why |
 |---|---|---|---|
 | `journal/2026-07-16-bThriftyBellows.md` | U1 | `memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md` (new stub folder) | **sole carrier** of the 9-bullet optimization inventory, the golden-diff protocol, `2647.5s → 33.9s`, and the banked negative result "cache-and-grep is SLOWER" |
-| `journal/2026-07-15-aRuledParchment.md` | U1 | `memory/builds/aRuledParchment/build/2026-07-15-build-aRuledParchment-1.md` | build exists; two facts are sole-carried |
+| `journal/2026-07-15-aRuledParchment.md` | U1 | `memory/builds/aRuledParchment/build/2026-07-15-build-TOOL-aRuledParchment-1-1.md` | build exists; two facts are sole-carried |
 | `MEMORY.md` | U1 | delete, after its digest folds into the relocated journal's header | its line 4 links INTO `journal/`; see the atomicity rule below |
 | `IN-FLIGHT.md` | U1 | delete; its protocol prose moves to `memory/archive/ledger/README.md` | its only durable content is the vocabulary, which retires with the ledger |
 | `project/README.md` | U1 | delete | describes only files that are moving, and already omits the five registries |
