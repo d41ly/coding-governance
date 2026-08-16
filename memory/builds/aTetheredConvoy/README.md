@@ -95,5 +95,5 @@ from the status header of every spec in this folder — do not hand-edit it.
 | [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | OPEN | rev-4 | 2026-08-16 |
 | [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | OPEN | rev-4 | 2026-08-16 |
 
-Records live under `spec/` and `reviews/`.
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
