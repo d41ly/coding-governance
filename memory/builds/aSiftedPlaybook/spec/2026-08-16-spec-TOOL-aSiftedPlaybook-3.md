@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -49,8 +49,11 @@ One new gate, `tools/check-playbook-parity.sh`, with three check families and a 
   rather than implying coverage it lacks — the same honesty `check-method-carriers.sh` already
   practises.
 - **Enforcing `baseline.toml`'s shrink-only rule.** Discovered unenforced during this build (four
-  written statements, zero mechanical checks, proved by simulation). It is a real finding and a real
-  gap, but it is the codebase-map kit's invariant, not the playbook's. Follow-up row.
+  written statements, zero mechanical checks, proved by simulation), and **the owner then relied on
+  that gap deliberately** in resolving `TOOL-aSiftedPlaybook-1` F1 to an in-place key swap. A gate
+  written here would red that resolution on the day it landed, so this stays firmly out of scope and
+  becomes a follow-up row rather than a quiet addition. If the convention is ever to be enforced, the
+  swap it would have caught needs a waiver first — which is the ordering, not a reason to skip it.
 - **Extending the pair list beyond the two seeded rows.** Every additional pair is a judgement about
   what is worth pinning; growing the list is ordinary maintenance, not this unit's job.
 
@@ -109,12 +112,11 @@ drifts silently". This gate reads one of the existing two.
 **Lands last.** Every other unit changes the values this gate would pin, so building it first means
 building it against values about to change.
 
-**This unit EXTENDS `memory/map/features/playbook.md` and never creates it.** Three units need that
-dossier — `TOOL-aSiftedPlaybook-1` F1 option 3, `TOOL-aSiftedPlaybook-2`'s new leg key, and this
-one — and the README fixes the order as TOOL-1 → TOOL-2 → TOOL-3, so the minter is whichever of the
-first two lands under a fork resolution that calls for it. If the dossier is absent when this unit
-builds, it **reds and stops** rather than minting a second one; two dossiers claiming overlapping
-keys is a coverage failure in both directions. It is also the only unit the owner may reasonably defer
+**This unit EXTENDS `memory/map/features/playbook.md` and never creates it.** The owner resolved
+`TOOL-aSiftedPlaybook-1` F1 to the in-place `baseline.toml` swap, so that unit mints no dossier and
+**`TOOL-aSiftedPlaybook-2` is the minter**. If the dossier is absent when this unit builds, it
+**reds and stops** rather than minting a second one; two dossiers claiming overlapping keys is a
+coverage failure in both directions. It is also the only unit the owner may reasonably defer
 indefinitely without leaving the tree inconsistent — the others fix falsehoods, this one prevents
 future ones.
 
@@ -200,6 +202,11 @@ future ones.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-4 · 2026-08-16 · absorbed the owner's `TOOL-aSiftedPlaybook-1` F1 resolution. The minter of
+  `memory/map/features/playbook.md` is now fixed as `TOOL-aSiftedPlaybook-2`, not "whichever lands
+  first". Sharpened the `baseline.toml` non-goal: the convention is not merely unenforced, it was
+  deliberately relied upon, so gating it here would red an owner decision — the waiver has to come
+  first if it is ever gated.
 - rev-3 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`, three findings. S1 never specified
   its match rule, and a substring match would have certified `lib` as documented on seven hits of
   the `lib` inside "deliberately" — the vacuity class this unit exists to catch, inside this unit.

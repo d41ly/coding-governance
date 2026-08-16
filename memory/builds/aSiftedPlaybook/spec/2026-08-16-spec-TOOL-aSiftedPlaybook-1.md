@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -31,6 +31,15 @@ records which relied on the old ceiling, because at least three of them cited it
   This is the largest single edit and the one an agent reads at every kickoff.
 - **S6 — the decision record.** A new `memory/DECISIONS.md` row minting the reversal and naming the
   records that relied on the old ceiling. Append-only: nothing prior is edited.
+- **S7 — the gate-leg label and its inventory key** (F1, resolved). `tools/gate-legs.json:17`
+  becomes `template size <=48KiB`, and `memory/map/baseline.toml:35` is edited IN PLACE to the new
+  key. `memory/map/generated/{MAP.md,inventories.json}` are regenerated with
+  `python tools/codebase-map/gen_map.py --write`, never hand-edited. No dossier is minted by this
+  unit.
+- **S8 — the soft ceiling warning** (F2, resolved). The gate prints a `TEMPLATE-SIZE WARN` line above
+  a soft threshold while still exiting 0, so growth stays visible before it becomes urgent. Roughly
+  six lines. The threshold is a second named constant beside `MAX_BYTES`, env-overridable on the
+  same pattern, and the warn line names both the measured size and the soft threshold.
 
 ## 3. Non-goals (OUT)
 
@@ -85,6 +94,13 @@ an ADDED leg and false here, in both directions:
   because the trap's "four gates" framing would have predicted otherwise and sent the build looking
   for a red that cannot occur.
 
+**With F1 resolved to the in-place swap, this unit trips THREE gates**: the manifest ratchet, plus
+codebase-map coverage and freshness. The coverage leg reds in both directions if the swap is done
+by halves — the old key as `stale_baseline`, the new one as `unclaimed` — so `tools/gate-legs.json`
+and `memory/map/baseline.toml` move in the same commit, and the generated artifacts are re-rendered
+rather than edited. S8's WARN touches no gate but changes the size leg's stdout, which is why
+`TOOL-aSiftedPlaybook-2` arms it.
+
 ### Migration
 
 None. `MAX_BYTES` remains env-overridable, and no adopter reads the constant — the gate ships only
@@ -138,8 +154,15 @@ ratchet's own rule.
 - **AC4** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0, and
   `.claude/SESSION-KICKOFF.md`'s `last-audit` carries a stamp newer than BASE with a delta line in
   the commit message.
-- **AC5** — When `bash tools/run-gates.sh` runs, every leg is green, including
-  `codebase-map coverage + freshness` under whichever F1 option the owner picks.
+- **AC5** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage reports neither an
+  `unclaimed` key nor a `stale_baseline` entry for the size leg, and the freshness byte-compare is
+  green against a fresh `gen_map.py --write` render.
+- **AC7** — When a file between the soft threshold and `MAX_BYTES` is passed to the gate, it **exits
+  0 and prints the warn line**; below the threshold it exits 0 and prints no warn line; above
+  `MAX_BYTES` it still exits 1. The middle case is the one that proves the threshold is advisory
+  rather than a second ceiling, and it is the case a hand-written check omits.
+- **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, both
+  spell `<=48KiB` and neither still spells `<=32KiB`.
 - **AC6** — When `memory/DECISIONS.md` is read, a new row records the reversal, names
   `PLAY-aCandidStub-1`, `TOOL-aGuardedTally-1` and the `aCandidStub` review's refuted id 19 as
   records whose premise this changes, and no prior row has been edited.
@@ -149,7 +172,8 @@ ratchet's own rule.
 - `bash tools/check-template-size.sh` — the subject.
 - `bash skills/session-kickoff/manifest-check.sh` — `tools/check-template-size.sh` is a watched
   pathspec; the re-stamp is mandatory, not optional.
-- `python tools/codebase-map/test_codebase_map.py` — only if F1 resolves to a rename.
+- `python tools/codebase-map/test_codebase_map.py` — F1 resolved to a rename, so this is mandatory,
+  not conditional. Coverage AND freshness.
 - `python tools/drift-audit/drift_report.py --check` — expected unaffected by the rename per §4; run it to
   confirm that rather than trust the analysis. Also guards the landmine below.
 - `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/memory-tree/gotchas.py --for-diff`.
@@ -164,8 +188,23 @@ the spec closes.
 
 ## 8. Open questions
 
-- **F1 — what happens to the gate-leg label `template size <=32KiB`?** Three options, and the
-  choice is the owner's because two of them trade a convention against a chore.
+none — the forks below are RESOLVED (owner, 2026-08-16).
+
+- **F1 — what happens to the gate-leg label `template size <=32KiB`?**
+  **RESOLVED (owner, 2026-08-16): option 2 — rename to `template size <=48KiB` and edit
+  `memory/map/baseline.toml:35` in place.** Built as S7.
+
+  One consequence to carry rather than re-argue. `baseline.toml`'s header, the coverage gate's
+  docstring and `AGENTS.md` each state the file is shrink-only and that additions are reserved for
+  the initial backfill; an in-place key swap is a delete plus an add through that file. Nothing
+  enforces the rule, which is why the option is available at all. Two follow-ons:
+  `TOOL-aSiftedPlaybook-2` must now mint `memory/map/features/playbook.md` itself, since this unit
+  no longer does and a genuinely NEW leg key is an addition rather than a rename; and
+  `TOOL-aSiftedPlaybook-3` keeps the unenforced convention as an explicit non-goal, because a gate
+  written to enforce it would red this resolution on the day it landed. The map still has no
+  playbook dossier after this unit.
+
+  The original options, kept for the record:
 
   1. **Leave it.** Zero gate work. The leg then advertises 32KiB while the gate enforces 49152 —
      the same rot class this whole build exists to close, in the build that closes it.
@@ -177,30 +216,30 @@ the spec closes.
   3. **Rename to a NUMBERLESS label (`template size gate`), claim the new key in a new dossier
      `memory/map/features/playbook.md`, delete the baseline line, regenerate.**
 
-  **Recommendation: option 3.** It follows the documented policy instead of exploiting the gap
-  between the policy and its enforcement; it retires the number from the map permanently, so this
-  fork cannot recur at the next ceiling change; and it closes a gap the audit already found
-  independently — the codebase map has seven dossiers and **none covers the playbook**, which is
-  the repo's own headline product. Cost is one dossier plus
-  `python tools/codebase-map/gen_map.py --write`. Option 2's mechanical greenness is worth recording
-  either way: a convention with four statements and no check is a finding in its own right, and it
-  belongs in `TOOL-aSiftedPlaybook-3`'s scope whichever way F1 goes.
+  (Agent recommendation at the time was option 3, on the ground that it followed the documented
+  policy and would have closed the missing-playbook-dossier gap. Not taken; recorded so the reasoning
+  is not lost if the convention is ever gated.)
 
-- **F2 — what replaces the forcing function the ceiling was providing?** At 86 bytes free the gate
-  priced every template edit; at 16470 nothing does until the headroom is spent, and the next
-  session to feel pressure will be one nobody has warned. Options: (a) accept it, and let
-  `TOOL-aSiftedPlaybook-3` gate correctness while nothing gates size; (b) add a soft advisory
-  threshold — the gate prints a WARN above, say, 36 KiB while still exiting 0, so growth is visible
-  before it is urgent; (c) re-justify `PLAY-aCandidStub-2` (externalize §14) on readability grounds
-  and keep shrinking the template regardless of the ceiling.
-  **Recommendation: (b) and (c) together.** (b) costs about six lines in the gate and restores a
-  signal without restoring a blocker, and (c) is the only option that engages the reason the ceiling
-  existed — per-session reading cost, which a byte limit was only ever a proxy for. Owner's call:
-  (b) changes a gate's output contract and (c) reopens a backlog row this unit's own premise
-  otherwise closes.
+- **F2 — what replaces the forcing function the ceiling was providing?**
+  **RESOLVED (owner, 2026-08-16): (b) and (c) together** — a soft WARN threshold in the gate, built
+  as S8, AND `PLAY-aCandidStub-2` stays OPEN, re-justified on readability rather than bytes.
+
+  Two follow-ons. The WARN changes the gate's OUTPUT contract, so
+  `TOOL-aSiftedPlaybook-2` gains an arm for it — a file above the soft threshold and below
+  `MAX_BYTES` must exit 0 **and** print the warn line, which is the only combination that proves
+  the threshold is advisory rather than a second blocker. And at landing, the
+  `PLAY-aCandidStub-2` backlog row needs its rationale rewritten: it currently reads "the template
+  is effectively FULL at v2.5", which this unit falsifies, so leaving the row untouched would keep
+  it open for a reason that no longer exists.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · owner resolved both forks. F1 → the in-place `baseline.toml` swap (option 2),
+  added as S7; the map gains no playbook dossier here, so `TOOL-aSiftedPlaybook-2` mints it and
+  `TOOL-aSiftedPlaybook-3` keeps the unenforced shrink-only convention as a non-goal. F2 → the WARN
+  threshold AND keeping `PLAY-aCandidStub-2` open, added as S8 with AC7 and a landing task to
+  rewrite that backlog row's now-false rationale. Blast radius restated at THREE gates, since the
+  rename is now happening.
 - rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S5's line range stopped mid-paragraph
   at `:107` and would have taken the drift-signal warning at `:107-109` with it — the warning that
   stops this unit redding the bar. Added `memory/DECISIONS.md` to the §4 Inventory, which S6 always

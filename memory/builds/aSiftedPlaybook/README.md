@@ -27,7 +27,7 @@ Measured at BASE `91ef1b05`: 32682 of 32768 bytes, 86 free, so every fix had to 
 externalizing prose. At 49152 the same file has 16470 free and the fixes land on their own merits.
 Both figures are BASE-time snapshots — every unit re-measures from the gate rather than carrying a
 number out of this paragraph. `PLAY-aCandidStub-2` (externalize §14) is therefore **decoupled, not
-closed** — see the owner menu below.
+closed** — the owner kept it OPEN on 2026-08-16, re-justified on readability rather than bytes.
 
 Records live under `spec/` and `reviews/`. The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
@@ -38,12 +38,12 @@ every spec in this folder — do not hand-edit it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | SPECCED | rev-3 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | SPECCED | rev-3 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | SPECCED | rev-2 | 2026-08-16 |
 | [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-2 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | SPECCED | rev-4 | 2026-08-16 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -88,17 +88,29 @@ reproduced inside the build that exists to close it. Read the spec, not the cell
   spec id written into the template as provenance reds the bar. `AGENTS.md` and `memory/` are
   outside the globs and may cite freely.
 
-## Owner decision menu
+## Owner decisions — RESOLVED 2026-08-16
 
-1. **`PLAY-aCandidStub-2` (externalize template §14) — keep open, or close as WONTDO?** The raise
-   removes its funding rationale entirely. The remaining argument is readability, not bytes: §14 is
-   1899 bytes of a document an agent reads every session, and the 32 KiB gate was a proxy for that
-   cost rather than an end in itself. **Recommendation: keep OPEN, re-justified on readability.**
-   Raising the ceiling answers "does it fit"; it does not answer "should an agent read it every
-   session", and nothing else in the repo now asks that question.
-2. **What replaces the forcing function?** At 32768 with 86 bytes free, every template edit was
-   priced. At 49152 nothing prices them until 16470 bytes have been spent. `TOOL-aSiftedPlaybook-3`
-   is the nearest replacement but it gates *correctness*, not *size*. Options are in that unit's §8.
-3. **The §16 micro-format fork** — whether a MANDATORY byte-stable output format may contain a
-   placeholder at all. Stated and argued in `PLAY-aSiftedPlaybook-2` §8; it is a genuine fork and is
-   the owner's, not the agent's.
+All three build-level forks were put to the owner and answered. Marked in place in each spec's §8.
+
+| Fork | Resolution |
+|---|---|
+| `TOOL-1` F1 — the gate-leg label | Rename to `template size <=48KiB` and swap `memory/map/baseline.toml:35` **in place**. No dossier minted here. |
+| `TOOL-1` F2 — the forcing function | A soft WARN threshold in the gate (advisory, still exits 0) **and** `PLAY-aCandidStub-2` stays OPEN, re-justified on readability. |
+| `PLAY-2` F1 — the §16 micro-formats | Parameterize both. Byte-stability describes the instantiated document, not the template. |
+
+Three consequences the resolutions created, carried into the specs rather than left implicit:
+
+- **`TOOL-aSiftedPlaybook-2` now mints `memory/map/features/playbook.md`.** `TOOL-1` renames an
+  existing key and mints nothing; `TOOL-2` adds the first genuinely NEW leg key, which is an
+  addition rather than a rename. `TOOL-3` extends and reds if it is absent.
+- **`TOOL-aSiftedPlaybook-3` keeps `baseline.toml`'s unenforced shrink-only rule as a non-goal.**
+  The owner relied on that gap deliberately, so a gate enforcing it would red the resolution on the
+  day it landed. Enforcing it later needs a waiver for this swap first.
+- **At landing, `PLAY-aCandidStub-2`'s backlog row needs rewriting.** It reads "the template is
+  effectively FULL at v2.5", which `TOOL-1` falsifies; leaving it would keep the row open for a
+  reason that no longer exists, when the actual reason is now per-session reading cost.
+
+Still open, and NOT put to the owner because they are unit-internal rather than build-level:
+`TOOL-2` F1 (whether the size gate is refactored onto a `fail()` helper and into the harness
+meta-gate), `PLAY-1` F1 (whether RULE 4's clause lands in §8 or §0), and `PLAY-3` F1 (whether the
+four kit bullets go inline or behind §-stubs).

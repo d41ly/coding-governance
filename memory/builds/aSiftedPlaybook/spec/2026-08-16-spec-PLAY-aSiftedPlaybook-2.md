@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -184,17 +184,20 @@ than being written twice against two different totals.
 
 ## 8. Open questions
 
-- **F1 — may a MANDATORY byte-stable micro-format contain a deploy-time placeholder?** §4 argues it
-  may, on the ground that byte-stability describes the instantiated document and the template's two
-  bracket shapes already separate runtime slots from deploy-time ones.
-  **Recommendation: parameterize both micro-formats.** The fork is left open rather than resolved
-  because §16 is the one section that declares a rule about its own formatting, and a reading of it
-  that turns out to be the owner's rather than mine would change the deliverable. If the owner
-  vetoes, the fallback is to leave `:218-219` literal and add one sentence noting the formats assume
-  `main` — worse, but honest, and cheap to revert later.
+none — the fork below is RESOLVED (owner, 2026-08-16).
+
+- **F1 — may a MANDATORY byte-stable micro-format contain a deploy-time placeholder?**
+  **RESOLVED (owner, 2026-08-16): yes — parameterize both micro-formats.** S3 builds it as specced.
+  The ratified reading is §4's: byte-stability is a property of the INSTANTIATED document, and the
+  template already separates runtime slots (`<remote>`, `<sha>`) from deploy-time ones
+  (`{{DEFAULT_BRANCH}}`) by bracket shape. The rejected fallback was leaving `:218-219` literal with
+  a sentence noting they assume `main`.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · owner resolved F1: parameterize both §16 micro-formats. No scope change —
+  S3 was already written that way — but the unit is now ratified rather than pending a reading of
+  §16 that could have gone the other way.
 - rev-2 · 2026-08-16 · folded four findings from the spec audit `wf_4ed62ebb-cef`, all re-measured
   before folding. AC1 counted lines where it meant occurrences and would have failed a correct build
   (17 occurrences sit on 14 lines). AC2 was structurally blind to the corruption it claimed to

@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -25,6 +25,13 @@ constant change is exactly when an unproven gate is most likely to be silently w
   | A3 | a missing path | exit 2 |
   | A4 | a file at `MAX_BYTES` bytes with every LF turned into CRLF | exit 0 |
   | A5 | `MAX_BYTES` set in the environment | the override is honoured, both directions |
+  | A6 | a file between the soft WARN threshold and `MAX_BYTES` | exit 0 **and** the warn line printed |
+  | A7 | a file below the soft threshold | exit 0 and **no** warn line |
+
+  A6 and A7 arm `TOOL-aSiftedPlaybook-1` S8, added after the owner resolved that unit's F2. Together
+  they are what proves the threshold is ADVISORY: A6 alone would pass if the warn had accidentally
+  been made a second blocker (it would exit 1 and the arm would still see the line), and A7 alone
+  would pass if the warn never fired at all.
 
   **How the harness learns `MAX_BYTES` decides whether these arms mean anything.** The gate reads
   `MAX_BYTES=${MAX_BYTES:-49152}`, so a harness that simply exports its own value tests the
@@ -78,10 +85,13 @@ charter's trap was written for, and all four fire:
    re-stamps with a delta line.
 4. **drift-audit hand-kept signal** — S4's charter citation, pin 0, tolerance 0, no slack.
 
-**This couples cleanly to `TOOL-aSiftedPlaybook-1` F1 option 3.** If that fork resolves to minting
-`memory/map/features/playbook.md`, this unit's new key is claimed in the same dossier and item 1
-costs nothing extra. If F1 resolves otherwise, this unit mints the dossier instead. Either way one
-dossier is created once; the specs must not both create it.
+**F1 of `TOOL-aSiftedPlaybook-1` resolved to the in-place `baseline.toml` swap, so THIS UNIT MINTS
+`memory/map/features/playbook.md`.** That unit renames an existing key and mints no dossier; this
+one adds a genuinely NEW leg, and a new key is an addition rather than a rename — the case
+`baseline.toml` reserves for the initial backfill and the coverage gate's own docstring sends to a
+dossier. `TOOL-aSiftedPlaybook-3` then extends it. The dossier follows the pinned heading contract
+in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, modelled on the
+76-line `memory/map/features/codebase-map.md`.
 
 ### Files touched (estimate)
 
@@ -165,7 +175,15 @@ dossier is created once; the specs must not both create it.
   and produced a gate with no test at all. Owner's call because it widens the diff on a merge-bar
   gate, which the tier rule prices as a contract change.
 
-- **F2 — who mints `memory/map/features/playbook.md`?** **THREE units need it**, not two:
+- **F2 — who mints `memory/map/features/playbook.md`?**
+  **RESOLVED (agent, 2026-08-16, downstream of TOOL-1 F1): THIS UNIT mints it;
+  `TOOL-aSiftedPlaybook-3` extends it and reds if it is absent.** The owner's F1 choice sent
+  `TOOL-aSiftedPlaybook-1` to the in-place baseline swap, which mints no dossier, and this unit adds
+  the first genuinely new key. Marked `(agent, …)` and not `(owner, …)` deliberately: the owner
+  decided F1, not this; this is the mechanical consequence, and signing it as theirs would make the
+  two indistinguishable later. The original framing:
+
+  **THREE units need it**, not two:
   `TOOL-aSiftedPlaybook-1` under F1 option 3, this unit for its new leg key, and
   `TOOL-aSiftedPlaybook-3` for its own leg key. The README fixes the order TOOL-1 → TOOL-2 → TOOL-3.
   **Recommendation: the first unit that needs it mints it; the later two EXTEND it and red if it is
@@ -177,6 +195,11 @@ dossier is created once; the specs must not both create it.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · absorbed the owner's resolutions on `TOOL-aSiftedPlaybook-1`. F1's in-place
+  baseline swap makes THIS unit the minter of `memory/map/features/playbook.md`, resolving F2. F2's
+  WARN threshold adds arms A6 and A7, which together prove the threshold is advisory — either alone
+  passes under a plausible wrong implementation. F1 of this spec (the `fail()` refactor) was not put
+  to the owner and remains OPEN.
 - rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S2 never said how the harness learns
   `MAX_BYTES`; a harness exporting its own value would have tested the override path five times and
   never observed the shipped ceiling, leaving every arm green through an edit to the default.
