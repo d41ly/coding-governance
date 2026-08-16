@@ -17,16 +17,22 @@ unfilled in the companion, and the §-stubs then point at a file the project nev
 
 ## Placeholders
 
-36 in total: 23 in the template and 14 in the companion, which sums to 37 because the groups are
+37 in total: 24 in the template and 14 in the companion, which sums to 38 because the groups are
 **not disjoint**. **1 shared: `{{MEMORY_ROOT}}`** — it appears in both files and must be filled
 IDENTICALLY in each. Every other placeholder is filled in exactly one place.
 
-The counts below are per-file and each is individually correct; the union is what the 36 counts.
+The counts below are per-file and each is individually correct; the union is what the 37 counts.
 Do not read a per-file heading as a share of the total.
 
-### In `parallel-coding-governance.template.md` — 23
+### In `parallel-coding-governance.template.md` — 24
 
 - `{{PROJECT_NAME}}` — the repo this governs (discoverable, not an ask).
+- `{{DEFAULT_BRANCH}}` — the shared integration branch (commonly `main`, but not always;
+  discoverable, not an ask). Derived from `git symbolic-ref`, the same derivation
+  `skills/session-kickoff/MANIFEST-TEMPLATE.md` states for the identically-named placeholder in
+  the kickoff manifest — one name, one spelling, across both halves of the product. It carries
+  17 senses in the template, including two §16 micro-formats, so fill it before anything greps
+  those formats for byte-stability.
 - **Fleet** *(ask user)*: node-registry rows `{{TAG_A}}` / `{{MACHINE_A}}` / `{{PRIMARY_TREE_A}}` /
   `{{WORKTREE_ROOT_A}}` / `{{VARIANCES_A}}` (one row per node) · `{{STREAM_OWNERSHIP}}` (stream → node).
 - **Records & docs**: `{{ID_FAMILIES}}` · `{{DOC_ROUTING_TABLE}}` · `{{PRODUCT_PREAMBLE}}` ·

@@ -18,7 +18,7 @@ new companion §1.*
 ## §0 — TL;DR (the load-bearing rules)
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
-- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
+- **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never more than 5 agents at once, AND never more than 5 per verify stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
@@ -31,7 +31,7 @@ new companion §1.*
 Keep units small: one stream/owner, no cross-stream contract change, reviewable as one Tier-1 diff — else split.
 
 **Definition of Ready — run before touching code:**
-- Sync: `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed (§3).
+- Sync: `fetch` + fast-forward local `{{DEFAULT_BRANCH}}` (another node may be ahead); recreate/repair your worktree if needed (§3).
 - Locate: read your stream's decision log + backlog (§6) and the derived work-state index (§5); confirm your node tag (§2).
 - Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
 - Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and open the unit's record (§6).
@@ -48,7 +48,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
-- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask, or a committed build folder whose shape your merge bar validates (companion §1).
+- Land on local `{{DEFAULT_BRANCH}}` first, verify, then push; the merge to shared `{{DEFAULT_BRANCH}}` and the push each need an explicit ask, or a committed build folder whose shape your merge bar validates (companion §1).
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Kickoff-manifest merge exception (its `last-audit` line), and the unattended-run rules → `parallel-coding-governance.domain-rules.md` §1. LOAD when a merge touches the manifest, or before a run with no human in the loop.
@@ -59,7 +59,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
 
-  | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
+  | Tag | Machine/user | Primary tree (`{{DEFAULT_BRANCH}}` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
   | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | `{{VARIANCES_A}}` |
 
@@ -80,13 +80,13 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §3 — Parallel work: streams, worktrees, trunk
 
 - Own streams, not files: `{{STREAM_OWNERSHIP}}`. Overlap on shared files (API clients, config, indexes) breeds collisions and integration reviews — minimize it.
-- Trunk-based: merge small and often to LOCAL `main`; long-lived branches mean bigger reconciles and review surface.
-- `main` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `main` on a feature branch strands it and is the root cause of concurrent-session collisions.
-- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `main`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
-- Doc-only commits go directly on local `main` only while the primary tree is on `main` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
-- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
+- Trunk-based: merge small and often to LOCAL `{{DEFAULT_BRANCH}}`; long-lived branches mean bigger reconciles and review surface.
+- `{{DEFAULT_BRANCH}}` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `{{DEFAULT_BRANCH}}` on a feature branch strands it and is the root cause of concurrent-session collisions.
+- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `{{DEFAULT_BRANCH}}`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
+- Doc-only commits go directly on local `{{DEFAULT_BRANCH}}` only while the primary tree is on `{{DEFAULT_BRANCH}}` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
+- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `{{DEFAULT_BRANCH}}` + dependency install.
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
-- Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
+- Commit the governing doc to `{{DEFAULT_BRANCH}}` so it propagates — it only exists in checkouts where it's committed.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
@@ -145,7 +145,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 - Tier 1 — mechanical/additive (no new write path, migration, auth/sanitization/egress surface, or shared-contract change): gates + one focused self-review of the diff. NO multi-agent review.
 - Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
-- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
+- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
 - **CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.** A ~40-agent fan trips the SERVER rate limiter and kills whole phases for millions of tokens; the harness auto-cap (≈14) does NOT protect you. Route ALL Workflow fan-out through cap-5 helpers `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …)` — inlined (scripts can't import; the `parallel(`/`pipeline(` line carries a `gov:bounded-fanout` marker). **CONSOLIDATE before you fan out:** at most 5 verify agents TOTAL (batch grows, agent count does not). Enforce mechanically: the `agent-cap.js` PreToolUse hook (matcher `Workflow|Agent` — the exact pair; `Workflow` alone leaves direct spawns unguarded) DENIES a raw primitive AND any `agent(` fanned over a receiver it cannot PROVE bounded — so the batching assignment carries a `gov:fixed-verifiers` marker and must spell `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)`, `K` an integer literal ≤5 or an identifier bound to one; an array LITERAL of ≤5 elements (the lens fan) passes unmarked. It RESOLVES that bound wherever it is written — call site, helper default parameter, `gov:bounded-fanout` slice width — and denies any `K` it cannot resolve to an integer ≤5. A direct `Agent` spawn carries no script, so it is COUNTED instead: five per user prompt, claimed as atomic slots. That count is the only enforcement reaching a fan-out made outside a `Workflow` script. Run the ready `tools/workflows/tier2-review.js` harness (install per WIRE §5).
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
@@ -156,7 +156,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Structured-output schemas for orchestration returns → `parallel-coding-governance.domain-rules.md` §8. LOAD when writing a Workflow script.
 - Orchestration scripts run in sidechains inheriting neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the ≤5 cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script, where no hook reaches.
 - Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
-- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
+- Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 
@@ -215,8 +215,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside):
   - `committed <sha> <branch> — <subject>`
-  - `pushed <remote>/main <old>..<new> (ff, N commits)`
-  - `merged --no-ff <branch> → main <sha> · post-merge gates GREEN`
+  - `pushed <remote>/{{DEFAULT_BRANCH}} <old>..<new> (ff, N commits)`
+  - `merged --no-ff <branch> → {{DEFAULT_BRANCH}} <sha> · post-merge gates GREEN`
   - `gates GREEN — <every leg, with tallies>` · `skipped: <leg> — <why>`
   - `up — <service> :<port> (<tree>) · … · admin <user> / <pw-or-where-it-lives>`
   - `READY — <slug> · node <tag> · <branch> off <sha> · Tier-N · gates: <list>`
