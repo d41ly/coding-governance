@@ -19,6 +19,7 @@ gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementat
 ]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/unattended/*",

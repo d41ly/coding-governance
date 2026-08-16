@@ -1623,6 +1623,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "signal_lexicon_ratified_stale",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "signal_lexicon_verbs_unused",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "signal_shrink_only",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -1981,6 +1991,16 @@
       "id": "test_generated_artifacts_are_fresh",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_lexicon_signals",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_no_signal_hardcodes_live",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_patch_is_installed",

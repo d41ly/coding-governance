@@ -1,6 +1,6 @@
 # Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
-<!-- governance-template: v2.9 -->
+<!-- governance-template: v2.10 -->
 
 Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a

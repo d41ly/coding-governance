@@ -121,7 +121,49 @@ EXTRACTORS: dict[str, object] = {
     "backlog-shards": lambda: m.glob_inventory(
         ROOT / "memory" / "backlog", "*.md", "backlog-shards"
     ),
+    # The DECLARED verb table, one key per verb. PROJECT-OWNED and never in the template: an adopter
+    # who takes codebase-map without the lexicon has no `.lexicon.conf` for this to read.
+    #
+    # `EXTRACTORS`, not `SYMBOL_EXTRACTORS`, and the choice is the point. The symbol tier feeds the
+    # recall corpus ONLY and never the ratchet — a new symbol there never fails CI — so declaring the
+    # table here would have answered none of the closure question this inventory exists for. What the
+    # ratchet buys, stated honestly per direction: the ADDITION half is weak for a hand-authored
+    # vocabulary (claiming a verb is a one-line dossier edit by the same author in the same commit,
+    # so it buys VISIBILITY in the diff, not cost), and the DELETION half is the load-bearing one —
+    # a dossier still describing a verb that `VERBS` no longer carries reds, which is the
+    # map-rots-into-fiction case nothing else here catches.
+    "lexicon-verbs": lambda: _read_lexicon_verbs(),
 }
+
+
+def _read_lexicon_verbs() -> list[str]:
+    """The declared verbs, read through the lexicon kit's OWN reader.
+
+    `.lexicon.conf`'s block grammar is not the sibling `KEY=VALUE` one, so `map_lib.load_conf()`
+    cannot read it — and a hand-rolled parser here would be a second answer to a question the lexicon
+    already answers, which is the class this repo has a catalogue record about. An explicit
+    `sys.path` insert against the install prefix is the seam instead.
+
+    An ABSENT conf yields an EMPTY inventory rather than a raise: the lexicon is opt-in, and a
+    codebase-map adopter who never took it must not inherit an exception from `all_inventories()`.
+    That is also the mid-teardown state, which `adopt-lexicon.sh --check` names.
+    """
+    conf = ROOT / ".lexicon.conf"
+    if not conf.is_file():
+        return []
+    # A conf can exist while the kit is NOT importable at this prefix: a root-prefix install, a
+    # mid-teardown tree, or an unparseable conf. Raising there would take out `all_inventories()`
+    # and every leg that calls it, on account of an OPTIONAL kit. Fail to the empty inventory, which
+    # is the same answer the absent-conf case gives and is what the dossier ratchet then reports.
+    import sys as _sys
+    kit = str(ROOT / "tools" / "lexicon")
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    try:
+        from lexicon_conf import load_conf  # noqa: E402
+        return sorted((load_conf(conf).get("VERBS") or {}).keys())
+    except Exception:
+        return []
 
 
 # --------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.9** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.10** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
 `…-v-N-N.md` snapshots + git. **v2.9 (2026-08-16):** §12's layout-convention clause now covers naming
@@ -9,7 +9,7 @@ moves 32→48 KiB with a high-water ratchet replacing it as the forcing function
 becomes `{{DEFAULT_BRANCH}}` throughout; §0/§8 state both halves of the agent cap and the hook's real
 matcher; §5/§6/§7 name the five kits that shipped unmentioned.*
 
-<!-- governance-template: v2.9 -->
+<!-- governance-template: v2.10 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -25,6 +25,7 @@ matcher; §5/§6/§7 name the five kits that shipped unmentioned.*
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
 - **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
+- **When no rule below covers it**, decide by these: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
 
 ## §1 — Work-unit lifecycle (start → done → land)
 
