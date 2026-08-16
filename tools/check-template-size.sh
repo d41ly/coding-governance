@@ -16,6 +16,14 @@
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
 
+# Every exit path goes through fail(), which is what puts this gate into check-arms.py's
+# population: its FAIL_RE matches `fail <n> "…` and its branches() refuses a message with no
+# literal run of 12+ characters to assert on. The exit CODE is carried in FAIL_CODE rather than
+# an argument, because the discovery regex reads the check number and the message and would not
+# survive a third positional between them. A message may span lines; only the first is asserted.
+FAIL_CODE=1
+fail() { printf 'TEMPLATE-SIZE check %s FAILED — %s\n' "$1" "$2"; exit "$FAIL_CODE"; }
+
 # `--bump` is a FLAG, not a positional, because the three positionals below are already spoken for
 # (subject, limit, record path) and a mode sharing a slot with a path is how one of them silently
 # becomes the other. Strip it wherever it appears, then read the positionals from what is left.
@@ -42,7 +50,7 @@ MAX_BYTES=${2:-${MAX_BYTES:-49152}}   # 48 KiB default — the ceiling for the p
 # the self-test must point the gate at a scratch copy without writing the tracked one.
 HIGHWATER=${3:-${HIGHWATER:-"$ROOT/tools/template-size-highwater.txt"}}
 
-[ -f "$FILE" ] || { echo "TEMPLATE-SIZE env ERROR — file not found: $FILE"; exit 2; }
+[ -f "$FILE" ] || { FAIL_CODE=2; fail 1 "the file to measure does not exist: $FILE"; }
 # Measure LF-NORMALIZED bytes (strip CR) so the gate is checkout-independent — a Windows autocrlf
 # smudge to CRLF must not inflate the count and spuriously fail the limit.
 bytes=$(tr -d '\r' < "$FILE" | wc -c | tr -d '[:space:]')
@@ -50,12 +58,12 @@ name=$(basename "$FILE")
 
 if [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))
-  echo "TEMPLATE-SIZE FAILED — $name is $bytes bytes, $over over the $MAX_BYTES-byte limit."
-  echo "  Trim non-instructional prose, or move an activity-scoped section to"
-  echo "  parallel-coding-governance.domain-rules.md (leaving a §-stub pointer), per the v2.3 pattern."
-  echo "  Raising the limit is an OWNER decision recorded in memory/DECISIONS.md, never a fix for"
-  echo "  the edit that hit it — and this message is shared with the kickoff engine at its own limit."
-  exit 1
+  FAIL_CODE=1
+  fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
+  Trim non-instructional prose, or move an activity-scoped section to
+  parallel-coding-governance.domain-rules.md (leaving a §-stub pointer), per the v2.3 pattern.
+  Raising the limit is an OWNER decision recorded in memory/DECISIONS.md, never a fix for
+  the edit that hit it — and this message is shared with the kickoff engine at its own limit."
 fi
 
 # --- the high-water ratchet -------------------------------------------------------------------
@@ -99,8 +107,8 @@ elif [ ! -f "$HIGHWATER" ]; then
 elif [ -z "$recorded" ]; then
   echo "TEMPLATE-SIZE no-ratchet — $key has no row in $HIGHWATER; growth is unpriced."
 elif ! printf '%s' "$recorded" | grep -qE '^[0-9]+$'; then
-  echo "TEMPLATE-SIZE RECORD ERROR — $key's high-water in $HIGHWATER is not a number: '$recorded'."
-  exit 3
+  FAIL_CODE=3
+  fail 3 "the high-water record holds a non-numeric value for $key in $HIGHWATER: '$recorded'"
 elif [ "$bytes" -gt "$recorded" ]; then
   echo "TEMPLATE-SIZE WARN — $name grew past its recorded high-water: $recorded -> $bytes (+$((bytes - recorded))). Advisory only; re-record with --bump when the growth is intended."
 fi

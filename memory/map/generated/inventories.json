@@ -48,6 +48,7 @@
       "run-gates evidence",
       "settings-merge selftest",
       "template size <=48KiB",
+      "template size gate selftest",
       "unattended adopter e2e",
       "unattended driver selftest",
       "unattended gate selftest",

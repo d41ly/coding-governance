@@ -21,6 +21,13 @@
     ]
   },
   {
+    "name": "template size gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-template-size.test.sh"
+    ]
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",
