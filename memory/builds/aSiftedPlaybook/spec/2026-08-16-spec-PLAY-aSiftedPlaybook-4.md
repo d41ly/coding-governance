@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
+**Status:** CLOSED · rev-4 · 2026-08-16 · node a · Tier-1 · base 91ef1b05 · streams playbook
 
 ## 1. Goal
 

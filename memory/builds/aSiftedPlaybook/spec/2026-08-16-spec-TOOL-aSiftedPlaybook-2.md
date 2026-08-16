@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** CLOSED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
