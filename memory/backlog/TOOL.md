@@ -2,6 +2,8 @@
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
 > **Rotated 2026-08-14** — 48 terminal rows moved byte-identical to [`../archive/TOOL.2026-08-14.md`](../archive/TOOL.2026-08-14.md), covering `TOOL-aRuledParchment-2` through `TOOL-cFinalBerth-2`. Nothing deleted; the all-time id-collision grep still reaches them there.
+- TOOL-aSiftedPlaybook-4 · OPEN · make the template ceiling a DECLARED pin, not a shell constant, the way .memory-tree.conf's READ_PATH_CEILING declares a byte budget with each raise justified beside it. Recorded by TOOL-aSiftedPlaybook-1 §4
+- TOOL-aSiftedPlaybook-5 · OPEN · the recall corpus cannot reach a constraint declared in a conf file. TOOL-aSiftedPlaybook-1 §10 found READ_PATH_CEILING to be live prior art its own query could not surface: retrieval indexes decision records, not confs
 - TOOL-aRootedPrefix-3 · OPEN · hygiene checks 6/7 measure RAW working-tree bytes, so an adopter without the eol=lf pin still gets a platform-dependent cap and entry budget — normalize before measuring, as `check-template-size.sh` already does
 - TOOL-aNumeralWarden-2 · OPEN · agent-cap's enclosing-opener walk is defeated by two nested wrappers or 59 lines of distance between the `.map` and the `agent(` call; it needs a statement-level walk, not an opener count, and the 58/59 boundary is unfixtured
 - TOOL-aNumeralWarden-3 · CLOSED · a weakening pin move now refuses unless a comment beside it names both values as `<old> -> <new>` — the marker the repo already wrote in prose and no gate read. Seven scalars declared; ARMS_FLOORS and CORE_FLOOR are compound and stay out, named
