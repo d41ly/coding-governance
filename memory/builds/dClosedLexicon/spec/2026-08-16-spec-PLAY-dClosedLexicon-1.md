@@ -1,6 +1,6 @@
 # PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted
 
-**Status:** BLOCKED · rev-2 · 2026-08-16 · node d · Tier-2 · base 587b95a4 · streams playbook
+**Status:** CLOSED · rev-3 · 2026-08-16 · node d · Tier-2 · base 587b95a4 · streams playbook
 
 ## 1. Goal
 
@@ -166,13 +166,23 @@ unit adds no gate.
 
 - **F1 — does the §0 line earn its bytes?** RESOLVED (owner, 2026-08-16): keep. It was ratified when
   157 B was scarce; at 48 KiB the byte objection is moot and the reason it was wanted is unchanged.
-- **F2 — this unit may land a lockstep it cannot yet verify.** `check-placeholders.sh` is
-  `TOOL-dClosedLexicon-1` S12 and lands with that unit. If this one lands first, AC3 is a read rather
-  than a gate for exactly one landing. RECOMMENDATION: land the lexicon unit first now that it is
-  unblocked, which makes S12 available and costs nothing, since this unit is waiting on the ceiling
-  raise regardless.
+- **F2 — this unit may land a lockstep it cannot yet verify.** RESOLVED (agent, 2026-08-16,
+  delegated): the recommendation was followed and the risk never materialised. `TOOL-dClosedLexicon-1`
+  landed FIRST, so `tools/check-placeholders.sh` exists and rides the bar; AC3 is a GATE for this
+  landing, not a read. The gate is also narrower than the fork assumed — its catalogue arithmetic was
+  dropped as a duplicate of `check-playbook-parity.sh` — but the marker lockstep, which is the half
+  AC3 needs, is exactly what survived and is checked by nothing else.
 
 ## 9. Revision log
+
+- rev-3 · 2026-08-16 · BUILT and CLOSED. The blocker is gone: the 48 KiB ceiling landed with
+  `aSiftedPlaybook` and arrived here in the dClosedLexicon merge, so the §0 line's 157 B now sits
+  against ~11.8 KB of headroom rather than 86 B. S1 lands the fallback line at the end of §0, S2
+  corrects `PLAY-aCandidStub-2` to WONTDO carrying the REFUTATION rather than a verdict — every
+  §-stub needs an ACTIVITY trigger and §14's is every call, so a stub reading "LOAD always" moves
+  bytes without saving any and makes always-on rules dark — and S3 takes both marker carriers to
+  v2.10 in lockstep. AC2 is no longer observable and is recorded as such: it asserted the unit reds
+  BEFORE the raise, and the raise has landed.
 
 - rev-1 · 2026-08-16 · initial draft. Corrects the externalization plan on measurement: §14 splits
   rather than moving whole, and the saving is ~738 B rather than the ~1,480 B ratified.
