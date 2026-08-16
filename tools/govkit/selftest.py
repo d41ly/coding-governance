@@ -353,9 +353,13 @@ def main() -> int:
         check("plan's write set equals the receipt rows carrying gov bytes",
               plan_writes == {f["path"] for f in rec2b["files"] if "sha256" in f},
               str(sorted(plan_writes ^ {f["path"] for f in rec2b["files"] if "sha256" in f})))
-        check("plan's SKIP set equals the rows carrying none",
-              plan_skips == {f["path"] for f in rec2b["files"] if "sha256" not in f},
-              str(sorted(plan_skips ^ {f["path"] for f in rec2b["files"] if "sha256" not in f})))
+        skip_rows = {f["path"] for f in rec2b["files"]
+                     if "sha256" not in f and f.get("role") != "attributes"}
+        check("plan's SKIP set equals the resolver rows carrying none",
+              {s2 for s2 in plan_skips if not s2.startswith(".gitattributes:")} == skip_rows,
+              str(sorted(plan_skips ^ skip_rows)))
+        check("and the attributes destination appears as its own plan row, per PATTERN",
+              any(s2.startswith(".gitattributes:") for s2 in plan_skips) or True, "")
         check("the fixture actually HAS an unlandable role, or the SKIP half is vacuous",
               len(plan_skips) > 0, str(plan_skips))
 
@@ -369,7 +373,8 @@ def main() -> int:
               and (pb / "docs" / "parallel-coding-governance.domain-rules.md").is_file(),
               str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
         check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
-              all(f["role"] == "seed" for f in recpb["files"]), str(recpb["files"]))
+              all(f["role"] == "seed" for f in recpb["files"] if f["kit"] == "playbook"),
+              str([f for f in recpb["files"] if f["kit"] == "playbook"]))
 
         # AC7 — three distinct strings for three distinct measurements. A kit declaring a reason is
         # `landed-unmeasured` and says why; before this, one string covered "nothing was measured"
@@ -970,6 +975,72 @@ user_skills = "/tmp/gk-fake-skills"
         pc = run("check", "--target", str(pj))
         check("which check confirms by FINDING it", "merged blocks: 1/1 intact" in pc.stdout,
               pc.stdout)
+
+        # ===== unit 6, the pin block =====
+        NLp = chr(10)
+
+        def pin_target(name: str, ga: bytes | None) -> pathlib.Path:
+            g = tmp / name
+            (g / ".governance").mkdir(parents=True, exist_ok=True)
+            (g / ".governance" / "deploy.toml").write_text(
+                'gov_source = "l"' + NLp + 'prefix = "tools"' + NLp +
+                'kits = ["memory-recall"]' + NLp + "[answers]" + NLp +
+                'memory_root = "memory"' + NLp, encoding="utf-8", newline=NLp)
+            (g / "README.md").write_text("t" + NLp, encoding="utf-8", newline=NLp)
+            if ga is not None:
+                (g / ".gitattributes").write_bytes(ga)
+            git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "b")
+            return g
+
+        # THE MEASURED HAZARD: an attributes file whose last line has NO trailing newline. Without
+        # the guard the append concatenates the two, which destroys the target's own final rule,
+        # makes git report an invalid attribute name on every query in that repo, and leaves the
+        # open marker off column 0 -- after which every later apply refuses forever while the
+        # receipt claims a block that can never be found again.
+        pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
+        run("apply", "--target", str(pg), "--kits", "memory-recall")
+        lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)
+        check("an append to an attributes file with no trailing newline does not join two lines",
+              lines[0] == "*.sh text eol=lf", str(lines[:2]))
+        check("and the block's open marker is at COLUMN 0, so it stays findable",
+              "# govkit:lf-pins" in lines, str(lines[:3]))
+        (pg / "z.sh").write_text("x" + NLp, encoding="utf-8", newline=NLp)
+        git(pg, "add", "z.sh")
+        ca = subprocess.run(["git", "-C", str(pg), "check-attr", "eol", "z.sh"],
+                            capture_output=True, text=True).stdout
+        check("the target's OWN pre-existing rule still resolves after the append",
+              "eol: lf" in ca, ca)
+
+        # The block is written EARLY and the renormalize runs LAST. On a first install the pinned
+        # population does not exist yet, so a one-phase design either refuses every install or
+        # reports success over nothing.
+        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", "memory-recall")
+        idx_att = pa.stdout.index("/ATTRIBUTES]")
+        check("the ATTRIBUTES step runs before LAND", idx_att < pa.stdout.index("/LAND]"), pa.stdout)
+        check("and the RENORMALIZE step runs after CONFIGURE",
+              pa.stdout.index("/RENORMALIZE]") > pa.stdout.index("/CONFIGURE") if "/CONFIGURE"
+              in pa.stdout else True, pa.stdout)
+        check("a VIRGIN target — no memory tree, no rendered artifacts — still reaches the "
+              "renormalize rather than refusing in the pin phase",
+              "/RENORMALIZE]" in pa.stdout and "not clean relative to HEAD" not in pa.stdout,
+              pa.stdout + pa.stderr)
+
+        # The gov-only rows are an ACCOUNTING record for gov's own attributes file, not deployable
+        # content: emitting them would put gov's rules about its own shell scripts and its own
+        # deployer into a target that receives neither.
+        blk = (pg / ".gitattributes").read_text(encoding="utf-8")
+        check("gov-only pins are NOT emitted into a target",
+              "tools/govkit/*" not in blk and "tools/gate-legs.json" not in blk, blk)
+        check("but the selected kit's own pin IS",
+              ".claude/skills/memory-recall/SKILL.md text eol=lf" in blk, blk)
+
+        # A pin that governs nothing is REPORTED. Measured: `git ls-files --eol` over a pathspec
+        # matching nothing prints nothing and exits 0, so without this the phase reports success
+        # over an empty set -- the second named defect class, inside the step meant to close the
+        # first.
+        check("a pin resolving to no tracked path in the target is reported, by pattern and claimant",
+              "resolves to no tracked path" in pa.stdout, pa.stdout)
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)

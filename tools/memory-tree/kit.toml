@@ -150,3 +150,22 @@ guard = []
 name = "check-arms selftest"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
 guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = "{memory_root}/**/*.md"
+why = "three gates byte- or char-compare these"
+[[lf_pin]]
+pattern = "{memory_root}/**/*.toml"
+why = "the same gates read them as data"
+[[lf_pin]]
+pattern = "{memory_root}/**/*.txt"
+why = "the waiver registries are read line by line"
+[[lf_pin]]
+pattern = ".memory-tree.conf"
+why = "a sourced conf: a CR reaches the shell as part of the value"
+[[lf_pin]]
+pattern = "{kit}/.memory-tree.conf.example"
+why = "the adopter copies it verbatim into the line above"

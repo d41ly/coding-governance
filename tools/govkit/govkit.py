@@ -34,7 +34,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.7"  # gov:kit govkit@1.7 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.8"  # gov:kit govkit@1.8 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -948,6 +948,16 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                         "why": UNLANDED_REASON.get(u["role"], "role outside the enum")})
 
         seen_sfx: set[str] = set()
+        # The attributes destination and ONE row per declared PIN PATTERN. Never the resolved path
+        # list: that population is git's answer about which paths the block governs, and at plan
+        # time the block is unwritten, so git resolves nothing. The resolved list is asserted
+        # receipt-versus-post-condition instead, which is why it is not a plan row.
+        for pin in d.get("lf_pin", []):
+            pat, miss = resolve_tokens(pin.get("pattern", ""), ctx)
+            out.append({"kit": eid, "role": "attributes", "kind": "skip",
+                        "dest": ".gitattributes:" + pat, "missing": miss, "src": "",
+                        "why": "a line-ending pin, emitted into one govkit-owned block"})
+
         for rule in rules:
             for sfx in rule.get("side_effects", []):
                 resolved, _ = resolve_tokens(sfx, ctx)
@@ -1298,6 +1308,68 @@ def write_block(text: str | None, open_m: str, close_m: str, block: str,
     return text + sep + block + "\n", "appended"
 
 
+def fnmatchcase_path(path: str, pattern: str) -> bool:
+    """Does a gitattributes-shaped pattern cover this path? Used ONLY to report a pin that governs
+    nothing — never to decide what the renormalize touches, which is git's own answer."""
+    import fnmatch
+    if pattern.startswith("**/"):
+        pattern = pattern[3:]
+    pat = pattern.replace("/**/", "/*/")
+    return (fnmatch.fnmatchcase(path, pattern) or fnmatch.fnmatchcase(path, pat)
+            or fnmatch.fnmatchcase(pathlib.PurePosixPath(path).name, pattern))
+
+
+GA_BLOCK_ID = "govkit:lf-pins"
+
+
+def eol_population(target: pathlib.Path) -> dict[str, str]:
+    """Ask GIT which tracked paths resolve to which `eol` value. Never a pattern match.
+
+    An attributes PATTERN and a git PATHSPEC are different languages, and feeding one string to both
+    is wrong in BOTH directions on the exact patterns this seeds: `memory/**/*.md` as an attribute
+    matches a file at depth 1, as a pathspec it does not; `memory/*.md` as a pathspec crosses a
+    directory separator, as an attribute it does not. So the population is git's own answer, and the
+    literal paths it returns are what the renormalize touches and what the post-condition re-reads.
+    """
+    files = subprocess.run(["git", "-C", str(target), "ls-files", "-z"],
+                           capture_output=True, text=True).stdout.split("\0")
+    files = [f for f in files if f]
+    if not files:
+        return {}
+    out = subprocess.run(["git", "-C", str(target), "check-attr", "--stdin", "-z", "eol"],
+                         input="\0".join(files), capture_output=True, text=True)
+    fields, res = out.stdout.split("\0"), {}
+    for i in range(0, len(fields) - 2, 3):
+        path, _attr, value = fields[i], fields[i + 1], fields[i + 2]
+        if value not in ("unspecified", "unset", ""):
+            res[path] = value
+    return res
+
+
+def lf_pins(descs: dict, selection: list[str], ctx_of) -> list[tuple[str, str, str]]:
+    """(pattern, claimant, why-first-line) for the selection, deduped and sorted.
+
+    Sorted so the block's bytes are stable at any selection order — otherwise the same install
+    produces different bytes depending on the order kits were named.
+
+    The registry's `[[gov_only_pin]]` rows are DELIBERATELY not here. They exist so every eol pin in
+    gov's own attributes file is accounted for by something — the same completeness claim the path
+    exemptions make — and emitting them would put gov-internal rules about gov's own shell scripts
+    and its own deployer into a target that receives neither.
+    """
+    seen: dict[str, tuple[str, str]] = {}
+    for eid in selection:
+        d = descs[eid][0]
+        for pin in d.get("lf_pin", []):
+            pat, miss = resolve_tokens(pin.get("pattern", ""), ctx_of(eid, d))
+            if miss or not pat:
+                raise Refusal(f"entry '{eid}' declares an lf_pin whose pattern needs answer "
+                              f"'{miss[0] if miss else '?'}' — a literal brace written into "
+                              f"somebody's .gitattributes matches nothing, forever")
+            seen.setdefault(pat, (eid, str(pin.get("why", "")).strip().split("\n")[0]))
+    return sorted((p, c, w) for p, (c, w) in seen.items())
+
+
 # ------------------------------------------------------------------- the gate runner declaration
 # ONE vocabulary, owned here. `make`, `npm` and `shell` are REFUSED BY NAME: refusing three and doing
 # one well beats half-writing four, because a splice into a Makefile that half-works ships a target a
@@ -1629,6 +1701,51 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
 
     rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 2
     staged: list[str] = []      # only what this run actually wrote
+
+    # ---- ATTRIBUTES. The pin block is written EARLY — before any content — because it is what the
+    # ---- renormalize and every later checkout read. The PROBE and the renormalize are NOT here:
+    # ---- they run last, after configure, because on a first install the pinned population does not
+    # ---- exist yet (the memory tree is scaffolded by an adopter, the confs are adopter outputs, the
+    # ---- rendered artifacts appear at configure). One phase would either refuse every first install
+    # ---- or report success over nothing.
+    # The UNION of this selection and whatever the receipt already claims. A narrower later apply
+    # must not un-pin files whose kit is still installed — that would be invisible until somebody
+    # re-checked-out on a foreign platform and a byte-comparing gate went red for reasons nothing
+    # records.
+    pins = lf_pins(descs, sorted(set(selection) | set((receipt or {}).get("kits") or [])),
+                   lambda e, dd: target_context(target, deploy, e, dd))
+    ga_path = target / ".gitattributes"
+    if pins:
+        # Cleanliness FIRST, and relative to HEAD so it covers staged, unstaged and both. Measured:
+        # `git add --renormalize` rewrites a DELIBERATELY STAGED blob, and a tracked path deleted in
+        # the worktree makes it abort entirely, staging nothing — which in this order would happen
+        # after the block was written, leaving gov's block in the file with no renormalize.
+        for marker in ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD"):
+            if (target / ".git" / marker).exists():
+                raise Refusal(f"the target has {marker} — a merge, rebase or cherry-pick is in "
+                              f"progress, and renormalizing mid-conflict rewrites index stages the "
+                              f"operator cannot reconstruct")
+        om, cm = marker_pair("hash-comment", GA_BLOCK_ID)
+        body = [om, "# GENERATED by govkit apply. Edit the kits' descriptors, not this block."]
+        for pat, claimant, why in pins:
+            body.append(f"# {claimant}" + (f" — {why}" if why else ""))
+            body.append(f"{pat} text eol=lf")
+        body.append(cm)
+        cur = ga_path.read_text(encoding="utf-8", errors="replace") if ga_path.is_file() else None
+        new, mode = write_block(cur, om, cm, "\n".join(body), "append")
+        ga_path.write_text(new, encoding="utf-8", newline="\n")
+        subprocess.run(["git", "-C", str(target), "add", "--", ".gitattributes"],
+                       capture_output=True, check=False)
+        rows.append({"path": ".gitattributes", "role": "attributes", "kit": "(govkit)",
+                     "version": "(synthesized)", "block_id": GA_BLOCK_ID,
+                     "marker_style": "hash-comment", "mode": mode, "normalized": "lf",
+                     "block_sha256": hashlib.sha256(
+                         "\n".join(body).encode("utf-8")).hexdigest(),
+                     "patterns": [p for p, _c, _w in pins], "written": True})
+        step(STEP_ATTRIBUTES, f"{len(pins)} pin(s) [{mode}]")
+    else:
+        step(STEP_ATTRIBUTES, f"0 pin(s) declared by {', '.join(selection)} — nothing to write")
+
     # ---- LAND. Kit content from the index at `commit`, through the ONE resolver `plan` also calls.
     step(STEP_LAND, f"from {commit[:8]} into {target.as_posix()}")
     for eid in selection:
@@ -1844,6 +1961,40 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             row["inputs"] = [{"path": conf,
                               "sha256": hashlib.sha256((target / conf).read_bytes()).hexdigest()}]
     print(f"govkit apply — observed {n_rendered} rendered destination(s)")
+
+    # ---- RENORMALIZE, after CONFIGURE and not beside the block. This DEPARTS from the contract's
+    # ---- stated order, deliberately and for a measured reason: before the adopters have run, the
+    # ---- pinned population is empty.
+    if pins:
+        want = eol_population(target)
+        lf_paths = sorted(p for p, v in want.items() if v == "lf")
+        if lf_paths:
+            dirty = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD", "--"]
+                                   + lf_paths, capture_output=True, text=True).stdout.split()
+            missing_wt = [p for p in lf_paths if not (target / p).exists()]
+            if dirty or missing_wt:
+                r.fail(f"the pinned population is not clean relative to HEAD "
+                       f"({', '.join(sorted(set(dirty + missing_wt))[:4])}) — refusing the "
+                       f"renormalize rather than folding somebody's work-in-progress into an index "
+                       f"gov does not own")
+            else:
+                subprocess.run(["git", "-C", str(target), "add", "--renormalize", "--"] + lf_paths,
+                               capture_output=True, check=False)
+        after = eol_population(target)
+        idx = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "--"] + lf_paths,
+                             capture_output=True, text=True).stdout if lf_paths else ""
+        bad = [ln.split("\t")[-1] for ln in idx.splitlines() if ln and "i/lf" not in ln.split()[0]]
+        for b in bad:
+            r.fail(f"'{b}' is pinned eol=lf and its INDEX blob is not LF after the renormalize")
+        covers_nothing = [p for p, _c, _w in pins
+                          if not any(fnmatchcase_path(f, p) for f in after)]
+        for p in covers_nothing:
+            claim = next(c for pp, c, _w in pins if pp == p)
+            r.note(f"pin '{p}' (declared by {claim}) resolves to no tracked path in this target")
+        step(STEP_RENORMALIZE, f"{len(lf_paths)} path(s) governed, {len(bad)} not LF in the index")
+        for row in rows:
+            if row.get("role") == "attributes":
+                row["renormalized"] = lf_paths
 
     # ---- LEGS. The last CONTENT step of the hard order. Guards are RENDERED against the target's
     # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:

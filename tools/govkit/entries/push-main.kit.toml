@@ -60,3 +60,13 @@ the self-test is this entry's gate leg and there is no rendered artifact to comp
 name = "pre-push self-test"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".githooks/pre-commit"
+why = "a CRLF hook does not execute"
+[[lf_pin]]
+pattern = ".githooks/pre-push"
+why = "a CRLF hook does not execute"

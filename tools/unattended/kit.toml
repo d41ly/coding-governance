@@ -90,3 +90,19 @@ guard = ["{kit}/"]
 name = "unattended adopter e2e"
 argv = ["bash", "{kit}/adopt-unattended.test.sh"]
 guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".unattended.conf"
+why = "its values are shell COMMANDS; a CR is executed"
+[[lf_pin]]
+pattern = "{kit}/.unattended.conf.example"
+why = "the adopter copies it verbatim into the line above"
+[[lf_pin]]
+pattern = "{kit}/*.md"
+why = "the protocol is byte-compared against the shipped copy"
+[[lf_pin]]
+pattern = ".claude/skills/unattended/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

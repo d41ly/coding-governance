@@ -44,3 +44,10 @@ discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\" \"$2\"",
 none = """
 installation is a copy to an owner-chosen path and there is no adopter. What needs observing is the placeholders, and that is the declared hole with its own probe
 """
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = "{playbook_dir}/parallel-coding-governance*.md"
+why = "under a strict byte gate"

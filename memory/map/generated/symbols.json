@@ -578,6 +578,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "eol_population",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "evict_dead_siblings",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -639,6 +644,11 @@
     },
     {
       "id": "find_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "fnmatchcase_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -766,6 +776,11 @@
       "id": "lf",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "lf_pins",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "load",

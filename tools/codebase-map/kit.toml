@@ -74,3 +74,10 @@ guard = ["{kit}/"]
 name = "codebase-map adopter e2e"
 argv = ["bash", "{kit}/adopt-codebase-map.test.sh"]
 guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".codebase-map.conf"
+why = "a sourced conf: a CR reaches the shell as part of the value"

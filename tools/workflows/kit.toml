@@ -58,3 +58,10 @@ guard = []
 name = "review-join self-test"
 argv = ["bash", "{kit}/check-review-join.test.sh"]
 guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = "{kit}/*.js"
+why = "measured: 350 CR bytes made the shipped harness unlaunchable while its own syntax leg stayed green"

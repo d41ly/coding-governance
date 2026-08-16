@@ -81,3 +81,10 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 name = "drift-audit wiring"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".claude/skills/drift-audit/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

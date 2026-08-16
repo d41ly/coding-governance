@@ -225,3 +225,19 @@ name = "govkit refusal join"
 why = """
 a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.
 """
+
+# ------------------------------------------------------------------- gov-only pins
+# eol pins that belong to NO deployable. Forcing them into an entry would attribute a
+# gov-internal rule to a kit an adopter receives.
+
+[[gov_only_pin]]
+pattern = "*.sh"
+why = "every shell script in this repo, including ones no kit ships"
+
+[[gov_only_pin]]
+pattern = "tools/gate-legs.json"
+why = "gov's own leg manifest, a registry exemption"
+
+[[gov_only_pin]]
+pattern = "tools/govkit/*"
+why = "the deployer itself, which never travels"
