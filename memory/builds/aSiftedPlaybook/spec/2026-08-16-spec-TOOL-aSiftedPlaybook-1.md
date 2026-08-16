@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -288,8 +288,13 @@ ratchet's own rule.
   during units 5 and 6; `PLAY-aSiftedPlaybook-3`'s closing `--bump` is what returns the tree to
   quiet, and that unit owns the observation. A ratchet that ships already firing is
   the permanently-red shape S8 exists to avoid.
-- **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, both
-  spell `<=48KiB` and neither still spells `<=32KiB`.
+- **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, the
+  KEY reads `<=48KiB` in both files and no live key still reads `<=32KiB`. **The old label may
+  survive inside `baseline.toml`'s header exception, and only there** — AC6b requires that header to
+  record which key was swapped in place, and an exception that cannot name what it excepts is not a
+  record. Written without this carve-out, AC8 forbade the artifact AC6b mandates: the two criteria
+  contradicted each other, and the contradiction was only visible once both were run against a real
+  tree. Same shape as AC3's history-comment carve-out, and found the same way.
 - **AC6** — When `memory/DECISIONS.md` is read, a new row records **both** reversals — the ceiling
   and the `baseline.toml` exception — and names all four records whose premise the ceiling change
   falsifies: `PLAY-aCandidStub-1`, `TOOL-aGuardedTally-1`, `PLAY-aPrunedCeremony-1` RD7, and the
@@ -409,6 +414,13 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-16 · **AC8 amended during the build pass, per M2's "change the spec first".**
+  Running AC6b and AC8 against a real tree showed they contradict: AC6b mandates a dated exception
+  in `memory/map/baseline.toml`'s header recording which gate-leg key was swapped in place, and
+  such a record must NAME the old key — which AC8, written as "neither still spells `<=32KiB`",
+  forbade. AC8 now carves out the header exception and only it, on AC3's own precedent. Neither
+  criterion was observable against the other before the code existed, which is why five review
+  rounds did not surface it and the first acceptance run did.
 - rev-9 · 2026-08-16 · folded round-5 H1 and L2. **H1**: S5's carrier — the kickoff manifest's
   32 KiB trap — was observed by no acceptance criterion in the entire build. AC3 is the only sweep
   and its pathspec is `-- ':!memory/'`; the manifest moved under `memory/` at `24f3991`, so the

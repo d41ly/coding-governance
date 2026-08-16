@@ -47,7 +47,7 @@
       "run-gates canary",
       "run-gates evidence",
       "settings-merge selftest",
-      "template size <=32KiB",
+      "template size <=48KiB",
       "unattended adopter e2e",
       "unattended driver selftest",
       "unattended gate selftest",

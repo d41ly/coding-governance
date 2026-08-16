@@ -54,7 +54,7 @@ Inventories: gate-legs: 55 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `run-gates canary` | baseline |
 | `run-gates evidence` | foundation |
 | `settings-merge selftest` | baseline |
-| `template size <=32KiB` | baseline |
+| `template size <=48KiB` | baseline |
 | `unattended adopter e2e` | unattended |
 | `unattended driver selftest` | unattended |
 | `unattended gate selftest` | unattended |

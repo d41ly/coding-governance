@@ -1,0 +1,2 @@
+parallel-coding-governance.template.md	32682
+skills/session-kickoff/SKILL.md	18215

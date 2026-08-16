@@ -151,6 +151,10 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/template-size-highwater.txt"
+why = "the size gate's high-water record, keyed by measured file. Travels with check-template-size.sh, which is exempt for the same reason: it gates gov's own product template and is prescribed for copy nowhere. Exemptions are exact-path, so the gate's row does not cover this one."
+
+[[exempt]]
 path = "tools/govkit"
 why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
 

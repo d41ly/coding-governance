@@ -14,7 +14,7 @@
     ]
   },
   {
-    "name": "template size <=32KiB",
+    "name": "template size <=48KiB",
     "argv": [
       "bash",
       "tools/check-template-size.sh"

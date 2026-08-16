@@ -9,7 +9,7 @@ machines/sessions on the same repo.
 ## Contents
 
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
-  ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
+  ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
   snapshots live under `memory/archive/`. Two companions ship with it:
   **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and
   **`.domain-rules.md`** (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references
@@ -30,7 +30,7 @@ machines/sessions on the same repo.
 - **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree: a FLAT
   `builds/<slug>/` per unit of work, one append-only `DECISIONS.md`, per-family backlog shards, index
   budgets + rotation, status vocabulary, a GENERATED work-state index (`LIVE.md` + `ledger/<month>.md`,
-  rendered from build front matter — nothing about status is authored), and a 19-check hygiene gate.
+  rendered from build front matter — nothing about status is authored), and a 20-check hygiene gate.
   The discipline is a `streams`
   value in each spec's status header, not a directory, so a build spanning two disciplines is one
   build. Every check that has a population asserts that population is NON-EMPTY, because a

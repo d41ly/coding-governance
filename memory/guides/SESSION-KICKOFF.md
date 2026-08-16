@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-16T16:07:30+03:00 @ f43a48c858dfbaf56dee113bbda8dce7b3740e12
+last-audit: 2026-08-16T17:29:54+03:00 @ 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: e99de5b6c3fa257277490eb19dcd05b4a137b855
@@ -118,9 +118,10 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
 
-- The template is under a STRICT 32 KiB gate. Never raise it; externalize into
-  `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
-  `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
+  recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
+  spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
+  margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
@@ -145,7 +146,8 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
 - Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
   assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
-  signal — which is pinned at 0 of 53 with ZERO slack, so an uncited leg reds immediately.
+  signal — pinned at 0 with ZERO slack, so an uncited leg reds immediately. Read the leg count
+  from `drift_report.py --check`; this line said 53 against a live 55.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.

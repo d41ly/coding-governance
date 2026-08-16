@@ -2,6 +2,13 @@
 # Items inventoried from code but not yet claimed by a dossier or FOUNDATION.md.
 # This file only SHRINKS: claim an item, delete its line. New keys belong in a
 # dossier, not here — additions are reserved for the initial backfill and reviewed.
+#
+# EXCEPTION, 2026-08-16 (TOOL-aSiftedPlaybook-1, owner-resolved F1): the gate-leg key
+# `template size <=32KiB` was RENAMED in place to `template size <=48KiB` when the owner
+# raised the template ceiling. A rename is a delete plus an add through this file, which the
+# rule above forbids; it was taken deliberately, and it is recorded here rather than only in a
+# spec so a reader meeting the shrink-only claim also meets its one exception. Nothing enforces
+# the rule today — that is why the option was available at all.
 
 gate-legs = [
   "agent-instructions self-test",
@@ -32,7 +39,7 @@ gate-legs = [
   "review-join self-test",
   "run-gates canary",
   "settings-merge selftest",
-  "template size <=32KiB",
+  "template size <=48KiB",
   "verdict epoch (kit version dates the engine)",
   "verdict-epoch self-test",
   "workflow script syntax",

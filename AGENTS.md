@@ -4,7 +4,8 @@ Project-agnostic governance + tooling for running Claude Code (or any agent) acr
 machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
 gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
 itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
-keys not yet claimed by one are in the shrink-only `baseline.toml`. Both counts move as dossiers
+keys not yet claimed by one are in the `baseline.toml`, which shrinks except where a recorded
+decision says otherwise (`TOOL-aSiftedPlaybook-1` swapped one key in place; see the file's header). Both counts move as dossiers
 land, so neither is spelled here — `python tools/codebase-map/reuse_lookup.py` prints the live pair.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
@@ -13,8 +14,8 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 ## What ships here (the product)
 
 - **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
-  ruleset; **≤32 KiB, strictly gated** by `tools/check-template-size.sh` — trim or externalize, never
-  raise the limit). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
+  ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`, which also prices every growth
+  against a recorded high-water — prefer externalizing to spending the headroom). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
   (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
   holding the kickoff-manifest merge exception the byte-gated template externalized, plus the
   kit-conditional unattended-run rules).
@@ -94,7 +95,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
-- template size ≤32 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
+- template size ≤48 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
   MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
   positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
@@ -194,7 +195,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
 
 - **LF** on all `.sh` + the memory-tree data files (`.gitattributes`); verify staged bytes on Windows.
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
-- The template is the operating ruleset — keep it ≤32 KiB; anything activity-scoped or one-time goes
+- The template is the operating ruleset — keep it ≤48 KiB; anything activity-scoped or one-time goes
   in a companion, not the template.
 - Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.

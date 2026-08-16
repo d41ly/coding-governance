@@ -6,6 +6,10 @@
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
+# The size gate's high-water record: a data file the gate PARSES and `--bump` REWRITES. The gate
+# strips CR from the value so it is tolerant either way, but an unpinned record makes every --bump
+# rewrite the whole file on a CRLF checkout, and the key side has no such tolerance to spare.
+tools/template-size-highwater.txt text eol=lf
 
 # Git hooks are extensionless (the *.sh rule above misses them); a CRLF hook won't execute.
 .githooks/pre-commit text eol=lf
