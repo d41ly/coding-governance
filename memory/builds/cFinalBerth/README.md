@@ -107,7 +107,7 @@ been asked; it is F3 above, now asked and answered.
 *(The synthesis pass's own summary says "three lenses". It was four — the per-agent journal records
 12, 10, 7 and 5 findings. Corrected here rather than in the record, which is left as written.)*
 
-Records live under `spec/` and `reviews/`. The table below is GENERATED from the status header of
+The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -117,4 +117,6 @@ every spec in this folder — do not hand-edit it.
 |---|---|---|---|
 | [TOOL-cFinalBerth-1 — the terminal transition: LANDED as an observation, ABORTED as a record](spec/2026-08-13-spec-cFinalBerth-1.md) | CLOSED | rev-4 | 2026-08-14 |
 | [TOOL-cFinalBerth-2 — the close that survives the landing it precedes](spec/2026-08-13-spec-cFinalBerth-2.md) | CLOSED | rev-4 | 2026-08-14 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

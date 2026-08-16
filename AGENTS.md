@@ -167,7 +167,10 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   `tools/workflows/check-verifier-fanout.test.sh` · `tools/workflows/check-review-join.test.sh`, plus
   the engines carrying their arms in a `--selftest` mode rather than a sibling file —
   `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/corpus_ids.py` and
-  `tools/memory-tree/row_grammar.py`. This is the list the charter-completeness signal reads, not a
+  `tools/memory-tree/row_grammar.py`. Beside them rides the marker-region contract itself,
+  `tools/memory-tree/marker-contract.test.sh`, which drives all four live readers of the
+  generated-region markers over one case table — the contract lives in that table, not in prose.
+  This is the list the charter-completeness signal reads, not a
   claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default

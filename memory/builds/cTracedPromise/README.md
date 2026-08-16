@@ -64,6 +64,8 @@ below was put to them.
 |---|---|---|---|
 | [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | CLOSED | rev-3 | 2026-08-15 |
 | [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | CLOSED | rev-4 | 2026-08-15 |
+
+Records live under `spec/`.
 <!-- /gen:build-index -->
 
 ## The owner decision menu

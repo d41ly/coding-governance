@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-grammar selftest"]
+gate-legs = ["row-grammar selftest", "marker contract (4 readers)"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -60,6 +60,17 @@ amendment is not a member; a row answers "what is on this line", where it is.
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.
 
+### The marker contract
+
+Four live readers parse the generated-region markers: `apply_region` in the index generator
+(Python, writes), `region()` in the unattended checker and in its driver (awk, read), and
+`splice()` in the driver (awk, WRITES). The contract is column 0, exact equality after one
+trailing CR is stripped, and it lives in the case table of `marker-contract.test.sh` rather than
+in any reader's prose. The Python side used to be permissive AND mutating — it accepted an
+indented marker and one carrying trailing whitespace, then re-emitted the bare marker, editing a
+line the author wrote. The test drives the SHIPPED bytes of each awk reader, sliced out at run
+time rather than transcribed, so an edit to a kit moves the verdict.
+
 ## Reuse affordance
 
 seam: `id_pattern(conf)` — reuse for building an id matcher from the DECLARED families rather than
@@ -70,10 +81,11 @@ test; extend by widening the family character class, never by rebuilding it from
 
 ## Gaps
 
-- The fence toggle is a bare boolean and is not checked at EOF, so an unterminated fence hides every
-  remaining row in that file, and `~~~` fences are not recognised at all.
-- The `unkeyed` assertion is zero-tolerance with no waiver, and it reports a bare count rather than
-  the path and line the duplicate branch prints.
+- CLOSED by TOOL-aMouldedFolio-5: fence handling delegates to the index generator's reader, so
+  `~~~` and marker-matched close come for free, and an unterminated fence is now a named refusal
+  naming the file and the opening line. The five shell replicas of `_unfenced` keep the defect —
+  they exit 0 with the fence open — and that is a named non-goal, not an oversight.
+- CLOSED by TOOL-aMouldedFolio-5: `unkeyed` reports path and line per offender.
 - The root is resolved from the tree being audited, but the first cut walked up from the module's own
   location and graded the kit's repo instead. The arm that covers it shells out with a foreign cwd,
   because every other arm passes an explicit root and so cannot reach the resolver at all.

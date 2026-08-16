@@ -41,6 +41,8 @@ import subprocess
 import sys
 import tempfile
 
+CR = chr(13)   # one carriage return; see _is() and _one_cr()
+RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
@@ -116,19 +118,40 @@ def load_conf(root: str) -> dict:
     return conf
 
 
-def unfenced(text: str):
+def unfenced_lines(text: str):
+    """Yield (lineno, line) for every line OUTSIDE a fenced block, then the open fence's line.
+
+    The final yield is `(opened_at, None)` when the document ends inside a fence, and nothing when it
+    does not. A caller that only wants the text ignores it; a caller that must REFUSE a document it
+    could not fully read needs it, and no reader in either kit had it — the shell `_unfenced` and this
+    module's own generator both end silently with the fence still open, dropping every later line at
+    exit 0. That is invisible by construction: a fence opened near the top of a row document hides
+    every duplicate below it, and hiding duplicates is what the check that reads this exists to stop.
+    """
     fence = ""
-    for line in text.split("\n"):
+    opened_at = 0
+    for n, line in enumerate(text.split("\n"), 1):
         stripped = line.lstrip()
         if stripped.startswith("```") or stripped.startswith("~~~"):
             mark = "```" if stripped.startswith("```") else "~~~"
             if not fence:
-                fence = mark
+                fence, opened_at = mark, n
                 continue
+            # Only the marker that OPENED the fence closes it: a ``` line inside a ~~~ block is
+            # content, not a toggle.
             if mark == fence:
                 fence = ""
                 continue
         if not fence:
+            yield n, line
+    if fence:
+        yield opened_at, None
+
+
+def unfenced(text: str):
+    """The text-only view, kept as the one fence machine's façade rather than a second copy."""
+    for _n, line in unfenced_lines(text):
+        if line is not None:
             yield line
 
 
@@ -312,12 +335,18 @@ def collect(root: str, conf: dict) -> list:
         # source names the id, the derivation takes over and a wrong authored value loses. Global
         # emptiness is the dangerous case, and the precondition above owns it.
         roster = roster_by_slug.get(slug) or [i for i in fm["ids"].split() if i]
+        # Which record folders this build actually HAS. Authored as prose in 17 READMEs and wrong
+        # in 15 of them: the sentence is written when a build opens, predicting the folders it will
+        # grow, and nothing revisits it. Seven claim a build/ that was never created.
+        kinds = [k for k in RECORD_KINDS
+                 if any(t.startswith(f"{m}/builds/{slug}/{k}/") for t in tracked)]
         builds.append(
             {
                 "slug": slug,
                 "readme": readme,
                 "fm": fm,
                 "roster": roster,
+                "kinds": kinds,
                 "units": [u for u in units if u],
                 "status": derive_status(units, fm, readme),
             }
@@ -347,8 +376,81 @@ def render_region(build: dict) -> str:
     else:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
+    if build["kinds"]:
+        ks = [f"`{k}/`" for k in build["kinds"]]
+        joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]
+        out += ["", f"Records live under {joined}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+# A period ends the sentence only when whitespace or end-of-line follows it. A dot INSIDE the claim
+# — `notes.md`, `(see AGENTS.md)` — is content. The first cut used `[^.]*` and stopped at the first
+# dot, deleting `Records live under `spec/` and `notes.` mid-token and writing the fragment back as
+# prose: the exact corruption this unit exists to prevent, one class narrower than the line-scoped
+# removal the review had already rejected.
+RECORDS_SENTENCE = re.compile(r"Records live under (?:[^.]|\.(?!\s|$))*\.[ ]?")
+RECORDS_ANCHOR = "Records live under"
+
+
+def strip_records_sentence(readme_text: str, readme: str) -> str:
+    """Remove the AUTHORED folder-claim sentence from the body, OUTSIDE the marker pair.
+
+    SENTENCE-scoped, never line-scoped: measured over the corpus, in 17 of 17 carriers the sentence
+    ENDS mid-line and the next sentence begins on the same line, so deleting the LINE destroys
+    unrelated prose in every file.
+
+    FENCE-AWARE, because a README documenting this very migration quotes the retired boilerplate
+    inside a code block — and the first cut rewrote that block. Unit 5 of this same build added the
+    fence reader precisely because a scanner that ignores fences is wrong by construction; the writer
+    has no excuse the reader did not.
+
+    THE WHOLE DOCUMENT outside the marked slice is in scope, not merely the text above it. Bounding
+    the scan at the opening marker left an authored claim below the close marker neither removed nor
+    refused, so the file shipped two contradicting sentences and `--check` was a stable fixed point
+    on that state.
+
+    TWO REFUSALS, not one. More than one match is a refusal, as before. And a line carrying the
+    anchor that the SENTENCE pattern does not match is also a refusal — a claim wrapped across lines
+    is exactly the case where the anchor is not identifying what it was reasoned about, and silently
+    leaving it produces the same two-answers state by a different route.
+    """
+    lines = readme_text.split("\n")
+    opens = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_OPEN]
+    closes = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_CLOSE]
+    inside = range(opens[0], closes[0] + 1) if opens and closes and closes[0] >= opens[0] else range(0)
+    fenced = {n for n, line in unfenced_lines(readme_text) if line is None}
+    unfenced_no = {n for n, line in unfenced_lines(readme_text) if line is not None}
+
+    hits, anchored = [], []
+    for i, line in enumerate(lines):
+        if i in inside or (i + 1) not in unfenced_no:
+            continue
+        if RECORDS_SENTENCE.search(line):
+            hits.append(i)
+        elif RECORDS_ANCHOR in line:
+            anchored.append(i)
+    if anchored:
+        where = ", ".join(str(i + 1) for i in anchored)
+        raise Problem(f"{readme}: line(s) {where} carry the folder-claim anchor but no complete "
+                      f"sentence — a claim wrapped across lines is not identifying what this remover "
+                      f"was reasoned about, so nothing is removed")
+    if not hits:
+        return readme_text
+    if len(hits) > 1:
+        where = ", ".join(str(i + 1) for i in hits)
+        raise Problem(f"{readme}: the folder-claim sentence appears {len(hits)} times outside the "
+                      f"generated region, at lines {where} — the anchor is not identifying one "
+                      f"sentence, so nothing is removed")
+    i = hits[0]
+    rest = RECORDS_SENTENCE.sub("", lines[i], count=1)
+    # Only drop the physical line when the sentence WAS the whole of it; otherwise the surviving
+    # text stays exactly where the author put it.
+    if rest.strip():
+        lines[i] = rest
+    else:
+        del lines[i]
+    return "\n".join(lines)
 
 
 def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
@@ -375,8 +477,21 @@ def apply_region(readme_text: str, region: str, readme: str) -> str:
     """Replace the marked slice EXACTLY. Never a regex substitution over the whole file: this
     generator owns a region inside an AUTHORED file, and getting it wrong eats prose."""
     lines = readme_text.split("\n")
-    opens = [i for i, l in enumerate(lines) if l.strip() == MARK_OPEN]
-    closes = [i for i, l in enumerate(lines) if l.strip() == MARK_CLOSE]
+    # COLUMN 0, EXACT EQUALITY after one trailing CR — the contract the three awk readers in the
+    # unattended kit already enforce. `.strip()` was permissive AND mutating: it accepted an
+    # indented marker and a marker with trailing whitespace (two spaces is a Markdown hard break,
+    # so an authored construct), then re-emitted the bare marker — silently rewriting a line the
+    # author wrote, in a file they ran this tool over for another reason. Refusing is the only
+    # reading that cannot edit prose behind the author.
+    def _is(line, mark):
+        # ONE trailing CR, not all of them. awk's `sub(/\r$/, "")` in the three unattended readers
+        # removes exactly one, so `rstrip("\r")` would accept a line ending in two CRs that they
+        # refuse — a divergence introduced by the very change that removed two others. It cannot be
+        # demonstrated on an MSYS node, where the runtime strips CR before awk sees a byte, so it is
+        # asserted at SOURCE level here rather than by a fixture that would pass either way.
+        return (line[:-1] if line.endswith(CR) else line) == mark
+    opens = [i for i, l in enumerate(lines) if _is(l, MARK_OPEN)]
+    closes = [i for i, l in enumerate(lines) if _is(l, MARK_CLOSE)]
     if not opens and not closes:
         raise Problem(f"{readme}: no '{MARK_OPEN}' / '{MARK_CLOSE}' marker pair — the generated "
                       f"region has nowhere to go, and a README without one leaves the index silently")
@@ -446,7 +561,8 @@ def plan(root: str, conf: dict) -> tuple:
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
-        text = apply_front_matter_ids(read_text(path), b["roster"], b["readme"])
+        text = strip_records_sentence(read_text(path), b["readme"])
+        text = apply_front_matter_ids(text, b["roster"], b["readme"])
         artifacts[b["readme"]] = apply_region(text, render_region(b), b["readme"])
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
@@ -611,6 +727,62 @@ def do_selftest() -> int:
             lambda: plan(d5, c5)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
         arm("the capped artifacts carry a COUNT, never the id list", "| arch | 2 |",
             lambda: plan(d1, c1)[0]["memory/LIVE.md"])
+
+        # ---- the folder-claim sentence. These are FIXTURE arms on purpose: once the corpus is
+        # ---- migrated the sentence is gone from it, so a control run against the live tree has
+        # ---- nothing left to catch and passes whatever the remover does.
+        def _rec(tmp, body):
+            c = _fixture(tmp, spec_status="INPROGRESS")
+            p = os.path.join(tmp, "memory", "builds", "tOne", "README.md")
+            t = read_text(p)
+            write_text(p, t.replace("# tOne\n", "# tOne\n\n" + body + "\n"))
+            run("git", "add", "-A", cwd=tmp)
+            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=tmp)
+            return c
+
+        ta = os.path.join(base, "recsurv"); os.makedirs(ta)
+        ca = _rec(ta, "Records live under `spec/`. The table below is\nGENERATED from the header.")
+        arm("the text following the sentence SURVIVES the removal", "The table below is",
+            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
+        arm("the authored sentence leaves the body", "1",
+            lambda: str(plan(ta, ca)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tb = os.path.join(base, "recwhole"); os.makedirs(tb)
+        cb = _rec(tb, "Records live under `spec/`.")
+        arm("a line that was ONLY the sentence is removed entirely", "1",
+            lambda: str(plan(tb, cb)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tc = os.path.join(base, "rectwice"); os.makedirs(tc)
+        cc = _rec(tc, "Records live under `spec/`. one\n\nRecords live under `build/`. two")
+        arm("the sentence appearing twice outside the region is a REFUSAL",
+            "is not identifying one sentence", lambda: plan(tc, cc))
+        arm("the derived sentence names only the folders that exist", "Records live under `spec/`.",
+            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
+
+        # ---- the four shapes the closing review reproduced against the first cut. Each corrupted or
+        # ---- silently skipped an authored README, and each is now a fixture rather than a promise.
+        td = os.path.join(base, "recdot"); os.makedirs(td)
+        cd_ = _rec(td, "Records live under `spec/` and `notes.md`. The table below is\nGENERATED.")
+        # The surviving line must be EXACTLY the next sentence. Asserting merely that "The table
+        # below is" appears does NOT discriminate: the truncating pattern leaves `md`. The table
+        # below is`, which contains it — both first-cut arms passed over the corruption they were
+        # written to catch, and only the negative control exposed them.
+        arm("a dot INSIDE the claim does not truncate the match, leaving no fragment",
+            chr(10) + "The table below is" + chr(10),
+            lambda: plan(td, cd_)[0]["memory/builds/tOne/README.md"])
+        te = os.path.join(base, "recfence"); os.makedirs(te)
+        ce = _rec(te, "The old text read:\n\n```\nRecords live under `spec/`, `build/`. Quoted.\n```\n\nNow derived.")
+        arm("a fenced QUOTE of the sentence is left untouched", "Records live under `spec/`, `build/`. Quoted.",
+            lambda: plan(te, ce)[0]["memory/builds/tOne/README.md"])
+        tf = os.path.join(base, "recbelow"); os.makedirs(tf)
+        cf = _rec(tf, "intro")
+        _p = os.path.join(tf, "memory", "builds", "tOne", "README.md")
+        write_text(_p, read_text(_p) + "\n### later\n\nRecords live under `build/`. Read in order.\n")
+        run("git", "add", "-A", cwd=tf); run("git", "commit", "-q", "-m", "b", "--no-verify", cwd=tf)
+        arm("a claim BELOW the marker pair is removed too, not ignored", "1",
+            lambda: str(plan(tf, cf)[0]["memory/builds/tOne/README.md"].count("Records live under")))
+        tg = os.path.join(base, "recwrap"); os.makedirs(tg)
+        cg = _rec(tg, "Records live under `spec/`, `build/` and\n`reviews/`. The table below is GENERATED.")
+        arm("a claim WRAPPED across lines is a named refusal, not a silent skip",
+            "no complete sentence", lambda: plan(tg, cg))
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)

@@ -82,7 +82,7 @@ terminal rows orphaned every id they defined against hygiene check 14. So the re
 does not work for this index, and the next row to land will breach the cap. It needs its own unit and
 has no backlog row, because there is no room to write one.
 
-Records live under `spec/` and `reviews/`. The table below is GENERATED from the status header of
+The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -91,4 +91,6 @@ every spec in this folder — do not hand-edit it.
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

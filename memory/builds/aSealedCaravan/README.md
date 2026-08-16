@@ -81,7 +81,7 @@ Deferring the last three until the `plan`/`check` slice existed was rev-4's plan
 because a fork resolved mid-build is a rewrite, and all three proved answerable from what the spec
 already stated.
 
-Records live under `spec/` and, once built, `build/` and `reviews/`. The table below is GENERATED
+The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -91,4 +91,6 @@ from the status header of every spec in this folder — do not hand-edit it.
 |---|---|---|---|
 | [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-7 | 2026-08-11 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
+
+Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

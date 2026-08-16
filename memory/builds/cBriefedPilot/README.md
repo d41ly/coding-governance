@@ -316,4 +316,6 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | OPEN | rev-2 | 2026-08-14 |
 | [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | OPEN | rev-1 | 2026-08-14 |
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | OPEN | rev-4 | 2026-08-14 |
+
+Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->

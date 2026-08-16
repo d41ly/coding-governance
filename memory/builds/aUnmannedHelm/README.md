@@ -140,7 +140,7 @@ paperwork and never the claim.
 raw findings, five batched default-refute skeptics, 50 confirmed at precision 0.88, no lens dead.
 Eight blocker-severity findings collapsing to five distinct defects, all folded at rev-3.
 
-Records live under `spec/`, `build/` and `reviews/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -155,4 +155,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | CLOSED | rev-3 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | CLOSED | rev-3 | 2026-08-10 |
 | [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | CLOSED | rev-3 | 2026-08-10 |
+
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

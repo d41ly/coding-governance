@@ -11,7 +11,7 @@ ids: TOOL-aRuledParchment-1 TOOL-aRuledParchment-2
 
 Node `a` · opened 2026-07-15 · streams tooling.
 
-Records live under `spec/`, `build/`, `reviews/` and `prompts/`. The table below is
+The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
@@ -20,4 +20,6 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRuledParchment-1 — Port the spec-format discipline into the memory-tree kit](spec/2026-07-15-spec-aRuledParchment-1.md) | CLOSED | rev-1 | 2026-07-15 |
+
+Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->
