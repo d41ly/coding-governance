@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
 
 ## 1. Goal
 
@@ -56,6 +56,12 @@ One new gate, `tools/check-playbook-parity.sh`, with three check families and a 
   swap it would have caught needs a waiver first — which is the ordering, not a reason to skip it.
 - **Extending the pair list beyond the two seeded rows.** Every additional pair is a judgement about
   what is worth pinning; growing the list is ordinary maintenance, not this unit's job.
+- **Seeding or extending `tools/playbook-kit-waivers.txt`.** `PLAY-aSiftedPlaybook-3` S7 owns its
+  contents. This unit only READS it. Stated as a non-goal because the alternative is live: if this
+  gate re-seeded "from the measured population" at its own build time it would either overwrite
+  PLAY-3's curated rows, or — with PLAY-3 not yet landed — waive all four of the kits PLAY-3 exists
+  to add, and then certify coverage that does not exist. Same resolution as the map dossier, one
+  file over.
 
 ## 4. Design
 
@@ -101,7 +107,7 @@ drifts silently". This gate reads one of the existing two.
 |---|---|
 | `tools/check-playbook-parity.sh` | new |
 | `tools/check-playbook-parity.test.sh` | new |
-| `tools/playbook-kit-waivers.txt` | new, seeded from the measured population |
+| `tools/playbook-kit-waivers.txt` | **consumed, never created** — `PLAY-aSiftedPlaybook-3` S7 seeds it; this gate reds and stops if it is absent, and never adds a row |
 | `tools/gate-legs.json`, `AGENTS.md`, `.memory-tree.conf` | wiring |
 | `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — `tools/gate-legs.json` is a watched pathspec |
 | `memory/map/features/playbook.md` | the new leg key claimed — EXTENDED, never created (see Rollout) |
@@ -109,8 +115,10 @@ drifts silently". This gate reads one of the existing two.
 
 ### Rollout
 
-**Lands last.** Every other unit changes the values this gate would pin, so building it first means
-building it against values about to change.
+**Lands last, and `PLAY-aSiftedPlaybook-3` is a hard prerequisite** — it seeds
+`tools/playbook-kit-waivers.txt`, without which S1 has no exemption registry to read. Every other
+unit changes the values this gate would pin, so building it first means building it against values
+about to change.
 
 **This unit EXTENDS `memory/map/features/playbook.md` and never creates it.** The owner resolved
 `TOOL-aSiftedPlaybook-1` F1 to the in-place `baseline.toml` swap, so that unit mints no dossier and
@@ -165,7 +173,12 @@ future ones.
   unresolvable — it never compares empty to empty and reports ok.
 - **AC5** — When the kit derivation is broken by hand to return an empty set, the gate reds on the
   missing sentinel rather than reporting universal coverage.
-- **AC6** — When a waiver row names a kit that no longer exists, the gate reds as stale.
+- **AC6** — When a waiver row names a kit that no longer exists, the gate reds as stale. When a
+  waiver row names a kit that IS present in the playbook, it also reds — otherwise a waiver that
+  excuses nothing sits in a shrink-only registry forever, which is how `workflows/` nearly shipped
+  one.
+- **AC9** — When `tools/playbook-kit-waivers.txt` is absent, the gate reds naming it and stops. It
+  never creates or extends the file; `PLAY-aSiftedPlaybook-3` S7 owns its contents.
 - **AC7** — When `bash tools/check-playbook-parity.test.sh` runs it exits 0; when any single arm's
   assertion is inverted it exits non-zero naming that arm.
 - **AC8** — When `python tools/memory-tree/check-arms.py` runs, the new gate is in its population
@@ -202,6 +215,14 @@ future ones.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-5 · 2026-08-16 · folded round-2 audit finding H4. `tools/playbook-kit-waivers.txt` had TWO
+  declared creators — this spec's Files-touched row and `PLAY-aSiftedPlaybook-3` S7 — and since the
+  README lets this unit be deferred indefinitely, a re-seed here would have either overwritten
+  PLAY-3's curated rows or permanently waived the four kits PLAY-3 exists to add, with the gate then
+  certifying coverage that does not exist. Resolved the same way rev-3/rev-4 resolved the identical
+  collision for the map dossier: consumed, never created. Added AC9 for the refusal, a non-goal
+  banning row additions, PLAY-3 as a stated prerequisite, and an AC6 arm that drains a waiver whose
+  kit IS named.
 - rev-4 · 2026-08-16 · absorbed the owner's `TOOL-aSiftedPlaybook-1` F1 resolution. The minter of
   `memory/map/features/playbook.md` is now fixed as `TOOL-aSiftedPlaybook-2`, not "whichever lands
   first". Sharpened the `baseline.toml` non-goal: the convention is not merely unenforced, it was

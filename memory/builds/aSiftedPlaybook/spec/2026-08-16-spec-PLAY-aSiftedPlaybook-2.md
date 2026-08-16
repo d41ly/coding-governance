@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -31,6 +31,12 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
 - **S4 — the customize catalogue.** `parallel-coding-governance.customize.md` gains
   `{{DEFAULT_BRANCH}}` in the template group with its fill instruction, and the counts move
   **36 → 37 and 23 → 24 only**.
+- **S5 — the runbook's restated count.** `WIRE-INTO-PROJECT.md:98` reads "the companion carries 13
+  of the 36 placeholders" and is that file's only `36`; it becomes **37**, and the **13 stays 13**.
+  It appeared in §4's Files touched but in no scope item and no acceptance criterion, so a builder
+  working §2 and §6 would ship a correct template and companion while the runbook still said 36,
+  with every AC green — the same shape as `PLAY-aSiftedPlaybook-1`'s S8 defect, one unit over.
+  `PLAY-aSiftedPlaybook-3` S6 also edits this file, so whichever lands second re-derives its anchor.
 
 ## 3. Non-goals (OUT)
 
@@ -167,6 +173,8 @@ than being written twice against two different totals.
   the grep over a freshly instantiated copy"**: nothing in this repo instantiates the playbook —
   there is no `adopt-playbook.sh` — so that observation names a step a builder cannot perform, and
   an AC nobody can run is not an AC.
+- **AC7** — When `grep -n '36\|37' WIRE-INTO-PROJECT.md` runs, the restated placeholder claim reads
+  37 and its "13" is unchanged.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0. Its `{{[A-Z]`
   ban is scoped to `.claude/SESSION-KICKOFF.md` and never reads the playbook, so a 37th placeholder
   cannot trip it — confirmed, and stated so the build does not go looking for a red that cannot
@@ -195,6 +203,10 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · folded round-2 audit finding H8. `WIRE-INTO-PROJECT.md:98` sat in §4's Files
+  touched with no scope item and no AC, so every acceptance criterion would have gone green over a
+  runbook still claiming 36 placeholders. Added as S5 with AC7, and noted the anchor collision with
+  `PLAY-aSiftedPlaybook-3` S6, which edits the same file.
 - rev-3 · 2026-08-16 · owner resolved F1: parameterize both §16 micro-formats. No scope change —
   S3 was already written that way — but the unit is now ratified rather than pending a reading of
   §16 that could have gone the other way.

@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -18,9 +18,12 @@ records which relied on the old ceiling, because at least three of them cited it
   the template"), the usage echo `MAX_BYTES=32768` at `:8`, and the FAILURE MESSAGE at `:25-26`
   ("Do NOT raise the limit"). The failure message is the string an agent reads at the exact moment
   it is over budget, so it is the highest-value line in the file to get right.
-- **S3 — the charter.** `AGENTS.md:16` (the most emphatic never-raise carrier), `:97` (the gate-suite
-  leg bullet), `:178` (the Conventions restatement). Note `:97` spells `≤32 KiB` with a unicode `≤`
-  while the leg itself spells `<=32KiB`, so a grep for the leg name alone misses it.
+- **S3 — the charter.** `AGENTS.md:16-17` (the most emphatic never-raise carrier — the sentence
+  SPANS the line break, "…trim or externalize, never" / "raise the limit)", so an edit scoped to
+  `:16` alone orphans the rest), `:97` (the gate-suite leg bullet), `:178` (the Conventions
+  restatement), and `:7` (which calls `baseline.toml` shrink-only — see S6). Note `:97` spells
+  `≤32 KiB` with a unicode `≤` while the leg itself spells `<=32KiB`, so a grep for the leg name
+  alone misses it.
 - **S4 — the adopter-facing README.** `README.md:12`.
 - **S5 — the kickoff manifest trap.** `.claude/SESSION-KICKOFF.md:99` (the rule) and `:100-106`
   (the measured 32682/32768/86-free figure plus the scarcity-funding policy the raise makes
@@ -29,17 +32,39 @@ records which relied on the old ceiling, because at least three of them cited it
   which is still true and still load-bearing — see §7's landmine. Scoping the edit to `:99-109`
   without saying that would delete the warning that keeps this very unit from redding the bar.
   This is the largest single edit and the one an agent reads at every kickoff.
-- **S6 — the decision record.** A new `memory/DECISIONS.md` row minting the reversal and naming the
-  records that relied on the old ceiling. Append-only: nothing prior is edited.
+- **S6 — the decision record, covering BOTH reversals.** A new `memory/DECISIONS.md` row minting the
+  ceiling reversal and naming the four records that relied on the old ceiling —
+  `PLAY-aCandidStub-1` §3, `TOOL-aGuardedTally-1`, `PLAY-aPrunedCeremony-1` RD7, and the
+  `aCandidStub` review's refuted id 19. Append-only: nothing prior is edited.
+
+  **This build reverses TWO rules, not one.** F1's in-place `baseline.toml` key swap is the second:
+  `memory/map/baseline.toml:3-4`, `AGENTS.md:7` and `compute_coverage`'s docstring all still assert
+  the file only shrinks and that additions are reserved for the initial backfill. That exception is
+  recorded in the same row and annotated in the `baseline.toml` header in place, dated. Precedent:
+  `tools/drift-audit/drift_signals.py` states an exclusion from a shrink-only promise deliberately
+  and in writing rather than by omission. A reversal recorded only in a spec's §8 is a reversal
+  nobody downstream can find.
 - **S7 — the gate-leg label and its inventory key** (F1, resolved). `tools/gate-legs.json:17`
   becomes `template size <=48KiB`, and `memory/map/baseline.toml:35` is edited IN PLACE to the new
   key. `memory/map/generated/{MAP.md,inventories.json}` are regenerated with
   `python tools/codebase-map/gen_map.py --write`, never hand-edited. No dossier is minted by this
   unit.
-- **S8 — the soft ceiling warning** (F2, resolved). The gate prints a `TEMPLATE-SIZE WARN` line above
-  a soft threshold while still exiting 0, so growth stays visible before it becomes urgent. Roughly
-  six lines. The threshold is a second named constant beside `MAX_BYTES`, env-overridable on the
-  same pattern, and the warn line names both the measured size and the soft threshold.
+- **S8 — the growth warning, as a HIGH-WATER RATCHET** (F2 + B2, resolved). Not a fixed threshold.
+  The gate records the template's size in a tracked file, `tools/template-size-highwater.txt`, and
+  prints a `TEMPLATE-SIZE WARN` line — still exiting 0 — whenever the measured size EXCEEDS the
+  recorded value. Raising the recorded value is a deliberate act visible in the diff, via a
+  `--bump` mode that rewrites the file and says by how much.
+
+  **Why not a constant.** Measured: this build lands the template near 34963 bytes, 71% of 49152.
+  Every conventional fraction is silent through the whole build and several KiB beyond it (80% =
+  39321, 90% = 44236), while any constant low enough to price these edits sits at or below 32768 and
+  fires on every run forever — the permanently-red decoration `tools/drift-audit/drift_signals.py:76-80`
+  names as an anti-pattern. A ratchet has neither failure mode: it is silent until something grows,
+  and it prices EVERY growth, which is the forcing function the 32 KiB ceiling was actually
+  providing and the one F2 set out to replace.
+
+  The warn line names the measured size, the recorded high-water, and the delta. The high-water file
+  ships seeded with the size measured at the end of THIS build, so the ratchet starts quiet.
 
 ## 3. Non-goals (OUT)
 
@@ -52,8 +77,10 @@ records which relied on the old ceiling, because at least three of them cited it
 - **Historical records.** ~45 hits under `memory/builds/**` are past measurements in landed specs,
   reviews and build logs. `memory/DECISIONS.md` is append-only and `memory/archive/**` is frozen.
   None is edited.
-- **Spending the new headroom.** `PLAY-aSiftedPlaybook-3` spends 1593 bytes of it and is a separate
-  unit with its own review.
+- **Spending the new headroom.** `PLAY-aSiftedPlaybook-3` spends it; **its §4 cost table owns the
+  figure** and this spec deliberately does not restate it. An earlier draft here said 1593 bytes,
+  which was that unit's pre-`gate-lint` total — the second-copy defect this build exists to close,
+  committed by the unit that justifies the raise.
 
 ## 4. Design
 
@@ -71,7 +98,9 @@ raise touches no shipped adopter artifact.
 | `AGENTS.md` | 16, 97, 178 | rule statements |
 | `README.md` | 12 | rule statement |
 | `.claude/SESSION-KICKOFF.md` | 99 | rule statement |
-| `.claude/SESSION-KICKOFF.md` | 100-107 | measured figure + funding policy |
+| `.claude/SESSION-KICKOFF.md` | 100 → mid-107 | measured figure + funding policy — DELETE, from "It sits at 32682/32768" through "…are the next candidate." |
+| `.claude/SESSION-KICKOFF.md` | mid-107 → 109 | the drift-signal parenthetical, from "(Paraphrased" onward — **SURVIVES**, and §7's landmine depends on it |
+| `tools/template-size-highwater.txt` | new | S8's ratchet record, seeded at the landed size |
 | `tools/gate-legs.json` | 17 | the leg label — see F1 |
 | `memory/map/baseline.toml` | 35 | the label as an inventory key — see F1 |
 | `memory/map/generated/inventories.json` | 46 | generated mirror of the key |
@@ -148,24 +177,40 @@ ratchet's own rule.
   passed, it exits 0. This observes the new boundary rather than asserting the constant, and is the
   minimum honest proof that the number took effect. (The durable version of this check is
   `TOOL-aSiftedPlaybook-2`; AC2 is its one-shot ancestor and must be run by hand here.)
-- **AC3** — When `git grep -nE '32768|32 ?KiB|never raise the limit' -- ':!memory/'` runs, every
-  surviving hit is either the gate's own history comment or absent entirely; no hit asserts a live
-  rule.
+- **AC3** — When
+  `git grep -nE '32768|32 ?KiB|never raise the limit|[Dd]o NOT raise|raise the limit|inflating' -- ':!memory/'`
+  runs, every surviving hit is either the gate's own history comment or absent entirely.
+  **The last three alternatives are load-bearing**: `tools/check-template-size.sh:4` says "never
+  inflating the template" and `:25` says "Do NOT raise the limit", and neither matches the original
+  three-token pattern. Without them S2 could be skipped in its entirety and every AC would still
+  pass, shipping a gate that tells an over-budget agent not to raise a limit the owner just raised.
+- **AC3b** — When the gate is run against a deliberately over-limit file, the emitted failure
+  message is read and contains no instruction not to raise the limit. AC3 observes the ABSENCE of
+  old strings; this observes the PRESENCE of the correct one, and S2 calls that message the
+  highest-value line in the file.
 - **AC4** — When `bash skills/session-kickoff/manifest-check.sh` runs, it exits 0, and
   `.claude/SESSION-KICKOFF.md`'s `last-audit` carries a stamp newer than BASE with a delta line in
   the commit message.
 - **AC5** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage reports neither an
   `unclaimed` key nor a `stale_baseline` entry for the size leg, and the freshness byte-compare is
   green against a fresh `gen_map.py --write` render.
-- **AC7** — When a file between the soft threshold and `MAX_BYTES` is passed to the gate, it **exits
-  0 and prints the warn line**; below the threshold it exits 0 and prints no warn line; above
-  `MAX_BYTES` it still exits 1. The middle case is the one that proves the threshold is advisory
-  rather than a second ceiling, and it is the case a hand-written check omits.
+- **AC7** — With `tools/template-size-highwater.txt` holding a value H and `MAX_BYTES` at 49152:
+  a file of H bytes exits 0 and prints **no** warn line; a file of H+1 bytes **exits 0 AND prints
+  the warn line** naming H, H+1 and the delta; a file of 49153 bytes still exits 1. The middle case
+  is what proves the ratchet is advisory rather than a second ceiling, and it is the case a
+  hand-written check omits. `--bump` rewrites the file to the measured size and reports the delta.
+- **AC9** — When the gate runs on the tracked template at the end of this build, it prints no warn
+  line, because S8 seeds the high-water at the landed size. A ratchet that ships already firing is
+  the permanently-red shape S8 exists to avoid.
 - **AC8** — When `grep -n 'template size' tools/gate-legs.json memory/map/baseline.toml` runs, both
   spell `<=48KiB` and neither still spells `<=32KiB`.
-- **AC6** — When `memory/DECISIONS.md` is read, a new row records the reversal, names
-  `PLAY-aCandidStub-1`, `TOOL-aGuardedTally-1` and the `aCandidStub` review's refuted id 19 as
-  records whose premise this changes, and no prior row has been edited.
+- **AC6** — When `memory/DECISIONS.md` is read, a new row records **both** reversals — the ceiling
+  and the `baseline.toml` exception — and names all four records whose premise the ceiling change
+  falsifies: `PLAY-aCandidStub-1`, `TOOL-aGuardedTally-1`, `PLAY-aPrunedCeremony-1` RD7, and the
+  `aCandidStub` review's refuted id 19. No prior row has been edited. §10's recall result and this
+  list are the same four; a mismatch between them was how RD7 nearly went unrecorded.
+- **AC6b** — When `memory/map/baseline.toml`'s header is read, it carries the dated exception for
+  the in-place swap, so the file's own shrink-only claim is qualified where a reader meets it.
 
 ## 7. Gates
 
@@ -234,6 +279,18 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · cleared blocker B2 and five findings from the round-2 audit
+  `wf_98677a7a-009`. **S8 is now a HIGH-WATER RATCHET, not a threshold constant** (owner, 2026-08-16):
+  the audit measured that every conventional fraction is silent through this whole build while
+  anything tight enough to price it fires forever, so no constant works and the mechanism changed.
+  AC7 rewritten against the ratchet, AC9 added so it ships quiet. AC3 gained the three alternatives
+  that let S2 be skipped entirely with every AC green ("Do NOT raise", "inflating"), plus AC3b
+  observing the rewritten message rather than only the absence of the old one. §4's
+  `SESSION-KICKOFF` row still carried the pre-rev-2 range and contradicted S5 — the boundary falls
+  MID-LINE-107 and is now spelled by sentence in both places. S3 extended to `AGENTS.md:16-17`
+  (the sentence spans the break) and `:7`. S6 and AC6 now record BOTH reversals and all four
+  falsified records; the `baseline.toml` exception was recorded nowhere but a spec's §8.
+  Dropped the restated 1593-byte figure in favour of a pointer.
 - rev-3 · 2026-08-16 · owner resolved both forks. F1 → the in-place `baseline.toml` swap (option 2),
   added as S7; the map gains no playbook dossier here, so `TOOL-aSiftedPlaybook-2` mints it and
   `TOOL-aSiftedPlaybook-3` keeps the unenforced shrink-only convention as a non-goal. F2 → the WARN

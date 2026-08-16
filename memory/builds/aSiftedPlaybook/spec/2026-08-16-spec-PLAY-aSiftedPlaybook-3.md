@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-2 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -32,12 +32,31 @@ Give each a template placement and a conditional-section row.
   placement, the customize row, and the charter's kit list.
 - **S5 — the customize conditional rows.** One per kit (~685 bytes total), in that file's existing
   voice, stating what to delete when the kit is declined.
-- **S7 — the exemption registry.** `tools/playbook-kit-waivers.txt`, seeded from the measured
-  population with the three kits that are legitimately not adopter-facing (`lib/`, `hooks/`,
-  `workflows/`) and a reason each, modelled on `tools/install-prefix-waivers.txt`. **This unit
-  creates it; `TOOL-aSiftedPlaybook-3` consumes it.** Without it AC1 quantifies over a "declared
-  exempt set" that exists only as prose inside this spec, which no builder can observe and no later
-  gate can read.
+- **S7 — the exemption registry.** `tools/playbook-kit-waivers.txt`, seeded with the kits that are
+  legitimately not adopter-facing and a reason each, modelled on `tools/install-prefix-waivers.txt`.
+  **This unit creates it; `TOOL-aSiftedPlaybook-3` consumes it and never adds a row.** Without it
+  AC1 quantifies over a "declared exempt set" that exists only as prose inside this spec, which no
+  builder can observe and no later gate can read.
+
+  **Seed with `lib/` and `hooks/` ONLY — not `workflows/`.** Measured against the trio under
+  `TOOL-aSiftedPlaybook-3` S1's own anchored path-segment rule: `lib` scores 0 (all seven apparent
+  hits are the substring inside "deliberate"), `hooks` scores 0 (its one mention is the English
+  word), but **`workflows` scores 1** — `parallel-coding-governance.template.md:150` spells
+  `tools/workflows/tier2-review.js`. A waiver for a kit that already passes excuses nothing, and
+  the registry's shrink-only contract only reds a row whose kit is GONE, so it would sit there
+  forever.
+- **S8 — the version marker and the archive snapshot.** Both deploy files carry
+  `<!-- governance-template: vN.N -->` and are re-pulled in lockstep:
+  `parallel-coding-governance.template.md:12` and `parallel-coding-governance.domain-rules.md:3`
+  move v2.7 → **v2.8**, and the pre-bump template is copied to
+  `memory/archive/parallel-coding-governance.template-v-2-7.md` (the archive holds `-v-2-0` through
+  `-v-2-6` and no v-2-7 today). The template's own header paragraph gains the v2.8 line describing
+  what changed.
+
+  **This unit owns it because it is the last template-touching unit in the build order**, per the
+  README's ordering. The obligation was previously stated only as a build-level rule in the README
+  and appeared in no spec — so a builder working these acceptance criteria would have shipped a
+  v2.7 marker over v2.8 content and passed every check.
 - **S6 — two broken cross-references found alongside.** `WIRE-INTO-PROJECT.md:81` cites a §2a
   section for the agent-instructions install **that does not exist**, and
   `tools/gate-lint/README.md:35` cites `parallel-coding-governance.domain-rules.md §14` for the
@@ -96,11 +115,17 @@ the clearest single justification for the owner's raise.
 ### A prior review refuted this, and the ground it was refuted on is being removed
 
 `memory/builds/aCandidStub/reviews/2026-08-10-review-aCandidStub-1.md:222-224` raised this exact
-omission as finding id 19 and **refuted it**, partly on the ground that "the template is at its
-ceiling". That refutation was correct on 2026-08-10. This unit is not re-litigating a settled
-verdict; it is landing a finding whose only blocking objection the owner has now removed. The spec
-must say so in those terms, and the build's decision row must cite id 19, or a future session
-reading the review record will conclude the playbook re-added something a skeptic had killed.
+omission as finding id 19 and **refuted it on THREE grounds**: no line claims the kit menu is
+exhaustive; each bullet is individually true; and the template is at its ceiling. Its dispositive
+framing — "an omission, not a contradicted claim" — rests on the first two, which the raise does not
+touch. **Only the third ground is removed.**
+
+The case for landing now is therefore not "the objection is gone". It is that the ceiling was the
+practical blocker, and that S1-S4 change the thing the other two grounds were about: they stop
+treating §5 as a menu that happens to be non-exhaustive and give each kit a placement in the section
+that owns its concern. A reader is then entitled to infer coverage, which is exactly what id 19 said
+they could not. The build's decision row cites id 19 in those terms — overstating it as "the only
+blocking objection" would write a mischaracterization into a record the repo declares append-only.
 
 ### Files touched (estimate)
 
@@ -112,7 +137,9 @@ reading the review record will conclude the playbook re-added something a skepti
 | `AGENTS.md` | S4's charter kit list |
 | `WIRE-INTO-PROJECT.md` | S6's dead §2a reference |
 | `tools/gate-lint/README.md` | S6's dead §14 reference |
-| `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/`, `hooks/`, `workflows/` |
+| `tools/playbook-kit-waivers.txt` | S7, new — seeded with `lib/` and `hooks/` only |
+| `parallel-coding-governance.template.md` `:12` · `.domain-rules.md` `:3` | S8, the v2.8 marker in lockstep |
+| `memory/archive/parallel-coding-governance.template-v-2-7.md` | S8, new — the pre-bump snapshot |
 | `.claude/SESSION-KICKOFF.md` | `last-audit` re-stamp — the template is a watched pathspec |
 
 ### Alternatives rejected
@@ -157,6 +184,11 @@ reading the review record will conclude the playbook re-added something a skepti
 - **AC5** — When `bash tools/check-template-size.sh` runs, it exits 0 against the raised ceiling and
   reports the measured size read FROM the gate.
 - **AC6** — When `bash tools/run-gates.sh` runs, every leg is green.
+- **AC7** — When `grep -n 'governance-template:' parallel-coding-governance.template.md
+  parallel-coding-governance.domain-rules.md` runs, both read `v2.8`, and
+  `memory/archive/parallel-coding-governance.template-v-2-7.md` exists and is byte-identical to the
+  template as it stood before this build's first template edit. Checking only one of the two markers
+  is the drift the lockstep re-pull rule exists to prevent.
 
 ## 7. Gates
 
@@ -169,7 +201,18 @@ reading the review record will conclude the playbook re-added something a skepti
 
 ## 8. Open questions
 
-- **F1 — do the four bullets go in the template, or behind §-stubs in the companion?** The template
+none — the fork below is RESOLVED (owner, 2026-08-16).
+
+- **F1 — do the four bullets go in the template, or behind §-stubs in the companion?**
+  **RESOLVED (owner, 2026-08-16): option (a) — all four INLINE in the template.** S1-S4, §4's cost
+  table, §4's ordering conclusion and AC5 are already written for inline, so no scope changes; the
+  agent recommendation had been (b) and is not taken. Discoverability wins over per-session read
+  cost: a session loading §7 for gate work meets the gate kit there. The ~2 KB is spent knowingly,
+  and `TOOL-aSiftedPlaybook-1` S8's high-water ratchet is what will price the next such spend.
+
+  The original framing:
+
+  **The template
   is read every session; a kit roster is reference material consulted at adoption time and rarely
   after. Putting ~2 KB of kit descriptions into the per-session read is the cost the old ceiling
   existed to prevent, and the raise makes it possible without making it wise.
@@ -184,6 +227,15 @@ reading the review record will conclude the playbook re-added something a skepti
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · cleared blocker B1 and two findings from the round-2 audit
+  `wf_98677a7a-009`, and the owner resolved F1 to inline. **S8 added**: the v2.8 marker bump and the
+  v2.7 archive snapshot were assigned to this unit by the build README and appeared in no spec, so
+  the ACs would have passed while shipping a v2.7 marker over v2.8 content — round 1's fix went to
+  the README and never reached the receiving unit, which is worse than the original state. S7's seed
+  drops `workflows/`: measured, it already scores a path-segment hit at template `:150`, so the
+  waiver would excuse nothing and never drain. §4's id-19 account corrected — the refutation rested
+  on three grounds, not one, and only the ceiling is removed; the previous wording would have
+  written that overstatement into an append-only record.
 - rev-2 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. AC1 quantified over a
   "declared not-adopter-facing set" that existed only as prose in §4, so nothing a builder could
   read; S7 now creates `tools/playbook-kit-waivers.txt` as that artifact and

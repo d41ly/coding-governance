@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -90,7 +90,7 @@ Every defect below was reproduced against source at BASE `91ef1b05`. D1–D5 com
 | S1 lens array bound | `≤6` | `5` | `tools/hooks/agent-cap.js:119` |
 | S2 hook matcher | `Workflow` | `Workflow\|Agent` | `.claude/settings.json:5` |
 | S3 hook rules | 2 described | 4 implemented | `agent-cap.js:90,346,549` |
-| S4 hygiene checks | `19` | `20` | `check-memory-hygiene.sh:713` |
+| S4 hygiene checks | `19` | `20` | `tools/gate-legs.json:3` · `tools/memory-tree/README.md:18` — **not** the engine, per §2 S4 |
 | S5 landing artifact | "build plan" | "build folder" | `UNATTENDED-PROTOCOL.md` |
 | S6 landing xref | `(companion §1, §8)` | §8 points back at §1 | template `:159` |
 | S7 §0 cap summary | concurrency only | concurrency AND total | `REVIEW-PROTOCOL.md:12-13` |
@@ -111,11 +111,20 @@ None. No adopter data, no generated artifact, no config key changes shape. An ad
 
 ### Rollout
 
-Independent of every other unit in this build. It does not depend on
-`TOOL-aSiftedPlaybook-1`'s ceiling raise: S3 is the only item that adds material and its cost is
-well under the 86 bytes available at BASE. **Stated deliberately** — this unit must not become a
-reason the raise is urgent, because a correctness fix that waits on a rule reversal is a correctness
-fix held hostage.
+**Not independent, and the earlier draft of this paragraph was wrong twice over.**
+
+Ordering: this unit is FIRST in the template lane, before `PLAY-aSiftedPlaybook-2` and
+`PLAY-aSiftedPlaybook-3`. Its anchors are BASE line numbers (`:24`, `:51`, `:107`, `:150`, `:157`),
+and PLAY-3 inserts ~2 KB into §5, §6 and §7 — above and inside every one of them, including `:107`,
+the very bullet PLAY-3 adds a sibling to. It also shares template `:51` with PLAY-2 (that line
+carries both "a committed build plan" and two branch senses) and shares `customize.md` with PLAY-3
+and PLAY-4.
+
+Byte cost: **measure it by simulation before building**, and record the number here. S3 is not the
+only adder — S7 adds to §0, S8 rewrites `:157`, S2 adds 6 bytes — against roughly 17 removed by S4
+and S6. The earlier claim that the cost was "well under the 86 bytes available at BASE" was asserted
+rather than measured, which is the one thing this unit is not allowed to do. If the measured cost
+exceeds 86, the unit depends on `TOOL-aSiftedPlaybook-1` and must say so.
 
 ### Alternatives rejected
 
@@ -158,15 +167,21 @@ fix held hostage.
 ## 6. Acceptance criteria
 
 - **AC1** — When each corrected value is re-derived from its source file at build time, it equals
-  the value written into the template. The **eight** derivations are the §4 Inventory table's third
-  column; each is a single grep and none may be taken from this spec.
+  the value written into the template. The derivations are the §4 Inventory table's third column;
+  each is a single grep and none may be taken from this spec. **S4 is exempt** — its fix is a
+  DELETION, so there is no value to re-derive; AC5 is its observation.
 - **AC1b** — When template `:157` is read, it names both the `Workflow` and the `Agent` tool-call as
   points where the cap is enforced, and no longer says the cap is never enforced outside a script.
   S8 needs its own observation because AC2 exercises the lens bound and nothing else reads `:157`.
-- **AC2** — When a workflow script declaring a 5-element lens array is fed to
-  `node tools/hooks/agent-cap.js`, it is allowed; when one declaring 6 is fed, it is DENIED. This
-  observes S1's defect directly rather than asserting the constant, and is the check that proves the
-  template's new number is the enforced one.
+- **AC2** — Modelled on the `js()` helper at `tools/hooks/agent-cap.test.sh:27-35`, which builds a
+  PreToolUse JSON payload and pipes it to the hook on fd 0. A fixture that **actually fans out over**
+  the lens array — `boundedParallel(LENSES.map(d => () => agent(d)), 5)` — exits **0** with a
+  5-element literal and **2** with a 6-element one.
+
+  Three things this phrasing exists to avoid, all reproduced: piping raw script text passes the
+  allow arm for the wrong reason, because the hook exits 0 on unparseable stdin by design; a script
+  that merely DECLARES the array exits 0 at both 5 and 6, since the bound is only read at a fan-out;
+  and "DENIED" is unanchored against the hook's 0/2 exit contract.
 - **AC3** — When `grep -c 'build plan' parallel-coding-governance.template.md
   parallel-coding-governance.customize.md` runs, it returns 0 for both.
 - **AC4** — When template `:51` is read, it cites companion §1 and not §8; when `:159` is read, it
@@ -194,7 +209,14 @@ fix held hostage.
 
 ## 8. Open questions
 
-- **F1 — does S3's RULE 4 clause belong in §8, or in §0?** RULE 4 governs direct `Agent` spawns,
+none — the fork below is RESOLVED (owner, 2026-08-16).
+
+- **F1 — does S3's RULE 4 clause belong in §8, or in §0?**
+  **RESOLVED (owner, 2026-08-16): §0.** RULE 4 binds any fan-out, not only a review, so it goes
+  where every session reads it. S7 carries the clause; §8 keeps RULE 3 and the mechanism detail, and
+  does not restate RULE 4. The original framing:
+
+  RULE 4 governs direct `Agent` spawns,
   which are not a review-protocol concern at all; a session fanning out for any reason meets it.
   §8 is the review section, so a reader doing non-review work may never load it.
   **Recommendation: state it in §8 with §0's S7 clause carrying the pointer.** §0 already names the
@@ -207,6 +229,14 @@ fix held hostage.
 - rev-1 · 2026-08-16 · initial draft. D1–D5 carried from the 2026-08-16 audit and re-verified
   against source; D6 (the ≤6 lens bound) and D7 (§0's cap summary) found while writing §2 and
   reproduced before inclusion.
+- rev-4 · 2026-08-16 · owner resolved F1 (RULE 4's clause goes in §0), and the round-2 audit
+  `wf_98677a7a-009` closed three findings. AC2 was **not runnable as written** — reproduced three
+  ways: the hook exits 0 on unparseable stdin so piping script text passes the allow arm for the
+  wrong reason, a script that merely declares the array exits 0 at both 5 and 6, and "DENIED" was
+  unanchored against the hook's 0/2 contract. It now names the payload, the fixture and the exit
+  codes. §4 Rollout's independence claim was false in two directions and is replaced by the real
+  template-lane ordering and an instruction to MEASURE the byte cost rather than assert it. §4's S4
+  row pointed at the engine that §2 S4 explicitly disqualifies as the authority for the count.
 - rev-3 · 2026-08-16 · folded the spec audit `wf_4ed62ebb-cef`. S8 was in §2 but in nothing else:
   it had no §4 Inventory row, no source of truth, no Files-touched entry and no acceptance
   criterion, so a builder working the ACs would have shipped seven of eight fixes and passed.

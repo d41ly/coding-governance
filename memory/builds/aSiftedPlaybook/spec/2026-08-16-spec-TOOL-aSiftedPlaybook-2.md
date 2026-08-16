@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -16,7 +16,9 @@ constant change is exactly when an unproven gate is most likely to be silently w
 - **S1 — the harness.** A new `tools/check-template-size.test.sh` in the shape the repo's other
   self-tests use: a `mktemp -d` scratch dir, one arm per branch, red and green both observed, no
   writes into the real tree.
-- **S2 — the arms.** Five, each an OBSERVED failure or pass, never an assertion about the constant:
+- **S2 — the arms**, each an OBSERVED failure or pass, never an assertion about a constant. The
+  table below is the count; no number is spelled here, because this unit's own rev history already
+  shows one going stale when arms were added:
 
   | Arm | Input | Expected |
   |---|---|---|
@@ -25,13 +27,19 @@ constant change is exactly when an unproven gate is most likely to be silently w
   | A3 | a missing path | exit 2 |
   | A4 | a file at `MAX_BYTES` bytes with every LF turned into CRLF | exit 0 |
   | A5 | `MAX_BYTES` set in the environment | the override is honoured, both directions |
-  | A6 | a file between the soft WARN threshold and `MAX_BYTES` | exit 0 **and** the warn line printed |
-  | A7 | a file below the soft threshold | exit 0 and **no** warn line |
+  | A6 | a file of `H`+1 bytes, `H` = the recorded high-water | exit 0 **and** the warn line, naming `H`, the size and the delta |
+  | A7 | a file of exactly `H` bytes | exit 0 and **no** warn line |
+  | A8 | `--bump` on an over-high-water file | the record is rewritten to the measured size and the delta reported |
 
-  A6 and A7 arm `TOOL-aSiftedPlaybook-1` S8, added after the owner resolved that unit's F2. Together
-  they are what proves the threshold is ADVISORY: A6 alone would pass if the warn had accidentally
-  been made a second blocker (it would exit 1 and the arm would still see the line), and A7 alone
-  would pass if the warn never fired at all.
+  A6-A8 arm `TOOL-aSiftedPlaybook-1` S8's high-water ratchet. A6 and A7 together are what prove the
+  ratchet is ADVISORY: A6 alone passes if the warn were accidentally built as a second blocker (it
+  would exit 1 and the arm would still see the line), and A7 alone passes if the warn never fires.
+
+  **How A6-A8 learn `H`** — the question that made the original threshold arms unbuildable. They
+  **read `tools/template-size-highwater.txt` directly**, which is the whole advantage of the ratchet
+  over a constant: the value lives in a tracked file the harness can read, so no arm has to export
+  its own and test the override path while never observing the shipped value. Each arm runs against
+  a scratch copy of that file, never the tracked one.
 
   **How the harness learns `MAX_BYTES` decides whether these arms mean anything.** The gate reads
   `MAX_BYTES=${MAX_BYTES:-49152}`, so a harness that simply exports its own value tests the
@@ -49,6 +57,17 @@ constant change is exactly when an unproven gate is most likely to be silently w
 - **S4 — the charter citation.** The new leg's script path added to `AGENTS.md`'s gate-suite section.
   This is not bookkeeping: the drift-audit signal `handkept_inventories_disagreeing_with_source`
   measures 0 of 51 at pin 0 with **zero tolerance**, so an uncited leg reds the bar immediately.
+- **S5 — the map dossier.** `memory/map/features/playbook.md`, minted by this unit (§8 F2), claiming
+  the new leg key. Follows the pinned heading contract in `tools/codebase-map/map_lib.py:58`
+  (`## Constraints & why`, `## Shared seams`, `## Gaps`) plus the graced `## Reuse affordance`,
+  modelled on the 76-line `memory/map/features/codebase-map.md`. It appeared in §4, §4's Files
+  touched and AC6 but never in Scope, which is the same defect this build fixed in `PLAY-3`.
+- **S6 — the `fail()` refactor** (F1, resolved). `tools/check-template-size.sh`'s three
+  `echo`+`exit` sites become a `fail()` helper, which pulls the gate into `check-arms.py`'s
+  population automatically and therefore demands an `ARMS_FLOORS` entry in `.memory-tree.conf`
+  alongside the positive arms S2 already supplies. **An undeclared floor is its own refusal**, so
+  the conf entry is not optional. Trap to respect while writing it: a bare positional inside a
+  `fail` message cannot be armed — bind the value to a name and put it after the literal sentence.
 
 ## 3. Non-goals (OUT)
 
@@ -57,8 +76,9 @@ constant change is exactly when an unproven gate is most likely to be silently w
 - **Testing the other untested gates.** `check-template-size.sh` is almost certainly not the only
   gate outside `check-arms.py`'s population, and a repo-wide sweep is its own unit. Recorded as a
   follow-up row rather than absorbed here.
-- **Retrofitting `fail()` into every gate that lacks it.** See F1: doing it for THIS gate is in
-  scope only if the owner picks that option.
+- **Retrofitting `fail()` into every gate that lacks it.** The owner resolved F1 to refactoring
+  THIS gate (S6); a repo-wide sweep of every gate outside `check-arms.py`'s population remains its
+  own unit and a follow-up row.
 
 ## 4. Design
 
@@ -162,7 +182,14 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 
 ## 8. Open questions
 
-- **F1 — does `check-template-size.sh` get refactored to use a `fail()` helper?** Doing so pulls it
+none — both forks below are RESOLVED.
+
+- **F1 — does `check-template-size.sh` get refactored to use a `fail()` helper?**
+  **RESOLVED (owner, 2026-08-16): yes, refactor.** Built as S6, with the mandatory `ARMS_FLOORS`
+  entry. The reasoning the owner ratified: a test proves the gate can fail once; the meta-gate proves
+  the test keeps proving it. The original framing:
+
+  Doing so pulls it
   into `check-arms.py`'s population automatically, which then demands a sibling `.test.sh` with a
   positive arm per branch (this unit supplies it) plus an `ARMS_FLOORS` entry in `.memory-tree.conf`.
   The payoff is durable: the harness meta-gate would thereafter notice an arm being deleted or a
@@ -195,6 +222,14 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-16 · owner resolved F1 (refactor) and the round-2 audit `wf_98677a7a-009` closed
+  three findings. **S5 and S6 added**: the map dossier mint appeared in §4, Files touched and AC6
+  but never in Scope, and the `fail()` refactor had no scope item at all. A6/A7 rewritten against
+  `TOOL-1`'s high-water ratchet, which also answers how they learn the value — they read the
+  tracked file, where a threshold constant left them no route but exporting their own value, the
+  vacuity rev-3 folded this section to prevent. A8 added for `--bump`. Deleted the arm COUNT from
+  S2's lead sentence: it said "five" over a seven-row table, which is the ratcheting-count class
+  this build exists to close, reproduced inside it.
 - rev-3 · 2026-08-16 · absorbed the owner's resolutions on `TOOL-aSiftedPlaybook-1`. F1's in-place
   baseline swap makes THIS unit the minter of `memory/map/features/playbook.md`, resolving F2. F2's
   WARN threshold adds arms A6 and A7, which together prove the threshold is advisory — either alone
