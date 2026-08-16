@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-12 — the census question, measured: refuse the coupling, close the real hole
 
-**Status:** SPECCED · rev-1 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
@@ -25,7 +25,9 @@ The 219 split three ways, and the split is the finding:
   nodes only ("a def nested in a class/try is not a top-level seam"), and `_live_py` filters
   templates by suffix with its own raise if the filter ever eats the layer.
 - **53 JavaScript definitions**, of which **30 are under `tools/`**, the map's own base. The recall
-  index carries **3** of them — the `meta` blocks of the three workflow scripts. `boundedK`
+  index carries **NONE** of them. Its three `kit-js` rows are the workflow scripts' `meta` blocks,
+  which are `export const meta = {` — an object, not a function, so the definition probe cannot see
+  them either. That is the table's `map-only | 3`, and those three are disjoint from the 30. `boundedK`
   (`tools/hooks/agent-cap.js:125`), the binder every fan-out consumer routes through, is invisible to
   `reuse_lookup.py`. That is `TOOL-aNumeralWarden-4`, verbatim and confirmed.
 
@@ -35,9 +37,10 @@ consumption would import are rows the map excludes on purpose. There IS a JavaSc
 real, and closing it needs no lexicon: it is one extractor inside the kit that already owns symbol
 extraction.
 
-`map_extractors.py:199` states the opposite in a comment — "the only exports are the workflow `meta`
-blocks. That is accurate coverage of a layer with few exports, not a hole." Measured, the layer has
-30 definitions and 3 indexed rows. The claim is true about EXPORTS and false about the layer.
+`map_extractors.py:202-204` states the opposite in a comment — "the only exports are the workflow
+`meta` blocks. That is accurate coverage of a layer with few exports, not a hole." Measured, the layer
+has 30 definitions and 3 indexed rows, disjoint. The claim is true about EXPORTS and false about the
+layer.
 
 ## 2. Scope (IN)
 
@@ -54,8 +57,9 @@ blocks. That is accurate coverage of a layer with few exports, not a hole." Meas
   `js_definitions`, deduped on `(id, file)`. Both are kept: `export const meta = {…}` is an object
   and only the export scan sees it; `boundedK` is a bare declaration and only the definition scan
   does.
-- **S4** — the stale comment at `map_extractors.py:199` is replaced with what was measured, including
-  the number, because "few exports, not a hole" is the sentence that kept this closed.
+- **S4** — the stale comment at `map_extractors.py:202-204` is replaced with what was measured,
+  including the number, because "few exports, not a hole" is the sentence that kept this closed. The
+  corrected sentence goes into the `js_definitions` DOCSTRING as well, which is where an AC can see it.
 - **S5** — a CROSS-CHECK arm in `tools/codebase-map/selftest.py`: over `tools/**/*.js`, the map's
   definition set is a SUPERSET of the lexicon's. It skips LOUDLY when `tools/lexicon/` is absent, so
   an adopter who took one kit is told the arm did not run rather than shown a green it did not earn.
@@ -65,8 +69,12 @@ blocks. That is accurate coverage of a layer with few exports, not a hole." Meas
 
 ## 3. Non-goals (OUT)
 
-- Any consumption of a lexicon-owned census by the map, in either direction, mandatory or optional.
-  §4 says why the optional shape is the worst of the three.
+- Any consumption of a lexicon-owned census by the GENERATED index — that is, by anything
+  `SYMBOL_EXTRACTORS` reaches at render time, in either direction, mandatory or optional. §4 says why
+  the optional shape is the worst of the three. S5's TEST-time cross-check is deliberately excepted,
+  and the two are different in the way that matters: a skipped ARM announces itself and changes
+  nothing on disk, while a skipped EXTRACTOR silently shrinks `symbols.json` and leaves a green gate
+  over a smaller index.
 - Indexing private, nested, or `.template.py` Python names. That is 166 of the 219 and the map
   excludes them by a stated doctrine this unit did not find a reason to overturn.
 - A shared JS-pattern module. The repo's own answer for code two kits need is "carry it inline,
@@ -140,8 +148,9 @@ regenerated `memory/map/generated/symbols.json`, the kit version pair, and the t
 
 - **AC1** — When `python tools/codebase-map/reuse_lookup.py boundedK` runs, `tools/hooks/agent-cap.js`
   is in the result.
-- **AC2** — When the map is regenerated, `symbols.json`'s `kit-js` rows number at least 30 and still
-  include the three `meta` rows, so the union kept both sources.
+- **AC2** — When the map is regenerated, `symbols.json`'s `kit-js` rows number at least **33** — the
+  30 measured definitions PLUS the three `meta` rows, which are disjoint from them — so an extractor
+  finding only 27 of the 30 cannot satisfy it by borrowing the export scan's three.
 - **AC3** — When a `.js` file under the scanned base yields no symbol, generation RAISES `MapError`
   naming that file.
 - **AC4** — When the lexicon's js pattern set finds a definition the map's extractor does not, the
@@ -149,7 +158,13 @@ regenerated `memory/map/generated/symbols.json`, the kit version pair, and the t
   and the selftest still passes.
 - **AC5** — When `python tools/codebase-map/test_codebase_map.py` runs, the generated artifacts
   byte-compare against a fresh render and no `baseline.toml` key moves.
-- **AC6** — When `bash tools/run-gates.sh` runs on the landing commit, it is green.
+- **AC6** — When S4's corrected sentence is checked, the `js_definitions` docstring states the
+  measured 30-vs-3 gap, and `python tools/codebase-map/selftest.py` asserts that docstring names a
+  number — an uncorrected copy of "few exports, not a hole" reds.
+- **AC7** — When S6 lands, `TOOL-aNumeralWarden-4` and `TOOL-dClosedLexicon-12` both read CLOSED in
+  `memory/backlog/TOOL.md`, and the §1 table's four figures (642 / 426 / 219 / 3) appear in the minted
+  `memory/DECISIONS.md` row, so the measurement survives where the next reopening would look.
+- **AC8** — When `bash tools/run-gates.sh` runs on the landing commit, it is green.
 
 ## 7. Gates
 
@@ -160,20 +175,46 @@ regenerated `memory/map/generated/symbols.json`, the kit version pair, and the t
 
 None open. F1's consumption question is ANSWERED — refused, with the measurement in §1 as the reason
 — rather than deferred again. The one judgement a reviewer should press is the OUT on a shared
-pattern module (§3), where the cheaper arm was chosen over the repo's inline-and-gate idiom.
+pattern module (§3), where the cheaper arm was chosen over the repo's inline-and-gate idiom. Pressed
+once in `review-dClosedLexicon-9` and REFUTED there: S5 is drift protection rather than a second
+opinion, and its own inert-operand vacuity is already armed one leg over by
+`tools/lexicon/selftest.py`'s frozen per-pattern-set sentinel (`lexicon.py:94-96`).
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-17 · initial draft. The deferral asked for numbers before reopening; §1 is those
   numbers, and they moved the answer from "should we couple these kits" to "no, and here is the
   30-symbol hole that has nothing to do with coupling".
+- rev-2 · 2026-08-17 · folds `review-dClosedLexicon-9`, 4 defects, no blockers; the audit re-derived
+  every census figure in §1 and all of them reproduce. §1 said the index "carries 3 of them" while its
+  own table said `map-only | 3` — the three `meta` rows are DISJOINT from the 30, so the index carries
+  none, and AC2's floor rises from 30 to 33 (12-1). §3's OUT is scoped to render-time consumption, so
+  it no longer forbids the S5 arm it also promotes to an AC (12-2). S4 and S6 gain criteria — a
+  comment and two backlog rows were the two scope items no gate could observe (12-3). §10 records what
+  the probes actually returned (12-4, X-1).
 
 ## 10. Reuse audit
 
-`_live_py` (`map_extractors.py:190`) is the direct precedent for S2 — a layer-level assertion that
-the extractor still sees something, raising rather than returning a smaller index — and this unit
-copies its shape rather than inventing one. `enumerate_exports` is REUSED unchanged rather than
-replaced (S3); its raise-on-unrecognised-export is a guarantee the definition probe does not offer,
-and dropping it to avoid two scans would trade a strong guarantee for a weak one.
-`python tools/codebase-map/reuse_lookup.py "javascript symbol extraction"` surfaces only
-`enumerate_exports`, which is itself evidence for §1: the corpus cannot see its own JS seams.
+**Probe 1, `reuse_lookup.py` — RE-RUN, and it MISSES.**
+`python tools/codebase-map/reuse_lookup.py "javascript symbol extraction"` returns
+`render_symbols_json`, `all_symbols`, `python_symbols`, `t_symbol_extractors_fail_closed`,
+`t_symbols_render_deterministic_and_fail_closed`, then neighbours from the same file. It does NOT
+return `enumerate_exports`, which IS in the corpus (`symbols.json` carries it against
+`tools/codebase-map/map_lib.py`) — so this is a ranking miss, not an absence, and rev-1's "surfaces
+only `enumerate_exports`" was false twice over. Recorded as an answer per M5. The §1 inference rests
+on the measured 30-vs-3 gap, which reproduces exactly, and never on this probe.
+
+**Probe 2, `query.py` — terms recorded for M7 (satisfied once for the SET, per M5).**
+Question: *how does this repo retire a finished record and start a fresh one without losing the old
+bytes, and how does a preview verb stay in step with the verb that acts.*
+Terms: `rotation archive retired record terminal phase preflight refusal preview parity plan apply
+divergence symbol corpus census`. Relevant hit for this unit: `TOOL-aCandidStub-2`
+(`memory/backlog/TOOL.md:13`), this repo's `vacuous-selector-empty-population` class — which is
+exactly what S2's per-file liveness floor exists to prevent on the JS side.
+
+**Reuse, hand-verified.** `_live_py` (`map_extractors.py:190`, inside its docstring) is the direct
+precedent for S2 — a layer-level assertion that the extractor still sees something, raising rather
+than returning a smaller index — and this unit copies its shape rather than inventing one.
+`enumerate_exports` is REUSED unchanged rather than replaced (S3); its raise-on-unrecognised-export is
+a guarantee the definition probe does not offer, and dropping it to avoid two scans would trade a
+strong guarantee for a weak one.
