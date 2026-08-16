@@ -63,7 +63,7 @@ about the files' quality just as a confirmed one is.
 | R3 | The template header's "nine domain checklists" is wrong | Exact: §1, §4, §7-§13. |
 | R4 | The companion header's "nine activity-scoped domain sections" is wrong | Exact, same nine. |
 | R5 | Template §10's "25 generic classes" is wrong | Exactly 25 bullets in `domain-rules.md` §10. |
-| R6 | "install per WIRE §5" points at the wrong section | Correct — the `tier2-review.js` install is at `WIRE-INTO-PROJECT.md:465-475`, inside §5, even though §5's title advertises only worktree tooling. |
+| R6 | "install per WIRE §5" points at the wrong section | Correct — the `tier2-review.js` install is at `WIRE-INTO-PROJECT.md:469-472`, inside §5, even though §5's title advertises only worktree tooling. |
 | R7 | `tools/workflows/tier2-review.js` in the template is an install-prefix violation | It is not. `tools/<kit>/` is the kit's declared one-segment install prefix, which is why the path carries no waiver. |
 | R8 | `adopt-memory-tree.sh --scaffold` does not exist as documented | It exists. |
 | R9 | `gate-lint`'s absence from the map is an undetected coverage gap | Its key is baselined at `memory/map/baseline.toml:43` — a tracked unclaimed key, not an undetected gap, and not a playbook defect. (Its absence from `AGENTS.md` IS real and is recorded above as B4.) |
@@ -82,7 +82,12 @@ Stated so the gap is deliberate rather than assumed:
   `agent-cap` "the review protocol's TWO rules" against four, and `tools/memory-tree/README.md:6`
   plus root `README.md:33` both still say "19-check".
 - **`WIRE-INTO-PROJECT.md`'s structure**, beyond the one dead `§2a` reference `PLAY-3` S6 corrects.
-- **`skills/session-kickoff/SKILL.md`**, which says the spec canon is nine sections where
-  `memory/TEMPLATE-SPEC.md` has been ten since `SPEC10_CUTOFF` (2026-08-04). Same class as A5,
-  different product; follow-up.
+- **`skills/session-kickoff/SKILL.md`'s spec-canon count — TRUE AT BASE, FIXED ON MAIN, no longer a
+  follow-up.** At BASE `91ef1b05` the engine read "status header + nine canonical sections" against a
+  ten-section canon. Commit `0f4d308`, one of the 102 this branch was behind, replaced it with the
+  right pattern: "the template states its own section count and the gate that enforces it; do not
+  restate that number here, because it has already gone stale in three other carriers." Round 3 read
+  it at HEAD, could not see BASE, and called the bullet fabricated. It was not — it was accurate when
+  written and went stale underneath this build. Recorded in full because a report about falsifiable
+  completeness should show its own corrections, including the ones where the reviewer was wrong.
 - **Whether each of the eleven is worth fixing.** That was the owner's call and was given.

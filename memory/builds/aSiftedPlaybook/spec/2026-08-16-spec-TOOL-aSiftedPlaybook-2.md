@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-5 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -36,7 +36,8 @@ constant change is exactly when an unproven gate is most likely to be silently w
   would exit 1 and the arm would still see the line), and A7 alone passes if the warn never fires.
 
   **How A6-A8 learn `H`** — the question that made the original threshold arms unbuildable. They
-  **read `tools/template-size-highwater.txt` directly**, which is the whole advantage of the ratchet
+  **read the high-water record through the path override `TOOL-aSiftedPlaybook-1` S8 specifies**
+  (a positional, then an environment variable, then the tracked default), which is the whole advantage of the ratchet
   over a constant: the value lives in a tracked file the harness can read, so no arm has to export
   its own and test the override path while never observing the shipped value. Each arm runs against
   a scratch copy of that file, never the tracked one.
@@ -128,10 +129,10 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 | File | Change |
 |---|---|
 | `tools/check-template-size.test.sh` | new |
-| `tools/check-template-size.sh` | only under F1 — the `fail()` refactor |
+| `tools/check-template-size.sh` | S6's `fail()` refactor — F1 is RESOLVED, this is unconditional |
 | `tools/gate-legs.json` | one leg entry |
 | `AGENTS.md` | one gate-suite bullet |
-| `memory/map/features/playbook.md` | new or extended, per the coupling above |
+| `memory/map/features/playbook.md` | new — minted by S5 |
 | `memory/map/generated/*` | regenerated, never hand-edited |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
@@ -164,8 +165,9 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/check-template-size.test.sh` runs on a clean tree, it exits 0 and
-  prints one line per arm.
+- **AC1** — When `bash tools/check-template-size.test.sh` runs on a clean tree, it exits 0 and prints
+  one line per arm in S2's table — **that table is the expected set**, since S2 deliberately states no
+  arm count and an unanchored "one line per arm" cannot detect an omitted arm.
 - **AC2** — When the gate's comparison operator is inverted by hand (`-gt` to `-lt`) and the harness
   is re-run, it exits non-zero naming the arm that caught it. This proves the harness can fail,
   which is the entire point of the unit and is itself an instance of the rule it enforces.
@@ -180,6 +182,12 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
   `tools/check-template-size.sh` with a NUMERIC floor rather than `unset`; when the floor is lowered
   by hand, `--check` reds. Without this the whole S6 half can be skipped with every other AC and
   `bash tools/run-gates.sh` green, because nothing else reads `.memory-tree.conf`.
+- **AC8** — When the warn comparison in `tools/check-template-size.sh` is inverted by hand,
+  `bash tools/check-template-size.test.sh` reds naming A6 or A7;
+  when the high-water record's path resolution is broken, A8 reds. The three ratchet arms were the
+  only ones in this unit with no proof they can fail, inside the unit whose §1 quotes "a gate you
+  have only ever seen pass is an assertion about nothing" — AC2's inversion touches the ceiling
+  comparison, not the warn branch.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage and freshness are
   both green, with the new key claimed in a dossier and NOT in `baseline.toml`.
 
@@ -237,6 +245,11 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-16 · folded round-3 M4, M5 and H3's second half. Three carriers still gated
+  RESOLVED forks on conditionals — §4's two rows and §7's `check-arms.py` line, which is the section
+  a builder reads to know what must run. AC8 added: A6-A8 were the only arms with no red proof, and
+  AC1's "one line per arm" is now anchored to S2's table, since S2 states no count and an omitted arm
+  was undetectable. S2 now points at TOOL-1's path override rather than naming the tracked file.
 - rev-5 · 2026-08-16 · folded round-3 H2, H3 and M1. **H2**: "an undeclared floor is its own
   refusal" is FALSE — `check-arms.py` skips a gate with no `ARMS_FLOORS` entry — and that false
   premise was the entire justification for S6's mandatory conf entry, with no AC reading the conf at

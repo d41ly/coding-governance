@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -41,7 +41,7 @@ records which relied on the old ceiling, because at least three of them cited it
   pointed at, which is the defect that shape produced once already.
 - **S5 — the kickoff manifest trap, at its NEW path.** The manifest moved to
   `memory/guides/SESSION-KICKOFF.md` (commit `24f3991`, `KICK-cKeyedLaunchpad-2`); the old
-  `memory/guides/SESSION-KICKOFF.md` no longer exists. The trap is now three lines at `:121-123`:
+  `.claude/SESSION-KICKOFF.md` no longer exists. The trap is now three lines at `:121-123`:
   "The template is under a STRICT 32 KiB gate. Never raise it; externalize into … Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose."
 
@@ -130,8 +130,8 @@ records which relied on the old ceiling, because at least three of them cited it
 ### Inventory
 
 Tracked lines outside historical records, across the files below plus the append-only
-`memory/DECISIONS.md` — the table is the inventory and the count is stated once here rather than
-being maintained in two places. Verified negatives are as
+`memory/DECISIONS.md`. **The table IS the inventory and no count is stated** — a count here would be
+a second copy of what the rows already say, which is the defect §2 S4 argues about one file over. Verified negatives are as
 load-bearing as the hits: the three `parallel-coding-governance*.md` files, `WIRE-INTO-PROJECT.md`,
 every kit `*.template.md` and every rendered `.claude/skills/**` state the limit **nowhere**, so the
 raise touches no shipped adopter artifact.
@@ -147,8 +147,8 @@ raise touches no shipped adopter artifact.
 | `tools/govkit/registry.toml` | + row | S8's new depth-1 path must be DECLARED or `govkit selfcheck` reds — see below |
 | `tools/gate-legs.json` | 17 | the leg label — see F1 |
 | `memory/map/baseline.toml` | 35 | the label as an inventory key — see F1 |
-| `memory/map/generated/inventories.json` | 46 | generated mirror of the key |
-| `memory/map/generated/MAP.md` | 53 | generated mirror of the key |
+| `memory/map/generated/inventories.json` | regenerated | mirror of the key — never anchored, S7 re-renders it |
+| `memory/map/generated/MAP.md` | regenerated | mirror of the key — never anchored, S7 re-renders it |
 | `memory/DECISIONS.md` | append | S6's reversal row — append-only, nothing edited |
 | `memory/backlog/PLAY.md` | 7 | S9 — the `PLAY-aCandidStub-2` row whose rationale this unit falsifies |
 
@@ -164,7 +164,7 @@ an ADDED leg and false here, in both directions:
   `stale_baseline` AND the new key reds as `unclaimed`, both at once) and codebase-map freshness
   (`inventories.json` and `MAP.md` are byte-compared against a fresh render).
 - **It does NOT trip the drift-audit charter signal.** That probe matches a leg's ARGV SCRIPT PATH,
-  not its display name (`tools/drift-audit/drift_signals.py:86-92`). Worth stating explicitly
+  not its display name (`tools/drift-audit/drift_signals.py:132-136`). Worth stating explicitly
   because the trap's "four gates" framing would have predicted otherwise and sent the build looking
   for a red that cannot occur.
 
@@ -197,8 +197,9 @@ ratchet's own rule.
 - **Make the ceiling a `.memory-tree.conf`-style declared pin.** Rejected as out of scope, but
   **recorded as a backlog row rather than deferred to a unit that declines it** — an earlier draft
   sent it to `TOOL-aSiftedPlaybook-3`, whose §2 has no ceiling pin and whose §3 forecloses growth.
-  The prior art is live and directly on point: `.memory-tree.conf:43-50` declares
-  `READ_PATH_CEILING` for the charter's mandatory read path and records each of its three raises
+  The prior art is live and directly on point: `.memory-tree.conf:57-71` declares
+  `READ_PATH_CEILING` for the charter's mandatory read path and records FOUR movements beside it —
+  the fourth being the kickoff-manifest relocation this unit's S5 is re-anchored against
   with the reason beside it — "a session's mandatory reading is a budget, and two binding docs
   growing at once spends from it visibly". That is this repo's established answer to exactly this
   problem, and S8's ratchet is a weaker cousin of it. Worth a real comparison in a later unit.
@@ -231,8 +232,8 @@ ratchet's own rule.
 - **AC3** — When
   `git grep -nE '32768|32 ?KiB|never raise the limit|[Dd]o NOT raise|raise the limit|inflating' -- ':!memory/'`
   runs, every surviving hit is either the gate's own history comment or absent entirely.
-  **The last three alternatives are load-bearing**: `tools/check-template-size.sh:4` says "never
-  inflating the template" and `:25` says "Do NOT raise the limit", and neither matches the original
+  **The last three alternatives are load-bearing**: `tools/check-template-size.sh:5` says "never
+  inflating the template" and `:31` says "Do NOT raise the limit", and neither matches the original
   three-token pattern. Without them S2 could be skipped in its entirety and every AC would still
   pass, shipping a gate that tells an over-budget agent not to raise a limit the owner just raised.
 - **AC3b** — When `bash tools/check-template-size.sh <over-limit-file>` is run, the emitted failure
@@ -338,19 +339,27 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
   is not lost if the convention is ever gated.)
 
 - **F2 — what replaces the forcing function the ceiling was providing?**
-  **RESOLVED (owner, 2026-08-16): (b) and (c) together** — a soft WARN threshold in the gate, built
-  as S8, AND `PLAY-aCandidStub-2` stays OPEN, re-justified on readability rather than bytes.
+  **RESOLVED (owner, 2026-08-16): (b) and (c) together** — an advisory growth warning in the gate,
+  built as S8, AND `PLAY-aCandidStub-2` stays OPEN, re-justified on readability rather than bytes.
+  **Refined in round 2 (B2):** no fixed threshold works, so S8 is a HIGH-WATER RATCHET, not a soft
+  threshold. Read S8, not this paragraph, for the mechanism.
 
   Two follow-ons. The WARN changes the gate's OUTPUT contract, so
-  `TOOL-aSiftedPlaybook-2` gains an arm for it — a file above the soft threshold and below
+  `TOOL-aSiftedPlaybook-2` gains an arm for it — a file above the recorded high-water and below
   `MAX_BYTES` must exit 0 **and** print the warn line, which is the only combination that proves
-  the threshold is advisory rather than a second blocker. And at landing, the
-  `PLAY-aCandidStub-2` backlog row needs its rationale rewritten: it currently reads "the template
+  the threshold is advisory rather than a second blocker. And **S9 with AC10** owns rewriting the
+  `PLAY-aCandidStub-2` backlog row: it currently reads "the template
   is effectively FULL at v2.5", which this unit falsifies, so leaving the row untouched would keep
   it open for a reason that no longer exists.
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-16 · folded round-3 mediums and lows M6, M7, M10, L1, L2, L3, L7. §8 F2 still
+  described a soft threshold the round-2 refinement replaced with a ratchet, and still routed the
+  backlog rewrite to "a landing task" after rev-5 had given it S9. S5's second clause said the
+  manifest moved to the path it says no longer exists — a substitution artifact from the reconcile.
+  Four citations re-derived post-merge; the two generated-mirror rows are now marked never-anchored,
+  since S7 re-renders them.
 - rev-6 · 2026-08-16 · folded round-3 blockers B2/B3 and highs H1/H3/H6/H8/H9 plus M3.
   **B3**: AC9 quantified over a state unit 1 cannot reach — the template is not edited until units
   4-6 — so S8 now seeds at ITS landed size, says units 5 and 6 are expected to warn, and hands the
@@ -366,8 +375,8 @@ none — the forks below are RESOLVED (owner, 2026-08-16).
   move the zero-tolerance charter signal is `AGENTS.md:97`, not the leg rename, and §4's blast-radius
   analysis had cleared only the rename. The declared-conf-pin alternative now points at
   `.memory-tree.conf`'s `READ_PATH_CEILING` as live prior art and becomes a backlog row instead of
-  being deferred to `TOOL-aSiftedPlaybook-3`, which declines it. Corrected "seven files" to eight
-  plus the append-only log.
+  being deferred to `TOOL-aSiftedPlaybook-3`, which declines it. De-numbered the inventory lead entirely rather than
+  correcting its count, on §2 S4's own argument.
 - rev-4 · 2026-08-16 · cleared blocker B2 and five findings from the round-2 audit
   `wf_98677a7a-009`. **S8 is now a HIGH-WATER RATCHET, not a threshold constant** (owner, 2026-08-16):
   the audit measured that every conventional fraction is silent through this whole build while
@@ -406,9 +415,9 @@ is why F1 is a fork at all rather than a rename.
 For F1 option 3 the extended seam is `memory/map/features/*.md`: a new dossier follows the pinned
 heading contract in `tools/codebase-map/map_lib.py:58` (`## Constraints & why`, `## Shared seams`,
 `## Gaps`) plus the graced `## Reuse affordance`, modelled on
-`memory/map/features/codebase-map.md` (76 lines, the smallest of the seven).
+`memory/map/features/codebase-map.md` (76 lines, the smallest of the nine at HEAD).
 
-**Prior art the recall query did NOT surface, and should have.** `.memory-tree.conf:43-50`'s
+**Prior art the recall query did NOT surface, and should have.** `.memory-tree.conf:57-71`'s
 `READ_PATH_CEILING` is a declared byte budget over a mandatory read path, with each raise justified
 in the conf beside the number. It is structurally the same problem this unit solves and the same
 problem S8's ratchet approaches from the other side. No §10 recall terms in this build would have

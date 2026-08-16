@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -14,7 +14,9 @@ this chain resolves the branch dynamically. Introduce `{{DEFAULT_BRANCH}}` so a 
 - **S1 — the placeholder.** `{{DEFAULT_BRANCH}}` becomes the 37th placeholder. **The name is not
   invented**: `skills/session-kickoff/MANIFEST-TEMPLATE.md:60,126` already defines it with identical
   semantics and documents its derivation from `git symbolic-ref`, and this repo's own filled
-  manifest carries the result at `memory/guides/SESSION-KICKOFF.md:39`. This unit adopts the existing name
+  manifest carries the result on its `Remote · default branch:` line
+  (`memory/guides/SESSION-KICKOFF.md:52` at HEAD — cited by content because five units re-stamp that
+  file and a line anchor in it will not survive them). This unit adopts the existing name
   and can copy its fill instruction verbatim, which also makes the two halves of the product agree
   on one spelling.
 - **S2 — the seventeen substitutions.** Anchored on verified (line, column) pairs, never a global
@@ -212,6 +214,9 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-16 · folded round-3 M9. S1's manifest anchor was path-substituted by the reconcile
+  but never re-derived: `:39` is an acceptance-criteria line, and the default-branch line is `:52`.
+  Now cited by content, since S1's whole argument depends on a builder finding it.
 - rev-6 · 2026-08-16 · folded round-3 H10. S5 preserved "the 13 stays 13", which was true only under
   the 2026-08-16 audit's mistaken R2 — the companion carries 14, not 13. The correction belongs to
   `PLAY-aSiftedPlaybook-4` S4, which lands two positions earlier; this unit now moves only the total.
