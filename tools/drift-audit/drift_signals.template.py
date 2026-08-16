@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.2
+gov:kit drift-audit@1.3
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.
@@ -130,3 +130,25 @@ DECLARED_EMPTY: set[str] = {
     "shrink_only_lists_not_shrinking",   # SHRINK_ONLY above ships empty
     "handkept_inventories_disagreeing_with_source",   # HANDKEPT above ships empty
 }
+
+# --------------------------------------------------------------------------------------------
+# RATCHETS — the shrink-only NUMBERS whose WEAKENING direction must be justified in place.
+#
+# Every gate that owns a pin compares only `value > pin`, so RAISING the pin and DRAINING the
+# population look identical from the outside: both turn a red run green, and nothing distinguishes
+# "we fixed it" from "we stopped asking". Declaring a scalar here makes a weakening move refuse
+# unless a comment within the preceding lines names BOTH numbers as `<old> -> <new>`.
+#
+# `weakens` is the direction that makes the guarantee weaker, and it differs by kind: a pin, ceiling
+# or budget weakens UPWARD; a floor weakens DOWNWARD. It is declared per entry rather than inferred
+# from the name, because getting it backwards refuses every honest ratchet and waves through every
+# regression.
+#
+# SCALARS ONLY. A compound floor (`<name>:<n>:<n>` sets) needs a per-member diff and is not covered;
+# leave those to the gate that owns them rather than declaring them here and believing they are
+# watched. Ships EMPTY — seed it with the pins you actually keep.
+# --------------------------------------------------------------------------------------------
+
+RATCHETS: list[dict] = [
+    # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
+]
