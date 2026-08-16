@@ -261,6 +261,18 @@ hit "$(run)" "a build README's generated markers are malformed, so the copy has 
 reset_tree; sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it"
 
+# ...and the SAME staleness on a TERMINAL record is silent. Check 26 refuses --preflight on a
+# finished run, and --preflight is the only verb that re-splices this region, so without the
+# exemption a build that continues after its run ended reds the bar forever with nothing able to
+# clear it. Reproduced on this repo's own tree. The pair matters more than either arm: the red one
+# above proves the exemption did not simply turn check 8 off.
+reset_tree
+mutate memory/builds/tRun/RUN.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
+mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
+out=$(run)
+miss "$out" "a run-state file's generated region differs from the build README slice it is a COPY of"
+same "a stale TERMINAL record leaves the leg green" "$(run; echo $?)" "0"
+
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and the record is written by the run"
@@ -835,7 +847,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=144
+FLOOR_ASSERTIONS=148
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

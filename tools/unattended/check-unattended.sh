@@ -245,8 +245,14 @@ while IFS= read -r f; do
 
   # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
   # ---- question the README already answers, differently — the whole class this build removes.
+  # ---- TERMINAL RUNS ARE EXEMPT, and the exemption resolves a direct contradiction rather than
+  # ---- softening the check. Check 26 refuses --preflight on a finished record, which is the ONLY
+  # ---- verb that re-splices this region; so once a run ends, any later change to the build README
+  # ---- reds this check permanently with no verb able to clear it. Reproduced by continuing this
+  # ---- build after its own run aborted. A finished record is a SNAPSHOT of what that run saw, not
+  # ---- a live view, and demanding it track a moving README is demanding the edit check 26 forbids.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ]; then
+  if [ -f "$rd" ] && ! case " $PHASES_TERMINAL " in *" $ph "*) true ;; *) false ;; esac; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
       fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
     b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
