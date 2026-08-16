@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked
 
-**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -173,7 +173,10 @@ future ones.
 ## 6. Acceptance criteria
 
 - **AC1** — When a kit dir is added under `tools/` and named in no playbook file and no waiver, the
-  gate reds naming that kit. Observed by creating one, not asserted.
+  gate reds naming that kit. Observed by creating one, not asserted. **Quantified over the live
+  derivation, never a count** — a twelfth kit (`govkit`) arrived from main mid-build and a spelled
+  number did not notice; `PLAY-aSiftedPlaybook-3` S9 gives it a disposition and AC9 there re-derives
+  the same population this gate reads.
 - **AC2** — When `MAX_LENSES` in `tools/hooks/agent-cap.js` is changed by hand and the template's
   stated bound is not, the gate reds naming that pair. This reproduces
   `PLAY-aSiftedPlaybook-1` S1's defect and is the unit's central proof.
@@ -257,6 +260,9 @@ they did not have to go back.
 - rev-1 · 2026-08-16 · initial draft. The four-recurrence table is drawn from `aCandidStub`'s spec
   and review records plus this build's own findings; the unenforced `baseline.toml` convention was
   proved by simulation during `wf_4e13d9e7-550` and is recorded in §3 as an out-of-scope sibling gap.
+- rev-9 · 2026-08-16 · folded round-3 B1's tail. AC1 now says explicitly that it quantifies over the
+  live kit derivation rather than any count, which is what a twelfth kit arriving mid-build proved
+  necessary.
 - rev-8 · 2026-08-16 · folded round-3 H2, M2 and B2. AC8 repeated the false "an undeclared floor is
   its own refusal" premise — `check-arms.py` silently skips one — so it now reads `--report`
   directly. The waiver key grammar is pinned (bare kit name, verbatim), because S1 derived bare names

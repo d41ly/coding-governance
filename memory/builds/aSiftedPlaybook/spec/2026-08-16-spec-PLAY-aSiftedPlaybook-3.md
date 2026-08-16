@@ -1,6 +1,6 @@
 # PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
+**Status:** SPECCED · rev-7 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams playbook · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -127,6 +127,8 @@ would excuse nothing and `TOOL-aSiftedPlaybook-3` AC6's second arm would red it 
 | S4 gate-lint bullet | ~450 | yes — template |
 | S2 domain-rules §10 append | ~130 | no |
 | S5 customize rows | ~685 | no |
+| S8 the v2.8 header entry | ~230, measured against the v2.7 entry | yes — template |
+| S9 govkit bullet | measure at build time | yes — template |
 
 The gated subtotal is roughly **2043 bytes against 86 free at BASE**. Unlike
 `PLAY-aSiftedPlaybook-2`, there is no cheaper naming that makes this fit: the content IS the cost.
@@ -266,6 +268,10 @@ none — the fork below is RESOLVED (owner, 2026-08-16).
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-16 · folded round-3 L4 and L5. The cost table priced S1-S5 only while
+  `TOOL-aSiftedPlaybook-1` §3 defers to it as the owning figure for the whole gated draw, so S8 and
+  S9 now have rows. S7's `lib` evidence disagreed with `TOOL-3` S1's on the same measurement — two
+  answers to one question, inside the build that exists to close it — and now points at the owner.
 - rev-6 · 2026-08-16 · folded round-3 blockers B1/B2/B3 and highs H4/H7. **B1**: `govkit` arrived
   from main as a TWELFTH kit and was in no scope item, waiver or non-goal; both spelled counts are
   deleted and the population is derived (AC9), with `govkit` given a disposition as S9. **B2**:
