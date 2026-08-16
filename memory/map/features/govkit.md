@@ -8,7 +8,7 @@ streams = ["deployer", "tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join"]
+gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govkit acceptance matrix"]
 kits = ["govkit"]
 git-hooks = []
 workflow-scripts = []

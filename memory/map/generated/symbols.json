@@ -305,6 +305,11 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
     {
@@ -665,6 +670,11 @@
     {
       "id": "git",
       "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "git",
+      "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
     {
@@ -920,7 +930,17 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/check_runbook_parity.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
     },
     {
       "id": "main",
@@ -1505,6 +1525,11 @@
     {
       "id": "run",
       "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
     {
@@ -1621,6 +1646,11 @@
       "id": "settled",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "shape",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
     },
     {
       "id": "signal_closed_specs_untraceable",

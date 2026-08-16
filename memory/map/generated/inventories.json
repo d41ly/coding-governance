@@ -18,6 +18,7 @@
       "drift-audit selftest",
       "drift-audit wiring",
       "gotchas selftest",
+      "govkit acceptance matrix",
       "govkit refusal join",
       "govkit selfcheck",
       "govkit selftest",

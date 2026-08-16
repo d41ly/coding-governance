@@ -52,6 +52,7 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
 
+<!-- govkit:entry kickoff-manifest -->
 ## 1 — Install the kickoff skill (ONCE per machine — NOT per project)
 
 Link the engine into the user-level skills dir so `/session-kickoff` fires in every project:
@@ -69,6 +70,7 @@ ln -s <gov>/skills/session-kickoff ~/.claude/skills/session-kickoff
 **Verify:** restart Claude Code; `/session-kickoff` is listed. (A project MAY keep its own tuned variant
 alongside — both then appear; pick by description.) Skip this step on a machine that already has it.
 
+<!-- govkit:entry playbook -->
 ## 2 — Install the governance playbook (per project)
 
 1. Copy the playbook **and its two companions** in (the template's §4/§9/§10/§11/§12/§13 are §-stubs
@@ -102,6 +104,7 @@ GitHub Actions `${{ }}` expressions; the shipped template contains none, so an u
 today and false-fails the first repo whose gate commands are a workflow. `{{ID_FAMILIES}}` must
 match the memory-tree `FAMILIES` (§3) — the build records and the decision logs share one id scheme.
 
+<!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 
 1. Copy the kit in and configure:
@@ -166,6 +169,7 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
    leaves the path holding OURS-ONLY content with zero conflict markers. `--fix` sets the config for
    you and refuses to declare a driver wired when it cannot run.
 
+<!-- govkit:entry drift-audit -->
 ## 3d — Adopt the drift-audit kit (optional, recommended)
 
 Does this repo's own RECORD of its state still match reality? Signals over stdlib + git, seconds,
@@ -217,6 +221,7 @@ its first run of the new gate. Skip this whole section if you are scaffolding fr
 Then re-pull §3, §5 and this kit's handling per the playbook's v2.4 banner, and drop any ledger row,
 pointer stub or self-prune rule from your kickoff manifest (§4) and your instantiated playbook (§2).
 
+<!-- govkit:entry codebase-map -->
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
 
 1. Copy the kit dir into the project as a directory **named `codebase-map`** (the fixed name the
@@ -263,6 +268,7 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
 6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
 7. Commit `<kit>/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
 
+<!-- govkit:entry memory-recall -->
 ## 3c — Adopt the memory-recall kit (if chosen in §0)
 
 Retrieval over the §3 tree: `query.py` indexes the corpus offline (stdlib only, no network, nothing
@@ -391,6 +397,7 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 6. Bump the manifest marker to `kickoff-manifest: v1.3` **LAST** — the bump silences the kit's
    version WARN, the only standing signal that the body still predates the ratchet.
 
+<!-- govkit:entry push-main -->
 ## 5 — Optional: worktree tooling + SessionStart nudge
 
 Optional for any pytest project: adopt `tools/pytest-parallel-guardrails/` (bounded + attributable

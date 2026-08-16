@@ -241,3 +241,9 @@ why = "gov's own leg manifest, a registry exemption"
 [[gov_only_pin]]
 pattern = "tools/govkit/*"
 why = "the deployer itself, which never travels"
+
+[[exempt_leg]]
+name = "govkit acceptance matrix"
+why = """
+a gov-internal harness over gov's OWN deployer, which never travels into a target. It drives the deployer against four repo SHAPES; an adopter has one repo and receives no deployer, so there is nothing there for it to exercise.
+"""

@@ -548,5 +548,15 @@
     "guard": [
       "tools/govkit/"
     ]
+  },
+  {
+    "name": "govkit acceptance matrix",
+    "argv": [
+      "python",
+      "tools/govkit/matrix.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
   }
 ]
