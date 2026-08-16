@@ -44,13 +44,30 @@ implementation could not see and no path-shaped fixture would have caught. Those
 `selftest.py`. The general question is `memory/gotchas/armed-but-unreachable-rule.md`, and it is a
 REVIEW question: no predicate here can decide reachability for a rule type it has never seen.
 
-HOW P3's DEFECTS WERE FOUND, because the pattern is the lesson. Three adversarial rounds produced
-four blockers, ALL of them in `_glob_match` or `resolve_import`, and NOT ONE was visible to an
-end-to-end fixture — reverting the `_glob_match` rewrite verbatim once left all 48 fixture arms
-green while the live gate stayed at exit 0. A fixture exercises a PATH through the engine; a CASE
-TABLE exercises the function. `selftest.py` now carries one per helper, and each row names the
-defect it exists to catch. When extending either function, add rows there first: that table caught
-two wrong expectations from its own author on the day it was written.
+*** P3 IS NOT FIT TO RELY ON. DO NOT TRUST A ZERO LAYER PIN. ***
+
+FOUR adversarial rounds, a blocker in every one, all of them in `_glob_match` or `resolve_import`.
+The most recent round found that the previous round's fix INTRODUCED two regressions while leaving
+the commonest crossing spelling unhandled. All three are verified and open:
+
+  1. `from <pkg> import <name>` resolves to NOTHING. The parser records only `node.module`, so the
+     imported NAME is discarded and only the last dotted segment is looked up as a file stem. This
+     is the commonest Python crossing spelling and P3 cannot see it.
+  2. A dotted target gets NO directory scoping, so `concurrent.helper` and `thirdparty.helper` —
+     imports touching nothing in this repo — resolve onto any same-stem file and RED as crossings.
+     A false positive whose only escape is a waiver that then permanently silences the genuine
+     violation it hides. Measured False before the last fix, True after.
+  3. `"." in target` is a PYTHON namespace rule applied to every language, so a JS `lodash.debounce`
+     loses importer-local precedence the same way.
+
+Also open: a boundary-free `startswith` in the relative branch — the exact class the glob anchoring
+removed, alive in the sibling helper — and `**` collapsing to `[^/]*[^/]*`, so `<dir>/**` selects
+strictly LESS than `<dir>/*`.
+
+P1, P2 and `tools/check-placeholders.sh` are unaffected: no round has implicated them, and P1 has
+now caught its own author four times. The CASE TABLES in `selftest.py` are the right instrument and
+they hold — every fix above was verified by reverting it and watching a named row red. What they
+cannot supply is a design for import resolution, which is what this predicate actually needs.
 """
 
 import re

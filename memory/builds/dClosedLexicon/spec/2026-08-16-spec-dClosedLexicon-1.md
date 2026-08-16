@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo
 
-**Status:** CLOSED · rev-9 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
+**Status:** BLOCKED · rev-10 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -446,6 +446,20 @@ dogfood-only and must not ship.
   fully resolved and the header carries `ratified`. Status moves SPECCED to DEFERRED: scope approval
   happened, so "awaiting owner scope approval" is no longer true, and the §14 externalization is a
   predecessor this unit is parked on rather than an external prereq.
+- rev-10 · 2026-08-16 · folded review-dClosedLexicon-6, the owner-sanctioned helper-only pass, and
+  the unit REOPENS. The two rev-9 fixes are correct — each verified by revert — but incomplete, and
+  one of them REGRESSED. Verified here: `from <pkg> import <name>` resolves to nothing (the parser
+  keeps only `node.module`, discarding the imported name), so the commonest Python crossing spelling
+  is invisible; and the new dotted branch dropped all directory scoping, so `concurrent.helper` and
+  `thirdparty.helper` — imports touching nothing in this repo — now RED as crossings where they did
+  not at the parent commit. A false positive is worse than the false negative it replaced: its only
+  escape is a waiver that then permanently silences the genuine violation it hides.
+  That is FOUR rounds with a blocker in every one, all in `_glob_match` or `resolve_import`, and the
+  latest fix introducing defects at the rate it closes them. The pattern is no longer "a bug to
+  fix": P3 needs an import-resolution DESIGN, which is a different piece of work from the one this
+  unit specced. Status BLOCKED, not landed, and the disposition is an owner call — the same one
+  declined at rev-9 on information that has since changed. Filed as TOOL-dClosedLexicon-8, -9, -10.
+  UNAFFECTED: S1, S2 and S12, implicated by no round across six review records.
 - rev-9 · 2026-08-16 · owner turn on the aborted run: ratified "fix P3 now, then land". Both rev-8
   blockers are FIXED and each is verified by REVERT — reverting either makes a named case-table row
   red. `_glob_match`'s two branches now share one glob-to-regex conversion, so a wildcard earlier in
