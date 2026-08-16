@@ -2,7 +2,7 @@
 
 > Mutable. Each row leads with one status token (OPEN…WONTDO).
 > **Rotated 2026-08-14** — 48 terminal rows moved byte-identical to [`../archive/TOOL.2026-08-14.md`](../archive/TOOL.2026-08-14.md), covering `TOOL-aRuledParchment-2` through `TOOL-cFinalBerth-2`. Nothing deleted; the all-time id-collision grep still reaches them there.
-- TOOL-aWalkedCorpus-1 · OPEN · memory-recall has TWO corpus enumerators — extract.corpus_files is the measurement path, query.py defines its own — and every widening must teach both. TOOL-aDeclaredCeiling-2 §4 said this was 'recorded as the follow-up it is' and no row existed
+- TOOL-aWalkedCorpus-1 · CLOSED · memory-recall has TWO corpus enumerators — extract.corpus_files is the measurement path, query.py defines its own — and every widening must teach both. TOOL-aDeclaredCeiling-2 §4 said this was 'recorded as the follow-up it is' and no row existed
 - TOOL-aWalkedCorpus-2 · DEFERRED · a recall quality floor. Measured NOT buildable against bench.py as it exists: it always exits 0, its flag set is closed, it needs an uncommitted data dir, and verbatim.json pins it byte-for-byte. See the spec's §1 for what a successor needs
 - TOOL-aDeclaredCeiling-1 · OPEN · make the template ceiling a DECLARED pin rather than a shell constant, the way .memory-tree.conf's READ_PATH_CEILING declares a byte budget with each movement justified beside the number. Recorded by TOOL-aSiftedPlaybook-1 §4 as this repo's established answer
 - TOOL-aDeclaredCeiling-2 · OPEN · the recall corpus cannot reach a constraint declared in a conf file. Its root is $MEMORY_ROOT and confs sit at the repo root, so READ_PATH_CEILING was live prior art TOOL-aSiftedPlaybook-1 §10's own query could not surface. A gap in what retrieval indexes

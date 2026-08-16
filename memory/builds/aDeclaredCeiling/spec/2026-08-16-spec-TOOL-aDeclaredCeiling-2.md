@@ -1,6 +1,6 @@
 # TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf
 
-**Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -95,7 +95,14 @@ run, and a benchmark measuring a different corpus than the one it reports on is 
 
 **Unifying the two walks is explicitly NOT this unit's job** — it is a real cleanup with its own
 blast radius across the query path, and doing it inside a corpus widening would make both
-unreviewable. Recorded as the follow-up it is.
+unreviewable. ~~Recorded as the follow-up it is.~~
+
+**That last sentence was FALSE when written and is corrected here (`TOOL-aWalkedCorpus-1` S3).**
+No row was minted. The deferral was real and the record of it was not, which is the same
+drifted-claim shape this build's own `PLAY-aDeclaredCeiling-1` corrected in a landed record one
+unit over — committed by the unit doing the correcting. It was caught only when the build was
+asked what it had left. The row exists now as `TOOL-aWalkedCorpus-1`, and the cleanup landed
+with it.
 
 ### Files touched
 
@@ -188,6 +195,10 @@ none.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-16 · §4's "Recorded as the follow-up it is" was false — no row was minted —
+  and is struck through in place with the correction beside it (`TOOL-aWalkedCorpus-1` S3).
+  Nothing this unit BUILT changes; a terminal record that revises its own scope is worse than
+  a stale claim, so only the claim moves.
 - rev-2 · 2026-08-16 · folded the round-1 spec audit. **B2**: §4 called `extract.corpus_files` "the
   single place the corpus is enumerated" and there are two — `query.py` defines and calls its own,
   and every AC in this unit shells out to `query.py`, which was in no Files-touched row. Both

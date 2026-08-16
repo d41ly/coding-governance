@@ -606,13 +606,14 @@ def t_build_marker_lifecycle():
             "import query\n"
             "seen = {}\n"
             "orig = query._docs\n"
-            "def spy(repo, files):\n"
+            "def spy(repo, files, declared=()):\n"
             "    seen['during'] = (query.cache_dir(repo) / query.BUILD_MARKER).exists()\n"
-            "    return orig(repo, files)\n"
+            "    return orig(repo, files, declared)\n"
             "query._docs = spy\n"
+            "import extract\n"
             "repo = pathlib.Path('.').resolve()\n"
             "d = query.cache_dir(repo)\n"
-            "query.build_cache(repo, d, query.corpus_files(repo))\n"
+            "query.build_cache(repo, d, *extract.corpus_inputs(repo, include_untracked=True))\n"
             "print('during=%s after=%s' % (seen.get('during'), (d / query.BUILD_MARKER).exists()))\n",
             encoding="utf-8", newline="\n")
         proc = run(root, kitdir, script="_markerprobe.py")
@@ -1189,6 +1190,35 @@ def test_undeclared_file_stays_out():
         cleanup(root)
 
 
+
+@check("the ONE walk still serves two callers: untracked visible to query, absent at a rev")
+def test_one_walk_two_callers():
+    """S5. The two enumerators existed because the query path must see a note written this session
+    and the measurement path must stay pinnable to a rev. Collapsing them into one function is only
+    correct if BOTH halves survive, and a refactor that quietly unified them would pass a one-sided
+    check — so this asserts the DIFFERENCE, not the sameness.
+    """
+    import os, sys, importlib
+    root, kitdir = make_repo()
+    cwd = os.getcwd()
+    try:
+        sys.path.insert(0, str(kitdir))
+        E = importlib.import_module("extract")
+        importlib.reload(E)
+        (root / "memory" / "uncommitted-note.md").write_text(
+            "# a note written this session\n", encoding="utf-8", newline="\n")
+        os.chdir(root)
+        live = E.corpus_files(root, include_untracked=True)
+        tracked = E.corpus_files(root)
+        rel = "memory/uncommitted-note.md"
+        assert rel in live, f"the query path cannot see an uncommitted note: {live}"
+        assert rel not in tracked, f"the measurement path sees an untracked file: {tracked}"
+        return f"query sees {len(live)} file(s), measurement sees {len(tracked)}"
+    finally:
+        os.chdir(cwd)
+        cleanup(root)
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -1210,7 +1240,7 @@ def main() -> int:
         t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
-        test_undeclared_file_stays_out,
+        test_undeclared_file_stays_out, test_one_walk_two_callers,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
 
