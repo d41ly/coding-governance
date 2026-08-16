@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-8 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** SPECCED · rev-9 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -33,6 +33,7 @@ constant change is exactly when an unproven gate is most likely to be silently w
   | A9 | `--bump` on one subject, with a second subject's row present | the second row is **byte-identical** afterwards |
   | A10 | the high-water record absent | exit 0, no ratchet, and **one explicit line saying the record is absent** — never silence, never a `set -u` failure |
   | A11 | the high-water record present but non-numeric for the subject | a NAMED failure, not a shell error |
+  | A12 | a repo-internal subject, after `--bump` | the row's KEY is the literal repo-relative path, compared against a hand-written string — never against the gate's own derivation |
 
   A6-A9 arm `TOOL-aSiftedPlaybook-1` S8's high-water ratchet. A6 and A7 together are what prove the
   ratchet is ADVISORY: A6 alone passes if the warn were accidentally built as a second blocker (it
@@ -44,6 +45,16 @@ constant change is exactly when an unproven gate is most likely to be silently w
   kickoff leg, and a `--bump` on that leg's argv would rewrite the shared value and make the
   template leg warn on every run forever. A6-A8 are all satisfiable by the single un-keyed number
   S8 forbids; only A9 distinguishes them.
+
+  **A12 exists because the round-trip cannot fail.** `--bump` WRITES the key and the ratchet READS
+  it back through the same derivation, so bump-then-check is green whatever the key is — the
+  `assertion-between-two-derived-values` class, where the population is fine and the comparison is
+  decided before any data is read. Not hypothetical: building `TOOL-aSiftedPlaybook-1` shipped keys
+  as machine-ABSOLUTE paths, because `git rev-parse --show-toplevel` answers a drive-letter form
+  while `pwd` answers the POSIX form and the prefix strip therefore never matched. Every run of
+  the gate stayed green over a TRACKED record that would have differed per machine and per
+  worktree, and it was caught by opening the file. A12 therefore compares against a hand-written
+  expected string; an arm that asks the gate what the key should be re-derives the bug.
 
   **A10 and A11 arm S8's degenerate-case contract**, which S8 states and hands to this unit by name.
   They are not covered by A3: A3 is a missing TEMPLATE (the gate's `file not found` branch at
@@ -205,7 +216,8 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
   when the high-water record's path resolution is broken, A8 reds; when `--bump` is made to rewrite
   the whole record instead of the subject's row, **A9** reds; when the absent-record branch is made
   to fall through silently, **A10** reds; and when the non-numeric branch is made to fall through to
-  the numeric comparison — or to a bare shell error — instead of a named failure, **A11** reds.
+  the numeric comparison — or to a bare shell error — instead of a named failure, **A11** reds. When the key derivation is changed to emit an absolute path, **A12** reds — and it is the only
+  arm that does, which is the whole reason it is written against a literal rather than a derivation.
   **The A11 limb is not optional and is the one this criterion was shipped without.** A11 arms the
   contract "non-numeric high-water → a NAMED failure", and `set -u` is live at
   `tools/check-template-size.sh:11` with the comparison at `:28`, so a `set -u` explosion also
@@ -287,6 +299,13 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-16 · **A12 added by left-shift from the `TOOL-aSiftedPlaybook-1` build pass**, per
+  M8. The recurring-bug-class checklist selected `assertion-between-two-derived-values` over that
+  pass's diff, and it named a real hole: `--bump` writes the record key and the ratchet reads it
+  back through the same derivation, so no arm here could have failed on a wrong key. Unit 1 shipped
+  machine-absolute keys through a green gate on exactly that path. A12 compares the key to a
+  literal, and AC8 gains its mutation. The defect was fixed in unit 1; this is the gate that keeps
+  it fixed.
 - rev-8 · 2026-08-16 · folded round-5 M1 and L1. **M1**: round-4 M1's remedy was two-part per arm
   and the AC8 half reached A10 and not A11 — while the rev-7 entry below certified both. A11 arms
   the named-failure contract for a non-numeric record, and a `set -u` explosion satisfies a bare
