@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.17   # gov:kit memory-tree@2.17 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.18   # gov:kit memory-tree@2.18 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -471,7 +471,7 @@ if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
 $drift"; fi
 fi
 
-# 21 — every record names the spec it is evidence about (TOOL-aTetheredRecord-4). Delegates the
+# 21 — every record names the spec it is evidence about. Delegates the
 # PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
 # fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
 # Python raise. ONE invocation of the read-only mode, split here into four branch populations.

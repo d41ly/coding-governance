@@ -809,7 +809,7 @@ done
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 [ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
 
-# ---- CHECK 21 — every record names the spec it is evidence about (TOOL-aTetheredRecord-4).
+# ---- CHECK 21 — every record names the spec it is evidence about.
 # ---- Five fail sites behind one check number, each armed on its OWN literal signature and each
 # ---- asserted inside check 21's own output block via chit(), never against a global hit: this
 # ---- check prints bare paths, and a global grep cannot tell which branch produced one.

@@ -229,7 +229,7 @@ def parse_spec(path: str) -> dict | None:
 
 
 # ------------------------------------------------------------------------------ record -> spec bindings
-# TOOL-aTetheredRecord-2. Every record under a build's non-spec folders names the spec(s) it is
+# Every record under a build's non-spec folders names the spec(s) it is
 # evidence about, in its own head. This parser READS that and CLASSIFIES; it never raises, because
 # `collect()` is reached by both --check and --write through one call site, so a raising parser would
 # let one unannotated record refuse to render every artifact.
@@ -1056,7 +1056,7 @@ def do_selftest() -> int:
         do_write(t11, conf11)
         arm("write then check is a fixed point", "0", lambda: str(do_check(t11, conf11)))
 
-        # ---- TOOL-aTetheredRecord-2 — the record->spec binding parser.
+        # ---- the record->spec binding parser.
         # Every arm is a POSITIVE assertion on a classification, because the failure mode of a
         # head-scan is silence: a boundary set one line short reports "absent" for a conformant
         # record and nothing anywhere says so.

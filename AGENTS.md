@@ -91,7 +91,7 @@ REPORTING is always manifest order, so output is byte-stable whatever the width,
 absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at width 8. Every leg's
 output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
 `gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
-- `memory/` hygiene (20 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
+- `memory/` hygiene (21 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19, 20 and 21's PARSE delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py` — 21 keeps its own fail branches in the shell, where the harness meta-gate can count them
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)

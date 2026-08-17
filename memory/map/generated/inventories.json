@@ -29,7 +29,7 @@
       "kit/dogfood doc parity",
       "manifest-check self-test",
       "marker contract (4 readers)",
-      "memory hygiene (20 checks)",
+      "memory hygiene (21 checks)",
       "memory-hygiene self-test",
       "memory-recall kit selftest",
       "memory-recall skill wiring",

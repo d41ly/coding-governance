@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.17 -->
+<!-- gov:kit memory-tree@2.18 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -272,9 +272,10 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `tools/memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
 
-The pin is EMPTY today — every discovered branch is armed; `--report` prints the count, and this
-sentence deliberately does not, because a number written here rots while the gate stays green — and an empty pin is the
-file's working state, not its retirement. A row appears when a new branch lands that no fixture can
+The pin's working state is EMPTY, and it is not empty today — one branch is pinned. `--report`
+prints the live count and this sentence deliberately does not, because a number written here rots
+while the gate stays green; the sentence claimed the pin WAS empty for as long as it carried a row,
+which is the same defect one level up. A row appears when a new branch lands that no fixture can
 reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
 from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
 property of the harness, not a preference: the hygiene gate's `fail` never aborts, so one scratch
