@@ -1,0 +1,25 @@
+# testsuite-count-waivers.txt — suites on the bar that do not yet print an executed assertion
+# count against a floor. SHRINK-ONLY: a row leaves when its suite complies, and a row naming a
+# compliant suite REDS as stale. Seeded 2026-08-16 from the measured population, so the leg landed
+# green over the tree it was written against rather than over an assumption about it.
+.githooks/pre-commit.test.sh
+.githooks/pre-push.test.sh
+tools/agent-instructions/adopt-agent-instructions.test.sh
+tools/check-install-prefix.test.sh
+tools/check-wiring.test.sh
+tools/codebase-map/adopt-codebase-map.test.sh
+tools/hooks/agent-cap.test.sh
+tools/lib/resolve-python.test.sh
+tools/memory-tree/check-method-carriers.test.sh
+tools/memory-tree/check-verdict-epoch.test.sh
+tools/memory-tree/kit-dogfood-parity.test.sh
+tools/memory-tree/marker-contract.test.sh
+tools/memory-tree/merge-rows.test.sh
+tools/push-main.test.sh
+tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh
+tools/run-gates.evidence.test.sh
+tools/run-gates.test.sh
+tools/unattended/adopt-unattended.test.sh
+tools/workflows/check-protocol-parity.test.sh
+tools/workflows/check-review-join.test.sh
+tools/workflows/check-verifier-fanout.test.sh

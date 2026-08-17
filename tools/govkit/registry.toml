@@ -104,6 +104,11 @@ descriptor = "tools/govkit/entries/settings-merge.kit.toml"
 kind = "flat"
 
 [[entry]]
+id = "check-testsuite-counts"
+descriptor = "tools/govkit/entries/check-testsuite-counts.kit.toml"
+kind = "flat"
+
+[[entry]]
 id = "check-wiring"
 descriptor = "tools/govkit/entries/check-wiring.kit.toml"
 kind = "flat"

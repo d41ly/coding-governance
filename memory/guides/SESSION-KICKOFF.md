@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T10:40:05+03:00 @ c48ccdaa47c1ea71b1a90b0cf16c64ac4efd5be4
+last-audit: 2026-08-17T06:30:00+03:00 @ 1d2ae8be3934a7f656d300df70f837abc5790fdf
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 0f8b21fb9a134cf4d538efa49eb4b4291da66a2a
@@ -56,6 +56,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
+- **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
+  POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
+  preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
+  registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
+  the handles are written here — that is the drift the pointer design exists to avoid.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -126,6 +131,13 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
+  grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
+  running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
+  (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
+- The template is under a STRICT 32 KiB gate. Never raise it; externalize into
+  `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
+  `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.

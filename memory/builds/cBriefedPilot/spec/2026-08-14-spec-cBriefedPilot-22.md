@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

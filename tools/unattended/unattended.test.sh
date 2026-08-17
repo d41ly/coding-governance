@@ -22,6 +22,17 @@ hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
+# A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
+# real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
+# raw newline (a sed syntax error that edits nothing while reading as written), and a `git fetch` by
+# PATH that moved no remote-tracking ref. Each looked correct and each mutated zero bytes.
+mutate() { # file · sed-script
+  local f="$1" before; before=$(git hash-object "$f")
+  sed -i "$2" "$f"
+  n=$((n+1))
+  [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
+}
+
 cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
@@ -95,11 +106,17 @@ printf 'not front matter at all
 # tNoFm
 ' > memory/builds/tNoFm/README.md
 readme tWrongSlug
-sed -i 's/^slug: tWrongSlug$/slug: someoneElse/' memory/builds/tWrongSlug/README.md
+mutate memory/builds/tWrongSlug/README.md 's/^slug: tWrongSlug$/slug: someoneElse/'
 # A build whose README is on MAIN and which never had a run-state file - S2's subject. Deleting
 # tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
 # would have tested the dirty-tree refusal while claiming to test creation.
 readme tFresh
+# TOOL-cBriefedPilot-4: the build-method carrier, which --preflight now REFUSES without. A stub,
+# because the driver tests existence and nothing else; the file whose sections have to resolve lives
+# in the LEG's fixture. It is created before the initial commit deliberately - every arm begins with
+# `reset_tree`, which runs `git clean -qfd`, and an untracked stub would be deleted by the first one.
+mkdir -p memory/guides
+printf '# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n' > memory/guides/BUILD-METHOD.md
 git add -A && git commit -q -m base --no-verify
 # A REMOTE-TRACKING anchor, because that is now the only thing resolve_base will measure against: a
 # bare local branch is a ref the run can move with `git branch -f`, and moving it to HEAD was a
@@ -135,6 +152,7 @@ run() { bash "$SCRIPT" "$@" 2>&1; }
 # checks 9 and 17 live. Those arms have to commit.
 fixture() { git add -A >/dev/null && git commit -q -m fixture --no-verify; }
 sum() { git hash-object memory/builds/tRun/RUN.md; }
+
 
 # ---- check 1: the slug is validated against hygiene check 4's OWN folder grammar, so a traversal
 # ---- argument is refused by the rule that would have refused the folder. Paired with the no-write
@@ -243,7 +261,7 @@ miss "$out" "rewrote the scope"
 
 # ...the run EDITS its own scope. Same tree, one line changed.
 rreset
-sed -i 's|^1\. the first unit$|1. a unit the owner never wrote|' memory/builds/tRun/README.md
+mutate memory/builds/tRun/README.md 's|^1\. the first unit$|1. a unit the owner never wrote|'
 hit "$(run --preflight tRun --keepalive-id k1)" "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
@@ -408,7 +426,7 @@ hit "$out" "the recorded BASE equals HEAD, so this run built nothing on top of t
 # BRANCH 2 — an ABSENT discriminator FAILS CLOSED. Deleting one line from a run-written file must not
 # be the way past this refusal; the kit's recorded scar is a deleted base line degenerating a
 # comparison to the git index, and this is the same shape one verb over.
-sed -i '/^base: /d' memory/builds/tRun/RUN.md
+mutate memory/builds/tRun/RUN.md '/^base: /d'
 hit "$(run --close tRun)" "the merge-base equals HEAD and the record pins no BASE to tell a landed run from one that built nothing, and an absent discriminator is a refusal rather than a pass"
 
 # BRANCH 3 — a base off the history the anchor blesses. The early return this replaces SKIPPED the
@@ -430,7 +448,7 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 fixture
 git push -q -f origin HEAD:main
-out=$(run --close tRun)
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
 miss "$out" "the recorded BASE equals HEAD"
 miss "$out" "an absent discriminator is a refusal"
 hit "$out" "close OK"
@@ -508,7 +526,7 @@ hit "$out" "--override requires --reason: an unrecorded override is indistinguis
 # ---- check 13, both branches, each ISOLATED so the arm names the right one. Agent-attested first:
 # ---- every machine item is satisfied, so only the attested pair can be unmet.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-out=$(run --close tRun)
+out=$(run --close tRun --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override closing-review-recorded --reason "fixture build records no review")
 hit "$out" "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks"
 
@@ -521,11 +539,373 @@ hit "$out" "gates-green"
 
 # ---- the override PATH, end to end: the blocked item is overridden, the run closes, and the reason
 # ---- is written as a parked entry. A blocking gate with an override nobody can read is not a gate.
-out=$(run --close tRun --override gates-green --reason "the bar was run by hand at the pinned base")
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "the bar was run by hand at the pinned base")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned base"
 same "the phase advanced to LANDING" \
   "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
+
+# ---- TOOL-cBriefedPilot-1: the override REPEATS. The scalar form overwrote the first pair, so
+# ---- verb_close blocked on the second unmet item forever with nobody to read the block.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+mkconf "false" "false"
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
+hit "$out" "close OK"
+hit "$out" "override recorded for 'gates-green'"
+hit "$out" "override recorded for 'records-current'"
+hit "$(cat memory/builds/tRun/RUN.md)" "bar run by hand"
+hit "$(cat memory/builds/tRun/RUN.md)" "index re-rendered by hand"
+same "four overrides parked, one per pair — the scalar form kept only the last" "$(grep -c 'override · item ' memory/builds/tRun/RUN.md)" "4"
+
+# ---- the non-overridable item refuses wherever it sits, not only last. The scalar form could only
+# ---- ever see the FINAL pair, so a first-position authorization-reachable was invisible to it.
+reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+out=$(run --close tRun --override authorization-reachable --reason "first" --override gates-green --reason "second")
+hit "$out" "the authorization item is NOT overridable"
+miss "$out" "close OK"
+
+# ---- a flag left pending when argv ends keeps its EMPTY reason, so it meets the missing-reason
+# ---- refusal that already exists rather than vanishing. No second branch was added for it.
+out=$(run --close tRun --override gates-green --reason "has one" --override records-current)
+hit "$out" "--override requires --reason: an unrecorded override is indistinguishable from a passing check"
+miss "$out" "close OK"
+
+# ---- TOOL-cBriefedPilot-7: `build-complete` — the owner's "merge and push only when the entire
+# ---- build is fully done", given a checker. FIVE terms, and the GREEN CONTROL comes FIRST: without
+# ---- a tree where the item is genuinely MET, every arm below would pass by finding nothing, which
+# ---- is the exact class this build kept meeting. Each arm then breaks exactly ONE term off it.
+# ---- Terms 4 and 5 are broken in BOTH the README and the run-state copy, so `records-current` stays
+# ---- met and the refusal is attributable to this item alone rather than to two at once.
+git checkout -qf main
+sed -i 's/| OPEN | rev-1 |/| CLOSED | rev-1 |/' memory/builds/tRun/README.md
+roster tRun "1. ARCH-tRun-1 — the unit"
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m bc-fixture --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+bcreset() { git reset -q --hard "$BCP"; git clean -qfd; mkconf; }
+bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md; }
+
+# GREEN CONTROL: a complete build closes with NO override at all. If this ever needs one, the item
+# has stopped being satisfiable and every arm below is measuring the wrong thing.
+bcopen
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
+hit "$out" "close OK"
+miss "$out" "build-complete"
+
+# term 1 — no well-formed roster pair. A COMPLETENESS check cannot borrow check_authorization's
+# opt-in-by-presence disposition: on this tree 1 of 35 build READMEs carries the pair, so an opt-in
+# build-complete would be vacuously true for 34 of them and blind in the case it exists for.
+bcopen; sed -i "/roster:units/d" memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "build-complete"
+
+# term 2 — the pair is well-formed and names no id at all.
+bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. a plan with no id in it/' memory/builds/tRun/README.md
+hit "$(run --close tRun)" "build-complete"
+
+# term 3 — the roster names a unit nobody specced. This is the ONLY term that can see it: the
+# generated region is rendered from the specs that EXIST, so terms 4 and 5 are blind to a planned
+# unit with no spec file.
+bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. ARCH-tRun-1 — the unit\n2. ARCH-tRun-9 — never specced/' memory/builds/tRun/README.md
+hit "$(run --close tRun)" "build-complete"
+
+# term 4 — the generated region is spliced EMPTY. Term 5 is vacuously true over an empty selection,
+# so without this term a run-state file carrying no unit rows would satisfy "none is non-terminal"
+# by having none. Emptied in both files, so records-current stays met.
+bcopen
+sed -i '/^| \[ARCH-tRun-1/d' memory/builds/tRun/RUN.md
+sed -i '/^| \[ARCH-tRun-1/d' memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "build-complete"
+miss "$out" "records-current"
+
+# term 5 — one unit row is non-terminal. The case the owner actually asked for.
+bcopen
+sed -i 's/| CLOSED | rev-1 |/| OPEN | rev-1 |/' memory/builds/tRun/RUN.md
+sed -i 's/| CLOSED | rev-1 |/| OPEN | rev-1 |/' memory/builds/tRun/README.md
+out=$(run --close tRun)
+hit "$out" "build-complete"
+miss "$out" "records-current"
+
+# the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
+# afterwards. A blocking gate whose override nobody can read is not a gate.
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "shipping 1 of 2 units deliberately")
+hit "$out" "close OK"
+hit "$(cat memory/builds/tRun/RUN.md)" "shipping 1 of 2 units deliberately"
+
+# restore main to the shared BASE so the later arms see the tree they were written against.
+git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# ---- TOOL-cBriefedPilot-8: `closing-review-recorded` — a tracked review record under this build
+# ---- names the base the run pinned once. GREEN CONTROL first for the same reason as unit 7: every
+# ---- arm below asserts the item is UNMET, and without a tree where it is genuinely MET they would
+# ---- all pass against an item that can never be satisfied.
+# NOTE: expanded UNQUOTED on purpose, so it must word-split into exactly four arguments. A
+# reason with spaces does not survive that: quotes inside a variable are literal characters,
+# not shell quoting, and the tail becomes stray argv the driver rejects.
+crbc='--override build-complete --reason fixture-build-is-one-open-unit'
+cropen() { reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           mkdir -p memory/builds/tRun/reviews; }
+crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
+
+# GREEN CONTROL: a TRACKED record naming the pinned base, abbreviated to eight, satisfies the item.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "close OK"
+miss "$out" "closing-review-recorded"
+
+# ...and a record spelling the base at EXACTLY SEVEN, the shortest abbreviation git produces here.
+# The join shipped at eight and matched none of this corpus's seven-char records, so the item could
+# only ever be cleared by an override the run wrote for itself. Pinned by name, not by whatever
+# `git rev-parse --short` returns on the machine running this suite.
+cropen; rb=$(crbase)
+printf '# closing review
+
+range %s...HEAD
+' "${rb:0:7}" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "close OK"
+miss "$out" "closing-review-recorded"
+
+# arm 1 — the build records no review at all. The empty directory is the ordinary case at the start
+# of a run, and it must block rather than pass by selecting over nothing.
+cropen
+out=$(run --close tRun $crbc)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
+hit "$out" "closing-review-recorded"
+
+# arm 2 — the record exists in the WORKING TREE and is not tracked. `--cached` reads the index, so
+# this is excluded by construction rather than by a filter; without --cached it would pass.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 3 — a tracked record that names a DIFFERENT sha. The record exists and the join still refuses,
+# which is the difference between "a review was written" and "the review covers what shipped".
+cropen
+printf '# closing review\n\nrange deadbee1...HEAD\n' > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 4 — THE LENGTH GUARD, and the reason it is not defensive decoration. The record here is a
+# perfectly good tracked review; only the recorded base is gone. `grep -F ""` matches every line of
+# every file, so without the >=8 test this arm would SELECT that record and the item would pass by
+# finding anything — the same degeneration an empty base once caused in check_authorization.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+sed -i '/^base: /d' memory/builds/tRun/RUN.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+
+# arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
+# because "absent" and "too short to be a needle" reach the guard by different routes.
+cropen; rb=$(crbase)
+printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
+hit "$(run --close tRun $crbc)" "closing-review-recorded"
+reset_tree
+
+# ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
+# ---- directive is a pointer into a section of that file, so a run without it is bound by a set
+# ---- that resolves to nothing. The refusal joins the precondition block, so it writes nothing.
+reset_tree
+rm -f memory/guides/BUILD-METHOD.md
+# COMMIT the removal. Left dirty, check_clean refuses first and the two assertions below are
+# satisfied by the dirty-tree path instead of by the subject - over-determined, and they would
+# stay green with this unit's branch deleted. Observed: only the message arm went red.
+fixture
+out=$(run --preflight tFresh --keepalive-id KA-1234)
+hit "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
+hit "$out" "unattended: --preflight refused; the run-state file is unchanged"
+present=$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)
+same "a refused preflight left NO run-state file" "$present" "absent"
+
+# ---- the green control. Without it the arm above passes on ANY preflight failure, which is the
+# ---- fixture-passes-by-finding-nothing class this repo has already paid for once.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id KA-1234)
+hit "$out" "preflight OK"
+miss "$out" "no build method under the memory root, so every directive this run is bound by points into a file that does not exist:"
+
+# ---- The BASE is pinned ONCE (unit deliberately unnamed — non-terminal spec, and the drift signal
+# ---- for those cited by product source is at its pin). Re-preflight is the verb a run is TOLD to
+# ---- re-run after a compaction, and it used to re-pin against a merge-base that had moved - which
+# ---- the mandated lander makes happen on most runs, because it reconciles origin before the gate.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+base1=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
+same "the first preflight wrote a base" "$([ -n "$base1" ] && echo yes || echo no)" "yes"
+asha1=$(sed -n "s/^anchor-sha: //p" memory/builds/tRun/RUN.md)
+# advance the anchor and reconcile it, which is exactly what the lander does before the gate
+git -C "$ORIGIN" --work-tree=. --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+git checkout -q main && echo advance >> advance.txt && git add -A && git commit -q -m advance --no-verify
+git push -q "$ORIGIN" main 2>/dev/null || true
+git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1 || true
+git fetch -q "$ORIGIN" 2>/dev/null || true
+# ...and again by REMOTE NAME. Fetching by PATH updates no `refs/remotes/origin/*`, so the anchor
+# this fixture spends four lines advancing never actually moved, and both pinned-once arms below
+# were comparing a value against itself. The freeze arm's control is what exposed it.
+git fetch -q origin 2>/dev/null || true
+out=$(run --preflight tRun --keepalive-id k1)
+base2=$(sed -n "s/^base: //p" memory/builds/tRun/RUN.md)
+same "the base did not move on the second preflight" "$base2" "$base1"
+# TOOL-cBriefedPilot-5, the fork the owner resolved: the anchor TRIPLE freezes with the base.
+# Protocol section 2 describes all four as observed at pin time so an outside party can re-derive
+# the pin; a triple that keeps moving dates a different moment from the value it is evidence for.
+# The CONTROL first — without it this arm passes whenever the anchor happens not to have moved, and
+# the whole point of the fixture above is that it did.
+asha2=$(sed -n "s/^anchor-sha: //p" memory/builds/tRun/RUN.md)
+now=$(git rev-parse refs/remotes/origin/main)
+same "the anchor really did move, so the freeze has something to resist"   "$([ "$now" != "$asha1" ] && echo moved || echo stayed)" "moved"
+same "the anchor sha did not move on the second preflight" "$asha2" "$asha1"
+hit "$out" "base $base1"
+
+# ---- TOOL-cBriefedPilot-2: the directive registry. AC1 is exercised by every arm in this file -
+# ---- mkconf does NOT emit DIRECTIVES_EXTRA, so a driver that read it without a default would have
+# ---- aborted under set -u on the first invocation. Asserted explicitly anyway, because a property
+# ---- that holds by accident of another fixture is one nobody notices losing.
+reset_tree
+out=$(run --status tRun)
+miss "$out" "unbound variable"
+hit "$out" "phase "
+
+# ---- eleven pairs, read from the driver's OWN constant line — the same line the gate leg's
+# ---- core_of() parses, so a count here and a count there cannot disagree.
+dirline=$(grep '^DIRECTIVES_CORE=' "$SCRIPT")
+ndir=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*' | wc -l | tr -d ' ')
+same "the registry declares eleven handles" "$ndir" "11"
+
+# ---- every handle POINTS at a build-method section and none of them restates one. The pointer is
+# ---- the whole design: a gloss grown into a condition would be the M1 defect this build exists to
+# ---- avoid, and a shape check is the cheapest thing that notices it happening.
+nbad=$(printf '%s\n' "$dirline" | sed -e 's/^DIRECTIVES_CORE="//' -e 's/"$//' | tr ' ' '\n' \
+       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+$' || true)
+same "every registry entry is handle:M-section and nothing else" "$nbad" "0"
+
+# ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
+# ---- it can silently not ship while the suite stays green.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+same "resume names the directive table" "$(run --resume tRun | grep -c 'the directives and their waivers')" "1"
+
+# ---- S2, the ACCESSOR exists and composes core plus extra. This arm is here because its absence
+# ---- was invisible: the accessor edit silently no-opped, the suite stayed green at 192, and the
+# ---- source-level arm below could not see it either — it checks that a key is DEFAULTED, not that
+# ---- anything READS it. A scope item with no arm is a scope item that can quietly not ship.
+same "directives() is defined" "$(grep -c '^directives()' "$SCRIPT")" "1"
+same "directives() composes core and extra" \
+  "$(grep '^directives()' "$SCRIPT" | grep -c 'DIRECTIVES_CORE.*DIRECTIVES_EXTRA')" "1"
+
+# ---- S6, the SOURCE-level arm: every conf key the DRIVER reads is defaulted in its own init block.
+# ---- The population is the KIT'S SHIPPED EXAMPLE, not the fixture's conf. The first cut read
+# ---- `.unattended.conf`, which under `mkconf` omits the very key the arm was written for, so it was
+# ---- VACUOUS — observed by stripping DIRECTIVES_EXTRA from the init line and watching the suite
+# ---- stay green. The example is the kit's own declaration of the surface a project fills in, it is
+# ---- tracked, and no fixture can narrow it.
+example="$HERE/.unattended.conf.example"
+initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
+undefaulted=""
+checked=0
+for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
+  grep -q "[^A-Z_]$k" "$SCRIPT" || continue
+  checked=$((checked + 1))
+  case "$initblock" in *"$k="*) ;; *) undefaulted="$undefaulted $k" ;; esac
+done
+same "every conf key the driver reads is defaulted in its init block" "$undefaulted" ""
+
+# ---- and the population is NON-EMPTY and plausible. Without this the arm above passes when the
+# ---- example cannot be read, when the reference test matches nothing, or when a path resolves
+# ---- differently for two tools — all three of which happened while this arm was being written.
+same "the arm actually checked a plausible number of keys" \
+  "$([ "$checked" -ge 8 ] && echo yes || echo no)" "yes"
+
+# ---- TOOL-cBriefedPilot-3: --waive. Five refusals, and the first is a DISPATCH guard rather than a
+# ---- precondition: verb_preflight never runs for another verb, so a guard there could never fire.
+# ---- The M4 audit found that; the spec had put it in the wrong place.
+reset_tree
+hit "$(run --status tRun --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+# --plan and --phase EXIT INSIDE the parse loop, so a post-loop guard alone never sees them. Both
+# arms are here because that is exactly the miss the guard is shaped to avoid.
+hit "$(run --plan tRun --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+hit "$(run --phase tRun BUILDING --witness deadbeef --waive minimal-prose --reason x)" \
+  "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question:"
+
+# ---- an undeclared handle waives nothing.
+reset_tree; before_waive=$(sum)
+hit "$(run --preflight tRun --keepalive-id k1 --waive no-such-directive --reason because)" \
+  "--waive names a handle that is not in the effective directive set, and a waiver on a directive nobody declared relaxes nothing:"
+
+# ---- a waiver with no reason is indistinguishable from one nobody meant.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose)" \
+  "--waive requires --reason, because a waiver with no recorded reason is indistinguishable from one nobody meant and the wrap-up has nothing to surface"
+
+# ---- the reason may not spell the declared bypass flag: park writes it verbatim and the leg greps
+# ---- this file whole, so a truthful reason would red the bar forever on a record no verb rewrites.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason 'ran with --no-verify')" \
+  "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+
+# ---- nor a newline: park's grammar is one line per entry, so a reason carrying one forges a second
+# ---- well-formed entry the owner never granted.
+reset_tree
+hit "$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "$(printf 'first\nsecond')")" \
+  "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
+
+# ---- every refusal above leaves the run-state file ABSENT, not merely prints. A refused preflight
+# ---- that had already written would have changed the state its refusal is about.
+# tRun SHIPS a run-state file, so `absent` was never the right claim - the property is that a
+# refused preflight changed NOTHING. `sum` is the idiom every other no-write arm here uses.
+same "a refused --waive preflight left the run-state file byte-identical" "$(sum)" "$before_waive"
+
+# ---- the happy path: two pairs, both parked with their reasons, in the STAGED blob.
+reset_tree
+# PREFLIGHT CREATES the record — protocol section 2 — so a first waiver arrives on a build
+# that has none. The fixture pre-makes tRun's, which let the old permissive guard accept a
+# SECOND owner turn: a waiver added to an existing waiver-free record. Unit 13's
+# cross-component arm found that, the guard was narrowed, and this arm now exercises the
+# flow a real run takes.
+rm -f memory/builds/tRun/RUN.md; git add -A >/dev/null; git commit -q -m 'no record yet' --no-verify
+out=$(run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "nobody reads it" --waive parallel-when-disjoint --reason "sequenced by hand")
+hit "$out" "preflight OK"
+hit "$out" "directive waived — minimal-prose"
+hit "$out" "directive waived — parallel-when-disjoint"
+same "two waivers parked, one per pair" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "2"
+hit "$(cat memory/builds/tRun/RUN.md)" "nobody reads it"
+hit "$(cat memory/builds/tRun/RUN.md)" "sequenced by hand"
+same "the waivers are in the STAGED blob, which is the leg's whole population" \
+  "$(git show :memory/builds/tRun/RUN.md | grep -c 'waiver · item ')" "2"
+
+# ---- a re-preflight naming the SAME set is idempotent: it is a resume, not a second owner turn.
+before=$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)
+run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "nobody reads it" --waive parallel-when-disjoint --reason "sequenced by hand" >/dev/null
+same "a re-preflight with the same set duplicates nothing" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "$before"
+
+# ---- and one naming a DIFFERENT set refuses, rather than silently re-writing what the owner granted.
+hit "$(run --preflight tRun --keepalive-id k1 --waive diff-reviewed --reason "changed my mind")" \
+  "the requested waiver set differs from the one already recorded, and a re-preflight is a RESUME rather than a second owner turn; re-issue the recorded set or none at all"
+
+# The happy path STAGED the run-state file, so the tree is dirty and check_clean refuses for a
+# reason that has nothing to do with waivers. Commit it, as every arm reaching the write phase does.
+fixture
+# ---- an invocation naming NO handle is not a refusal. Unit 5's design requires a --preflight before
+# ---- every --close, and over a waived run that invocation carries no pairs.
+hit "$(run --preflight tRun --keepalive-id k1)" "preflight OK"
+same "a no-handle re-preflight left the recorded set intact" \
+  "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "2"
 
 # ---- S6, the phase PRODUCER. Three branches and one behavioural claim.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -646,16 +1026,66 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ...and a build with no tracked spec REFUSES rather than printing an empty, complete-looking list.
 reset_tree; readme tPlanEmpty; fixture
-hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING and this verb cannot say which - the roster it would need is the README's authored Units table, which it does not parse"
+
+# ---- TOOL-cBriefedPilot-6: --plan sees the planned unit that has no spec. M2 makes the README's
+# ---- authored Units table the roster; this verb did not parse it, so it enumerated the half of the
+# ---- roster that already had specs and said so in its own closing line.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tPlan "1. ARCH-tPlan-1 the specced one
+2. ARCH-tPlan-7 the one nobody has specced"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "ARCH-tPlan-7"
+hit "$out" "MISSING"
+same "exactly one MISSING row, for the id with no spec" "$(printf '%s\n' "$out" | grep -c 'MISSING')" "1"
+miss "$out" "ARCH-tPlan-1        -           MISSING"
+hit "$out" "roster: the README roster region"
+
+# ---- a MALFORMED pair is a NAMED refusal, not a silent fall-through to the no-roster path. `region`
+# ---- exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
+# ---- discarded-signal defect this kit has already shipped once.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tPlan "1. one"; roster tPlan "2. a second pair nobody granted"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice:"
+miss "$out" "ARCH-tPlan-1"
+
+# ---- no roster marker at all: today's output, today's sentence, and the caveat is then TRUE.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "roster: tracked specs under"
+hit "$out" "a planned unit with no spec is invisible here"
+miss "$out" "MISSING"
+
+# ---- S6's extraction is BYTE-IDENTICAL at --status. A refactor and a behaviour change in one
+# ---- reviewable diff is what this criterion exists to prevent.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+same "--status names a non-terminal unit through the extracted helper" "$(run --status tRun | grep -c 'next ')" "1"
+# ---- the extraction selects the SAME first row as the inline pipeline it replaced. `region` is a
+# ---- function INSIDE the driver, not a command here, so the control re-derives the slice with awk.
+# ---- The first cut called `region` and the control returned empty, which would have compared the
+# ---- helper against nothing and passed forever.
+want_unit=$(awk '/<!-- run:generated -->/{f=1;next} /<!-- .run:generated -->/{f=0} f' memory/builds/tRun/RUN.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
+same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
+
+
+hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
-for v in --preflight --plan --phase --status --resume --close --landed --abort; do
+for v in --preflight --plan --phase --status --resume --close --landed --park --abort; do
   n=$((n+1))
   [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
     || { echo "FAIL the header docstring omits $v"; st=1; }
@@ -896,7 +1326,7 @@ miss "$(sed -n '/^## Parked/,$p' memory/builds/tRun/RUN.md)" "override"
 # has simply relabelled every parked line rather than distinguishing two kinds.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
-run --close tRun --override records-current --reason "records lag" >/dev/null 2>&1
+run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override records-current --reason "records lag" >/dev/null 2>&1
 hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
 
 
@@ -1032,5 +1462,83 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL the driver reaches the repairing wiring
 nf=$(grep -nE 'head -1 \| tr -d' "$HERE/unattended.sh" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per-call idiom: $nf"; st=1; }
 
+# ---- TOOL-cSettledDocket-1: `--park`, the fourth writer of a parked entry and the first available
+# ---- MID-RUN. §2 declares four kinds; park() had callers for three, and DECISION — the kind §2
+# ---- names first — had none. GREEN CONTROL first, then one arm per refusal.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+
+# GREEN CONTROL: the happy path writes exactly one row, of the declared kind.
+out=$(run --park tRun --item "do facts 5-7 pin with fact 4" --reason "widens the unit; owner call")
+hit "$out" "decision parked"
+same "exactly one decision row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "1"
+hit "$(cat memory/builds/tRun/RUN.md)" "decision · item do facts 5-7 pin with fact 4 · reason widens the unit; owner call"
+
+# ...and it is IDEMPOTENT on the same pair. The protocol's post-compaction recovery re-runs the run's
+# own steps, so a re-derived refusal must not duplicate. NOT --waive's rule: that compares handle
+# SETS, this compares one pair, because there is no set here to compare.
+out=$(run --park tRun --item "do facts 5-7 pin with fact 4" --reason "widens the unit; owner call")
+hit "$out" "already parked, unchanged"
+same "the repeat added no row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "1"
+
+# ...a DIFFERENT question is a second row, not a no-op.
+run --park tRun --item "second question" --reason "also owner" >/dev/null
+same "a different item parks its own row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "2"
+
+# ...and --status SURFACES it, which is the whole point of writing it somewhere a reader reaches.
+# The arm here used to assert the slug appeared in --status's output — true on every reachable path,
+# so it could not fail, and it documented a capability the verb did not have. It has it now.
+hit "$(run --status tRun)" "· parked 2"
+miss "$(run --status tNoPark)" "· parked"
+
+# refusal: no --item.
+before=$(git hash-object memory/builds/tRun/RUN.md)
+out=$(run --park tRun --reason "r")
+hit "$out" "--park requires --item, because a parked entry with no question recorded is the bare 'parked' the protocol calls indistinguishable from 'forgotten'"
+same "a refused park wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# refusal: no --reason.
+out=$(run --park tRun --item "q")
+hit "$out" "--park requires --reason, because an entry recording no reason is indistinguishable from one nobody meant - the same argument --waive already makes"
+
+# refusal: a reason spelling the declared bypass flag. park() writes it verbatim and leg check 11
+# greps the file WHOLE, so recording it would red the bar on a record no verb can rewrite.
+out=$(run --park tRun --item "q" --reason "the lander wanted --no-verify")
+hit "$out" "the item or the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
+# ...and the ITEM half, which is the half that shipped unscreened: check 11 greps the file WHOLE,
+# so it does not care which field spelled the flag.
+before=$(git hash-object memory/builds/tRun/RUN.md)
+hit "$(run --park tRun --item "drop --no-verify from the lander" --reason r)" "the item or the reason spells the declared bypass flag"
+same "the unscreened field wrote nothing either" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# refusal: a NEWLINE in the reason. This is the one --waive refusal rev-1 of the spec left out, and
+# it is the load-bearing one here: park() appends ONE line and check 17 parses the region line-wise,
+# so a reason carrying a newline forges a second parked row that no verb wrote.
+out=$(run --park tRun --item "q" --reason "$(printf 'first\nsecond')")
+hit "$out" "a parked item or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+same "the forged row was not written" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "2"
+
+# refusal: an item spelling the record's own field separator, which would make its row unparseable
+# by the very check that grades it.
+hit "$(run --park tRun --item 'a · reason b' --reason r)" "a parked item spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"
+
+# refusal: a TERMINAL record. Two guards, not one — see the next arm for why.
+run --phase tRun LANDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1 || true
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+hit "$(run --park tRun --item q --reason r)" "ABORTED via --park"
+
+# refusal: NO RECORD AT ALL. `refuse_if_terminal` returns 0 for a file that does not exist, so a
+# design leaning on it alone would let --park mint a parked entry for a run that never started.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+out=$(run --park tRun --item q --reason r)
+hit "$out" "no run-state file, so there is no run to park a decision against"
+same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
+reset_tree
+
+# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
+# shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
+# grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
+# which nothing compared to anything. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=276
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

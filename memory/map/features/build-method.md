@@ -70,15 +70,19 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 
 ## Gaps
 
-- **Fourteen lines of headroom**, after the displacement moved M5's taxonomy, M11's list, three
+- **Eleven lines of headroom** (239 of 250; 16,680 of 20,480 B), re-measured after units 15 and 16
+  spent three. The earlier fourteen came after the displacement moved M5's taxonomy, M11's list, three
   judgment asides and M4's lens catalogue into `tools/memory-tree/README.md`. The line axis still
   binds before the byte axis, so M1's displacement rule stays load-bearing.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
-- **The unattended-side pointers are conditional prose.** `check-unattended.sh` permits its kit to be
-  installed without memory-tree, so both pointers say "if this project ships one". Nothing verifies
-  the conditional is honoured in either direction.
+- **One unattended-side pointer is still conditional, and it is now the only one.** The Skill's step
+  0 is unconditional after `cBriefedPilot` unit 9, and `--preflight` REFUSES a tree with no method
+  after unit 4 — so the kit is a run-time dependent rather than an optional reader. What survives is
+  `verb_resume`'s echo, still guarded by `[ -f "$M/guides/BUILD-METHOD.md" ]`, and leg check 16's
+  arm B, which stays silent when the carrier is absent BY DESIGN: the leg grades the tree, the driver
+  grades the run.
 - **`M4` has no harness.** `tier2-review.js` reviews DIFFS and cannot be pointed at a document, so
   the spec audit is hand-run under the review protocol's caps. The most token-expensive obligation
   the method names is its least instrumented step.

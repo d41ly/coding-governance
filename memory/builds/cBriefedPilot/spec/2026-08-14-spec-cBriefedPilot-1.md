@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -128,6 +128,22 @@ literal run between interpolations as the signature, so renaming the bound varia
 
 ## 8. Open questions
 
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (b), the newline
+  refusal stays in unit 3's precondition block and covers `--waive` alone.
+
+  **This overrides the fork's own recommendation, on M3 veto 1.** Option (a) — one shared refusal at
+  the dispatch `--reason` arm — is the better principle and the spec argues it well: `park()` is the
+  shared writer, and this driver's own `refuse_if_terminal` comment records what a rule spelled at one
+  call site costs. But a shared refusal is a NEW `fail` branch in THIS unit, and this unit's S4 states
+  that it adds none while AC5 observes `check-arms.py` green with `ARMS_FLOORS` UNEDITED. M3 rule 1
+  discards an option that fails an acceptance criterion already written in the spec, so (a) is
+  discarded and (b) survives. Taking (a) would have meant rewriting S4, AC5 and unit 3's S2 to rescue
+  an option the veto ladder had already removed.
+
+  **The residual is real and is not closed by this resolution:** the newline hole stays open for the
+  `override` and `abort` park kinds, which is pre-existing and which this unit did not create. It is
+  filed rather than absorbed, because absorbing it is exactly the scope creep the veto prevented.
+
 **Where does the newline refusal on a `--reason` live?** `park()` writes a reason verbatim into a
 region with a line grammar, so a reason containing a newline can write a second parked line — after
 unit 3 that includes a well-formed `waiver · item <handle> · reason <text>` line that leg check 17
@@ -149,6 +165,10 @@ would move a clause out of unit 3's fifth refusal rather than add a branch anywh
   permits.
 - rev-2 · 2026-08-14 · §3's deferral repointed. It named "units 9 through 11" without naming one, and
   none of the three had claimed the sentence; it is unit 9's S6, added there on the same cross-read.
+
+- rev-3 · 2026-08-15 · §8 resolved under the standing mandate. Option (a) was discarded on M3
+  veto 1 — it would have added a `fail` branch this unit's own S4 and AC5 forbid. Scope, acceptance
+  and `ARMS_FLOORS` are unchanged; the residual newline hole for the other two park kinds is filed.
 
 ## 10. Reuse audit
 

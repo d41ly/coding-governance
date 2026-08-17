@@ -25,9 +25,9 @@ placeholders = []
 [config]
 file = ".unattended.conf"
 owner = "unattended"
-required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR"]
+required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -67,6 +67,14 @@ blocks_adopt = false
 blocks_gate = true
 why = "a key ABSENT from the conf reds both the adopter check arm and the kit gate leg. But the shipped conf example copied verbatim renders its angle-bracket placeholder text as literal prose and passes EVERY check, because the placeholder detector greps the brace shape only — so this hole is half-silent and the probe is the only thing that sees that half."
 discharge = { command = ["bash", "-c", "! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md"] }
+
+[[hole]]
+id = "directives-floor"
+kind = "measured-pin"
+blocks_adopt = false
+blocks_gate = true
+why = "undeclared or malformed reds the kit gate at check 16 arm C. The correct value for a faithful copy install is the driver's own DIRECTIVES_CORE member count, so this is a transcription hole rather than a corpus measurement — the same shape as core-floor, and declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
+discharge = { command = ["bash", "-c", "grep -qE '^DIRECTIVES_FLOOR=\"?[0-9]+' .unattended.conf"] }
 
 [[hole]]
 id = "core-floor"

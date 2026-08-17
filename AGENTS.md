@@ -48,7 +48,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
   `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
   `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
-  `project/` (the gate's six `*.txt` waiver registries and nothing else). Specs, reports, research
+  `project/` (the gate's `*.txt` waiver registries and nothing else). Specs, reports, research
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
   `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
   `memory/archive/`.
@@ -136,10 +136,14 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
   under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
   (sixteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  (eighteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
   the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the
-  mandate at that BASE is asserted by the bar and not only by the driver, and the shipped protocol
+  mandate at that BASE is asserted by the bar and not only by the driver, every parked WAIVER names
+  a declared handle and was there in the record's FIRST committed blob, the Skill orders its kickoff
+  step AFTER preflight, the protocol's OWN run-order list and DoD table join both ways to the
+  driver's constants, and the shipped protocol
   equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
@@ -174,6 +178,13 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   CP1252, so an em dash closes a string early). Byte-level; carries `--selftest`. Despite the
   name it does NOT lint gate logic — it is a source-hygiene scanner, and this line said otherwise
   until the closing review ran the kit.
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- testsuite counts — `tools/check-testsuite-counts.sh` (+ `tools/check-testsuite-counts.test.sh`): every `*.test.sh` the BAR
+  runs prints an executed assertion count in one agreed shape against a shrink-only floor. The
+  population is DERIVED from `tools/gate-legs.json`, never hand-kept, and the non-compliant set is a
+  shrink-only registry beside the other waiver lists — a row naming a suite that now complies reds
+  as stale. Written after a suite printed a hardcoded `PASS (130 assertions)` for its whole life
+  with no counter behind it, and 12 of 27 suites printed no count at all
 - govkit registry — `python tools/govkit/govkit.py selfcheck`: the deployable population is a
   DECLARATION (`tools/govkit/registry.toml` plus a descriptor per entry), never a directory listing,
   and the leg asserts it against the tracked SURFACE in both directions — every depth-1 path under
