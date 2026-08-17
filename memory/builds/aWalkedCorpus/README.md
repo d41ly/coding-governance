@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3
+ids: TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4
 ---
 
 # aWalkedCorpus — one walk over the corpus, and something that grades it
@@ -25,13 +25,13 @@ The table below is GENERATED from the status header of every spec in this folder
 hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3
+**Build status:** OPEN · 3 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | OPEN | rev-2 | 2026-08-17 |
+| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | OPEN | rev-3 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

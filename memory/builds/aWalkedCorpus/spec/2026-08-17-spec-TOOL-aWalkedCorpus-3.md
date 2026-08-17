@@ -1,6 +1,6 @@
 # TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists
 
-**Status:** OPEN · rev-2 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
+**Status:** OPEN · rev-3 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -25,26 +25,44 @@ four.
   apart. The value is **not** today's score: it is the one-retirement worst case computed in §4, and
   §4 shows the derivation. The pin is shrink-only in the sense that matters — the score may rise and
   the floor may follow, but a fall reds, and lowering the floor to accommodate a fall is the move this
-  unit exists to make visible.
-- **S4 — the per-id resolution assertion.** `check-recall.py` resolves every `expected_ids` entry
-  against the graded set itself and exits non-zero naming any id with an empty hit set. This is a
-  separate predicate from the floor, not a second pin: round-2 F3 measured that `ceiling` counts
-  QUERIES and cannot express per-id resolution, so a question carrying one real and one fictional id
-  scores `ceiling 1.00`.
+  unit exists to make visible. **A fixture edit that moves `h` or `R` re-derives the pin in the same
+  commit**; `--audit-fixture` prints both counts and `(h-1)/(R-1)` beside the declared value so the
+  obligation is checkable rather than remembered.
+- **S4 — the per-id resolution assertion.** `check-recall.py` computes the SET DIFFERENCE
+  `set(q["expected_ids"]) - set(bench.expected_by_target(docs, q, anchors).keys())` and reds naming
+  every id in it. It is a separate predicate from the floor, not a second pin: round-2 F3 measured
+  that `ceiling` counts QUERIES and cannot express per-id resolution, so a question carrying one real
+  and one fictional id scores `ceiling 1.00`. The predicate is a set difference and **not** "an id
+  with an empty hit set", because `expected_by_target` DROPS an unresolvable target
+  (`if hits: out[tid] = hits`, `bench.py:360-361`) — the empty hit set never occurs, so rev-2's
+  wording named a permanently-green assertion.
 - **S5 — the leg.** A `tools/gate-legs.json` entry running S1, guarded on `tools/memory-recall/`,
   `memory/` and `.memory-tree.conf` — the three things that can move the number.
-- **S6 — the arms.** `tools/memory-recall/selftest.py` gains one arm per row of §4's degradation
-  table, including the two that must fire SINGLY, plus the empty fixture, the all-miss fixture, the
-  absent cell, the absent fixture and the absent or malformed pin.
+- **S6 — the arms, in a gov-only file.** `tools/memory-recall/test_recall_floor.py`, with its own
+  `tools/gate-legs.json` entry beside S5's. It carries one arm per row of §4's degradation table
+  including the two that must fire SINGLY, plus the empty fixture, the all-miss fixture, the absent
+  cell, the absent fixture, the absent/malformed/out-of-vocabulary pin, and the `--audit-fixture`
+  overlap red. **`tools/memory-recall/selftest.py` is NOT touched.** Round-3 F4 measured why: it is
+  shipped byte-for-byte by the `**` engine rule AND is itself a declared `[[gate_leg]]`, so an arm
+  keyed on `TOOL-aWrittenMethod-4` would run on an adopter's bar against a corpus that has no such
+  id, over two files S8 deliberately withholds. Arm names lead with `test`, a declared lexicon verb;
+  `selftest.py`'s dominant `t_` prefix is not one, and the verb pin has zero headroom (§4).
 - **S7 — the dossier.** `memory/map/features/memory-recall.md`, claiming S5's leg key and **every**
   `memory-recall` key currently in `memory/map/baseline.toml` — measured at four, not two (round-2
   F4). The coverage gate reds until a dossier claims a new leg and `baseline.toml`'s own header
   forbids new keys in itself, so the dossier is not optional.
-- **S8 — the fixture stays out of adopters' trees.** `tools/memory-recall/kit.toml` gains a
-  `[[files]]` exclude for `recall-fixture.json` and `check-recall.py`. Its `include = "**"` otherwise
-  ships a question set keyed on gov record ids, plus a program reading pins an adopter's conf does not
-  carry, into every adopting tree with no `[[gate_leg]]` to run it (round-2 F5). §8 records what was
-  parked instead.
+- **S8 — the fixture stays out of adopters' trees.** `tools/memory-recall/kit.toml` gains a SECOND
+  `[[files]]` rule, `include = ["recall-fixture.json", "check-recall.py", "test_recall_floor.py"]`
+  with `role = "project-owned"` and no `to`. Its `include = "**"` otherwise ships a question set keyed
+  on gov record ids, plus a program reading pins an adopter's conf does not carry, into every adopting
+  tree with no `[[gate_leg]]` to run it (round-2 F5). §8 records what was parked instead.
+
+  **The mechanism is claim-by-destination, and rev-2 named one that does not exist.** govkit has no
+  `exclude` key: a `**` rule's pool drops only what another rule's DESTINATION claims
+  (`govkit.py` `scan_claimed_paths`), and `project-owned` is absent from
+  `LANDABLE_ROLES = ("engine", "seed")` so `apply` never writes it. `tools/drift-audit/kit.toml` and
+  `tools/lexicon/kit.toml` are the working precedents. Round-3 F1 proved the rev-2 spelling was a
+  silent no-op that `selfcheck` passes either way, which is why AC13 asserts the PAYLOAD instead.
 
 ## 3. Non-goals (OUT)
 
@@ -95,21 +113,56 @@ needs and which rev-1 left the builder to invent. With no `--data-dir` the progr
 own corpus into a `tempfile.mkdtemp()` at `query.CHUNK_MAX`, imported rather than restated so the
 graded corpus is the served one.
 
-Evaluation order is fixed, and it is fixed because the message a red prints must be determinate:
+**Two PRECONDITIONS stop the run; three PREDICATES all evaluate and all report.** Rev-2 wrote one
+five-step short-circuit, and round-3 F2 measured what that cost: the two levers that prove the floor
+and the per-id check are independent both red at per-id, so under a short-circuit the floor verdict
+they assert is never computed. Separating evaluation from reporting is what makes both observable in
+one run — the same split `run-gates.sh` already makes between scheduling order and reporting order.
 
-1. **The fixture** — absent or unparseable reds naming the path. It does not skip.
-2. **The pin** — `RECALL_FLOOR` absent, empty, or not matching `<set>:<sub>:<metric>@<k>>=<float>`
-   reds naming the key. There is no default.
-3. **Per-id resolution (S4)** — every `expected_ids` entry resolves in the graded set, or red naming
-   the id. This runs BEFORE the floor so a retired record is reported as a retired record.
-4. **The cell** — `sets.<set>.substrates.<sub>[<metric>@<k>]` present in the report, or red naming the
-   cell as unmeasured. An empty fixture makes `substrates` `{}` and this is the branch that catches
-   it, rather than a `KeyError`.
-5. **The floor** — `ceiling` of 0 reds at step 3 and never reaches the division, so the normalisation
-   has no 0/0 branch. Otherwise compare `r@k / ceiling` against the pin.
+Preconditions, in order, each redding by NAME and stopping — without either, nothing can be evaluated:
 
-`--audit-fixture` prints each question's content-term overlap with its target's own text and reds
-above `OVERLAP_MAX`. It exists because the anti-tautology property below is otherwise a sentence.
+1. **The fixture** — absent, unparseable, or carrying an empty `queries` list reds naming the path.
+   It does not skip. The empty list is a precondition rather than a downstream symptom because a
+   question set with no questions makes the per-id predicate vacuously green.
+2. **The pin** — `RECALL_FLOOR` absent, empty, or not matching
+   `<set>:<sub>:<metric>@<k>>=<float>` reds naming the key. There is no default. `<set>` and `<sub>`
+   are constrained to the enumerated vocabularies — `spine|records|chunks` and `bench.py`'s substrate
+   names — so a one-character typo reds HERE naming the key rather than raising `FileNotFoundError`
+   inside `bench.load` (round-3, med).
+
+Predicates. Each is evaluated, each prints its own `ok` / `RED` line, and the process exits non-zero
+if ANY of them failed. Reporting order is fixed so the leading message is determinate:
+
+3. **Per-id resolution (S4)** — the set difference above, redding with every unresolved id named. It
+   REPORTS FIRST so a retired record is reported as a retired record, and it does not stop the run.
+4. **The cell** — `<metric>@<k>` present for the pinned set and substrate, or RED naming the cell as
+   unmeasured.
+5. **The floor** — `r@k / ceiling` against the pin. **When `ceiling` is 0, or step 4 found no cell,
+   the floor prints `not evaluated` and is not a red of its own.** That is an explicit rule, not a
+   side effect of stopping early: it is what keeps the normalisation free of a 0/0 branch now that
+   step 3 no longer halts the run. An all-miss fixture therefore exits non-zero on step 3 with the
+   floor reported as not evaluated, which is AC5.
+
+`--audit-fixture` is a separate mode over the same loaded corpus. Per question it prints the measured
+`homes`, the measured `hits`, and the content-term overlap defined below; it reds when any overlap
+exceeds `OVERLAP_MAX` or when a fixture's declared `hits` disagrees with the measurement. In
+aggregate it prints `h`, `R` and `(h-1)/(R-1)` beside the declared `RECALL_FLOOR`, so the pin's own
+derivation is re-checkable rather than living only in this section (round-3, med).
+
+### The seam is bench's SCORING FUNCTIONS, imported — not its JSON report
+
+`check-recall.py` imports `bench` for `load`, `build_index`, `rank_with`, `score`,
+`expected_by_target` and `terms`, and `query` for `CHUNK_MAX` only. Both imports were measured
+side-effect-free: `import query` costs 0.085 s and writes nothing into the kit directory.
+`sys.dont_write_bytecode = True` goes ABOVE both, as `extract.py` already does — that one line is the
+whole of the kit's "a query writes nothing in your tree" property.
+
+The `--json` report is NOT the seam, and rev-2's §10 said it was. Two reasons, both measured: it is
+aggregate-only and carries no target-level data, so step 3 is not computable from it at all; and it
+rounds every value to four decimals (`bench.py:456`, `:475-477`), so a normalisation built on it
+returns 0.9090 where the unrounded inputs give 0.9091 — a spec literal that fails against the seam
+the spec names. One in-process path removes both problems and keeps `bench.py` byte-pinned, since
+importing a module edits nothing.
 
 ### The pin is DERIVED from the worst case, not read off today's score
 
@@ -121,11 +174,23 @@ F2 measured it.
 
 The fix is to price one retirement into the pin instead of pretending it costs nothing. Measured on
 the committed fixture: `h=10`, `R=12`. The one-retirement worst case is `(h-1)/(R-1) = 9/11 = 0.8182`,
-so the pin is **0.81**, and the property it buys is stated rather than assumed: *the floor carries
-exactly one legitimate retirement's headroom by construction.* A second retirement (`8/10 = 0.80`) or
-any genuine regression (`9/12 = 0.75`) reds, which is correct — the first demands fixture
-maintenance, the second demands investigation, and step 3 above tells them apart before the floor is
-ever evaluated.
+so the pin is **0.81**. All twelve single retirements were enumerated rather than argued: ten hitting
+targets land on exactly 0.8182 and the two missing targets on 0.9091, with no collateral rank
+movement, so the headroom generalises and is not a property of the one row the table shows.
+
+**Stated precisely, because rev-2 over-stated it in the permissive direction.** The floor carries one
+retirement of a **hitting** target. Retiring a NON-hitting target costs the floor nothing at all — it
+drops `R` without dropping `h`, so the score RISES, which is exactly what row 3 below shows. A second
+retirement reds only when both were hits: swept over all 66 two-retirement pairs, 21 stay green and
+every one of them includes a currently-missing target. Rev-2's sentence "a second retirement
+(`8/10 = 0.80`) reds" is therefore true of the hit-plus-hit case and false of the other 21, and the
+honest version is this paragraph. A genuine regression with no retirement (`9/12 = 0.75`) reds in
+every case, which is the direction that matters.
+
+Nothing recomputes the pin from the run it grades — that is the circular-ceiling class
+`aQuarriedLantern-1:568` refused. What `--audit-fixture` does instead is PRINT `h`, `R` and
+`(h-1)/(R-1)` beside the declared value, so a fixture edit that moves either is visible in the same
+commit rather than silently widening or narrowing the floor's slack. S3 states that obligation.
 
 ### The degradation table — every row measured, two of them isolating
 
@@ -162,22 +227,23 @@ regression. This is why the pin is derived from `h` and `R` rather than copied f
 ### Inventory — the fixture, and the h and R the pin rests on
 
 `homes` is the number of records carrying the id; `hits` is whether the question is answered at
-`records:fts5:r@5` today. Ten hit, twelve resolve.
+`records:fts5:r@5` today; `overlap` is the metric defined below. Ten hit, twelve resolve, and every
+column here is MEASURED by `--audit-fixture` rather than kept by hand.
 
-| # | expected id | homes | hits | provenance |
-|---|---|---|---|---|
-| 1 | `TOOL-aUnmannedHelm-5` | 3 | yes | `aWrittenMethod-2` §10 probe |
-| 2 | `TOOL-aUnmannedHelm-6` | 3 | yes | `aWrittenMethod-2` §10 probe |
-| 3 | `TOOL-aStandingWrit-2` | 2 | yes | `DECISIONS.md` row |
-| 4 | `TOOL-aStandingWrit-4` | 2 | yes | `DECISIONS.md` row |
-| 5 | `TOOL-cSteadyMetronome-1` | 1 | yes | `DECISIONS.md` row |
-| 6 | `TOOL-aWidenedGuide-1` | 2 | yes | `DECISIONS.md` row |
-| 7 | `TOOL-aWrittenMethod-4` | 3 | yes | `DECISIONS.md` row |
-| 8 | `TOOL-aWrittenMethod-6` | 3 | yes | `DECISIONS.md` row |
-| 9 | `TOOL-aUnmannedHelm-10` | 2 | **no** | `DECISIONS.md` row |
-| 10 | `TOOL-aMouldedFolio-1` | 1 | **no** | `DECISIONS.md` row |
-| 11 | `TOOL-aUnmannedHelm-9` | 2 | yes | `DECISIONS.md` row |
-| 12 | `TOOL-cFinalBerth-1` | 2 | yes | `DECISIONS.md` row |
+| # | expected id | homes | hits | overlap | provenance |
+|---|---|---|---|---|---|
+| 1 | `TOOL-aUnmannedHelm-5` | 3 | yes | 0.444 | `aWrittenMethod-2` §10 probe |
+| 2 | `TOOL-aUnmannedHelm-6` | 3 | yes | 0.500 | `aWrittenMethod-2` §10 probe |
+| 3 | `TOOL-aStandingWrit-2` | 2 | yes | 0.500 | `DECISIONS.md` row |
+| 4 | `TOOL-aStandingWrit-4` | 2 | yes | 0.375 | `DECISIONS.md` row |
+| 5 | `TOOL-cSteadyMetronome-1` | 1 | yes | 0.375 | `DECISIONS.md` row |
+| 6 | `TOOL-aWidenedGuide-1` | 2 | yes | 0.429 | `DECISIONS.md` row |
+| 7 | `TOOL-aWrittenMethod-4` | 3 | yes | 0.333 | `DECISIONS.md` row |
+| 8 | `TOOL-aWrittenMethod-6` | 3 | yes | 0.167 | `DECISIONS.md` row |
+| 9 | `TOOL-aUnmannedHelm-10` | 2 | **no** | 0.125 | `DECISIONS.md` row |
+| 10 | `TOOL-aMouldedFolio-1` | 1 | **no** | 0.167 | `DECISIONS.md` row |
+| 11 | `TOOL-aUnmannedHelm-9` | 2 | yes | 0.500 | `DECISIONS.md` row |
+| 12 | `TOOL-cFinalBerth-1` | 2 | yes | 0.429 | `DECISIONS.md` row |
 
 ### The fixture's provenance rule, and the tautology it has to avoid
 
@@ -193,6 +259,29 @@ nothing, satisfying rev-1's AC9 outright. Prose cannot exclude that, so `--audit
 and AC9 observes the measurement. Two of the twelve questions are in the set precisely because they
 FAIL today, which a fixture written from a result list would never contain.
 
+### The overlap metric and OVERLAP_MAX, both declared
+
+Rev-2 converted the anti-tautology property from a prose number into a gate and then named a
+threshold it never defined, which round-3 F3 filed as a knob a builder sets after seeing the result.
+All three parts are declared here:
+
+- **Tokenizer** — `bench.terms`, IMPORTED rather than reimplemented, so the audit and the index agree
+  on what a content word is.
+- **Formula** — `|terms(question) ∩ terms(target)| / |terms(question)|`. The denominator is the
+  QUESTION's distinct content terms. The target text is the **UNION of every record carrying any of
+  the question's `expected_ids`**; the Inventory table's `homes` column reaches 3, and the reduction
+  has to be named because the readings disagree materially — union gives 9 of 12 strictly under half,
+  first-home 11 of 12, and last-home reports 0.000 on four questions, which would hide a genuinely
+  tautological question rather than catch it.
+- **`OVERLAP_MAX = 0.60`**, a module constant in `check-recall.py` with its justification beside it,
+  not a conf key: nothing but this gate reads it, and S3's argument for the conf was that a person
+  edits the floor between releases, which is not true of this.
+
+The value is DERIVED from the measured distribution, the same way the floor is. Over the committed
+fixture: **min 0.125, mean 0.362, max 0.500**, three questions at 0.500 and **none at or above
+0.60**. A query-is-the-record fixture scores ~1.0. So 0.60 sits one step above the observed maximum —
+tight enough that copied text cannot pass, loose enough that today's set is not on the boundary.
+
 ### What this does not prove
 
 A floor over twelve questions measures that these questions still find these records. A change that
@@ -206,9 +295,9 @@ number stand for quality.
 | `tools/memory-recall/check-recall.py` | new — S1, S4 |
 | `tools/memory-recall/recall-fixture.json` | new — S2, committed with this spec |
 | `.memory-tree.conf` | S3, the pin plus its derivation and the measuring argv |
-| `tools/gate-legs.json` | S5 |
-| `tools/memory-recall/selftest.py` | S6 |
-| `tools/memory-recall/kit.toml` | S8, the `[[files]]` exclude |
+| `tools/gate-legs.json` | S5's leg, and S6's beside it |
+| `tools/memory-recall/test_recall_floor.py` | new — S6, gov-only, non-landable |
+| `tools/memory-recall/kit.toml` | S8, the second `[[files]]` rule at `role = "project-owned"` |
 | `memory/map/features/memory-recall.md` | new — S7 |
 | `memory/map/baseline.toml` | all four `memory-recall` keys deleted |
 | `memory/map/generated/inventories.json` | GENERATED — `python tools/codebase-map/gen_map.py --write` |
@@ -254,12 +343,13 @@ one probe file and watching the leg go red.
   `records,chunks`. The leg is guarded, but `memory/` is one of its guards, so it runs on most
   commits.
 - a11y / i18n — N/A.
-- error / empty / loading states — the five ordered branches in §4's `### Data model`, each redding by
-  NAME: absent fixture, absent or malformed pin, unresolved expected id, absent cell (the empty-fixture
-  case), and the floor itself. A grading leg that skips when its question set is missing is the
-  vacuity class this unit exists to close.
-- observability — the leg prints the cell, the raw score, the ceiling and the normalised value, so a
-  red says which half moved before anyone opens a file.
+- error / empty / loading states — §4's `### Data model`: two PRECONDITIONS that red by name and stop
+  (absent/unparseable/empty fixture; absent, malformed or out-of-vocabulary pin) and three PREDICATES
+  that each red by name without stopping (unresolved expected id, absent cell, the floor). A grading
+  leg that skips when its question set is missing is the vacuity class this unit exists to close.
+- observability — every predicate prints its own verdict line in one run, so a red says which half
+  moved before anyone opens a file. The floor's line reads `not evaluated` when `ceiling` is 0 or the
+  cell is absent, which is a REPORTED state rather than a silent skip.
 - risks — **the fixture going stale as records are legitimately removed.** S4's per-id assertion names
   the unresolved id, and the pin's derived headroom absorbs the first retirement so the red arrives as
   fixture maintenance rather than as a false regression. Second risk: `pin-copied-from-another-corpus`,
@@ -270,51 +360,66 @@ one probe file and watching the leg go red.
 
 ## 6. Acceptance criteria
 
+Every criterion below observes a PRINTED verdict line rather than the absence of a string, because
+round-3 F2 found that rev-2's phrasing ("the floor stays green") asserted a state the short-circuiting
+program never reached.
+
 - **AC1** — When `python tools/memory-recall/check-recall.py` runs on a clean tree it exits 0 and
-  prints the cell `records:fts5:r@5`, the raw score, the ceiling and the normalised score.
+  prints one line per predicate: the cell `records:fts5:r@5`, the raw score, the ceiling, the
+  normalised score, and `per-id: ok`.
 - **AC2a** — **The floor reds ALONE.** With only the `memory/DECISIONS.md` record for
   `TOOL-aWrittenMethod-4` removed from an extracted dir, `check-recall.py --data-dir` exits non-zero,
-  its message names `RECALL_FLOOR`, and the per-id assertion stays green. Measured 0.7500 against the
-  0.81 pin.
-- **AC2b** — **The per-id assertion reds ALONE.** With every record for `TOOL-aMouldedFolio-1` removed,
-  `check-recall.py --data-dir` exits non-zero naming that id, and the floor stays green. Measured
-  normalised 0.9091.
-- **AC2c** — **One retirement is free by construction.** With every record for `TOOL-aStandingWrit-2`
-  removed, the normalised score is 0.8182 and does NOT breach `RECALL_FLOOR`; only the per-id
-  assertion reds.
-- **AC3** — With `tools/memory-recall/recall-fixture.json` absent, `check-recall.py` exits non-zero
-  and names that path. It does not skip and does not exit 0.
-- **AC4** — With `RECALL_FLOOR` absent, empty, or not matching the pin grammar, `check-recall.py`
-  exits non-zero naming the key rather than assuming a default.
-- **AC5** — With a fixture whose `queries` is empty, `check-recall.py` reds naming the cell as
-  unmeasured rather than raising; with an all-miss fixture it reds at the per-id assertion and never
-  divides by a zero `ceiling`.
-- **AC6** — When `bash tools/run-gates.sh` runs, the new leg appears by name and is green.
-- **AC7** — When `python tools/memory-recall/selftest.py` runs it exits 0, and inverting any one arm
-  in §4's degradation table reds it naming that arm.
+  prints `RECALL_FLOOR` RED at a normalised 0.7500 against the 0.81 pin, and prints `per-id: ok` in
+  the same run.
+- **AC2b** — **The per-id assertion reds ALONE.** With every record for `TOOL-aMouldedFolio-1`
+  removed, `check-recall.py --data-dir` exits non-zero, names that id on its per-id line, and prints
+  the floor line as `ok` at a normalised 0.9091 — both verdicts in one run.
+- **AC2c** — **One retirement of a hitting target is free.** With every record for
+  `TOOL-aStandingWrit-2` removed, the printed normalised score is 0.8182, the floor line reads `ok`,
+  and only the per-id line reds.
+- **AC3** — With `tools/memory-recall/recall-fixture.json` absent, unparseable, or carrying an empty
+  `queries` list, `check-recall.py` exits non-zero naming that path. It does not skip and does not
+  exit 0.
+- **AC4** — With `RECALL_FLOOR` absent, empty, not matching the pin grammar, or naming a set or
+  substrate outside the enumerated vocabularies, `check-recall.py` exits non-zero naming the key. A
+  pin reading `record:fts5:r@5>=0.81` reds here rather than raising inside `bench.load`.
+- **AC5** — With an all-miss fixture, `check-recall.py` exits non-zero on the per-id line and prints
+  the floor line as `not evaluated`, never dividing by a zero `ceiling`.
+- **AC6** — When `bash tools/run-gates.sh` runs, both new legs appear by name and are green.
+- **AC7** — When `python tools/memory-recall/test_recall_floor.py` runs it exits 0, and inverting any
+  one arm — including the `--audit-fixture` overlap arm — reds it naming that arm.
 - **AC8** — When `python tools/codebase-map/test_codebase_map.py` runs after
   `python tools/codebase-map/gen_map.py --write`, coverage and freshness are green, and every
   `memory-recall` key is claimed by `memory/map/features/memory-recall.md` and absent from
   `memory/map/baseline.toml`.
-- **AC9** — When `python tools/memory-recall/check-recall.py --audit-fixture` runs, every question
-  carries a `from` field and its content-term overlap with its target is at or below `OVERLAP_MAX`;
-  a fixture whose questions are copied from their targets' text reds.
-- **AC10** — When `python tools/drift-audit/drift_report.py --check` runs,
+- **AC9** — When `python tools/memory-recall/check-recall.py --audit-fixture` runs, it prints each
+  question's measured `homes`, `hits` and overlap; every overlap is at or below `OVERLAP_MAX` of
+  0.60; and a fixture whose questions are copied from their targets' text reds naming the offending
+  question index and its measured overlap.
+- **AC10** — When `--audit-fixture` runs it prints `h`, `R` and `(h-1)/(R-1)` beside the declared
+  `RECALL_FLOOR`, and reds when any question's declared `hits` disagrees with the measurement.
+- **AC11** — When `python tools/drift-audit/drift_report.py --check` runs,
   `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0.
-- **AC11** — When `python tools/memory-recall/bench.py` and `tools/memory-recall/union.py` are
+- **AC12** — When `python tools/memory-recall/bench.py` and `tools/memory-recall/union.py` are
   compared against `tools/memory-recall/verbatim.json`, both digests are unchanged.
-- **AC12** — When `python tools/govkit/govkit.py selfcheck` runs it is green, and
-  `tools/memory-recall/kit.toml` excludes `recall-fixture.json` and `check-recall.py` from the kit
-  payload.
+- **AC13** — When `python tools/govkit/govkit.py plan --kits memory-recall <target>` runs, it lists
+  none of `recall-fixture.json`, `check-recall.py` or `test_recall_floor.py`. The assertion is over
+  the PAYLOAD, not over `selfcheck`'s exit code, which round-3 F1 measured green against a key govkit
+  never reads.
+- **AC14** — When `python tools/lexicon/lexicon.py` runs it exits 0, with every new definition's name
+  leading with a declared verb.
 
 ## 7. Gates
 
-- `python tools/memory-recall/selftest.py` — S6's arms, and the verbatim pins.
+- `python tools/memory-recall/selftest.py` — the verbatim pins and the kit contract, UNCHANGED by
+  this unit and green as the proof it stayed adopter-safe.
+- `python tools/memory-recall/test_recall_floor.py` — S6's arms.
 - `python tools/memory-recall/check-recall.py` — the new leg itself.
+- `python tools/govkit/govkit.py selfcheck` and `... plan --kits memory-recall <target>` — the kit
+  payload changes, and only `plan` can observe it.
 - `bash tools/run-gates.test.sh` — the canary over the changed manifest.
 - `python tools/codebase-map/test_codebase_map.py` — the new leg key and the new dossier.
 - `python tools/lexicon/lexicon.py` — zero headroom on the verb pin; see §4.
-- `python tools/govkit/govkit.py selfcheck` — the kit payload changes.
 - `python tools/drift-audit/drift_report.py --check` — the zero-tolerance charter signal.
 - `bash skills/session-kickoff/manifest-check.sh` — watched pathspecs move.
 - `bash tools/run-gates.sh` at the push boundary.
@@ -334,6 +439,30 @@ one probe file and watching the leg go red.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-17 · **folded the round-3 re-review, which returned BLOCKED on two — and BOTH were
+  defects rev-2's own fold introduced, which is the finding about this build's method rather than
+  about its subject.** F1: S8's `[[files]] exclude` is a key govkit does not implement, so the F5 fold
+  was a silent no-op that `selfcheck` passed either way; the mechanism is claim-by-destination with a
+  non-landable role, verified here against `scan_claimed_paths` and `LANDABLE_ROLES`, and AC13 now
+  asserts the PAYLOAD via `govkit plan`. F2: the five-step evaluation order added to fold round-2's F6
+  short-circuited at per-id resolution, so AC2b and AC2c asserted a floor verdict the program never
+  computed — §4 now separates two PRECONDITIONS that stop from three PREDICATES that all evaluate and
+  all print, with `ceiling == 0` an explicit `not evaluated` rule rather than a side effect of halting.
+  F3: `OVERLAP_MAX` was named three times and defined nowhere over a metric whose denominator swings
+  the measurement fivefold; §4 declares the tokenizer, the formula, the union-over-homes reduction and
+  the value 0.60, derived from a measured distribution (max 0.500, mean 0.362, none at or above 0.60)
+  now carried as an Inventory column. F4: S6's arms would have put gov record ids into `selftest.py`,
+  which ships to every adopter AND runs on their bar, so they move to a gov-only
+  `test_recall_floor.py` under the same non-landable rule and `selftest.py` is untouched. F5: the
+  one-retirement headroom claim over-stated — 21 of 66 two-retirement pairs stay green — and §4 now
+  states the hitting/non-hitting asymmetry the table already showed. Also: the pin grammar constrains
+  set and substrate to their vocabularies so a typo reds at the pin rather than raising inside
+  `bench.load`; §10 corrects the seam from the rounded `--json` report to the imported scoring
+  functions; and `--audit-fixture` now measures the fixture's own `hits`, `homes`, `h` and `R` so
+  three hand-kept claims become observed ones.
+  **The next pass is the BUILD, not a fourth review round.** Two rounds of folding produced two
+  rounds of fold-introduced blockers, and `memory/guides/REVIEW-PROTOCOL.md` names the exit:
+  building is cheaper and stricter than another spec pass. M8's closing diff review is the backstop.
 - rev-2 · 2026-08-17 · **folded the round-2 spec audit, which returned BLOCKED on two.** F1: every
   retrieval number rested on a fixture in no tracked file, and two of those numbers carried design
   arguments that REVERSED on an independently authored set — `chunks:fts5:r@5` is 0.1667 not 0.08,
@@ -359,9 +488,15 @@ one probe file and watching the leg go red.
 `python tools/codebase-map/reuse_lookup.py "compare a measured retrieval score against a declared
 floor and fail the merge bar"` — ranked `score` in `tools/memory-recall/bench.py` and
 `check-template-size.sh` (the repo's other declared-pin gate). The seam this unit extends is
-`bench.py`'s `--json` report, which already carries every value the pin and the per-id assertion need;
-the shape it copies is `check-template-size.sh`'s, a declared number in a file a person edits with its
-justification beside it.
+`bench.py`'s SCORING FUNCTIONS — `load`, `build_index`, `rank_with`, `score`, `expected_by_target`
+and `terms`, imported in-process — and the shape it copies is `check-template-size.sh`'s, a declared
+number in a file a person edits with its justification beside it.
+
+**Not the `--json` report, and rev-2 said it was.** That report is aggregate-only, so the per-id
+predicate is not computable from it at all: `expected_by_target` drops an unresolvable target before
+`ceiling` is ever counted, and no target-level data survives into the JSON. It also rounds to four
+decimals, which turns the 0.9091 this spec measures into 0.9090 for anyone who implements against it.
+Importing edits nothing, so `verbatim.json`'s byte pin on `bench.py` is untouched either way.
 
 `python tools/memory-recall/query.py "what makes a gate that measures a number honest rather than a
 decoration" --terms "vacuous pin floor shrink-only arm red-proof fixture decoration ceiling measured
