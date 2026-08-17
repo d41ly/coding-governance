@@ -37,7 +37,7 @@ hand-edit it.
 |---|---|---|---|
 | [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-3 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.

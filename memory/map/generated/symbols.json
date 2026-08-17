@@ -433,9 +433,9 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
-      "id": "corpus_files",
+      "id": "corpus_inputs",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-recall/extract.py"
     },
     {
       "id": "dead_alias_diagnosis",
@@ -2176,6 +2176,11 @@
       "id": "test_no_signal_hardcodes_live",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_one_walk_two_callers",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_patch_is_installed",
