@@ -134,14 +134,19 @@ are in this unit's prose sweep anyway, so S16 corrects the attribution while it 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-17 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-17 · streams tooling
 ids TOOL-aRelaxedShard-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-6 | 2026-08-17 |
+| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | INPROGRESS | rev-7 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md) | spec-audit | TOOL-aRelaxedShard-1 |
+| [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md) | spec-audit | TOOL-aRelaxedShard-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

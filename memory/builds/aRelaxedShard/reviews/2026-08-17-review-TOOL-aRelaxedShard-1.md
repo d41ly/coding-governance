@@ -1,5 +1,7 @@
 ## Verdict: BLOCKED
 
+**Serves:** spec-audit TOOL-aRelaxedShard-1
+
 *Review shape: raw 55, confirmed 38, refuted 17, unverified 0, precision 0.69, lenses 4/4, verify
 batches 5. M4 spec audit over `spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md`, read against this
 worktree at the spec's declared base `43eb6b10`. Every number below was re-measured against source

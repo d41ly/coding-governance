@@ -1,6 +1,6 @@
 # TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds
 
-**Status:** OPEN · rev-6 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-7 · 2026-08-17 · node a · Tier-2 · base 52f9bbb0 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -30,38 +30,46 @@ the bound was inert; §4 prices what it costs and the dossier key is what keeps 
   `memory/gotchas/pin-copied-from-another-corpus.md`: this corpus's measured numbers are DECLARED here,
   never shipped as anyone else's defaults. The line bound is retired for everyone, which is the one part
   of this unit an adopter cannot opt out of, and the kit README says so.
-- **S4** — The per-class cap block at `tools/memory-tree/check-memory-hygiene.sh:379` becomes THREE
-  classes, ordered most-specific first: the guide class keeps its own `61440` and `750`; the dossier class
-  takes `DOSSIER_CAP_BYTES` and no line count; every other row document takes `ROW_DOC_CAP_BYTES` and no
-  line count. The dossier branch keys on the engine's existing `MAP_SUB`, the same variable check 7's
-  `ex7` already uses, and like `ex7` at `:401` it is written UNDER AN EMPTINESS GUARD. That is not
-  ceremony: an unguarded `index(f, M "/" MAP_SUB) == 1` degenerates to `memory/` when `MAP_SUB` is empty
-  and prefix-matches EVERY row document, silently capping the whole class at the dossier bound and
-  undoing the unit. The cited precedent guards for this reason and is not licence to skip one.
+- **S4** — The per-class cap block, now at `tools/memory-tree/check-memory-hygiene.sh:391-405`. **The
+  reground changed this item substantially, in the unit's favour**: the tree already carries THREE classes
+  and already carries the exact mechanism rev-5 was designing. `:396` initialises `cb = 20480; cl = 250`,
+  `:397` gives guides `61440`/`750`, and `:401` gives a build README `cb = 25600; cl = 0` — where **`cl = 0`
+  already means NO line cap**, the comparison at `:402` is already the guarded
+  `b>cb || (cl>0 && l>cl)`, and `:403-404` already splits the message per class. So this unit FOLLOWS an
+  established convention instead of inventing a sentinel, a guard and a message split.
 
-  The engine's own justification comment at `:372-378` states the refusal this unit reverses, in the
-  words `memory/DECISIONS.md:41` ratified. It is rewritten here to state the three-class shape and to
-  point at this unit as what changed it, because leaving it is the stale-carrier defect S15 and S16 exist
-  to fix, in the one file this unit rewrites.
+  What it adds: a fourth class for dossiers taking `DOSSIER_CAP_BYTES` with `cl = 0`, and the row default
+  at `:396` becoming `cb = <resolved ROW_DOC_CAP_BYTES>; cl = 0`. Branch order stays most-specific-last as
+  the block already reads, because the guide, build-README and dossier selectors are disjoint.
 
-  The retirement must not leave the guide's `750` in play on the shared `cl` variable. Deleting the row
-  branch's assignment does exactly that, and so does a `cl > 0 && l > cl` guard whose `cl` defaults to
-  the guide value. Three classes on one shared pair is now the hazard rather than two, and S8's arm is
-  pinned where it can see the failure.
-- **S5** — The finding message, stated PER CLASS because one shared printf serves all three. A row
-  document and a dossier report bytes and the applied byte cap, with no line figure. A GUIDE still
-  reports both, because it still carries both bounds. The likeliest slip is dropping the line figure
-  from the shared format for every class, which ships a check 6 that names a guide for a line breach
-  while printing a byte count under its own byte cap — AC4 grades that.
-- **S6** — `KIT_MEMORY_TREE_VERSION` bumped off `2.18`. The diff moves non-comment lines of the engine,
+  The dossier branch keys on the engine's existing `MAP_SUB`, the same variable check 7's `ex7` uses, and
+  like `ex7` at `:419` it is written UNDER AN EMPTINESS GUARD. That is not ceremony: an unguarded
+  `index(f, M "/" MAP_SUB) == 1` degenerates to `memory/` when `MAP_SUB` is empty and prefix-matches EVERY
+  row document, silently capping the whole class at the dossier bound. The cited precedent guards for this
+  reason and is not licence to skip one.
+
+  The engine's own justification comment at `:384-390` states the refusal this unit reverses, in the words
+  `memory/DECISIONS.md:41` ratified — and it is ALREADY stale, because it says "the two classes" while the
+  code beneath it has three. It is rewritten here.
+- **S5** — The finding message needs NO new work after the reground: `:403-404` already prints both
+  figures when `cl>0` and `"%dB > %dB; no line cap for this class"` when it is 0. Setting the row and
+  dossier classes to `cl = 0` gets the correct message for free. AC4 still grades the guide side, because
+  the remaining slip is editing that shared branch rather than the class assignments.
+- **S6** — `KIT_MEMORY_TREE_VERSION` bumped off `2.19`. The diff moves non-comment lines of the engine,
   so `check-verdict-epoch.sh` requires it and `hygiene-parity.test.sh` derives its floor from it.
 - **S7** — A BYTE-axis arm for check 6's row class, plus a green control under the declared cap. This is
-  the unit's coverage gain: all three existing check-6 fixtures are line-axis constructions, so the byte
-  bound that fires in production has never been armed.
-- **S8** — The retirement arm, pinned **above 750 lines** and under the declared byte cap. A fixture in
-  the 251-750 band is silent under the intended retirement AND under the likeliest implementation slip
-  in S4, so it cannot discriminate between them. The 750 reason is stated in the arm so the number is
-  not quietly lowered later.
+  the unit's coverage gain: every existing check-6 fixture is a line-axis construction, so the byte bound
+  that fires in production has never been armed. The reground widened this: main's own build-README class
+  at `cb = 25600; cl = 0` has NO check-6 arm either — `tRunOk/README.md` and `tRunBig/README.md` exist as
+  front-matter stubs and nothing sizes one past 25,600 — so a class whose ONLY bound is bytes is entirely
+  unarmed. This unit arms the row and dossier classes it touches and files the build-README gap as a
+  backlog row rather than widening scope.
+- **S8** — The retirement arm, pinned **above 750 lines** and under the declared byte cap. The reground
+  changed which slip this guards: with `cl = 0` and the guarded comparison already in the tree, forgetting
+  to zero the row initialiser leaves `250` in force, which is LOUD — every row document over 250 lines
+  reds at once. What the above-750 pin still catches is the guide class's `750` leaking into the row class,
+  which a 251-750 fixture cannot see. The 750 reason is stated in the arm so the number is not quietly
+  lowered later.
 - **S9** — `memory/builds/tRunBig/RUN.md` preserved as a row-class `chit 6` by growing it past the byte
   cap. It is 265 lines and about 3 KB, so lines are its only over-cap axis today; retiring the row line
   bound silences check 6 on it and vacates two other contracts that are asserted THROUGH it — the only
@@ -102,12 +110,15 @@ the bound was inert; §4 prices what it costs and the dossier key is what keeps 
   bound" rather than spelling gov's 61,440 into an adopter's rule-set.
 
   Two of the carriers state the CLASS STRUCTURE rather than a figure, which is why a figure-shaped grep
-  cannot reach them and they must be named: `memory/HYGIENE.md:127` opens rule 6 with "TWO classes", and
-  `:276-278` gives ONE cap to all three map documents while under S4 `features/*.md` take the dossier
-  bound and `map/README.md` and `FOUNDATION.md` take the row bound — so that sentence splits and the
-  SPLIT remedy re-attaches to the dossier bound. The figure carriers are `memory/HYGIENE.md:66`, `:128`
-  and `:132`. All five lines have byte-identical mirrors in `tools/memory-tree/HYGIENE.template.md`,
-  which is what an adopter receives, and the two files stay byte-identical.
+  cannot reach them and they must be named. `memory/HYGIENE.md:127` opens rule 6 with "TWO classes" — and
+  the reground proved that is ALREADY WRONG, before this unit touches anything, because main added the
+  build-README class to the engine without moving the prose. Correcting it to name FOUR classes is
+  therefore a repair as well as a description. `:312` gives ONE cap to all three map documents while under
+  S4 `features/*.md` take the dossier bound and `map/README.md` and `FOUNDATION.md` take the row bound — so
+  that sentence splits and the SPLIT remedy re-attaches to the dossier bound. The figure carriers are
+  `memory/HYGIENE.md:66`, `:128` and `:132`. Every one has a mirror in
+  `tools/memory-tree/HYGIENE.template.md`, which is what an adopter receives; the two agree modulo the
+  `{{KIT_DIR}}` substitution the parity gate performs, and must keep agreeing.
 
   `.gitattributes:26` is a present-tense cap claim and is swept. `:30` is a DATED MEASUREMENT and stays
   exactly as it is — rewriting it would falsify the evidence the `eol=lf` pin rests on.
@@ -280,20 +291,24 @@ asking for and costs nothing observable.
 ### Rollout
 
 **This unit's own records cannot be written until its conf change lands, and that ordering is forced by
-the defect.** The figures above are measured at the spec's immutable base. The local default branch has
-since advanced 37 commits past `origin/main`, and at that tip `memory/backlog/TOOL.md` is **20,345 of
-20,480 bytes — 99.34%, with 135 bytes left**, holding 80 rows of which none is terminal, with no fourth
-rotation having occurred. At 253.7 bytes per row, 135 bytes is half a row: **the next backlog row that
-tree receives reds check 6**, and rotation cannot make room.
+the defect.** The §4 figures above are measured at the ORIGINAL base `43eb6b10` and stay there — a base is
+immutable and the measurements belong to it. The reground has since HAPPENED: this branch merged the local
+default's 37 commits and the spec's base moved to `52f9bbb0`, which is what the header now carries. At
+that tip `memory/backlog/TOOL.md` is **20,345 of 20,480 bytes — 99.34%, with 135 bytes left**, holding 80
+rows of which none is terminal. At 253.7 bytes per row, 135 bytes is half a row: **the next backlog row
+that tree receives reds check 6**, and rotation cannot make room.
 
 So the landing order is: the conf change and its declared value first, then this build's decision rows
 and backlog rows. Writing the records first is red, not merely untidy. This is the bind
 `memory/builds/cSteadyMetronome/README.md` described on 2026-08-14 arriving a second time, and it is why
 S17 closes `TOOL-cSettledDocket-16` in place rather than filing a fresh row beside it.
 
-The reground onto the local default is the first build pass. It does not move the spec's base or its
-figures — a base is immutable and the measurements belong to it — and it shortens the runway by about
-half a day.
+The reground onto the local default was the first build pass, and it earned itself. It found that main
+had already built the `cl = 0` sentinel, the guarded comparison and the per-class message this unit was
+designing (S4, S5), that main's own build-README class shipped with no byte-axis arm (S7), that rule 6's
+prose already understates the class count (S14), and that `KIT_MEMORY_TREE_VERSION` had moved to `2.19`
+(S6). Building on the original base would have produced a diff against a file that no longer exists: main
+touched every one of this unit's targets, the engine by 108 lines.
 
 ### Files touched (estimate)
 
@@ -536,6 +551,17 @@ and the re-shape unit's options depend on the answer.
   the engine's own justification comment entered S4, S9 gained the band its third contract needs, the
   message requirement became per-class, the sub-population table stopped reporting the decision log
   against a group that excludes it, and this log now ascends.
+- rev-7 · 2026-08-17 · REGROUND onto the local default (M7), which was the first build pass, and folded
+  what it found. Base moves to `52f9bbb0`; the §4 figures stay at `43eb6b10` where they were measured.
+  main had already landed most of this unit's mechanism for a build-README class: `cl = 0` meaning no line
+  cap, the guarded `b>cb || (cl>0 && l>cl)` comparison, and the per-class message split. S4 now EXTENDS
+  three classes to four instead of inventing a sentinel; S5 needs no work at all; S8's hazard changed
+  character, because forgetting to zero the row initialiser is now loud rather than silent. `S6` bumps off
+  `2.19`, not `2.18`. Two fresh findings: main's build-README class at 25,600 has no byte-axis arm either,
+  so S7 arms what it touches and files the rest as a row; and `memory/HYGIENE.md:127` already says "TWO
+  classes" against an engine with three, so S14 is a repair and not only a description. Every line anchor
+  the spec cites was re-derived — the cap block is `:391-405`, `ex7` is `:419`, the map additions are
+  `:347-349`, rule 6 is `:127-136` and the dossier sentence is `:312`. Status moves to INPROGRESS.
 
 ## 10. Reuse audit
 

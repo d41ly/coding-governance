@@ -1,5 +1,7 @@
 ## Verdict: CLEAN WITH FIXES
 
+**Serves:** spec-audit TOOL-aRelaxedShard-1
+
 *Review shape: raw 43, confirmed 29, refuted 14, unverified 0, precision 0.67, lenses 3/3, verify
 batches 5. Round 2 of the M4 audit over `spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md`, scoped to what
 rev-4 and rev-5 CHANGED — the ratified retirement of the row line bound and the second conf key
