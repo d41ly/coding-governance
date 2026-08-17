@@ -29,7 +29,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.5   # gov:kit unattended@1.5 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -431,7 +431,11 @@ check_wiring() {
 # keyed on it must either OR the phases together or pick one arbitrarily.
 check_single_live() {
   local n=0 f p live=""
-  for f in $(GIT ls-files "$M/builds/*/RUN.md" 2>/dev/null); do
+  # BOTH globs: the live record AND every archived one. Rotation puts finished records beside the
+  # live one, and a rule that quantified over `RUN.md` alone would let an archive hand-edited back to
+  # a non-terminal phase sit there as an unseen second run — which is exactly what this check exists
+  # to make impossible.
+  for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
     n=$((n + 1)); live="$live $f"
@@ -571,6 +575,27 @@ stage_or_fail() { # run-state file
 # The lesson is the shape, not the two misses: a rule spelled at each call site is a rule that will be
 # missing from the next call site. This is the single branch, and the self-test derives the
 # phase-writer population from source and drives a terminal record through every one of them.
+# WHERE A RETIRED RECORD GOES. DERIVED from the record itself, never chosen: the terminal phase plus
+# the first 8 hex of the record's own blob hash. That makes the name TOTAL, which the obvious
+# `<witness8>` spelling is not — NO driver verb commits (`grep -c "git commit"` over this file and the
+# leg returns 0 for both), so run A aborting at commit W and run B aborting at the same W produce one
+# name for two records, and a refusal on collision would then block every later run with no operator
+# path out. Two records with the same CONTENT are the same record twice, so overwriting is lossless.
+#
+# The `<phase>` half cannot carry a path separator: it comes from PHASES_TERMINAL through the same
+# `is_terminal` test that decides whether to rotate at all. The witness could — nothing constrains a
+# non-LANDED witness to a sha — which is a second reason the name does not use it.
+#
+# Stable across the fleet: .gitattributes pins `memory/**/*.md text eol=lf`, which covers RUN.*.md,
+# and `git hash-object` applies the path's clean filter, so this is the INDEX blob on every platform.
+archive_name_of() { # run-state file -> its immutable archive path
+  local rel="$1" ph blob
+  ph=$(fact "$rel" phase)
+  blob=$(GIT hash-object "$rel" 2>/dev/null) || return 1
+  [ -n "$ph" ] && [ -n "$blob" ] || return 1
+  printf '%s/RUN.%s.%.8s.md' "${rel%/RUN.md}" "$ph" "$blob"
+}
+
 refuse_if_terminal() { # run-state file · verb
   local rel="$1" verb="$2" cur
   [ -f "$rel" ] || return 0
@@ -815,10 +840,41 @@ verb_abort() { # slug · reason
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
-  refuse_if_terminal "$rel" --preflight || return 1
+  # ROTATION, HALF ONE: the TEST. A terminal record is not a reason to refuse a NEW run — it is a
+  # reason to retire the old one. The refusal below is right about the RECORD and was wrong as a
+  # policy about the BUILD: this build's first run aborted with three units left and no second run
+  # could start. So --preflight, and ONLY --preflight, rotates instead of refusing; every other phase
+  # writer still routes through refuse_if_terminal untouched, because only this verb starts something.
+  #
+  # The TEST runs HERE, with the other preconditions, and the RENAME runs after the write gate. That
+  # split is the whole correctness of it: the rename is what makes the tree dirty, and `check_clean`
+  # fails on any non-zero diff/cached/untracked count — so a rotation placed here would ALWAYS reach
+  # the gate, print "the run-state file is unchanged" over a tree where the record had already been
+  # renamed away from the path every reader globs, and return 1.
+  if [ -f "$rel" ] && is_terminal "$(fact "$rel" phase)"; then
+    arch=$(archive_name_of "$rel") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
+    # TWO refusals, both BEFORE the write gate, because everything `GIT mv -f` will not refuse for
+    # itself has to be refused here.
+    #
+    # The non-file case is not paranoia: MEASURED, `git mv -f RUN.md <dir>` exits 0 and moves the
+    # record INSIDE the directory, so the retired file ends up at `<dir>/RUN.md` — off the path every
+    # reader globs, with the verb reporting success. Letting git decide would have made a silent
+    # misfiling the happy path.
+    if [ -e "$arch" ] && [ ! -f "$arch" ]; then
+      fail 28 "the name this record derives is occupied by something that is not a regular file, and a rename onto it would file the finished record somewhere no reader looks rather than fail: $rel -> $arch"
+      return 1
+    fi
+    if [ -f "$arch" ] && ! cmp -s "$rel" "$arch"; then
+      fail 28 "an archive already exists at the name this record derives, carrying DIFFERENT bytes — that cannot happen by rotation, so something placed it by hand and overwriting it would destroy a finished record: $rel -> $arch"
+      return 1
+    fi
+    rotate=1
+  else
+    refuse_if_terminal "$rel" --preflight || return 1
+  fi
   [ -n "$kid" ] || fail 8 "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
   # The anchor is observed BEFORE anything that consumes it, and its refusals do not cascade: a
   # failed observation leaves ASHA empty and the base block below is skipped entirely, so the
@@ -845,6 +901,27 @@ verb_preflight() { # slug · keepalive-id
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
+
+  # ROTATION, HALF TWO: the RENAME, in scaffold_runmd's position and for scaffold_runmd's reason —
+  # nothing is written until every precondition above has passed.
+  #
+  # `-f` is what the TEST above buys. A byte-DIFFERING destination already refused over an untouched
+  # tree, so the only destination reachable here is absent or byte-identical, and forcing over
+  # identical bytes writes the bytes that were already there. Plain `GIT mv` cannot do it: MEASURED
+  # rc=128, `destination exists`, with the destination tracked and with it merely present. What
+  # actually reaches the identical case is a hand-placed copy — after a completed rotation RUN.md is
+  # the fresh RUNNING record, so refuse_if_terminal returns 0 and rotation is never re-attempted.
+  #
+  # `GIT mv` and not `mv`: BOTH sides have to enter the index in one operation, because the gate leg's
+  # whole per-run population is `git ls-files` and an unstaged archive is invisible to every check the
+  # widened population gave it.
+  if [ "$rotate" = 1 ]; then
+    if ! GIT mv -f -- "$rel" "$arch" >/dev/null 2>&1; then
+      fail 29 "cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved: $rel -> $arch"
+      return 1
+    fi
+    echo "unattended: retired the finished record — $rel -> $arch"
+  fi
 
   # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
   # then discovers a refusal has already changed the state the refusal was about.

@@ -49,11 +49,17 @@
 - TOOL-cSteadyMetronome-1 · a gate asserts what the SUBJECT does, never what the NODE does. The canary's elapsed-time ratio measured the machine and blocked three pushes over a tree it had passed; a rendezvous measures dispatch and ignores load
 
 - TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
+- TOOL-dClosedLexicon-12 · a symbol corpus that indexes only EXPORTS is complete about exports and silent about a layer that exports nothing: `kit-js` had 30 definitions and 3 indexed rows, DISJOINT. Coupling an opt-in kit to one that is not was REFUSED — its absence shrinks the index
+
+- TOOL-dClosedLexicon-13 · a preview and the verb it previews must classify with ONE predicate, and the ROLE alone is not it: two entries declare no adopter, two share a destination with a sibling seed. The kind keys on role, producer and destination together
+
+- TOOL-dClosedLexicon-11 · a refusal can be right about the RECORD and wrong as a policy about the BUILD. A finished run is retired by rotation, not re-opened; the archive name derives from the record's BYTES, because no verb here commits and two runs can honestly share a witness
 - TOOL-aBoundedVerdict-1 · the tier-2 review cap is TWO rounds per subject, a driver FILE CONSTANT (owner: unattended runs only). Rounds are park lines under a `record` kind, not authored facts. The loop's engine was M4's missing BLOCKED disposition, not a missing count
 - TOOL-aBoundedVerdict-2 · a halted run records a validated halt CODE, never a new phase (owner). Measured: nothing outside the kit reads the phase, a new terminal is unwritable without a producer verb, a non-terminal one wedges the next preflight. The code is the region's EIGHTH fact
 - TOOL-aBoundedVerdict-3 · forks get a narrow FACT-QUESTION probe rule, not a general testing rule (owner). Measured 3 of 46 real forks test-decidable, ~67% not testable at all, one where the measurement picks the wrong answer. A unit awaiting scope approval is approved by the mandate at BASE
 - TOOL-aBoundedVerdict-4 · §8's resolution mark becomes anchored and attributed, graded per ITEM BLOCK rather than on the first line, in both readers, gated by a new cutoff rather than by repairing landed specs. Today a first line saying a fork is not resolved classifies READY in both
 - TOOL-aBoundedVerdict-5 · parking becomes a VERB, and the parked region's kinds become a decision/record taxonomy so review rounds cannot inflate the count of decisions a run must surface. The close verb's own override line is excluded, because it lands after the DoD loop
+
 ## DEPL — deployer
 
 *(none yet)*

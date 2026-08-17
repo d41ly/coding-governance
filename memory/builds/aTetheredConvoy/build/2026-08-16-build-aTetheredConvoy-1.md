@@ -131,3 +131,107 @@ decorating it:
 
 The pattern across all three is the one this repo already names: the defects were not the findings a
 pass missed, they were disagreements between two paragraphs written in the same pass.
+
+## Parked — the landing is blocked on a third convergence, and it is a real one
+
+The merge to `main` completed and every gate was green at `49e06d9`. The PUSH is not done: local is
+25 ahead / 10 behind, and `tools/push-main.sh` reconciles before the gate, so it re-enters a merge
+with `origin/main`.
+
+That merge resolves structurally — both files parse, `govkit selfcheck` exits 0, and 177 of 186 arms
+hold. It is filed as `DEPL-aTetheredConvoy-8` rather than landed, because the 9 red arms are not
+merge damage; they are a **semantic disagreement between upstream's landed classifier and this
+branch's receipt schema 2**, and upstream's arms predate the schema.
+
+`TOOL-dClosedLexicon-13` made `plan` and `apply` share one predicate — `ROLE_KINDS` plus
+`derive_rule_kind` — and deleted the role filter from the arm that compares plan's write set to
+apply's receipt, correctly: under schema 1 every receipt row was `engine` or `seed`, so the whole
+receipt *was* the write set. Schema 2 records a row for every file gov is responsible for, including
+`rendered`, `attributes` and `project-owned`. The comparison has to filter to `LANDABLE_ROLES` on the
+receipt side — which is exactly what the conflicted arm's filter was for, and what its own comment
+said.
+
+Four separable questions, stated so the next pass measures rather than guesses:
+
+- **the expected per-role mark counts move**, because unit 6 adds 9 `ORDER|attributes` pin rows that
+  did not exist when the arm was written. Measured on this tree: `write|engine` 54 · `write|seed` 4 ·
+  `SIDE|rendered` 4 · `ORDER|attributes` 9 · `ORDER|engine` 1 · `ORDER|hole` 5 ·
+  `COVER|project-owned` 1 — and `ORDER|project-owned` 0, which is the arm that reds.
+- **the receipt-side role filter**, above.
+- **`cmd_apply` prints the skip fact twice** — upstream's `SKIPPED [role] dest <- kit: why` and this
+  branch's `not landed [role] dest — why`. Two answers to one question, in the output of the verb
+  built to end silent partial installs. Drop the second and re-key this branch's two `why` arms onto
+  upstream's line, which already carries role, destination, kit and reason.
+- **the `settings-merge` refusal arm reuses a target earlier applies left kits in**, so apply refuses
+  for the pre-existing-kits reason instead of the merged-role one. The arm passes for `push-main` and
+  reds for `settings-merge` on fixture order alone.
+
+*Why this was not pushed through.* The tempting move is to read the four failing counts off the
+measured output and write them into the arms. That is `fixture-passes-by-finding-nothing` performed
+deliberately: the arm would then assert whatever the code does, and the receipt-schema question — the
+one that actually matters — would be buried under a green bar. The resolution is preserved as a patch
+so no reconcile work is lost, and the tree stands at a green `49e06d9`.
+
+*Also unresolved, and not caused by this:* the renormalize refused with `the pinned population is not
+clean relative to HEAD` naming two gov paths. That was measured against a mid-merge working tree, so
+it is unusable as a verdict — the same discarded-gate-result trap this record already names once.
+Re-measure against a clean tree before believing it either way.
+
+## Worked — DEPL-aTetheredConvoy-8, and the filed diagnosis was half wrong
+
+The blocker was filed calling all four questions "schema-1 assumptions in upstream's arms". Measured,
+only **one** was. Two were this branch's own doing, and one was fixture order. Recorded because the
+wrong attribution was the more expensive half: it pointed the fix at upstream's code.
+
+- **The schema one, as filed.** Two arms compared `plan`'s write set to the WHOLE receipt. Correct
+  under schema 1, where every row carried gov bytes; wrong under schema 2, which records a row per
+  file gov is responsible for. Re-keyed on `"sha256" in f` — the BYTES, not a role list — so a new
+  non-landing role needs no edit here.
+- **Two arms were riding a role THIS branch corrected.** They asserted the playbook pair previews as
+  `ORDER|project-owned` and that `apply` skips `docs/PARALLEL.md`. Unit 1 changed both playbook rules
+  to `seed`, because tagged `project-owned` the entry landed ZERO bytes while sitting first in the
+  default selection — the defect is named in the descriptor. The arms were grading the role the
+  defect wore. Re-keyed: the playbook pair asserts seed WRITES, and the skip arm moved to
+  `codebase-map`'s `map_extractors.py`, which is a real project-owned skip.
+- **A vacuous arm, found on the way and not in the filed four.** The plan-row reader matched
+  `^  (write|SKIP)`, and `SKIP` is not in `KIND_MARKS` — it never was. So the skip half of two arms
+  matched NOTHING and reported green by finding nothing, including the arm written to catch exactly
+  that (`the fixture actually HAS an unlandable role, or the SKIP half is vacuous` — it read
+  `len(plan_skips) > 0` on a set the regex could never fill). The vocabulary is now imported from the
+  engine through `govkit_kind_marks()`, the sibling of `govkit_steps()`, for the reason that function
+  already carries.
+- **`cmd_apply` announced every skip twice** — upstream's `SKIPPED` line and this branch's
+  `not landed`. Only the print was duplicated; the loop also appends the schema-2 receipt rows, so
+  deleting it would have taken the rows with it. The print went, the rows stayed, and a new arm
+  asserts the destination is named ONCE rather than once per classifier.
+- **One arm passed or failed on fixture order.** The merged-role refusal ran `apply` twice against a
+  target that had already had a full default apply, so it could refuse for the pre-existing-kits
+  reason instead of the merged-region one. Fresh target per kit; `plan` still shares the old one
+  because it writes nothing.
+
+**The un-covered `project-owned` row lost its integration arm and gained a better one.** No entry on
+this tree has such a row — codebase-map's is covered by a sibling seed — which is why the old arm had
+to borrow the playbook's role and died when that role was corrected. It is now pinned on
+`derive_rule_kind` directly, in both directions plus a not-one-answer-twice arm, so an entry edit
+cannot silently redefine it again.
+
+## Still red — one arm, and it is a real gap rather than a merge artefact
+
+`apply over the DEFAULT selection ran` asserts `returncode == 0`. It fails, and NOT for any of the
+reasons the blocker was filed for. Its six problems are all this branch's own unit-5 OBSERVE checks
+firing against a fixture that predates them:
+
+- two adopters exit 1 in the fixture (`memory-tree` classified `seed-and-stop`; `memory-recall`
+  **unclassified, because the `[[outcome]]` evaluator does not exist** — already named unbuilt above)
+- four `rendered` destinations are absent after their adopter ran, which OBSERVE correctly reports
+
+Upstream's arm passed because upstream's `apply` had no CONFIGURE/OBSERVE verification to fail: it
+asserted an exit code over a fixture never built to let adopters succeed. The arm is right to exist
+and the fixture is what is missing.
+
+**Not weakened to green.** Rewriting it to accept the current problem set would assert whatever the
+code does, which is the same move refused when the blocker was filed. It needs the `[[outcome]]`
+evaluator plus a fixture whose adopters can run — real scope, carrying forward.
+
+The seven pin lines that look like failures in the same output are `r.note`, not `r.fail`, and never
+counted toward the exit code. Recorded because they read like the cause and are not.
