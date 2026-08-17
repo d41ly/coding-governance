@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T21:11:30+03:00 @ 6382c56476029a7ac1e5c133b992a0883beb124c
+last-audit: 2026-08-17T21:20:47+03:00 @ 6382c56476029a7ac1e5c133b992a0883beb124c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 827296b2288b3a634197d8f8fb5771b9fab13abf
+last-body-change: 22f3e12c1b470dda7e6103027f18382a6b8a069d
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -218,3 +218,15 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
   costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
   that name states a count.
+- The hygiene engine PRE-SETS its conf keys and then sources `.memory-tree.conf` OVER them, so a blank
+  line in the conf overrides a default WITH BLANK. Every measured pin uses that as "skip this check". A
+  key that must not be skippable therefore needs an explicit re-normalisation AFTER the source —
+  `_resolve_cap` is the seam. Copying the pin idiom gives you a bound an adopter disables by accident.
+- A budget with no headroom left blocks RECORDING work, not doing it, and this repo has hit it twice:
+  the TOOL backlog at its byte cap with nothing terminal to rotate, and `READ_PATH_CEILING` breached by
+  ONE new build's row in the generated `memory/LIVE.md`. Before theorising, measure the headroom in
+  DAYS at the measured growth rate — the percentage reads survivable long after the runway is gone.
+- Naming a record `<date>-review-<FAMILY>-<slug>-<n>.md` where `n` is a round counter rather than a
+  DEFINED unit id makes the filename cite an id nothing defines: check 14 reds and
+  `gen_build_index.py` derives a phantom id into the README front matter. Use the unit-tail form
+  (`…-<slug>-1-round2.md`) so the ordinal stays the id the record serves.
