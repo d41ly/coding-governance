@@ -108,7 +108,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
 3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
    `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/` contents are
-   unconstrained; `project/` holds ONLY the six waiver registries — no catch-all — and its selector
+   unconstrained; `project/` holds ONLY the waiver registries — no catch-all — and its selector
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
    `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a

@@ -58,6 +58,8 @@
       "settings-merge selftest",
       "template size <=48KiB",
       "template size gate selftest",
+      "testsuite counts (every bar self-test prints one)",
+      "testsuite counts self-test",
       "unattended adopter e2e",
       "unattended driver selftest",
       "unattended gate selftest",
