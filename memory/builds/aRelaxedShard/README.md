@@ -62,11 +62,10 @@ Classification per the build method, written before acting: unit 1 was **MISSING
 run, was audited at M4, and is now **FORKED** at rev-2 — its §8 carries five items, and with no standing
 mandate they are the owner's.
 
-The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`. Verdict **BLOCKED**: 55
-raw findings, 38 confirmed, 17 refuted, precision 0.69, 4 of 4 lenses live, collapsing to 21 distinct
-defects. rev-2 is the fold. The blocker RESCOPED the unit — see F5 — and six further findings were
-downstream of the same omission, an Inventory table that measured 7 of the 29 documents in the class it
-claimed to enumerate.
+The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`, which owns its shape
+measurements and its finding list. Verdict **BLOCKED**, and rev-2 is the fold. The blocker RESCOPED the
+unit — see F5 — and six further findings were downstream of one omission: an Inventory table that
+measured 7 of the 29 documents in the class it claimed to enumerate.
 
 The owner sequenced two units. Unit 1 is the knob and the correction. The second is the re-shape —
 sharding a backlog below `FAMILY`, or a spill tier like the run-state file's — and its id is minted when
