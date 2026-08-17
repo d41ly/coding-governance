@@ -64,6 +64,26 @@ naming a path no verb walks. A run that hit it could only hand-edit an artifact 
 generated. Deriving removes the class instead of adding a verb to service it, and the invariant is
 the same one stated as emptiness: one fact, one home.
 
+### A build gets more than one run by ROTATING the finished one
+
+A record that has reached a terminal phase is not something to move, re-open or re-pin, and every
+phase writer refuses one. That is right about the RECORD and was wrong as a policy about the BUILD:
+a build whose first run aborted could never be carried unattended again.
+
+So `--preflight`, and only `--preflight`, RETIRES a finished record instead of refusing it. The
+retired file is renamed to `RUN.<phase>.<blob8>.md` beside the live one — the terminal phase, then
+the first 8 hex of that record's own blob hash — and a fresh `RUN.md` is created at `RUNNING`. The
+name is DERIVED, never chosen, and it is derived from the BYTES rather than the witness because no
+verb here commits: two runs can honestly share a witness, and a name that collided would block every
+later run with no way out. Two records with the same content are the same record twice.
+
+What rotation does NOT do: it does not re-open, re-pin, or edit the retired record. Its bytes are
+preserved exactly, `git mv` puts both sides in the index in one operation, and the gate leg reads
+every archived record as part of its population — an archived record carrying a non-terminal phase
+reds. The collision test runs with the other preconditions, so a name that already exists carrying
+DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
+passed, because the rename is what makes the tree dirty.
+
 **Authored**, carrying exactly eight facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:

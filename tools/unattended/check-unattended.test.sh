@@ -237,6 +237,35 @@ sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tTwo/RUN.md
 out=$(run)
 miss "$out" "more than one run-state file is non-terminal"
 
+# ---- check 4, the ARCHIVED-record branch (kit 1.6). An archived record must be TERMINAL, and this
+# ---- has its own branch rather than riding check 7 because check 7 fires at TWO: a live RUN.md that
+# ---- has reached LANDED plus one archived record edited back to RUNNING gives nlive=1 and the leg
+# ---- would say nothing — which is the steady state after every completed second run.
+# ---- THE POPULATION ARM COMES FIRST: the branch is only meaningful if the widened selector reaches
+# ---- an archived file at all, and a selector that reached none would leave this silent for the
+# ---- wrong reason.
+reset_tree
+cp memory/builds/tRun/RUN.md memory/builds/tRun/RUN.LANDED.abcd1234.md
+sed -i 's/^phase: .*/phase: RUNNING/' memory/builds/tRun/RUN.LANDED.abcd1234.md
+git add -A && git commit -q -m "an archived record left live" --no-verify
+out=$(run)
+hit "$out" "an ARCHIVED run-state file carries a non-terminal phase, so a finished record was retired while still claiming to be live, or was edited after retirement"
+hit "$out" "RUN.LANDED.abcd1234.md"
+# ...and a TERMINAL archived record is silent. Without this control the arm above proves only that
+# the leg can red, not that it reds on the right thing.
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.LANDED.abcd1234.md
+git add -A && git commit -q -m "archived and finished" --no-verify
+out=$(run)
+miss "$out" "an ARCHIVED run-state file carries a non-terminal phase"
+
+# ---- check 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 cannot
+# ---- see this — it is a byte-diff of the shipped/installed pair and is green whatever BOTH say.
+reset_tree
+sed -i 's/RUN\.<phase>\.<blob8>\.md/RUN.the-old-spelling.md/g' memory/guides/UNATTENDED-PROTOCOL.md
+hit "$(run)" "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record"
+reset_tree
+miss "$(run)" "the installed protocol does not spell the archive filename grammar"
+
 # ---- check 8: the region holds NO COPY. It used to assert the region EQUALLED the README slice,
 # ---- which was unmaintainable in the ordinary case — a spec rev bump moves the build index and the
 # ---- only writer refuses once a run is live. Asserting EMPTINESS is the same invariant with the

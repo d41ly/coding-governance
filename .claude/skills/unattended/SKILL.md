@@ -22,6 +22,10 @@ distinction real.
    `memory/builds/<slug>/README.md` committed before your branch existed is the whole
    precondition. Preflight refuses a build folder you created, because a run that authorizes itself
    has no authorization. You also do not create the run-state file: preflight does that.
+   **A build that has already been run once is not closed to you.** If its `RUN.md` reached a
+   terminal phase, preflight RETIRES that record to `RUN.<phase>.<blob8>.md` beside it and starts you
+   a fresh one — it says so on stdout, naming both paths. You do not move, edit or delete a finished
+   record yourself; the retired bytes stay exactly as the previous run left them.
 2. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
    store is in-memory and session-scoped, reachable only through your own tool calls. Use
    `CronCreate`, at the cadence this project declares — every 10 minutes (cron 3-59/10 * * * *). Keep the
