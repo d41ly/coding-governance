@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T04:45:00+03:00 @ 3e5c6d4373050f545eb516b6e305d352ceb10b66
+last-audit: 2026-08-17T05:00:00+03:00 @ febba16b77c5a802a7f3ebb6c053bf9e1d9c4198
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 0f8b21fb9a134cf4d538efa49eb4b4291da66a2a
+last-body-change: febba16b77c5a802a7f3ebb6c053bf9e1d9c4198
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -64,7 +64,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 | playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | the three `parallel-coding-governance.*` files · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker lockstep, TWO carriers) |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
-| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
+| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `tools/govkit/` — the deployer: `govkit.py`, `registry.toml` + a descriptor per entry (the population is the REGISTRY, never a listing), and its harnesses · `WIRE-INTO-PROJECT.md` |
 
 ### Gate commands (the merge bar)
 
