@@ -229,7 +229,7 @@ bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$b3b" "$b3c")
 # admitted-but-never-written entry would be a third answer to a question this list is closing.
 p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
 # The precondition is deliberately UN-SEGMENTED (see pop_guard): `project/` is drained of session
-# machinery, not emptied — the six registries stay — so the population is 6 on a real tree and 0
+# machinery, not emptied — the registries stay — so the population is non-zero on a real tree and 0
 # only when the path expression is mis-segmented, which is the one shape that silently disarms this
 # sub-lint. A tree with no `.txt` anywhere is a young tree and stays silent.
 PRE_REGISTRY=$(printf '%s\n' "$FILES" | grep -cE '\.txt$')
@@ -238,7 +238,7 @@ pop_guard 3 "no registry under $M/project/" \
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:legacy-files.txt|F:curation-debt.txt) ;;
   F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
-  F:method-carriers.txt) ;;
+  F:method-carriers.txt|F:testsuite-count-waivers.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then
@@ -258,6 +258,12 @@ $bad3"
 # (`<date>-<kind>-<FAMILY>-<slug>-<seq>.md`), which is how one slug shared by two families survives
 # the merge into a single folder; the alternation is the CLOSED one from FAMILIES, never `[A-Z]+`.
 #
+# A RETIRED run-state file (2.18) joins it as a GRAMMAR rather than a literal — `RUN.<PHASE>.<8 hex>.md`,
+# where the hex is the retired record's own blob hash. A build gets more than one unattended run by
+# ROTATING the finished record to that name, so the family is unbounded and cannot be whitelisted by
+# equality the way the three below are. It joins check 6's caps and check 7's prose exemption too: an
+# archived record is the same document frozen.
+#
 # RUN.md (2.3) is the THIRD whitelisted root file: the run-state file an unattended run writes, which
 # needs a name a resuming session can compute without knowing when the run started. A dated recording
 # under build/ is legal today and has no stable resume target, which is why the name is fixed here
@@ -272,6 +278,14 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
         vre = "^[A-Za-z][A-Za-z0-9-]*$"              # the slug, alone
         rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?[A-Za-z0-9]+-[0-9]+\\.md$"
+        # An ARCHIVED run-state file (2.18). A GRAMMAR, because the whitelist above it is string
+        # equality and a family of names cannot be spelled that way. SHAPE, not vocabulary: a phase
+        # token and a content hash. `RUN\\..*\\.md` would admit `RUN.notes.md` and `RUN.md.bak` at
+        # every build root forever with no waiver registry and no ratchet;
+        # `RUN\\.(LANDED|ABORTED)\\.` would hard-code the unattended kit`s PHASES_TERMINAL into this
+        # engine. The unattended leg owns the vocabulary — it reds on an archived record whose phase
+        # is not terminal — and this gate owns the folder grammar.
+        arre = "^RUN\\.[A-Z]+\\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.md$"
       }
       function flush(   n,i,j,k,keys,tmp,type,name) {
         if (folder=="") return
@@ -282,6 +296,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
           if (k=="F:README.md"||k=="F:STATUS.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (type=="F" && name ~ arre) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
         folder=""; delete ent
@@ -334,7 +349,8 @@ index_set() {
     # spills the oldest parked entries into the build's own build/ folder as a dated recording
     # (a name check 5's grammar already admits) before the cap is reached. Entry-budget exempt
     # below, because the standing mandate is verbatim prose, not index rows.
-    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.md$"
+    # An ARCHIVED record (2.18) is the same document frozen, so the same cap applies to it.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$"
     # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
     # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
     # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
@@ -381,7 +397,7 @@ $bad6"
 # rebuild the whole expression, which silently dropped the guides/ alternative on any repo carrying a
 # .codebase-map.conf — every guide entered this check's population and nothing said so. Two spellings
 # of one expression is the two-answers-to-one-question class, and this is how it fired.
-ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN\.md$'
+ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 [ -n "$MAP_SUB" ] && ex7="$ex7|/$MAP_SUB/FOUNDATION\.md\$|/$MAP_SUB/features/[^/]+\.md\$"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
@@ -623,6 +639,69 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       if (nwb > 0)
         print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
     }
+    # ---- TOOL-cSettledDocket-3: these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut.
+    # ---- TEMPLATE-SPEC calls the fork rule machine-checked; it was checked on Tier-2 alone because
+    # ---- `next` is a PREFIX cut and both assertions sat behind it. Moving the cut cannot fix that:
+    # ---- the two blocks that must STAY Tier-2-only (the section canon, the empty-body test) sit
+    # ---- between the cut and these, so no placement runs these two while skipping those. Hoisted.
+    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
+    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
+    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
+    # ---- anywhere further down. Reproduced at 99 against a true 1.
+    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
+    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
+    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
+    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
+    k = "· rev-"; p = index(hdr, k); hrev = ""
+    if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
+    in9 = 0; seen = 0; mx = 0
+    for (i = 1; i <= n; i++) {
+      L = body[i]
+      if (L ~ /^## [0-9]+\. Revision log/) in9 = 1
+      else if (in9 && L ~ /^## /) in9 = 0
+      if (in9) while (match(L, /rev-[0-9]+/)) {
+        v = substr(L, RSTART + 4, RLENGTH - 4) + 0
+        if (!seen || v > mx) mx = v
+        seen = 1; L = substr(L, RSTART + RLENGTH)
+      }
+    }
+    if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
+    # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
+    # ---- when shorter than three lines because both deletes land inside it.
+    if (hdr ~ /^\*\*Status:\*\* CLOSED/ || hdr ~ /^\*\*Status:\*\* WONTDO/) {
+      q = 0; inr = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (!inr) { if (L ~ /^## [0-9]+\. Open questions/) { inr = 1; rng[++q] = L } }
+        else { rng[++q] = L; if (L ~ /^## [0-9]+\. /) inr = 0 }
+      }
+      # TEMPLATE-SPEC promises TWO ways for a terminal spec to satisfy §8: it reads `none`, OR every
+      # question is marked RESOLVED in place. Only the first was ever implemented, so the documented
+      # second option was unreachable and a fully-resolved spec could not go CLOSED — a rule the doc
+      # states and the gate does not enforce is the same false-claim class this catalogue exists for.
+      q8 = ""; items = 0; resolved = 0
+      for (i = 2; i <= q - 1; i++) {
+        if (rng[i] ~ /^[[:space:]]*$/) continue
+        if (q8 == "") q8 = rng[i]
+        # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
+        # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
+        # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
+        # items, could never satisfy `items == resolved`, and could never go terminal no matter how
+        # thoroughly its forks were answered. That is the same false-claim class as the note directly
+        # above, one level down: the doc offered two shapes and the gate implemented one.
+        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/ || rng[i] ~ /^###[[:space:]]/) {
+          items++
+          if (rng[i] ~ /RESOLVED/) resolved++
+        }
+      }
+      if (q == 0)
+        print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
+      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
+        print f " (terminal Status with unresolved §8 Open questions)"
+    }
+
     if (hdr ~ /Tier-1/) next
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""
@@ -648,61 +727,6 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
     if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
     if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
-    # ---- header rev vs the §9 high-water. The range CLOSES on the next `## ` heading. Without that
-    # ---- close it ran to the end of the body, so any rev-N below §9 -- in §10, or in later prose --
-    # ---- raised the high-water and a header rev counted as logged whenever a larger number appeared
-    # ---- anywhere further down. Reproduced at 99 against a true 1.
-    # ---- A VERDICT change, measured before it landed: closing the range can only produce MORE
-    # ---- findings, and over the real corpus it changes 0 of 22 in-scope specs. Nobody paid, so the
-    # ---- two fixtures in the self-test are the only evidence this works -- one per sub-path, since
-    # ---- the branch fires both when §9 logs a SMALLER rev and when it logs NONE.
-    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
-    k = "· rev-"; p = index(hdr, k); hrev = ""
-    if (p > 0) { t = substr(hdr, p + length(k)); sp = index(t, " "); hrev = (sp > 0) ? substr(t, 1, sp - 1) : t }
-    in9 = 0; seen = 0; mx = 0
-    for (i = 1; i <= n; i++) {
-      L = body[i]
-      if (L ~ /^## 9\. Revision log/) in9 = 1
-      else if (in9 && L ~ /^## /) in9 = 0
-      if (in9) while (match(L, /rev-[0-9]+/)) {
-        v = substr(L, RSTART + 4, RLENGTH - 4) + 0
-        if (!seen || v > mx) mx = v
-        seen = 1; L = substr(L, RSTART + RLENGTH)
-      }
-    }
-    if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
-    # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
-    # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
-    # ---- when shorter than three lines because both deletes land inside it.
-    if (hdr ~ /^\*\*Status:\*\* CLOSED/ || hdr ~ /^\*\*Status:\*\* WONTDO/) {
-      q = 0; inr = 0
-      for (i = 1; i <= n; i++) {
-        L = body[i]
-        if (!inr) { if (L ~ /^## 8\. Open questions/) { inr = 1; rng[++q] = L } }
-        else { rng[++q] = L; if (L ~ /^## 9\. /) inr = 0 }
-      }
-      # TEMPLATE-SPEC promises TWO ways for a terminal spec to satisfy §8: it reads `none`, OR every
-      # question is marked RESOLVED in place. Only the first was ever implemented, so the documented
-      # second option was unreachable and a fully-resolved spec could not go CLOSED — a rule the doc
-      # states and the gate does not enforce is the same false-claim class this catalogue exists for.
-      q8 = ""; items = 0; resolved = 0
-      for (i = 2; i <= q - 1; i++) {
-        if (rng[i] ~ /^[[:space:]]*$/) continue
-        if (q8 == "") q8 = rng[i]
-        # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
-        # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
-        # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
-        # items, could never satisfy `items == resolved`, and could never go terminal no matter how
-        # thoroughly its forks were answered. That is the same false-claim class as the note directly
-        # above, one level down: the doc offered two shapes and the gate implemented one.
-        if (rng[i] ~ /^[[:space:]]*[-*][[:space:]]/ || rng[i] ~ /^###[[:space:]]/) {
-          items++
-          if (rng[i] ~ /RESOLVED/) resolved++
-        }
-      }
-      if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
-        print f " (terminal Status with unresolved §8 Open questions)"
-    }
   }')
 fi
 # The section-canon excerpt keeps a REAL `diff`: reproducing its normal-format output inside awk

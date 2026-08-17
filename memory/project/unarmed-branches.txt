@@ -11,3 +11,18 @@
 # written" and "cannot be written from here" are indistinguishable in a bare pin, and only one of
 # them is acceptable.
 tools/unattended/unattended.sh	9	1	cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has
+#
+# THE TWO ROTATION ROWS (kit 1.6) carry their reason, per the rule above. Both sit BELOW two
+# pre-write refusals that a fixture CAN reach — a derived name occupied by a non-file, and one
+# occupied by a file with different bytes — and both were left as branches rather than deleted
+# because the alternative is a silent misfiling:
+#   27  `archive_name_of` returns non-zero only when the record's phase is empty or `git hash-object`
+#       fails over a file that exists and was just read. The phase cannot be empty here — `is_terminal`
+#       has already matched it against the closed PHASES_TERMINAL set — so reaching this needs a git
+#       or filesystem fault, which no fixture in this suite can produce.
+#   29  `GIT mv -f` after both pre-write tests cleared the destination. MEASURED: the two reachable
+#       failure modes were the ones now refused above it (a directory destination exits 0 and files
+#       the record INSIDE it; a differing file is refused by name), so what is left is an index or
+#       filesystem fault. Trying to arm this is what FOUND the directory case.
+tools/unattended/unattended.sh	27	2	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
+tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved

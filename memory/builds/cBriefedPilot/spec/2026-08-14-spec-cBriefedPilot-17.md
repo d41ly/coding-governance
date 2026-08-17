@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -122,7 +122,8 @@ must not turn it into a copy) · the full bar.
 
 ## 8. Open questions
 
-**RESOLVED at authoring: keep the derived glob, and give `SKILL.template.md` the marker it implies.**
+### RESOLVED at authoring: keep the derived glob, and give `SKILL.template.md` the marker it implies
+
 The alternative was to narrow the population to `PROTOCOL.template.md`, which is what the design pass
 described and what the backlog row asks for literally. It is rejected on `TOOL-aSealedCaravan-3`'s
 recorded evidence: a named population is the defect, and a shipped doc that self-identifies as

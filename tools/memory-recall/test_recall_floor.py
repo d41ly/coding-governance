@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -196,8 +197,17 @@ def test_both_red_on_wholesale_drop():
     out = read_lines(p)
     assert p.returncode != 0, out
     assert "per-id RED" in out and "RECALL_FLOOR RED" in out, f"both should red\n{out}"
-    assert "0.2000" in out, f"expected normalised 0.2000\n{out}"
-    return "both RED at 0.2000 — proves the score responds to the corpus, not that retrieval is good"
+    # DIRECTION plus a magnitude BOUND, not a literal. This arm claims only that the score RESPONDS
+    # to the corpus, and the corpus moves: a merge from origin/main took this cell 0.2000 -> 0.1000
+    # with the behaviour identical. The three single-direction arms keep their literals, because
+    # those encode the h/R arithmetic the pin is DERIVED from and `--audit-fixture` reds if h or R
+    # moves — here there is no derivation to protect, so a literal is over-specification that reds
+    # on an unrelated commit.
+    m = re.search(r"normalised ([0-9.]+) <", out)
+    assert m, f"expected a normalised figure in the floor's red line\n{out}"
+    norm = float(m.group(1))
+    assert norm < 0.5, f"a wholesale drop must fall far below the pin, got {norm}\n{out}"
+    return f"both RED at {norm:.4f} — the score responds to the corpus, which is all this arm claims"
 
 
 # ------------------------------------------------------------------ the refusals

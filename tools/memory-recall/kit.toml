@@ -56,3 +56,10 @@ guard = ["{kit}/"]
 name = "memory-recall skill wiring"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 guard = []
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".claude/skills/memory-recall/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

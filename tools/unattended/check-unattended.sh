@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. FIFTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. EIGHTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -15,7 +15,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.5   # gov:kit unattended@1.5 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -47,7 +47,7 @@ if [ ! -f "$CONF" ]; then
 fi
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
-KICKOFF_ENGINE=""; KICKOFF_EXITS=""
+KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -75,6 +75,7 @@ core_of() { # KEY  ->  the quoted value from $DRIVER
 }
 PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
+DIRECTIVES_CORE=$(core_of DIRECTIVES_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
@@ -135,7 +136,14 @@ FILES=$(git ls-files "$M/")
 # is not a violation, and a guard that cannot tell that from a mis-segmented selector reds every
 # fresh adopter on install. Precondition non-zero with an empty population is the mis-segmentation.
 PRE=$(printf '%s\n' "$FILES" | grep -cE '(^|/)RUN\.md$' || true)
-RUNS=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.md$" || true)
+# THE POPULATION IS THE LIVE RECORD PLUS EVERY ARCHIVED ONE (kit 1.6). Rotation retires a finished
+# record to `RUN.<phase>.<blob8>.md` beside the live one, so every per-file check below now
+# quantifies over both — checks 9, 13 and 15 included, which is what keeps an archived LANDED
+# record's witness answerable to the anchor.
+#
+# `PRE` above is deliberately NOT widened: it is the mis-segmentation PRECONDITION, not the
+# population. An archives-only tree reading PRE=0 with POP>0 is silent by design.
+RUNS=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$" || true)
 POP=$(printf '%s\n' "$RUNS" | grep -c . || true)
 if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
@@ -209,6 +217,17 @@ while IFS= read -r f; do
     *) fail 4 "a run-state file declares a phase outside the effective vocabulary: $ph in $f (legal: $PHASES)";; esac
 
   case " $PHASES_TERMINAL " in *" $ph "*) ;; *) nlive=$((nlive+1)); live="$live $f";; esac
+
+  # AN ARCHIVED RECORD MUST BE TERMINAL, and this is its own branch rather than a consequence of the
+  # live-run rule below. Check 7 is `nlive <= 1`, which fires at TWO — so a `RUN.md` that has reached
+  # LANDED plus one archived record hand-edited back to RUNNING gives nlive=1 and the leg says
+  # nothing. That is the steady state after every completed second run, which makes it the one window
+  # where the widened population would otherwise buy less than it looks like it does.
+  case "$f" in
+    */RUN.md) ;;
+    *) case " $PHASES_TERMINAL " in *" $ph "*) ;;
+         *) fail 4 "an ARCHIVED run-state file carries a non-terminal phase, so a finished record was retired while still claiming to be live, or was edited after retirement: $ph in $f";; esac;;
+  esac
 
   # ---- 5: witness PRESENCE, its own branch. Check 6 below reuses the drift oracle's judgeability
   # ---- discipline, which SKIPS a claim carrying no sha — so folding presence into resolution makes
@@ -366,6 +385,47 @@ while IFS= read -r f; do
   if [ -n "$BYPASS_BAN" ] && grep -qF -- "$BYPASS_BAN" "$f"; then
     fail 11 "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on: $BYPASS_BAN in $f"
   fi
+  # ---- 17: a parked WAIVER names a declared handle, carries a reason, and was in the run-state
+  # ---- file's FIRST committed blob. Unit 3 refuses a bad waiver at the moment of writing; this is
+  # ---- the SECOND OPINION over what actually landed.
+  # ----
+  # ---- Only the waiver kind is joined. `park()` writes four, and the other three legitimately
+  # ---- arrive late — an `override` is written at `--close`, an `abort` reason later still — so
+  # ---- joining them to the first blob would red every honest run. The waiver's whole claim is that
+  # ---- it was taken at preflight, which is exactly why the join means something on it alone.
+  # ----
+  # ---- HONEST LIMIT, in source rather than in a document read at a different time (check 13's
+  # ---- precedent): run locally this proves little, because the run writes BOTH sides — it can
+  # ---- commit a waiver at pass 4 and the blob it is compared against is one it also authored.
+  # ---- What changes is that the same leg re-run in a clone the run never touched now has something
+  # ---- to catch here. This is not an authorization verdict and does not claim to be.
+  while IFS= read -r wl; do
+    [ -n "$wl" ] || continue
+    # Free text LAST, so nothing after the reason is ever read: a reason that could contain the
+    # separator would make this parse ambiguous, which is why unit 3 refuses a newline in one.
+    wh=${wl#* waiver · item }; wh=${wh%% · reason *}
+    wr=${wl#* · reason }
+    case " $PHASES_TERMINAL " in *" $ph "*) ;;
+      *) case " $DIRECTIVES_CORE $DIRECTIVES_EXTRA " in
+           *" $wh:"*) ;;
+           *) fail 17 "a parked waiver names a handle outside the effective directive set, so the record claims a relaxation of a rule no verb would have accepted: $wh in $f" ;;
+         esac ;;
+    esac
+    [ -n "$wr" ] \
+      || fail 17 "a parked waiver carries an empty reason, and a waiver recording no reason is indistinguishable from one nobody meant: $wh in $f"
+    # --diff-filter=A with `tail -1` takes the OLDEST add, so a file deleted and re-added is still
+    # judged against its original commit. Rename following is off on purpose: this leg selects its
+    # population at an exact path, so a renamed run-state file is a different file to every check.
+    # SILENT when the file has no committed blob at all — that is the honest preflight-to-first-
+    # commit window, and reddening it would red a correct run with nobody present to read it.
+    wfirst=$(GIT log --diff-filter=A --format=%H -- "$f" 2>/dev/null | tail -1)
+    if [ -n "$wfirst" ]; then
+      GIT show "$wfirst:$f" 2>/dev/null | grep -qF -- "$wl" \
+        || fail 17 "a parked waiver line is absent from the run-state file's FIRST committed blob, so it was appended after the record was created and the claim that the owner took it at preflight is not what landed: $wh in $f"
+    fi
+  done <<WAIVERS
+$(tr -d '' < "$f" 2>/dev/null | grep -E '^[0-9][0-9-]*T[0-9:]*Z waiver · item [^ ]* · reason ' || true)
+WAIVERS
 done <<EOF
 $RUNS
 EOF
@@ -390,6 +450,14 @@ if [ -f "$SHIP" ] && [ -f "$LIVEDOC" ]; then
   fi
 elif [ ! -f "$SHIP" ] || [ ! -f "$LIVEDOC" ]; then
   fail 10 "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail: $SHIP / $LIVEDOC"
+fi
+
+# ---- 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 above cannot
+# ---- see this: it is a byte-diff of the pair, and it is green whatever BOTH of them say. A rotation
+# ---- shipped with a protocol that does not name the archive grammar is a mechanism an operator
+# ---- meets for the first time in a directory listing.
+if [ -f "$LIVEDOC" ] && ! grep -qF 'RUN.<phase>.<blob8>.md' "$LIVEDOC"; then
+  fail 16 "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record: $LIVEDOC"
 fi
 
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not
@@ -417,6 +485,190 @@ if [ -n "$KICKOFF_ENGINE" ]; then
       [ "$nex" -ge "$KICKOFF_EXITS" ] \
         || fail 12 "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS"
     fi
+  fi
+fi
+
+
+# ---- 16: the DIRECTIVE REGISTRY, joined to the table an agent actually reads. Three arms.
+# ----
+# ---- Arm A is a SECOND OPINION, not a recomputation. The driver's constant and the Skill's
+# ---- hand-authored table are two different artifacts in two different languages; joining them
+# ---- catches a handle added to one and forgotten in the other, which is the drift this build's
+# ---- whole pointer-not-copy design depends on not happening. A generator would make the two agree
+# ---- by construction and check nothing.
+tmpl="$HERE/SKILL.template.md"
+# Bound BEFORE either guard, because arm B reads it from outside the branch that used to assign it.
+# A template present but carrying no readable row left `core` unset, and under `set -u` arm B then
+# died on it — so the refusal for an unreadable table took arm C and this leg's own exit code down
+# with it, reporting one problem where there were two.
+# TOOL-cSettledDocket-2: the EFFECTIVE set, core plus whatever the project declared. `--waive` has
+# always accepted an extra handle — the driver composes both — while this join covered CORE alone,
+# so an extra was waivable by a verb and invisible to the agent, and the project could not fix that
+# by adding a table row because the Skill is rendered from a kit template. It has a row source now.
+core=$(printf '%s
+' $DIRECTIVES_CORE $DIRECTIVES_EXTRA | sort -u)
+if [ ! -f "$tmpl" ]; then
+  fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
+else
+  # The handle must be the row's FIRST cell; the carrier is its M<n> token wherever it sits, so the
+  # M<n> column may move but the handle column may not. A `tbl` sed used to sit here duplicating this
+  # awk's row filter in BRE — non-empty in exactly the same cases, readable only by the emptiness
+  # test below. Two grammars over one row shape, and no input could tell them apart, so one is gone.
+  tblpairs=$(tr -d '\r' < "$tmpl" | awk -F'|' '
+    /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+      h = ""; c = ""; n = 0
+      for (i = 2; i <= NF; i++) {
+        cell = $i
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+        if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+        if (cell ~ /^M[0-9]+$/) { c = cell; n++ }
+      }
+      if (h != "" && n == 1) print h ":" c
+      else if (h != "" && n != 1) print h ":AMBIGUOUS"
+    }' | sort -u)
+  # TOOL-cSettledDocket-2 — the PROJECT's own rows, if it declared a source. Same row grammar as the
+  # kit table, read with the same awk, so the two cannot disagree about what a row IS.
+  #
+  # A declared path that does not EXIST is a named refusal, never an empty union: silent, every
+  # project-declared directive would land back on the "declared and absent from the table" branch
+  # with nothing saying why. Undeclared is the empty set, which is every adopter today.
+  if [ -n "$DIRECTIVES_EXTRA_TABLE" ]; then
+    if [ ! -f "$ROOT/$DIRECTIVES_EXTRA_TABLE" ]; then
+      fail 16 "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in: $DIRECTIVES_EXTRA_TABLE"
+    else
+      xtra=$(tr -d '\r' < "$ROOT/$DIRECTIVES_EXTRA_TABLE" | awk -F'|' '
+        /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+          h = ""; c = ""; nm = 0
+          for (i = 2; i <= NF; i++) {
+            cell = $i
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+            if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+            if (cell ~ /^M[0-9]+$/) { c = cell; nm++ }
+          }
+          if (h != "" && nm == 1) print h ":" c
+          else if (h != "" && nm != 1) print h ":AMBIGUOUS"
+        }' | sort -u)
+      if [ -z "$xtra" ]; then
+        fail 16 "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty: $DIRECTIVES_EXTRA_TABLE"
+      else
+        tblpairs=$(printf '%s\n%s\n' "$tblpairs" "$xtra" | grep . | sort -u)
+      fi
+    fi
+  fi
+  if [ -z "$tblpairs" ]; then
+    fail 16 "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
+  else
+    case "$tblpairs" in *":AMBIGUOUS"*)
+      fail 16 "a directive row cites more than one build-method section, so the join has no single answer to read for that handle" ;;
+    esac
+    only_reg=$(comm -23 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
+    only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
+    [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"
+    [ -z "$only_tbl" ] || fail 16 "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: $only_tbl"
+  fi
+  # Arm B: every cited section RESOLVES. SILENT when the carrier is absent — the leg grades the
+  # TREE and an adopter may install this kit without the memory-tree one; the DRIVER is what grades
+  # the RUN, and unit 4's refusal is where a missing carrier actually stops something.
+  if [ -f "$M/guides/BUILD-METHOD.md" ]; then
+    for pair in $core; do
+      sec=${pair#*:}
+      grep -qE "^## $sec( |\$)" "$M/guides/BUILD-METHOD.md" \
+        || fail 16 "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach: $pair"
+    done
+  fi
+fi
+# Arm C: the floor. Mirrors CORE_FLOOR's two branches — undeclared and malformed are both refusals,
+# because either one leaves the pin unenforced while the conf still looks configured.
+if [ -z "$DIRECTIVES_FLOOR" ]; then
+  fail 16 "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
+else
+  case "$DIRECTIVES_FLOOR" in
+    ''|*[!0-9]*) fail 16 "DIRECTIVES_FLOOR is not a plain integer, so the shrink-only pin on the directive set is unenforced while the conf still looks configured: $DIRECTIVES_FLOOR" ;;
+    *) ndir=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+       [ "$ndir" -ge "$DIRECTIVES_FLOOR" ] \
+         || fail 16 "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it: $ndir against $DIRECTIVES_FLOOR" ;;
+  esac
+fi
+# Arms D and E: the CONTRACT's own two tables joined to the constants the driver enforces. Same
+# shape as arm A one document over — a shell constant against a hand-authored markdown table — and
+# the same reason: the protocol is what an outside reader is told, and a contract that publishes a
+# vocabulary the kit does not use is worse than one that publishes none.
+# The SHIPPED template is the side read. Check 10 already asserts the installed copy equals it after
+# prefix substitution, so reading both here would be a second answer to a question that check owns.
+proto="$HERE/PROTOCOL.template.md"
+if [ -f "$proto" ]; then
+  # §3's run-order PARAGRAPH, not the whole file. Measured: the same pattern over the document also
+  # returns `LANDER`, which is a conf key — the paragraph scope is load-bearing, not tidy.
+  pph=$(tr -d '\r' < "$proto" | awk '
+    /in run order:$/ { f = 1; next }
+    f && /^$/        { if (seen) exit; next }
+    f                { seen = 1; print }' | grep -oE '`[A-Z][A-Z_]*`' | tr -d '`' | sort -u)
+  # An EMPTY extraction is its own NAMED refusal, as arm A's is: a prose anchor that gets reworded
+  # otherwise empties the comparison and the join passes by finding nothing.
+  if [ -z "$pph" ]; then
+    fail 16 "the protocol's run-order paragraph yields no phase token, so the phase join would compare the driver's vocabulary against nothing and pass by finding nothing; the anchor is the line ending 'in run order:'"
+  else
+    pcore=$(printf '%s\n' $PHASES_CORE | sort -u)
+    pd1=$(comm -23 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
+    pd2=$(comm -13 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
+    [ -z "$pd1" ] || fail 16 "a CORE phase is enforced by the driver and absent from the protocol's run-order list, so the contract publishes a vocabulary the kit does not use: $pd1"
+    [ -z "$pd2" ] || fail 16 "the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy: $pd2"
+  fi
+  # Item NAMES only. The checker column is deliberately not joined: measured today three cells read
+  # `machine, PRE-LANDING` or `agent-attested` against the constant's `machine`/`agent`, and those
+  # spellings say something true the constant has no room for. Joining them would need a
+  # normalisation table, which is a third spelling of a two-value fact.
+  pdod=$(tr -d '\r' < "$proto" | sed -n 's/^| `\([a-z][a-z-]*\)` |.*/\1/p' | sort -u)
+  if [ -z "$pdod" ]; then
+    fail 16 "the protocol's Definition-of-Done table yields no item row, so the DoD join would compare the driver's set against nothing and pass by finding nothing"
+  else
+    dcore=$(printf '%s\n' $DOD_CORE | sed 's/:.*//' | sort -u)
+    ed1=$(comm -23 <(printf '%s\n' "$dcore") <(printf '%s\n' "$pdod"))
+    ed2=$(comm -13 <(printf '%s\n' "$dcore") <(printf '%s\n' "$pdod"))
+    [ -z "$ed1" ] || fail 16 "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about: $ed1"
+    [ -z "$ed2" ] || fail 16 "the protocol's Definition-of-Done table names an item the driver does not carry, so the contract publishes a gate nothing evaluates: $ed2"
+    # ...and the COUNT SENTENCE above the table, joined to the same set. This is the finding that
+    # earned the arm: the table grew to eight rows while the sentence directly above it still said
+    # six, in BOTH copies, so the parity leg was green over a document contradicting itself. A row
+    # join cannot see a miscount, because the rows were right and only the prose was wrong.
+    cw=$(tr -d '\r' < "$proto" | sed -n 's/^\([A-Za-z]*\) kit-owned core items\..*/\1/p' | head -1)
+    if [ -z "$cw" ]; then
+      fail 16 "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
+    else
+      case "$(printf '%s' "$cw" | tr 'A-Z' 'a-z')" in
+        one) cn=1 ;; two) cn=2 ;; three) cn=3 ;; four) cn=4 ;; five) cn=5 ;; six) cn=6 ;;
+        seven) cn=7 ;; eight) cn=8 ;; nine) cn=9 ;; ten) cn=10 ;; eleven) cn=11 ;; twelve) cn=12 ;;
+        *) cn=-1 ;;
+      esac
+      ndod=$(printf '%s
+' "$dcore" | grep -c . || true)
+      [ "$cn" = "$ndod" ]         || fail 16 "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '$cw', driver carries $ndod"
+    fi
+  fi
+fi
+
+# ---- 18: the kickoff step comes AFTER preflight in the Skill an agent reads. Invoked first,
+# ---- /session-kickoff halts at its READY card, which under a mandate nobody is present to answer.
+# ---- Two line numbers and a comparison — the shape region() already uses here and in the driver,
+# ---- for the reason recorded there: a TRANSPOSED pair satisfies a count-only check, and the
+# ---- driver's copy of that function truncated a file on exactly that.
+# ---- Keyed on a non-blank KICKOFF_ENGINE, matching check 12: an adopter may not ship the kickoff
+# ---- skill at all. ABSENCE IS A REFUSAL rather than the safe side, because a template that never
+# ---- names kickoff and a template that names it too early read identically on any count.
+# ---- It asserts the ORDER OF TWO LINES in a document and nothing more. Whether the sequence WORKS
+# ---- is unexecuted and is carried as a residual in the build README, not implied away here.
+if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
+  # First match of each, so a template naming either twice is judged on the occurrence the agent
+  # reads first. Anchored on the fenced invocation and the literal skill name — neither is a
+  # heading, which a reword survives while gutting the body.
+  pfl=$(awk '{ sub(/$/,"") } index($0, "unattended.sh --preflight") { print NR; exit }' "$tmpl")
+  kol=$(awk '{ sub(/$/,"") } index($0, "/session-kickoff") { print NR; exit }' "$tmpl")
+  if [ -z "$pfl" ]; then
+    fail 18 "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated: $tmpl"
+  elif [ -z "$kol" ]; then
+    fail 18 "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check: $tmpl"
+  elif [ "$kol" -lt "$pfl" ]; then
+    fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
   fi
 fi
 

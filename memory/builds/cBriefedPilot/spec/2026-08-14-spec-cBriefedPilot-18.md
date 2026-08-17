@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook
+**Status:** CLOSED · rev-5 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling+playbook · ratified 2026-08-15
 
 ## 1. Goal
 
@@ -39,6 +39,9 @@ already exists.
   the carriers leg keys on that basename. The live twin is excluded by the leg's `memory/*` rule.
 - **S11** — both halves of the pair move in ONE commit. Leg check 10 byte-compares them and would
   otherwise red on the first of two.
+- **S12b** — §1's preamble reads `Three properties, all mechanical:` over FOUR bullets, in BOTH
+  halves. It is the same class as the `:909` five-against-seven comment S9 already fixes, in the very
+  section S12 rewrites. It becomes `Four properties, all mechanical`.
 - **S12** — §1's roster bullet stops reading opt-in by presence. For an unattended build the roster
   marker pair is REQUIRED, per the owner's P3, and the enforcement it names is `build-complete`'s
   term 1 rather than a second rule. The immutability half of that bullet is unchanged: the slice
@@ -193,6 +196,9 @@ adopter reads about it.
   enumerates the default directive set and its named waiver.
 - **AC8** — `tools/unattended/unattended.sh:909` reads seven, and no other count in the driver
   disagrees with the protocol's §2.
+- **AC9b** — §1's stated property count equals the number of bullets that follow it, observed in
+  BOTH halves. A count asserted against prose is the defect this build keeps finding, so the check is
+  the comparison and not the literal word.
 - **AC9** — §1's roster bullet in both halves no longer reads `Opt-in by presence`, grepped and
   found zero, and names `build-complete` as what enforces the requirement.
 - **AC10** — §7's `--plan` bullet no longer says the verb cannot see a planned unit with no spec,
@@ -207,6 +213,30 @@ adopter reads about it.
 the full bar at the push boundary.
 
 ## 8. Open questions
+
+none — the fork this spec carried was RESOLVED (owner, 2026-08-15) and §6's Landing takes no
+  edit. What is recorded here instead is a PARTIAL BUILD, because two scope items describe behaviour
+  that does not exist.
+
+  **S4 and S12 are NOT BUILT.** S4 adds §4 rows for `build-complete` and `closing-review-recorded`
+  and moves the count six to eight; S12 makes the roster REQUIRED and names `build-complete`'s
+  term 1 as the enforcement. Units 7 and 8 are PARKED, so neither item is in `DOD_CORE` and no
+  term 1 exists. Writing them would put the binding contract in the position this whole build
+  keeps finding others in: a record describing a rule nobody shipped. The count would say eight
+  over six rows, which is the same defect S12b fixes two sections up.
+
+  The other eleven items ARE built, because each documents something that shipped: §10 the
+  directive layer (units 2, 3, 9, 10), §2's fourth parked kind and its spill rule (unit 3), §1's
+  run-time dependency (unit 4), §7's `--waive` and `--plan` bullets (units 3, 6), §8's two
+  declarations (unit 2).
+
+
+none — the fork below is RESOLVED (agent, 2026-08-15, delegated): option (a) — protocol §6 Landing takes no edit.
+
+  Option (b) was VETOED under M3 rule 2: it writes a rule into a governance carrier that already
+  states it one document over, which is the two-answers-to-one-question defect this build exists to
+  avoid. The design pass already rejected D11's second half on the same ground, and the close-time
+  consequence is already printed by name at the point of use.
 
 **What is the §6 sentence the design pass called DELTA 3?** The folded design's §0 re-affirms
 "DELTA 3 (protocol §6's one sentence)" and never states the sentence; the converged design it
@@ -242,6 +272,15 @@ owner declined, and it is recorded because unit 22's join depends on it.
   undeclared `DIRECTIVES_FLOOR` and the deployer's `required_keys_gate` would never have gained it.
   AC7 replaced: `template size` is green on an empty commit, so it observed nothing about this change.
 
+- rev-3 · 2026-08-15 · §8 resolved under the standing mandate for `cBriefedPilot`; the pick and the reasoning are in §8. Header gains the ratified pointer.
+
+- rev-4 · 2026-08-15 · §8's audit fold. S12b and AC9b: §1 reads `Three properties` over FOUR bullets in both halves, in
+  the very section S12 rewrites — the same class as the five-against-seven comment S9 fixes.
+
+- rev-5 · 2026-08-15 · built PARTIALLY and the omission is in §8. S4 and S12 describe the two
+  Definition-of-Done items units 7 and 8 park, so they would document behaviour that does not
+  exist — including a count of eight over six rows. Eleven items built; both halves moved in one
+  commit, as S11 requires.
 ## 10. Reuse audit
 
 - **The protocol pair itself, `tools/unattended/PROTOCOL.template.md` and

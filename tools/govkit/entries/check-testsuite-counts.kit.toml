@@ -1,0 +1,32 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# TOOL-cSettledDocket-5. No version constant, DECLARED as none rather than omitted — selfcheck
+# refuses silence as a third option, and it is right to: an absent constant and an undeclared one
+# look identical to every reader afterwards.
+
+id = "check-testsuite-counts"
+scope = "repo"
+kind = "flat"
+home = "tools"
+version_from = { none = "the leg carries no behaviour an adopter pins against: it reads the adopter's OWN gate manifest and the adopter's own waiver registry, so every value it grades belongs to them. A constant here would be one nothing asserts, which is what selfcheck reports as a mismatch." }
+requires = []
+
+[[files]]
+include = ["check-testsuite-counts.sh", "check-testsuite-counts.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/check-testsuite-counts.sh", "tools/check-testsuite-counts.test.sh"]
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "it needs no install step: the population is DERIVED from the adopter's own gate manifest, and the waiver registry is seeded by running the leg once and pasting what it names. An adopter script would have to guess the memory root's registry path, which the memory-tree kit already owns."
+
+[[gate_leg]]
+name = "testsuite counts (every bar self-test prints one)"
+argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
+guard = ["{prefix}/check-testsuite-counts.sh", "tools/gate-legs.json"]
+
+[[gate_leg]]
+name = "testsuite counts self-test"
+argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
+guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]

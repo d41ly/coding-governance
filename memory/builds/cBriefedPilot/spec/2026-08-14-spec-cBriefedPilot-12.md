@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -169,13 +169,15 @@ spells a check COUNT the bar does not read — which is exactly why it rots, so 
 
 ## 8. Open questions
 
-**Does arm A read the template or the render? — RESOLVED at authoring: the template.**
+### Does arm A read the template or the render? — RESOLVED at authoring: the template
+
 `adopt-unattended.sh --check` already diffs the render against a fresh render of the template, and it
 is a leg on this bar. Reading both here would be a second answer to a question one leg already owns,
 and the fixture would need a rendered Skill it has no adopter to produce. This is a decision by the
 spec's author, not a fork the owner declined.
 
-**Does arm C's floor pin the CORE count or the EFFECTIVE count? — RESOLVED at authoring: CORE.**
+### Does arm C's floor pin the CORE count or the EFFECTIVE count? — RESOLVED at authoring: CORE
+
 `DIRECTIVES_FLOOR` mirrors `CORE_FLOOR`, which counts `PHASES_CORE` and `DOD_CORE` and not the
 composed sets — because the effective set is composed as core plus the project's extras, so core is a
 subset by construction and a floor over the effective set could be held up by extras while a core

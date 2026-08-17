@@ -306,6 +306,13 @@ const synth = await agent(
       : '  (none)') +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with file:line + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
+    // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
+    // reaches the record without a human remembering to type it. HONEST LIMIT: `base` defaults to
+    // the REF 'origin/main', and a caller who lets it stand writes a line carrying no sha, which
+    // satisfies nothing. The harness cannot tell whether a mandate is in force — it has no
+    // filesystem and no repo access — so M8 spelling the invocation with the pinned sha is what
+    // makes this work, and the failure surfaces as an unmet DoD item naming the run's own record.
+    `Open the report with a line naming the reviewed range as ${base}...${head}. ` +
     `Return JSON {path, blockers, highs, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
