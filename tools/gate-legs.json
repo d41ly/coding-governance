@@ -596,21 +596,21 @@
     ]
   },
   {
-    "name": "memory hygiene",
+    "name": "memory hygiene (20 checks)",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
     ]
   },
   {
-    "name": "marker contract",
+    "name": "marker contract (4 readers)",
     "argv": [
       "bash",
       "tools/memory-tree/marker-contract.test.sh"
     ]
   },
   {
-    "name": "verifier fan-out",
+    "name": "verifier fan-out (≤5 verify agents per review)",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
@@ -634,6 +634,20 @@
     ],
     "guard": [
       "tools/govkit/"
+    ]
+  },
+  {
+    "name": "testsuite counts (every bar self-test prints one)",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.sh"
+    ]
+  },
+  {
+    "name": "testsuite counts self-test",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.test.sh"
     ]
   }
 ]

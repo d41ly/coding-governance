@@ -23,7 +23,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 
-- The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed build folder as the authorization and its provenance properties, the run-state file's generated and authored halves, the phase vocabulary and its witnesses, the Definition of Done and its override, the keepalive split by actor, and the landing rule. It is NOT paraphrased here — a paraphrase and its source are two answers to one question, and the paraphrase is the copy that rots.
+- The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed build folder as the authorization and its provenance properties, the run-state file's generated and authored halves, the phase vocabulary and its witnesses, the Definition of Done and its override, the keepalive split by actor, the default directive set and its named waiver, and the landing rule. It is NOT paraphrased here — a paraphrase and its source are two answers to one question, and the paraphrase is the copy that rots.
 
 ## §4 — Runtime isolation & the verification harness
 

@@ -96,14 +96,53 @@ else
   done
 fi
 
-need "KIT_UNATTENDED_VERSION"     tools/unattended/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"
-# The unattended kit carries its version in TWO hand-kept literals — the driver and the leg — and the
-# leg's own comment claimed this gate paired them while nothing did. Same shape as memory-tree below.
-u=$(grep -oE "^KIT_UNATTENDED_VERSION=$V" tools/unattended/unattended.sh | head -1 | cut -d= -f2)
-if [ -z "$u" ] || ! grep -qE "^KIT_UNATTENDED_VERSION=$u([^0-9.]|\$)" tools/unattended/check-unattended.sh; then
-  echo "kit-versions: check-unattended.sh KIT_UNATTENDED_VERSION != unattended.sh (${u:-unreadable})"
+# unattended's version lives in TWO engine constants and in a marker on every doc the kit SHIPS.
+# check-kit-versions paired the two CONSTANTS and not the shipped docs, which is how
+# PROTOCOL.template.md sat at @1.2 against 1.3 unnoticed — the exact hole memory-tree's block above
+# was widened to close, one kit over. Filed as TOOL-cFinalBerth-3; this is that row.
+#
+# ENUMERATED, NOT NAMED, for the reason the block above records: naming one file is why the hole
+# reopens at every bump. The population is DERIVED, so the next shipped template is covered already.
+#
+# The two INLINE markers that share a line with each constant are paired too. Same line is NOT same
+# value: agent-cap's same-line pair is the recorded case where a half-bumped constant and marker
+# passed because nothing compared them to each other.
+uc=$(grep -oE "^KIT_UNATTENDED_VERSION=$V" tools/unattended/unattended.sh | head -1 | cut -d= -f2)
+if [ -z "$uc" ]; then
+  echo "kit-versions: KIT_UNATTENDED_VERSION is unreadable in unattended.sh, so no marker can be compared against it"
   fails=$((fails+1))
+else
+  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh; do
+    if ! grep -qE "^KIT_UNATTENDED_VERSION=$uc([^0-9.]|\$)" "$s"; then
+      echo "kit-versions: $s KIT_UNATTENDED_VERSION != $uc — the driver and its leg disagree about which kit this is"
+      fails=$((fails+1))
+    fi
+    if ! grep -qE "gov:kit unattended@$uc([^0-9.]|\$)" "$s"; then
+      echo "kit-versions: $s carries a same-line gov:kit unattended@ marker that disagrees with $uc — same line is not same value"
+      fails=$((fails+1))
+    fi
+  done
+  un_templates=$(git ls-files 'tools/unattended/*.template.md' 2>/dev/null)
+  if [ -z "$un_templates" ]; then
+    echo "kit-versions: no tracked tools/unattended/*.template.md — the marker assertion would be vacuous"
+    fails=$((fails+1))
+  fi
+  for t in $un_templates; do
+    if ! grep -qE "gov:kit unattended@$V" "$t"; then
+      echo "kit-versions: $t ships with NO gov:kit unattended@ marker — an adopter renders it and cannot tell which kit version they hold"
+      fails=$((fails+1))
+    elif ! grep -qE "gov:kit unattended@$uc([^0-9.]|\$)" "$t"; then
+      echo "kit-versions: $t marker != KIT_UNATTENDED_VERSION ($uc)"
+      fails=$((fails+1))
+    fi
+  done
 fi
+
+need "KIT_UNATTENDED_VERSION"     tools/unattended/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"
+# The driver/leg constant pairing that used to sit here is SUBSUMED by the unattended block below,
+# which derives the same $uc from the same file and asserts the same regex against the same second
+# file — one defect, two messages, two increments, and two copies to keep in step. Deleted rather
+# than kept as a second opinion, because a re-implementation of an assertion is not one.
 need "KIT_MEMORY_RECALL_VERSION"  tools/memory-recall/recall_conf.py         "^KIT_MEMORY_RECALL_VERSION = \"$V\""
 
 # memory-recall: constant in recall_conf.py, marker in the README the adopter keeps. Same pair

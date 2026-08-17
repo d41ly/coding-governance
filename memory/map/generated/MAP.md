@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 67 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -40,8 +40,8 @@ Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
-| `marker contract` | row-grammar |
-| `memory hygiene` | baseline |
+| `marker contract (4 readers)` | UNCLAIMED |
+| `memory hygiene (20 checks)` | UNCLAIMED |
 | `memory-hygiene self-test` | baseline |
 | `memory-recall kit selftest` | baseline |
 | `memory-recall skill wiring` | baseline |
@@ -65,6 +65,8 @@ Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `settings-merge selftest` | baseline |
 | `template size <=48KiB` | baseline |
 | `template size gate selftest` | playbook |
+| `testsuite counts (every bar self-test prints one)` | testsuite-counts |
+| `testsuite counts self-test` | testsuite-counts |
 | `unattended adopter e2e` | unattended |
 | `unattended driver selftest` | unattended |
 | `unattended gate selftest` | unattended |
@@ -72,7 +74,7 @@ Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out` | agent-cap |
+| `verifier fan-out (≤5 verify agents per review)` | UNCLAIMED |
 | `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 
