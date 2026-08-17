@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it
 
-**Status:** SPECCED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 
@@ -134,6 +134,11 @@ is measured against the adopting tree.
   ship. The adopter's first run is now stated as RED, with the mechanical `none` pass as their
   migration, S1 reordered to match, and AC2b covering the non-empty tree AC2 structurally could not
   reach.
+
+- rev-3 · 2026-08-17 · BUILT. AC2b verified end to end against a scratch adopter tree: an untouched
+  tree holding two records reds naming branch 1, the mechanical `none` pass with the pin measured at
+  2 goes green, and lowering the pin to 1 fires branch 3. That is the migration this unit documents,
+  observed rather than asserted.
 
 ## 10. Reuse audit
 

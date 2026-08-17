@@ -92,6 +92,13 @@ absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at
 output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
 `gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
 - `memory/` hygiene (21 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19, 20 and 21's PARSE delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py` — 21 keeps its own fail branches in the shell, where the harness meta-gate can count them
+- record→spec bindings (check 21) — every file under `memory/builds/*/{build,prompts,reviews}/` names
+  in its own head the spec ids it is evidence about, so a review, a build ledger or a research report
+  converges on its spec without a reader opening it. Four branches: presence · the id resolves to a
+  SPEC (narrower than check 14, which counts a decision-row anchor as a definition) · the deliberate
+  `none` escape stays under `RECORD_UNBOUND_PIN` · the FILENAME projects the header, which is what
+  makes the two carriers unable to drift. The parse delegates to `gen_build_index.py` and raises
+  nothing; the fail branches stay in the shell, where `check-arms.py` can count them
 - recurring-bug-class checklist — `python tools/memory-tree/gotchas.py --for-diff <base>..<head>` prints the classes a diff can hit; run it before a review, not after
 - harness meta-gate — `tools/memory-tree/check-arms.py` (every `fail` branch armed by a positive assertion naming its own failure text, or pinned shrink-only; keyed on the call site, pinned in both directions, excluded from its own scan)
 - kickoff-manifest ratchet — `skills/session-kickoff/manifest-check.sh` (+ self-test)
