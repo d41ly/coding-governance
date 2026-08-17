@@ -187,6 +187,18 @@ reset_tree; mkconf "false"
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "the declared wiring check failed, and a dormant hook makes every later green meaningless"
 
+# ---- check 4, the SURFACING half. `false` prints nothing, so the arm above passes identically
+# ---- whether the driver forwards the declared check's output or discards it with `>/dev/null 2>&1`
+# ---- — it cannot tell the two apart. This one declares a check whose failure carries a distinctive
+# ---- literal and asserts that literal reaches the operator, which is the whole of what S4 changed.
+# ---- The remedy the driver may not spell itself is the one the declared check already prints.
+reset_tree
+printf '#!/usr/bin/env bash\necho "WIRINGPROBE-the-declared-checks-own-remedy"\nexit 1\n' > probe-wiring.sh
+mkconf "bash probe-wiring.sh"
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "the declared wiring check failed, and a dormant hook makes every later green meaningless"
+hit "$out" "WIRINGPROBE-the-declared-checks-own-remedy"
+
 # ---- check 5: a second non-terminal run-state file. Both are TRACKED, because the selector reads
 # ---- git, not the filesystem — an untracked second run would leave this arm passing over one file.
 reset_tree
