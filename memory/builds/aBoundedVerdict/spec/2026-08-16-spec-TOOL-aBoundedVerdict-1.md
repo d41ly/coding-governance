@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -54,15 +54,16 @@ its own rule that a rev-moved spec is unreviewed means folding one round's fixes
 
 ## 3. Non-goals (OUT)
 
-- **No cap on attended runs.** The owner decided this, shown the measurement that twelve of
-  thirty-eight build folders hold no review record at all on a green gate. Nothing here adds a
-  required field to a review record, a date-cutoff ratchet, or a waiver pass over the existing
-  fifty-three.
+- **No cap on attended runs.** The owner decided this, shown the measurement that thirteen of
+  forty-three build folders hold no review record at all on a green gate, re-measured at the merge
+  base. Nothing here adds a required field to a review record, a date-cutoff ratchet, or a waiver
+  pass over the existing sixty-seven.
 - No join from a review record on disk to the unit it reviewed. The filename carries a per-build
   counter, the driver already refuses that join in its own source having measured it wrong on seven
   of seven multi-unit builds, and this unit does not retry it.
-- No parse of a review record's verdict heading. The corpus's headings include four spellings
-  outside the method's three and thirty-one records carry none at all.
+- No parse of a review record's verdict heading. The corpus's headings include five spellings
+  outside the method's three — a fifth landed while this spec was open — and thirty-one records carry
+  none at all.
 - No change to the review harness's fan-out or concurrency caps. Those are a different bound over a
   different thing and are already enforced at the tool call.
 - No claim that the count is unforgeable. The run calls the verb, so the run controls the count. §4
@@ -83,8 +84,8 @@ One appended line per round, in the PARKED region, under a new `review` kind:
 The count is derived, not stored: the number of `review` lines naming the subject. Rev-1 made these
 two AUTHORED FACTS, one key per subject, which was wrong twice over. The binding protocol pins the
 authored region at a closed set of facts and enumerates them, and rev-1 would have made these the
-ninth and tenth without naming or moving the pin — while a tracked sibling spec had already declined
-an eighth fact by name for this exact reason and added a park kind instead. And a round count is
+tenth and eleventh without naming or moving the pin — while a tracked sibling spec had already
+declined what is now a ninth fact by name for this exact reason and added a park kind instead. And a round count is
 append-only HISTORY, which is what the parked region is; a fact is a mutable singleton, which a round
 count is not.
 
@@ -107,10 +108,21 @@ The loop's engine is not a missing count. The method says a spec whose rev moved
 review is unreviewed; the only stated exit is a synthesis pass calling the design clean; and no
 disposition exists for a blocked verdict. So a clean-with-fixes round is folded, the fold bumps the
 rev, the rev makes the spec unreviewed, and the loop re-arms — while a blocked round has no exit at
-all. Measured on the newest build in the tree: five consecutive spec-audit rounds over one seven-unit
-set in one day, verdicts clean-with-fixes, blocked, blocked, blocked, clean-with-fixes, and a sixth
-closing round that was also blocked. A cap alone would have stopped that at two and left the run with
-no rule for what to do next. S7 is that rule and S8 is where it disposes.
+all.
+
+**The worst case in the corpus landed WHILE THIS SPEC WAS OPEN, and it is the owner's report almost
+verbatim.** `memory/builds/dClosedLexicon/` holds EIGHT review records in one day. Rounds two through
+seven are all BLOCKED — six consecutive — with blocker counts of 1, 1, 2, 1, 2 that do not converge;
+round eight returns "PASS WITH FINDINGS", a spelling outside the method's three. The run then reached
+the ABORTED terminal with a witness and no reason anything can read. Eight rounds, no exit rule, an
+ambiguous halt: the three faults this build exists to fix, in one record, produced by a run following
+the method faithfully. It is not a hypothetical and it is not old.
+
+The previously-cited case is the second-worst and is still instructive: `memory/builds/aSiftedPlaybook/`
+took five consecutive spec-audit rounds over one seven-unit set in one day — clean-with-fixes,
+blocked, blocked, blocked, clean-with-fixes — plus a sixth closing round that was also blocked. That
+one LANDED; the eight-round case did not. A cap alone would have stopped either at two and left the
+run with no rule for what to do next. S7 is that rule and S8 is where it disposes.
 
 ### Inventory
 
@@ -175,10 +187,12 @@ So the displacement obligation is EDITORIAL, not mechanical: it is M1's growth r
 by nothing, and it exists because the file is re-read whole at every pass boundary. This spec honours
 it and says plainly that no gate will catch a failure to.
 
-The budget that IS mechanical is the charter read-path ceiling, measured at 70262 bytes against a
-ceiling of 86476 — **16214 bytes of headroom**. It is shared by FOUR units, not two: this unit and
+The budget that IS mechanical is the charter read-path ceiling, measured AT THE MERGE BASE at 72122
+bytes against a ceiling of 86476 — **14354 bytes of headroom**, and 1860 less than this spec first
+stated because the protocol grew under it. `LIVE.md` is generated, so the total drifts a few hundred
+bytes between renders and the figure is a snapshot, never an allowance. It is shared by FOUR units, not two: this unit and
 `TOOL-aBoundedVerdict-3` grow the method, and `TOOL-aBoundedVerdict-2`, `TOOL-aBoundedVerdict-3` and
-`TOOL-aBoundedVerdict-5` grow the unattended protocol, which is a read-path member at 18214 bytes.
+`TOOL-aBoundedVerdict-5` grow the unattended protocol, which is a read-path member at 19317 bytes.
 The spender set is stated ONCE, in the README's cross-unit rules, rather than in each spec. This
 unit's share is the method prose S7 adds, and the builder re-measures with the corpus reporter before
 spending rather than treating either figure as authority.
@@ -292,6 +306,13 @@ spending rather than treating either figure as authority.
 - rev-4 · 2026-08-17 · §8 F1 RESOLVED by the owner: the cap binds the closing diff review too, at two
   uniformly, with the build slug as the subject and a second blocker in the fix disposed of as a park.
   A fix-re-review chain was refused as the unbounded case wearing a bound's clothing.
+- rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. The default branch moved 94 commits
+  while this build was open. Five claims went stale and are re-measured: the corpus is 43 build
+  folders and 67 review records with 13 holding none; a fifth verdict spelling landed; the read path
+  is 72122 B leaving 14354 of headroom, not 16214, because the protocol grew under it; and the fact
+  ordinals move by one because the protocol pinned an eighth. **The evidence anchor is UPGRADED:** a
+  build with EIGHT review rounds, six consecutively blocked, ending ABORTED with no readable reason,
+  landed mid-build — the owner's three faults in one record, produced by a run following the method.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "bound how many times a review may run for one unit"`

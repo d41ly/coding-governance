@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -136,8 +136,9 @@ and it is real for that reason and not because a gate would catch it. S2, S4, S5
 rules and will not fit in the 14 lines M1's own budget leaves, so the displacement is identified and
 made in the same commit.
 
-The MECHANICAL budget is the charter read-path ceiling: 70262 bytes measured against 86476, so
-**16214 bytes of headroom**. This unit spends from it twice, growing both the method and the
+The MECHANICAL budget is the charter read-path ceiling: 72122 bytes measured AT THE MERGE BASE
+against 86476, so **14354 bytes of headroom** — 1860 less than this spec first stated, because the
+protocol grew under it while the spec was open. This unit spends from it twice, growing both the method and the
 unattended protocol, and it is not the only spender — the full set is stated ONCE in the build
 README's cross-unit rules rather than in each spec, because two specs each naming the total and each
 other is how a shared budget gets spent twice. The builder re-measures with the corpus reporter
@@ -267,6 +268,9 @@ before spending.
   base is scope-approved by the same act that authorized the run is RATIFIED as a named cost, and S8
   is added to carry it into the protocol's existing cost list as a fifth entry. Narrowing was refused
   because it reinstates the deadlock §4 rejects.
+- rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. One claim moved: the read-path headroom
+  is 14354 B, not 16214, because the unattended protocol grew 1103 B under this spec. No rule in this
+  unit was affected.
 ## 10. Reuse audit
 
 `python tools/memory-recall/query.py` over the fork and owner-turn question returns the decision that

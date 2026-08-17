@@ -30,7 +30,8 @@ Each row was reproduced against this tree, not inferred.
 
 | Finding | Measurement |
 |---|---|
-| The review loop is real and recent | `memory/builds/aSiftedPlaybook/reviews/` holds five consecutive spec-audit rounds over one 7-unit set plus a sixth closing round, all on one day. Verdicts: CLEAN WITH FIXES, BLOCKED, BLOCKED, BLOCKED, CLEAN WITH FIXES, BLOCKED. Final spec revs reached rev-12 |
+| **The review loop is real, and it happened AGAIN during this build** | `memory/builds/dClosedLexicon/` holds EIGHT review records in one day. Rounds 2–7 are all BLOCKED — six consecutive, blocker counts 1, 1, 2, 1, 2, not converging — round 8 returns "PASS WITH FINDINGS", and the run then reached ABORTED with a witness and no readable reason. All three reported faults in one record, from a run following the method faithfully. It landed on `main` while these specs were open |
+| The second-worst case, and the one the specs were first written against | `memory/builds/aSiftedPlaybook/reviews/` holds five consecutive spec-audit rounds over one 7-unit set plus a sixth closing round, all on one day. Verdicts: CLEAN WITH FIXES, BLOCKED, BLOCKED, BLOCKED, CLEAN WITH FIXES, BLOCKED. Final spec revs reached rev-12. That one landed; the eight-round case did not |
 | Nothing counts reviews | A repo-wide grep for any numeric review bound returns nothing. The review filename carries the build slug and a per-build record counter, so the unit is not recoverable from the name — the driver refuses that join in its own source, having measured it wrong on 7 of 7 multi-unit builds |
 | The loop's engine is a rule, not a missing number | The build method has NO stated disposition for a BLOCKED verdict, and its own rule that a rev-moved spec is unreviewed means folding a CLEAN-WITH-FIXES round re-arms the loop |
 | Testing forks would serve 7% of them | Of 46 resolved forks read in full across 10 specs, 3 were decidable by a mechanical test alone. About 67% are not testable at all. In one, resolving on the measurement would have picked the answer this repo names as its own vacuous-selector class |
@@ -73,11 +74,11 @@ it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-3 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-5 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -151,6 +152,29 @@ concurrently — and their write sets intersect in the protocol document, so the
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.
+
+## The reground, 2026-08-17
+
+The default branch moved **94 commits** while this build was open, and the spec set was regrounded
+onto it at `febba16` before landing. Seventeen claims had gone stale; one was a blocker. What the
+reground changed, recorded because a set that silently re-based is a set nobody can audit:
+
+- **The blocker.** `TOOL-aBoundedVerdict-2`'s migration said the population of codeless ABORTED
+  run-state records was zero. At the new base it is ONE — `memory/builds/dClosedLexicon/RUN.md` — so
+  that unit's own leg check would have redded the merge bar on the day it landed. It is now a stated
+  one-record retrofit.
+- **The pin moved under the spec.** The authored region went from seven facts to eight while this
+  build was open, so the halt code is the NINTH, not the eighth. That is the third move, and the
+  third to leave stale readers behind — which is the argument `TOOL-aBoundedVerdict-2` S7 was already
+  making, now demonstrated rather than asserted.
+- **A completeness grep that would have failed exactly as designed.** The two-value alternation
+  would have returned nothing while two carriers still said `eight`. It is now number-agnostic.
+- **Two arguments that had come to argue the opposite.** "The most recent closed build" no longer
+  supports the continuation-line convention, and the kickoff size leg no longer takes the positional
+  the spec cited.
+
+Every measured figure in this build is now a snapshot with the command beside it, not an allowance.
+That rule was written into these specs before the reground and the reground is what proved it.
 
 ## Out of scope for this build
 

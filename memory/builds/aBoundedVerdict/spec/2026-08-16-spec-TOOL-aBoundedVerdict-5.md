@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -38,7 +38,8 @@ generated and whose grammar the driver owns. Give parking a verb.
   bound the shape:
   - It extends the existing key's value rather than adding a field. The current predicate matches the
     key with a yes-or-true value and tolerates trailing text, so a richer value costs no new authored
-    fact and does not touch the region's seven-fact pin.
+    fact and does not touch the authored region's fact-count pin. The numeral is deliberately not
+    spelled here: that pin has moved three times, once while this build was open.
   - **The refusal lives in the close verb ONLY.** The evaluator is shared: the abort verb calls it for
     the same item, and the abort verb writes its own parked line. A refusal in the shared helper would
     block the exit that exists for a run which cannot proceed, which is the hazard the driver's own
@@ -244,6 +245,11 @@ no file of its own.
 - rev-4 · 2026-08-17 · §8 F2 RESOLVED by the owner: the Definition-of-Done refusal stays in this
   unit rather than becoming a sixth. The refusal is only reachable once the verb exists to create the
   state it refuses, so the two are one change in sequence. The set stays at five units.
+- rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. One claim moved, and the fix is to stop
+  spelling the number at all: the authored region's fact-count pin went from seven to eight under
+  this spec, so the sub-bullet now names the pin without a numeral. Every other claim — the park
+  helper and its two callers, the attestation predicate's tolerance of a richer value, the close
+  verb's override ordering, the phase-writer arm's count of five — re-verified unchanged.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "record a decision the run refused to make"` names the

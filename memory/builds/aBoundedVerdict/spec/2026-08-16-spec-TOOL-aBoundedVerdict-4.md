@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -65,8 +65,11 @@ actually enforceable.
   rather than landing beside it. Rev-2 offered both and they are not interchangeable: a new sibling
   is either a row in `tools/gate-legs.json` — which pulls in the run-gates canary and the
   codebase-map leg inventory, whose baseline is closed to new keys, so the key reds until a dossier
-  claims it — or it is a test nothing runs. Extending needs neither. The cost of extending is that
-  the leg's display name and header must move to cover two contracts, and S2 says so.
+  claims it — or it is a test nothing runs. Extending needs neither. **Its cost grew at the merge
+  base and is now four-part**: the leg was renamed, and its display name is spelled in
+  `tools/gate-legs.json` AND `tools/memory-tree/kit.toml`, which must move in lockstep; the claiming
+  dossier `memory/map/features/row-grammar.md` moves with them; and the codebase-map generated
+  artifacts are re-rendered. S2 carries all four.
 - No enforcement that a delegated resolution is signed as delegated rather than as the owner. The
   attribution SHAPE is checked; whether the named resolver really decided is not checkable here.
 - No repair of the planning verb's other known blindness beyond what S3 incidentally closes. The
@@ -79,9 +82,12 @@ actually enforceable.
 **An ITEM** is a line opening with a bullet marker or a `###` sub-head, TOGETHER WITH every following
 line until the next item or the end of the section. The block reading is not a preference: the spec
 template explicitly sanctions a multi-line fork, and the corpus's dominant convention puts the mark
-on an indented continuation line — the most recent closed build has both its §8 marks on the second
-line of their bullets. Both existing readers grade one line and have no notion of an item spanning
-lines, so block extraction is new work in both, and S1 and S2 each carry it.
+on an indented continuation line: at the merge base the per-item split is 55 continuation against 33
+opening line. The appeal to "the most recent closed build" that rev-2 made is DELETED — the newest
+closed build now writes to the opening-line convention, so that sentence had come to argue the
+opposite of its own point, which is what an argument anchored on a moving superlative does. Both
+existing readers grade one line and have no notion of an item spanning lines, so block extraction is
+new work in both, and S1 and S2 each carry it.
 
 **An item is RESOLVED** when its block carries the resolution word immediately followed by a
 parenthesised attribution whose first field is `owner` or `agent`, whose second is a date, and whose
@@ -136,8 +142,11 @@ which is the same disposition the streams ratchet took for the same reason and r
   already mandatory in the authoring contract and checking a rule nobody enforces is how that rule
   rotted.
 - **Grade the item's opening line only.** Cheaper in both readers and needs no block extraction.
-  Rejected on the corpus, which measures 33 of 41 item-bearing terminal specs failing the
-  opening-line reading against 13 for the block reading. **That is evidence about the AUTHORING
+  Rejected on the corpus, which at the merge base measures roughly 36 of 46 item-bearing terminal
+  specs failing the opening-line reading against far fewer for the block reading. The figures moved
+  once already — the tracked spec population grew from 118 to 136 files while this spec was open — so
+  S5's run at build time is the authority and these are an order-of-magnitude sketch, not a number to
+  build against. **That is evidence about the AUTHORING
   CONVENTION, not a prediction about this unit** — S6's cutoff grandfathers every one of those specs,
   so neither reading reds anything landed, and rev-2's "newly red" phrasing described an outcome this
   unit cannot produce. The convention is what matters: it is what future specs will follow, so
@@ -268,6 +277,13 @@ conf are both on its watch list).
 - rev-4 · 2026-08-17 · §8 F1 RESOLVED by the owner: a §8 with no items and no none form REFUSES.
   Each gate therefore gains one new `fail` branch, which is the only thing in this unit that can move
   an arms floor, so AC9's floors are re-measured rather than assumed unchanged.
+- rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. Four claims moved. The appeal to "the
+  most recent closed build" now argues the OPPOSITE — the newest closed build writes to the
+  opening-line convention — so it is replaced by the per-item corpus split, which is the evidence
+  that actually carries the point. The corpus measurement moved with 18 new tracked specs and is
+  demoted to a sketch, with S5's build-time run as the authority. The marker-contract leg was RENAMED
+  and its name is now spelled in four places, so the extension's cost is four-part rather than one.
+  One of its four readers has had no caller since the unattended kit's 1.5.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "decide whether a spec's open questions are resolved"`
@@ -282,7 +298,8 @@ the predicate, which is the evidence that actually establishes it and which the 
 re-run rather than re-running the probe.
 
 The seam this unit extends is `tools/memory-tree/marker-contract.test.sh`'s case-table shape — an
-existing, gated arm that already drives four live readers of one marker grammar over a single table,
+existing, gated arm that already drives four readers of one marker grammar over a single table —
+three live, plus one retained deliberately with no caller since the unattended kit's 1.5 —
 which is exactly the problem this unit has with two readers of another. No new seam is created.
 
 Recall terms used, recorded for the reground: fork resolution marker attribution delegated owner

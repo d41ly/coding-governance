@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling
 
 ## 1. Goal
 
@@ -24,12 +24,14 @@ stopped without reading prose.
   against the effective vocabulary. An unlisted code is refused naming the legal set.
 - **S3** — the code is recorded as an AUTHORED FACT through the existing fact writer, not buried in
   the reason prose, so a reader is a field read rather than a parse. It is therefore the region's
-  EIGHTH fact, and S7 moves the pin that says seven rather than leaving the spec silently in breach
+  NINTH fact, and S7 moves the pin that says eight rather than leaving the spec silently in breach
   of it. The justification is the protocol's own membership test — nothing in the tree derives the
   code, and only the run knows it — and the shape: a halt code is a per-run SINGLETON that three
-  readers read by key, which is what a fact is for. A tracked sibling spec declined an eighth fact
-  and added a park KIND instead, and that remains the right answer for append-only history; it is
-  the wrong answer for a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
+  readers read by key, which is what a fact is for. **The in-tree precedent is now exact**: the
+  eighth fact, the roster frozen at landing, is a singleton written by a TERMINAL verb, which is the
+  same shape this code has. A tracked sibling spec declined what is now a ninth fact and added a park
+  KIND instead, and that remains the right answer for append-only history; it is the wrong answer for
+  a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
   takes the park-kind route for exactly that reason, so this build uses both shapes deliberately and
   moves the pin exactly once.
 - **S4** — two new `.unattended.conf` keys, spelled here rather than described, in the shape the
@@ -53,16 +55,20 @@ stopped without reading prose.
   and rev-2 pre-applied that recommendation to the files list while leaving the scope item pointing
   at the method. If F3 is resolved the other way, `memory/guides/BUILD-METHOD.md` and its kit
   template join Files touched, and the manifest re-stamp and read-path clauses apply with them.
-- **S7** — the SEVEN-FACT PIN moves to eight, in every place it is spelled, because it has moved
-  twice before and left a stale reader each time. All four: the "exactly seven facts and nothing
-  else" sentence in `tools/unattended/PROTOCOL.template.md` and the installed
-  `memory/guides/UNATTENDED-PROTOCOL.md`; the closed enumeration beneath it, which gains the code as
-  its eighth entry; the driver comment in `unattended.sh`'s resume path, which today still says the
-  region carries FIVE and was already stale before this unit; and **BOTH** count statements in
-  `memory/map/features/unattended.md` — the dossier spells it twice, once as a bare numeral before
-  "of them" and once as a numeral before "facts", and rev-2 said "the count", singular. Nothing
-  counts the facts, so no leg catches a missed one — which is why the list is enumerated here rather
-  than left to the builder.
+- **S7** — the EIGHT-FACT PIN moves to nine, in every place it is spelled, because it has now moved
+  THREE times and left a stale reader every time — the third move landed while this spec was open,
+  which is the argument for enumerating the sites rather than trusting a builder to find them. The
+  three carriers now disagree three ways, and each needs its own edit:
+  - the "exactly eight facts and nothing else" sentence in `tools/unattended/PROTOCOL.template.md`
+    and the installed `memory/guides/UNATTENDED-PROTOCOL.md` — currently correct at eight, moving to
+    nine — plus the closed enumeration beneath it, which gains the code as its NINTH entry;
+  - the driver comment in `unattended.sh`'s resume path, which says the region carries FIVE and has
+    been stale across two moves;
+  - **BOTH** count statements in `memory/map/features/unattended.md`, which say SEVEN — one as a bare
+    numeral before "of them", one before "facts".
+
+  Nothing counts the facts, so no leg catches a missed one. Read the current value from the protocol
+  at build time rather than from this bullet: it was seven when this spec was drafted.
 - **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
   rendered Skill, and the kit version constants.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
@@ -81,8 +87,10 @@ stopped without reading prose.
   silently.
 - No code on the landed terminal. A landing needs no reason.
 - No code on a park. Parking is unit 5's mechanism and a park is not a halt.
-- No retrofit of existing terminal records. The leg check applies to records the new verb wrote; the
-  enumeration and the disposition for older ones are in §4.
+- No retrofit of existing terminal records BEYOND the one §4 enumerates. Exactly one tracked record
+  claims the aborted terminal without a code, it is named, and it is migrated by this unit's commit.
+  A blanket no-retrofit rule was the rev-3 position and rested on a population that was zero at the
+  old base and is not at this one.
 - No claim that the code is trustworthy. The run writes it, as it writes every other authored fact,
   and the protocol's boundary section already states what that is worth.
 
@@ -105,7 +113,7 @@ one conf line, one entry in the leg's required-key loop, and no change to a work
 
 | Fact | Written by | Read by |
 |---|---|---|
-| the phase | the terminal producers | thirteen in-kit readers, all on the terminal binary |
+| the phase | the terminal producers | every in-kit reader, all on the terminal binary |
 | the halt code | the abort verb | `--status`, `--resume`, the new leg check, the wrap-up |
 | the free-text reason | the abort verb, through the park helper | a human, and the bypass-flag grep |
 
@@ -134,16 +142,29 @@ vocabulary already is.
 
 ### Migration
 
-**There is nothing to migrate, measured rather than assumed.** The only two tracked run-state files
-both claim the LANDED terminal, so the population of codeless ABORTED records is ZERO. The leg check
-therefore needs no exemption, no registry and no enumeration, and rev-2's plan for all three was
-answering a question the tree does not ask — worse, it would have "registered" them in a recording
-under this build's `build/` folder, which no gate reads, so the exemption would have exempted
-nothing.
+**The population is ONE, named, and it must be retrofitted — re-measured at the merge base.** There
+are four tracked run-state files. Three claim the LANDED terminal; `memory/builds/dClosedLexicon/RUN.md`
+claims ABORTED and carries no code. Rev-2 said the population was zero, which was true at the old
+base and false at this one: that record landed while this spec was open.
 
-The consequence is that the corpus does not exercise the new check, which is this repo's own vacuity
-class. Its red arm therefore lives entirely in `tools/unattended/check-unattended.test.sh` fixtures,
-the same disposition every other ratchet in this tree takes for the same reason.
+So AC4's leg check has a live subject and would red the merge bar the day it lands. The disposition
+is a RETROFIT of that one record, enumerated here rather than waived:
+
+- The code is `fork unresolvable`, and it is read from the record rather than invented. Its own
+  parked text says the two candidate resolutions are not resolver calls "under a mandate that does
+  not delegate scope" and that its unit is BLOCKED — which is that member's definition.
+- It is a DATA migration performed by this unit's commit, not a driver verb. The driver refuses to
+  move a terminal record on purpose, and nothing here changes that refusal.
+- One record, named in Files touched. No waiver registry, no cutoff, no enumeration file: a
+  one-row registry would need a path, a grammar and a reader, which is more machinery than the row
+  it holds.
+
+**Re-measure before building.** The population moves every time a run aborts, and it moved once
+already inside this build. The count is not carried out of this paragraph.
+
+The corpus therefore DOES exercise the new check, which is better than rev-2's position: the red arm
+has a live subject as well as fixtures in `tools/unattended/check-unattended.test.sh`, rather than
+fixtures alone.
 
 ### Rollout
 
@@ -163,13 +184,17 @@ arm asserts that every tracked file spelling the abort invocation also spells th
 ### The kickoff engine's size budget
 
 S9 edits `skills/session-kickoff/SKILL.md`, which rides a HARD gate leg no other unit in this build
-touches and which this spec's §7 did not name. Measured at base:
-`bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` prints 18215 of 18432
-bytes — 217 under, at 98.8% — and that exact argv is a leg in `tools/gate-legs.json`. The edit is the
-code argument on the one abort line plus a code named on each code-bearing exit, measured at 102
-bytes against a scratch copy, landing at 18317 with 115 to spare. **It fits, and the finding is that
-nothing in the spec knew the margin existed.** The builder re-measures rather than trusting either
-number, and the leg is now in §7.
+touches and which this spec's §7 did not name. The file is 18215 bytes against an 18432 ceiling —
+217 under, at 98.8% — and the edit is the code argument on the one abort line plus a code named on
+each code-bearing exit, measured at 102 bytes against a scratch copy, landing at 18317 with 115 to
+spare. **It fits, and the finding is that nothing in the spec knew the margin existed.**
+
+The INVOCATION moved at the merge base and the spec must not carry the old one: the ceiling is no
+longer a positional. `tools/gate-legs.json`'s argv is now `bash tools/check-template-size.sh
+skills/session-kickoff/SKILL.md` with no number, and the limit is DECLARED in the new
+`tools/template-size-limits.txt`. So a unit growing that file spends against a declared limit rather
+than one spelled in a leg, and the builder re-measures through the leg's own argv rather than
+through either number here.
 
 ### Alternatives rejected
 
@@ -199,6 +224,7 @@ validates against the required-key set · `tools/unattended/kit.toml` ·
 `tools/unattended/PROTOCOL.template.md` and the installed protocol (the verb section, the phase
 section, and the seven-fact pin with its enumeration) · `tools/unattended/SKILL.template.md` and the
 rendered Skill · `skills/session-kickoff/SKILL.md` (the exits' abort disposition names the code) ·
+`memory/builds/dClosedLexicon/RUN.md` — the ONE tracked record §4's migration retrofits ·
 `memory/map/features/unattended.md` (BOTH fact counts) · `tools/unattended/check-unattended.sh`'s
 header check COUNT and the matching count in `AGENTS.md`'s gate-suite bullet, which S5 moves by one
 and which no gate observes — `TOOL-aBoundedVerdict-1` moves it again, so the two units state their
@@ -237,8 +263,13 @@ are both on its watch list) · the kit version constants.
 - **AC3** — When a run aborts with a code, `bash tools/unattended/unattended.sh --status <slug>` and
   `--resume <slug>` both name it, and resume states the run is finished rather than resumable.
 - **AC4** — When a tracked run-state file claims the aborted terminal and carries no code fact,
-  `bash tools/unattended/check-unattended.sh` reds naming the file. No exemption clause: the measured
-  population is zero, so both arms live in `tools/unattended/check-unattended.test.sh` fixtures.
+  `bash tools/unattended/check-unattended.sh` reds naming the file. No exemption clause and no
+  waiver: the one tracked record in that state is migrated by this unit, so the check is green over
+  the real tree on the day it lands, and both arms also live in
+  `tools/unattended/check-unattended.test.sh` fixtures.
+- **AC4a** — When `memory/builds/dClosedLexicon/RUN.md` is read after the migration, it carries the
+  `fork unresolvable` code, and `bash tools/unattended/check-unattended.sh` is green over the whole
+  tracked population re-measured at build time rather than at the count this spec states.
 - **AC5** — When the core vocabulary shrinks below its declared floor,
   `bash tools/unattended/check-unattended.sh` reds; when the floor key is absent or malformed, it
   refuses rather than passing with the pin disarmed.
@@ -252,13 +283,16 @@ are both on its watch list) · the kit version constants.
   code argument — all three documented call sites — and the arm that asserts it lives in
   `tools/unattended/unattended.test.sh`.
 - **AC8** — When the region's fact count is greped across the FIVE statements it is spelled in, none
-  still says seven or five. The pattern must catch the dossier's bare-numeral form as well as the
-  "N facts" form — `grep -rniE '(seven|five)[[:space:]]+(facts|of them)' tools/unattended/ memory/guides/ memory/map/`
-  returns nothing. The narrower two-alternative pattern rev-2 proposed misses one of the dossier's
-  two statements, which is the whole class this criterion exists to catch.
+  states a stale count. The pattern is NUMBER-AGNOSTIC, not an alternation of the values that happen
+  to be stale today —
+  `grep -rniE '(one|two|three|four|five|six|seven|eight|nine|ten|[0-9]+)[[:space:]]+(facts|of them)' tools/unattended/ memory/guides/ memory/map/`
+  returns only statements naming the current count. Rev-3's two-value alternation would have returned
+  nothing while two carriers still said `eight`, because the pin moved after it was written — the
+  criterion failing in exactly the way it exists to prevent, one word later. The pin has moved three
+  times and a value-listing pattern has been wrong at every move.
 - **AC9** — When `skills/session-kickoff/SKILL.md` is edited,
-  `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` is green, re-measured
-  rather than assumed.
+  `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` is green — no positional; the
+  ceiling is declared in `tools/template-size-limits.txt` — re-measured rather than assumed.
 - **AC10** — When the Skill and protocol are re-rendered,
   `bash tools/unattended/adopt-unattended.sh --check` reports in sync with no surviving placeholder
   shape, and `bash tools/check-kit-versions.sh` is green with both unattended constants moved.
@@ -272,8 +306,8 @@ are both on its watch list) · the kit version constants.
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
-`tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` — the hard leg on the kickoff
-engine, at 98.8% of its ceiling · `skills/session-kickoff/manifest-check.sh` ·
+`tools/check-template-size.sh skills/session-kickoff/SKILL.md` — the hard leg on the kickoff engine,
+at 98.8% of the ceiling declared in `tools/template-size-limits.txt` · `skills/session-kickoff/manifest-check.sh` ·
 `tools/memory-tree/check-memory-hygiene.sh` — this unit edits two files under the memory root and
 grows a read-path member, and rev-2's gate list omitted it ·
 `python tools/memory-tree/corpus_ids.py --report` for the read-path share ·
@@ -331,6 +365,15 @@ grows a read-path member, and rev-2's gate list omitted it ·
   residual they leave. Added the hygiene gate and the read-path reporter to §7, and the leg's own
   check count to Files touched, sequenced against the other unit that moves it.
 
+- rev-4 · 2026-08-17 · M7 REGROUND onto the new merge base, and the most affected spec. BLOCKER: the
+  migration said the population of codeless aborted records was zero; at the new base it is ONE, a
+  named tracked record that this unit's own leg check would have redded the bar on at landing — it is
+  now a stated one-record retrofit rather than a claim of nothing to do. The authored-region pin moved
+  from seven to eight under the spec, so the halt code is the NINTH fact, not the eighth, and the
+  in-tree precedent is now exact: the eighth fact is a singleton written by a terminal verb. The
+  completeness grep is rewritten NUMBER-AGNOSTIC — the two-value alternation would have returned
+  nothing while two carriers still said eight, the criterion failing exactly as it exists to prevent.
+  The kickoff size leg lost its positional; the ceiling now lives in a declared limits file.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "terminal phase for a run that cannot continue"` returns
