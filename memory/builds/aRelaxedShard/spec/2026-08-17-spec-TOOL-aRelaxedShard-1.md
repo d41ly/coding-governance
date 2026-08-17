@@ -1,108 +1,115 @@
-# TOOL-aRelaxedShard-1 — the row-document byte cap becomes a declared value
+# TOOL-aRelaxedShard-1 — the row class becomes one declared byte bound
 
-**Status:** OPEN · rev-3 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling
 
 ## 1. Goal
 
-Hygiene check 6 caps every row document at a hardcoded 20,480 bytes, and on this repo that bound is
-spent: `memory/backlog/TOOL.md` is at 19,152 of 20,480 bytes with no terminal rows left for rotation to
-archive. Make the byte bound a declared per-repo value so this tree can raise it against its own
-measurement while every adopter keeps today's behaviour until they measure their own.
+Hygiene check 6 caps every row document at a hardcoded 20,480 bytes and 250 lines, and on this repo the
+byte bound is spent: the tooling backlog shard has no terminal rows left for rotation to archive. Make
+the byte bound a declared per-repo value, set here to 61,440, and retire the row class's line bound so
+that one declared number bounds the class. The retirement is a ratified owner decision to relax a
+curation discipline, not a claim that the bound was inert — §4 prices what it costs.
 
 ## 2. Scope (IN)
 
-- **S1** — A new `.memory-tree.conf` key, `ROW_DOC_CAP_BYTES`, holding the byte cap check 6 applies to
-  the row class. Its value here is MEASURED against this corpus and its comment records the movement,
-  the way `READ_PATH_CEILING` records its four.
-- **S2** — The key resolved in `tools/memory-tree/check-memory-hygiene.sh` with three branches, because
-  the engine's own conf idiom produces the wrong answer for two of them. The engine pre-sets defaults
-  and THEN sources the conf, so a blank line overrides a default with blank; this key therefore needs an
-  explicit re-normalisation AFTER the source. Absent resolves to the shipped default. Blank resolves to
-  the shipped default, not to "off" — check 6 is the rule the kit exists to enforce and
-  `memory/project/curation-debt.txt` is already the deliberate per-file exemption. A non-numeric value
-  refuses before the scan with `exit 2`, matching the conf-validation precedent at
-  `tools/memory-tree/check-memory-hygiene.sh:101`.
-- **S3** — The shipped default stays **20,480**. An adopter who never adds the key gets byte-for-byte
-  today's verdicts, which is what keeps this unit out of
-  `memory/gotchas/pin-copied-from-another-corpus.md`: this corpus's measured number is DECLARED here,
-  never shipped as anyone else's default.
-- **S4** — The byte comparison in the per-class cap block at
-  `tools/memory-tree/check-memory-hygiene.sh:379` reads the resolved value for the row class. The guide
-  class keeps its own `61440` and `750` untouched, and the row class keeps its `250`-line bound
-  untouched — see §3.
-- **S5** — `KIT_MEMORY_TREE_VERSION` bumped off `2.18`. The diff moves a non-comment line of the engine,
+- **S1** — A new `.memory-tree.conf` key, `ROW_DOC_CAP_BYTES`, declared **61,440** here. Its comment
+  records the derivation and the movement, the way `READ_PATH_CEILING` records its four.
+- **S2** — The key resolved in `tools/memory-tree/check-memory-hygiene.sh` with three branches. The
+  engine pre-sets defaults and THEN sources the conf, so a blank line overrides a default with blank;
+  this key therefore needs an explicit re-normalisation AFTER the source. Absent resolves to the shipped
+  default. Blank resolves to the shipped default, not to "off". A non-numeric value refuses before the
+  scan with `exit 2`, matching the conf-validation precedent at `:101`.
+- **S3** — The shipped default stays **20,480**. An adopter who never declares the key gets byte-for-byte
+  today's verdicts, which keeps this unit out of `memory/gotchas/pin-copied-from-another-corpus.md`: this
+  corpus's measured number is DECLARED here, never shipped as anyone else's default.
+- **S4** — The per-class cap block at `tools/memory-tree/check-memory-hygiene.sh:379`: the row class is
+  bounded by the resolved byte value and by NO line count; the guide class keeps its own `61440` and
+  `750`. The retirement must not leave the guide's `750` in play on the shared `cl` variable — deleting
+  the row branch's assignment does exactly that, and so does a `cl > 0 && l > cl` guard whose `cl`
+  defaults to the guide value. The two classes share the code path and must not share the bound.
+- **S5** — The finding message reports bytes alone for a row document. A line figure the gate no longer
+  enforces reads as a second bound, and the message must also print the cap it applied so a default is
+  distinguishable from a declaration in the output alone.
+- **S6** — `KIT_MEMORY_TREE_VERSION` bumped off `2.18`. The diff moves non-comment lines of the engine,
   so `check-verdict-epoch.sh` requires it and `hygiene-parity.test.sh` derives its floor from it.
-- **S6** — A BYTE-axis arm for check 6's row class in
-  `tools/memory-tree/check-memory-hygiene.test.sh`, plus a green control under the declared cap. This is
-  the unit's real coverage gain: all three existing check-6 fixtures are line-axis constructions, so the
-  byte bound that fires in production has never been armed. The arm is ADDED, never substituted — the
-  three line-axis fixtures stay exactly as they are, for the reasons in §3.
-- **S7** — An arm asserting `tools/memory-tree/.memory-tree.conf.example` declares the key. Nothing else
+- **S7** — A BYTE-axis arm for check 6's row class, plus a green control under the declared cap. This is
+  the unit's coverage gain: all three existing check-6 fixtures are line-axis constructions, so the byte
+  bound that fires in production has never been armed.
+- **S8** — The retirement arm, pinned **above 750 lines** and under the declared byte cap. A fixture in
+  the 251-750 band is silent under the intended retirement AND under the likeliest implementation slip
+  in S4, so it cannot discriminate between them. The 750 reason is stated in the arm so the number is
+  not quietly lowered later.
+- **S9** — `memory/builds/tRunBig/RUN.md` preserved as a row-class `chit 6` by growing it past the byte
+  cap. It is 265 lines and about 3 KB, so lines are its only over-cap axis today; retiring the row line
+  bound silences check 6 on it and vacates two other contracts that are asserted THROUGH it — the only
+  proof `RUN.md` enters `index_set` at all, and the check-7 exemption precondition asserted on the same
+  file check 6 named. Losing those is `fixture-passes-by-finding-nothing`.
+- **S10** — The guide arms untouched: `memory/guides/tfixture.md` past 750 lines stays NAMED and
+  `memory/guides/twide.md` at 401 lines stays SILENT. Those two are the only proof the classes are still
+  separate, and `twide.md` is a deliberate silent control that must not be rebuilt on the byte axis.
+- **S11** — An arm asserting `tools/memory-tree/.memory-tree.conf.example` declares the key. Nothing else
   reads that file: `adopt-memory-tree.sh:40` only copies it and `tools/check-install-prefix.sh:17`
-  excludes `*.conf.example`, so without this arm S8 can be forgotten silently.
-- **S8** — The key added to `tools/memory-tree/.memory-tree.conf.example` **with the shipped default's
-  value**, in that file's policy-ceiling idiom rather than blank. Blank there means "check off" for every
-  measured pin, while both policy ceilings — `UNIVERSAL_BUDGET` and `ROW_DUPLICATE_PIN` — ship with a
-  value and say why. This key is the same kind.
-- **S9** — `FLOOR_ASSERTIONS` in the hygiene self-test raised to the new executed count, so the arms S6
-  and S7 add cannot later go dark without a diff.
-- **S10** — The byte-figure prose carriers, enumerated by line rather than by count:
-  `memory/HYGIENE.md:66`, `:128`, `:132` and `:276`, the four mirrors at the same lines in
+  excludes `*.conf.example`.
+- **S12** — The key added to that example **with the shipped default's value**, in its policy-ceiling
+  idiom rather than blank. Blank there means "check off" for every measured pin, while both policy
+  ceilings ship with a value and say why. This key is the same kind.
+- **S13** — `FLOOR_ASSERTIONS` in the hygiene self-test raised to the new executed count, so the arms S7
+  to S11 add cannot later go dark without a diff.
+- **S14** — The prose carriers, enumerated by line. Both figures move for the row class, so the sweep
+  covers `memory/HYGIENE.md:66`, `:128`, `:132` and `:276`, the four mirrors at the same lines in
   `tools/memory-tree/HYGIENE.template.md`, `tools/memory-tree/README.md`, and `.gitattributes:26` and
-  `:30`. The `250`-line figures in those carriers stay, because the line bound stays.
-- **S11** — Rule 6's spill clause corrected in both HYGIENE carriers (`memory/HYGIENE.md:133-136` and
-  its lockstep twin). It says check 6's cap is what `builds/*/RUN.md` spills against;
-  `memory/guides/UNATTENDED-PROTOCOL.md:130-132` budgets the authored region at 8 KB and spills against
-  THAT, with check 6 as the backstop. Raising the byte cap widens the gap and makes the sentence more
-  wrong. Same mis-attribution class as S12, one file over.
-- **S12** — `memory/guides/BUILD-METHOD.md` line 8 and its kit template. Both cite hygiene rule 6 for a
-  budget rule 6 does not impose on a guide, which gets 61,440 bytes and 750 lines. The corrected line
-  names the budget as self-imposed. The discipline is real, because M7 re-reads that file whole; the
-  citation is wrong.
-- **S13** — `TOOL-cSettledDocket-16` closed against this unit. It is this unit's problem statement,
-  already filed and OPEN, and landing without closing it leaves a stale duplicate in the very shard the
-  unit exists to unblock.
-- **S14** — A `memory/map/features/` dossier for the hygiene engine, and `memory-tree` deleted from
-  `memory/map/baseline.toml:53` in the same commit, because the coverage gate reds on a baseline line
-  whose key a dossier now claims.
+  `:30`. Each must state the new shape: rows carry a declared byte bound and no line bound; guides carry
+  both.
+- **S15** — Rule 6's spill clause corrected in both HYGIENE carriers. It says check 6's cap is what
+  `builds/*/RUN.md` spills against; the protocol budgets the authored region at 8 KB and spills against
+  THAT, with check 6 as the backstop. Raising the byte cap and dropping the line bound widens the gap and
+  makes the sentence more wrong.
+- **S16** — `memory/guides/BUILD-METHOD.md` line 8 and its kit template. Both cite hygiene rule 6 for a
+  budget rule 6 does not impose on a guide. The corrected line names the budget as self-imposed.
+- **S17** — `TOOL-cSettledDocket-16` closed against this unit. It is this unit's problem statement,
+  already filed and OPEN.
+- **S18** — A `memory/map/features/` dossier for the hygiene engine, with `memory-tree` deleted from
+  `memory/map/baseline.toml:53` in the same commit.
+- **S19** — The kit marker in `tools/memory-tree/SPEC-TEMPLATE.template.md` and `memory/TEMPLATE-SPEC.md`
+  moved with S6, and `memory/guides/SESSION-KICKOFF.md` re-stamped, because three files in its `watch:`
+  list move.
 
 ## 3. Non-goals (OUT)
 
-- **Retiring the row class's 250-line bound.** rev-1 scoped this and the M4 audit falsified its premise:
-  the line bound is the OPERATIVE bound on 22 of the 29 row documents, including all 12 map dossiers,
-  where check 6 is the only gate that bounds anything. It is now fork F5, re-opened with the correct
-  measurement, and it is OUT until the owner answers.
+- **A per-class LINE bound.** The owner considered retiring the row line bound while giving dossiers and
+  run-state files their own line value, and chose outright retirement instead. The row class carries no
+  line bound after this unit.
 - **The re-shape.** Sharding a backlog below `FAMILY`, or a spill tier like the run-state file's, is the
-  second unit the owner sequenced after this one. Its id is minted when its spec is authored, so that
-  this spec cites nothing check 14 would call an orphan.
+  second unit the owner sequenced after this one. Its id is minted when its spec is authored.
 - **Byte normalisation before measuring.** `TOOL-aRootedPrefix-3` is open against checks 6 and 7 for
   measuring raw working-tree bytes, which makes the cap platform-dependent for an adopter without the
-  `eol=lf` pin. It is why a larger declared cap is worth more to an adopter than to this repo, and it is
-  a separate mechanism.
+  `eol=lf` pin. It is a separate mechanism.
 - **Check 10's blindness to shard rotations.** `TOOL-cTracedPromise-6` is open and untouched.
-- **A per-document-kind cap matrix.** One key for the row class. See F3.
-- **The guide class.** `TOOL-aWidenedGuide-1` set `61440` and `750` and nothing here reopens it.
+- **The guide class.** `TOOL-aWidenedGuide-1` set `61440` and `750` for guides and nothing here changes
+  them. That the row byte cap now equals the guide byte cap is arithmetic, not a merge of the classes.
 - **`READ_PATH_CEILING`, the 300-char entry budget, and rotation's carry-forward rule.** All three stay
   exactly as they are. The `20480` at `.memory-tree.conf:57` and `tools/memory-tree/corpus_ids.py:461`
   belongs to `READ_PATH_CEILING`'s headroom and is not this unit's number.
+
+**What this unit deliberately gives up, stated as a non-goal so it cannot be read as an oversight.** The
+row-class curation discipline `TOOL-aWidenedGuide-1` protected is being RELAXED, knowingly. That decision
+ratified a class split and refused to triple the row allowance in the words the engine still carries at
+`:376-378`. This unit triples it and removes the line bound as well. The owner ratified that on
+2026-08-17, asked a second time, with the 22-of-29 population measurement and the 3.3x-to-4.3x dossier
+figure in front of them. §4 prices it; §8 F3 carries the one question the decision opens.
 
 ## 4. Design
 
 ### Data model
 
-One conf key, `ROW_DOC_CAP_BYTES`, holding a byte count. Resolution has three branches and one
-non-obvious step. The engine pre-sets its defaults and then sources the conf at
-`tools/memory-tree/check-memory-hygiene.sh:27`, so a blank conf line overrides a pre-set default with
-blank — every existing key in that block documents blank as skip, which is the opposite of what this key
-needs. The design therefore re-normalises AFTER the source: an empty resolved value is reset to the
-shipped default. A non-numeric value refuses with `exit 2` before the scan.
+One conf key, `ROW_DOC_CAP_BYTES`, holding a byte count, declared 61,440 here. Resolution has three
+branches and one non-obvious step: the engine pre-sets its defaults and then sources the conf at `:27`,
+so a blank conf line overrides a pre-set default with blank. Every existing key in that block documents
+blank as skip, which is the opposite of what this key needs, so the design re-normalises AFTER the
+source. A non-numeric value refuses with `exit 2` before the scan.
 
-There is deliberately no value that disables the bound, and the shipped default stays 20,480 so that
-nothing an adopter receives changes until they declare their own.
-
-The guide class keeps its own hardcoded pair. If the value ratified in F1 is 61,440 the two byte numbers
-coincide, and the engine comment must say they coincide rather than that they are one number —
-`TOOL-aWidenedGuide-1` split the classes as a decision, and a later row-class movement re-separates them.
+There is no value that disables the bound, and the shipped default stays 20,480 so nothing an adopter
+receives changes until they declare their own.
 
 ### Inventory
 
@@ -110,17 +117,15 @@ Check 6's row class is `INDEX_SET` minus `memory/guides/`: **29 files** at base,
 population is `tools/memory-tree/check-memory-hygiene.sh:337-359` and the only class override is
 `index(f, gp) == 1` at `:385`.
 
-The seven largest row documents, and then the sub-populations rev-1 omitted:
-
-| path | bytes | lines | rows | share of 20,480 | share of 250 lines |
-|---|---|---|---|---|---|
-| `memory/backlog/TOOL.md` | 19,152 | 78 | 73 | 93.5% | 31.2% |
-| `memory/map/features/memory-tree-merge-driver.md` | 14,713 | 197 | — | 71.8% | 78.8% |
-| `memory/builds/cBriefedPilot/RUN.md` | 13,806 | 151 | — | 67.4% | 60.4% |
-| `memory/DECISIONS.md` | 12,328 | 69 | — | 60.2% | 27.6% |
-| `memory/map/features/unattended.md` | 11,751 | 171 | — | 57.4% | 68.4% |
-| `memory/map/features/lexicon.md` | 11,403 | 190 | — | 55.7% | 76.0% |
-| `memory/builds/aSealedCaravan/RUN.md` | 8,141 | 114 | — | 39.8% | 45.6% |
+| path | bytes | lines | share of 20,480 | share of 250 lines |
+|---|---|---|---|---|
+| `memory/backlog/TOOL.md` | 19,152 | 78 | 93.5% | 31.2% |
+| `memory/map/features/memory-tree-merge-driver.md` | 14,713 | 197 | 71.8% | 78.8% |
+| `memory/builds/cBriefedPilot/RUN.md` | 13,806 | 151 | 67.4% | 60.4% |
+| `memory/DECISIONS.md` | 12,328 | 69 | 60.2% | 27.6% |
+| `memory/map/features/unattended.md` | 11,751 | 171 | 57.4% | 68.4% |
+| `memory/map/features/lexicon.md` | 11,403 | 190 | 55.7% | 76.0% |
+| `memory/builds/aSealedCaravan/RUN.md` | 8,141 | 114 | 39.8% | 45.6% |
 
 | sub-population | members | max bytes | max lines |
 |---|---|---|---|
@@ -130,198 +135,191 @@ The seven largest row documents, and then the sub-populations rev-1 omitted:
 | generated indices and ledgers | 3 | 12,328 | 69 |
 | other row documents | 5 | 2,695 | 35 |
 
-**Which bound binds first: 22 of 29 are LINE-bound.** The break-even is 20,480/250 = 81.92 bytes per
-line. Every one of the 12 dossiers sits below it, as do 4 of the 5 run-state files, both ledger shards,
+**Which bound binds first today: 22 of 29 are LINE-bound.** The break-even is 20,480/250 = 81.92 bytes
+per line. All 12 dossiers sit below it, as do 4 of the 5 run-state files, both ledger shards,
 `memory/README.md`, `memory/map/README.md`, `memory/map/FOUNDATION.md` and
-`memory/builds/aPrunedCeremony/STATUS.md`. Only 7 documents are byte-bound first, and they are the four
-backlog shards, the decision log, `memory/LIVE.md` and `memory/builds/cBriefedPilot/RUN.md`.
+`memory/builds/aPrunedCeremony/STATUS.md`. Only 7 are byte-bound: the four backlog shards, the decision
+log, `memory/LIVE.md` and `memory/builds/cBriefedPilot/RUN.md`.
 
-Three measurements decide the value, each derived rather than estimated:
+Three measurements decide the declared value:
 
 - **Row length.** `wc -c` over the dash rows of `memory/backlog/TOOL.md` is 18,519 bytes across 73 rows,
   so 253.7 bytes per row. This is a BYTE count, which is what check 6 measures; a character count reads
-  18,314, and the `·` separators are two bytes each.
+  18,314, because the `·` separators are two bytes each.
 - **Minting rate.** 156 of the 161 distinct `TOOL-` ids across the live shard and its three archives
-  first appear inside the nine-day window, which is 17.3 ids per day.
+  first appear inside the nine-day window: 17.3 ids per day.
 - **Live-set growth.** Those nine days left 73 non-terminal rows standing: 8.1 rows per day, about
   2,057 bytes.
 
-Against those, the remaining 1,328 bytes of headroom is **0.65 days**. That figure, not the percentage,
-is what makes this a defect rather than a tight budget.
+61,440 is 250 rows at the measured 253.7 bytes, which is 63,425, rounded down to 60 KiB. Runway from
+today's 19,152 at 2,057 bytes per day is about 21 days.
 
 ### Why rotation cannot be the answer here
 
-Rotation moves terminal rows only and carries forward everything else, so the live file's floor is what
-survives it. `memory/backlog/TOOL.md` has 66 OPEN, 6 SPECCED, 1 DEFERRED and zero terminal rows, so a
-fourth rotation leaves the whole 19,152-byte file exactly where it is — the floor is 93.5% of the cap,
-not some smaller row-only figure, because the 633-byte head with its three rotation announcements stays
-too. It has already rotated three times in four days, twice on one of them.
+Rotation moves terminal rows only and carries forward everything else. `memory/backlog/TOOL.md` has 66
+OPEN, 6 SPECCED, 1 DEFERRED and zero terminal rows, so a fourth rotation leaves the whole 19,152-byte
+file where it is — the floor is 93.5% of the cap, because the 633-byte head with its three rotation
+announcements stays too. It has rotated three times in four days, twice on one of them.
+`TOOL-cSettledDocket-16` is OPEN in that shard and says the same thing.
 
-This was filed. `TOOL-cSettledDocket-16` is OPEN in that shard and states the same thing, and
-`memory/builds/cSteadyMetronome/README.md` recorded it on 2026-08-14 including the detail that the unit
-it needed could not be given a backlog row because there was no room to write one. S13 closes the row.
+`memory/builds/cSteadyMetronome/README.md` also recorded that rotation orphans ids against check 14,
+which is why a rotation was once attempted and reverted. That claim looks stale and this spec does not
+rely on it: `corpus_ids.py`'s one walk is `git ls-files` with no `archive/` exclusion, and three
+rotations have since landed green. F4 turns the reading into a fixture.
 
-That build also recorded that rotation orphans ids against check 14, which is why a rotation was once
-attempted and reverted. That claim looks stale and this spec does not rely on it: `corpus_ids.py`'s one
-walk is `git ls-files` with no `archive/` exclusion, and three rotations have since landed green. F4
-turns the reading into a fixture rather than acting on either.
+### What retiring the row line bound costs
 
-### Why the line bound is NOT retired
+rev-1 argued the line bound "cannot fire". That was measured on one document and is false: it is the
+bound that binds FIRST on 22 of 29 row documents. The retirement therefore removes a bound that is doing
+work, and the price is concentrated in one sub-population.
 
-rev-1 argued the 250-line bound "cannot fire" from the break-even arithmetic — true — and then tested it
-against one document. Over the real population it is false 22 times out of 29. The nearest-to-cap row
-document in the tree on either axis is `memory/map/features/memory-tree-merge-driver.md` at 197 of 250
-lines (78.8%) against 14,713 of 20,480 bytes (71.8%): the line bound is the closer of the two, today, on
-the axis rev-1 called unreachable.
+**Dossiers.** A dossier's effective ceiling today is its line count at its own density: 250 x 74.7 is
+about 18.7 KB for `memory-tree-merge-driver.md`, about 15.0 KB for `lexicon.md` at 60.0 bytes per line,
+about 14.4 KB for `agent-cap.md` at 57.7. After this unit each is bounded at 61,440 bytes alone — a
+**3.3x to 4.3x loosening**. At about 58 bytes per line a dossier reaches roughly 1,050 lines with nothing
+firing. Dossiers are row class by construction, `tools/codebase-map/test_codebase_map.py` carries no size
+or line predicate of its own, and `memory/HYGIENE.md:276-278` gives their remedy as a SPLIT rather than a
+rotation — so check 6 is the only thing bounding a dossier at all, and its split trigger moves with the
+cap. This is the cost the owner ratified, and it is the subject of F3.
 
-It binds hardest exactly where nothing else does. Dossiers are row class by construction, their declared
-remedy is a SPLIT rather than a rotation, and `tools/codebase-map/test_codebase_map.py` carries no size
-predicate of its own — so check 6 is the only thing bounding a dossier at all. Retiring the line bound
-and adopting F1's value would take a dossier from an effective ~14.5 KB ceiling at its measured density
-to 61,440 bytes: a 3.3x to 4.3x loosening of precisely the class `TOOL-aWidenedGuide-1` refused to
-triple, in the words the engine still carries at `:376-378`.
+**Run-state files.** Four of five are line-bound today and become byte-bound at 61,440. Behaviour does
+not change, because the protocol budgets the authored region at 8 KB and spills against that; check 6 is
+the backstop whose purpose is never to be reached. But the fixture that PROVES `RUN.md` is in the
+population is line-only, which is why S9 grows it rather than leaving it silent.
 
-Narrowing to the byte bound also makes that loosening inert rather than merely unratified. A dossier at
-~58 bytes per line reaches its 250-line bound around 14.5 KB, so raising the byte cap above that changes
-nothing for the 22 line-bound documents. The unit's effect lands only on the 7 byte-bound ones, which
-are the backlog shards and the decision log — the documents the owner asked about.
+**The other line-bound members** — both ledgers, three READMEs, a STATUS file, `FOUNDATION.md` — sit
+between 3.6% and 16.4% of the byte cap. The retirement gives them room they were not asking for and
+costs nothing observable.
 
-### The three consumers whose behaviour shifts, and by how much
+### The three consumers whose behaviour shifts
 
-- **`builds/*/RUN.md`** — unaffected in behaviour. The protocol budgets the authored region at 8 KB and
-  spills against that; check 6 is the backstop whose purpose is never to be reached. Raising the byte cap
-  loosens the backstop and moves no trigger. Four of the five run-state files are line-bound anyway. The
-  protocol names no byte figure, so it needs no edit; rule 6's clause that contradicts it does, and S11
-  is that edit.
-- **Codebase-map dossiers** — effectively unaffected, per the paragraph above: all 12 are line-bound
-  first and the line bound does not move. rev-1 claimed "No dossier is near the bound today"; the
-  measured answer is 14,713 bytes and 197 of 250 lines, which is nearer than anything else in the class.
-- **The generated indices** — `memory/LIVE.md` and the ledger shards are rendered, and a larger byte cap
-  only defers the month a ledger shard would have to rotate.
+- **`builds/*/RUN.md`** — no trigger moves; the backstop loosens. The protocol names no byte figure, so
+  it needs no edit. Rule 6's clause contradicting it does, and S15 is that edit.
+- **Codebase-map dossiers** — the largest shift, priced above. The split trigger moves from an effective
+  ~14.5 KB to 61,440 bytes.
+- **The generated indices** — `memory/LIVE.md` and the ledger shards are rendered; a larger byte cap
+  defers the month a ledger shard would rotate.
 
 ### Rollout
 
 **This unit's own records cannot be written until its conf change lands, and that ordering is forced by
 the defect.** The figures above are measured at the spec's immutable base. The local default branch has
 since advanced 37 commits past `origin/main`, and at that tip `memory/backlog/TOOL.md` is **20,345 of
-20,480 bytes — 99.34%, with 135 bytes left**, holding 80 rows of which none is terminal (66 OPEN, 7
-INPROGRESS, 6 SPECCED, 1 DEFERRED) and with no fourth rotation having occurred. At the measured mean of
-253.7 bytes per row, 135 bytes is half a row: **the next backlog row that tree receives reds check 6**,
-and rotation cannot make room because there is nothing terminal to move.
+20,480 bytes — 99.34%, with 135 bytes left**, holding 80 rows of which none is terminal, with no fourth
+rotation having occurred. At 253.7 bytes per row, 135 bytes is half a row: **the next backlog row that
+tree receives reds check 6**, and rotation cannot make room.
 
 So the landing order is: the conf change and its declared value first, then this build's decision rows
-and backlog rows. Writing the records first is not merely untidy, it is red. This is the bind
-`memory/builds/cSteadyMetronome/README.md` described on 2026-08-14 — a unit that could not be given a
-backlog row because there was no room to write one — arriving for the second time, and it is why S13
-closes `TOOL-cSettledDocket-16` in place rather than filing a fresh row beside it.
+and backlog rows. Writing the records first is red, not merely untidy. This is the bind
+`memory/builds/cSteadyMetronome/README.md` described on 2026-08-14 arriving a second time, and it is why
+S17 closes `TOOL-cSettledDocket-16` in place rather than filing a fresh row beside it.
 
-The reground onto the local default is the first pass after the forks are answered, per M7. It does not
-move the spec's base or its figures: a base is immutable and the measurements belong to it. It does
-shorten every F1 runway by about half a day, which changes no recommendation.
+The reground onto the local default is the first build pass. It does not move the spec's base or its
+figures — a base is immutable and the measurements belong to it — and it shortens the runway by about
+half a day.
 
 ### Files touched (estimate)
 
 | path | change | forced by |
 |---|---|---|
-| `.memory-tree.conf` | the key, measured, with its movement comment | S1 |
-| `tools/memory-tree/.memory-tree.conf.example` | the key with the shipped default's value | S8 |
-| `tools/memory-tree/check-memory-hygiene.sh` | conf read and re-normalisation · the byte comparison · the finding message · kit version | S2 S4 S5 |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | the byte-axis arms · the example-conf arm · `FLOOR_ASSERTIONS` | S6 S7 S9 |
-| `memory/HYGIENE.md` | the four byte carriers · rule 6's spill clause | S10 S11 |
-| `tools/memory-tree/HYGIENE.template.md` | the same, in lockstep | S10 S11 |
-| `tools/memory-tree/README.md` | the byte figure | S10 |
-| `.gitattributes` | the two present-tense cap claims at `:26` and `:30` | S10 |
-| `memory/guides/BUILD-METHOD.md` · `tools/memory-tree/BUILD-METHOD.template.md` | the budget line and its mis-citation | S12 |
-| `tools/memory-tree/SPEC-TEMPLATE.template.md` · `memory/TEMPLATE-SPEC.md` | the kit marker, paired by `kit-dogfood-parity.test.sh:53` | S5 |
-| `memory/guides/SESSION-KICKOFF.md` | the manifest re-stamp; three watched files move | S1 S2 S12 |
-| `memory/map/features/` · `memory/map/baseline.toml` | the dossier, and the baseline line it claims | S14 |
-| `memory/DECISIONS.md` · `memory/backlog/TOOL.md` | the decision row, and closing `TOOL-cSettledDocket-16` | S13 |
+| `.memory-tree.conf` | the key at 61,440, with its derivation and movement | S1 |
+| `tools/memory-tree/.memory-tree.conf.example` | the key at the shipped default | S12 |
+| `tools/memory-tree/check-memory-hygiene.sh` | conf read and re-normalisation · the cap block · the message · kit version | S2 S4 S5 S6 |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | byte-axis arms · the above-750 retirement arm · tRunBig grown · the example-conf arm · `FLOOR_ASSERTIONS` | S7 S8 S9 S11 S13 |
+| `memory/HYGIENE.md` | the four carriers · rule 6's spill clause | S14 S15 |
+| `tools/memory-tree/HYGIENE.template.md` | the same, in lockstep | S14 S15 |
+| `tools/memory-tree/README.md` | the figures | S14 |
+| `.gitattributes` | the two present-tense cap claims at `:26` and `:30` | S14 |
+| `memory/guides/BUILD-METHOD.md` · `tools/memory-tree/BUILD-METHOD.template.md` | the budget line and its mis-citation | S16 |
+| `tools/memory-tree/SPEC-TEMPLATE.template.md` · `memory/TEMPLATE-SPEC.md` | the kit marker, paired by `kit-dogfood-parity.test.sh:53` | S19 |
+| `memory/guides/SESSION-KICKOFF.md` | the manifest re-stamp; three watched files move | S19 |
+| `memory/map/features/` · `memory/map/baseline.toml` | the dossier, and the baseline line it claims | S18 |
+| `memory/DECISIONS.md` · `memory/backlog/TOOL.md` | the decision rows, and closing `TOOL-cSettledDocket-16` | S17 |
 
 ### Alternatives rejected
 
-- **Raise the constant and leave it hardcoded.** Cheapest diff, and it ships this corpus's measured
-  number to every adopter with no knob. That is `pin-copied-from-another-corpus` by construction, which
-  is also why S3 keeps the shipped default at 20,480 rather than at whatever F1 ratifies.
-- **Retire the row line bound as well** — rev-1's shape, now F5. Rejected as a default by the
-  measurement above: it removes the operative bound from 22 of 29 documents and triples the dossier
-  allowance that a ratified decision refused to triple.
-- **One byte cap for the whole index set.** Dissolves `TOOL-aWidenedGuide-1`'s class split by arithmetic
-  rather than by decision, and re-plumbing the guide class is a larger diff than leaving it alone.
-- **A per-document-kind matrix.** See F3. Nothing needs it today.
+- **Raise the constant and leave it hardcoded.** Ships this corpus's number to every adopter with no
+  knob — `pin-copied-from-another-corpus`, which is also why S3 keeps the shipped default at 20,480.
+- **Keep the row line bound and move only the byte bound.** rev-2's shape and the smaller diff. Rejected
+  by the owner on 2026-08-17 in favour of outright retirement.
+- **Retire the line bound but give dossiers and run-state files their own line value.** Also rejected by
+  the owner in the same turn. F3 asks the narrower remaining question about a BYTE sub-bound.
+- **One byte cap for the whole index set.** Dissolves the class split by arithmetic rather than by
+  decision; re-plumbing the guide class is a larger diff than leaving it alone.
 - **Do nothing and rotate harder.** Measured impossible: zero terminal rows remain.
 
 ## 5. Production-readiness checklist
 
-- **security** — N/A. No new input, no write path, no surface; one gate threshold becomes declared.
-- **perf / scale** — Neutral. The awk block already computes both counts per file and no new pass over
-  the corpus is added.
+- **security** — N/A. No new input, no write path, no surface.
+- **perf / scale** — Neutral. The awk block already computes both counts per file; one comparison is
+  dropped for the row class and no new pass over the corpus is added.
 - **a11y** — N/A. A shell gate with no user interface.
-- **i18n** — N/A, with one live caveat the engine already carries: check 7 deliberately sets no `LC_ALL`
-  because character-versus-byte counting is a property of the adopter's awk. This unit adds no
-  locale-sensitive comparison, and rev-1's own row-length figure was wrong by exactly that confusion.
-- **error / empty / loading states** — Three branches, all in S2: absent and blank both resolve to the
-  shipped default after an explicit post-source re-normalisation, and a non-numeric value refuses with
-  `exit 2` before the scan.
-- **observability** — The finding message is the whole interface. It must print the cap it applied, so an
-  operator can tell a default from a declaration without opening the conf.
-- **risks** — Two directions, and rev-1 named the wrong one as silent. A blank or zero byte cap is the
+- **i18n** — N/A, with one live caveat the engine carries: check 7 sets no `LC_ALL` because
+  character-versus-byte counting is a property of the adopter's awk. This unit adds no locale-sensitive
+  comparison, and rev-1's own row-length figure was wrong by exactly that confusion.
+- **error / empty / loading states** — Three branches, all in S2: absent and blank resolve to the shipped
+  default after an explicit post-source re-normalisation, and a non-numeric value refuses with `exit 2`.
+- **observability** — The finding message is the whole interface. Per S5 it prints the cap it applied.
+- **risks** — Three, and rev-1 named the wrong one as silent. First, a blank or zero byte cap is the
   LOUDEST failure available: measured on this repo's awk, `19152 > ""`, `19152 > 0` and an uninitialised
-  right-hand side all evaluate true, so the whole class reds at once and announces itself. The genuinely
-  silent direction is an over-large declared value, which is why the value is a measured declaration with
-  its movement recorded rather than a round number. Rollback is reverting one commit; nothing migrates.
-- **testing + left-shift gates** — S6, S7 and S9 are the left-shift. The byte axis of check 6 gains its
-  first arm in the kit's life, which is coverage this repo did not have before the unit.
-- **migration / rollback** — None required. An adopter who never adds the key keeps today's verdicts
+  right-hand side all evaluate true, so the whole class reds at once. Second, the genuinely silent
+  direction is a bound that cannot fire — which is what this unit deliberately creates for the row line
+  axis, and why S8 pins its arm above the guide's 750 rather than inside the band where a slip is
+  invisible. Third, the shared `cl` variable in S4: deleting the row assignment leaves the guide's 750
+  governing rows, which looks like a successful retirement and is a silent 3x line raise instead.
+  Rollback is reverting one commit; nothing migrates.
+- **testing + left-shift gates** — S7 to S11 and S13. The byte axis of check 6 gains its first arm in the
+  kit's life; S9 keeps the one row-class arm that three other contracts hang on.
+- **migration / rollback** — None required. An adopter who never declares the key keeps today's verdicts
   exactly, because S3 keeps the shipped default at the present value.
-- **user docs** — The kit README and both HYGIENE carriers, per S10. No end-user surface.
+- **user docs** — The kit README and both HYGIENE carriers, per S14. No end-user surface.
 
-Two items for the owner scope menu: the declared value (F1), and whether the row line bound is retired
-at all (F5, which rev-1 assumed and this rev does not).
+One item for the owner scope menu: F3, the dossier byte sub-bound, which the F5 decision opened.
 
 ## 6. Acceptance criteria
 
 - **AC1a** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over a scratch tree whose conf
   declares no `ROW_DOC_CAP_BYTES`, the row class is capped at the shipped default.
 - **AC1b** — When that conf declares `ROW_DOC_CAP_BYTES=` blank, the row class is capped at the shipped
-  default and not left unbounded, which is the branch fork F2 is about and the one the engine's own
-  pre-set-then-source idiom gets wrong.
+  default and not left unbounded, which is the branch the engine's pre-set-then-source idiom gets wrong.
 - **AC1c** — When that conf declares a non-numeric value, `check-memory-hygiene.sh` refuses with
   `exit 2` before scanning, naming the key and the value.
 - **AC2** — When a row document exceeds the declared byte cap, `check-memory-hygiene.sh` names it and the
-  finding reports the measured bytes and the cap it applied, so a default is distinguishable from a
-  declaration in the output alone.
-- **AC3** — When a row document sits under the declared byte cap and over the old 20,480,
-  `check-memory-hygiene.sh` is SILENT about it on the byte axis while still naming it if it passes 250
-  lines, which is the observation that proves the byte bound moved and the line bound did not.
+  finding reports the measured bytes and the cap it applied, with no line figure for the row class.
+- **AC3** — When a row document carries **more than 750 lines** and stays under the declared byte cap,
+  `check-memory-hygiene.sh` is SILENT about it. Above 750 rather than above 250 deliberately: a fixture
+  in the 251-750 band is equally silent if the implementation leaves the guide class's `cl` governing
+  rows, so it cannot tell a retirement from that slip.
 - **AC4** — When the guide fixtures run, `memory/guides/tfixture.md` past 750 lines is still NAMED and
-  `memory/guides/twide.md` at 401 lines is still SILENT, proving the classes are still separate.
-- **AC5** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, its new check-6 row arms
-  fail on the BYTE axis, the three existing line-axis fixtures are unchanged, and `FLOOR_ASSERTIONS` in
-  that file has been raised to the new executed count.
-- **AC6** — When `bash tools/memory-tree/check-verdict-epoch.sh` runs over this diff it is green, and
+  `memory/guides/twide.md` at 401 lines is still SILENT, proving the classes are still separate and that
+  the silent control was not rebuilt.
+- **AC5** — When the suite runs, `memory/builds/tRunBig/RUN.md` is still NAMED by check 6, now on the
+  byte axis, so the `index_set` membership proof and the check-7 exemption precondition asserted on that
+  same file both still hold.
+- **AC6** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, its new check-6 row arms
+  fail on the BYTE axis and `FLOOR_ASSERTIONS` has been raised to the new executed count.
+- **AC7** — When `bash tools/memory-tree/check-verdict-epoch.sh` runs over this diff it is green, and
   `KIT_MEMORY_TREE_VERSION` no longer reads `2.18`.
-- **AC7** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs it is green, which is the gate
-  that pairs `memory/HYGIENE.md` with its template, `memory/TEMPLATE-SPEC.md` with
-  `tools/memory-tree/SPEC-TEMPLATE.template.md`, and `memory/guides/BUILD-METHOD.md` with its template —
-  so it is also what observes S12's corrected budget line in both carriers.
-- **AC8** — When `git grep -nE '20 ?KB|20,?480'` runs over the explicit S10 carrier list, no listed
-  carrier still states the retired byte figure. Expected survivors elsewhere, each for a stated reason:
+- **AC8** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs it is green, which is the gate
+  that pairs `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md` and `memory/guides/BUILD-METHOD.md` with
+  their templates — so it is also what observes S16's corrected budget line in both carriers.
+- **AC9** — When `git grep -nE '20 ?KB|20,?480|250 lines'` runs over the explicit S14 carrier list, no
+  listed carrier still states a retired figure. Expected survivors elsewhere, each for a stated reason:
   `memory/DECISIONS.md:41` (the ratified `TOOL-aWidenedGuide-1` row, in an append-only log),
   `.memory-tree.conf:57` and `tools/memory-tree/corpus_ids.py:461` (`READ_PATH_CEILING`'s headroom, out
-  of scope per §3), the engine's own shipped default (S3 keeps it at 20,480), and
-  `tools/memory-tree/check-memory-hygiene.test.sh` fixtures. The criterion is scoped to a path list
-  precisely because a tree-wide zero-survivor sweep is unsatisfiable.
-- **AC9** — When `bash tools/check-testsuite-counts.sh` and `bash tools/memory-tree/check-arms.py` run,
-  both are green, with the hygiene gate's `ARMS_FLOORS` pair unchanged at `14:14` because no `fail`
+  of scope), the engine's own shipped default at 20,480 per S3, the guide class's own `750`, and the test
+  fixtures. The criterion is scoped to a path list because a tree-wide zero-survivor sweep is
+  unsatisfiable.
+- **AC10** — When `bash tools/check-testsuite-counts.sh` and `python tools/memory-tree/check-arms.py`
+  run, both are green, with the hygiene gate's `ARMS_FLOORS` pair unchanged at `14:14` because no `fail`
   branch is added or removed.
-- **AC10** — When `python tools/codebase-map/test_codebase_map.py` runs, the hygiene engine is claimed by
+- **AC11** — When `python tools/codebase-map/test_codebase_map.py` runs, the hygiene engine is claimed by
   a dossier under `memory/map/features/`, `memory-tree` is gone from `memory/map/baseline.toml`, and the
   generated artifacts byte-compare against a fresh render.
-- **AC11** — When `bash skills/session-kickoff/manifest-check.sh` runs it exits 0, because three files in
-  its `watch:` list moved and `memory/guides/SESSION-KICKOFF.md` was re-stamped in the same change.
-- **AC12** — When `GATE_FULL=1 bash tools/run-gates.sh` runs at the push boundary it is green,
-  `memory/backlog/TOOL.md` sits under the declared cap, and `TOOL-cSettledDocket-16` reads CLOSED against
-  this unit.
+- **AC12** — When `bash skills/session-kickoff/manifest-check.sh` runs it exits 0, because three files in
+  its `watch:` list moved and the manifest was re-stamped in the same change.
+- **AC13** — When `GATE_FULL=1 bash tools/run-gates.sh` runs at the push boundary it is green,
+  `memory/backlog/TOOL.md` sits under 61,440, and `TOOL-cSettledDocket-16` reads CLOSED against this unit.
 
 ## 7. Gates
 
@@ -331,119 +329,105 @@ self-test · the harness meta-gate `check-arms.py` against the `ARMS_FLOORS` pai
 markers · kit/dogfood doc parity · method carriers · testsuite counts · codebase-map coverage and
 freshness · the kickoff-manifest ratchet, because `.memory-tree.conf`,
 `tools/memory-tree/check-memory-hygiene.sh` and `memory/guides/BUILD-METHOD.md` are all in its `watch:`
-list · drift-audit records. It adds no new leg, so the four gates that trip on a new leg are not in play.
+list · drift-audit records. It adds no new leg.
 
-Bug classes the checklist selects for these paths, each answered in the M4 record and re-answerable at
-the closing review: `fixture-passes-by-finding-nothing` · `two-answers-to-one-question` ·
-`vacuous-selector-empty-population` · `pin-copied-from-another-corpus` ·
-`gate-green-by-accident-on-generated-bytes`.
+One leg is RED at the spec's base for a reason outside this diff, and the build must not read it as its
+own: `drift-audit records` reports `ORPHAN_ID_PIN moved 0 -> 5`, because the local default drained that
+pin in `7f2b7b0` while this branch sits on `origin/main`, which still carries 5. It clears on the
+reground the Rollout section schedules.
+
+Bug classes the checklist selects: `fixture-passes-by-finding-nothing` (S8, S9, S10 exist for it) ·
+`two-answers-to-one-question` · `vacuous-selector-empty-population` · `pin-copied-from-another-corpus`
+(S3 exists for it) · `gate-green-by-accident-on-generated-bytes`.
 
 ## 8. Open questions
 
-### F1 — the declared value for THIS repo
+### F1 — the declared value · RESOLVED (owner, 2026-08-17): 61,440
 
-S3 fixes the shipped default at 20,480, so this fork decides only what this tree declares. Runway is
-measured from today's 19,152 bytes at 2,057 bytes per day, on one convention for all three rows.
+Three candidates were priced from today's 19,152 bytes at 2,057 bytes per day: 61,440 for about 21 days,
+derived as 250 rows at the measured 253.7 bytes; 39,632 for about 10 days, from the flat 20,480 headroom
+`READ_PATH_CEILING` uses; and 184,500 for about 80 days, a quarter of measured net growth, listed to be
+rejected because a 180 KB backlog shard is not scannable. The owner ratified 61,440.
 
-| value | basis | runway |
-|---|---|---|
-| 61,440 | 250 rows at the measured 253.7 B/row is 63,425, rounded to 60 KiB | ~21 days |
-| 39,632 | today's 19,152 plus the flat 20,480 headroom `READ_PATH_CEILING` uses | ~10 days |
-| 184,500 | a quarter of measured net growth | ~80 days |
+### F5 — the row line bound · RESOLVED (owner, 2026-08-17): retire it outright
 
-**Recommendation: 61,440.** It is the only candidate derived from something already in the rule rather
-than from a headroom convention borrowed from another check. The third row is listed to be rejected
-explicitly: a 180 KB backlog shard is not scannable, and the honest conclusion is that no byte cap
-compatible with a readable file buys a quarter at this minting rate. That is what the re-shape unit is
-for, and this fork must not be resolved by pretending otherwise.
+Asked twice. rev-1 recommended retirement on a premise the M4 audit falsified, so the fork was re-opened
+with the measured population — 22 of 29 row documents line-bound first, all 12 dossiers among them, and a
+3.3x-to-4.3x dossier loosening that `TOOL-aWidenedGuide-1` had refused. The owner was shown that
+measurement and both alternatives, and chose outright retirement. Recorded here as a deliberate
+relaxation of a ratified curation discipline, not as an inherited assumption.
 
-### F2 — absent-and-blank semantics
+### F3 — RE-OPENED by F5's answer: does the dossier sub-population need its own byte bound?
 
-The conf carries two idioms. The measured pins read "blank turns its check off"; the two policy ceilings
-ship with a value and say why.
+F3 previously asked whether the row class needs a per-document-kind matrix, and rev-3 recommended no on
+the grounds that a dossier's operative bound was the line count this unit would not touch. **F5's answer
+removes that ground.** After retirement a dossier is bounded only at 61,440 bytes, which at its measured
+density is roughly 1,050 lines; check 6 is the only size gate a dossier has, and its declared remedy is a
+split.
 
-**Recommendation: absent and blank both resolve to the shipped default, and no value disables the
-bound** — the policy-ceiling idiom, which this key matches. Note that the engine's pre-set-then-source
-order means this needs the explicit re-normalisation S2 specifies; the naive spelling gives the opposite
-behaviour, which is what makes this a design decision rather than a preference.
+Options: one key for the whole row class, accepting ~1,050-line dossiers until the map's convergence
+discipline is felt; or one extra branch giving the dossier sub-population its own byte bound at roughly
+its present effective ceiling, so the backlog shards get their 61,440 and dossiers keep the pressure to
+split.
 
-### F3 — one row-class key, or a per-document-kind matrix
+**Recommendation: the dossier sub-bound.** It is one branch and one conf key, it keeps the relaxation
+aimed at the population that asked for it, and it is the cheapest thing that stops the retirement
+reaching a class the owner's goal never mentioned. This is the only item that changes what gets built, so
+it is not resolved here.
 
-Backlog shards, the decision log, map dossiers and run-state files share a cap and do not share a reason
-for having one. Measured maxima against 20,480: backlog shard 93.5%, largest dossier 71.8%, largest
-run-state file 67.4%, decision log 60.2%. None is under 20%, so rev-1's stated basis for rejecting the
-matrix was simply false.
+### F2 — absent-and-blank semantics · recommendation not overruled
 
-**Recommendation: still one key, on the grounds that survive.** The run-state file's real bound is the
-protocol's 8 KB authored budget; a dossier's remedy is a split and, with F5 answered NO, its operative
-bound is the line count this unit does not touch. So the byte cap is load-bearing for one sub-population
-— the backlog shards and the decision log — and a matrix would be four knobs for one live case.
+Absent and blank both resolve to the shipped default; no value disables the bound. Put to the owner in
+the 2026-08-17 hand-back with F1 and F5 and not overruled, so S2 builds it. This is the policy-ceiling
+idiom rather than the measured-pin idiom, and it needs the explicit re-normalisation S2 specifies.
 
-### F4 — confirm or park the stale rotation claim
+### F4 — the stale rotation claim · recommendation not overruled
 
-`memory/builds/cSteadyMetronome/README.md` records that rotating a backlog orphans every id the moved
-rows defined. Reading `corpus_ids.py` says otherwise and three landed rotations agree with the reading.
-
-**Recommendation: confirm it by fixture in this unit.** It is two arms in a suite this unit is already
-editing, and the re-shape unit's options depend on whether rotation is a live remedy or a dead one.
-
-### F5 — the row line bound, re-opened
-
-**This fork was answered once already, and the answer rested on a premise the M4 audit falsified.** The
-owner chose to retire the row class's 250-line bound on rev-1's recommendation that it "cannot fire".
-Measured over the real population it is the bound that binds FIRST on 22 of 29 row documents, all 12
-dossiers among them, and check 6 is the only gate bounding a dossier at all. Retiring it with F1's value
-would loosen the dossier allowance 3.3x to 4.3x — the exact loosening `TOOL-aWidenedGuide-1` refused.
-
-**Recommendation: do not retire it.** §1's goal is met by the byte bound alone, the narrowing is a
-strictly smaller diff, it keeps the three existing line-axis arms intact instead of rebuilding one of
-them, and it leaves the byte raise inert for the 22 documents where the line bound already binds — which
-is the same thing as saying the raise reaches only the documents the owner asked about.
-
-If the owner still wants the line bound retired, the buildable shape is a SECOND declared bound rather
-than a deletion: a per-class line value that keeps the dossier and run-state sub-populations bounded
-while the backlog shards go byte-only. That is a materially larger unit, and it belongs with the
-re-shape rather than here.
+Confirm by fixture in this unit that rotating a backlog does not orphan the ids the moved rows defined.
+Put to the owner in the same hand-back and not overruled. Two arms in a suite this unit already edits,
+and the re-shape unit's options depend on the answer.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-17 · initial draft. Authored this run, so unreviewed by definition.
-- rev-2 · 2026-08-17 · folded the M4 spec audit recorded at
-  `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md` — verdict BLOCKED, 55 raw, 38 confirmed, 17
-  refuted, precision 0.69, 4 of 4 lenses, 21 distinct defects. The blocker rescoped the unit: retiring
-  the row line bound left §3 for fork F5, because the bound binds first on 22 of 29 row documents and
-  rev-1 had measured one. §4's Inventory now carries the whole 29-member class with a lines axis and the
-  sub-population maxima, which is what hid the blocker. Corrected figures: row length 253.7 B by `wc -c`
-  and not 251 by character count, the rotation floor is the whole 19,152-byte file at 93.5% and not
-  89.4%, minting is 17.3 ids/day, and F1's third candidate runs 80 days on its neighbours' formula and
-  not 90. Also: the shipped default is now stated and pinned at 20,480 (S3), the blank and non-numeric
-  branches gained scope items and criteria, AC8's sweep became a runnable scoped `git grep` with its
-  expected survivors named, AC7 moved onto the gate that actually pairs the carriers, four
-  gate-mandated files entered the files-touched table, the carrier list is enumerated by line, rule 6's
-  spill clause and `.gitattributes` entered the sweep, and `TOOL-cSettledDocket-16` — already OPEN for
-  this exact defect and missed by rev-1's recall probe — is closed by S13.
-- rev-3 · 2026-08-17 · added §4 Rollout. The local default branch advanced 37 commits past
-  `origin/main` during the build, and at that tip the tooling shard is at 99.34% with 135 bytes left and
-  nothing terminal to rotate — half a row. That forces a landing order the earlier revs did not state:
-  the conf change lands before this build's own decision and backlog rows, because writing the records
-  first reds check 6. Found while diagnosing the `drift-audit records` leg, whose red is a baseline
-  artifact of the same branch-versus-default gap and not this diff.
+- rev-2 · 2026-08-17 · folded the M4 spec audit at
+  `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md` — verdict BLOCKED, 21 distinct defects. The
+  blocker rescoped the unit: retiring the row line bound left for fork F5, because the bound binds first
+  on 22 of 29 row documents and rev-1 had measured one. §4's Inventory gained the whole 29-member class
+  with a lines axis. Corrected: row length 253.7 B by `wc -c` not 251 by character count, the rotation
+  floor is the whole 19,152-byte file at 93.5%, minting 17.3 ids/day, F1's third candidate ~80 days. The
+  shipped default was stated and pinned at 20,480, the blank and non-numeric branches gained scope items
+  and criteria, the sweep became a runnable scoped `git grep` with expected survivors named, four
+  gate-mandated files entered the files-touched table, and `TOOL-cSettledDocket-16` — already OPEN for
+  this defect and missed by rev-1's recall probe — is closed by scope.
+- rev-3 · 2026-08-17 · added §4 Rollout: the local default advanced 37 commits during the build and the
+  shard is at 99.34% there with 135 bytes left, forcing the conf change to land before this build's own
+  records.
+- rev-4 · 2026-08-17 · folded the owner's F1 and F5 decisions. F5 was reaffirmed AFTER the correct
+  measurement was put in front of the owner, so the line bound is retired outright and §3 now states the
+  relaxation of `TOOL-aWidenedGuide-1`'s discipline as deliberate and ratified rather than as a premise.
+  §4 gained "What retiring the row line bound costs", pricing the dossier shift at 3.3x-4.3x and about
+  1,050 lines. Three arms follow from the audit's folds: AC3 is pinned above 750 rather than 250 because
+  the 251-750 band cannot distinguish retirement from the shared-`cl` slip, AC5 keeps `tRunBig` named on
+  the byte axis so two contracts asserted through it survive, and AC4 protects the silent control. §5
+  risks gained the shared-`cl` hazard and now names the cannot-fire direction as one the unit creates on
+  purpose. F3 is RE-OPENED, because its rejection rested on the line bound staying.
 
 ## 10. Reuse audit
 
 **The seam this unit extends** is the per-class cap block at
 `tools/memory-tree/check-memory-hygiene.sh:379`, together with the conf-key convention of
-`.memory-tree.conf` itself. rev-1 attributed that convention to the engine; it is wrong. The engine
+`.memory-tree.conf` itself. rev-1 attributed that convention to the engine, which is wrong: the engine
 mentions `READ_PATH_CEILING` only in a prose comment at `:375` and contains neither `UNIVERSAL_BUDGET`
-nor `ROW_DUPLICATE_PIN`. The actual readers are `tools/memory-tree/corpus_ids.py:74`,
+nor `ROW_DUPLICATE_PIN`. The readers are `tools/memory-tree/corpus_ids.py:74`,
 `tools/memory-tree/gotchas.py:84` and `tools/memory-tree/row_grammar.py:42`. The correction matters
-because the engine's own six keys are pre-set defaults followed by a source, so copying its idiom yields
-the blank-disables-the-bound behaviour §4 forbids — which is why S2 specifies a re-normalisation step.
+because the engine's own keys are pre-set defaults followed by a source, so copying its idiom yields the
+blank-disables-the-bound behaviour S2 forbids.
 
-`TOOL-aWidenedGuide-1` is the decision this unit sits inside. rev-1 framed it as a seam extended; with
-F5 recommended NO it genuinely is extended rather than reopened, because the row class keeps the line
-bound that decision left in place. If F5 is answered YES, §10 must be rewritten to name the decision as
-reopened.
+**`TOOL-aWidenedGuide-1` is REOPENED by this unit, not extended.** That decision split the cap by class
+and explicitly refused to triple the row allowance. This unit triples it and retires the row line bound
+as well. rev-1 and rev-2 framed the decision as a seam being extended; with F5 answered YES that framing
+is false, and the record of the reopening is §3's closing paragraph plus the F5 mark above.
 
 `python tools/codebase-map/reuse_lookup.py "index file size cap and rotation for backlog shards"`
 returned no seam that fits. Its ranked candidates were name-stem coincidences — `build_index` in
@@ -463,5 +447,4 @@ which did not exist when rev-1 ran it, so re-running it does not reproduce rev-1
 
 **Where a hit and the source disagreed.** cSteadyMetronome's rotation-orphans-ids claim is contradicted
 by `corpus_ids.py`, whose one walk enumerates `git ls-files` with no `archive/` exclusion, and by three
-rotations landing green since it was written. The spec treats the record as stale and F4 turns the
-reading into a fixture rather than acting on either.
+rotations landing green since it was written. F4 turns the reading into a fixture.
