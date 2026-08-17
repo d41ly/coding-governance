@@ -218,14 +218,12 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
   costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
   that name states a count.
-- The hygiene engine PRE-SETS its conf keys and then sources `.memory-tree.conf` OVER them, so a blank
-  line in the conf overrides a default WITH BLANK. Every measured pin uses that as "skip this check". A
-  key that must not be skippable therefore needs an explicit re-normalisation AFTER the source —
-  `_resolve_cap` is the seam. Copying the pin idiom gives you a bound an adopter disables by accident.
-- A budget with no headroom left blocks RECORDING work, not doing it, and this repo has hit it twice:
-  the TOOL backlog at its byte cap with nothing terminal to rotate, and `READ_PATH_CEILING` breached by
-  ONE new build's row in the generated `memory/LIVE.md`. Before theorising, measure the headroom in
-  DAYS at the measured growth rate — the percentage reads survivable long after the runway is gone.
+- The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
+  overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
+  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
+- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
+  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
+  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
 - Naming a record `<date>-review-<FAMILY>-<slug>-<n>.md` where `n` is a round counter rather than a
   DEFINED unit id makes the filename cite an id nothing defines: check 14 reds and
   `gen_build_index.py` derives a phantom id into the README front matter. Use the unit-tail form
