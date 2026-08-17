@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = []
 backlog-shards = ["DEPL.md"]
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/govkit/*",

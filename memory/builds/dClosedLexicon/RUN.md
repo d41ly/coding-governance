@@ -1,0 +1,55 @@
+# dClosedLexicon - run state
+
+Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED
+from the build README on every read, so it cannot go stale between them. This file holds
+only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE
+with its anchor evidence, and the parked decisions.
+
+<!-- run:generated -->
+<!-- /run:generated -->
+
+## Run facts
+witness: 365be1c7d48e74b75defb60e2b8fdbee8a917a89
+phase: ABORTED
+keepalive: 6d0f3c29
+anchor-url: https://github.com/d41ly/coding-governance
+anchor-sha: 8e7eff82c3aca6305d4843de1901102563d0d4ca
+anchor-ref: refs/heads/main
+base: 8e7eff82c3aca6305d4843de1901102563d0d4ca
+
+keepalive-reaped: yes
+parked-surfaced: yes
+
+## Parked
+
+**How unit 2's two drift questions get declared (its fork F3).** The M4 audit found rev-2's answer
+mechanically impossible: it declared two signals in the project-owned data layer, which cannot
+declare one. Two options survive and they differ in what gets BUILT. The engine route appends two
+functions to the shipped drift-audit engine, each reporting not-asked when the lexicon conf is
+absent — it works, but it makes a generic shipped engine name an optional kit, which is the coupling
+that spec's own Alternatives section rejects for the map extractor template, and it changes what
+every drift-audit adopter receives. The project-layer route declares both as handkept rows, needing
+no engine edit, but they then share one pin that is currently drained to 0, and the spec's own
+prediction of a non-zero day-one seed forces that pin up — blinding the charter-completeness ratchet
+riding the same signal, which unit 1 depends on staying at 0. REFUSED because one changes a shipped
+kit's public surface while reversing a stated doctrine and the other degrades an existing gate to buy
+a new one; neither is a resolver call under a mandate that does not delegate scope, and there is no
+third option that is merely least-bad. Unit 2 is BLOCKED at rev-3 and this run does not build it. It
+was always inert without unit 1, so the park costs the run nothing.
+
+**A defect in this kit, hit during the fold, and the action taken.** Check 8 asserts the run-state
+file's generated region equals the build README slice it copies. Folding a review bumps spec revs,
+which moves the build index, which makes that region stale — an ordinary pass, not an abuse. The
+refusal says to re-run the driver rather than hand-edit, but the region's only writer is preflight,
+and preflight refuses while a run is live, so the instruction names no reachable verb. I restored the
+invariant by performing the driver's own copy mechanically — extracting the README slice and splicing
+it verbatim, authoring nothing — and filed the gap as an OPEN tooling row. Flagged here because the
+action is one the kit's own prose forbids in form while requiring in substance, and that is the
+owner's call to review rather than mine to normalize silently.
+
+**A record correction this run did not make.** The build README's PLAY unit still names the 48 KiB
+ceiling raise as landing "in a parallel build". It has not landed: the ceiling is still 32,768 and
+the template measures 32,682. That unit stays BLOCKED and correctly so, but nothing in the tree
+records how long it has been waiting or on which build, and this run did not go looking.
+
+2026-08-16T14:54:13Z abort · item dClosedLexicon · reason P3 did not converge across three adversarial rounds: four blockers in one predicate, the last two verified and unfixed (a <dir>/* nesting glob that escapes an earlier wildcard literally, and importer-local precedence applied to fully-qualified dotted imports). Both re-create the unfalsifiable-zero condition the unit exists to close. I set a stopping rule before the third round and it binds: my own assessment was wrong three consecutive times on this mechanism, so a fourth self-approved fix is not evidence of anything. REFUSED TO DECIDE: whether to ship P3 weakened, cut it from the ratified scope, or land the sound remainder (P1, P2, check-placeholders) without it -- all three are scope calls the standing mandate does not delegate. Nothing merged, nothing pushed; the branch carries the full record.

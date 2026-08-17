@@ -77,14 +77,26 @@ summarising it — twice over, this file has caught a number that a summary sent
 
 Stated so the gap is deliberate rather than assumed:
 
-- **The kits themselves**, except as reference targets. Two defects found in passing while using them
-  as sources of truth are recorded as follow-ups, not fixed here: `WIRE-INTO-PROJECT.md:463` calls
-  `agent-cap` "the review protocol's TWO rules" against four, and `tools/memory-tree/README.md:6`
-  plus root `README.md:33` both still say "19-check".
+- **The kits themselves**, except as reference targets. Defects found in passing while using them
+  as sources of truth are recorded as follow-ups, not fixed here. **The `agent-cap` "TWO rules"
+  item is WITHDRAWN 2026-08-16** (`PLAY-aDeclaredCeiling-1`): this report filed
+  `WIRE-INTO-PROJECT.md` as calling `agent-cap` "the review protocol's TWO rules" against four, and
+  the sentence is CORRECT. It reads "the mechanical enforcement of the review protocol's TWO rules:
+  route fan-out through the cap-5 helpers, AND a review's verify stage spawns at most 5 agents
+  TOTAL", and `memory/guides/REVIEW-PROTOCOL.md` binds exactly two rules — its `## The hard cap`
+  and `## Concurrency` sections. The "four" is `tools/hooks/agent-cap.js`'s four numbered
+  IMPLEMENTATION rules, which are how the hook enforces those two, not a second count of them. This
+  audit compared a sentence about the PROTOCOL to a population in the HOOK. The remaining follow-up
+  is real: `tools/memory-tree/README.md:6` still said "19-check" when this was written, and was
+  corrected at the closing review. **Root `README.md:33` was PULLED INTO SCOPE and is no longer a follow-up**
+  — `TOOL-aSiftedPlaybook-1` S4 receives it with a §4 inventory row and AC13 observing it, because
+  that unit already edits the file and the front door is adopter-facing. Three documents gave three
+  answers on this carrier across two review rounds; this is the one that records where it landed.
 - **`WIRE-INTO-PROJECT.md`'s structure**, beyond the one dead `§2a` reference `PLAY-3` S6 corrects.
 - **`skills/session-kickoff/SKILL.md`'s spec-canon count — TRUE AT BASE, FIXED ON MAIN, no longer a
   follow-up.** At BASE `91ef1b05` the engine read "status header + nine canonical sections" against a
-  ten-section canon. Commit `0f4d308`, one of the 102 this branch was behind, replaced it with the
+  ten-section canon. Commit `5fd7c7e` ("build(KICK-cKeyedLaunchpad-4): the sealed task region, and
+  the duplication it removes"), one of the 102 this branch was behind, replaced it with the
   right pattern: "the template states its own section count and the gate that enforces it; do not
   restate that number here, because it has already gone stale in three other carriers." Round 3 read
   it at HEAD, could not see BASE, and called the bullet fabricated. It was not — it was accurate when

@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-16
 streams: playbook+tooling
 roster: PLAY+TOOL
-ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
+ids: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13
 ---
 
 # dClosedLexicon — a declared naming lexicon, gated, and portable into an unknown repo
@@ -36,8 +36,8 @@ raise landing in a parallel build.
 
 The owner ratified the scope menu on 2026-08-16. All three predicates ship behind one opt-in kit,
 with the retirement condition for P1 written into F4 so a later session can act on it without
-reargument. `TOOL-dClosedLexicon-2` keeps one fork open by design — whether `codebase-map` should
-consume a lexicon-owned definition census cannot be settled without a measured corpus.
+reargument. `TOOL-dClosedLexicon-2`'s open forks are counted in the run section below rather than
+here, because this sentence said "one fork" and the 2026-08-16 audit added a second.
 
 The sequencing has been rewritten twice and the reasons are worth reading before trusting any of it.
 `PLAY-dClosedLexicon-1` began as a byte-freeing predecessor the whole build was parked on. It then
@@ -58,17 +58,33 @@ the `{{MEMORY_ROOT}}` disjointness error and `PLAY-aCandidStub-2` owns the byte 
 reopens the first only because it converts a repeated prose correction into a gate. The stale
 `19-check` count in template §5 is new, and its fix is to delete the number rather than update it.
 
+## The 2026-08-16 unattended run — classification and what it carries
+
+The M4 audit at `reviews/2026-08-16-review-dClosedLexicon-2.md` came back BLOCKED with two blockers,
+and the classification after folding it is: `TOOL-dClosedLexicon-1` READY and building;
+`TOOL-dClosedLexicon-2` BLOCKED on a parked scope fork; `PLAY-dClosedLexicon-1` still BLOCKED on the
+ceiling raise, which has NOT landed — the ceiling is still 32,768 and the template measures 32,682,
+so the 157 B line still does not fit. The aSiftedPlaybook merge specced that raise; it did not land it.
+
+Unit 2 is parked at its F3 and the run does not build it. rev-2 declared two drift signals in
+`drift_signals.py`, which is the project-owned DATA layer and cannot declare one. The two routes that
+can — editing the shipped `drift_report.py` engine, or folding both into the single `HANDKEPT` signal
+— differ in what gets built, and one of them reverses a doctrine this build's own spec states while
+the other degrades a pin unit 1 depends on. That is scope, and the standing mandate does not delegate
+scope. Unit 2 was always inert without unit 1, so parking it costs this run nothing.
+
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** BLOCKED · 3 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2
+**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | BLOCKED | rev-2 | 2026-08-16 |
-| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | SPECCED | rev-5 | 2026-08-16 |
-| [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | SPECCED | rev-2 | 2026-08-16 |
+| [PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-dClosedLexicon-1 — a declared naming lexicon, gated, and portable into an unknown repo](spec/2026-08-16-spec-dClosedLexicon-1.md) | CLOSED | rev-11 | 2026-08-16 |
+| [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | CLOSED | rev-5 | 2026-08-16 |
+| [TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns](spec/2026-08-16-spec-dClosedLexicon-4.md) | CLOSED | rev-3 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

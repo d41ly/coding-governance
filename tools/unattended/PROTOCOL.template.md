@@ -57,11 +57,19 @@ override on the authorization check is the authorization check.
 
 `<MEMORY_ROOT>/builds/<slug>/RUN.md`, split mechanically rather than by discipline.
 
-**Generated**, delimited by a marker pair and rendered by the driver: the unit list and per-unit
-status, both derived from build front matter and spec status headers. The gate byte-compares it
-against a fresh render. Never hand-edit it.
+**Generated** — and the marker pair is now EMPTY by contract. The unit list and per-unit status are
+DERIVED from the build README on every read, never copied here, and the gate asserts the region holds
+no copy.
 
-**Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
+This inverted an earlier design in which the region WAS a copy the gate byte-compared against its
+source. That equality was unmaintainable in the ordinary case: folding a review bumps a spec rev,
+which moves the build index, which makes the copy stale — and the region's only writer was
+`--preflight`, which refuses once a run is live. The refusal told the reader to "re-run the driver",
+naming a path no verb walks. A run that hit it could only hand-edit an artifact this document calls
+generated. Deriving removes the class instead of adding a verb to service it, and the invariant is
+the same one stated as emptiness: one fact, one home.
+
+**Authored**, carrying exactly eight facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
@@ -79,6 +87,11 @@ which is the test for belonging here:
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
 6. **The anchor tip sha**, from that same advertisement.
 7. **The endpoint URL** it was observed from.
+8. **The roster AT LANDING**, frozen by `--landed` and by nothing else. While a run is LIVE the unit
+   list is derived from the build README, which cannot go stale between reads. But a FINISHED record
+   must still answer which units the run covered, and that README is mutable: a later build adding a
+   unit would otherwise change a landed run's answer retroactively. Freezing the ids at the moment of
+   landing is what keeps a terminal record a record rather than a live query.
 
 Facts 5 through 7 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
 so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is

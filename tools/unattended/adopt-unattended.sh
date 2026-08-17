@@ -22,32 +22,81 @@ case "$MODE" in
   *) echo "usage: $0 [--check]"; exit 2 ;;
 esac
 
+# THE KIT DIR IS RESOLVED FIRST, BEFORE ANY `cd`. The walk below starts here, and the `cd "$ROOT"`
+# further down re-anchors the cwd — which is precisely what used to make this derivation depend on
+# how the adopter was INVOKED. See the strip note below.
+KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a git repo"; exit 2; }
 ROOT="$(cd "$ROOT" && pwd)"
-cd "$ROOT" || exit 2
-KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # WHICH TREE AM I ALLOWED TO TOUCH — asked FIRST, before anything else is read. The ordering is
 # load-bearing: running this from a repo that does not own the kit used to reach the conf check
 # first, whose message ("no .unattended.conf at the repo root") sends the operator to create a conf
 # in the very repo the adopter must not adopt. Measured by the e2e's foreign-repo arm.
-# The kit dir AS THE ADOPTER SEES IT, so the rendered commands are copy-pasteable. Both sides go
-# through the same `cd … && pwd` chain first: under MSYS/git-bash one directory has two spellings
-# and a raw prefix strip across them silently yields an absolute path, which then renders a command
-# carrying a drive letter.
+#
+# THIS USED TO BE `KIT_REL=${KIT_DIR#"$ROOT"/}` AND THAT WAS A DEFECT, not a shortcut. The two
+# operands are two spellings of one directory whenever the adopter is invoked by ABSOLUTE path:
+# `ROOT` carries git's flavor (`/c/Users/…/Temp/x`) and `KIT_DIR` the caller's (`/tmp/x`), `/tmp`
+# being an MSYS MOUNT POINT rather than a symlink, so the strip no-ops, `KIT_REL` comes out absolute,
+# and the refusal below fires for a kit that is perfectly well inside the repo. Invoked RELATIVELY it
+# worked, because the old `cd "$ROOT"` ran first and re-anchored `dirname "$0"` — so the bug was
+# invisible to the documented invocation and visible to the e2e's two absolute-path arms. The old
+# comment here claimed the shared `cd … && pwd` chain made both sides comparable; it does not, and
+# claiming sufficiency is what kept this alive.
+#
+# So: NOTHING IS COMPARED AS A PATH STRING ANY MORE. Two different questions, two mechanisms.
+#
+# (1) WHAT PATH DO WE RENDER — a purely LOGICAL upward walk from the kit dir, building the relative
+# path from basenames and stopping at the first `.git`. It compares nothing, so no pair of spellings
+# can disagree. `-e` and not `-d`, because a linked worktree's `.git` is a FILE and this fleet nests
+# worktrees inside the repository.
 #
 # THE WALK IS LOGICAL, NOT PHYSICAL, and that is the junction contract. `pwd` without `-P` keeps the
 # path the caller traversed, so a kit dir that is a JUNCTION inside the adopting repo anchors to the
 # ADOPTING repo — which is the install shape this fleet uses, and the codebase-map adopter's e2e
 # scores a refusal of it as a FAILURE. Resolving physically would follow the link to the target and
-# adopt the wrong tree, silently.
-KIT_REL=${KIT_DIR#"$ROOT"/}
-if [ "$KIT_REL" = "$KIT_DIR" ]; then
-  echo "unattended: the kit at $KIT_DIR is not inside $ROOT — refusing to touch either tree."
-  echo "  A kit outside the adopting repo would render a Skill whose commands point at another"
-  echo "  checkout, and would install this repo's declarations into somebody else's."
+# adopt the wrong tree, silently. Asking git instead is NOT an option and was measured: both
+# `git rev-parse --show-prefix` after a `cd` and `git -C <junction> rev-parse --show-prefix` answer
+# with the junction's TARGET.
+KIT_ROOT=""; KIT_REL=""; _p="$KIT_DIR"
+while : ; do
+  _parent="$(dirname "$_p")"
+  [ "$_parent" = "$_p" ] && break                     # filesystem root; no boundary found
+  KIT_REL="$(basename "$_p")${KIT_REL:+/$KIT_REL}"
+  if [ -e "$_parent/.git" ]; then KIT_ROOT="$_parent"; break; fi
+  _p="$_parent"
+done
+if [ -z "$KIT_ROOT" ]; then
+  echo "unattended: the kit at $KIT_DIR is not inside any git repository — refusing to touch anything."
+  echo "  The walk up from the kit dir reached the filesystem root without finding a .git, so there"
+  echo "  is no repo whose declarations this kit could install."
   exit 2
 fi
+
+# (2) IS THE KIT IN THE REPO WE ARE ADOPTING — repository IDENTITY, asked of git on BOTH sides so one
+# speller answers both. `--path-format=absolute` is the load-bearing half, not decoration: bare
+# `--git-common-dir` prints the RELATIVE `.git` from any toplevel, so two unrelated repositories both
+# answer `.git` and compare EQUAL — the refusal would never fire — while a linked worktree answers an
+# absolute path and would compare UNEQUAL to its own primary tree. Measured both ways on this fleet.
+# `--absolute-git-dir` is NOT a substitute: in a linked worktree it names that worktree's private git
+# dir, not the common one, so it would refuse the very install shape this fleet uses.
+_kit_id="$(git -C "$KIT_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || _kit_id=""
+_root_id="$(git -C "$ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || _root_id=""
+if [ -z "$_kit_id" ] || [ "$_kit_id" != "$_root_id" ]; then
+  echo "unattended: the kit at $KIT_DIR belongs to another repository — refusing to touch either tree."
+  echo "  You are standing in $ROOT. A kit outside the adopting repo would render a Skill whose"
+  echo "  commands point at another checkout, and would install this repo's declarations into"
+  echo "  somebody else's."
+  exit 2
+fi
+
+# EVERY WRITE GOES TO $ROOT, THE OPERATOR'S TREE — never to $KIT_ROOT. The two are the same directory
+# for an ordinary install and DIFFERENT working trees of one repository when the operator runs from a
+# linked worktree, which the identity test above deliberately admits. `$KIT_ROOT` fed the walk and the
+# comparison and has no further business here: writing there would put the rendered Skill and the
+# committed protocol copy into a tree the operator is not standing in, at exit 0.
+cd "$ROOT" || exit 2
 # An UNSUPPORTED PREFIX. The kit path is interpolated into shell commands in the rendered Skill, so
 # whitespace in it does not merely look wrong — it renders `bash my kit/unattended.sh --status`,
 # which runs `bash my` with three arguments. Refuse rather than emit a Skill that misfires.

@@ -30,6 +30,11 @@
     {
       "id": "ConfError",
       "kind": "class",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
+      "id": "ConfError",
+      "kind": "class",
       "file": "tools/memory-recall/recall_conf.py"
     },
     {
@@ -86,6 +91,11 @@
       "id": "Misfiled",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "Offender",
+      "kind": "class",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "Problem",
@@ -263,6 +273,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_module_index",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "build_reference_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -305,7 +320,17 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_layer_violation",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "checks",
@@ -578,7 +603,22 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "extract_chunks",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_declarations",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
     },
@@ -698,9 +738,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "langs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "last_qid",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "leading_verb",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "lf",
@@ -731,6 +781,11 @@
       "id": "load_conf",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "load_conf",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
     },
     {
       "id": "load_conf",
@@ -798,6 +853,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "load_waivers",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "log_event",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -851,6 +911,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lexicon/scaffold_lexicon.py"
     },
     {
       "id": "main",
@@ -1328,6 +1398,21 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_declared_sources",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "resolve_dests",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_import",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -1346,6 +1431,11 @@
       "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "resolve_rule_pool",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "resolve_selection",
@@ -1405,6 +1495,11 @@
     {
       "id": "run",
       "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
     {
@@ -1436,6 +1531,11 @@
       "id": "run",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "run_case",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "run_dense",
@@ -1471,6 +1571,16 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scan_claimed_paths",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_unselective_rules",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "score",
@@ -1538,6 +1648,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "signal_lexicon_ratified_stale",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "signal_lexicon_verbs_unused",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "signal_shrink_only",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -1586,6 +1706,11 @@
       "id": "subtokens",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "subtokens",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "surface_paths",
@@ -1873,6 +1998,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_declared_source_absent_is_skipped",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_declared_sources_reach_the_corpus",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_dossier_affordance_present_or_graced",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -1891,6 +2026,16 @@
       "id": "test_generated_artifacts_are_fresh",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_lexicon_signals",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_no_signal_hardcodes_live",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_patch_is_installed",
@@ -1913,6 +2058,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_undeclared_file_stays_out",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
@@ -1926,6 +2076,11 @@
       "id": "tracked",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "tracked_files",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "tree",
