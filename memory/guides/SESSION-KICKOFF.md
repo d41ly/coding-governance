@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T12:05:00+03:00 @ 23e3484abcf1edfe7fe058ff02e8db331e952716
+last-audit: 2026-08-17T18:35:18+03:00 @ 43eb6b101f5fefe3b04c06302db80c8bbe022f5f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 23e3484abcf1edfe7fe058ff02e8db331e952716
@@ -190,10 +190,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
-- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
-  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
-  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
-  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
+- A harness-created worktree carries CRLF on the `eol=lf`-pinned `.claude/` renders. Since
+  `TOOL-aBranchedMandate-1` and `-2` that reds no leg and refuses no `--preflight`; `--fix` still
+  repairs the bytes. Prior entry's "prune when the adopter CR-normalises" now holds.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.

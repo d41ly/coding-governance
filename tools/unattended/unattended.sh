@@ -60,6 +60,10 @@ CONF="$ROOT/.unattended.conf"
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""
+# CLOSED value set, and the default is the STRICT anchor. Anything outside the set — a blank, a
+# typo, a value from a newer kit — keeps `default-branch`, because a value-set guard that fell
+# through to the wide behaviour would make a misspelling silently grant what nobody declared.
+ANCHOR_SCOPE=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -270,18 +274,89 @@ default_branch() {
   printf '%s' "${d#origin/}"
 }
 
+# THE SECOND ANCHOR, and it is an observation of the SAME endpoint the first one used. It runs only
+# when `resolve_base` needs it, so an adopter on `default-branch` pays no extra `ls-remote`.
+#
+# The run's own branch NAME is read locally and that is sound: a forged local name merely selects a
+# different remote ref to observe, and the authorization still requires the remote to advertise that
+# ref AND a conforming build README to resolve at the tip it advertises. What is never read locally
+# is the TIP — that comes from the advertisement, exactly as the first anchor's does.
+BREF=""; BSHA=""
+# SILENT, and that is load-bearing. `fail` sets the global `status`, which has no reset in this
+# file, so a SPECULATIVE probe that called it would make every run that merely CONSIDERED the second
+# anchor exit non-zero. S12's monotone test probes speculatively on a path where the first anchor
+# already succeeded, so the two concerns are split: this returns a tip or nothing and says why via
+# its return code, and observe_branch turns those codes into the numbered refusals.
+#   1 = not on a named branch · 2 = the remote advertises no tip for it
+#   3 = advertised a tip this clone lacks · 4 = the tip is not an ancestor of HEAD
+branch_tip_quiet() { # -> prints "<ref> <sha>" on stdout
+  local cur rem adv sha
+  cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null) || return 1
+  [ -n "$cur" ] && [ "$cur" != HEAD ] || return 1
+  rem=$(GIT remote 2>/dev/null | head -1)
+  [ -n "$rem" ] || return 2
+  adv=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --exit-code "$rem" "refs/heads/$cur" 2>/dev/null) || return 2
+  sha=$(printf '%s\n' "$adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  [ -n "$sha" ] || return 2
+  GIT rev-parse --verify --quiet "$sha^{commit}" >/dev/null 2>&1 || return 3
+  # S2: a tip that is NOT an ancestor of HEAD is a branch this run is not building on, and pinning
+  # to it would measure the authorization against history this run does not contain.
+  GIT merge-base --is-ancestor "$sha" HEAD 2>/dev/null || return 4
+  printf '%s %s\n' "refs/heads/$cur" "$sha"
+  return 0
+}
+observe_branch() { # -> sets BREF/BSHA, or returns 1 having said why
+  local out rc cur
+  BREF=""; BSHA=""
+  out=$(branch_tip_quiet); rc=$?
+  cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null)
+  case "$rc" in
+    0) BREF=${out%% *}; BSHA=${out##* }; return 0 ;;
+    1) fail 31 "the run is not on a named branch, so there is no branch for the remote to advertise a tip for, and a detached HEAD cannot be the second anchor" ;;
+    2) fail 32 "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/$cur" ;;
+    3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
+    4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
+  esac
+  return 1
+}
+
 # BASE is the merge-base against the OBSERVED tip. Two non-zero returns carry meaning:
 #   2 = the merge-base equals HEAD. Nothing was built on top of the anchor, so the comparison would
 #       be trivially true. Still a refusal: F2 ratified equality over ancestry, because relaxing a
 #       guard for a hazard nobody has reproduced is how the anchor bypass survived in the first place.
 #   1 = there is no observed anchor, or no shared history with it.
-resolve_base() {
-  local mb
+#
+# S1: it takes the resolved README PATH so the fallback has a trigger. The trigger is a SILENT
+# existence probe and NOT a call to check_authorization: that function answers by calling `fail 6`,
+# which prints a numbered refusal and sets the global `status` that has no reset in this file, so
+# every successful branch-anchored preflight would have emitted "UNATTENDED check 6 FAILED" on its
+# way to succeeding. Shape only lives in check_authorization; existence only lives here.
+ANCHOR_KIND=""
+resolve_base() { # readme path (may be empty) -> base on stdout; sets ANCHOR_KIND
+  local mb rel="${1:-}" head
+  ANCHOR_KIND=""
   [ -n "$ASHA" ] || return 1
   mb=$(GIT merge-base "$ASHA" HEAD 2>/dev/null) || return 1
   [ -n "$mb" ] || return 1
-  [ "$mb" = "$(GIT rev-parse HEAD)" ] && return 2
-  printf '%s\n' "$mb"; return 0
+  head=$(GIT rev-parse HEAD)
+  # The FIRST anchor, unchanged, and it keeps its rc=2 contract.
+  if [ -z "$rel" ] || GIT show "$mb:$rel" >/dev/null 2>&1; then
+    ANCHOR_KIND=default-branch
+    [ "$mb" = "$head" ] && return 2
+    printf '%s\n' "$mb"; return 0
+  fi
+  # The README does not resolve at the merge-base. Widen ONLY when the project declared it; any
+  # other value — blank, misspelled, from a newer kit — keeps the strict anchor and the caller gets
+  # the same refusal it got before this unit existed.
+  [ "$ANCHOR_SCOPE" = published ] || { ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; printf '%s\n' "$mb"; return 0; }
+  observe_branch || return 1
+  # S11: the rc=2 contract is PRESERVED on this path too. Both `fail 16` branches gate on it, and
+  # without this the fallback would reach them through rc=0 and silence both for every
+  # branch-anchored run — while check-arms stays green, because the branches are still reachable on
+  # the default-branch path.
+  ANCHOR_KIND=run-branch
+  [ "$BSHA" = "$head" ] && return 2
+  printf '%s\n' "$BSHA"; return 0
 }
 
 # The mandate assertion's inputs, re-derived and cross-checked, in ONE place so preflight and close
@@ -299,9 +374,15 @@ resolve_base() {
 # message channel is the fix, and it is why this function returns 0/1 and sets `TB`.
 TB=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
-  local fresh rc rec head rec0
+  local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
-  fresh=$(resolve_base); rc=$?
+  # S1's plumbing: the README beside the run-state file, derived the way the gate leg derives it
+  # (`${f%/RUN.md}/README.md`) so the two halves of one kit spell it once. `resolve_base` needs it to
+  # decide whether the FIRST anchor carries the build folder; handed nothing it keeps the old
+  # behaviour, which is what the degenerate preflight path relies on.
+  _tb_rd="${1%/RUN.md}/README.md"
+  ANCHOR_KIND=""; BREF=""; BSHA=""
+  fresh=$(resolve_base "$_tb_rd"); rc=$?
   if [ "$rc" = 2 ]; then
     # BASE == HEAD. Legal outright where the caller says so, and only ONE caller does - see
     # verb_preflight, where a run has correctly built nothing yet and the file may not exist at all.
@@ -374,7 +455,26 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
         fail 18 "the BASE recorded in the run-state file does not resolve to a commit in this history, and the recorded value is written by the run: recorded $rec"
         return 1
       fi
-      if ! GIT merge-base --is-ancestor "$rec" "$fresh" 2>/dev/null; then
+      # S12, and it is a MONOTONE derivation rather than a discriminator. With two anchors the
+      # derivation stops being stable across a run: if the build folder reaches the default branch
+      # mid-run — another node lands it, or this run merges origin — the FIRST anchor starts firing,
+      # `$fresh` moves to the merge-base, and a recorded branch tip is not an ancestor of it. That
+      # refuses at `--close`, `authorization-reachable` is not overridable and `LANDING` is
+      # close-only, so the run wedges in a non-terminal phase with `--abort` as its only exit. A
+      # wedge with no attacker in it, reachable by another node simply doing its job.
+      #
+      # The fix is NOT to read `anchor-kind` back: the run writes that value, and a verb branching on
+      # it would be the inputs-inside-the-subject's-reach defect wearing a new key — the class this
+      # kit has been burned by three times. Instead nothing selects: a recorded BASE on EITHER
+      # derivation is accepted, so the anchor that fired is irrelevant and never has to be remembered.
+      #
+      # THE COST: `fail 18` widens. It now fires only for a base on NEITHER history, which is
+      # strictly smaller than before, so S9 carries an arm proving it still has a failing case. A
+      # widened guard with no failing-case arm is indistinguishable from a deleted one.
+      if ! GIT merge-base --is-ancestor "$rec" "$fresh" 2>/dev/null \
+         && ! { [ "$ANCHOR_SCOPE" = published ] \
+                && _tb_alt=$(branch_tip_quiet) \
+                && GIT merge-base --is-ancestor "$rec" "${_tb_alt##* }" 2>/dev/null; }; then
         fail 18 "the BASE recorded in the run-state file is not an ancestor of the base this history derives, so it names a commit off the history the anchor blesses - which is where a run's own commits live: recorded $rec, derived $fresh"
         return 1
       fi
@@ -1148,6 +1248,16 @@ verb_preflight() { # slug · keepalive-id
   [ -n "$(fact "$rel" anchor-sha)" ] || set_fact "$rel" anchor-sha "$ASHA" || return 1
   [ -n "$(fact "$rel" anchor-url)" ] || set_fact "$rel" anchor-url "$AURL" || return 1
   set_fact "$rel" keepalive "$kid"  || return 1
+  # S4: which anchor authorized this run, and — when it was the second one — the observation it
+  # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
+  # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
+  # NOT branch on anchor-kind (S12), because a verb that did would be taking a security decision from
+  # a value its own subject wrote.
+  set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  if [ -n "$BREF" ]; then
+    set_fact "$rel" branch-ref "$BREF" || return 1
+    set_fact "$rel" branch-sha "$BSHA" || return 1
+  fi
   # ONLY when the file carries no phase yet. Preflight used to rewrite this unconditionally, so a
   # resumed run that had reached BUILDING was silently moved back to RUNNING by the verb it is told
   # to re-run after a compaction.

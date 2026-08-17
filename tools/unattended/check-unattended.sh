@@ -198,6 +198,42 @@ fi
 # two non-existent paths, both swallowed by the `[ -f ]` guard — so every per-file check below never
 # ran on that file and the gate exited 0 without ever naming it. The mis-segmentation guard at check
 # 4 above could not see it either: the path matches the selector, it is the LOOP that loses it.
+# ---- S6c: ONE advertisement per leg RUN, never per record. This leg made ZERO network calls before
+# ---- this unit. Check 9's predicate is now stated against what the REMOTE advertises, and AC8
+# ---- forbids the leg from reading `anchor-kind` — a value its own subject writes — so it cannot
+# ---- know which records need the observation and must hold it for all of them.
+# ----
+# ---- FAIL-CLOSED, decided rather than left open, and the cost is smaller than it first looks. The
+# ---- AUTHORITATIVE run of this bar is `.githooks/pre-push`, and a push has the network by
+# ---- construction, so the run that actually decides a landing never pays this. An offline
+# ---- diff-scoped run pays it LOUDLY, which is the whole point: failing open would disarm the only
+# ---- BASE check on the bar, and that is the silent-skip shape this file refuses by name elsewhere.
+# ---- GIT_TERMINAL_PROMPT=0 is carried HERE rather than left to the driver: this leg runs under a
+# ---- hook with no tty, and a credential prompt would hang the push rather than refuse it.
+ADV_HEAD=""; ADV_TIPS=""
+adv_remote=$(GIT remote 2>/dev/null | head -1)
+if [ -n "$adv_remote" ]; then
+  adv_raw=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$adv_remote" HEAD 2>/dev/null) \
+    && ADV_HEAD=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  ADV_TIPS=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --heads "$adv_remote" 2>/dev/null \
+    | awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }')
+fi
+
+# PUBLISHED = an ancestor of a tip the remote advertises. Ancestry and NOT equality, and the
+# distinction is the whole of S6: under the second anchor the BASE is pinned to the advertised branch
+# tip, the run then commits and pushes that same branch again — which is exactly what the Skill tells
+# it to do — and the advertised tip moves PAST the pin. Equality reds from that moment on, forever,
+# and worse after a branch delete or a squash-merge landing. This file already records being moved
+# off equality once for that reason; writing it back in a second place would re-earn the same wedge.
+is_published() { # commit -> 0 if it is an ancestor of any advertised tip
+  local c="$1" t
+  [ -n "$ADV_HEAD" ] && GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
+  for t in $ADV_TIPS; do
+    GIT merge-base --is-ancestor "$c" "$t" 2>/dev/null && return 0
+  done
+  return 1
+}
+
 live=""; nlive=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
@@ -287,13 +323,20 @@ while IFS= read -r f; do
   if [ -z "$rb" ]; then
     fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
-    d=${GOV_DEFAULT_BRANCH:-}
-    [ -n "$d" ] || { d=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) || d=""; d=${d#origin/}; }
-    if [ -n "$d" ]; then
-      # REMOTE-TRACKING ONLY, matching the driver: a bare local branch is a ref the run can move
-      # with `git branch -f`, which is how BASE was made to equal HEAD.
-      for b in "refs/remotes/origin/$d" "refs/remotes/$d"; do
-        GIT rev-parse --verify --quiet "$b" >/dev/null 2>&1 || continue
+    # S6/S6b: the ADVERTISEMENT replaces the remote-tracking loop, and with it goes the last place
+    # this leg read GOV_DEFAULT_BRANCH or a `refs/remotes/*` ref on the BASE path — both of which the
+    # run can write, which is what TOOL-aStandingWrit-6 records. The loop carried five things and
+    # each is disposed of explicitly rather than left to fall out of the rewrite:
+    #   1 the not-a-commit refusal      — kept, below, and it needs no anchor
+    #   2 ancestor-of-anchor            — REPLACED by is_published (this is S6 itself)
+    #   3 ancestor-of-HEAD              — KEPT. Clause 2 has no relation to this run's history, so a
+    #                                     BASE published on a wholly unrelated ref would otherwise
+    #                                     satisfy the check; this is what ties it to this tree
+    #   4 the phase-keyed `rb != HEAD`  — kept, below, and it needs no anchor
+    #   5 check 15's second half        — kept, RE-ANCHORED to the advertised HEAD tip, which is the
+    #                                     same commit the old `$b` resolved to on an honest tree
+    if [ -n "$ADV_HEAD" ] || [ -n "$ADV_TIPS" ]; then
+      b="$ADV_HEAD"
         # ANCESTRY, NOT EQUALITY — and the reason is the kit's own first success. Equality wedged the
         # bar permanently: merging then pushing, the two acts an authorization grants, move the
         # merge-base past the pin forever, so a LANDED record red every later default-branch push.
@@ -303,8 +346,8 @@ while IFS= read -r f; do
         # ANCHOR names rather than on the branch the run authored.
         if ! GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
           fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
-        elif ! GIT merge-base --is-ancestor "$rb" "$b" 2>/dev/null; then
-          fail 9 "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded $rb against $b in $f"
+        elif ! is_published "$rb"; then
+          fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
         elif ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
           fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
         fi
@@ -338,8 +381,6 @@ while IFS= read -r f; do
               fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
             fi ;;
         esac
-        break
-      done
     fi
   fi
 
