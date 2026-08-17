@@ -12,7 +12,7 @@ prescribes a script the enforcement hook denies, and hands out a pre-flatten mem
 ## 2. Scope (IN)
 
 Every item below is a defect CONFIRMED by an adversarial skeptic in review `aCandidStub-1`
-(`reviews/2026-08-10-review-aCandidStub-1.md`); the id in brackets is that review's finding id.
+(`reviews/2026-08-10-review-PLAY-aCandidStub-1-1.md`); the id in brackets is that review's finding id.
 
 - **S1 — the deploy chain learns the companion exists.** `parallel-coding-governance.customize.md`
   names `parallel-coding-governance.domain-rules.md` zero times today, so its fill-and-verify

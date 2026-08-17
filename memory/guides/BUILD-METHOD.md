@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.18 -->
+<!-- gov:kit memory-tree@2.19 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -25,10 +25,8 @@ or generated artifact is a separate unit with its own id and spec. Two mechanism
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
-`memory/builds/<slug>/spec/`. **The README's `ids:` key is not it either** — `ids:` is DERIVED and rewritten by the
-index generator from every id the corpus mentions, so it answers "which ids exist" and never "which units are
-planned". A unit with no spec yet appears in neither, and cannot be added to `ids:` by hand: the next render removes
-it. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
+`memory/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
+answers "which ids exist", never "which units are planned", and a planned unit cannot be added to it by hand. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
 `memory/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
 
 **Classify, first match wins.** Write it into the build README before acting on it.
@@ -101,7 +99,9 @@ underspecification, contradiction, unstated assumption, prior art — with what 
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Most existing review records carry no
-verdict line; write it anyway, because M9 derives from these records. **Fold fixes into the spec** (rev bump + §9
+verdict line; write it anyway, because M9 derives from these records. **Carry the binding line** check 21 requires —
+`**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
+answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
 ## M5 — Recall and reuse
@@ -153,11 +153,8 @@ the other's output either way; (3) neither touches a shared mutable record — `
 `memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
 cannot write both path lists down, the work is not known to be disjoint — sequence it.
 
-Clause 3 once named the build README and every generated index outright. That reading is VACUOUS, not strict: a
-build README is regenerated from its specs' status headers, and every pass changes one, so no two passes of any
-build could ever be concurrent. A rule that forbids everything is obeyed by nobody. What actually collides is two
-passes RENDERING the same artifact, or one editing a generator while another runs it — a rendered artifact whose
-inputs are disjoint is regenerated once, at the end, by whichever pass finishes last. The fan-out and concurrency
+Clause 3 once named the build README outright, which was VACUOUS not strict: every pass changes a spec header it
+is regenerated from. What collides is two passes RENDERING one artifact, or one editing a generator another runs. The fan-out and concurrency
 CEILINGS are `memory/guides/REVIEW-PROTOCOL.md`'s; this is about WHICH work is parallel, never HOW MUCH.
 
 ## M7 — Regrounding
@@ -194,12 +191,15 @@ Workflow { scriptPath: 'tools/workflows/tier2-review.js',
 
 **Pass `reviewDir` explicitly** — its default is repo-root-relative and writes the report outside the memory tree,
 where nothing indexes it. The harness names the file it wrote: **rename it to `memory/HYGIENE.md` check 5's
-recording grammar before the next gate run**, or check 5 reds on a free-named file.
+recording grammar before the next gate run**, or check 5 reds on a free-named file. A closing review is a
+`diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
+in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
 `memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns. **Landing** —
-merge and push authorization, the lander, the bypass ban, conflict reconciliation — is template §1 Landing and
+merge and push authorization, the lander, the bypass ban, conflict reconciliation, when a build may land — is
+template §1 Landing and
 `memory/guides/UNATTENDED-PROTOCOL.md`.
 
 ## M9 — The wrap-up — a derivation, not a recollection
@@ -212,7 +212,7 @@ from, the line does not go in.**
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
-| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override |
+| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
 
 **Completeness test, the only one that matters:** every row has a source on disk. A field you cannot cite a source
@@ -222,7 +222,7 @@ apply: §16 budgets a completion message, and this is the only turn the owner ge
 
 ## M10 — If the run is unattended
 
-Two deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
+Three deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
 `memory/guides/UNATTENDED-PROTOCOL.md`, deliberately not paraphrased here.
 
 - **Nobody reads the transcript.** Speak only when it changes what happens next: a refusal, an abort, a park, the
@@ -231,6 +231,8 @@ Two deltas, and no others. The contract — mandate, run state, phases, witnesse
   are derive, park and abort; Step 5b says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it before preflight, reap it before the wrap-up. Both halves: protocol §5.
+- **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,
+  its record and what it cannot reach are protocol §10.
 
 ## M11 — Where everything else lives — read these, do not restate them
 

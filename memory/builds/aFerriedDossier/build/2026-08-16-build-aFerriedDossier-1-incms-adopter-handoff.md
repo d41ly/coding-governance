@@ -3,6 +3,8 @@
      by an adversarial pass (50 findings, 46 confirmed, 4 refuted, 0 unverified). Asks are
      DEPL-aFerriedDossier-1..3. -->
 
+**Serves:** none — an adopter handoff carried in from another repo; this build holds no spec for it to serve
+
 # Handoff to the `aTetheredConvoy` builder — from inCMS, node `a`
 
 **Standalone by design.** This file is meant to be readable inside `coding-governance` with no

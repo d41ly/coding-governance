@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T15:30:00+03:00 @ 827296b2288b3a634197d8f8fb5771b9fab13abf
+last-audit: 2026-08-17T16:30:00+03:00 @ af708d8f04d5af598e3451aeb9fe913e52ee81e9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 827296b2288b3a634197d8f8fb5771b9fab13abf
@@ -56,6 +56,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
+- **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
+  POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
+  preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
+  registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
+  the handles are written here — that is the drift the pointer design exists to avoid.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -126,6 +131,14 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
+  grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
+  running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
+  (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
+- Two branches can BOTH rotate `memory/backlog/<FAMILY>.md` to archive independently. The row
+  driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
+  verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
+  0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
@@ -193,3 +206,15 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
+- The full bar can TIME OUT on a node whose `TMPDIR` holds tens of thousands of stale scratch dirs:
+  every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
+  >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
+  dir before blaming the diff, and do not delete the shared one.
+- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
+  check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
+  it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
+  after a round counter.
+- A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
+  assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
+  costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
+  that name states a count.

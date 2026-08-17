@@ -63,11 +63,13 @@ alone still contains the string `agent-cap.js` and used to report the tree corre
 
 - A `Workflow({name:'…'})` run of a saved workflow supplies no source to the hook. Those workflows
   live in `workflows/` and the merge-bar leg covers them there.
-- The agents a workflow script spawns INSIDE itself. That script runs in a sidechain with no hooks,
-  so no process observes those spawns and none ever will. This is a statement about the SIDECHAIN
-  specifically — not a blanket claim that runtime counting is impossible, which is what it used to
-  read as. A `PreToolUse` hook on a main-loop tool call is a different case and was measured on its
-  own evidence.
+- The agents a workflow script spawns INSIDE itself. MEASURED 2026-08-15 by dispatching a probe and
+  asking it to report what arrived before it read anything: a sidechain agent holds no `Agent` tool
+  at all — `ToolSearch` for it returns nothing — so it cannot fan out, and the arity rule has nothing
+  to bind at that depth. The capability is ABSENT rather than unpoliced, which is the stronger
+  property and not the one this bullet used to claim. Whether a `PreToolUse` hook would fire there
+  is UNMEASURED: the matcher covers `Workflow|Agent`, neither of which a sidechain holds, so the
+  experiment never ran. A matcher on a tool it does hold — `Bash` — would answer it.
 - A session whose token directory cannot be resolved at all — no git dir, or a payload missing
   `session_id` / `prompt_id` / `tool_use_id`. That fails OPEN and silently, because a hook that
   denies every spawn on a filesystem hiccup is worse than the burst it prevents. A token that could
@@ -165,6 +167,11 @@ on one unescaped backslash and regenerating whole.
   ignore beats reject-and-regenerate; on a validation failure feed back the offending key, not
   "regenerate everything".
 - Workflow scripts are **plain JavaScript** — type annotations, interfaces and generics fail to parse.
-- Workflow scripts run in sidechains that inherit **no hooks and no `CLAUDE.md`**. The discipline
-  lives with the ORCHESTRATOR that writes the script, which is why the cap is enforced at the tool
-  call and never inside the script, where no hook reaches.
+- Workflow scripts run in sidechains. This document asserted they inherit **no hooks and no
+  `CLAUDE.md`**; MEASURED 2026-08-15, both halves are FALSE. The probe's first message carried a
+  `system-reminder` holding `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, and a
+  `SubagentStart` hook fired and was obeyed, arriving with its own verbatim header. No
+  `SessionStart`-shaped injection was observed — recorded as not-observed rather than as absent.
+  Measured by dispatching a probe and asking it to report what arrived before it read anything.
+  The cap is still enforced at the tool call rather than inside the script, but because the
+  orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.

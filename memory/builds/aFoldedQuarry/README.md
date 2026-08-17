@@ -52,6 +52,17 @@ ids TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQ
 | [TOOL-aFoldedQuarry-7 — U5: the harness disciplines, made mechanical](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md) | CLOSED | rev-1 | 2026-08-08 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-08-build-TOOL-aFoldedQuarry-2-1.md](build/2026-08-08-build-TOOL-aFoldedQuarry-2-1.md) | journal | TOOL-aFoldedQuarry-2 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-1.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-1.md) | spec-audit | TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-7.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-7.md) | diff-review | TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-3-2.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-3-2.md) | spec-audit | TOOL-aFoldedQuarry-3 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-4-3.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-4-3.md) | spec-audit | TOOL-aFoldedQuarry-4 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-5-4.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-5-4.md) | spec-audit | TOOL-aFoldedQuarry-5 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-6-5.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-6-5.md) | spec-audit | TOOL-aFoldedQuarry-6 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-7-6.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-7-6.md) | spec-audit | TOOL-aFoldedQuarry-7 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -75,13 +86,13 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md](spec/units/2026-08-08-spec-aFoldedQuarry-6-u4-gotchas.md)
   - [2026-08-08-spec-aFoldedQuarry-7-u5-harness.md](spec/units/2026-08-08-spec-aFoldedQuarry-7-u5-harness.md)
 - **`build/`**
-  - [2026-08-08-build-aFoldedQuarry-1.md](build/2026-08-08-build-aFoldedQuarry-1.md)
+  - [2026-08-08-build-TOOL-aFoldedQuarry-2-1.md](build/2026-08-08-build-TOOL-aFoldedQuarry-2-1.md)
 - **`reviews/`**
-  - [2026-08-08-review-aFoldedQuarry-1.md](reviews/2026-08-08-review-aFoldedQuarry-1.md)
-  - [2026-08-08-review-aFoldedQuarry-2.md](reviews/2026-08-08-review-aFoldedQuarry-2.md)
-  - [2026-08-08-review-aFoldedQuarry-3.md](reviews/2026-08-08-review-aFoldedQuarry-3.md)
-  - [2026-08-08-review-aFoldedQuarry-4.md](reviews/2026-08-08-review-aFoldedQuarry-4.md)
-  - [2026-08-08-review-aFoldedQuarry-5.md](reviews/2026-08-08-review-aFoldedQuarry-5.md)
-  - [2026-08-08-review-aFoldedQuarry-6.md](reviews/2026-08-08-review-aFoldedQuarry-6.md)
-  - [2026-08-08-review-aFoldedQuarry-7.md](reviews/2026-08-08-review-aFoldedQuarry-7.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-1-1.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-1.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-1-7.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-7.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-3-2.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-3-2.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-4-3.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-4-3.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-5-4.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-5-4.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-6-5.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-6-5.md)
+  - [2026-08-08-review-TOOL-aFoldedQuarry-7-6.md](reviews/2026-08-08-review-TOOL-aFoldedQuarry-7-6.md)
 <!-- /gen:build-docs -->

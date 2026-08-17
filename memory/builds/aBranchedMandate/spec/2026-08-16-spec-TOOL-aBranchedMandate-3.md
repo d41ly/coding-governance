@@ -149,7 +149,7 @@ document that already states what the first one costs.
 
 ### What fails today, and why it is not a bug
 
-Reproduced by `build/repro-c3.sh` under this build, against a bare origin that advertises a HEAD
+Reproduced by `build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` under this build, against a bare origin that advertises a HEAD
 symref so the anchor observation succeeds and only the authorization comparison fails:
 
 ```
@@ -378,7 +378,7 @@ bar on the next push, on the one path the run is required to take.
   attacker, reachable by another node simply landing the build folder, and it ends with the run stuck
   in a non-terminal phase because the verb that would move it is the one that refuses.
 - testing + left-shift gates — S9, and the fixture must build a real bare origin that advertises a
-  HEAD symref. `build/repro-c3.sh` under this build is the working fixture shape and the arms reuse
+  HEAD symref. `build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` under this build is the working fixture shape and the arms reuse
   it. An arm keyed on the exit code alone would pass on any refusal, which is the
   `fixture-passes-by-finding-nothing` class this repo tracks by name.
 - migration / rollback — no record migrates. Reverting restores the strict anchor and makes any
@@ -392,7 +392,7 @@ bar on the next push, on the one path the run is required to take.
   wide scope declared, it succeeds and the run-state file records `anchor-kind: run-branch` together
   with the observed branch ref and tip.
 - **AC2** — When the same command runs with the scope undeclared or blank, it refuses with the check
-  6 message, exactly as `build/repro-c3.sh` reproduces today.
+  6 message, exactly as `build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` reproduces today.
 - **AC3** — When the build folder is committed on the branch but the branch has **not** been pushed,
   `--preflight` refuses and its message names the branch that the remote does not advertise.
 - **AC4** — When the remote advertises the branch but its tip is not an ancestor of HEAD,
@@ -582,6 +582,6 @@ the working copy, and on the branch anchor BASE is a tip the run itself pushed, 
 re-satisfy it against its own new bytes. Protocol section 1 lists that as a mechanical property, which
 is why S8 qualifies it per anchor instead of leaving it standing.
 
-The fixture shape is reused from `build/repro-c3.sh` under this build, which itself follows the bare
+The fixture shape is reused from `build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` under this build, which itself follows the bare
 origin with an advertised HEAD symref that `tools/unattended/unattended.test.sh` established. No new
 test harness is introduced.

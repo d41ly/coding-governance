@@ -134,7 +134,7 @@ between commits.
   the completeness pin stays at 0 and the non-terminal-spec pin stays at 2.
 - **AC6** — the test binds the SHIPPED readers: a deliberate edit to each of the four changes the
   test's verdict, demonstrated once per reader and recorded in the build report at
-  `build/2026-08-16-build-TOOL-aMouldedFolio-3-followups-controls.md` §5 2, which carries the transcripts.
+  `build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md` §5 2, which carries the transcripts.
 
 ## 7. Gates
 

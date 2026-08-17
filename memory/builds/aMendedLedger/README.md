@@ -34,6 +34,16 @@ ids TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedL
 | [TOOL-aMendedLedger-8 — U9: the merge driver, redesigned around what git already gets right](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md) | SPECCED | rev-2 | 2026-08-10 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+
+Ids no `spec-audit` record has ever named: TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -58,10 +68,10 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md](spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md)
   - [2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md)
 - **`build/`**
-  - [2026-08-10-build-aMendedLedger-1-driver-repro-corpus.md](build/2026-08-10-build-aMendedLedger-1-driver-repro-corpus.md)
+  - [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md)
 - **`reviews/`**
-  - [2026-08-09-review-aMendedLedger-1-closing-diff.md](reviews/2026-08-09-review-aMendedLedger-1-closing-diff.md)
-  - [2026-08-09-review-aMendedLedger-2-repair.md](reviews/2026-08-09-review-aMendedLedger-2-repair.md)
-  - [2026-08-09-review-aMendedLedger-3-regression.md](reviews/2026-08-09-review-aMendedLedger-3-regression.md)
-  - [2026-08-10-review-aMendedLedger-4-u9-redesign.md](reviews/2026-08-10-review-aMendedLedger-4-u9-redesign.md)
+  - [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md)
+  - [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md)
+  - [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md)
+  - [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md)
 <!-- /gen:build-docs -->

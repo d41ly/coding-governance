@@ -18,11 +18,26 @@ include = ["agent-cap.test.sh"]
 role = "engine"
 to = "{prefix}/hooks/agent-cap.test.sh"
 
+# The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
+# this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
+# surface predicate, which is depth-1 and sees only `tools/hooks`.
+[[files]]
+include = ["kit.toml"]
+role = "engine"
+to = "{prefix}/hooks/kit.toml"
+
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
 
 [[gate_leg]]
-name = "agent-cap selftest"
+name = "agent-cap self-test"
 argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
 guard = ["{prefix}/hooks/"]
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the kit ships a self-test that rides the bar as its own leg, and no adopter and no rendered artifact — so there is nothing here for `check` to run that is not already a gate. Whether the hook is WIRED is check-wiring's question, not this kit's
+"""

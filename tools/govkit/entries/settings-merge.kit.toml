@@ -17,6 +17,7 @@ claims = ["tools/settings-merge.py"]
 include = []
 role = "merged"
 to = ".claude/settings.json"
+delegate = true
 marker_style = "json-pointer"
 block_id = "hooks.PreToolUse[matcher]/hooks[command~agent-cap.js]"
 side_effects = [".claude/settings.json.bak"]
@@ -25,3 +26,15 @@ note = "the merge re-serializes the WHOLE document, so the first apply reformats
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the shipped engine DOES carry a check arm and this entry deliberately does not wire it yet: the arm exits non-zero whenever the hook is unwired, and the precondition that makes that legal is declared by the merged-region unit. Wiring it before then would make `check` permanently red for a target that selected this entry alone
+"""
+
+[[gate_leg]]
+name = "settings-merge selftest"
+argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
+guard = ["{prefix}/"]

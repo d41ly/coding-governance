@@ -1,5 +1,8 @@
 # aBranchedMandate — why an unattended run refuses in a worktree
 
+**Serves:** none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it
+**Commissions:** TOOL-aBranchedMandate-1..4
+
 Node `a` · 2026-08-16 · reproduced against BASE `96141aed`.
 
 The commissioning report was one sentence: an unattended build cannot be started from a worktree
@@ -141,7 +144,7 @@ not at that merge-base.
 
 Reproduced in a scratch clone with a real bare origin advertising a HEAD symref, so the anchor
 observation succeeds and only the authorization comparison fails. The script is
-`build/repro-c3.sh` beside this record. Its flow: seed and push a default branch, branch to `unit`,
+`build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` beside this record. Its flow: seed and push a default branch, branch to `unit`,
 write and commit a conforming build folder there, then preflight.
 
 ```

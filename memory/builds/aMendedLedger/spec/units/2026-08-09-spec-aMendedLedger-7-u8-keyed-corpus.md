@@ -267,10 +267,10 @@ exists for. The line numbers locate them exactly.
 
 | id, elided | file and lines | occurrences |
 |---|---|---|
-| `TOOL-aMendedLedger-<n>b` | `reviews/2026-08-09-review-aMendedLedger-1-closing-diff.md:132, :427` | 2 |
-| `TOOL-zFixture-<n>b` | `reviews/2026-08-09-review-aMendedLedger-2-repair.md:75` | 1 |
-| `TOOL-zFix-<n>b`, one-digit | `reviews/2026-08-09-review-aMendedLedger-2-repair.md:157, :158, :160` | 3 |
-| `TOOL-zFix-<n>b`, two-digit | `reviews/2026-08-09-review-aMendedLedger-2-repair.md:219, :220, :226` | 3 |
+| `TOOL-aMendedLedger-<n>b` | `reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md:132, :427` | 2 |
+| `TOOL-zFixture-<n>b` | `reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md:75` | 1 |
+| `TOOL-zFix-<n>b`, one-digit | `reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md:157, :158, :160` | 3 |
+| `TOOL-zFix-<n>b`, two-digit | `reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md:219, :220, :226` | 3 |
 
 Nine occurrences, two files. The remedy is the elision this build already established and which the
 third review report uses throughout: replace the trailing numeral with `<n>`, giving forms such as
@@ -287,7 +287,7 @@ decision and orphan nothing, which is the opposite of the remedy.
 
 The commit message must disclose that SIX of the nine occurrences sit inside fenced quoted tool
 output, and that eliding the token there trades a little reporting fidelity for not spending a
-shrink-only pin on prose. Verified fence positions in `2026-08-09-review-aMendedLedger-2-repair.md`:
+shrink-only pin on prose. Verified fence positions in `2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md`:
 one fence spans `:155-161`, enclosing `:157`, `:158` and `:160`; a second spans `:217-227`, enclosing
 `:219`, `:220` and `:226`. Only `review-2:75` and `review-1:132` and `:427` are prose. Rev-1 wrote
 "one of the nine", which understates the trade by six times and ships a record that does not match
@@ -354,8 +354,8 @@ Driver and its suite: `tools/memory-tree/merge-rows.py` (docstring `:78-83` and 
 `:196-211`, the comment at `:479-480`, and the groups at `:496`, `:507`, `:519`, `:523`, `:531`,
 `:586-594`, `:635`).
 
-Records: `memory/builds/aMendedLedger/reviews/2026-08-09-review-aMendedLedger-1-closing-diff.md`,
-`memory/builds/aMendedLedger/reviews/2026-08-09-review-aMendedLedger-2-repair.md`,
+Records: `memory/builds/aMendedLedger/reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md`,
+`memory/builds/aMendedLedger/reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md`,
 `memory/map/features/memory-tree-merge-driver.md:49-50`, `memory/DECISIONS.md` (append only),
 `memory/backlog/TOOL.md`, `memory/builds/aMendedLedger/README.md` front matter.
 
@@ -477,7 +477,7 @@ spent three review rounds making the driver correct.
   replaced with `<n>`. The four ids are located by `python tools/memory-tree/corpus_ids.py --report`
   rather than by a hand-written pattern, because a pattern loose enough to catch all four also
   catches the ratified correction records `TOOL-aMendedLedger-1b` and `-1c` — measured, at three
-  further lines of `2026-08-09-review-aMendedLedger-1-closing-diff.md` — and eliding those would
+  further lines of `2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md` — and eliding those would
   delete a real citation of a real decision. The commit message must state that six of the nine
   elided occurrences sat inside fenced quoted tool output.
 - **AC4b** When the elisions have landed, `wc -c memory/DECISIONS.md` is unchanged and

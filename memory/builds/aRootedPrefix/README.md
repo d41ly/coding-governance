@@ -24,6 +24,10 @@ ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 | [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | CLOSED | rev-3 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md) | spec-audit | TOOL-aRootedPrefix-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -41,5 +45,5 @@ Records live under `spec/` and `reviews/`.
 - **`spec/`**
   - [2026-08-09-spec-aRootedPrefix-1.md](spec/2026-08-09-spec-aRootedPrefix-1.md)
 - **`reviews/`**
-  - [2026-08-09-review-aRootedPrefix-1.md](reviews/2026-08-09-review-aRootedPrefix-1.md)
+  - [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md)
 <!-- /gen:build-docs -->

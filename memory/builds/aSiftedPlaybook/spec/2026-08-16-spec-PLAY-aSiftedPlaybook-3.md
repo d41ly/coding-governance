@@ -160,7 +160,7 @@ the clearest single justification for the owner's raise.
 
 ### A prior review refuted this, and the ground it was refuted on is being removed
 
-`memory/builds/aCandidStub/reviews/2026-08-10-review-aCandidStub-1.md:222-224` raised this exact
+`memory/builds/aCandidStub/reviews/2026-08-10-review-PLAY-aCandidStub-1-1.md:222-224` raised this exact
 omission as finding id 19 and **refuted it on THREE grounds**: no line claims the kit menu is
 exhaustive; each bullet is individually true; and the template is at its ceiling. Its dispositive
 framing — "an omission, not a contradicted claim" — rests on the first two, which the raise does not

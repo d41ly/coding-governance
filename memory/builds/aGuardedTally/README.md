@@ -23,6 +23,13 @@ ids TOOL-aGuardedTally-1
 | [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | INPROGRESS | rev-4 | 2026-08-03 |
 
 Records live under `spec/`, `reviews/` and `prompts/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md) | research | TOOL-aGuardedTally-1 |
+| [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md) | diff-review | TOOL-aGuardedTally-1 |
+
+Ids no `spec-audit` record has ever named: TOOL-aGuardedTally-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -40,7 +47,7 @@ Records live under `spec/`, `reviews/` and `prompts/`.
 - **`spec/`**
   - [2026-08-03-spec-aGuardedTally-1.md](spec/2026-08-03-spec-aGuardedTally-1.md)
 - **`reviews/`**
-  - [2026-08-04-review-aGuardedTally-1.md](reviews/2026-08-04-review-aGuardedTally-1.md)
+  - [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md)
 - **`prompts/`**
-  - [2026-08-03-prompt-aGuardedTally-1.md](prompts/2026-08-03-prompt-aGuardedTally-1.md)
+  - [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md)
 <!-- /gen:build-docs -->

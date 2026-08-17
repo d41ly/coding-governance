@@ -1,12 +1,5 @@
 [
   {
-    "name": "memory hygiene (20 checks)",
-    "argv": [
-      "bash",
-      "tools/memory-tree/check-memory-hygiene.sh"
-    ]
-  },
-  {
     "name": "kickoff-manifest ratchet",
     "argv": [
       "bash",
@@ -239,13 +232,6 @@
     ]
   },
   {
-    "name": "marker contract (4 readers)",
-    "argv": [
-      "bash",
-      "tools/memory-tree/marker-contract.test.sh"
-    ]
-  },
-  {
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",
@@ -309,13 +295,6 @@
       ".claude/",
       "tools/",
       "tools/lib/"
-    ]
-  },
-  {
-    "name": "verifier fan-out (\u22645 verify agents per review)",
-    "argv": [
-      "bash",
-      "tools/workflows/check-verifier-fanout.sh"
     ]
   },
   {
@@ -622,6 +601,61 @@
     "guard": [
       "tools/check-placeholders.sh",
       "tools/check-placeholders.test.sh"
+    ]
+  },
+  {
+    "name": "memory hygiene",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-memory-hygiene.sh"
+    ]
+  },
+  {
+    "name": "marker contract",
+    "argv": [
+      "bash",
+      "tools/memory-tree/marker-contract.test.sh"
+    ]
+  },
+  {
+    "name": "verifier fan-out",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.sh"
+    ]
+  },
+  {
+    "name": "govkit refusal join",
+    "argv": [
+      "python",
+      "tools/govkit/refusal_join.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "govkit acceptance matrix",
+    "argv": [
+      "python",
+      "tools/govkit/matrix.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "testsuite counts (every bar self-test prints one)",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.sh"
+    ]
+  },
+  {
+    "name": "testsuite counts self-test",
+    "argv": [
+      "bash",
+      "tools/check-testsuite-counts.test.sh"
     ]
   }
 ]

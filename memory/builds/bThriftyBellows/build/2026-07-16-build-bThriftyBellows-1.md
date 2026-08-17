@@ -1,5 +1,7 @@
 # 2026-07-16 — `bThriftyBellows` (node b): memory-tree kit 1.2 — hygiene-gate fork-collapse port
 
+**Serves:** none — this build shipped before the spec-format ratchet reached it and holds no spec at all, so there is no id to serve
+
 Index digest, folded here when memory/project/MEMORY.md was retired: memory-tree kit 1.2 fork-collapse — hygiene gate 2647s → 34s on a 1487-file tree, byte-identical (golden diff ×3 targets); gen-memory-tree cache-and-grep is SLOWER, don't retry (TOOL-bThriftyBellows-2).
 
 Port of BOTH upstream inCMS optimization rounds (ARCH-aFencedNamespace-3 + PERF-eThriftyBellows-1)

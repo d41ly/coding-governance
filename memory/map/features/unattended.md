@@ -82,6 +82,13 @@ headroom, so the unattended rules live in the domain-rules companion (§1) with 
 the template proper, both written to stay true for a non-adopting re-puller. A new universal-core
 section for an opt-in kit was rejected on both counts.
 
+**A run is bound by eleven named directives, and each is a POINTER.** The set is a kit constant the
+project may extend but not delete; the rules live in the build method and the contract names zero
+handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
+taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
+cannot take an answer and a re-preflight re-issues the recorded set. A waiver relaxes the directive,
+never a DoD item and never a gate.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -140,10 +147,22 @@ section rots silently and is worth re-deriving whenever the feature is touched.*
   and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
   above, and it was owned by nobody until this dossier row.
 
-- **The shipped protocol's version marker is not paired by any gate.** `check-kit-versions.sh` pairs
-  this kit's two script constants and not the doc it ships, which is how the marker sat at `1.2`
-  against `1.3` unnoticed. The memory-tree and memory-recall kits both pair their shipped doc; this
-  one does not. Corrected by value at 1.4; the gate is the open work.
+- **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
+  both directions by check 16, every cited method section resolves, and the protocol's own §3 phase
+  list, §4 DoD table and the count sentence above it are joined to the driver's constants by arms D
+  and E. Check 17 grades the parked waiver record: a declared handle, a non-empty reason, and the
+  whole line present in the run-state file's FIRST committed blob. Its green control's waiver is
+  written by `--preflight --waive` rather than by hand, which is the cross-component arm
+  `TOOL-aStandingWrit-8` asked for. Two exemptions are deliberate and each carries its reason in
+  source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
+  against a moving directive set is a red wedge no verb can repair, and the git join is silent when
+  the record has no committed blob.
+- **Both Definition-of-Done items shipped.** `build-complete` is a five-term conjunction over the
+  authored roster and the run-state file's copied region; `closing-review-recorded` joins the pinned
+  BASE to a tracked review record. `CORE_FLOOR` is `10:8`. The base needle is SEVEN characters, not
+  eight: git abbreviates to seven here, 29 of 48 tracked records spell it that way, and the
+  eight-char form shipped briefly and matched none of them — an item clearable only by an override
+  the run wrote for itself.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.

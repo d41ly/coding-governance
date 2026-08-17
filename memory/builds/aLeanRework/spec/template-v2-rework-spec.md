@@ -1,4 +1,4 @@
-# Template v2.0 rework — wiring spec
+# PLAY-aLeanRework-1 — template v2.0 rework, wiring spec
 
 *2026-07-03. Drives the v1.4 → v2.0 rework of `parallel-coding-governance.template.md`. Two changes land
 together: (1) **wire in the functionality the template lacked** (found by an 88-agent gap analysis against the

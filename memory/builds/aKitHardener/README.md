@@ -16,7 +16,7 @@ Makes every kit **version-detectable** and every adopt script **re-run-safe**, s
 
 - [spec/2026-07-14-spec-aKitHardener-1.md](spec/2026-07-14-spec-aKitHardener-1.md) — closed scope, the
   version-marker convention, and the two contested calls resolved (no-conf halt; skip set -e on codebase-map).
-- [build/2026-07-14-build-aKitHardener-1.md](build/2026-07-14-build-aKitHardener-1.md) — the 7 surfaces, what
+- [build/2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md) — the 7 surfaces, what
   shipped, verification ledger (incl. the no-Python-interpreter caveat), gate deltas, and the closing review.
 
 <!-- gen:build-index -->
@@ -26,6 +26,10 @@ ids DEPL-aKitHardener-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `spec/` and `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md) | journal | DEPL-aKitHardener-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -43,5 +47,5 @@ Records live under `spec/` and `build/`.
 - **`spec/`**
   - [2026-07-14-spec-aKitHardener-1.md](spec/2026-07-14-spec-aKitHardener-1.md)
 - **`build/`**
-  - [2026-07-14-build-aKitHardener-1.md](build/2026-07-14-build-aKitHardener-1.md)
+  - [2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md)
 <!-- /gen:build-docs -->

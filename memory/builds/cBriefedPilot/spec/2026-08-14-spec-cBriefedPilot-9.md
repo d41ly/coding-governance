@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion
 
-**Status:** OPEN · rev-4 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -104,8 +104,9 @@ the full bar.
 
 ## 8. Open questions
 
-**RESOLVED (owner, 2026-08-14): yes, the naming is required.** S4's second clause is unconditional.
-The reasoning is kept below because it is what changed the answer.
+### P4 — RESOLVED (owner, 2026-08-14): yes, the naming is required
+
+S4's second clause is unconditional. The reasoning is kept below because it is what changed the answer.
 
 **P4 — does a waived `reuse-first` have to say so in §10?** The refusal option is off the table: it
 rested on the claim that this waiver reds the bar, and that was measured false (hygiene check 12

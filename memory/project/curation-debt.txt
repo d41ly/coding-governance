@@ -5,3 +5,10 @@
 # each row drains when that build's owner curates it.
 memory/builds/cBriefedPilot/README.md
 memory/builds/aUnmannedHelm/README.md
+memory/builds/aBoundedVerdict/README.md
+memory/builds/aDrainedSluice/README.md
+# This build's own README: 11 units with long spec titles put three GENERATED unit-table rows
+# over the per-line tier and the file over the byte tier. Both are renderer-shaped problems
+# (the row carries the full title AND the path), not curation ones, and reshaping the renderer
+# during a merge is the wrong moment. Drains when the row shape is revisited.
+memory/builds/aRuledFrontispiece/README.md

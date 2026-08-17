@@ -23,6 +23,11 @@ ids TOOL-aBatchedLintel-1 TOOL-aBatchedLintel-2
 | [TOOL-aBatchedLintel-1 — memory-tree kit: collapse checks 12 and 7 to one awk each](spec/2026-08-03-spec-aBatchedLintel-1.md) | INPROGRESS | rev-3 | 2026-08-03 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aBatchedLintel-1-1.md](build/2026-08-03-build-TOOL-aBatchedLintel-1-1.md) | journal | TOOL-aBatchedLintel-1 |
+| [2026-08-03-review-TOOL-aBatchedLintel-1-1.md](reviews/2026-08-03-review-TOOL-aBatchedLintel-1-1.md) | spec-audit | TOOL-aBatchedLintel-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -40,7 +45,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 - **`spec/`**
   - [2026-08-03-spec-aBatchedLintel-1.md](spec/2026-08-03-spec-aBatchedLintel-1.md)
 - **`build/`**
-  - [2026-08-03-build-aBatchedLintel-1.md](build/2026-08-03-build-aBatchedLintel-1.md)
+  - [2026-08-03-build-TOOL-aBatchedLintel-1-1.md](build/2026-08-03-build-TOOL-aBatchedLintel-1-1.md)
 - **`reviews/`**
-  - [2026-08-03-review-aBatchedLintel-1.md](reviews/2026-08-03-review-aBatchedLintel-1.md)
+  - [2026-08-03-review-TOOL-aBatchedLintel-1-1.md](reviews/2026-08-03-review-TOOL-aBatchedLintel-1-1.md)
 <!-- /gen:build-docs -->

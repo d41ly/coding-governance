@@ -23,3 +23,10 @@ blocks_adopt = false
 blocks_gate = false
 why = "the kit declares no legs of its own and no document says which lints a target should wire. Nothing in a target observes this, which is why it is declared as a hole rather than left as silence."
 discharge = { command = ["bash", "-c", "exit 1"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the kit ships no adopter, no rendered artifact and no leg of its own — there is nothing to measure, which is also why its only hole is declared undischargeable by construction
+"""

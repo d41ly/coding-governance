@@ -76,7 +76,7 @@ reader who cannot find the spilled text will re-derive it worse.
 
 ## 7. Open questions
 
-### F1 — spill M5's taxonomy, or M11's pointer list
+### F1 — RESOLVED (agent, 2026-08-11, delegated): spill BOTH, M5's taxonomy and M11's pointer list
 
 **RESOLVED (agent, 2026-08-11, delegated): BOTH**, which is what the backlog row this unit came from
 specified and what the 225-line target requires arithmetically. Rev-1 recommended M5's taxonomy alone

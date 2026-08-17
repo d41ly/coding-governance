@@ -41,6 +41,12 @@ ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL
 | [TOOL-aBatchedTribunal-8 — W6: the epoch gate's endpoint hole, and the trade measured](spec/2026-08-09-spec-aBatchedTribunal-8.md) | CLOSED | rev-1 | 2026-08-09 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md) | diff-review | TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+
+Ids no `spec-audit` record has ever named: TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -60,5 +66,5 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-09-spec-aBatchedTribunal-6.md](spec/2026-08-09-spec-aBatchedTribunal-6.md)
   - [2026-08-09-spec-aBatchedTribunal-8.md](spec/2026-08-09-spec-aBatchedTribunal-8.md)
 - **`reviews/`**
-  - [2026-08-09-review-aBatchedTribunal-7.md](reviews/2026-08-09-review-aBatchedTribunal-7.md)
+  - [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md)
 <!-- /gen:build-docs -->

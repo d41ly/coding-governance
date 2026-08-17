@@ -768,7 +768,7 @@ requires nor pretends to that.
   timing and size figure were measured in-session against both repos; the alias-layer recall figure
   is carried from the upstream record and labelled as not re-derived.
 - rev-2 · 2026-08-03 · folded the pre-code adversarial review
-  (`memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/reviews/2026-08-03-review-aQuarriedLantern-1.md`,
+  (`memory/tooling/builds/2026-08-03-TOOL-aQuarriedLantern/reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-1.md`,
   NOT READY, 14 confirmed findings, precision 0.93, zero unverified). All 14 folded; none declined.
   **Blocker F1** — the cache freshness key ignored the conf, so the one value the port moves into
   `.memory-tree.conf` was a cold input to a hot cache and the S7 remediation path was a silent no-op

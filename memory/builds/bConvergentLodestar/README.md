@@ -49,6 +49,10 @@ ids TOOL-bConvergentLodestar-1
 | [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | TOOL-bConvergentLodestar-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -66,5 +70,5 @@ Records live under `spec/` and `reviews/`.
 - **`spec/`**
   - [2026-07-22-spec-bConvergentLodestar-1.md](spec/2026-07-22-spec-bConvergentLodestar-1.md)
 - **`reviews/`**
-  - [2026-07-22-review-bConvergentLodestar-1.md](reviews/2026-07-22-review-bConvergentLodestar-1.md)
+  - [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md)
 <!-- /gen:build-docs -->

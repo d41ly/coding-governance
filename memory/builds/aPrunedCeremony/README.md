@@ -125,6 +125,12 @@ ids PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aP
 | [TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md) | CLOSED | rev-3 | 2026-07-19 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md) | journal | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md) | spec-audit | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md) | diff-review | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -147,8 +153,8 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-07-19-spec-TOOL-aPrunedCeremony-1.md](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md)
   - [2026-07-19-spec-TOOL-aPrunedCeremony-2.md](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md)
 - **`build/`**
-  - [2026-07-19-build-PLAY-aPrunedCeremony-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1.md)
+  - [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md)
 - **`reviews/`**
-  - [2026-07-19-review-TOOL-aPrunedCeremony-1.md](reviews/2026-07-19-review-TOOL-aPrunedCeremony-1.md)
-  - [2026-07-19-review-TOOL-aPrunedCeremony-2.md](reviews/2026-07-19-review-TOOL-aPrunedCeremony-2.md)
+  - [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md)
+  - [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md)
 <!-- /gen:build-docs -->

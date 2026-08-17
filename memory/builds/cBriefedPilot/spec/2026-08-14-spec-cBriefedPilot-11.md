@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster
 
-**Status:** OPEN · rev-2 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

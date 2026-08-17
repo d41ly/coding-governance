@@ -26,6 +26,8 @@ Inventories: gate-legs: 64 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
 | `gotchas selftest` | baseline |
+| `govkit acceptance matrix` | govkit |
+| `govkit refusal join` | govkit |
 | `govkit selfcheck` | govkit |
 | `govkit selftest` | govkit |
 | `harness arms (fail branches armed or pinned)` | baseline |
@@ -39,8 +41,8 @@ Inventories: gate-legs: 64 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
-| `marker contract (4 readers)` | row-grammar |
-| `memory hygiene (20 checks)` | baseline |
+| `marker contract` | row-grammar |
+| `memory hygiene` | baseline |
 | `memory-hygiene self-test` | baseline |
 | `memory-recall kit selftest` | baseline |
 | `memory-recall skill wiring` | baseline |
@@ -64,6 +66,8 @@ Inventories: gate-legs: 64 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `settings-merge selftest` | baseline |
 | `template size <=48KiB` | baseline |
 | `template size gate selftest` | playbook |
+| `testsuite counts (every bar self-test prints one)` | testsuite-counts |
+| `testsuite counts self-test` | testsuite-counts |
 | `unattended adopter e2e` | unattended |
 | `unattended driver selftest` | unattended |
 | `unattended gate selftest` | unattended |
@@ -71,7 +75,7 @@ Inventories: gate-legs: 64 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out (≤5 verify agents per review)` | agent-cap |
+| `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 

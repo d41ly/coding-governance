@@ -25,9 +25,9 @@ placeholders = []
 [config]
 file = ".unattended.conf"
 owner = "unattended"
-required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR"]
+required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -69,9 +69,48 @@ why = "a key ABSENT from the conf reds both the adopter check arm and the kit ga
 discharge = { command = ["bash", "-c", "! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md"] }
 
 [[hole]]
+id = "directives-floor"
+kind = "measured-pin"
+blocks_adopt = false
+blocks_gate = true
+why = "undeclared or malformed reds the kit gate at check 16 arm C. The correct value for a faithful copy install is the driver's own DIRECTIVES_CORE member count, so this is a transcription hole rather than a corpus measurement — the same shape as core-floor, and declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
+discharge = { command = ["bash", "-c", "grep -qE '^DIRECTIVES_FLOOR=\"?[0-9]+' .unattended.conf"] }
+
+[[hole]]
 id = "core-floor"
 kind = "measured-pin"
 blocks_adopt = false
 blocks_gate = true
 why = "undeclared or malformed reds the kit gate. For a faithful copy install the correct value is the driver's own core set sizes, so this is a transcription hole rather than a corpus measurement."
 discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
+
+[[gate_leg]]
+name = "unattended gate selftest"
+argv = ["bash", "{kit}/check-unattended.test.sh"]
+guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
+
+[[gate_leg]]
+name = "unattended driver selftest"
+argv = ["bash", "{kit}/unattended.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "unattended adopter e2e"
+argv = ["bash", "{kit}/adopt-unattended.test.sh"]
+guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = ".unattended.conf"
+why = "its values are shell COMMANDS; a CR is executed"
+[[lf_pin]]
+pattern = "{kit}/.unattended.conf.example"
+why = "the adopter copies it verbatim into the line above"
+[[lf_pin]]
+pattern = "{kit}/*.md"
+why = "the protocol is byte-compared against the shipped copy"
+[[lf_pin]]
+pattern = ".claude/skills/unattended/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

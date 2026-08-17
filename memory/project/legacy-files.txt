@@ -1,6 +1,7 @@
 # legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
+# DRAINED 2026-08-17 (TOOL-aTetheredRecord-7): the two aRatchetForge RECORDS left this
+# list when the rename gave them conforming names. The three that remain are SPECS, which
+# this build does not rename -- a spec filename already carries family, slug and ordinal.
 memory/builds/aRatchetForge/spec/manifest-ratchet-spec.md
-memory/builds/aRatchetForge/build/manifest-ratchet-build-report.md
-memory/builds/aRatchetForge/reviews/2026-07-12-tier2-cumulative-main.md
 memory/builds/aDeployScout/spec/governance-deployer-research.md
 memory/builds/aLeanRework/spec/template-v2-rework-spec.md

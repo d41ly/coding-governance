@@ -54,6 +54,14 @@ ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrai
 | [TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md) | INPROGRESS | rev-3 | 2026-08-08 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+| [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md) | spec-audit | TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 |
+| [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md) | spec-audit | TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 |
+
+Ids no `spec-audit` record has ever named: TOOL-aDrainedSluice-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -79,7 +87,7 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md)
   - [2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md)
 - **`reviews/`**
-  - [2026-08-08-review-aDrainedSluice-1.md](reviews/2026-08-08-review-aDrainedSluice-1.md)
-  - [2026-08-08-review-aDrainedSluice-2.md](reviews/2026-08-08-review-aDrainedSluice-2.md)
-  - [2026-08-08-review-aDrainedSluice-3.md](reviews/2026-08-08-review-aDrainedSluice-3.md)
+  - [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md)
+  - [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md)
+  - [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md)
 <!-- /gen:build-docs -->
