@@ -53,13 +53,13 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6
+**Build status:** DEFERRED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | CLOSED | rev-4 | 2026-08-17 |
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | DEFERRED | rev-5 | 2026-08-17 |
 | [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -127,6 +127,33 @@ what was weighed rather than a menu.
   states "No eighth authored fact" as the premise for routing its own waiver through fact 3, while
   unit 3's S4 moves that count to ten. Whichever build lands second is changing a number the other
   build reasoned from, and the correct response is to stop and re-read, not to reconcile the number.
+
+## PARKED — unit 4 (`TOOL-aBranchedMandate-3`), by the unattended run of 2026-08-17
+
+Units 1 and 2 of the order (`TOOL-aBranchedMandate-4`, then `-1`, then `-2`) are CLOSED and landing.
+`TOOL-aBranchedMandate-3` is DEFERRED and NOT built. The stop-and-reconsider rule above fired, on
+both of the two values it names.
+
+**The question, unanswered on purpose.** Does the owner's ratification of unit 3 — given against a
+three-cost price list on 2026-08-17 — still stand now that the document carrying that price list has
+changed underneath it? `origin/main` gained `dClosedLexicon`'s unattended work mid-run: the kit
+version is 1.6 rather than the 1.5 F3 reasoned about, protocol section 2 gained a subsection, the
+leg gained a sixteenth check, and the `for b in refs/remotes/…` loop that S6b enumerates item by item
+no longer exists. The authored-fact count S4 moves from "seven" was already eight before this run
+started, so both this README's collision note and S4's arithmetic are off by one.
+
+**The options seen.** (a) Re-derive S6b and S4 against the merged leg and build it — rejected: S6b's
+obligation is to state the disposition of five assertions inside a loop that is gone, which is
+re-specifying a security predicate, not re-pointing a citation. (b) Build the mechanical parts and
+leave S6b — rejected: S6's rollout section requires the leg and the driver to land in one commit,
+so a half-built unit writes records that red the bar on the next push. (c) Park, land units 1 and 2,
+and hand the re-pricing back. **Taken.**
+
+**Why refused rather than decided.** M3 delegates fork resolution, not scope, and this is not a fork
+in any spec — it is whether a ratified price is still the price. Units 1 and 2 were always a
+deliverable subset: this README's own "What each unit is worth on its own" records that they fix
+every worktree failure that is not the authorization rule and spend no security property. Unit 3's
+full drift table is in its own §9 rev-5.
 
 ## Owner decisions — RESOLVED 2026-08-16
 

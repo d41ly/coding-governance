@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** DEFERRED · rev-5 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -532,6 +532,33 @@ was a cost the owner was not shown when they priced the unit.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-17 · **PARKED by the unattended run that built units 1 and 2**, and not built. No
+  design decision in this spec is withdrawn: every fork stays RESOLVED and the owner's ratification of
+  the rule change stands. What moved is the GROUND the spec measures against — `origin/main` gained
+  `dClosedLexicon`'s unattended work while this run was in flight, and the build README's
+  stop-and-reconsider rule names two of the moved values by name. Measured against the merge at
+  `9cb6b46`:
+
+  | Premise | This spec says | Measured after the merge |
+  |---|---|---|
+  | protocol §2 authored-fact count | "exactly seven", S4 moves it to ten | already **eight**; S4's arithmetic and the `cBriefedPilot` "no eighth authored fact" collision it cites are both off by one |
+  | the loop S6b enumerates | ONE `for b in refs/remotes/…` loop at `:269-316` carrying five things | **no such loop exists**; the leg was restructured and check 9 now derives `d` from `GOV_DEFAULT_BRANCH` directly |
+  | leg check ordinals | `fail 1`…`fail 15`, and §4 expects the `AGENTS.md` "fifteen checks" claim to stand | `fail 16` exists; `AGENTS.md` already says sixteen |
+  | `KIT_UNATTENDED_VERSION` | do not bump; node `c` moves it to 1.5 (F3) | already **1.6**, moved by node `d`, so F3's question is moot rather than answered |
+  | protocol §2 body, which S8 edits | as read at rev-4 | gained a whole subsection, the `--preflight` record rotation |
+
+  **Why parked rather than re-derived.** S6b is not a citation that can be re-pointed: its whole
+  obligation is to state, item by item, the disposition of five assertions inside a loop that is gone,
+  and re-deriving it is re-specifying a security predicate on a file another node has just
+  restructured and may still be in flight on. S4's count and F3's version are mechanical, but they are
+  not the blocker. The blocker is that this unit spends three ratified properties against a price list
+  the owner approved, and the document that carries that price list has changed twice underneath it.
+  Re-pricing is the owner's turn, which is exactly the turn an unattended run does not have.
+
+  **What is NOT claimed.** Nothing here says the design is wrong. S1, S2, S5, S11 and S12 read as
+  sound against the merged driver — `resolve_base`, `trusted_base`, `check_authorization` and
+  `observe_anchor` all still exist with the shapes §4's Inventory describes. The unit is deliverable
+  after S6b and S4 are re-derived against the current leg and the owner re-confirms the price.
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
 - rev-2 · 2026-08-16 · all four forks resolved by the owner. F1's pick folded into S5 as a closed
   value set with its refusals, and into S9 as an arm; F2's into the new S10 and §3's non-goal; F3's
