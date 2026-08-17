@@ -40,8 +40,8 @@ Inventories: gate-legs: 67 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
-| `marker contract (4 readers)` | UNCLAIMED |
-| `memory hygiene (20 checks)` | UNCLAIMED |
+| `marker contract` | row-grammar |
+| `memory hygiene` | baseline |
 | `memory-hygiene self-test` | baseline |
 | `memory-recall kit selftest` | baseline |
 | `memory-recall skill wiring` | baseline |
@@ -74,7 +74,7 @@ Inventories: gate-legs: 67 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out (≤5 verify agents per review)` | UNCLAIMED |
+| `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 
