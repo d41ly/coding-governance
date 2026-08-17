@@ -57,22 +57,27 @@ Three separate problems, not one.
    measuring raw working-tree bytes. At the pre-kickoff base the tooling shard measured 20,408 bytes as
    LF and 20,492 as CRLF, so it was already over cap on a CRLF checkout. The inflation is under half a
    percent and it lands exactly where the margin is thinnest.
-3. **The two halves of the rule bind on different populations, and nothing says so.** The byte bound
-   decides the backlog shards and the decision log; the line bound decides the other 22 row documents,
-   dossiers above all. rev-1 read the first half as the whole rule and the audit caught it — see F5. The
-   byte figure also ships in prose in eight carriers, which is why moving it is a sweep, not an edit.
+3. **The two halves of the rule bind on different populations, and nothing says so.** Of the 29 row
+   documents, the byte bound decides 7 — the four backlog shards, the decision log, `LIVE.md` and one
+   run-state file — and the line bound decides the other 22, all 12 dossiers among them. rev-1 read the
+   first half as the whole rule and the audit caught it. The byte figure also ships in prose across eight
+   carriers, two of which state the CLASS COUNT rather than a number and so cannot be found by grepping
+   for one — which is why moving it is a sweep, not an edit.
 
 ## The unit set
 
 Classification per the build method, written before acting: unit 1 was **MISSING**, was authored this
-run, was audited at M4, and is **READY** at rev-5 — every fork is resolved. F1, F3 and F5 are ratified by
-the owner; F2 and F4 are built on recommendations put to the owner and not overruled. What remains before
-code is one more M4 pass: rev-5 changed mechanism since the audit, so by definition it is unreviewed.
+run, was audited at M4 twice, and is **READY** at rev-6. Every fork is resolved — F1, F3 and F5 ratified by
+the owner, F2 and F4 built on recommendations put to the owner and not overruled — and both audit rounds
+are folded, so building is the next pass.
 
-The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`, which owns its shape
-measurements and its finding list. Verdict **BLOCKED**, and rev-2 is the fold. The blocker RESCOPED the
-unit — see F5 — and six further findings were downstream of one omission: an Inventory table that
-measured 7 of the 29 documents in the class it claimed to enumerate.
+Both rounds are recorded under `reviews/`, and each owns its own shape measurements and finding list.
+Round 1 returned **BLOCKED** on 21 distinct defects; rev-2 is its fold. Its blocker RESCOPED the unit and
+six further findings were downstream of one omission — an Inventory table that measured 7 of the 29
+documents in the class it claimed to enumerate. Round 2 audited only what rev-4 and rev-5 changed and
+returned **CLEAN WITH FIXES** on 17 distinct defects with no blocker; rev-6 is its fold, and it says
+plainly that round 3 is not warranted because building is now the stricter test. Its sharpest finding was
+that two of the three arms rev-5 added to prevent a vacuous fixture were themselves vacuous.
 
 The owner sequenced two units. Unit 1 is the knob and the correction. The second is the re-shape —
 sharding a backlog below `FAMILY`, or a spill tier like the run-state file's — and its id is minted when
@@ -102,10 +107,11 @@ resolve to the shipped default, and no value disables the bound. F4 — confirm 
 backlog does not orphan the ids the moved rows defined.
 
 - **F3 — the dossier bound.** **Its own conf key**, `DOSSIER_CAP_BYTES`, declared 20,480. F5's answer
-  had left a dossier bounded only at 61,440 — roughly 1,050 lines at measured density, with check 6 its
-  only size gate. The key holds it to about 350 lines for the densest instead: a **39% effective
-  loosening** rather than 3.3x-to-4.3x. The cap block becomes three classes, keyed on the engine's
-  existing `MAP_SUB` so it is inert where no codebase map is adopted.
+  had left a dossier bounded only at 61,440 — 820 to 1,200 lines across the measured class, with check 6
+  its only size gate. The key holds the loosening to **1.10x at the densest dossier and 1.60x at the
+  sparsest** (274 and 400 lines) instead of 3.29x-to-4.80x. The cap block becomes three classes, keyed on
+  the engine's existing `MAP_SUB` under an emptiness guard — unguarded it would resolve to `memory/` and
+  cap every row document at the dossier bound.
 
 Every fork is resolved, so the spec carries `ratified 2026-08-17`.
 
@@ -132,7 +138,7 @@ The table below is GENERATED from the status header of every spec in this folder
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-5 | 2026-08-17 |
+| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-6 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
