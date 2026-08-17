@@ -1393,8 +1393,17 @@ user_skills = "/tmp/gk-fake-skills"
             marks = measure_plan_marks(pl2.stdout)
             check("the default selection previews exactly 4 SIDE|rendered rows",
                   marks.get("SIDE|rendered") == 4, str(marks))
+            # `ORDER|project-owned` is 3, and the three are NAMED: memory-recall's
+            # `recall-fixture.json`, `check-recall.py` and `test_recall_floor.py`, withheld from the
+            # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8).
+            # This half of the arm is a TREE-STATE snapshot; the SEMANTIC invariant it used to carry
+            # -- an un-covered `project-owned` rule derives ORDER -- moved to the scratch descriptor
+            # below precisely so an entry edit could not redefine it, and that arm is untouched.
+            # govkit has no kind meaning "in the kit dir, deliberately not in the payload", so the
+            # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
+            # TOOL-aWalkedCorpus-6 rather than papered over here.
             check("...and the playbook pair previews as seed WRITES, not as orders",
-                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") is None,
+                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") == 3,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
