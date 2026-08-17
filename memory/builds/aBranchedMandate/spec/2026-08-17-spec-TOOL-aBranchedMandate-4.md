@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings
 
-**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -288,7 +288,7 @@ none — the fork below is RESOLVED.
   symlink path is only a fallback), and arm 4's junction fallback fires, which removes the skip that
   had left the junction contract uncovered. AC5 proven by reverting the adopter and re-running: arm 3b
   fails four ways (`expected [0], got [2]`, the artifact missing, the content missing) and arms 2 and
-  3 fail on their literals. Status moves to CLOSED when this lands, not before.
+  3 fail on their literals. LANDED on origin/main at 79328da with the full bar green at 63/63, observed on the remote's own advertisement rather than on the lander's exit code.
 
 ## 10. Reuse audit
 
