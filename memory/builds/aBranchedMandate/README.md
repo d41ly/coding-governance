@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6
+ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-7 TOOL-aBranchedMandate-8
 ---
 
 # aBranchedMandate — an unattended run stops needing its build landed first
@@ -53,7 +53,7 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6
+**Build status:** DEFERRED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-7 TOOL-aBranchedMandate-8
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
