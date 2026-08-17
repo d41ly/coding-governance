@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 witness: 9d41abb1677194e1f4a75b825e28b490ac999ff7
-phase: VERIFYING
+phase: LANDING
 keepalive: 267649f9
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 3e5c6d4373050f545eb516b6e305d352ceb10b66
