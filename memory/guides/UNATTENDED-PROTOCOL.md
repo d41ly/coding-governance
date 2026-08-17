@@ -70,7 +70,10 @@ which is the test for belonging here:
 3. **Parked entries**, of four kinds, which `park()`'s own kind argument already discriminates: a
    parked DECISION — the question, the options seen, and the reason the run refused, because a bare
    "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, and an
-   owner directive WAIVER (§10).
+   owner directive WAIVER (§10). Each kind names the verb that writes it: `--park`, `--abort`,
+   `--close --override` and `--preflight --waive` respectively. DECISION had no writer for as long as
+   this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
+   with no route is a rule nobody follows, and it took a build hitting it to notice.
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.

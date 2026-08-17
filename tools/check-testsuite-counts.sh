@@ -45,9 +45,19 @@ fi
 waived=""
 [ -f "$WAIVERS" ] && waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" || true)
 
-compliant() { # file -> 0 when it prints the agreed shape AND pins a floor
-  grep -qE 'echo "PASS \(\$[A-Za-z_][A-Za-z0-9_]* assertions\)"' "$1" \
-    && grep -qE '^FLOOR_ASSERTIONS=[0-9]+$' "$1"
+compliant() { # file -> 0 when it prints the agreed shape, pins a real floor, and COMPARES the two
+  # ANCHORED on the emitting line. Unanchored, the pattern is satisfied by the string appearing
+  # anywhere — including inside a fixture generator that writes a compliant-looking suite for its own
+  # arms, which certifies a file by the test data it produces rather than by what it prints.
+  grep -qE '^[[:space:]]*(\[ "\$[A-Za-z_][A-Za-z0-9_]*" = 0 \][[:space:]]*&&[[:space:]]*)?echo "PASS \(\$[A-Za-z_][A-Za-z0-9_]* assertions\)"' "$1" || return 1
+  # A FLOOR OF ZERO IS NOT A FLOOR. `[0-9]+` accepted it, and a pin nothing can fall below is exactly
+  # the decoration this leg exists to remove.
+  grep -qE '^FLOOR_ASSERTIONS=0+$' "$1" && return 1
+  grep -qE '^FLOOR_ASSERTIONS=[0-9]+$' "$1" || return 1
+  # AND THE TWO MUST MEET. A suite can print a count, pin a floor, and never compare them — which is
+  # what `check-memory-hygiene.test.sh` did for its whole life at a hardcoded 130. A pin nothing
+  # reads is the same nothing as no pin at all.
+  grep -qE '\$\{?FLOOR_ASSERTIONS\}?' "$1"
 }
 
 while IFS= read -r f; do
@@ -68,8 +78,10 @@ $f
     [ "$is_waived" = 0 ] || fail "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: $f in $WAIVERS"
   else
     if [ "$is_waived" = 0 ]; then
-      if grep -qE '^FLOOR_ASSERTIONS=[0-9]+$' "$f"; then
-        fail "a self-test pins a floor but does not print the agreed count line, so nothing compares the floor to anything: $f wants echo \"PASS (\$n assertions)\""
+      if grep -qE '^FLOOR_ASSERTIONS=0+$' "$f"; then
+        fail "a self-test pins a floor of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: $f"
+      elif grep -qE '^FLOOR_ASSERTIONS=[0-9]+$' "$f"; then
+        fail "a self-test pins a floor but does not print the agreed count line, or never compares the two, so nothing reads the pin: $f wants echo \"PASS (\$n assertions)\" and a comparison against it"
       else
         fail "a self-test on the bar prints no executed assertion count against a floor, so a block of its arms could be stranded past an exit and the suite would still report success: $f"
       fi

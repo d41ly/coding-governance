@@ -663,6 +663,9 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # spelling and reported a missing capability after measuring a missing convention.
 FLOOR_ASSERTIONS=62
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
-echo "PASS ($pass assertions)"
+# GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
+# reported success on its last line — the exact shape the floor above exists to catch, introduced
+# by the conversion that added the floor. `pass` counts SUCCESSES, so it is `fail` that decides.
+[ "$fail" = 0 ] && echo "PASS ($pass assertions)"
 [ "$fail" = 0 ] || echo "---- $fail failed ----"
 [ "$fail" = 0 ]

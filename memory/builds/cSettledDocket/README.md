@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6
+ids: KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10
 ---
 
 # cSettledDocket — the six items cBriefedPilot parked
@@ -34,11 +34,11 @@ is cheaper than building them apart:
   them, since that pin covers gate scripts and `check-arms.py` excludes `*.test.sh` outright.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams tooling · ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6
+**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams tooling · ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once](spec/2026-08-16-spec-cSettledDocket-2.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two](spec/2026-08-16-spec-cSettledDocket-3.md) | CLOSED | rev-3 | 2026-08-16 |
 | [TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file](spec/2026-08-16-spec-cSettledDocket-4.md) | CLOSED | rev-2 | 2026-08-16 |

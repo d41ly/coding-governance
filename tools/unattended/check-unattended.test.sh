@@ -886,7 +886,14 @@ hit "$(run)" "a run-state file's generated region differs from the build README 
 # waiver's handle graded against today's set. The waiver is written by the DRIVER, so the row is real
 # rather than hand-authored, and then the world moves around it.
 reset_tree
-git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+# THE WAIVER ROW IS THE POPULATION. Without it check 17's loop never iterates and the `miss` below
+# passes by finding nothing — which is what shipped, in the flagship arm of the unit built to catch
+# exactly that. The row is written the same way the LIVE control writes it, so the two arms differ
+# only in the phase, which is the variable under test.
+printf '
+2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it
+' >> memory/builds/tRun/RUN.md
+same "the frozen arm HAS a waiver row to grade" "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "1"
 mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
 frozen
 out=$(run)
@@ -953,7 +960,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=174
+FLOOR_ASSERTIONS=175
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

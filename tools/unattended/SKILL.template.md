@@ -108,7 +108,15 @@ distinction real.
   cheapest possible lie and you are the only author of that field.
 - Park what you refuse to decide, with the question, the options you saw, and why you refused. A
   bare "parked" is indistinguishable from "forgotten", and the wrap-up is where the owner gets the
-  turn you did not take.
+  turn you did not take. There is a verb for it, and it is the only route a gate reads:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --park <slug> --item "<the question>" --reason "<the options seen, and why you refused>"
+  ```
+
+  Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
+  same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
+  for a decision that stops the run.
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
 
 ## While the work runs

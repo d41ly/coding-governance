@@ -421,7 +421,6 @@ hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1;
 miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
 hitl() { n=$((n+1)); grep -qxF "$1" <<<"$out" || { echo "FAIL missing exact line: $1"; st=1; }; }
 lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
-n=$((n+1))
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
@@ -952,13 +951,19 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 # now increment too, at each statement's start rather than inside its failure brace — inside, it
 # would count failures and a green run would report near zero. main's static call-site count of 115
 # "reconciled with nothing" for exactly this reason. Derivation, so a reader can re-check rather than
-# trust: 88 helper-only -> 137 whole, i.e. +49 against 52 sites inserted. The three-site gap is NOT
-# arithmetic error — three sites sit on paths this run does not take, which is the very signal the
-# floor exists to surface, so it is written down instead of smoothed away.
+# trust: 88 helper-only -> 137 whole, and the sweep inserted 52. The gap is NOT arithmetic error
+# and NOT — as this comment first claimed — sites on paths the run does not take. Measured: some
+# increments sit inside SUBSHELLS, where `n=$((n+1))` mutates a copy that dies with the subshell.
+# Those assertions DO run; only their count is discarded. The floor is therefore slightly lower
+# than the true executed total, which is safe (it under-claims) but is not what it looks like.
+# Written down twice now, because the first explanation was a guess dressed as a measurement.
+# 137 -> 136 is a DELIBERATE lowering, and the only kind that is legitimate: the sweep had inserted
+# one increment between two function DEFINITIONS, counting an assertion that does not exist. The
+# floor went down because the count got HONEST, not because coverage shrank.
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
 n=$((n+1))
-FLOOR_ASSERTIONS=137
+FLOOR_ASSERTIONS=136
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

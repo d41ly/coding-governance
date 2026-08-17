@@ -21,11 +21,23 @@ SCRIPT="$TMP/tools/check-testsuite-counts.sh"
 run() { bash "$SCRIPT" 2>&1; }
 
 # A COMPLIANT suite: the agreed count line plus a pinned floor.
-mk_ok()  { printf 'FLOOR_ASSERTIONS=3\necho "PASS ($n assertions)"\n' > "$1"; }
+mk_ok()  { printf 'FLOOR_ASSERTIONS=3
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || st=1
+echo "PASS ($n assertions)"
+' > "$1"; }
 # SILENT: no count at all, which is the state 12 of 27 suites were in when the leg was written.
 mk_bad() { printf 'echo done\n' > "$1"; }
 # A floor pinned with nothing printing a count to compare it against.
 mk_floor_only() { printf 'FLOOR_ASSERTIONS=3\necho done\n' > "$1"; }
+# A count and a floor that never MEET — the shape the reference suite actually had for its whole life.
+mk_uncompared() { printf 'FLOOR_ASSERTIONS=3
+echo "PASS ($n assertions)"
+' > "$1"; }
+# A floor of ZERO: pinned, compared, and unable to bite.
+mk_zero() { printf 'FLOOR_ASSERTIONS=0
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || st=1
+echo "PASS ($n assertions)"
+' > "$1"; }
 
 manifest() { # one argv entry per named suite
   { echo '['
@@ -65,7 +77,15 @@ hit "$(run)" "a testsuite-count waiver names a suite the gate manifest does not 
 # ---- a floor with no count line to compare it to. Distinct message, because the fix is different.
 : > memory/project/testsuite-count-waivers.txt
 mk_floor_only tools/c.test.sh; manifest tools/a.test.sh tools/c.test.sh
-hit "$(run)" "a self-test pins a floor but does not print the agreed count line, so nothing compares the floor to anything: tools/c.test.sh"
+hit "$(run)" "or never compares the two, so nothing reads the pin: tools/c.test.sh"
+
+# ...a count AND a floor that never meet — a pin nothing reads is the same nothing as no pin.
+mk_uncompared tools/e.test.sh; manifest tools/a.test.sh tools/e.test.sh
+hit "$(run)" "or never compares the two, so nothing reads the pin: tools/e.test.sh"
+
+# ...a floor of ZERO, which nothing can fall below.
+mk_zero tools/g.test.sh; manifest tools/a.test.sh tools/g.test.sh
+hit "$(run)" "a self-test pins a floor of ZERO, which nothing can fall below"
 
 # ---- THE DERIVED-POPULATION ARM. Adding a suite to the manifest reds the leg with NO edit to the
 # ---- leg itself; a hand-kept list would have stayed green and that is the defect being prevented.
@@ -83,7 +103,7 @@ hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skip
 manifest
 hit "$(run)" "the gate manifest names no *.test.sh, so this leg would grade an empty population"
 
-FLOOR_ASSERTIONS=12
+FLOOR_ASSERTIONS=14
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

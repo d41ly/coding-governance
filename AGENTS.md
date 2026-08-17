@@ -47,7 +47,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
   `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
   `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
-  `project/` (the gate's six `*.txt` waiver registries and nothing else). Specs, reports, research
+  `project/` (the gate's `*.txt` waiver registries and nothing else). Specs, reports, research
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
   `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
   `memory/archive/`.

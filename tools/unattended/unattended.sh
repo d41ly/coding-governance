@@ -60,9 +60,12 @@ CONF="$ROOT/.unattended.conf"
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""
-PK_ITEM=""
 # shellcheck disable=SC1090
 . "$CONF"
+# ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
+# a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
+# supplying the item nobody typed.
+PK_ITEM=""
 M="$MEMORY_ROOT"
 
 status=0
@@ -1085,7 +1088,7 @@ set_fact() { # file · key · value
 }
 
 verb_status() { # slug
-  local slug="$1" rel p w unit
+  local slug="$1" rel p w unit nparked parked
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
@@ -1094,7 +1097,13 @@ verb_status() { # slug
   # The first non-terminal unit, read from the COPIED generated region — never re-derived.
   unit=$(nonterminal_units "$rel" | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
-  printf 'unattended: %s · phase %s · witness %s · next %s\n' "$slug" "$p" "${w:-NONE}" "$unit"
+  # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
+  # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
+  # it to a file nobody re-opens. Omitted at zero, so the ordinary line does not grow a `· 0`.
+  nparked=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z (decision|abort|override|waiver) · item ' "$rel" 2>/dev/null || true)
+  if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
+  printf 'unattended: %s · phase %s · witness %s · next %s%s
+' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
   return 0
 }
@@ -1270,7 +1279,7 @@ park() { # file · kind · item · reason
 # at pass four had nowhere to put it that any gate reads. Hit during cBriefedPilot's own fold, where
 # the workaround was a backlog row: a different document, read by different people, at a later time.
 verb_park() { # slug · item · reason
-  local slug="$1" item="$2" reason="$3" rel
+  local slug="$1" item="$2" reason="$3" rel want pl
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   # TWO guards and not one. `refuse_if_terminal` returns 0 for a record that does not EXIST, so
@@ -1287,18 +1296,29 @@ verb_park() { # slug · item · reason
   # The item is read back as the token between ' · item ' and ' · reason ', so an item spelling the
   # separator makes its own record unparseable - by the very check that grades it.
   case "$item" in *" · "*) fail 43 "a parked item spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item"; return 1 ;; esac
-  if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
-    fail 43 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar; say it without the literal flag: $BYPASS_BAN"; return 1
+  # BOTH FIELDS. Check 11 greps the run-state file WHOLE for the flag, so it does not care which
+  # field spelled it — screening only the reason left an --item naming the flag free to red the bar
+  # permanently, on a terminal record no verb can repair. The same defect one field over.
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$item" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 43 "the item or the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
   refuse_if_terminal "$rel" --park || return 1
   # IDEMPOTENT, and deliberately NOT by --waive's rule: that one compares handle SETS and refuses a
   # differing one; this compares ONE pair and no-ops on a match. Same purpose - the protocol's
   # post-compaction recovery re-runs the run's own steps, and a re-derived refusal must not
   # duplicate - reached by a different mechanism, because there is no set here to compare.
-  if grep -qF -- " decision · item $item · reason $reason" "$rel"; then
+  # EXACT LINE COMPARE, not a substring search. The reason is the LINE-FINAL field, so `grep -qF`
+  # matched any existing row whose reason merely STARTS with this one — and the verb then reported
+  # success while writing nothing, silently dropping a distinct decision. Compared in shell against
+  # the row with its timestamp stripped, so there is no regex to escape and no anchor to get wrong.
+  want="decision · item $item · reason $reason"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
     echo "unattended: decision already parked, unchanged — $item"
     return 0
-  fi
+  done <<PARKED
+$(grep -F -- ' decision · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+PARKED
   park "$rel" decision "$item" "$reason"
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"

@@ -1381,8 +1381,11 @@ same "the repeat added no row" "$(grep -c 'decision · item ' memory/builds/tRun
 run --park tRun --item "second question" --reason "also owner" >/dev/null
 same "a different item parks its own row" "$(grep -c 'decision · item ' memory/builds/tRun/RUN.md)" "2"
 
-# ...and --status surfaces it, which is the whole point of writing it somewhere a reader reaches.
-hit "$(run --status tRun)" "tRun"
+# ...and --status SURFACES it, which is the whole point of writing it somewhere a reader reaches.
+# The arm here used to assert the slug appeared in --status's output — true on every reachable path,
+# so it could not fail, and it documented a capability the verb did not have. It has it now.
+hit "$(run --status tRun)" "· parked 2"
+miss "$(run --status tNoPark)" "· parked"
 
 # refusal: no --item.
 before=$(git hash-object memory/builds/tRun/RUN.md)
@@ -1397,7 +1400,12 @@ hit "$out" "--park requires --reason, because an entry recording no reason is in
 # refusal: a reason spelling the declared bypass flag. park() writes it verbatim and leg check 11
 # greps the file WHOLE, so recording it would red the bar on a record no verb can rewrite.
 out=$(run --park tRun --item "q" --reason "the lander wanted --no-verify")
-hit "$out" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar; say it without the literal flag"
+hit "$out" "the item or the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
+# ...and the ITEM half, which is the half that shipped unscreened: check 11 greps the file WHOLE,
+# so it does not care which field spelled the flag.
+before=$(git hash-object memory/builds/tRun/RUN.md)
+hit "$(run --park tRun --item "drop --no-verify from the lander" --reason r)" "the item or the reason spells the declared bypass flag"
+same "the unscreened field wrote nothing either" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
 
 # refusal: a NEWLINE in the reason. This is the one --waive refusal rev-1 of the spec left out, and
 # it is the load-bearing one here: park() appends ONE line and check 17 parses the region line-wise,
@@ -1427,7 +1435,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=273
+FLOOR_ASSERTIONS=276
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

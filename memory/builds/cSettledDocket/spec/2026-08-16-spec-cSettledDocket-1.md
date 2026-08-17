@@ -1,6 +1,6 @@
 # TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads
 
-**Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
 ## 1. Goal
 
@@ -36,7 +36,10 @@ document, read by different people, at a different time.
 - **S6** — arms in `tools/unattended/unattended.test.sh`: the happy path writes one row; a missing
   reason refuses; a terminal record refuses; a repeat is a no-op; and the parked row is visible to
   `--status`.
-- **S7** — the protocol's §2 gains the verb beside the kind it writes, in both copies.
+- **S7** — the protocol's §2 gains the verb beside the kind it writes, in both copies, AND the
+  rendered Skill gains the command. A verb an agent is never shown gives a refused decision no
+  route, which is this unit's whole goal — S7 shipped unbuilt in the first pass and the M8 review
+  called it a blocker.
 
 ## 3. Non-goals (OUT)
 
@@ -131,6 +134,11 @@ the new kind does not disturb the one kind that IS joined.
 ## 9. Revision log
 
 - rev-1 · 2026-08-16 · authored from `TOOL-cBriefedPilot-30`.
+- rev-3 · 2026-08-17 · M8 fold. S7 had shipped UNBUILT: `--park` existed in four places inside the
+  driver and zero an agent reads. The BYPASS_BAN screen read only the reason while check 11 greps the
+  file whole. The idempotence probe was an unanchored substring match on a line-final field, so a
+  prefix reason vanished with a success exit. And S6's `--status` claim was a capability the verb did
+  not have; it has it now, with a zero-control.
 - rev-2 · 2026-08-16 · M4 audit fold. The kind was `fork`, which the protocol does not declare — §2's
   unwritten kind is DECISION. S2 imported one of `--waive`'s three reason refusals into a
   line-oriented region where the newline one is load-bearing. S3 leaned on `refuse_if_terminal`,
