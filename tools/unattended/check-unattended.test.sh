@@ -515,12 +515,14 @@ miss "$(run)" "recorded BASE"
 anchor_restore
 
 
-# ---- check 9: a base that RESOLVES but sits off the anchor's history. The run's own branch is
-# ---- exactly where such a commit lives, so this is the branch that replaced the equality test.
+# ---- check 9, S6: a base that RESOLVES but is PUBLISHED NOWHERE. The predicate moved from
+# ---- "ancestor of the anchor" to "ancestor of any tip the remote advertises", so the failing
+# ---- case is a commit on no advertised history at all — which is exactly where a commit the
+# ---- run authored on its own unpushed branch lives.
 reset_tree
 off=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m "a commit the run authored off the anchor")
 sed -i "s/^base: .*/base: $off/" memory/builds/tRun/RUN.md
-hit "$(run)" "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded"
+hit "$(run)" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
 
 # ---- check 9: an ancestor of the ANCHOR that this working history does not build on. Two separate
 # ---- branches because they fail separately — the anchor can advance past a stale unit branch.

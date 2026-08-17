@@ -377,7 +377,10 @@ while IFS= read -r f; do
         # half stays silent on an unresolvable witness and lets check 6 own it.
         case "$w" in
           [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
-            if [ "$ph" = LANDED ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+            # GUARDED on a non-empty anchor. `$b` is the ADVERTISED HEAD tip now, and a remote that answers
+            # with heads but no HEAD symref leaves it empty — `--is-ancestor "$w" ""` then fails, and this
+            # fired on an honest LANDED record. The old `$b` was a loop variable that could not be empty.
+            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
               fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
             fi ;;
         esac

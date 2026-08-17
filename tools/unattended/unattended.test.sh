@@ -1452,6 +1452,88 @@ hit "$out" "preflight OK"
 hit "$out" "retired the finished record"
 same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
 
+# ---- TOOL-aBranchedMandate-3, S9: the SECOND ANCHOR. Every arm here drives the real bare origin the
+# ---- fixture already builds, because the whole mechanism is an observation of a remote and a
+# ---- fixture that stubbed it would be asserting against this test's own imagination.
+# ----
+# ---- The build README is committed on `unit` and NOT on `main`, which is the exact state the unit
+# ---- exists for: the merge-base carries no build folder, so the first anchor refuses and the second
+# ---- one is the only thing that can authorize the run.
+scope() { printf 'ANCHOR_SCOPE="%s"\n' "$1" >> .unattended.conf; }
+
+# S5's refusal set FIRST, because it decides whether any of the rest may fire. UNDECLARED, BLANK and
+# MISSPELLED must all keep the strict anchor — a value-set guard whose failing case is untested is
+# the guard that silently admits.
+reset_tree; readme tBr; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+for s in "" "publshed" "PUBLISHED" "default-branch"; do
+  reset_tree; readme tBr; [ -n "$s" ] && scope "$s"; git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+  out=$(run --preflight tBr --keepalive-id k1)
+  hit "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it"
+done
+
+# ...and DECLARED, the same tree, now authorizes. Paired with the arms above so "it refused" and "it
+# refused for the reason we think" are two claims, not one.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+miss "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
+hit "$(cat memory/builds/tBr/RUN.md)" "branch-ref: refs/heads/unit"
+
+# ---- 32: the branch is committed but NOT published. Nothing the remote advertises authorizes it.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin :refs/heads/unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/"
+git push -q -f origin unit 2>/dev/null
+
+# ---- 33: the remote advertises a tip that is NOT an ancestor of HEAD. A real advertised commit, not
+# ---- a missing one — the spec names that distinction because a fixture using an absent ref proves
+# ---- only that absence refuses.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+# A SIBLING commit: parented on main, present in THIS clone (commit-tree writes it here), and not
+# an ancestor of HEAD. Pushing `main` itself does not work — main IS an ancestor of the unit
+# branch, so the guard correctly stays silent and the arm proves nothing. Pushing from the second
+# clone does not work either: the object would be missing locally and refusal 30 fires first.
+side=$(git commit-tree "$(git rev-parse HEAD^{tree})" -p "$(git rev-parse main)" -m side)
+git push -q -f origin "$side:refs/heads/unit" 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/"
+git push -q -f origin unit 2>/dev/null
+
+# ---- 30 branch 2: the remote advertises a tip this clone does not have. Pushed from a SECOND clone
+# ---- so the object genuinely never reaches this one.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+C2=$(mktemp -d)
+git clone -q "$ORIGIN" "$C2/c2" 2>/dev/null
+( cd "$C2/c2" && git config user.email t@t.test && git config user.name t \
+  && git checkout -q -B unit && git commit -q --allow-empty -m offshore \
+  && git push -q -f origin unit ) 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/"
+rm -rf "$C2"
+git push -q -f origin unit 2>/dev/null
+
+# ---- 31: a detached HEAD has no branch for the remote to advertise a tip for.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git checkout -q --detach 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the run is not on a named branch, so there is no branch for the remote to advertise a tip for, and a detached HEAD cannot be the second anchor"
+git checkout -qf unit
+
+# ---- S12's WIDENED fail 18. The guard now fires only for a base on NEITHER derivation, which is
+# ---- strictly smaller than before — so without a failing case here "monotone" and "deleted" look
+# ---- identical from outside. The base recorded is a commit on no advertised history at all.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+run --preflight tBr --keepalive-id k1 >/dev/null
+ORPHAN=$(git commit-tree -m orphan "$(git rev-parse HEAD^{tree})" 2>/dev/null)
+sed -i "s|^base: .*|base: $ORPHAN|" memory/builds/tBr/RUN.md
+out=$(run --close tBr)
+hit "$out" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
+
 # ---- F5: a TRUTHFUL abort reason may not spell the bypass flag, because park() writes it verbatim
 # ---- into the file leg check 11 greps WHOLE — so the honest sentence would red the bar permanently,
 # ---- on a terminal record no verb can rewrite. The control is that an ordinary reason is accepted.

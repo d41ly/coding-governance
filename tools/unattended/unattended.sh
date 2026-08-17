@@ -58,12 +58,12 @@ cd "$ROOT" || exit 2
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — the kit reads every"; \
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
+# ANCHOR_SCOPE defaults to the STRICT anchor: a blank, a typo or a value from a newer kit all keep
+# `default-branch`, because a value-set guard falling through to the wide behaviour would let a
+# misspelling grant what nobody declared. It sits ON the second line because the source-level arm
+# greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""
-# CLOSED value set, and the default is the STRICT anchor. Anything outside the set — a blank, a
-# typo, a value from a newer kit — keeps `default-branch`, because a value-set guard that fell
-# through to the wide behaviour would make a misspelling silently grant what nobody declared.
-ANCHOR_SCOPE=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -305,6 +305,24 @@ branch_tip_quiet() { # -> prints "<ref> <sha>" on stdout
   printf '%s %s\n' "refs/heads/$cur" "$sha"
   return 0
 }
+# THE MESSAGE CHANNEL, separate from the value channel ON PURPOSE. `resolve_base` sets globals and
+# must therefore run WITHOUT a command substitution; it also must not `fail`, because a refusal raised
+# inside it competes with the value it is computing. So it records WHY in BR_RC and stays silent, and
+# this turns that code into the numbered refusal — called by trusted_base, which has the caller's
+# context. Both halves of that split were learned here the hard way: first the refusal was captured
+# into `$fresh`, then the globals were discarded by the subshell.
+BR_RC=""
+emit_branch_fail() { # BR_RC -> the numbered refusal it stands for
+  local cur; cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null)
+  case "${1:-}" in
+    1) fail 31 "the run is not on a named branch, so there is no branch for the remote to advertise a tip for, and a detached HEAD cannot be the second anchor" ;;
+    2) fail 32 "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/$cur" ;;
+    3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
+    4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
+    *) return 0 ;;
+  esac
+  return 1
+}
 observe_branch() { # -> sets BREF/BSHA, or returns 1 having said why
   local out rc cur
   BREF=""; BSHA=""
@@ -331,10 +349,14 @@ observe_branch() { # -> sets BREF/BSHA, or returns 1 having said why
 # which prints a numbered refusal and sets the global `status` that has no reset in this file, so
 # every successful branch-anchored preflight would have emitted "UNATTENDED check 6 FAILED" on its
 # way to succeeding. Shape only lives in check_authorization; existence only lives here.
-ANCHOR_KIND=""
-resolve_base() { # readme path (may be empty) -> base on stdout; sets ANCHOR_KIND
-  local mb rel="${1:-}" head
-  ANCHOR_KIND=""
+ANCHOR_KIND=""; RB_BASE=""
+# RETURNS VIA A GLOBAL, not stdout — the same rule `trusted_base` states below, and for a reason this
+# unit re-learned the hard way. A caller written as `fresh=$(resolve_base …)` runs it in a SUBSHELL,
+# so ANCHOR_KIND, BREF, BSHA and BR_RC were all set and then thrown away, and every second-anchor
+# refusal surfaced as check 16 while the recorded anchor-kind silently stayed default-branch.
+resolve_base() { # readme path (may be empty) -> sets RB_BASE, ANCHOR_KIND, BREF, BSHA, BR_RC
+  local mb rel="${1:-}" head _bt
+  ANCHOR_KIND=""; RB_BASE=""
   [ -n "$ASHA" ] || return 1
   mb=$(GIT merge-base "$ASHA" HEAD 2>/dev/null) || return 1
   [ -n "$mb" ] || return 1
@@ -343,20 +365,25 @@ resolve_base() { # readme path (may be empty) -> base on stdout; sets ANCHOR_KIN
   if [ -z "$rel" ] || GIT show "$mb:$rel" >/dev/null 2>&1; then
     ANCHOR_KIND=default-branch
     [ "$mb" = "$head" ] && return 2
-    printf '%s\n' "$mb"; return 0
+    RB_BASE="$mb"; return 0
   fi
   # The README does not resolve at the merge-base. Widen ONLY when the project declared it; any
   # other value — blank, misspelled, from a newer kit — keeps the strict anchor and the caller gets
   # the same refusal it got before this unit existed.
-  [ "$ANCHOR_SCOPE" = published ] || { ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; printf '%s\n' "$mb"; return 0; }
-  observe_branch || return 1
+  [ "$ANCHOR_SCOPE" = published ] || { ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0; }
+  # SILENT. This function's stdout is the VALUE channel — a `fail` raised here lands in the
+  # caller's variable instead of reaching the operator, which is how every second-anchor refusal
+  # came out as check 16. trusted_base emits, outside the substitution.
+  _bt=$(branch_tip_quiet); BR_RC=$?
+  [ "$BR_RC" = 0 ] || return 1
+  BREF=${_bt%% *}; BSHA=${_bt##* }
   # S11: the rc=2 contract is PRESERVED on this path too. Both `fail 16` branches gate on it, and
   # without this the fallback would reach them through rc=0 and silence both for every
   # branch-anchored run — while check-arms stays green, because the branches are still reachable on
   # the default-branch path.
   ANCHOR_KIND=run-branch
   [ "$BSHA" = "$head" ] && return 2
-  printf '%s\n' "$BSHA"; return 0
+  RB_BASE="$BSHA"; return 0
 }
 
 # The mandate assertion's inputs, re-derived and cross-checked, in ONE place so preflight and close
@@ -381,8 +408,14 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   # decide whether the FIRST anchor carries the build folder; handed nothing it keeps the old
   # behaviour, which is what the degenerate preflight path relies on.
   _tb_rd="${1%/RUN.md}/README.md"
-  ANCHOR_KIND=""; BREF=""; BSHA=""
-  fresh=$(resolve_base "$_tb_rd"); rc=$?
+  ANCHOR_KIND=""; BREF=""; BSHA=""; BR_RC=""
+  resolve_base "$_tb_rd"; rc=$?; fresh="$RB_BASE"
+  # The second anchor's refusals are emitted HERE, outside the command substitution that would have
+  # eaten them. Without this the operator saw check 16 ("no merge-base") for every one of them.
+  if [ "$rc" = 1 ] && [ -n "$BR_RC" ] && [ "$BR_RC" != 0 ]; then
+    emit_branch_fail "$BR_RC"
+    return 1
+  fi
   if [ "$rc" = 2 ]; then
     # BASE == HEAD. Legal outright where the caller says so, and only ONE caller does - see
     # verb_preflight, where a run has correctly built nothing yet and the file may not exist at all.
