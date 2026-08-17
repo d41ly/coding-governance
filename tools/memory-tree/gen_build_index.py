@@ -1165,15 +1165,29 @@ def do_selftest() -> int:
         # by patching do_check to pass create_missing=True — the exact regression it claims to catch —
         # and watching the suite still report PASS. It runs BEFORE the write now, on a fixture that
         # genuinely lacks the pairs, and asserts the render directly rather than an exit code.
-        rd12rel = "memory/builds/tOne/README.md"
-        arm("check does not CREATE an absent pair", "3", lambda: str(
-            sum(GEN_REGIONS[i][1] not in plan(t12, conf12)[0][rd12rel] for i in (1, 2, 3))))
-        # The old spelling asserted `do_check` returns 0 on this fixture. That is not S1c and was
-        # never true on its own: a fixture whose build-index region is unrendered IS legitimately
-        # stale, so the arm only passed because do_write had already run and made it pass.
+        # THE ARM MUST RUN THROUGH do_check, not through plan(). Two earlier spellings did not, and
+        # both were mutation-proved useless: one ran after do_write so no pair was absent, and one
+        # called plan() directly so patching do_check — the site that actually carries the defect —
+        # left the suite green. The fixture is rendered FIRST so the build-index region is fresh, then
+        # the three other pairs are removed. Now the only thing that can make do_check report stale is
+        # create_missing leaking into it, which is exactly S1c.
+        rd12 = os.path.join(t12, "memory", "builds", "tOne", "README.md")
         do_write(t12, conf12)
-        arm("after a write, check is clean with the new pairs present", "0",
-            lambda: str(do_check(t12, conf12)))
+        # WHOLE regions, markers and body together. Stripping only the marker lines orphans the
+        # rendered body as loose authored text, which makes the fixture genuinely non-conforming and
+        # reds a later arm for a reason that has nothing to do with what this one tests.
+        _ls = read_text(rd12).split("\n")
+        for _i in (3, 2, 1):
+            _o, _c = _marker_index(_ls, GEN_REGIONS[_i][1]), _marker_index(_ls, GEN_REGIONS[_i][2])
+            if _o is not None and _c is not None:
+                _ls = _ls[:_o] + _ls[_c + 1:]
+        write_text(rd12, "\n".join(_ls))
+        arm("check does not CREATE an absent pair", "0", lambda: str(do_check(t12, conf12)))
+        arm("the three pairs really are absent for that arm", "3",
+            lambda: str(sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
+        do_write(t12, conf12)
+        arm("write restores them", "0", lambda: str(
+            sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
         arm("write CREATED the three absent pairs", "3",
             lambda: str(sum(GEN_REGIONS[i][1] in read_text(rd12) for i in (1, 2, 3))))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
