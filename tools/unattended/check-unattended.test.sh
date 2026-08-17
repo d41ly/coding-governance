@@ -525,6 +525,16 @@ miss "$(run)" "recorded BASE"
 anchor_restore
 
 
+# ---- check 9, S6c: the leg FAILS CLOSED when the remote advertises nothing. Without this branch
+# ---- the whole block was skipped, so every BASE predicate, check 15's second half and the check-13
+# ---- mandate assertion went silently absent on an unreachable remote — fail-OPEN under a comment
+# ---- promising the opposite. The control is the arms above, which pass with the remote reachable.
+reset_tree
+git remote set-url origin "$ORIGIN_DIR/gone.git"
+hit "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction"
+git remote set-url origin "$ORIGIN"
+miss "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published"
+
 # ---- check 9, S6: a base that RESOLVES but is PUBLISHED NOWHERE. The predicate moved from
 # ---- "ancestor of the anchor" to "ancestor of any tip the remote advertises", so the failing
 # ---- case is a commit on no advertised history at all — which is exactly where a commit the
@@ -551,7 +561,11 @@ hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file 
 # ---- fixture, no attacker anywhere in it.
 reset_tree
 git checkout -q main && git merge -q --no-ff unit -m "land the run"
-git update-ref refs/remotes/origin/main "$(git rev-parse main)"
+# PUSHED. The control used to move `refs/remotes/origin/main`, a ref S6 removed from this leg's
+# reads — so it stopped reproducing the merge-AND-PUSH state it exists for, and an is_published
+# mutated back to equality would have survived it silently. The push moves the ADVERTISED tip,
+# which is what the predicate now reads.
+git push -q -f origin main
 out=$(run); rc=$?
 same "a LANDED run-state record leaves the bar green" "$out" ""
 same "a LANDED run-state record exits 0" "$rc" "0"

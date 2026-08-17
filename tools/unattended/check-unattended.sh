@@ -211,8 +211,20 @@ fi
 # ---- GIT_TERMINAL_PROMPT=0 is carried HERE rather than left to the driver: this leg runs under a
 # ---- hook with no tty, and a credential prompt would hang the push rather than refuse it.
 ADV_HEAD=""; ADV_TIPS=""
-adv_remote=$(GIT remote 2>/dev/null | head -1)
-if [ -n "$adv_remote" ]; then
+# EXACTLY ONE remote, matching the driver's check 24. `| head -1` blessed whichever name sorted
+# first, with none of the endpoint guards the driver applies — so a run that adds a second
+# remote it controls could have the leg measure "published" against an endpoint the landing push
+# never reaches. A clone with several remotes is refused rather than guessed at.
+adv_nrem=$(GIT remote 2>/dev/null | grep -c . || true)
+adv_remote=""
+if [ "$adv_nrem" = 1 ]; then
+  adv_remote=$(GIT remote 2>/dev/null | head -1)
+elif [ "$adv_nrem" != 0 ]; then
+  adv_remote=""   # left empty on purpose: the fail-closed branch in check 9 reports it
+fi
+# GUARDED on the population too: with no run-state file there is nothing whose BASE could be
+# checked, and two network round-trips per bar run bought exactly nothing. POP is computed above.
+if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
   adv_raw=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$adv_remote" HEAD 2>/dev/null) \
     && ADV_HEAD=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
   ADV_TIPS=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --heads "$adv_remote" 2>/dev/null \
@@ -335,8 +347,19 @@ while IFS= read -r f; do
     #   4 the phase-keyed `rb != HEAD`  — kept, below, and it needs no anchor
     #   5 check 15's second half        — kept, RE-ANCHORED to the advertised HEAD tip, which is the
     #                                     same commit the old `$b` resolved to on an honest tree
-    if [ -n "$ADV_HEAD" ] || [ -n "$ADV_TIPS" ]; then
+    if [ -z "$ADV_HEAD" ] && [ -z "$ADV_TIPS" ]; then
+      # FAIL CLOSED, and this branch is the whole of that claim. Without it the block below was
+      # simply SKIPPED when the remote did not answer — every check-9 BASE predicate, check 15's
+      # second half, and (through the rb gate) the check-13 mandate assertion, silently absent on
+      # a forged base. That is fail-OPEN under a comment promising the opposite, and a REGRESSION:
+      # before this unit the leg read local refs and still checked something.
+      fail 9 "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction: $f"
+    else
+      # D3: PROVED PRESENT, not merely non-empty. `$b` is the advertised HEAD tip, which a clone
+      # that has not fetched does not have — and `--is-ancestor` against a missing object fails,
+      # which red three honest LANDED records. An absent tip disables the ancestry half only.
       b="$ADV_HEAD"
+      GIT rev-parse --verify --quiet "$b^{commit}" >/dev/null 2>&1 || b=""
         # ANCESTRY, NOT EQUALITY — and the reason is the kit's own first success. Equality wedged the
         # bar permanently: merging then pushing, the two acts an authorization grants, move the
         # merge-base past the pin forever, so a LANDED record red every later default-branch push.

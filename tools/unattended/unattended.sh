@@ -323,21 +323,6 @@ emit_branch_fail() { # BR_RC -> the numbered refusal it stands for
   esac
   return 1
 }
-observe_branch() { # -> sets BREF/BSHA, or returns 1 having said why
-  local out rc cur
-  BREF=""; BSHA=""
-  out=$(branch_tip_quiet); rc=$?
-  cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null)
-  case "$rc" in
-    0) BREF=${out%% *}; BSHA=${out##* }; return 0 ;;
-    1) fail 31 "the run is not on a named branch, so there is no branch for the remote to advertise a tip for, and a detached HEAD cannot be the second anchor" ;;
-    2) fail 32 "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/$cur" ;;
-    3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
-    4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
-  esac
-  return 1
-}
-
 # BASE is the merge-base against the OBSERVED tip. Two non-zero returns carry meaning:
 #   2 = the merge-base equals HEAD. Nothing was built on top of the anchor, so the comparison would
 #       be trivially true. Still a refusal: F2 ratified equality over ancestry, because relaxing a
@@ -1286,8 +1271,11 @@ verb_preflight() { # slug · keepalive-id
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
   # NOT branch on anchor-kind (S12), because a verb that did would be taking a security decision from
   # a value its own subject wrote.
-  set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
-  if [ -n "$BREF" ]; then
+  # PINNED ONCE, exactly as `base` is one line up. Written unconditionally these drifted on a
+  # re-preflight — the base stayed pinned while the anchor evidence beside it moved to whatever
+  # the remote said today, so the record described two different observations as one.
+  [ -n "$(fact "$rel" anchor-kind)" ] || set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1
   fi

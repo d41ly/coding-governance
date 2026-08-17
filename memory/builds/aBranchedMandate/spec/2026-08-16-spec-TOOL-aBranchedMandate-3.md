@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** INPROGRESS · rev-6 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-7 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -538,6 +538,34 @@ was a cost the owner was not shown when they priced the unit.
   this spec records is an accepted cost the next reader of the binding document never sees.
 
 ## 9. Revision log
+
+- rev-7 · 2026-08-17 · BUILT and CLOSED. The closing review (`reviews/2026-08-17-review-aBranchedMandate-4.md`)
+  returned 19 raw / 13 confirmed, deduplicating to SEVEN defects: 1 blocker, 1 high, 4 medium, 1 low.
+  All seven are folded and both sibling self-tests are green — driver 311 assertions, leg 178.
+
+  **The blocker was a fail-OPEN under a comment claiming fail-CLOSED.** S6c's advertisement block
+  carried no `else`, so a remote that did not answer skipped every check-9 BASE predicate, check 15's
+  second half and — through the `rb` gate — the check-13 mandate assertion. Reproduced offline
+  exiting 0 on a forged base, and a REGRESSION: the pre-S6 leg read local refs and still checked
+  something. Every arm in this unit passed throughout because every fixture had a reachable remote,
+  which is the `fixture-passes-by-finding-nothing` class the bug-class checklist had pre-selected for
+  this exact diff. The fail-closed branch is now armed, with a reachable-remote control beside it.
+
+  The other six: the leg took whichever remote sorted first with none of the driver's check-24/25
+  endpoint guards (now exactly one remote, or the fail-closed branch reports it); `$b` was not proved
+  present locally, reding three honest LANDED records; `anchor-kind`/`branch-ref`/`branch-sha` were
+  written unconditionally while `base` is pinned once, so a re-preflight drifted the evidence off the
+  pin; the lifecycle control still moved `refs/remotes/origin/main`, a ref S6 removed from the leg's
+  reads, so an `is_published`-mutated-to-equality would have survived it; `observe_branch` went DEAD
+  in the resolve_base refactor with four byte-identical twin `fail` branches scored ARMED; and two
+  `ls-remote` round-trips ran even with no run-state file.
+
+  **`ARMS_FLOORS` moved twice and the second move was DOWN**: 71:70 -> 83:80 raised a floor over the
+  dead `observe_branch`, which is the inversion of what a ratchet is for; removing it and adding the
+  fail-closed branch settles the pair at 79:76, with the leg at 66:66.
+
+  The review's own root-cause line is the accurate one: an observation replaced a construction and
+  the new source's failure modes were handled at one site out of three.
 
 - rev-6 · 2026-08-17 · **UNPARKED — the owner re-priced and said build it, and one of rev-5's five
   drift claims was WRONG.** The premises are re-measured here rather than re-asserted:
