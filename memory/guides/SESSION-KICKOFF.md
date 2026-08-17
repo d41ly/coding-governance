@@ -177,6 +177,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
+- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
+  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
+  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
+  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
