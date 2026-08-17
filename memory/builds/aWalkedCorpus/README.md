@@ -31,7 +31,7 @@ hand-edit it.
 |---|---|---|---|
 | [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | OPEN | rev-1 | 2026-08-17 |
+| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | OPEN | rev-2 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
