@@ -1,6 +1,6 @@
 # TOOL-dClosedLexicon-11 — a build may have more than one unattended run
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
 
 ## 1. Goal
 
@@ -251,9 +251,14 @@ MEASURED: bumping the constant alone reds `check-kit-versions.sh` with three fin
 - **AC5** — When an archive already exists at the computed name with IDENTICAL bytes, `--preflight`
   proceeds and exits 0; when one exists with DIFFERENT bytes, the early TEST refuses, names both
   paths, and `git status --porcelain` is empty afterwards.
-- **AC6** — When `GIT mv -f` fails for a reason the collision test did not cover, `--preflight` emits
-  a named refusal carrying both paths and does not scaffold a fresh record — the branch is armed by an
-  assertion naming its own failure text, per `check-arms.py`.
+- **AC6** — When the derived name is occupied by something that is NOT a regular file, `--preflight`
+  refuses before the write gate, names both paths, and leaves the record alone. This is a SEPARATE
+  refusal from AC5's differing-bytes one and not a `GIT mv` failure, because MEASURED,
+  `git mv -f RUN.md <dir>` exits 0 and files the record INSIDE the directory — at `<dir>/RUN.md`, off
+  every reader's glob, with the verb reporting success. The residual `GIT mv -f` failure and the
+  derive failure are PINNED in `memory/project/unarmed-branches.txt` with their reasons: after two
+  pre-write tests clear the destination, what is left is an index or filesystem fault no fixture in
+  this suite can produce.
 - **AC7** — When an ARCHIVED record carries a phase outside `PHASES_TERMINAL`,
   `bash tools/unattended/check-unattended.sh` reds at check 4 naming that path and phase — asserted
   over a fixture where the live `RUN.md` is already LANDED, so `nlive` is 1 and check 7 is silent.
@@ -339,6 +344,17 @@ it, so no ordinal renumbers.
   would make eight arms dead probes, and `:912`'s derivation counts writers in the DRIVER, not the
   drive list (11-15). Population re-cited to `:138` (11-16). §10's quotation re-attributed (11-17).
   `AGENTS.md` and `check-memory-hygiene.test.sh` added to Files touched (11-18).
+- rev-4 · 2026-08-17 · CLOSED. Two corrections the BUILD forced, both found by trying to arm a branch
+  rather than by reading. **`git mv -f` onto a DIRECTORY exits 0 and files the record inside it** —
+  the retired record would land at `<dir>/RUN.md`, off the path every reader globs, with the verb
+  reporting success. So the non-file case is refused BEFORE the write gate as its own branch, and
+  AC6 is restated against that refusal rather than against a `GIT mv` failure. The residual rename
+  failure and the derive failure are PINNED in `memory/project/unarmed-branches.txt` with measured
+  reasons; the pin file's own header demands exactly that distinction between "not yet written" and
+  "cannot be written from here". Separately, two check-4 near-misses were written and REMOVED rather
+  than left passing: a lowercase phase is the SAME PATH on a case-insensitive filesystem, and a
+  `.md.bak` tail never reaches the gate because this node's global excludesfile carries `*.bak`, so
+  `git ls-files` never sees it. Both would have read as coverage of an anchor they do not test.
 
 ## 10. Reuse audit
 

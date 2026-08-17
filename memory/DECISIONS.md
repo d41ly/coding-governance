@@ -53,6 +53,8 @@
 
 - TOOL-dClosedLexicon-13 · a preview and the verb it previews must classify with ONE predicate, and the ROLE alone is not it: two entries declare no adopter, two share a destination with a sibling seed. The kind keys on role, producer and destination together
 
+- TOOL-dClosedLexicon-11 · a refusal can be right about the RECORD and wrong as a policy about the BUILD. A finished run is retired by rotation, not re-opened; the archive name derives from the record's BYTES, because no verb here commits and two runs can honestly share a witness
+
 ## DEPL — deployer
 
 *(none yet)*
