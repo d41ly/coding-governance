@@ -37,8 +37,11 @@ terminal phase, keep the two shape refusals at every phase, and price the escape
   drift fixture still HITS its message at a non-terminal phase, and MISSES it once the same fixture's
   phase is moved to a terminal one. A one-directional arm here proves the skip fires and proves
   nothing about what survives it.
-- **S5** — `ARMS_FLOORS` in `.memory-tree.conf` is re-measured for this gate. The pair is
-  `tools/unattended/check-unattended.sh:39:39` today and becomes `40:40` with S3's branch.
+- **S5** — `ARMS_FLOORS` in `.memory-tree.conf` is re-measured for this gate and STAYS at
+  `tools/unattended/check-unattended.sh:39:39`. An earlier revision forecast `40:40` on the
+  assumption that S3 adds a `fail` branch. It does not: the carve-out SCOPES an existing branch
+  inside a `case`, so the branch count is unchanged and the arms gate is clean at the old pair.
+  The forecast was a prediction about code not yet written, and the code came out smaller.
 - **S6** — `KIT_UNATTENDED_VERSION` moves in both literals, `tools/unattended/unattended.sh:32` and
   `tools/unattended/check-unattended.sh:17`. The two are not at the same line and an earlier revision
   of this item said they were; both read `1.4` today. The kit is copy-installed, so two adopters
@@ -162,7 +165,7 @@ Reading `PHASES_TERMINAL` from the driver keeps the set where the refusals that 
   every reachable run is terminal. A second fixture setting `PHASES_TERMINAL=""` fails on the same
   branch.
 - **AC6** — When `python tools/memory-tree/check-arms.py --check` runs at this unit's tip, it is clean
-  with `ARMS_FLOORS` reading `tools/unattended/check-unattended.sh:40:40`.
+  with `ARMS_FLOORS` reading `tools/unattended/check-unattended.sh:39:39`, unchanged.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it is clean, and `KIT_UNATTENDED_VERSION`
   differs from `1.4` in both `tools/unattended/unattended.sh` and `check-unattended.sh`.
 

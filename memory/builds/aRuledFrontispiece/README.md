@@ -240,7 +240,10 @@ shrink-only `memory/project/curation-debt.txt`, which is empty today — so the 
 outlier drains rather than being grandfathered by widening. Flagged because the owner set 25600
 before those regions were measurable.
 
-**P5 is still open.** It was raised and not put to the owner, so it must not be marked resolved. The
+**P5 · RESOLVED (owner, 2026-08-16): keep the bump.** `KIT_UNATTENDED_VERSION` moves 1.4 -> 1.5 in
+both literals. The closing review caught this paragraph still reading "still open" while the spec
+recorded it resolved and the code still read 1.4 — one question with three answers, in the build
+whose subject is that class. The
 `KIT_UNATTENDED_VERSION` bump stands as the spec author wrote it until the owner says otherwise, and
 it is the cheapest of the five to reverse.
 
@@ -338,4 +341,5 @@ Records live under `spec/`, `build/` and `reviews/`.
 - **`reviews/`**
   - [2026-08-16-review-aRuledFrontispiece-1.md](reviews/2026-08-16-review-aRuledFrontispiece-1.md)
   - [2026-08-17-review-aRuledFrontispiece-2.md](reviews/2026-08-17-review-aRuledFrontispiece-2.md)
+  - [2026-08-17-review-aRuledFrontispiece-3.md](reviews/2026-08-17-review-aRuledFrontispiece-3.md)
 <!-- /gen:build-docs -->

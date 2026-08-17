@@ -812,8 +812,17 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
         for name, mo, mc in GEN_REGIONS:
             renderer = REGION_RENDERERS[name]
             lines = text.split("\n")
-            if _marker_index(lines, mo) is None and _marker_index(lines, mc) is None:
-                continue  # not present and not being created — S1c
+            # S1c's tolerance is for a NEW region a README has not adopted yet. It must NOT extend to
+            # `build-index`, whose pair has always been mandatory: apply_region's "leaves the index
+            # silently" refusal is the only thing standing between a build README and a hand-authored
+            # status block. Measured with a live control — with the skip applied uniformly, deleting
+            # four marker lines from a build README left --check, --check-format and the whole hygiene
+            # gate green, while the pre-change engine refused the identical tree. The build's own
+            # premise is that this file is generated and gated; a skip that covers the index region
+            # defeats it in four lines.
+            if name != GEN_REGIONS[0][0] and _marker_index(lines, mo) is None \
+                    and _marker_index(lines, mc) is None:
+                continue  # a region this README has not adopted — S1c
             text = apply_region(text, renderer(b), b["readme"], mo, mc)
         artifacts[b["readme"]] = text
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
@@ -1149,11 +1158,22 @@ def do_selftest() -> int:
         conf12 = _fixture(t12, spec_status="OPEN")
         rd12 = os.path.join(t12, "memory", "builds", "tOne", "README.md")
 
-        # S1c — the ASYMMETRY. --check must be SILENT about the three absent pairs. This is the arm
-        # that fails if create_missing ever leaks into the check path, and its failure mode is a
-        # corpus-wide re-render forced into every unit that registers a region.
+        # S1c — the ASYMMETRY. --check must be SILENT about the three absent pairs.
+        #
+        # ORDER IS THE WHOLE ARM. This ran AFTER do_write, which had just created the three pairs, so
+        # there was no absent pair left to be silent about and the arm could not fail: mutation-proved
+        # by patching do_check to pass create_missing=True — the exact regression it claims to catch —
+        # and watching the suite still report PASS. It runs BEFORE the write now, on a fixture that
+        # genuinely lacks the pairs, and asserts the render directly rather than an exit code.
+        rd12rel = "memory/builds/tOne/README.md"
+        arm("check does not CREATE an absent pair", "3", lambda: str(
+            sum(GEN_REGIONS[i][1] not in plan(t12, conf12)[0][rd12rel] for i in (1, 2, 3))))
+        # The old spelling asserted `do_check` returns 0 on this fixture. That is not S1c and was
+        # never true on its own: a fixture whose build-index region is unrendered IS legitimately
+        # stale, so the arm only passed because do_write had already run and made it pass.
         do_write(t12, conf12)
-        arm("check is silent about an absent region pair", "0", lambda: str(do_check(t12, conf12)))
+        arm("after a write, check is clean with the new pairs present", "0",
+            lambda: str(do_check(t12, conf12)))
         arm("write CREATED the three absent pairs", "3",
             lambda: str(sum(GEN_REGIONS[i][1] in read_text(rd12) for i in (1, 2, 3))))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
