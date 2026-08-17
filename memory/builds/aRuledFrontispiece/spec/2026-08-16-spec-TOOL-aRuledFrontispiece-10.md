@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 

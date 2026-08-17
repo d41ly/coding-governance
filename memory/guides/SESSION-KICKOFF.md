@@ -138,6 +138,17 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
 - A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
   prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
+- A build README's top level is a SLOT SEQUENCE — front matter, title, one authored prose block, the
+  authored `roster:units` plan, then the generated regions — gated by its own leg,
+  `gen_build_index.py --check-format`. Authored content after the first generated marker reds it. The
+  refusal is deliberately unreachable from `--write` and `--check`, so the generator still renders a
+  tree it would refuse to grade.
+- `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
+  adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
+- `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed
+  corpus-wide and contradicted its own build README. Check 8's population is the backlog shards alone.
+- A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
+  reservation range and a planned unit cannot be added to it by hand; the next render removes it.
 - A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
   message that reads like a families misconfiguration.
 - Hygiene check 12's skeleton scan matches a literal date-shape or id-shape ANYWHERE in a spec body,

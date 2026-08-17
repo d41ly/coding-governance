@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan
 
-**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 

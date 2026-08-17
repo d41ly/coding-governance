@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-11 — the corpus is conformed to the slot contract, by hand
 
-**Status:** OPEN · rev-1 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired
 
-**Status:** OPEN · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling
 
 ## 1. Goal
 
