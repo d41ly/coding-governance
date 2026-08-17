@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-17
 streams: tooling
 roster: TOOL
-ids: TOOL-aRelaxedShard-1
+ids: TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3
 ---
 
 # aRelaxedShard — the backlog budget stops being something rotation can pay
@@ -135,7 +135,7 @@ The table below is GENERATED from the status header of every spec in this folder
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-17 · streams tooling
-ids TOOL-aRelaxedShard-1
+ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

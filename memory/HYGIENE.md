@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.19 -->
+<!-- gov:kit memory-tree@2.20 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -63,7 +63,9 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
   files; a second full spelling of it is how the `guides/` half went missing once.
-- **File caps:** index + generated files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
+- **File caps:** index + generated files carry a DECLARED byte bound and no line bound; only
+  `guides/*.md` still carry both. The byte bounds are `ROW_DOC_CAP_BYTES` and `DOSSIER_CAP_BYTES` in
+  `.memory-tree.conf`, and rule 6 below names all four classes. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
@@ -124,16 +126,37 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
-6. **index size caps** — TWO classes, because prose and rows fail for different reasons. Row
-   documents ≤ 20 KB / ≤ 250 lines; `guides/*.md` ≤ 60 KB / ≤ 750 lines (grandfather:
-   `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
-   and check 16 refuses a charter-cited file that nothing caps — but for a guide the LINE count is a
-   proxy, and check 16's `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed
-   here. So a guide's effective room is whichever of the two binds first, and past ~250 lines that is
-   normally the read-path ceiling rather than this cap. Entry-budget exempt (check 7's `ex7`) — a
-   guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
-   to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
-   build's own `build/` folder as a dated recording).
+6. **index size caps** — FOUR classes, and only ONE still carries a line bound:
+
+   | class | byte bound | line bound |
+   |---|---|---|
+   | `guides/*.md` | 60 KB | 750 |
+   | `builds/*/README.md` | 25 KB | none |
+   | `<MAP_ROOT>/features/*.md` | `DOSSIER_CAP_BYTES` | none |
+   | every other row document | `ROW_DOC_CAP_BYTES` | none |
+
+   (grandfather: `curation-debt.txt` exempts any of them). Both keys are DECLARED in
+   `.memory-tree.conf`, both default to the kit's shipped value, and neither can be switched off —
+   blank resolves FORWARD to the default rather than skipping the check, and a non-numeric value
+   refuses before the scan. The dossier class applies only where a codebase map is adopted.
+
+   A guide is MANDATORY reading the charter points a session at, and check 16 refuses a charter-cited
+   file that nothing caps — but for a guide the LINE count is a proxy, and check 16's
+   `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed here. So a guide's
+   effective room is whichever of the two binds first, and past ~250 lines that is normally the
+   read-path ceiling rather than this cap. Entry-budget exempt (check 7's `ex7`) — a guide is prose,
+   not index rows.
+
+   **Why the row line bound is gone.** At check 7's 300-char entry budget a 250-line row document may
+   hold 75,000 B, so the byte figure decided every real case and the line figure needed rows averaging
+   under 82 B — measured here at 253.7. It DID bind on 22 of the 29 row documents, dossiers above all,
+   which is why retiring it was an owner decision (`TOOL-aRelaxedShard-1`) that deliberately relaxes
+   the curation discipline `TOOL-aWidenedGuide-1` protected, and why dossiers were given their own
+   bound rather than inheriting the row one.
+
+   `builds/*/RUN.md` takes the row class. It is designed to GROW, and the bound the protocol spills
+   against is its OWN 8 KB authored-region budget, not this cap — this cap is the backstop that spill
+   exists to keep it away from.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
@@ -309,7 +332,10 @@ If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tr
 `affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
 freshly-adopted map),
 `features/`, `generated/`; `README.md`,
-`FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
-entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
-dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's
+`FOUNDATION.md` and `features/*.md` carry check 6's size caps but are entry-budget exempt (check 7) —
+dossiers are detail files. The two split across bounds: `features/*.md` take `DOSSIER_CAP_BYTES`, while
+`README.md` and `FOUNDATION.md` take `ROW_DOC_CAP_BYTES` like any other row document. A `features/*.md`
+over `DOSSIER_CAP_BYTES` is SPLIT into two dossiers (never rotated; the map gate requires
+`FOUNDATION.md` in place), and that bound is deliberately kept tighter than the row one because a split
+is the only remedy a dossier has and check 6 is the only size gate it has. The map's
 coverage/freshness enforcement is its own test file, not this script.

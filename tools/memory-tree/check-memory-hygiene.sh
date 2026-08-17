@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.19   # gov:kit memory-tree@2.19 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.20   # gov:kit memory-tree@2.20 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -24,7 +24,28 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+# Check 6's two DECLARED byte bounds. These are POLICY CEILINGS a project chooses, not measured pins,
+# so unlike the pins above they ship WITH a value and there is no spelling that turns the bound off:
+# a cap an adopter can disable by blanking a line is a gate that reports green for a tree nobody is
+# checking, and `project/curation-debt.txt` is already the deliberate per-file exemption.
+KIT_ROW_DOC_CAP_DEFAULT=20480      # the shipped default for BOTH keys below; an adopter who declares
+KIT_DOSSIER_CAP_DEFAULT=20480      # neither gets byte-for-byte the verdicts of kit 2.19 and earlier
+ROW_DOC_CAP_BYTES=""   # bytes; every row document except a build README and a codebase-map dossier
+DOSSIER_CAP_BYTES=""   # bytes; <MAP_ROOT>/features/*.md only, and only when a codebase map is adopted
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
+# RE-NORMALISE AFTER THE SOURCE, and this order is the whole reason the helper exists. The block
+# above pre-sets defaults and the conf is sourced OVER it, so a project writing `ROW_DOC_CAP_BYTES=`
+# overrides a default with blank — the idiom every measured pin here uses to mean "skip this check".
+# These two must not be skippable, so blank resolves forward to the shipped default instead.
+_resolve_cap() {   # <name> <value> <default> -> the resolved value on stdout, or exit 2
+  case "$2" in
+    "") printf '%s\n' "$3"; return 0 ;;
+    *[!0-9]*|0) echo "HYGIENE — .memory-tree.conf: $1 is '$2', which is not a positive byte count. Check 6 cannot run against it; set a positive integer or delete the line to take the shipped default of $3." >&2; exit 2 ;;
+    *) printf '%s\n' "$2"; return 0 ;;
+  esac
+}
+ROW_DOC_CAP_BYTES=$(_resolve_cap ROW_DOC_CAP_BYTES "$ROW_DOC_CAP_BYTES" "$KIT_ROW_DOC_CAP_DEFAULT") || exit 2
+DOSSIER_CAP_BYTES=$(_resolve_cap DOSSIER_CAP_BYTES "$DOSSIER_CAP_BYTES" "$KIT_DOSSIER_CAP_DEFAULT") || exit 2
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # codebase-map kit interop: when its MAP_ROOT is a DIRECT child of this tree (e.g. memory/map),
@@ -381,24 +402,43 @@ bad6=""
 if [ -n "$sel6" ]; then
   cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
   clines=$(printf '%s\n' "$sel6" | xargs -r wc -l)
-  # PER-CLASS CAPS, and the split is between PROSE and ROWS. A guide is a document the charter points
-  # a session at and reads end to end; an index is a row set that a curation sweep prunes. They shared
-  # one 250-line limit, and for a guide that limit is a PROXY for the read budget rather than the
-  # budget itself — check 16's `READ_PATH_CEILING` is the real one, it is measured in bytes, and it is
-  # not relaxed here. So guides carry 3x and every row document keeps the original cap: tripling the
-  # allowance for a backlog shard or a map dossier would loosen a curation discipline nobody asked to
-  # loosen, and the two classes fail for different reasons.
-  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" '
+  # PER-CLASS CAPS. FOUR classes now, and only ONE of them still carries a line bound.
+  #
+  # A guide is prose the charter points a session at and reads end to end; for it the 750-line limit is
+  # a PROXY for the read budget rather than the budget itself — check 16's `READ_PATH_CEILING` is the
+  # real one, measured in bytes, and it is not relaxed here. Every other class is a row set, and for a
+  # row set the line count was never the bound that bound: at check 7's 300-char entry budget a
+  # 250-line row document may hold 75,000 B, so the byte figure decided every real case and the line
+  # figure needed rows averaging under 82 B. Measured over this corpus's backlog rows: 253.7 B.
+  #
+  # It did bind elsewhere, and that is why retiring it was an OWNER DECISION and not a tidy-up.
+  # Measured over check 6's 29-member row class, 22 sat below the 81.92 B/line break-even and were
+  # line-bound FIRST — every codebase-map dossier among them, and check 6 is the only size gate a
+  # dossier has. `TOOL-aWidenedGuide-1` had refused to triple the row allowance for exactly that
+  # reason. `TOOL-aRelaxedShard-1` reverses that refusal deliberately, after the owner was shown the
+  # population, and buys the dossier sub-population back its own declared bound so the relaxation
+  # lands on the backlog shards and the decision log that asked for it.
+  #
+  # `cl = 0` means NO line bound for the class. The two byte bounds are DECLARED in
+  # `.memory-tree.conf` and default to the kit's shipped value, so an adopter who declares neither
+  # keeps the byte verdicts of kit 2.19 exactly; the line bound is retired for everyone.
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" \
+             -v rc="$ROW_DOC_CAP_BYTES" -v dc="$DOSSIER_CAP_BYTES" \
+             -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
     FNR==NR { if ($NF!="total") b[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
-            cb = 20480; cl = 250
+            cb = rc+0; cl = 0
             if (index(f, gp) == 1) { cb = 61440; cl = 750 }
-            # A build README: its own tier, and cl=0 means NO independent line cap. The line count is
-            # whatever fits the byte budget at the per-line width, so there is no third number to
-            # drift against the other two.
+            # A build README: its own tier, and the line count is whatever fits the byte budget at the
+            # per-line width, so there is no third number to drift against the other two.
             if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = 25600; cl = 0 }
+            # A codebase-map dossier, GUARDED on a non-empty prefix. `dp` is empty when no map is
+            # adopted, and `index(f, "")` is 1 for every string — an unguarded test would give the
+            # dossier bound to the whole tree and silently undo the row cap. The `ex7` selector in
+            # check 7 adds its map alternatives under `[ -n "$MAP_SUB" ]` for the same reason.
+            if (dp != "" && index(f, dp) == 1) { cb = dc+0; cl = 0 }
             if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
               if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
               else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }

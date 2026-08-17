@@ -428,9 +428,22 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
 # ---- `*.bak`, so `git ls-files` never sees it and check 4's population is the index. An arm that
 # ---- passes because its fixture was never staged is this repo's fixture-passes-by-finding-nothing
 # ---- class, and it would have read as coverage of an anchor it does not test.
+# ---- tRunBig is over cap on BYTES, not lines. It used to be 265 lines / ~3 KB, and lines were its
+# ---- only over-cap axis — which stopped being an axis when TOOL-aRelaxedShard-1 retired the row
+# ---- class's line bound. THREE contracts are asserted THROUGH check 6 naming this file: that RUN.md
+# ---- enters index_set at all, that check 7 EXEMPTS it, and the per-class scoping control. Letting it
+# ---- fall silent would have vacated all three while every arm still passed.
 { printf '# run\n\n- ARCH-tFixture-1 · parked, and this dash row ANCHORS the id\n\n%s\n' "$C7L"
-  i=1; while [ "$i" -le 260 ]; do printf -- '- note %d\n' "$i"; i=$((i+1)); done; } \
-  > memory/builds/tRunBig/RUN.md                                    # 265 lines -> RED on 6; 340-char row -> silent on 7
+  RP=$(printf 'p%.0s' $(seq 1 80))
+  i=1; while [ "$i" -le 260 ]; do printf -- '- note %d %s\n' "$i" "$RP"; i=$((i+1)); done; } \
+  > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
+
+# ---- THE RETIREMENT ARM (TOOL-aRelaxedShard-1). Over 750 lines and far under the byte cap, so it is
+# ---- SILENT only because the row class has no line bound at all. Pinned above 750 rather than above
+# ---- the old 250 deliberately: a fixture in the 251-750 band is equally silent if the implementation
+# ---- leaves the GUIDE class's cl=750 governing rows, so it could not tell a retirement from that slip.
+{ printf '# tRunOk status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } \
+  > memory/builds/tRunOk/STATUS.md                                  # 801 lines, ~6 KB -> SILENT on 6
 
 git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
@@ -572,6 +585,14 @@ cnot 2 'links.md -> kickoff-prompt.md'
 hit  'index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it)'
 chit 6 'memory/guides/tfixture.md'
 cnot 6 'memory/backlog/ARCH.md'
+# ---- The guide is the ONE class that still carries a line bound, so its finding must still print
+# ---- BOTH figures. The likeliest slip in the per-class message is dropping the line half from the
+# ---- shared format for every class, which would name a guide for a LINE breach while printing only a
+# ---- byte count under its own byte cap. TOOL-aRelaxedShard-1.
+chit 6 '761L > 61440B/750L'
+# ---- THE RETIREMENT (TOOL-aRelaxedShard-1): 801 lines, under the byte cap, SILENT. Above 750 so it
+# ---- cannot be satisfied by an engine that merely left the guide class's cl governing rows.
+cnot 6 'memory/builds/tRunOk/STATUS.md'
 # ---- THE TWO HALVES OF THE PER-CLASS CAP. A guide between the row cap and the guide cap is silent;
 # ---- a guide past the guide cap is named. Asserting only the second would pass identically under
 # ---- one shared 250-line cap, which is the state this change moved away from.
@@ -874,7 +895,11 @@ n=$((n+1))
 G=$TMP/mapped
 mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/memory/backlog"
 ( cd "$G" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  # ---- The two cap keys are declared APART here, and that is PART OF THE ARMS rather than setup.
+  # ---- Both SHIP at 20,480, so a fixture declaring neither makes the row and dossier bounds ONE
+  # ---- number, the band between them empty, and the dossier arm satisfiable by an engine carrying no
+  # ---- dossier branch at all. Do not "simplify" these two settings away.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nROW_DOC_CAP_BYTES="61440"\nDOSSIER_CAP_BYTES="20480"\n' > .memory-tree.conf
   printf 'MAP_ROOT=memory/map\n' > .codebase-map.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
@@ -883,6 +908,15 @@ mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/mem
   printf '# map index\n\n- %s\n' "$L" > memory/map/README.md          # NOT exempt      -> RED
   printf '# a guide\n\n- %s\n' "$L"  > memory/guides/tguide.md        # exempt (guides) -> silent
   printf '# a dossier\n\n- %s\n' "$L" > memory/map/features/tdoss.md  # exempt (map)    -> silent
+  # ---- CHECK 6, the dossier class. ~31 KB sits BETWEEN DOSSIER_CAP_BYTES and ROW_DOC_CAP_BYTES, so
+  # ---- this pair is the only observation that tells a dossier class from a row class under a larger
+  # ---- bound: the dossier is NAMED and a row document of the SAME SIZE is SILENT. Either one alone
+  # ---- is satisfied by an engine with no dossier branch.
+  BB=$(printf 'b%.0s' $(seq 1 120))
+  { printf '# fat dossier\n'; i=1; while [ "$i" -le 250 ]; do printf -- '- %s\n' "$BB"; i=$((i+1)); done; } \
+    > memory/map/features/tfat.md                                    # ~31 KB > 20480 -> RED on 6
+  { printf '# fat rows\n'; i=1; while [ "$i" -le 250 ]; do printf -- '- %s\n' "$BB"; i=$((i+1)); done; } \
+    > memory/backlog/ZFAT.md                                         # ~31 KB < 61440 -> silent on 6
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && git add -A
   git commit -q -m mapped --no-verify )
 outm=$(cd "$G" && bash "$SCRIPT" 2>/dev/null)
@@ -894,6 +928,39 @@ cblock "$outm" 7 | grep -qF 'memory/guides/tguide.md' \
 n=$((n+1))
 cblock "$outm" 7 | grep -qF 'memory/map/features/tdoss.md' \
   && { echo "FAIL check 7 reported a codebase-map dossier's over-cap row — dossiers are detail files"; st=1; }
+# ---- CHECK 6, THE DOSSIER CLASS (TOOL-aRelaxedShard-1). The pair, and only the pair, discriminates.
+n=$((n+1))
+cblock "$outm" 6 | grep -qF 'memory/map/features/tfat.md' \
+  || { echo "FAIL check 6 did not name a dossier over DOSSIER_CAP_BYTES — the dossier class is not applied"; st=1; }
+n=$((n+1))
+cblock "$outm" 6 | grep -qF 'memory/backlog/ZFAT.md' \
+  && { echo "FAIL check 6 named a row document at the SAME size as the over-cap dossier — the dossier bound leaked onto the row class, which is what an unguarded MAP_SUB prefix does"; st=1; }
+# ---- ...and the message for a dossier carries no line figure, because the class has no line bound.
+n=$((n+1))
+cblock "$outm" 6 | grep -qF '; no line cap for this class' \
+  || { echo "FAIL a dossier finding did not carry the no-line-cap message shape"; st=1; }
+
+# ---- (c2) THE EMPTINESS GUARD, in a tree with NO codebase map. `index(f, "")` is 1 for EVERY string,
+# ----      so an unguarded dossier selector resolves to a bare prefix and hands the DOSSIER bound to
+# ----      the whole tree — silently undoing the row cap. Asserting mere silence in a no-map tree
+# ----      proves nothing: without a .codebase-map.conf no dossier path is in check 6's population at
+# ----      all, so silence comes from index_set membership one layer ABOVE the branch under test. The
+# ----      discriminating form is a ROW document sized BETWEEN the two declared bounds: correct under
+# ----      the guard, RED under the degenerate selector.
+n=$((n+1))
+NG=$TMP/nomap
+mkdir -p "$NG/memory/project" "$NG/memory/backlog"
+( cd "$NG" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nROW_DOC_CAP_BYTES="61440"\nDOSSIER_CAP_BYTES="20480"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# legacy\n' > memory/project/legacy-files.txt
+  NB=$(printf 'n%.0s' $(seq 1 120))
+  { printf '# fat rows\n'; i=1; while [ "$i" -le 250 ]; do printf -- '- %s\n' "$NB"; i=$((i+1)); done; } \
+    > memory/backlog/ARCH.md                                         # ~31 KB: over the dossier bound, under the row bound
+  git add -A && git commit -q -m nomap --no-verify )
+outn=$(cd "$NG" && bash "$SCRIPT" 2>/dev/null)
+cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
+  && { echo "FAIL check 6 applied the DOSSIER bound to a row document in a tree with no codebase map — the dossier selector is missing its emptiness guard"; st=1; }
 
 # ---- (d) THE RUN.md ANCHOR BAN (kit 2.3), in its OWN tree because `armed()` in corpus_ids.py turns
 # ----     checks 13-16 off outright when every pin is blank, and the main fixture conf sets none.
@@ -1037,7 +1104,15 @@ chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
 n=$((n+1))
-FLOOR_ASSERTIONS=136
+# ---- THE SHIPPED EXAMPLE CONF (TOOL-aRelaxedShard-1). Nothing else in the bar reads that file:
+# ---- adopt-memory-tree.sh only copies it and check-install-prefix.sh excludes *.conf.example. So
+# ---- without this arm the one artifact an adopter actually RECEIVES can lose a key silently.
+for _k in ROW_DOC_CAP_BYTES DOSSIER_CAP_BYTES; do
+  n=$((n+1))
+  grep -qE "^${_k}=\"[0-9]+\"" "$HERE/.memory-tree.conf.example" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k with a value — an adopter would inherit a key the engine reads and their conf never mentions"; st=1; }
+done
+
+FLOOR_ASSERTIONS=153
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
