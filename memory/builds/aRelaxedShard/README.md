@@ -18,31 +18,20 @@ the gate names has nothing left to pay with.
 
 ## What was measured
 
-Every figure here was derived at base sha `43eb6b10`, not read from prose.
+The per-document figures, the row length, the minting rate and the live-set growth are all derived at
+base sha `43eb6b10` and live in the spec's §4 Inventory, which owns them. This overview states only what
+they add up to, so that there is one place to correct when the tree moves.
 
-| row document | bytes | rows | share of the 20,480-byte cap |
-|---|---|---|---|
-| `memory/backlog/TOOL.md` | 19,152 | 73 | 93.5% |
-| `memory/DECISIONS.md` | 12,328 | — | 60.2% |
-| `memory/ledger/2026-08.md` | 3,240 | — | 15.8% |
-| `memory/LIVE.md` | 2,054 | — | 10.0% |
-| `memory/backlog/PLAY.md` | 1,741 | 9 | 8.5% |
-| `memory/backlog/DEPL.md` | 1,734 | 11 | 8.5% |
-| `memory/backlog/KICK.md` | 373 | 4 | 1.8% |
-
-- **Row length** is 251 bytes, from 18,314 bytes across 73 rows in the tooling shard.
-- **Minting rate** is 17.9 ids per day, from 161 distinct `TOOL-` ids first appearing over nine active
-  days across the live shard and its three archives. The last four of those days average 20.3.
-- **Live-set growth** is 8.1 rows per day, about 2,034 bytes, from the 73 non-terminal rows those nine
-  days left standing.
-- **Remaining headroom** is 1,328 bytes, which is **0.65 days**. That figure is the finding.
+The tooling backlog shard is at 93.5% of its cap. Its remaining headroom is **0.65 days** of measured
+net growth. That figure is the finding — not the percentage, which has read like a tight budget for a
+week.
 
 ## Why rotation is finished as a remedy
 
 Rotation carries forward every non-terminal row, so a live shard's floor is its live row set. The
-tooling shard holds 73 live rows and zero terminal ones: its floor is its current 18,314 bytes, 89.4%
-of the cap, and a fourth rotation would move nothing. It has already rotated three times in four days,
-twice on one of them.
+tooling shard's live rows are its entire contents — there are no terminal rows left — so its floor is
+89.4% of the cap and a fourth rotation would move nothing. It has already rotated three times in four
+days, twice on one of them.
 
 This was predicted. `memory/builds/cSteadyMetronome/README.md` recorded it on 2026-08-14, including the
 detail that the unit it needed could not be given a backlog row because there was no room left to write
@@ -59,9 +48,9 @@ Three separate problems, not one.
    measuring raw working-tree bytes. At the pre-kickoff base the tooling shard measured 20,408 bytes as
    LF and 20,492 as CRLF, so it was already over cap on a CRLF checkout. The inflation is under half a
    percent and it lands exactly where the margin is thinnest.
-3. **Half the rule cannot fire.** At the 300-char entry budget a 250-line row document may hold 75,000
-   bytes, so the byte bound decides every real case and the line bound needs rows averaging under 82
-   bytes. Measured mean is 251. The retired figures also ship in prose in six carriers.
+3. **Half the rule cannot fire.** The line bound would need rows a third of their measured length, so
+   the byte bound decides every real case — the arithmetic is in the spec's §4. The figures also ship in
+   prose in six carriers, which is why retiring them is a sweep rather than an edit.
 
 ## The unit set
 
@@ -105,9 +94,9 @@ row class with no arm at all. Rebuilding those arms on the byte axis is a covera
 unit.
 
 `memory/guides/BUILD-METHOD.md` and its kit template both cite hygiene rule 6 for a budget rule 6 does
-not impose on a guide, which gets 61,440 bytes and 750 lines. The self-imposed discipline is real,
+not impose on a guide — the guide class is three times wider. The self-imposed discipline is real,
 because the build method is re-read whole at every pass boundary; the citation is wrong. Both carriers
-are in this unit's prose sweep anyway.
+are in this unit's prose sweep anyway, so S9 corrects the attribution while it is there.
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
