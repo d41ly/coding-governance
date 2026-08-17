@@ -51,8 +51,7 @@
     "argv": [
       "bash",
       "tools/check-template-size.sh",
-      "skills/session-kickoff/SKILL.md",
-      "18432"
+      "skills/session-kickoff/SKILL.md"
     ]
   },
   {
@@ -571,6 +570,58 @@
     ],
     "guard": [
       "tools/govkit/"
+    ]
+  },
+  {
+    "name": "lexicon naming predicates",
+    "argv": [
+      "python",
+      "tools/lexicon/lexicon.py"
+    ],
+    "guard": [
+      "tools/",
+      "skills/session-kickoff/",
+      ".githooks/",
+      ".claude/"
+    ]
+  },
+  {
+    "name": "lexicon selftest",
+    "argv": [
+      "python",
+      "tools/lexicon/selftest.py"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "lexicon wiring",
+    "argv": [
+      "bash",
+      "tools/lexicon/adopt-lexicon.sh",
+      "--check"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "playbook placeholder catalogue",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.sh"
+    ]
+  },
+  {
+    "name": "placeholder-catalogue self-test",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.test.sh"
+    ],
+    "guard": [
+      "tools/check-placeholders.sh",
+      "tools/check-placeholders.test.sh"
     ]
   }
 ]

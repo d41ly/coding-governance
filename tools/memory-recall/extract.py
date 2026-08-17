@@ -163,13 +163,106 @@ def git(repo: pathlib.Path, *args: str) -> str:
     ).stdout
 
 
-def corpus_files(repo: pathlib.Path, rev: str | None) -> list[str]:
+def corpus_files(repo: pathlib.Path, rev: str | None = None,
+                 include_untracked: bool = False) -> list[str]:
+    """The ONE corpus walk. Markdown under ``$MEMORY_ROOT``, for both callers.
+
+    There used to be two, and every widening had to teach both — the last one nearly shipped
+    teaching only this half. They differed on ONE axis seen from two ends, and it is preserved as a
+    parameter rather than as a duplicate: the MEASUREMENT path stays pinnable to a ``rev``, and the
+    QUERY path also takes untracked-not-ignored files, because a note written this session and not
+    yet committed is exactly what a session needs to find.
+
+    ``rev`` and ``include_untracked`` are mutually exclusive and a caller passing both is REFUSED:
+    a revision has no untracked files, so the combination has no meaning to resolve silently into.
+    """
+    if rev and include_untracked:
+        raise ValueError(
+            "corpus_files: rev and include_untracked are mutually exclusive — a revision has no "
+            "untracked files, and silently preferring one would make the corpus depend on which")
     root = CONF.memory_root + "/"  # FORKED: conf, not a literal `memory/`
     if rev:
-        out = git(repo, "ls-tree", "-r", "--name-only", rev, root)
+        names = git(repo, "ls-tree", "-r", "--name-only", rev, root).splitlines()
     else:
-        out = git(repo, "ls-files", root)
-    return sorted(p for p in out.splitlines() if p.endswith(".md"))
+        names = git(repo, "ls-files", root).splitlines()
+        if include_untracked:
+            names += git(repo, "ls-files", "--others", "--exclude-standard", root).splitlines()
+    return sorted({p for p in names if p.endswith(".md")})
+
+
+def corpus_inputs(repo: pathlib.Path, rev: str | None = None,
+                  include_untracked: bool = False) -> tuple[list[str], list[str]]:
+    """Both halves of the corpus in ONE call: markdown, and the DECLARED extra sources.
+
+    They stay separate in the RETURN because they are extracted differently — markdown by heading,
+    a declaration by its key plus the comment block above it — but they are enumerated together so
+    a caller cannot take one and forget the other. That is exactly what happened: three call sites
+    outside the walks each had to be taught about declared sources, and the digest pair was taught
+    on only one side, which left the query cache unable to hit at all.
+    """
+    return (corpus_files(repo, rev, include_untracked), resolve_declared_sources(repo, rev))
+
+
+def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list[str]:
+    """The DECLARED extra sources, from ``RECALL_EXTRA_SOURCES``.
+
+    Repo-relative, not repo-root-only: the first design admitted root confs alone, which would have
+    left ``tools/template-size-limits.txt`` -- a declaration created in the same build -- outside
+    the corpus this widening exists to reach.
+
+    Declared, never globbed. A glob would sweep whatever a project happens to keep, and the
+    membership of a retrieval corpus is a decision about what counts as an answer. A declared file
+    that is absent is SKIPPED and reported; a glob matching nothing says nothing, which is the
+    vacuous-selector shape.
+    """
+    out = []
+    for rel in CONF.extra_sources:
+        if rev:
+            try:
+                git(repo, "cat-file", "-e", f"{rev}:{rel}")
+            except subprocess.CalledProcessError:
+                print(f"recall: declared source absent at {rev}, skipped: {rel}", file=sys.stderr)
+                continue
+        elif not (repo / rel).is_file():
+            print(f"recall: declared source absent, skipped: {rel}", file=sys.stderr)
+            continue
+        out.append(rel)
+    return sorted(out)
+
+
+_DECL_RE = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=(.*)$")
+
+
+def extract_declarations(path: str, text: str) -> list[dict]:
+    """One chunk per ``KEY=value`` assignment, carrying the comment block ABOVE it.
+
+    The comment block is the whole point. This tree puts a constraint's justification in the lines
+    above the number -- ``READ_PATH_CEILING`` is fourteen of them for one value -- and a chunk of
+    just ``READ_PATH_CEILING="86476"`` would be reachable and worthless.
+
+    These are CHUNKS, not records: a record is keyed by a corpus id in this tree's
+    ``FAMILY-slug-seq`` grammar, and a declaration has a KEY. Admitting them to ``records`` would
+    put un-id'd rows into the set ``anchors.json`` is built from.
+    """
+    lines = text.split("\n")
+    out = []
+    for i, line in enumerate(lines):
+        m = _DECL_RE.match(line)
+        if not m:
+            continue
+        key, value = m.group(1), m.group(2).strip()
+        j = i - 1
+        while j >= 0 and lines[j].lstrip().startswith("#"):
+            j -= 1
+        why = "\n".join(lines[j + 1:i]).strip()
+        body = f"{key} = {value}"
+        if why:
+            body += "\n" + why
+        out.append({
+            "path": path, "line": i + 1, "heading": key,
+            "text": body[:CHUNK_MAX], "kind": "declaration",
+        })
+    return out
 
 
 def read(repo: pathlib.Path, path: str, rev: str | None) -> str:
@@ -508,6 +601,15 @@ def main() -> int:
             records.append(d)
             anchors[d["id"]].append(path)
         chunks.extend(extract_chunks(path, text, chunk_max, overlap))
+
+    # The DECLARED extra sources. Chunks only, and separate from the loop above because these are
+    # not markdown: a conf swept as prose would put shell syntax and section banners into
+    # retrieval, where the unit of value is the declaration plus its justification.
+    for path in resolve_declared_sources(repo, rev):
+        text = read(repo, path, rev)
+        if not text:
+            continue
+        chunks.extend(extract_declarations(path, text))
 
     # COPIES, and BEFORE the join: spine is a filter over the same dict objects and `dump()` writes
     # every key, so a join applied first would silently alias 2 505 of spine's 2 959 documents --

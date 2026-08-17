@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. FIFTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. SIXTEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -7,14 +7,15 @@
 # Exit 0 + no output = clean. Anything printed is a violation. Exit 2 = misconfigured.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
-# nothing: the run-state file's generated region is COMPARED against the build README's slice, whose
-# freshness the memory-tree gate's check 9 already owns. Two legs answering one question is the class
-# the file under test exists to remove.
+# nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
+# from the build README at read time and lives in no second place. The README's own freshness is the
+# memory-tree gate's check 9. Two legs answering one question is the class the file under test exists
+# to remove — and a copy that has to be refreshed is that class wearing a different hat.
 #
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.5   # gov:kit unattended@1.5 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -134,7 +135,14 @@ FILES=$(git ls-files "$M/")
 # is not a violation, and a guard that cannot tell that from a mis-segmented selector reds every
 # fresh adopter on install. Precondition non-zero with an empty population is the mis-segmentation.
 PRE=$(printf '%s\n' "$FILES" | grep -cE '(^|/)RUN\.md$' || true)
-RUNS=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.md$" || true)
+# THE POPULATION IS THE LIVE RECORD PLUS EVERY ARCHIVED ONE (kit 1.6). Rotation retires a finished
+# record to `RUN.<phase>.<blob8>.md` beside the live one, so every per-file check below now
+# quantifies over both — checks 9, 13 and 15 included, which is what keeps an archived LANDED
+# record's witness answerable to the anchor.
+#
+# `PRE` above is deliberately NOT widened: it is the mis-segmentation PRECONDITION, not the
+# population. An archives-only tree reading PRE=0 with POP>0 is silent by design.
+RUNS=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$" || true)
 POP=$(printf '%s\n' "$RUNS" | grep -c . || true)
 if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
@@ -209,6 +217,17 @@ while IFS= read -r f; do
 
   case " $PHASES_TERMINAL " in *" $ph "*) ;; *) nlive=$((nlive+1)); live="$live $f";; esac
 
+  # AN ARCHIVED RECORD MUST BE TERMINAL, and this is its own branch rather than a consequence of the
+  # live-run rule below. Check 7 is `nlive <= 1`, which fires at TWO — so a `RUN.md` that has reached
+  # LANDED plus one archived record hand-edited back to RUNNING gives nlive=1 and the leg says
+  # nothing. That is the steady state after every completed second run, which makes it the one window
+  # where the widened population would otherwise buy less than it looks like it does.
+  case "$f" in
+    */RUN.md) ;;
+    *) case " $PHASES_TERMINAL " in *" $ph "*) ;;
+         *) fail 4 "an ARCHIVED run-state file carries a non-terminal phase, so a finished record was retired while still claiming to be live, or was edited after retirement: $ph in $f";; esac;;
+  esac
+
   # ---- 5: witness PRESENCE, its own branch. Check 6 below reuses the drift oracle's judgeability
   # ---- discipline, which SKIPS a claim carrying no sha — so folding presence into resolution makes
   # ---- naming no witness the cheapest way for a run to say nothing, and it is the sole author here.
@@ -242,37 +261,21 @@ while IFS= read -r f; do
     esac
   fi
 
-  # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
-  # ---- question the README already answers, differently — the whole class this build removes.
+  # ---- 8: the generated region holds NO COPY of the unit list. It is DERIVED from the build README
+  # ---- on every read, so there is nothing here to keep fresh.
+  #
+  # This check used to assert the opposite — that the region EQUALS the README slice — and the
+  # equality was unmaintainable in the ordinary case: a spec rev bump moves the build index, and the
+  # region's only writer was `--preflight`, which refuses once a run is live. The refusal told the
+  # reader to "re-run the driver", naming a path no verb walks. Asserting EMPTINESS is the same
+  # invariant with the copy removed: one fact, one home, and nothing to go stale between reads.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ]; then
+  case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
+  if [ -n "$rd" ] && [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
-      fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
-    b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
-      fail 8 "a build README's generated markers are malformed, so the copy has no source to be compared with: $rd"
-    # THE EQUALITY REFUSAL IS SCOPED TO A NON-TERMINAL RUN. Both malformed-marker refusals above
-    # still fire on every phase: a terminal run's file must still be READABLE, and skipping those
-    # would let a file rot into unparseability once it landed.
-    #
-    # Why the equality cannot bind a terminal run: the copy is refreshed by `--preflight` and by
-    # nothing else, and `verb_preflight` calls `refuse_if_terminal` before it reaches that splice.
-    # So a LANDED run has no supported route back to equality — the driver refuses to re-copy, and
-    # the check's own message ("re-run the driver") names a remedy that does not exist for it. The
-    # only ways to satisfy it were to hand-edit a file this same message calls generated, or to
-    # freeze the README the copy was taken from, which would have made the corpus permanently
-    # unrenderable.
-    #
-    # What the copy MEANS also differs by phase. For a live run it is a mirror, and drift means the
-    # run is working from a stale roster — a real defect. For a landed one it is a historical record
-    # of what the README said when the run finished, and the README moving afterwards is ordinary.
-    # Judging a record against a source that legitimately moved is not a check, it is a countdown.
-    #
-    # Section 9 of the protocol governs what a check running under the run's own uid can buy; this
-    # carve-out narrows a check that could not be satisfied rather than one that was inconvenient.
-    case " $PHASES_TERMINAL " in
-      *" $ph "*) ;;
-      *) [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f" ;;
-    esac
+      fail 8 "a run-state file's generated markers are malformed: $f"
+    [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
+      fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
   fi
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
@@ -405,6 +408,14 @@ if [ -f "$SHIP" ] && [ -f "$LIVEDOC" ]; then
   fi
 elif [ ! -f "$SHIP" ] || [ ! -f "$LIVEDOC" ]; then
   fail 10 "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail: $SHIP / $LIVEDOC"
+fi
+
+# ---- 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 above cannot
+# ---- see this: it is a byte-diff of the pair, and it is green whatever BOTH of them say. A rotation
+# ---- shipped with a protocol that does not name the archive grammar is a mechanism an operator
+# ---- meets for the first time in a directory listing.
+if [ -f "$LIVEDOC" ] && ! grep -qF 'RUN.<phase>.<blob8>.md' "$LIVEDOC"; then
+  fail 16 "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record: $LIVEDOC"
 fi
 
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not

@@ -33,7 +33,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.0"  # gov:kit govkit@1.0 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.1"  # gov:kit govkit@1.1 — kit identity; set HERE, never from a conf
 
 try:
     import tomllib
@@ -324,6 +324,19 @@ def selfcheck(root: pathlib.Path) -> int:
                 if not (root / src).exists():
                     r.fail(f"entry '{eid}' declares a source that does not exist: {src}")
 
+    # ---- 3b: every role a descriptor SPELLS is a key of ROLE_KINDS. Caught here rather than at
+    #          install time, because a role the table does not carry has no defined outcome in
+    #          either verb — and the fallback that would let it through is `write`, the one kind
+    #          that promises a file. An ABSENT role still defaults to `engine`; this is about a
+    #          role spelled and unrecognised.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            role = rule.get("role")
+            if role is not None and role not in ROLE_KINDS:
+                r.fail(f"entry '{eid}' declares role '{role}', which is not in ROLE_KINDS "
+                       f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
+                       f"table, so an unlisted role has no defined outcome in either verb")
+
     # ---- 4: no two file rules across the whole registry write the SAME destination.
     #         One source reaching two destinations is legal; two sources contending for one is not.
     dest_owner: dict[str, str] = {}
@@ -527,20 +540,161 @@ def selfcheck(root: pathlib.Path) -> int:
     return r.emit()
 
 
+# ------------------------------------------------------------------------------ roles → outcomes
+# THE ONE TABLE. `plan` classifies with it, `apply` derives its write condition from it, and
+# `selfcheck` asserts the declared role population is a subset of its keys. TWO FUNCTIONS DECIDING
+# INDEPENDENTLY WHAT `apply` WILL DO IS THE DEFECT THIS TABLE DELETES — the same class as the
+# `resolve_dests`/`resolve_rule_pool` seam one level down, and the same class the repo records at
+# memory/gotchas/two-answers-to-one-question.md.
+#
+# `merged` maps to `blocked` rather than to a write because writing a gov-owned region into a file
+# the target owns is the one shape with no seam anywhere in this repo — measured, nothing here writes
+# a `.gitattributes` block or performs the renormalize that follows it — and `cmd_apply` refuses the
+# whole install over one. `rendered`/`generated` map to `side-effect` because a step `apply` runs
+# produces them; whether such a step EXISTS is a per-entry question and `derive_rule_kind` asks it.
+ROLE_KINDS = {
+    "engine": "write",
+    "seed": "write",
+    "rendered": "side-effect",
+    "generated": "side-effect",
+    "project-owned": "order",
+    "merged": "blocked",
+}
+
+#: DERIVED, never declared beside the table. A role added with any kind other than `write` is
+#: automatically not landable and a role added as `write` is automatically landed, in BOTH verbs,
+#: from one edit — which is what makes the single-table rule mechanical rather than remembered.
+LANDABLE_ROLES = tuple(k for k, v in ROLE_KINDS.items() if v == "write")
+
+#: The plan marks, in the order `cmd_plan` prints them. Kept beside the table so a new kind cannot
+#: reach the printer without a mark.
+KIND_MARKS = {"write": "write ", "order": "ORDER ", "side-effect": "SIDE  ",
+              "covered": "COVER ", "blocked": "BLOCK "}
+
+
+def check_entry_producer(desc: dict) -> bool:
+    """Does `apply` run anything for this entry that could produce a `rendered`/`generated` file?
+
+    MEASURED, not assumed. CONFIGURE is `argv = d.get("adopt", {}).get("argv") or []` followed by
+    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and two entries
+    carrying a `rendered`/`generated` rule declare exactly that in writing: `review-harness`
+    ("the render is performed by the parity gate's own --render mode rather than by a separate
+    adopter") and `check-install-prefix` ("seeded empty rather than copied"). Previewing those two as
+    a side-effect would be the same over-promise this unit deletes, moved one mark over.
+
+    A `blocks_adopt` hole makes CONFIGURE skip too. No descriptor here declares one today, so that
+    half is correct and unexercised by the shipped tree; `selftest.py` arms it with a FIXTURE, which
+    is the difference between a guard and a claim.
+    """
+    if not ((desc.get("adopt") or {}).get("argv") or []):
+        return False
+    return not any(h.get("blocks_adopt") for h in desc.get("hole", []))
+
+
+def scan_produced_destinations(desc: dict, ctx: dict) -> set[str]:
+    """Destinations some rule in this descriptor declares as a `side_effects` product."""
+    out: set[str] = set()
+    for rule in desc.get("files", []):
+        for sfx in rule.get("side_effects", []):
+            out.add(resolve_tokens(sfx, ctx)[0])
+    return out
+
+
+def scan_written_destinations(root: pathlib.Path, desc: dict, ctx: dict, home: str) -> set[str]:
+    """Every destination a LANDABLE rule in this descriptor actually writes.
+
+    Exists because a role does not determine an outcome on its own. In 2 of this tree's 4
+    `project-owned` rules a sibling `seed` rule lands that exact path in the SAME apply —
+    `map_extractors.py` beside `map_extractors.template.py`, and `drift_signals.py` beside its
+    template. Classifying on the role alone printed two contradictory verbs for one path.
+    """
+    out: set[str] = set()
+    for rule in desc.get("files", []):
+        if ROLE_KINDS.get(rule.get("role", "engine")) != "write":
+            continue
+        if rule.get("scope") == "machine" or rule.get("link"):
+            continue
+        for src in resolve_rule_pool(root, desc, rule, ctx, home):
+            out.update(d for d, _m in resolve_dests(desc, rule, src, ctx, home))
+    return out
+
+
+#: What `apply` prints when it declines a rule, keyed by the kind the PREVIEW gave that rule — so
+#: the two verbs cannot describe one skip two ways.
+SKIP_REASONS = {
+    "side-effect": "a step this apply runs produces it; govkit does not copy it",
+    "order": "nothing in this install produces it — the target or its operator must supply it",
+    "covered": "a sibling rule in this entry writes that same path in this run",
+    "blocked": "no verb here can write a gov-owned region into a target-owned file",
+}
+
+
+def _resolve_skip_destinations(root: pathlib.Path, desc: dict, rule: dict, ctx: dict,
+                       home: str) -> list[tuple[str, list[str]]]:
+    """The destinations a SKIPPED rule would have had, for reporting only.
+
+    Machine-scoped and link rules never resolve a source pool, so they answer from
+    `rule_destinations` the way `planned_writes` does for them.
+    """
+    if rule.get("scope") == "machine" or rule.get("link") \
+            or ROLE_KINDS.get(rule.get("role", "engine")) == "blocked":
+        return [resolve_tokens(x, ctx) for x in rule_destinations(desc, rule)]
+    return [p for src in resolve_rule_pool(root, desc, rule, ctx, home)
+            for p in resolve_dests(desc, rule, src, ctx, home)]
+
+
+def derive_rule_kind(eid: str, desc: dict, rule: dict, dest: str, written: set[str],
+                  produced: set[str], r: "Report") -> str | None:
+    """What `apply` will do at ONE resolved destination. `None` means the role is unknown and `r`
+    now carries the refusal.
+
+    An unknown role does NOT fall back to `write`. Defaulting an unrecognised role to the one kind
+    that promises a file is how this defect would be reintroduced by the next role someone adds; an
+    ABSENT role still defaults to `engine`, which is the documented existing behaviour.
+    """
+    role = rule.get("role", "engine")
+    if rule.get("scope") == "machine" or rule.get("link"):
+        return "order"          # an act on the machine, not on the tree — role does not enter
+    kind = ROLE_KINDS.get(role)
+    if kind is None:
+        r.fail(f"entry '{eid}' declares role '{role}', which is not in ROLE_KINDS "
+               f"({', '.join(sorted(ROLE_KINDS))}) — refusing rather than guessing whether "
+               f"`apply` writes it. Add the role to the table with the kind it deserves")
+        return None
+    if kind == "side-effect" and not (check_entry_producer(desc) or dest in produced):
+        return "order"          # nothing in this install produces it; someone else must
+    if kind == "order" and dest in written:
+        return "covered"        # a sibling rule writes this same path in this same apply
+    return kind
+
+
 # ----------------------------------------------------------------------------------------- plan
 def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                    descs: dict[str, tuple[dict, str]], selection: list[str],
                    r: Report) -> list[dict]:
-    """Every file `apply` would write, with its role and source commit. WRITES NOTHING.
+    """What `apply` would DO, one row per resolved destination. WRITES NOTHING.
 
-    Machine-scoped rules produce an ORDER, not a write, so they are listed separately and never as
-    files: `apply` writes nothing outside the repository the operator named.
+    A row's `kind` comes from `derive_rule_kind()` — the ONE table `apply` derives its write condition
+    from. Every non-`write` kind is a promise this tool does NOT make: `order` (someone else supplies
+    it), `side-effect` (a step `apply` runs produces it), `covered` (a sibling rule writes that same
+    path), `blocked` (`apply` refuses the install over it).
+
+    THIS FUNCTION USED TO STAMP `write` ON EVERY ROLE. `apply` writes only `LANDABLE_ROLES`, so a
+    preview of the `playbook` entry — in the DEFAULT selection — promised two files and `apply`
+    landed zero and exited 0. Four of the six declared roles were previewed as writes and never
+    written.
     """
     commit = git(root, "rev-parse", "HEAD").strip()
     out: list[dict] = []
     for eid in selection:
         d, _dpath = descs[eid]
         ctx = target_context(target, deploy, eid, d)
+        home = (d.get("home") or "").rstrip("/")
+        # Computed ONCE per entry: which destinations a landable rule in this descriptor writes, so
+        # a `project-owned` row that shares a path with a sibling `seed` is not previewed as an
+        # ORDER for a file this same run creates.
+        written = scan_written_destinations(root, d, ctx, home)
+        produced = scan_produced_destinations(d, ctx)
         for rule in d.get("files", []):
             role = rule.get("role", "engine")
             srcs = rule_sources(d, rule)
@@ -550,18 +704,34 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                     out.append({"kit": eid, "role": role, "kind": "order",
                                 "dest": resolved, "missing": missing, "src": ", ".join(srcs)})
                 continue
-            dests = rule_destinations(d, rule)
-            if not dests:
-                dests = [f"{{prefix}}/{{kit_id}}/{pathlib.PurePosixPath(s).name}" for s in srcs]
-            for dest in dests:
-                resolved, missing = resolve_tokens(dest, ctx)
-                for k in missing:
-                    r.fail(f"entry '{eid}' needs answer '{k}' to resolve destination '{dest}', and "
-                           f"the target descriptor supplies none — refusing before any write, and "
-                           f"naming the key rather than inventing a value")
-                out.append({"kit": eid, "role": role, "kind": "write",
-                            "dest": resolved, "missing": missing, "src": ", ".join(srcs),
-                            "commit": commit})
+            if ROLE_KINDS.get(role) == "blocked":
+                # PREVIEWED FROM `to`, NOT FROM A SOURCE POOL. `cmd_apply` refuses the whole install
+                # on a `merged` rule regardless of what it includes, so a preview that reads the pool
+                # shows NOTHING for a merged rule declaring `include = []` — measured on
+                # `settings-merge`, where plan listed one write and one side-effect while apply
+                # refused. The refusal is the most important thing a preview can carry.
+                for dest in rule_destinations(d, rule):
+                    resolved, missing = resolve_tokens(dest, ctx)
+                    out.append({"kit": eid, "role": role, "kind": "blocked",
+                                "dest": resolved, "missing": missing, "src": ", ".join(srcs) or "(no source)",
+                                "commit": commit})
+                continue
+            # THE SAME POOL `apply` WILL USE. This used to read `rule_destinations()`, which resolves
+            # sources through `rule_sources()` and therefore skips every glob — so a `**` rule
+            # produced no rows at all and the operator approved a plan describing a fraction of the
+            # write. Measured on the lexicon kit before this changed: plan 3, apply 12.
+            for src in resolve_rule_pool(root, d, rule, ctx, home):
+                for resolved, missing in resolve_dests(d, rule, src, ctx, home):
+                    for k in missing:
+                        r.fail(f"entry '{eid}' needs answer '{k}' to resolve a destination for "
+                               f"'{src}', and the target descriptor supplies none — refusing before "
+                               f"any write, and naming the key rather than inventing a value")
+                    kind = derive_rule_kind(eid, d, rule, resolved, written, produced, r)
+                    if kind is None:
+                        continue
+                    out.append({"kit": eid, "role": role, "kind": kind,
+                                "dest": resolved, "missing": missing, "src": src,
+                                "commit": commit})
             for sfx in rule.get("side_effects", []):
                 resolved, _ = resolve_tokens(sfx, ctx)
                 out.append({"kit": eid, "role": role, "kind": "side-effect", "dest": resolved,
@@ -581,25 +751,25 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     print(f"govkit plan — target {target.as_posix()} · selection: {', '.join(selection)}")
     print(f"govkit plan — source commit {git(root, 'rev-parse', '--short', 'HEAD').strip()} "
           f"(bytes are taken from the git index at this commit, never from the working tree)")
+    # THE LEGEND IS PART OF THE PROMISE. Only `write` says govkit puts bytes at that path; every
+    # other mark says something else does, or nothing does. Printed before the rows because a mark
+    # an operator has to infer is a mark that gets read as a write.
+    print("govkit plan — marks: write = govkit writes it · SIDE = a step apply runs produces it · "
+          "ORDER = something outside apply must supply it · COVER = a sibling rule writes that same "
+          "path · BLOCK = apply refuses the install over it · UNRES. = unresolved token, not a path")
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
         # reads as a file set anyone can rely on.
-        if row["missing"]:
-            mark = "UNRES."
-        elif row["kind"] == "order":
-            mark = "ORDER "
-        elif row["kind"] == "side-effect":
-            mark = "SIDE  "
-        else:
-            mark = "write "
+        mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")
     holes = [(eid, h.get("id")) for eid in selection for h in descs[eid][0].get("hole", [])]
     for eid, hid in holes:
         print(f"  ORDER  [hole         ] .governance/outbox/{hid}.md   <- {eid}")
-    print(f"govkit plan — {sum(1 for x in rows if x['kind'] == 'write')} write(s), "
-          f"{sum(1 for x in rows if x['kind'] == 'side-effect')} side-effect(s), "
-          f"{sum(1 for x in rows if x['kind'] == 'order') + len(holes)} order(s). NOTHING was written.")
+    n = {k: sum(1 for x in rows if x["kind"] == k) for k in KIND_MARKS}
+    print(f"govkit plan — {n['write']} write(s), {n['side-effect']} side-effect(s), "
+          f"{n['order'] + len(holes)} order(s), {n['covered']} covered, {n['blocked']} blocked. "
+          f"NOTHING was written.")
     return r.emit()
 
 
@@ -677,13 +847,90 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
 
 
 # ----------------------------------------------------------------------------------------- apply
-# Roles `apply` can land today. `merged` is deliberately NOT here: writing a gov-owned region into a
-# file the target owns is the one shape with no seam anywhere in this repo — measured, nothing here
-# writes a `.gitattributes` block or performs the renormalize that follows it — and a half-written
-# anchored-region writer is worse than a named refusal. `rendered` is not here either, and for the
-# opposite reason: the ADOPTERS render those artifacts themselves, so govkit copying a rendered
-# output would be a second renderer racing the real one.
-LANDABLE_ROLES = ("engine", "seed")
+# `LANDABLE_ROLES` used to be a hand-written `("engine", "seed")` HERE, beside the write loop, while
+# `planned_writes` decided the same question with a different predicate. It is now DERIVED from
+# `ROLE_KINDS` at the top of the roles section, so there is one table and one answer.
+
+
+def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> list[tuple[str, list[str]]]:
+    """Where one source lands under a rule, as `(destination, unresolved-answer-keys)` pairs.
+
+    ONE spelling, called by `plan`, by the write loop, and by the wildcard exclusion — each has to
+    ask the same question the writer will answer, and two computations of one thing is the class this
+    repo keeps a record about.
+
+    THE `missing` LIST IS RETURNED, not dropped. An earlier cut called `resolve_tokens(...)[0]` and
+    discarded it, so `apply --kits kickoff-manifest` with no `manifest_path` answer wrote a file
+    named literally `{manifest_path}` and exited 0, while `plan` exited 1 refusing the same install.
+    A destination with an unresolved token is not a destination.
+
+    An explicit `to` WINS for every role. Defaulting engine files to the kit-relative form regardless
+    is how a flat entry — one with no kit directory at all — silently lands under a directory it does
+    not have. The default applies only where the rule declared no destination.
+    """
+    if rule.get("to"):
+        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)
+                for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
+    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
+        pathlib.PurePosixPath(src).name
+    return [(f"{ctx['kit']}/{rel}", [])]
+
+
+def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str) -> list[str]:
+    """The source paths a rule actually lands. ONE spelling for `plan` AND `apply`.
+
+    THIS SEAM EXISTS BECAUSE THE TWO DISAGREED. `plan` resolved sources through `rule_sources()`,
+    which skips any include containing a glob character — so a `**` rule produced ZERO plan rows
+    while `apply` pooled every tracked file under `home`. Measured on the lexicon kit: plan printed
+    3 writes, apply landed 12. Ten of this repo's nineteen descriptors carry a `**` engine rule, so
+    an operator approving a plan was approving a fraction of what would be written — and the files
+    that went unlisted are exactly the ones a re-apply overwrites.
+
+    A deployer whose preview disagrees with its action is worse than one that simply does the wrong
+    thing, because the wrong thing is at least visible.
+    """
+    inc = rule.get("include")
+    srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+    if any(s == "**" for s in srcs):
+        claimed = scan_claimed_paths(desc, rule, ctx, home)
+        return [f for f in tracked(root)
+                if home and f.startswith(home + "/")
+                and not ({d for d, _m in resolve_dests(desc, rule, f, ctx, home)} & claimed)]
+    return rule_sources(desc, rule)
+
+
+def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) -> set[str]:
+    """Every DESTINATION some other rule in this descriptor already owns.
+
+    A `**` include means "everything not otherwise claimed" — which is how every descriptor author
+    has read it, and what the engine did NOT implement. It pooled every tracked file under `home` and
+    wrote each one unconditionally, so a rule declared LATER never got the chance to protect its own
+    file. Measured against `drift-audit`: an adopter's edit to the `project-owned` `drift_signals.py`
+    was destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
+
+    CLAIMED BY DESTINATION, NOT BY SOURCE, and the distinction was measured rather than reasoned.
+    Excluding claimed SOURCES too is the obvious first cut and it UNDER-LANDS: `drift_signals.template.py`
+    is the seed rule's source, its `**` destination is `{kit}/drift_signals.template.py`, and nothing
+    else claims that path — so a source-based exclusion silently stopped shipping the adopter the
+    template their own re-seed depends on. Measured: 8 files landed before, 6 after, and the two
+    missing were not the two being protected.
+
+    A destination claim covers both real cases. `project-owned` names `drift_signals.py`, which
+    resolves to `{kit}/drift_signals.py` — the path it owns and, being non-landable, could not
+    otherwise defend. `seed` names a different source but lands ON that same path, so its "copied
+    ONCE, then the target owns it" guard is protected by the same test.
+    """
+    claimed: set[str] = set()
+    for other in desc.get("files", []):
+        if other is wildcard_rule:
+            continue
+        inc = other.get("include")
+        srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+        if any(s == "**" for s in srcs):
+            continue  # two wildcards claim nothing FROM each other; neither is more specific
+        for s in rule_sources(desc, other):
+            claimed.update(d for d, _m in resolve_dests(desc, other, s, ctx, home))
+    return claimed
 
 
 def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
@@ -793,29 +1040,30 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         d, _p = descs[eid]
         ctx = target_context(target, deploy, eid, d)
         home = (d.get("home") or "").rstrip("/")
+        written_here = scan_written_destinations(root, d, ctx, home)
+        produced_here = scan_produced_destinations(d, ctx)
         for rule in d.get("files", []):
             role = rule.get("role", "engine")
             if role not in LANDABLE_ROLES or rule.get("scope") == "machine" or rule.get("link"):
+                # A SKIP IS AN OUTCOME, NOT HOUSEKEEPING. This used to be a bare `continue`, so a
+                # `plan` promising two playbook files was followed by `landed 0 file(s)` and exit 0
+                # with neither skip named on either side. One line per rule, with the same kind the
+                # preview printed, so the two verbs are legible against each other.
+                for dest, _miss in _resolve_skip_destinations(root, d, rule, ctx, home):
+                    kind = derive_rule_kind(eid, d, rule, dest, written_here, produced_here, r)
+                    print(f"govkit apply — SKIPPED [{role:<13}] {dest} <- {eid}: "
+                          f"{SKIP_REASONS.get(kind, 'not a role this verb lands')}")
                 continue
-            inc = rule.get("include")
-            srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
-            if any(s == "**" for s in srcs):
-                pool = [f for f in tracked(root) if home and f.startswith(home + "/")]
-            else:
-                pool = rule_sources(d, rule)
+            pool = resolve_rule_pool(root, d, rule, ctx, home)
             for src in pool:
-                # An explicit `to` WINS for every role. Defaulting engine files to the kit-relative
-                # form regardless is how a flat entry — one with no kit directory at all — silently
-                # lands under a directory it does not have. The default applies only where the rule
-                # declared no destination.
-                if rule.get("to"):
-                    dests = [resolve_tokens(x.replace("{relpath}",
-                                                      pathlib.PurePosixPath(src).name), ctx)[0]
-                             for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
-                else:
-                    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
-                        pathlib.PurePosixPath(src).name
-                    dests = [f"{ctx['kit']}/{rel}"]
+                pairs = resolve_dests(d, rule, src, ctx, home)
+                unresolved = sorted({k for _dst, miss in pairs for k in miss})
+                if unresolved:
+                    r.fail(f"entry '{eid}': {src} has no resolvable destination — the target "
+                           f"descriptor supplies no answer for {', '.join(unresolved)}. Refusing "
+                           f"rather than writing a path with the token still in it")
+                    continue
+                dests = [dst for dst, _miss in pairs]
                 data = blob_at(root, commit, src)
                 if data is None:
                     r.fail(f"entry '{eid}': {src} does not resolve at {commit[:8]}")

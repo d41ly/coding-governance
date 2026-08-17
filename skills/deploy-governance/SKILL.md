@@ -39,9 +39,14 @@ Commit that file. It is the thing that makes the next `apply` reproducible.
 python tools/govkit/govkit.py plan --target <path>
 ```
 
-Read-only. Lists every file `apply` would write, with its role and the source commit its bytes would
-come from, and leaves the target byte-identical. Read it before applying — this is the last cheap
-moment to notice a destination you did not expect.
+Read-only. Lists every destination the install TOUCHES, one row per path, with its role, its mark and
+the source commit, and leaves the target byte-identical. **Only a `write` row says govkit puts bytes
+there.** `SIDE` means a step `apply` runs produces it, `ORDER` means something outside `apply` must
+supply it, `COVER` means a sibling rule writes that same path, `BLOCK` means `apply` refuses the
+install over it, and `UNRES.` means the destination still carries an unanswered token and is not a
+path. The legend prints above the rows. Read it before applying — this is the last cheap moment to
+notice a destination you did not expect, and the last cheap moment to notice one you expected and are
+not getting.
 
 ```bash
 python tools/govkit/govkit.py apply --target <path>

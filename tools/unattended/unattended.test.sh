@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Fixture self-test for unattended.sh — every refusal branch armed by a POSITIVE assertion naming
 # its own failure text (which is what check-arms.py reads), plus the behavioural arms no message
-# test can cover: that a refusal writes NOTHING, that the generated region is a COPY rather than a
-# re-derivation, and that --status and --resume agree.
+# test can cover: that a refusal writes NOTHING, that the generated region holds NO copy (the unit
+# list is derived from the build README), and that --status and --resume agree.
 #
 #   bash tools/unattended/unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
@@ -442,7 +442,7 @@ git push -q -f origin "$BASE":main
 # ---- pair upstream is a refusal rather than something to guess around.
 reset_tree; sed -i '/<!-- \/gen:build-index -->/d' memory/builds/tRun/README.md; fixture; before=$(sum)
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the build README's generated markers are malformed, and the region is COPIED from there, so an unpaired marker is not something to guess around"
+hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
 same "check 9.1 wrote nothing" "$(sum)" "$before"
 
 reset_tree; sed -i '/<!-- \/run:generated -->/d' memory/builds/tRun/RUN.md; fixture
@@ -459,11 +459,15 @@ hit "$out" "cannot record a run fact — the file carries neither that key's lin
 reset_tree
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "preflight OK"
-# the region is a COPY: byte-identical to the README's slice, not a re-render of the same data
+# The region holds NO COPY. It used to be byte-identical to the README's slice, and that equality
+# was unmaintainable in the ordinary case: a spec rev bump moves the build index and preflight — the
+# only writer — refuses once a run is live. The unit list is DERIVED at read time instead, so the
+# region is empty and there is nothing here to keep fresh.
 slice() { awk -v o="$2" -v c="$3" 'index($0,o)==1{i=1;next} index($0,c)==1{i=0;next} i' "$1"; }
-same "the generated region is a byte copy of the README slice" \
-  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | git hash-object --stdin)" \
-  "$(slice memory/builds/tRun/README.md '<!-- gen:build-index -->' '<!-- /gen:build-index -->' | git hash-object --stdin)"
+same "the generated region holds no copy of the unit list" \
+  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | tr -d '[:space:]')" ""
+# ...and --status DERIVES the unit from the README rather than from the file it just wrote.
+hit "$(run --status tRun)" "tRun"
 same "the recorded BASE is the merge-base" \
   "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)" "$BASE"
 same "the keepalive id is recorded verbatim" \
@@ -758,7 +762,14 @@ groot=$(git -C "$gtmp" rev-parse main); gz=$(git -C "$gtmp" rev-parse side)
 mkdir -p "$gtmp/.git/info"
 printf '%s %s
 ' "$groot" "$gz" > "$gtmp/.git/info/grafts"
-same "graft-control: the graft gives two unrelated histories a merge-base"      "$(git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
+# `env -u GIT_GRAFT_FILE`, and the -u is load-bearing. This arm's meaning is "a graft is
+# effective BY DEFAULT", so it must control the one variable that decides that rather than
+# inherit it. The driver `export`s GIT_GRAFT_FILE=/dev/null as deliberate hardening, and that
+# export reaches every child — so when `--close` ran the merge bar, which runs this selftest,
+# the control got an empty merge-base and the leg redded. The gate could not pass in a state
+# that was entirely legitimate: a branch touching tools/unattended/ un-skips this leg, and
+# --close is exactly where it then runs.
+same "graft-control: the graft gives two unrelated histories a merge-base"      "$(env -u GIT_GRAFT_FILE git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
 same "graft-arm: GIT_GRAFT_FILE suppresses it, which is what the driver exports"      "$(GIT_GRAFT_FILE=/dev/null git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" ""
 rm -rf "$gtmp"
 
@@ -835,6 +846,16 @@ out=$(run --landed tRun)
 hit "$out" "phase LANDED"
 same "--landed wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDED"
 same "--landed witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
+# THE ROSTER IS FROZEN AT LANDING. The unit list is derived from a MUTABLE README while a run is
+# live, which is right — but a finished record must still answer which units it covered, and a later
+# build touching that README would otherwise change a landed run's answer retroactively.
+same "--landed froze the roster into the record" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+# ...and it survives the README moving underneath it, which is the whole point.
+printf '%s\n' '| [ARCH-tRun-2 — a unit added later](spec/two.md) | OPEN | rev-1 | 2026-08-02 |' >> memory/builds/tRun/README.md
+same "the frozen roster does not follow a later README edit" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+git checkout -q -- memory/builds/tRun/README.md 2>/dev/null || true
 n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
@@ -888,19 +909,101 @@ hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reas
 # So the population is DERIVED from source rather than listed here, and every member is driven against
 # a finished record. A sixth phase writer reds this arm until it is added to the drive list, which is
 # the property a hand-written list cannot have.
+# THE DRIVE LIST IS FOUR, NOT FIVE, since kit 1.6 — `--preflight` ROTATES a finished record rather
+# than refusing it (TOOL-dClosedLexicon-11), and is proven separately below. The derived count still
+# covers all FIVE writers: four refuse here and the fifth is the rotation arm, so a SIXTH writer
+# still reds this arm until someone places it.
 writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
-n=$((n+1)); [ "$writers" = 5 ]   || { echo "FAIL the driver has $writers phase writer(s), and this arm drives 5 — add the new verb to the drive list below, or the terminal guard is unproven for it"; st=1; }
+n=$((n+1)); [ "$writers" = 5 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 4 of them and the rotation arm below drives the fifth — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
 fixture
 before=$(sum)
-for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--preflight tRun --keepalive-id k2" "--landed tRun"; do
+for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--landed tRun"; do
   # shellcheck disable=SC2086
   out=$(run $v)
   hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
   same "the finished record survived $v" "$(sum)" "$before"
 done
+
+# ============================================================ rotation: the fifth phase writer
+# `--preflight` over a terminal record RETIRES it and starts a fresh run. The refusal above is right
+# about the RECORD and was wrong as a policy about the BUILD: this repo's own first unattended run
+# aborted with three units left and no second run could start.
+#
+# `sum()` at the top of this file is DELIBERATELY not re-pointed. It is a shared helper — `$(sum)`
+# appears in nine arms, every one proving a refused verb wrote nothing — and `git hash-object` on a
+# missing path exits 128 with EMPTY stdout, so re-pointing it would make eight unrelated arms compare
+# "" to "" and pass whatever happened. Byte-identity here is `cmp -s` against a copy taken before the
+# call, which is what the spec's AC2 asks for.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+fixture
+retired_copy=$(mktemp -t retired.XXXXXX); cp memory/builds/tRun/RUN.md "$retired_copy"
+blob=$(git hash-object memory/builds/tRun/RUN.md)
+arch="memory/builds/tRun/RUN.ABORTED.${blob:0:8}.md"
+out=$(run --preflight tRun --keepalive-id k2)
+hit "$out" "preflight OK"
+hit "$out" "retired the finished record"
+n=$((n+1)); [ -f "$arch" ]                     || { echo "FAIL rotation did not produce the derived archive path: $arch"; st=1; }
+n=$((n+1)); [ -f memory/builds/tRun/RUN.md ]   || { echo "FAIL rotation left no fresh run-state file"; st=1; }
+same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
+n=$((n+1)); cmp -s "$retired_copy" "$arch" || { echo "FAIL the archived bytes are not the retired record's"; st=1; }
+# BOTH SIDES IN THE INDEX. The leg's whole per-run population is `git ls-files`, so an unstaged
+# archive is invisible to every check the widened population gave it.
+n=$((n+1)); git ls-files --error-unmatch "$arch" >/dev/null 2>&1 || { echo "FAIL the archive is not staged, so the gate leg cannot see it"; st=1; }
+n=$((n+1)); [ "$(git hash-object memory/builds/tRun/RUN.md)" != "$blob" ] || { echo "FAIL RUN.md still hashes to the retired record — the fresh one was not written"; st=1; }
+
+# ...and a NON-terminal record is not rotated. The green control for the arm above: without it,
+# "rotation happened" and "rotation happens on everything" look the same.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+git add -A >/dev/null; git commit -q -m "live run" --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "retired the finished record"
+n=$((n+1)); [ -z "$(ls memory/builds/tRun/RUN.*.md 2>/dev/null)" ] || { echo "FAIL a NON-terminal record was rotated"; st=1; }
+
+# ...and an archive already present with DIFFERENT bytes REFUSES, over an untouched tree. This is the
+# branch that makes `GIT mv -f` safe: force is only ever applied to a destination the test cleared.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+blob=$(git hash-object memory/builds/tRun/RUN.md)
+printf 'a hand-placed file at the derived name\n' > "memory/builds/tRun/RUN.ABORTED.${blob:0:8}.md"
+fixture
+before=$(git hash-object memory/builds/tRun/RUN.md)
+out=$(run --preflight tRun --keepalive-id k2)
+hit "$out" "an archive already exists at the name this record derives, carrying DIFFERENT bytes — that cannot happen by rotation, so something placed it by hand and overwriting it would destroy a finished record"
+same "the refused rotation left the record alone" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+n=$((n+1)); [ -z "$(git status --porcelain)" ] || { echo "FAIL the refused rotation left the tree dirty: $(git status --porcelain | head -3)"; st=1; }
+
+# ...and a DIRECTORY at the derived name REFUSES before the write gate. MEASURED: `git mv -f` onto a
+# directory exits 0 and files the record INSIDE it, so the retired record lands at `<dir>/RUN.md`,
+# off the path every reader globs, with the verb reporting success. Letting git decide would have
+# made a silent misfiling the happy path — which is why this is refused here rather than there.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+blob=$(git hash-object memory/builds/tRun/RUN.md)
+mkdir -p "memory/builds/tRun/RUN.ABORTED.${blob:0:8}.md"
+printf 'x
+' > "memory/builds/tRun/RUN.ABORTED.${blob:0:8}.md/inner.txt"
+fixture
+before=$(git hash-object memory/builds/tRun/RUN.md)
+out=$(run --preflight tRun --keepalive-id k2)
+hit "$out" "the name this record derives is occupied by something that is not a regular file, and a rename onto it would file the finished record somewhere no reader looks rather than fail"
+same "the refused rotation left the record alone" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# ...and an archive present with IDENTICAL bytes PROCEEDS. Plain `git mv` returns 128 here
+# (`destination exists`), so without `-f` this case takes the refusal path the spec says it does not.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+blob=$(git hash-object memory/builds/tRun/RUN.md)
+cp memory/builds/tRun/RUN.md "memory/builds/tRun/RUN.ABORTED.${blob:0:8}.md"
+fixture
+out=$(run --preflight tRun --keepalive-id k2)
+hit "$out" "preflight OK"
+hit "$out" "retired the finished record"
+same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
 
 # ---- F5: a TRUTHFUL abort reason may not spell the bypass flag, because park() writes it verbatim
 # ---- into the file leg check 11 greps WHOLE — so the honest sentence would red the bar permanently,

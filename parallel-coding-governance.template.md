@@ -1,18 +1,15 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.8** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.10** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.8 (2026-08-16):** the size ceiling moves 32→48 KiB with a
-high-water ratchet replacing it as the forcing function; the default branch becomes
-`{{DEFAULT_BRANCH}}` throughout; §0/§8 state both halves of the agent cap and the hook's real
-matcher; §5/§6/§7 name the five kits that shipped unmentioned. **v2.7 (2026-08-11):** companion §1's unattended block collapses to a
-pointer at the protocol the kit installs, and §8's second spelling of the §1 landing rule becomes a
-pointer — re-pull §8 and the companion together. **v2.6 (2026-08-10):** §1 and §8 accept a committed
-standing mandate in place of the explicit ask; the kickoff-manifest merge exception moved into the
-new companion §1.*
+`…-v-N-N.md` snapshots + git. **v2.9 (2026-08-16):** §12's layout-convention clause now covers naming
+— a DECLARED verb table and banned type suffixes, gated. **v2.8 (2026-08-16):** the size ceiling
+moves 32→48 KiB with a high-water ratchet replacing it as the forcing function; the default branch
+becomes `{{DEFAULT_BRANCH}}` throughout; §0/§8 state both halves of the agent cap and the hook's real
+matcher; §5/§6/§7 name the five kits that shipped unmentioned.*
 
-<!-- governance-template: v2.8 -->
+<!-- governance-template: v2.10 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -28,6 +25,7 @@ new companion §1.*
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
 - **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
+- **When no rule below covers it**, decide by these: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
 
 ## §1 — Work-unit lifecycle (start → done → land)
 
@@ -107,7 +105,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
+<<<<<<< HEAD
+- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+=======
 - **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+>>>>>>> main
 - **Optional — a self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
 - **Optional — a records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of
   its own state still matches the tree — stale claims, closed specs with no product commit, ids
@@ -205,7 +207,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 
-- Architectural-consistency rules → `parallel-coding-governance.domain-rules.md` §12 (decide the extension pattern before instance #2 so #3..N are data + overrides; a kind gets a factory/base not copies; one shared core + thin adapters; single-source-of-truth generation with a drift gate; promote shared widgets on a two-tier ladder; forward-compatible additive+defaulted data; reuse-audit before building; gate layout conventions). LOAD when adding a 2nd instance of a kind or building shared structure (§7, §13).
+- Architectural-consistency rules → `parallel-coding-governance.domain-rules.md` §12 (decide the extension pattern before instance #2 so #3..N are data + overrides; a kind gets a factory/base not copies; one shared core + thin adapters; single-source-of-truth generation with a drift gate; promote shared widgets on a two-tier ladder; forward-compatible additive+defaulted data; reuse-audit before building; gate layout conventions, naming included — a DECLARED verb table + banned type suffixes, never a mirror of the code). LOAD when adding a 2nd instance of a kind or building shared structure (§7, §13).
 
 ## §13 — Visual consistency (design system FIRST, before screens)
 

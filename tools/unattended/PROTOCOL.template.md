@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.4 -->
+<!-- gov:kit unattended@1.5 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -52,11 +52,39 @@ override on the authorization check is the authorization check.
 
 `<MEMORY_ROOT>/builds/<slug>/RUN.md`, split mechanically rather than by discipline.
 
-**Generated**, delimited by a marker pair and rendered by the driver: the unit list and per-unit
-status, both derived from build front matter and spec status headers. The gate byte-compares it
-against a fresh render. Never hand-edit it.
+**Generated** — and the marker pair is now EMPTY by contract. The unit list and per-unit status are
+DERIVED from the build README on every read, never copied here, and the gate asserts the region holds
+no copy.
 
-**Authored**, carrying exactly seven facts and nothing else. The file is CREATED by `--preflight`
+This inverted an earlier design in which the region WAS a copy the gate byte-compared against its
+source. That equality was unmaintainable in the ordinary case: folding a review bumps a spec rev,
+which moves the build index, which makes the copy stale — and the region's only writer was
+`--preflight`, which refuses once a run is live. The refusal told the reader to "re-run the driver",
+naming a path no verb walks. A run that hit it could only hand-edit an artifact this document calls
+generated. Deriving removes the class instead of adding a verb to service it, and the invariant is
+the same one stated as emptiness: one fact, one home.
+
+### A build gets more than one run by ROTATING the finished one
+
+A record that has reached a terminal phase is not something to move, re-open or re-pin, and every
+phase writer refuses one. That is right about the RECORD and was wrong as a policy about the BUILD:
+a build whose first run aborted could never be carried unattended again.
+
+So `--preflight`, and only `--preflight`, RETIRES a finished record instead of refusing it. The
+retired file is renamed to `RUN.<phase>.<blob8>.md` beside the live one — the terminal phase, then
+the first 8 hex of that record's own blob hash — and a fresh `RUN.md` is created at `RUNNING`. The
+name is DERIVED, never chosen, and it is derived from the BYTES rather than the witness because no
+verb here commits: two runs can honestly share a witness, and a name that collided would block every
+later run with no way out. Two records with the same content are the same record twice.
+
+What rotation does NOT do: it does not re-open, re-pin, or edit the retired record. Its bytes are
+preserved exactly, `git mv` puts both sides in the index in one operation, and the gate leg reads
+every archived record as part of its population — an archived record carrying a non-terminal phase
+reds. The collision test runs with the other preconditions, so a name that already exists carrying
+DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
+passed, because the rename is what makes the tree dirty.
+
+**Authored**, carrying exactly eight facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
@@ -69,6 +97,11 @@ which is the test for belonging here:
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
 6. **The anchor tip sha**, from that same advertisement.
 7. **The endpoint URL** it was observed from.
+8. **The roster AT LANDING**, frozen by `--landed` and by nothing else. While a run is LIVE the unit
+   list is derived from the build README, which cannot go stale between reads. But a FINISHED record
+   must still answer which units the run covered, and that README is mutable: a later build adding a
+   unit would otherwise change a landed run's answer retroactively. Freezing the ids at the moment of
+   landing is what keeps a terminal record a record rather than a live query.
 
 Facts 5 through 7 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
 so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is

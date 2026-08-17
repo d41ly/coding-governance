@@ -335,6 +335,22 @@ runreadme tRunBig > memory/builds/tRunBig/README.md
 printf '# run\n\nThe mandate names ARCH-tFixture-1 inline, in prose, so nothing anchors here.\n' \
   > memory/builds/tRunOk/RUN.md                                     # under cap, no anchor -> silent
 printf '# not the run-state file\n' > memory/builds/tRunOk/RUNSTATE.md   # neither name nor grammar -> RED on 4
+# ---- The ARCHIVED run-state file of kit 2.18. Check 4 admits it by GRAMMAR, not by equality — a
+# ---- build gets more than one unattended run by ROTATING the finished record to this name, so the
+# ---- family is unbounded and cannot be whitelisted the way RUN.md is. The NEAR-MISSES beside it
+# ---- are what pin the grammar rather than merely the amendment: a loose spelling would pass the
+# ---- admit arm while opening the build-folder grammar to anything at all, forever.
+printf '# retired run\n\nNothing anchors here.\n' > memory/builds/tRunOk/RUN.ABORTED.a1b2c3d4.md
+printf '# retired run\n' > memory/builds/tRunOk/RUN.notes.md              # no hash at all -> RED on 4
+printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.a1b2c3.md    # 6 hex, not 8 -> RED on 4
+printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' is not hex -> RED on 4
+# ---- TWO further near-misses were WRITTEN AND REMOVED rather than left passing, because neither
+# ---- tests the grammar on this fleet. A lowercase `RUN.aborted.<hash>.md` is the SAME PATH as the
+# ---- admitted one on a case-insensitive filesystem — measured, only one file survives `git add`.
+# ---- And a `.md.bak` tail never reaches the gate at all: this node's global excludesfile carries
+# ---- `*.bak`, so `git ls-files` never sees it and check 4's population is the index. An arm that
+# ---- passes because its fixture was never staged is this repo's fixture-passes-by-finding-nothing
+# ---- class, and it would have read as coverage of an anchor it does not test.
 { printf '# run\n\n- ARCH-tFixture-1 · parked, and this dash row ANCHORS the id\n\n%s\n' "$C7L"
   i=1; while [ "$i" -le 260 ]; do printf -- '- note %d\n' "$i"; i=$((i+1)); done; } \
   > memory/builds/tRunBig/RUN.md                                    # 265 lines -> RED on 6; 340-char row -> silent on 7
@@ -476,6 +492,13 @@ cnot 8 'memory/backlog/ARCH.md:5'
 cnot 4 'memory/builds/tRunOk/RUN.md'
 cnot 4 'memory/builds/tRunBig/RUN.md'
 chit 4 'memory/builds/tRunOk/RUNSTATE.md'
+# ---- ...and the same pair for the ARCHIVED grammar of kit 2.18: admitted, with three near-misses
+# ---- still named. The `chit` half is the one that pins the GRAMMAR — the `cnot` alone is satisfied
+# ---- by any spelling loose enough to admit everything.
+cnot 4 'memory/builds/tRunOk/RUN.ABORTED.a1b2c3d4.md'
+chit 4 'memory/builds/tRunOk/RUN.notes.md'
+chit 4 'memory/builds/tRunOk/RUN.ABORTED.a1b2c3.md'
+chit 4 'memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md'
 # ---- (b) check 6 CAPS it. This is the load-bearing arm of the pair: a RUN.md that never entered
 # ----     index_set is silent here for the same reason a compliant one is, so the green control
 # ----     below proves nothing without it.

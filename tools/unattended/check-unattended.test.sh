@@ -61,7 +61,6 @@ EOF
 # $1 — run state
 
 <!-- run:generated -->
-**Build status:** OPEN · 1 unit(s)
 <!-- /run:generated -->
 
 ## Mandate
@@ -238,14 +237,52 @@ sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tTwo/RUN.md
 out=$(run)
 miss "$out" "more than one run-state file is non-terminal"
 
-# ---- check 8, all three branches: malformed markers on each side, and a region that DRIFTED from
-# ---- the slice it is a copy of.
+# ---- check 4, the ARCHIVED-record branch (kit 1.6). An archived record must be TERMINAL, and this
+# ---- has its own branch rather than riding check 7 because check 7 fires at TWO: a live RUN.md that
+# ---- has reached LANDED plus one archived record edited back to RUNNING gives nlive=1 and the leg
+# ---- would say nothing — which is the steady state after every completed second run.
+# ---- THE POPULATION ARM COMES FIRST: the branch is only meaningful if the widened selector reaches
+# ---- an archived file at all, and a selector that reached none would leave this silent for the
+# ---- wrong reason.
+reset_tree
+cp memory/builds/tRun/RUN.md memory/builds/tRun/RUN.LANDED.abcd1234.md
+sed -i 's/^phase: .*/phase: RUNNING/' memory/builds/tRun/RUN.LANDED.abcd1234.md
+git add -A && git commit -q -m "an archived record left live" --no-verify
+out=$(run)
+hit "$out" "an ARCHIVED run-state file carries a non-terminal phase, so a finished record was retired while still claiming to be live, or was edited after retirement"
+hit "$out" "RUN.LANDED.abcd1234.md"
+# ...and a TERMINAL archived record is silent. Without this control the arm above proves only that
+# the leg can red, not that it reds on the right thing.
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.LANDED.abcd1234.md
+git add -A && git commit -q -m "archived and finished" --no-verify
+out=$(run)
+miss "$out" "an ARCHIVED run-state file carries a non-terminal phase"
+
+# ---- check 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 cannot
+# ---- see this — it is a byte-diff of the shipped/installed pair and is green whatever BOTH say.
+reset_tree
+sed -i 's/RUN\.<phase>\.<blob8>\.md/RUN.the-old-spelling.md/g' memory/guides/UNATTENDED-PROTOCOL.md
+hit "$(run)" "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record"
+reset_tree
+miss "$(run)" "the installed protocol does not spell the archive filename grammar"
+
+# ---- check 8: the region holds NO COPY. It used to assert the region EQUALLED the README slice,
+# ---- which was unmaintainable in the ordinary case — a spec rev bump moves the build index and the
+# ---- only writer refuses once a run is live. Asserting EMPTINESS is the same invariant with the
+# ---- second copy removed.
 reset_tree; sed -i '/<!-- \/run:generated -->/d' memory/builds/tRun/RUN.md
-hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
-reset_tree; sed -i '/<!-- \/gen:build-index -->/d' memory/builds/tRun/README.md
-hit "$(run)" "a build README's generated markers are malformed, so the copy has no source to be compared with"
-reset_tree; sed -i 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/' memory/builds/tRun/RUN.md
-hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it"
+hit "$(run)" "a run-state file's generated markers are malformed"
+reset_tree
+printf '%s
+' '**Build status:** OPEN · 1 unit(s)' > /tmp/_copy.$$
+sed -i "/<!-- run:generated -->/r /tmp/_copy.$$" memory/builds/tRun/RUN.md; rm -f /tmp/_copy.$$
+hit "$(run)" "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers"
+
+# ---- TOOL-aDeclaredCeiling-3's four arms lived here and are SUPERSEDED. They asserted that a
+# ---- terminal run's region is skipped from the EQUALITY comparison; dClosedLexicon r2 removed the
+# ---- copy entirely, so the region is empty by contract and there is nothing to compare at any
+# ---- phase. That is the same invariant with the failure mode designed out rather than scoped
+# ---- around, and the arms above already cover it.
 
 # ---- check 8's TERMINAL carve-out, BOTH directions. The equality refusal is scoped to a live run,
 # ---- because a terminal one has no supported route back to equality: only --preflight re-copies the
@@ -516,13 +553,12 @@ miss "$(run)" "also carries a grafts file"
 # ---- could not see it, and anything a run appended there rode along invisibly.
 reset_tree
 sed -i 's|^<!-- run:generated -->$|<!-- run:generated --> trailing text the byte-compare cannot see|' memory/builds/tRun/RUN.md
-hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
+hit "$(run)" "a run-state file's generated markers are malformed"
 reset_tree
 sed -i 's|^<!-- /run:generated -->$|<!-- /run:generated --> and the same on the close marker|' memory/builds/tRun/RUN.md
-hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
-reset_tree
-sed -i 's|^<!-- gen:build-index -->$|<!-- gen:build-index --> trailing text on the SOURCE side|' memory/builds/tRun/README.md
-hit "$(run)" "a build README's generated markers are malformed, so the copy has no source to be compared with"
+hit "$(run)" "a run-state file's generated markers are malformed"
+# The SOURCE-side marker is no longer check 8's business: nothing compares against it here any
+# more. `--preflight` still validates it, and its arm lives in the driver's own test.
 # GREEN CONTROL: clean markers stay silent, or the three arms above prove only that region() reds.
 reset_tree
 miss "$(run)" "generated markers are malformed"
