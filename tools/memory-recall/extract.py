@@ -163,13 +163,44 @@ def git(repo: pathlib.Path, *args: str) -> str:
     ).stdout
 
 
-def corpus_files(repo: pathlib.Path, rev: str | None) -> list[str]:
+def corpus_files(repo: pathlib.Path, rev: str | None = None,
+                 include_untracked: bool = False) -> list[str]:
+    """The ONE corpus walk. Markdown under ``$MEMORY_ROOT``, for both callers.
+
+    There used to be two, and every widening had to teach both — the last one nearly shipped
+    teaching only this half. They differed on ONE axis seen from two ends, and it is preserved as a
+    parameter rather than as a duplicate: the MEASUREMENT path stays pinnable to a ``rev``, and the
+    QUERY path also takes untracked-not-ignored files, because a note written this session and not
+    yet committed is exactly what a session needs to find.
+
+    ``rev`` and ``include_untracked`` are mutually exclusive and a caller passing both is REFUSED:
+    a revision has no untracked files, so the combination has no meaning to resolve silently into.
+    """
+    if rev and include_untracked:
+        raise ValueError(
+            "corpus_files: rev and include_untracked are mutually exclusive — a revision has no "
+            "untracked files, and silently preferring one would make the corpus depend on which")
     root = CONF.memory_root + "/"  # FORKED: conf, not a literal `memory/`
     if rev:
-        out = git(repo, "ls-tree", "-r", "--name-only", rev, root)
+        names = git(repo, "ls-tree", "-r", "--name-only", rev, root).splitlines()
     else:
-        out = git(repo, "ls-files", root)
-    return sorted(p for p in out.splitlines() if p.endswith(".md"))
+        names = git(repo, "ls-files", root).splitlines()
+        if include_untracked:
+            names += git(repo, "ls-files", "--others", "--exclude-standard", root).splitlines()
+    return sorted({p for p in names if p.endswith(".md")})
+
+
+def corpus_inputs(repo: pathlib.Path, rev: str | None = None,
+                  include_untracked: bool = False) -> tuple[list[str], list[str]]:
+    """Both halves of the corpus in ONE call: markdown, and the DECLARED extra sources.
+
+    They stay separate in the RETURN because they are extracted differently — markdown by heading,
+    a declaration by its key plus the comment block above it — but they are enumerated together so
+    a caller cannot take one and forget the other. That is exactly what happened: three call sites
+    outside the walks each had to be taught about declared sources, and the digest pair was taught
+    on only one side, which left the query cache unable to hit at all.
+    """
+    return (corpus_files(repo, rev, include_untracked), resolve_declared_sources(repo, rev))
 
 
 def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list[str]:

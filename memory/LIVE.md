@@ -17,6 +17,7 @@ terminal status. Nothing here is edited by hand.
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aSealedCaravan](builds/aSealedCaravan/README.md) | INPROGRESS | a | 2026-08-10 | deployer+tooling | 10 |
 | [aTimedTurnstile](builds/aTimedTurnstile/README.md) | INPROGRESS | a | 2026-08-11 | tooling | 8 |
+| [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 2 |
 | [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [cBriefedPilot](builds/cBriefedPilot/README.md) | OPEN | c | 2026-08-14 | tooling+playbook | 22 |

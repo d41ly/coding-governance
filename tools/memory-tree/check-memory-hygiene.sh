@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.17   # gov:kit memory-tree@2.17 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.18   # gov:kit memory-tree@2.18 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -258,6 +258,12 @@ $bad3"
 # (`<date>-<kind>-<FAMILY>-<slug>-<seq>.md`), which is how one slug shared by two families survives
 # the merge into a single folder; the alternation is the CLOSED one from FAMILIES, never `[A-Z]+`.
 #
+# A RETIRED run-state file (2.18) joins it as a GRAMMAR rather than a literal — `RUN.<PHASE>.<8 hex>.md`,
+# where the hex is the retired record's own blob hash. A build gets more than one unattended run by
+# ROTATING the finished record to that name, so the family is unbounded and cannot be whitelisted by
+# equality the way the three below are. It joins check 6's caps and check 7's prose exemption too: an
+# archived record is the same document frozen.
+#
 # RUN.md (2.3) is the THIRD whitelisted root file: the run-state file an unattended run writes, which
 # needs a name a resuming session can compute without knowing when the run started. A dated recording
 # under build/ is legal today and has no stable resume target, which is why the name is fixed here
@@ -272,6 +278,14 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
         vre = "^[A-Za-z][A-Za-z0-9-]*$"              # the slug, alone
         rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?[A-Za-z0-9]+-[0-9]+\\.md$"
+        # An ARCHIVED run-state file (2.18). A GRAMMAR, because the whitelist above it is string
+        # equality and a family of names cannot be spelled that way. SHAPE, not vocabulary: a phase
+        # token and a content hash. `RUN\\..*\\.md` would admit `RUN.notes.md` and `RUN.md.bak` at
+        # every build root forever with no waiver registry and no ratchet;
+        # `RUN\\.(LANDED|ABORTED)\\.` would hard-code the unattended kit`s PHASES_TERMINAL into this
+        # engine. The unattended leg owns the vocabulary — it reds on an archived record whose phase
+        # is not terminal — and this gate owns the folder grammar.
+        arre = "^RUN\\.[A-Z]+\\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.md$"
       }
       function flush(   n,i,j,k,keys,tmp,type,name) {
         if (folder=="") return
@@ -282,6 +296,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
           if (k=="F:README.md"||k=="F:STATUS.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (type=="F" && name ~ arre) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
         folder=""; delete ent
@@ -334,7 +349,8 @@ index_set() {
     # spills the oldest parked entries into the build's own build/ folder as a dated recording
     # (a name check 5's grammar already admits) before the cap is reached. Entry-budget exempt
     # below, because the standing mandate is verbatim prose, not index rows.
-    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.md$"
+    # An ARCHIVED record (2.18) is the same document frozen, so the same cap applies to it.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$"
     # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
     # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
     # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
@@ -381,7 +397,7 @@ $bad6"
 # rebuild the whole expression, which silently dropped the guides/ alternative on any repo carrying a
 # .codebase-map.conf — every guide entered this check's population and nothing said so. Two spellings
 # of one expression is the two-answers-to-one-question class, and this is how it fired.
-ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN\.md$'
+ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 [ -n "$MAP_SUB" ] && ex7="$ex7|/$MAP_SUB/FOUNDATION\.md\$|/$MAP_SUB/features/[^/]+\.md\$"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the

@@ -49,6 +49,12 @@
 - TOOL-cSteadyMetronome-1 · a gate asserts what the SUBJECT does, never what the NODE does. The canary's elapsed-time ratio measured the machine and blocked three pushes over a tree it had passed; a rendezvous measures dispatch and ignores load
 
 - TOOL-aNumeralWarden-3 · a pin RAISE and a population DRAIN are indistinguishable to `value > pin`, so the guard reads the justification the repo already wrote by hand: a weakening move must name both numbers as `<old> -> <new>` beside the pin. Scalars only; compound floors stay out
+- TOOL-dClosedLexicon-12 · a symbol corpus that indexes only EXPORTS is complete about exports and silent about a layer that exports nothing: `kit-js` had 30 definitions and 3 indexed rows, DISJOINT. Coupling an opt-in kit to one that is not was REFUSED — its absence shrinks the index
+
+- TOOL-dClosedLexicon-13 · a preview and the verb it previews must classify with ONE predicate, and the ROLE alone is not it: two entries declare no adopter, two share a destination with a sibling seed. The kind keys on role, producer and destination together
+
+- TOOL-dClosedLexicon-11 · a refusal can be right about the RECORD and wrong as a policy about the BUILD. A finished run is retired by rotation, not re-opened; the archive name derives from the record's BYTES, because no verb here commits and two runs can honestly share a witness
+
 ## DEPL — deployer
 
 *(none yet)*

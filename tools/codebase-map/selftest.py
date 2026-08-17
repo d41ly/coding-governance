@@ -678,6 +678,46 @@ def t_symbol_extractors_fail_closed(tmp: Path):
     (md / "x.ts").write_text("export default class extends Base {}\n", encoding="utf-8")
     assert m.enumerate_exports(md, "md", extensions=frozenset({".ts"}), root=tmp) == []
 
+    # --- scan_js_definitions: the DEFINITION probe the export scan cannot substitute for -------
+    # The export scan is complete over export FORMS and blind to a file with no `export` line.
+    # Measured on gov's own tools/**/*.js: 30 definitions, 3 indexed export rows, DISJOINT.
+    js = tmp / "js"
+    js.mkdir()
+    (js / "hooks.js").write_text(
+        "function boundedK(t) {}\n"                    # bare declaration — the whole point
+        "async function loadIt() {}\n"
+        "function* genIt() {}\n"                       # generator
+        "class Cache {}\n"
+        "const slug = (s) => s;\n"                     # arrow const
+        "const one = x => x;\n"                        # single-param arrow, no parens
+        "const legacy = function () {};\n"             # function expression
+        "export function shared() {}\n"                # BOTH a definition and an export
+        "const NOTAFN = 3;\n"                          # a value, not a definition
+        "  const indented = () => 1;\n"                # statement-leading after whitespace
+        "// function commented() {}\n"                 # line comment ignored
+        "/* class Blocked {} */\n"                     # block comment ignored
+        "const prose = `functionality, duplicate or reinvented functionality?`;\n",
+        encoding="utf-8",
+    )
+    dget = {(s["id"], s["kind"]) for s in m.scan_js_definitions(js, "js", root=tmp)}
+    assert dget == {
+        ("boundedK", "function"), ("loadIt", "function"), ("genIt", "function"),
+        ("Cache", "class"), ("slug", "function"), ("one", "function"),
+        ("legacy", "function"), ("shared", "function"), ("indented", "function"),
+    }, dget
+    # `functionality, …` at the head of a prose line is NOT a function named `ality`. The permissive
+    # `function\s*\*?\s*` form indexed exactly that, and it was the one row by which this probe
+    # disagreed with the lexicon's independently-authored set over the real corpus.
+    assert not any(s["id"] == "ality" for s in m.scan_js_definitions(js, "js", root=tmp))
+    # LIVENESS FLOOR: a scanned file that yields nothing RAISES rather than contributing silence —
+    # the failure mode that let a 30-definition layer sit at 3 indexed rows without a red anywhere.
+    (js / "empty.js").write_text("const x = 1;\nmodule.exports = { x };\n", encoding="utf-8")
+    try:
+        m.scan_js_definitions(js, "js", root=tmp)
+        raise AssertionError("scan_js_definitions indexed nothing from a file and said nothing")
+    except m.MapError as exc:
+        assert "yielded NO definition" in str(exc) and "empty.js" in str(exc), str(exc)
+
 
 def t_affordance_graced_presence(tmp: Path):
     # --- parse_affordance: leading seam block, none decl, delimiter-agnostic, presence-only ----
@@ -1048,6 +1088,55 @@ def t_new_clones_reader(tmp: Path):
     assert md._new_clones(tmp, conf) is None
 
 
+def test_js_probe_against_the_lexicon():
+    """CROSS-CHECK: over this repo's own `tools/**/*.js`, the map's definition set is a SUPERSET of
+    the lexicon's independently-authored one.
+
+    WHY THIS DIRECTION ONLY. If the lexicon learns a definition form the map has not, the map is
+    UNDER-indexing and that is the defect — silently, since a recall index that misses a seam looks
+    exactly like a corpus that has none. The other direction is not a defect: the map indexes
+    `export const meta = {…}` and the lexicon does not, correctly, today.
+
+    NOT A SECOND OPINION — DRIFT PROTECTION. The two probes were written independently for different
+    questions, which is what makes the comparison worth anything; unifying them behind one pattern
+    set would delete the signal along with the duplication.
+
+    SKIPS LOUDLY when `tools/lexicon/` is absent. An adopter who took the map without the lexicon is
+    TOLD the arm did not run, rather than shown a green it did not earn — a silent skip here would be
+    this repo's own `fixture-passes-by-finding-nothing` class inside the kit that gates it.
+    """
+    kit = m.repo_root() / "tools" / "lexicon"
+    if not (kit / "lexicon.py").is_file():
+        print("     SKIP js-probe cross-check: tools/lexicon/ is not installed here, so the "
+              "independent definition set this arm compares against does not exist. NOT a pass.")
+        return
+    sys.path.insert(0, str(kit))
+    try:
+        import lexicon as lx
+        import lexicon_conf as lxc
+    finally:
+        sys.path.pop(0)
+    root = m.repo_root()
+    conf = lxc.load_conf(root / ".lexicon.conf")
+    langs = {ext: (pset, mode) for ext, pset, mode in lxc.langs(conf) if mode != "dark"}
+    if "js" not in langs:
+        print("     SKIP js-probe cross-check: .lexicon.conf declares no live `js` language.")
+        return
+    pset, mode = langs["js"]
+    theirs = set()
+    for f in lx.tracked_files(root):
+        if f.endswith(".js") and f.startswith("tools/"):
+            fns, types, _imports = lx.extract(root / f, mode, pset)
+            theirs |= {(f, name) for name, _line in list(fns) + list(types)}
+    ours = {(r["file"], r["id"]) for r in m.scan_js_definitions(root / "tools", "kit-js")}
+    missing = sorted(theirs - ours)
+    assert not missing, (
+        f"the map's JS definition probe misses {len(missing)} symbol(s) the lexicon's finds — the "
+        f"map is under-indexing this layer: {missing[:8]}"
+    )
+    assert theirs, "the lexicon found NO js definitions under tools/, so this arm compared to empty"
+
+
 def main() -> int:
     import tempfile
 
@@ -1083,6 +1172,8 @@ def main() -> int:
             "printed remedies name real paths; the remedy runs (TOOL-aRootedPrefix-2)",
             lambda: t_remedy_paths_are_real(Path(td)),
         )
+    failures += check("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
+                      test_js_probe_against_the_lexicon)
     failures += check("coverage both directions + ratchet guards", t_coverage_directions)
     failures += check("dossier contract fails loud", t_parse_contract)
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)
