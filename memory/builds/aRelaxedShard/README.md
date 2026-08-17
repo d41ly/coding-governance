@@ -65,9 +65,9 @@ Three separate problems, not one.
 ## The unit set
 
 Classification per the build method, written before acting: unit 1 was **MISSING**, was authored this
-run, was audited at M4, and is **FORKED** at rev-4 — F1 and F5 are ratified by the owner, F2 and F4 build
-on recommendations that were put to the owner and not overruled, and F3 is re-opened by F5's own answer.
-With no standing mandate the remaining fork is the owner's.
+run, was audited at M4, and is **READY** at rev-5 — every fork is resolved. F1, F3 and F5 are ratified by
+the owner; F2 and F4 are built on recommendations put to the owner and not overruled. What remains before
+code is one more M4 pass: rev-5 changed mechanism since the audit, so by definition it is unreviewed.
 
 The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`, which owns its shape
 measurements and its finding list. Verdict **BLOCKED**, and rev-2 is the fold. The blocker RESCOPED the
@@ -85,7 +85,7 @@ The re-shape is what changes the slope, which is why the owner put it second rat
 
 ## Owner decision menu
 
-**Ratified by the owner, 2026-08-17.**
+**All five forks resolved by the owner, 2026-08-17.**
 
 - **F1 — the declared cap value.** **61,440 bytes**, derived as 250 rows at the measured 253.7 B/row.
   About 21 days of runway. The kit's shipped default stays at 20,480, so this declares a value for this
@@ -101,15 +101,13 @@ The re-shape is what changes the slope, which is why the owner put it second rat
 resolve to the shipped default, and no value disables the bound. F4 — confirm by fixture that rotating a
 backlog does not orphan the ids the moved rows defined.
 
-**Still open, and it is the F5 answer that opened it.**
+- **F3 — the dossier bound.** **Its own conf key**, `DOSSIER_CAP_BYTES`, declared 20,480. F5's answer
+  had left a dossier bounded only at 61,440 — roughly 1,050 lines at measured density, with check 6 its
+  only size gate. The key holds it to about 350 lines for the densest instead: a **39% effective
+  loosening** rather than 3.3x-to-4.3x. The cap block becomes three classes, keyed on the engine's
+  existing `MAP_SUB` so it is inert where no codebase map is adopted.
 
-- **F3 — does the dossier sub-population need its own byte bound?** F3's earlier rejection rested on a
-  dossier's operative bound being the line count unit 1 would not touch. Retirement removes that ground:
-  a dossier ends up bounded only at 61,440 bytes, which at its measured density is roughly **1,050
-  lines**, and check 6 is the only size gate a dossier has. Recommended: **one extra branch giving
-  dossiers their own byte bound** at about their present effective ceiling, so the relaxation stays aimed
-  at the shards that asked for it. This is the one item that changes what gets built, so it is not
-  resolved here.
+Every fork is resolved, so the spec carries `ratified 2026-08-17`.
 
 ## What this build found on the way in
 
@@ -134,7 +132,7 @@ The table below is GENERATED from the status header of every spec in this folder
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row class becomes one declared byte bound](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-4 | 2026-08-17 |
+| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-5 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->

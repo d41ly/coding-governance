@@ -1,32 +1,46 @@
-# TOOL-aRelaxedShard-1 — the row class becomes one declared byte bound
+# TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds
 
-**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
 Hygiene check 6 caps every row document at a hardcoded 20,480 bytes and 250 lines, and on this repo the
 byte bound is spent: the tooling backlog shard has no terminal rows left for rotation to archive. Make
-the byte bound a declared per-repo value, set here to 61,440, and retire the row class's line bound so
-that one declared number bounds the class. The retirement is a ratified owner decision to relax a
-curation discipline, not a claim that the bound was inert — §4 prices what it costs.
+the byte bound declared per-repo — 61,440 for the row class here, with map dossiers carrying their own
+declared bound — and retire the row class's line bound, so that a declared byte number is what bounds
+each class. The retirement is a ratified owner decision to relax a curation discipline, not a claim that
+the bound was inert; §4 prices what it costs and the dossier key is what keeps the price bounded.
 
 ## 2. Scope (IN)
 
 - **S1** — A new `.memory-tree.conf` key, `ROW_DOC_CAP_BYTES`, declared **61,440** here. Its comment
   records the derivation and the movement, the way `READ_PATH_CEILING` records its four.
-- **S2** — The key resolved in `tools/memory-tree/check-memory-hygiene.sh` with three branches. The
-  engine pre-sets defaults and THEN sources the conf, so a blank line overrides a default with blank;
-  this key therefore needs an explicit re-normalisation AFTER the source. Absent resolves to the shipped
-  default. Blank resolves to the shipped default, not to "off". A non-numeric value refuses before the
-  scan with `exit 2`, matching the conf-validation precedent at `:101`.
-- **S3** — The shipped default stays **20,480**. An adopter who never declares the key gets byte-for-byte
-  today's verdicts, which keeps this unit out of `memory/gotchas/pin-copied-from-another-corpus.md`: this
-  corpus's measured number is DECLARED here, never shipped as anyone else's default.
-- **S4** — The per-class cap block at `tools/memory-tree/check-memory-hygiene.sh:379`: the row class is
-  bounded by the resolved byte value and by NO line count; the guide class keeps its own `61440` and
-  `750`. The retirement must not leave the guide's `750` in play on the shared `cl` variable — deleting
-  the row branch's assignment does exactly that, and so does a `cl > 0 && l > cl` guard whose `cl`
-  defaults to the guide value. The two classes share the code path and must not share the bound.
+- **S1b** — A second key, `DOSSIER_CAP_BYTES`, declared **20,480** here, bounding the codebase-map
+  dossier sub-population separately. Retiring the row line bound would otherwise leave a dossier bounded
+  only at 61,440 — roughly 1,050 lines at its measured density — and check 6 is the only size gate a
+  dossier has. Both keys follow S2's resolution rules and S3's shipped default.
+- **S2** — BOTH keys resolved in `tools/memory-tree/check-memory-hygiene.sh` through the same three
+  branches, in one helper rather than two copies. The engine pre-sets defaults and THEN sources the conf,
+  so a blank line overrides a default with blank; each key therefore needs an explicit re-normalisation
+  AFTER the source. Absent resolves to the shipped default. Blank resolves to the shipped default, not to
+  "off". A non-numeric value refuses before the scan with `exit 2`, naming which key, matching the
+  conf-validation precedent at `:101`.
+- **S3** — The shipped default for BOTH keys stays **20,480**. An adopter who declares neither gets
+  byte-for-byte today's byte verdicts, which keeps this unit out of
+  `memory/gotchas/pin-copied-from-another-corpus.md`: this corpus's measured numbers are DECLARED here,
+  never shipped as anyone else's defaults. The line bound is retired for everyone, which is the one part
+  of this unit an adopter cannot opt out of, and the kit README says so.
+- **S4** — The per-class cap block at `tools/memory-tree/check-memory-hygiene.sh:379` becomes THREE
+  classes, ordered most-specific first: the guide class keeps its own `61440` and `750`; the dossier class
+  takes `DOSSIER_CAP_BYTES` and no line count; every other row document takes `ROW_DOC_CAP_BYTES` and no
+  line count. The dossier branch keys on the engine's existing `MAP_SUB`, the same variable check 7's
+  `ex7` already uses, so it is inert by construction in a tree with no codebase map rather than needing
+  its own guard.
+
+  The retirement must not leave the guide's `750` in play on the shared `cl` variable. Deleting the row
+  branch's assignment does exactly that, and so does a `cl > 0 && l > cl` guard whose `cl` defaults to
+  the guide value. Three classes on one shared pair is now the hazard rather than two, and S8's arm is
+  pinned where it can see the failure.
 - **S5** — The finding message reports bytes alone for a row document. A line figure the gate no longer
   enforces reads as a second bound, and the message must also print the cap it applied so a default is
   distinguishable from a declaration in the output alone.
@@ -44,15 +58,20 @@ curation discipline, not a claim that the bound was inert — §4 prices what it
   bound silences check 6 on it and vacates two other contracts that are asserted THROUGH it — the only
   proof `RUN.md` enters `index_set` at all, and the check-7 exemption precondition asserted on the same
   file check 6 named. Losing those is `fixture-passes-by-finding-nothing`.
+- **S9b** — A dossier arm pair: a fixture dossier over `DOSSIER_CAP_BYTES` is NAMED, and one between
+  `DOSSIER_CAP_BYTES` and `ROW_DOC_CAP_BYTES` is ALSO named — the second is the load-bearing one, because
+  it is the only thing that distinguishes a dossier class from a row class that happens to be under the
+  larger bound. Both need a `.codebase-map.conf` in the fixture tree so `MAP_SUB` resolves; without it
+  the branch is inert and the arms pass by finding nothing.
 - **S10** — The guide arms untouched: `memory/guides/tfixture.md` past 750 lines stays NAMED and
   `memory/guides/twide.md` at 401 lines stays SILENT. Those two are the only proof the classes are still
   separate, and `twide.md` is a deliberate silent control that must not be rebuilt on the byte axis.
-- **S11** — An arm asserting `tools/memory-tree/.memory-tree.conf.example` declares the key. Nothing else
-  reads that file: `adopt-memory-tree.sh:40` only copies it and `tools/check-install-prefix.sh:17`
+- **S11** — An arm asserting `tools/memory-tree/.memory-tree.conf.example` declares BOTH keys. Nothing
+  else reads that file: `adopt-memory-tree.sh:40` only copies it and `tools/check-install-prefix.sh:17`
   excludes `*.conf.example`.
-- **S12** — The key added to that example **with the shipped default's value**, in its policy-ceiling
+- **S12** — Both keys added to that example **with the shipped default's value**, in its policy-ceiling
   idiom rather than blank. Blank there means "check off" for every measured pin, while both policy
-  ceilings ship with a value and say why. This key is the same kind.
+  ceilings ship with a value and say why. These keys are the same kind.
 - **S13** — `FLOOR_ASSERTIONS` in the hygiene self-test raised to the new executed count, so the arms S7
   to S11 add cannot later go dark without a diff.
 - **S14** — The prose carriers, enumerated by line. Both figures move for the row class, so the sweep
@@ -77,8 +96,12 @@ curation discipline, not a claim that the bound was inert — §4 prices what it
 ## 3. Non-goals (OUT)
 
 - **A per-class LINE bound.** The owner considered retiring the row line bound while giving dossiers and
-  run-state files their own line value, and chose outright retirement instead. The row class carries no
-  line bound after this unit.
+  run-state files their own line value, and chose outright retirement instead. No class below `guides/`
+  carries a line bound after this unit. The dossier key added by F3 is a BYTE bound, which is a different
+  thing and is what the owner ratified.
+- **A byte bound for the run-state sub-population.** F3 resolved to a dossier key only. Run-state files
+  take the row-class value, because the protocol's own 8 KB authored budget is their real bound and check
+  6 is only the backstop. If that reasoning ever fails, it is a new fork and not a silent third key.
 - **The re-shape.** Sharding a backlog below `FAMILY`, or a spill tier like the run-state file's, is the
   second unit the owner sequenced after this one. Its id is minted when its spec is authored.
 - **Byte normalisation before measuring.** `TOOL-aRootedPrefix-3` is open against checks 6 and 7 for
@@ -94,22 +117,32 @@ curation discipline, not a claim that the bound was inert — §4 prices what it
 **What this unit deliberately gives up, stated as a non-goal so it cannot be read as an oversight.** The
 row-class curation discipline `TOOL-aWidenedGuide-1` protected is being RELAXED, knowingly. That decision
 ratified a class split and refused to triple the row allowance in the words the engine still carries at
-`:376-378`. This unit triples it and removes the line bound as well. The owner ratified that on
-2026-08-17, asked a second time, with the 22-of-29 population measurement and the 3.3x-to-4.3x dossier
-figure in front of them. §4 prices it; §8 F3 carries the one question the decision opens.
+`:376-378`. This unit triples it for the backlog shards and the decision log, and removes the line bound
+from every class below `guides/`. The owner ratified that on 2026-08-17, asked a second time, with the
+22-of-29 population measurement and the 3.3x-to-4.3x dossier figure in front of them, and then answered
+F3 by giving dossiers their own declared byte bound — which is what holds the dossier loosening to about
+39% instead of 3.3x-to-4.3x. §4 prices both.
 
 ## 4. Design
 
 ### Data model
 
-One conf key, `ROW_DOC_CAP_BYTES`, holding a byte count, declared 61,440 here. Resolution has three
-branches and one non-obvious step: the engine pre-sets its defaults and then sources the conf at `:27`,
-so a blank conf line overrides a pre-set default with blank. Every existing key in that block documents
-blank as skip, which is the opposite of what this key needs, so the design re-normalises AFTER the
-source. A non-numeric value refuses with `exit 2` before the scan.
+Two conf keys, each holding a byte count: `ROW_DOC_CAP_BYTES` declared 61,440 here, and
+`DOSSIER_CAP_BYTES` declared 20,480. Each resolves through three branches and one non-obvious step: the
+engine pre-sets its defaults and then sources the conf at `:27`, so a blank conf line overrides a pre-set
+default with blank. Every existing key in that block documents blank as skip, which is the opposite of
+what these keys need, so the design re-normalises AFTER the source. A non-numeric value refuses with
+`exit 2` before the scan, naming which key.
 
-There is no value that disables the bound, and the shipped default stays 20,480 so nothing an adopter
-receives changes until they declare their own.
+Neither key has a value that disables its bound, and the shipped default for both stays 20,480 so nothing
+an adopter receives changes on the byte axis until they declare their own.
+
+`DOSSIER_CAP_BYTES` at 20,480 is not the same as changing nothing for dossiers. Their operative bound
+today is the LINE count at their own density, which lands between about 14.5 KB and 18.7 KB; a 20,480-byte
+bound with no line count lets the densest of them reach roughly 350 lines instead of 250. That is about a
+**39% effective loosening**, against the 3.3x-to-4.3x a single row-class key would have given. The key
+exists to hold that difference, and the number is the one that keeps the byte axis unchanged for the class
+while the line axis goes.
 
 ### Inventory
 
@@ -173,14 +206,15 @@ rev-1 argued the line bound "cannot fire". That was measured on one document and
 bound that binds FIRST on 22 of 29 row documents. The retirement therefore removes a bound that is doing
 work, and the price is concentrated in one sub-population.
 
-**Dossiers.** A dossier's effective ceiling today is its line count at its own density: 250 x 74.7 is
-about 18.7 KB for `memory-tree-merge-driver.md`, about 15.0 KB for `lexicon.md` at 60.0 bytes per line,
-about 14.4 KB for `agent-cap.md` at 57.7. After this unit each is bounded at 61,440 bytes alone — a
-**3.3x to 4.3x loosening**. At about 58 bytes per line a dossier reaches roughly 1,050 lines with nothing
-firing. Dossiers are row class by construction, `tools/codebase-map/test_codebase_map.py` carries no size
-or line predicate of its own, and `memory/HYGIENE.md:276-278` gives their remedy as a SPLIT rather than a
-rotation — so check 6 is the only thing bounding a dossier at all, and its split trigger moves with the
-cap. This is the cost the owner ratified, and it is the subject of F3.
+**Dossiers — the sub-population F3 carved out.** A dossier's effective ceiling today is its line count at
+its own density: 250 x 74.7 is about 18.7 KB for `memory-tree-merge-driver.md`, about 15.0 KB for
+`lexicon.md` at 60.0 bytes per line, about 14.4 KB for `agent-cap.md` at 57.7. Under a single row-class
+key each would have been bounded at 61,440 bytes alone — a 3.3x to 4.3x loosening, roughly 1,050 lines at
+measured density. `DOSSIER_CAP_BYTES` at 20,480 holds them to about 350 lines for the densest instead,
+a **39% effective loosening**. That matters because dossiers are row class by construction,
+`tools/codebase-map/test_codebase_map.py` carries no size or line predicate of its own, and
+`memory/HYGIENE.md:276-278` gives their remedy as a SPLIT rather than a rotation — so check 6 is the only
+thing bounding a dossier at all, and its split trigger moves with whichever bound applies.
 
 **Run-state files.** Four of five are line-bound today and become byte-bound at 61,440. Behaviour does
 not change, because the protocol budgets the authored region at 8 KB and spills against that; check 6 is
@@ -195,8 +229,9 @@ costs nothing observable.
 
 - **`builds/*/RUN.md`** — no trigger moves; the backstop loosens. The protocol names no byte figure, so
   it needs no edit. Rule 6's clause contradicting it does, and S15 is that edit.
-- **Codebase-map dossiers** — the largest shift, priced above. The split trigger moves from an effective
-  ~14.5 KB to 61,440 bytes.
+- **Codebase-map dossiers** — priced above. With `DOSSIER_CAP_BYTES` the split trigger moves from an
+  effective ~14.5 KB to a declared 20,480, not to 61,440. In a tree with no codebase map the branch is
+  inert because `MAP_SUB` is empty, and the key is then declared-and-unreached rather than wrong.
 - **The generated indices** — `memory/LIVE.md` and the ledger shards are rendered; a larger byte cap
   defers the month a ledger shard would rotate.
 
@@ -222,10 +257,10 @@ half a day.
 
 | path | change | forced by |
 |---|---|---|
-| `.memory-tree.conf` | the key at 61,440, with its derivation and movement | S1 |
-| `tools/memory-tree/.memory-tree.conf.example` | the key at the shipped default | S12 |
-| `tools/memory-tree/check-memory-hygiene.sh` | conf read and re-normalisation · the cap block · the message · kit version | S2 S4 S5 S6 |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | byte-axis arms · the above-750 retirement arm · tRunBig grown · the example-conf arm · `FLOOR_ASSERTIONS` | S7 S8 S9 S11 S13 |
+| `.memory-tree.conf` | both keys — 61,440 and 20,480 — with derivations and movement | S1 S1b |
+| `tools/memory-tree/.memory-tree.conf.example` | both keys at the shipped default | S12 |
+| `tools/memory-tree/check-memory-hygiene.sh` | two conf reads and re-normalisation · the three-class cap block · the message · kit version | S2 S4 S5 S6 |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | byte-axis arms · the above-750 retirement arm · tRunBig grown · the dossier arm pair · the example-conf arm · `FLOOR_ASSERTIONS` | S7 S8 S9 S9b S11 S13 |
 | `memory/HYGIENE.md` | the four carriers · rule 6's spill clause | S14 S15 |
 | `tools/memory-tree/HYGIENE.template.md` | the same, in lockstep | S14 S15 |
 | `tools/memory-tree/README.md` | the figures | S14 |
@@ -265,9 +300,11 @@ half a day.
   right-hand side all evaluate true, so the whole class reds at once. Second, the genuinely silent
   direction is a bound that cannot fire — which is what this unit deliberately creates for the row line
   axis, and why S8 pins its arm above the guide's 750 rather than inside the band where a slip is
-  invisible. Third, the shared `cl` variable in S4: deleting the row assignment leaves the guide's 750
-  governing rows, which looks like a successful retirement and is a silent 3x line raise instead.
-  Rollback is reverting one commit; nothing migrates.
+  invisible. Third, the shared `cb`/`cl` pair now carries THREE classes in S4: deleting the row `cl`
+  assignment leaves the guide's 750 governing rows, and mis-ordering the branches leaves a dossier taking
+  the row-class value. Both look like a successful retirement. Fourth, the dossier branch is inert when
+  `MAP_SUB` is empty, which is correct in a tree with no codebase map and is `vacuous-selector-empty-population`
+  in a fixture that forgot the conf — S9b requires one. Rollback is reverting one commit; nothing migrates.
 - **testing + left-shift gates** — S7 to S11 and S13. The byte axis of check 6 gains its first arm in the
   kit's life; S9 keeps the one row-class arm that three other contracts hang on.
 - **migration / rollback** — None required. An adopter who never declares the key keeps today's verdicts
@@ -296,6 +333,14 @@ One item for the owner scope menu: F3, the dossier byte sub-bound, which the F5 
 - **AC5** — When the suite runs, `memory/builds/tRunBig/RUN.md` is still NAMED by check 6, now on the
   byte axis, so the `index_set` membership proof and the check-7 exemption precondition asserted on that
   same file both still hold.
+- **AC5b** — When a fixture dossier exceeds `DOSSIER_CAP_BYTES`, `check-memory-hygiene.sh` names it; and
+  when one sits BETWEEN `DOSSIER_CAP_BYTES` and `ROW_DOC_CAP_BYTES` it is still named, which is the
+  observation that proves the dossier class exists rather than a row class under a larger bound. The
+  fixture tree carries a `.codebase-map.conf` so `MAP_SUB` resolves — without it the branch is inert and
+  both arms would pass by finding nothing.
+- **AC5c** — When the suite runs a fixture tree with NO codebase map, the dossier branch is inert and no
+  row document is judged against `DOSSIER_CAP_BYTES`, so an adopter without the map kit inherits nothing
+  from this key.
 - **AC6** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, its new check-6 row arms
   fail on the BYTE axis and `FLOOR_ASSERTIONS` has been raised to the new executed count.
 - **AC7** — When `bash tools/memory-tree/check-verdict-epoch.sh` runs over this diff it is green, and
@@ -357,23 +402,18 @@ with the measured population — 22 of 29 row documents line-bound first, all 12
 measurement and both alternatives, and chose outright retirement. Recorded here as a deliberate
 relaxation of a ratified curation discipline, not as an inherited assumption.
 
-### F3 — RE-OPENED by F5's answer: does the dossier sub-population need its own byte bound?
+### F3 — the dossier bound · RESOLVED (owner, 2026-08-17): its own conf key
 
-F3 previously asked whether the row class needs a per-document-kind matrix, and rev-3 recommended no on
-the grounds that a dossier's operative bound was the line count this unit would not touch. **F5's answer
-removes that ground.** After retirement a dossier is bounded only at 61,440 bytes, which at its measured
-density is roughly 1,050 lines; check 6 is the only size gate a dossier has, and its declared remedy is a
-split.
+F3 originally asked whether the row class needs a per-document-kind matrix, and rev-3 recommended no on
+the grounds that a dossier's operative bound was the line count this unit would not touch. F5's answer
+removed that ground: after retirement a dossier would be bounded only at 61,440 bytes, roughly 1,050 lines
+at measured density, with check 6 the only size gate it has and a split as its declared remedy.
 
-Options: one key for the whole row class, accepting ~1,050-line dossiers until the map's convergence
-discipline is felt; or one extra branch giving the dossier sub-population its own byte bound at roughly
-its present effective ceiling, so the backlog shards get their 61,440 and dossiers keep the pressure to
-split.
-
-**Recommendation: the dossier sub-bound.** It is one branch and one conf key, it keeps the relaxation
-aimed at the population that asked for it, and it is the cheapest thing that stops the retirement
-reaching a class the owner's goal never mentioned. This is the only item that changes what gets built, so
-it is not resolved here.
+Three options were put to the owner — one key for the whole row class, one extra branch pinning dossiers
+at the shipped 20,480 with no new key, or a second declared key. The owner chose the **second declared
+key**, which is `DOSSIER_CAP_BYTES` in S1b. It costs one more number to measure and comment, and it buys
+an adopter the ability to set a dossier bound different from the one gov measured — the same argument that
+made the row cap a key rather than a constant.
 
 ### F2 — absent-and-blank semantics · recommendation not overruled
 
@@ -403,6 +443,17 @@ and the re-shape unit's options depend on the answer.
 - rev-3 · 2026-08-17 · added §4 Rollout: the local default advanced 37 commits during the build and the
   shard is at 99.34% there with 135 bytes left, forcing the conf change to land before this build's own
   records.
+- rev-5 · 2026-08-17 · folded the owner's F3 decision: dossiers get their own declared key,
+  `DOSSIER_CAP_BYTES`, at 20,480. §4's cap block becomes THREE classes ordered most-specific first, keyed
+  on the engine's existing `MAP_SUB` so the branch is inert by construction where no codebase map is
+  adopted. That holds the dossier loosening to about 39% — the densest reaches roughly 350 lines rather
+  than 250 — instead of the 3.3x-to-4.3x a single row-class key would have given, and §4 now says so
+  rather than claiming dossiers are unaffected. Three arms added: AC5b names a dossier over its own bound
+  AND one between the two bounds, which is the only observation distinguishing a dossier class from a row
+  class under a larger bound; AC5c asserts the branch is inert with no map. §5 gained the mis-ordering
+  hazard and the inert-branch vacuity. §3 gained two non-goals the answer creates: no line bound anywhere
+  below `guides/`, and no third key for run-state files. §8 F3 is RESOLVED, so the header carries
+  `ratified`.
 - rev-4 · 2026-08-17 · folded the owner's F1 and F5 decisions. F5 was reaffirmed AFTER the correct
   measurement was put in front of the owner, so the line bound is retired outright and §3 now states the
   relaxation of `TOOL-aWidenedGuide-1`'s discipline as deliberate and ratified rather than as a premise.
