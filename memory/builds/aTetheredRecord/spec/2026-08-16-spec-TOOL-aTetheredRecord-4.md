@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -36,7 +36,7 @@ filename agrees with the header it projects.
   ratchet row in `tools/drift-audit/drift_signals.py` declaring that raising it is the weakening
   direction.
 - **S5** — `ARMS_FLOORS` for `tools/memory-tree/check-memory-hygiene.sh` moves from `14:14` to
-  `18:18`, stated as a literal here because `check-arms.py` compares one-sidedly: an UNDER-set floor
+  `19:19`, stated as a literal here because `check-arms.py` compares one-sidedly: an UNDER-set floor
   passes silently, so the value has to be asserted rather than derived from a passing run.
 - **S9** — Bump `KIT_MEMORY_TREE_VERSION` and every `gov:kit memory-tree@` marker, re-rendering the
   three doc pairs. A non-comment change to the engine is exactly what `check-verdict-epoch.sh` dates,
@@ -266,6 +266,9 @@ the six-file sweep a prior unit measured and rejected.
 - rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork A ratified RENAME-ALL against this
   spec's recommendation, adding branch 4, its arm, the ordinal redefinition in §4 that avoids the
   alternation blocker, and the rename itself as `TOOL-aTetheredRecord-7`. Fork D ratified the count.
+- rev-4 · 2026-08-17 · S5's floor corrected 18:18 -> 19:19 during the build. The four BRANCHES are
+  five FAIL SITES: branch 3 has two failure modes, an undeclared pin and an exceeded one, and
+  `check-arms` counts call sites rather than concepts. The spec's own count was wrong, not the code.
 - rev-3 · 2026-08-17 · folded the M4 audit, which returned BLOCKED with this unit holding one of the
   three blockers. **B2:** branch 4 had NO INPUT — the mode `TOOL-aTetheredRecord-2` shipped emits
   nothing for a conformant record, so S2b now amends it. **B3:** branch 4's projection is a whole id

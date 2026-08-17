@@ -79,7 +79,7 @@ The table below is GENERATED from the status header of every spec in this folder
 | [TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md) | INPROGRESS | rev-2 | 2026-08-17 |
 | [TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser](spec/2026-08-16-spec-TOOL-aTetheredRecord-2.md) | INPROGRESS | rev-3 | 2026-08-17 |
 | [TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line](spec/2026-08-16-spec-TOOL-aTetheredRecord-3.md) | SPECCED | rev-3 | 2026-08-17 |
-| [TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md) | SPECCED | rev-3 | 2026-08-17 |
+| [TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md) | INPROGRESS | rev-4 | 2026-08-17 |
 | [TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join](spec/2026-08-16-spec-TOOL-aTetheredRecord-5.md) | SPECCED | rev-3 | 2026-08-17 |
 | [TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it](spec/2026-08-16-spec-TOOL-aTetheredRecord-6.md) | SPECCED | rev-2 | 2026-08-17 |
 | [TOOL-aTetheredRecord-7 — the rename: every record filename names a spec](spec/2026-08-17-spec-TOOL-aTetheredRecord-7.md) | INPROGRESS | rev-2 | 2026-08-17 |
