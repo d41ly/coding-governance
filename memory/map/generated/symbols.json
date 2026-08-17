@@ -2038,11 +2038,6 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
-      "id": "t_js_probe_against_the_lexicon",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
       "id": "t_kit_commits_to_abspath",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -2206,6 +2201,11 @@
       "id": "test_generated_artifacts_are_fresh",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_js_probe_against_the_lexicon",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_lexicon_signals",

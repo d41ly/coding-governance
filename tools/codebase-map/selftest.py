@@ -1088,7 +1088,7 @@ def t_new_clones_reader(tmp: Path):
     assert md._new_clones(tmp, conf) is None
 
 
-def t_js_probe_against_the_lexicon():
+def test_js_probe_against_the_lexicon():
     """CROSS-CHECK: over this repo's own `tools/**/*.js`, the map's definition set is a SUPERSET of
     the lexicon's independently-authored one.
 
@@ -1173,7 +1173,7 @@ def main() -> int:
             lambda: t_remedy_paths_are_real(Path(td)),
         )
     failures += check("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
-                      t_js_probe_against_the_lexicon)
+                      test_js_probe_against_the_lexicon)
     failures += check("coverage both directions + ratchet guards", t_coverage_directions)
     failures += check("dossier contract fails loud", t_parse_contract)
     failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)

@@ -196,7 +196,7 @@ def _live_py(layer: str) -> list[dict[str, str]]:
     return live
 
 
-def _union_js(layer: str) -> list[dict[str, str]]:
+def _build_js_layer(layer: str) -> list[dict[str, str]]:
     """The JS layer: every EXPORT plus every top-level DEFINITION, deduped on `(id, file)`.
 
     BOTH SCANS, because neither sees the other's population. `enumerate_exports` reads
@@ -223,8 +223,8 @@ def _union_js(layer: str) -> list[dict[str, str]]:
 SYMBOL_EXTRACTORS: dict[str, object] = {
     # Real-parser-backed (ast); raises MapError on a SyntaxError rather than indexing less.
     "kit-py": lambda: _live_py("kit-py"),
-    # Export scan UNION definition probe — see _union_js for why one of them alone indexed 3 of 33.
-    "kit-js": lambda: _union_js("kit-js"),
+    # Export scan UNION definition probe — see _build_js_layer for why one of them alone indexed 3 of 33.
+    "kit-js": lambda: _build_js_layer("kit-js"),
 }
 
 
