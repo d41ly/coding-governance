@@ -12,6 +12,13 @@ README slice named by the same marker grammar; never hand-edit it.
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md) | journal | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
+| [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md) | spec-audit | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md) | spec-audit | DEPL-aSealedCaravan-2 |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md) | spec-audit | DEPL-aSealedCaravan-2 |
 <!-- /run:generated -->
 
 ## Run facts
