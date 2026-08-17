@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-1 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-16 · node c · Tier-1 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 

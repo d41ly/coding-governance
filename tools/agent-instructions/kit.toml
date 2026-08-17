@@ -27,3 +27,8 @@ means = "adopted"
 name = "agent-instructions wiring"
 argv = ["bash", "{kit}/adopt-agent-instructions.sh", "--check"]
 guard = []
+
+[[gate_leg]]
+name = "agent-instructions self-test"
+argv = ["bash", "{kit}/adopt-agent-instructions.test.sh"]
+guard = ["{kit}/"]

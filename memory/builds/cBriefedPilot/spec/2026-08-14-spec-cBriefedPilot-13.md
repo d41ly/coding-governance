@@ -1,6 +1,6 @@
 # TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit
 
-**Status:** OPEN · rev-1 · 2026-08-14 · node c · Tier-2 · base 37c05e1b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 37c05e1b · streams tooling
 
 ## 1. Goal
 
@@ -24,7 +24,12 @@ being re-run somewhere the run could not write.
 - **S6** — the honest limit lives in a source comment beside the branch, matching check 13's
   precedent, not in a document read at a different time.
 - **S7** — `tools/unattended/check-unattended.test.sh` gains a committing fixture and one arm per
-  refusal beside the green control; `ARMS_FLOORS` is raised in the same commit; the leg header's
+  refusal beside the green control. **At least one arm's waiver line is PRODUCED by invoking
+  `unattended.sh --preflight --waive <handle> --reason <text>` inside the fixture and committing it**,
+  not hand-authored, and AC4 and the S4 join arm anchor on THAT line. `TOOL-aStandingWrit-8` names
+  this exact gap — the kit has driver arms and leg arms and zero arms that run the driver and THEN
+  the leg over one tree — and a hand-authored line tests the checker against the checker's own idea
+  of the grammar; `ARMS_FLOORS` is raised in the same commit; the leg header's
   check count and the charter's gate-suite count move with it.
 
 ## 3. Non-goals (OUT)
@@ -137,8 +142,11 @@ The join is not the control that binds; §9 names the one that does.
 - **AC5** — When the run-state file has never been committed, the shape checks still run and the
   join prints nothing.
 - **AC6** — The fixture's green control still exits 0 and prints nothing with check 17 live.
-- **AC7** — `python tools/memory-tree/check-arms.py` is green with the raised `ARMS_FLOORS`, and red
-  with the floor left unraised.
+- **AC7** — `python tools/memory-tree/check-arms.py` is green with the branch armed and the floor
+  raised, and RED when the branch is present and its arm is removed — twice over: once naming
+  the unarmed branch, once at the armed count against the raised floor. *An UNRAISED floor does
+  NOT red on an added branch: `ARMS_FLOORS` is a one-sided minimum, so a higher count passes.
+  Measured on unit 4, where the same wording was an acceptance criterion no run could fail.*
 
 ## 7. Gates
 
@@ -150,14 +158,15 @@ trip, only the charter's gate-suite bullet moves, for its check count.
 
 ## 8. Open questions
 
-**Silent or red when the run-state file has no committed blob? — RESOLVED at authoring: silent, with
-the cost written down.** Red is the stricter reading and it reds the honest preflight-to-first-commit
+### Silent or red when the run-state file has no committed blob? — RESOLVED at authoring: silent
+
+The cost is written down. Red is the stricter reading and it reds the honest preflight-to-first-commit
 window on every diff-scoped run, with nobody present to interpret it. The residual it leaves is a
 weaker form of a hole §9 already enumerates, so the trade buys nothing it does not already concede.
 This is the spec author's decision, not a fork the owner declined.
 
-**The whole line, or the extracted `(handle, reason)` pair? — RESOLVED at authoring: the whole
-line.** The pair form needs a second parser over the blob, and the two parsers would then have to
+### The whole line, or the extracted `(handle, reason)` pair? — RESOLVED at authoring: the whole line
+ The pair form needs a second parser over the blob, and the two parsers would then have to
 agree about whitespace forever. The line is stable because unit 3's re-preflight does not re-park,
 and `grep -qF` needs no parser at all.
 
@@ -167,6 +176,13 @@ and `grep -qF` needs no parser at all.
   `build/2026-08-14-build-cBriefedPilot-1-design-pass.md`, folding FG-2 as the owner resolved it on
   2026-08-14 (P1: buy the git join). The design pass had this unit at Tier 1 with shape checks only;
   the join is what moves it.
+
+- rev-2 · 2026-08-15 · §8's audit fold. S7 now requires at least one arm whose waiver line is PRODUCED by the driver and
+  committed, not hand-authored, and §10 cites `TOOL-aStandingWrit-8` — the row naming this kit's
+  driver-arms-and-leg-arms-but-never-both gap, which is exactly what the join needs closed.
+- rev-3 · 2026-08-15 · the acceptance criterion asserting that an UNRAISED `ARMS_FLOORS`
+  reds is corrected against measurement. It cannot: the floor is a one-sided minimum and a
+  higher branch count passes. Found on unit 4 and swept across the set; three specs carried it.
 
 ## 10. Reuse audit
 
@@ -181,6 +197,9 @@ and `grep -qF` needs no parser at all.
   override. The selector reads it rather than inventing a marker.
 - **Check 13's honest-limit comment** — the precedent for where the limit goes: beside the branch,
   because a document stating it is read at a different time from the code relying on it.
+
+The cross-component gap this unit's S7 closes for one line is `TOOL-aStandingWrit-8`, cited here
+because §10 is where a reused seam is named and that row is the reason the arm has its shape.
 
 Recall terms used: unattended waiver parked region park kind grammar run-state first commit blob git
 show join tamper evidence shape check directive handle reason index population.

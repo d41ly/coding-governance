@@ -54,5 +54,12 @@ KICKOFF_EXITS=""
 
 # Project EXTENSIONS to the kit-owned core sets, space-separated. Empty is legal and means "core
 # only"; it is NOT the same as an empty core set, which is a refusal.
+# The DEFAULT DIRECTIVE SET is kit-owned and MUST-by-default; this is the extension point, and
+# DIRECTIVES_FLOOR is the shrink-only pin on the core count. Separate from CORE_FLOOR on purpose:
+# that key has a recorded failure where ONE malformed spelling disarms BOTH its pins while the
+# conf still looks configured, and a third field would make one typo disarm three.
+DIRECTIVES_EXTRA=""
+DIRECTIVES_FLOOR="11"
+
 PHASES_EXTRA=""
 DOD_EXTRA=""

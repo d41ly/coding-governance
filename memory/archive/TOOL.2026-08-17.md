@@ -1,7 +1,9 @@
-# tooling backlog
+# tooling backlog — archived 2026-08-17
 
-> Mutable. Each row leads with one status token (OPEN…WONTDO).
-> **Rotated 2026-08-14** — 48 terminal rows moved byte-identical to [`../archive/TOOL.2026-08-14.md`](../archive/TOOL.2026-08-14.md), covering `TOOL-aRuledParchment-2` through `TOOL-cFinalBerth-2`. Nothing deleted; the all-time id-collision grep still reaches them there.
+> Terminal rows only, moved byte-identical from `../backlog/TOOL.md`. TWO rotations landed on
+> this date from concurrent builds; this file is their UNION, deduplicated by id. Nothing was
+> deleted, and the all-time id-collision grep still reaches every row here.
+
 - TOOL-aWalkedCorpus-1 · CLOSED · memory-recall has TWO corpus enumerators — extract.corpus_files is the measurement path, query.py defines its own — and every widening must teach both. TOOL-aDeclaredCeiling-2 §4 said this was 'recorded as the follow-up it is' and no row existed
 - TOOL-aWalkedCorpus-2 · DEFERRED · a recall quality floor. Measured NOT buildable against bench.py as it exists: it always exits 0, its flag set is closed, it needs an uncommitted data dir, and verbatim.json pins it byte-for-byte. See the spec's §1 for what a successor needs
 - TOOL-aDeclaredCeiling-1 · OPEN · make the template ceiling a DECLARED pin rather than a shell constant, the way .memory-tree.conf's READ_PATH_CEILING declares a byte budget with each movement justified beside the number. Recorded by TOOL-aSiftedPlaybook-1 §4 as this repo's established answer
@@ -86,3 +88,5 @@
 - TOOL-aBranchedMandate-4 · CLOSED · `adopt-unattended.sh` decides repo membership by PATH-STRING prefix strip, which never converges under an MSYS mount point, so its not-inside guard misfires ahead of the whitespace guard and reds the adopter e2e on node `a` → `builds/aBranchedMandate/`
 - TOOL-aBranchedMandate-5 · OPEN · `adopt-drift-audit.sh` diffs its render with no `[ -s ]` test, so an empty render against an equally empty Skill PASSES. The other two adopters carry that guard; found while building TOOL-aBranchedMandate-1, whose §4 had recorded this cell as present
 - TOOL-aBranchedMandate-6 · OPEN · `tools/memory-recall/selftest.py` cleans up with `shutil.rmtree(ignore_errors=True)`, which cannot remove read-only git objects on Windows, so every run leaks its scratch repos — 3,616 `mrecall-*` residues measured in %TEMP% on node `a`
+- TOOL-cBriefedPilot-36 · CLOSED · checks 8 and 26 contradicted: 26 refuses `--preflight` on a finished run and that is the only verb re-splicing the generated region, so a build continuing after its run ended red check 8 forever with no verb able to clear it. Terminal records are now exempt
+- TOOL-cBriefedPilot-37 · CLOSED · `closing-review-recorded` joined on an EIGHT-char base prefix where git abbreviates to seven: the 8-char grep matched none of 48 tracked records, the 7-char matched. The item was unmeetable, clearable only by a self-authored override. Needle is seven now

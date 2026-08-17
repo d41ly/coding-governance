@@ -39,3 +39,10 @@ guard = []
 name = "placeholder-catalogue self-test"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]
 guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"]
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv
+# nor a reason.
+none = """
+this entry IS a gate. Its self-test is the leg, and running a gate from `check` would make `check` a second merge bar rather than a verifier of the install.
+"""

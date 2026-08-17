@@ -73,3 +73,99 @@ blocks_adopt = false
 blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-16 are simply OFF, so the hygiene leg exits 0 with the hole wide open."
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN READ_PATH_CEILING; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+none = """
+the adopter accepts only `--scaffold`, measured. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
+"""
+
+[[gate_leg]]
+name = "verdict epoch (kit version dates the engine)"
+argv = ["bash", "{kit}/check-verdict-epoch.sh"]
+guard = []
+
+[[gate_leg]]
+name = "verdict-epoch self-test"
+argv = ["bash", "{kit}/check-verdict-epoch.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "memory-hygiene self-test"
+argv = ["bash", "{kit}/check-memory-hygiene.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "row-keyed merge driver replay"
+argv = ["bash", "{kit}/merge-rows.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "kit/dogfood doc parity"
+argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
+guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{kit}/"]
+
+[[gate_leg]]
+name = "method carriers (every pointer declared)"
+argv = ["bash", "{kit}/check-method-carriers.sh"]
+guard = []
+
+[[gate_leg]]
+name = "method-carriers self-test"
+argv = ["bash", "{kit}/check-method-carriers.test.sh"]
+guard = []
+
+[[gate_leg]]
+name = "build-index selftest"
+argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "corpus-ids selftest"
+argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "gotchas selftest"
+argv = ["python3", "{kit}/gotchas.py", "--selftest"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "row-grammar selftest"
+argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "marker contract"
+argv = ["bash", "{kit}/marker-contract.test.sh"]
+guard = []
+
+[[gate_leg]]
+name = "harness arms (fail branches armed or pinned)"
+argv = ["python3", "{kit}/check-arms.py", "--check"]
+guard = []
+
+[[gate_leg]]
+name = "check-arms selftest"
+argv = ["python3", "{kit}/check-arms.py", "--selftest"]
+guard = ["{kit}/"]
+
+# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
+# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
+# answer about which paths they govern, never these pattern strings.
+[[lf_pin]]
+pattern = "{memory_root}/**/*.md"
+why = "three gates byte- or char-compare these"
+[[lf_pin]]
+pattern = "{memory_root}/**/*.toml"
+why = "the same gates read them as data"
+[[lf_pin]]
+pattern = "{memory_root}/**/*.txt"
+why = "the waiver registries are read line by line"
+[[lf_pin]]
+pattern = ".memory-tree.conf"
+why = "a sourced conf: a CR reaches the shell as part of the value"
+[[lf_pin]]
+pattern = "{kit}/.memory-tree.conf.example"
+why = "the adopter copies it verbatim into the line above"
