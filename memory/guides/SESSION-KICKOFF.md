@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T10:07:24+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
+last-audit: 2026-08-17T10:54:54+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
+last-body-change: 19eb9f5ce25e606c757d2075c89a5d814a0549d9
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -176,3 +176,11 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
+- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
+  check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
+  it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
+  after a round counter.
+- A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
+  assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
+  costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
+  that name states a count.

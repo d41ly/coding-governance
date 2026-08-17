@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -164,6 +164,12 @@ none.
   non-records, and cannot skip a fenced example — AC1 already asserts the same thing through the
   gate's own predicate. §4 also now fixes the commissioning-brief case, which would otherwise have
   manufactured spec-audit coverage from an H1's phrasing.
+
+- rev-4 · 2026-08-17 · BUILT, and one defect found afterwards by unit 5's render: rule 1 scanned
+  forty lines, so two aSiftedPlaybook M4 records bound nine and ten ids by sweeping up ids they CITE
+  as prior decisions. Corrected in place. The rule stands as written — the head is the evidence — and
+  the executing pass read too far, which is the kind of error a rendered table makes visible and a
+  per-file read does not.
 
 ## 10. Reuse audit
 
