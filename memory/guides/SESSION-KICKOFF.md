@@ -5,7 +5,7 @@
 last-audit: 2026-08-17T12:30:00+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: a136e920de54c09767f065d618b311315f3c35cb
+last-body-change: 97433b8e42f07e3f580697907d0dc45f57307f82
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
