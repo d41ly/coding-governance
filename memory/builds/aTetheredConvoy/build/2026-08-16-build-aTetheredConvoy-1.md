@@ -131,3 +131,48 @@ decorating it:
 
 The pattern across all three is the one this repo already names: the defects were not the findings a
 pass missed, they were disagreements between two paragraphs written in the same pass.
+
+## Parked — the landing is blocked on a third convergence, and it is a real one
+
+The merge to `main` completed and every gate was green at `49e06d9`. The PUSH is not done: local is
+25 ahead / 10 behind, and `tools/push-main.sh` reconciles before the gate, so it re-enters a merge
+with `origin/main`.
+
+That merge resolves structurally — both files parse, `govkit selfcheck` exits 0, and 177 of 186 arms
+hold. It is filed as `DEPL-aTetheredConvoy-8` rather than landed, because the 9 red arms are not
+merge damage; they are a **semantic disagreement between upstream's landed classifier and this
+branch's receipt schema 2**, and upstream's arms predate the schema.
+
+`TOOL-dClosedLexicon-13` made `plan` and `apply` share one predicate — `ROLE_KINDS` plus
+`derive_rule_kind` — and deleted the role filter from the arm that compares plan's write set to
+apply's receipt, correctly: under schema 1 every receipt row was `engine` or `seed`, so the whole
+receipt *was* the write set. Schema 2 records a row for every file gov is responsible for, including
+`rendered`, `attributes` and `project-owned`. The comparison has to filter to `LANDABLE_ROLES` on the
+receipt side — which is exactly what the conflicted arm's filter was for, and what its own comment
+said.
+
+Four separable questions, stated so the next pass measures rather than guesses:
+
+- **the expected per-role mark counts move**, because unit 6 adds 9 `ORDER|attributes` pin rows that
+  did not exist when the arm was written. Measured on this tree: `write|engine` 54 · `write|seed` 4 ·
+  `SIDE|rendered` 4 · `ORDER|attributes` 9 · `ORDER|engine` 1 · `ORDER|hole` 5 ·
+  `COVER|project-owned` 1 — and `ORDER|project-owned` 0, which is the arm that reds.
+- **the receipt-side role filter**, above.
+- **`cmd_apply` prints the skip fact twice** — upstream's `SKIPPED [role] dest <- kit: why` and this
+  branch's `not landed [role] dest — why`. Two answers to one question, in the output of the verb
+  built to end silent partial installs. Drop the second and re-key this branch's two `why` arms onto
+  upstream's line, which already carries role, destination, kit and reason.
+- **the `settings-merge` refusal arm reuses a target earlier applies left kits in**, so apply refuses
+  for the pre-existing-kits reason instead of the merged-role one. The arm passes for `push-main` and
+  reds for `settings-merge` on fixture order alone.
+
+*Why this was not pushed through.* The tempting move is to read the four failing counts off the
+measured output and write them into the arms. That is `fixture-passes-by-finding-nothing` performed
+deliberately: the arm would then assert whatever the code does, and the receipt-schema question — the
+one that actually matters — would be buried under a green bar. The resolution is preserved as a patch
+so no reconcile work is lost, and the tree stands at a green `49e06d9`.
+
+*Also unresolved, and not caused by this:* the renormalize refused with `the pinned population is not
+clean relative to HEAD` naming two gov paths. That was measured against a mid-merge working tree, so
+it is unusable as a verdict — the same discarded-gate-result trap this record already names once.
+Re-measure against a clean tree before believing it either way.
