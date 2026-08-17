@@ -38,7 +38,10 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 135    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 141    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+                    # 135 -> 141 at the origin/main reconcile: upstream's one plan/apply classifier
+                    # adds refusal branches of its own. Raised rather than left slack, because a
+                    # floor that trails the population stops catching the matcher going blind.
 FILE_PIN = 1        # 1 -> current: the deployer is one module today; a refactor may only grow this
 
 

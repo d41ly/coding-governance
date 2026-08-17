@@ -818,6 +818,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "govkit_kind_marks",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "govkit_steps",
       "kind": "function",
       "file": "tools/govkit/selftest.py"

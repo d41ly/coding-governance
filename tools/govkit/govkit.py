@@ -2049,9 +2049,13 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                 r.fail(f"entry '{eid}' declares role '{u['role']}', which is not in the role enum — "
                        f"refusing rather than skipping a rule this engine cannot classify")
                 continue
+            # THE ROW, NOT A SECOND PRINT. Schema 2 needs a receipt row for every file gov is
+            # responsible for, which is what this loop is for. The announcement is already made
+            # once, by the SKIPPED line the write path emits with the same role, destination, kit
+            # and reason — printing it again here was two answers to one question in the output of
+            # the verb built to end silent partial installs.
             rows.append({"path": u["dest"], "role": u["role"], "kit": eid,
-                         "version": vers, "written": False, "source": u["src"]})
-            print(f"govkit apply — not landed [{u['role']}] {u['dest']} — {why}")
+                         "version": vers, "written": False, "source": u["src"], "why": why})
 
         for dest, w in sorted(res["writes"].items()):
             if w["missing"]:
@@ -2211,8 +2215,17 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         want = eol_population(target)
         lf_paths = sorted(p for p, v in want.items() if v == "lf")
         if lf_paths:
-            dirty = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD", "--"]
-                                   + lf_paths, capture_output=True, text=True).stdout.split()
+            # GOV'S OWN WRITES ARE NOT "SOMEBODY'S WORK-IN-PROGRESS". `git diff HEAD` covers the
+            # index, and STAGE has already `git add`-ed everything this run landed — so on a normal
+            # first install every pinned path gov just wrote came back dirty and the renormalize
+            # refused itself. `staged` is the paths this run actually wrote; what remains after
+            # subtracting them is a change gov did not make, which is the only thing this guard is
+            # for. Measured: without this, a clean fixture target failed here on the DEFAULT
+            # selection, naming two files gov had itself just landed.
+            ours = set(staged)
+            dirty = [p for p in subprocess.run(
+                ["git", "-C", str(target), "diff", "--name-only", "HEAD", "--"] + lf_paths,
+                capture_output=True, text=True).stdout.split() if p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
                 r.fail(f"the pinned population is not clean relative to HEAD "

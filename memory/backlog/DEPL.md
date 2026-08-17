@@ -7,4 +7,5 @@
 - DEPL-aFerriedDossier-3 · OPEN · 13 defects inCMS measured in this tree with line numbers: the discarded prefix answer, the literal probe, the unresolved sentinel, the unconditional engine write, absolute gov_source, an unhandled gov-side rename. → builds/aFerriedDossier/
 
 
-- DEPL-aTetheredConvoy-8 · OPEN · Reconcile `TOOL-dClosedLexicon-13`'s one plan/apply classifier against receipt schema 2: its arms assume schema 1, where plan's write set equalled the whole receipt. 177/186 arms green; 9 red over four questions. Blocks the push. → builds/aTetheredConvoy/
+- DEPL-aTetheredConvoy-8 · CLOSED · Reconciled `TOOL-dClosedLexicon-13` against receipt schema 2. One of the four filed questions was the schema; two were arms riding the playbook role unit 1 corrected, one was fixture order, plus a vacuous `SKIP` mark. → builds/aTetheredConvoy/
+- DEPL-aTetheredConvoy-9 · OPEN · `apply over the DEFAULT selection ran` needs unit 5's `[[outcome]]` evaluator AND a fixture whose adopters can run; today two exit 1 and four rendered destinations are absent. Not weakened to green. → builds/aTetheredConvoy/

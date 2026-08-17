@@ -36,6 +36,17 @@ def govkit_steps() -> tuple:
     sys.path.insert(0, str(HERE))
     import govkit  # noqa: E402
     return govkit.STEPS
+
+
+def govkit_kind_marks() -> dict:
+    """The engine's OWN plan marks, for the same reason as `govkit_steps`.
+
+    The harness used to spell one of these (`SKIP`) itself, and the engine's table never contained
+    it — so the arm reading plan rows matched nothing and reported vacuously green.
+    """
+    sys.path.insert(0, str(HERE))
+    import govkit  # noqa: E402
+    return govkit.KIND_MARKS
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -378,26 +389,40 @@ def main() -> int:
 
         # AC5 — no rule leaves the land loop without a line. The silent skip this replaces swallowed
         # every rendered, project-owned and generated rule in the tree.
+        # Keyed on the SKIPPED line, which is now the ONLY announcement. It carries the same four
+        # facts the removed `not landed` print did — role, destination, kit and reason — and the
+        # two together were the duplicate this reconcile removed.
         check("an unlanded rule prints its role, its destination and who does produce it",
-              "not landed [project-owned]" in p.stdout and
-              "gov supplies no bytes for this source, ever" in p.stdout, p.stdout)
+              "SKIPPED [project-owned] tools/codebase-map/map_extractors.py" in p.stdout and
+              "writes that same path in this run" in p.stdout, p.stdout)
 
         # AC4 — plan promises exactly the file set gov owns. NOT keyed on `written`: that flag is a
         # per-RUN fact, and on a re-apply a seed that exists is a row gov owns and did not write.
         pl = run("plan", "--target", str(cm), "--kits", "codebase-map")
         plan_writes, plan_skips = set(), set()
         for line in pl.stdout.splitlines():
-            m = _re.match(r"^  (write|SKIP)\s+\[[^\]]+\]\s+(\S+)", line)
-            if m:
+            # THE MARK VOCABULARY IS THE ENGINE'S, NOT A LITERAL HERE. This read `SKIP`, which
+            # `KIND_MARKS` does not contain — so the skip half matched nothing and BOTH arms below
+            # went vacuous rather than red. Derived from the table so a new kind cannot slip past.
+            m = _re.match(r"^  (\S+)\s+\[[^\]]+\]\s+(\S+)", line)
+            if m and m.group(1) in {v.strip() for v in govkit_kind_marks().values()}:
                 (plan_writes if m.group(1) == "write" else plan_skips).add(m.group(2))
         check("plan's write set equals the receipt rows carrying gov bytes",
               plan_writes == {f["path"] for f in rec2b["files"] if "sha256" in f},
               str(sorted(plan_writes ^ {f["path"] for f in rec2b["files"] if "sha256" in f})))
+        # OUTBOX ROWS ARE NOT PREVIEWABLE, and that is a fact about the verbs rather than a gap.
+        # `.governance/outbox/<hole>.md` is written when a hole BLOCKS at configure time; `plan`
+        # runs nothing, so it cannot know which holes will block and honestly cannot preview them.
         skip_rows = {f["path"] for f in rec2b["files"]
-                     if "sha256" not in f and f.get("role") != "attributes"}
+                     if "sha256" not in f and f.get("role") != "attributes"
+                     and not f["path"].startswith(".governance/outbox/")}
+        plan_skip_files = {s2 for s2 in plan_skips
+                           if not s2.startswith((".gitattributes:", ".governance/outbox/"))}
         check("plan's SKIP set equals the resolver rows carrying none",
-              {s2 for s2 in plan_skips if not s2.startswith(".gitattributes:")} == skip_rows,
-              str(sorted(plan_skips ^ skip_rows)))
+              plan_skip_files == skip_rows,
+              # The FILTERED operands. This printed the raw sets, so it named `.gitattributes:`
+              # rows the assertion had already excluded and pointed at the wrong difference.
+              str(sorted(plan_skip_files ^ skip_rows)))
         check("and the attributes destination appears as its own plan row, per PATTERN",
               any(s2.startswith(".gitattributes:") for s2 in plan_skips) or True, "")
         check("the fixture actually HAS an unlandable role, or the SKIP half is vacuous",
@@ -1328,8 +1353,15 @@ user_skills = "/tmp/gk-fake-skills"
             # verbs, and the filter is gone: a `write` row that apply does not land, from ANY role,
             # fails here.
             plan_out = run("plan", "--target", str(t), "--kits", "drift-audit")
-            applied = {f["path"] for f in first_receipt.get("files", [])}
-            check("plan's write set equals apply's receipt for a ** kit, NO role filter",
+            # FILTERED ON THE RECEIPT SIDE, AND THAT IS NOT THE FILTER THIS ARM DROPPED. The role
+            # filter removed above was on the PLAN side, where it hid apply/plan disagreement. This
+            # one is a schema fact: under schema 1 every receipt row carried gov bytes, so the whole
+            # receipt WAS the write set and no filter was needed. Schema 2 records a row for every
+            # file gov is responsible for — `rendered`, `attributes`, `project-owned` included — so
+            # comparing plan's writes to the whole receipt compares two different questions. Keyed
+            # on the bytes rather than on a role list, so a new non-landing role needs no edit here.
+            applied = {f["path"] for f in first_receipt.get("files", []) if "sha256" in f}
+            check("plan's write set equals the receipt rows CARRYING BYTES, any role",
                   extract_plan_writes(plan_out.stdout) == applied,
                   f"planned-only={sorted(extract_plan_writes(plan_out.stdout) - applied)} "
                   f"applied-only={sorted(applied - extract_plan_writes(plan_out.stdout))}")
@@ -1341,25 +1373,53 @@ user_skills = "/tmp/gk-fake-skills"
             check("apply over the DEFAULT selection ran", ap2.returncode == 0, ap2.stdout + ap2.stderr)
             rec2 = json.loads((t2 / ".governance" / "install.json").read_text(encoding="utf-8"))
             pl2 = run("plan", "--target", str(t2))
-            check("plan's write set equals apply's receipt over the DEFAULT selection",
-                  extract_plan_writes(pl2.stdout) == {f["path"] for f in rec2.get("files", [])},
-                  f"planned-only={sorted(extract_plan_writes(pl2.stdout) - {f['path'] for f in rec2.get('files', [])})} "
-                  f"applied-only={sorted({f['path'] for f in rec2.get('files', [])} - extract_plan_writes(pl2.stdout))}")
+            bytes2 = {f["path"] for f in rec2.get("files", []) if "sha256" in f}
+            check("plan's write set equals the DEFAULT selection's byte-carrying rows",
+                  extract_plan_writes(pl2.stdout) == bytes2,
+                  f"planned-only={sorted(extract_plan_writes(pl2.stdout) - bytes2)} "
+                  f"applied-only={sorted(bytes2 - extract_plan_writes(pl2.stdout))}")
 
             # THE MAPPING, PINNED POSITIVELY AND PER ROLE. Set-equality above cannot express this:
-            # an implementation emitting all seven non-landable rows under ONE mark satisfies it.
-            # Counted from the descriptors: memory-tree 3 + memory-recall 1 rendered with adopters,
-            # playbook 2 project-owned with no sibling writer, codebase-map 1 project-owned whose
-            # sibling seed lands the same path.
+            # an implementation emitting every non-landable row under ONE mark satisfies it.
+            # MEASURED from the descriptors on this tree, not carried over: memory-tree 3 +
+            # memory-recall 1 rendered with adopters, codebase-map 1 project-owned whose sibling seed
+            # lands the same path, and the playbook's 9 line-ending pin patterns.
+            #
+            # The playbook pair is NOT in this count any more, and that is a fix rather than drift:
+            # both its rules are `seed`, because tagged `project-owned` the entry landed ZERO bytes
+            # while sitting first in the default selection. This arm asserted the role that defect
+            # wore. An un-covered `project-owned` row is worth an arm, so it keeps one — over a
+            # scratch descriptor below, where the role cannot be silently redefined out from under it.
             marks = measure_plan_marks(pl2.stdout)
             check("the default selection previews exactly 4 SIDE|rendered rows",
                   marks.get("SIDE|rendered") == 4, str(marks))
-            check("...2 ORDER|project-owned rows, the playbook pair nothing produces",
-                  marks.get("ORDER|project-owned") == 2, str(marks))
+            check("...and the playbook pair previews as seed WRITES, not as orders",
+                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") is None,
+                  str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",
                   marks.get("write|project-owned") is None, str(marks))
+
+            # THE UN-COVERED `project-owned` ROW, PINNED ON THE TABLE ITSELF. No entry on this tree
+            # has one — codebase-map's is covered by a sibling seed — so the integration arm that
+            # used to assert it was riding the playbook's role and died when that role was corrected.
+            # Keyed on `derive_rule_kind` directly, it cannot be redefined out from under itself by
+            # an entry edit, and it still reds if `order` ever stops being the answer.
+            sys.path.insert(0, str(HERE))
+            import govkit as _gk  # noqa: E402
+            _rep = _gk.Report()
+            _po = {"role": "project-owned"}
+            check("an un-covered project-owned rule derives ORDER",
+                  _gk.derive_rule_kind("demo", {}, _po, "a.md", set(), set(), _rep) == "order",
+                  "expected 'order'")
+            check("...and the same rule derives COVERED when a sibling writes that path",
+                  _gk.derive_rule_kind("demo", {}, _po, "a.md", {"a.md"}, set(), _rep) == "covered",
+                  "expected 'covered'")
+            check("...and the ORDER/COVERED pair is not one answer twice",
+                  _gk.derive_rule_kind("demo", {}, _po, "a.md", set(), set(), _rep)
+                  != _gk.derive_rule_kind("demo", {}, _po, "a.md", {"a.md"}, set(), _rep),
+                  "the two states collapsed to one kind")
 
             # A ROLE WITH NO PRODUCER IS AN ORDER, NOT A SIDE-EFFECT. Both entries say so themselves:
             # `review-harness` renders through the parity gate's --render, `check-install-prefix`
@@ -1383,18 +1443,30 @@ user_skills = "/tmp/gk-fake-skills"
                             and dest in l), "")
                 check(f"{kit}: a merged rule previews as BLOCK", row.strip().startswith("BLOCK"),
                       row or out)
-                ap = run("apply", "--target", str(t2), "--kits", kit)
+                # A FRESH TARGET PER KIT. `t2` has had a full default apply run against it, so a
+                # second apply there can refuse for the pre-existing-kits reason instead of the
+                # merged-region one — and the arm would then pass or fail on fixture order rather
+                # than on the behaviour it names. `plan` above is read-only, so it can share `t2`.
+                tm = make_target(tmp3 / f"merged-{kit}", DEPLOY_FULL)
+                ap = run("apply", "--target", str(tm), "--kits", kit)
                 check(f"{kit}: ...and apply refuses over it",
                       "no verb here can write a gov-owned region" in ap.stdout + ap.stderr,
                       ap.stdout + ap.stderr)
 
             # APPLY NAMES WHAT IT SKIPS. The aggregate `landed 0 file(s)` was the whole report.
+            # KEYED ON codebase-map, NOT ON playbook. The playbook's two rules are `seed` and LAND,
+            # so it skips nothing to name — this arm was reading the role the landed-zero-bytes
+            # defect wore. codebase-map's `map_extractors.py` is a real project-owned skip.
             t3 = make_target(tmp3 / "skips", DEPLOY_FULL)
-            sk = run("apply", "--target", str(t3), "--kits", "playbook")
+            sk = run("apply", "--target", str(t3), "--kits", "codebase-map")
             check("apply names each skipped rule, its role and its destination",
-                  "SKIPPED [project-owned] docs/PARALLEL.md" in sk.stdout, sk.stdout)
+                  "SKIPPED [project-owned] tools/codebase-map/map_extractors.py" in sk.stdout,
+                  sk.stdout)
             check("...and says why, in the same terms the preview used",
-                  "the target or its operator must supply it" in sk.stdout, sk.stdout)
+                  "writes that same path in this run" in sk.stdout, sk.stdout)
+            check("...and names it ONCE, not once per classifier",
+                  sk.stdout.count("tools/codebase-map/map_extractors.py <- codebase-map") == 1,
+                  sk.stdout)
 
             # LANDABLE_ROLES IS DERIVED, and pinned against a literal so a table edit that changes
             # what lands cannot pass unremarked.

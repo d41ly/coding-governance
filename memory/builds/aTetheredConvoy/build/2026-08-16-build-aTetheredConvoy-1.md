@@ -176,3 +176,62 @@ so no reconcile work is lost, and the tree stands at a green `49e06d9`.
 clean relative to HEAD` naming two gov paths. That was measured against a mid-merge working tree, so
 it is unusable as a verdict — the same discarded-gate-result trap this record already names once.
 Re-measure against a clean tree before believing it either way.
+
+## Worked — DEPL-aTetheredConvoy-8, and the filed diagnosis was half wrong
+
+The blocker was filed calling all four questions "schema-1 assumptions in upstream's arms". Measured,
+only **one** was. Two were this branch's own doing, and one was fixture order. Recorded because the
+wrong attribution was the more expensive half: it pointed the fix at upstream's code.
+
+- **The schema one, as filed.** Two arms compared `plan`'s write set to the WHOLE receipt. Correct
+  under schema 1, where every row carried gov bytes; wrong under schema 2, which records a row per
+  file gov is responsible for. Re-keyed on `"sha256" in f` — the BYTES, not a role list — so a new
+  non-landing role needs no edit here.
+- **Two arms were riding a role THIS branch corrected.** They asserted the playbook pair previews as
+  `ORDER|project-owned` and that `apply` skips `docs/PARALLEL.md`. Unit 1 changed both playbook rules
+  to `seed`, because tagged `project-owned` the entry landed ZERO bytes while sitting first in the
+  default selection — the defect is named in the descriptor. The arms were grading the role the
+  defect wore. Re-keyed: the playbook pair asserts seed WRITES, and the skip arm moved to
+  `codebase-map`'s `map_extractors.py`, which is a real project-owned skip.
+- **A vacuous arm, found on the way and not in the filed four.** The plan-row reader matched
+  `^  (write|SKIP)`, and `SKIP` is not in `KIND_MARKS` — it never was. So the skip half of two arms
+  matched NOTHING and reported green by finding nothing, including the arm written to catch exactly
+  that (`the fixture actually HAS an unlandable role, or the SKIP half is vacuous` — it read
+  `len(plan_skips) > 0` on a set the regex could never fill). The vocabulary is now imported from the
+  engine through `govkit_kind_marks()`, the sibling of `govkit_steps()`, for the reason that function
+  already carries.
+- **`cmd_apply` announced every skip twice** — upstream's `SKIPPED` line and this branch's
+  `not landed`. Only the print was duplicated; the loop also appends the schema-2 receipt rows, so
+  deleting it would have taken the rows with it. The print went, the rows stayed, and a new arm
+  asserts the destination is named ONCE rather than once per classifier.
+- **One arm passed or failed on fixture order.** The merged-role refusal ran `apply` twice against a
+  target that had already had a full default apply, so it could refuse for the pre-existing-kits
+  reason instead of the merged-region one. Fresh target per kit; `plan` still shares the old one
+  because it writes nothing.
+
+**The un-covered `project-owned` row lost its integration arm and gained a better one.** No entry on
+this tree has such a row — codebase-map's is covered by a sibling seed — which is why the old arm had
+to borrow the playbook's role and died when that role was corrected. It is now pinned on
+`derive_rule_kind` directly, in both directions plus a not-one-answer-twice arm, so an entry edit
+cannot silently redefine it again.
+
+## Still red — one arm, and it is a real gap rather than a merge artefact
+
+`apply over the DEFAULT selection ran` asserts `returncode == 0`. It fails, and NOT for any of the
+reasons the blocker was filed for. Its six problems are all this branch's own unit-5 OBSERVE checks
+firing against a fixture that predates them:
+
+- two adopters exit 1 in the fixture (`memory-tree` classified `seed-and-stop`; `memory-recall`
+  **unclassified, because the `[[outcome]]` evaluator does not exist** — already named unbuilt above)
+- four `rendered` destinations are absent after their adopter ran, which OBSERVE correctly reports
+
+Upstream's arm passed because upstream's `apply` had no CONFIGURE/OBSERVE verification to fail: it
+asserted an exit code over a fixture never built to let adopters succeed. The arm is right to exist
+and the fixture is what is missing.
+
+**Not weakened to green.** Rewriting it to accept the current problem set would assert whatever the
+code does, which is the same move refused when the blocker was filed. It needs the `[[outcome]]`
+evaluator plus a fixture whose adopters can run — real scope, carrying forward.
+
+The seven pin lines that look like failures in the same output are `r.note`, not `r.fail`, and never
+counted toward the exit code. Recorded because they read like the cause and are not.
