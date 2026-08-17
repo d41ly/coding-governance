@@ -1,15 +1,16 @@
 # Governance domain rules — lifecycle, runtime, cross-OS, architecture, security, recurring bugs & design system
 
-<!-- governance-template: v2.7 -->
+<!-- governance-template: v2.10 -->
 
 Companion to `parallel-coding-governance.template.md`, holding nine activity-scoped domain sections
 the template references by section number rather than inlining (they apply only when a unit touches a
 risky surface, runs a Tier-2 review, or runs with no human in the loop). Deploy this file alongside
 the playbook and re-pull it in lockstep — the marker above must read the same version as the
 template's. Numbering is one-to-one: companion §N extends template §N, and the template's §1, §4 and
-§7–§13 stubs each point at exactly one section here. Four are droppable-per-project (§4, §9, §11 and
-§13, per the customize companion) and §1's unattended block is a fifth, line-scoped one; §7, §8, §10
-and §12 are universal core.
+§7–§13 stubs each point at exactly one section here. Five are droppable-per-project, in two SHAPES
+(per the customize companion): §11 and §13 drop WHOLE, while §4, §9 and §1's unattended block are
+LINE-SCOPED — §4 loses its harness lines and §9 its outbound-call / stored-HTML lines, and the rest
+of each section stays. §7, §8, §10 and §12 are universal core.
 
 ## §1 — Work-unit lifecycle: the manifest merge exception, and unattended runs
 
@@ -84,7 +85,9 @@ matched its target population.
 - Never cache a degraded/failed response (rate-limit, 5xx, flag-off blip) as the permanent answer — mark degraded ≠ genuinely empty and skip caching it, or one transient failure suppresses the feature all session.
 - Stale async response race: guard success-path state writes with a request-identity check and abort superseded in-flight requests, or a late response clobbers fresher results.
 - Blocking/synchronous work on a hot path or event loop (I/O, DNS, heavy transforms) — find it and off-load it.
-- A parallel test runner can deadlock in its OWN distribution/IPC layer after a worker crash — a mode no per-test timeout can reach (it only arms while a test executes). Any `-n auto` suite needs a per-test timeout AND fail-fast on worker death (`--max-worker-restart=0`) AND a pre-kill stack dump (`faulthandler_timeout` below the per-test bound); on Windows a "worker crashed" is your own timeout's `os._exit` until proven otherwise, and a session budget only reds a slow-but-COMPLETING run — it bounds no hang.
+- A parallel test runner can deadlock in its OWN distribution/IPC layer after a worker crash — a mode no per-test timeout can reach (it only arms while a test executes). Any `-n auto` suite needs a per-test timeout AND fail-fast on worker death (`--max-worker-restart=0`) AND a pre-kill stack dump (`faulthandler_timeout` below the per-test bound); on Windows a "worker crashed" is your own timeout's `os._exit` until proven otherwise, and a session budget only reds a slow-but-COMPLETING run — it bounds no hang. The
+  `pytest-parallel-guardrails/` kit ships this as a four-knob ini recipe plus a worker-death
+  attribution plugin, so the failure names the test that caused it.
 - A helper THREAD posting a result to a per-test event loop that already closed must not die trying (the aiosqlite class: a double `call_soon_threadsafe` raise escapes the worker loop, the thread dies, every later op on that connection hangs forever) — loop-side drains cannot win the race, so guard the post at the seam (drop the undeliverable delivery, keep the thread alive) and gate it with a test that FORCES the race deterministically.
 - Verify the COMPUTED value, never the declaration: styling/config declarations can silently resolve to nothing (conflicting caps, percentage sizes against indefinite bases, no-op utility values) — measure the rendered result.
 - Scale-to-fit frames measure their container SYNCHRONOUSLY at first commit (layout-effect/callback ref), never defaulting until a resize observer fires (unreliable in throttled/preview contexts); a CSS max-width cap fights the scale model (double-shrinks) — rely on the container's overflow clip, verify rendered width ≤ container at a narrow viewport.
@@ -119,6 +122,13 @@ matched its target population.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
 - Gate the layout conventions you can (naming, layer boundaries); the "where things live" map lives in the always-loaded doc (§6) so every feature has an obvious home.
+*The five naming bullets below are kit-conditional — drop them if the project does not adopt the lexicon kit, the same way §1's unattended block is dropped. The rest of §12 is universal core.*
+
+- **Naming is one of those conventions, and it is gateable.** Declare it in `{{LEXICON_CONF}}`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and forbidden import DIRECTIONS between layers (the machine-checkable form of "one shared core, thin adapters" above). A repo that declares none of these has a naming convention it asks people to remember.
+- The verb table's value is NOT spelling — it is scoping. "Which verb is this?" is answerable only when a function does ONE thing, so a name that will not fit the table is reporting an unclear responsibility or a seam in the wrong place. If the reflex on a refusal is to add a verb, the table has become a synonym list and is buying nothing.
+- Write the NEGATIVE definitions or do not bother: `build` not `create`, `load` not `fetch`, `remove` not `delete`, `set` not `update`. A row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
+- DERIVE the initial table from the repo's own corpus, then FREEZE it and mark that a human curated it — a derived table nobody edited is a mirror of the code, which is the one shape a naming gate must not have (§7's rule against a gate whose vocabulary tracks its subject). Measure every offender pin against THIS corpus; a pin copied from a larger tree is either vacuous or permanently red.
+- Declare a COVERAGE MODE per language — a real parser, a regex probe (incomplete by construction, and reported as such on every run), or explicitly dark. An undeclared language must be a named refusal, never a silent skip: a regex that quietly misses what it forgot looks exactly like coverage. An unarmed predicate REDS rather than passing green (§7).
 
 ## §13 — Visual consistency (design system FIRST, before screens)
 

@@ -241,7 +241,7 @@ UNLANDED_REASON = {
 }
 
 
-def expand_rules(root: pathlib.Path, desc: dict) -> list[dict]:
+def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[dict]:
     """Every (rule index, source, destination template, role) the descriptor names, BEFORE precedence.
 
     A `**` include enumerates the tracked files under `home`; everything else is literal. A rule that
@@ -249,24 +249,21 @@ def expand_rules(root: pathlib.Path, desc: dict) -> list[dict]:
     no gov bytes and its destination must still be visible to `plan` and to the receipt.
     """
     home = (desc.get("home") or "").rstrip("/")
-    pool_all: list[str] | None = None
     out: list[dict] = []
     for i, rule in enumerate(desc.get("files", [])):
         role = rule.get("role", "engine")
-        inc = rule.get("include")
-        srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
-        if any(s == "**" for s in srcs):
-            if pool_all is None:
-                pool_all = tracked(root)
-            pool = [f for f in pool_all if home and f.startswith(home + "/")]
-        else:
-            pool = rule_sources(desc, rule)
-        for src in pool:
-            for dest in destinations_for(desc, rule, src):
-                out.append({"rule": i, "src": src, "dest": dest, "role": role})
-        if not pool:
+        # THE SAME POOL `plan` AND the write loop use. This function used to carry its own glob
+        # expansion; another node landed `resolve_rule_pool` for the same reason on the same file,
+        # and two expanders for one question is the class this repo keeps a record about. Theirs is
+        # landed and recorded, so this defers to it — and their pool already excludes a source whose
+        # DESTINATION another rule claims, which is the same protection this function's carve-out
+        # provides and measurably reaches further.
+        for src in resolve_rule_pool(root, desc, rule, ctx, home):
+            for dest, miss in resolve_dests(desc, rule, src, ctx, home):
+                out.append({"rule": i, "src": src, "dest": dest, "role": role, "miss": miss})
+        if not resolve_rule_pool(root, desc, rule, ctx, home):
             for dest in rule_destinations(desc, rule):
-                out.append({"rule": i, "src": None, "dest": dest, "role": role})
+                out.append({"rule": i, "src": None, "dest": dest, "role": role, "miss": []})
     return out
 
 
@@ -288,7 +285,7 @@ def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
     Returns writes (resolved destination -> row), unlanded rows with their reasons, the carved source
     set, and the census of destinations whose winner is not the first rule that matched them.
     """
-    rows = expand_rules(root, desc)
+    rows = expand_rules(root, desc, ctx)
 
     carve_at: dict[str, int] = {}
     for r in rows:
@@ -302,7 +299,7 @@ def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
     unlanded: list[dict] = []
     missing: list[str] = []
     for r in survivors:
-        dest, miss = resolve_tokens(r["dest"], ctx)
+        dest, miss = r["dest"], r.get("miss", [])
         row = dict(r, dest=dest, missing=miss)
         missing += miss
         if r["role"] in LANDABLE_ROLES:
@@ -1536,6 +1533,87 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
         if ok:
             return oc.get("means")
     return None
+
+
+def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> list[tuple[str, list[str]]]:
+    """Where one source lands under a rule, as `(destination, unresolved-answer-keys)` pairs.
+
+    ONE spelling, called by `plan`, by the write loop, and by the wildcard exclusion — each has to
+    ask the same question the writer will answer, and two computations of one thing is the class this
+    repo keeps a record about.
+
+    THE `missing` LIST IS RETURNED, not dropped. An earlier cut called `resolve_tokens(...)[0]` and
+    discarded it, so `apply --kits kickoff-manifest` with no `manifest_path` answer wrote a file
+    named literally `{manifest_path}` and exited 0, while `plan` exited 1 refusing the same install.
+    A destination with an unresolved token is not a destination.
+
+    An explicit `to` WINS for every role. Defaulting engine files to the kit-relative form regardless
+    is how a flat entry — one with no kit directory at all — silently lands under a directory it does
+    not have. The default applies only where the rule declared no destination.
+    """
+    if rule.get("to"):
+        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)
+                for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
+    rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
+        pathlib.PurePosixPath(src).name
+    return [(f"{ctx['kit']}/{rel}", [])]
+
+
+def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str) -> list[str]:
+    """The source paths a rule actually lands. ONE spelling for `plan` AND `apply`.
+
+    THIS SEAM EXISTS BECAUSE THE TWO DISAGREED. `plan` resolved sources through `rule_sources()`,
+    which skips any include containing a glob character — so a `**` rule produced ZERO plan rows
+    while `apply` pooled every tracked file under `home`. Measured on the lexicon kit: plan printed
+    3 writes, apply landed 12. Ten of this repo's nineteen descriptors carry a `**` engine rule, so
+    an operator approving a plan was approving a fraction of what would be written — and the files
+    that went unlisted are exactly the ones a re-apply overwrites.
+
+    A deployer whose preview disagrees with its action is worse than one that simply does the wrong
+    thing, because the wrong thing is at least visible.
+    """
+    inc = rule.get("include")
+    srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+    if any(s == "**" for s in srcs):
+        claimed = scan_claimed_paths(desc, rule, ctx, home)
+        return [f for f in tracked(root)
+                if home and f.startswith(home + "/")
+                and not ({d for d, _m in resolve_dests(desc, rule, f, ctx, home)} & claimed)]
+    return rule_sources(desc, rule)
+
+
+def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) -> set[str]:
+    """Every DESTINATION some other rule in this descriptor already owns.
+
+    A `**` include means "everything not otherwise claimed" — which is how every descriptor author
+    has read it, and what the engine did NOT implement. It pooled every tracked file under `home` and
+    wrote each one unconditionally, so a rule declared LATER never got the chance to protect its own
+    file. Measured against `drift-audit`: an adopter's edit to the `project-owned` `drift_signals.py`
+    was destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
+
+    CLAIMED BY DESTINATION, NOT BY SOURCE, and the distinction was measured rather than reasoned.
+    Excluding claimed SOURCES too is the obvious first cut and it UNDER-LANDS: `drift_signals.template.py`
+    is the seed rule's source, its `**` destination is `{kit}/drift_signals.template.py`, and nothing
+    else claims that path — so a source-based exclusion silently stopped shipping the adopter the
+    template their own re-seed depends on. Measured: 8 files landed before, 6 after, and the two
+    missing were not the two being protected.
+
+    A destination claim covers both real cases. `project-owned` names `drift_signals.py`, which
+    resolves to `{kit}/drift_signals.py` — the path it owns and, being non-landable, could not
+    otherwise defend. `seed` names a different source but lands ON that same path, so its "copied
+    ONCE, then the target owns it" guard is protected by the same test.
+    """
+    claimed: set[str] = set()
+    for other in desc.get("files", []):
+        if other is wildcard_rule:
+            continue
+        inc = other.get("include")
+        srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
+        if any(s == "**" for s in srcs):
+            continue  # two wildcards claim nothing FROM each other; neither is more specific
+        for s in rule_sources(desc, other):
+            claimed.update(d for d, _m in resolve_dests(desc, other, s, ctx, home))
+    return claimed
 
 
 def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:

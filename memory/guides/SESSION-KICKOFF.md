@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T01:30:00+03:00 @ 0f0a121da2d18d1e2b995aa0f60b74f6794a94f2
+last-audit: 2026-08-17T04:00:00+03:00 @ 401416faebff58c4527abef9f1a4ae80d244c4f2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e99de5b6c3fa257277490eb19dcd05b4a137b855
+last-body-change: 0f8b21fb9a134cf4d538efa49eb4b4291da66a2a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -61,7 +61,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | the three `parallel-coding-governance.*` files · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker lockstep, TWO carriers) |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
@@ -118,9 +118,10 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
 
-- The template is under a STRICT 32 KiB gate. Never raise it; externalize into
-  `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
-  `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
+  recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
+  spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
+  margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
@@ -145,7 +146,8 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
 - Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
   assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
-  signal — which is pinned at 0 of 53 with ZERO slack, so an uncited leg reds immediately.
+  signal — pinned at 0 with ZERO slack, so an uncited leg reds immediately. Read the leg count
+  from `drift_report.py --check`, never from here: this line has now been wrong twice.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
@@ -171,6 +173,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
+- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
+  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
+  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
+  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.

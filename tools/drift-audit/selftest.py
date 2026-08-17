@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.2
+gov:kit drift-audit@1.4
 
     python drift-audit/selftest.py
 
@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -576,6 +577,108 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
 
 
 # ---------------------------------------------------------------------------------------------
+# 3b — the two LEXICON signals: NOT ASKED without the kit, and falsifiable with it
+# ---------------------------------------------------------------------------------------------
+
+
+def test_no_signal_hardcodes_live(tmp: pathlib.Path) -> None:
+    """No signal may return a LITERAL `live: True`.
+
+    `live` is the field that makes DEAD PROBE possible — the kit's central claim is that a metric
+    which cannot move is worse than none, and `live` is how a probe admits it cannot. A literal True
+    asserts the opposite by construction: it says "this probe can move" without consulting anything,
+    which is the armed-but-unreachable-rule class landing on the very field that exists to refuse it.
+    One signal shipped that way and reported a permanent, reassuring, GATEABLE zero.
+
+    Grep-able and shrink-only, deliberately. It cannot tell a well-derived `live` from a badly
+    derived one — only that SOMETHING was consulted — which is a smaller claim than it looks and is
+    stated here rather than implied.
+    """
+    print("no signal hardcodes live:True")
+    src = (KIT / "drift_report.py").read_text(encoding="utf-8")
+    hits = [f"{i}: {l.strip()}" for i, l in enumerate(src.splitlines(), 1)
+            if '"live": True' in l and not l.lstrip().startswith("#")]
+    check("no signal returns a literal live:True", not hits, "; ".join(hits))
+
+
+def test_lexicon_signals(tmp: pathlib.Path) -> None:
+    """These are the only two signals in this shipped engine that name an OPTIONAL kit, so the
+    absent-conf case is the load-bearing arm: an adopter who never took the lexicon must inherit
+    `gateable: False` — not a clean 0, which would read as "asked and fine", and not a red."""
+    print("lexicon signals (not-asked without the kit; falsifiable with it)")
+    r = make_repo(tmp / "lexsig")
+
+    base = report(r)
+    for name in ("lexicon_verbs_declared_but_unused", "lexicon_ratified_older_than_language_surface"):
+        s = base[name]
+        check(f"no .lexicon.conf: {name} is NOT ASKED, not a clean zero",
+              s["gateable"] is False and s["value"] == 0, f"{s}")
+        check(f"no .lexicon.conf: {name} says why", "not adopted" in str(s["detail"]),
+              f"{s['detail']}")
+
+    # Adopt the kit INTO the fixture: the engine reaches it by `sys.path`, so the reader has to be
+    # present exactly where an installed kit puts it.
+    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
+    shutil.copytree(kit_src, r / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    src = r / "src" / "thing.py"
+    src.write_text("def build_thing():\n    pass\n", encoding="utf-8", newline="\n")
+    conf = r / ".lexicon.conf"
+    conf.write_text(
+        'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
+
+    clean = report(r)["lexicon_verbs_declared_but_unused"]
+    check("clean fixture: every declared verb is used, so the signal is silent",
+          clean["value"] == 0 and clean["gateable"] is True, f"{clean}")
+    check("clean fixture: ...and LIVE over a non-empty population", clean["live"] is True, f"{clean}")
+
+    # VIOLATE: declare a verb nothing is called. This is the OUTLIVING direction — the half no other
+    # mechanism here can see.
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        "VERBS:\n  build  make a thing\n", "VERBS:\n  build  make a thing\n  vanish  used by nothing\n"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "declare an unused verb", "--no-verify"], r)
+    fired = report(r)["lexicon_verbs_declared_but_unused"]
+    check("violated: a declared-but-unused verb fires the signal", fired["value"] == 1, f"{fired}")
+    check("violated: it names the verb", "vanish" in str(fired["detail"]), f"{fired['detail']}")
+
+    # THE LANGS LOOKUP, ARMED DIRECTLY. The first version of this arm rolled the stamp back AND
+    # widened LANGS in ONE commit, so it fired off the stamp alone and would have stayed green with
+    # the widening deleted — which is exactly how a `-S` pickaxe shipped here. `-S` counts
+    # OCCURRENCES of the string, and `LANGS=` appears once before and once after an in-place
+    # widening, so the lookup froze at the adoption commit forever while reporting a confident 0.
+    # Asserting the COMMIT the lookup found is what makes the two implementations distinguishable;
+    # a DATE cannot, because a same-day fixture gives both the same answer.
+    before = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser js:js-regex:probe"'),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "widen the language surface IN PLACE", "--no-verify"], r)
+    after = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    check("the LANGS lookup SEES an in-place widening (a -S pickaxe cannot)",
+          bool(after) and after != before, f"before={before} after={after}")
+
+    # ...and only THEN the end-to-end arm, on a stamp that predates it.
+    conf.write_text(conf.read_text(encoding="utf-8").replace('ratified="2999-01-01 node t"',
+                                                             'ratified="1999-01-01 node t"'),
+                    encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "roll the stamp back", "--no-verify"], r)
+    stale = report(r)["lexicon_ratified_older_than_language_surface"]
+    check("violated: a language surface widened after ratification fires the staleness signal",
+          stale["value"] == 1, f"{stale}")
+    check("...and the signal is LIVE by derivation, not a hardcoded True",
+          stale["live"] is True, f"{stale}")
+
+
+# ---------------------------------------------------------------------------------------------
 # 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (three directions)
 # ---------------------------------------------------------------------------------------------
 
@@ -783,6 +886,8 @@ def main() -> int:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
+        test_lexicon_signals(tmp)
+        test_no_signal_hardcodes_live(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
     print()

@@ -1,0 +1,7 @@
+# lexicon layer waivers — deliberate exceptions to predicate P3.
+# One MATCHED TEXT per row, reason after whitespace. SHRINK-ONLY: the count may fall, never rise.
+#
+# Keyed on the matched TEXT, not on <path>:<line>. install-prefix-waivers.txt keys on position, and
+# any edit ABOVE a waived line unpins it — that reds a merge which touched nothing the waiver
+# guards, and it was hit on that gate's first real merge. A waiver whose text is gone reds as STALE,
+# so this file cannot quietly outlive what it excuses.

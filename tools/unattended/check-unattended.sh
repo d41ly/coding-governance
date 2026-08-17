@@ -7,14 +7,15 @@
 # Exit 0 + no output = clean. Anything printed is a violation. Exit 2 = misconfigured.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
-# nothing: the run-state file's generated region is COMPARED against the build README's slice, whose
-# freshness the memory-tree gate's check 9 already owns. Two legs answering one question is the class
-# the file under test exists to remove.
+# nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
+# from the build README at read time and lives in no second place. The README's own freshness is the
+# memory-tree gate's check 9. Two legs answering one question is the class the file under test exists
+# to remove — and a copy that has to be refreshed is that class wearing a different hat.
 #
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.4   # gov:kit unattended@1.4 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.5   # gov:kit unattended@1.5 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -242,15 +243,21 @@ while IFS= read -r f; do
     esac
   fi
 
-  # ---- 8: the generated region is a COPY. If it drifts from its source the file is answering a
-  # ---- question the README already answers, differently — the whole class this build removes.
+  # ---- 8: the generated region holds NO COPY of the unit list. It is DERIVED from the build README
+  # ---- on every read, so there is nothing here to keep fresh.
+  #
+  # This check used to assert the opposite — that the region EQUALS the README slice — and the
+  # equality was unmaintainable in the ordinary case: a spec rev bump moves the build index, and the
+  # region's only writer was `--preflight`, which refuses once a run is live. The refusal told the
+  # reader to "re-run the driver", naming a path no verb walks. Asserting EMPTINESS is the same
+  # invariant with the copy removed: one fact, one home, and nothing to go stale between reads.
   rd=${f%/RUN.md}/README.md
-  if [ -f "$rd" ]; then
+  case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
+  if [ -n "$rd" ] && [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
-      fail 8 "a run-state file's generated markers are malformed, so the copy cannot be compared with its source: $f"
-    b=$(region "$rd" '<!-- gen:build-index -->' '<!-- /gen:build-index -->' 2>/dev/null) || \
-      fail 8 "a build README's generated markers are malformed, so the copy has no source to be compared with: $rd"
-    [ "$a" = "$b" ] || fail 8 "a run-state file's generated region differs from the build README slice it is a COPY of; re-run the driver rather than hand-editing it: $f"
+      fail 8 "a run-state file's generated markers are malformed: $f"
+    [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
+      fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
   fi
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move

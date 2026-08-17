@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Fixture self-test for unattended.sh — every refusal branch armed by a POSITIVE assertion naming
 # its own failure text (which is what check-arms.py reads), plus the behavioural arms no message
-# test can cover: that a refusal writes NOTHING, that the generated region is a COPY rather than a
-# re-derivation, and that --status and --resume agree.
+# test can cover: that a refusal writes NOTHING, that the generated region holds NO copy (the unit
+# list is derived from the build README), and that --status and --resume agree.
 #
 #   bash tools/unattended/unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
@@ -442,7 +442,7 @@ git push -q -f origin "$BASE":main
 # ---- pair upstream is a refusal rather than something to guess around.
 reset_tree; sed -i '/<!-- \/gen:build-index -->/d' memory/builds/tRun/README.md; fixture; before=$(sum)
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the build README's generated markers are malformed, and the region is COPIED from there, so an unpaired marker is not something to guess around"
+hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
 same "check 9.1 wrote nothing" "$(sum)" "$before"
 
 reset_tree; sed -i '/<!-- \/run:generated -->/d' memory/builds/tRun/RUN.md; fixture
@@ -459,11 +459,15 @@ hit "$out" "cannot record a run fact — the file carries neither that key's lin
 reset_tree
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "preflight OK"
-# the region is a COPY: byte-identical to the README's slice, not a re-render of the same data
+# The region holds NO COPY. It used to be byte-identical to the README's slice, and that equality
+# was unmaintainable in the ordinary case: a spec rev bump moves the build index and preflight — the
+# only writer — refuses once a run is live. The unit list is DERIVED at read time instead, so the
+# region is empty and there is nothing here to keep fresh.
 slice() { awk -v o="$2" -v c="$3" 'index($0,o)==1{i=1;next} index($0,c)==1{i=0;next} i' "$1"; }
-same "the generated region is a byte copy of the README slice" \
-  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | git hash-object --stdin)" \
-  "$(slice memory/builds/tRun/README.md '<!-- gen:build-index -->' '<!-- /gen:build-index -->' | git hash-object --stdin)"
+same "the generated region holds no copy of the unit list" \
+  "$(slice memory/builds/tRun/RUN.md '<!-- run:generated -->' '<!-- /run:generated -->' | tr -d '[:space:]')" ""
+# ...and --status DERIVES the unit from the README rather than from the file it just wrote.
+hit "$(run --status tRun)" "tRun"
 same "the recorded BASE is the merge-base" \
   "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)" "$BASE"
 same "the keepalive id is recorded verbatim" \
@@ -758,7 +762,14 @@ groot=$(git -C "$gtmp" rev-parse main); gz=$(git -C "$gtmp" rev-parse side)
 mkdir -p "$gtmp/.git/info"
 printf '%s %s
 ' "$groot" "$gz" > "$gtmp/.git/info/grafts"
-same "graft-control: the graft gives two unrelated histories a merge-base"      "$(git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
+# `env -u GIT_GRAFT_FILE`, and the -u is load-bearing. This arm's meaning is "a graft is
+# effective BY DEFAULT", so it must control the one variable that decides that rather than
+# inherit it. The driver `export`s GIT_GRAFT_FILE=/dev/null as deliberate hardening, and that
+# export reaches every child — so when `--close` ran the merge bar, which runs this selftest,
+# the control got an empty merge-base and the leg redded. The gate could not pass in a state
+# that was entirely legitimate: a branch touching tools/unattended/ un-skips this leg, and
+# --close is exactly where it then runs.
+same "graft-control: the graft gives two unrelated histories a merge-base"      "$(env -u GIT_GRAFT_FILE git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
 same "graft-arm: GIT_GRAFT_FILE suppresses it, which is what the driver exports"      "$(GIT_GRAFT_FILE=/dev/null git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" ""
 rm -rf "$gtmp"
 
@@ -835,6 +846,16 @@ out=$(run --landed tRun)
 hit "$out" "phase LANDED"
 same "--landed wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDED"
 same "--landed witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
+# THE ROSTER IS FROZEN AT LANDING. The unit list is derived from a MUTABLE README while a run is
+# live, which is right — but a finished record must still answer which units it covered, and a later
+# build touching that README would otherwise change a landed run's answer retroactively.
+same "--landed froze the roster into the record" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+# ...and it survives the README moving underneath it, which is the whole point.
+printf '%s\n' '| [ARCH-tRun-2 — a unit added later](spec/two.md) | OPEN | rev-1 | 2026-08-02 |' >> memory/builds/tRun/README.md
+same "the frozen roster does not follow a later README edit" \
+  "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+git checkout -q -- memory/builds/tRun/README.md 2>/dev/null || true
 n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main

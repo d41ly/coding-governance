@@ -1,6 +1,6 @@
 # TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time
 
-**Status:** SPECCED · rev-6 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
+**Status:** CLOSED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -27,13 +27,41 @@ constant change is exactly when an unproven gate is most likely to be silently w
   | A3 | a missing path | exit 2 |
   | A4 | a file at `MAX_BYTES` bytes with every LF turned into CRLF | exit 0 |
   | A5 | `MAX_BYTES` set in the environment | the override is honoured, both directions |
-  | A6 | a file of `H`+1 bytes, `H` = the recorded high-water | exit 0 **and** the warn line, naming `H`, the size and the delta |
-  | A7 | a file of exactly `H` bytes | exit 0 and **no** warn line |
-  | A8 | `--bump` on an over-high-water file | the record is rewritten to the measured size and the delta reported |
+  | A6 | a file of `H`+1 bytes, `H` = the value on the record's row **keyed by that subject file** | exit 0 **and** the warn line, naming `H`, the size and the delta |
+  | A7 | a file of exactly `H` bytes, same keying | exit 0 and **no** warn line |
+  | A8 | `--bump` on an over-high-water file | **that subject's row** is rewritten to the measured size and the delta reported |
+  | A9 | `--bump` on one subject, with a second subject's row present | the second row is **byte-identical** afterwards |
+  | A10 | the high-water record absent | exit 0, no ratchet, and **one explicit line saying the record is absent** — never silence, never a `set -u` failure |
+  | A11 | the high-water record present but non-numeric for the subject | a NAMED failure, not a shell error |
+  | A12 | a repo-internal subject, after `--bump` | the row's KEY is the literal repo-relative path, compared against a hand-written string — never against the gate's own derivation |
 
-  A6-A8 arm `TOOL-aSiftedPlaybook-1` S8's high-water ratchet. A6 and A7 together are what prove the
+  A6-A9 arm `TOOL-aSiftedPlaybook-1` S8's high-water ratchet. A6 and A7 together are what prove the
   ratchet is ADVISORY: A6 alone passes if the warn were accidentally built as a second blocker (it
   would exit 1 and the arm would still see the line), and A7 alone passes if the warn never fires.
+
+  **A9 is the arm that proves the KEYING, and it is not optional.** S8 requires one `<path>\t<bytes>`
+  row per measured subject precisely because this gate has two consumers: `skills/session-kickoff/SKILL.md`
+  measures 18215 against a template of 32682, so a single shared value can never warn for the
+  kickoff leg, and a `--bump` on that leg's argv would rewrite the shared value and make the
+  template leg warn on every run forever. A6-A8 are all satisfiable by the single un-keyed number
+  S8 forbids; only A9 distinguishes them.
+
+  **A12 exists because the round-trip cannot fail.** `--bump` WRITES the key and the ratchet READS
+  it back through the same derivation, so bump-then-check is green whatever the key is — the
+  `assertion-between-two-derived-values` class, where the population is fine and the comparison is
+  decided before any data is read. Not hypothetical: building `TOOL-aSiftedPlaybook-1` shipped keys
+  as machine-ABSOLUTE paths, because `git rev-parse --show-toplevel` answers a drive-letter form
+  while `pwd` answers the POSIX form and the prefix strip therefore never matched. Every run of
+  the gate stayed green over a TRACKED record that would have differed per machine and per
+  worktree, and it was caught by opening the file. A12 therefore compares against a hand-written
+  expected string; an arm that asks the gate what the key should be re-derives the bug.
+
+  **A10 and A11 arm S8's degenerate-case contract**, which S8 states and hands to this unit by name.
+  They are not covered by A3: A3 is a missing TEMPLATE (the gate's `file not found` branch at
+  `tools/check-template-size.sh:22`, exit 2), not a missing RECORD. `set -u` is live at
+  `tools/check-template-size.sh:11` and the numeric comparison at `:28` is `[ "$bytes" -gt "$MAX_BYTES" ]`,
+  so an empty operand is a shell error on a leg the bar runs twice — the failure mode the contract
+  exists to forbid and the one nothing observed until round 4.
 
   **How A6-A8 learn `H`** — the question that made the original threshold arms unbuildable. They
   **read the high-water record through the path override `TOOL-aSiftedPlaybook-1` S8 specifies**
@@ -129,6 +157,7 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 | File | Change |
 |---|---|
 | `tools/check-template-size.test.sh` | new |
+| `tools/govkit/registry.toml` | the harness above DECLARED. **Mandatory and measured** on this branch's post-merge tree, where the kit exists — it post-dates `base 91ef1b05` and arrived at `a4caea9`: in a scratch clone of `f43a48c`, `python tools/govkit/govkit.py selfcheck` exits 0 with `0 unclaimed`, and exits 1 the moment `tools/check-template-size.test.sh` is staged — "neither an entry member nor an exemption". Exemptions are exact-path (`tools/govkit/govkit.py:501-519`), so the sibling gate's own `[[exempt]]` row at `registry.toml:150` does NOT cover it; the `run-gates.sh` / `.test.sh` / `.evidence.test.sh` trio at `:134`/`:142`/`:146` is the precedent that each path needs its own row |
 | `tools/check-template-size.sh` | S6's `fail()` refactor — F1 is RESOLVED, this is unconditional |
 | `tools/gate-legs.json` | one leg entry |
 | `AGENTS.md` | one gate-suite bullet |
@@ -184,10 +213,30 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
   `bash tools/run-gates.sh` green, because nothing else reads `.memory-tree.conf`.
 - **AC8** — When the warn comparison in `tools/check-template-size.sh` is inverted by hand,
   `bash tools/check-template-size.test.sh` reds naming A6 or A7;
-  when the high-water record's path resolution is broken, A8 reds. The three ratchet arms were the
-  only ones in this unit with no proof they can fail, inside the unit whose §1 quotes "a gate you
-  have only ever seen pass is an assertion about nothing" — AC2's inversion touches the ceiling
-  comparison, not the warn branch.
+  when the high-water record's path resolution is broken, A8 reds; when `--bump` is made to rewrite
+  the whole record instead of the subject's row, **A9** reds; when the absent-record branch is made
+  to fall through silently, **A10** reds; and when the non-numeric branch is made to fall through to
+  the numeric comparison — or to a bare shell error — instead of a named failure, **A11** reds. When the key derivation is changed to emit an absolute path, **A12** reds — and it is the only
+  arm that does, which is the whole reason it is written against a literal rather than a derivation.
+  **The A11 limb is not optional and is the one this criterion was shipped without.** A11 arms the
+  contract "non-numeric high-water → a NAMED failure", and `set -u` is live at
+  `tools/check-template-size.sh:11` with the comparison at `:28`, so a `set -u` explosion also
+  satisfies a bare non-zero-exit assertion: without a mutation criterion a builder writes A11 as
+  exactly that and every AC here stays green. `check-arms.py` cannot backstop it, because S6 reads
+  the `ARMS_FLOORS` values from `--report` AFTER the refactor — a gate built without the branch
+  yields a floor derived from its own omission.
+  This criterion covers A6-A11, **not just the ratchet arms**: A10 and A11 are degenerate-record
+  arms and were inside its reach before this sentence said so. A3 and A5 still carry no mutation
+  criterion, which is a deliberate limit rather than an oversight — they observe the gate's
+  pre-existing branches, not the ones this unit adds. All of this sits inside the unit whose §1
+  quotes "a gate you have only ever seen pass is an assertion about nothing" — AC2's inversion
+  touches the ceiling comparison, not the warn branch.
+- **AC9** — When `python tools/govkit/govkit.py selfcheck` runs, it is green with
+  `tools/check-template-size.test.sh` declared in `tools/govkit/registry.toml`. This unit creates a
+  depth-1 path under `tools/` and the registry asserts that surface, so the declaration and the
+  harness land in the same commit. Reproduced rather than argued, on a scratch clone of `f43a48c` — the leg post-dates `base 91ef1b05`, so this observation is only available post-merge: without the row the leg
+  exits 1, and the leg carries no `guard` in `tools/gate-legs.json`, so it reds on diff-scoped runs
+  as well as at the push boundary — AC4's `bash tools/run-gates.sh` cannot be green without this.
 - **AC6** — When `python tools/codebase-map/test_codebase_map.py` runs, coverage and freshness are
   both green, with the new key claimed in a dossier and NOT in `baseline.toml`.
 
@@ -201,6 +250,11 @@ in `tools/codebase-map/map_lib.py:58` plus the graced `## Reuse affordance`, mod
 - `python tools/memory-tree/check-arms.py` — F1 resolved to the refactor, so this is mandatory. Note
   it CANNOT catch a missing `ARMS_FLOORS` entry: an undeclared floor is skipped, not refused. AC7 is
   what observes the entry.
+- `python tools/govkit/govkit.py selfcheck` — **mandatory, and the one this unit was missing.** S1
+  creates `tools/check-template-size.test.sh`, a depth-1 path under the `tools/*` surface
+  `tools/govkit/registry.toml` asserts; undeclared, the leg exits 1. It carries no `guard` in
+  `tools/gate-legs.json`, so it is not scoped away on a records-only or diff-scoped run. AC9
+  observes it.
 - `bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -245,6 +299,48 @@ none — both forks below are RESOLVED.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-16 · folded the M8 closing review. **H2**: no arm anywhere pinned the 48 KiB
+  ceiling this unit's sibling was convened to raise — A1/A2/A4 derive the fixture size AND the
+  expectation from the gate's own OK line, so mutating the default to 131072 or 40000 left every
+  arm green in both directions. **A0** pins the literal, and is deliberately the only arm that
+  does. **M5**: A10 asserted `TEMPLATE-SIZE no-ratchet`, a prefix SHARED by the record-absent and
+  row-absent branches, so it did not distinguish the branch it named; split into A10/A10b on
+  their unique clauses. **L2**: the ratchet arms matched the marker substring where S2's rows
+  require the line to NAME H, the size and the delta; they now assert the numbers. **M1/M2/M3**
+  are gate defects this unit's harness did not catch and now does — see `TOOL-aSiftedPlaybook-1`.
+- rev-9 · 2026-08-16 · **A12 added by left-shift from the `TOOL-aSiftedPlaybook-1` build pass**, per
+  M8. The recurring-bug-class checklist selected `assertion-between-two-derived-values` over that
+  pass's diff, and it named a real hole: `--bump` writes the record key and the ratchet reads it
+  back through the same derivation, so no arm here could have failed on a wrong key. Unit 1 shipped
+  machine-absolute keys through a green gate on exactly that path. A12 compares the key to a
+  literal, and AC8 gains its mutation. The defect was fixed in unit 1; this is the gate that keeps
+  it fixed.
+- rev-8 · 2026-08-16 · folded round-5 M1 and L1. **M1**: round-4 M1's remedy was two-part per arm
+  and the AC8 half reached A10 and not A11 — while the rev-7 entry below certified both. A11 arms
+  the named-failure contract for a non-numeric record, and a `set -u` explosion satisfies a bare
+  non-zero-exit assertion, so without a mutation criterion the arm is vacuous and every AC stays
+  green; `check-arms.py` cannot backstop it, since S6 derives the floor from the refactored gate
+  itself. AC8 gained the A11 limb and its closing sentence no longer scopes itself to "the ratchet
+  arms", which was already false of A10. **L1**: three carriers said the blocker's reproduction
+  was measured "in a scratch clone of BASE"; `govkit` post-dates `base 91ef1b05` and arrived at
+  `a4caea9`, so the command cannot run there. All three now name `f43a48c`, the tree it was
+  actually measured on — round 4's own text was right and this fold degraded it.
+- rev-7 · 2026-08-16 · folded round-4's **blocker B1**, plus M1 and H3. **B1**: S1 creates
+  `tools/check-template-size.test.sh`, a depth-1 path under the `tools/*` surface
+  `tools/govkit/registry.toml` asserts, and this spec named the registry in no section — no §4 row,
+  no §7 gate line, no AC. Reproduced rather than argued: in a scratch clone of `f43a48c`,
+  `govkit selfcheck` exits 0 with `0 unclaimed` and exits 1 the moment that path is staged, and the
+  leg carries no `guard`, so it reds diff-scoped runs too. Round 3's fold enumerated four new
+  depth-1 paths and there are five; the count in `TOOL-aSiftedPlaybook-1` AC12 that certified
+  otherwise is deleted there. Added the §4 row, the §7 line and **AC9**. **M1**: `TOOL-aSiftedPlaybook-1`
+  S8 ends "Both are armed in `TOOL-aSiftedPlaybook-2` S2" and neither was — A3 is a missing TEMPLATE,
+  not a missing RECORD, and `set -u` is live at the numeric comparison. Added **A10** (absent record)
+  and **A11** (non-numeric). *AC8 was extended to A10 only — round 5 measured this clause as
+  overstated and rev-8 added the A11 limb.* **H3**: A6-A8 read `H` from an un-keyed value while
+  S8 requires one row per measured subject; the arms are now bound to a subject row and **A9** proves
+  a `--bump` on one subject leaves the other byte-identical — the arm round-3 H1 asked for and the
+  only one that distinguishes the keyed record from the single number S8 forbids. (Round 4's fold
+  list named rev-6 as the target; this spec was already at rev-6.)
 - rev-6 · 2026-08-16 · folded round-3 M4, M5 and H3's second half. Three carriers still gated
   RESOLVED forks on conditionals — §4's two rows and §7's `check-arms.py` line, which is the section
   a builder reads to know what must run. AC8 added: A6-A8 were the only arms with no red proof, and

@@ -80,7 +80,8 @@ alongside — both then appear; pick by description.) Skip this step on a machin
    cp <gov>/parallel-coding-governance.domain-rules.md <project>/docs/parallel-coding-governance.domain-rules.md
    # the customize companion is deploy-time only — read it, don't ship it
    ```
-   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit — §2a.)
+   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit —
+   see its own install step below, §3c.)
    **Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
    fallback and the upstream-re-pull mechanism both read it.
 2. Fill every `{{PLACEHOLDER}}` per **`<gov>/parallel-coding-governance.customize.md`** (the deploy-time
@@ -97,7 +98,7 @@ alongside — both then appear; pick by description.) Skip this step on a machin
 3. The customize companion lists the conditional sections to delete when they don't apply; apply that.
 
 **Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md <project>/docs/parallel-coding-governance.domain-rules.md`
-prints nothing. BOTH files — the companion carries 13 of the 36 placeholders, and a template-only grep
+prints nothing. BOTH files — the companion carries 14 of the 37 placeholders, and a template-only grep
 passes green while the §-stubs point at a file the project never filled. The grep is SHAPE-scoped
 (`\{\{[A-Z]`) rather than a bare `{{`, because a filled `{{GATE_COMMANDS}}` may legitimately contain
 GitHub Actions `${{ }}` expressions; the shipped template contains none, so an unscoped grep is green

@@ -1,15 +1,15 @@
 # Parallel Multi-Node Coding — Governance Template
 
-*Template **v2.7** · 2026-08-11. One line per directive (a wrapped line is still one rule). Deploy +
+*Template **v2.10** · 2026-08-16. One line per directive (a wrapped line is still one rule). Deploy +
 re-pull BOTH files per `parallel-coding-governance.customize.md`; the nine domain checklists (§1, §4,
 §7–§13) live in `parallel-coding-governance.domain-rules.md`, one per template section; history in the
-`…-v-N-N.md` snapshots + git. **v2.7 (2026-08-11):** companion §1's unattended block collapses to a
-pointer at the protocol the kit installs, and §8's second spelling of the §1 landing rule becomes a
-pointer — re-pull §8 and the companion together. **v2.6 (2026-08-10):** §1 and §8 accept a committed
-standing mandate in place of the explicit ask; the kickoff-manifest merge exception moved into the
-new companion §1.*
+`…-v-N-N.md` snapshots + git. **v2.9 (2026-08-16):** §12's layout-convention clause now covers naming
+— a DECLARED verb table and banned type suffixes, gated. **v2.8 (2026-08-16):** the size ceiling
+moves 32→48 KiB with a high-water ratchet replacing it as the forcing function; the default branch
+becomes `{{DEFAULT_BRANCH}}` throughout; §0/§8 state both halves of the agent cap and the hook's real
+matcher; §5/§6/§7 name the five kits that shipped unmentioned.*
 
-<!-- governance-template: v2.7 -->
+<!-- governance-template: v2.10 -->
 
 > **What:** a project-agnostic playbook for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** fill the placeholders per the customize
@@ -18,20 +18,21 @@ new companion §1.*
 ## §0 — TL;DR (the load-bearing rules)
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
-- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
+- **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
-- **Never run more than 5 agents concurrently** — consolidate before you fan out; a wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook).
+- **Never more than 5 agents at once, AND never more than 5 per verify stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
 - **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
+- **When no rule below covers it**, decide by these: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
 
 ## §1 — Work-unit lifecycle (start → done → land)
 
 Keep units small: one stream/owner, no cross-stream contract change, reviewable as one Tier-1 diff — else split.
 
 **Definition of Ready — run before touching code:**
-- Sync: `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed (§3).
+- Sync: `fetch` + fast-forward local `{{DEFAULT_BRANCH}}` (another node may be ahead); recreate/repair your worktree if needed (§3).
 - Locate: read your stream's decision log + backlog (§6) and the derived work-state index (§5); confirm your node tag (§2).
 - Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
 - Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and open the unit's record (§6).
@@ -48,7 +49,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
-- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask, or a committed build plan whose shape your merge bar validates (companion §1, §8).
+- Land on local `{{DEFAULT_BRANCH}}` first, verify, then push; the merge to shared `{{DEFAULT_BRANCH}}` and the push each need an explicit ask, or a committed build folder whose shape your merge bar validates (companion §1).
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Kickoff-manifest merge exception (its `last-audit` line), and the unattended-run rules → `parallel-coding-governance.domain-rules.md` §1. LOAD when a merge touches the manifest, or before a run with no human in the loop.
@@ -59,7 +60,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
 
-  | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
+  | Tag | Machine/user | Primary tree (`{{DEFAULT_BRANCH}}` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
   | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | `{{VARIANCES_A}}` |
 
@@ -80,13 +81,13 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §3 — Parallel work: streams, worktrees, trunk
 
 - Own streams, not files: `{{STREAM_OWNERSHIP}}`. Overlap on shared files (API clients, config, indexes) breeds collisions and integration reviews — minimize it.
-- Trunk-based: merge small and often to LOCAL `main`; long-lived branches mean bigger reconciles and review surface.
-- `main` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `main` on a feature branch strands it and is the root cause of concurrent-session collisions.
-- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `main`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
-- Doc-only commits go directly on local `main` only while the primary tree is on `main` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
-- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
+- Trunk-based: merge small and often to LOCAL `{{DEFAULT_BRANCH}}`; long-lived branches mean bigger reconciles and review surface.
+- `{{DEFAULT_BRANCH}}` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `{{DEFAULT_BRANCH}}` on a feature branch strands it and is the root cause of concurrent-session collisions.
+- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `{{DEFAULT_BRANCH}}`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
+- Doc-only commits go directly on local `{{DEFAULT_BRANCH}}` only while the primary tree is on `{{DEFAULT_BRANCH}}` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
+- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `{{DEFAULT_BRANCH}}` + dependency install.
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
-- Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
+- Commit the governing doc to `{{DEFAULT_BRANCH}}` so it propagates — it only exists in checkouts where it's committed.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
 - Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
@@ -104,12 +105,29 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
-- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **19-check hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+<<<<<<< HEAD
+- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+=======
+- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+>>>>>>> main
 - **Optional — a self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from machine-enumerated inventories; a test-suite ratchet fails on any unclaimed new key AND any claim naming a dead key (the map can't rot into fiction); `map_diff` renders any git range as a feature-level changelog. Zero CI changes — the gate rides the existing suite. Adopt + derive inventories per the kit README.
+- **Optional — a records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of
+  its own state still matches the tree — stale claims, closed specs with no product commit, ids
+  cited from product source while non-terminal, hand-kept inventories disagreeing with what they
+  describe. Stdlib + git, seconds, no agents. Every signal carries a LIVENESS assertion, so a probe
+  that cannot move prints DEAD PROBE rather than a reassuring 0 — a green audit means the checks
+  ran, not merely that nothing was reported. Signals are pinned shrink-only, so drift can only be
+  paid down. Run it when the build 'feels' like it is drifting, before a planning session, or when
+  you want to know whether a green gate still means anything.
 - **Optional — retrieval over that tree** (`memory-recall/` kit, requires it): ask the decision corpus a question and get the records that answer it, ranked; an offline stdlib CLI reading `.memory-tree.conf`, so root + id families are declared once; writes nothing in the worktree; the rendered recall Skill's drift rides `{{GATE_RUNNER}}`.
 
 ## §6 — Decisions, backlogs & the governing doc
 
+- **Wire the governing doc so every tool actually reads it** (`agent-instructions/` kit): agents do
+  not all read the same filename. Writing the filled playbook to `AGENTS.md` alone ships a repo
+  Claude Code cannot read, because it does not read `AGENTS.md` natively; the kit makes one file
+  canonical and the others thin imports of it, so there is one text and no copy to drift. Verify
+  with its `--check` mode rather than by eye — an unwired pair fails silently and looks fine.
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; gaps fine).
 - Per-stream id families (`{{ID_FAMILIES}}`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
@@ -125,7 +143,24 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §7 — Quality gates = the merge bar
 
+- **A parallel test runner needs its own guardrails** (`pytest-parallel-guardrails/` kit, if you run
+  `pytest -n auto`): a four-knob ini recipe bounding the hang modes no per-test timeout can reach, a
+  worker-death ATTRIBUTION plugin (a crashed worker otherwise reports as an anonymous session
+  failure naming no test), and the aiosqlite closed-loop seam patch with a forced-race gate. §10's
+  own bullets already state these bug classes in full; this is the shipped fix for them.
 - Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- **Scan PowerShell for the two classes that break it silently** (`gate-lint/` kit, if the project
+  has `.ps1` files): case-only identifier collisions, because PowerShell variable names are
+  case-INSENSITIVE and `$LEGS`/`$legs` are one variable; and BOM-less scripts containing
+  non-ASCII, which PowerShell 5.1 decodes as CP1252 so an em dash closes a string early and
+  desynchronises the parser. Byte-level, because every text-mode read hides the second. Drop-in,
+  two lines to adopt, no gate legs of its own. A repo with no `.ps1` gets `0 files clean`, which
+  is honest and proves nothing — adopt it only where PowerShell exists.
+- **Deploy the kits as a declared population, not a directory listing** (`govkit/` kit): the set of
+  things installable into a target is a REGISTRY plus a descriptor each, asserted against the
+  tracked surface in both directions — a new moving part reds until a declaration claims it, and an
+  exemption naming a path that no longer exists reds too, because a stale one silently widens the
+  surface it was written to narrow. Its `plan` and `check` verbs are read-only and gated as such.
 - Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
@@ -145,18 +180,18 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 - Tier 1 — mechanical/additive (no new write path, migration, auth/sanitization/egress surface, or shared-contract change): gates + one focused self-review of the diff. NO multi-agent review.
 - Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
-- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
+- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
-- **CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.** A ~40-agent fan trips the SERVER rate limiter and kills whole phases for millions of tokens; the harness auto-cap (≈14) does NOT protect you. Route ALL Workflow fan-out through cap-5 helpers `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …)` — inlined (scripts can't import; the `parallel(`/`pipeline(` line carries a `gov:bounded-fanout` marker). **CONSOLIDATE before you fan out:** at most 5 verify agents TOTAL (batch grows, agent count does not). Enforce mechanically: the `agent-cap.js` PreToolUse hook (matcher `Workflow`) DENIES a raw primitive AND any `agent(` fanned over a receiver it cannot PROVE bounded — so the batching assignment carries a `gov:fixed-verifiers` marker and must spell `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)`, `K` an integer literal ≤5 or an identifier bound to one; an array LITERAL of ≤6 elements (the lens fan) passes unmarked. Run the ready `tools/workflows/tier2-review.js` harness (install per WIRE §5).
+- **CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.** A ~40-agent fan trips the SERVER rate limiter and kills whole phases for millions of tokens; the harness auto-cap (≈14) does NOT protect you. Route ALL Workflow fan-out through cap-5 helpers `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …)` — inlined (scripts can't import; the `parallel(`/`pipeline(` line carries a `gov:bounded-fanout` marker). **CONSOLIDATE before you fan out:** at most 5 verify agents TOTAL (batch grows, agent count does not). Enforce mechanically: the `agent-cap.js` PreToolUse hook (matcher `Workflow|Agent` — the exact pair; `Workflow` alone leaves direct spawns unguarded) DENIES a raw primitive AND any `agent(` fanned over a receiver it cannot PROVE bounded — so the batching assignment carries a `gov:fixed-verifiers` marker and must spell `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)`, `K` an integer literal ≤5 or an identifier bound to one; an array LITERAL of ≤5 elements (the lens fan) passes unmarked. It RESOLVES that bound wherever it is written — call site, helper default parameter, `gov:bounded-fanout` slice width — and denies any `K` it cannot resolve to an integer ≤5. A direct `Agent` spawn carries no script, so it is COUNTED instead: five per user prompt, claimed as atomic slots. That count is the only enforcement reaching a fan-out made outside a `Workflow` script. Run the ready `tools/workflows/tier2-review.js` harness (install per WIRE §5).
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
 - Structured-output schemas for orchestration returns → `parallel-coding-governance.domain-rules.md` §8. LOAD when writing a Workflow script.
-- Orchestration scripts run in sidechains inheriting neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the ≤5 cap is enforced at the `Workflow` tool-call (where a main-loop `PreToolUse` fires), never inside the script where no hook reaches.
+- Orchestration scripts run in sidechains inheriting neither your hooks nor the governing doc, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the ≤5 cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script, where no hook reaches.
 - Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
-- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
+- Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 
@@ -172,7 +207,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 
-- Architectural-consistency rules → `parallel-coding-governance.domain-rules.md` §12 (decide the extension pattern before instance #2 so #3..N are data + overrides; a kind gets a factory/base not copies; one shared core + thin adapters; single-source-of-truth generation with a drift gate; promote shared widgets on a two-tier ladder; forward-compatible additive+defaulted data; reuse-audit before building; gate layout conventions). LOAD when adding a 2nd instance of a kind or building shared structure (§7, §13).
+- Architectural-consistency rules → `parallel-coding-governance.domain-rules.md` §12 (decide the extension pattern before instance #2 so #3..N are data + overrides; a kind gets a factory/base not copies; one shared core + thin adapters; single-source-of-truth generation with a drift gate; promote shared widgets on a two-tier ladder; forward-compatible additive+defaulted data; reuse-audit before building; gate layout conventions, naming included — a DECLARED verb table + banned type suffixes, never a mirror of the code). LOAD when adding a 2nd instance of a kind or building shared structure (§7, §13).
 
 ## §13 — Visual consistency (design system FIRST, before screens)
 
@@ -215,8 +250,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside):
   - `committed <sha> <branch> — <subject>`
-  - `pushed <remote>/main <old>..<new> (ff, N commits)`
-  - `merged --no-ff <branch> → main <sha> · post-merge gates GREEN`
+  - `pushed <remote>/{{DEFAULT_BRANCH}} <old>..<new> (ff, N commits)`
+  - `merged --no-ff <branch> → {{DEFAULT_BRANCH}} <sha> · post-merge gates GREEN`
   - `gates GREEN — <every leg, with tallies>` · `skipped: <leg> — <why>`
   - `up — <service> :<port> (<tree>) · … · admin <user> / <pw-or-where-it-lives>`
   - `READY — <slug> · node <tag> · <branch> off <sha> · Tier-N · gates: <list>`
