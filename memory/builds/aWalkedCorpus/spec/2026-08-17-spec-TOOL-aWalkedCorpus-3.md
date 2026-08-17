@@ -1,6 +1,6 @@
 # TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists
 
-**Status:** OPEN · rev-3 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
+**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -36,13 +36,18 @@ four.
   with an empty hit set", because `expected_by_target` DROPS an unresolvable target
   (`if hits: out[tid] = hits`, `bench.py:360-361`) — the empty hit set never occurs, so rev-2's
   wording named a permanently-green assertion.
-- **S5 — the leg.** A `tools/gate-legs.json` entry running S1, guarded on `tools/memory-recall/`,
-  `memory/` and `.memory-tree.conf` — the three things that can move the number.
+- **S5 — the leg.** A `tools/gate-legs.json` entry running S1, guarded on `tools/memory-recall/`
+  and `memory/`. `.memory-tree.conf` is the third thing that can move the number and is NOT in the
+  guard: govkit's `selfcheck` partitions every guard pathspec into four prefix classes — under
+  `memory/`, under `.githooks/` or `.claude/`, under `skills/session-kickoff/`, or kit-relative — and
+  a repo-root conf falls into none of them, so declaring it reds the bar. The cost is bounded and
+  one-sided: a commit touching ONLY the pin skips this leg on a diff-scoped run, while `GATE_FULL=1`
+  in the pre-push hook bypasses every guard, so the authoritative run still grades it.
 - **S6 — the arms, in a gov-only file.** `tools/memory-recall/test_recall_floor.py`, with its own
   `tools/gate-legs.json` entry beside S5's. It carries one arm per row of §4's degradation table
-  including the two that must fire SINGLY, plus the empty fixture, the all-miss fixture, the absent
-  cell, the absent fixture, the absent/malformed/out-of-vocabulary pin, and the `--audit-fixture`
-  overlap red. **`tools/memory-recall/selftest.py` is NOT touched.** Round-3 F4 measured why: it is
+  including the two that must fire SINGLY, plus the empty fixture, the all-miss fixture, the empty
+  graded set, the absent fixture, the absent/malformed/out-of-vocabulary pin, and the
+  `--audit-fixture` overlap and `hits`-disagreement reds. **`tools/memory-recall/selftest.py` is NOT touched.** Round-3 F4 measured why: it is
   shipped byte-for-byte by the `**` engine rule AND is itself a declared `[[gate_leg]]`, so an arm
   keyed on `TOOL-aWrittenMethod-4` would run on an adopter's bar against a corpus that has no such
   id, over two files S8 deliberately withholds. Arm names lead with `test`, a declared lexicon verb;
@@ -130,18 +135,28 @@ Preconditions, in order, each redding by NAME and stopping — without either, n
    names — so a one-character typo reds HERE naming the key rather than raising `FileNotFoundError`
    inside `bench.load` (round-3, med).
 
+3. **The graded set** — `<set>.jsonl` present under the data dir and NON-EMPTY, or red naming the
+   set and the dir. A floor over an empty document set is satisfied by any corpus.
+
 Predicates. Each is evaluated, each prints its own `ok` / `RED` line, and the process exits non-zero
 if ANY of them failed. Reporting order is fixed so the leading message is determinate:
 
-3. **Per-id resolution (S4)** — the set difference above, redding with every unresolved id named. It
+4. **Per-id resolution (S4)** — the set difference above, redding with every unresolved id named. It
    REPORTS FIRST so a retired record is reported as a retired record, and it does not stop the run.
-4. **The cell** — `<metric>@<k>` present for the pinned set and substrate, or RED naming the cell as
-   unmeasured.
-5. **The floor** — `r@k / ceiling` against the pin. **When `ceiling` is 0, or step 4 found no cell,
-   the floor prints `not evaluated` and is not a red of its own.** That is an explicit rule, not a
-   side effect of stopping early: it is what keeps the normalisation free of a 0/0 branch now that
-   step 3 no longer halts the run. An all-miss fixture therefore exits non-zero on step 3 with the
-   floor reported as not evaluated, which is AC5.
+5. **The floor** — `r@k / ceiling` against the pin. **When `ceiling` is 0 the floor prints
+   `not evaluated` and is not a red of its own.** That is an explicit rule, not a side effect of
+   stopping early: it is what keeps the normalisation free of a 0/0 branch now that step 4 no longer
+   halts the run. An all-miss fixture therefore exits non-zero on step 4 with the floor reported as
+   not evaluated, which is AC5.
+
+**Step 3 replaced a branch that could not fail, and the BUILD found that, not a review.** Rev-3 wrote
+it as a predicate asking whether the pinned `<metric>@<k>` appeared in the report. Measured while
+implementing: `bench.score()` emits `r@k` and `f@k` for whatever `k` it is handed, and step 2's
+grammar admits only those two metrics — so the branch was green for every pin it could ever see. That
+is `memory/gotchas/fixture-passes-by-finding-nothing.md` shipped inside the gate written to close it,
+and it survived two adversarial spec reviews because a spec cannot be executed. The reachable state
+is an absent or empty document set, which a `--data-dir` arm can produce and which `spine` — zero
+docs in this repo today — produces live.
 
 `--audit-fixture` is a separate mode over the same loaded corpus. Per question it prints the measured
 `homes`, the measured `hits`, and the content-term overlap defined below; it reds when any overlap
@@ -385,6 +400,9 @@ program never reached.
   pin reading `record:fts5:r@5>=0.81` reds here rather than raising inside `bench.load`.
 - **AC5** — With an all-miss fixture, `check-recall.py` exits non-zero on the per-id line and prints
   the floor line as `not evaluated`, never dividing by a zero `ceiling`.
+- **AC5b** — With the pinned set absent from the data dir, or present and empty, `check-recall.py`
+  refuses naming the set and the dir. A pin of `spine:fts5:r@5>=0.81` reproduces it live, because
+  `spine` extracts to zero docs in this repo.
 - **AC6** — When `bash tools/run-gates.sh` runs, both new legs appear by name and are green.
 - **AC7** — When `python tools/memory-recall/test_recall_floor.py` runs it exits 0, and inverting any
   one arm — including the `--audit-fixture` overlap arm — reds it naming that arm.
@@ -402,10 +420,12 @@ program never reached.
   `handkept_inventories_disagreeing_with_source` still reports 0 at pin 0.
 - **AC12** — When `python tools/memory-recall/bench.py` and `tools/memory-recall/union.py` are
   compared against `tools/memory-recall/verbatim.json`, both digests are unchanged.
-- **AC13** — When `python tools/govkit/govkit.py plan --kits memory-recall <target>` runs, it lists
-  none of `recall-fixture.json`, `check-recall.py` or `test_recall_floor.py`. The assertion is over
-  the PAYLOAD, not over `selfcheck`'s exit code, which round-3 F1 measured green against a key govkit
-  never reads.
+- **AC13** — When the `**` rule's pool is resolved through govkit's own `resolve_rule_pool`, it
+  contains none of `recall-fixture.json`, `check-recall.py` or `test_recall_floor.py`, and still
+  contains `selftest.py`. The assertion is over the PAYLOAD, not over `selfcheck`'s exit code, which
+  round-3 F1 measured green against a key govkit never reads. It is an ARM in
+  `test_recall_floor.py` rather than a manual `plan` invocation, because `plan` refuses without a
+  target descriptor `intake` writes — so a one-time command could not have been a standing check.
 - **AC14** — When `python tools/lexicon/lexicon.py` runs it exits 0, with every new definition's name
   leading with a declared verb.
 
@@ -439,6 +459,14 @@ program never reached.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-17 · **the BUILD found what two adversarial spec reviews could not.** rev-3's
+  predicate 4 asked whether the pinned `<metric>@<k>` appeared in the report; `bench.score()` emits
+  `r@k` and `f@k` for any `k`, and the pin grammar admits only those two metrics, so the branch was
+  green for every pin reachable through it — the `fixture-passes-by-finding-nothing` class inside the
+  gate written to close that class. It becomes precondition 3, the graded set being present and
+  NON-EMPTY, which `spine` (zero docs here) fires live. §4 now reads three preconditions and two
+  predicates, and AC5b observes the new one. Nothing else moved: the two single-direction levers, the
+  derived pin and the overlap declaration are unchanged.
 - rev-3 · 2026-08-17 · **folded the round-3 re-review, which returned BLOCKED on two — and BOTH were
   defects rev-2's own fold introduced, which is the finding about this build's method rather than
   about its subject.** F1: S8's `[[files]] exclude` is a key govkit does not implement, so the F5 fold

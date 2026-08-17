@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -41,8 +41,8 @@ Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `marker contract (4 readers)` | row-grammar |
 | `memory hygiene (20 checks)` | baseline |
 | `memory-hygiene self-test` | baseline |
-| `memory-recall kit selftest` | baseline |
-| `memory-recall skill wiring` | baseline |
+| `memory-recall kit selftest` | memory-recall |
+| `memory-recall skill wiring` | memory-recall |
 | `method carriers (every pointer declared)` | build-method |
 | `method-carriers self-test` | build-method |
 | `placeholder-catalogue self-test` | lexicon |
@@ -53,6 +53,8 @@ Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
+| `recall floor` | memory-recall |
+| `recall floor arms` | memory-recall |
 | `review-join ban (no ref-keyed join)` | baseline |
 | `review-join self-test` | baseline |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
@@ -86,7 +88,7 @@ Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `hooks` | agent-cap |
 | `lexicon` | lexicon |
 | `lib` | baseline |
-| `memory-recall` | baseline |
+| `memory-recall` | memory-recall |
 | `memory-tree` | baseline |
 | `pytest-parallel-guardrails` | baseline |
 | `unattended` | unattended |
@@ -120,7 +122,7 @@ Inventories: gate-legs: 63 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | key | claimant |
 |---|---|
 | `drift-audit` | baseline |
-| `memory-recall` | baseline |
+| `memory-recall` | memory-recall |
 | `unattended` | unattended |
 
 ## gotcha-classes

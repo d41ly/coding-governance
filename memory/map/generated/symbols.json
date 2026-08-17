@@ -18,6 +18,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "CheckRefused",
+      "kind": "class",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "CollisionFlag",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -253,6 +258,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "build_base_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -263,9 +273,19 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_data_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "build_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "build_filtered",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "build_index",
@@ -326,6 +346,16 @@
       "id": "check",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "check_audit",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
     },
     {
       "id": "check_layer_violation",
@@ -930,6 +960,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-recall/extract.py"
     },
     {
@@ -946,6 +981,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "main",
@@ -1011,6 +1051,16 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "measure_overlap",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_run",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
     },
     {
       "id": "merge",
@@ -1135,6 +1185,11 @@
     {
       "id": "parse_pin",
       "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "parse_pin",
+      "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
     },
     {
@@ -1246,6 +1301,16 @@
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_fixture",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "read_lines",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "read_log",
@@ -1536,6 +1601,11 @@
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "run_dense",
@@ -1988,6 +2058,36 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "test_absent_fixture_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_absent_pin_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_all_miss_fixture",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_audit_green",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_baseline_green",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_both_red_on_wholesale_drop",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_conf_parser_matches_bash",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -2018,9 +2118,24 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_empty_fixture_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_empty_graded_set_refuses",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_every_inventory_key_is_claimed_or_baselined",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_floor_reds_alone",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_generated_artifacts_are_fresh",
@@ -2028,9 +2143,24 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_hits_disagreement_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_kit_payload_withholds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_lexicon_signals",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_malformed_pin_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_no_signal_hardcodes_live",
@@ -2038,9 +2168,19 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_one_retirement_is_free",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_one_walk_two_callers",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_out_of_vocabulary_pin_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_patch_is_installed",
@@ -2053,6 +2193,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_per_id_reds_alone",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_ratchet_guard",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -2061,6 +2206,11 @@
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_tautological_fixture_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_undeclared_file_stays_out",

@@ -46,6 +46,8 @@
       "push-main self-test",
       "pytest-guardrails self-test",
       "python resolver (behaviour + inline parity + idiom ban)",
+      "recall floor",
+      "recall floor arms",
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
