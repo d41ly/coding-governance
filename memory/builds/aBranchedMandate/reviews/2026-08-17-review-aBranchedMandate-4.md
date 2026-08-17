@@ -374,3 +374,22 @@ that rule across its checks 24, 25, 27 and 30. The leg should not have needed to
 **The review's root-cause line is the accurate one** and is kept here rather than paraphrased: an
 observation replaced a construction, and the new source's failure modes were handled at one site
 out of three.
+
+## Provenance — which BASE this review sits against
+
+The run's pinned BASE is `401416faebff58c4527abef9f1a4ae80d244c4f2`. This review was scoped
+`eb09d6e..HEAD` and the earlier one `3e5c6d4..HEAD`, so NEITHER range starts at that commit, and
+saying so is the point of this section rather than a footnote to it.
+
+Why the ranges differ from M8's "from the run's pinned BASE": `401416f..HEAD` spans two reconciles
+that pulled in roughly 4,000 lines from five other builds — `dClosedLexicon`, `aWalkedCorpus`,
+`aBoundedVerdict`, `aTetheredConvoy`, `cSettledDocket` — each already reviewed and gated by the run
+that landed it. Reviewing them again would have produced findings about other people's landed code
+and diluted the lenses across a diff ten times the size of this run's own work. The two ranges
+together cover every line THIS run authored: `3e5c6d4..HEAD` for units 1 and 2, `eb09d6e..HEAD` for
+unit 4.
+
+What that costs, stated rather than implied: no adversarial pass examined the SEAM between the
+merged-in work and this run's, beyond the gates. The merge conflicts were resolved by hand in
+`memory/backlog/TOOL.md`, `memory/archive/TOOL.2026-08-17.md`, `tools/install-prefix-waivers.txt`
+and the two generated indexes, and those resolutions are covered by the bar rather than by a review.
