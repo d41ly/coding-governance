@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T16:30:00+03:00 @ af708d8f04d5af598e3451aeb9fe913e52ee81e9
+last-audit: 2026-08-18T02:52:46+03:00 @ 6382c56476029a7ac1e5c133b992a0883beb124c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 827296b2288b3a634197d8f8fb5771b9fab13abf
+last-body-change: 6382c56476029a7ac1e5c133b992a0883beb124c
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -127,6 +127,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
   produce an arm that passes because its fixture was never there. Check what `git ls-files`
   actually holds before trusting a near-miss control.
+- The read-path ceiling is spent by things nobody thinks of as reading: the generated
+  `memory/LIVE.md` row a NEW BUILD FOLDER adds, and every `memory/DECISIONS.md` append. A
+  build can red check 16 on its own bookkeeping before it edits a guide. Read the margin
+  from `python tools/memory-tree/corpus_ids.py --report`, never from the ceiling alone.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
   recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
