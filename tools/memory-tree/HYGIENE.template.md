@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.18 -->
+<!-- gov:kit memory-tree@2.19 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -202,6 +202,41 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
 
+21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
+    and everything else in it (an adversarial review, a build ledger, a research report, a
+    transcript) is a RECORD. Each carries one authored line in its head naming the spec ids it
+    serves, so the binding is a fact rather than an inference from a filename ordinal. The rule, the
+    grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
+    which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
+    never refuse the render.
+
+## Record bindings — how a record names its spec
+
+Within the first 12 unfenced lines, optionally behind a comment marker so a non-markdown record can
+carry it too:
+
+```
+**Serves:** <kind> <id> [<id> …]
+**Serves:** none — <why this record serves no spec>
+**Commissions:** <id> [<id> …]          (optional, for a record that PRODUCED specs)
+```
+
+- `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
+  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs).
+  An open kind field stops being groupable the first time two authors spell one relation differently.
+- `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
+  because one closing review legitimately covers two builds. It may carry a trailing `@rev-N`, which
+  is recorded and never validated, and a contiguous run may be written `N..M`, which EXPANDS at
+  authoring time and therefore cannot rot when the build later gains a unit.
+- Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
+  which is a reservation range that admits backlog and decision rows as if they were units.
+- The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
+  required otherwise, because an unbound record names no ids for a kind to describe. The count of
+  `none` records is bounded shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus.
+- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
+  nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
+  seed list and a gate that disagree is structurally impossible.
+
 ## The harness meta-gate
 
 Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
@@ -237,9 +272,10 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
-The pin is EMPTY today — every discovered branch is armed; `--report` prints the count, and this
-sentence deliberately does not, because a number written here rots while the gate stays green — and an empty pin is the
-file's working state, not its retirement. A row appears when a new branch lands that no fixture can
+The pin's working state is EMPTY, and it is not empty today — one branch is pinned. `--report`
+prints the live count and this sentence deliberately does not, because a number written here rots
+while the gate stays green; the sentence claimed the pin WAS empty for as long as it carried a row,
+which is the same defect one level up. A row appears when a new branch lands that no fixture can
 reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
 from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
 property of the harness, not a preference: the hygiene gate's `fail` never aborts, so one scratch

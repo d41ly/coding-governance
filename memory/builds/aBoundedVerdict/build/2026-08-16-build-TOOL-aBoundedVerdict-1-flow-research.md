@@ -1,5 +1,8 @@
 # Research — the unattended review cycle, the fork rule, and the halt vocabulary
 
+**Serves:** none — an adversarial research pass run BEHIND this build; it precedes the spec set and is what warranted it
+**Commissions:** TOOL-aBoundedVerdict-1..5
+
 Adversarial research pass behind `aBoundedVerdict`, run 2026-08-16 against base `96141aed` on node
 `a`. Five evidence-producing probes, then batched skeptics defaulting to refute over every claim,
 then one synthesis. Sixty-four claims raised, fifty-four confirmed, ten refuted, none left unjudged.

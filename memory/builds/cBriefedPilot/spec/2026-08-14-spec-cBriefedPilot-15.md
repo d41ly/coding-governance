@@ -160,7 +160,7 @@ boundary. No new leg.
 
 none — the fork below is RESOLVED by unit 21's recorded verdict, not by an argument made here.
   The token reads `parallelism route: none`, so this unit takes BRANCH B: M6 is not touched and the
-  finding ships. The evidence is `build/2026-08-15-build-cBriefedPilot-2-parallelism-routes.md`,
+  finding ships. The evidence is `build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md`,
   which records per-route observations rather than conclusions. §8 said the resolution would be a
   READ and not a design decision, and it was.
 **Which branch does this unit take?** Unresolved, and it cannot be resolved here: the resolver is

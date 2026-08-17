@@ -22,4 +22,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-bTamedTempest-1 — pytest-parallel-guardrails kit: bounded, attributable parallel test runs](spec/2026-07-16-spec-bTamedTempest-1.md) | CLOSED | rev-2 | 2026-07-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-16-build-TOOL-bTamedTempest-1-1.md](build/2026-07-16-build-TOOL-bTamedTempest-1-1.md) | journal | TOOL-bTamedTempest-1 |
+| [2026-07-16-review-TOOL-bTamedTempest-1-1.md](reviews/2026-07-16-review-TOOL-bTamedTempest-1-1.md) | spec-audit | TOOL-bTamedTempest-1 |
 <!-- /gen:build-index -->

@@ -54,4 +54,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to](spec/2026-08-10-spec-aNumeralWarden-1.md) | CLOSED | rev-6 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aNumeralWarden-1-1.md](reviews/2026-08-10-review-TOOL-aNumeralWarden-1-1.md) | spec-audit | TOOL-aNumeralWarden-1 |
+| [2026-08-10-review-TOOL-aNumeralWarden-1-2.md](reviews/2026-08-10-review-TOOL-aNumeralWarden-1-2.md) | spec-audit | TOOL-aNumeralWarden-1 |
 <!-- /gen:build-index -->

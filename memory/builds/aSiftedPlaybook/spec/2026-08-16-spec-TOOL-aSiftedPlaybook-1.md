@@ -530,7 +530,7 @@ externalize — the load-bearing constraint").
 
 **A fourth record the query did NOT return**, added by hand and named here so AC6's identity clause
 is true of this section: the `aCandidStub` review's **refuted id 19**
-(`memory/builds/aCandidStub/reviews/2026-08-10-review-aCandidStub-1.md:222-224`). It was found by
+(`memory/builds/aCandidStub/reviews/2026-08-10-review-PLAY-aCandidStub-1-1.md:222-224`). It was found by
 reading that review rather than by retrieval, which is the whole reason AC6 cross-checks the two
 enumerations — a record the corpus cannot reach is exactly the one a recall-only list drops, and
 this one nearly went unrecorded twice.

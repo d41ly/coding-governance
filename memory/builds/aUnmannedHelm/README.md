@@ -37,7 +37,7 @@ hook's schedule.
 **State.** All seven units are SPECCED, BUILT and REVIEWED on
 `branch/aunmannedhelm-build-setup-38f3a9`, and **unmerged**. A second Tier-2 ran over the built diff
 and returned "do not land" on three reproduced authorization blockers; all three are fixed and armed,
-and the review record is `reviews/2026-08-10-review-aUnmannedHelm-2.md`. Every unit sits at INPROGRESS rather than CLOSED, which in this tree's vocabulary means
+and the review record is `reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`. Every unit sits at INPROGRESS rather than CLOSED, which in this tree's vocabulary means
 built-but-not-landed — the state this build's own unit 1 argued the seven-token set cannot express.
 
 **Next action:** none for the build itself. The owner asked for the merge and the push explicitly,
@@ -54,7 +54,7 @@ the first honest test of the thing.
 - The two keepalive DoD items are agent-attested by construction and remain the softest part of the
   contract.
 
-**Read before reviewing:** `reviews/2026-08-10-review-aUnmannedHelm-1.md`. The obligations column
+**Read before reviewing:** `reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-1.md`. The obligations column
 below is a one-line summary of what that review pinned on each unit, not a replacement for it.
 
 **Live constraints, re-measured 2026-08-10 at the end of the build:**
@@ -116,7 +116,7 @@ driver only records the id and asserts a recorded reap.
 
 ## Review record
 
-`reviews/2026-08-10-review-aUnmannedHelm-2.md` — Tier-2 over the BUILT diff at tip `f1ad6e9`. 37 raw,
+`reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md` — Tier-2 over the BUILT diff at tip `f1ad6e9`. 37 raw,
 34 confirmed, precision 0.92, consolidating to 15 distinct defects: 3 blockers, 4 highs, 6 mediums,
 2 lows. Verdict: do not land. Every blocker was reproduced end-to-end before a line was changed, and
 re-tested after.
@@ -136,7 +136,7 @@ The fourth finding was the one that made the other three survivable: **the merge
 mandate assertion at all** — the leg did not contain the string `run:mandate`. It checked the
 paperwork and never the claim.
 
-`reviews/2026-08-10-review-aUnmannedHelm-1.md` — the earlier Tier-2, on the rev-2 spec. Five spec lenses over 57
+`reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-1.md` — the earlier Tier-2, on the rev-2 spec. Five spec lenses over 57
 raw findings, five batched default-refute skeptics, 50 confirmed at precision 0.88, no lens dead.
 Eight blocker-severity findings collapsing to five distinct defects, all folded at rev-3.
 
@@ -157,4 +157,11 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | CLOSED | rev-3 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-1.md](reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-1.md) | spec-audit | TOOL-aUnmannedHelm-1 |
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 |
+
+Ids no `spec-audit` record has ever named: TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9.
 <!-- /gen:build-index -->

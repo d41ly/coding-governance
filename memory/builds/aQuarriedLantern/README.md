@@ -22,4 +22,13 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aQuarriedLantern-1 — memory-recall: the retrieval CLI as a project-agnostic kit](spec/2026-08-03-spec-aQuarriedLantern-1.md) | INPROGRESS | rev-2 | 2026-08-03 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-1.md](build/2026-08-03-build-TOOL-aQuarriedLantern-1-1.md) | journal | TOOL-aQuarriedLantern-1 |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-2.md](build/2026-08-03-build-TOOL-aQuarriedLantern-1-2.md) | journal | TOOL-aQuarriedLantern-1 |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-3.md](build/2026-08-03-build-TOOL-aQuarriedLantern-1-3.md) | journal | TOOL-aQuarriedLantern-1 |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-4.md](build/2026-08-03-build-TOOL-aQuarriedLantern-1-4.md) | journal | TOOL-aQuarriedLantern-1 |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-1.md](reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-1.md) | spec-audit | TOOL-aQuarriedLantern-1 |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-2.md](reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-2.md) | diff-review | TOOL-aQuarriedLantern-1 |
 <!-- /gen:build-index -->

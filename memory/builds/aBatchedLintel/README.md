@@ -22,4 +22,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aBatchedLintel-1 — memory-tree kit: collapse checks 12 and 7 to one awk each](spec/2026-08-03-spec-aBatchedLintel-1.md) | INPROGRESS | rev-3 | 2026-08-03 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aBatchedLintel-1-1.md](build/2026-08-03-build-TOOL-aBatchedLintel-1-1.md) | journal | TOOL-aBatchedLintel-1 |
+| [2026-08-03-review-TOOL-aBatchedLintel-1-1.md](reviews/2026-08-03-review-TOOL-aBatchedLintel-1-1.md) | spec-audit | TOOL-aBatchedLintel-1 |
 <!-- /gen:build-index -->

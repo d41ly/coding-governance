@@ -1,8 +1,5 @@
 # id-orphan-waiver.txt — ids cited but never defined, deliberately. Shrink-only (ORPHAN_ID_PIN).
-# The four below are grandfathered builds whose only spec is a legacy-named recording with no
-# anchor line; each leaves this file when its build gains a conforming spec.
-DEPL-aDeployScout-1
-DEPL-aKitHardener-1
-KICK-aRatchetForge-1
-PLAY-aLeanRework-1
-TOOL-aPortableWarden-1
+# EMPTY, and that is its working state rather than its retirement. The five grandfathered builds
+# that lived here left it the way the rows said they would: each gained a family-qualified H1 id in
+# its own spec (TOOL-aTetheredRecord-1), so every one now resolves and the pin fell 5 -> 0.
+# A row returns here only for an id that is cited, cannot be defined, and carries the reason why.

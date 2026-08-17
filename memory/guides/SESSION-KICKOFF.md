@@ -201,3 +201,11 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
   >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
   dir before blaming the diff, and do not delete the shared one.
+- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
+  check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
+  it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
+  after a round counter.
+- A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
+  assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
+  costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
+  that name states a count.

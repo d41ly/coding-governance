@@ -41,7 +41,7 @@ The roster. This table is the roster, not the `ids:` key — M2 says so and this
 | `TOOL-aWrittenMethod-6` | 2 | escaping conf values before substitution | OPEN |
 
 **Unit 2 is the blocker and leads.** It is the unapplied half of `D3` from
-`../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`: fixes 1 and 2 landed with that
+`../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`: fixes 1 and 2 landed with that
 build, fixes 3 and 4 did not, and the hole they leave was reproduced end to end during unit 1.
 
 ## State of this pass
@@ -109,7 +109,7 @@ Three findings, each verified against source rather than inherited from the pass
   staying unequal to HEAD, so the degenerate guard does not fire, and `check_mandate` compares
   run-authored bytes against run-authored bytes. The driver's own comment asserts the opposite
   defense. This was already filed as D3/BLOCKER in
-  `../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md` and no backlog row tracked it.
+  `../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md` and no backlog row tracked it.
   Now `TOOL-aWrittenMethod-2`, and it is **not** in this build's scope.
 - **Four project declarations are delivery, not enforcement**, and carry into pass 2: the recall
   entrypoint, the reuse entrypoint, the review harness, and the keepalive interval.
@@ -139,4 +139,14 @@ spec in this folder — do not hand-edit it.
 | [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | CLOSED | rev-4 | 2026-08-11 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md](build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md) | journal | TOOL-aWrittenMethod-1 |
+| [2026-08-11-build-aWrittenMethod-1-enforcement-pass.md](build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md) | — | *none — a design pass the build README grades REJECTED for scope; it warranted no spec and none was minted* |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+
+Ids no `spec-audit` record has ever named: TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6.
 <!-- /gen:build-index -->

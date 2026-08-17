@@ -23,4 +23,8 @@ shipped reinvention reports `collision_flags: 1` at a root install and `0` at a 
 | [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | CLOSED | rev-3 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md) | spec-audit | TOOL-aRootedPrefix-1 |
 <!-- /gen:build-index -->

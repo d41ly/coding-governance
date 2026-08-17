@@ -46,6 +46,11 @@ is cheaper than building them apart:
 | [TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class](spec/2026-08-16-spec-cSettledDocket-6.md) | CLOSED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
+| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
 <!-- /gen:build-index -->
 
 ## Units

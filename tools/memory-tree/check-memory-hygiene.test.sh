@@ -282,8 +282,12 @@ wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When th
 # ---- CHECK 5: the optional FAMILY qualifier. It exists so one slug shared by two families survives
 # ---- the merge into a single folder. The alternation is the CLOSED one from FAMILIES — a generic
 # ---- [A-Z]+ would admit a family that does not exist and make the rejection arm vacuous.
-printf 'x\n' > "$D/build/2026-08-01-build-ARCH-tFixture-1.md"                    # legal qualifier -> silent
-printf 'x\n' > "$D/build/2026-08-01-build-XXXX-tFixture-2.md"                    # unknown family -> red
+# Both carry the UNBOUND binding line. Check 21 grades every record, and these two exist to exercise
+# check 5's family alternation rather than the binding — without a line they would red check 21 and
+# the global `miss` arm below would fire on a fixture that is doing exactly its job.
+c5f='# f\n\n**Serves:** none — a check-5 fixture, exercising the family qualifier and not the binding\n'
+printf "$c5f" > "$D/build/2026-08-01-build-ARCH-tFixture-1.md"                   # legal qualifier -> silent
+printf "$c5f" > "$D/build/2026-08-01-build-XXXX-tFixture-2.md"                   # unknown family -> red
 
 # ---- THE §9 REV RANGE, both sub-paths. The high-water scan used to run from `## 9.` to the end of
 # ---- the body, so a rev-N in §10 satisfied the header rev. The branch has TWO conditions and the
@@ -961,6 +965,51 @@ done
 n=$((n+1))
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 [ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
+
+# ---- CHECK 21 — every record names the spec it is evidence about.
+# ---- Five fail sites behind one check number, each armed on its OWN literal signature and each
+# ---- asserted inside check 21's own output block via chit(), never against a global hit: this
+# ---- check prints bare paths, and a global grep cannot tell which branch produced one.
+# ---- The GREEN control matters as much as the reds. A cross-build record correctly named for the
+# ---- SERVED id's slug must stay silent, or branch 5 would be a rule the corpus cannot satisfy.
+K=$TMP/c21
+mkdir -p "$K"
+( cd "$K" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nRECORD_UNBOUND_PIN="1"\n' > .memory-tree.conf
+  mkdir -p memory/backlog memory/project memory/builds/tOne/spec memory/builds/tOne/reviews \
+           memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  rk() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n' "$1" "$1" "$1"; }
+  rk tOne > memory/builds/tOne/README.md
+  rk tTwo > memory/builds/tTwo/README.md
+  printf '# ARCH-tOne-1 — unit one\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  printf '# ARCH-tTwo-1 — unit two\n\nbody\n' > memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md
+  # branch 1 — no line at all
+  printf '# r\n\nbody\n' > memory/builds/tOne/reviews/2026-08-01-review-ARCH-tOne-1-a.md
+  # branch 2 — an id no spec defines
+  printf '# r\n\n**Serves:** spec-audit ARCH-tGhost-9\n' > memory/builds/tOne/reviews/2026-08-01-review-ARCH-tOne-1-b.md
+  # branch 5 — the filename claims a real id the header does not list
+  printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/reviews/2026-08-01-review-ARCH-tTwo-1-c.md
+  # branch 4 — two unbound records against a pin of 1
+  printf '# r\n\n**Serves:** none — nothing to serve\n' > memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-d.md
+  printf '# r\n\n**Serves:** none — nothing to serve either\n' > memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-e.md
+  # the GREEN control — a CROSS-BUILD record, housed under tTwo, named for the id it SERVES
+  printf '# r\n\n**Serves:** diff-review ARCH-tOne-1\n' > memory/builds/tTwo/reviews/2026-08-01-review-ARCH-tOne-1-f.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m c21 --no-verify )
+out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
+chit 21 'records under build/, prompts/ or reviews/ whose head carries no conformant Serves line'
+chit 21 'Serves or Commissions lines naming an id that no spec in this tree defines'
+chit 21 'records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it'
+chit 21 'record filenames whose family, slug and ordinal name an id their own Serves line does not list'
+cblock "$out" 21 | grep -qF '2026-08-01-review-ARCH-tOne-1-f.md' \
+  && { echo "FAIL check 21 flagged a CROSS-BUILD record correctly named for the id it serves"; st=1; }
+# branch 3 — the pin UNDECLARED is a refusal, not a disabled check.
+( cd "$K" && printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf )
+out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
+chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus'
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.

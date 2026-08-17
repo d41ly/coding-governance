@@ -30,6 +30,14 @@ with `fails=0`, which is the number this unit is built to reproduce.
 | [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md) | spec-audit | TOOL-aTimedTurnstile-5 |
+
+Ids no record names: TOOL-aTimedTurnstile-2.
+
+Ids no `spec-audit` record has ever named: TOOL-aTimedTurnstile-2.
 <!-- /gen:build-index -->
 
 ### The specs

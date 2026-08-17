@@ -66,7 +66,7 @@ answered the direction — "spec the canary fix and build it" — immediately af
 
 ## Review record
 
-`reviews/2026-08-14-review-cSteadyMetronome-1.md` — M4 spec audit, 3 lenses, 19 raw, 15 confirmed,
+`reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md` — M4 spec audit, 3 lenses, 19 raw, 15 confirmed,
 4 refuted, precision 0.79, no dead lens; 11 distinct — 2 blockers. Verdict **BLOCKED**, and rev-2 is
 the fold. Both blockers were fatal to rev-1's mechanism and both were reproduced against the real
 runner rather than argued: three legs run one script so per-script timestamps collide (and the
@@ -93,4 +93,8 @@ every spec in this folder — do not hand-edit it.
 | [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-14-review-TOOL-cSteadyMetronome-1-1.md](reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md) | spec-audit | TOOL-cSteadyMetronome-1 |
 <!-- /gen:build-index -->

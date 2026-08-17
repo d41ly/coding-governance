@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.18 -->
+<!-- gov:kit memory-tree@2.19 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -100,7 +100,9 @@ underspecification, contradiction, unstated assumption, prior art — with what 
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Most existing review records carry no
-verdict line; write it anyway, because M9 derives from these records. **Fold fixes into the spec** (rev bump + §9
+verdict line; write it anyway, because M9 derives from these records. **Carry the binding line** check 21 requires —
+`**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
+answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
 ## M5 — Recall and reuse
@@ -187,7 +189,9 @@ Workflow { scriptPath: '{{TOOL_ROOT}}workflows/tier2-review.js',
 
 **Pass `reviewDir` explicitly** — its default is repo-root-relative and writes the report outside the memory tree,
 where nothing indexes it. The harness names the file it wrote: **rename it to `memory/HYGIENE.md` check 5's
-recording grammar before the next gate run**, or check 5 reds on a free-named file.
+recording grammar before the next gate run**, or check 5 reds on a free-named file. A closing review is a
+`diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
+in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a

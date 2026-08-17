@@ -41,6 +41,10 @@ hand-edit it.
 | [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-3 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)

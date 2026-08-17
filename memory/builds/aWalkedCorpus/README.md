@@ -33,6 +33,10 @@ hand-edit it.
 | [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)

@@ -22,4 +22,10 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aRuledParchment-1 — Port the spec-format discipline into the memory-tree kit](spec/2026-07-15-spec-aRuledParchment-1.md) | CLOSED | rev-1 | 2026-07-15 |
 
 Records live under `spec/` and `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-15-build-TOOL-aRuledParchment-1-1.md](build/2026-07-15-build-TOOL-aRuledParchment-1-1.md) | journal | TOOL-aRuledParchment-1 |
+
+Ids no `spec-audit` record has ever named: TOOL-aRuledParchment-1.
 <!-- /gen:build-index -->

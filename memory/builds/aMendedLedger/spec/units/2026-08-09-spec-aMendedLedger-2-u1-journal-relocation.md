@@ -16,7 +16,7 @@ hygiene check 2 is full-tree at the push boundary.
   `memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md`, creating the stub
   build folder.
 - **S2** `git mv memory/project/journal/2026-07-15-aRuledParchment.md` to
-  `memory/builds/aRuledParchment/build/2026-07-15-build-aRuledParchment-1.md`. That build folder
+  `memory/builds/aRuledParchment/build/2026-07-15-build-TOOL-aRuledParchment-1-1.md`. That build folder
   already exists and holds `README.md` + `spec/` only; `build/` is new.
 - **S3** Author `memory/builds/bThriftyBellows/README.md` with front matter carrying an authored
   `status: CLOSED`, and write NO spec under that folder.
@@ -105,7 +105,7 @@ and stays off both couplings named in §7.
 | path | action | destination |
 |---|---|---|
 | `memory/project/journal/2026-07-16-bThriftyBellows.md` | `git mv` | `memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md` |
-| `memory/project/journal/2026-07-15-aRuledParchment.md` | `git mv` | `memory/builds/aRuledParchment/build/2026-07-15-build-aRuledParchment-1.md` |
+| `memory/project/journal/2026-07-15-aRuledParchment.md` | `git mv` | `memory/builds/aRuledParchment/build/2026-07-15-build-TOOL-aRuledParchment-1-1.md` |
 | `memory/project/MEMORY.md` | delete, digest folded first | — |
 | `memory/project/IN-FLIGHT.md` | delete, prose moved first | `memory/archive/ledger/README.md` |
 | `memory/project/README.md` | delete | — |
@@ -312,7 +312,7 @@ Deleted: 4. Regenerated: `memory/builds/bThriftyBellows/README.md`'s marked regi
   the five `*.txt` registries, `in-flight/.gitkeep` and `in-flight/{a,b,c}.md` — with no path under
   `journal/` and no `.md` file at `memory/project/` itself.
 - **AC2** When
-  `git log --follow -p --find-renames -- memory/builds/aRuledParchment/build/2026-07-15-build-aRuledParchment-1.md | grep -m1 'similarity index'`
+  `git log --follow -p --find-renames -- memory/builds/aRuledParchment/build/2026-07-15-build-TOOL-aRuledParchment-1-1.md | grep -m1 'similarity index'`
   is run it prints `similarity index 100%`, over a diff naming
   `memory/project/journal/2026-07-15-aRuledParchment.md` as the source. The `-p` is the criterion, not
   decoration: `git log --follow` alone prints commit subjects, `similarity index` comes from the diff

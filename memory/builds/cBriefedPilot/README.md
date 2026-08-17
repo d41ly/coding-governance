@@ -53,7 +53,7 @@ protocol-table join into scope. One answer moved unit 13 from Tier 1 to Tier 2.
 **Next action.** Build unit 1, then unit 21. Unit 1 is the paired accumulator every later flag
 depends on; unit 21 is the research that decides whether D6 can be built at all, and it is the only
 unit in the build whose write set lets it run alongside the rest. The M4 spec audit is recorded at
-`reviews/2026-08-15-review-cBriefedPilot-1.md` — CLEAN WITH FIXES, no blockers, all fixes folded.
+`reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md` — CLEAN WITH FIXES, no blockers, all fixes folded.
 
 **The one thing that must not be lost.** Every directive is a POINTER. `BUILD-METHOD.md` M1 states
 that nothing in it is stated anywhere else in this repo, and that a rule appearing both there and in
@@ -125,7 +125,7 @@ genuinely new:
    clause excusing it where no mechanism exists, and bought unit 21's hunt instead.
 
    Unit 21's verdict is `parallelism route: none`, recorded with per-route observations at
-   `build/2026-08-15-build-cBriefedPilot-2-parallelism-routes.md`. Unit 15 read that token and took
+   `build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md`. Unit 15 read that token and took
    branch B: the finding ships, the rule does not. **D6 is the one owner directive this build does
    not deliver**, and saying so here is the point of the branch — a record that described an
    inversion nobody built would be worse than the gap itself.
@@ -342,4 +342,14 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | CLOSED | rev-2 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md) | — | *none — a design pass that PRECEDES and produced this build's spec set* |
+| [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md) | journal | TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-21 |
+| [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md) | spec-audit | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
+| [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md) | diff-review | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
+| [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md) | diff-review | TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 |
+
+Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 <!-- /gen:build-index -->

@@ -60,7 +60,7 @@ caught the defect it was written for.
   docstring (`govkit.py:534`, whose "Machine-scoped rules produce an ORDER" exception list goes stale
   the moment four roles map to non-write kinds), and `skills/deploy-governance/SKILL.md:40-42` — "Lists
   every file `apply` would write, with its role and the source commit its bytes would come from",
-  which this build's own `reviews/2026-08-16-review-dClosedLexicon-8.md:96-98` already listed as a
+  which this build's own `reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md:96-98` already listed as a
   carrier of the false promise.
 
 ## 3. Non-goals (OUT)

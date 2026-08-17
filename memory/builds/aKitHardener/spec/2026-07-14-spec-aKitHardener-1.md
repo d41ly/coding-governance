@@ -1,4 +1,4 @@
-# govkit Phase 0 — kit hardening (spec)
+# DEPL-aKitHardener-1 — govkit Phase 0, kit hardening (spec)
 
 *2026-07-14 · DEPL-aKitHardener · node `a`. Pre-build design for the first govkit build unit. The
 parent research ([../../2026-07-12-DEPL-aDeployScout/](../../2026-07-12-DEPL-aDeployScout/), §4 + §8)

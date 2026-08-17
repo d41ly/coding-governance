@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.18   # gov:kit memory-tree@2.18 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.19   # gov:kit memory-tree@2.19 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -132,6 +132,12 @@ PRE_ANYBUILD=$(printf '%s\n' "$FILES" | grep -cE "/builds/" || true)
 PRE_RECORD=$(printf '%s\n' "$FILES" | grep -cE "/builds/.+/.+\.md$" || true)
 PRE_SPEC=$(printf '%s\n' "$FILES" | grep -cE "/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[^/]*\.md$" || true)
 PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/STATUS\.md$|/BACKLOG\.md$|^$M/backlog/)" || true)
+# Check 21's precondition. Deliberately NOT anchored to `$M/builds/<slug>/`: a precondition that
+# restates its check's own population can never differ from it, so pop_guard would be unreachable
+# and the vacuity guard decoration. Un-anchored, a record left at a pre-flatten path counts here and
+# not there — which is exactly the mis-segmentation the guard exists to name. Extension-agnostic,
+# because one record in the corpus is a shell script.
+PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -479,6 +485,54 @@ $bad8"
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
+fi
+
+# 21 — every record names the spec it is evidence about. Delegates the
+# PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
+# fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
+# Python raise. ONE invocation of the read-only mode, split here into four branch populations.
+c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|reviews)/" || true)
+pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
+  "$(printf '%s\n' "$c21_sel" | grep -c . || true)" "$PRE_BINDABLE"
+if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
+  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>/dev/null || true)
+  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
+$miss21"
+  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
+$bad21"
+  # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
+  # declaration and the number of them is the thing a reader is entitled to see bounded.
+  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  pin21=${RECORD_UNBOUND_PIN-}
+  if [ -z "$pin21" ]; then
+    fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
+  elif [ "${n21:-0}" -gt "$pin21" ]; then
+    over21="  measured ${n21:-0} against the pin $pin21"
+    fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
+$over21"
+  fi
+  # Branch 4 — the filename PROJECTS the header. Its input is the S row, because a conformant record
+  # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
+  # id: family, slug and ordinal. A bound record whose name carries no family qualifier fails here,
+  # since two thirds of an id is not a projection of it.
+  proj21=$(printf '%s\n' "$b21" | sed -n 's/^S\t\([^\t]*\)\t[^\t]*\t\(.*\)$/\1|\2/p' | while IFS='|' read -r p ids; do
+      base=${p##*/}; base=${base%.*}
+      case "$base" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) stem=${base#????-??-??-} ;;
+        *) echo "  $p — the name carries no date, so no id can be read from it"; continue ;;
+      esac
+      rest=${stem#*-}
+      claimed=$(printf '%s\n' "$rest" | grep -oE "^($FAM_ALT)-[A-Za-z0-9]+-[0-9]+" || true)
+      if [ -z "$claimed" ]; then
+        echo "  $p — bound, but the name carries no family-qualified id"
+      else
+        printf '%s\n' "$ids" | tr ' ' '\n' | grep -qxF "$claimed" || echo "  $p — the name claims $claimed"
+      fi
+    done)
+  [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
+$proj21"
 fi
 
 # 10 — rotation note (always; cheap). FLAT (1.5): one archive at the memory root.

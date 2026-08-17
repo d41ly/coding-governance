@@ -4,12 +4,11 @@
 # message is reworded out from under its signature.
 # Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
 #
-# EMPTY, and that is the point of the file rather than the end of it. Every branch in every
-# discovered gate is armed today; `check-arms.py --report` prints the count, and this comment does
-# not, because a number written here rots silently. A row appears here only when a NEW branch lands
-# with no fixture that can reach it, and it carries the reason it cannot be armed — "not yet
-# written" and "cannot be written from here" are indistinguishable in a bare pin, and only one of
-# them is acceptable.
+# NOT empty, and the distinction matters more than the count: a row here is a branch no fixture can
+# reach, carrying the REASON it cannot be armed — "not yet written" and "cannot be written from
+# here" are indistinguishable in a bare pin, and only one of them is acceptable. `check-arms.py
+# --report` prints the live count; this comment does not, because a number written here rots
+# silently, and this header claimed EMPTY while carrying a row until TOOL-aTetheredRecord-4.
 tools/unattended/unattended.sh	9	1	cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has
 #
 # THE TWO ROTATION ROWS (kit 1.6) carry their reason, per the rule above. Both sit BELOW two

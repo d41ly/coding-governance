@@ -19,7 +19,7 @@ The reproduction found **three** causes, not one. They fire in a fixed order, an
 report names fires last — so fixing only it leaves every worktree run still refused. All three are
 enumerated with their observed output in
 [`build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md`](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md),
-and the third has a committed fixture at [`build/repro-c3.sh`](build/repro-c3.sh) that exits 0 only
+and the third has a committed fixture at [`build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh`](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) that exits 0 only
 when it reproduces the specific refusal it is about.
 
 | | What refuses | Fires when | In the report? | Unit |
@@ -63,6 +63,13 @@ it.
 | [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
+| [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
 <!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
@@ -165,7 +172,7 @@ exactly one build.
 
 ## The spec audit — BLOCKED, folded at rev-3
 
-`reviews/2026-08-16-review-aBranchedMandate-1.md` records an M4 audit run as a five-lens workflow with
+`reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md` records an M4 audit run as a five-lens workflow with
 batched default-refute skeptics under the review protocol's caps: 45 raw findings, 36 confirmed,
 9 refuted, none unverified, deduplicated to 18. **Verdict BLOCKED, three blockers.** All 18 are folded;
 every spec is at rev-3 with its §9 line.

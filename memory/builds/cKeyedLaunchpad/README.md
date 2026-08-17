@@ -212,6 +212,11 @@ header of every spec in this folder — do not hand-edit it.
 | [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-3 | 2026-08-13 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md](reviews/2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md) | spec-audit | KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-6 |
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5 |
 <!-- /gen:build-index -->
 
 ## Method
