@@ -5,7 +5,7 @@
 last-audit: 2026-08-17T12:30:00+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
+last-body-change: a136e920de54c09767f065d618b311315f3c35cb
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -138,11 +138,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
 - A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
   prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
-- A build README's top level is a SLOT SEQUENCE — front matter, title, one authored prose block, the
-  authored `roster:units` plan, then the generated regions — gated by its own leg,
-  `gen_build_index.py --check-format`. Authored content after the first generated marker reds it. The
-  refusal is deliberately unreachable from `--write` and `--check`, so the generator still renders a
-  tree it would refuse to grade.
+- A build README's top level is a SLOT SEQUENCE gated by its own leg,
+  `gen_build_index.py --check-format`: authored content after the first generated marker reds it.
+  Detail in `memory/map/features/build-readme-surface.md`.
 - `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
 - `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed
