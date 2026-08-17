@@ -23,3 +23,6 @@ tools/unattended/adopt-unattended.test.sh
 tools/workflows/check-protocol-parity.test.sh
 tools/workflows/check-review-join.test.sh
 tools/workflows/check-verifier-fanout.test.sh
+tools/check-placeholders.test.sh
+tools/check-playbook-parity.test.sh
+tools/check-template-size.test.sh

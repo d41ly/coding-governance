@@ -890,6 +890,48 @@ miss "$gout" "FAIL fixture no-op"
 hit "$gout" "st=0 n=1"
 reset_tree
 
+# ---- TOOL-cSettledDocket-2: DIRECTIVES_EXTRA was waivable and unshowable at once. `--waive` accepts
+# ---- any handle `directives()` composes — core PLUS extra — while check 16 arm A joined CORE alone,
+# ---- so a project could relax a rule the agent was never shown and could not fix that by adding a
+# ---- table row, because the Skill is rendered from a kit-owned template.
+# ----
+# ---- RESTORED: these arms were deleted by a marker-to-marker slice while rewriting unit 6's block,
+# ---- and the suite stayed green because the arms that remained were fine. Only `check-arms` saw it,
+# ---- by noticing two `fail 16` branches had lost their positive assertion. That is the whole reason
+# ---- the arms meta-gate is keyed on branches rather than on a suite's exit code.
+
+# GREEN CONTROL: undeclared is the empty set, which is every adopter today, and is what keeps this
+# change from reddening anyone who uses no extras.
+reset_tree
+same "an undeclared row source changes nothing" "$(run)" ""
+
+# ...an extra handle with NO row source is REFUSED now, where it was silently waivable.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+hit "$(run)" "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: house-style:M9"
+
+# ...and with a row source that CARRIES it, the project is whole again: declared, shown, waivable.
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+same "declared + shown is silent" "$(run)" ""
+
+# ...a row source naming a handle the registry does NOT declare reds the other way, so the join stays
+# two-directional across the union rather than one-directional over it.
+printf '| `never-declared` | nothing declares this | M9 | P2 |\n' >> memory/project/extra-directives.md
+hit "$(run)" "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: never-declared"
+
+# ...a DECLARED path that does not exist is a NAMED refusal, not an empty union. Silently, every
+# extra handle would land back on the absent-from-table branch with nothing saying why.
+reset_tree
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/nope.md"|'
+hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in"
+
+# ...and a declared file carrying no readable row is its own refusal, for the reason every locator in
+# this leg has one: a source contributing nothing is indistinguishable from no source at all.
+mkdir -p memory/project && printf 'no rows here, just prose\n' > memory/project/nope.md
+hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty"
+reset_tree
+
 # ---- TOOL-cSettledDocket-6: the STANDING frozen-versus-live fixture. cBriefedPilot's closing review
 # ---- found one root three times — a predicate joining a FROZEN historical value to a LIVE present
 # ---- one. The rule it encodes is general: once a run is TERMINAL its record is immutable through

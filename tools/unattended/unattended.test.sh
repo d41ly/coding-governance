@@ -1071,7 +1071,12 @@ same "--status names a non-terminal unit through the extracted helper" "$(run --
 # ---- function INSIDE the driver, not a command here, so the control re-derives the slice with awk.
 # ---- The first cut called `region` and the control returned empty, which would have compared the
 # ---- helper against nothing and passed forever.
-want_unit=$(awk '/<!-- run:generated -->/{f=1;next} /<!-- .run:generated -->/{f=0} f' memory/builds/tRun/RUN.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+# The control reads the BUILD README, not the run-state file: main's redesign removed the copy,
+# so the unit list lives in one place and is derived on every read. This control still
+# re-derives the slice with awk rather than calling `region`, which is a driver function and
+# not a command here — the first cut called it, got empty, and would have compared the helper
+# against nothing and passed forever.
+want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
