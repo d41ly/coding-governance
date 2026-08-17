@@ -2168,6 +2168,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_crlf_working_copy_is_not_drift",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_declared_empty",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"

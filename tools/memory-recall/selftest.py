@@ -965,7 +965,7 @@ def t_skill_drift_reds():
 
 
 @check("a CRLF working copy is not drift, content still is, and an empty render never matches")
-def t_crlf_working_copy_is_not_drift():
+def test_crlf_working_copy_is_not_drift():
     """The CRLF is written DELIBERATELY, never inherited.
 
     A fixture that creates a git worktree and hopes for CRLF passes with the normalisation
@@ -1285,7 +1285,7 @@ def main() -> int:
         t_budget_build_in_flight, t_budget_marker_ttl,
         t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
         t_python3_only,
-        t_scaffold_converges, t_skill_drift_reds, t_crlf_working_copy_is_not_drift,
+        t_scaffold_converges, t_skill_drift_reds, test_crlf_working_copy_is_not_drift,
         t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
