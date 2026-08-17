@@ -422,8 +422,15 @@ check_wiring() {
           esac ;;
     esac
   done
-  $WIRING_CHECK >/dev/null 2>&1 && return 0
+  local wout
+  wout=$($WIRING_CHECK 2>&1) && return 0
   fail 4 "the declared wiring check failed, and a dormant hook makes every later green meaningless: $WIRING_CHECK"
+  # The declared check's OWN output, indented under the refusal rather than discarded. It already
+  # carries whatever remedy that project's check knows about, and this kit may not spell a repairing
+  # command itself: nothing it may read holds one — the conf declares no repairing counterpart and
+  # the allow-list above refuses any token outside --check|--dry-run|--verify|-n — and the driver
+  # self-test reds if this source spells one at all. Surfacing beats naming, and works for any adopter.
+  [ -n "$wout" ] && printf '%s\n' "$wout" | sed 's/^/    /'
   return 1
 }
 

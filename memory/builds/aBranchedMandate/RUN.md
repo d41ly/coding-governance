@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 401416faebff58c4527abef9f1a4ae80d244c4f2
+witness: a7567fd99e36b3807d4f1db0f3d8d9c2e9308e03
 phase: BUILDING
 keepalive: 3ff2b805
 anchor-url: https://github.com/d41ly/coding-governance.git
