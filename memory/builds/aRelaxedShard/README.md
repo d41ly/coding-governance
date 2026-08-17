@@ -28,10 +28,13 @@ week.
 
 ## Why rotation is finished as a remedy
 
-Rotation carries forward every non-terminal row, so a live shard's floor is its live row set. The
-tooling shard's live rows are its entire contents — there are no terminal rows left — so its floor is
-89.4% of the cap and a fourth rotation would move nothing. It has already rotated three times in four
-days, twice on one of them.
+Rotation moves terminal rows only. The tooling shard has none left, so a fourth rotation leaves the
+whole file exactly where it is: the floor is **93.5%** of the cap, the file's own current size, and the
+rotation announcements in its head stay too. It has already rotated three times in four days, twice on
+one of them.
+
+`TOOL-cSettledDocket-16` is OPEN in that shard and already says this. The unit closes it rather than
+landing a duplicate beside it.
 
 This was predicted. `memory/builds/cSteadyMetronome/README.md` recorded it on 2026-08-14, including the
 detail that the unit it needed could not be given a backlog row because there was no room left to write
@@ -48,15 +51,22 @@ Three separate problems, not one.
    measuring raw working-tree bytes. At the pre-kickoff base the tooling shard measured 20,408 bytes as
    LF and 20,492 as CRLF, so it was already over cap on a CRLF checkout. The inflation is under half a
    percent and it lands exactly where the margin is thinnest.
-3. **Half the rule cannot fire.** The line bound would need rows a third of their measured length, so
-   the byte bound decides every real case — the arithmetic is in the spec's §4. The figures also ship in
-   prose in six carriers, which is why retiring them is a sweep rather than an edit.
+3. **The two halves of the rule bind on different populations, and nothing says so.** The byte bound
+   decides the backlog shards and the decision log; the line bound decides the other 22 row documents,
+   dossiers above all. rev-1 read the first half as the whole rule and the audit caught it — see F5. The
+   byte figure also ships in prose in eight carriers, which is why moving it is a sweep, not an edit.
 
 ## The unit set
 
 Classification per the build method, written before acting: unit 1 was **MISSING**, was authored this
-run, and is now **FORKED** — its §8 carries four items, and with no standing mandate they are the
-owner's. It is unreviewed by definition, so the M4 spec audit is the next pass.
+run, was audited at M4, and is now **FORKED** at rev-2 — its §8 carries five items, and with no standing
+mandate they are the owner's.
+
+The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`. Verdict **BLOCKED**: 55
+raw findings, 38 confirmed, 17 refuted, precision 0.69, 4 of 4 lenses live, collapsing to 21 distinct
+defects. rev-2 is the fold. The blocker RESCOPED the unit — see F5 — and six further findings were
+downstream of the same omission, an Inventory table that measured 7 of the 29 documents in the class it
+claimed to enumerate.
 
 The owner sequenced two units. Unit 1 is the knob and the correction. The second is the re-shape —
 sharding a backlog below `FAMILY`, or a spill tier like the run-state file's — and its id is minted when
@@ -69,11 +79,21 @@ The re-shape is what changes the slope, which is why the owner put it second rat
 
 ## Owner decision menu
 
-Four forks, each carrying a recommendation in the spec's §8 and none of them resolved.
+Five forks, each carrying a recommendation in the spec's §8 and none of them resolved. **F5 is the one
+that needs your attention first: it is a fork you already answered, and the answer rested on a premise
+the audit falsified.**
 
-- **F1 — the ratified cap value.** 61,440 bytes recommended, derived from the line bound's own evident
-  intent of 250 scannable rows at the measured row length. Runway about 21 days. Two alternatives are
-  priced in §8, including the 90-day one, which is listed in order to be rejected on readability.
+- **F5 — the row line bound, re-opened.** You chose to retire it on rev-1's recommendation that it
+  "cannot fire". Measured over the real population it is the bound that binds FIRST on 22 of 29 row
+  documents, all 12 map dossiers among them, and check 6 is the only gate that bounds a dossier at all.
+  Retiring it would loosen the dossier allowance 3.3x to 4.3x — the exact loosening a ratified decision
+  refused. Recommended now: **do not retire it.** The goal is met by the byte bound alone, and that
+  narrowing is a smaller diff which leaves the raise inert for the 22 line-bound documents, so it reaches
+  only the shards you asked about.
+- **F1 — the declared cap value for this repo.** 61,440 bytes recommended, derived from 250 rows at the
+  measured 253.7 B/row. Runway about 21 days. Two alternatives are priced in §8, including an 80-day one
+  listed in order to be rejected on readability. The kit's shipped default stays at today's value, so
+  this fork decides only what this tree declares and no adopter inherits this corpus's number.
 - **F2 — absent-and-blank semantics.** Recommended that both resolve to the shipped default and that no
   value disables the bound. This argues against the conf's own local idiom, so it is the fork most worth
   overruling if the consistency cost reads higher than the off-switch risk.
@@ -88,15 +108,16 @@ Four forks, each carrying a recommendation in the spec's §8 and none of them re
 
 Two things worth recording separately from the cap change itself.
 
-The byte half of check 6 has never been armed. All three of its fixtures trip on line count, so the
-bound that fires in production has no test behind it, and retiring the line bound would have left the
-row class with no arm at all. Rebuilding those arms on the byte axis is a coverage gain wider than this
-unit.
+The byte half of check 6 has never been armed. Two of its three fixtures trip on line count and the
+third, `memory/guides/twide.md` at 401 lines, is a deliberate SILENT control that must stay one — so the
+bound that fires in production has no test behind it. Unit 1 ADDS a byte-axis arm rather than rebuilding
+the line-axis ones, which is a coverage gain wider than this unit and, per the audit, the safer half of
+the two options.
 
 `memory/guides/BUILD-METHOD.md` and its kit template both cite hygiene rule 6 for a budget rule 6 does
 not impose on a guide — the guide class is three times wider. The self-imposed discipline is real,
 because the build method is re-read whole at every pass boundary; the citation is wrong. Both carriers
-are in this unit's prose sweep anyway, so S9 corrects the attribution while it is there.
+are in this unit's prose sweep anyway, so S12 corrects the attribution while it is there.
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
@@ -105,7 +126,7 @@ The table below is GENERATED from the status header of every spec in this folder
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row-document cap becomes one declared byte bound](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-1 | 2026-08-17 |
+| [TOOL-aRelaxedShard-1 — the row-document byte cap becomes a declared value](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-2 | 2026-08-17 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
