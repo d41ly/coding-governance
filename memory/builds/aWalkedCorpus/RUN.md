@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 9d41abb1677194e1f4a75b825e28b490ac999ff7
-phase: LANDING
+witness: 30db4329e93a58f7838061ec36c4c3d38462bf80
+phase: ABORTED
 keepalive: 267649f9
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 3e5c6d4373050f545eb516b6e305d352ceb10b66
@@ -45,3 +45,5 @@ derived from h=10 and R=12 over a corpus that moves every commit. It has been gr
 build only. The first genuine movement — a record retired, a question that starts or stops hitting —
 is the first real test of whether the one-retirement headroom is the right budget, and nothing here
 has observed that yet.
+
+2026-08-17T18:22:13Z abort · item aWalkedCorpus · reason Landing refused, not attempted: origin/main is RED on two of its own merge-bar legs at 43eb6b1, measured in a clean detached worktree carrying none of this branch's changes — lexicon naming predicates (verb offenders 450 over pin 417) and govkit selftest (the DEFAULT-selection apply arm). The unit is BUILT, reviewed across four rounds and CLOSED, and every leg this run owns is green on the reconciled tree; the pre-push hook runs the full bar and would refuse the push, and bypassing it discards the entire bar the standing mandate leans on. Raising another build's shrink-only pin or re-pinning its selftest arm is a SCOPE decision a standing mandate does not delegate, so it is parked as TOOL-aWalkedCorpus-7 rather than absorbed. The branch is complete and committed: merge and push it once main is green, or hand the two legs to their owning builds first.
