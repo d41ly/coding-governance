@@ -107,6 +107,17 @@ def read_fixture(path: pathlib.Path) -> list[dict]:
     queries = blob.get("queries") if isinstance(blob, dict) else blob
     if not isinstance(queries, list) or not queries:
         raise CheckRefused(f"fixture carries no queries: {path.as_posix()}")
+    # The ELEMENTS, not just the container. Validating only the list let a hand edit reach
+    # `bench.rank_with(..., q["query"])` and die on a KeyError three branches later, reported as
+    # exit 1 -- this program's "a predicate failed" code -- so a malformed fixture was
+    # indistinguishable from a genuine recall regression on the bar.
+    for i, q in enumerate(queries, 1):
+        if not isinstance(q, dict) or not isinstance(q.get("query"), str) or not q["query"].strip():
+            raise CheckRefused(f"fixture question {i} carries no `query`: {path.as_posix()}")
+        ids = q.get("expected_ids", [])
+        if not isinstance(ids, list) or any(not isinstance(x, str) for x in ids):
+            raise CheckRefused(
+                f"fixture question {i} has a non-string `expected_ids`: {path.as_posix()}")
     return queries
 
 
@@ -150,7 +161,15 @@ def build_data_dir(root: pathlib.Path) -> pathlib.Path:
     )
     if proc.returncode != 0:
         shutil.rmtree(out, ignore_errors=True)
-        raise CheckRefused(f"extract.py failed ({proc.returncode}):\n{proc.stderr.strip()}")
+        # The LAST stderr line, not the whole stream. Embedding a subprocess traceback inside a
+        # refusal makes the refusal read like a crash, which is the exact confusion this branch
+        # exists to remove; the full trace is one `python extract.py <root> <dir>` away and the
+        # message says so.
+        tail = next((ln for ln in reversed(proc.stderr.strip().splitlines()) if ln.strip()), "")
+        raise CheckRefused(
+            f"extract.py failed ({proc.returncode}): {tail.strip()} "
+            f"-- rerun `python {(KIT / 'extract.py').as_posix()} {root.as_posix()} <dir>` for the trace"
+        )
     return out
 
 
@@ -185,36 +204,39 @@ def measure_run(data: pathlib.Path, queries: list[dict], pin: dict) -> dict:
     resolved = sum(1 for p in per if p["resolves"])
     hits = sum(1 for p in per if p["hit"])
     return {
-        "docs": docs, "anchors": anchors, "per": per, "n": n,
+        "docs": docs, "per": per, "n": n,
         "unresolved": unresolved, "R": resolved, "h": hits,
         "ceiling": resolved / n, "cell_value": hits / n,
     }
 
 
-def measure_overlap(run: dict, pin: dict) -> list[dict]:
+def measure_overlap(run: dict) -> list[dict]:
     """Per question: how much of its vocabulary it shares with the records that answer it.
 
     The denominator is the QUESTION's distinct content terms; the target text is the UNION of every
-    record carrying any of its expected ids. The reduction has to be named because the readings
-    disagree materially -- first-home and last-home both report a different set, and last-home reads
-    0.000 on four of the committed questions, hiding a tautological one rather than catching it.
+    document the RUN ITSELF resolved for that question. Reusing `measure_run`'s targets is
+    load-bearing rather than tidy: an earlier cut re-implemented resolution as a records-only
+    `id ->  doc` map, so a question the run could not resolve scored `overlap 0.000` — a PASS, and the
+    most independent row in the table. Under a `chunks:` pin, where docs carry no `id` at all, EVERY
+    row read 0.000 and the anti-tautology guard was vacuous for a whole in-vocabulary set. That is
+    `memory/gotchas/fixture-passes-by-finding-nothing.md` inside the gate written to close it, and
+    AGENTS.md's own rule is that a probe which cannot move prints DEAD PROBE, never a reassuring 0.
+
+    A question with no resolved target therefore reports `overlap = None` — NOT MEASURED — which
+    `check_audit` reds on and excludes from the summary, rather than averaging in as a perfect row.
     `bench.terms` is imported so the audit and the index agree on what a content word is.
     """
-    by_id: dict[str, list[dict]] = {}
-    for r in run["docs"]:
-        if "id" in r:
-            by_id.setdefault(r["id"], []).append(r)
     rows = []
     for p in run["per"]:
         q = p["q"]
-        ids = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
-        homes = [r for tid in ids for r in by_id.get(tid, [])]
+        idx = {d for hs in p["targets"].values() for d in hs}
         target_terms: set[str] = set()
-        for r in homes:
-            target_terms |= set(bench.terms(r["text"]))
+        for i in idx:
+            target_terms |= set(bench.terms(run["docs"][i]["text"]))
         qt = list(dict.fromkeys(bench.terms(q["query"])))
-        overlap = len([t for t in qt if t in target_terms]) / max(1, len(qt))
-        rows.append({"ids": ids, "homes": len(homes), "overlap": overlap,
+        overlap = (len([x for x in qt if x in target_terms]) / max(1, len(qt))) if idx else None
+        rows.append({"ids": [i.strip() for i in q.get("expected_ids", []) if i.strip()],
+                     "homes": len(idx), "overlap": overlap,
                      "hit": p["hit"], "declared_hit": q.get("hits")})
     return rows
 
@@ -226,14 +248,19 @@ def check_audit(run: dict, pin: dict) -> list[str]:
     the pin is derived from -- in a repo whose own corpus moves. Measuring them here is what turns
     the table into documentation a gate keeps honest.
     """
-    rows = measure_overlap(run, pin)
+    rows = measure_overlap(run)
     failures = []
     print(f"{'#':>3}  {'expected id':<28} {'homes':>5} {'hits':>5} {'overlap':>8}")
     for i, row in enumerate(rows, 1):
         tag = "yes" if row["hit"] else "no"
-        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['homes']:>5} {tag:>5} "
-              f"{row['overlap']:>8.3f}")
-        if row["overlap"] > OVERLAP_MAX:
+        shown = "NOT MEAS" if row["overlap"] is None else f"{row['overlap']:.3f}"
+        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['homes']:>5} {tag:>5} {shown:>8}")
+        if row["overlap"] is None:
+            failures.append(
+                f"question {i} resolves no target in {pin['set']!r} -- overlap is NOT MEASURED, "
+                f"which is a DEAD PROBE rather than a passing 0.000"
+            )
+        elif row["overlap"] > OVERLAP_MAX:
             failures.append(
                 f"question {i} overlaps its target at {row['overlap']:.3f} > OVERLAP_MAX "
                 f"{OVERLAP_MAX:.2f} -- written from the record's own text?"
@@ -244,8 +271,14 @@ def check_audit(run: dict, pin: dict) -> list[str]:
             )
     h, R = run["h"], run["R"]
     headroom = (h - 1) / (R - 1) if R > 1 else float("nan")
-    print(f"\noverlap: max {max(r['overlap'] for r in rows):.3f} "
-          f"mean {sum(r['overlap'] for r in rows) / len(rows):.3f}  (OVERLAP_MAX {OVERLAP_MAX:.2f})")
+    # Only MEASURED rows enter the summary. Averaging an unmeasured row in as 0.000 is what made the
+    # earlier cut read healthiest exactly when it was measuring nothing.
+    live = [r["overlap"] for r in rows if r["overlap"] is not None]
+    if live:
+        print(f"\noverlap: max {max(live):.3f} mean {sum(live) / len(live):.3f}  "
+              f"over {len(live)}/{len(rows)} measured  (OVERLAP_MAX {OVERLAP_MAX:.2f})")
+    else:
+        print(f"\noverlap: NOT MEASURED on any of {len(rows)} question(s)")
     print(f"derivation: h={h} R={R}  (h-1)/(R-1) = {headroom:.4f}  "
           f"declared {PIN_KEY} {pin['value']:.2f}")
     if headroom == headroom and headroom < pin["value"]:
@@ -278,13 +311,16 @@ def main() -> int:
         return 2
 
     try:
-        if args.data_dir:
-            data = pathlib.Path(args.data_dir)
-        else:
-            data = scratch = build_data_dir(root)
         try:
+            if args.data_dir:
+                data = pathlib.Path(args.data_dir)
+            else:
+                data = scratch = build_data_dir(root)
             run = measure_run(data, queries, pin)
         except CheckRefused as exc:
+            # ONE handler over BOTH preconditions. Splitting them left `build_data_dir`'s refusal
+            # escaping as a traceback and exit 1, and it is the only branch the leg's own argv
+            # reaches -- every arm passes --data-dir.
             print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
             return 2
 

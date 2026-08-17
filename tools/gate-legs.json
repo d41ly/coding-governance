@@ -1,641 +1,642 @@
 [
- {
-  "name": "memory hygiene (20 checks)",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-memory-hygiene.sh"
-  ]
- },
- {
-  "name": "kickoff-manifest ratchet",
-  "argv": [
-   "bash",
-   "skills/session-kickoff/manifest-check.sh"
-  ]
- },
- {
-  "name": "template size <=48KiB",
-  "argv": [
-   "bash",
-   "tools/check-template-size.sh"
-  ]
- },
- {
-  "name": "playbook parity",
-  "argv": [
-   "bash",
-   "tools/check-playbook-parity.sh"
-  ]
- },
- {
-  "name": "playbook parity selftest",
-  "guard": [
-   "tools/check-playbook-parity.sh",
-   "tools/check-playbook-parity.test.sh",
-   "tools/playbook-kit-waivers.txt"
-  ],
-  "argv": [
-   "bash",
-   "tools/check-playbook-parity.test.sh"
-  ]
- },
- {
-  "name": "template size gate selftest",
-  "argv": [
-   "bash",
-   "tools/check-template-size.test.sh"
-  ]
- },
- {
-  "name": "kickoff engine size <=18KiB",
-  "argv": [
-   "bash",
-   "tools/check-template-size.sh",
-   "skills/session-kickoff/SKILL.md"
-  ]
- },
- {
-  "name": "kit version markers",
-  "argv": [
-   "bash",
-   "tools/check-kit-versions.sh"
-  ]
- },
- {
-  "name": "verdict epoch (kit version dates the engine)",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-verdict-epoch.sh"
-  ]
- },
- {
-  "name": "verdict-epoch self-test",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-verdict-epoch.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "agent-instructions wiring",
-  "argv": [
-   "bash",
-   "tools/agent-instructions/adopt-agent-instructions.sh",
-   "--check",
-   "--aliases",
-   "claude"
-  ]
- },
- {
-  "name": "manifest-check self-test",
-  "argv": [
-   "bash",
-   "skills/session-kickoff/manifest-check.test.sh"
-  ],
-  "guard": [
-   "skills/session-kickoff/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "python resolver (behaviour + inline parity + idiom ban)",
-  "argv": [
-   "bash",
-   "tools/lib/resolve-python.test.sh"
-  ],
-  "guard": [
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "agent-cap self-test",
-  "argv": [
-   "bash",
-   "tools/hooks/agent-cap.test.sh"
-  ],
-  "guard": [
-   "tools/hooks/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "agent-instructions self-test",
-  "argv": [
-   "bash",
-   "tools/agent-instructions/adopt-agent-instructions.test.sh"
-  ],
-  "guard": [
-   "tools/agent-instructions/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "memory-hygiene self-test",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-memory-hygiene.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "row-keyed merge driver replay",
-  "argv": [
-   "bash",
-   "tools/memory-tree/merge-rows.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "kit/dogfood doc parity",
-  "argv": [
-   "bash",
-   "tools/memory-tree/kit-dogfood-parity.test.sh"
-  ],
-  "guard": [
-   "memory/HYGIENE.md",
-   "memory/TEMPLATE-SPEC.md",
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "method carriers (every pointer declared)",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-method-carriers.sh"
-  ]
- },
- {
-  "name": "method-carriers self-test",
-  "argv": [
-   "bash",
-   "tools/memory-tree/check-method-carriers.test.sh"
-  ]
- },
- {
-  "name": "build-index selftest",
-  "argv": [
-   "python3",
-   "tools/memory-tree/gen_build_index.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "corpus-ids selftest",
-  "argv": [
-   "python3",
-   "tools/memory-tree/corpus_ids.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "gotchas selftest",
-  "argv": [
-   "python3",
-   "tools/memory-tree/gotchas.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "row-grammar selftest",
-  "argv": [
-   "python3",
-   "tools/memory-tree/row_grammar.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "marker contract (4 readers)",
-  "argv": [
-   "bash",
-   "tools/memory-tree/marker-contract.test.sh"
-  ]
- },
- {
-  "name": "harness arms (fail branches armed or pinned)",
-  "argv": [
-   "python3",
-   "tools/memory-tree/check-arms.py",
-   "--check"
-  ]
- },
- {
-  "name": "check-arms selftest",
-  "argv": [
-   "python3",
-   "tools/memory-tree/check-arms.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-tree/"
-  ]
- },
- {
-  "name": "branch-guard self-test",
-  "argv": [
-   "bash",
-   ".githooks/pre-commit.test.sh"
-  ],
-  "guard": [
-   ".githooks/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "pre-push self-test",
-  "argv": [
-   "bash",
-   ".githooks/pre-push.test.sh"
-  ],
-  "guard": [
-   ".githooks/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "push-main self-test",
-  "argv": [
-   "bash",
-   "tools/push-main.test.sh"
-  ],
-  "guard": [
-   ".githooks/",
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "check-wiring self-test",
-  "argv": [
-   "bash",
-   "tools/check-wiring.test.sh"
-  ],
-  "guard": [
-   ".claude/",
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "verifier fan-out (≤5 verify agents per review)",
-  "argv": [
-   "bash",
-   "tools/workflows/check-verifier-fanout.sh"
-  ]
- },
- {
-  "name": "verifier fan-out self-test",
-  "argv": [
-   "bash",
-   "tools/workflows/check-verifier-fanout.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/workflows/"
-  ]
- },
- {
-  "name": "review-protocol parity (kit vs dogfood)",
-  "argv": [
-   "bash",
-   "tools/workflows/check-protocol-parity.test.sh"
-  ],
-  "guard": [
-   "memory/guides/REVIEW-PROTOCOL.md",
-   "tools/lib/",
-   "tools/workflows/"
-  ]
- },
- {
-  "name": "review-join ban (no ref-keyed join)",
-  "argv": [
-   "bash",
-   "tools/workflows/check-review-join.sh"
-  ]
- },
- {
-  "name": "workflow script syntax",
-  "argv": [
-   "node",
-   "tools/workflows/check-workflow-syntax.js"
-  ]
- },
- {
-  "name": "review-join self-test",
-  "argv": [
-   "bash",
-   "tools/workflows/check-review-join.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/workflows/"
-  ]
- },
- {
-  "name": "pytest-guardrails self-test",
-  "argv": [
-   "bash",
-   "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/pytest-parallel-guardrails/"
-  ]
- },
- {
-  "name": "codebase-map kit selftest",
-  "argv": [
-   "python3",
-   "tools/codebase-map/selftest.py"
-  ],
-  "guard": [
-   "tools/codebase-map/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "codebase-map coverage + freshness",
-  "argv": [
-   "python3",
-   "tools/codebase-map/test_codebase_map.py"
-  ]
- },
- {
-  "name": "codebase-map adopter e2e",
-  "argv": [
-   "bash",
-   "tools/codebase-map/adopt-codebase-map.test.sh"
-  ],
-  "guard": [
-   "tools/codebase-map/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "settings-merge selftest",
-  "argv": [
-   "python3",
-   "tools/settings-merge.py",
-   "--selftest"
-  ],
-  "guard": [
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "memory-recall kit selftest",
-  "argv": [
-   "python3",
-   "tools/memory-recall/selftest.py"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/memory-recall/"
-  ]
- },
- {
-  "name": "recall floor",
-  "argv": [
-   "python3",
-   "tools/memory-recall/check-recall.py"
-  ],
-  "guard": [
-   "tools/memory-recall/",
-   "memory/"
-  ]
- },
- {
-  "name": "recall floor arms",
-  "argv": [
-   "python3",
-   "tools/memory-recall/test_recall_floor.py"
-  ],
-  "guard": [
-   "tools/memory-recall/",
-   "memory/"
-  ]
- },
- {
-  "name": "memory-recall skill wiring",
-  "argv": [
-   "bash",
-   "tools/memory-recall/adopt-memory-recall.sh",
-   "--check"
-  ]
- },
- {
-  "name": "drift-audit selftest",
-  "argv": [
-   "python",
-   "tools/drift-audit/selftest.py"
-  ],
-  "guard": [
-   "tools/drift-audit/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "drift-audit wiring",
-  "argv": [
-   "bash",
-   "tools/drift-audit/adopt-drift-audit.sh",
-   "--check"
-  ]
- },
- {
-  "name": "drift-audit records",
-  "argv": [
-   "python",
-   "tools/drift-audit/drift_report.py",
-   "--check"
-  ]
- },
- {
-  "name": "unattended kit gate",
-  "argv": [
-   "bash",
-   "tools/unattended/check-unattended.sh"
-  ]
- },
- {
-  "name": "unattended gate selftest",
-  "argv": [
-   "bash",
-   "tools/unattended/check-unattended.test.sh"
-  ],
-  "guard": [
-   "memory/guides/UNATTENDED-PROTOCOL.md",
-   "tools/lib/",
-   "tools/unattended/"
-  ]
- },
- {
-  "name": "unattended driver selftest",
-  "argv": [
-   "bash",
-   "tools/unattended/unattended.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/unattended/"
-  ]
- },
- {
-  "name": "unattended skill wiring",
-  "argv": [
-   "bash",
-   "tools/unattended/adopt-unattended.sh",
-   "--check"
-  ]
- },
- {
-  "name": "unattended adopter e2e",
-  "argv": [
-   "bash",
-   "tools/unattended/adopt-unattended.test.sh"
-  ],
-  "guard": [
-   "tools/lib/",
-   "tools/unattended/"
-  ]
- },
- {
-  "name": "run-gates canary",
-  "argv": [
-   "bash",
-   "tools/run-gates.test.sh"
-  ],
-  "guard": [
-   "tools/",
-   "tools/gate-legs.json",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "run-gates evidence",
-  "argv": [
-   "bash",
-   "tools/run-gates.evidence.test.sh"
-  ],
-  "guard": [
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "install-prefix (shipped surface)",
-  "argv": [
-   "bash",
-   "tools/check-install-prefix.sh"
-  ]
- },
- {
-  "name": "install-prefix self-test",
-  "argv": [
-   "bash",
-   "tools/check-install-prefix.test.sh"
-  ],
-  "guard": [
-   "tools/",
-   "tools/lib/"
-  ]
- },
- {
-  "name": "govkit selfcheck",
-  "argv": [
-   "python",
-   "tools/govkit/govkit.py",
-   "selfcheck"
-  ]
- },
- {
-  "name": "govkit selftest",
-  "argv": [
-   "python",
-   "tools/govkit/selftest.py"
-  ],
-  "guard": [
-   "tools/govkit/"
-  ]
- },
- {
-  "name": "lexicon naming predicates",
-  "argv": [
-   "python",
-   "tools/lexicon/lexicon.py"
-  ],
-  "guard": [
-   "tools/",
-   "skills/session-kickoff/",
-   ".githooks/",
-   ".claude/"
-  ]
- },
- {
-  "name": "lexicon selftest",
-  "argv": [
-   "python",
-   "tools/lexicon/selftest.py"
-  ],
-  "guard": [
-   "tools/lexicon/"
-  ]
- },
- {
-  "name": "lexicon wiring",
-  "argv": [
-   "bash",
-   "tools/lexicon/adopt-lexicon.sh",
-   "--check"
-  ],
-  "guard": [
-   "tools/lexicon/"
-  ]
- },
- {
-  "name": "playbook placeholder catalogue",
-  "argv": [
-   "bash",
-   "tools/check-placeholders.sh"
-  ]
- },
- {
-  "name": "placeholder-catalogue self-test",
-  "argv": [
-   "bash",
-   "tools/check-placeholders.test.sh"
-  ],
-  "guard": [
-   "tools/check-placeholders.sh",
-   "tools/check-placeholders.test.sh"
-  ]
- }
+  {
+    "name": "memory hygiene (20 checks)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-memory-hygiene.sh"
+    ]
+  },
+  {
+    "name": "kickoff-manifest ratchet",
+    "argv": [
+      "bash",
+      "skills/session-kickoff/manifest-check.sh"
+    ]
+  },
+  {
+    "name": "template size <=48KiB",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh"
+    ]
+  },
+  {
+    "name": "playbook parity",
+    "argv": [
+      "bash",
+      "tools/check-playbook-parity.sh"
+    ]
+  },
+  {
+    "name": "playbook parity selftest",
+    "guard": [
+      "tools/check-playbook-parity.sh",
+      "tools/check-playbook-parity.test.sh",
+      "tools/playbook-kit-waivers.txt"
+    ],
+    "argv": [
+      "bash",
+      "tools/check-playbook-parity.test.sh"
+    ]
+  },
+  {
+    "name": "template size gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-template-size.test.sh"
+    ]
+  },
+  {
+    "name": "kickoff engine size <=18KiB",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "skills/session-kickoff/SKILL.md"
+    ]
+  },
+  {
+    "name": "kit version markers",
+    "argv": [
+      "bash",
+      "tools/check-kit-versions.sh"
+    ]
+  },
+  {
+    "name": "verdict epoch (kit version dates the engine)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-verdict-epoch.sh"
+    ]
+  },
+  {
+    "name": "verdict-epoch self-test",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-verdict-epoch.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "agent-instructions wiring",
+    "argv": [
+      "bash",
+      "tools/agent-instructions/adopt-agent-instructions.sh",
+      "--check",
+      "--aliases",
+      "claude"
+    ]
+  },
+  {
+    "name": "manifest-check self-test",
+    "argv": [
+      "bash",
+      "skills/session-kickoff/manifest-check.test.sh"
+    ],
+    "guard": [
+      "skills/session-kickoff/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "python resolver (behaviour + inline parity + idiom ban)",
+    "argv": [
+      "bash",
+      "tools/lib/resolve-python.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "agent-cap self-test",
+    "argv": [
+      "bash",
+      "tools/hooks/agent-cap.test.sh"
+    ],
+    "guard": [
+      "tools/hooks/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "agent-instructions self-test",
+    "argv": [
+      "bash",
+      "tools/agent-instructions/adopt-agent-instructions.test.sh"
+    ],
+    "guard": [
+      "tools/agent-instructions/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "memory-hygiene self-test",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-memory-hygiene.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "row-keyed merge driver replay",
+    "argv": [
+      "bash",
+      "tools/memory-tree/merge-rows.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "kit/dogfood doc parity",
+    "argv": [
+      "bash",
+      "tools/memory-tree/kit-dogfood-parity.test.sh"
+    ],
+    "guard": [
+      "memory/HYGIENE.md",
+      "memory/TEMPLATE-SPEC.md",
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "method carriers (every pointer declared)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-method-carriers.sh"
+    ]
+  },
+  {
+    "name": "method-carriers self-test",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-method-carriers.test.sh"
+    ]
+  },
+  {
+    "name": "build-index selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/gen_build_index.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "corpus-ids selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/corpus_ids.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "gotchas selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/gotchas.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "row-grammar selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/row_grammar.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "marker contract (4 readers)",
+    "argv": [
+      "bash",
+      "tools/memory-tree/marker-contract.test.sh"
+    ]
+  },
+  {
+    "name": "harness arms (fail branches armed or pinned)",
+    "argv": [
+      "python3",
+      "tools/memory-tree/check-arms.py",
+      "--check"
+    ]
+  },
+  {
+    "name": "check-arms selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/check-arms.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ]
+  },
+  {
+    "name": "branch-guard self-test",
+    "argv": [
+      "bash",
+      ".githooks/pre-commit.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "pre-push self-test",
+    "argv": [
+      "bash",
+      ".githooks/pre-push.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "push-main self-test",
+    "argv": [
+      "bash",
+      "tools/push-main.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "check-wiring self-test",
+    "argv": [
+      "bash",
+      "tools/check-wiring.test.sh"
+    ],
+    "guard": [
+      ".claude/",
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "verifier fan-out (\u22645 verify agents per review)",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.sh"
+    ]
+  },
+  {
+    "name": "verifier fan-out self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/workflows/"
+    ]
+  },
+  {
+    "name": "review-protocol parity (kit vs dogfood)",
+    "argv": [
+      "bash",
+      "tools/workflows/check-protocol-parity.test.sh"
+    ],
+    "guard": [
+      "memory/guides/REVIEW-PROTOCOL.md",
+      "tools/lib/",
+      "tools/workflows/"
+    ]
+  },
+  {
+    "name": "review-join ban (no ref-keyed join)",
+    "argv": [
+      "bash",
+      "tools/workflows/check-review-join.sh"
+    ]
+  },
+  {
+    "name": "workflow script syntax",
+    "argv": [
+      "node",
+      "tools/workflows/check-workflow-syntax.js"
+    ]
+  },
+  {
+    "name": "review-join self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/check-review-join.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/workflows/"
+    ]
+  },
+  {
+    "name": "pytest-guardrails self-test",
+    "argv": [
+      "bash",
+      "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/pytest-parallel-guardrails/"
+    ]
+  },
+  {
+    "name": "codebase-map kit selftest",
+    "argv": [
+      "python3",
+      "tools/codebase-map/selftest.py"
+    ],
+    "guard": [
+      "tools/codebase-map/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "codebase-map coverage + freshness",
+    "argv": [
+      "python3",
+      "tools/codebase-map/test_codebase_map.py"
+    ]
+  },
+  {
+    "name": "codebase-map adopter e2e",
+    "argv": [
+      "bash",
+      "tools/codebase-map/adopt-codebase-map.test.sh"
+    ],
+    "guard": [
+      "tools/codebase-map/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "settings-merge selftest",
+    "argv": [
+      "python3",
+      "tools/settings-merge.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "memory-recall kit selftest",
+    "argv": [
+      "python3",
+      "tools/memory-recall/selftest.py"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-recall/"
+    ]
+  },
+  {
+    "name": "recall floor",
+    "argv": [
+      "python3",
+      "tools/memory-recall/check-recall.py"
+    ],
+    "guard": [
+      "tools/memory-recall/",
+      "memory/"
+    ]
+  },
+  {
+    "name": "recall floor arms",
+    "argv": [
+      "python3",
+      "tools/memory-recall/test_recall_floor.py"
+    ],
+    "guard": [
+      "tools/memory-recall/",
+      "memory/",
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "memory-recall skill wiring",
+    "argv": [
+      "bash",
+      "tools/memory-recall/adopt-memory-recall.sh",
+      "--check"
+    ]
+  },
+  {
+    "name": "drift-audit selftest",
+    "argv": [
+      "python",
+      "tools/drift-audit/selftest.py"
+    ],
+    "guard": [
+      "tools/drift-audit/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "drift-audit wiring",
+    "argv": [
+      "bash",
+      "tools/drift-audit/adopt-drift-audit.sh",
+      "--check"
+    ]
+  },
+  {
+    "name": "drift-audit records",
+    "argv": [
+      "python",
+      "tools/drift-audit/drift_report.py",
+      "--check"
+    ]
+  },
+  {
+    "name": "unattended kit gate",
+    "argv": [
+      "bash",
+      "tools/unattended/check-unattended.sh"
+    ]
+  },
+  {
+    "name": "unattended gate selftest",
+    "argv": [
+      "bash",
+      "tools/unattended/check-unattended.test.sh"
+    ],
+    "guard": [
+      "memory/guides/UNATTENDED-PROTOCOL.md",
+      "tools/lib/",
+      "tools/unattended/"
+    ]
+  },
+  {
+    "name": "unattended driver selftest",
+    "argv": [
+      "bash",
+      "tools/unattended/unattended.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
+    ]
+  },
+  {
+    "name": "unattended skill wiring",
+    "argv": [
+      "bash",
+      "tools/unattended/adopt-unattended.sh",
+      "--check"
+    ]
+  },
+  {
+    "name": "unattended adopter e2e",
+    "argv": [
+      "bash",
+      "tools/unattended/adopt-unattended.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
+    ]
+  },
+  {
+    "name": "run-gates canary",
+    "argv": [
+      "bash",
+      "tools/run-gates.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/gate-legs.json",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "run-gates evidence",
+    "argv": [
+      "bash",
+      "tools/run-gates.evidence.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "install-prefix (shipped surface)",
+    "argv": [
+      "bash",
+      "tools/check-install-prefix.sh"
+    ]
+  },
+  {
+    "name": "install-prefix self-test",
+    "argv": [
+      "bash",
+      "tools/check-install-prefix.test.sh"
+    ],
+    "guard": [
+      "tools/",
+      "tools/lib/"
+    ]
+  },
+  {
+    "name": "govkit selfcheck",
+    "argv": [
+      "python",
+      "tools/govkit/govkit.py",
+      "selfcheck"
+    ]
+  },
+  {
+    "name": "govkit selftest",
+    "argv": [
+      "python",
+      "tools/govkit/selftest.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "lexicon naming predicates",
+    "argv": [
+      "python",
+      "tools/lexicon/lexicon.py"
+    ],
+    "guard": [
+      "tools/",
+      "skills/session-kickoff/",
+      ".githooks/",
+      ".claude/"
+    ]
+  },
+  {
+    "name": "lexicon selftest",
+    "argv": [
+      "python",
+      "tools/lexicon/selftest.py"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "lexicon wiring",
+    "argv": [
+      "bash",
+      "tools/lexicon/adopt-lexicon.sh",
+      "--check"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "playbook placeholder catalogue",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.sh"
+    ]
+  },
+  {
+    "name": "placeholder-catalogue self-test",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.test.sh"
+    ],
+    "guard": [
+      "tools/check-placeholders.sh",
+      "tools/check-placeholders.test.sh"
+    ]
+  }
 ]

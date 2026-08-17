@@ -1,6 +1,6 @@
 # TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists
 
-**Status:** OPEN · rev-4 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-5 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -459,6 +459,25 @@ program never reached.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-17 · **folded the round-4 closing review of the BUILT unit: SHIP WITH FIXES, 0
+  blockers, 2 high, 3 medium, 6 low — all 11 applied, each with an arm.** F2 (high) is the sharp one
+  and it is this unit's own subject class for the third time: `measure_overlap` re-implemented target
+  resolution records-only, so a question the run could not resolve scored `overlap 0.000` — a PASS,
+  and under a `chunks:` pin EVERY row read 0.000 with the guard fully vacuous. It now reuses the
+  run's own targets, reports NOT MEASURED as a red, and excludes unmeasured rows from the summary;
+  the chunks pin measures 12/12 through the anchor map. F1 (high): every arm leaked an ~8 MB corpus
+  copy, 15 per run, ~2 GB accumulated on one node — tracked and removed, with a leak-delta assertion
+  in `main()`. F3: `build_data_dir`'s refusal escaped as a traceback at exit 1, the one branch no arm
+  reached because all of them pass `--data-dir`; one handler now covers both preconditions and the
+  refusal carries extract's last stderr line rather than its whole trace. F4: `read_fixture`
+  validated the container, not the questions. The six lows: the derivation guard is one-directional
+  and three records said otherwise (narrowed to what the code does), the withholding binds
+  `govkit apply` only so `WIRE-INTO-PROJECT.md` gains its own delete step, the arms leg guard gains
+  `tools/govkit/`, the fixture header contradicted its own armed gate, `sys.path.insert` sat after
+  the import it enabled (15 of 16 arms died under `-P`), `gate-legs.json` had been rewritten
+  wholesale into 639/617 lines with three non-ASCII bytes and is now a 23-line ASCII addition, and
+  `measure_run` returned a dead `anchors` key that made F2's gap look covered. Arms 16 -> 20; the
+  bar is 65/65.
 - rev-4 · 2026-08-17 · **the BUILD found what two adversarial spec reviews could not.** rev-3's
   predicate 4 asked whether the pinned `<metric>@<k>` appeared in the report; `bench.score()` emits
   `r@k` and `f@k` for any `k`, and the pin grammar admits only those two metrics, so the branch was

@@ -2078,6 +2078,16 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_audit_measures_chunk_targets",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_audit_reds_on_unresolved_target",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_baseline_green",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2133,6 +2143,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_extract_failure_refuses",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2159,6 +2174,11 @@
     },
     {
       "id": "test_malformed_pin_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_malformed_question_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
     },

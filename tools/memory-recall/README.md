@@ -166,7 +166,9 @@ resolve at all.
 worst case is `(h-1)/(R-1) = 0.8182`, so the pin sits just below it and the property it buys is that
 retiring one hitting record costs nothing. Retiring a NON-hitting one raises the score. A regression
 with no retirement (`9/12 = 0.75`) reds. Re-measure with `--audit-fixture`, which prints `h`, `R` and
-`(h-1)/(R-1)` beside the declared value and reds if a fixture edit moved either without re-deriving.
+`(h-1)/(R-1)` beside the declared value. It reds in ONE direction — when the pin has become LOOSER
+than the worst case, i.e. unsafe. A pin left merely conservative is caught by the arms, which assert
+the literal `h=10 R=12`.
 
 **Two predicates, and each can red ALONE** — two checks that only ever fail together are one check
 wearing two names. `test_recall_floor.py` proves both directions on this corpus:

@@ -14,9 +14,10 @@
     "`check-recall.py --audit-fixture` measures that mechanically as content-term overlap against the",
     "target's own text and reds above OVERLAP_MAX. See memory/gotchas/fixture-passes-by-finding-nothing.md.",
     "",
-    "`hits` records whether the question is answered at the pinned cell TODAY. It is documentation of",
-    "the fixture's shape, not an input: nothing reads it, and the two misses are in the set precisely",
-    "because they fail."
+    "`hits` records whether the question is answered at the pinned cell TODAY. It is not an input to",
+    "the SCORE -- nothing in the grading path reads it -- but `--audit-fixture` compares it against the",
+    "measurement and reds on a disagreement, so it is documentation a gate keeps honest. The two",
+    "misses are in the set precisely because they fail."
   ],
   "queries": [
     {

@@ -277,6 +277,17 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    `check-wiring.sh` probes both spellings — but `tools/` is what this runbook declares, and
    `corpus_ids.py` needs memory-tree and memory-recall to be SIBLINGS, so they move together:
    `cp -r <gov>/tools/memory-recall <project>/tools/memory-recall`.
+
+   **Then delete the three GOV-ONLY files that copy brings with it.** `kit.toml` withholds them from
+   `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
+   ```bash
+   rm -f <project>/tools/memory-recall/{check-recall.py,recall-fixture.json,test_recall_floor.py}
+   ```
+   They are gov's recall floor: a question set keyed on gov record ids, the gate that grades it, and
+   its arms. A question set from another corpus grades nothing in yours, and a floor copied from one
+   is `memory/gotchas/pin-copied-from-another-corpus.md`. Keeping them is loud rather than silent —
+   `check-recall.py` refuses with `RECALL_FLOOR is not declared` — but it is still a file you did not
+   ask for. If you later want a floor, author your own fixture and MEASURE your own value.
 2. Render the Skill from the conf and prove the index sees your ids. The Skill's `description` is the
    whole trigger mechanism and it names project values (id families, query path, corpus root), so it
    is GENERATED, never shipped:

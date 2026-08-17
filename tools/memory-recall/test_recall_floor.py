@@ -38,6 +38,18 @@ CHECK = KIT / "check-recall.py"
 FIXTURE = KIT / "recall-fixture.json"
 ROOT = KIT.parent.parent
 
+# BEFORE the deferred sibling import below, not after it. Written after, the insert is a no-op and
+# the import resolves only because CPython seeds sys.path[0] with the script's directory -- the exact
+# accident it was written not to depend on. Under `python -P` that seeding is off and 15 of 16 arms
+# died on ModuleNotFoundError while the file looked correct.
+sys.path.insert(0, str(KIT))
+
+# Every scratch dir this file creates, so main() can remove them. Each is a full copy of the
+# extracted corpus (~8 MB); with 15 call sites and GATE_FULL=1 on every push, leaking them grew to
+# ~2 GB on one node before a review measured it. `check-recall.py` removes its own in a `finally`,
+# which is the asymmetry that made this an omission rather than a convention.
+_SCRATCH: list[pathlib.Path] = []
+
 _checks: list[tuple[str, str, str]] = []
 
 
@@ -70,7 +82,6 @@ def build_base_dir() -> pathlib.Path:
         out = pathlib.Path(tempfile.mkdtemp(prefix="recallarm-base-"))
         import query  # noqa: PLC0415 — imported here so a missing sibling fails as an arm, not at load
 
-        sys.path.insert(0, str(KIT))
         proc = subprocess.run(
             [sys.executable, str(KIT / "extract.py"), str(ROOT), str(out),
              "--chunk-max", str(query.CHUNK_MAX)],
@@ -85,6 +96,7 @@ def build_filtered(drop=None) -> pathlib.Path:
     """A copy of the base data dir with `records.jsonl` rows removed by a predicate."""
     src = build_base_dir()
     dst = pathlib.Path(tempfile.mkdtemp(prefix="recallarm-"))
+    _SCRATCH.append(dst)
     for name in ("spine", "records", "chunks"):
         rows = [ln for ln in (src / f"{name}.jsonl").read_text(encoding="utf-8").splitlines() if ln.strip()]
         if name == "records" and drop is not None:
@@ -358,14 +370,92 @@ def test_kit_payload_withholds():
     return f"3 withheld, selftest.py still shipped ({len(pool)} files in the ** pool)"
 
 
+@check("the overlap audit reds NOT MEASURED on an unresolvable target, never a passing 0.000")
+def test_audit_reds_on_unresolved_target():
+    """The liveness half of the anti-tautology guard.
+
+    An earlier cut re-implemented target resolution records-only, so a question the run could not
+    resolve scored `overlap 0.000` — the most independent row in the table, and a PASS. This arm is
+    the one that would have caught it.
+    """
+    d = build_filtered(lambda r: r.get("id") == "TOOL-aMouldedFolio-1")
+    p = run_check("--audit-fixture", "--data-dir", str(d))
+    out = read_lines(p)
+    assert p.returncode == 1, f"expected a red\n{out}"
+    assert "NOT MEAS" in out, f"the row must report NOT MEASURED\n{out}"
+    assert "DEAD PROBE" in out, f"and red as one\n{out}"
+    assert "over 11/12 measured" in out, f"an unmeasured row must leave the summary\n{out}"
+    return "row 10 NOT MEASURED, red, and excluded from max/mean"
+
+
+@check("the overlap audit MEASURES a chunks pin instead of reading 0.000 across the board")
+def test_audit_measures_chunk_targets():
+    """Chunk docs carry no `id`, so a records-only resolver read 0.000 on EVERY row and passed.
+
+    Reusing the run's own targets resolves chunks through the anchor map exactly as the scorer does,
+    so the guard is live for a whole second in-vocabulary set rather than vacuous for it.
+    """
+    p = run_check("--audit-fixture", "--data-dir", str(build_filtered()),
+                  conf_floor='RECALL_FLOOR="chunks:fts5:r@5>=0.05"')
+    out = read_lines(p)
+    assert "over 12/12 measured" in out, f"every chunk target must resolve\n{out}"
+    assert "max 0.000" not in out, f"a whole-set 0.000 is the vacuous reading\n{out}"
+    return "12/12 measured under a chunks pin — the guard is live for both sets"
+
+
+@check("a failed extraction REFUSES with exit 2, not a traceback at exit 1")
+def test_extract_failure_refuses():
+    """The one branch no other arm reaches: every other arm passes --data-dir, but the bar's leg
+    does not, so this was the gate's own path and the untested one."""
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallnorepo-"))
+    (tmp / ".memory-tree.conf").write_text(
+        'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nRECALL_FLOOR="records:fts5:r@5>=0.81"\n',
+        encoding="utf-8", newline="\n")
+    try:
+        p = subprocess.run([sys.executable, str(CHECK), "--repo", str(tmp)],
+                           capture_output=True, text=True, cwd=str(ROOT))
+        out = read_lines(p)
+        assert p.returncode == 2, f"expected refusal 2, got {p.returncode}\n{out}"
+        assert "REFUSED" in out, out
+        assert "Traceback" not in out, f"a refusal must not surface as a stack trace\n{out}"
+        return "exit 2 and REFUSED — not exit 1, which reads as a floor regression"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+@check("a question with no `query` REFUSES by index, not KeyError three branches later")
+def test_malformed_question_refuses():
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallfx-"))
+    fx = tmp / "malformed.json"
+    fx.write_text(json.dumps({"queries": [
+        {"query": "a real one", "expected_ids": ["TOOL-aStandingWrit-2"]},
+        {"expected_ids": ["TOOL-aStandingWrit-2"]},
+    ]}), encoding="utf-8", newline="\n")
+    try:
+        p = run_check("--data-dir", str(build_filtered()), fixture=fx)
+        out = read_lines(p)
+        assert p.returncode == 2, f"expected 2, got {p.returncode}\n{out}"
+        assert "question 2 carries no" in out, out
+        assert "KeyError" not in out, f"the container check must reach the elements\n{out}"
+        return "REFUSED naming the 1-based index"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main() -> int:
     for state, name, detail in _checks:
         mark = {"ok": "ok  ", "FAIL": "FAIL"}[state]
         print(f"{mark} {name}" + (f" — {detail}" if detail else ""))
     bad = [c for c in _checks if c[0] == "FAIL"]
     print(f"\n{len(_checks) - len(bad)}/{len(_checks)} arms green")
+    for d in _SCRATCH:
+        shutil.rmtree(d, ignore_errors=True)
     if _BASE is not None:
         shutil.rmtree(_BASE, ignore_errors=True)
+    leaked = [d for d in _SCRATCH if d.exists()]
+    if leaked:
+        print(f"FAIL scratch cleanup — {len(leaked)} dir(s) survived: {leaked[0]}")
+        return 1
     return 1 if bad else 0
 
 

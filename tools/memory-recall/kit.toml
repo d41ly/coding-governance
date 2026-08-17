@@ -10,7 +10,10 @@ requires = ["memory-tree"]
 include = "**"
 role = "engine"
 
-# The graded floor is GOV-ONLY, and these three are withheld by CLAIMING their destination — govkit
+# The graded floor is GOV-ONLY. NOTE THE SCOPE: this withholds them from `govkit apply` only. The
+# copy-install path WIRE-INTO-PROJECT.md documents is a plain `cp -r` of the kit dir and does not
+# read this file, so that runbook names the three as gov-only separately.
+# They are withheld by CLAIMING their destination — govkit
 # has no `exclude` key, and a `**` rule's pool drops only what another rule owns (scan_claimed_paths).
 # `project-owned` is absent from LANDABLE_ROLES, so `apply` never writes them. Without this the kit
 # ships an adopter a question set keyed on gov record ids, a program reading a `RECALL_FLOOR` their

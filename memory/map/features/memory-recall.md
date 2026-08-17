@@ -85,9 +85,10 @@ floor on the merge bar.
 - **No adopter gets a floor.** The parked half of that decision is recorded in
   `TOOL-aWalkedCorpus-3` §8: an adopter-facing version needs a seeding path and a measuring verb that
   differ in what gets BUILT, not merely in configuration.
-- **The pin's derivation is re-checked, not re-derived.** `--audit-fixture` prints `h`, `R` and
-  `(h-1)/(R-1)` beside the declared value and reds when they disagree; nothing recomputes the pin,
-  by design.
+- **The pin's derivation is re-checked in ONE direction.** `--audit-fixture` prints `h`, `R` and
+  `(h-1)/(R-1)` beside the declared value and reds only when the pin has become LOOSER than that
+  worst case. A pin left conservative by a fixture edit is caught instead by the arms, which assert
+  the literal counts. Nothing recomputes the pin, by design.
 
 ## Reuse affordance
 
