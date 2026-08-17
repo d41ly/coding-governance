@@ -88,7 +88,17 @@ git add -A && git commit -q -m base --no-verify
 # branch is a ref the run can move with `git branch -f` — a reproduced way to make BASE equal HEAD.
 # It lives OUTSIDE the work tree, or `git clean -qfd` in reset_tree deletes it.
 ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
-git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+# It must ADVERTISE a HEAD symref. Since TOOL-aBranchedMandate-3 the leg reads the remote rather
+# than any refs/remotes ref, and `git init --bare` leaves HEAD dangling — so without this line
+# ADV_HEAD is empty, check 15's second half is guarded off and check 9's ancestor-of-HEAD branch
+# is unreachable. The driver test carries the same line for the same reason.
+git init -q --bare "$ORIGIN"
+# SEPARATE LINES, not an && chain: chained, a non-zero from symbolic-ref silently skips the push,
+# `refs/remotes/origin/main` never exists, and the merge-base below resolves EMPTY — which showed
+# up as 33 arms failing with "records no BASE" rather than as anything about this line.
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+git remote add origin "$ORIGIN"
+git push -q origin main
 ANCHOR0=$(git rev-parse main)
 git checkout -q -b unit
 git commit -q --allow-empty -m "unit work" --no-verify
@@ -528,7 +538,10 @@ hit "$(run)" "a recorded BASE is not published on the remote — it is an ancest
 # ---- branches because they fail separately — the anchor can advance past a stale unit branch.
 reset_tree
 ahead=$(git commit-tree "$(git rev-parse "$ANCHOR0^{tree}")" -p "$ANCHOR0" -m ahead)
-git update-ref refs/remotes/origin/main "$ahead"
+# PUSHED, not update-ref'd. The old fixture moved `refs/remotes/origin/main`, which S6 no longer
+# reads, so the base was simply unpublished and check 9 refused one branch earlier. Reaching the
+# ancestor-of-HEAD branch needs a base that IS published and still off this working history.
+git push -q -f origin "$ahead:refs/heads/ahead" 2>/dev/null
 sed -i "s/^base: .*/base: $ahead/" memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on"
 
