@@ -1,4 +1,4 @@
-# worktree-guards kit — spec (port inCMS/nc worktree guards to a project-agnostic tools/ kit)
+# TOOL-aPortableWarden-1 — worktree-guards kit, spec (port inCMS/nc worktree guards to a project-agnostic tools/ kit)
 
 *2026-07-13 · TOOL-aPortableWarden-1 · status: SPECCED (pending adversarial review + owner approval).
 Ports the inCMS `workflow-guards` (ARCH-aVigilantWarden-1) — the branch-guard hooks + `install-guards`

@@ -85,7 +85,8 @@ The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling · ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling
+ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -93,4 +94,34 @@ from the status header of every spec in this folder — do not hand-edit it.
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md) | journal | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
+| [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md) | spec-audit | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md) | spec-audit | DEPL-aSealedCaravan-2 |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md) | spec-audit | DEPL-aSealedCaravan-2 |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-10-spec-DEPL-aSealedCaravan-2.md](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md)
+  - [2026-08-10-spec-TOOL-aSealedCaravan-1.md](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md)
+- **`build/`**
+  - [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md)
+- **`reviews/`**
+  - [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md)
+  - [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md)
+  - [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md)
+<!-- /gen:build-docs -->

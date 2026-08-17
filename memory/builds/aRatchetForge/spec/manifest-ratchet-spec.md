@@ -1,4 +1,4 @@
-# Manifest ratchet — spec (kickoff-manifest v1.0 → v1.1 + the enforcement chain)
+# KICK-aRatchetForge-1 — manifest ratchet, spec (kickoff-manifest v1.0 → v1.1 + the enforcement chain)
 
 *2026-07-12. Drives the change that makes per-project kickoff manifests LIVING documents. Problem: the
 chain ships a read path (the engine loads the manifest every kickoff) but no write path — nothing

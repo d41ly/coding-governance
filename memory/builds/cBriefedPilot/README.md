@@ -53,7 +53,7 @@ protocol-table join into scope. One answer moved unit 13 from Tier 1 to Tier 2.
 **Next action.** Build unit 1, then unit 21. Unit 1 is the paired accumulator every later flag
 depends on; unit 21 is the research that decides whether D6 can be built at all, and it is the only
 unit in the build whose write set lets it run alongside the rest. The M4 spec audit is recorded at
-`reviews/2026-08-15-review-cBriefedPilot-1.md` — CLEAN WITH FIXES, no blockers, all fixes folded.
+`reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md` — CLEAN WITH FIXES, no blockers, all fixes folded.
 
 **The one thing that must not be lost.** Every directive is a POINTER. `BUILD-METHOD.md` M1 states
 that nothing in it is stated anywhere else in this repo, and that a rule appearing both there and in
@@ -125,7 +125,7 @@ genuinely new:
    clause excusing it where no mechanism exists, and bought unit 21's hunt instead.
 
    Unit 21's verdict is `parallelism route: none`, recorded with per-route observations at
-   `build/2026-08-15-build-cBriefedPilot-2-parallelism-routes.md`. Unit 15 read that token and took
+   `build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md`. Unit 15 read that token and took
    branch B: the finding ships, the rule does not. **D6 is the one owner directive this build does
    not deliver**, and saying so here is the point of the branch — a record that described an
    inversion nobody built would be worse than the gap itself.
@@ -196,33 +196,6 @@ byte-compares the roster slice across the pinned BASE, so anything inside the ma
 units land makes `authorization-reachable` unmeetable — and that item has no override. State is
 already derived twice, by `gen:build-index` and by `--plan`.*
 
-<!-- roster:units -->
-| # | Unit | Tier | Mechanism | Depends on |
-|---|---|---|---|---|
-| 1 | `TOOL-cBriefedPilot-1` | 1 | one accumulator parses repeated flag/value/reason triples; `--override` becomes repeatable | — |
-| 2 | `TOOL-cBriefedPilot-2` | 1 | the kit-owned `DIRECTIVES_CORE` of eleven pointer pairs | — |
-| 3 | `TOOL-cBriefedPilot-3` | 2 | `--waive` at preflight: validated, parked, staged | 1, 2 |
-| 4 | `TOOL-cBriefedPilot-4` | 1 | preflight refuses when the derived build-method carrier is absent | — |
-| 5 | `TOOL-cBriefedPilot-5` | 1 | the recorded BASE is written once, not re-pinned per preflight | — |
-| 6 | `TOOL-cBriefedPilot-6` | 2 | `--plan` sees a planned unit that has no spec | — |
-| 7 | `TOOL-cBriefedPilot-7` | 2 | the `build-complete` Definition-of-Done item, over a roster marker now MANDATORY in an unattended build's README (P3) | 1, 6 |
-| 8 | `TOOL-cBriefedPilot-8` | 2 | the `closing-review-recorded` Definition-of-Done item | 1, 5 |
-| 9 | `TOOL-cBriefedPilot-9` | 1 | the Skill's directive table and its hard step 0 | 2 |
-| 10 | `TOOL-cBriefedPilot-10` | 1 | the Skill's waiver turn — one AskUserQuestion, default-deny | 9 |
-| 11 | `TOOL-cBriefedPilot-11` | 1 | the Skill's kickoff step and the README-as-roster read | 10 |
-| 12 | `TOOL-cBriefedPilot-12` | 2 | leg check 16 — the registry join, both directions | 2, 9 |
-| 13 | `TOOL-cBriefedPilot-13` | 2 | leg check 17 — a waiver line names a declared handle and a reason, AND is present in the FIRST committed blob of the run-state file | 3, 12 |
-| 14 | `TOOL-cBriefedPilot-14` | 1 | leg check 18 — the Skill names kickoff AFTER preflight | 11 |
-| 21 | `TOOL-cBriefedPilot-21` | 2 | the parallelism mechanism hunt — does ANY route dispatch a build pass concurrently without voiding the directive layer? | — |
-| 15 | `TOOL-cBriefedPilot-15` | 2 | M6's parallelism inversion — shape decided by unit 21; if no route survives, this unit ships the finding instead of the inversion | 21 |
-| 16 | `TOOL-cBriefedPilot-16` | 1 | the method's pointers name the new layer; M10's delta index count is unit 16 §8's fork, three or four depending on unit 15's branch | 15 |
-| 17 | `TOOL-cBriefedPilot-17` | 1 | `check-kit-versions.sh` pairs the shipped protocol marker | — |
-| 18 | `TOOL-cBriefedPilot-18` | 2 | the protocol pair gains §10 and the domain-rules enumeration | 3, 7, 8, 13, 16 |
-| 22 | `TOOL-cBriefedPilot-22` | 1 | check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table | 12, 18 |
-| 23 | `TOOL-cBriefedPilot-23` | 2 | a shrink-only floor on each suite's EXECUTED assertion count, plus a `mutate` helper that refuses a fixture edit changing no bytes | — |
-| 19 | `TOOL-cBriefedPilot-19` | 1 | the kit identifies as version 1.5 | 17, 18, 22 |
-| 20 | `TOOL-cBriefedPilot-20` | 1 | the dossiers, the closed rows, the stale row F5 names | all |
-<!-- /roster:units -->
 
 *Units 21 and 22 are listed in BUILD order, not id order — 21 must precede 15 because it decides
 15's shape, and 22 follows 18 because it joins against the tables 18 writes.*
@@ -312,8 +285,40 @@ anyway.
 The build method is `memory/guides/BUILD-METHOD.md`. The generated region below is rendered by
 `gen_build_index.py` from the front matter and each spec's status header — do not hand-edit it.
 
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism | Depends on |
+|---|---|---|---|---|
+| 1 | `TOOL-cBriefedPilot-1` | 1 | one accumulator parses repeated flag/value/reason triples; `--override` becomes repeatable | — |
+| 2 | `TOOL-cBriefedPilot-2` | 1 | the kit-owned `DIRECTIVES_CORE` of eleven pointer pairs | — |
+| 3 | `TOOL-cBriefedPilot-3` | 2 | `--waive` at preflight: validated, parked, staged | 1, 2 |
+| 4 | `TOOL-cBriefedPilot-4` | 1 | preflight refuses when the derived build-method carrier is absent | — |
+| 5 | `TOOL-cBriefedPilot-5` | 1 | the recorded BASE is written once, not re-pinned per preflight | — |
+| 6 | `TOOL-cBriefedPilot-6` | 2 | `--plan` sees a planned unit that has no spec | — |
+| 7 | `TOOL-cBriefedPilot-7` | 2 | the `build-complete` Definition-of-Done item, over a roster marker now MANDATORY in an unattended build's README (P3) | 1, 6 |
+| 8 | `TOOL-cBriefedPilot-8` | 2 | the `closing-review-recorded` Definition-of-Done item | 1, 5 |
+| 9 | `TOOL-cBriefedPilot-9` | 1 | the Skill's directive table and its hard step 0 | 2 |
+| 10 | `TOOL-cBriefedPilot-10` | 1 | the Skill's waiver turn — one AskUserQuestion, default-deny | 9 |
+| 11 | `TOOL-cBriefedPilot-11` | 1 | the Skill's kickoff step and the README-as-roster read | 10 |
+| 12 | `TOOL-cBriefedPilot-12` | 2 | leg check 16 — the registry join, both directions | 2, 9 |
+| 13 | `TOOL-cBriefedPilot-13` | 2 | leg check 17 — a waiver line names a declared handle and a reason, AND is present in the FIRST committed blob of the run-state file | 3, 12 |
+| 14 | `TOOL-cBriefedPilot-14` | 1 | leg check 18 — the Skill names kickoff AFTER preflight | 11 |
+| 21 | `TOOL-cBriefedPilot-21` | 2 | the parallelism mechanism hunt — does ANY route dispatch a build pass concurrently without voiding the directive layer? | — |
+| 15 | `TOOL-cBriefedPilot-15` | 2 | M6's parallelism inversion — shape decided by unit 21; if no route survives, this unit ships the finding instead of the inversion | 21 |
+| 16 | `TOOL-cBriefedPilot-16` | 1 | the method's pointers name the new layer; M10's delta index count is unit 16 §8's fork, three or four depending on unit 15's branch | 15 |
+| 17 | `TOOL-cBriefedPilot-17` | 1 | `check-kit-versions.sh` pairs the shipped protocol marker | — |
+| 18 | `TOOL-cBriefedPilot-18` | 2 | the protocol pair gains §10 and the domain-rules enumeration | 3, 7, 8, 13, 16 |
+| 22 | `TOOL-cBriefedPilot-22` | 1 | check 16 arm A's join extended to the protocol's own §3 phase list and §4 DoD table | 12, 18 |
+| 23 | `TOOL-cBriefedPilot-23` | 2 | a shrink-only floor on each suite's EXECUTED assertion count, plus a `mutate` helper that refuses a fixture edit changing no bytes | — |
+| 19 | `TOOL-cBriefedPilot-19` | 1 | the kit identifies as version 1.5 | 17, 18, 22 |
+| 20 | `TOOL-cBriefedPilot-20` | 1 | the dossiers, the closed rows, the stale row F5 names | all |
+<!-- /roster:units -->
+
+
 <!-- gen:build-index -->
-**Build status:** CLOSED · 23 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook · ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25 TOOL-cBriefedPilot-26 TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBriefedPilot-30 TOOL-cBriefedPilot-31 TOOL-cBriefedPilot-32 TOOL-cBriefedPilot-34 TOOL-cBriefedPilot-35 TOOL-cBriefedPilot-36 TOOL-cBriefedPilot-37 TOOL-cBriefedPilot-38
+**Build status:** CLOSED · 23 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook
+ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13
+ids TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25 TOOL-cBriefedPilot-26
+ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBriefedPilot-30 TOOL-cBriefedPilot-31 TOOL-cBriefedPilot-32 TOOL-cBriefedPilot-34 TOOL-cBriefedPilot-35 TOOL-cBriefedPilot-36 TOOL-cBriefedPilot-37 TOOL-cBriefedPilot-38
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -342,4 +347,59 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 | [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | CLOSED | rev-2 | 2026-08-16 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md) | — | *none — a design pass that PRECEDES and produced this build's spec set* |
+| [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md) | journal | TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-21 |
+| [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md) | spec-audit | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
+| [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md) | diff-review | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
+| [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md) | diff-review | TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 |
+
+Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-14-spec-cBriefedPilot-1.md](spec/2026-08-14-spec-cBriefedPilot-1.md)
+  - [2026-08-14-spec-cBriefedPilot-10.md](spec/2026-08-14-spec-cBriefedPilot-10.md)
+  - [2026-08-14-spec-cBriefedPilot-11.md](spec/2026-08-14-spec-cBriefedPilot-11.md)
+  - [2026-08-14-spec-cBriefedPilot-12.md](spec/2026-08-14-spec-cBriefedPilot-12.md)
+  - [2026-08-14-spec-cBriefedPilot-13.md](spec/2026-08-14-spec-cBriefedPilot-13.md)
+  - [2026-08-14-spec-cBriefedPilot-14.md](spec/2026-08-14-spec-cBriefedPilot-14.md)
+  - [2026-08-14-spec-cBriefedPilot-15.md](spec/2026-08-14-spec-cBriefedPilot-15.md)
+  - [2026-08-14-spec-cBriefedPilot-16.md](spec/2026-08-14-spec-cBriefedPilot-16.md)
+  - [2026-08-14-spec-cBriefedPilot-17.md](spec/2026-08-14-spec-cBriefedPilot-17.md)
+  - [2026-08-14-spec-cBriefedPilot-18.md](spec/2026-08-14-spec-cBriefedPilot-18.md)
+  - [2026-08-14-spec-cBriefedPilot-19.md](spec/2026-08-14-spec-cBriefedPilot-19.md)
+  - [2026-08-14-spec-cBriefedPilot-2.md](spec/2026-08-14-spec-cBriefedPilot-2.md)
+  - [2026-08-14-spec-cBriefedPilot-20.md](spec/2026-08-14-spec-cBriefedPilot-20.md)
+  - [2026-08-14-spec-cBriefedPilot-21.md](spec/2026-08-14-spec-cBriefedPilot-21.md)
+  - [2026-08-14-spec-cBriefedPilot-22.md](spec/2026-08-14-spec-cBriefedPilot-22.md)
+  - [2026-08-14-spec-cBriefedPilot-3.md](spec/2026-08-14-spec-cBriefedPilot-3.md)
+  - [2026-08-14-spec-cBriefedPilot-4.md](spec/2026-08-14-spec-cBriefedPilot-4.md)
+  - [2026-08-14-spec-cBriefedPilot-5.md](spec/2026-08-14-spec-cBriefedPilot-5.md)
+  - [2026-08-14-spec-cBriefedPilot-6.md](spec/2026-08-14-spec-cBriefedPilot-6.md)
+  - [2026-08-14-spec-cBriefedPilot-7.md](spec/2026-08-14-spec-cBriefedPilot-7.md)
+  - [2026-08-14-spec-cBriefedPilot-8.md](spec/2026-08-14-spec-cBriefedPilot-8.md)
+  - [2026-08-14-spec-cBriefedPilot-9.md](spec/2026-08-14-spec-cBriefedPilot-9.md)
+  - [2026-08-16-spec-cBriefedPilot-23.md](spec/2026-08-16-spec-cBriefedPilot-23.md)
+- **`build/`**
+  - [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md)
+  - [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md)
+- **`reviews/`**
+  - [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md)
+  - [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md)
+  - [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md)
+<!-- /gen:build-docs -->

@@ -41,11 +41,34 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 - **F8** collision precision knobs: (a) token stem + fan-in threshold · (b) + structural signal *(rec)* · (c) + affordance cross-check; threshold in `.codebase-map.conf`.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling · ids TOOL-bConvergentLodestar-1
+**Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling
+ids TOOL-bConvergentLodestar-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | TOOL-bConvergentLodestar-1 |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-07-22-spec-bConvergentLodestar-1.md](spec/2026-07-22-spec-bConvergentLodestar-1.md)
+- **`reviews/`**
+  - [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md)
+<!-- /gen:build-docs -->

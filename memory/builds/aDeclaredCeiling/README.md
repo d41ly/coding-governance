@@ -30,18 +30,6 @@ the drift in the AUDIT rather than in the subject.
 The table below is GENERATED from the status header of every spec in this folder — do not
 hand-edit it.
 
-<!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-3 | 2026-08-16 |
-
-Records live under `spec/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
 
@@ -101,3 +89,43 @@ Nothing is unassigned, and one of the four is discharged by being disproved.
   closing review found a fabricated `gate-lint` description that had shipped into four carriers
   because nobody opened its README. Any unit here that describes a kit reads it first and says in
   its §10 that it did.
+
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling
+ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-3 | 2026-08-16 |
+
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-PLAY-aDeclaredCeiling-1.md](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md)
+  - [2026-08-16-spec-TOOL-aDeclaredCeiling-1.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md)
+  - [2026-08-16-spec-TOOL-aDeclaredCeiling-2.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md)
+  - [2026-08-16-spec-TOOL-aDeclaredCeiling-3.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md)
+- **`reviews/`**
+  - [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md)
+<!-- /gen:build-docs -->

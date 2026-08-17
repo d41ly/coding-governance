@@ -32,7 +32,7 @@ tools/template-size-limits.txt text eol=lf
 # files"; this is that claim made true.
 #
 # Pinned by EXTENSION rather than by listing today's index files, because the index set is DERIVED
-# (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build STATUS.md joins
+# (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build README joins
 # it with no edit here. A pin that must be remembered is the pin that gets forgotten.
 memory/**/*.md text eol=lf
 memory/**/*.toml text eol=lf
@@ -117,6 +117,15 @@ tools/unattended/.unattended.conf.example text eol=lf
 # committed bytes are right, and CR normalisation in the comparison so a Windows checkout does not
 # red every line — and the shipped half had only the second.
 tools/unattended/*.md text eol=lf
+
+# The memory-tree kit's three shipped templates, pinned for the IDENTICAL reason as the line above
+# and found the same way: `kit-dogfood-parity.test.sh` renders the template and byte-compares it to
+# the installed copy under `memory/`, which `memory/**/*.md` already pins — so the gate had one
+# pinned half and one unpinned half. Both were LF when this landed, and `git add` warned that the
+# next checkout would smudge the template to CRLF, at which point the render emits CRLF, the live
+# side is CR-stripped, and the leg reds on every line while passing whenever a render just ran. The
+# comparison now strips CR on both sides too; the pin is what keeps the committed bytes right.
+tools/memory-tree/*.template.md text eol=lf
 
 memory/map/generated/* text eol=lf
 memory/map/baseline.toml text eol=lf

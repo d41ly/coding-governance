@@ -20,9 +20,30 @@ only record is the recording under `build/`. That recording carries no status he
 the front matter above declares `status:` outright instead of leaving it to be derived.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling · ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
+**Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling
+ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-16-build-bThriftyBellows-1.md](build/2026-07-16-build-bThriftyBellows-1.md) | — | *none — this build shipped before the spec-format ratchet reached it and holds no spec at all, so there is no id to serve* |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`build/`**
+  - [2026-07-16-build-bThriftyBellows-1.md](build/2026-07-16-build-bThriftyBellows-1.md)
+<!-- /gen:build-docs -->

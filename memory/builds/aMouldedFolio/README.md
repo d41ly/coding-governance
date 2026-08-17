@@ -43,7 +43,8 @@ The table below is GENERATED from this folder's spec status headers —
 do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-11 · streams tooling
+ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -53,4 +54,35 @@ do not hand-edit it.
 | [TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md) | CLOSED | rev-2 | 2026-08-11 |
 
 Records live under `spec/` and `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md) | — | *none — this census PRECEDES the specs it produced; TOOL-aMouldedFolio-1 has no spec, so there is no id to serve* |
+| [2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md](build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md) | journal | TOOL-aMouldedFolio-3 |
+
+Ids no record names: TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5.
+
+Ids no `spec-audit` record has ever named: TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md)
+  - [2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md)
+- **`build/`**
+  - [2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md)
+  - [2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md](build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md)
+<!-- /gen:build-docs -->

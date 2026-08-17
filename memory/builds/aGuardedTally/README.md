@@ -15,11 +15,39 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-03 · streams tooling · ids TOOL-aGuardedTally-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-03 · streams tooling
+ids TOOL-aGuardedTally-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | INPROGRESS | rev-4 | 2026-08-03 |
 
 Records live under `spec/`, `reviews/` and `prompts/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md) | research | TOOL-aGuardedTally-1 |
+| [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md) | diff-review | TOOL-aGuardedTally-1 |
+
+Ids no `spec-audit` record has ever named: TOOL-aGuardedTally-1.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-03-spec-aGuardedTally-1.md](spec/2026-08-03-spec-aGuardedTally-1.md)
+- **`reviews/`**
+  - [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md)
+- **`prompts/`**
+  - [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md)
+<!-- /gen:build-docs -->

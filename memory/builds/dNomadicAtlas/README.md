@@ -18,7 +18,8 @@ a full gate cycle: a red leg inside a push piped through `tail -45`, unidentifia
 the reflexive re-run passed, so the evidence was gone for good.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-11 · streams tooling · ids TOOL-dNomadicAtlas-1
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-11 · streams tooling
+ids TOOL-dNomadicAtlas-1
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -26,3 +27,19 @@ the reflexive re-run passed, so the evidence was gone for good.
 
 Records live under `spec/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md)
+<!-- /gen:build-docs -->

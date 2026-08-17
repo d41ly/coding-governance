@@ -198,21 +198,6 @@ bare "parked" is indistinguishable from "forgotten".
 The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
-<!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling · ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-2 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-2 | 2026-08-13 |
-| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-3 | 2026-08-13 |
-
-Records live under `spec/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Method
 
@@ -228,3 +213,51 @@ The size-gate probe returned `tools/check-template-size.sh` as the nearest seam.
 to extend: it is a gov-only gate leg over a single file, and these checks must ride
 `manifest-check.sh` so that adopters inherit them when they re-pull the kit. That is a recorded miss,
 not a skipped audit.
+
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling
+ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-2 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-3 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | OPEN | rev-3 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-2 | 2026-08-13 |
+| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-3 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-3 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-3 | 2026-08-13 |
+
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md](reviews/2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md) | spec-audit | KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-6 |
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-13-spec-cKeyedLaunchpad-1.md](spec/2026-08-13-spec-cKeyedLaunchpad-1.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-2.md](spec/2026-08-13-spec-cKeyedLaunchpad-2.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-3.md](spec/2026-08-13-spec-cKeyedLaunchpad-3.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-4.md](spec/2026-08-13-spec-cKeyedLaunchpad-4.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-5.md](spec/2026-08-13-spec-cKeyedLaunchpad-5.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-6.md](spec/2026-08-13-spec-cKeyedLaunchpad-6.md)
+  - [2026-08-13-spec-cKeyedLaunchpad-7.md](spec/2026-08-13-spec-cKeyedLaunchpad-7.md)
+- **`reviews/`**
+  - [2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md](reviews/2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md)
+  - [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md)
+<!-- /gen:build-docs -->

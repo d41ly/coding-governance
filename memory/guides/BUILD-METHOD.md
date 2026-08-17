@@ -1,11 +1,11 @@
-<!-- gov:kit memory-tree@2.18 -->
+<!-- gov:kit memory-tree@2.19 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `tools/run-gates.sh`.
-**Budget: ≤20 KB, ≤250 lines** (`memory/HYGIENE.md` rule 6); it grows only by DISPLACEMENT, because M7 re-reads it
+**Budget: ≤20 KB, ≤250 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
@@ -25,9 +25,8 @@ or generated artifact is a separate unit with its own id and spec. Two mechanism
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
-`memory/builds/<slug>/spec/`. **The README's `ids:` key is NOT a roster** — it is a reservation range written as
-ranges and unions (`<FAMILY>-<slug>-1..-9`), and reading it as a unit list silently drops every unit after the first. A
-unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
+`memory/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
+answers "which ids exist", never "which units are planned", and a planned unit cannot be added to it by hand. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
 `memory/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
 
 **Classify, first match wins.** Write it into the build README before acting on it.
@@ -100,7 +99,9 @@ underspecification, contradiction, unstated assumption, prior art — with what 
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Most existing review records carry no
-verdict line; write it anyway, because M9 derives from these records. **Fold fixes into the spec** (rev bump + §9
+verdict line; write it anyway, because M9 derives from these records. **Carry the binding line** check 21 requires —
+`**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
+answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
 ## M5 — Recall and reuse
@@ -149,8 +150,11 @@ turn you did not take.
 WRITE sets — actual paths, written down before dispatch — do not intersect; (2) neither writes a file the other
 reads as a contract (conf, template, interface, generator input) or as an acceptance input, and neither depends on
 the other's output either way; (3) neither touches a shared mutable record — `memory/DECISIONS.md`,
-`memory/backlog/*.md`, the build README, the run-state file, or any generated index with its generator. If you
-cannot write both path lists down, the work is not known to be disjoint — sequence it. The fan-out and concurrency
+`memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
+cannot write both path lists down, the work is not known to be disjoint — sequence it.
+
+Clause 3 once named the build README outright, which was VACUOUS not strict: every pass changes a spec header it
+is regenerated from. What collides is two passes RENDERING one artifact, or one editing a generator another runs. The fan-out and concurrency
 CEILINGS are `memory/guides/REVIEW-PROTOCOL.md`'s; this is about WHICH work is parallel, never HOW MUCH.
 
 ## M7 — Regrounding
@@ -187,7 +191,9 @@ Workflow { scriptPath: 'tools/workflows/tier2-review.js',
 
 **Pass `reviewDir` explicitly** — its default is repo-root-relative and writes the report outside the memory tree,
 where nothing indexes it. The harness names the file it wrote: **rename it to `memory/HYGIENE.md` check 5's
-recording grammar before the next gate run**, or check 5 reds on a free-named file.
+recording grammar before the next gate run**, or check 5 reds on a free-named file. A closing review is a
+`diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
+in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.18 -->
+<!-- gov:kit memory-tree@2.19 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -28,7 +28,7 @@ memory/
 ├── archive/               rotated indexes + legacy material a build can't claim
 ├── project/               the gate's own waiver registries (`*.txt`, six of them) and nothing else
 └── builds/<slug>/
-    ├── README.md · STATUS.md       (required only when >3 files / multi-item)
+    ├── README.md                   (the build's entry point; mostly generated)
     ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
     └── prompts/ · spec/ · build/ · reviews/   (<date>-<kind>[-<FAMILY>]-<slug>-<seq>.md)
 ```
@@ -37,7 +37,7 @@ memory/
 named for its SLUG alone — no date, no family. A recording filename MAY carry the family as an
 optional qualifier, which is how one slug shared by two families survives in a single folder.
 Ceremony is conditional: subfolders exist only when non-empty; a single-file build is one spec file
-plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data) are legal only inside
+plus its backlog row — no README. Non-markdown artifacts (scripts, data) are legal only inside
 `builds/*/build/`, `guides/`, and `archive/`.
 
 ## Rules
@@ -57,7 +57,7 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
 
 ## Index budgets, caps, rotation
 
-- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`, `STATUS.md`,
+- **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
   `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
@@ -69,9 +69,9 @@ plus its backlog row — no README/STATUS. Non-markdown artifacts (scripts, data
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
   covers them. Rotation moves whole files — it never rewrites or renumbers a ratified record.
 
-## Status vocabulary (backlogs + STATUS.md)
+## Status vocabulary (backlogs)
 
-Every backlog / STATUS row leads with exactly one token of
+Every backlog row leads with exactly one token of
 `OPEN · SPECCED · INPROGRESS · BLOCKED · DEFERRED · CLOSED · WONTDO`, in its `·`/`|`/leading-dash slot
 (a prose mention of one of these words elsewhere on the line does not count). New-entry dash form:
 `- <id> · <STATUS> · <one-liner>[ → <pointer>]`.
@@ -112,7 +112,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
    `builds/` shape is check 4.
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
-   build folder only `README.md STATUS.md RUN.md prompts/ spec/ build/ reviews/` plus loose
+   build folder only `README.md RUN.md prompts/ spec/ build/ reviews/` plus loose
    recording-named `.md`; non-md only in `build/`. `RUN.md` is the UNATTENDED run-state file: one
    generated region plus an authored one, present only while a run is or was live. It is capped by
    rule 6, exempt from rule 7 (the standing mandate is verbatim prose), and deliberately OUTSIDE
@@ -135,7 +135,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
    build's own `build/` folder as a dated recording).
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
-8. **status vocabulary** — `backlog/<FAMILY>.md` and STATUS rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
+8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `{{KIT_DIR}}/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
@@ -202,6 +202,41 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
 
+21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
+    and everything else in it (an adversarial review, a build ledger, a research report, a
+    transcript) is a RECORD. Each carries one authored line in its head naming the spec ids it
+    serves, so the binding is a fact rather than an inference from a filename ordinal. The rule, the
+    grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
+    which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
+    never refuse the render.
+
+## Record bindings — how a record names its spec
+
+Within the first 12 unfenced lines, optionally behind a comment marker so a non-markdown record can
+carry it too:
+
+```
+**Serves:** <kind> <id> [<id> …]
+**Serves:** none — <why this record serves no spec>
+**Commissions:** <id> [<id> …]          (optional, for a record that PRODUCED specs)
+```
+
+- `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
+  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs).
+  An open kind field stops being groupable the first time two authors spell one relation differently.
+- `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
+  because one closing review legitimately covers two builds. It may carry a trailing `@rev-N`, which
+  is recorded and never validated, and a contiguous run may be written `N..M`, which EXPANDS at
+  authoring time and therefore cannot rot when the build later gains a unit.
+- Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
+  which is a reservation range that admits backlog and decision rows as if they were units.
+- The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
+  required otherwise, because an unbound record names no ids for a kind to describe. The count of
+  `none` records is bounded shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus.
+- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
+  nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
+  seed list and a gate that disagree is structurally impossible.
+
 ## The harness meta-gate
 
 Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
@@ -237,9 +272,10 @@ the walk, so one bad gate cannot hide every other gate's findings.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
-The pin is EMPTY today — every discovered branch is armed; `--report` prints the count, and this
-sentence deliberately does not, because a number written here rots while the gate stays green — and an empty pin is the
-file's working state, not its retirement. A row appears when a new branch lands that no fixture can
+The pin's working state is EMPTY, and it is not empty today — one branch is pinned. `--report`
+prints the live count and this sentence deliberately does not, because a number written here rots
+while the gate stays green; the sentence claimed the pin WAS empty for as long as it carried a row,
+which is the same defect one level up. A row appears when a new branch lands that no fixture can
 reach, and it carries the REASON in a comment above it: "not yet written" and "cannot be written
 from here" look identical in a bare pin and only one of them is acceptable. Where an arm goes is a
 property of the harness, not a preference: the hygiene gate's `fail` never aborts, so one scratch

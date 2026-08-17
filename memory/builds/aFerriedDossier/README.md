@@ -53,9 +53,30 @@ All three rows. Nothing here has been actioned.
 Rendered by `gen_build_index.py` from this file's front matter — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-16 · streams deployer · ids DEPL-aFerriedDossier-1 DEPL-aFerriedDossier-2 DEPL-aFerriedDossier-3
+**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-16 · streams deployer
+ids DEPL-aFerriedDossier-1 DEPL-aFerriedDossier-2 DEPL-aFerriedDossier-3
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md](build/2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md) | — | *none — an adopter handoff carried in from another repo; this build holds no spec for it to serve* |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`build/`**
+  - [2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md](build/2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md)
+<!-- /gen:build-docs -->

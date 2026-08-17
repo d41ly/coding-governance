@@ -21,16 +21,6 @@ SELF-TESTS holding 96.7% of the wall, while the 18 legs that actually check this
 This build makes them run together. A scratchpad prototype completed all 47 legs in 79.9s at width 8
 with `fails=0`, which is the number this unit is built to reproduce.
 
-<!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | INPROGRESS | rev-1 | 2026-08-11 |
-| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
-
-Records live under `spec/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ### The specs
 
@@ -45,3 +35,43 @@ decision, because guards honoured at the push boundary would make the authoritat
 while `AGENTS.md` calls that run the full bar. Making individual legs cheaper is
 `TOOL-aTimedTurnstile-3`, and it only becomes the binding constraint after this unit lands, since the
 floor stops being the sum and becomes the longest leg under load.
+
+
+<!-- gen:build-index -->
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
+ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | INPROGRESS | rev-1 | 2026-08-11 |
+| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
+
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md) | spec-audit | TOOL-aTimedTurnstile-5 |
+
+Ids no record names: TOOL-aTimedTurnstile-2.
+
+Ids no `spec-audit` record has ever named: TOOL-aTimedTurnstile-2.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-TOOL-aTimedTurnstile-2.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md)
+  - [2026-08-11-spec-TOOL-aTimedTurnstile-5.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md)
+- **`reviews/`**
+  - [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md)
+<!-- /gen:build-docs -->

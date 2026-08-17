@@ -64,7 +64,7 @@ there and in a carrier it points at is a defect THERE, so the four classificatio
 exactly as M2 spells them and their definitions stay in M2.
 
 **Read before reviewing:** `memory/guides/UNATTENDED-PROTOCOL.md` (binding, and this build amends
-it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md`, whose three
+it) and `memory/builds/aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`, whose three
 reproduced blockers are the reason the current authorization is shaped the way it is. A review of
 this build that does not re-derive those three attacks against the NEW surface has not reviewed it.
 
@@ -87,21 +87,6 @@ One spec, scope items `S0`–`S8`. The rows below are the reading order, not a d
 sub-specs — and they sit inside the roster marker pair S8 added, which is what makes this table the
 thing a run's authorization is compared against.
 
-<!-- roster:units -->
-
-| Area | What changes |
-|---|---|
-| **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
-| **S1** | BUILT — authorization reads the build README at BASE; the mandate block and its marker pair retire |
-| **S2** | BUILT — `--preflight` CREATES and stages the run-state file; staging is what the gate leg can see |
-| **S3** | BUILT — merge-base-equals-HEAD is legal at preflight, still a refusal at close |
-| **S4** | BUILT — `--plan` mechanises BUILD-METHOD M2's four states, and names the two things it cannot see |
-| **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
-| **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
-| **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
-| **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
-
-<!-- /roster:units -->
 
 ## Owner decision menu — all eight RESOLVED 2026-08-11
 
@@ -191,7 +176,7 @@ this says which step remains.
 
 ## Review record
 
-`reviews/2026-08-11-review-aStandingWrit-1.md` — Tier-2 over the rev-1 spec. Five lenses, five
+`reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md` — Tier-2 over the rev-1 spec. Five lenses, five
 cold-start agents, at the review protocol's cap of five total; no lens dead. Verdict: **do not
 build**. Seven blockers, thirteen highs, seven verified factual errors, and one reproduced bypass in
 landed code that outranks the spec entirely. Three findings were independently confirmed by two
@@ -203,12 +188,54 @@ with this build's file list, and the rev-1 spec was machine-clean against the fo
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| Area | What changes |
+|---|---|
+| **S0** | close the anchor bypass — the pinned BASE becomes an observation of the remote, not of a local ref. Everything else depends on it |
+| **S1** | BUILT — authorization reads the build README at BASE; the mandate block and its marker pair retire |
+| **S2** | BUILT — `--preflight` CREATES and stages the run-state file; staging is what the gate leg can see |
+| **S3** | BUILT — merge-base-equals-HEAD is legal at preflight, still a refusal at close |
+| **S4** | BUILT — `--plan` mechanises BUILD-METHOD M2's four states, and names the two things it cannot see |
+| **S5** | ~~the authored plan region and a build-README template~~ — **WITHDRAWN**, superseded by BUILD-METHOD M2 |
+| **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
+| **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
+| **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
+
+<!-- /roster:units -->
+
+
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff · ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
+ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aStandingWrit-1-1.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md) | spec-audit | TOOL-aStandingWrit-1 |
+| [2026-08-11-review-TOOL-aStandingWrit-1-2.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md) | diff-review | TOOL-aStandingWrit-1 |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-aStandingWrit-1.md](spec/2026-08-11-spec-aStandingWrit-1.md)
+- **`reviews/`**
+  - [2026-08-11-review-TOOL-aStandingWrit-1-1.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md)
+  - [2026-08-11-review-TOOL-aStandingWrit-1-2.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md)
+<!-- /gen:build-docs -->

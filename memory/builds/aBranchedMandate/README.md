@@ -19,7 +19,7 @@ The reproduction found **three** causes, not one. They fire in a fixed order, an
 report names fires last — so fixing only it leaves every worktree run still refused. All three are
 enumerated with their observed output in
 [`build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md`](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md),
-and the third has a committed fixture at [`build/repro-c3.sh`](build/repro-c3.sh) that exits 0 only
+and the third has a committed fixture at [`build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh`](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) that exits 0 only
 when it reproduces the specific refusal it is about.
 
 | | What refuses | Fires when | In the report? | Unit |
@@ -52,18 +52,6 @@ trade: they are a missing normalisation and a report severity.
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
 it.
 
-<!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
-
-Records live under `spec/`, `build/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
 
@@ -165,7 +153,7 @@ exactly one build.
 
 ## The spec audit — BLOCKED, folded at rev-3
 
-`reviews/2026-08-16-review-aBranchedMandate-1.md` records an M4 audit run as a five-lens workflow with
+`reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md` records an M4 audit run as a five-lens workflow with
 batched default-refute skeptics under the review protocol's caps: 45 raw findings, 36 confirmed,
 9 refuted, none unverified, deduplicated to 18. **Verdict BLOCKED, three blockers.** All 18 are folded;
 every spec is at rev-3 with its §9 line.
@@ -201,3 +189,50 @@ protocol never sees.
 
 **The fold itself is unreviewed**, by M4's stop rule: fixes are folded once and reviewing resumes only
 if the design moves again. A second audit is a decision, not an obligation.
+
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
+
+Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
+| [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-TOOL-aBranchedMandate-1.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md)
+  - [2026-08-16-spec-TOOL-aBranchedMandate-2.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md)
+  - [2026-08-16-spec-TOOL-aBranchedMandate-3.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md)
+  - [2026-08-17-spec-TOOL-aBranchedMandate-4.md](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md)
+- **`build/`**
+  - [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh)
+  - [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md)
+- **`reviews/`**
+  - [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md)
+<!-- /gen:build-docs -->

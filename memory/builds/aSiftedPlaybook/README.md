@@ -43,21 +43,6 @@ closed** — the owner kept it OPEN on 2026-08-16, re-justified on readability r
 The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
-<!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling · ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | CLOSED | rev-9 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | CLOSED | rev-7 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | CLOSED | rev-10 | 2026-08-16 |
-| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | CLOSED | rev-4 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | CLOSED | rev-10 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | CLOSED | rev-10 | 2026-08-16 |
-| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | CLOSED | rev-12 | 2026-08-16 |
-
-Records live under `spec/`, `build/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
 
@@ -204,3 +189,62 @@ arms — kit gone, or kit named in the playbook — which is also the one delibe
 
 **Every fork in this build is now resolved.** All seven specs' §8 read `none` with their items
 marked in place, so no unit is classified FORKED.
+
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling
+ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [PLAY-aSiftedPlaybook-1 — the template's claims reconverge with the kits they describe](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md) | CLOSED | rev-9 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-2 — the default branch stops being hardcoded as `main`](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md) | CLOSED | rev-7 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-3 — the playbook learns which kits it ships](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md) | CLOSED | rev-10 | 2026-08-16 |
+| [PLAY-aSiftedPlaybook-4 — the companions stop contradicting their own contents](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md) | CLOSED | rev-4 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-1 — the template ceiling moves to 48 KiB, as a recorded rule reversal](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md) | CLOSED | rev-10 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-2 — the size gate's failing case gets observed for the first time](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md) | CLOSED | rev-10 | 2026-08-16 |
+| [TOOL-aSiftedPlaybook-3 — the playbook's claims about the repo become machine-checked](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md) | CLOSED | rev-12 | 2026-08-16 |
+
+Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md](build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md) | — | *none — the commissioning input: it PRECEDES the spec set and warranted it* |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md) | spec-audit | PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md) | spec-audit | TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-4 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md) | diff-review | PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-2 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-1.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-1.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-2.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-2.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-3.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-3.md)
+  - [2026-08-16-spec-PLAY-aSiftedPlaybook-4.md](spec/2026-08-16-spec-PLAY-aSiftedPlaybook-4.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-1.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-1.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-2.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-2.md)
+  - [2026-08-16-spec-TOOL-aSiftedPlaybook-3.md](spec/2026-08-16-spec-TOOL-aSiftedPlaybook-3.md)
+- **`build/`**
+  - [2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md](build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md)
+- **`reviews/`**
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md)
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md)
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md)
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md)
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md)
+  - [2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md)
+<!-- /gen:build-docs -->

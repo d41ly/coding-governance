@@ -15,9 +15,26 @@ The one-line-per-directive rework + 80-finding gap-analysis wiring that produced
 - [spec/template-v2-rework-spec.md](spec/template-v2-rework-spec.md) — the durable record of what moved where.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-03 · streams playbook · ids PLAY-aLeanRework-1
+**Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-03 · streams playbook
+ids PLAY-aLeanRework-1
 
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `spec/`.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [template-v2-rework-spec.md](spec/template-v2-rework-spec.md)
+<!-- /gen:build-docs -->

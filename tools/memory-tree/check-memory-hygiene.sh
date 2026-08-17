@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.18   # gov:kit memory-tree@2.18 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.19   # gov:kit memory-tree@2.19 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -131,7 +131,13 @@ pop_guard() { # check-number · label · population-count · precondition-count
 PRE_ANYBUILD=$(printf '%s\n' "$FILES" | grep -cE "/builds/" || true)
 PRE_RECORD=$(printf '%s\n' "$FILES" | grep -cE "/builds/.+/.+\.md$" || true)
 PRE_SPEC=$(printf '%s\n' "$FILES" | grep -cE "/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[^/]*\.md$" || true)
-PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/STATUS\.md$|/BACKLOG\.md$|^$M/backlog/)" || true)
+PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" || true)
+# Check 21's precondition. Deliberately NOT anchored to `$M/builds/<slug>/`: a precondition that
+# restates its check's own population can never differ from it, so pop_guard would be unreachable
+# and the vacuity guard decoration. Un-anchored, a record left at a pre-flatten path counts here and
+# not there — which is exactly the mis-segmentation the guard exists to name. Extension-agnostic,
+# because one record in the corpus is a shell script.
+PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -295,7 +301,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         n=0; for (k in ent) keys[++n]=k
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
-          if (k=="F:README.md"||k=="F:STATUS.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          if (k=="F:README.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
           if (type=="F" && name ~ arre) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
@@ -344,6 +350,12 @@ index_set() {
     fi
     printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
+    # A BUILD README is ROWS, not prose — TOOL-aWidenedGuide-1 split the cap by CLASS on exactly that
+    # distinction, and after the generated surface landed this file is four rendered regions plus one
+    # bounded authored block. It carries its OWN tier below (25600 B, 350 chars, and no independent
+    # line cap), because the 20480/250 tier was measured against a corpus in which these files were
+    # not members at all.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/README\.md$"
     # RUN.md (2.3): the run-state file is capped like every other index. It is designed to GROW —
     # a parked entry per refused decision — so the cap is the point, not an accident: the protocol
     # spills the oldest parked entries into the build's own build/ folder as a dated recording
@@ -376,14 +388,20 @@ if [ -n "$sel6" ]; then
   # not relaxed here. So guides carry 3x and every row document keeps the original cap: tripling the
   # allowance for a backlog shard or a map dossier would loosen a curation discipline nobody asked to
   # loosen, and the two classes fail for different reasons.
-  bad6=$(awk -v gp="$M/guides/" '
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" '
     FNR==NR { if ($NF!="total") b[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
             cb = 20480; cl = 250
             if (index(f, gp) == 1) { cb = 61440; cl = 750 }
-            if (b[f]+0>cb || l[f]+0>cl) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl } }
+            # A build README: its own tier, and cl=0 means NO independent line cap. The line count is
+            # whatever fits the byte budget at the per-line width, so there is no third number to
+            # drift against the other two.
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = 25600; cl = 0 }
+            if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
+              if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
+              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
 fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
@@ -414,11 +432,25 @@ sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
 done)
 bad7=""
 if [ -n "$sel7" ]; then
-  bad7=$(awk '
+  bad7=$(awk -v bp="$M/builds/" '
     { f = $0; if (f == "") next
-      fence = ""; uln = 0
+      # PER-CLASS WIDTH. A build README is four rendered regions plus one authored block, and its
+      # widest authored lines sit between 300 and 331 — the tier is what buys those.
+      cap = 300
+      if (index(f, bp) == 1 && f ~ /\/README\.md$/) cap = 350
+      fence = ""; uln = 0; fm = 0; nl = 0
       while ((getline line < f) > 0) {
         sub(/\r$/, "", line)
+        nl++
+        # THE FRONT-MATTER BLOCK IS NOT MEASURED. It is machine-written, not read prose: `--write`
+        # rewrites `ids:` from the derived roster, and that one line is 479 characters in the largest
+        # build. It cannot be wrapped — parse_front_matter refuses an indented continuation and
+        # check-unattended.sh check 13 parses the same block — so measuring it would cap a value no
+        # author controls and no renderer may reflow. This is scoping WITHIN a file, which is what
+        # the fence handling below already does. Measured: no index-set member opens with front
+        # matter today, so this changes no current verdict.
+        if (nl == 1 && line == "---") { fm = 1; continue }
+        if (fm) { if (line == "---") fm = 0; continue }
         if (line ~ /^[[:space:]]*(```|~~~)/) {
           mk = (line ~ /^[[:space:]]*```/) ? "```" : "~~~"
           if (fence == "") { fence = mk; continue }
@@ -426,8 +458,8 @@ if [ -n "$sel7" ]; then
         }
         if (fence != "") continue
         uln++
-        if (length(line) > 300 && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
-          print f ":" uln " (" length(line) " chars)"
+        if (length(line) > cap && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
+          print f ":" uln " (" length(line) " chars > " cap ")"
       }
       close(f)
     }' <<<"$sel7")
@@ -435,7 +467,11 @@ fi
 [ -n "$bad7" ] && fail 7 "index entry lines over 300 chars:
 $bad7"
 
-# 8 — status vocabulary on BACKLOG.md / STATUS.md (grandfather: curation-debt.txt).
+# 8 — status vocabulary on the backlog shards (grandfather: curation-debt.txt).
+#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it
+#     contradicted its own build README, nothing ever wrote one, and no decision record created
+#     the slot. The population is the shards alone, which is non-empty, so the guard below still
+#     measures something rather than passing by finding nothing.
 # One awk over the whole filtered file set (was _unfenced + grep -n PER file and a 3-fork
 # printf|grep -oE|wc -l PER row). nmatch() reproduces `grep -oE '…\b' | wc -l` EXACTLY: the
 # `^[[:space:]]*-` slot can only anchor once (caret pattern on the first match, no-caret thereafter),
@@ -444,7 +480,7 @@ $bad7"
 # the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
 # tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
-pop_guard 8 "no backlog shard under $M/backlog/ and no STATUS.md under $M/builds/" "$pop8" "$PRE_STATUSY"
+pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
 files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
   [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
 bad8=""
@@ -469,7 +505,7 @@ if [ -n "$files8" ]; then
       if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/ && nmatch(line)!=1) print FILENAME ":" uln
     }')
 fi
-[ -n "$bad8" ] && fail 8 "backlog/STATUS rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
+[ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
 
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
@@ -479,6 +515,54 @@ $bad8"
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
+fi
+
+# 21 — every record names the spec it is evidence about. Delegates the
+# PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
+# fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
+# Python raise. ONE invocation of the read-only mode, split here into four branch populations.
+c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|reviews)/" || true)
+pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
+  "$(printf '%s\n' "$c21_sel" | grep -c . || true)" "$PRE_BINDABLE"
+if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
+  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>/dev/null || true)
+  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
+$miss21"
+  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
+$bad21"
+  # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
+  # declaration and the number of them is the thing a reader is entitled to see bounded.
+  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  pin21=${RECORD_UNBOUND_PIN-}
+  if [ -z "$pin21" ]; then
+    fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
+  elif [ "${n21:-0}" -gt "$pin21" ]; then
+    over21="  measured ${n21:-0} against the pin $pin21"
+    fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
+$over21"
+  fi
+  # Branch 4 — the filename PROJECTS the header. Its input is the S row, because a conformant record
+  # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
+  # id: family, slug and ordinal. A bound record whose name carries no family qualifier fails here,
+  # since two thirds of an id is not a projection of it.
+  proj21=$(printf '%s\n' "$b21" | sed -n 's/^S\t\([^\t]*\)\t[^\t]*\t\(.*\)$/\1|\2/p' | while IFS='|' read -r p ids; do
+      base=${p##*/}; base=${base%.*}
+      case "$base" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) stem=${base#????-??-??-} ;;
+        *) echo "  $p — the name carries no date, so no id can be read from it"; continue ;;
+      esac
+      rest=${stem#*-}
+      claimed=$(printf '%s\n' "$rest" | grep -oE "^($FAM_ALT)-[A-Za-z0-9]+-[0-9]+" || true)
+      if [ -z "$claimed" ]; then
+        echo "  $p — bound, but the name carries no family-qualified id"
+      else
+        printf '%s\n' "$ids" | tr ' ' '\n' | grep -qxF "$claimed" || echo "  $p — the name claims $claimed"
+      fi
+    done)
+  [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
+$proj21"
 fi
 
 # 10 — rotation note (always; cheap). FLAT (1.5): one archive at the memory root.

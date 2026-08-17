@@ -69,19 +69,6 @@ required field on every review record, a date-cutoff ratchet, and a waiver pass 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
 it.
 
-<!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-5 | 2026-08-17 |
-
-Records live under `spec/`, `build/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Units — the authored roster
 
@@ -192,3 +179,50 @@ Named here so the cut-line is one place rather than five.
   cross-component fixture, the planning verb's first-line blindness as a separate row, the
   unpaired shipped protocol version, and the never-landed silent-exit refusals. Unit 4 closes the
   planning verb's blindness as a side effect and says so in its own record.
+
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-5 | 2026-08-17 |
+
+Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md) | — | *none — an adversarial research pass run BEHIND this build; it precedes the spec set and is what warranted it* |
+| [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
+| [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-TOOL-aBoundedVerdict-1.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md)
+  - [2026-08-16-spec-TOOL-aBoundedVerdict-2.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md)
+  - [2026-08-16-spec-TOOL-aBoundedVerdict-3.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md)
+  - [2026-08-16-spec-TOOL-aBoundedVerdict-4.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md)
+  - [2026-08-16-spec-TOOL-aBoundedVerdict-5.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md)
+- **`build/`**
+  - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
+- **`reviews/`**
+  - [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md)
+  - [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md)
+<!-- /gen:build-docs -->

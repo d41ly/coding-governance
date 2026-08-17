@@ -171,6 +171,38 @@ match the memory-tree `FAMILIES` (§3) — the build records and the decision lo
    you and refuses to declare a driver wired when it cannot run.
 
 <!-- govkit:entry drift-audit -->
+
+### 3a-bind — Record bindings, if your tree already holds records (kit ≥ 2.19)
+
+**An untouched tree with records reds on the first run, and that is the design.** Hygiene check 21
+requires every file under `<MEMORY_ROOT>/builds/*/{build,prompts,reviews}/` to name, in its own head,
+the spec ids it is evidence about. Branch 1 names every record carrying no such line. No value of
+`RECORD_UNBOUND_PIN` makes that green: the pin bounds the deliberate `none` escape, and a record
+nobody has annotated is a different state from one someone declared unbindable.
+
+This section applies to an EXISTING adopter as much as a new one — `adopt-memory-tree.sh` exits early
+on an already-adopted tree, so a rule added after your adoption reaches you here and nowhere else.
+
+1. **See the work.** `python <kit>/gen_build_index.py --print-bindings` — read-only, writes nothing,
+   always exits 0. Every `A` row is a record with no line.
+2. **One mechanical pass.** Give each `**Serves:** none — <why>`. This needs no judgement about what
+   any document was about, which is what makes it mechanical rather than a retrofit, and it is not a
+   cutoff: nothing is exempted by date and every record stays visible and countable.
+3. **Then measure.** Set `RECORD_UNBOUND_PIN` to the `N` count that pass leaves. Measured against
+   YOUR corpus — a number copied from another repo is either vacuous or permanently red.
+4. **Drain it.** As you bind records for real, replace `none` with
+   `**Serves:** <kind> <id> [<id>…]`, kinds `spec-audit` · `diff-review` · `journal` · `research`.
+   The pin is shrink-only, so the ratchet points down from wherever you started.
+
+Worked example, measured on this repo at kit 2.19: 78 records, of which 72 bound and 6 carry `none`
+with a reason — a build that predates the spec-format ratchet and holds no spec at all, two design
+passes their READMEs grade as rejected or preceding, two commissioning censuses, and one build's own
+design-pass record. That six is the pin, and it falls when those builds gain specs a record can name.
+
+Renaming records so the FILENAME also names its spec is optional and separate. This repo did it; the
+grammar does not change to allow it, because the ordinal is redefined rather than widened. If you do
+it, check 21's branch 4 keeps the two carriers in agreement afterwards.
+
 ## 3d — Adopt the drift-audit kit (optional, recommended)
 
 Does this repo's own RECORD of its state still match reality? Signals over stdlib + git, seconds,

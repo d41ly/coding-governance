@@ -129,7 +129,7 @@ requires the version bump at or after the last engine change in the pushed range
   set are identical before and after, measured and recorded in the build report.
 - **AC7** — every new branch has a positive arm naming its own text, and each arm FAILS against the
   pre-change code; the negative control is run per branch and its output recorded in the build report at
-  `build/2026-08-16-build-TOOL-aMouldedFolio-3-followups-controls.md` §3.
+  `build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md` §3.
 - **AC8** — the false claim in `row_grammar.py`'s module docstring and in the dossier — that an
   undeclared pin is "its own refusal" — is corrected, since `pin_of` returns 0. Both copies move.
 

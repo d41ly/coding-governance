@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T14:25:47+03:00 @ 43eb6b101f5fefe3b04c06302db80c8bbe022f5f
+last-audit: 2026-08-17T16:30:00+03:00 @ af708d8f04d5af598e3451aeb9fe913e52ee81e9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 23e3484abcf1edfe7fe058ff02e8db331e952716
+last-body-change: 827296b2288b3a634197d8f8fb5771b9fab13abf
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -155,6 +155,15 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
 - A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
   prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
+- A build README's top level is a SLOT SEQUENCE gated by its own leg,
+  `gen_build_index.py --check-format`: authored content after the first generated marker reds it.
+  Detail in `memory/map/features/build-readme-surface.md`.
+- `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
+  adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
+- `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed
+  corpus-wide and contradicted its own build README. Check 8's population is the backlog shards alone.
+- A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
+  reservation range and a planned unit cannot be added to it by hand; the next render removes it.
 - A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
   message that reads like a families misconfiguration.
 - Hygiene check 12's skeleton scan matches a literal date-shape or id-shape ANYWHERE in a spec body,
@@ -201,3 +210,11 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
   >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
   dir before blaming the diff, and do not delete the shared one.
+- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
+  check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
+  it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
+  after a round counter.
+- A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
+  assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
+  costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
+  that name states a count.

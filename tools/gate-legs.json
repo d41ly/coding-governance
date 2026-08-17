@@ -188,6 +188,14 @@
     ]
   },
   {
+    "name": "build README slot contract",
+    "argv": [
+      "python3",
+      "tools/memory-tree/gen_build_index.py",
+      "--check-format"
+    ]
+  },
+  {
     "name": "corpus-ids selftest",
     "argv": [
       "python3",

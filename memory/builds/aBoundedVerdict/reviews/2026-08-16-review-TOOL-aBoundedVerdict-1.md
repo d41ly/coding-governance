@@ -1,3 +1,5 @@
+**Serves:** spec-audit TOOL-aBoundedVerdict-1..5  <!-- inferred: its own header scopes it to the five-spec set -->
+
 ## Verdict: BLOCKED
 
 *Review shape: raw 87, confirmed 40, refuted 47, unverified 0, precision 0.46, lenses 5/5. M4 spec

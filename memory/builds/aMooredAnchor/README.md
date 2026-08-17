@@ -96,7 +96,7 @@ information `base:` does not, so its disagreement branch would compare a constan
 
 ## Review record
 
-`reviews/2026-08-11-review-aMooredAnchor-1.md` — Tier-2 over the rev-1 spec. Five lenses, 38 raw, 32
+`reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md` — Tier-2 over the rev-1 spec. Five lenses, 38 raw, 32
 confirmed, 6 refuted, precision 0.84, no dead lens. 17 distinct defects: 4 blockers, 6 highs, 4
 mediums, 3 lows. Verdict: **fold and rebuild the spec**, which rev-2 is.
 
@@ -111,11 +111,39 @@ The table below is GENERATED from the status
 header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling · ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling
+ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | CLOSED | rev-5 | 2026-08-11 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md) | journal | TOOL-aMooredAnchor-1 |
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh) | journal | TOOL-aMooredAnchor-1 |
+| [2026-08-11-review-TOOL-aMooredAnchor-1-1.md](reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md) | spec-audit | TOOL-aMooredAnchor-1 |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-11-spec-aMooredAnchor-1.md](spec/2026-08-11-spec-aMooredAnchor-1.md)
+- **`build/`**
+  - [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md)
+  - [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh)
+- **`reviews/`**
+  - [2026-08-11-review-TOOL-aMooredAnchor-1-1.md](reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md)
+<!-- /gen:build-docs -->

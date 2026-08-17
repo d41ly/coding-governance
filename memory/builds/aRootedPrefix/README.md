@@ -16,11 +16,34 @@ corpus that produced instead of failing. Measured on paired fixture repos: one r
 shipped reinvention reports `collision_flags: 1` at a root install and `0` at a prefixed one.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling
+ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | CLOSED | rev-3 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md) | spec-audit | TOOL-aRootedPrefix-1 |
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-09-spec-aRootedPrefix-1.md](spec/2026-08-09-spec-aRootedPrefix-1.md)
+- **`reviews/`**
+  - [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md)
+<!-- /gen:build-docs -->

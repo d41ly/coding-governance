@@ -24,16 +24,6 @@ exists at all rather than the cleanup simply being scheduled.
 The table below is GENERATED from the status header of every spec in this folder — do not
 hand-edit it.
 
-<!-- gen:build-index -->
-**Build status:** DEFERRED · 2 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2
-
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
-
-Records live under `spec/` and `reviews/`.
-<!-- /gen:build-index -->
 
 ## Units — the authored roster (M2)
 
@@ -68,3 +58,39 @@ afterwards would make the pin's provenance a guess. Unit 2 measures the corpus u
 - **A floor is measured, never chosen.** Unit 2 pins whatever the tree actually scores, and the
   number's provenance is the run that produced it. A floor set to a value nobody measured is a
   decoration, and this repo already names that anti-pattern.
+
+
+<!-- gen:build-index -->
+**Build status:** DEFERRED · 2 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
+
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 |
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-TOOL-aWalkedCorpus-1.md](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md)
+  - [2026-08-16-spec-TOOL-aWalkedCorpus-2.md](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md)
+- **`reviews/`**
+  - [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md)
+<!-- /gen:build-docs -->

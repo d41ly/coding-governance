@@ -31,7 +31,8 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | W6 | `-8` | the epoch gate's endpoint hole; the per-commit trade measured, not guessed |
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling · ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling
+ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -40,4 +41,30 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | [TOOL-aBatchedTribunal-8 — W6: the epoch gate's endpoint hole, and the trade measured](spec/2026-08-09-spec-aBatchedTribunal-8.md) | CLOSED | rev-1 | 2026-08-09 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md) | diff-review | TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+
+Ids no `spec-audit` record has ever named: TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-09-spec-aBatchedTribunal-1.md](spec/2026-08-09-spec-aBatchedTribunal-1.md)
+  - [2026-08-09-spec-aBatchedTribunal-6.md](spec/2026-08-09-spec-aBatchedTribunal-6.md)
+  - [2026-08-09-spec-aBatchedTribunal-8.md](spec/2026-08-09-spec-aBatchedTribunal-8.md)
+- **`reviews/`**
+  - [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md)
+<!-- /gen:build-docs -->

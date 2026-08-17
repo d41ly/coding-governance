@@ -553,6 +553,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "do_check_format",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "do_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -576,6 +581,11 @@
       "id": "do_measure",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "do_print_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "do_report",
@@ -871,6 +881,11 @@
       "id": "inert_only",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "insert_region",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "intConsts",
@@ -1488,6 +1503,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "read_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1521,6 +1541,11 @@
       "id": "reconcile",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "record_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "records",
@@ -1578,6 +1603,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_docs",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_edges",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_inventories_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1591,6 +1626,11 @@
       "id": "render_map_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_order",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_region",
@@ -1983,6 +2023,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "slot_violations",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "slug",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -1991,6 +2036,11 @@
       "id": "snippet_bytes",
       "kind": "function",
       "file": "tools/memory-recall/union.py"
+    },
+    {
+      "id": "spec_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "stems",

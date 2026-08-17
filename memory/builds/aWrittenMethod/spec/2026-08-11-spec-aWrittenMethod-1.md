@@ -12,7 +12,7 @@ run actually reads, and survives a compaction the agent cannot observe.
 ## 2. Scope (IN)
 
 - **S1** — `tools/memory-tree/BUILD-METHOD.template.md`, the authored source. Its content is the
-  pass-2 draft at `../build/2026-08-11-build-aWrittenMethod-1-method-pass.md`, trimmed to budget and
+  pass-2 draft at `../build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md`, trimmed to budget and
   with B1 through B7 applied. Eleven sections M1 through M11, keeping that draft's own numbering.
   Budget: the hygiene check 6 caps on `memory/guides/*.md`, **≤20,480 B and ≤250 lines**, measured on
   the RENDERED copy. See F2 — the tighter self-imposed budget did not survive contact. Paths follow the
@@ -174,7 +174,7 @@ nothing forces the first read.
 ## 6. Acceptance criteria
 
 - **AC0** — When `memory/guides/BUILD-METHOD.md` is read against
-  `../build/2026-08-11-build-aWrittenMethod-1-method-pass.md`, every rule in that draft appears in the
+  `../build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md`, every rule in that draft appears in the
   M section S1 assigns it, and each of B1 through B7 is applied.
 - **AC1** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs, it reports three
   pairs from a count derived from `PAIRS` and exits 0.

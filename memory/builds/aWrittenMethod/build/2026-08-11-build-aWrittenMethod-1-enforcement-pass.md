@@ -1,5 +1,7 @@
 # Design pass 1 — the enforcement layer, mis-aimed and kept
 
+**Serves:** none — a design pass the build README grades REJECTED for scope; it warranted no spec and none was minted
+
 **What this pass was aimed at:** proving that an unattended run did not tamper with its own
 instructions. It produced a provenance-and-evidence system.
 
@@ -113,7 +115,7 @@ resolves to a commit the run authored, and it stays unequal to HEAD so the degen
 fire. `check_mandate` then compares run-authored bytes against run-authored bytes and prints OK. The
 driver's own comment block asserts the defense that fails here, claiming a remote-tracking ref cannot
 be moved without a push. This was already filed as D3/BLOCKER in
-`../../aUnmannedHelm/reviews/2026-08-10-review-aUnmannedHelm-2.md` with fixes specified, and no
+`../../aUnmannedHelm/reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md` with fixes specified, and no
 backlog row tracked it. It is now `TOOL-aWrittenMethod-2` and is out of this build's scope.
 
 **Four declarations are delivery rather than enforcement** and carry forward: the recall entrypoint,

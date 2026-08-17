@@ -76,3 +76,10 @@
 - TOOL-aBoundedVerdict-8 · OPEN · no leg asserts a review subject AT the cap with a non-clean verdict was actually DISPOSED of, so `TOOL-aBoundedVerdict-1` S8 is advisory. The check spans three units' mechanisms (cap, park verb, halt code); write it once all three have landed, not before
 - TOOL-aBoundedVerdict-9 · OPEN · hygiene check 10 is INERT for backlog archives: it derives the live index as stem-dot-md at the MEMORY ROOT, but a backlog index lives one level down, so the derived path never exists and the `[ -f ]` guard skips it. No backlog rotation reference is checked
 - TOOL-aBoundedVerdict-10 · OPEN · `unattended driver selftest` HANGS on node `a` inside its first `--preflight` (traced), zero output at 240s. It wedges the WHOLE bar at 46/65: `run-gates.sh` has no per-leg deadline, and the driver's `ls-remote` anchor call has no timeout either. Two fixes
+- TOOL-aTetheredRecord-1 · INPROGRESS · mint the five missing spec H1 ids; the orphan waiver drains empty and `ORPHAN_ID_PIN` falls 5 -> 0 → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-2 · INPROGRESS · the record-to-spec binding grammar and its read-only parser; it classifies and never raises → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-3 · INPROGRESS · the retrofit: every record gains a binding line, by a precedence in which the filename is not evidence → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-4 · INPROGRESS · check 21 — four branches over five armed fail sites; the filename projects the header and cannot drift → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-5 · INPROGRESS · the generated region renders each record under the ids it serves, plus the two coverage joins → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-6 · INPROGRESS · the adopter path: their first run is RED, and the migration is ordered — mechanical, then measured → `builds/aTetheredRecord/`
+- TOOL-aTetheredRecord-7 · INPROGRESS · the rename: every record filename names a spec via a REDEFINED ordinal, with no grammar change → `builds/aTetheredRecord/`

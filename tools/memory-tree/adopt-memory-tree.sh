@@ -92,7 +92,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
   echo "- [TEMPLATE-SPEC.md](TEMPLATE-SPEC.md) — the canonical spec / design-pass format (hygiene check 12)."
   echo "- [HYGIENE.md](HYGIENE.md) — the rule set; the check script is its enforcement."; echo
   echo "## Directories"; echo
-  echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`STATUS.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
+  echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
   echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers."; echo
   echo "## Streams (the closed enum)"; echo
@@ -229,3 +229,15 @@ echo "     STRICTLY AHEAD of every committed spec. From that date on, every acce
 echo "     name a witness in backticks — the command, file or test that makes the observation."
 echo "  7. MEASURE any pin/floor this kit gains against YOUR corpus — never inherit another repo's"
 echo "     numbers. A pin copied from a larger tree is either vacuous or permanently red here."
+echo "  8. Bind your records (hygiene check 21). If $M/builds/*/{build,prompts,reviews}/ already"
+echo "     holds records, THE FIRST RUN IS RED: check 21 names every record carrying no Serves line,"
+echo "     and no pin value changes that — RECORD_UNBOUND_PIN bounds the deliberate 'none' escape,"
+echo "     never the absent line. Migrate in this ORDER:"
+echo "       a. See what is unbound:  $_PY $KIT_REL/gen_build_index.py --print-bindings"
+echo "          (read-only, writes nothing, always exits 0; 'A' rows are the work)"
+echo "       b. One mechanical pass: add '**Serves:** none — <why>' to each. No judgement about what"
+echo "          any document was about, so it is not a retrofit — and not a cutoff either: nothing"
+echo "          is exempted by date and every record stays visible."
+echo "       c. THEN measure: set RECORD_UNBOUND_PIN to the 'N' count that pass leaves."
+echo "       d. Drain it as you bind records for real: '**Serves:** <kind> <id> [<id>…]', kinds"
+echo "          spec-audit | diff-review | journal | research. Grammar: $M/HYGIENE.md, Record bindings."

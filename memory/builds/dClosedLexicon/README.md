@@ -60,7 +60,7 @@ reopens the first only because it converts a repeated prose correction into a ga
 
 ## The 2026-08-16 unattended run — classification and what it carries
 
-The M4 audit at `reviews/2026-08-16-review-dClosedLexicon-2.md` came back BLOCKED with two blockers,
+The M4 audit at `reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md` came back BLOCKED with two blockers,
 and the classification after folding it is: `TOOL-dClosedLexicon-1` READY and building;
 `TOOL-dClosedLexicon-2` BLOCKED on a parked scope fork; `PLAY-dClosedLexicon-1` still BLOCKED on the
 ceiling raise, which has NOT landed — the ceiling is still 32,768 and the template measures 32,682,
@@ -77,7 +77,9 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling · ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13 TOOL-dClosedLexicon-14 TOOL-dClosedLexicon-15
+**Build status:** CLOSED · 7 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling
+ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12
+ids TOOL-dClosedLexicon-13 TOOL-dClosedLexicon-14 TOOL-dClosedLexicon-15
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -90,5 +92,53 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-dClosedLexicon-13 — govkit's preview promises writes `apply` will not perform](spec/2026-08-17-spec-dClosedLexicon-13.md) | CLOSED | rev-2 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md) | spec-audit | TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md) | diff-review | TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md) | diff-review | TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md) | diff-review | TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md) | diff-review | TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md) | diff-review | TOOL-dClosedLexicon-4 |
+| [2026-08-17-review-TOOL-dClosedLexicon-11-10.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-10.md) | spec-audit | TOOL-dClosedLexicon-11 |
+| [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md) | spec-audit | TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13 |
+
+Ids no `spec-audit` record has ever named: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-4.
 <!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-PLAY-dClosedLexicon-1.md](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md)
+  - [2026-08-16-spec-dClosedLexicon-1.md](spec/2026-08-16-spec-dClosedLexicon-1.md)
+  - [2026-08-16-spec-dClosedLexicon-2.md](spec/2026-08-16-spec-dClosedLexicon-2.md)
+  - [2026-08-16-spec-dClosedLexicon-4.md](spec/2026-08-16-spec-dClosedLexicon-4.md)
+  - [2026-08-17-spec-dClosedLexicon-11.md](spec/2026-08-17-spec-dClosedLexicon-11.md)
+  - [2026-08-17-spec-dClosedLexicon-12.md](spec/2026-08-17-spec-dClosedLexicon-12.md)
+  - [2026-08-17-spec-dClosedLexicon-13.md](spec/2026-08-17-spec-dClosedLexicon-13.md)
+- **`reviews/`**
+  - [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md)
+  - [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md)
+  - [2026-08-17-review-TOOL-dClosedLexicon-11-10.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-10.md)
+  - [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md)
+<!-- /gen:build-docs -->
 
