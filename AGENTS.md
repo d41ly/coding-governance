@@ -102,7 +102,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   derivation, because `--bump` writes that key and the ratchet reads it back through the same
   code — the round trip is green whatever it says
 - template size ≤48 KiB — `tools/check-template-size.sh`; the kickoff engine rides the same script at a
-  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md 18432` (the limit is a
+  MEASURED 18 KiB — `tools/check-template-size.sh skills/session-kickoff/SKILL.md` (its ceiling is DECLARED in
+  `tools/template-size-limits.txt` with its history beside it, and outranks the environment so the
+  engine keeps the insulation a positional used to give it; the limit is a
   positional because a leg cannot set an env var: the runner execs argv with no shell)
 - kit version markers — `tools/check-kit-versions.sh` (every kit's version constant present + the memory-tree marker/constant pair agrees)
 - verdict epoch — `tools/memory-tree/check-verdict-epoch.sh` (+ self-test): the kit version DATES the engine's verdicts, so a diff that moves a non-comment line of `check-memory-hygiene.sh` must move `KIT_MEMORY_TREE_VERSION` too — `hygiene-parity.test.sh` derives its baseline floor from that constant, and a stale one made the floor point before the change
@@ -126,7 +128,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - memory-recall skill wiring — `tools/memory-recall/adopt-memory-recall.sh --check` (the rendered `.claude/skills/memory-recall/SKILL.md` still matches `.memory-tree.conf`)
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
-- drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`)
+- drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`). Two of them name an OPTIONAL kit — `lexicon_verbs_declared_but_unused` and `lexicon_ratified_older_than_language_surface` — and with no `.lexicon.conf` both report NOT ASKED rather than a clean zero, so an adopter without the lexicon inherits nothing live. The unused-verb pin is honestly non-zero: curation adds aspirational verbs, and it is the DELETION direction (a verb outliving the code that justified it) the signal exists for
 - **the unattended-run protocol is BINDING** — `memory/guides/UNATTENDED-PROTOCOL.md`: a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
   mandate it ASSERTS and cannot have written. The BASE that mandate hangs on is OBSERVED from the
@@ -152,7 +154,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (ten inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 - playbook carrier parity — `tools/check-playbook-parity.sh` (+ `tools/check-playbook-parity.test.sh`):
   the playbook's claims about THIS repo, machine-checked in three classes that have each recurred
   after being fixed once — every tracked kit dir is named in the trio or carries a waiver row with a
@@ -186,7 +188,45 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   never an exit code alone — including the on-disk arm that `plan` leaves the target byte-identical
   a read-only verb that writes is the whole risk of that verb. It found two real defects on its
   first run, one of them a token regex matching the `{k}` inside a shell `${k}`
+- acceptance matrix — `python tools/govkit/matrix.py`: the deployer driven against four repo
+  SHAPES rather than against kits — empty, no-Python, a pre-commit hook that refuses, and a
+  gate leg of the target's own that is already red. Every arm's expected outcome is STATED in
+  the harness rather than read off the implementation, and each asserts a message or an
+  on-disk effect, never an exit code alone. Its sibling `tools/govkit/check_runbook_parity.py`
+  is NOT on the bar: it reds on ten entries the runbook has no section for, which is a real
+  documented gap (`DEPL-aSealedCaravan-3`) and not something to waive a gate over
+- refusal join — `python tools/govkit/refusal_join.py`: every refusal branch in the deployer is
+  reached by an arm that asserts it. `check-arms.py` is shell-only by a resolved fork, so the
+  strongest write path in this repo would otherwise be its least armed. A branch is a call site of
+  either refusal channel; its ANCHOR is module-function-ordinal, so it survives edits above it where
+  a line number would not. TWO shrink-only pins, because they catch different things: the branch pin
+  sees a matcher that stopped matching, the FILE pin sees a module that stopped being scanned — and
+  neither sees a branch MOVED into a new module, which the enumerated anchor set catches instead
 
+- naming lexicon — `tools/lexicon/lexicon.py` (three predicates over the `.lexicon.conf` DECLARATION:
+  a closed verb table every definition leads with, banned type suffixes at DEFINITION sites only, and
+  forbidden import DIRECTIONS between layers). OPT-IN: with no conf it reports NOT ADOPTED and exits
+  0, which is the whole off switch. Vacuity is armed on both sides — a declared `parser`/`probe`
+  language whose definition population is empty against a corpus containing that extension prints
+  `DEAD PROBE` and reds, and `tools/lexicon/selftest.py` freezes a SENTINEL per shipped pattern set,
+  because the corpus-side arm is defeated by an empty corpus. An empty `LAYERS` is `NOT ARMED` and
+  REDS rather than passing, and a rule whose globs select no tracked file is `UNSELECTIVE`. What is
+  NOT checked — stated because an earlier revision claimed it was — is whether a selective rule can
+  actually FIRE: a construction-based proof of that was built, measured to be a tautology (it
+  certified the very resolver whose blindness it existed to catch) and removed. P3 rests on its
+  resolver, an OBSERVED failing case, and production-shaped fixtures. Waivers key on the matched TEXT, never `<path>:<line>`, so an edit above a
+  waived line cannot unpin it; a waiver whose text is gone reds as stale. Wiring:
+  `tools/lexicon/adopt-lexicon.sh --check`. The three offender pins are MEASURED against this corpus
+  and are honestly non-zero on day one
+- playbook placeholder catalogue — `tools/check-placeholders.sh` (+ `tools/check-placeholders.test.sh`):
+  the shipped playbook files here ARE the un-instantiated sources and carry placeholders permanently,
+  so the bar-side question is whether `customize.md`'s CATALOGUE still agrees with them — every
+  measured placeholder listed, per-file tallies equal to the measurement, a placeholder appearing in
+  BOTH files declared SHARED rather than disjoint, and the TWO marker-carrying files agreeing on
+  `governance-template: vN.N` (`customize.md` carries no marker and is not in that population). The
+  "no placeholder survived" predicate is a separate `--check <a> <b>` mode over FIXTURES only; the
+  render-side owner of it is govkit's `playbook-placeholders` hole. It landed red on the live
+  `{{MEMORY_ROOT}}`-in-both-files defect the catalogue called disjoint
 - **the self-test legs** — harnesses that ride the bar as their own leg, so a gate and the proof it
   can fail are both visible: `tools/memory-tree/check-memory-hygiene.test.sh` ·
   `tools/memory-tree/check-verdict-epoch.test.sh` · `skills/session-kickoff/manifest-check.test.sh` ·

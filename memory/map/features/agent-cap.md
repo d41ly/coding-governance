@@ -10,7 +10,7 @@ decisions = []
 [claims]
 gate-legs = [
   "agent-cap self-test",
-  "verifier fan-out (≤5 verify agents per review)",
+  "verifier fan-out",
   "verifier fan-out self-test",
   "review-protocol parity (kit vs dogfood)",
 ]
@@ -22,6 +22,7 @@ rendered-skills = []
 gotcha-classes = ["trailing-comma-counted-as-an-element.md"]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/hooks/*",

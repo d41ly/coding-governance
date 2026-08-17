@@ -8,7 +8,7 @@ streams = ["deployer", "tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["govkit selfcheck", "govkit selftest"]
+gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govkit acceptance matrix"]
 kits = ["govkit"]
 git-hooks = []
 workflow-scripts = []
@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = []
 backlog-shards = ["DEPL.md"]
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/govkit/*",
@@ -96,6 +97,11 @@ non-empty reason. Never by editing a listing.
 seam: `govkit.py selfcheck` — reuse for asserting a declared population against a tracked surface in
 both directions; extend via a new arm inside `selfcheck`, which is the single home for every
 registry-shaped assertion this unit adds.
+
+seam: `refusal_join.py` — reuse for "is every branch of this shape reached by something that
+asserts it", over any Python population; extend via the matcher in `_is_refusal`, which is the one
+place the branch SHAPES are named. Its anchor is module-function-ordinal rather than a line, so it
+survives edits above the branch.
 
 ## Gaps
 

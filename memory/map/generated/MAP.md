@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 14 · guides: 4 · backlog-shards: 4
+Inventories: gate-legs: 65 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -25,6 +25,8 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
 | `gotchas selftest` | baseline |
+| `govkit acceptance matrix` | govkit |
+| `govkit refusal join` | govkit |
 | `govkit selfcheck` | govkit |
 | `govkit selftest` | govkit |
 | `harness arms (fail branches armed or pinned)` | baseline |
@@ -34,16 +36,21 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `kickoff-manifest ratchet` | baseline |
 | `kit version markers` | baseline |
 | `kit/dogfood doc parity` | baseline |
+| `lexicon naming predicates` | lexicon |
+| `lexicon selftest` | lexicon |
+| `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
-| `marker contract (4 readers)` | row-grammar |
-| `memory hygiene (20 checks)` | baseline |
+| `marker contract` | row-grammar |
+| `memory hygiene` | baseline |
 | `memory-hygiene self-test` | baseline |
 | `memory-recall kit selftest` | baseline |
 | `memory-recall skill wiring` | baseline |
 | `method carriers (every pointer declared)` | build-method |
 | `method-carriers self-test` | build-method |
+| `placeholder-catalogue self-test` | lexicon |
 | `playbook parity` | playbook |
 | `playbook parity selftest` | playbook |
+| `playbook placeholder catalogue` | lexicon |
 | `pre-push self-test` | baseline |
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
@@ -65,7 +72,7 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | baseline |
 | `verdict-epoch self-test` | baseline |
-| `verifier fan-out (≤5 verify agents per review)` | agent-cap |
+| `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
 
@@ -79,6 +86,7 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `gate-lint` | baseline |
 | `govkit` | govkit |
 | `hooks` | agent-cap |
+| `lexicon` | lexicon |
 | `lib` | baseline |
 | `memory-recall` | baseline |
 | `memory-tree` | baseline |
@@ -122,6 +130,7 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | key | claimant |
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
+| `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `fixture-passes-by-finding-nothing.md` | baseline |
@@ -153,3 +162,30 @@ Inventories: gate-legs: 58 · kits: 12 · git-hooks: 2 · workflow-scripts: 4 ·
 | `KICK.md` | baseline |
 | `PLAY.md` | baseline |
 | `TOOL.md` | baseline |
+
+## lexicon-verbs
+
+| key | claimant |
+|---|---|
+| `add` | lexicon |
+| `arm` | lexicon |
+| `build` | lexicon |
+| `check` | lexicon |
+| `derive` | lexicon |
+| `extract` | lexicon |
+| `init` | lexicon |
+| `load` | lexicon |
+| `main` | lexicon |
+| `measure` | lexicon |
+| `parse` | lexicon |
+| `print` | lexicon |
+| `read` | lexicon |
+| `remove` | lexicon |
+| `render` | lexicon |
+| `resolve` | lexicon |
+| `run` | lexicon |
+| `scan` | lexicon |
+| `seed` | lexicon |
+| `set` | lexicon |
+| `test` | lexicon |
+| `write` | lexicon |

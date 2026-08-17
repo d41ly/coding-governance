@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-grammar selftest", "marker contract (4 readers)"]
+gate-legs = ["row-grammar selftest", "marker contract"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -17,6 +17,7 @@ rendered-skills = []
 gotcha-classes = []
 guides = []
 backlog-shards = []
+lexicon-verbs = []
 [paths]
 globs = [
   "tools/memory-tree/row_grammar.py",

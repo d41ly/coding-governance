@@ -10,6 +10,9 @@ tools/gate-legs.json text eol=lf
 # strips CR from the value so it is tolerant either way, but an unpinned record makes every --bump
 # rewrite the whole file on a CRLF checkout, and the key side has no such tolerance to spare.
 tools/template-size-highwater.txt text eol=lf
+# The DECLARED ceilings, same reason: the gate parses this file, and an unpinned path smudges to
+# CRLF on this fleet. A person edits it, so it never gets a rewrite to normalise it back.
+tools/template-size-limits.txt text eol=lf
 
 # Git hooks are extensionless (the *.sh rule above misses them); a CRLF hook won't execute.
 .githooks/pre-commit text eol=lf
@@ -126,3 +129,13 @@ tools/govkit/*.toml text eol=lf
 tools/govkit/*.py text eol=lf
 tools/govkit/entries/*.toml text eol=lf
 tools/*/kit.toml text eol=lf
+
+# The lexicon kit's conf. Pinned for the same determinism reason as the two confs above: it is read
+# by the kit's Python reader AND grepped by `adopt-lexicon.sh`, whose `ratified` extraction strips a
+# trailing quote with `s/"$//` — a CRLF checkout puts a carriage return after that quote and the
+# anchor stops matching, leaving `"
+# `, a NON-EMPTY value. That INVERTS the unratified-seed refusal:
+# the one check stopping an uncurated verb table from reaching the merge bar passes exactly when it
+# must fire. Not harmless, and MEASURED — this comment previously said "harmless today", which the
+# same kit's own selftest then disproved. The reader also strips CR; both halves are armed.
+.lexicon.conf text eol=lf

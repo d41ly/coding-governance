@@ -215,17 +215,8 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     return p.resolve() if p.is_absolute() else (repo / raw).resolve()
 
 
-def corpus_files(repo: pathlib.Path) -> list[str]:
-    """Tracked AND untracked-not-ignored ``$MEMORY_ROOT/**/*.md``.
-
-    A note written this session and not yet committed is exactly what a session needs to find, and
-    ``extract.corpus_files`` is tracked-only on purpose -- it is the MEASUREMENT path and stays
-    pinnable to a rev.
-    """
-    root = CONF.memory_root + "/"  # FORKED: conf, not a literal `memory/`
-    tracked = git(repo, "ls-files", root).splitlines()
-    untracked = git(repo, "ls-files", "--others", "--exclude-standard", root).splitlines()
-    return sorted({p for p in tracked + untracked if p.endswith(".md")})
+# The query path's corpus walk lived HERE as a second enumerator and is gone: `E.corpus_inputs`
+# serves both callers, with `include_untracked=True` the one thing this path asks for.
 
 
 def corpus_digest(repo: pathlib.Path, files: list[str]) -> str:
@@ -288,7 +279,7 @@ def dead_alias_diagnosis(man: dict) -> str | None:
     )
 
 
-def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict], dict]:
+def _docs(repo: pathlib.Path, files: list[str], declared: list[str]) -> tuple[list[dict], list[dict], dict]:
     records, chunks = [], []
     for path in files:
         try:
@@ -299,6 +290,14 @@ def _docs(repo: pathlib.Path, files: list[str]) -> tuple[list[dict], list[dict],
             continue
         records.extend(E.extract_records(path, text))
         chunks.extend(E.extract_chunks(path, text, CHUNK_MAX))
+    # The DECLARED extra sources, handed in by the ONE enumerator rather than re-derived here.
+    # Re-deriving is what let the digest pair disagree about what the corpus was.
+    for path in declared:
+        try:
+            text = (repo / path).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        chunks.extend(E.extract_declarations(path, text))
     # The SECOND call site of the alias join, and the one the merge bar cannot see
     # (ARCH-aGrittedFlagstone-3). `check_recall.py` grades a SUBPROCESS of `extract.py`; this CLI
     # never runs that entry point and never reads its output dir -- it re-extracts here and indexes
@@ -328,7 +327,7 @@ def _write_set(dirp: pathlib.Path, name: str, docs: list[dict]) -> None:
     db.close()
 
 
-def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dict:
+def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], declared: list[str]) -> dict:
     """Build the cache, announcing the build FIRST so a sibling's eviction pass can see it.
 
     The mkdir moved ABOVE `_docs` and the marker is written before the first read: the extraction
@@ -341,7 +340,7 @@ def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dic
     marker = dirp / BUILD_MARKER
     marker.write_text(str(os.getpid()), encoding="utf-8")
     try:
-        return _build_cache(repo, dirp, files, t0)
+        return _build_cache(repo, dirp, files, declared, t0)
     finally:
         # ONLY IF IT IS STILL OURS. Two builders can target one cache directory — last writer wins,
         # which the atomic manifest makes survivable — but an unconditional unlink means the first to
@@ -355,8 +354,9 @@ def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str]) -> dic
             pass
 
 
-def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], t0: float) -> dict:
-    records, chunks, aliases = _docs(repo, files)
+def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str],
+                 declared: list[str], t0: float) -> dict:
+    records, chunks, aliases = _docs(repo, files, declared)
     _write_set(dirp, "records", records)
     _write_set(dirp, "chunks", chunks)
     man = {
@@ -364,7 +364,12 @@ def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], t0: f
         "chunk_max": CHUNK_MAX,
         "n_files": len(files),
         "counts": {"records": len(records), "chunks": len(chunks)},
-        "digest": corpus_digest(repo, files),
+        # The declared sources join the digest: their COMMENT BLOCKS are corpus content, and
+        # `CONF.digest()` deliberately hashes resolved conf VALUES rather than file bytes — so
+        # without this a justification edit in a declared conf leaves a warm cache serving prose
+        # that no longer exists. The list is the one the WALK returned: computing it here while
+        # `ensure_cache` compared a digest over `files` alone is what made the cache unhittable.
+        "digest": corpus_digest(repo, files + declared),
         "alias_digest": alias_digest(),
         # The join COUNTS beside the source digest: the digest keys freshness and cannot tell a
         # joined alias layer from a dead one. Here so the diagnosis fires on a cache hit too.
@@ -586,14 +591,14 @@ def read_manifest(dirp: pathlib.Path) -> dict | None:
 
 def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path, dict, bool]:
     dirp = cache_dir(repo)
-    files = corpus_files(repo)
+    files, declared = E.corpus_inputs(repo, include_untracked=True)
     man = read_manifest(dirp)
     fresh = (
         not force
         and man is not None
         and man.get("version") == CACHE_VERSION
         and man.get("chunk_max") == CHUNK_MAX
-        and man.get("digest") == corpus_digest(repo, files)
+        and man.get("digest") == corpus_digest(repo, files + declared)
         and man.get("alias_digest") == alias_digest()
         and man.get("conf_digest") == CONF.digest()
         and (dirp / "records.db").exists()
@@ -601,7 +606,7 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
     )
     if fresh:
         return dirp, man, False
-    built = build_cache(repo, dirp, files)
+    built = build_cache(repo, dirp, files, declared)
     # Dead-worktree eviction FIRST and unconditionally — it is free correctness. The budget is a
     # second pass over whatever survives, and both run only AFTER a successful build: a cache is
     # replaceable only once its replacement exists.
@@ -1176,7 +1181,7 @@ def main(argv: list[str] | None = None) -> int:
         dirp, man, rebuilt = ensure_cache(repo, force=True)
         hits = rrf([search(dirp, "records", expr, k), search(dirp, "chunks", expr, k)])
 
-    live_files = len(corpus_files(repo))
+    live_files = len(E.corpus_files(repo, include_untracked=True))
     notices = []
     if man.get("n_files") != live_files:
         notices.append(f"index covers {man.get('n_files')} files, corpus now has {live_files}")

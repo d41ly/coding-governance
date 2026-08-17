@@ -1,3 +1,4 @@
+# govkit:pytest-guardrails
 # gov:kit pytest-parallel-guardrails@1.0
 #
 # The four-knob parallel-suite guardrail recipe — merge into your [tool.pytest.ini_options].
@@ -31,3 +32,4 @@ addopts = "--max-worker-restart=0"
 # stderr dup — a channel that survives execnet's worker fd redirection. The victim test names
 # itself instead of vanishing.
 faulthandler_timeout = 240
+# /govkit:pytest-guardrails

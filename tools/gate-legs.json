@@ -1,12 +1,5 @@
 [
   {
-    "name": "memory hygiene (20 checks)",
-    "argv": [
-      "bash",
-      "tools/memory-tree/check-memory-hygiene.sh"
-    ]
-  },
-  {
     "name": "kickoff-manifest ratchet",
     "argv": [
       "bash",
@@ -51,8 +44,7 @@
     "argv": [
       "bash",
       "tools/check-template-size.sh",
-      "skills/session-kickoff/SKILL.md",
-      "18432"
+      "skills/session-kickoff/SKILL.md"
     ]
   },
   {
@@ -232,13 +224,6 @@
     ]
   },
   {
-    "name": "marker contract (4 readers)",
-    "argv": [
-      "bash",
-      "tools/memory-tree/marker-contract.test.sh"
-    ]
-  },
-  {
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",
@@ -302,13 +287,6 @@
       ".claude/",
       "tools/",
       "tools/lib/"
-    ]
-  },
-  {
-    "name": "verifier fan-out (≤5 verify agents per review)",
-    "argv": [
-      "bash",
-      "tools/workflows/check-verifier-fanout.sh"
     ]
   },
   {
@@ -560,6 +538,99 @@
     "argv": [
       "python",
       "tools/govkit/selftest.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "lexicon naming predicates",
+    "argv": [
+      "python",
+      "tools/lexicon/lexicon.py"
+    ],
+    "guard": [
+      "tools/",
+      "skills/session-kickoff/",
+      ".githooks/",
+      ".claude/"
+    ]
+  },
+  {
+    "name": "lexicon selftest",
+    "argv": [
+      "python",
+      "tools/lexicon/selftest.py"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "lexicon wiring",
+    "argv": [
+      "bash",
+      "tools/lexicon/adopt-lexicon.sh",
+      "--check"
+    ],
+    "guard": [
+      "tools/lexicon/"
+    ]
+  },
+  {
+    "name": "playbook placeholder catalogue",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.sh"
+    ]
+  },
+  {
+    "name": "placeholder-catalogue self-test",
+    "argv": [
+      "bash",
+      "tools/check-placeholders.test.sh"
+    ],
+    "guard": [
+      "tools/check-placeholders.sh",
+      "tools/check-placeholders.test.sh"
+    ]
+  },
+  {
+    "name": "memory hygiene",
+    "argv": [
+      "bash",
+      "tools/memory-tree/check-memory-hygiene.sh"
+    ]
+  },
+  {
+    "name": "marker contract",
+    "argv": [
+      "bash",
+      "tools/memory-tree/marker-contract.test.sh"
+    ]
+  },
+  {
+    "name": "verifier fan-out",
+    "argv": [
+      "bash",
+      "tools/workflows/check-verifier-fanout.sh"
+    ]
+  },
+  {
+    "name": "govkit refusal join",
+    "argv": [
+      "python",
+      "tools/govkit/refusal_join.py"
+    ],
+    "guard": [
+      "tools/govkit/"
+    ]
+  },
+  {
+    "name": "govkit acceptance matrix",
+    "argv": [
+      "python",
+      "tools/govkit/matrix.py"
     ],
     "guard": [
       "tools/govkit/"

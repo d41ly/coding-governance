@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.1
+gov:kit memory-recall@1.3
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.1"
+KIT_MEMORY_RECALL_VERSION = "1.3"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
@@ -135,10 +135,12 @@ def _budget(raw: str | None) -> float | None:
 class Conf:
     """The RESOLVED values every other module in the kit reads."""
 
-    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb")
+    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
+                 "extra_sources")
 
     def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
-                 cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB):
+                 cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
+                 extra_sources: tuple[str, ...] = ()):
         self.root = root
         self.path = root / CONF_NAME
         self.memory_root = memory_root
@@ -148,6 +150,9 @@ class Conf:
         # measured knob in this tree. It is deliberately NOT part of digest(): a size limit is not a
         # corpus input, and folding it in would rebuild every cache whenever someone raised the cap.
         self.cache_budget_mb = cache_budget_mb
+        # DECLARED extra corpus sources, repo-relative. Empty is the pre-widening corpus
+        # exactly, which is what an adopter whose conf has no such key must keep getting.
+        self.extra_sources = extra_sources
 
     def digest(self) -> str:
         """A hash of the RESOLVED values, not of the conf file's bytes.
@@ -169,8 +174,12 @@ class Conf:
         layering: `extract` imports `recall_conf`, not the other way round. The cost is one rebuild
         per kit bump, which is the same order as the alias-edit rebuild already accepted above.
         """
+        # `extra_sources` is in the blob for the same reason the kit version is: it changes WHICH
+        # documents exist, so a widened or narrowed list must not read a cache built before it.
+        # Measured: without it, editing the declaration left the index warm and the corpus stale,
+        # so both arms proving the widening is opt-in were answered by a cached number.
         blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
-                          KIT_MEMORY_RECALL_VERSION))
+                          " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
@@ -205,7 +214,8 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
         raise ConfError(
             refusal(base, f"{CONF_NAME} declares no usable FAMILIES (want `discipline:FAMILY ...`)")
         )
-    out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")))
+    out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
+               tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()))
     if root is None:
         _cached = out
     return out

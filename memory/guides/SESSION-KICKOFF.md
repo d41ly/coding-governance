@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T01:55:00+03:00 @ 96141aed368273cb82e21e23bfa8eb817e10785a
+last-audit: 2026-08-17T05:40:00+03:00 @ febba16b77c5a802a7f3ebb6c053bf9e1d9c4198
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 1640f680816de71a3f9ae88afd70231a68025721
+last-body-change: febba16b77c5a802a7f3ebb6c053bf9e1d9c4198
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -61,10 +61,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `parallel-coding-governance.template.md` + `.customize.md` + `.domain-rules.md` · `tools/check-template-size.sh` |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | the three `parallel-coding-governance.*` files · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker lockstep, TWO carriers) |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
-| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
+| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `tools/govkit/` — the deployer: `govkit.py`, `registry.toml` + a descriptor per entry (the population is the REGISTRY, never a listing), and its harnesses · `WIRE-INTO-PROJECT.md` |
 
 ### Gate commands (the merge bar)
 
@@ -173,6 +173,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
+- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
+  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
+  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
+  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.

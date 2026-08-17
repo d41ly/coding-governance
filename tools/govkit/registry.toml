@@ -70,6 +70,15 @@ id = "gate-lint"
 descriptor = "tools/gate-lint/kit.toml"
 
 [[entry]]
+id = "lexicon"
+descriptor = "tools/lexicon/kit.toml"
+
+[[entry]]
+id = "check-placeholders"
+descriptor = "tools/govkit/entries/check-placeholders.kit.toml"
+why_split = "a FLAT entry for two depth-1 FILES under tools/, not a kit directory; `tools/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
+
+[[entry]]
 id = "agent-cap"
 descriptor = "tools/hooks/kit.toml"
 why_split = "tools/hooks/ and tools/workflows/ are two kit ids with two version constants and two destinations; one inventory row could not carry them"
@@ -167,6 +176,10 @@ path = "tools/check-template-size.test.sh"
 why = "gov's own red/green self-test for the template size gate, which is itself exempt: it gates gov's product template and is prescribed for copy nowhere in the runbook. Exemptions are exact-path, so the gate's row does not cover its sibling — the run-gates.sh / .test.sh / .evidence.test.sh trio is the precedent."
 
 [[exempt]]
+path = "tools/template-size-limits.txt"
+why = "the DECLARED size ceilings for gov's own product template and kickoff engine, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
+
+[[exempt]]
 path = "tools/template-size-highwater.txt"
 why = "the size gate's high-water record, keyed by measured file. Travels with check-template-size.sh, which is exempt for the same reason: it gates gov's own product template and is prescribed for copy nowhere. Exemptions are exact-path, so the gate's row does not cover this one."
 
@@ -185,3 +198,109 @@ why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring 
 [[exempt]]
 path = "parallel-coding-governance.customize.md"
 why = "the deploy-time placeholder catalog. The runbook's own words are 'read it, don't ship it'. Counting it as a playbook member is how the spec over-stated that entry's file count for four revisions."
+
+# ------------------------------------------------------------------------- leg exemptions
+# A leg an adopter does NOT receive, each with its reason, on the same staleness rule as the
+# path exemptions above: a row naming a leg that is no longer in the manifest reds, and a leg
+# that is BOTH exempted and claimed by a descriptor reds too — an exemption and a claim for
+# one fact is the two-spellings class arriving through the escape hatch built to prevent it.
+
+[[exempt_leg]]
+name = "branch-guard self-test"
+why = """
+gov's own red/green proof of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file, and the path it drives is already a registry exemption for that reason.
+"""
+
+[[exempt_leg]]
+name = "govkit selfcheck"
+why = """
+the deployer grading its own declarations. It runs on the deployer machine and is never installed into a target, so there is nothing in an adopter for it to check.
+"""
+
+[[exempt_leg]]
+name = "govkit selftest"
+why = """
+the deployer's own arms. Same reason as its selfcheck: the deployer does not travel.
+"""
+
+[[exempt_leg]]
+name = "manifest-check self-test"
+why = """
+gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is claimed by the kickoff-manifest entry; this self-test is not prescribed for copy anywhere in the runbook, and that asymmetry is deliberate.
+"""
+
+[[exempt_leg]]
+name = "python resolver (behaviour + inline parity + idiom ban)"
+why = """
+grades tools/lib/, the permanently exempt gov-internal directory, plus the inline copies every kit already carries. Nothing here travels, and the parity it asserts is asserted before the kits ship rather than after.
+"""
+
+[[exempt_leg]]
+name = "run-gates canary"
+why = """
+gov's own gate runner's canary; the runner is a registry exemption and the canary travels with it.
+"""
+
+[[exempt_leg]]
+name = "run-gates evidence"
+why = """
+gov's own gate runner's evidence arm; travels with the runner, which is exempt.
+"""
+
+[[exempt_leg]]
+name = "template size <=48KiB"
+why = """
+gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
+"""
+
+[[exempt_leg]]
+name = "govkit refusal join"
+why = """
+a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.
+"""
+
+# ------------------------------------------------------------------- gov-only pins
+# eol pins that belong to NO deployable. Forcing them into an entry would attribute a
+# gov-internal rule to a kit an adopter receives.
+
+[[gov_only_pin]]
+pattern = "*.sh"
+why = "every shell script in this repo, including ones no kit ships"
+
+[[gov_only_pin]]
+pattern = "tools/gate-legs.json"
+why = "gov's own leg manifest, a registry exemption"
+
+[[gov_only_pin]]
+pattern = "tools/govkit/*"
+why = "the deployer itself, which never travels"
+
+[[exempt_leg]]
+name = "govkit acceptance matrix"
+why = """
+a gov-internal harness over gov's OWN deployer, which never travels into a target. It drives the deployer against four repo SHAPES; an adopter has one repo and receives no deployer, so there is nothing there for it to exercise.
+"""
+
+[[exempt_leg]]
+name = "template size <=48KiB"
+why = """
+gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
+"""
+
+[[exempt_leg]]
+name = "template size gate selftest"
+why = """
+gov's own red/green proof of the size gate above; it travels with a gate that does not travel.
+"""
+
+[[exempt_leg]]
+name = "playbook parity"
+why = """
+grades gov's OWN playbook against this repo's state. An adopter's playbook is an instantiated copy with their own answers in it, so there is nothing here for them to grade.
+"""
+
+[[exempt_leg]]
+name = "playbook parity selftest"
+why = """
+gov's own red/green proof of the parity gate above; same reason.
+"""
