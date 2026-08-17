@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 6e4c9265d373efd95303537f7433afc81e300c5e
-phase: VERIFYING
+witness: 84825c3439e08bf32ac550a4ad26c82a19dcd3bc
+phase: SPECCING
 keepalive: 3ff2b805
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 401416faebff58c4527abef9f1a4ae80d244c4f2
@@ -41,3 +41,5 @@ criterion, and preflight OVERWROTE the live run-state file — keepalive id and 
 was restored from the commit that preceded it, so the pin-time evidence above is the original
 observation. Upstream's record rotation retires a TERMINAL record; a non-terminal one is still
 overwritten in place. Row minted for that too.
+
+2026-08-17T13:46:06Z decision · item unit 4 re-pricing · reason Owner re-priced 2026-08-17 and chose to build TOOL-aBranchedMandate-3. The earlier park's main reason was a measurement error: the S6b loop exists at check-unattended.sh:295; the grep pattern lacked the quote the source carries. Premises re-derived in spec rev-6.

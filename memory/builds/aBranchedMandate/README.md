@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-7 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
+ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
 ---
 
 # aBranchedMandate — an unattended run stops needing its build landed first
@@ -53,13 +53,13 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-7 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
+**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | CLOSED | rev-4 | 2026-08-17 |
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | DEFERRED | rev-5 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | INPROGRESS | rev-6 | 2026-08-17 |
 | [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -127,6 +127,22 @@ what was weighed rather than a menu.
   states "No eighth authored fact" as the premise for routing its own waiver through fact 3, while
   unit 3's S4 moves that count to ten. Whichever build lands second is changing a number the other
   build reasoned from, and the correct response is to stop and re-read, not to reconcile the number.
+
+## UNPARKED 2026-08-17 — the owner re-priced, and the park rested on a measurement error
+
+The park below stands as the record of what was refused and why, because a park that vanishes when
+it is answered is indistinguishable from one nobody made. Two corrections sit on top of it.
+
+**The owner re-priced and chose to build unit 4.** Asked whether the three-cost ratification still
+stood against the moved protocol, they answered build it. The run resumed at `SPECCING`.
+
+**And the park's load-bearing reason was WRONG.** It said S6b's obligation could not be re-pointed
+because the `for b in refs/remotes/…` loop it enumerates no longer existed. It does exist, at
+`check-unattended.sh:295` — the run grepped `for b in refs/remotes` against a source that spells it
+`for b in "refs/remotes/origin/$d"`, matched nothing, and read its own bad pattern as a restructure.
+All five assertions S6b names are intact. Of the five drift claims the park rested on, four held and
+this one did not, so the work was re-pointing rather than re-specification the whole time. The
+re-derived premises are in the spec's rev-6.
 
 ## PARKED — unit 4 (`TOOL-aBranchedMandate-3`), by the unattended run of 2026-08-17
 
