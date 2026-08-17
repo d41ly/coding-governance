@@ -135,7 +135,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   remote's own HEAD advertisement, never read from a local ref and never named by the environment —
   both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
   under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
-  (fifteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
+  (sixteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
   the recorded BASE is the merge-base git reproduces, no run-state file names the bypass flag, the

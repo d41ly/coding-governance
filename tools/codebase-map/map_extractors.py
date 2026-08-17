@@ -196,15 +196,35 @@ def _live_py(layer: str) -> list[dict[str, str]]:
     return live
 
 
+def _build_js_layer(layer: str) -> list[dict[str, str]]:
+    """The JS layer: every EXPORT plus every top-level DEFINITION, deduped on `(id, file)`.
+
+    BOTH SCANS, because neither sees the other's population. `enumerate_exports` reads
+    `export const meta = {…}` — an object, not a function — and `scan_js_definitions` cannot;
+    `scan_js_definitions` reads `function boundedK(…)` in a CommonJS file with no `export` line, and
+    the export scan cannot. MEASURED at `b4f0cf1c`: 3 export rows, 30 definition rows, DISJOINT.
+
+    The comment this replaces read "the only exports are the workflow `meta` blocks. That is accurate
+    coverage of a layer with few exports, not a hole." It was accurate about EXPORTS and wrong about
+    the layer, and it is the sentence that kept `TOOL-aNumeralWarden-4` open — `reuse_lookup.py`
+    could not see `boundedK` or any other seam inside the kit's own hooks.
+    """
+    rows = m.enumerate_exports(ROOT / "tools", layer, extensions=frozenset({".js"}))
+    rows += m.scan_js_definitions(ROOT / "tools", layer)
+    out, seen = [], set()
+    for r in rows:
+        key = (r["id"], r["file"])
+        if key not in seen:
+            seen.add(key)
+            out.append(r)
+    return out
+
+
 SYMBOL_EXTRACTORS: dict[str, object] = {
     # Real-parser-backed (ast); raises MapError on a SyntaxError rather than indexing less.
     "kit-py": lambda: _live_py("kit-py"),
-    # The stdlib enumeration floor. Sparse by construction here — the hooks and gates are
-    # CommonJS scripts that export nothing, so the only exports are the workflow `meta` blocks.
-    # That is accurate coverage of a layer with few exports, not a hole.
-    "kit-js": lambda: m.enumerate_exports(
-        ROOT / "tools", "kit-js", extensions=frozenset({".js"})
-    ),
+    # Export scan UNION definition probe — see _build_js_layer for why one of them alone indexed 3 of 33.
+    "kit-js": lambda: _build_js_layer("kit-js"),
 }
 
 

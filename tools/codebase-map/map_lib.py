@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.1"
+KIT_CODEBASE_MAP_VERSION = "1.2"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -398,6 +398,85 @@ JS_EXPORT_RULES: tuple[tuple[re.Pattern[str], str | None], ...] = (
 )
 
 _BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
+
+#: Statement-leading DEFINITION forms for a JS/TS layer — the companion to JS_EXPORT_RULES, which
+#: sees only what a file exports. (regex, kind). `export` prefixes are optional here: a form that is
+#: both a definition and an export is emitted by both scans and deduped on `(id, file)`.
+JS_DEFINITION_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
+    # `function(?:\s*\*\s*|\s+)` and NOT `function\s*\*?\s*`: the permissive form lets the keyword
+    # run straight into the name, so a line of prose beginning "functionality, duplicate or …"
+    # inside a prompt string was indexed as a function named `ality`. Measured — it was the one row
+    # by which this probe disagreed with the lexicon's independently-authored set.
+    (re.compile(rf"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function(?:\s*\*\s*|\s+){_JS_ID}",
+                re.M), "function"),
+    (re.compile(rf"^\s*(?:export\s+)?(?:default\s+)?class\s+{_JS_ID}", re.M), "class"),
+    (re.compile(rf"^\s*(?:export\s+)?(?:const|let|var)\s+{_JS_ID}\s*=\s*(?:async\s*)?"
+                r"(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)", re.M), "function"),
+)
+
+
+def scan_js_definitions(
+    base: Path,
+    layer: str,
+    *,
+    extensions: frozenset[str] = frozenset({".js"}),
+    rules: tuple[tuple[re.Pattern[str], str], ...] = JS_DEFINITION_RULES,
+    root: Path | None = None,
+    skip_dirs: frozenset[str] = _SKIP_DIRS,
+) -> list[dict[str, str]]:
+    """SYMBOL extractor for a JS layer's DEFINITIONS, not only its exports.
+
+    WHY THIS EXISTS, MEASURED. ``enumerate_exports`` guarantees completeness over ``export`` FORMS —
+    an unrecognised one raises. It guarantees nothing about a file with no ``export`` line at all,
+    and that is the shape this repo's own kit hooks have. Measured on gov at ``b4f0cf1c``: the six
+    tracked ``tools/**/*.js`` carry **30** top-level definitions and the recall index carried **3**
+    rows for that layer — the three workflow ``meta`` blocks, which are objects and are DISJOINT from
+    the 30. So the index carried none of the definitions, and ``reuse_lookup.py`` could not see
+    ``boundedK`` (``tools/hooks/agent-cap.js``), the binder every fan-out consumer routes through.
+    The comment that kept it that way read "accurate coverage of a layer with few exports, not a
+    hole"; it was true about exports and false about the layer.
+
+    Fail-closed, in the only direction available. There is no stdlib JS parser, so this is a probe
+    and says so — its ceiling is a definition FORM the rule set forgot, and a definition spelled
+    inside a template literal (the ceiling ``enumerate_exports`` documents for itself). What it does
+    guarantee is a LIVENESS floor: a scanned file yielding ZERO symbols raises MapError naming it,
+    because a probe that silently reads nothing is exactly how the hole above stayed invisible.
+    Measured: every one of the six files under ``tools/`` yields at least one definition today
+    (19, 4, 1, 2, 2, 2), so the floor is a measurement rather than an assumption.
+
+    Comments are stripped the same way ``enumerate_exports`` strips them — block spans replaced by
+    their own newline count so removing one never merges two statements onto one line.
+    """
+    root = root or repo_root()
+    if not base.is_dir():
+        raise MapError(f"{layer}: expected directory missing: {base}")
+    out: list[dict[str, str]] = []
+    for dirpath, dirnames, files in os.walk(base):
+        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+        for name in sorted(files):
+            if not any(name.endswith(ext) for ext in extensions):
+                continue
+            path = Path(dirpath) / name
+            rel = path.relative_to(root).as_posix()
+            text = _BLOCK_COMMENT_RE.sub(
+                lambda mm: "\n" * mm.group(0).count("\n"), path.read_text(encoding="utf-8")
+            )
+            text = "\n".join(ln.split("//", 1)[0] for ln in text.splitlines())
+            seen: set[str] = set()
+            for rx, kind in rules:
+                for mm in rx.finditer(text):
+                    sym = mm.group("id")
+                    if sym in seen:
+                        continue
+                    seen.add(sym)
+                    out.append({"id": sym, "kind": kind, "file": rel})
+            if not seen:
+                raise MapError(
+                    f"{layer}: {rel} yielded NO definition. A JS file with no top-level function or "
+                    f"class is either not what this layer is for, or a form these rules forgot — "
+                    f"raising rather than indexing less, which is how this layer went 30-to-3 unseen"
+                )
+    return out
 
 
 def _has_top_level_comma(s: str) -> bool:

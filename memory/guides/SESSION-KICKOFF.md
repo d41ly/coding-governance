@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T02:46:37+03:00 @ b4f0cf1ce01e67a6db8b73ecad08e79d61095834
+last-audit: 2026-08-17T03:18:48+03:00 @ b4f0cf1ce01e67a6db8b73ecad08e79d61095834
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 0f8b21fb9a134cf4d538efa49eb4b4291da66a2a
@@ -118,6 +118,10 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
 
+- A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
+  `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
+  produce an arm that passes because its fixture was never there. Check what `git ls-files`
+  actually holds before trusting a near-miss control.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
   recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
