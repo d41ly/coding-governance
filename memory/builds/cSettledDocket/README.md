@@ -4,7 +4,7 @@ node: c
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10
+ids: KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10 TOOL-cSettledDocket-11
 ---
 
 # cSettledDocket — the six items cBriefedPilot parked
@@ -34,7 +34,7 @@ is cheaper than building them apart:
   them, since that pin covers gate scripts and `check-arms.py` excludes `*.test.sh` outright.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams tooling · ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10
+**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams tooling · ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10 TOOL-cSettledDocket-11
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

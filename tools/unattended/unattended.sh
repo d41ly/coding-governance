@@ -983,7 +983,7 @@ verb_abort() { # slug · reason
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp
+  local slug="$1" kid="$2" rel base src
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   refuse_if_terminal "$rel" --preflight || return 1
@@ -1037,7 +1037,6 @@ verb_preflight() { # slug · keepalive-id
     fail 9 "the run-state file's generated markers are malformed — exactly one open and one close, close after open: $rel"
     return 1
   fi
-  mv "$tmp" "$rel"; rm -f "$payload"
   # The BASE is pinned ONCE, in the same shape as the phase write below (the unit that established
   # this is deliberately NOT named: its spec is non-terminal, and the drift signal for non-terminal
   # specs cited by product source sits at its shrink-only pin, so naming one reds the bar). It

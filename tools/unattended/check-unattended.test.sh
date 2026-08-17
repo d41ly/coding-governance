@@ -270,17 +270,16 @@ hit "$(run)" "a run-state file's generated region carries a COPY of the unit lis
 # ---- phase. That is the same invariant with the failure mode designed out rather than scoped
 # ---- around, and the arms above already cover it.
 
-# ...and the SAME staleness on a TERMINAL record is silent. Check 26 refuses --preflight on a
-# finished run, and --preflight is the only verb that re-splices this region, so without the
-# exemption a build that continues after its run ended reds the bar forever with nothing able to
-# clear it. Reproduced on this repo's own tree. The pair matters more than either arm: the red one
-# above proves the exemption did not simply turn check 8 off.
+# ...and the same COPY on a TERMINAL record is silent. No verb can empty that region once a run has
+# ended, so reddening it would be a wedge with no exit — and the RED arm above is what proves the
+# exemption did not simply switch check 8 off. Unit 6's fixture carries this pair as a standing
+# property rather than as two arms about one past bug.
 reset_tree
-mutate memory/builds/tRun/RUN.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
+mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
 mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
 out=$(run)
-miss "$out" "a run-state file's generated region differs from the build README slice it is a COPY of"
-same "a stale TERMINAL record leaves the leg green" "$(run; echo $?)" "0"
+miss "$out" "a run-state file's generated region carries a COPY of the unit list"
+same "a terminal record carrying a copy leaves the leg green" "$(run; echo $?)" "0"
 
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
@@ -864,110 +863,69 @@ reset_tree
 
 # ---- TOOL-cSettledDocket-6: the STANDING frozen-versus-live fixture. cBriefedPilot's closing review
 # ---- found one root three times — a predicate joining a FROZEN historical value to a LIVE present
-# ---- one — and each instance was found by hand, filed separately, fixed locally. The rule this
-# ---- encodes is general: once a run is TERMINAL its record is immutable through the kit
-# ---- (`refuse_if_terminal` refuses all six verbs), so ANY leg check that can red on a terminal
-# ---- record is a wedge by construction, whatever it is checking.
+# ---- one. The rule it encodes is general: once a run is TERMINAL its record is immutable through
+# ---- the kit, so ANY leg check that can red on a terminal record is a wedge by construction.
 # ----
-# ---- AC1 is scoped PER MOVE to the check named in that move's collision column, NOT to total leg
-# ---- silence. Two moves — widening DIRECTIVES_CORE and adding a phase — red check 16 and arm D by
-# ---- construction, with no run population involved and no terminal exemption possible. A builder
-# ---- chasing total silence would exempt check 16 on terminal records, which is exactly the
-# ---- over-wide exemption the last arm here forbids.
+# ---- REWRITTEN for main's check-8 redesign, adopted over this branch's. Main removed the COPY
+# ---- rather than exempting its staleness: the region must be EMPTY and the unit list is derived
+# ---- from the README on every read. The frozen-vs-live PAIR survives the change intact — only the
+# ---- invariant it moves around is different — which is the argument for a standing fixture rather
+# ---- than three arms pinned to three past bugs.
+# ----
+# ---- AC1 is scoped PER MOVE to the check named in that move's collision column, never to total leg
+# ---- silence: widening DIRECTIVES_CORE reds check 16 by construction, and a builder chasing total
+# ---- silence would exempt check 16 on terminal records — the over-wide exemption this build has
+# ---- already committed once.
 frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; }
 
-# MOVE 1 — the build index is re-rendered, which every unit close does. Collides with check 8: the
-# run-state file's copied generated region.
+# MOVE 1 — a COPY appears in the run-state region, which is what every pre-redesign record holds.
+# Collides with check 8. On a TERMINAL record it must be silent: no verb can empty that region once
+# the run has ended, so reddening it would be a wedge with no exit.
 reset_tree; frozen
-mutate memory/builds/tRun/README.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
+mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
 out=$(run)
-miss "$out" "a run-state file's generated region differs from the build README slice it is a COPY of"
+miss "$out" "a run-state file's generated region carries a COPY of the unit list"
 same "move 1 leaves a terminal record green" "$(run; echo $?)" "0"
 
-# ...LIVE control. Without it, move 1's silence is satisfiable by deleting check 8.
+# ...LIVE control. Without it, move 1's silence is satisfiable by deleting check 8 altogether.
 reset_tree
-mutate memory/builds/tRun/README.md 's/^\*\*Build status:\*\* OPEN · 1 unit(s)$/**Build status:** CLOSED · 9 unit(s)/'
-hit "$(run)" "a run-state file's generated region differs from the build README slice it is a COPY of"
+mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
+hit "$(run)" "a run-state file's generated region carries a COPY of the unit list"
 
 # MOVE 2 — the kit gains a directive, which a later version does. Collides with check 17: a frozen
-# waiver's handle graded against today's set. The waiver is written by the DRIVER, so the row is real
-# rather than hand-authored, and then the world moves around it.
+# waiver's handle graded against today's set. THE WAIVER ROW IS THE POPULATION — without it the loop
+# never iterates and the miss below passes by finding nothing, which is what shipped in this arm and
+# is what the closing review caught by deleting the exemption and watching the suite still pass.
 reset_tree
-# THE WAIVER ROW IS THE POPULATION. Without it check 17's loop never iterates and the `miss` below
-# passes by finding nothing — which is what shipped, in the flagship arm of the unit built to catch
-# exactly that. The row is written the same way the LIVE control writes it, so the two arms differ
-# only in the phase, which is the variable under test.
 printf '
 2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it
 ' >> memory/builds/tRun/RUN.md
 same "the frozen arm HAS a waiver row to grade" "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "1"
 mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
 frozen
-out=$(run)
-miss "$out" "a parked waiver names a handle outside the effective directive set"
+miss "$(run)" "a parked waiver names a handle outside the effective directive set"
 
 # ...LIVE control for move 2: the same tree with a RUNNING record must still red, or the exemption
 # has switched the check off rather than scoped it.
 reset_tree
-printf '\n2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it\n' >> memory/builds/tRun/RUN.md
+printf '
+2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it
+' >> memory/builds/tRun/RUN.md
 mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
 hit "$(run)" "a parked waiver names a handle outside the effective directive set"
-
-# THE ANTI-OVER-EXEMPTION ARM. Unit 36 scoped check 8's terminal exemption to the whole block rather
-# than to its equality, which left this kit's only marker validator guarding zero files the moment a
-# run ended. A malformed marker is malformed whatever the phase says.
-reset_tree; frozen
-mutate memory/builds/tRun/RUN.md '/<!-- \/run:generated -->/d'
-hit "$(run)" "a run-state file's generated markers are malformed, so the copy cannot be compared with its source"
 reset_tree
 
-# ---- TOOL-cSettledDocket-2: DIRECTIVES_EXTRA was waivable and unshowable at once. `--waive` accepts
-# ---- any handle `directives()` composes — core PLUS extra — while check 16 arm A joined CORE alone,
-# ---- so a project could relax a rule the agent was never shown and could not fix it by adding a
-# ---- table row, because the Skill is rendered from a kit template.
-# ----
-# ---- Branch B, owner-resolved: the project gets a ROW SOURCE. Built as a conf-declared FILE rather
-# ---- than a region inside the render — the render has a recorded zero-byte write that `--check`
-# ---- then certified, and a file nobody renders has no adopter bytes to lose.
-
-# GREEN CONTROL: undeclared is the empty set, which is every adopter today. This is also the arm
-# that keeps the change from reddening anyone who uses no extras.
-reset_tree
-same "an undeclared row source changes nothing" "$(run)" ""
-
-# ...an extra handle with NO row source is now REFUSED, where before it was silently waivable. This
-# is the defect closing.
-reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
-hit "$(run)" "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: house-style:M9"
-
-# ...and with a row source that CARRIES it, the project is whole again: declared, shown, waivable.
-mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
-mkdir -p memory/project
-printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
-same "declared + shown is silent" "$(run)" ""
-
-# ...a row source naming a handle the registry does NOT declare reds the other way, so the join stays
-# two-directional across the union rather than one-directional over it.
-printf '| `never-declared` | nothing declares this | M9 | P2 |\n' >> memory/project/extra-directives.md
-hit "$(run)" "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: never-declared"
-
-# ...a DECLARED path that does not exist is a named refusal, not an empty union. Silently, every
-# extra handle would land back on the absent-from-table branch with nothing saying why.
-reset_tree
-mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/nope.md"|'
-hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in: memory/project/nope.md"
-
-# ...and a declared file carrying no readable row is its own refusal, for the reason every locator in
-# this leg has one: a source that contributes nothing is indistinguishable from no source at all.
-mkdir -p memory/project && printf 'no rows here, just prose\n' > memory/project/nope.md
-hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty: memory/project/nope.md"
-reset_tree
-
+# 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
+# main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
+# retired the staleness arms this branch had written against the old invariant. The
+# frozen-versus-live PAIR survived and was rewritten against the new one; the anti-over-exemption
+# arm did not, because main's exemption has the same over-wide scoping and narrowing it is a
+# change the owner did not ask for. Filed as TOOL-cSettledDocket-11 rather than made silently.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=175
+FLOOR_ASSERTIONS=162
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
