@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -232,8 +232,10 @@ conf are both on its watch list).
   through the empty-first-line branch and silently resolved today; it is the only genuinely
   undecided population, and it is exactly what §4's condition 1 protects. Options: refuse, which is
   this repo's stated rule about empty populations; or pass, which is a deliberate choice to keep a
-  hollow section legal. Recommendation: refuse. Taking it gives each gate one new `fail` branch and
-  is the only thing in this unit that could move an arms floor.
+  hollow section legal. **RESOLVED (owner, 2026-08-17): refuse.** Each gate therefore gains one new
+  `fail` branch, each needing an armed assertion under AC9, and this is the only thing in the unit
+  that could move an arms floor — so the floors are re-measured with the report mode rather than
+  assumed unchanged.
 - **F2 — is the attribution's DATE validated as a date, or only as a non-empty field?** Validating
   the shape costs one pattern and catches a mark whose date field holds prose. Recommendation: shape
   only, on the same grounds the acceptance-witness rule gives for checking that a bullet names
@@ -263,6 +265,9 @@ conf are both on its watch list).
   and the cutoff makes their answers legitimately differ — so the table now carries a per-reader
   expected verdict and each side's fixture requirements.
 
+- rev-4 · 2026-08-17 · §8 F1 RESOLVED by the owner: a §8 with no items and no none form REFUSES.
+  Each gate therefore gains one new `fail` branch, which is the only thing in this unit that can move
+  an arms floor, so AC9's floors are re-measured rather than assumed unchanged.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "decide whether a spec's open questions are resolved"`

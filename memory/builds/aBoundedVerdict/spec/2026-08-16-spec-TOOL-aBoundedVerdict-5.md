@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -214,9 +214,9 @@ no file of its own.
   Recommendation: no field. The wrap-up is composed by an agent reading the record, not by a parser.
 - **F2 — is S6 in this unit or its own?** It changes a Definition-of-Done item's evaluation, which is
   a different mechanism from a verb, and this build's own rule is one mechanism per spec.
-  Recommendation: keep it here, because the refusal is only reachable once a verb exists to create
-  the state it refuses — but this is the fork most likely to be split by review, and splitting it
-  costs nothing but a sixth id.
+  **RESOLVED (owner, 2026-08-17): keep it in this unit.** The refusal is only reachable once a verb
+  exists to create the state it refuses, so the two are one change in sequence rather than two
+  mechanisms; round 2 scrutinised the pairing and accepted it. The set stays at five units.
 
 ## 9. Revision log
 
@@ -241,6 +241,9 @@ no file of its own.
   row was asserted narrowed by a unit that neither scopes nor touches the method; S7c hands it to the
   unit that does.
 
+- rev-4 · 2026-08-17 · §8 F2 RESOLVED by the owner: the Definition-of-Done refusal stays in this
+  unit rather than becoming a sixth. The refusal is only reachable once the verb exists to create the
+  state it refuses, so the two are one change in sequence. The set stays at five units.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "record a decision the run refused to make"` names the

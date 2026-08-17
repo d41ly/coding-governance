@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -43,6 +43,11 @@ proceeds, parks or halts rather than stopping with nothing written.
 - **S7** — the carriers. S1 and S3 are the unattended protocol's; S2, S4, S5 and S6 are the method's
   fork section. Neither restates the other, and the method's pointer rule decides which side each
   sentence lands on.
+- **S8** — the protocol's list of costs the build-folder grant carries gains a FIFTH entry, in that
+  list's own shape: a spec reachable at the pinned base is scope-approved by the same act, so an
+  owner who commits a build folder holding a spec they deliberately left unapproved has approved it.
+  Ratified by the owner on 2026-08-17 (§8 F1). The list exists so a widening lands on the record
+  rather than in a reader's inference, and this is the first entry added to it since it was written.
 
 ## 3. Non-goals (OUT)
 
@@ -214,8 +219,11 @@ before spending.
   the grant is read to mean even though it creates no new grant. Options: ratify it explicitly, the
   way the four costs of the current grant were ratified; treat it as already covered by the
   class-wide grant; or narrow it, so only a spec at a status past awaiting-approval counts as
-  approved, which reintroduces the deadlock §4 rejects. Recommendation: put it to the owner as a
-  named cost, in the same shape the protocol's existing cost list uses.
+  approved, which reintroduces the deadlock §4 rejects. **RESOLVED (owner, 2026-08-17): ratify it as
+  a named cost.** S8 below carries the consequence: the reading joins the protocol's existing list of
+  costs the build-folder grant already carries, as a fifth entry, in that list's own shape. Narrowing
+  was refused because it reinstates the deadlock — the method requires a run to author a missing spec,
+  and an authored complete spec is written at exactly this status.
 - **F2 — where does the fact-question mark live in a spec?** Options: a prefix on the fork's own
   bullet, which puts it where the resolution mark already goes and where another unit in this build
   is hardening the predicate; or a separate sub-head. Recommendation: the bullet prefix, and it is
@@ -255,6 +263,10 @@ before spending.
   double share. `TOOL-aBoundedVerdict-2`'s awaiting-approval member was narrowed in the same round to
   the residual S1's three cases leave, so the two now cite each other in both directions.
 
+- rev-4 · 2026-08-17 · §8 F1 RESOLVED by the owner: the reading that a spec reachable at the pinned
+  base is scope-approved by the same act that authorized the run is RATIFIED as a named cost, and S8
+  is added to carry it into the protocol's existing cost list as a fifth entry. Narrowing was refused
+  because it reinstates the deadlock §4 rejects.
 ## 10. Reuse audit
 
 `python tools/memory-recall/query.py` over the fork and owner-turn question returns the decision that

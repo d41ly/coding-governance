@@ -73,11 +73,11 @@ it.
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-3 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-4 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-3 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-3 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-3 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-3 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-4 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-4 | 2026-08-17 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

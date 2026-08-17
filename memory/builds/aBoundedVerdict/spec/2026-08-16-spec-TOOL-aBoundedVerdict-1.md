@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -249,8 +249,9 @@ spending rather than treating either figure as authority.
   re-review?** The method mandates exactly one closing review and then a re-review of the fix, which
   is two, so the numbers coincide today. They stop coinciding if a second blocker appears in the
   fix. Options: two, uniformly, and a second blocker is a park; or an explicit allowance for the fix
-  re-review chain. Recommendation: two, uniformly — the owner's instruction was a maximum of two and
-  a chain allowance is the unbounded case wearing a bound's clothing.
+  re-review chain. **RESOLVED (owner, 2026-08-17): two, uniformly.** The closing review rides the
+  same counter with the BUILD SLUG as its subject, and a second blocker in the fix is a park, not a
+  third round. A chain allowance was refused as the unbounded case wearing a bound's clothing.
 - **F2 — is the verdict token recorded at all, or only the count?** The count alone enforces the cap.
   The verdict is what lets S8's disposition be chosen without re-reading the review record, and what
   lets a future check ask whether a capped subject was disposed of. Options: both, as specced; count
@@ -288,6 +289,9 @@ spending rather than treating either figure as authority.
   the displacement's receiving file, the manifest re-stamp, and the leg's own check count, which this
   unit moves and which no gate observes.
 
+- rev-4 · 2026-08-17 · §8 F1 RESOLVED by the owner: the cap binds the closing diff review too, at two
+  uniformly, with the build slug as the subject and a second blocker in the fix disposed of as a park.
+  A fix-re-review chain was refused as the unbounded case wearing a bound's clothing.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "bound how many times a review may run for one unit"`
