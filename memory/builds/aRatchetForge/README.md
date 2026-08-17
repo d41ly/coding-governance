@@ -23,4 +23,9 @@ coding-governance `main` and retrofitted into nicocares. Records:
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-08-build-KICK-aRatchetForge-1-manifest-ratchet-build-report.md](build/2026-08-08-build-KICK-aRatchetForge-1-manifest-ratchet-build-report.md) | journal | KICK-aRatchetForge-1 |
+| [2026-07-12-review-KICK-aRatchetForge-1-tier2-cumulative-main.md](reviews/2026-07-12-review-KICK-aRatchetForge-1-tier2-cumulative-main.md) | diff-review | KICK-aRatchetForge-1 |
 <!-- /gen:build-index -->

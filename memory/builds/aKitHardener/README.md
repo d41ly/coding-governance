@@ -25,4 +25,8 @@ Makes every kit **version-detectable** and every adopt script **re-run-safe**, s
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 
 Records live under `spec/` and `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md) | journal | DEPL-aKitHardener-1 |
 <!-- /gen:build-index -->

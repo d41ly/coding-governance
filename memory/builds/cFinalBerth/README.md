@@ -119,4 +119,9 @@ every spec in this folder — do not hand-edit it.
 | [TOOL-cFinalBerth-2 — the close that survives the landing it precedes](spec/2026-08-13-spec-cFinalBerth-2.md) | CLOSED | rev-4 | 2026-08-14 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-13-review-TOOL-cFinalBerth-1-1.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-1.md) | spec-audit | TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 |
+| [2026-08-13-review-TOOL-cFinalBerth-1-2.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-2.md) | diff-review | TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 |
 <!-- /gen:build-index -->

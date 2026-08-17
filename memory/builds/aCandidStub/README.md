@@ -31,4 +31,8 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [PLAY-aCandidStub-1 — the playbook reconverges on the repo it governs](spec/2026-08-10-spec-aCandidStub-1.md) | CLOSED | rev-3 | 2026-08-10 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-10-review-PLAY-aCandidStub-1-1.md](reviews/2026-08-10-review-PLAY-aCandidStub-1-1.md) | spec-audit | PLAY-aCandidStub-1 |
 <!-- /gen:build-index -->

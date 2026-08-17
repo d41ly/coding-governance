@@ -1,6 +1,6 @@
 # Review — aSiftedPlaybook spec set, round 2 (M4 spec audit)
 
-**Serves:** spec-audit PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 PLAY-aCandidStub-1 TOOL-aGuardedTally-1 PLAY-aPrunedCeremony-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-1
+**Serves:** spec-audit PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3  <!-- inferred: an M4 pass over this build's whole spec set; the other ids in the body are prior decisions this round CITES, not units it reviews -->
 
 ## Verdict: BLOCKED
 

@@ -71,5 +71,13 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-dClosedLexicon-2 — wiring the verb table into the map ratchet and the drift signal set](spec/2026-08-16-spec-dClosedLexicon-2.md) | SPECCED | rev-2 | 2026-08-16 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md) | spec-audit | TOOL-dClosedLexicon-1 |
+
+Ids no record names: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-2.
+
+Ids no `spec-audit` record has ever named: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-2.
 <!-- /gen:build-index -->
 

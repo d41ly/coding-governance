@@ -554,6 +554,31 @@ def render_region(build: dict) -> str:
         ks = [f"`{k}/`" for k in build["kinds"]]
         joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]
         out += ["", f"Records live under {joined}."]
+    # The records table and the two coverage joins. The sentence above is KEPT rather than replaced:
+    # `strip_records_sentence` manages it and several arms detect a mis-segmented record selector by
+    # noticing the sentence went missing, so replacing it would remove the thing they watch.
+    recs = build.get("records") or []
+    if recs:
+        out += ["", "| Record | Kind | Serves |", "|---|---|---|"]
+        for r in sorted(recs, key=lambda x: x["path"]):
+            rel = r["path"].split(f"/builds/{build['slug']}/", 1)[1]
+            label = rel.rsplit("/", 1)[-1]
+            if r["state"] == "unbound":
+                out.append(f"| [{label}]({rel}) | — | *none — {r['reason']}* |")
+            else:
+                out.append(f"| [{label}]({rel}) | {r['kind']} | {' '.join(r['ids'])} |")
+        named = {i for r in recs for i in r.get("ids", [])}
+        audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
+        own = [u["id"] for u in build["units"]]
+        gap = [i for i in own if i not in named]
+        agap = [i for i in own if i not in audited]
+        if gap:
+            out += ["", f"Ids no record names: {' '.join(gap)}."]
+        if agap:
+            # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit
+            # record names EVER — a spec audited at rev-1 and since bumped does not appear here.
+            # An "unreviewed" label would be a coverage claim the data cannot support.
+            out += ["", f"Ids no `spec-audit` record has ever named: {' '.join(agap)}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
@@ -749,6 +774,18 @@ def plan(root: str, conf: dict) -> tuple:
     """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk."""
     m = conf["MEMORY_ROOT"]
     builds = collect(root, conf)
+    # The bindings, read ONCE for the whole render and attached per build. Each record is filed under
+    # the build folder that HOUSES it, which is not always the build its ids belong to — a
+    # cross-build record renders where a reader will look for it.
+    try:
+        tracked_all = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
+        binds_all = read_bindings(root, tracked_all, conf)
+    except Exception:  # noqa: BLE001 — the render must not depend on the parse succeeding
+        binds_all = {}
+    for b in builds:
+        pre = f"{m}/builds/{b['slug']}/"
+        b["records"] = [dict(rec, path=p) for p, rec in binds_all.items()
+                        if p.startswith(pre) and rec["state"] in ("bound", "unbound")]
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
@@ -1157,6 +1194,35 @@ def do_selftest() -> int:
             lambda: _rows(t13, conf13))
         arm("--print-bindings still exits 0 with an S row present", "0",
             lambda: str(do_print_bindings(t13, conf13)))
+
+        # ---- the rendered Records table and the two coverage joins.
+        arm("a build with a record renders it in the Records table",
+            "| [2026-08-01-review-tOne-1.md](reviews/2026-08-01-review-tOne-1.md) | spec-audit | ARCH-tOne-1 |",
+            lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        arm("the derived folder sentence SURVIVES the table (nine arms depend on it)",
+            "Records live under", lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        # The record above serves the build's only id, so neither join has anything to report. A
+        # positive-population arm: an empty table rendering silently is the failure that matters.
+        arm("a fully-covered build renders no coverage line", "True",
+            lambda: str("Ids no record names:" not in
+                        plan(t13, conf13)[0]["memory/builds/tOne/README.md"]))
+        t14 = os.path.join(base, "gap"); os.makedirs(t14)
+        conf14 = _fixture(t14)
+        p14 = os.path.join(t14, "memory/builds/tOne/build/2026-08-01-build-tOne-1.md")
+        os.makedirs(os.path.dirname(p14), exist_ok=True)
+        write_text(p14, "# j\n\n**Serves:** journal ARCH-tOne-1\n")
+        run("git", "add", "-A", cwd=t14)
+        arm("a build whose only record is a journal names its id as never spec-audited",
+            "Ids no `spec-audit` record has ever named: ARCH-tOne-1",
+            lambda: plan(t14, conf14)[0]["memory/builds/tOne/README.md"])
+        arm("...and does NOT claim the id is unnamed, which a journal did name", "True",
+            lambda: str("Ids no record names:" not in
+                        plan(t14, conf14)[0]["memory/builds/tOne/README.md"]))
+        t15 = os.path.join(base, "norec"); os.makedirs(t15)
+        conf15 = _fixture(t15)
+        arm("a build with NO records renders neither the table nor a coverage line", "True",
+            lambda: str("| Record | Kind | Serves |" not in
+                        plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

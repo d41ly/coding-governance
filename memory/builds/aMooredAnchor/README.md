@@ -118,4 +118,10 @@ header of every spec in this folder — do not hand-edit it.
 | [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | CLOSED | rev-5 | 2026-08-11 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md) | journal | TOOL-aMooredAnchor-1 |
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh](build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh) | journal | TOOL-aMooredAnchor-1 |
+| [2026-08-11-review-TOOL-aMooredAnchor-1-1.md](reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md) | spec-audit | TOOL-aMooredAnchor-1 |
 <!-- /gen:build-index -->

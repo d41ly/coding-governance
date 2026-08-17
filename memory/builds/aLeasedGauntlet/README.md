@@ -22,4 +22,10 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | CLOSED | rev-4 | 2026-07-20 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md](reviews/2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md) | diff-review | TOOL-aLeasedGauntlet-1 |
+
+Ids no `spec-audit` record has ever named: TOOL-aLeasedGauntlet-1.
 <!-- /gen:build-index -->

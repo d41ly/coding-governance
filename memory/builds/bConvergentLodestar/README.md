@@ -48,4 +48,8 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 | [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | TOOL-bConvergentLodestar-1 |
 <!-- /gen:build-index -->

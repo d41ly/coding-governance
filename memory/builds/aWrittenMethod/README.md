@@ -139,4 +139,14 @@ spec in this folder — do not hand-edit it.
 | [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | CLOSED | rev-4 | 2026-08-11 |
 
 Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md](build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md) | journal | TOOL-aWrittenMethod-1 |
+| [2026-08-11-build-aWrittenMethod-1-enforcement-pass.md](build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md) | — | *none — a design pass the build README grades REJECTED for scope; it warranted no spec and none was minted* |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+
+Ids no `spec-audit` record has ever named: TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6.
 <!-- /gen:build-index -->

@@ -211,4 +211,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aStandingWrit-1-1.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md) | spec-audit | TOOL-aStandingWrit-1 |
+| [2026-08-11-review-TOOL-aStandingWrit-1-2.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md) | diff-review | TOOL-aStandingWrit-1 |
 <!-- /gen:build-index -->

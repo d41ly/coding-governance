@@ -93,4 +93,8 @@ every spec in this folder — do not hand-edit it.
 | [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
 
 Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-14-review-TOOL-cSteadyMetronome-1-1.md](reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md) | spec-audit | TOOL-cSteadyMetronome-1 |
 <!-- /gen:build-index -->

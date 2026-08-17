@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join
 
-**Status:** SPECCED · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -138,6 +138,11 @@ is the interaction.
 - rev-2 · 2026-08-17 · folded the owner's fork resolutions. Fork B ratified BUILD-IT. Fork E ratified
   ADD-NOW against this spec's recommendation, adding the kind column, the second derived line, and
   the §3 statement of what the two resolutions together still cannot answer.
+- rev-4 · 2026-08-17 · BUILT. The render exposed a retrofit defect the M4 audit could not: two
+  aSiftedPlaybook M4 records had bound NINE and TEN ids, because `TOOL-aTetheredRecord-3`'s rule-1
+  scan read forty lines and swept up ids the reviews CITE as prior decisions. The table made it
+  visible at a glance, which is the argument for the table. Both corrected to the set they actually
+  audit, and renamed; only the deliberate cross-build record now binds a foreign slug.
 - rev-3 · 2026-08-17 · folded the M4 audit. S5 adds the kit-version bump this unit's own edit to
   `gen_build_index.py` obliges, and §7 gains the two gates that date it. The "three-folder sentence"
   S1 anchored to does not exist — that sentence's folder list is DERIVED from the record kinds, and
