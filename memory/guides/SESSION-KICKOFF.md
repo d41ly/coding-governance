@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-17T07:15:00+03:00 @ d523861fcc9646f8a118dc65abfc137f5d56f698
+last-audit: 2026-08-17T12:40:00+03:00 @ 23e3484abcf1edfe7fe058ff02e8db331e952716
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 0f8b21fb9a134cf4d538efa49eb4b4291da66a2a
+last-body-change: 23e3484abcf1edfe7fe058ff02e8db331e952716
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -135,9 +135,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
   running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
   (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
-- The template is under a STRICT 32 KiB gate. Never raise it; externalize into
-  `parallel-coding-governance.domain-rules.md` instead. Read the current margin FROM
-  `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+- Two branches can BOTH rotate `memory/backlog/<FAMILY>.md` to archive independently. The row
+  driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
+  verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
+  0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.

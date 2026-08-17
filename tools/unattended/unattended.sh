@@ -779,7 +779,10 @@ missing_units() { # slug · dir
 # S6 - extracted out of verb_status's inline pipeline, ahead of the unit that consumes it. Unit 7's
 # build-complete asks the same two questions, and a second copy would be two answers to one question
 # in the two verbs that report on the same region.
-unit_rows() { region "$1" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | grep -E '^\| \['; }
+# Reads the BUILD README's pair — the one home of the unit list since main's redesign removed the
+# run-state copy and required that region to be EMPTY. Pointing these at the emptied region made
+# `build-complete` unsatisfiable: a check that cannot PASS, caught by its own green control.
+unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \['; }
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 
 verb_plan() { # slug
@@ -1331,8 +1334,8 @@ dod_met() { # slug · run-state file · item · checker
       region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1 \
         && [ -n "$(roster_ids "$slug")" ] \
         && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
-        && [ -n "$(unit_rows "$rel")" ] \
-        && [ -z "$(nonterminal_units "$rel")" ] ;;
+        && [ -n "$(unit_rows "$(readme_of "$slug")")" ] \
+        && [ -z "$(nonterminal_units "$(readme_of "$slug")")" ] ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
       # sha because every filename and sequence join was measured wrong on 7 of 7 multi-unit builds
