@@ -1,6 +1,6 @@
 # TOOL-aRelaxedShard-1 — the row-document byte cap becomes a declared value
 
-**Status:** OPEN · rev-2 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-17 · node a · Tier-2 · base 43eb6b10 · streams tooling
 
 ## 1. Goal
 
@@ -198,6 +198,26 @@ are the backlog shards and the decision log — the documents the owner asked ab
   measured answer is 14,713 bytes and 197 of 250 lines, which is nearer than anything else in the class.
 - **The generated indices** — `memory/LIVE.md` and the ledger shards are rendered, and a larger byte cap
   only defers the month a ledger shard would have to rotate.
+
+### Rollout
+
+**This unit's own records cannot be written until its conf change lands, and that ordering is forced by
+the defect.** The figures above are measured at the spec's immutable base. The local default branch has
+since advanced 37 commits past `origin/main`, and at that tip `memory/backlog/TOOL.md` is **20,345 of
+20,480 bytes — 99.34%, with 135 bytes left**, holding 80 rows of which none is terminal (66 OPEN, 7
+INPROGRESS, 6 SPECCED, 1 DEFERRED) and with no fourth rotation having occurred. At the measured mean of
+253.7 bytes per row, 135 bytes is half a row: **the next backlog row that tree receives reds check 6**,
+and rotation cannot make room because there is nothing terminal to move.
+
+So the landing order is: the conf change and its declared value first, then this build's decision rows
+and backlog rows. Writing the records first is not merely untidy, it is red. This is the bind
+`memory/builds/cSteadyMetronome/README.md` described on 2026-08-14 — a unit that could not be given a
+backlog row because there was no room to write one — arriving for the second time, and it is why S13
+closes `TOOL-cSettledDocket-16` in place rather than filing a fresh row beside it.
+
+The reground onto the local default is the first pass after the forks are answered, per M7. It does not
+move the spec's base or its figures: a base is immutable and the measurements belong to it. It does
+shorten every F1 runway by about half a day, which changes no recommendation.
 
 ### Files touched (estimate)
 
@@ -402,6 +422,12 @@ re-shape rather than here.
   gate-mandated files entered the files-touched table, the carrier list is enumerated by line, rule 6's
   spill clause and `.gitattributes` entered the sweep, and `TOOL-cSettledDocket-16` — already OPEN for
   this exact defect and missed by rev-1's recall probe — is closed by S13.
+- rev-3 · 2026-08-17 · added §4 Rollout. The local default branch advanced 37 commits past
+  `origin/main` during the build, and at that tip the tooling shard is at 99.34% with 135 bytes left and
+  nothing terminal to rotate — half a row. That forces a landing order the earlier revs did not state:
+  the conf change lands before this build's own decision and backlog rows, because writing the records
+  first reds check 6. Found while diagnosing the `drift-audit records` leg, whose red is a baseline
+  artifact of the same branch-versus-default gap and not this diff.
 
 ## 10. Reuse audit
 

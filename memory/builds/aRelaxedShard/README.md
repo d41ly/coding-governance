@@ -36,6 +36,12 @@ one of them.
 `TOOL-cSettledDocket-16` is OPEN in that shard and already says this. The unit closes it rather than
 landing a duplicate beside it.
 
+**On the tree this will land into it is already past tight.** The local default branch advanced 37
+commits during the build, and at that tip the shard holds **20,345 of 20,480 bytes — 135 left, half of
+one row** — with 80 rows and still nothing terminal. The next backlog row that tree receives reds the
+gate. That forces a landing order, in the spec's §4 Rollout: the conf change lands before this build's
+own decision rows, because writing the records first is red.
+
 This was predicted. `memory/builds/cSteadyMetronome/README.md` recorded it on 2026-08-14, including the
 detail that the unit it needed could not be given a backlog row because there was no room left to write
 one. That is still true today.
@@ -59,7 +65,7 @@ Three separate problems, not one.
 ## The unit set
 
 Classification per the build method, written before acting: unit 1 was **MISSING**, was authored this
-run, was audited at M4, and is now **FORKED** at rev-2 — its §8 carries five items, and with no standing
+run, was audited at M4, and is now **FORKED** at rev-3 — its §8 carries five items, and with no standing
 mandate they are the owner's.
 
 The audit is recorded at `reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md`, which owns its shape
@@ -125,7 +131,7 @@ The table below is GENERATED from the status header of every spec in this folder
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row-document byte cap becomes a declared value](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-2 | 2026-08-17 |
+| [TOOL-aRelaxedShard-1 — the row-document byte cap becomes a declared value](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | OPEN | rev-3 | 2026-08-17 |
 
 Records live under `spec/` and `reviews/`.
 <!-- /gen:build-index -->
