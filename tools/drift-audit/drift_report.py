@@ -144,7 +144,7 @@ def load_project_layer(root: pathlib.Path):
 DEFAULT_RATCHET_LOOKBACK = 14
 
 
-def _lookback_of(proj) -> int:
+def _read_lookback(proj) -> int:
     """The project layer's RATCHET_LOOKBACK, or the shipped default — a NAMED refusal otherwise.
 
     Absent is the default, so a layer written before this key keeps working and does not fail to
@@ -925,7 +925,7 @@ def main(argv: list[str] | None = None) -> int:
         # is enumerated in the project layer, never inferred.
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()),
-                                    _lookback_of(ctx.proj))
+                                    _read_lookback(ctx.proj))
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]

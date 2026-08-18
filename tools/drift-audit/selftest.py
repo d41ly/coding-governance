@@ -948,7 +948,7 @@ def test_ratchet_lookback(tmp: pathlib.Path) -> None:
     """
     print("RATCHET_LOOKBACK (a declared window, both directions over one fixture)")
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-    from drift_report import _justified, _lookback_of, DEFAULT_RATCHET_LOOKBACK, DriftError
+    from drift_report import _justified, _read_lookback, DEFAULT_RATCHET_LOOKBACK, DriftError
 
     lines = ["# filler"] * 21
     lines[10] = "# RAISED 5 -> 8 because the measurement said so"
@@ -964,17 +964,17 @@ def test_ratchet_lookback(tmp: pathlib.Path) -> None:
     class _Bare:
         pass
     check("a layer declaring nothing takes the shipped default",
-          _lookback_of(_Bare()) == DEFAULT_RATCHET_LOOKBACK)
+          _read_lookback(_Bare()) == DEFAULT_RATCHET_LOOKBACK)
 
     class _Declared:
         RATCHET_LOOKBACK = 6
-    check("a layer declaring six gets six", _lookback_of(_Declared()) == 6)
+    check("a layer declaring six gets six", _read_lookback(_Declared()) == 6)
 
     for bad in (0, -3, "14", 2.5, True):
         cls = type("_Bad", (), {"RATCHET_LOOKBACK": bad})
         named = False
         try:
-            _lookback_of(cls())
+            _read_lookback(cls())
         except DriftError as exc:
             named = "RATCHET_LOOKBACK" in str(exc)
         check(f"an unusable declaration ({bad!r}) is a refusal that NAMES the key", named)

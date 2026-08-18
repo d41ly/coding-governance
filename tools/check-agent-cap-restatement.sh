@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # check-agent-cap-restatement — no live prose ASSERTS a fan-out bound as a bare number.
 #
-# The number the hook enforces is adjustable per repo (TOOL-aDeclaredBound-4). A document that
-# states it as a digit is a second answer to a question that has a declared first one, and this repo
-# already ruled on that shape for the kit version: a version written in prose rots between bumps.
+# The number the hook enforces is the hook's to state, and it is the only carrier a run actually
+# obeys. A document that states it as a digit is a second answer to a question that already has an
+# executable first one, and this repo has ruled on that shape before: a kit version written in prose
+# rots between bumps. The digit is what rots; the pointer is what does not.
 #
 #   bash tools/check-agent-cap-restatement.sh          # the gate
 #
@@ -77,8 +78,8 @@ EOF
 
 if [ -n "${bad%$'\n'}" ]; then
   echo "AGENT-CAP-RESTATEMENT FAILED — live prose asserts a fan-out bound as a bare number."
-  echo "  The bound is DECLARED and adjustable; a digit here is a second answer that goes stale the"
-  echo "  day someone turns the knob. Point at the file that resolves it, or add a row to $WAIVERS"
+  echo "  The hook is the carrier a run obeys; a digit here is a second answer that goes stale the"
+  echo "  day the hook's value changes. Point at the file that resolves it, or add a row to $WAIVERS"
   echo "  with the reason it must stay (rows key on the matched TEXT, not on a line number)."
   printf '%s' "$bad" | sed 's/^/  /'
   status=1

@@ -1,0 +1,44 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: memory/builds/aDeclaredBound/spec/.
+
+id = "check-agent-cap-restatement"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+why_conditional = "it polices PROSE about the agent-cap fan-out bound, so it is worth installing only in a target that adopts the agent-cap hook AND writes governance prose of its own; a target that consumes the hook without documenting it has nothing for this to scan"
+version_from = { none = "no version constant exists; measured 2026-08-18." }
+requires = ["agent-cap"]
+sentinel = "tools/check-agent-cap-restatement.sh"
+
+[[files]]
+include = ["check-agent-cap-restatement.sh", "check-agent-cap-restatement.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+claims = ["tools/check-agent-cap-restatement.sh", "tools/check-agent-cap-restatement.test.sh"]
+
+[[files]]
+include = ["agent-cap-restatement-waivers.txt"]
+role = "generated"
+to = "{prefix}/agent-cap-restatement-waivers.txt"
+claims = ["tools/agent-cap-restatement-waivers.txt"]
+note = "MEASURED optional: the gate is green with the file absent and with it empty (its own self-test carries both). gov's single waiver row is gov-specific prose and must not travel, so this is seeded empty rather than copied — the same rule the install-prefix registry beside it follows."
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "installation is a copy of a gate script plus its self-test; the waiver registry beside it is target-authored and gov never seeds it"
+
+[check]
+none = """
+this entry IS a gate. Its self-test is the leg, and running a gate from `check` would make `check` a second merge bar rather than a verifier of the install
+"""
+
+[[gate_leg]]
+name = "agent-cap restatement"
+argv = ["bash", "{prefix}/check-agent-cap-restatement.sh"]
+guard = []
+
+[[gate_leg]]
+name = "agent-cap restatement self-test"
+argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]
+guard = ["{prefix}/check-agent-cap-restatement.sh"]

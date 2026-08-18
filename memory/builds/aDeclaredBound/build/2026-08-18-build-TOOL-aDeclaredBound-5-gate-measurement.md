@@ -104,3 +104,35 @@ ledger files already excluded a pass earlier by the frozen-tree rule. That enume
 only itemised evidence offered for a decision the spec calls measured rather than guessed, so
 the class list needs re-deriving before it can carry that weight.
 
+## Addendum — what committing before running §7 cost
+
+Unit 5 was committed without running the gates its own §7 names. Four legs went red on the next
+full bar, and three of them were unit 5's:
+
+- **govkit selfcheck / selftest.** A new gate leg is not just a row in `tools/gate-legs.json` — the
+  govkit registry grades the tracked SURFACE, so two legs and a waiver registry arrived claimed by
+  no descriptor. Fixed with `tools/govkit/entries/check-agent-cap-restatement.kit.toml` and its
+  registry row; the surface reads `0 unclaimed` again.
+- **drift-audit records.** `handkept_inventories_disagreeing_with_source` fired: `AGENTS.md`'s
+  gate-suite section named 70 legs against a manifest of 72. A gate that nothing in the charter
+  describes is coverage a session obeying the charter under-reports.
+
+The fourth was unit 3's `_lookback_of`, whose leading token is not in the declared VERBS table.
+Renamed `_read_lookback` rather than bumping the pin — the standing rule from `TOOL-aLoosenedCeiling`
+is that a pin bumped to fit a name is the ratchet going slack by one every time someone is in a
+hurry.
+
+**The charter bullet then tripped the gate it was describing.** The first draft quoted both carriers
+the pattern had missed, verbatim and with their digits, inside the very section that bans a bare
+fan-out number in live prose. That is the best evidence this build has that the gate fires on real
+prose written by someone who knows the rule: it caught its own documentation on the first run. The
+bullet now names them by noun and says so.
+
+**One prose defect ran through three carriers.** The gate's header, the protocol-parity test's
+header and the gate's own FAILURE MESSAGE all asserted the bound is "DECLARED and adjustable per
+repo". Unit 4 is parked; `tools/hooks/agent-cap.js` still carries `const CAP = 5` as a bare literal,
+so all three described a channel that does not exist. Nothing gates a comment against reality —
+`non_terminal_specs_cited_by_product_source` caught two of the three only because they happened to
+cite the spec id, and the remedy string, which is what a reader actually sees when the gate reds,
+carried no id and would have survived.
+

@@ -126,6 +126,22 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - **the review protocol is BINDING** — `memory/guides/REVIEW-PROTOCOL.md`: a review's verify stage spawns **at most the total `tools/hooks/agent-cap.js` resolves** (the batch grows, the agent count never does) and **the same bound applies to how many run concurrently**. Enforced at the `Workflow` tool call by `tools/hooks/agent-cap.js` (it sees the inline `script`, which is where the rule actually gets broken) and on the bar by `tools/workflows/check-verifier-fanout.sh`, which delegates to that same hook rather than re-implementing it. Ready-made harness: `tools/workflows/tier2-review.js`.
 - install prefix — `tools/check-install-prefix.sh` (+ `tools/check-install-prefix.test.sh`): nothing this repo SHIPS may spell a root-install kit path. Kits install at `tools/<kit>/` in a target (ONE segment — the codebase-map gate template resolves no deeper), every engine derives its own prefix, and what actually strands an adopter is a path SPELLED in something they receive: a runbook step, a usage header, a remedy string, a rendered artifact. Those fail quietly — a `tools/` install used to scaffold the adopter's own committed hygiene rule-set document with seven dead kit paths while the hygiene gate exited 0. The kit-name alternation is DERIVED from the tracked `tools/*` dirs; `*.test.sh`/`selftest.py` are excluded because they build root installs on purpose to prove the dual-spelling support kept for the not-retrofitted adopters; deliberate spellings live in the shrink-only `tools/install-prefix-waivers.txt` (11 today) and a waiver whose hit is gone reds as stale
 - verifier fan-out — `tools/workflows/check-verifier-fanout.sh` (+ `.test.sh`) and the protocol's kit/dogfood parity, `tools/workflows/check-protocol-parity.test.sh`
+- fan-out bound restatement — `tools/check-agent-cap-restatement.sh` (+
+  `tools/check-agent-cap-restatement.test.sh`): no LIVE prose asserts the fan-out bound as a bare
+  number. The hook is the carrier a run obeys; a document spelling the digit is a second answer that
+  rots at the next change, the same shape this repo already ruled on for the kit version. Markdown
+  outside the frozen record trees, and the two exclusion mechanisms are deliberately different —
+  a PATH PREFIX for `memory/{builds,archive,gotchas,backlog}/` (a record describing what was true
+  when it was written is not drift) and MATCHED TEXT in the shrink-only
+  `tools/agent-cap-restatement-waivers.txt` for a live exception, because a text key written for a
+  frozen record would silence every live carrier sharing its sentence. Its header states its two
+  blind spots rather than leaving them to be assumed away: the noun list IS a list, so a bound phrased
+  outside it is invisible, and executable files are out of scope. An empty population REFUSES rather
+  than passing green. Both blind spots are OBSERVED, not imagined: the pattern silently dropped two
+  real carriers during its own construction, one phrased around `skeptics` and one around a bare
+  `verify-stage`, each of which cost the noun list a widening. Their sentences are not quoted here on
+  purpose — a charter reciting the digit it exists to ban is the defect, and this bullet tripped its
+  own gate the first time it did
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js` git can see — tracked OR untracked-and-unignored), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
 - run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
 - run-gates evidence — `tools/run-gates.evidence.test.sh` (a red leg's own output survives on disk under `<gitdir>/gate-logs/`, the durable summary POINTS at it, and `gate-last-failure.txt` outlives a green re-run; drives the runner through `GATE_LEGS` so it never re-enters the real bar)

@@ -65,19 +65,20 @@ fi
 #
 # THE POINTER, per RULE. This arm used to freeze the literal cap as a digit, on the reasoning that a
 # digit-free paraphrase is the drift it exists to catch. That reasoning was right and its instrument
-# became wrong: TOOL-aDeclaredBound-4 makes the bound a per-repo DECLARATION, so a document carrying
-# the number is the second answer rather than the check. The property that needs protecting is
-# unchanged — a protocol stating a bound it does not say how to READ is a protocol an agent cannot
-# check itself against.
+# was the weaker half of it: a document that RESTATES the number is itself a second answer, and a
+# reader holding a stale copy cannot tell which of the two binds. The property that needs protecting
+# is unchanged — a protocol stating a bound it does not say how to READ is a protocol an agent
+# cannot check itself against.
 #
 # PER RULE and not per document. This protocol states TWO bounds in two sections, and
 # memory/gotchas/concurrency-is-not-a-budget.md exists because conflating them was a real defect; one
 # predicate over "the document" would let either section lose its pointer while the other carried the
 # gate. Each section that states a bound names the resolver within its OWN body.
 #
-# This is the POINTER-SHAPE half. TOOL-aDeclaredBound-4 adds the second half — that the named
-# declaration is one the hook actually READS — in the commit that makes the hook read it. Split by
-# landing on the owner's ruling, because neither the conf key nor the read exists until that unit.
+# This is the POINTER-SHAPE half and deliberately only that half: it asserts each section NAMES its
+# resolver, never that the named file resolves anything. The second half — that the pointed-at
+# carrier is one the hook actually reads — belongs to the commit that makes the hook read it, and no
+# such commit exists yet.
 _p_bad=0
 for _sec in 'The hard cap' 'Concurrency'; do
   _body=$(awk -v want="$_sec" '
