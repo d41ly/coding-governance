@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 witness: 6f705002cd4c21e7a2c7899cac3a0b4a3ce6a8da
-phase: VERIFYING
+phase: LANDING
 keepalive: 3ff2b805
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 401416faebff58c4527abef9f1a4ae80d244c4f2
@@ -45,3 +45,5 @@ overwritten in place. Row minted for that too.
 2026-08-17T13:46:06Z decision · item unit 4 re-pricing · reason Owner re-priced 2026-08-17 and chose to build TOOL-aBranchedMandate-3. The earlier park's main reason was a measurement error: the S6b loop exists at check-unattended.sh:295; the grep pattern lacked the quote the source carries. Premises re-derived in spec rev-6.
 
 2026-08-18T00:19:54Z decision · item gates-green is red for upstream reasons · reason MEASURED on a clean origin/main checkout at 43eb6b1: lexicon 450 offenders over pin 417, none of the 7 offender files touched by this diff. drift-audit reports ORPHAN_ID_PIN 0->5 only because local main is stale at 6678260 while origin/main is 43eb6b1; the value is 5 on both. Options seen: (A) fast-forward local main, which desyncs the primary worktree another session may be using, and clears only drift; (B) --override gates-green, which spends the one check standing between an unattended run and an unverified landing; (C) stop and let main's owner clear the lexicon pin. REFUSED to pick: B is the owner's call because the reds are not this build's to fix and an override here buys a landing at the cost of the bar's meaning.
+
+2026-08-18T02:05:52Z override · item gates-green · reason Owner instructed 2026-08-18 to land and disregard this red. MEASURED: the only failing leg is drift-audit records, and it fails solely because LOCAL main is stale at 6678260 while origin/main is 31d0831 -- running the same tool with --base-ref origin/main yields zero WEAKENED complaints. ORPHAN_ID_PIN is 5 on this branch and 5 on origin/main; only the stale local ref reads 0. No signal about this branch's own content is being overridden.
