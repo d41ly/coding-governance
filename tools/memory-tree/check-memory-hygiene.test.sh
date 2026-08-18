@@ -637,7 +637,7 @@ cnot 10 'DECISIONS.2026-08-02.md'
 hit  '/ is the only sanctioned memory root'
 chit 11 'docs/legacy-note.md'
 hit  'recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered)'
-hit  'index entry lines over 300 chars'
+hit  'index entry lines over their declared cap'
 hit  'spec files dated >='
 
 # ---- the section-canon DIFF EXCERPT. The batched check 12 emits a sentinel record and rebuilds the
@@ -1131,7 +1131,7 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   [ "$c6rc" != 2 ] || { echo "FAIL check-6 caps '$1' aborted the gate (status 2); a silent run below would prove nothing"; st=1; }
 }
 ( cd "$C6" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong
+  mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong memory/builds/tWide
   printf '# r\n' > memory/README.md
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   # ONE seq, reused. Building each line with its own command substitution cost this suite minutes.
@@ -1151,6 +1151,13 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   # (d) a BUILD README with more lines than the row-document tier allows and well under its OWN byte
   #     cap. Its silence is the proof that a zero LINE cap means NO line cap rather than a cap of zero.
   { fm tLong; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/README.md
+  # (e) and (f) — check 7's ENTRY budget, one fixture per class at a width BETWEEN the two shipped
+  #     tiers. 320 characters is over the row-document 300 and under the build-README 350, so with
+  #     nothing declared the row is named and the README is silent: one width, both defaults, and
+  #     neither arm can pass while the other is broken.
+  W=$(printf 'w%.0s' $(seq 1 316))
+  { printf '# BRAND backlog\n\n'; printf -- '- %s\n' "$W"; } > memory/backlog/BRAND.md
+  { fm tWide; printf -- '- %s\n' "$W"; } > memory/builds/tWide/README.md
   # (e) an INDEX-CLASS row document over the shipped LINE cap and far under its byte cap: ~800 short
   #     rows, about 7 KB. Named by default because the line axis fires, SILENT once INDEX_CAP_LINES is
   #     declared 0 — which is the only pair in this suite that proves a project can RETIRE the line axis
@@ -1172,6 +1179,11 @@ cblock "$out" 6 | grep -qE 'memory/backlog/ARCH\.md \([0-9]+B [0-9]+L > 20480B/2
 n=$((n+1))
 cblock "$out" 6 | grep -qE 'memory/builds/tBig/README\.md \([0-9]+B > 25600B; no line cap for this class\)' \
   || { echo "FAIL check 6 named the build README but not against the SHIPPED 25600B default, or printed a line cap for a class that has none"; st=1; }
+# --- CHECK 7's entry budget at the SHIPPED defaults. One 320-char fixture line in each class: the
+# --- row document is over 300 and named, the build README is under 350 and silent. A single arm
+# --- would pass under one merged tier; the pair is what observes the split.
+chit 7 'memory/backlog/BRAND.md'
+cnot 7 'memory/builds/tWide/README.md'
 
 # --- the GUIDE cap declared BELOW the fixture: the file that was silent is now named, AGAINST THE
 # --- DECLARED number — which is what proves the binding reached awk rather than the default surviving.
@@ -1193,6 +1205,18 @@ c6run 'BUILD_README_CAP_BYTES=60000\n'
 cnot 6 'memory/builds/tBig/README.md'
 chit 6 'memory/backlog/ARCH.md'
 
+# --- CHECK 7 with the row budget declared ABOVE the fixture: the named line goes silent, and the
+# --- build README stays silent because a key that is not its own does not reach it.
+c6run 'ENTRY_CAP_CHARS=400\n'
+cnot 7 'memory/backlog/BRAND.md'
+cnot 7 'memory/builds/tWide/README.md'
+
+# --- and with the BUILD-README budget declared BELOW its fixture: the silent one is named, while the
+# --- row document returns to being named by its own untouched default.
+c6run 'BUILD_README_ENTRY_CAP_CHARS=310\n'
+chit 7 'memory/builds/tWide/README.md'
+chit 7 'memory/backlog/BRAND.md'
+
 # --- a zero LINE cap is LEGAL, and is not the same declaration as a zero byte cap. Without this the
 # --- refusal below could have been written as "any zero is malformed", which would have made the
 # --- build-README class undeclarable in the very conf this unit added.
@@ -1209,13 +1233,13 @@ cnot 6 'memory/builds/tLong/STATUS.md'
 # '00' is here because the first cut of the guard matched the LITERAL 0 with a case pattern, so a
 # leading zero walked past it and awk's +0 belt then coerced it to zero — every file in the class
 # red, with no line pointing at the conf. The guard now compares ARITHMETICALLY; this arm is why.
-for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'INDEX_CAP_BYTES=00' 'GUIDE_CAP_LINES=-5'; do
+for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'INDEX_CAP_BYTES=00' 'GUIDE_CAP_LINES=-5' 'ENTRY_CAP_CHARS=0' 'BUILD_README_ENTRY_CAP_CHARS=xyz'; do
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n%s\n' "$_bad" > "$C6/.memory-tree.conf"
   outc=$(cd "$C6" && bash "$SCRIPT" 2>/dev/null); rcc=$?
   n=$((n+1))
   [ "$rcc" = 2 ] || { echo "FAIL a malformed check-6 cap ($_bad) exited $rcc, not the cannot-run status 2"; st=1; }
   n=$((n+1))
-  printf '%s\n' "$outc" | grep -qF 'HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:' \
+  printf '%s\n' "$outc" | grep -qF 'HYGIENE — cannot run: size cap(s) declared in .memory-tree.conf are unusable:' \
     || { echo "FAIL a malformed check-6 cap ($_bad) printed no cannot-run line on stdout"; st=1; }
   n=$((n+1))
   printf '%s\n' "$outc" | grep -qF "${_bad%%=*}" \
@@ -1231,7 +1255,14 @@ done
 # ---- the engine, the docs and the tests green with the example half-done — which is exactly what
 # ---- happened here, and what the closing review caught.
 EX="$HERE/.memory-tree.conf.example"
-for _k in READ_PATH_HEADROOM INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES; do
+# ---- DERIVED from the engine's own validation loop, never retyped. The hand-kept version of this
+# ---- list covered seven of the engine's keys and missed DOSSIER_CAP_* entirely, so adding two more
+# ---- by hand would have been the same omission a third time. READ_PATH_HEADROOM is appended because
+# ---- it is corpus_ids.py's key rather than this engine's, so no loop here can yield it.
+_engkeys=$(sed -n 's/^for _k in \(.*\); do$/\1/p' "$HERE/check-memory-hygiene.sh" | head -1)
+n=$((n+1))
+[ -n "$_engkeys" ] || { echo "FAIL could not derive the cap-key list from the engine; the example-conf arms below would pass by finding nothing"; st=1; }
+for _k in $_engkeys READ_PATH_HEADROOM; do
   n=$((n+1))
   grep -qE "^$_k=" "$EX" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
 done
@@ -1270,7 +1301,7 @@ for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES BUILD_README_CAP_BYTES
     || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k"; st=1; }
 done
 
-FLOOR_ASSERTIONS=204
+FLOOR_ASSERTIONS=225
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

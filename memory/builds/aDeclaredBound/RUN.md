@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: fa5e6225641b60ab0a8d6311688aed3eb64e6342
-phase: FOLDING
+witness: a9fd55d274f743fca79d354cf4a3fd44ee866ebd
+phase: BUILDING
 branch-sha: 75a664fbeedf0e9b41bbde56194d14ee37bc018d
 branch-ref: refs/heads/branch/adeclaredbound-unattended
 anchor-kind: run-branch

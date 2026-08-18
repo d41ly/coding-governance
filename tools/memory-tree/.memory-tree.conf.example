@@ -73,23 +73,23 @@ GUIDE_CAP_BYTES="61440"         # a guide: prose the charter points a session at
 GUIDE_CAP_LINES="750"
 BUILD_README_CAP_BYTES="25600"  # a build README: generated regions plus one bounded authored block
 BUILD_README_CAP_LINES="0"
+# Codebase-map dossiers, when that kit is adopted under this tree. Kept TIGHTER than the row cap on
+# purpose: a dossier's remedy is a SPLIT rather than a rotation, and check 6 is the only size gate
+# it has. MEASURE your own before raising any of these -- 250 rows at YOUR corpus's bytes-per-row is
+# the derivation, and a figure copied from another tree is either vacuous or permanently red.
+DOSSIER_CAP_BYTES="20480"
+DOSSIER_CAP_LINES="0"
+# Check 7's ENTRY budget: how long one line inside a capped index file may be, per class. Same
+# refusal rules as the size caps above — not a whole number is refused, and a zero is refused
+# because it reds every line rather than expressing an intent.
+ENTRY_CAP_CHARS="300"           # a row document
+BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were measured wider
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.
 DEAD_PATH_EXCLUDE=""
 # Read-path members deliberately under no byte cap, space-separated. Blank = every member is capped.
 READ_PATH_WAIVER=""
-
-# check 6's two DECLARED byte bounds. POLICY CEILINGS you choose, so unlike the measured pins above
-# they ship WITH a value: blank resolves FORWARD to the kit default rather than skipping the check, and
-# neither bound can be switched off -- `project/curation-debt.txt` is the deliberate per-file exemption.
-# MEASURE your own before raising either: 250 rows at YOUR corpus's bytes-per-row is the derivation, and
-# a figure copied from another tree is either vacuous or permanently red.
-# Row documents, except a build README (25,600, kit-owned) and a dossier below:
-ROW_DOC_CAP_BYTES="20480"
-# Codebase-map dossiers, when that kit is adopted under this tree. Their remedy is a SPLIT, not a
-# rotation, and check 6 is the only size gate they have -- so keep this tighter than the row cap.
-DOSSIER_CAP_BYTES="20480"
 
 # gotchas.py (checks 17-19): how many bug-class records under $MEMORY_ROOT/gotchas/ may be
 # `universal: true`. A universal record is emitted on EVERY reviewer checklist, so this is budgeted
