@@ -63,9 +63,9 @@
 - TOOL-aBoundedVerdict-3 · forks get a narrow FACT-QUESTION probe rule, not a general testing rule (owner). Measured 3 of 46 real forks test-decidable, ~67% not testable at all, one where the measurement picks the wrong answer. A unit awaiting scope approval is approved by the mandate at BASE
 - TOOL-aBoundedVerdict-4 · §8's resolution mark becomes anchored and attributed, graded per ITEM BLOCK rather than on the first line, in both readers, gated by a new cutoff rather than by repairing landed specs. Today a first line saying a fork is not resolved classifies READY in both
 - TOOL-aBoundedVerdict-5 · parking becomes a VERB, and the parked region's kinds become a decision/record taxonomy so review rounds cannot inflate the count of decisions a run must surface. The close verb's own override line is excluded, because it lands after the DoD loop
+- TOOL-aWalkedCorpus-8 · `requires` ORDERS the install. Declared by memory-recall and read by nothing: every resolve_selection mode returned sorted(...), so CONFIGURE ran adopters alphabetically and memory-recall ran before memory-tree seeded the conf it reads
+- TOOL-aWalkedCorpus-9 · a DECLARED outcome may be an ACCEPTED stop. memory-tree seeds and stops by design, so every correct first install exited 1 and a default-selection apply could never return 0. Per-OUTCOME: refused-foreign-tree shares the code and stays a failure
 
 ## DEPL — deployer
 
 *(none yet)*
-- TOOL-aWalkedCorpus-8 · `requires` ORDERS the install. Declared by memory-recall and read by nothing: every resolve_selection mode returned sorted(...), so CONFIGURE ran adopters alphabetically and memory-recall ran before memory-tree seeded the conf it reads
-- TOOL-aWalkedCorpus-9 · a DECLARED outcome may be an ACCEPTED stop. memory-tree seeds and stops by design, so every correct first install exited 1 and a default-selection apply could never return 0. Per-OUTCOME: refused-foreign-tree shares the code and stays a failure
