@@ -79,8 +79,14 @@ fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
 # CORE, in run order. A project EXTENDS via PHASES_EXTRA and deletes nothing: the gate leg asserts
 # core membership against a shrink-only floor, because a deletable core member is a silent,
 # reason-free override of everything keyed on it.
-PHASES_CORE="PREFLIGHT SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
+PHASES_CORE="PREFLIGHT RESEARCHING TESTING SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
 PHASES_TERMINAL="LANDED ABORTED"
+# TOOL-aPromptedMandate-2 - the subset NAMED FOR the build method's pass kinds, published so the
+# protocol's claim about it can be JOINED rather than believed. RESEARCHING and TESTING are
+# deliberately absent: the method closes its pass set and neither is in it, so they are POSITIONS a
+# prompt-started run occupies while performing the passes that set does name. Adding a phase and
+# calling it a pass kind now has to move this line, and the leg reds if the contract disagrees.
+PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.

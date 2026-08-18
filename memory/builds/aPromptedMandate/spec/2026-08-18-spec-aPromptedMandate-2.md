@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-2 — the RESEARCHING and TESTING phases
 
-**Status:** SPECCED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -20,7 +20,8 @@ run that dies mid-research resumes into the right place instead of claiming a ph
   the same leg AC3 requires green. Any per-phase meaning prose is a separate, ungated addition
   below it.
 - **S4** — §3's sentence "The four middle members are named for the build method's PASS kinds" is
-  rewritten. The two new members are **POSITIONS, not pass kinds**: M6 closes the pass set at five
+  rewritten, and the claim it makes becomes JOINABLE: the driver publishes `PHASES_PASSKIND` and the
+  protocol carries the same four tokens under an anchored heading, joined in both directions. The two new members are **POSITIONS, not pass kinds**: M6 closes the pass set at five
   ("Nothing else is a pass") and neither new member is one of them. Rewriting §3 rather than widening
   M6 keeps the commit boundary and M7's reground points exactly where M6 puts them; research and test
   work commits at the boundary of the pass that consumes it.
@@ -95,9 +96,10 @@ of its own, in that arm's shape.
 - **AC3b** — When the run-order list in `memory/guides/UNATTENDED-PROTOCOL.md` omits either new
   token, `bash tools/unattended/check-unattended.sh` fails with arm D's text "a CORE phase is
   enforced by the driver and absent from the protocol's run-order list".
-- **AC3c** — When §3's pass-kinds sentence names a count that disagrees with the driver's middle-member
-  count, `bash tools/unattended/check-unattended.sh` fails by name — the prose arm, in the shape of
-  the existing DoD count-sentence arm.
+- **AC3c** — When the protocol's pass-kind block lists a phase the driver does not publish as a pass
+  kind, or omits one it does, `bash tools/unattended/check-unattended.sh` fails by name; and when the
+  block's prose anchor is reworded away, it fails with its own vacuity refusal rather than comparing
+  two empty sets. THREE branches, all measured firing before the arms were written.
 - **AC3d** — When `tools/unattended/.unattended.conf.example`'s `CORE_FLOOR` or `DIRECTIVES_FLOOR`
   disagrees with the word counts of `PHASES_CORE`, `DOD_CORE` and `DIRECTIVES_CORE` in
   `tools/unattended/unattended.sh`, `bash tools/unattended/unattended.test.sh` fails by name.
@@ -114,6 +116,12 @@ of its own, in that arm's shape.
 
 none — the fork below is RESOLVED.
 
+- **How the pass-kinds claim is made checkable** — RESOLVED (agent, 2026-08-18, mid-build): a TOKEN
+  join against a new kit-owned `PHASES_PASSKIND` constant, not the count arm rev-2 specified. A count
+  needs a driver-side notion of "middle member" and the driver had none, so the specified arm had
+  nothing to join against and would have compared a number to a number the same edit produced. The
+  token form is strictly stronger and its vacuity is armed. Recorded here rather than folded silently
+  because the constant is a kit-owned declaration no spec had named.
 - **Core or `PHASES_EXTRA`** — RESOLVED (agent, 2026-08-18): core. The conf's own header reserves the
   core vocabulary to the kit, and the mode this build adds is a kit capability.
 
@@ -125,6 +133,10 @@ none — the fork below is RESOLVED.
   pass-kinds sentence and M6's closed pass set with nothing to catch it (id 6). S5 added: the example
   conf was in scope with no AC and carries a stale `:6` (id 15). Tier 1 -> 2, because the unit now
   amends a binding contract's prose.
+- rev-3 · 2026-08-18 · folded mid-build. AC3c's count arm was unbuildable as an honest join, so S4
+  now publishes `PHASES_PASSKIND` from the driver and the protocol's pass-kind block is joined to it
+  both ways plus a vacuity guard. The code was written before this fold, which is the wrong order
+  — M2 asks for the spec to move first; recorded rather than tidied away.
 
 ## 10. Reuse audit
 

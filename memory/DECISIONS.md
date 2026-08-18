@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-aPromptedMandate-2 · the pass-kind claim joins a NEW kit-owned `PHASES_PASSKIND` rather than a count: the driver had no notion of a middle member, so a count arm compares a number to one the same edit derived. RESEARCHING/TESTING are POSITIONS, not pass kinds
 - TOOL-aPromptedMandate-1 · a prose-started run needs NO new authorization primitive: `ANCHOR_SCOPE="published"` already admits a build folder the run authored and pushed, measured green through driver AND leg. §1 cost 1 priced it, so this build records the MODE, not a mechanism
 - TOOL-aPromptedMandate-4 · research and solution-test bind PROMPT-authorized runs only (owner), the directive layer's first scoped member. Unconditional was rejected as ceremony over a slug-mode build whose solution was already chosen
 - TOOL-aPromptedMandate-5 · the one owner turn lands BEFORE the anchor push, so the clarification is a property of the commit graph, not a transcript claim. Protocol §1 MAY be amended (owner) — the authorization parameter is that consent — bounded to §1's DESCRIPTION, never its MECHANISM

@@ -835,6 +835,18 @@ same "directives() composes core and extra" \
 # ---- stay green. The example is the kit's own declaration of the surface a project fills in, it is
 # ---- tracked, and no fixture can narrow it.
 example="$HERE/.unattended.conf.example"
+
+# ---- TOOL-aPromptedMandate-2, S5: the example's FLOORS, joined to the driver's own set sizes.
+# ---- The example shipped CORE_FLOOR="10:6" against an EIGHT-member DOD_CORE, and stayed wrong for
+# ---- its whole life because the only arm that read this file iterates key NAMES and never a value.
+# ---- The header tells an adopter to MEASURE rather than copy; nothing made that self-enforcing, so
+# ---- a project copying the example inherited a floor too slack to detect the deletion it exists to
+# ---- detect. `wc -w` is normalised because it pads on this platform and the comparison is textual.
+wcw() { grep -m1 "^$1=" "$SCRIPT" | cut -d\" -f2 | wc -w | tr -d " \t"; }
+same "the example CORE_FLOOR equals the driver phase and DoD set sizes" \
+  "$(sed -n 's/^CORE_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw PHASES_CORE):$(wcw DOD_CORE)"
+same "the example DIRECTIVES_FLOOR equals the driver directive count" \
+  "$(sed -n 's/^DIRECTIVES_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw DIRECTIVES_CORE)"
 initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
 undefaulted=""
 checked=0
@@ -1701,7 +1713,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=305
+FLOOR_ASSERTIONS=307
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

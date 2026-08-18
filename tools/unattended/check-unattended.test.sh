@@ -1046,6 +1046,33 @@ reset_tree
 miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 reset_tree
 
+# TOOL-aPromptedMandate-2 - the PASS-KIND subset, joined both ways and guarded against its own
+# vacuity, exactly as D is. Each arm was run against the live tree with the template broken in that
+# one way BEFORE being written here, and each fired with the text below and no other. The line is
+# anchored ^...$ so it selects the pass-kind line and not the run-order line above it, which also
+# contains SPECCING.
+#
+# F, driver -> protocol: the driver publishes a pass kind the contract omits.
+reset_tree; pedit 's/^`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`$/`SPECCING` · `REVIEWING` · `FOLDING`/'
+out=$(run)
+hit "$out" "the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names:"
+miss "$out" "the contract claims the method names a position it does not"
+
+# F, protocol -> driver: the contract calls a POSITION a pass kind. This is the direction the spec
+# audit found - RESEARCHING and TESTING are positions, and a document that quietly promotes one
+# contradicts the build method's closed pass set with nothing to notice.
+reset_tree; pedit 's/^`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`$/`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RESEARCHING`/'
+out=$(run)
+hit "$out" "the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not:"
+miss "$out" "the contract understates which positions the method names"
+
+# F, the locator: the same vacuity hole D has, opened the same way - by rewording prose.
+reset_tree; pedit "s/Named for the build method's PASS kinds:/Named for the pass kinds of the method:/"
+out=$(run)
+hit "$out" "the protocol names no phase as a build-method pass kind, so the pass-kind join would compare the driver's subset against nothing and pass by finding nothing; the anchor is the line ending 'PASS kinds:'"
+miss "$out" "the contract understates which positions the method names"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1056,7 +1083,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=162
+FLOOR_ASSERTIONS=174
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

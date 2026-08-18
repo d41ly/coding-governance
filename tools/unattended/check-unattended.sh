@@ -77,6 +77,9 @@ PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
 DIRECTIVES_CORE=$(core_of DIRECTIVES_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
+# TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
+# the leg never carries a second spelling of a driver declaration.
+PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
   exit "$status"
@@ -707,6 +710,23 @@ if [ -f "$proto" ]; then
     pd2=$(comm -13 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
     [ -z "$pd1" ] || fail 16 "a CORE phase is enforced by the driver and absent from the protocol's run-order list, so the contract publishes a vocabulary the kit does not use: $pd1"
     [ -z "$pd2" ] || fail 16 "the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy: $pd2"
+    # TOOL-aPromptedMandate-2 - ...and the PASS-KIND subset, joined the same way. Adding a phase and
+    # calling it a pass kind is a claim about the build method, and the row join above cannot see it:
+    # the rows were right and only the prose was wrong is exactly how the DoD count sentence went
+    # stale in both copies while its leg stayed green.
+    ppk=$(tr -d '\r' < "$proto" | awk '
+      /PASS kinds:$/ { f = 1; next }
+      f && /^$/      { if (seen) exit; next }
+      f              { seen = 1; print }' | grep -oE '`[A-Z][A-Z_]*`' | tr -d '`' | sort -u)
+    if [ -z "$ppk" ]; then
+      fail 16 "the protocol names no phase as a build-method pass kind, so the pass-kind join would compare the driver's subset against nothing and pass by finding nothing; the anchor is the line ending 'PASS kinds:'"
+    else
+      pkcore=$(printf '%s\n' $PHASES_PASSKIND | sort -u)
+      kd1=$(comm -23 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
+      kd2=$(comm -13 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
+      [ -z "$kd1" ] || fail 16 "the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names: $kd1"
+      [ -z "$kd2" ] || fail 16 "the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not: $kd2"
+    fi
   fi
   # Item NAMES only. The checker column is deliberately not joined: measured today three cells read
   # `machine, PRE-LANDING` or `agent-attested` against the constant's `machine`/`agent`, and those

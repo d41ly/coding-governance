@@ -176,11 +176,20 @@ the only exit: the spill exists so that never happens.
 
 Kit-owned core, in run order:
 
-`PREFLIGHT` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RUNNING` · `VERIFYING` ·
-`LANDING` · `LANDED` · `ABORTED`
+`PREFLIGHT` · `RESEARCHING` · `TESTING` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` ·
+`RUNNING` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
 
-The four middle members are named for the build method's PASS kinds, so a run's phase and the pass it
-is performing are one vocabulary rather than two. `RUNNING` survives with a stated meaning — a run
+Named for the build method's PASS kinds:
+
+`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`
+
+— so a run's phase and the pass it is performing are one vocabulary rather than two. The list is a
+DECLARATION in the driver and this paragraph is joined to it in both directions, because a phase
+added and casually called a pass kind is a claim no row join can see.
+
+**`RESEARCHING` and `TESTING` are POSITIONS, not pass kinds.** The build method closes its pass set
+and neither is a member, so a prompt-started run OCCUPIES them while performing the passes that set
+does name — the commit boundary and the regrounding points stay exactly where the method puts them. `RUNNING` survives with a stated meaning — a run
 between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
 `LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
