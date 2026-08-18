@@ -1393,9 +1393,14 @@ user_skills = "/tmp/gk-fake-skills"
             marks = measure_plan_marks(pl2.stdout)
             check("the default selection previews exactly 4 SIDE|rendered rows",
                   marks.get("SIDE|rendered") == 4, str(marks))
-            # `ORDER|project-owned` is 3, and the three are NAMED: memory-recall's
+            # `ORDER|project-owned` is 4, and the four are NAMED: memory-recall's
             # `recall-fixture.json`, `check-recall.py` and `test_recall_floor.py`, withheld from the
-            # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8).
+            # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8);
+            # and run-gates' `run-gates.gov.test.sh`, withheld by the same mechanism for the same
+            # stated reason — its arms are keyed on THIS repo's corpus, so in another tree they would
+            # red on absence rather than on behaviour. Four, not three, because the run-gates kit
+            # landed; the count is a MEASUREMENT of this tree and moves when the tree does, which is
+            # what the paragraph below already says about this half of the arm.
             # This half of the arm is a TREE-STATE snapshot; the SEMANTIC invariant it used to carry
             # -- an un-covered `project-owned` rule derives ORDER -- moved to the scratch descriptor
             # below precisely so an entry edit could not redefine it, and that arm is untouched.
@@ -1403,7 +1408,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
             # TOOL-aWalkedCorpus-6 rather than papered over here.
             check("...and the playbook pair previews as seed WRITES, not as orders",
-                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") == 3,
+                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") == 4,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
