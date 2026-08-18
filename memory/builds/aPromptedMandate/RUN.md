@@ -10,8 +10,8 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 mode: slug
-witness: da574464caf516a2bf16638ae91f080b8f3759d5
-phase: SPECCING
+witness: 721ed4191a7f730daaa78387672a2b69d56aaa0b
+phase: REVIEWING
 branch-sha: b9ebebaae6f776788046980199703c58575d8805
 branch-ref: refs/heads/branch/unattended-sessions-kit-extend-2e4038
 anchor-kind: run-branch

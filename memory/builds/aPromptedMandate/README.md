@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11
+ids: TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13
 ---
 
 # aPromptedMandate — an unattended run starts from the owner's prose, not from a landed slug
@@ -63,8 +63,8 @@ BASE. A run cannot have taken an answer later than a commit it is authorized by.
 | 4 | `TOOL-aPromptedMandate-4` | 2 | the two mode-scoped directives |
 | 5 | `TOOL-aPromptedMandate-5` | 2 | the Skill's prompt start path |
 | 6 | `TOOL-aPromptedMandate-6` | 1 | the driver-then-leg cross-component arm |
-| 7 | `TOOL-aPromptedMandate-7` | 2 | build-complete reads the units table, not the whole region |
-| 8 | `TOOL-aPromptedMandate-8` | 2 | the canary's timeout must not assert a cause it cannot see |
+| 7 | `TOOL-aPromptedMandate-12` | 2 | build-complete reads the units table, not the whole region |
+| 8 | `TOOL-aPromptedMandate-13` | 2 | the canary's timeout must not assert a cause it cannot see |
 
 Unit 6 closes `TOOL-aStandingWrit-8`, which is open on exactly the gap this build's own evidence
 had to fill by hand: the kit has driver arms, leg arms and Skill-parity arms, and zero arms that run
@@ -113,24 +113,25 @@ that may rewrite the rules it is authorized under has no rules.
 | 4 | `TOOL-aPromptedMandate-4` | 2 | the two mode-scoped directives |
 | 5 | `TOOL-aPromptedMandate-5` | 2 | the Skill's prompt start path |
 | 6 | `TOOL-aPromptedMandate-6` | 1 | the driver-then-leg cross-component arm |
-| 7 | `TOOL-aPromptedMandate-7` | 2 | build-complete reads the units table, not the whole region |
-| 8 | `TOOL-aPromptedMandate-8` | 2 | the canary's timeout must not assert a cause it cannot see |
+| 7 | `TOOL-aPromptedMandate-12` | 2 | build-complete reads the units table, not the whole region |
+| 8 | `TOOL-aPromptedMandate-13` | 2 | the canary's timeout must not assert a cause it cannot see |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
-ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11
+ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12
+ids TOOL-aPromptedMandate-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPromptedMandate-1 — the prompt-mode declaration, and where it is carried](spec/2026-08-18-spec-aPromptedMandate-1.md) | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-12.md) | SPECCED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-13 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-13.md) | SPECCED | rev-2 | 2026-08-18 |
 | [TOOL-aPromptedMandate-2 — the RESEARCHING and TESTING phases](spec/2026-08-18-spec-aPromptedMandate-2.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-3 — the build method's research→test→choose section](spec/2026-08-18-spec-aPromptedMandate-3.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-5 — the Skill's prompt start path](spec/2026-08-18-spec-aPromptedMandate-5.md) | CLOSED | rev-4 | 2026-08-18 |
 | [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aPromptedMandate-7 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-7.md) | SPECCED | rev-1 | 2026-08-18 |
-| [TOOL-aPromptedMandate-8 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-8.md) | SPECCED | rev-1 | 2026-08-18 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 
@@ -139,10 +140,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md) | research | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 |
 | [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
 | [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
-
-Ids no record names: TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8.
-
-Ids no `spec-audit` record has ever named: TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8.
+| [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -159,16 +157,17 @@ Ids no `spec-audit` record has ever named: TOOL-aPromptedMandate-7 TOOL-aPrompte
 
 - **`spec/`**
   - [2026-08-18-spec-aPromptedMandate-1.md](spec/2026-08-18-spec-aPromptedMandate-1.md)
+  - [2026-08-18-spec-aPromptedMandate-12.md](spec/2026-08-18-spec-aPromptedMandate-12.md)
+  - [2026-08-18-spec-aPromptedMandate-13.md](spec/2026-08-18-spec-aPromptedMandate-13.md)
   - [2026-08-18-spec-aPromptedMandate-2.md](spec/2026-08-18-spec-aPromptedMandate-2.md)
   - [2026-08-18-spec-aPromptedMandate-3.md](spec/2026-08-18-spec-aPromptedMandate-3.md)
   - [2026-08-18-spec-aPromptedMandate-4.md](spec/2026-08-18-spec-aPromptedMandate-4.md)
   - [2026-08-18-spec-aPromptedMandate-5.md](spec/2026-08-18-spec-aPromptedMandate-5.md)
   - [2026-08-18-spec-aPromptedMandate-6.md](spec/2026-08-18-spec-aPromptedMandate-6.md)
-  - [2026-08-18-spec-aPromptedMandate-7.md](spec/2026-08-18-spec-aPromptedMandate-7.md)
-  - [2026-08-18-spec-aPromptedMandate-8.md](spec/2026-08-18-spec-aPromptedMandate-8.md)
 - **`build/`**
   - [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md)
 - **`reviews/`**
   - [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md)
   - [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md)
+  - [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md)
 <!-- /gen:build-docs -->
