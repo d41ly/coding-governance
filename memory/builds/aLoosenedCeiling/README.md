@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4
+ids: TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4 TOOL-aLoosenedCeiling-5 TOOL-aLoosenedCeiling-6
 ---
 
 # aLoosenedCeiling — the read-path budget's last hardcoded numbers become adopter declarations
@@ -120,7 +120,7 @@ block was wrong in both halves. Both are corrected at the rev the audit produced
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-18 · streams tooling
-ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4
+ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4 TOOL-aLoosenedCeiling-5 TOOL-aLoosenedCeiling-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -134,6 +134,7 @@ Records live under `spec/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
 
 Ids no record names: TOOL-aLoosenedCeiling-4.
 

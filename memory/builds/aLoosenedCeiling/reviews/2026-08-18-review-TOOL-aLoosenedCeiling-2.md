@@ -4,7 +4,7 @@
 main (`06015fa` unit 2 built · `8a5fd19` unit 1 built · `446f7f5` the four-legs fix-up, plus the
 merge and reconcile commits `00fd177`/`9f919e2` already in the range's base).
 
-**Serves:** TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2
+**Serves:** diff-review TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3
 
 **Review shape:** raw 18 · confirmed 12 · refuted 6 · unverified 0 · precision **0.67**.
 
