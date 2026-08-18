@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-3 — the build method's research→test→choose section
 
-**Status:** SPECCED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -48,7 +48,10 @@ the thing M1 warns against.
 
 ### The budget
 
-M1 currently states **≤20 KB, ≤250 lines** and the file measures 245 lines / 17460 B. The line budget
+M1 currently states **≤20 KB, ≤250 lines** and the file measures 245 lines / 17460 B. **Re-measured
+at `098bebd9` during the M7 reground: unchanged.** Main's only edit to this file since BASE was the
+kit marker line, byte-for-byte; the budget figures, M1's stated constraint and M6's pass set are all
+identical, so nothing below rests on a stale reading. The line budget
 has five lines of headroom and M12 does not fit in five lines. M1 also states WHY the budget exists —
 M7 re-reads the file whole at every pass boundary — so the raise is priced against that, not waived:
 
@@ -101,9 +104,12 @@ agreement, and M2's ordering axis is why it is written here rather than assumed.
   render agree.
 - **AC3** — When `wc -l memory/guides/BUILD-METHOD.md` and `wc -c` on the same file are compared
   against the budget M1 states, the measurements match the stated figures and both are within them.
-- **AC4** — When `bash tools/check-kit-versions.sh` runs, it is clean, and
-  `KIT_MEMORY_TREE_VERSION` is UNCHANGED from its value at `base 6517579f` — S4 is struck, and the
-  criterion observes that the strike held rather than that a gate nobody moved stayed quiet.
+- **AC4** — When `bash tools/check-kit-versions.sh` runs, it is clean, and THIS BUILD's cumulative
+  diff does not modify the `KIT_MEMORY_TREE_VERSION` line — S4 is struck, and the criterion observes
+  that the strike held rather than that a gate nobody moved stayed quiet. **Keyed on the build's own
+  diff, not on a literal value**: main moved the constant 2.21 -> 2.22 independently at `098bebd9`,
+  so a criterion naming the value at `base 6517579f` would fail at landing for a reason that has
+  nothing to do with this build.
 - **AC5** — When `python tools/memory-tree/corpus_ids.py --report` runs, the read-path total is under
   `READ_PATH_CEILING`.
 - **AC6** — When `bash tools/memory-tree/check-method-carriers.sh` runs, it exits 0.
@@ -134,6 +140,10 @@ none — the forks below are RESOLVED.
   gate does not scan this unit's subject, so AC4 could not fail, and a bump at the stated two-carrier
   scope would have redded four other files (ids 10, 23). Added the M6 agreement sentence and AC7,
   which unit 2's S4 depends on.
+- rev-3 · 2026-08-18 · M7 reground against `098bebd9`, which main advanced to after this build's
+  BASE. AC4 was keyed to a literal `KIT_MEMORY_TREE_VERSION` value that main has since moved
+  (2.21 -> 2.22); re-keyed onto this build's own diff. Budget figures re-measured and unchanged —
+  main's only edit to the build method was the kit marker.
 
 ## 10. Reuse audit
 
