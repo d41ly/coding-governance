@@ -15,10 +15,11 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 
 - **`coding-governance-agents.template.md`** — the governance playbook template (the operating
   ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`, which also prices every growth
-  against a recorded high-water — prefer externalizing to spending the headroom). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
-  (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
-  holding the kickoff-manifest merge exception the byte-gated template externalized, plus the
-  kit-conditional unattended-run rules).
+  against a recorded high-water — prefer externalizing to spending the headroom). **ONE file as of
+  v3.0**: the activity-scoped checklists that used to sit in a prose companion converged into the
+  charter, and the deploy-time placeholder catalog became a program — `tools/playbook/`, whose
+  renderer fills every placeholder from the target's `deploy.toml` and drops the `kit:`/`when:`
+  conditional blocks that target has no kit for.
 - **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
   ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
 - **`tools/`** — `lib/resolve-python.sh` (the one python-launcher resolver: it RUNS the candidate,
@@ -42,7 +43,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 
 ## Layout
 
-- Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template + its two companions.
+- Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template (one file).
 - `tools/` — the deployable kits (copied into target repos).
 - `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
 - `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·

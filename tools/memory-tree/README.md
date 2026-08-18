@@ -169,8 +169,9 @@ method.
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
-- `coding-governance-agents.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
-  gate discipline, diff-scoping, the final-message format.
+- `coding-governance-agents.template.md` §1, §7, §8, §16 — DoR, DoD, landing,
+  gate discipline, diff-scoping, the final-message format. (ONE file since v3.0: the activity-scoped
+  companion sections converged into those §§.)
 - `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
 
 ### M2 and M3 — the judgment calls, and why they are not procedure

@@ -583,11 +583,6 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
-      "id": "derive_machine",
-      "kind": "function",
-      "file": "tools/playbook/render_playbook.py"
-    },
-    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

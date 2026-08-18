@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 78 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -23,6 +23,8 @@ Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 ·
 | `codebase-map coverage + freshness` | codebase-map |
 | `codebase-map kit selftest` | codebase-map |
 | `corpus-ids selftest` | baseline |
+| `dead-path carriers (deleted files still named)` | install-prefix |
+| `dead-path carriers self-test` | install-prefix |
 | `drift-audit records` | baseline |
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |

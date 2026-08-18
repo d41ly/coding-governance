@@ -16,6 +16,8 @@
       "codebase-map coverage + freshness",
       "codebase-map kit selftest",
       "corpus-ids selftest",
+      "dead-path carriers (deleted files still named)",
+      "dead-path carriers self-test",
       "drift-audit records",
       "drift-audit selftest",
       "drift-audit wiring",

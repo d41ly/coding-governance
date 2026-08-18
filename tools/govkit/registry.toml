@@ -180,8 +180,22 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/check-dead-paths.sh"
+why = """
+gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
+"""
+
+[[exempt]]
+path = "tools/check-dead-paths.test.sh"
+why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
+path = "tools/dead-path-waivers.txt"
+why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and gov line numbers; seeded from this repo's measured population, meaningless in any other tree."
+
+[[exempt]]
 path = "tools/check-playbook-parity.sh"
-why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and reads this repo's customize.md arithmetic. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
+why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and compares values against the sources in this repo that own them. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
 
 [[exempt]]
 path = "tools/check-playbook-parity.test.sh"
@@ -235,6 +249,18 @@ gov's own recall-quality floor. The question set it grades is keyed on gov recor
 name = "recall floor arms"
 why = """
 the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
+"""
+
+[[exempt_leg]]
+name = "dead-path carriers (deleted files still named)"
+why = """
+gov's own dead-path scan. Its needle set is derived from this repo's deletion history and it is anchored on a frozen sentinel basename only this repo ever had, so the script is a registry exemption rather than an entry file and there is no descriptor for the leg to be claimed by.
+"""
+
+[[exempt_leg]]
+name = "dead-path carriers self-test"
+why = """
+the arms for the leg above, gov-only for the same reason. Its fixtures construct real deletion histories containing gov's sentinel basename, which is a fact about this repo rather than about the predicate.
 """
 
 [[exempt_leg]]

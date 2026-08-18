@@ -601,6 +601,23 @@
     ]
   },
   {
+    "name": "dead-path carriers (deleted files still named)",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.sh"
+    ]
+  },
+  {
+    "name": "dead-path carriers self-test",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.test.sh"
+    ],
+    "guard": [
+      "tools/"
+    ]
+  },
+  {
     "name": "govkit selfcheck",
     "argv": [
       "python",

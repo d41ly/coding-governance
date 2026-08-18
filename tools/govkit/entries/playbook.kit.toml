@@ -6,12 +6,14 @@ kind = "flat"
 version_from = { file = "coding-governance-agents.template.md", pattern = "governance-template: v", kind = "marker" }
 requires = []
 
-# ONE file as of v3.0. The charter converged and the domain companion was deleted; the customize
-# companion was a deploy-time catalogue the runbook said to read and not ship, and it is now a
-# renderer. What ships is the charter template, and
-# the old note read:
-# TWO files, not three. The customize companion is a deploy-time catalog the runbook says to read and
-# not ship, and counting it is how the spec over-stated this entry for four revisions.
+# ONE file as of v3.0. The charter converged and the domain companion was deleted; the deploy-time
+# placeholder catalogue was never shipped either — it was prose the runbook said to read, and it is
+# now a program (`tools/playbook/`). What ships is the charter template and nothing else, which is
+# why `[[files]] include` names exactly one path.
+#
+# COUNTING THIS ENTRY has been wrong twice, in the same direction both times: a catalogue the runbook
+# told an operator to READ was counted as a file this entry SHIPS, and the spec over-stated the entry
+# for four revisions on the strength of it. The include list is the count; prose beside it is not.
 #
 # ROLE: `seed`, not `project-owned`. Gov SUPPLIES these bytes once and the target owns them
 # afterwards, which is what `seed` means. Tagged `project-owned` the entry landed zero bytes while
@@ -33,7 +35,7 @@ id = "playbook-placeholders"
 kind = "authoring"
 blocks_adopt = false
 blocks_gate = false
-why = "the placeholders span BOTH deployed files, and nothing in a target observes them — no leg reads the playbook. A probe naming only the main file was MEASURED going false-green while the companion sat unfilled, which is why both operands are named."
+why = "nothing in a target observes the placeholders — no leg reads the deployed charter. The probe names the ONE file this entry ships, at {playbook_path}. History, kept because it is the reason this hole is armed at all rather than a reason to widen it back: when the charter deployed as two files, a probe naming only the main one was MEASURED going false-green while the companion sat unfilled. The second file is gone as of v3.0; a probe that names it again would be checking a path no target has."
 discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
 
 [check]

@@ -36,7 +36,7 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
   - **Tier policy** — single-tier, or Tier-1/Tier-2 and what forces Tier-2 (new write path · migration ·
     auth/sanitization/egress surface · shared-contract change · cross-stream merge).
   - **memory-tree is REQUIRED** — not a question. Playbook v2.5 made it so
-    (`coding-governance-agents.template.md` §5, and `.customize.md` says it twice): §5's work-state
+    (`coding-governance-agents.template.md` §5): §5's work-state
     rules and §6's record protocol both assume the tree. There is no drop path and no
     `{{MEMORY_*}}`-deletion branch; §3 is mandatory.
   - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
@@ -604,8 +604,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 ```
 <project>/
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
-├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept)
-├── docs/parallel-coding-governance.domain-rules.md  # the §4/§9–§13 domain checklists (travels with the template)
+├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept) — ONE file; §2 ships no companion
 ├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.3: audit block + sealed §A region) — the engine reads this
 ├── tools/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
@@ -667,7 +666,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   **v2.6 (2026-08-10) moves a rule you may already hold:** §1's Landing bullet and §8's commit bullet
   now accept a committed standing mandate in place of the explicit ask, and the kickoff-manifest
   merge exception left §1 for the new companion §1. Re-pull §1, §8 and the companion in lockstep, and
-  read the customize companion's conditional-sections row first — the mandate clauses are keyed on
+  read §2's "The two blocks that are not about a kit" plus `drop_blocks` in the target's
+  `deploy.toml` first — that is where the conditional-sections row went — because the mandate clauses are keyed on
   adopting `unattended/`, and a repo that keeps them without that kit is carrying a rule nothing can
   make true. Snapshot of the prior release: `memory/archive/parallel-coding-governance.template-v-2-5.md`.
 - **`manifest-check.sh` is engine-identical** across repos — overwrite wholesale from `<gov>` (this also

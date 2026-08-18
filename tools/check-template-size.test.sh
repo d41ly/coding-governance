@@ -7,7 +7,7 @@
 #
 # WHY THIS EXISTS. Until this file landed, the gate had no test anywhere in the repo, no
 # `fail()` helper and therefore no entry in check-arms.py's population: its failing case had never
-# been observed by any committed harness. `parallel-coding-governance.domain-rules.md:44-45` — "a
+# been observed by any committed harness. `coding-governance-agents.template.md` §7 — "a
 # gate you have only ever seen pass is an assertion about nothing." The debt was paid at the moment
 # the gate's constant changed, because that is exactly when an unproven gate is most likely to be
 # silently wrong.

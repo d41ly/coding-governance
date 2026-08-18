@@ -270,5 +270,5 @@ does not push.
    don't bundle — the pre-commit `--staged` leg (stated plainly: it narrows the drift remedy to
    the bundle-into-this-commit form) and a CI leg with `fetch-depth: 0` on the checkout step.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
-   (`coding-governance-agents.template.md`, per its own "Customize before use" block) for
+   (`coding-governance-agents.template.md`, via `tools/playbook/adopt-playbook.sh --target <repo>`) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.

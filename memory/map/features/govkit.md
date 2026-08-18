@@ -43,7 +43,8 @@ side: README-gating "would have silently dropped three of ten".
 **No population count appears in the spec or the registry, on purpose.** The spec stated two counts
 across its life and both were true when measured and false when read — the `tools/` directory count
 moved when the unattended kit landed, and the playbook file count was always one high because the
-customize companion is explicitly not shipped. `selfcheck` derives every figure at the moment it
+deploy-time catalogue it counted was prose to READ, never a file the entry shipped — and v3.0 then
+deleted that catalogue outright. `selfcheck` derives every figure at the moment it
 checks. A number in that prose is now a defect in the document.
 
 **The DEFAULT selection is declared in the registry, not the engine.** It began as a constant in

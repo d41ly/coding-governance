@@ -7,11 +7,11 @@
 #
 # WHY EACH ARM IS A RED PROOF. The gate under test exists to catch coverage checks that pass by
 # checking nothing, so a harness that only ever watched it pass would be the very defect it gates.
-# `parallel-coding-governance.domain-rules.md`: "a new gate is not landed until its failing case has
+# `coding-governance-agents.template.md` §7: "a new gate is not landed until its failing case has
 # been observed."
 #
 # HOW THE ARMS WORK. Every arm builds a scratch WORKTREE-SHAPED fixture — a real git repo with its
-# own tools/ and playbook trio — and runs the gate inside it. Nothing here mutates the real tree,
+# own tools/, charter and runbook — and runs the gate inside it. Nothing here mutates the real tree,
 # which matters because the gate derives its kit set from `git ls-files` and would otherwise see
 # this repo's own population.
 set -u

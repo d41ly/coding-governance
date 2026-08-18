@@ -11,15 +11,19 @@
 #
 #   S1 kit coverage      — every tracked kit dir under tools/ is named in a playbook file or waived.
 #   S2 value parity      — a value the playbook STATES equals the source that OWNS it.
-#   S3 catalogue         — the placeholder counts customize.md states equal the measured sets.
+#
+# THERE IS NO S3. It asserted the placeholder arithmetic a deploy-time catalogue stated, and v3.0
+# deleted that catalogue along with the companion carrying it — the counts have no author left to
+# disagree with. Said here rather than left as a gap in the numbering, because a reader who trusts
+# a header enumerating a stage the script no longer runs believes the arithmetic is still checked.
 #
 # WHAT IT DOES NOT DO, said here rather than implied away: it holds STRUCTURAL claims only. A fluent
 # paraphrase that is subtly wrong still passes. Checking prose for accuracy in general is undecidable
 # and this gate does not pretend otherwise.
 #
-# ANTI-VACUITY IS THE LOAD-BEARING CONSTRAINT. `parallel-coding-governance.domain-rules.md` names the
-# failure this gate is most likely to have: "a coverage check that greps for a literal the real code
-# never spells … matches the empty set and passes checking nothing." Three arms guard it:
+# ANTI-VACUITY IS THE LOAD-BEARING CONSTRAINT. `memory/gotchas/vacuous-selector-empty-population.md`
+# owns the failure this gate is most likely to have: a selector that matches nothing prints nothing,
+# and nothing is exactly what a passing check prints. Three arms guard it:
 #   1. every S2 pair must extract a NON-EMPTY value on BOTH sides, or it reds as unresolvable;
 #   2. the S1 kit set must be non-empty AND contain the frozen sentinel `memory-tree`;
 #   3. the sibling self-test proves each arm reds, by feeding it a synthetic violation.

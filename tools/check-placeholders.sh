@@ -5,19 +5,23 @@
 #   bash tools/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
 #
 # SCOPE, and what deliberately is NOT here. This gate landed carrying a third assertion — that
-# `customize.md`'s placeholder catalogue agrees with the measured sets — and `tools/check-playbook-
+# a deploy-time placeholder CATALOGUE agreed with the measured sets — and `tools/check-playbook-
 # parity.sh` landed on the default branch first with exactly that predicate as its S3. Two gates
 # asserting one property over one file is the two-answers-to-one-question class at gate level, and
 # the two disagreed immediately: each expected its own prose format, so satisfying one red the other.
-# The arithmetic is parity's. What remains here is the half nothing else checks.
+# The arithmetic was ceded to parity, and v3.0 then deleted the catalogue itself — the placeholders
+# are filled by `tools/playbook/` now, so there is no prose to agree with. What remains here is the
+# half nothing else checks.
 #
 # THE SUBJECT SPLIT, which is why the survival predicate is a separate mode. In this repo the shipped
-# playbook files ARE the un-instantiated template sources and carry placeholders permanently and by
-# design. A leg asserting "no placeholder survives" over them would red on its own landing commit and
-# could never go green here. So that predicate takes an explicit target pair and is exercised only by
-# fixtures in the sibling test — never over the tracked sources. The RENDER-side owner of it already
+# playbook file IS the un-instantiated template source and carries placeholders permanently and by
+# design. A leg asserting "no placeholder survives" over it would red on its own landing commit and
+# could never go green here. So that predicate takes explicit targets and is exercised only by
+# fixtures in the sibling test — never over the tracked source. The RENDER-side owner of it already
 # exists and stays where it is: `tools/govkit/entries/playbook.kit.toml`'s `playbook-placeholders`
-# hole runs it over the DEPLOYED pair, which is the only place "survived" is a meaningful question.
+# hole runs it over the DEPLOYED charter at `{playbook_path}`, which is the only place "survived" is
+# a meaningful question. The mode still takes TWO operands: an adopter whose charter renders beside a
+# second filled file has two subjects, and one operand could not express that.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "check-placeholders: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2

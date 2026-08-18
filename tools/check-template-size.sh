@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-template-size.sh — size gate for the governance playbook template.
 # The template is the operational ruleset an agent reads every session; it must stay lean.
-# Prose that doesn't affect instruction clarity still belongs in a companion
-# (parallel-coding-governance.customize.md / .domain-rules.md) rather than the template. The ceiling
+# Prose that doesn't affect instruction clarity is what gets dropped first: since v3.0 the charter
+# is ONE file with no companion to externalize into, so the budget is spent or it is trimmed. The ceiling
 # moved 32 KiB -> 48 KiB on owner order (recorded in memory/DECISIONS.md); the PREFERENCE for externalizing
 # did not move with it, and the high-water ratchet below is what prices growth now that the ceiling
 # is no longer doing it.
@@ -105,8 +105,8 @@ if [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))
   FAIL_CODE=1
   fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
-  Trim non-instructional prose, or move an activity-scoped section to
-  parallel-coding-governance.domain-rules.md (leaving a §-stub pointer), per the v2.3 pattern.
+  Drop a conditional block, or trim non-instructional prose — the v3.0 charter is ONE file, so
+  there is no companion to move a section into.
   Raising the limit is an OWNER decision recorded in memory/DECISIONS.md, never a fix for
   the edit that hit it — and this message is shared with the kickoff engine at its own limit."
 fi
