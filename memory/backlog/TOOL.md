@@ -83,3 +83,4 @@
 - TOOL-aTetheredRecord-5 · INPROGRESS · the generated region renders each record under the ids it serves, plus the two coverage joins → `builds/aTetheredRecord/`
 - TOOL-aTetheredRecord-6 · INPROGRESS · the adopter path: their first run is RED, and the migration is ordered — mechanical, then measured → `builds/aTetheredRecord/`
 - TOOL-aTetheredRecord-7 · INPROGRESS · the rename: every record filename names a spec via a REDEFINED ordinal, with no grammar change → `builds/aTetheredRecord/`
+- TOOL-aWiredReckoning-1 · OPEN · govkit's 45 new defs skip the verb table; VERB_OFFENDER_PIN raised 417->463. Curate them, drop it

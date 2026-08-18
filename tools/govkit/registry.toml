@@ -150,7 +150,7 @@ why = "gov's own gate runner. A spec non-goal: govkit wires legs into the runner
 
 [[exempt]]
 path = "tools/gate-legs.json"
-why = "gov's own 49-leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
+why = "gov's own leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
 
 [[exempt]]
 path = "tools/run-gates.test.sh"
@@ -284,12 +284,6 @@ why = "the deployer itself, which never travels"
 name = "govkit acceptance matrix"
 why = """
 a gov-internal harness over gov's OWN deployer, which never travels into a target. It drives the deployer against four repo SHAPES; an adopter has one repo and receives no deployer, so there is nothing there for it to exercise.
-"""
-
-[[exempt_leg]]
-name = "template size <=48KiB"
-why = """
-gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
 """
 
 [[exempt_leg]]

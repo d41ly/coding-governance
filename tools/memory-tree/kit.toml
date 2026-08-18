@@ -117,6 +117,11 @@ argv = ["bash", "{kit}/check-method-carriers.test.sh"]
 guard = []
 
 [[gate_leg]]
+name = "build README slot contract"
+argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
+guard = []
+
+[[gate_leg]]
 name = "build-index selftest"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
