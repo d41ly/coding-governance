@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -67,9 +67,13 @@ template by name. `tools/drift-audit/drift_signals.py` names all three files in 
 `PLAY-aFusedCharter-1`, `-2` and `-3` all touch the document and none of them bumps it; a marker
 moved mid-build would describe a partial change.
 
-**S9 — Leave the frozen records alone, and say so in the commit.** 60 files under `memory/builds/`
-and `memory/archive/` name one of the three paths. Those are append-only decision records and
-version snapshots; rewriting them would falsify what a prior unit actually decided against. The
+**S9 — Leave the frozen records alone, and say so in the commit.** Many files under
+`memory/builds/` and `memory/archive/` name one of the three paths, and **no count is written here**
+— the figure moves as this very build adds records, and an earlier revision of this spec stated one
+that was already wrong by the time it was committed. Derive it when you need it:
+`git grep -lF 'parallel-coding-governance' -- memory/builds memory/archive | wc -l`. Those files are
+append-only decision records and version snapshots; rewriting them would falsify what a prior unit
+actually decided against. The
 `dead path cites` counter in `python tools/memory-tree/corpus_ids.py --report` reads `0` today and
 must still read `0` after the rename, so the exclusion has to be a rule the checker already holds
 rather than an assertion here. If it does not hold, that is a fork, not a licence to rewrite
@@ -92,8 +96,10 @@ unit moves paths and rewrites the strings that name them.
 
 ### Inventory
 
-Measured with `git grep -lF 'parallel-coding-governance'` at BASE: 31 live consumers plus 60 frozen
-records. Live consumers, grouped by what breaks if one is missed.
+Measured with `git grep -lF 'parallel-coding-governance'` at BASE `497d25d0`: 31 live consumers.
+That figure is a BASE-time snapshot of the set this unit must repoint, and AC1 re-derives it rather
+than trusting it. The frozen-record population is deliberately uncounted, per S9. Live consumers,
+grouped by what breaks if one is missed.
 
 | Group | Files | Failure mode if missed |
 |---|---|---|
@@ -190,6 +196,11 @@ none — the fork below is RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. The consumer inventory is measured, not recalled.
+- rev-2 · 2026-08-18 · S9 stated a frozen-record count that the tree moved underneath within the
+  same session, because this build's own spec files join that population. The count is deleted and
+  replaced with the derivation. Second instance of the class in one session, after
+  `DEPL-aFusedCharter-1` rev-2 — which is evidence for `PLAY-aFusedCharter-1` S10's rule that a
+  derived population's size is never written in prose.
 
 ## 10. Reuse audit
 
