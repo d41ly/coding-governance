@@ -56,3 +56,42 @@ The pattern was run against THIS corpus. An adopter's prose will phrase the same
 and the noun list is gov's vocabulary. The gate ships with the kit, so its first run in an adopter
 tree is the one that matters and nobody has made it. That is the same class as a pin copied from
 another corpus, and the honest mitigation is the one S1 already carries: measure, then set.
+
+## CORRECTION — this record did not contain the pattern it reported
+
+Round 2 of the spec audit found that no pattern stated here reproduces the headline figure, and
+re-running it confirms that. The correction is appended rather than folded into the text above,
+because the text above is what was reported to the owner and what the numbers were claimed from.
+
+**The noun list was load-bearing and is absent.** The section "What the two tightenings are" names
+two constraints — a bound word, and markdown only — and calls them the whole tightening. They are
+not. The run that produced 18 also required the match to be followed by a fan-out NOUN, from a list
+of nine (`agents`, `verifiers`, `lens`/`lenses`, `skeptics`, `concurrent`, `per verify stage`,
+`are verify-stage`, `ever run`, `batched`). Re-measured at the commit this correction lands on:
+
+| pattern | lines | files |
+|---|---|---|
+| bound word only, as this record states it | 54 | 23 |
+| bound word AND the noun list, as it was actually run | 19 | 11 |
+
+Neither is 18 across ten. The 18 was true of the tree at `5770f4a` under the unwritten pattern; the
+figure moved because this build has since added records that themselves state bounds, which is a
+property of the corpus rather than of the scanner.
+
+**Two arithmetic faults in the pass table.** Pass 2 reads `55 hits, 17 true positives, 30 false
+positives`, and 17 plus 30 is 47. The missing 8 are the two copies of `agent-cap.js`, which the
+prose classified as SOURCE and the table silently dropped. The stated rate "about 64%" is therefore
+30/47 and not 30/55. And pass 3 reports 18 true positives where pass 2 reports 17, while being a
+strict narrowing of pass 2 in both scope and pattern — a subset cannot contain more. The 17 was a
+hand count and it was wrong.
+
+**A consequence for the spec, not just for this record.** `skills/session-kickoff/SKILL.md:47` reads
+`report ≤5 lines` and MATCHES the bound-word-only pattern. Unit 5's AC2 names that exact line as the
+gate's green control. Against the pattern this record documents, that control fails; against the
+pattern actually run, it passes. An acceptance criterion cannot be graded on an undocumented
+predicate, which is why round 2 called this a blocker rather than a tidy-up.
+
+**What is not withdrawn.** The finding that the frozen-tree exclusion is load-bearing stands, and so
+does the direction of the tightening: requiring a bound word does separate an assertion from a
+measurement, and every false positive it removed was a measurement. What is withdrawn is the claim
+that this record contains enough to reproduce any of it.
