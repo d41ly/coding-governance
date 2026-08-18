@@ -76,7 +76,7 @@ the figure says in place that it is derived and has already moved.
 
 | id | unit | classification | audit |
 |---|---|---|---|
-| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | F1 blocker folded |
+| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | **BUILT** | F1 blocker folded |
 | TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY | — |
 | TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY | — |
 | TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY | — |
@@ -97,6 +97,31 @@ the design closed:
 | F5 | `-7` | a full green earned on a DIRTY tree reset the lag counter, making the replacement property false while the record made it look measured |
 | R1 | `-7` | the fix for F5 overshot. Predicate 0 joined the recorded digest against a fresh fingerprint of the PUSHED TIP, and `-5` defines that digest over the committed tree object, so it fired on every push whose tree had moved — exactly the population predicates 3 and 4 admit. Both arms were fixture-built, so nothing on the bar noticed |
 | T1 | `-5`, `-7` | the fix for R1 landed in the CONSUMER, not the owner. `-7` said predicate 0 computes at the recorded sha by CALLING `-5`'s helper, while `-5` declared one digest over the live working tree with no sha argument. R19 gave that helper a NAME and nobody gave it a SIGNATURE |
+
+## What the first unit changed for the six that follow
+
+`TOOL-aPacedTurnstile-1` is BUILT and landed, full bar green at 73/73. Four of its effects are
+inputs to units specced before it existed, so they are named here rather than left to be
+rediscovered:
+
+- **The canary SPLIT.** `run-gates.test.sh` ships and asserts only what is true in any tree;
+  `tools/run-gates/run-gates.gov.test.sh` holds the arms keyed on gov's corpus, is withheld from the
+  payload by a `project-owned` rule, and REFUSES with exit 2 rather than passing on a foreign
+  manifest. `-3` AC6, `-6` AC12 and `-7` AC9 now have a named home that did not exist when they were
+  written.
+- **The manifest is DERIVED, not spelled** — the kit dir's sibling, computed identically in the
+  runner and both harnesses, with the gov canary asserting that identity as SOURCE parity. `-3`'s
+  reorder must preserve it.
+- **The report tail is a two-space contract.** Every report verb `-2`, `-3` and `-6` add conforms:
+  two spaces before any parenthesised tail.
+- **The leg count moved 70 → 73**, which is the figure `-3`'s chunk arithmetic reads and which that
+  spec already records as DERIVED and already-moved-once.
+
+Three defects the unit's own arms caught while it was built, each a class this repo already names,
+each fixed rather than waived: a prefix strip comparing a git-spelled path against a pwd-spelled one
+(two spellings, one directory); a gate arm that RECOMPUTED the answer it was checking and disagreed
+with itself on first run; and a mutation arm whose mutation silently never happened, so it passed by
+finding the string it was meant to remove.
 
 ## Build order, and the dependency that forces each edge
 
@@ -181,7 +206,7 @@ ids TOOL-aPacedTurnstile-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | CLOSED | rev-6 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-4 | 2026-08-18 |

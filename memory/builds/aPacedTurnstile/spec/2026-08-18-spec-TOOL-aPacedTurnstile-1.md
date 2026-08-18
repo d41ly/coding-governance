@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -328,7 +328,7 @@ could not see any of the three reds its own single-commit rollout would produce.
 
 ## 8. Open questions
 
-none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+none — the forks below are RESOLVED, and one residual from the BUILD is recorded below them. Every pick is the M3 ratification of the fork's own
 recommendation; the reason each survived the veto order is recorded with it.
 
 - **Where the leg manifest lives.** Options: keep it at its current path with the runner deriving it
@@ -354,6 +354,14 @@ recommendation; the reason each survived the veto order is recorded with it.
   reason survives the promotion unchanged.
   RESOLVED (agent, 2026-08-18, delegated): no. Its stated reason survives the promotion
   unchanged, and section 3 already carries the same disposition as a non-goal.
+
+- **Recorded at build time, not a fork:** `adopt-run-gates.sh` ships with no WRITE path. S7 asked
+  for an adopter with `--check`; what the unit needed was the `--check` half, because S9 makes
+  `govkit intake` the writer of a target's `[gate_runner]` block — a declaration written at
+  configure time cannot reach the same run's leg-emission step. The adopt verb therefore reports
+  that it has nothing to write and points at the seed, rather than exiting 0 in silence. Stated here
+  because a reader comparing S7 to the shipped file would otherwise find a verb that does less than
+  its scope item promises.
 
 ## 9. Revision log
 
@@ -390,6 +398,19 @@ recommendation; the reason each survived the veto order is recorded with it.
   Files touched said the manifest gains TWO new legs where this unit now adds three. T1: the kit
   layout's gloss said the hook computes "the same one"; it computes the AT-A-REV form, and the two
   forms are named.
+- rev-6 · 2026-08-18 · BUILT and landed on the run's branch, full bar GREEN at 73/73. Three defects
+  the arms caught during the build, each a class this repo already names, and each fixed rather than
+  waived: the prefix strip compared a git-spelled path against a pwd-spelled one (two spellings, one
+  directory, mount points not symlinks) so the adopter now decides membership by GIT IDENTITY rather
+  than by comparing strings; the gov canary's derivation arm RECOMPUTED the derivation and compared
+  two answers, which is `second-implementation-is-not-a-second-opinion` inside the arm written to
+  prevent it, and it disagreed with itself on first run — it is source parity now; and the e2e's
+  mutation arm ran its edit through a nested python heredoc that dies silently on this host, so the
+  arm passed by finding the string it was meant to remove, and the mutation is asserted before the
+  adopter is asked anything. S10's MEASURED carrier list found 13 files where the authored list had
+  eight, two of which no review round had caught. One scope item is honestly weaker than specced and
+  is recorded in §8 rather than left implied: `adopt-run-gates.sh` has no WRITE path, because the
+  declaration is emitted by `govkit intake` from `[gate_runner_seed]`.
 
 ## 10. Reuse audit
 
