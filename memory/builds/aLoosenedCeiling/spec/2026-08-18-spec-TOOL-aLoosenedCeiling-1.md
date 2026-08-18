@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -230,6 +230,11 @@ recorded in section 4.
   in a sibling module of this kit, thirty lines below the seam this spec's own reuse audit cited,
   and three bare parses in this very file raise the traceback S3 forbids. Also: the conf line this
   spec and unit 3 both claimed is now unit 3's alone.
+- rev-4 · 2026-08-18 · folded the closing diff review. Two lows landed on this unit's code: the
+  integer guard gated on `str.isdigit()`, which is True for unicode digit forms `int()` then
+  rejects, so a conf value could still escape as a raw traceback past the module's own refusal
+  channel — now an ASCII-only match; and the conf comment still described the window in which
+  this unit had not landed. Status CLOSED.
 
 ## 10. Reuse audit
 

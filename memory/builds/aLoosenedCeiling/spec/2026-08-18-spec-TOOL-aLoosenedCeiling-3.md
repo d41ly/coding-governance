@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-1 · base 5498254b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-1 · base 5498254b · streams tooling
 
 ## 1. Goal
 
@@ -128,6 +128,7 @@ none.
   107418 while the build was in its review pass, so this unit is the SIXTH movement rather than the
   fifth, and its number is re-derived on the merged tree (87387 + 25600 = 112987) instead of being
   carried forward from a base that no longer exists. AC4 widened to both superseded figures.
+- rev-4 · 2026-08-18 · status CLOSED. No finding in the closing review landed on this unit.
 
 ## 10. Reuse audit
 

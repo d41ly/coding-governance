@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -161,6 +161,8 @@ from the measured growth rate, which section 4 records.
   arithmetic. S3 gained the second, ungated citation and AC4 its witness. AC3's flag was wrong and
   would have run a different mode silently. Files touched and S5 now name the absolute path, the
   two files and the branch.
+- rev-4 · 2026-08-18 · status CLOSED. No finding in the closing review landed on this unit; it
+  is the only one whose product is in another repository, and its gates were run there.
 
 ## 10. Reuse audit
 

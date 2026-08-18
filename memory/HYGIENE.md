@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.20 -->
+<!-- gov:kit memory-tree@2.21 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -127,7 +127,8 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
-6. **index size caps** — TWO classes, because prose and rows fail for different reasons. Row
+6. **index size caps** — THREE classes, because prose, rows and a generated surface fail for
+   different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
    `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent

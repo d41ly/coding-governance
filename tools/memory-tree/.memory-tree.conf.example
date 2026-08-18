@@ -61,6 +61,18 @@ READ_PATH_CEILING=""
 # largest class on a typical read path. Declare your own if your tree grows continuously rather
 # than in rare jumps: a headroom that cannot absorb one more binding document absorbs nothing.
 READ_PATH_HEADROOM=""
+# Check 6's per-class size caps. Declared here with the SHIPPED values rather than blank, because
+# blank is not 'use the default' for these: the gate SOURCES this file, so an empty assignment
+# overrides the built-in with an empty string and is refused at startup. Delete a line to take the
+# default; change a number to take your own. A LINE cap of 0 means no independent line cap for that
+# class, which is what the build-README tier ships with. A zero BYTE cap is refused: it would red
+# every file in its class, which reads as a misconfiguration rather than an intent.
+INDEX_CAP_BYTES="20480"         # a row document: an index a curation sweep prunes
+INDEX_CAP_LINES="250"
+GUIDE_CAP_BYTES="61440"         # a guide: prose the charter points a session at, read end to end
+GUIDE_CAP_LINES="750"
+BUILD_README_CAP_BYTES="25600"  # a build README: generated regions plus one bounded authored block
+BUILD_README_CAP_LINES="0"
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.

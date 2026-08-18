@@ -1097,7 +1097,10 @@ cnot 6 'memory/builds/tLong/README.md'
 # --- idiom discards stderr and the status, and the whole point is that a gate which cannot read its
 # --- thresholds must not report a clean tree. Asserted on stdout AND the status: either alone passes
 # --- under the wrong choice of channel.
-for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'GUIDE_CAP_LINES=-5'; do
+# '00' is here because the first cut of the guard matched the LITERAL 0 with a case pattern, so a
+# leading zero walked past it and awk's +0 belt then coerced it to zero — every file in the class
+# red, with no line pointing at the conf. The guard now compares ARITHMETICALLY; this arm is why.
+for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'INDEX_CAP_BYTES=00' 'GUIDE_CAP_LINES=-5'; do
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n%s\n' "$_bad" > "$C6/.memory-tree.conf"
   outc=$(cd "$C6" && bash "$SCRIPT" 2>/dev/null); rcc=$?
   n=$((n+1))
@@ -1111,6 +1114,17 @@ for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'GUIDE_
   n=$((n+1))
   printf '%s\n' "$outc" | grep -qF 'HYGIENE check' \
     && { echo "FAIL a malformed check-6 cap ($_bad) reported check findings instead of refusing to run"; st=1; }
+done
+
+# ---- the SHIPPED conf example declares every key this engine reads as an override. Nothing else
+# ---- observes that file: no gate parses it, its only consumer is the adopt script that copies it,
+# ---- and the rendered hygiene doc TELLS an adopter the keys are declared there. So a build can ship
+# ---- the engine, the docs and the tests green with the example half-done — which is exactly what
+# ---- happened here, and what the closing review caught.
+EX="$HERE/.memory-tree.conf.example"
+for _k in READ_PATH_HEADROOM INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES; do
+  n=$((n+1))
+  grep -qE "^$_k=" "$EX" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
 done
 
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
@@ -1137,7 +1151,7 @@ done
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
 n=$((n+1))
-FLOOR_ASSERTIONS=179
+FLOOR_ASSERTIONS=190
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

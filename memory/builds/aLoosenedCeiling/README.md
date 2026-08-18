@@ -119,15 +119,15 @@ decided the OPPOSITE of what it was quoted for, and unit 4's account of the adop
 block was wrong in both halves. Both are corrected at the rev the audit produced.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-18 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | CLOSED | rev-4 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | CLOSED | rev-4 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | CLOSED | rev-4 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | CLOSED | rev-4 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
@@ -159,4 +159,5 @@ Ids no `spec-audit` record has ever named: TOOL-aLoosenedCeiling-4.
   - [2026-08-18-spec-TOOL-aLoosenedCeiling-4.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md)
 - **`reviews/`**
   - [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md)
+  - [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md)
 <!-- /gen:build-docs -->

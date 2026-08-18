@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -237,6 +237,12 @@ none.
   reason for its placement, S6 the invocation count and S6b the default-tier arms the Inventory gap
   actually asks for. The awk failure modes in section 4 were stated backwards: the silent-green one
   is the non-numeric binding. Check 6 has two failure call sites, not one.
+- rev-4 · 2026-08-18 · folded the closing diff review. The zero-BYTE-cap guard matched the
+  LITERAL `0` through a case pattern, so `00` and `020` walked past it and awk's coercion turned
+  them into zero — every file in the class red, with nothing naming the conf. Now an arithmetic
+  comparison, with `00` as its own arm. S7's example-conf half had shipped UNDONE because no
+  acceptance criterion observed that file: the six keys are now declared there and seven arms
+  assert it. Rule 6's prose said TWO classes while enumerating three. Status CLOSED.
 
 ## 10. Reuse audit
 

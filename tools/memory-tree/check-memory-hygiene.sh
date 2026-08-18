@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.20   # gov:kit memory-tree@2.20 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.21   # gov:kit memory-tree@2.21 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -43,8 +43,12 @@ _capbad=""
 for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES; do
   eval "_v=\${$_k-}"
   case "$_v" in
-    *[!0-9]*|"") _capbad="$_capbad $_k='$_v' (not a whole number)" ;;
-    0) case "$_k" in *_BYTES) _capbad="$_capbad $_k=0 (a zero byte cap reds every file in its class)" ;; esac ;;
+    *[!0-9]*|"") _capbad="$_capbad $_k='$_v' (not a whole number)"; continue ;;
+  esac
+  # ARITHMETIC, not a literal match. `case ... in 0)` accepted "00" and "020", which awk's `+0` belt
+  # then coerced to zero — the exact silent-green this guard exists to stop, one leading zero away.
+  case "$_k" in
+    *_BYTES) [ "$_v" -eq 0 ] && _capbad="$_capbad $_k='$_v' (a zero byte cap reds every file in its class)" ;;
   esac
 done
 [ -n "$_capbad" ] && { echo "HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }

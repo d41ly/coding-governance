@@ -58,6 +58,7 @@ WAIVER = "project/id-orphan-waiver.txt"
 # What counts as a repo PATH: rooted at a real top-level directory. That is the only class where
 # "does it exist" is a well-posed question. A loose "backticked token with a slash" measures package
 # specifiers, git refs and bare fragments as dead citations — upstream counted 13 085 of them.
+_ASCII_INT = re.compile(r"\A[0-9]+\Z")
 BACKTICKED = re.compile(r"`([^`\s]+)`")
 MD_LINK_TARGET = re.compile(r"\]\(([^)\s]+)\)")
 ELISION = ("...", "…", "<", ">", "*", "{{")
@@ -112,7 +113,10 @@ def _parse_conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> 
         if default is None:
             raise Problem(f"corpus_ids: {key} is not declared in .memory-tree.conf")
         return default
-    if not raw.isdigit() or int(raw) < minimum:
+    # ASCII-only ON PURPOSE: str.isdigit() is True for "\u00b2" and other unicode digit forms that
+    # int() then REJECTS, so gating on it and calling int() on what it admitted escapes as a raw
+    # ValueError past main()'s `except Problem` — the one outcome this module's docstring forbids.
+    if not _ASCII_INT.match(raw) or int(raw) < minimum:
         raise Problem(f"corpus_ids: {key} must be a whole number of at least {minimum}, "
                       f"got {raw!r}")
     return int(raw)
