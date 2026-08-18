@@ -67,3 +67,5 @@
 ## DEPL — deployer
 
 *(none yet)*
+- TOOL-aWalkedCorpus-8 · `requires` ORDERS the install. Declared by memory-recall and read by nothing: every resolve_selection mode returned sorted(...), so CONFIGURE ran adopters alphabetically and memory-recall ran before memory-tree seeded the conf it reads
+- TOOL-aWalkedCorpus-9 · a DECLARED outcome may be an ACCEPTED stop. memory-tree seeds and stops by design, so every correct first install exited 1 and a default-selection apply could never return 0. Per-OUTCOME: refused-foreign-tree shares the code and stays a failure

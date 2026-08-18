@@ -1,8 +1,12 @@
 # tooling backlog — rotated 2026-08-17
 
-> 34 terminal rows moved byte-identical out of `../backlog/TOOL.md` when the live index
-> crossed its 20 KiB cap. More than one node rotated on this date; this file is the union, and every
-> id appears in exactly one of the two files. Nothing deleted.
+> Terminal rows (CLOSED, WONTDO) moved byte-identical out of `../backlog/TOOL.md` when it
+> reached the index size cap. Nothing was edited and nothing was deleted; the all-time
+> id-collision grep still reaches every row here.
+>
+> **Two rotations, one file.** origin/main and the aWalkedCorpus run each hit the cap on the
+> same day and rotated to this name independently. The merge UNIONS both row sets by id —
+> nothing was dropped and no id appears twice.
 
 - TOOL-aMouldedFolio-3 · CLOSED · the folder claim is DERIVED: 21 disagreements across 15 READMEs went to 0, and the removal is sentence-scoped because in 17 of 17 the sentence shares its line with the next one — closed by TOOL-aMouldedFolio-3
 - TOOL-aMouldedFolio-4 · CLOSED · one marker contract, proven across FOUR readers (the fourth writes); the Python side stopped accepting-and-rewriting an indented or trailing-whitespace marker — closed by TOOL-aMouldedFolio-4
@@ -38,3 +42,4 @@
 - TOOL-dClosedLexicon-12 · CLOSED · REFUSED on measurement: of 219 lexicon-only definitions, 166 are deliberate map exclusions and 53 are JS. The coupling buys noise; the JS hole is closed inside the map, 3 rows to 33 — closed by TOOL-dClosedLexicon-12
 - TOOL-dClosedLexicon-13 · CLOSED · ROLE_KINDS is the one table and LANDABLE_ROLES derives from it; plan keys on the producer and the destination too, apply names every skip, and the parity arm drops its role filter — closed by TOOL-dClosedLexicon-13
 - TOOL-aNumeralWarden-4 · CLOSED · `map_lib.scan_js_definitions` joins the export scan in the `kit-js` layer, so the 30 definitions under `tools/` are indexed alongside the 3 `meta` exports and `boundedK` is findable — closed by TOOL-dClosedLexicon-12
+- TOOL-aWalkedCorpus-3 · CLOSED · the recall floor: check-recall.py is the exit code bench.py cannot have, RECALL_FLOOR names a CELL (records:fts5:r@5) and is DERIVED as the one-retirement worst case, and the floor and the per-id assertion each red ALONE. 20 arms, gov-only

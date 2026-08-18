@@ -84,3 +84,8 @@
 - TOOL-aTetheredRecord-6 · INPROGRESS · the adopter path: their first run is RED, and the migration is ordered — mechanical, then measured → `builds/aTetheredRecord/`
 - TOOL-aTetheredRecord-7 · INPROGRESS · the rename: every record filename names a spec via a REDEFINED ordinal, with no grammar change → `builds/aTetheredRecord/`
 - TOOL-aWiredReckoning-1 · OPEN · govkit's 45 new defs skip the verb table; VERB_OFFENDER_PIN raised 417->463. Curate them, drop it
+- TOOL-aWalkedCorpus-6 · OPEN · govkit has no rule kind meaning 'in the kit dir, deliberately NOT in the payload'. project-owned drops it from the ** pool but derives an ORDER telling the adopter to supply a file gov withholds
+- TOOL-aWalkedCorpus-10 · OPEN · codebase-map's `seeded-extractors-or-crashed` outcome stays unmarked because its NAME admits it cannot tell a seed from a crash. Split it in two so the seeding half can be an accepted stop, or rename it to what it detects
+- TOOL-aWalkedCorpus-7 · CLOSED · origin/main was RED on its own bar at 43eb6b1: lexicon 450 over pin 417, and govkit's DEFAULT-selection apply arm. Both fixed here — TOOL-aWalkedCorpus-8 and -9 — and the pin raised with the 33 arrivals attributed
+- TOOL-aWalkedCorpus-5 · OPEN · govkit selfcheck partitions gate-leg guard pathspecs into four PREFIX classes and a repo-root file (.memory-tree.conf) lands in none, so a leg cannot guard on a root conf. Hit wiring the recall floor; the guard was narrowed instead
+- TOOL-aWalkedCorpus-4 · OPEN · memory-recall selftest.py mints its two synthetic corpus ids in a LIVE family, so any record quoting them trips hygiene check 14 as orphans. Sibling fixtures use a dead family. Hit twice in one hour: a review record, then the row recording it

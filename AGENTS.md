@@ -135,6 +135,18 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap, the three-state `recall-opened` opt-in, and CRLF on the `eol=lf`-pinned `.claude/` renders — reported in `--check`, byte-rewritten in `--fix`)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
 - memory-recall skill wiring — `tools/memory-recall/adopt-memory-recall.sh --check` (the rendered `.claude/skills/memory-recall/SKILL.md` still matches `.memory-tree.conf`)
+- recall floor — `python tools/memory-recall/check-recall.py`: grades the committed question set
+  `tools/memory-recall/recall-fixture.json` at the CELL `.memory-tree.conf`'s `RECALL_FLOOR` names,
+  and the value is DERIVED (the one-retirement worst case `(h-1)/(R-1)`) rather than read off the
+  day's score. Two predicates that must be able to red SEPARATELY: a per-id resolution assertion that
+  names an id the corpus no longer carries, and the ceiling-normalised floor itself. `bench.py`
+  always returns 0 and is byte-pinned, so this program is the exit code it cannot have — it imports
+  the scoring functions and edits nothing
+- recall floor arms — `python tools/memory-recall/test_recall_floor.py`: one arm per degradation,
+  including the two SINGLE-direction ones that are the whole claim (drop one home of a multi-homed
+  hitting target and only the floor reds; retire a non-hitting target and only the per-id assertion
+  does). GOV-ONLY and withheld from the kit payload with `check-recall.py` and the fixture, because
+  arms keyed on this repo's record ids are meaningless in an adopter's tree
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`). Two of them name an OPTIONAL kit — `lexicon_verbs_declared_but_unused` and `lexicon_ratified_older_than_language_surface` — and with no `.lexicon.conf` both report NOT ASKED rather than a clean zero, so an adopter without the lexicon inherits nothing live. The unused-verb pin is honestly non-zero: curation adds aspirational verbs, and it is the DELETION direction (a verb outliving the code that justified it) the signal exists for

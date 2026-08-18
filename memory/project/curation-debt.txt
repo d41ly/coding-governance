@@ -12,3 +12,12 @@ memory/builds/aDrainedSluice/README.md
 # (the row carries the full title AND the path), not curation ones, and reshaping the renderer
 # during a merge is the wrong moment. Drains when the row shape is revisited.
 memory/builds/aRuledFrontispiece/README.md
+# memory/backlog/TOOL.md — a MERGE-INDUCED overflow, not a curation lapse. Both parents were legal
+# and within a hair of the cap (theirs 20435 B, ours 20479 B, cap 20480); the row driver unioned
+# them correctly to 86 rows / 21762 B. Rotation cannot fix it: TERMINAL is ("CLOSED","WONTDO") and
+# exactly ONE row qualifies, so rotating sheds less than the rotation note it must add. This is
+# TOOL-cSettledDocket-16 arriving — "new rows are now paid for by shortening old ones" — and paying
+# that fee by trimming 1 KB of other builds' prose mid-merge is the wrong moment, on the same
+# reasoning the aRuledFrontispiece row above already carries. Drains when the TOOL index is curated
+# or the shard is split.
+memory/backlog/TOOL.md

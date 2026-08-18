@@ -217,6 +217,18 @@ gov's own red/green proof of the reference branch-guard block. The runbook presc
 """
 
 [[exempt_leg]]
+name = "recall floor"
+why = """
+gov's own recall-quality floor. The question set it grades is keyed on gov record ids and the value it compares against was MEASURED on this corpus, so both are meaningless in an adopter's tree — a pin copied from another corpus is the class `memory/gotchas/pin-copied-from-another-corpus.md` names. `tools/memory-recall/kit.toml` withholds `check-recall.py` and `recall-fixture.json` from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs. An adopter who wants a floor authors their own fixture and measures their own value; that adoption path is the parked half of `TOOL-aWalkedCorpus-3` section 8.
+"""
+
+[[exempt_leg]]
+name = "recall floor arms"
+why = """
+the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
+"""
+
+[[exempt_leg]]
 name = "govkit selfcheck"
 why = """
 the deployer grading its own declarations. It runs on the deployer machine and is never installed into a target, so there is nothing in an adopter for it to check.
