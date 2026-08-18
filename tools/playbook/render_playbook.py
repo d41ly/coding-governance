@@ -192,7 +192,7 @@ def check_fences(text: str, entries: set[str], blocks: set[str]) -> list[tuple[s
     return seen
 
 
-def drop_fenced(text: str, drop: set[tuple[str, str]]) -> str:
+def remove_fenced(text: str, drop: set[tuple[str, str]]) -> str:
     """Remove every fenced block whose (namespace, name) is in `drop`, fences included."""
     out, skip_depth, keep_fences = [], 0, True
     for line in text.splitlines(keepends=True):
@@ -217,7 +217,7 @@ def drop_fenced(text: str, drop: set[tuple[str, str]]) -> str:
 
 
 # --------------------------------------------------------------------------- the region reader
-def apply_region(charter: str | None, body: str) -> str:
+def build_region(charter: str | None, body: str) -> str:
     """Write `body` between the region markers. THREE states, and this reader serves all of them.
 
     absent charter          -> a file holding only the region
@@ -272,7 +272,7 @@ def render(gov_root: Path, target: Path, template: Path) -> tuple[str, list[str]
 
     drop = {('kit', name) for ns, name in present if ns == 'kit' and name not in kits}
     drop |= {('when', d) for d in drop_names}
-    text = drop_fenced(text, drop)
+    text = remove_fenced(text, drop)
 
     notes = []
     rows = desc.get('placeholder', [])
@@ -329,6 +329,16 @@ def main(argv: list[str]) -> int:
     template = gov_root / 'coding-governance-agents.template.md'
     charter_path = target / a.charter
 
+    # NOT ADOPTED is exit 0, and only in --check. A wiring leg runs unguarded against a tree that
+    # has not run intake yet — gov's own, until its charter is rendered — and a leg that refuses
+    # there is red for a reason that is not drift. It says so explicitly rather than passing
+    # silently, because a leg green for "nothing was measured" is the shape this repo refuses.
+    # Writing without a descriptor still REFUSES: that is an operator asking for a render.
+    if a.check and not (target / '.governance' / 'deploy.toml').is_file():
+        print(f'render-playbook: NOT ADOPTED — {target.as_posix()} has no .governance/deploy.toml, '
+              f'so no region was rendered here and there is nothing to compare')
+        return 0
+
     try:
         body, notes = render(gov_root, target, template)
     except Refusal as e:
@@ -347,7 +357,7 @@ def main(argv: list[str]) -> int:
                   f'to compare', file=sys.stderr)
             return 1
         cur = charter_path.read_text(encoding='utf-8')
-        want = apply_region(cur, body)
+        want = build_region(cur, body)
         # NORMALISE line endings before comparing. This fleet runs core.autocrlf=true and a charter
         # with no eol attribute holds CRLF in the worktree against an LF blob, so a raw compare
         # mismatches on every line for a reason that has nothing to do with drift.
@@ -369,7 +379,7 @@ def main(argv: list[str]) -> int:
         return 1
     cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
     charter_path.parent.mkdir(parents=True, exist_ok=True)
-    charter_path.write_text(apply_region(cur, body), encoding='utf-8', newline='\n')
+    charter_path.write_text(build_region(cur, body), encoding='utf-8', newline='\n')
     for n in notes:
         print(f'  {n}')
     print(f'render-playbook — wrote the gov:playbook region into {charter_path.as_posix()}')

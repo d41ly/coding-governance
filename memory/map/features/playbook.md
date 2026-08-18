@@ -8,8 +8,8 @@ streams = ["playbook", "tooling"]
 decisions = ["TOOL-aSiftedPlaybook-1"]
 
 [claims]
-gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest"]
-kits = []
+gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring"]
+kits = ["playbook"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
@@ -27,13 +27,20 @@ globs = [
   "tools/check-playbook-parity.test.sh",
   "tools/playbook-kit-waivers.txt",
   "tools/template-size-limits.txt",
+  "tools/playbook/*",
 ]
 ```
 
-The product this repo ships is three files at the root — `coding-governance-agents.template.md`
-(the operating ruleset), `.customize.md` (the deploy-time placeholder catalog) and `.domain-rules.md`
-(the activity-scoped checklists the template references by §-stub). This dossier covers the
-machinery that holds their claims true, not the documents' contents.
+The product this repo ships is ONE file at the root — `coding-governance-agents.template.md`, the
+charter template a target renders into its own `AGENTS.md`. It was three files until v3.0: a
+ruleset, a deploy-time placeholder catalogue, and a companion of activity-scoped checklists the
+ruleset reached by §-stub. The companion kept falling out of the deploy path and the catalogue was a
+second answer to the question the renderer now answers, so both were retired.
+
+`tools/playbook/` is that renderer. It fills every placeholder from a target's `deploy.toml`, drops
+the conditional blocks a target has no kit for, and writes the result into a `gov:playbook` marker
+region; its `--check` is the standing observation that the region still matches its source. This
+dossier covers the machinery that holds the charter's claims true, not the document's contents.
 
 Minted by `TOOL-aSiftedPlaybook-2` because that unit adds the first genuinely NEW leg key in this
 area. `TOOL-aSiftedPlaybook-1` renamed an existing key in place and minted nothing, which is why the

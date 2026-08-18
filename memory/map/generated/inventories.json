@@ -45,6 +45,7 @@
       "playbook parity",
       "playbook parity selftest",
       "playbook placeholder catalogue",
+      "playbook render wiring",
       "pre-push self-test",
       "push-main self-test",
       "pytest-guardrails self-test",
@@ -85,6 +86,7 @@
       "lib",
       "memory-recall",
       "memory-tree",
+      "playbook",
       "pytest-parallel-guardrails",
       "unattended",
       "workflows"

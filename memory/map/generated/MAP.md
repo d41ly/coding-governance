@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 71 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -52,6 +52,7 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `playbook parity` | playbook |
 | `playbook parity selftest` | playbook |
 | `playbook placeholder catalogue` | lexicon |
+| `playbook render wiring` | playbook |
 | `pre-push self-test` | baseline |
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
@@ -95,6 +96,7 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lib` | baseline |
 | `memory-recall` | memory-recall |
 | `memory-tree` | memory-tree-hygiene |
+| `playbook` | playbook |
 | `pytest-parallel-guardrails` | baseline |
 | `unattended` | unattended |
 | `workflows` | baseline |

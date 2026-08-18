@@ -92,23 +92,24 @@ fi
 # Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
 # its legs concurrently, so an arm that mutates a tracked file races every other leg.
 LIM="$TMP/limits"
-printf '%s	%d
-' "coding-governance-agents.template.md" 47000 > "$LIM"
-# 47000 is deliberately NOT the hard default, and it is deliberately ABOVE the subject's real size.
-# It read 40000 until the charter converged at v3.0 and the file grew past it — at which point both
-# arms red on the OVER-BUDGET branch instead of printing the resolved limit, and neither was
-# measuring precedence any more. A fixture limit for a precedence arm has two constraints, not one:
-# different from the default, and above the file. The declared value and the default are both 49152 in
-# the shipped tree, so an arm using 49152 would pass whether or not the declaration is read at all —
-# 49152 -> 49152 proves nothing. That is the assertion-between-two-derived-values class one step
-# removed, and it is what the first draft of this arm did.
-expect_out "A14 the DECLARED row supplies the limit"   "/ 47000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
-expect_out "A15 a positional beats the declaration"   "/ 45000 bytes" 0 bash "$GATE" "$TEMPLATE" 45000 "" "$LIM"
+# The fixture limit is DERIVED from the subject's real size, never typed. It has rotted TWICE: it
+# read 40000, then 47000, and each time the charter grew past it the two precedence arms red on the
+# OVER-BUDGET branch instead of printing the resolved limit — so they stopped measuring precedence
+# and started measuring a stale constant, silently. A precedence fixture has two constraints, not
+# one: it must differ from the gate's hard default AND sit above the file. Both are now properties
+# of the derivation rather than of somebody's memory.
+_subj_bytes=$(tr -d '\r' < "$TEMPLATE" | wc -c | tr -d '[:space:]')
+LIM_VALUE=$((_subj_bytes + 1000))
+if [ "$LIM_VALUE" -eq 49152 ]; then LIM_VALUE=$((LIM_VALUE + 1)); fi   # never collide with the default
+printf '%s	%d\n' "coding-governance-agents.template.md" "$LIM_VALUE" > "$LIM"
+expect_out "A14 the DECLARED row supplies the limit"   "/ $LIM_VALUE bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
+A15_POS=$((_subj_bytes + 2000))
+expect_out "A15 a positional beats the declaration"   "/ $A15_POS bytes" 0 bash "$GATE" "$TEMPLATE" "$A15_POS" "" "$LIM"
 # The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
 out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
 case "$out" in
-  */\ 47000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
-  *) say_fail "A16 the declaration beats the environment" "expected 47000; got: $out" ;;
+  *"/ $LIM_VALUE bytes"*) say_ok "A16 the declaration beats the environment" ;;
+  *) say_fail "A16 the declaration beats the environment" "expected $LIM_VALUE; got: $out" ;;
 esac
 # A subject with NO row falls through to the environment, then to the default.
 mkfile 100 "$TMP/undeclared"
