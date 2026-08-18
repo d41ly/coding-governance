@@ -85,11 +85,11 @@ that two of the three arms rev-5 added to prevent a vacuous fixture were themsel
 
 ### What unit 2 found, and why it is not what it was sequenced to be
 
-Unit 1 bought about 24 days. Unit 2 was meant to shard the backlog below `FAMILY` or give it a spill tier.
+Unit 1 bought about 18 days at the census rate. Unit 2 was meant to shard the backlog below `FAMILY` or give it a spill tier.
 Measured first, both are the wrong shape:
 
-- **Minting runs 17.3 ids/day against closure at 10.6**, so the live set grows +6.7 rows/day, about
-  1,700 B/day, monotonically. A shard relocates that, a spill hides it, a bigger cap postpones it. Only
+- **Minting runs 18.9 ids/day against closure at 10.1**, so the live set grows +8.8 rows/day, about
+  2,233 B/day, monotonically. A shard relocates that, a spill hides it, a bigger cap postpones it. Only
   minting less or closing more changes the slope, and neither is a file layout.
 - **53 of the 82 rows name no kit at all.** Sharding by kit would put 65% in a catch-all and the largest
   real cluster is 11% — one file with the same problem plus nine small ones.
@@ -153,7 +153,7 @@ ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | INPROGRESS | rev-7 | 2026-08-17 |
-| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-2 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 

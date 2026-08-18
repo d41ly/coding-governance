@@ -1,10 +1,10 @@
 # TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 86eefd8f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 86eefd8f · streams tooling
 
 ## 1. Goal
 
-`TOOL-aRelaxedShard-1` raised the row byte cap and bought about 24 days. This unit is the one the owner
+`TOOL-aRelaxedShard-1` raised the row byte cap and bought about 18 days. This unit is the one the owner
 sequenced after it: change the rate at which the tooling backlog grows, rather than the bound it grows
 into. The measurement below says both mechanisms that unit named are the wrong shape, so this unit's
 first job is to establish what the lever actually is.
@@ -45,18 +45,29 @@ first job is to establish what the lever actually is.
 
 ### The measurement that decides this unit
 
-Derived over the tooling shard and its three archives, across the nine active days the corpus covers:
+Derived over the tooling shard and its three archives, across the nine active days the corpus covers.
+**Two methods were run and they disagree, so the weaker one is named rather than dropped.** A CENSUS of
+distinct ids is the figure of record. A per-commit diff scan gave 17.3 and 10.6 for a net of +6.7, and it
+is the one to distrust: it double-counts rows a merge re-adds and misses rows closed by an in-place edit,
+which is most of them.
 
-| quantity | measured |
+| quantity | measured (census) |
 |---|---|
-| ids minted | 17.3 / day |
-| rows reaching a terminal status | 10.6 / day |
-| **net live growth** | **+6.7 rows / day, about 1,700 B / day** |
+| distinct ids ever minted | 170 |
+| now terminal | 91 |
+| still live | 79 |
+| ids minted | 18.9 / day |
+| rows reaching a terminal status | 10.1 / day |
+| **net live growth** | **+8.8 rows / day, about 2,233 B / day** |
 | mean row length | 253.7 B by `wc -c` |
 | shard today | 20,940 B · 82 rows · 34.1% of 61,440 |
-| runway to the declared cap | about 24 days |
+| runway to the declared cap | about 18 days |
 
-**Closure trails minting by roughly 40%, so the live set grows monotonically.** That one fact is what
+Three of the 170 are this build's own rows and the window is approximate at its edges; neither moves the
+conclusion, because what matters is the GAP between the two rates and both methods agree on its sign and
+rough size.
+
+**Closure trails minting by nearly half, so the live set grows monotonically.** That one fact is what
 makes both candidate mechanisms the wrong shape: a shard relocates the growth, a spill hides it, and a
 larger cap postpones it. Only minting less or closing more changes the slope, and neither of those is a
 file layout.
@@ -116,7 +127,7 @@ byte cap in `TOOL-aRelaxedShard-1` and what should have happened.
   scannable, which is the constraint `TOOL-aWidenedGuide-1` protected and `-1` already spent once.
 - **A hard cap on live rows that REFUSES a new row.** It would block filing work in order to keep a
   record tidy, which is the failure this build hit twice from the other direction.
-- **Doing nothing.** Defensible on 24 days of runway, and it is F1 below. The cost is that the next
+- **Doing nothing.** Defensible on 18 days of runway, and it is F1 below. The cost is that the next
   session rediscovers the slope by hitting it, exactly as this one did.
 
 ## 5. Production-readiness checklist
@@ -172,8 +183,9 @@ Bug classes for these paths: `fixture-passes-by-finding-nothing` (S4 and AC3 exi
 ### F1 — build this at all, on 24 days of runway?
 
 The case FOR building now is that the slope is the actual defect, and it took a two-round audit and a
-blocked landing to see it. The case for waiting is that 24 days is real and the backlog may drain on its
-own as open units close.
+blocked landing to see it. The case for waiting is that 18 days is still real and the backlog may drain on
+its own as open units close. Note that re-deriving the rate moved it from 24 days to 18 INSIDE this
+unit's own authoring pass, which is itself an argument for a signal that tracks it.
 
 **Recommendation: build S2 and S3 only.** S2 is owed regardless — it settles a claim two units now
 depend on, and it is two arms. S3 is small and makes the slope visible. Defer any layout change until
@@ -186,7 +198,7 @@ make it an adopter-facing declaration like the two caps `-1` added.
 
 **Recommendation: a `drift_signals.py` constant.** Those two caps are adopter-facing because they gate a
 merge; this is a drift REPORT about gov's own records, and drift-audit's pins already live there. Set it
-at today's count plus about one week of measured growth — roughly 129 rows — so it fires on a trend
+at today's count plus about one week of measured growth — roughly 141 rows — so it fires on a trend
 rather than on the next row filed.
 
 ### F3 — one pin for all families, or one per shard?
@@ -205,6 +217,13 @@ inside a total, which is the aggregation mistake this repo has already fixed onc
   sequenced for into §3 non-goals. `base` is this branch's tip rather than a default-branch sha, because
   unit 1 is built and NOT landed (the primary tree is mid-merge with unresolved conflicts) and this
   unit's design assumes unit 1's mechanism is in place.
+
+- rev-2 · 2026-08-18 · re-derived the load-bearing rate by a SECOND method before handing the spec back,
+  and the two disagreed. A census of distinct ids (170 ever, 91 terminal, 79 live) gives net +8.8 live
+  rows/day against the diff scan's +6.7, so the runway is about 18 days rather than 24 and F2's suggested
+  pin moves from 129 to 141. The diff scan is NAMED in §4 as the method to distrust rather than deleted,
+  because it is the one a later session reaches for first. Nothing else moved: both §3 rejections rest on
+  the GAP between the rates, which both methods agree on.
 
 ## 10. Reuse audit
 
