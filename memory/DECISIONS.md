@@ -15,6 +15,9 @@
 
 ## TOOL — tooling
 
+- TOOL-aPromptedMandate-1 · a prose-started run needs NO new authorization primitive: `ANCHOR_SCOPE="published"` already admits a build folder the run authored and pushed, measured green through driver AND leg. §1 cost 1 priced it, so this build records the MODE, not a mechanism
+- TOOL-aPromptedMandate-4 · research and solution-test bind PROMPT-authorized runs only (owner), the directive layer's first scoped member. Unconditional was rejected as ceremony over a slug-mode build whose solution was already chosen
+- TOOL-aPromptedMandate-5 · the one owner turn lands BEFORE the anchor push, so the clarification is a property of the commit graph, not a transcript claim. Protocol §1 MAY be amended (owner) — the authorization parameter is that consent — bounded to §1's DESCRIPTION, never its MECHANISM
 - TOOL-aSiftedPlaybook-1 · ceiling 32768->49152 (owner); a high-water ratchet keyed by file replaces its forcing function; baseline.toml's shrink-only rule reversed in place, dated in-header. Falsifies: PLAY-aCandidStub-1 §3, TOOL-aGuardedTally-1, PLAY-aPrunedCeremony-1 RD7, aCandidStub review 19
 - TOOL-aMendedLedger-8 · U9 REPLACES the merge driver's algorithm rather than patching it a fourth time: two planes split by row SHAPE, structure delegated to `git merge-file`, only the row set key-merged, recombined via a token skeleton. The bar is a live control per case
 - TOOL-aMendedLedger-9 · a row one side MOVED and the other DELETED was dropped at rc 0 where git keeps it. The row plane is position-blind, so the SKELETON arbitrates: a surviving token for a deleted key means a move, and the disagreement becomes a scoped conflict
