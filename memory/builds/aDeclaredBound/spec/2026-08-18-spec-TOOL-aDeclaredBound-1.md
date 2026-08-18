@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -158,7 +158,8 @@ none.
 
 - rev-1 · 2026-08-18 · initial draft.
 - rev-2 · 2026-08-18 · folded spec-audit round 1.
-- rev-3 · 2026-08-18 · folded spec-audit round 2. S4 names the replacement string and the
+- rev-3 · 2026-08-18 · folded spec-audit round 2.
+- rev-3 · 2026-08-18 · BUILT and status CLOSED. S4 names the replacement string and the
   twelve-character longest-literal-run constraint `check-arms.py` imposes on it, which the rev-2
   wording left a builder to discover. The inventory was three sites and is three plus three
   comments. S10 and S11 close round 1's finding 23, which had survived a fold: nothing observed the

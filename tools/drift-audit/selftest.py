@@ -937,6 +937,77 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (out.stdout + out.stderr)[-400:])
 
 
+
+def test_ratchet_lookback(tmp: pathlib.Path) -> None:
+    """The justification WINDOW is a project-layer declaration — TOOL-aDeclaredBound-3.
+
+    Both directions over ONE fixture: the same pin, the same justification, the same distance, and
+    only the declared window moving. A one-directional arm would pass under any window wide enough,
+    which is the failure mode a tunable threshold invites. The shipped default is asserted against
+    the module constant rather than a retyped 14, so an arm cannot agree with itself.
+    """
+    print("RATCHET_LOOKBACK (a declared window, both directions over one fixture)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    from drift_report import _justified, _lookback_of, DEFAULT_RATCHET_LOOKBACK, DriftError
+
+    lines = ["# filler"] * 21
+    lines[10] = "# RAISED 5 -> 8 because the measurement said so"
+    text = "\n".join(lines)
+
+    check("a justification ten lines up is INSIDE the shipped window",
+          _justified(text, 20, 5, 8, DEFAULT_RATCHET_LOOKBACK))
+    check("...and OUTSIDE a declared window of five",
+          not _justified(text, 20, 5, 8, 5))
+    check("...and inside a declared eleven, so the boundary moves with the number",
+          _justified(text, 20, 5, 8, 11))
+
+    class _Bare:
+        pass
+    check("a layer declaring nothing takes the shipped default",
+          _lookback_of(_Bare()) == DEFAULT_RATCHET_LOOKBACK)
+
+    class _Declared:
+        RATCHET_LOOKBACK = 6
+    check("a layer declaring six gets six", _lookback_of(_Declared()) == 6)
+
+    for bad in (0, -3, "14", 2.5, True):
+        cls = type("_Bad", (), {"RATCHET_LOOKBACK": bad})
+        named = False
+        try:
+            _lookback_of(cls())
+        except DriftError as exc:
+            named = "RATCHET_LOOKBACK" in str(exc)
+        check(f"an unusable declaration ({bad!r}) is a refusal that NAMES the key", named)
+
+
+def test_ratchet_message_states_its_window(tmp: pathlib.Path) -> None:
+    """The finding says how far it looked, using the DECLARED number.
+
+    Stated differentially on purpose: the message already interpolated the constant before this
+    unit, so an arm asserting it names fourteen would have been green before a line was written.
+    """
+    print("RATCHET message (states the window it actually searched)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import drift_report as dr
+
+    class _Git:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0, "stdout": 'PIN="5"\n'})()
+
+    root = tmp / "lookbackmsg"
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "p.conf").write_text('PIN="9"\n', encoding="utf-8", newline="\n")
+    spec = [{"file": "p.conf", "key": "PIN", "weakens": "up"}]
+
+    out6 = dr.ratchet_findings(_Git(), root, spec, 6)
+    check("a declared six is what the message reports",
+          bool(out6) and "within 6 lines" in out6[0], str(out6))
+    out_def = dr.ratchet_findings(_Git(), root, spec)
+    check("...and the shipped default when the caller passes none",
+          bool(out_def) and f"within {dr.DEFAULT_RATCHET_LOOKBACK} lines" in out_def[0], str(out_def))
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -947,6 +1018,8 @@ def main() -> int:
         test_live_backlog_rows(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
+        test_ratchet_lookback(tmp)
+        test_ratchet_message_states_its_window(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

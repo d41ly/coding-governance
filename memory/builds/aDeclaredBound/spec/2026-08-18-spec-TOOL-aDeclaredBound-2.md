@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -142,7 +142,8 @@ rather than left open, because the survey's whole finding was that two channels 
 
 - rev-1 · 2026-08-18 · initial draft.
 - rev-2 · 2026-08-18 · folded spec-audit round 1.
-- rev-3 · 2026-08-18 · folded spec-audit round 2. The kit-version item was filed under Non-goals,
+- rev-3 · 2026-08-18 · folded spec-audit round 2.
+- rev-3 · 2026-08-18 · BUILT and status CLOSED. The kit-version item was filed under Non-goals,
   where a builder reading section 3 as authoritative would drop it — it is now S7 inside section 2,
   and it NAMES the order rather than saying "the later of the two" and leaving the pair
   unresolved. S8 adds the example-conf observation neither unit had. S1 asked for one statement that had to be in two

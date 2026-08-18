@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -152,7 +152,8 @@ none.
 
 - rev-1 · 2026-08-18 · initial draft.
 - rev-2 · 2026-08-18 · folded spec-audit round 1.
-- rev-3 · 2026-08-18 · folded spec-audit round 2. The per-ratchet-window rejection rested on a
+- rev-3 · 2026-08-18 · folded spec-audit round 2.
+- rev-3 · 2026-08-18 · BUILT and status CLOSED. The per-ratchet-window rejection rested on a
   premise the corpus contradicts — two pins three lines apart already compete for one window — so
   it now rests on scope, which is the reason that survives. S1c states that unit 4's hook window is
   a separate number, which neither spec said and which an adopter narrowing one would discover the

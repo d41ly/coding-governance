@@ -236,6 +236,14 @@ PINS: dict[str, int] = {
 # both `<name>:<n>:<n>` sets — are NOT covered here: they need a per-member diff, which is a
 # different parse and a different message. They keep their own gates' one-sided checks. Naming the
 # gap is the point; a guard whose coverage is guessed at is the class this repo keeps finding.
+# How many lines ABOVE a ratcheted pin this gate looks for the `<old> -> <new>` justification
+# that excuses a weakening move. Absent takes the kit's shipped 14. Widen it if your repo writes
+# long justifications above a pin; narrow it if your pins sit close together, so a justification
+# for a DIFFERENT pin cannot be read as this one's.
+# Declared explicitly at the shipped value, so the example an adopter copies is a LIVE one and the
+# key is discoverable from this file rather than only from the kit's default.
+RATCHET_LOOKBACK = 14
+
 RATCHETS: list[dict] = [
     {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
