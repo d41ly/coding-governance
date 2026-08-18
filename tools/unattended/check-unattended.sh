@@ -836,4 +836,34 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
   fi
 fi
 
+# ---- 20: the PROMPT path's own ordering, PER PATH. TOOL-aPromptedMandate-5.
+# ---- Check 18 above orders the FIRST --preflight against the FIRST /session-kickoff across the
+# ---- whole template. Once a second start path exists that check keeps grading the FIRST one and is
+# ---- SILENTLY BLIND to the other - which is the failure direction nobody notices, as against a
+# ---- false red, which somebody fixes in a minute. So the prompt path is ordered inside its OWN
+# ---- section rather than against the file.
+# ----
+# ---- What it holds: the single owner turn precedes the push, and the push precedes preflight. That
+# ---- ordering is the whole provenance argument - everything written before the push is older than
+# ---- the commit that authorizes the run, and an ask after it is an ask nobody is present for.
+if [ -f "$tmpl" ]; then
+  # The section, sliced heading-to-heading. A template with no prompt path at all is LEGAL and
+  # silent: this kit shipped without one, and an adopter reading an older copy is not in error.
+  psec=$(awk '
+    /^## Start a run from a PROMPT/ { f = 1; n = 0; next }
+    f && /^## / { exit }
+    f { n++; print n "\t" $0 }' "$tmpl")
+  if [ -n "$psec" ]; then
+    askl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "AskUserQuestion") { print $1; exit }')
+    pshl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "PUSH THE BRANCH") { print $1; exit }')
+    pfl2=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "**Preflight**") { print $1; exit }')
+    if [ -z "$askl" ] || [ -z "$pshl" ] || [ -z "$pfl2" ]; then
+      fail 20 "the Skill's prompt path does not name all three of its ordered steps, so the order that makes the owner turn provably older than the authorization cannot be checked at all; it looks for AskUserQuestion, PUSH THE BRANCH and a bolded Preflight"
+    else
+      [ "$askl" -lt "$pshl" ] || fail 20 "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it: $askl against $pshl"
+      [ "$pshl" -lt "$pfl2" ] || fail 20 "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run: $pshl against $pfl2"
+    fi
+  fi
+fi
+
 exit "$status"

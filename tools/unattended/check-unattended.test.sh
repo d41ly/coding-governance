@@ -1099,6 +1099,40 @@ printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n
 miss "$(run)" "the Skill's directive table carries no scope cell this leg can read"
 reset_tree
 
+# TOOL-aPromptedMandate-5 - check 20, the PROMPT path ordered inside its OWN section. Check 18
+# orders the file's FIRST --preflight against its FIRST /session-kickoff; once a second start path
+# exists that check keeps grading the first one and goes SILENTLY blind to the other. A false red is
+# noticed in a minute; silent blindness is not, so the second path gets its own ordering.
+#
+# H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
+# one question the path may ask would be asked by a run already authorized, with nobody present.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
+hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
+
+# H, the PUSH after preflight. Preflight run first meets the refusal that nothing published
+# authorizes the run - the exact refusal step 1 quotes so the agent does not have to diagnose it.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\.\*\*/4. **Commit.**/'
+mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
+hit "$(run)" "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run:"
+
+# H, the locator: a step no longer named at all. Without this the two order comparisons compare
+# against empty strings and are green - the vacuity shape every join in this leg carries a guard for.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/PUSH THE BRANCH/push the branch/'
+out=$(run)
+hit "$out" "the Skill's prompt path does not name all three of its ordered steps, so the order that makes the owner turn provably older than the authorization cannot be checked at all; it looks for AskUserQuestion, PUSH THE BRANCH and a bolded Preflight"
+miss "$out" "puts its owner turn AFTER the branch push"
+
+# H, a template with NO prompt path is legal and silent - this kit shipped without one, and an
+# adopter on an older copy is not in error. Deleting the heading empties the slice.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/^## Start a run from a PROMPT$/## Notes/'
+miss "$(run)" "the Skill's prompt path does not name all three of its ordered steps"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1109,7 +1143,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=182
+FLOOR_ASSERTIONS=194
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -71,6 +71,11 @@ DIRECTIVES_FLOOR="13"
 # a branch push is not gated by the pre-push hook; the bar's BASE check widens for EVERY adopter,
 # because this file is a working-tree file the run can commit and so the leg cannot read it; and
 # roster integrity stops being enforceable on the branch anchor. Protocol section 1 carries them.
+# TOOL-aPromptedMandate-5 - this key also gates the Skill's PROMPT start path. Left blank (the
+# default, and what this example ships) a run can only be started from a build folder somebody
+# already landed; the prompt path is rendered as unavailable and says so, rather than printing a
+# procedure that ends in a refusal. Declaring `published` turns it on and accepts the three costs
+# section 1 of the protocol enumerates.
 ANCHOR_SCOPE=""
 
 PHASES_EXTRA=""

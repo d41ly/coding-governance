@@ -52,10 +52,15 @@ distinction real.
    NAME the waiver, or the skip leaves no trace at all. **`land-once-done`** — waiving it does not
    remove the Definition-of-Done item that observes completeness; that still owes an override at
    close.
-1. **The build folder IS the authorization — you do not write one, and neither does the owner.** A
-   `memory/builds/<slug>/README.md` committed before your branch existed is the whole
-   precondition. Preflight refuses a build folder you created, because a run that authorizes itself
-   has no authorization. You also do not create the run-state file: preflight does that.
+1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
+   `memory/builds/<slug>/README.md` that resolves at the anchor this project declares is the
+   whole precondition. **This project's anchor scope is `published`.**
+   On the **default-branch** anchor that means committed before your branch existed, and preflight
+   REFUSES a build folder you created — a run that authorizes itself has no authorization. Where the
+   project declares **published**, the tip the remote advertises for your OWN branch also counts, so a
+   run may author its build folder and push it; protocol section 1 states what that costs, and the
+   run-state file records which anchor was used. You still do not create the run-state file:
+   preflight does that.
    **If the build is not on the default branch, PUSH YOUR BRANCH FIRST.** Where the project declares
    `ANCHOR_SCOPE="published"`, a build folder that does not resolve at the merge-base is looked for
    at the tip the remote advertises for the branch you are on — so an unpushed commit authorizes
@@ -118,6 +123,59 @@ distinction real.
    It buys the orientation preflight does not: the manifest audit, the pointer map, the tier rule,
    and the dated corrections and environment traps that repo has front-loaded. Skip it silently if
    the project has no such skill — that is legal, and this kit states none of what it carries.
+
+## Start a run from a PROMPT
+
+**Only when the invocation carries the authorizing parameter.** Prose alone is not an unattended
+build, however unattended it sounds — the parameter IS the authorization gesture, and inferring it
+from wording would let a description of a build start one. No parameter, no prompt path; use the slug
+path above or do ordinary attended work.
+
+**This project's anchor scope is `published`, and this path needs `published`.** Under
+`default-branch` there is no anchor a build folder you author can resolve at, so every step below
+would end in the refusal step 1 names, with its remedy inert. If the value above is not `published`,
+say so and stop — do not start, and do not write a build folder nothing can authorize.
+
+The steps are ORDERED and the order is the point. Everything before the push is provably older than
+the commit that authorizes the run; everything after it is contemporaneous with a run already
+authorized. That is what makes "the owner was asked at the start" a property of the commit graph
+rather than a claim in a transcript nobody reads.
+
+1. **Orient from the prose**, in the `/session-kickoff` manner — steps 0 to 4 of that engine. Derive
+   every field you can from the prose, the memory tree and the code. Do not ask yet.
+2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's, not this file's:
+   `bash <check-script> --task-skeleton` prints it. **ACCEPTANCE and GATES are disqualifying** — a
+   unit with no observable that proves it is not Ready, and no run can split it. Any other gap is
+   askable, and askable once.
+
+   **THIS IS THE ONLY OWNER TURN THERE IS.** One `AskUserQuestion`, every gap in it, four options
+   maximum per call because that is the call's own limit. Not one call per gap: the owner is trying
+   to walk away. From step 3 onward there is nobody to answer, and no verb will take an answer.
+
+   If ACCEPTANCE or GATES is still missing after the ask, **stop without writing anything**. No run
+   has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
+   file, and the kickoff engine's Step 5b exit 5 does not reach here — it is scoped to a run already
+   started. Nothing staged, nothing committed, nothing to clean up.
+3. **Write the build folder.** `memory/builds/<slug>/README.md` with front matter carrying
+   the slug, the streams value, and **`authorized-by: prompt`** — the key that records which
+   discipline bound this run, and which the merge bar re-derives from this same file. Carry the
+   owner's prose VERBATIM under its own heading, and every clarification with its answer. The roster
+   may be provisional: a roster that grows after preflight draws no refusal on this anchor, because
+   your own push re-satisfies the comparison.
+4. **Commit, then PUSH THE BRANCH.** Both, in that order. Skip the push and preflight refuses with
+   `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`
+   — read here so you do not have to diagnose it there.
+5. **Preflight**, exactly as the slug path does. It records the mode from the file you just pushed.
+6. **The kickoff hand-back**, at the slug path's step 5 and for its reason.
+
+**After any later roster change, commit AND PUSH before the next authorization read.** The roster
+comparison holds on this anchor only because you re-push; a roster grown and committed but not pushed
+is the ordinary state after research, and it blocks `--close` on `authorization-reachable` with no
+override available and nobody to interpret it.
+
+**The research and test obligations bind this path and not the slug path** — `researched` and
+`solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
+which is where the loop is stated.
 
 ## While it runs
 

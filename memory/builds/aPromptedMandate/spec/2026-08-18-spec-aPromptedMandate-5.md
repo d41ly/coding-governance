@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-5 — the Skill's prompt start path
 
-**Status:** SPECCED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -253,6 +253,11 @@ none — the forks below are RESOLVED.
   18's placement was unstated and silently blind in one direction (id 24); Step 5b exit 5 does not
   reach the pre-preflight moment (id 26); the roster re-push obligation was dropped from the prior
   record's conclusion (id 43).
+- rev-4 · 2026-08-18 · built. S1b renders the EFFECTIVE anchor scope rather than the raw key: every
+  adopter ships `ANCHOR_SCOPE=""`, so interpolating the declaration would print a hole in the
+  sentence and keeping the placeholder would red the placeholder arm for the majority case. The
+  derivation mirrors the driver's own fall-through, so no value of that key can render an empty cell.
+  S5's per-path arm became check 20 with three branches, all measured firing.
 - rev-3 · 2026-08-18 · owner ratified the section 1 amendment (the authorization parameter is the
   consent for it). Added the agent-set bound on what the amendment may reach — description, not
   mechanism — and AC9b to observe it.

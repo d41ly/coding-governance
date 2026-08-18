@@ -15,12 +15,19 @@ check, not merely removed.
 ## 1. The authorization
 
 The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
-committed before the run's branch existed. The owner's act is `/unattended <slug>`; they author
-nothing per run except the reason text of a directive waiver, which `--preflight` records on
-their behalf (§10). Four properties, all mechanical:
+that resolves at the anchor the project declares. On the default-branch anchor that means committed
+before the run's branch existed. The owner's act is `/unattended <slug>`, or — where the project
+admits the second anchor — an invocation carrying the authorizing parameter and the prose the build
+is scoped by. They author nothing per run except the reason text of a directive waiver, which
+`--preflight` records on their behalf (§10), and on the prompt path the prose itself plus whatever
+the agent asks at its single opening turn. Four properties, all mechanical:
 
-- **It is asserted, never written by the run.** `--preflight` refuses if it is absent; a run that
-    could write its own authorization has none.
+- **It is asserted, never written by the run — on the DEFAULT-BRANCH anchor.** `--preflight` refuses
+    if it is absent, and at that anchor a run that could write its own authorization has none. **On
+    the second anchor this property is weaker, deliberately**: the run may author its own build folder
+    and push it, which is cost 1 below made USABLE rather than merely conceded. Which anchor
+    authorized a run is recorded, and so is the discipline it claimed — neither is a verdict, and §9's
+    reduction applies to both.
 - **It is reachable from the pinned BASE.** A build folder introduced by a commit on the run's own
   branch grants nothing. Reachability is the machine-checkable form of "somebody with push rights put
   this here before this run branched" — and the run holds push rights by construction, so it is a
