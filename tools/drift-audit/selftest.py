@@ -683,6 +683,62 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
 # ---------------------------------------------------------------------------------------------
 
 
+def test_live_backlog_rows(tmp: pathlib.Path) -> None:
+    """TOOL-aRelaxedShard-4: the live-row signal, in every direction it can be wrong."""
+    print("live backlog rows per shard")
+    r = make_repo(tmp, name="liverows")
+    bl = r / "memory" / "backlog"
+    bl.mkdir(parents=True, exist_ok=True)
+
+    # Three live rows and two terminal ones. The terminal pair is the load-bearing half: a signal that
+    # counted ENTRIES rather than LIVE entries would pass every other arm in this function.
+    rows = [
+        "# ARCH backlog",
+        "- ARCH-tLive-1 · OPEN · one",
+        "- ARCH-tLive-2 · SPECCED · two",
+        "- ARCH-tLive-3 · INPROGRESS · three",
+        "- ARCH-tLive-4 · CLOSED · four",
+        "- ARCH-tLive-5 · WONTDO · five",
+    ]
+    (bl / "ARCH.md").write_text("\n".join(rows) + "\n", encoding="utf-8", newline="\n")
+    # A second, EMPTY shard: it must contribute 0 and must NOT make the probe dead.
+    (bl / "DES.md").write_text("# DES backlog\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "shards", "--no-verify"], r)
+
+    got = report(r)["live_backlog_rows_per_shard"]
+    check("counts LIVE rows, not entries: 3 of 5", got["value"] == 3, f"got {got['value']}")
+    check("reports every shard, so a total cannot hide one", got["of"] == 2, f"got {got['of']}")
+    check("probe is LIVE with shards present", got["live"] is True)
+    per = {d["shard"]: d for d in got["detail"]}
+    check("the empty shard reports 0 rather than being skipped",
+          per.get("memory/backlog/DES.md", {}).get("live") == 0,
+          f"got {per.get('memory/backlog/DES.md')}")
+    check("the busy shard reports its total beside its live count",
+          per.get("memory/backlog/ARCH.md", {}).get("total") == 5,
+          f"got {per.get('memory/backlog/ARCH.md')}")
+
+    # --- it MOVES when a row is closed. That is the whole point of the signal. ----------------
+    closed = (bl / "ARCH.md").read_text(encoding="utf-8").replace(
+        "- ARCH-tLive-1 · OPEN · one", "- ARCH-tLive-1 · CLOSED · one")
+    (bl / "ARCH.md").write_text(closed, encoding="utf-8", newline="\n")
+    check("closing a row lowers the count", report(r)["live_backlog_rows_per_shard"]["value"] == 2,
+          "the signal does not track the variable it exists for")
+
+    # --- REPORT-ONLY, and F2 decided that deliberately: `drift-audit records` is an unguarded
+    # --- merge-bar leg, so a gateable version turns a growing backlog into a scheduled refusal.
+    check("the signal is not gateable", report(r)["live_backlog_rows_per_shard"]["gateable"] is False)
+
+    # --- DEAD, not a reassuring 0, where there are no shards at all --------------------------
+    r2 = make_repo(tmp, name="noshards")
+    for f in sorted((r2 / "memory" / "backlog").glob("*.md")):
+        run(["git", "rm", "-q", str(f.relative_to(r2))], r2)
+    run(["git", "commit", "-q", "-m", "drop shards", "--no-verify"], r2)
+    dead = report(r2)["live_backlog_rows_per_shard"]
+    check("no shards at all reports DEAD rather than 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
 def test_declared_empty(tmp: pathlib.Path) -> None:
     """A declaration must stay LIFTABLE, or it is the DEAD PROBE defect wearing a nicer label.
 
@@ -888,6 +944,7 @@ def main() -> int:
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
         test_no_signal_hardcodes_live(tmp)
+        test_live_backlog_rows(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
     print()

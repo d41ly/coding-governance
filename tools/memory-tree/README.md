@@ -135,8 +135,9 @@ see the "Codebase-map interop" section the HYGIENE template ships. No conf keys 
 
 ## The build method's displaced sections
 
-`memory/guides/BUILD-METHOD.md` is capped at 250 lines by hygiene rule 6 and is re-read WHOLE at every pass
-boundary, so it grows only by displacement. These two sections live here because they are EXPLANATION: nothing
+`memory/guides/BUILD-METHOD.md` holds itself to ≤20 KB and ≤250 lines — a LOCAL constraint and NOT rule 6's,
+which gives a guide far more and no longer caps lines outside `guides/` at all. It is re-read WHOLE at every
+pass boundary, so it grows only by displacement. These two sections live here because they are EXPLANATION: nothing
 below changes what an agent does next, and the rules that do stayed in the method.
 
 ### M5 — the probe-failure taxonomy

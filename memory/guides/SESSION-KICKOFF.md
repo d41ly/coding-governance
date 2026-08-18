@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T07:10:00+03:00 @ fcd11108f7b391d7b1855800f5696cc0c1d37000
+last-audit: 2026-08-18T08:38:44+03:00 @ 7761bbf231899b28744a67550ba95abc644f7cb7
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 94a4150510cd853662016f34188dd5a8892f42fd
+last-body-change: 5d2c32fe9e2c6165b84b14a275d138585b15b22a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -214,11 +214,17 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
   >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
   dir before blaming the diff, and do not delete the shared one.
-- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
-  check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
-  it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
-  after a round counter.
+- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line or check 21 reds;
+  grammar in `memory/HYGIENE.md`. The filename must PROJECT it — family, slug, ordinal of the lowest id
+  served. A ROUND COUNTER there cites an id nothing defines: check 14 reds and a phantom id reaches the
+  front matter. Use `…-<slug>-1-round2.md`.
 - A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
   assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
   costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
   that name states a count.
+- The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
+  overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
+  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
+- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
+  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
+  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.

@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.21   # gov:kit memory-tree@2.21 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.22   # gov:kit memory-tree@2.22 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -33,6 +33,11 @@ SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every
 INDEX_CAP_BYTES=20480         ; INDEX_CAP_LINES=250
 GUIDE_CAP_BYTES=61440         ; GUIDE_CAP_LINES=750
 BUILD_README_CAP_BYTES=25600  ; BUILD_README_CAP_LINES=0
+# A codebase-map dossier is its own class (TOOL-aRelaxedShard-1). It is kept TIGHTER than the index
+# class on purpose: check 6 is the only size gate a dossier has, and its remedy is a SPLIT rather
+# than a rotation, so inheriting a relaxed index cap would loosen the one class that cannot rotate.
+# Only reached where a codebase map is adopted; the selector is guarded on a non-empty MAP_SUB.
+DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
 # the sibling classifier that asks this script for the index set gets a non-zero exit it turns into
@@ -40,7 +45,7 @@ BUILD_README_CAP_BYTES=25600  ; BUILD_README_CAP_LINES=0
 # an ABORT, not a check failure: a gate that cannot read its own thresholds has not found a hygiene
 # regression, it has failed to run. Same channel and status as the no-python abort below.
 _capbad=""
-for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES; do
+for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES DOSSIER_CAP_BYTES DOSSIER_CAP_LINES; do
   eval "_v=\${$_k-}"
   case "$_v" in
     *[!0-9]*|"") _capbad="$_capbad $_k='$_v' (not a whole number)"; continue ;;
@@ -52,6 +57,12 @@ for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_
   esac
 done
 [ -n "$_capbad" ] && { echo "HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
+# CONVERGED. This branch (TOOL-aRelaxedShard-1) built the same feature independently and arrived at
+# two byte-only keys with blank resolving FORWARD to a shipped default. main's scheme is kept because
+# it is strictly more general — both axes of every class — and because its validation caught a trap the
+# other did not: `case $v in 0)` accepts "00" and "020", which awk's `+0` then coerces to zero, so the
+# check is arithmetic. The other design's concern was that a BLANK key must never silently disable a
+# bound; the abort above satisfies that more loudly than a fall-forward would.
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # codebase-map kit interop: when its MAP_ROOT is a DIRECT child of this tree (e.g. memory/map),
@@ -408,20 +419,27 @@ bad6=""
 if [ -n "$sel6" ]; then
   cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
   clines=$(printf '%s\n' "$sel6" | xargs -r wc -l)
-  # PER-CLASS CAPS, and the split is between PROSE and ROWS. A guide is a document the charter points
-  # a session at and reads end to end; an index is a row set that a curation sweep prunes. They shared
-  # one line limit, and for a guide that limit is a PROXY for the read budget rather than the budget
-  # itself — check 16's `READ_PATH_CEILING` is the real one, it is measured in bytes, and it is not
-  # relaxed here. So a guide is allowed more than a row document, and tripling the allowance for a
-  # backlog shard or a map dossier would loosen a curation discipline nobody asked to loosen: the two
-  # classes fail for different reasons. The NUMBERS are declared at the top of this file and
-  # overridable per project; the shipped ratio is 3x, but a project that moves one key and not the
-  # other changes that, which is why this comment states the relation as an allowance and not as an
-  # arithmetic identity.
-  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" \
-          -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES" \
-          -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES" \
-          -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES" '
+  # PER-CLASS CAPS. FOUR classes, and the numbers are DECLARED at the top of this file and overridable
+  # per project — the value that suits one corpus is not the value that suits another.
+  #
+  # A guide is prose the charter points a session at and reads end to end; for it a line limit is a
+  # PROXY for the read budget rather than the budget itself — check 16's `READ_PATH_CEILING` is the real
+  # one, measured in bytes, and it is not relaxed here. Every other class is a row set, and for a row set
+  # the line count was never the bound that bound: at check 7's 300-char entry budget a 250-line row
+  # document may hold 75,000 B, so the byte figure decided every real case and the line figure needed
+  # rows averaging under 82 B. Measured over this corpus's backlog rows: 253.7 B.
+  #
+  # A LINE CAP OF 0 MEANS NO INDEPENDENT LINE CAP for the class. That is how a project retires the line
+  # axis for its row documents, and this repo has: `TOOL-aRelaxedShard-1` sets `INDEX_CAP_LINES=0` in
+  # `.memory-tree.conf` after the owner ratified it, reversing the refusal `TOOL-aWidenedGuide-1`
+  # recorded. It was a DECISION and not a tidy-up: measured over the 29-member index class, 22 sat below
+  # the 81.92 B/line break-even and were line-bound FIRST, every codebase-map dossier among them. Which
+  # is why a dossier is its own class here rather than inheriting a relaxed index cap — check 6 is the
+  # only size gate it has, and its remedy is a SPLIT rather than a rotation.
+  #
+  # The shipped ratio between the classes is stated as an allowance, not an arithmetic identity: a
+  # project that moves one key and not another changes it.
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
     FNR==NR { if ($NF!="total") b[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
@@ -434,6 +452,11 @@ if [ -n "$sel6" ]; then
             # count is whatever fits the byte budget at the per-line width, so there is no third
             # number to drift against the other two.
             if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0 }
+            # A codebase-map dossier, GUARDED on a non-empty prefix. `dp` is empty when no map is
+            # adopted, and `index(f, "")` is 1 for EVERY string — an unguarded test would hand the
+            # dossier bound to the whole tree and silently undo the index cap. The `ex7` selector in
+            # check 7 adds its map alternatives under `[ -n "$MAP_SUB" ]` for the same reason.
+            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0 }
             if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
               if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
               else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
