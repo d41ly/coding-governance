@@ -71,9 +71,10 @@ machines/sessions on the same repo.
   is read statically: it DENIES any
   script calling raw `parallel(`/`pipeline(` instead of the cap-5 `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
-  the rule too: a review's verify stage spawns at most 5 agents TOTAL. The 5 is a FILE CONSTANT and
-  not overridable — the guard resolves the number at the call site, at the helper's default parameter
-  and at the `gov:bounded-fanout` width, and refuses a set `AGENT_CAP` rather than ignoring it.
+  the rule too: a review's verify stage spawns at most the total the guard resolves. That number is
+  DECLARED per repository and read by `tools/hooks/agent-cap.js`; the guard resolves it at the call
+  site, at the helper's default parameter and at the `gov:bounded-fanout` width, and refuses a set
+  `AGENT_CAP` rather than ignoring it — an environment override leaves no diff behind.
   Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.
@@ -87,7 +88,7 @@ machines/sessions on the same repo.
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth): four finder lenses, at most five batched verifiers, one synthesis pass — 6–10
-  agents over the run, of which at most 5 are verify-stage and at most 5 concurrent, per the BINDING
+  agents over the run, all of them within the verify-stage and concurrency bounds, per the BINDING
   `memory/guides/REVIEW-PROTOCOL.md`. Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to
   their verdicts on an INTEGER the orchestrator assigns before the skeptic sees them — a `file:line`

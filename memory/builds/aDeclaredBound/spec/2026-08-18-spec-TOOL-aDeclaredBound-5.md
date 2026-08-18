@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
+**Status:** CLOSED · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -234,6 +234,9 @@ RESOLVED (owner, 2026-08-18): the pointer and a new predicate.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-5 · 2026-08-18 · BUILT and status CLOSED. The scanner's noun list missed `≤5
+  verify-stage agents TOTAL` on its first run here — the single line the parity gate froze, and the
+  most important carrier in the corpus. Second miss in one unit; S10's warning is a measurement.
 - rev-5 · 2026-08-18 · folded spec-audit round 2, which BLOCKED on this unit twice. The ratified
   predicate could not be satisfied at this unit's own landing commit, because its second half needs
   a conf key and a hook read that unit 4 mints later; the owner ratified SPLITTING IT BY LANDING

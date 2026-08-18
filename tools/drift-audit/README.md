@@ -139,7 +139,7 @@ works it prints `SKIP` and tallies it. It never prints `ok` for an arm that did 
 | Tier | Cost | Answers |
 |---|---|---|
 | 0 | seconds, 0 agents | Are the records still true? Which pins moved? |
-| 1 | ~20 min, ≤5 agents | Why did a signal move? Is an instrument blind? |
+| 1 | ~20 min, one bounded wave | Why did a signal move? Is an instrument blind? |
 | 2 | hours, ~22 agents | Dead / unwired / duplicated code, and everything above |
 
 In the founding audit, **Tier 0 alone produced the blocker, the vacuous-metric lead and the entire

@@ -1,0 +1,7 @@
+# agent-cap-restatement waivers — rows are `<matched text><TAB><reason>`, keyed on the TEXT.
+# Shrink-only. A row whose text no longer appears anywhere REDS as stale, because a waiver that
+# outlives its hit silently widens the gate it was written to narrow.
+#
+# Keyed on text and NOT on <path>:<line> deliberately: a line-keyed sibling registry unpinned itself
+# twice during one build when insertions above it shifted the numbers (TOOL-aLoosenedCeiling-5).
+≤5 batched skeptics (required)	a MEASUREMENT row: the token cost of one real review at that shape, not the enforced rule. The 5 records what was run, and stays true whatever the cap becomes.

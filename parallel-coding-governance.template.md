@@ -21,7 +21,8 @@ matcher; §5/§6/§7 name the five kits that shipped unmentioned.*
 - **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
-- **Never more than 5 agents at once, AND never more than 5 per verify stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
+- **Never more than the declared bound at once, AND never more than the declared total per verify
+  stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
 - **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
 - **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).

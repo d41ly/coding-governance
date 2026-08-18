@@ -63,10 +63,32 @@ fi
 # A parity check that compares two empty files passes. Assert the population is real: the live copy
 # must carry the rule this document exists to state, or "in parity" means "both are wrong".
 #
-# THE NUMBER, not the digit-free phrase. `verify-stage agents TOTAL` survives every edit that changes
-# the cap — the live copy could read "≤50 verify-stage agents TOTAL", the shipped copy could be
-# re-rendered to match, and both halves of this gate would go green over a document that no longer
-# states the rule the hook enforces. The assertion has to be able to fail on the thing that matters.
-grep -qF '≤5 verify-stage agents TOTAL' "$LIVE" \
-  || { echo "protocol-parity: $LIVE no longer states the hard cap AT ITS NUMBER (expected the literal '≤5 verify-stage agents TOTAL') — parity over the wrong content"; exit 1; }
+# THE POINTER, per RULE. This arm used to freeze the literal cap as a digit, on the reasoning that a
+# digit-free paraphrase is the drift it exists to catch. That reasoning was right and its instrument
+# became wrong: TOOL-aDeclaredBound-4 makes the bound a per-repo DECLARATION, so a document carrying
+# the number is the second answer rather than the check. The property that needs protecting is
+# unchanged — a protocol stating a bound it does not say how to READ is a protocol an agent cannot
+# check itself against.
+#
+# PER RULE and not per document. This protocol states TWO bounds in two sections, and
+# memory/gotchas/concurrency-is-not-a-budget.md exists because conflating them was a real defect; one
+# predicate over "the document" would let either section lose its pointer while the other carried the
+# gate. Each section that states a bound names the resolver within its OWN body.
+#
+# This is the POINTER-SHAPE half. TOOL-aDeclaredBound-4 adds the second half — that the named
+# declaration is one the hook actually READS — in the commit that makes the hook read it. Split by
+# landing on the owner's ruling, because neither the conf key nor the read exists until that unit.
+_p_bad=0
+for _sec in 'The hard cap' 'Concurrency'; do
+  _body=$(awk -v want="$_sec" '
+      /^## / { inb = (index($0, want) > 0) ? 1 : 0 }
+      inb { print }' "$LIVE")
+  if [ -z "$_body" ]; then
+    echo "protocol-parity: $LIVE has no '## $_sec ...' section, so this pointer arm would pass by finding nothing"
+    _p_bad=1; continue
+  fi
+  printf '%s\n' "$_body" | grep -qF 'agent-cap.js' \
+    || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
+done
+[ "$_p_bad" = 0 ] || exit 1
 echo "protocol-parity: in parity — $LIVE == $SHIP rendered for '$KITREL'"

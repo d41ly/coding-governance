@@ -126,7 +126,7 @@ ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDecl
 | [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | CLOSED | rev-5 | 2026-08-18 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 

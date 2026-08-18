@@ -4,10 +4,15 @@ Read this before ANY multi-agent review or `Workflow` run. Ported from the upstr
 (`ARCH-bWhittledTome-1`, 2026-07-15; hard cap added by the owner 2026-07-29) and re-measured here —
 every number below is either measured on THIS tree or marked as inherited with the reason it travels.
 
-## The hard cap — ≤5 verify-stage agents TOTAL
+## The hard cap — the verify-stage total `agent-cap.js` resolves
 
-**A review's verify stage spawns at most 5 agents, whatever the finding count.** The batch size grows
+**A review's verify stage spawns at most the cap `tools/hooks/agent-cap.js` resolves,
+whatever the finding count.** The batch size grows
 with the finding count; the agent count never does.
+
+The NUMBER is not written here. It is declared per repository and resolved by the hook, and a copy
+in this document would be a second answer that goes stale the day someone turns the knob — the same
+reason a kit version is never spelled in prose. Read it from the hook.
 
 This is not the concurrency cap wearing a different hat. `boundedParallel(thunks, 5)` bounds how many
 run AT ONCE; N findings still spawn N agents, five at a time. **Concurrency is not a budget.**
@@ -105,7 +110,7 @@ slice a bare identifier by a width that is either the enclosing helper's own `ca
 the two rules above have already bounded, or a `<K>` that resolves. It used to exempt its line
 outright, so a line slicing fifty wide passed unread.
 
-## Concurrency — ≤5 agents at once, always
+## Concurrency — the at-once bound `agent-cap.js` resolves, always
 
 Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)`. The
 same hook DENIES a script calling raw `parallel(` / `pipeline(` outside a line marked
@@ -132,7 +137,8 @@ Dimension finders (security / correctness / data-integrity / dead-code / integra
 is recorded. Feed the finders the security model, the open backlog and what is by-design, so they
 hunt NEW issues instead of re-reporting known ones.
 
-Default configuration: **3–6 primed finder lenses → ≤5 batched default-refute skeptics → one
+Default configuration: **3–6 primed finder lenses → batched default-refute skeptics within the
+hook's declared bound → one
 synthesis pass**; three phases, find → verify → synthesize. The ready-made harness is
 `tools/workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
