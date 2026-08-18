@@ -146,23 +146,33 @@ printf '# past\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/mem/buil
 run
 ck "a relocated MEMORY_ROOT's records are excluded" '[ "$rc" = 0 ]'
 
+# ---- A QUOTED value is the NORM, not an edge case: 26 of 27 keys in the shipped example conf are
+# ---- quoted. Unstripped it built ^"docs/mem"/(...), which matches nothing -- so every committed
+# ---- record was scanned as a live carrier and an adopter's whole history reds on install. The
+# ---- unquoted fixture above is exactly why this went unseen.
+mk quoted
+mkdir -p "$R/docs/mem/builds/tOne"
+printf 'MEMORY_ROOT="docs/mem"   # the tree\n' > "$R/.memory-tree.conf"
+printf '# past\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/mem/builds/tOne/README.md"
+run
+ck "a QUOTED, commented MEMORY_ROOT still excludes records" '[ "$rc" = 0 ]'
+
+# ---- A metacharacter SHRINKS the population instead of widening it, and no vacuity arm can see a
+# ---- partial exclusion -- `^docs|memory/...` made `^docs` swallow a whole subtree while the gate
+# ---- printed `clean`. Refused rather than escaped.
+mk metachar
+mkdir -p "$R/docs"
+printf 'MEMORY_ROOT=docs|memory\n' > "$R/.memory-tree.conf"
+printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/A.md"
+run
+ck "a MEMORY_ROOT that is not a plain path is REFUSED" '[ "$rc" = 2 ] && printf "%s" "$out" | grep -q "not a plain relative path"'
+
 # ---- ...and the default still holds when no conf declares one.
 mk defaultroot
 printf '# past\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/memory/builds/tOne/README.md"
 run
 ck "with no conf, memory/ is still the frozen root" '[ "$rc" = 0 ]'
 
-# ---- PARITY-OWNED EXCLUSION IS NOT A HOLE. The playbook is excluded because check-playbook-parity.sh
-# ---- BINDS its digits; if those pairs go, the exclusion silently becomes an unwatched file.
-mk hole
-printf '# rules\n\nRoute fan-out through cap-5 helpers.\n' > "$R/parallel-coding-governance.template.md"
-mkdir -p "$R/tools"
-printf 'lens-array bound~$TEMPLATE~sed -n s/x/[0-9]/p~tools/hooks/agent-cap.js~sed -n s/y/z/p\n' > "$R/tools/check-playbook-parity.sh"
-run
-ck "the playbook is excluded while a digit pair binds it" '[ "$rc" = 0 ]'
-printf '# no pairs left\n' > "$R/tools/check-playbook-parity.sh"
-run
-ck "...and REFUSES once those pairs are gone"       '[ "$rc" = 2 ] && printf "%s" "$out" | grep -q "become a hole"'
 
 
 FLOOR_ASSERTIONS=24

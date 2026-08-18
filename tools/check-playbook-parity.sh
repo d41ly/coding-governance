@@ -106,8 +106,8 @@ PAIRS="
 lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const CAP = \([0-9]\+\).*/\1/p'
-resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const CAP = \([0-9]\+\).*/\1/p'
+bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 "
 
 # The pair loop runs in a subshell (it is the right-hand side of a pipe), so its findings have to

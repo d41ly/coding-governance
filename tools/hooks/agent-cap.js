@@ -694,7 +694,7 @@ function main() {
         `reads it. The cap is the file constant ${MAX_VERIFIERS}, resolved at the call site, the ` +
         `default parameter and the gov:bounded-fanout width. An environment override would be a ` +
         `ceiling raise that leaves no diff behind. Unset AGENT_CAP and re-run; to change the number, ` +
-        `change it in this file, which is the one place it is written.\n`,
+        `change it in tools/hooks/agent-cap.js, the source of truth -- .claude/hooks/agent-cap.js is a mirror the bar reverts.\n`,
     )
     process.exit(2)
   }

@@ -56,43 +56,27 @@ WAIVERS=${1:-tools/agent-cap-restatement-waivers.txt}
 # choice and its own adopter tells them to edit it. A hardcoded `memory/` turns every record in a
 # relocated tree into a live carrier, so the gate would red an adopter's whole history on install.
 # Extracted rather than sourced -- sourcing a conf into this script would let it set PAT.
-MEMORY_ROOT=$(sed -n 's/^MEMORY_ROOT=\(.*\)$/\1/p' .memory-tree.conf 2>/dev/null | head -1)
+# STRIPPED like every sibling reader, then VALIDATED. 26 of 27 keys in the shipped
+# .memory-tree.conf.example are quoted, so the quoted form is the norm, not an edge case; unstripped,
+# `MEMORY_ROOT="docs/mem"` built the ERE ^"docs/mem"/(...) which matches nothing and reds an
+# adopter's whole committed history -- the exact outcome this read exists to prevent. A trailing
+# comment and a CRLF-committed conf fail identically, and the unquoted-LF fixture could not see any
+# of it. The REFUSAL is separate and matters more: this value is interpolated into an ERE, so a `|`
+# in it made `^docs` a top-level alternation that swallowed a whole subtree -- the gate printed
+# `clean -- 1 file scanned` over a live carrier. Partial exclusion is invisible to a vacuity arm that
+# only fires at zero, so a value that is not a plain path is refused rather than escaped.
+MEMORY_ROOT=$(tr -d '\r' < .memory-tree.conf 2>/dev/null | sed -n 's/^[[:space:]]*MEMORY_ROOT=//p' \
+  | head -1 | sed 's/[[:space:]]*#.*$//; s/^["'"'"']//; s/["'"'"']$//; s/[[:space:]]*$//')
 : "${MEMORY_ROOT:=memory}"
+case "$MEMORY_ROOT" in
+  *[!A-Za-z0-9_/.-]*|/*|*/)
+    echo "agent-cap-restatement: MEMORY_ROOT='$MEMORY_ROOT' is not a plain relative path, and it is"
+    echo "  interpolated into a regex here. Refusing rather than guessing: a metacharacter in it"
+    echo "  silently SHRINKS the scanned population, which no vacuity arm can see."
+    exit 2 ;;
+esac
 FROZEN="^$MEMORY_ROOT/(builds|archive|gotchas|backlog)/"
 
-# PARITY-OWNED files, excluded by PATH because a STRONGER control already binds their numbers, and
-# kept SEPARATE from FROZEN because the two exclusions are not the same claim. The shipped playbook
-# is an operating ruleset an adopter reads standalone: "the total the hook resolves" is worse for
-# them than a number they can act on. Its bounds are declared pairs in `check-playbook-parity.sh`,
-# which asserts every stated digit equals the constant in `tools/hooks/agent-cap.js` that owns it --
-# a CHECKED COPY, not a second answer, and a stronger guarantee than deletion.
-#
-# Two gates demanded opposite things here: the parity pair `lens-array bound` REQUIRES the playbook
-# to spell `array LITERAL of ≤5 elements` and reds when that extraction matches nothing, while this
-# gate banned the same digit. Resolved in favour of the gate that CHECKS the number over the gate
-# that removes it, and the other three playbook bounds were given pairs of their own in the same
-# commit so the exclusion covers nothing that is merely unwatched.
-PARITY_OWNED='^parallel-coding-governance\.template\.md$'
-PARITY_GATE=tools/check-playbook-parity.sh
-
-# The exclusion is only honest while those pairs exist. ASSERT it rather than trusting the comment
-# above: an excluded file whose pairs were deleted is a hole that reports as a boundary, and this
-# gate's whole subject is a claim that stopped being true while its carrier still said it.
-# Asserted only when the exclusion actually EXCLUDED something. A tree that ships no playbook has
-# no hole to open, and demanding the pairs there would make every adopter and every scratch fixture
-# refuse over a file they do not have.
-_excluded=$(git ls-files -z '*.md' | tr '\0' '\n' | grep -cE "$PARITY_OWNED" || true)
-# `grep -c` PRINTS 0 and EXITS 1 when it matches nothing, so `|| echo 0` appended a second line
-# and made `[` compare a two-line string. An absent file prints nothing at all, hence the default
-# below rather than a second echo.
-_pairs=$(grep -cE '^[^~]+~\$TEMPLATE~.*\[0-9\]' "$PARITY_GATE" 2>/dev/null || true)
-: "${_pairs:=0}"
-[ "$_excluded" -eq 0 ] || [ "$_pairs" -ge 1 ] || {
-  echo "agent-cap-restatement: the playbook is excluded here because $PARITY_GATE binds its numbers,"
-  echo "  and that file now declares NO digit-extracting pair over it. The exclusion has become a hole:"
-  echo "  either restore the pairs or delete PARITY_OWNED and let this gate scan the playbook again."
-  exit 2
-}
 
 BOUND='(≤|<=|at most|never more than|no more than|up to|maximum of|max of|capped at|only)'
 NOUN='(agents?|verifiers?|lens(es)?|skeptics?|helpers?|verify|cap|concurrency|concurrent|verify-stage|per verify stage|are verify-stage|arity|ever run|batched)'
@@ -126,7 +110,7 @@ while IFS= read -r -d '' f; do
   }
   [ -n "$out" ] && hits="$hits$out
 "
-done < <(git ls-files -z '*.md' | grep -zvE "$FROZEN" | grep -zvE "$PARITY_OWNED")
+done < <(git ls-files -z '*.md' | grep -zvE "$FROZEN")
 
 # VACUITY: a scanner whose population is empty passes by finding nothing, which is this repo's own
 # named class. An empty selection is a refusal, never a green. Asserted on what was SCANNED.
