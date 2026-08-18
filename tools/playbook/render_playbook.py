@@ -136,12 +136,20 @@ def derive_machine(_r: Path, _a: dict) -> str:
 
 
 def derive_primary_tree(root: Path, _a: dict) -> str:
+    # The PRIMARY tree, not whichever worktree this render runs from. `--show-toplevel` answers the
+    # linked worktree, so a render performed inside one would register that worktree as the node's
+    # primary tree — measured on gov's own first render. `--git-common-dir` points at the main
+    # repository's .git wherever it is run, and its parent is the primary checkout.
+    common = read_git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir')
+    if common:
+        return Path(common).parent.as_posix()
     top = read_git(root, 'rev-parse', '--show-toplevel')
     return top or root.resolve().as_posix()
 
 
 def derive_worktree_root(root: Path, _a: dict) -> str:
-    return (root / '.claude' / 'worktrees').as_posix() if (root / '.claude').is_dir() else ''
+    primary = derive_primary_tree(root, _a)
+    return f'{primary}/.claude/worktrees' if primary else ''
 
 
 PROBES = {
@@ -290,9 +298,19 @@ def render(gov_root: Path, target: Path, template: Path) -> tuple[str, list[str]
                               f'not define')
             val = probe(target, answers)
             if not val:
-                raise Refusal(f'{key} is derived by probe `{row["probe"]}` and it returned nothing '
-                              f'for this target. Supply it as an answer instead of shipping a blank')
-            notes.append(f'derived   {key} = {val}')
+                # AN EXPLICIT ANSWER OVERRIDES A PROBE THAT CANNOT SEE. Gov's own first render found
+                # this: it has no CI workflow yet, so `ci_file` derived to nothing and the refusal
+                # told the operator to "supply it as an answer" — which the engine then did not
+                # honour. A message naming an escape the code does not implement is worse than no
+                # escape. What is still refused is the SILENT case: probe empty AND no answer.
+                val = answers.get(key.lower()) or ''
+                if not val:
+                    raise Refusal(f'{key} is derived by probe `{row["probe"]}`, it returned nothing '
+                                  f'for this target, and no answer overrides it. Supply it under '
+                                  f'[answers] rather than shipping a blank')
+                notes.append(f'override  {key} = {val}   (probe saw nothing)')
+            else:
+                notes.append(f'derived   {key} = {val}')
         elif cls == 'asked':
             val = answers.get(key.lower())
             if val in (None, ''):
