@@ -79,11 +79,23 @@ deliberately does not restate it.
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aBoundedVerdict-4` | 2 | the open-questions predicate, in both readers |
-| 2 | `TOOL-aBoundedVerdict-5` | 2 | a park verb |
-| 3 | `TOOL-aBoundedVerdict-2` | 2 | the halt code vocabulary |
-| 4 | `TOOL-aBoundedVerdict-1` | 2 | the review round cap |
-| 5 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
+| 1 | *(id minted with its spec)* | 2 | the units region: generated, mandatory, read by name |
+| 2 | *(id minted with its spec)* | 2 | a blocked close names its cause |
+| 3 | *(id minted with its spec)* | 2 | every remote observation is bounded |
+| 4 | `TOOL-aBoundedVerdict-4` | 2 | the open-questions predicate, in both readers |
+| 5 | `TOOL-aBoundedVerdict-5` | 2 | a park verb |
+| 6 | `TOOL-aBoundedVerdict-2` | 2 | the halt code and verdict vocabularies |
+| 7 | `TOOL-aBoundedVerdict-1` | 2 | the review loop's convergence rule |
+| 8 | *(id minted with its spec)* | 2 | fold-scoped review rounds |
+| 9 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
+| 10 | *(id minted with its spec)* | 1 | close-path writes are staged and guarded |
+| 11 | *(id minted with its spec)* | 2 | the closing-review join: a diff-review, in range |
+| 12 | *(id minted with its spec)* | 2 | authorization survives a split fetch/push URL |
+| 13 | *(id minted with its spec)* | 1 | the two vacuous checks get subjects |
+| 14 | *(id minted with its spec)* | 1 | the protocol pair says what the code does |
+
+*An id appears here only once a conforming spec defines it — hygiene check 14 refuses a cited
+id nothing defines, which is the mechanical form of the method's "never build a MISSING unit".*
 
 **The order is a dependency order, not a preference.** Unit 4 hardens the predicate that decides
 whether a fork is resolved; until it does, every rule the later units write about forks is
@@ -180,6 +192,53 @@ Named here so the cut-line is one place rather than five.
   unpaired shipped protocol version, and the never-landed silent-exit refusals. Unit 4 closes the
   planning verb's blindness as a side effect and says so in its own record.
 
+
+## The 2026-08-19 re-decomposition
+
+The owner reopened this build with three reports and one reversal. The reversal is the round cap:
+`TOOL-aBoundedVerdict-1`'s two-round design is **withdrawn**, not re-tuned. Its replacement, the
+measurement that forced it, and the disposition the owner ratified for a residual blocker are in
+`build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md`. A five-lens adversarial audit
+of the close path ran behind that design and confirmed 32 defects, 3 of them blockers;
+`build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md` is the findings table and is the
+source every new unit below derives from.
+
+**The reversal in one line.** The cap bound the wrong variable. Over 90 tracked review records the
+only exit the method states — a literal clean verdict — occurs **zero** times, while `BLOCKED` is 38
+and has no disposition anywhere. A count does not give a loop an exit; it moves the stall earlier.
+
+**Why the build grew from five units to fourteen.** The owner's second report — closing "faces
+multiple issues, and often stalls" — was scoped to a full close-path audit rather than to the two
+named symptoms, and the audit found that the headline symptom is a dated cross-kit regression rather
+than a design flaw: `TOOL-aTetheredRecord-5` began rendering a Records table inside the region the
+driver selects unit rows out of by row shape, which makes `build-complete` and
+`closing-review-recorded` mutually unsatisfiable on 49 of 49 builds. Nine new units carry that and
+the rest of the confirmed set.
+
+### Classification, per the build method's four states
+
+| Unit | State | What it needs |
+|---|---|---|
+| `-11` `-12` `-13` `-14` `-15` `-16` `-17` `-18` `-19` | **MISSING** | no conforming spec carries the id — author at the tier the roster names |
+| `-1` | **THIN by reversal** | its design is withdrawn; rev-6 replaces the cap with the convergence rule and deletes the S8 the audit found vacuous |
+| `-5` | **THIN** | its S1 spells a three-field `--park` and its S5 a decision-only count; the verb that shipped under `TOOL-cSettledDocket-1` has two fields and counts four kinds, so the spec and the code disagree |
+| `-2` | **READY, widening** | gains the verdict-token half — the vocabulary a machine can read is the same problem one document over |
+| `-3` | **READY, widening** | gains an `--attest` verb and the sentence that says which item cannot be overridden |
+| `-4` | **READY** | unchanged by any of this |
+
+### What the audit changed about the dependency order
+
+`-11` moves to the front. It is the owner's ratified mechanism — the units region becomes generated
+and mandatory — and three other things wait on it: `build-complete` cannot pass until it lands, the
+promotion disposition `-1` now carries needs a units region a run may legally extend, and `--status`
+cannot name a real next unit without it. `-12` and `-13` are independent blockers on the same verb
+and neither waits for anything.
+
+### The trap the ratified resolution must not fall into
+
+The frozen scope cannot move into the run-state file. That file is written by the run, and a scope
+frozen where its subject can write it is `memory/gotchas/inputs-inside-the-subjects-reach.md`. The
+authority stays the BASE blob, re-derived through git by both the driver and the leg.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-16 · streams tooling
