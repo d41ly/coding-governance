@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -35,7 +35,12 @@ including after a crash.
   Its ABSENCE is the crash signal, and is the only crash signal needed.
 - **S5** — a fingerprint helper computing one digest over the committed tree object plus the
   porcelain status lines plus the blob hashes of every dirty-or-untracked file that still exists.
-  Over-sensitive by construction, never under-sensitive; empty on any failure.
+  Over-sensitive by construction, never under-sensitive; empty on any failure. It ships as its OWN
+  executable inside the kit, not as a function private to the runner, because
+  `TOOL-aPacedTurnstile-7`'s predicate 0 has to compute the same digest from a git hook. Two
+  independent implementations of one digest is the `two-answers-to-one-question` class, and here it
+  fails toward FULL forever — safe, and it would permanently defeat the scoped path this build
+  exists to enable, which is the kind of failure nobody investigates because it looks like caution.
 - **S6** — `<git-dir>/gate-ledger.tsv` replaces the timing cache: rows gain status, input key and a
   timestamp while KEEPING the duration in field 2, so the existing dispatch-order parser needs no
   edit. The carry-forward merge for guard-skipped legs is kept exactly as written, and the rewrite
@@ -99,14 +104,19 @@ against the manifest: no leg name contains a tab, a newline or a colon, and all 
 
 ### Data model
 
-`<git-dir>/gate-run/header` exists to prove the run started; its absence proves nothing ran. Keys are
-listed in S2.
+Every path below sits under the PER-RUN directory `<git-dir>/gate-run/<run-id>/`, and
+`<git-dir>/gate-run/current` is a pointer to the in-flight one. The flat spelling is deliberately
+absent: a completion file at a fixed path is a stale DISPATCH SUPPRESSOR, and that is the whole of
+blocker F2. A reader that wants the live run resolves `current` first.
 
-`<git-dir>/gate-run/<i>.leg` is keyed on the manifest INDEX, which is stable within a run and
-lossless, with the leg name carried inside the row — so a slug-safe filename can never mis-attribute
-a verdict. Status is one of ok, fail, skip, reuse; a skipped row carries a dash for rc and key.
+`<run-id>/header` exists to prove the run started; its absence proves nothing ran. Keys are listed in
+S2, and the dispatch-order key is the one `TOOL-aPacedTurnstile-3`'s ordering criteria read.
 
-`<git-dir>/gate-run/verdict` is written last and carries the tallies.
+`<run-id>/<i>.leg` is keyed on the manifest INDEX, which is stable within a run and lossless, with
+the leg name carried inside the row — so a slug-safe filename can never mis-attribute a verdict.
+Status is one of ok, fail, skip, reuse; a skipped row carries a dash for rc and key.
+
+`<run-id>/verdict` is written last and carries the tallies.
 
 `<git-dir>/gate-ledger.tsv` is the cross-run keyed store. Field 2 stays the duration, so the
 dispatch-order block reads it unchanged — it splits on tab and ignores every extra column. A failed
@@ -193,12 +203,13 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a run is in flight, a leg can read `<git-dir>/gate-run/header` and see this run's
-  id — asserted by a fixture leg in `tools/run-gates/run-gates.evidence.test.sh`.
-- **AC2** — When the runner is killed mid-run with `timeout -s KILL`, `<git-dir>/gate-run/header`
-  exists and `<git-dir>/gate-run/verdict` does not.
-- **AC3** — When a run completes, `<git-dir>/gate-run/` holds one `.leg` row per non-sentinel leg,
-  and each row's first field equals the manifest name at that index.
+- **AC1** — When a run is in flight, a leg can resolve `<git-dir>/gate-run/current` and read that
+  run's `header`, seeing this run's id — asserted by a fixture leg in
+  `tools/run-gates/run-gates.evidence.test.sh`.
+- **AC2** — When the runner is killed mid-run with `timeout -s KILL`, that run's `header` exists
+  under `<git-dir>/gate-run/<run-id>/` and its `verdict` does not.
+- **AC3** — When a run completes, `<git-dir>/gate-run/<run-id>/` holds one `.leg` row per
+  non-sentinel leg, and each row's first field equals the manifest name at that index.
 - **AC4** — When a leg fails, its row in `<git-dir>/gate-ledger.tsv` carries status `fail` and a
   dash in the input-key field.
 - **AC5** — When a guard-skipped leg produces no duration, its previously cached ledger row survives
@@ -222,10 +233,13 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 - **AC13** — When the working tree is DIRTY at the start of an otherwise fully green run,
   `<git-dir>/gate-full-green` is not written, asserted in
   `tools/run-gates/run-gates.evidence.test.sh`.
-- **AC14** — When a stale completion file for leg index 3 is planted before a run starts, that leg
-  still EXECUTES and its reported verdict is the one it produced this run — asserted in
-  `tools/run-gates/run-gates.evidence.test.sh`, because the completion file suppresses dispatch and a
-  stale one would print a green nobody earned.
+- **AC14** — When the run id is pinned through a test seam and a stale completion file for leg index
+  3 is planted INSIDE that exact run directory before the run starts, that leg still EXECUTES and its
+  reported verdict is the one it produced this run — asserted in
+  `tools/run-gates/run-gates.evidence.test.sh`. The seam is load-bearing for the ARM, not for the
+  runner: without a pinned id the plant lands in a directory the run never opens, so the arm passes
+  by finding nothing and proves the opposite of what it claims. A second plant at the retired FLAT
+  path must also be ignored.
 - **AC12** — When `bash tools/check-testsuite-counts.sh` runs, both moved harnesses report their
   executed assertion counts at or above their floors.
 
@@ -248,6 +262,15 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · folded the blocker re-review, which found F2 only PARTLY closed. The first
+  fold-in repointed the scope items and left §4 Data model and AC1 through AC3 spelling the flat
+  path, so a builder grading against §6 would have built the very thing S1 forbids — and it stranded
+  sibling `-3`'s AC7 and AC8 on a file that no longer exists. AC14 was also unfalsifiable as written:
+  under a per-run directory a plant made before the run starts lands where the run never looks, so
+  the arm passed by finding nothing. It now pins the run id through a seam and plants inside that
+  exact directory. S5's fingerprint becomes a shipped executable rather than a private function,
+  because `TOOL-aPacedTurnstile-7` predicate 0 must compute the same digest from a git hook and two
+  implementations of one digest is the two-answers-to-one-question class.
 - rev-2 · 2026-08-18 · folded the spec audit. The record directory becomes PER-RUN: at a fixed path
   a leftover completion file is not a stale log but a stale DISPATCH SUPPRESSOR, so the leg never
   runs and the bar prints it green — and two sibling units add exactly the writers that outlive a run

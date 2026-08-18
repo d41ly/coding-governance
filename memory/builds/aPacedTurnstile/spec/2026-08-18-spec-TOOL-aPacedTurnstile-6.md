@@ -243,7 +243,9 @@ so the rollback state is the shipped state and every arm runs against it.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
-- rev-2 · 2026-08-18 · folded the spec audit: S5 names the ref it takes the merge-base against and
+- rev-2 · 2026-08-18 · folded the spec audit. BLOCKER F4 — this unit had no position in the build
+  order — is fixed in the build README, which now sequences it `-5 → -6 → -3` with its forcing edges.
+  In this file: S5 names the ref it takes the merge-base against and
   refuses a degenerate base equal to HEAD, the `TOOL-cFinalBerth-2` class the adopted form otherwise
   inherits (F22, F23); S8's matcher becomes wrapper-aware and carries a `DEAD PROBE` anti-vacuity
   control, having found zero sites in the very files that motivated it (F24); S4 states which unit

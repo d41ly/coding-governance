@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -222,9 +222,10 @@ and the row-keyed merge driver does not cover JSON.
   asserted in `tools/run-gates/run-gates.test.sh` against a fixture leg that spawns a child. Asserting
   the printed lines and the exit code says nothing about what is still running.
 - **AC7** — When the timing ledger is absent, dispatch order is pure chunk-major, asserted against
-  the dispatch order `<git-dir>/gate-run/header` carries.
+  the dispatch order the run's `header` carries under `<git-dir>/gate-run/<run-id>/`.
 - **AC8** — When the ledger is present, a leg whose duration reaches the pole threshold is
-  dispatched in the first batch, asserted against the same `<git-dir>/gate-run/header` field.
+  dispatched in the first batch, asserted against that same `header` field. Both poles are checked,
+  not just the longest.
 - **AC9** — When a run halts, `<git-dir>/gate-last-summary.txt` carries the chunk roll-up and the
   list of chunks not reported.
 - **AC10** — When any chunk verdict line is printed, it carries no elapsed time, so the existing
@@ -254,6 +255,9 @@ and the row-keyed merge driver does not cover JSON.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · folded the blocker re-review: AC7 and AC8 pointed at a `header` path that
+  `TOOL-aPacedTurnstile-5`'s F2 fix had moved under the per-run directory, so both read a file no
+  unit writes any more. AC8 now checks both poles rather than the longest.
 - rev-2 · 2026-08-18 · folded the spec audit: the dispatch-order key is declared in
   `TOOL-aPacedTurnstile-5`'s header rather than read from a field no unit wrote (F12, F13); the halt
   signals the process group, because killing the shell's job leaves the leg and its children running

@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -14,6 +14,13 @@ obligation instead of deleting it.
 - **S1** — `.githooks/pre-push` stops exporting `GATE_FULL=1` unconditionally; it decides.
 - **S2** — the hook forces a full run when the run record's last full green is absent, is not an
   ancestor of the pushed tip, or is more than `GATE_FULL_MAX_LAG` commits behind it.
+- **S2b** — the hook forces a full run when the record's TREE fingerprint does not equal a fresh
+  fingerprint of the pushed tip (predicate 0), when the lag value is not a decimal integer
+  (predicate 6), and on any `push-main` retry after the first, whose reconcile merge commit no
+  recorded green describes (predicate 7). It computes that fingerprint by CALLING
+  `TOOL-aPacedTurnstile-5`'s shipped helper, never by reimplementing the digest — two implementations
+  of one digest disagree silently and then force full forever, which reads as caution rather than as
+  the defect it is.
 - **S3** — the hook forces a full run when the pushed diff touches `tools/gate-legs.json`, the file
   in which a guard can be narrowed.
 - **S4** — the hook forces a full run when the recorded leg-manifest fingerprint differs from
@@ -213,6 +220,10 @@ and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-4 · 2026-08-18 · folded the blocker re-review: §2 described none of predicates 0, 6 or 7, so
+  the scope under-described its own decision table; and predicate 0 is now stated as CALLING
+  `TOOL-aPacedTurnstile-5`'s shipped fingerprint helper rather than computing its own digest, which
+  would have failed toward FULL permanently and looked like caution.
 - rev-3 · 2026-08-18 · folded the spec audit. Predicate 0 joins the record's tree fingerprint to the
   pushed tip, without which a full green earned on a dirty tree reset the lag counter (BLOCKER F5,
   F30). Predicate 7 forces full on a push-main retry, whose reconcile merge commit no recorded green
