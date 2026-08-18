@@ -167,6 +167,12 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   equals the installed one), plus its sibling
   `tools/unattended/check-unattended.test.sh` and the driver's
   `tools/unattended/unattended.test.sh`. Both siblings are LEGS, not files someone remembers to run
+- unattended cross-component — `bash tools/unattended/cross-component.test.sh`: the driver and THEN
+  the leg over ONE tree. The kit had driver arms, leg arms and Skill-parity arms and none that ran
+  both halves against the same repository, so each could agree with itself and disagree with the
+  other unobserved. Six arms, each first performed by hand; the fixture asserts its OWN completeness
+  before any arm perturbs it, because an incomplete one fails on checks unrelated to the subject and
+  a naive arm scores that as a correct refusal
 - unattended adopter e2e — `bash tools/unattended/adopt-unattended.test.sh`: the adopter WRITES, so
   it is gated on the EFFECTS in BOTH trees, never on the exit code. It refuses a foreign repo and an
   install prefix carrying whitespace (the kit path is interpolated into shell commands in the

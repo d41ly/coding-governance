@@ -5,7 +5,7 @@
 last-audit: 2026-08-18T16:08:24+03:00 @ 6517579fcf0841de272c5da37f1f8546a0ebddf7
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 94a4150510cd853662016f34188dd5a8892f42fd
+last-body-change: c8cee4f825464a45c2ef24b555c109a586722faf
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -143,6 +143,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
   verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
   0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
+- A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
+  and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
+  `TOOL-aPromptedMandate-4`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
