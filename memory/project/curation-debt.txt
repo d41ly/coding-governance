@@ -1,5 +1,5 @@
 # curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
-# Two build READMEs entered the index set at TOOL-aRuledFrontispiece-5's tier (BUILD_README_CAP_BYTES
+# Two build READMEs entered the index set at TOOL-aRuledFrontispiece-5's tier (BUILD_README_CAP_BYTES / BUILD_README_ENTRY_CAP_CHARS)
 # already above it. Both are other builds' records, so slimming them is not this build's to do —
 # TOOL-aMouldedFolio-3 is the precedent that a build's own folder owns its own prose. Shrink-only:
 # each row drains when that build's owner curates it.

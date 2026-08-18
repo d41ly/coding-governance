@@ -10,9 +10,12 @@ every number below is either measured on THIS tree or marked as inherited with t
 whatever the finding count.** The batch size grows
 with the finding count; the agent count never does.
 
-The NUMBER is not written here. It is declared per repository and resolved by the hook, and a copy
-in this document would be a second answer that goes stale the day someone turns the knob — the same
-reason a kit version is never spelled in prose. Read it from the hook.
+The NUMBER is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js`, and that file is what a run actually
+obeys — it ships deployed verbatim, with no conf channel and no environment override. This document
+restates it only where a reader has to act on it, and every restatement is a copy that can go stale:
+when the two disagree, the hook is right and the sentence you are reading is the bug. An earlier
+revision of this line claimed the number was "declared per repository"; that was written for a
+mechanism that was specced and then parked, and it described a channel this tree does not have.
 
 This is not the concurrency cap wearing a different hat. `boundedParallel(thunks, 5)` bounds how many
 run AT ONCE; N findings still spawn N agents, five at a time. **Concurrency is not a budget.**
@@ -112,7 +115,10 @@ outright, so a line slicing fifty wide passed unread.
 
 ## Concurrency — the at-once bound `agent-cap.js` resolves, always
 
-Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)`. The
+Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)` —
+the literal `5` STAYS in these two forms on purpose: they are code an agent inlines into a script,
+and a script that spells a pointer instead of an integer does not run. `{{TOOL_ROOT}}hooks/agent-cap.js` re-resolves
+that width at the call site and denies it if it is wrong, so the digit here is checked, not trusted. The
 same hook DENIES a script calling raw `parallel(` / `pipeline(` outside a line marked
 `gov:bounded-fanout`; scripts cannot `import`, so inline the helper.
 
@@ -124,9 +130,11 @@ travels. It moved 6 → 5 here on that basis.
 the cap argument at each `boundedParallel(` / `boundedPipeline(` CALL SITE, the helper's own DEFAULT
 PARAMETER when a call passes none, and the slice width a `gov:bounded-fanout` line claims — joining
 lines forward until the parens balance, because every shipped call site spans lines. A K it cannot
-resolve to an integer ≤ 5 is denied; the burden is on the fan-out.
+resolve to an integer within the cap `{{TOOL_ROOT}}hooks/agent-cap.js` holds is denied; the burden is on
+the fan-out.
 
-The 5 is a FILE CONSTANT. There is no environment override, and a set `AGENT_CAP` is refused with a
+The cap is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js` — the one place it is written and the
+one place to change it. There is no environment override, and a set `AGENT_CAP` is refused with a
 message rather than ignored — a ceiling that can be raised from the environment leaves no diff behind,
 which is the defeatable class this rule exists to stay out of.
 
@@ -150,7 +158,8 @@ the process cwd twice made it audit a repository nobody had briefed it on.
   write paths; over already-hardened code it manufactures defence-in-depth noise. Review light, or
   skip.
 - **Scale a large fresh surface by adding LENSES, not skeptics.** Coverage is what more agents buy;
-  precision saturates. The lens allowance is **5**, the same number as everything else here — it
+  precision saturates. The lens allowance is the same number as everything else here, and
+  `{{TOOL_ROOT}}hooks/agent-cap.js` holds it as `MAX_LENSES` — it
   briefly read as 6, which was never a decision: the hook counted a trailing comma as an element, so
   every prettier-formatted 5-lens array measured 6 and the constant had been raised to fit the error.
   Ratified at 5 by the owner once the miscount was found.

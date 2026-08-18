@@ -29,6 +29,9 @@ lexicon-verbs = []
 globs = [
   "tools/hooks/*",
   ".claude/hooks/agent-cap.js",
+  "tools/check-agent-cap-restatement.sh",
+  "tools/check-agent-cap-restatement.test.sh",
+  "tools/agent-cap-restatement-waivers.txt",
   "tools/workflows/check-verifier-fanout.sh",
   "tools/workflows/check-verifier-fanout.test.sh",
   "tools/workflows/check-protocol-parity.test.sh",

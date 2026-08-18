@@ -19,6 +19,7 @@ Everything runs in a throwaway git repo under tempfile. Nothing is written into 
 from __future__ import annotations
 
 import os
+import io
 import pathlib
 import shutil
 import subprocess
@@ -978,6 +979,34 @@ def test_ratchet_lookback(tmp: pathlib.Path) -> None:
         except DriftError as exc:
             named = "RATCHET_LOOKBACK" in str(exc)
         check(f"an unusable declaration ({bad!r}) is a refusal that NAMES the key", named)
+
+    # THE RAISE IS NOT THE CHANNEL. Every arm above calls the function and catches the exception,
+    # which is exactly what let the real defect through: the raise worked and nothing carried it to
+    # the caller, because the only call site sat OUTSIDE main's try. That shipped as a raw traceback
+    # and rc=1 -- the leg's "a signal is over its pin" exit -- so a config error read as drift.
+    # This arm drives main() and asserts the REFUSAL CHANNEL: rc 2, and the `drift-report: ` prefix
+    # a reader greps for. The repo's own idiom, asserted on the message and the code, never the raise.
+    import drift_report as _dr
+    import drift_signals as _ds
+
+    _saved = getattr(_ds, "RATCHET_LOOKBACK", None)
+    _err = io.StringIO()
+    try:
+        _ds.RATCHET_LOOKBACK = 0
+        _stderr, sys.stderr = sys.stderr, _err
+        try:
+            rc = _dr.main(["--check"])
+        finally:
+            sys.stderr = _stderr
+    finally:
+        if _saved is None:
+            delattr(_ds, "RATCHET_LOOKBACK")
+        else:
+            _ds.RATCHET_LOOKBACK = _saved
+
+    check("an unusable RATCHET_LOOKBACK refuses through main with rc=2, not a traceback", rc == 2)
+    check("...and on the prefixed channel a reader greps for",
+          _err.getvalue().startswith("drift-report: ") and "RATCHET_LOOKBACK" in _err.getvalue())
 
 
 def test_ratchet_message_states_its_window(tmp: pathlib.Path) -> None:

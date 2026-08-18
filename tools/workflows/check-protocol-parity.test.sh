@@ -81,8 +81,12 @@ fi
 # such commit exists yet.
 _p_bad=0
 for _sec in 'The hard cap' 'Concurrency'; do
+  # `next` DROPS the heading from the body. Without it this arm graded the heading line, and both
+  # headings already contain the literal `agent-cap.js` -- so `grep -qF` passed on the heading no
+  # matter what the body said, and the arm could not detect the body losing its pointer. A predicate
+  # that reads its own subject line is this repo's vacuity class wearing the shape of a section scan.
   _body=$(awk -v want="$_sec" '
-      /^## / { inb = (index($0, want) > 0) ? 1 : 0 }
+      /^## / { inb = (index($0, want) > 0) ? 1 : 0; next }
       inb { print }' "$LIVE")
   if [ -z "$_body" ]; then
     echo "protocol-parity: $LIVE has no '## $_sec ...' section, so this pointer arm would pass by finding nothing"

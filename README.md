@@ -69,10 +69,10 @@ machines/sessions on the same repo.
   numbered slot with `O_EXCL` under a session+prompt-keyed dir in the git common dir, and the spawn
   that finds every slot taken is denied; the budget resets on the next user prompt. A `Workflow` call
   is read statically: it DENIES any
-  script calling raw `parallel(`/`pipeline(` instead of the cap-5 `boundedParallel`/`boundedPipeline`
+  script calling raw `parallel(`/`pipeline(` instead of the bounded `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
-  the rule too: a review's verify stage spawns at most the total the guard resolves. That number is
-  DECLARED per repository and read by `tools/hooks/agent-cap.js`; the guard resolves it at the call
+  the rule too: a review's verify stage spawns at most the total the guard resolves. That number is a
+  FILE CONSTANT inside `tools/hooks/agent-cap.js`, which ships deployed verbatim; the guard resolves it at the call
   site, at the helper's default parameter and at the `gov:bounded-fanout` width, and refuses a set
   `AGENT_CAP` rather than ignoring it — an environment override leaves no diff behind.
   Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.

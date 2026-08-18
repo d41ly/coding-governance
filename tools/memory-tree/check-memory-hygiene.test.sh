@@ -1264,7 +1264,7 @@ n=$((n+1))
 [ -n "$_engkeys" ] || { echo "FAIL could not derive the cap-key list from the engine; the example-conf arms below would pass by finding nothing"; st=1; }
 for _k in $_engkeys READ_PATH_HEADROOM; do
   n=$((n+1))
-  grep -qE "^$_k=" "$EX" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
+  grep -qE "^$_k=" "$EX" || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
 done
 
 # ---- SPEC10_CUTOFF is a CONF DECLARATION, and the environment no longer reaches it
@@ -1345,17 +1345,14 @@ cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
 n=$((n+1))
-# ---- THE SHIPPED EXAMPLE CONF (TOOL-aRelaxedShard-1). Nothing else in the bar reads that file:
-# ---- adopt-memory-tree.sh only copies it and check-install-prefix.sh excludes *.conf.example, so
-# ---- without this arm the one artifact an adopter actually RECEIVES can lose a key silently.
-# ---- Key NAMES are main's landed ones; this branch's own pair converged with them at the merge.
-for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES BUILD_README_CAP_BYTES DOSSIER_CAP_BYTES; do
-  n=$((n+1))
-  grep -qE "^${_k}=" "$HERE/.memory-tree.conf.example" \
-    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k"; st=1; }
-done
+# ---- The hand-kept five-key version of this arm lived here and was DELETED, not left beside the
+# ---- derived loop above it. A strict subset asserting the identical property over the identical
+# ---- file can only under-cover, and it is the copy that silently falls behind the next engine
+# ---- key -- the exact hand-kept-list drift the derived loop was written to remove. A reader
+# ---- grepping for the assertion would have landed on whichever copy came first and concluded
+# ---- coverage was five keys. The derived loop is now the ONLY site naming .memory-tree.conf.example.
 
-FLOOR_ASSERTIONS=229
+FLOOR_ASSERTIONS=224
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

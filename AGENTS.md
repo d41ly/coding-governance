@@ -27,7 +27,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
   `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
   stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
-  that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the ≤5-verifier arity rule),
+  that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the verifier-arity rule it resolves),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
   `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
   reads the project's `.unattended.conf` declarations rather than restating them — a run that will

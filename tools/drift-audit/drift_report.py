@@ -859,6 +859,13 @@ def main(argv: list[str] | None = None) -> int:
         root = repo_root()
         conf = load_conf(root)
         proj = load_project_layer(root)
+        # RESOLVED HERE, beside the other project-layer reads, and not at the --check call site.
+        # An unusable RATCHET_LOOKBACK raised DriftError out of main() from there: a raw traceback
+        # and rc=1, which is the leg's "a gateable signal is over its pin" exit -- so a config error
+        # reported itself as drift. The docstring promised a refusal on this channel; this is the
+        # line that keeps it. It also means the key is validated on EVERY run, not only under
+        # --check, which is the run an adopter is told to make first.
+        lookback = _read_lookback(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
@@ -924,8 +931,7 @@ def main(argv: list[str] | None = None) -> int:
         # rule with no exception here would red every fresh adopter on their first run. The exception
         # is enumerated in the project layer, never inferred.
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
-        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()),
-                                    _read_lookback(ctx.proj))
+        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]

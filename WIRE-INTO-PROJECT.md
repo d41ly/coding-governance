@@ -507,7 +507,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   git never tracks it), and the budget resets on the next user prompt. `tools/check-wiring.sh` asserts
   this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
   alone contains the string and used to report ok.
-  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the cap-5
+  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the bounded
   `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
   site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is
   a file constant — there is no environment override, and a set `AGENT_CAP` is refused with a message

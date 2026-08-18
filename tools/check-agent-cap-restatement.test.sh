@@ -21,7 +21,10 @@ mk() {   # $1 = tree name; builds a repo whose markdown the gate will scan
 }
 run() {  # runs the gate inside $R with $R/waivers.txt; sets $out and $rc
   ( cd "$R" && git add -A >/dev/null 2>&1 && git commit -q -m f --no-verify >/dev/null 2>&1 || true )
-  out=$(cd "$R" && WAIVERS=waivers.txt bash "$GATE" 2>&1); rc=$?
+  # POSITIONAL, not an env var. The gate stopped reading `$WAIVERS` because an ambient one greens
+  # the bar with no diff; this suite is the reason the knob exists at all, so it uses the shape the
+  # gate actually ships rather than a private back door.
+  out=$(cd "$R" && bash "$GATE" waivers.txt 2>&1); rc=$?
 }
 ck() { n=$((n+1)); eval "$2" || { echo "FAIL $1"; st=1; }; }
 
@@ -75,8 +78,94 @@ rm -f "$R/README.md"
 run
 ck "an empty population REFUSES rather than passing" '[ "$rc" = 2 ]'
 
-n=$((n+1))
-FLOOR_ASSERTIONS=9
+# ---- SCAN INTEGRITY (H1). A filename holding a SPACE was split by the old batched `xargs grep`
+# ---- into fragments that were never opened, and the gate reported a file count taken from the
+# ---- LIST rather than from what grep read -- a clean verdict over a file nobody looked at.
+mk space
+printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/Design Notes.md"
+run
+ck "a filename with a SPACE is scanned, not split"  '[ "$rc" = 1 ] && printf "%s" "$out" | grep -q "Design Notes.md"'
+
+# ---- The count must be what grep OPENED. Two files in, two reported.
+mk counted
+printf '# a\n' > "$R/A.md"; printf '# b\n' > "$R/B.md"; rm -f "$R/README.md"
+run
+ck "the reported count is the files actually scanned" 'printf "%s" "$out" | grep -q "2 markdown file(s) scanned"'
+
+# ---- SINGLE-FILE POPULATION (H1). `grep` prints no path for a one-file argv unless -H is forced,
+# ---- so the remedy said "point at the file" while naming none. A fresh adopter tree IS this case.
+mk lone
+rm -f "$R/README.md"
+printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/ONLY.md"
+run
+ck "a single-file population still names its file"  '[ "$rc" = 1 ] && printf "%s" "$out" | grep -qE "ONLY\.md:[0-9]+:"'
+
+# ---- MEASURED CARRIER SHAPES (H2). Every one of these was live in this corpus while the gate
+# ---- reported it clean. They are frozen as fixtures because a pattern written from a pattern is
+# ---- what certified them green; a pattern written from the measured population is what caught
+# ---- them. A shape that stops matching reds HERE, not in a review six weeks later.
+for _shape in \
+  'A review spawns at most 5 agents TOTAL.' \
+  'CONSOLIDATE before you fan out: at most 5 verify agents TOTAL (batch grows).' \
+  'the ≤5 cap is enforced at the Workflow tool-call' \
+  'the raw-primitive ban + the ≤5-verifier arity rule' \
+  'Route ALL Workflow fan-out through cap-5 helpers.' \
+  'CONCURRENCY ≤ 5, ALWAYS — the #1 rate-limit lever.' \
+  ; do
+  mk shape
+  printf '# rules\n\n%s\n' "$_shape" > "$R/GUIDE.md"
+  run
+  ck "measured carrier shape is caught: $_shape" '[ "$rc" = 1 ] && printf "%s" "$out" | grep -q "GUIDE.md"'
+done
+
+# ---- The false positive that narrowing REMOVED, frozen so a future widening cannot bring it back.
+# ---- `agents?-[0-9]+` matched the node-registry hostname `agent-0`; the reversed form is `cap-N` only.
+mk hostname
+printf '# nodes\n\n| `c` | agent-0 @ `DESKTOP-8BKM8GN` | `origin` |\n' > "$R/GUIDE.md"
+run
+ck "a node hostname like agent-0 is NOT a bound"    '[ "$rc" = 0 ]'
+
+# ---- WAIVER KEYS ON TEXT, NOT PATH (M2). A row reading `docs/` waived an entire subtree, because
+# ---- the row was matched against the whole `<path>:<line>:<text>` hit line by a registry whose own
+# ---- contract says it never keys on a path.
+mk pathwaiver
+mkdir -p "$R/docs"
+printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/A.md"
+printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/B.md"
+printf 'docs/\ta path fragment must not waive a subtree\n' > "$R/waivers.txt"
+run
+ck "a path-fragment row does NOT waive its subtree" '[ "$rc" = 1 ] && printf "%s" "$out" | grep -q "docs/A.md"'
+ck "...and that path-only row reds as STALE"        'printf "%s" "$out" | grep -q "matches nothing"'
+
+# ---- MEMORY_ROOT IS READ (M3). A relocated tree's records must still be excluded, or the gate
+# ---- reds an adopter's entire committed history on the day they install it.
+mk relocated
+mkdir -p "$R/docs/mem/builds/tOne"
+printf 'MEMORY_ROOT=docs/mem\n' > "$R/.memory-tree.conf"
+printf '# past\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/docs/mem/builds/tOne/README.md"
+run
+ck "a relocated MEMORY_ROOT's records are excluded" '[ "$rc" = 0 ]'
+
+# ---- ...and the default still holds when no conf declares one.
+mk defaultroot
+printf '# past\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/memory/builds/tOne/README.md"
+run
+ck "with no conf, memory/ is still the frozen root" '[ "$rc" = 0 ]'
+
+# ---- PARITY-OWNED EXCLUSION IS NOT A HOLE. The playbook is excluded because check-playbook-parity.sh
+# ---- BINDS its digits; if those pairs go, the exclusion silently becomes an unwatched file.
+mk hole
+printf '# rules\n\nRoute fan-out through cap-5 helpers.\n' > "$R/parallel-coding-governance.template.md"
+mkdir -p "$R/tools"
+printf 'lens-array bound~$TEMPLATE~sed -n s/x/[0-9]/p~tools/hooks/agent-cap.js~sed -n s/y/z/p\n' > "$R/tools/check-playbook-parity.sh"
+run
+ck "the playbook is excluded while a digit pair binds it" '[ "$rc" = 0 ]'
+printf '# no pairs left\n' > "$R/tools/check-playbook-parity.sh"
+run
+ck "...and REFUSES once those pairs are gone"       '[ "$rc" = 2 ] && printf "%s" "$out" | grep -q "become a hole"'
+
+
+FLOOR_ASSERTIONS=24
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
