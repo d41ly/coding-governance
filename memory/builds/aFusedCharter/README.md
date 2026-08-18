@@ -148,6 +148,23 @@ Put to the owner at kickoff and answered before any spec was written.
 | How binding the micro-format is | Doc-binding plus a gate over the DEFINITIONS. Emission stays a documented pre-send check. |
 | Which further trims | The kit-advertisement prose, `§8`'s agent-cap hook grammar, and `§17` folded into `§16`. |
 
+### The second round — RESOLVED 2026-08-18
+
+Three forks the spec audit left open or created, put to the owner together and answered. Each is
+marked in place in its own spec's `§8`.
+
+| Fork | Resolution |
+|---|---|
+| `TOOL-1` F2 — where the parity gate's two value-parity rows take their stated side from | KEEP them in the playbook. The gate's subject is the playbook's own claims, and moving the stated side into a file the playbook does not ship changes what the gate is for. No scope change; `PLAY-1` S7 was already written against this answer. |
+| `PLAY-3` F1 — a byte ceiling for the charter, and over what | YES, over the WHOLE file, seeded at the landed measurement plus headroom. The rejected option priced the authored half alone, which needs a region-aware measurement mode the size gate lacks. This flips a Non-goal into new scope. |
+| `DEPL-1` F4 — where the target descriptor lives | KEEP `.governance/deploy.toml`. The four root confs are tuning knobs; this is a committed authorization artifact that `intake` writes once and every deployer verb reads there. No scope change. |
+
+The whole-file answer to `PLAY-3` F1 accepts an apparent double-count deliberately: the region is
+already priced by the ruleset's own ceiling, and pricing it again in the charter is the honest
+reading rather than a flaw. If the ruleset grows five kilobytes, gov's charter really did become five
+kilobytes more expensive to read every session, and a ceiling that hid that would price the wrong
+thing.
+
 The owner's correction that produced the first row is recorded because it refutes a design this
 session proposed: `AGENTS.md` cannot import a second playbook file, because `@`-imports are Claude
 Code syntax and `AGENTS.md` exists precisely so that Codex, Cursor, Copilot and Windsurf read it
@@ -159,11 +176,11 @@ ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCh
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-3 | 2026-08-18 |
+| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-4 | 2026-08-18 |
 | [PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session](spec/2026-08-18-spec-PLAY-aFusedCharter-1.md) | OPEN | rev-2 | 2026-08-18 |
 | [PLAY-aFusedCharter-2 — every session emits a shaped overview of its own state, and the shapes get one grammar](spec/2026-08-18-spec-PLAY-aFusedCharter-2.md) | OPEN | rev-2 | 2026-08-18 |
-| [PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest](spec/2026-08-18-spec-PLAY-aFusedCharter-3.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md) | OPEN | rev-3 | 2026-08-18 |
+| [PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest](spec/2026-08-18-spec-PLAY-aFusedCharter-3.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md) | OPEN | rev-2 | 2026-08-18 |
 | [TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md) | OPEN | rev-2 | 2026-08-18 |
 

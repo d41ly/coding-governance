@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -36,8 +36,8 @@ commit as S1 so no intermediate tree has a stub pointing at an absent file.
   `PLAY-aFusedCharter-1` S7 keeps the two extracted literals in the file rather than moving them,
   which is the resolution of the audit's first blocker. Repointing them at
   `tools/hooks/README.md` would make the gate's "stated" side a file the playbook does not itself
-  ship — a change to what this gate is FOR — and `§8` records it as an owner fork rather than
-  taking it here.
+  ship, which is a change to what this gate is FOR. That was put to the owner as `§8` F2 and
+  RESOLVED on 2026-08-18 in favour of keeping it here.
 - `tools/check-placeholders.sh` — the marker lockstep compared TWO carriers. With one carrier a
   comparison is not available, so the assertion becomes presence plus well-formedness of the single
   marker, and the header states plainly that the lockstep question died with the second file rather
@@ -263,8 +263,7 @@ meaningful here and the full bar is the acceptance instrument — `GATE_FULL=1 b
 
 ## 8. Open questions
 
-none blocking — F1 is RESOLVED; F2 is an OWNER fork the build can proceed without, because its
-recommendation is the status quo.
+none — both forks below are RESOLVED.
 
 - **F1 — does `corpus_ids.py`'s dead-path checker already exempt frozen records?** RESOLVED (agent,
   2026-08-18, delegated), and the fork was CLOSED BEFORE IT WAS ASKED, which the spec audit is right
@@ -282,12 +281,18 @@ recommendation is the status quo.
   whole subject is *a value the playbook STATES equals the source that OWNS it*, so a stated side
   living in a file the playbook does not ship changes what the gate is FOR. That is a change to a
   governance carrier, which the build method makes an owner turn rather than a delegated one — so it
-  is raised here rather than taken. Proceeding on the recommendation costs nothing if the owner
-  later moves it.
+  is raised here rather than taken. RESOLVED (owner, 2026-08-18): KEEP the literals in the
+  playbook. The gate's subject stays what it was, and `PLAY-aFusedCharter-1` S7 is already written
+  against this answer — its retained bullet carries both literals verbatim and its AC7 proves the
+  extractions still resolve by RUNNING the gate. The two strings are arguably hook-implementation
+  detail sitting in a ruleset, and that cost is accepted deliberately rather than overlooked.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. The consumer inventory is measured, not recalled.
+- rev-4 · 2026-08-18 · F2 resolved by the owner: the parity gate's two value-parity rows keep
+  taking their stated side from the playbook. No scope change — S3 and `PLAY-aFusedCharter-1` S7
+  were both written against this outcome; the fork is now marked rather than pending.
 - rev-3 · 2026-08-18 · folded the M4 spec audit. New S4a lowers the parity gate's arms floor with
   the branch deletion, new S4b pins the line endings the render comparison depends on, new S10 moves
   the charter-completeness signal retirement here from `PLAY-aFusedCharter-3` because three later

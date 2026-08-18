@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -81,6 +81,25 @@ without one, `core.autocrlf` decides its bytes per node and the render's answers
 fleet for no reason anybody can see. This unit verifies the pin took effect with `git check-attr`
 rather than assuming the row was written.
 
+**S8 — Declare a byte ceiling for the charter, over the WHOLE file.** The owner resolved this at
+the second fork round, so it is scope rather than a recommendation. One row in
+`tools/template-size-limits.txt` keyed on `AGENTS.md`, in that file's existing grammar, with the
+justification written beside the number the way every other row there carries its history. It is
+seeded at the LANDED measurement plus headroom rather than at a figure predicted here — this spec
+projects roughly 56 KB and a projection is not a measurement.
+
+**Why the whole file and not the authored half.** The alternative was to measure `AGENTS.md` minus
+the rendered region, so the region stayed priced by the ruleset's own 48 KiB gate and this ceiling
+priced only what gov adds. It was rejected: the number that matters is what a session actually reads
+every turn, and that is the whole file. The apparent double-counting is the honest reading rather
+than a flaw — if the ruleset grows five kilobytes, gov's charter really did become five kilobytes
+more expensive to read, and a ceiling that hid that would be pricing the wrong thing.
+
+**The headroom has one named consumer.** `TOOL-aFusedCharter-3` lands after this unit and wraps every
+line over 450 characters in this file, which ADDS bytes — a newline and its indent per wrap, across
+eight lines. The seeded headroom absorbs that, and `TOOL-aFusedCharter-3` re-measures against the
+declared ceiling rather than assuming it still fits.
+
 **S7 — Re-stamp the kickoff manifest.** `memory/guides/SESSION-KICKOFF.md` names `AGENTS.md` in
 `verify-paths` and states the charter is authoritative. Its `§B` claims are re-verified against the
 restructured file and `last-audit` re-stamped with a delta line in this unit's commit message.
@@ -95,8 +114,9 @@ dropped.
 **No renderer work.** `DEPL-aFusedCharter-1` owns the engine, the adopter and `--check`. This unit is
 its first target.
 
-**No byte ceiling for `AGENTS.md`.** Recommended and raised as a fork; setting one is an owner
-decision and this unit does not take it.
+**No SECOND measurement mode.** The ceiling S8 declares is over the whole file. Measuring the
+authored half alone — the file minus the rendered region — was the fork's other option and was not
+taken, so no region-aware measurement is built here.
 
 **No rewrite of the node registry.** Four rows, all still true. The registry stays authored, above
 the region, because it is per-repo data the ruleset asks for rather than ruleset text.
@@ -196,25 +216,41 @@ is the honest act and the file already has a precedent for it.
   `memory hygiene`, whose check 16 rules read the charter.
 - **AC7** — When the commit lands, `memory/guides/SESSION-KICKOFF.md` carries a re-stamped
   `last-audit` and the commit message carries the `manifest-audit` delta line.
+- **AC8** — When `bash tools/check-template-size.sh AGENTS.md` runs, it exits 0 and reports the
+  limit it resolved FROM `tools/template-size-limits.txt` rather than from the hard default — which
+  is observable because the printed limit equals the declared row and not `49152`.
+- **AC9** — When the declared row is temporarily lowered below the landed size,
+  `bash tools/check-template-size.sh AGENTS.md` reds naming the overage. A ceiling whose failing
+  case has never been observed is an assertion about nothing, so this is checked before the row is
+  committed at its real value.
 
 ## 7. Gates
 
 `memory hygiene` · `drift-audit records` · `drift-audit selftest` · `drift-audit wiring` ·
-`kickoff-manifest ratchet` · `playbook render wiring` · `template size <=48KiB` · the full bar.
+`kickoff-manifest ratchet` · `playbook render wiring` · `template size <=48KiB` (S8 adds a third
+subject to its declaration) · `template size gate selftest` · the full bar.
 
 ## 8. Open questions
 
-- **F1 — should `AGENTS.md` get a declared byte ceiling in `tools/template-size-limits.txt`?**
-  Recommendation: yes, seeded at the landed measurement plus the headroom that file's own comments
-  argue for, so the charter gets the same forcing function the ruleset has. It is an owner decision
-  by that gate's stated rule — a ceiling is never set by the unit that would be measured against it
-  — and this unit does not take it. Building without a ceiling is safe; the file simply stays
-  unpriced, which is where it is today.
+none — the fork below is RESOLVED.
+
+- **F1 — should `AGENTS.md` get a declared byte ceiling, and over what?** RESOLVED (owner,
+  2026-08-18): yes, over the WHOLE file, seeded at the landed measurement plus headroom. This is now
+  S8 rather than a recommendation, and the rejected option — a ceiling over the authored half only,
+  which would have needed a region-aware measurement mode the size gate does not have — is recorded
+  in `§3` as a Non-goal so a later reader does not re-open it as an oversight. The ceiling is still
+  not set by this spec: S8 seeds it from the landed measurement, because a ceiling written from a
+  projection prices a file nobody measured.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. S4 was added after measuring that the charter-completeness
   drift signal sits at a drained pin of zero and would red on seventy legs the moment S3 lands.
+- rev-3 · 2026-08-18 · F1 resolved by the owner: the charter gets a whole-file byte ceiling. That
+  flips a Non-goal into new scope S8, adds two acceptance criteria including the failing-case
+  observation, records the rejected authored-half option as a Non-goal in its place, and names
+  `TOOL-aFusedCharter-3`'s wrapping as the headroom's one known consumer. This unit was classified
+  FORKED until now and is READY with it.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. S4's retirement MOVES to `TOOL-aFusedCharter-1` S10,
   because three earlier units add a gate leg and would each red the same zero-pin signal; its three
   wrong mechanism facts are corrected and recorded here rather than lost with the move. New S6a pins

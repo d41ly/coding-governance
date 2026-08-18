@@ -1,6 +1,6 @@
 # DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
 
 ## 1. Goal
 
@@ -34,8 +34,8 @@ the lexicon kit.
 **S2 — Declare every placeholder as data, in three classes.** The declaration is a `[[placeholder]]`
 array in `tools/govkit/entries/playbook.kit.toml` — the `playbook` entry, not the new
 `playbook-render` one, because the placeholders describe the ARTIFACT that entry ships and
-`needed_answers()` quantifies over every selected descriptor either way — because `needed_answers()` in `tools/govkit/govkit.py` already reads descriptors to
-decide what `intake` must ask for. Each row carries a key, a class, and one line of guidance — the
+`needed_answers()` in `tools/govkit/govkit.py` quantifies over every selected descriptor either way
+and already reads them to decide what `intake` must ask for. Each row carries a key, a class, and one line of guidance — the
 useful residue of the retiring companion.
 
 - `derived` — a named probe computes it from the target repo. The renderer RUNS the probe and prints
@@ -312,8 +312,7 @@ if the spec says so and expensive if it does not.
 
 ## 8. Open questions
 
-none blocking — F1 through F3 are RESOLVED; F4 is an OWNER fork with a recommendation the build can
-proceed on.
+none — all four forks below are RESOLVED.
 
 - **F1 — where does the renderer live?** RESOLVED (agent, 2026-08-18, delegated by the build's
   stated order): a `tools/playbook/` kit with an adopter, on the tie-break that reuses an existing
@@ -330,13 +329,17 @@ proceed on.
   `.governance/deploy.toml`. It is govkit's existing location, `intake` already writes it and refuses
   to overwrite it, and moving it would change a deployer contract for cosmetic consistency. The spec
   audit flagged that it was never compared against the root-conf convention, which is fair — the
-  comparison is made here and comes out for the status quo. Raised rather than taken because the
-  descriptor is a committed authorization artifact, and where it lives is the owner's call.
+  comparison is made here and comes out for the status quo. RESOLVED (owner, 2026-08-18): keep
+  `.governance/deploy.toml`. The four root confs are tuning knobs an adopter edits; this file is a
+  committed authorization artifact that `intake` writes once and refuses to overwrite, and every
+  other deployer verb already reads it there. No scope change.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. F3's resolution folded the render-parity gate into this
   unit's `--check`, which is why the build roster carries seven units and not eight.
+- rev-4 · 2026-08-18 · F4 resolved by the owner: the target descriptor stays at
+  `.governance/deploy.toml`. No scope change; the fork is now marked rather than pending.
 - rev-3 · 2026-08-18 · folded the M4 spec audit. The kit gets its own registry id because a second
   `playbook` entry would silently shadow the existing one; S7 RETIRES the placeholder hole rather
   than closing it, because its probe targets the un-rendered template and can never come true; S5's
