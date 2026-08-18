@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -129,8 +129,11 @@ Two files, both in the adopter repo at `C:/projects/incms/main/vendor/nicocares-
   flag is `--report-only`; that script parses argv by substring and has no argument parser, so
   `--report` is silently ignored and runs a different mode, which is what the first draft of this
   criterion asked for by mistake.
-- **AC4** — When `grep -n 110000 .claude/SESSION-KICKOFF.md` runs there, it returns nothing. This
-  is the witness for the UNGATED half of S3, which AC3 cannot see.
+- **AC4** — When `grep -n 'pin is 110000' .claude/SESSION-KICKOFF.md` runs there, it returns
+  nothing: no sentence states the old value as the CURRENT pin. A bare search for the number is
+  the wrong witness and was the first draft's — the movement record names the value it replaced,
+  exactly as the conf's own comment convention does, so demanding zero occurrences would have
+  forced the history out. This is the witness for the UNGATED half of S3, which AC3 cannot see.
 - **AC5** — When the adopter repo's `git log` on `main` is read, the raise is one commit naming
   exactly two paths, unpushed, whose message carries the measured rate and the runway it buys.
 
@@ -148,7 +151,10 @@ from the measured growth rate, which section 4 records.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
-- rev-2 · 2026-08-18 · folded spec-audit round 1. Two of S2's factual claims were wrong and are
+- rev-2 · 2026-08-18 · folded spec-audit round 1.
+- rev-3 · 2026-08-18 · AC4's witness was wrong in the build pass that ran it: it searched for the
+  bare number, which the movement record correctly still names as the value it replaced. Narrowed
+  to the sentence that would assert it as current. Two of S2's factual claims were wrong and are
   rewritten against what the adopter's history actually shows. The sum-of-caps bound in section 4
   was overstated as absolute: three of the seven members are waived and carry no cap, so the raise
   buys them slack nothing else watches, and that cost is now stated rather than hidden by the

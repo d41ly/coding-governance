@@ -94,7 +94,7 @@ def load_conf(root: str) -> dict:
     return conf
 
 
-def _conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> int:
+def _parse_conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> int:
     """The integer bound to `key`, or a named Problem — never a raw ValueError traceback.
 
     The contract is `row_grammar.pin_of`'s, deliberately: EMPTY means the default, because a key
@@ -405,7 +405,7 @@ def checks(w: dict) -> list:
         for i in waived:
             if i not in orphans:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
-        pin = _conf_int(conf, "ORPHAN_ID_PIN")
+        pin = _parse_conf_int(conf, "ORPHAN_ID_PIN")
         if len(waived) > pin:
             bad.append(f"check 14: the orphan waiver holds {len(waived)} rows, pinned at {pin} (shrink-only)")
 
@@ -438,7 +438,7 @@ def checks(w: dict) -> list:
         for key, (count, ln) in sorted(measured.items()):                      # rule 1, new side
             if key not in seen:
                 bad.append(f"check 15 rule 1: {key[0]}:{ln} cites {key[1]}, which resolves to nothing and has no row in {m}/{REGISTRY}")
-        pin = _conf_int(conf, "DEAD_PATH_PIN")
+        pin = _parse_conf_int(conf, "DEAD_PATH_PIN")
         if len(rows) > pin:                                                    # rule 2
             bad.append(f"check 15 rule 2: the dead-path registry holds {len(rows)} rows, pinned at {pin} (shrink-only)")
 
@@ -448,7 +448,7 @@ def checks(w: dict) -> list:
         capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
         waived = set(conf["READ_PATH_WAIVER"].split())
         total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-        ceiling = _conf_int(conf, "READ_PATH_CEILING", minimum=1)
+        ceiling = _parse_conf_int(conf, "READ_PATH_CEILING", minimum=1)
         if total > ceiling:
             bad.append(f"check 16: the charter's read path is {total} B, ceiling {ceiling} B "
                        f"({len(members)} files) — trim it or raise the ceiling in a commit that says why")
@@ -492,7 +492,7 @@ def _measure_lines(root: str, conf: dict) -> list:
     orphans = sorted(set(w["cites"]) - set(w["defs"]))
     members, _ = read_set(w)
     total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-    headroom = _conf_int(conf, "READ_PATH_HEADROOM", DEFAULT_READ_PATH_HEADROOM, minimum=1)
+    headroom = _parse_conf_int(conf, "READ_PATH_HEADROOM", DEFAULT_READ_PATH_HEADROOM, minimum=1)
     return [
         f'ORPHAN_ID_PIN="{len(orphans)}"',
         f'DEAD_PATH_PIN="{len(w["dead"])}"',

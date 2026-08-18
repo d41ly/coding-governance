@@ -127,7 +127,7 @@ ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL
 | [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-3 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
