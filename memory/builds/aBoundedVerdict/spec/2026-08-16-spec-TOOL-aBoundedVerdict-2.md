@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -13,8 +13,10 @@ stopped without reading prose.
 ## 2. Scope (IN)
 
 - **S1** — a kit-owned core halt vocabulary in the driver, one member per halt site this build's
-  research actually enumerated, and no member invented for symmetry: the review budget was exhausted
-  with the unit not clean; a fork survived the method's vetoes with no resolution the mandate
+  research actually enumerated, and no member invented for symmetry: the review loop reached its
+  RUNAWAY CEILING with the subject not clean — rev-5's re-reading of a member that used to name a
+  routine cap refusal, and now names a backstop whose being reached is itself a defect
+  (`TOOL-aBoundedVerdict-1` S1a); a fork survived the method's vetoes with no resolution the mandate
   delegates; a unit awaits owner scope approval the mandate does not supply; a unit is blocked on an
   EXTERNAL PREREQUISITE, which is a different owner turn from an unapproved scope and is the case
   `TOOL-aBoundedVerdict-3` S1 routes here; a unit's acceptance or gates could not be derived; the
@@ -71,6 +73,15 @@ stopped without reading prose.
   at build time rather than from this bullet: it was seven when this spec was drafted.
 - **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
   rendered Skill, and the kit version constants.
+- **S10** — the REVIEW VERDICT vocabulary gets the same treatment as the halt vocabulary, because it
+  is the same defect one document over and this unit's title is the promise to fix it. Measured over 90
+  tracked review records: 18 distinct `## Verdict` lines, 5 leading tokens, 32 records with no verdict
+  line at all, 2 where `Verdict` is a section heading rather than a verdict, and **zero** carrying the
+  literal clean token the method names as the loop's only exit. So the vocabulary the method states in
+  prose is read by nothing and written consistently by no one. S10 makes a token from a closed set the
+  FIRST line of a review record, adds it to `memory/HYGIENE.md` check 5's grammar for `diff-review` and
+  `spec-audit` records, and makes `TOOL-aBoundedVerdict-1`'s `--review` verb accept exactly that set.
+  **Forward-only**: no retrofit of the 90, for the reason §3 already gives about existing records.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
   arm asserts they cannot silently stop carrying it. No existing gate joins a documented invocation
   to the driver's argument set — the adopter check, the protocol parity check and the kickoff-engine
@@ -128,7 +139,7 @@ owner turn it needs:
 
 | Code | Reached from | The owner turn it names |
 |---|---|---|
-| review budget exhausted | unit 1's cap refusal | the unit's design is not converging; re-scope or split it |
+| review budget exhausted | unit 1's RUNAWAY CEILING, not its ordinary exit — the convergence predicate promotes a residual blocker to a unit and never halts | the convergence rule failed to terminate; read the round sequence and decide whether the ceiling or the predicate is wrong |
 | fork unresolvable | the method's vetoes 2 and 3, and a scope fork | decide the fork |
 | awaiting scope approval | a unit at the awaiting-approval status that is NEITHER reachable at the pinned base NOR authored by this run — the residual `TOOL-aBoundedVerdict-3` S1's three cases do not cover, reached when a spec arrives on the run's own branch from elsewhere | approve or amend the scope |
 | blocked on an external prerequisite | a unit whose status names a prerequisite outside the run | clear the prerequisite |
@@ -374,6 +385,17 @@ grows a read-path member, and rev-2's gate list omitted it ·
   completeness grep is rewritten NUMBER-AGNOSTIC — the two-value alternation would have returned
   nothing while two carriers still said eight, the criterion failing exactly as it exists to prevent.
   The kickoff size leg lost its positional; the ceiling now lives in a declared limits file.
+- rev-5 · 2026-08-19 · widened by the close-path audit's medium 24 and by `TOOL-aBoundedVerdict-1`'s
+  rev-6 reversal. Two changes, no removals. **S10 is new**: the review VERDICT vocabulary is the same
+  defect as the halt vocabulary one document over — measured at 18 distinct verdict lines, 5 leading
+  tokens, 32 records carrying none, and zero carrying the token the method calls the loop's only exit —
+  so this unit, whose title is about a vocabulary something reads, takes it. Forward-only, on §3's
+  existing no-retrofit reasoning. **The first core halt member is re-read**: it used to name unit 1's
+  cap refusal, and unit 1 no longer has a cap; it now names the runaway ceiling, whose being reached is
+  itself a defect, and the owner turn it names changes with it — the old wording would have told a
+  returning owner to re-scope a unit when the real question is whether the convergence predicate
+  terminated. The member is NOT removed, so the shrink-only floor does not move.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "terminal phase for a run that cannot continue"` returns
@@ -386,3 +408,4 @@ for the parse reason §4 gives.
 
 Recall terms used, recorded for the reground: halt code abort terminal phase vocabulary shrink-only
 floor run-state authored fact status resume reader unattended driver conf declaration.
+

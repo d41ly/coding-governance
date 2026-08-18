@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -271,6 +271,19 @@ before spending.
 - rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. One claim moved: the read-path headroom
   is 14354 B, not 16214, because the unattended protocol grew 1103 B under this spec. No rule in this
   unit was affected.
+- rev-6 · 2026-08-19 · re-read against the close-path audit and `TOOL-aBoundedVerdict-1` rev-6. **No
+  scope item changes**, and that is the finding rather than an omission: the three dispositions here are
+  about FORKS and STATUSES, and S3's "continue with the units that do not depend on it" test is
+  meaningful at a fork in a way it was not at the closing review — which is exactly why the audit's
+  medium 25 landed on unit 1's S8 and not here. Two cross-references added by this rev, both to
+  mechanisms this unit's dispositions now depend on and neither of which existed when it was ratified:
+  the HALT disposition reaches `--abort`, which requires both agent-attested keys first, and those keys
+  have no writer until `TOOL-aBoundedVerdict-15`'s `--attest` verb lands — so this unit's halt path is
+  reachable only by a hand-edit today, and that dependency is named rather than assumed. And the review
+  side of "a thing the run cannot resolve" is now `TOOL-aBoundedVerdict-1` S9's park case, which is this
+  unit's rule applied to a blocker; the two must stay phrased as a SCOPE test rather than a difficulty
+  test, or both become an escape from ordinary work.
+
 ## 10. Reuse audit
 
 `python tools/memory-recall/query.py` over the fork and owner-turn question returns the decision that

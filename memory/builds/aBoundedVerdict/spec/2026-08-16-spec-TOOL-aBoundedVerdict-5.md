@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -49,6 +49,21 @@ generated and whose grammar the driver owns. Give parking a verb.
     close carrying an override validates against N and leaves N+1 on disk, and a count that included
     it could never be satisfied. The exclusion is stated here and armed by an acceptance fixture
     carrying an override, because the arm that does not carry one passes either way.
+- **S6a** — **RECONCILIATION, new at rev-6.** The park VERB this unit specifies has SHIPPED, under
+  `TOOL-cSettledDocket-1`, and it disagrees with S1 and S5 in two measurable ways. The spec is what
+  moves where the shipped behaviour is defensible, and the code is what moves where it is not:
+  - **Two fields, not three.** The shipped verb is `--park <slug> --item <text> --reason <text>`; S1
+    specifies `--question`, `--options` and `--reason`. The shipped shape is DEFENSIBLE — the method
+    asks for the question, the options and the reason, and `--item` carries the question while the
+    reason carries the rest — but it is not what S1 says, and S2's refusal for a missing field cannot
+    be met for a field that does not exist. S1 and S2 are restated to the two-field shape, and the
+    method's three-part obligation is carried by the REASON's content rather than by three flags.
+  - **Four kinds counted, not one.** `--status` counts `(decision|abort|override|waiver)` lines, and
+    S5 says DECISION-kind only. This one is a real DEFECT against the shipped code, not a spec that
+    needs relaxing: S5's whole argument is that a status line inflated by non-decisions reports the
+    opposite of what it is for, and the shipped count is inflated by three kinds. The code moves.
+  - S6's countable attestation is UNSHIPPED and stays as specified, and `TOOL-aBoundedVerdict-15`'s
+    `--attest --value` is the writer it needs — named here so neither unit invents a second one.
 - **S7** — the parked region's KINDS become a declared two-class taxonomy, because this unit is the
   first to need the distinction and `TOOL-aBoundedVerdict-1` depends on it. A **decision** kind is
   one the owner must be shown — the existing abort and override kinds, and this unit's park. A
@@ -250,6 +265,16 @@ no file of its own.
   this spec, so the sub-bullet now names the pin without a numeral. Every other claim — the park
   helper and its two callers, the attestation predicate's tolerance of a richer value, the close
   verb's override ordering, the phase-writer arm's count of five — re-verified unchanged.
+- rev-6 · 2026-08-19 · **reconciled with the verb that shipped.** The mechanism this unit specifies
+  exists in the driver under `TOOL-cSettledDocket-1`, which the re-decomposition found by reading the
+  code rather than the roster — so this spec was SPECCED against a tree that had already built part of
+  it. S6a records the two divergences and which side moves for each: the two-field flag shape is the
+  shipped verb's and defensible, so S1 and S2 restate to it; the four-kind `--status` count contradicts
+  S5's own argument and is a defect in the code, so the code moves. S4a's justification for the `record`
+  class is unchanged but its motivating example moved — `TOOL-aBoundedVerdict-1` rev-6 still writes a
+  `review` line per round, so review rounds can still inflate a decision count and the qualifier stays
+  load-bearing.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "record a decision the run refused to make"` names the
