@@ -48,17 +48,21 @@ list` shows eleven live worktrees on this node.
 
 All seven were MISSING at kickoff, were authored in this build's design pass, and were then audited
 by `reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md`, which returned **BLOCKED** on five
-blockers. All five are folded in, each as a rev bump with its §9 line.
+blockers. All five are folded in, each as a rev bump with its §9 line. The forks every spec's
+§8 still carried were then swept and RESOLVED in place under the standing mandate, which is what
+moved the set from FORKED to READY; before that sweep this table's classification column and the
+driver's own computation disagreed. **The live rev of each spec is in the generated table below,
+not here** — restating it in this column is what let that column go stale once already.
 
 | id | unit | classification | audit |
 |---|---|---|---|
-| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | rev-2, F1 blocker folded |
-| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY | rev-2 |
-| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY | rev-2 |
-| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY | rev-2 |
-| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY | rev-2, F2/F3/F5 blockers folded |
-| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY | rev-2, F4 blocker folded |
-| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | rev-3, F5 blocker folded |
+| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | F1 blocker folded |
+| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY | — |
+| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY | — |
+| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY | — |
+| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY | F2/F3/F5 blockers folded |
+| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY | F4 blocker folded |
+| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | F5 blocker folded |
 
 The five blockers, because they are the record of what the design got wrong before a line of code:
 
