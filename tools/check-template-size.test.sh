@@ -30,7 +30,7 @@ set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE="tools/check-template-size.sh"
-TEMPLATE="parallel-coding-governance.template.md"
+TEMPLATE="coding-governance-agents.template.md"
 fails=0
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -78,7 +78,7 @@ printf 'harness    shipped limit read from the gate: %s\n' "$LIMIT"
 # --- A0 · the SHIPPED ceiling, pinned to a literal ------------------------------------------
 # Deriving the limit (above) is right for the boundary arms — it keeps them honest about the
 # override paths — but it means NO arm pins the number itself. Mutating the default to 131072 or
-# to 40000 leaves every other arm green in both directions, on the one constant this whole build
+# to 47000 leaves every other arm green in both directions, on the one constant this whole build
 # was convened to change. This arm is the literal, and it is deliberately the only one.
 EXPECT_LIMIT=49152
 if [ "$LIMIT" = "$EXPECT_LIMIT" ]; then
@@ -93,18 +93,22 @@ fi
 # its legs concurrently, so an arm that mutates a tracked file races every other leg.
 LIM="$TMP/limits"
 printf '%s	%d
-' "parallel-coding-governance.template.md" 40000 > "$LIM"
-# 40000 is deliberately NOT the hard default. The declared value and the default are both 49152 in
+' "coding-governance-agents.template.md" 47000 > "$LIM"
+# 47000 is deliberately NOT the hard default, and it is deliberately ABOVE the subject's real size.
+# It read 40000 until the charter converged at v3.0 and the file grew past it — at which point both
+# arms red on the OVER-BUDGET branch instead of printing the resolved limit, and neither was
+# measuring precedence any more. A fixture limit for a precedence arm has two constraints, not one:
+# different from the default, and above the file. The declared value and the default are both 49152 in
 # the shipped tree, so an arm using 49152 would pass whether or not the declaration is read at all —
 # 49152 -> 49152 proves nothing. That is the assertion-between-two-derived-values class one step
 # removed, and it is what the first draft of this arm did.
-expect_out "A14 the DECLARED row supplies the limit"   "/ 40000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
+expect_out "A14 the DECLARED row supplies the limit"   "/ 47000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
 expect_out "A15 a positional beats the declaration"   "/ 45000 bytes" 0 bash "$GATE" "$TEMPLATE" 45000 "" "$LIM"
 # The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
 out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
 case "$out" in
-  */\ 40000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
-  *) say_fail "A16 the declaration beats the environment" "expected 40000; got: $out" ;;
+  */\ 47000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
+  *) say_fail "A16 the declaration beats the environment" "expected 47000; got: $out" ;;
 esac
 # A subject with NO row falls through to the environment, then to the default.
 mkfile 100 "$TMP/undeclared"

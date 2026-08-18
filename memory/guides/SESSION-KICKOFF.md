@@ -2,9 +2,9 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T08:38:44+03:00 @ 7761bbf231899b28744a67550ba95abc644f7cb7
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
-verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
+last-audit: 2026-08-18T16:05:00+03:00 @ 098bebd9876c8f2f61a528b5cc9ac0a6b5d7719a
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 5d2c32fe9e2c6165b84b14a275d138585b15b22a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
@@ -52,7 +52,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
   ask, or a build folder committed before the run's branch existed (`memory/guides/UNATTENDED-PROTOCOL.md`).
-- **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
+- **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
@@ -66,7 +66,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | the three `parallel-coding-governance.*` files · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker lockstep, TWO carriers) |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0 · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker presence, ONE carrier) |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
@@ -132,7 +132,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   build can red check 16 on its own bookkeeping before it edits a guide. Read the margin
   from `python tools/memory-tree/corpus_ids.py --report`, never from the ceiling alone.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
+  recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
 - Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's

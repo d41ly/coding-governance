@@ -56,6 +56,6 @@ user edit, so overwriting it demands the explicit flag).
 ## Deploying the governance playbook this way
 
 To make the governance playbook a project's agent instructions: fill
-`parallel-coding-governance.template.md` per its customize companion, install the result as `AGENTS.md`
-with this tool, and copy `parallel-coding-governance.domain-rules.md` alongside (the template's §-stubs
+`coding-governance-agents.template.md` per its customize companion, install the result as `AGENTS.md`
+with this tool. The charter is ONE file as of v3.0 — there is no companion to copy alongside (the §-stubs
 reference it). See `WIRE-INTO-PROJECT.md`.

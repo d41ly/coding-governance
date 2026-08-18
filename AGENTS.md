@@ -13,7 +13,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 
 ## What ships here (the product)
 
-- **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
+- **`coding-governance-agents.template.md`** — the governance playbook template (the operating
   ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`, which also prices every growth
   against a recorded high-water — prefer externalizing to spending the headroom). Companions: `.customize.md` (deploy-time placeholder catalog) and `.domain-rules.md`
   (the §1/§4/§7–§13 activity-scoped checklists the template references by §-stub — §1 is the newest,
@@ -292,7 +292,7 @@ set value) so a fresh clone self-heals instead of running with dormant gates.
 - Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
 - The template is the operating ruleset — keep it ≤48 KiB; anything activity-scoped or one-time goes
   in a companion, not the template.
-- Follow the governance playbook (`parallel-coding-governance.template.md`) for the full multi-node
+- Follow the governance playbook (`coding-governance-agents.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
 - Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build folder the
   run did not create**, whose shape the merge bar validates. The mandate is

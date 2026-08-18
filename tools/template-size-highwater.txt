@@ -1,2 +1,2 @@
-parallel-coding-governance.template.md	37381
+coding-governance-agents.template.md	37381
 skills/session-kickoff/SKILL.md	18215

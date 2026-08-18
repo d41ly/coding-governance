@@ -435,7 +435,7 @@ def main() -> int:
         recpb = json.loads((pb / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("the playbook entry lands its two files",
               (pb / "docs" / "PARALLEL.md").is_file()
-              and (pb / "docs" / "parallel-coding-governance.domain-rules.md").is_file(),
+              and (pb / "docs" / "coding-governance-agents.template.md").is_file(),
               str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
         check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
               all(f["role"] == "seed" for f in recpb["files"] if f["kit"] == "playbook"),

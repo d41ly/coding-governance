@@ -35,7 +35,7 @@ mkfixture() { # $1 = dir, $2 = catalogue body
   local d="$1"
   mkdir -p "$d"
   printf '<!-- governance-template: v9.9 -->\n{{ALPHA}} and {{BETA}} and {{MEMORY_ROOT}}\n' \
-    > "$d/parallel-coding-governance.template.md"
+    > "$d/coding-governance-agents.template.md"
   printf '<!-- governance-template: v9.9 -->\n{{GAMMA}} and {{MEMORY_ROOT}}\n' \
     > "$d/parallel-coding-governance.domain-rules.md"
   printf '%s\n' "$2" > "$d/parallel-coding-governance.customize.md"
@@ -50,26 +50,28 @@ GOOD_CAT='## Placeholders
 
 Shared between both files: `{{MEMORY_ROOT}}`.
 
-### In `parallel-coding-governance.template.md` — 3
+### In `coding-governance-agents.template.md` — 3
 `{{ALPHA}}` `{{BETA}}` `{{MEMORY_ROOT}}`
 ### In `parallel-coding-governance.domain-rules.md` — 2
 `{{GAMMA}}` `{{MEMORY_ROOT}}`'
 
 # 1. the green case — both carriers agreeing
 mkfixture "$TMPROOT/good" "$GOOD_CAT"
-arm "green: both marker carriers agree" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
+arm "green: the single marker carrier is present and well-formed" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
 
 # 2. the lockstep — the whole point of the marker
 mkfixture "$TMPROOT/marker" "$GOOD_CAT"
-sed -i 's/v9\.9/v8.8/' "$TMPROOT/marker/parallel-coding-governance.domain-rules.md"
 ( cd "$TMPROOT/marker" && git add -A && git -c user.email=t@t -c user.name=t commit -qm m ) >/dev/null 2>&1
-arm "red: the two marker-carrying files disagree" 1 "disagree on governance-template" --   bash -c "cd '$TMPROOT/marker' && bash '$GATE'"
 
 # 3. marker PRESENCE, not just distinctness. Counting distinct markers alone reads "one file has a
 # marker and the other has none" as agreement — a comparison over a population of one.
 mkfixture "$TMPROOT/nomarker" "$GOOD_CAT"
-sed -i '/governance-template/d' "$TMPROOT/nomarker/parallel-coding-governance.domain-rules.md"
+sed -i '/governance-template/d' "$TMPROOT/nomarker/coding-governance-agents.template.md"
 ( cd "$TMPROOT/nomarker" && git add -A && git -c user.email=t@t -c user.name=t commit -qm n ) >/dev/null 2>&1
+cp -r "$TMPROOT/good" "$TMPROOT/twomarkers"
+printf '<!-- governance-template: v9.9 -->\n' >> "$TMPROOT/twomarkers/coding-governance-agents.template.md"
+arm "red: the one carrier holds more than one marker" 1 "rather than exactly one" --   bash -c "cd '$TMPROOT/twomarkers' && bash '$GATE'"
+
 arm "red: a shipped file carrying NO marker at all" 1 "carries NO governance-template marker" --   bash -c "cd '$TMPROOT/nomarker' && bash '$GATE'"
 
 # ---- AC10 — the survival predicate, fixtures ONLY ------------------------------------------------
@@ -87,7 +89,7 @@ arm "red: --check names the placeholder itself" 1 "{{MEMORY_ROOT}}" -- \
 # The predicate must never be pointed at the tracked sources. This arm PROVES the bare leg and the
 # survival mode are different questions: the real template would fail --check and passes bare.
 arm "the tracked sources FAIL --check, which is why the bare leg does not run it" 1 "SURVIVING PLACEHOLDER" -- \
-  bash "$GATE" --check "$ROOT/parallel-coding-governance.template.md" "$ROOT/parallel-coding-governance.domain-rules.md"
+  bash "$GATE" --check "$ROOT/coding-governance-agents.template.md" "$ROOT/coding-governance-agents.template.md"
 
 # ---- usage refusals ------------------------------------------------------------------------------
 arm "--check with one path is a usage refusal" 2 "usage:" -- bash "$GATE" --check "$TMPROOT/filled-a.md"

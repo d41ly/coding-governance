@@ -8,7 +8,7 @@ machines/sessions on the same repo.
 
 ## Contents
 
-- **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
+- **`coding-governance-agents.template.md`** — the governance playbook template (the operating
   ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
   snapshots live under `memory/archive/`. Two companions ship with it:
   **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and

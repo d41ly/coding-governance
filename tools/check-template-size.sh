@@ -46,7 +46,7 @@ if [ "$#" -gt 0 ]; then
   unset _n _i _a
 fi
 
-FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
+FILE=${1:-"$ROOT/coding-governance-agents.template.md"}
 
 # The DECLARED limits file, resolved the same three ways every other path here is — positional,
 # then environment, then the tracked default — so the self-test can point the gate at a scratch copy

@@ -22,8 +22,7 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "check-placeholders: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-TEMPLATE="parallel-coding-governance.template.md"
-COMPANION="parallel-coding-governance.domain-rules.md"
+TEMPLATE="coding-governance-agents.template.md"
 
 # --- the fixture-only survival mode ---------------------------------------------------------------
 if [ "${1:-}" = "--check" ]; then
@@ -42,36 +41,28 @@ fi
 
 [ "${1:---assert}" = "--assert" ] || { echo "usage: $(basename "$0") [--check <a> <b>]"; exit 2; }
 
-for f in "$TEMPLATE" "$COMPANION"; do
-  [ -f "$f" ] || { echo "check-placeholders: missing shipped file: $f"; exit 2; }
-done
+[ -f "$TEMPLATE" ] || { echo "check-placeholders: missing shipped file: $TEMPLATE"; exit 2; }
 
 rc=0
 
-# TWO files carry the marker, not three. `customize.md` is the deploy-time catalogue, is exempt from
-# the shipped surface, and its only `vN.N` is prose — a gate built to "three" would compare a literal
-# against a real version and red forever. That miscount reached a spec through a review fold and was
-# caught only by measuring.
-#
-# PRESENCE FIRST, then agreement. Counting DISTINCT markers alone reads "one file has v2.9 and the
-# other has none" as agreement: a comparison over a population of one is not a comparison.
-for f in "$TEMPLATE" "$COMPANION"; do
-  grep -qE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$f" || {
-    echo "check-placeholders: $f carries NO governance-template marker — the lockstep comparison"
-    echo "check-placeholders: needs both carriers present, or it compares one file against itself"
-    rc=1
-  }
-done
-
-markers=$(grep -hoE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE" "$COMPANION" | sort -u)
-n_markers=$(printf '%s\n' "$markers" | grep -c . || true)
-if [ "$rc" -eq 0 ] && [ "$n_markers" -ne 1 ]; then
-  echo "check-placeholders: the two marker-carrying files disagree on governance-template:"
-  for f in "$TEMPLATE" "$COMPANION"; do
-    echo "  $f: $(grep -oE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$f" | head -1 || echo '(none)')"
-  done
+# ONE file carries the marker now. The charter converged at v3.0 and its companion was deleted, so
+# the LOCKSTEP QUESTION DIED WITH THE SECOND CARRIER. It is not weakened — it is gone, and saying so
+# plainly is the point: a comparison over a population of one is not a comparison, and a gate that
+# pretended otherwise would be comparing a file against itself. What survives is presence plus
+# well-formedness of the single marker, which is what the kickoff engine's Step-2 fallback and the
+# upstream re-pull actually read.
+if ! grep -qE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE"; then
+  echo "check-placeholders: $TEMPLATE carries NO governance-template marker, and the kickoff"
+  echo "check-placeholders: engine's Step-2 fallback plus the upstream re-pull both read it"
   rc=1
 fi
 
-[ "$rc" -eq 0 ] && echo "check-placeholders OK — both marker carriers agree at $markers"
-exit "$rc"
+n_markers=$(grep -cE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE" || true)
+if [ "$rc" -eq 0 ] && [ "$n_markers" -ne 1 ]; then
+  echo "check-placeholders: $TEMPLATE carries $n_markers version markers rather than exactly one,"
+  echo "check-placeholders: so which one a reader gets is a matter of scan order"
+  rc=1
+fi
+marker=$(grep -oE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE" | head -1)
+
+[ "$rc" -eq 0 ] && echo "check-placeholders OK — one marker carrier at $marker"

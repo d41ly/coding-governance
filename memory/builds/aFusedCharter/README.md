@@ -186,10 +186,11 @@ ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCh
 | [TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md) | OPEN | rev-3 | 2026-08-18 |
 
-Records live under `spec/` and `reviews/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
+| [2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md](build/2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md) | journal | PLAY-aFusedCharter-1 DEPL-aFusedCharter-1 |
 | [2026-08-18-review-PLAY-aFusedCharter-1-1.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
 | [2026-08-18-review-PLAY-aFusedCharter-1-2.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
 <!-- /gen:build-index -->
@@ -214,6 +215,8 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-18-spec-TOOL-aFusedCharter-1.md](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md)
   - [2026-08-18-spec-TOOL-aFusedCharter-2.md](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md)
   - [2026-08-18-spec-TOOL-aFusedCharter-3.md](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md)
+- **`build/`**
+  - [2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md](build/2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md)
 - **`reviews/`**
   - [2026-08-18-review-PLAY-aFusedCharter-1-1.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md)
   - [2026-08-18-review-PLAY-aFusedCharter-1-2.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md)

@@ -251,7 +251,7 @@ does not push.
 
 1. **Locate the templates.** This skill ships in the `coding-governance` repo; the starter is
    `MANIFEST-TEMPLATE.md` beside this file and the full playbook is
-   `parallel-coding-governance.template.md` two levels up. If the skill was discovered through
+   `coding-governance-agents.template.md` two levels up. If the skill was discovered through
    a junction/symlink, resolve the real path first (PowerShell:
    `(Get-Item <skill-dir>).Target`; POSIX: `readlink -f`). If resolution fails, ask the user
    where their `coding-governance` checkout lives.
@@ -270,5 +270,5 @@ does not push.
    don't bundle — the pre-commit `--staged` leg (stated plainly: it narrows the drift remedy to
    the bundle-into-this-commit form) and a CI leg with `fetch-depth: 0` on the checkout step.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
-   (`parallel-coding-governance.template.md`, per its own "Customize before use" block) for
+   (`coding-governance-agents.template.md`, per its own "Customize before use" block) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.

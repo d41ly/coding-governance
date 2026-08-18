@@ -3,9 +3,13 @@
 id = "playbook"
 scope = "repo"
 kind = "flat"
-version_from = { file = "parallel-coding-governance.template.md", pattern = "governance-template: v", kind = "marker" }
+version_from = { file = "coding-governance-agents.template.md", pattern = "governance-template: v", kind = "marker" }
 requires = []
 
+# ONE file as of v3.0. The charter converged and the domain companion was deleted; the customize
+# companion was a deploy-time catalogue the runbook said to read and not ship, and it is now a
+# renderer. What ships is the charter template, and
+# the old note read:
 # TWO files, not three. The customize companion is a deploy-time catalog the runbook says to read and
 # not ship, and counting it is how the spec over-stated this entry for four revisions.
 #
@@ -14,16 +18,10 @@ requires = []
 # sitting first in the default selection, and the placeholder hole below probed two paths nothing
 # had written.
 [[files]]
-include = ["parallel-coding-governance.template.md"]
+include = ["coding-governance-agents.template.md"]
 role = "seed"
 to = "{playbook_path}"
-claims = ["parallel-coding-governance.template.md"]
-
-[[files]]
-include = ["parallel-coding-governance.domain-rules.md"]
-role = "seed"
-to = "{playbook_dir}/parallel-coding-governance.domain-rules.md"
-claims = ["parallel-coding-governance.domain-rules.md"]
+claims = ["coding-governance-agents.template.md"]
 
 [adopt]
 argv = []
@@ -36,7 +34,7 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = false
 why = "the placeholders span BOTH deployed files, and nothing in a target observes them — no leg reads the playbook. A probe naming only the main file was MEASURED going false-green while the companion sat unfilled, which is why both operands are named."
-discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\" \"$2\"", "--", "{playbook_path}", "{playbook_dir}/parallel-coding-governance.domain-rules.md"] }
+discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -49,5 +47,5 @@ installation is a copy to an owner-chosen path and there is no adopter. What nee
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
 [[lf_pin]]
-pattern = "{playbook_dir}/parallel-coding-governance*.md"
+pattern = "{playbook_dir}/coding-governance-agents.template.md"
 why = "under a strict byte gate"

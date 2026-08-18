@@ -169,7 +169,7 @@ method.
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
-- `parallel-coding-governance.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
+- `coding-governance-agents.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
   gate discipline, diff-scoping, the final-message format.
 - `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
 

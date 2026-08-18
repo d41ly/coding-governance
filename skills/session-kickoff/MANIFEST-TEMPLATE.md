@@ -138,7 +138,7 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
   `<default>`" — or "none".
 - `{{GOVERNING_DOCS}}` — decision logs / backlogs / plans and their precedence; "none" if the
   project has none yet.
-- `{{PLAYBOOK_PATH}}` — path to the instantiated parallel-coding-governance doc — or "not adopted".
+- `{{PLAYBOOK_PATH}}` — path to the instantiated governance charter — or "not adopted".
 - `{{AREA_1}}` `{{DOC_1}}` `{{ENTRYPOINTS_1}}` · `{{AREA_2}}` `{{DOC_2}}` `{{ENTRYPOINTS_2}}` —
   pointer-map rows; add/remove rows as needed.
 - `{{GATE_COMMANDS}}` — the exact typecheck / lint / test / freshness commands, one per line. Keep

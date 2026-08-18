@@ -6,7 +6,7 @@ derive-vs-ask calls.
 
 **The chain is three composing layers:**
 
-1. **Governance playbook** (`parallel-coding-governance.template.md`) — the multi-node ruleset (IDs,
+1. **Governance playbook** (`coding-governance-agents.template.md`) — the multi-node ruleset (IDs,
    streams, work state, gates, reviews, memory, output discipline). Lives in the project as one doc.
 2. **`/session-kickoff` skill** (`skills/session-kickoff/`) — the project-agnostic kickoff *engine*,
    installed ONCE per machine; it reads a per-project **kickoff manifest** to learn project specifics.
@@ -36,7 +36,7 @@ the target repo root. Commands are bash (git-bash on Windows). If `<gov>` is unk
   - **Tier policy** — single-tier, or Tier-1/Tier-2 and what forces Tier-2 (new write path · migration ·
     auth/sanitization/egress surface · shared-contract change · cross-stream merge).
   - **memory-tree is REQUIRED** — not a question. Playbook v2.5 made it so
-    (`parallel-coding-governance.template.md` §5, and `.customize.md` says it twice): §5's work-state
+    (`coding-governance-agents.template.md` §5, and `.customize.md` says it twice): §5's work-state
     rules and §6's record protocol both assume the tree. There is no drop path and no
     `{{MEMORY_*}}`-deletion branch; §3 is mandatory.
   - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
@@ -71,39 +71,75 @@ ln -s <gov>/skills/session-kickoff ~/.claude/skills/session-kickoff
 alongside — both then appear; pick by description.) Skip this step on a machine that already has it.
 
 <!-- govkit:entry playbook -->
-## 2 — Install the governance playbook (per project)
+## 2 — Install the governance charter (per project)
 
-1. Copy the playbook **and its two companions** in (the template's §4/§9/§10/§11/§12/§13 are §-stubs
-   that reference `parallel-coding-governance.domain-rules.md` by name — it MUST travel alongside):
-   ```bash
-   cp <gov>/parallel-coding-governance.template.md    <project>/docs/PARALLEL.md
-   cp <gov>/parallel-coding-governance.domain-rules.md <project>/docs/parallel-coding-governance.domain-rules.md
-   # the customize companion is deploy-time only — read it, don't ship it
-   ```
-   (or install the filled playbook as the canonical `AGENTS.md` via the agent-instructions kit —
-   see its own install step below, §3c.)
-   **Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
-   fallback and the upstream-re-pull mechanism both read it.
-2. Fill every `{{PLACEHOLDER}}` per **`<gov>/parallel-coding-governance.customize.md`** (the deploy-time
-   placeholder catalog — externalized from the template as of v2.3). The groups:
-   - **Fleet** (ask): node-registry rows + stream ownership.
-   - **Records & docs** (derive/ask): id families, doc-routing table, product preamble, repo-layout map,
-     command catalog, product-context home, help dir, review dir.
-   - **Memory tree** (only if §3 chosen): `{{MEMORY_ROOT}}` + `{{MEMORY_DISCIPLINES}}` — else delete them
-     and the two §5 memory-tree lines.
-   - **Gates & git** (derive): gate commands, CI file, gate runner, commit trailer, worktree script,
-     toolchain notes.
-   - **Runtime/verification · architecture/design-system · output-discipline** — fill what applies, delete
-     what doesn't per the customize companion's conditional-sections list.
-3. The customize companion lists the conditional sections to delete when they don't apply; apply that.
+The charter is ONE file and it BECOMES the project's `AGENTS.md`. There is no companion to ship
+alongside and no placeholder catalogue to read: `tools/playbook/adopt-playbook.sh` fills every
+placeholder from the target's own `deploy.toml` and drops the conditional blocks the target has no
+kit for. Run it rather than copying by hand.
 
-**Verify:** `grep -nE '\{\{[A-Z]' <project>/docs/PARALLEL.md <project>/docs/parallel-coding-governance.domain-rules.md`
-prints nothing. BOTH files — the companion carries 14 of the 37 placeholders, and a template-only grep
-passes green while the §-stubs point at a file the project never filled. The grep is SHAPE-scoped
-(`\{\{[A-Z]`) rather than a bare `{{`, because a filled `{{GATE_COMMANDS}}` may legitimately contain
-GitHub Actions `${{ }}` expressions; the shipped template contains none, so an unscoped grep is green
-today and false-fails the first repo whose gate commands are a workflow. `{{ID_FAMILIES}}` must
-match the memory-tree `FAMILIES` (§3) — the build records and the decision logs share one id scheme.
+```bash
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,…
+bash  <gov>/tools/playbook/adopt-playbook.sh --target <project>
+bash  <gov>/tools/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
+```
+
+**Keep the `<!-- governance-template: vN.N -->` marker verbatim** — the kickoff engine's Step-2
+fallback and the upstream re-pull both read it.
+
+### What the renderer cannot decide for you
+
+Everything below is a judgement call about YOUR project. The renderer refuses rather than guessing,
+so these are the answers `intake` will ask for, and the kits whose blocks the charter carries.
+
+- **The memory tree is not droppable.** `§5`'s derived work-state index and `§6`'s record protocol
+  are both written against it, so a charter without it states rules nothing can make true. Adopt it
+  at §3 below.
+- **A self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from
+  machine-enumerated inventories, and a ratchet fails on any unclaimed new key AND any claim naming a
+  dead key, so the map cannot rot into fiction. `map_diff` renders any git range as a feature-level
+  changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps three
+  `kit:codebase-map` blocks in the charter.
+- **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own
+  state still matches the tree — stale claims, closed specs with no product commit, hand-kept
+  inventories disagreeing with what they describe. Stdlib and git, seconds, no agents. Drop it if the
+  project keeps no in-repo records for an audit to compare reality against.
+- **Retrieval over that tree** (`memory-recall/` kit, requires the memory tree): ask the decision
+  corpus a question and get the records that answer it, ranked. Offline, stdlib, writes nothing in
+  the worktree.
+- **One canonical instruction file** (`agent-instructions/` kit): agents do not all read the same
+  filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
+  tool reads this repo; with two, this kit is what stops the second reading a stale copy.
+- **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
+  Python or does not run `pytest -n auto`. The bug classes it fixes stay in the charter either way.
+- **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project has no `.ps1`
+  files. A repo with none gets a clean report that proves nothing, which is honest and is why it is
+  adopted only where the language exists.
+- **A deployer for your own tooling** (`govkit/` kit): drop it unless this repo DEPLOYS kits into
+  other repos. An adopter that only consumes them has no population to declare.
+- **A naming lexicon** (`lexicon/` kit): a closed verb table every definition leads with, banned type
+  suffixes, and forbidden import directions between layers. Opt-in — with no conf it reports NOT
+  ADOPTED and exits 0. Keeping it selected keeps the `kit:lexicon` block in `§12`; dropping it
+  removes five bullets and `{{LEXICON_CONF}}` with them.
+- **Unattended runs** (`unattended/` kit): keeping it selected keeps the `kit:unattended` block in
+  `§1`, which is the ONE substitute for the explicit ask before a merge and a push. A repo that keeps
+  that clause without the kit is carrying a rule nothing can make true.
+
+### The two blocks that are not about a kit
+
+`drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. Two exist:
+
+- `when:security-outbound` — the outbound-call and stored-content rules in `§9`. Drop them if the
+  project has no such surface.
+- `when:cross-os` — `§11` whole. Drop it for a single-OS team.
+
+`§15`'s persona is adjustable per project and is NOT a droppable block: editing the persona is the
+sanctioned change, and its facts-over-wit rules are not adjustable at all.
+
+**Verify:** the renderer's `--check` is the standing verification and it asserts two separate things
+— that the rendered region still matches the template plus the answers, and that no placeholder
+survived. Those are two questions, and a conf that declares nothing for a key renders a region that
+is perfectly in sync and still tells the agent to invoke a placeholder's name.
 
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
@@ -435,7 +471,7 @@ the INVOKING directory, not from its own location — run it with the cwd inside
 4. `bash tools/manifest-check.sh` → 0.
 5. Re-pull the playbook's §1 manifest lines (DoD write-back + Landing reconcile exception) into the
    project's instantiated playbook, and bump its `governance-template:` marker to the version you
-   actually pulled FROM — read it out of `<gov>/parallel-coding-governance.template.md`, never from
+   actually pulled FROM — read it out of `<gov>/coding-governance-agents.template.md`, never from
    this line. Stamping an older number on a newer copy makes the marker lie, and the marker is what
    both the kickoff engine's Step-2 fallback and the re-pull mechanism read.
 6. Bump the manifest marker to `kickoff-manifest: v1.3` **LAST** — the bump silences the kit's
@@ -618,7 +654,7 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
 - **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your
-  filled copy against `<gov>/parallel-coding-governance.template.md` per §-body (ignore filled
+  filled copy against `<gov>/coding-governance-agents.template.md` per §-body (ignore filled
   placeholders + the deleted Customize block) — a re-pull carries the v2.2 §1 manifest lines (DoD
   write-back + Landing reconcile exception) into instantiated playbooks. The manifest carries its own
   `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos — copy the newer

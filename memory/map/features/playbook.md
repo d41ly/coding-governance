@@ -30,7 +30,7 @@ globs = [
 ]
 ```
 
-The product this repo ships is three files at the root — `parallel-coding-governance.template.md`
+The product this repo ships is three files at the root — `coding-governance-agents.template.md`
 (the operating ruleset), `.customize.md` (the deploy-time placeholder catalog) and `.domain-rules.md`
 (the activity-scoped checklists the template references by §-stub). This dossier covers the
 machinery that holds their claims true, not the documents' contents.

@@ -27,8 +27,7 @@ globs = [
   "tools/*",
   ".githooks/**",
   "skills/session-kickoff/**",
-  "parallel-coding-governance.*.md",
-  "parallel-coding-governance.template.md",
+  "coding-governance-agents.template.md",
 ]
 
 # The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
@@ -174,7 +173,7 @@ why = "the red/green self-test for the above, which is itself exempt. Exemptions
 
 [[exempt]]
 path = "tools/playbook-kit-waivers.txt"
-why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the three shipped playbook files. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
+why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the shipped charter template. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
 
 [[exempt]]
 path = "tools/check-template-size.test.sh"
@@ -182,7 +181,7 @@ why = "gov's own red/green self-test for the template size gate, which is itself
 
 [[exempt]]
 path = "tools/template-size-limits.txt"
-why = "the DECLARED size ceilings for gov's own product template and kickoff engine, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
+why = "the DECLARED size ceilings for gov's own charter template, kickoff engine and rendered charter, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
 
 [[exempt]]
 path = "tools/template-size-highwater.txt"
@@ -199,16 +198,6 @@ why = "gov's own red/green self-test of the reference branch-guard block. The ru
 [[exempt]]
 path = "skills/session-kickoff/manifest-check.test.sh"
 why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
-
-[[exempt]]
-path = "parallel-coding-governance.customize.md"
-why = "the deploy-time placeholder catalog. The runbook's own words are 'read it, don't ship it'. Counting it as a playbook member is how the spec over-stated that entry's file count for four revisions."
-
-# ------------------------------------------------------------------------- leg exemptions
-# A leg an adopter does NOT receive, each with its reason, on the same staleness rule as the
-# path exemptions above: a row naming a leg that is no longer in the manifest reds, and a leg
-# that is BOTH exempted and claimed by a descriptor reds too — an exemption and a claim for
-# one fact is the two-spellings class arriving through the escape hatch built to prevent it.
 
 [[exempt_leg]]
 name = "branch-guard self-test"
