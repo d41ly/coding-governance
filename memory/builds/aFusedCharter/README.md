@@ -189,6 +189,7 @@ Records live under `spec/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-18-review-PLAY-aFusedCharter-1-1.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
+| [2026-08-18-review-PLAY-aFusedCharter-1-2.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -213,4 +214,5 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-18-spec-TOOL-aFusedCharter-3.md](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md)
 - **`reviews/`**
   - [2026-08-18-review-PLAY-aFusedCharter-1-1.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md)
+  - [2026-08-18-review-PLAY-aFusedCharter-1-2.md](reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md)
 <!-- /gen:build-docs -->
