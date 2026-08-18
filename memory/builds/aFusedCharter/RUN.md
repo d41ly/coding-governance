@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: ac158844225c03d2216fd3b82ecd128d5cad3701
+witness: e2bfe3f8a2571e99d12c65bf0c0652673cb174eb
 phase: BUILDING
 branch-sha: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 branch-ref: refs/heads/branch/governance-template-convergence-91c2c6
@@ -25,3 +25,5 @@ base: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 2026-08-18T12:32:10Z decision · item The full bar has not completed a green run in this session · reason It exceeds 10 minutes on node a against 4139 stale scratch dirs in TMPDIR, which is the documented environment trap; every leg this pass touches was run individually and is green, but the authoritative full run is owed before landing and no run in this session produced one. Options seen: keep retrying inside a single tool call (rejected, it exceeds the wall-clock limit), run it detached across turns (the resumption's job), or land without it (refused).
 
 2026-08-18T12:45:49Z decision · item DEPL-aFusedCharter-1 landed in slices and three scope items are unbuilt · reason S1c's duplicate-id predicate for govkit selfcheck, S5's fifth column in marker-contract.test.sh, and the kit's own test are specced and not yet written. Options seen: hold the commit until the unit is whole (rejected — a stalled run would then leave nothing on disk for the next one to resume from), or commit the working engine and name the residue (taken). The engine is proven by effect on a fixture and every gate it currently trips is green.
+
+2026-08-18T15:21:21Z decision · item PLAY-aFusedCharter-3 is started but not landed, and gov's deploy.toml is written outside the repo · reason S1 through S3 must land in ONE commit — a tree with the rendered region added and the authored gate-suite section still present states the bar twice, and the wiring leg reds on a descriptor with no region. The descriptor is written and held at ~/.gov-hold/deploy.toml with every answer filled and verified to render clean. What remains is the 26 KB admission cut over the gate-suite section, which is a substantial authored edit. Options seen: land the region alone (rejected, it reds the bar and states the bar twice), commit the descriptor alone (rejected for the same red), or hold both for one whole pass (taken).
