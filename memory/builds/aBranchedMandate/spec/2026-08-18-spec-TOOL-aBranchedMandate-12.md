@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it
 
-**Status:** SPECCED · rev-1 · 2026-08-18 · node a · Tier-1 · base 401416fa · streams tooling · ratified 2026-08-18
+**Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-1 · base 401416fa · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -53,6 +53,13 @@ each under load — to recover a leg name the driver already had in hand.
 none.
 
 ## 9. Revision log
+
+- rev-2 · 2026-08-18 · BUILT and CLOSED, with one divergence from S1. S1 said print the bar's
+  output; measured live, that was 95 lines under a single refusal, 68 of them `GATE ok` — burying
+  the one line the unit exists to surface. The implementation FILTERS `GATE ok`/`GATE skip` and
+  prints the rest, so a FAIL line, the summary and any stderr survive. AC1 observed live on this
+  build's own close: `GATE FAIL  drift-audit records (exit 1)` appeared under the refusal, where
+  recovering it previously cost a separate full-bar run.
 
 - rev-1 · 2026-08-18 · from the closing review's fold record; the sibling unit 2's S4 did not grep for.
 

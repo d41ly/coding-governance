@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-13 — build-complete says which region it could not find
 
-**Status:** SPECCED · rev-1 · 2026-08-18 · node a · Tier-1 · base 401416fa · streams tooling · ratified 2026-08-18
+**Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-1 · base 401416fa · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -55,6 +55,12 @@ output said so. Every build folder in this tree predating the item is in the sam
 none.
 
 ## 9. Revision log
+
+- rev-2 · 2026-08-18 · BUILT and CLOSED. The arm went where an arm already was: the driver
+  self-test's term-1 case already deletes the roster pair from a fixture that HAS one, so it was
+  extended to assert the named region rather than duplicated. My first attempt wrote a new arm
+  against `readme()`, whose fixture never writes the markers — the `sed` was a no-op and the arm
+  would have passed by finding nothing, in a unit about roster markers.
 
 - rev-1 · 2026-08-18 · from this run's own blocked close, recorded in the build folder.
 

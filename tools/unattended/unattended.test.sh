@@ -615,6 +615,9 @@ bcopen; sed -i "/roster:units/d" memory/builds/tRun/README.md
 out=$(run --close tRun)
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
 hit "$out" "build-complete"
+# TOOL-aBranchedMandate-13: and it says WHICH region. The five terms were ANDed into one verdict,
+# so this case reported a bare "unmet" -- the state of every build README older than the item.
+hit "$out" "the build README carries no well-formed roster marker pair"
 
 # term 2 — the pair is well-formed and names no id at all.
 bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. a plan with no id in it/' memory/builds/tRun/README.md
@@ -1451,6 +1454,33 @@ out=$(run --preflight tRun --keepalive-id k2)
 hit "$out" "preflight OK"
 hit "$out" "retired the finished record"
 same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
+
+# ---- TOOL-aBranchedMandate-12: a blocked --close NAMES the leg. The existing check-13 arm declares
+# ---- GATE_CMD="false", which prints nothing, so it passes whether the output is forwarded or
+# ---- discarded -- the same blind spot unit 2's AC4 found in the wiring arm one function away.
+reset_tree; readme tRun
+printf '#!/usr/bin/env bash
+echo "GATEPROBE-the-leg-that-blocked-it"
+exit 1
+' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null
+out=$(run --close tRun)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit "$out" "GATEPROBE-the-leg-that-blocked-it"
+
+# ---- ...and a PASSING bar prints nothing. Without this the arm above is satisfied by a driver that
+# ---- dumps the gate's output unconditionally, which is noise on every successful close.
+reset_tree; readme tRun
+printf '#!/usr/bin/env bash
+echo "GATEPROBE-should-not-appear"
+exit 0
+' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null
+miss "$(run --close tRun)" "GATEPROBE-should-not-appear"
 
 # ---- TOOL-aBranchedMandate-3, S9: the SECOND ANCHOR. Every arm here drives the real bare origin the
 # ---- fixture already builds, because the whole mechanism is an observation of a remote and a

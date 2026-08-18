@@ -1418,8 +1418,12 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         # What the item had to SAY, indented under the refusal that is still the headline. The
         # bar's own output for gates-green; the missing region for build-complete. Empty for an
         # item with nothing to add, so this prints nothing rather than a blank indent block.
+        # FILTERED, not dumped. The first cut printed all 95 lines of a 69-leg bar under one refusal,
+        # 68 of them "GATE ok" -- which buries the one line the operator needs in the noise the
+        # unit exists to remove. Anything that is not an ok/skip line survives, so a FAIL, a
+        # summary and any stderr all reach the operator while the roll-call does not.
         [ -n "${DOD_OUT:-}" ] && printf '%s
-' "$DOD_OUT" | sed 's/^/    /'
+' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
       fi
     fi

@@ -53,7 +53,7 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -61,8 +61,8 @@ it.
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
 | [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | CLOSED | rev-7 | 2026-08-17 |
 | [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | SPECCED | rev-1 | 2026-08-18 |
-| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | SPECCED | rev-1 | 2026-08-18 |
+| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->

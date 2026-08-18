@@ -83,5 +83,5 @@
 - TOOL-aWalkedCorpus-10 · OPEN · codebase-map's `seeded-extractors-or-crashed` outcome stays unmarked because its NAME admits it cannot tell a seed from a crash. Split it in two so the seeding half can be an accepted stop, or rename it to what it detects
 - TOOL-aWalkedCorpus-5 · OPEN · govkit selfcheck partitions gate-leg guard pathspecs into four PREFIX classes and a repo-root file (.memory-tree.conf) lands in none, so a leg cannot guard on a root conf. Hit wiring the recall floor; the guard was narrowed instead
 - TOOL-aWalkedCorpus-4 · OPEN · memory-recall selftest.py mints its two synthetic corpus ids in a LIVE family, so any record quoting them trips hygiene check 14 as orphans. Sibling fixtures use a dead family. Hit twice in one hour: a review record, then the row recording it
-- TOOL-aBranchedMandate-12 · SPECCED · `--close` discards `$GATE_CMD`'s output, so a blocked close names no leg
-- TOOL-aBranchedMandate-13 · SPECCED · `build-complete` reports a bare unmet when the README has no roster region
+- TOOL-aBranchedMandate-12 · CLOSED · `--close` discards `$GATE_CMD`'s output, so a blocked close names no leg
+- TOOL-aBranchedMandate-13 · CLOSED · `build-complete` reports a bare unmet when the README has no roster region
