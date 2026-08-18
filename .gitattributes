@@ -23,7 +23,7 @@ tools/template-size-limits.txt text eol=lf
 #   check 9  byte-compares the generated build index against a fresh LF render — an unpinned
 #            generated file on a Windows checkout differs on EVERY line, so it reds on a file nobody
 #            touched and goes green only right after a render;
-#   check 6  caps index files at 20 KB;
+#   check 6  caps index files at a DECLARED byte bound (`ROW_DOC_CAP_BYTES` / `DOSSIER_CAP_BYTES`);
 #   check 7  caps an index ENTRY at 300 chars.
 # A CRLF checkout adds one byte to every LINE, so checks 6 and 7 measure something different per
 # platform: the same corpus passes on Linux and fails on Windows. Measured — DECISIONS.md at

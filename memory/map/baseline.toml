@@ -24,11 +24,7 @@ gate-legs = [
   "gotchas selftest",
   "harness arms (fail branches armed or pinned)",
   "kickoff-manifest ratchet",
-  "kit version markers",
-  "kit/dogfood doc parity",
   "manifest-check self-test",
-  "memory hygiene",
-  "memory-hygiene self-test",
   "pre-push self-test",
   "push-main self-test",
   "pytest-guardrails self-test",
@@ -38,8 +34,6 @@ gate-legs = [
   "run-gates canary",
   "settings-merge selftest",
   "template size <=48KiB",
-  "verdict epoch (kit version dates the engine)",
-  "verdict-epoch self-test",
   "workflow script syntax",
 ]
 kits = [
@@ -47,7 +41,6 @@ kits = [
   "drift-audit",
   "gate-lint",
   "lib",
-  "memory-tree",
   "pytest-parallel-guardrails",
   "workflows",
 ]

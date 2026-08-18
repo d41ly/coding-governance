@@ -80,6 +80,17 @@ DEAD_PATH_EXCLUDE=""
 # Read-path members deliberately under no byte cap, space-separated. Blank = every member is capped.
 READ_PATH_WAIVER=""
 
+# check 6's two DECLARED byte bounds. POLICY CEILINGS you choose, so unlike the measured pins above
+# they ship WITH a value: blank resolves FORWARD to the kit default rather than skipping the check, and
+# neither bound can be switched off -- `project/curation-debt.txt` is the deliberate per-file exemption.
+# MEASURE your own before raising either: 250 rows at YOUR corpus's bytes-per-row is the derivation, and
+# a figure copied from another tree is either vacuous or permanently red.
+# Row documents, except a build README (25,600, kit-owned) and a dossier below:
+ROW_DOC_CAP_BYTES="20480"
+# Codebase-map dossiers, when that kit is adopted under this tree. Their remedy is a SPLIT, not a
+# rotation, and check 6 is the only size gate they have -- so keep this tighter than the row cap.
+DOSSIER_CAP_BYTES="20480"
+
 # gotchas.py (checks 17-19): how many bug-class records under $MEMORY_ROOT/gotchas/ may be
 # `universal: true`. A universal record is emitted on EVERY reviewer checklist, so this is budgeted
 # rather than left to drift — a checklist nobody can finish is not a checklist. Blank = no budget.

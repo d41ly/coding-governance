@@ -196,6 +196,21 @@ PINS: dict[str, int] = {
     "lexicon_verbs_declared_but_unused": 3,
     # 0, and it can move: the stamp is a date and the language surface is a commit date, so adding a
     # LANGS entry without re-ratifying turns this to 1 the same day.
+    # 81 — the live (non-terminal) row count of the LARGEST backlog shard, measured 2026-08-18 on
+    # memory/backlog/TOOL.md. TOOL-aRelaxedShard-4.
+    #
+    # This is a WATERMARK, not a ceiling, and the signal is `gateable: False` so crossing it never
+    # blocks a merge. What it buys is that RAISING it lands in RATCHETS below and therefore needs a
+    # reason written in place — which is the whole point: this repo hit a spent budget twice in one
+    # session because the number nobody was tracking moved without anyone deciding it should.
+    #
+    # Do not turn this gateable without also declaring it in the shipped conf template. A signal
+    # absent from an adopter's PINS falls back to tolerance 0, so a gateable version reds their first
+    # `--check` on one open row.
+    # 81 -> 89. RAISED at the reground onto main, and by the signal doing its job on its first real
+    # merge: two branches' live rows united, and neither side was over its own watermark. Same shape
+    # as READ_PATH_CEILING in this same reconcile, one budget over.
+    "live_backlog_rows_per_shard": 89,
     "lexicon_ratified_older_than_language_surface": 0,
 }
 
@@ -231,6 +246,8 @@ RATCHETS: list[dict] = [
      "key": "non_terminal_specs_cited_by_product_source", "weakens": "up"},
     {"file": "tools/drift-audit/drift_signals.py",
      "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
+    {"file": "tools/drift-audit/drift_signals.py",
+     "key": "live_backlog_rows_per_shard", "weakens": "up"},
 ]
 
 CHARTER = "AGENTS.md"

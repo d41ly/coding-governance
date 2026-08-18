@@ -35,15 +35,15 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `install-prefix self-test` | install-prefix |
 | `kickoff engine size <=18KiB` | session-kickoff |
 | `kickoff-manifest ratchet` | baseline |
-| `kit version markers` | baseline |
-| `kit/dogfood doc parity` | baseline |
+| `kit version markers` | memory-tree-hygiene |
+| `kit/dogfood doc parity` | memory-tree-hygiene |
 | `lexicon naming predicates` | lexicon |
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
 | `manifest-check self-test` | baseline |
 | `marker contract` | row-grammar |
-| `memory hygiene` | baseline |
-| `memory-hygiene self-test` | baseline |
+| `memory hygiene` | memory-tree-hygiene |
+| `memory-hygiene self-test` | memory-tree-hygiene |
 | `memory-recall kit selftest` | memory-recall |
 | `memory-recall skill wiring` | memory-recall |
 | `method carriers (every pointer declared)` | build-method |
@@ -75,8 +75,8 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `unattended gate selftest` | unattended |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
-| `verdict epoch (kit version dates the engine)` | baseline |
-| `verdict-epoch self-test` | baseline |
+| `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
+| `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
 | `workflow script syntax` | baseline |
@@ -94,7 +94,7 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lexicon` | lexicon |
 | `lib` | baseline |
 | `memory-recall` | memory-recall |
-| `memory-tree` | baseline |
+| `memory-tree` | memory-tree-hygiene |
 | `pytest-parallel-guardrails` | baseline |
 | `unattended` | unattended |
 | `workflows` | baseline |

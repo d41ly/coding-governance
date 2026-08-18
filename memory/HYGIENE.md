@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.21 -->
+<!-- gov:kit memory-tree@2.22 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -64,9 +64,15 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   exemption is ONE expression with one base and one optional append for the codebase-map detail
   files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
-  `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`). The shipped defaults are
-  20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, and 25 KB with no line cap
-  for a build README. `archive/` is wholly exempt.
+  `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`, `DOSSIER_CAP_*`). The shipped
+  defaults are 20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, 25 KB with no line
+  cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
+  exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
+  the line axis — this repo has, for row documents.
+- **The live-row floor.** Because rotation carries forward every non-terminal row, a shard's floor is
+  its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the cap.
+  So the number that actually bounds a shard is its LIVE ROW COUNT, and `drift-audit` reports that per
+  shard on every run (`live_backlog_rows_per_shard`, report-only). `TOOL-aRelaxedShard-4`.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
@@ -127,12 +133,14 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `FAMILIES` alternation and the optional unit tail is shared with check 12's selector, in one
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
-6. **index size caps** — THREE classes, because prose, rows and a generated surface fail for
-   different reasons. Row
+6. **index size caps** — FOUR classes, because prose, rows, a generated surface and a map dossier
+   fail for different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
    `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
-   line cap for that class. A cap that is not a whole number, or a zero BYTE cap, is refused before
+   line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
+   reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
+   would hand the dossier bound to the whole tree. A cap that is not a whole number, or a zero BYTE cap, is refused before
    any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
@@ -143,6 +151,13 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
    to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
    build's own `build/` folder as a dated recording).
+
+   **A row class may retire its line axis, and this repo has.** `TOOL-aRelaxedShard-1` declares
+   `INDEX_CAP_LINES=0` after the owner ratified it, reversing what `TOOL-aWidenedGuide-1` refused. It
+   was a decision, not a tidy-up: at check 7's 300-char entry budget a 250-line row document may hold
+   75,000 B, so the byte figure decided every real case — but the line figure DID bind on 22 of the 29
+   members, every dossier among them, which is why dossiers became their own class rather than
+   inheriting the relaxed index cap.
 7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
@@ -321,7 +336,10 @@ If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tr
 `affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
 freshly-adopted map),
 `features/`, `generated/`; `README.md`,
-`FOUNDATION.md` and `features/*.md` carry the row-document size caps (check 6, `INDEX_CAP_*`) but are
-entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
-dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's
+`FOUNDATION.md` and `features/*.md` carry check 6's size caps but are entry-budget exempt (check 7) —
+dossiers are detail files. The two split across CLASSES: `features/*.md` take `DOSSIER_CAP_*`, while
+`README.md` and `FOUNDATION.md` take `INDEX_CAP_*` like any other row document. A `features/*.md` over
+its cap is SPLIT into two dossiers (never rotated; the map gate requires `FOUNDATION.md` in place), and
+that class is deliberately kept tighter than the index class because a split is the only remedy a
+dossier has and check 6 is the only size gate it has. The map's
 coverage/freshness enforcement is its own test file, not this script.
