@@ -318,6 +318,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_live_backlog_rows",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_module_index",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2069,11 +2074,6 @@
     },
     {
       "id": "signal_lexicon_verbs_unused",
-      "kind": "function",
-      "file": "tools/drift-audit/drift_report.py"
-    },
-    {
-      "id": "signal_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
     },
