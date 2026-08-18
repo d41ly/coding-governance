@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -16,7 +16,19 @@ including after a crash.
   one for a concurrent reader. The per-run uniqueness is preserved deliberately, not incidentally:
   the completion file is the DISPATCH SUPPRESSOR, not a log, so a leftover one at a fixed path would
   make the runner skip a leg and print it green. Creating the run directory fails the run the way
-  the `mktemp -d` it replaces already does; retention of older run dirs is bounded by a sweep.
+  the `mktemp -d` it replaces already does; retention of older run dirs is bounded by a sweep that
+  runs AFTER the verdict file is written, never before the first leg dispatches.
+  **The two directories have separate lifetimes and separate owners, and round 2's R2/R3 are why
+  this is now stated rather than implied.** `<git-dir>/gate-run/` is the DURABLE record: this unit
+  owns it, the EXIT trap stops covering it, and the only deleter is the post-verdict sweep named
+  above. The `mktemp -d` scratch survives this unit — it still holds the timings temporaries — and
+  the trap goes on covering it; `TOOL-aPacedTurnstile-4` widens that trap to INT, TERM and HUP and
+  its scope is the SCRATCH dir alone. A trap that swept `<git-dir>/gate-run/` would erase the record
+  on every ordinary exit and on every caught signal, which is every path except the crash the record
+  exists to make readable, and `-4` lands sixth so it would win by default. Nothing clears the
+  record at the START of a run: per-run uniqueness is what closes blocker F2, and a start-of-run
+  clear can partially fail on this platform against an open handle or an AV lock and inherit the
+  previous run's verdicts — the exact branch F2 named.
 - **S2** — `<git-dir>/gate-run/<run-id>/header` is written BEFORE the first leg dispatches, in a
   key-per-line grammar, carrying the schema version, run id, start time, head, base and how the base
   was resolved, the tree fingerprint, whether the tree was CLEAN at start, the manifest path and its
@@ -35,9 +47,14 @@ including after a crash.
   Its ABSENCE is the crash signal, and is the only crash signal needed.
 - **S5** — a fingerprint helper computing one digest over the committed tree object plus the
   porcelain status lines plus the blob hashes of every dirty-or-untracked file that still exists.
-  Over-sensitive by construction, never under-sensitive; empty on any failure. It ships as its OWN
-  executable inside the kit, not as a function private to the runner, because
-  `TOOL-aPacedTurnstile-7`'s predicate 0 has to compute the same digest from a git hook. Two
+  Over-sensitive by construction, never under-sensitive; empty on any failure. It ships as
+  `tools/run-gates/gate-fingerprint.sh` — its OWN executable inside the kit, named here by repo
+  identifier and spelled identically in `TOOL-aPacedTurnstile-7` S2b and in
+  `TOOL-aPacedTurnstile-1`'s kit-dir layout — rather than as a function private to the runner,
+  because `TOOL-aPacedTurnstile-7`'s predicate 0 has to compute the same digest from a git hook.
+  Round 2's R19: the one interface in this build that both specs insist must have exactly one
+  implementation was the only one with no identifier, which made reimplementing the digest the path
+  of least resistance for `-7`'s builder. Two
   independent implementations of one digest is the `two-answers-to-one-question` class, and here it
   fails toward FULL forever — safe, and it would permanently defeat the scoped path this build
   exists to enable, which is the kind of failure nobody investigates because it looks like caution.
@@ -87,8 +104,12 @@ worker writes its output, then its duration, then commits its completion through
 That is already a per-leg, lock-free, atomically-committed completion record. The only reasons it is
 not durable are the scratch dir and the EXIT trap that deletes it.
 
-So the emitter is not a new subsystem. It is: retarget the directory, drop the trap, add a header
-before dispatch and a verdict after.
+So the emitter is not a new subsystem. It is: retarget the completion files to the per-run
+directory, NARROW the trap so it covers the `mktemp -d` scratch and no longer the record, add a
+header before dispatch and a verdict after, and sweep older run dirs once the verdict is on disk.
+"Drop the trap" is what an earlier draft said, and it was wrong in a way that mattered: the scratch
+dir is still there and still needs covering, and the sentence read as licence for
+`TOOL-aPacedTurnstile-4` to claim the cleanup line for a widened trap over the record.
 
 ### Format
 
@@ -160,14 +181,17 @@ failed or skipped or reused leg is recorded as such, so no consumer can mistake 
 
 ### Rollout
 
-One commit. Rollback is restoring the trap and the scratch destination; the record is additive and
-nothing reads it until `TOOL-aPacedTurnstile-6` lands.
+One commit. Rollback is restoring the trap's original scope and the scratch destination; the record
+is additive and nothing reads it until `TOOL-aPacedTurnstile-6` lands. "Restoring the trap" named
+the whole trap in an earlier draft, which contradicted this unit's own narrowing — the trap is
+never removed, only its coverage of `<git-dir>/gate-run/` is.
 
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `tools/run-gates/run-gates.sh` | destination, trap, header, per-leg row, verdict, fingerprint, ledger |
+| `tools/run-gates/run-gates.sh` | destination, trap narrowing, header, per-leg row, verdict, ledger, post-verdict sweep |
+| `tools/run-gates/gate-fingerprint.sh` | NEW — S5's digest, shipped as its own executable and called by the runner and by `.githooks/pre-push` |
 | `tools/run-gates/run-gates.evidence.test.sh` | S9's arms |
 | `tools/run-gates/run-gates.test.sh` | S10's pinned key set |
 | `tools/gate-legs.json` | the `impure` key on the measured legs |
@@ -184,8 +208,13 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 
 ## 5. Production-readiness checklist
 
-- security — the record carries paths and leg names, no credentials; the existing redaction on the
-  per-leg logs is untouched and the new files carry no command output.
+- security — the record carries paths and leg names, and S3's per-leg OUTPUT copy DOES carry command
+  output, which is what makes the redaction load-bearing here rather than untouched. It takes the
+  same masking and the same restrictive mode the existing per-leg log already has; the record
+  directory takes the restrictive mode too. An earlier draft of this line said the opposite — that
+  the new files carry no command output — while S3 said they do, and §5 is the section a builder
+  grades the security line against, so the contradiction sat in the half that gets read (round 2's
+  R24). AC16 observes it.
 - perf / scale — 0.41 s for the fingerprint, twice per run; per-leg rows are one line each.
 - a11y — N/A: no user interface.
 - i18n — N/A: machine-readable keys and operator-facing English.
@@ -240,8 +269,25 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
   runner: without a pinned id the plant lands in a directory the run never opens, so the arm passes
   by finding nothing and proves the opposite of what it claims. A second plant at the retired FLAT
   path must also be ignored.
+- **AC15** — When a run completes, run directories older than the declared retention bound are gone
+  and the current one and its predecessor remain, asserted in
+  `tools/run-gates/run-gates.evidence.test.sh` against a fixture carrying more than the bound. Its
+  control is the same fixture with the run KILLED before the verdict is written: nothing is swept,
+  because the sweep runs after the verdict and never before dispatch. Without this pair the bound S1
+  states has no owner and the record grows without limit (round 2's R6).
+- **AC16** — When a fixture leg emits a token the runner's redaction masks, the DURABLE per-leg
+  output copy under the run directory contains only the masked form, and both that file's mode and
+  the run directory's mode are the restrictive ones the existing per-leg log already uses — asserted
+  in `tools/run-gates/run-gates.evidence.test.sh`. Its control is the same fixture with the masking
+  removed, which must red. S3 made this copy durable and §5 said the new files carried no command
+  output; the criterion is what stops the two from disagreeing again (round 2's R24).
 - **AC12** — When `bash tools/check-testsuite-counts.sh` runs, both moved harnesses report their
-  executed assertion counts at or above their floors.
+  executed assertion counts at or above their floors, and the count registry carries no row naming
+  either of them. Round 2's R4/R5 found this unsatisfiable while `TOOL-aPacedTurnstile-1` S11 kept
+  both rows: satisfying the count reds the registry's staleness arm the other way, so there was no
+  green state. The counters and BOTH row deletions now land together in `-1`, which owns the move
+  and the rows; this criterion is unchanged in substance and gains only the registry clause that
+  makes the join visible from this side.
 
 ## 7. Gates
 
@@ -258,10 +304,18 @@ recommendation; the reason each survived the veto order is recorded with it.
   Options: clear each run (one run's state, simple, and the crash signal stays unambiguous), or keep
   N runs. Recommendation: clear. The ledger already carries cross-run history keyed per leg, and a
   rolling directory needs a retention policy nobody has asked for.
-  RESOLVED (agent, 2026-08-18, delegated): clear it each run. The ledger already carries
-  cross-run history keyed per leg, so the rolling option adds no acceptance criterion this spec
-  states while adding a retention policy nobody has asked for - and a leftover file in this
-  directory is the F2 blocker's false-GREEN class, which clearing is what closes.
+  RESOLVED (agent, 2026-08-18, delegated), and CORRECTED after round 2's R6: **per-run
+  directories, nothing cleared at start, older run dirs bounded by a sweep that runs after the
+  verdict is written.** The first ratification took "clear each run" off an option set written
+  BEFORE blocker F2 was folded in, and both halves of it contradicted the text the rest of this file
+  now carries. S1 says the per-run uniqueness is preserved deliberately; §4 says the flat spelling is
+  deliberately absent "and that is the whole of blocker F2". F2 is closed by the RUN ID, not by
+  clearing — and a builder following the old answer would have restored the branch F2 named: a
+  start-of-run clear with no failure branch, which on this platform can partially fail against an
+  open handle or an AV lock and inherit the previous run's verdicts. AC14 cannot tell the two
+  designs apart, because with the id pinned and the directory cleared at start the planted file is
+  deleted, the leg executes, and the arm is green either way. The retention policy the old answer
+  dismissed as unasked-for is the one S1 already states, and AC15 now grades its bound.
 - **Whether `impure` carries reason strings or a bare boolean.** Recommendation: reason strings. A
   bare `true` is a claim with no evidence beside it, and this tree's settled pattern for a waiver is
   that it names its reason.
@@ -293,6 +347,20 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-4 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-5 · 2026-08-18 · folded the round-2 spec audit. R2/R3: the two directory lifetimes are now
+  stated separately with an owner each — the EXIT trap keeps the `mktemp -d` scratch and stops
+  covering `<git-dir>/gate-run/`, whose only deleter is the post-verdict sweep — because
+  `TOOL-aPacedTurnstile-4` had claimed the cleanup line for a widened trap over the record, lands
+  sixth, and would have erased the record on every ordinary exit and every caught signal. §4's bare
+  "drop the trap" and Rollout's "restoring the trap" are narrowed to match. R6: §8's first
+  resolution is CORRECTED — this run's own sweep ratified a pre-fold option set and credited F2's
+  closure to clearing, which re-licensed the branch the fold-in removed and which AC14 cannot
+  detect; the answer is now per-run directories with a post-verdict sweep, and AC15 grades its
+  bound. R19: S5's helper is named `tools/run-gates/gate-fingerprint.sh` and added to Files touched,
+  so `-7`'s builder has a path to call rather than an incentive to reimplement the digest. R24: §5's
+  security line said the new files carry no command output while S3 said they do; corrected, with
+  AC16 observing the masking and both modes. R4/R5: AC12 gains the registry clause and the counters
+  move to `-1`, which owns the waiver rows.
 
 ## 10. Reuse audit
 

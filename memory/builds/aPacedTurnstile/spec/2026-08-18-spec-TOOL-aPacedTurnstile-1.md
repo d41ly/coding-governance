@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -13,6 +13,18 @@ instead of wiring legs into a runner the target is assumed to already own.
 
 - **S1** — create `tools/run-gates/` and `git mv` three files into it: `run-gates.sh`,
   `run-gates.test.sh`, `run-gates.evidence.test.sh`. `tools/gate-legs.json` does NOT move.
+  **The canary SPLITS in the same move, and round 2's R10 is why.** `run-gates.test.sh` becomes the
+  SHIPPED harness and keeps only assertions true in ANY tree; a new gov-only sibling
+  `tools/run-gates/run-gates.gov.test.sh` takes every arm keyed on THIS repo's corpus and is its own
+  gate leg, WITHHELD from the kit payload by the file rules S6 writes. Three siblings key arms on
+  gov's corpus unconditionally — `-3` AC6 on gov's six declared chunk names, `-6` on gov's
+  network-calling leg names, `-7` AC9 on a gov leg's guard — and in an adopter tree the manifest is
+  seeded empty and emitted from descriptors with no chunk key, so all three would red on arrival.
+  That is the `memory/gotchas/pin-copied-from-another-corpus.md` class §3 cites by name when it
+  refuses to seed gov's leg names, and the memory-recall kit's gov-only split is the settled
+  precedent. Naming the split HERE is what lets the three siblings land their arms in the right
+  file; the likely field repair otherwise is to make the arms conditional, which silently undoes the
+  round-1 fix that made `-3` AC6 unconditional.
 - **S2** — cut the `tools/lib/` dependency in EVERY shipped file that has one. The runner's source
   line becomes the marker-delimited canonical block, byte-identical; `run-gates.test.sh` carries one
   too, because it sources the resolver itself and a kit that ships a harness which cannot start
@@ -27,7 +39,10 @@ instead of wiring legs into a runner the target is assumed to already own.
   `tools/check-kit-versions.sh`.
 - **S5** — widen the tail separator to TWO spaces on every tailed report line, and add a canary arm
   forbidding a double space inside any leg NAME. This is the output contract
-  `TOOL-aPacedTurnstile-2`, `-3` and `-5` all extend, and this unit owns it.
+  `TOOL-aPacedTurnstile-2`, `-3` and `-6` all extend, and this unit owns it. Not `-5`: that unit adds
+  no stdout verb at all — it writes a header, per-leg rows, a verdict and ledger files, and its §3
+  states it changes no verdict — while `-6` cites this contract by name for its reuse verbs
+  (round 2's R27, in the section that defines the contract).
 - **S6** — write `tools/run-gates/kit.toml`: id, home, version_from, file rules, adopt, check,
   outcome, FOUR `[[gate_leg]]` rows, the LF pin, and the `[gate_runner_seed]` table. FOUR, not five:
   only the two repointed legs plus S7's adopter e2e and its `--check` exist when this unit lands.
@@ -38,17 +53,43 @@ instead of wiring legs into a runner the target is assumed to already own.
   `tools/run-gates/adopt-run-gates.test.sh` gated on EFFECTS, printing its executed assertion count
   against a floor so it needs no waiver row.
 - **S8** — registry surgery in `tools/govkit/registry.toml`: add the entry, delete the three exempt
-  path rows and the two exempt-leg rows naming run-gates, and correct the `tools/lib` exemption's
-  now-false clause about the runner sourcing it. The `tools/gate-legs.json` exemption STAYS.
+  path rows and the two exempt-leg rows naming run-gates, correct the `tools/lib` exemption's
+  now-false clause about the runner sourcing it, AND add this entry's id to `[selection].default`.
+  The `tools/gate-legs.json` exemption STAYS. The default-selection line is the work §8's second
+  fork ratifies, and round 2's R11-R13 found it committed to in §8 and carried by no scope item, no
+  files-touched row and no criterion — so it would have shipped unbuilt and silently. It closes the
+  hazard the fork names: `.githooks/pre-push` invokes the merge bar, a `requires` edge only ORDERS a
+  selection and pulls no missing kit in, and the push-main descriptor declares no requires edge at
+  all, so a target could receive the merge-bar hook with no merge bar. No existing arm can catch
+  that — the selfcheck's unreachable-entry test quantifies over all non-conditional entries, so an
+  entry named in no default set is never unreachable and it exits 0 whatever the default array
+  holds. AC14 is the observation.
 - **S9** — teach `cmd_intake` to emit the target's `[gate_runner]` block from the selected entry's
   `[gate_runner_seed]`, resolving the path tokens only and passing the runner's own `{name}`
   placeholder through verbatim.
-- **S10** — repoint every live spelling of the old path: `.githooks/pre-push`, `.unattended.conf`,
-  `tools/unattended/.unattended.conf.example`, `tools/lib/pyrun.sh`'s docstring, `AGENTS.md`'s gate
-  suite bullets, and the two moved harnesses' self-references.
-- **S11** — the two obligations a new kit dir creates on day one: a row in
-  `tools/playbook-kit-waivers.txt` or coverage in the playbook trio, and the two repointed rows in
-  `memory/project/testsuite-count-waivers.txt`.
+- **S10** — repoint every live spelling of the old path. The population is MEASURED — a grep for the
+  pre-move path across tracked files, excluding the build and archive areas, which are append-only
+  and keep it by design — not authored, because round 2's R9 found the authored list of six missing
+  two live carriers under `memory/`, both inside the hygiene gate's present-tense population, on a
+  leg that is UNGUARDED and therefore runs on every bar. At this base the measurement selects:
+  `.githooks/pre-push`, `.unattended.conf`, `tools/unattended/.unattended.conf.example`,
+  `tools/lib/pyrun.sh`'s docstring, `AGENTS.md`'s gate-suite bullets, the two moved harnesses'
+  self-references, **`memory/guides/BUILD-METHOD.md` — whose authored source is
+  `tools/memory-tree/BUILD-METHOD.template.md`, so the edit goes through the TEMPLATE and is
+  re-rendered or `kit-dogfood-parity.test.sh` reds** — and **`memory/guides/SESSION-KICKOFF.md`,
+  which spells it four more times, one of them in the manifest-audit `watch:` line**, where an
+  unmatched pathspec fails the kickoff ratchet a second way. §4 Rollout insists on ONE commit
+  because a half-moved runner has no green state; missing either guide makes that commit land RED.
+- **S11** — the obligations a new kit dir creates on day one: a row in
+  `tools/playbook-kit-waivers.txt` or coverage in the playbook trio, and — instead of the two
+  REPOINTED rows an earlier draft kept — an EXECUTED ASSERTION COUNTER in each moved harness with
+  both of their rows DELETED from `memory/project/testsuite-count-waivers.txt`, in this same commit.
+  Round 2's R4/R5: `-5` AC12 and `-3` AC11 assert those harnesses report counts at or above their
+  floors, the registry reds on a waiver naming a suite that now complies, and no scope item added a
+  counter — so the set had no reachable green state and there is no ORDERING of the two edits that
+  is green at every commit. The work belongs here because this unit owns both the move and the rows.
+  The gov-only sibling S1 splits out gets a counter and a floor of its own at birth, so it never
+  needs a waiver row.
 - **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and the gate-leg keys
   THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`. It does not claim
   `TOOL-aPacedTurnstile-4`'s turnstile leg, which does not exist for four more units and would red
@@ -93,6 +134,9 @@ tools/run-gates/
   run-gates.sh                    the runner, carrying the version constant and its marker
   run-gates.test.sh               the canary
   run-gates.evidence.test.sh      the evidence arm
+  run-gates.gov.test.sh           the GOV-ONLY arms, withheld from the payload (S1)
+  gate-fingerprint.sh             TOOL-aPacedTurnstile-5's digest, shipped as its own executable
+                                  because .githooks/pre-push must compute the same one
   adopt-run-gates.sh              + --check
   adopt-run-gates.test.sh         the adopter e2e, effects-gated
   gate-profiles.txt               TOOL-aPacedTurnstile-2's table, a kit seed file
@@ -140,15 +184,19 @@ sequenced last in the build for that reason.
 
 | file | change |
 |---|---|
-| `tools/run-gates.sh` and the two harnesses | moved, resolver inlined, manifest default derived, tails widened |
+| `tools/run-gates.sh` and the two harnesses | moved, resolver inlined, manifest default derived, tails widened, assertion counters added |
+| `tools/run-gates/run-gates.gov.test.sh` | new — the gov-corpus arms split out of the shipped canary (S1) |
 | `tools/run-gates/adopt-run-gates.sh`, `adopt-run-gates.test.sh`, `kit.toml`, `README.md` | new |
-| `tools/govkit/registry.toml` | entry added, five rows deleted, one `why` corrected |
+| `tools/govkit/registry.toml` | entry added, five rows deleted, one `why` corrected, the entry id added to `[selection].default` (S8) |
 | `tools/govkit/govkit.py` | `cmd_intake` emits the runner declaration |
 | `tools/check-kit-versions.sh` | the new constant and marker pair |
 | `tools/gate-legs.json` | two argv repoints, TWO new legs — the adopter e2e and the wiring check |
 | `.githooks/pre-push`, `.unattended.conf` and its example, `tools/lib/pyrun.sh` | path repoints |
 | `AGENTS.md` | gate-suite bullets and their script paths |
-| `tools/playbook-kit-waivers.txt`, `memory/project/testsuite-count-waivers.txt` | the day-one rows |
+| `tools/memory-tree/BUILD-METHOD.template.md` + `memory/guides/BUILD-METHOD.md` | the pre-move path, edited in the TEMPLATE and re-rendered as a pair (S10, R9) |
+| `memory/guides/SESSION-KICKOFF.md` | four more spellings, one in the manifest-audit `watch:` line (S10, R9) |
+| `tools/playbook-kit-waivers.txt` | the day-one waiver row |
+| `memory/project/testsuite-count-waivers.txt` | BOTH moved harnesses' rows DELETED, beside S11's counters |
 | `memory/map/features/run-gates.md`, `memory/map/baseline.toml` | the dossier and its shrink |
 
 ### Alternatives rejected
@@ -218,6 +266,22 @@ sequenced last in the build for that reason.
 - **AC13** — When `KIT_RUN_GATES_VERSION` is deleted, or bumped in the constant without its marker,
   `bash tools/check-kit-versions.sh` exits 1 naming that constant — the red-proof the comparable kit
   pairs already carry, without which S4's named gate passes on a marker nobody checks.
+- **AC14** — When `python tools/govkit/govkit.py plan --target <scratch>` runs with NO explicit
+  selection, the plan includes this entry; and when the entry's id is removed from
+  `[selection].default`, that same plan omits it. Both halves, because the positive alone is
+  satisfied by `--all` semantics and by a plan that selects everything. This is the only observation
+  of S8's default-selection line: the selfcheck's unreachable-entry test quantifies over all
+  non-conditional entries, so it exits 0 whatever the default array holds (round 2's R11-R13).
+- **AC15** — When `bash tools/run-gates/run-gates.test.sh` — the SHIPPED canary — runs inside the
+  `tools/lib`-free scratch tree of AC1, whose manifest carries two adopter-shaped legs with no
+  `chunk` key and none of gov's leg names, it exits 0. Its control is
+  `bash tools/run-gates/run-gates.gov.test.sh` in that same tree, which must REFUSE rather than pass:
+  a gov-only harness that quietly succeeds against a foreign corpus is the split failing open
+  (round 2's R10).
+- **AC16** — When the pre-move runner path is searched for across tracked files, excluding the build
+  and archive areas, the search returns nothing — the measured form of S10, whose authored
+  enumeration missed two live carriers under `memory/`. Paired with a positive search finding the
+  post-move path in each carrier the same measurement selected, so a deletion cannot satisfy it.
 
 ## 7. Gates
 
@@ -229,7 +293,14 @@ sequenced last in the build for that reason.
 `bash tools/check-install-prefix.sh` · `bash tools/check-testsuite-counts.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `bash tools/check-playbook-parity.sh` ·
 `python tools/drift-audit/drift_report.py --check` · `bash .githooks/pre-push.test.sh` ·
-`bash tools/push-main.test.sh` · `bash tools/unattended/check-unattended.sh`.
+`bash tools/push-main.test.sh` · `bash tools/unattended/check-unattended.sh` ·
+`bash tools/run-gates/run-gates.gov.test.sh` ·
+`bash tools/memory-tree/check-memory-hygiene.sh` · `bash tools/memory-tree/kit-dogfood-parity.test.sh` ·
+`bash skills/session-kickoff/manifest-check.sh`. The last three are the ones round 2's R9 found
+missing: the hygiene leg is UNGUARDED and reds on an unresolved repo-path citation the moment the
+runner moves, the parity leg reds if the build-method guide is edited without its template, and the
+manifest check fails on a `watch:` pathspec matching no tracked file — so this unit's stated DoD
+could not see any of the three reds its own single-commit rollout would produce.
 
 ## 8. Open questions
 
@@ -273,6 +344,19 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-4 · 2026-08-18 · folded the round-2 spec audit. R10: the canary SPLITS — the shipped harness
+  keeps only tree-agnostic assertions and a gov-only sibling takes every gov-corpus arm, withheld
+  from the payload, because three siblings key arms on gov's chunk names, leg names and a leg guard
+  and would have made the kit red-on-arrival in an adopter tree; AC15 grades both directions. R9:
+  S10's carrier list is MEASURED, not authored — it missed `memory/guides/BUILD-METHOD.md` (whose
+  edit must go through its shipped template) and `memory/guides/SESSION-KICKOFF.md` (four spellings,
+  one in the manifest-audit `watch:` line), both of which would have made the mandated single commit
+  land red on an UNGUARDED leg — and §7 gains the three gates that could see it. R11-R13: S8 gains
+  the `[selection].default` line the ratified fork commits this unit to and AC14 observes it; no
+  existing arm could, since the selfcheck's unreachable-entry test exits 0 whatever the default
+  holds. R4/R5: S11 stops repointing the two count-waiver rows and DELETES them beside new counters,
+  which is the only edit ordering that is green at every commit. R19: the kit layout names
+  `gate-fingerprint.sh`. R27: S5's dependent list reads `-2`, `-3`, `-6`; `-5` adds no stdout verb.
 
 ## 10. Reuse audit
 

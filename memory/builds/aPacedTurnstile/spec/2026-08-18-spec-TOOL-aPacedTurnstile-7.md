@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -15,12 +15,32 @@ obligation instead of deleting it.
 - **S2** — the hook forces a full run when the run record's last full green is absent, is not an
   ancestor of the pushed tip, or is more than `GATE_FULL_MAX_LAG` commits behind it.
 - **S2b** — the hook forces a full run when the record's TREE fingerprint does not equal a fresh
-  fingerprint of the pushed tip (predicate 0), when the lag value is not a decimal integer
-  (predicate 6), and on any `push-main` retry after the first, whose reconcile merge commit no
-  recorded green describes (predicate 7). It computes that fingerprint by CALLING
-  `TOOL-aPacedTurnstile-5`'s shipped helper, never by reimplementing the digest — two implementations
-  of one digest disagree silently and then force full forever, which reads as caution rather than as
-  the defect it is.
+  fingerprint computed AT THE RECORDED SHA (predicate 0), and when the pushed tip is a merge whose
+  second parent is not an ancestor of the recorded green — the shape a `push-main` reconcile retry
+  produces (predicate 6). It computes that fingerprint by CALLING `TOOL-aPacedTurnstile-5`'s shipped
+  `tools/run-gates/gate-fingerprint.sh`, never by reimplementing the digest — two implementations of
+  one digest disagree silently and then force full forever, which reads as caution rather than as the
+  defect it is.
+
+  **Predicate 0 joins at the RECORDED sha, not at the tip, and round 2's blocker R1 is why.**
+  `TOOL-aPacedTurnstile-5` defines the digest over the committed tree object, so it moves on every
+  commit; joined against the TIP it fires on every push whose tree is not identical to the commit the
+  green was earned on, which is exactly the population predicates 3 and 4 exist to admit. That
+  spelling made the scoped path unreachable, predicates 3-6 dead code, and AC1 and AC6b mutually
+  unsatisfiable on a real push — while both arms, being fixture-built, stayed green. What predicate 0
+  buys in its corrected form is stated rather than implied: it detects a record whose stored digest no
+  longer describes the tree at the sha it names — a hand-edited record, or an object store rewritten
+  under that sha. It does NOT detect a dirty working tree, because `TOOL-aPacedTurnstile-5` S7 already
+  refuses to write the record unless the tree was clean at start, and that refusal is where the
+  dirty-tree hole is closed. Predicate 0 is not the clean-tree assertion and this spec no longer
+  claims it is.
+
+  **Predicate 6 is derived from the tip's SHAPE and not from the lander.** The first spelling forced
+  full "on any `push-main` retry after the first", and the lander keeps its attempt counter as a plain
+  shell local that it exports nowhere; the hook is a separate process git invokes and cannot see it,
+  so alone among the rows that predicate would have failed toward SCOPED when its signal was absent —
+  against §4's "every predicate fails toward FULL". The retry reconciles with origin, which produces a
+  merge commit, so the hook derives the same fact from the commit it is already given.
 - **S3** — the hook forces a full run when the pushed diff touches `tools/gate-legs.json`, the file
   in which a guard can be narrowed.
 - **S4** — the hook forces a full run when the recorded leg-manifest fingerprint differs from
@@ -34,20 +54,52 @@ obligation instead of deleting it.
   TOML a bash hook cannot parse, and the profile table's header forbids a coverage knob by rule. It
   is deliberately NOT the `GOV_DEFAULT_BRANCH` shape, which the spec audit showed does not exist as
   described and would be fail-OPEN here — an environment value that widens the lag leaves no diff
-  behind, which is the defeatable class `TOOL-aStandingWrit-4` recorded in this very hook. If an
-  environment value is honoured at all it is CLAMPED and validated, and anything non-integer forces
-  full rather than being ignored.
+  behind, which is the defeatable class `TOOL-aStandingWrit-4` recorded in this very hook.
+  **The environment supplies it NOWHERE, and round 2's R20 is why the hedge came out.** The first
+  spelling made it a source constant and then hedged that an environment value, "if honoured at all",
+  would be clamped and validated — which left the reachability of the forcing row guarding it
+  undecidable from the text: a builder reading the constant as final writes no such row and every
+  criterion stays green, and a builder honouring the environment writes the very env-settable bound
+  this item argues against, also with no arm. The row is therefore deleted from §4's table rather than
+  left unobserved, and the constant is validated by `.githooks/pre-push.test.sh` at EDIT time — an arm
+  asserting the literal in the hook is a decimal integer, which reds on the edit that breaks it
+  instead of at a push nobody is watching.
 - **S7** — the hook exports the no-halt flag `TOOL-aPacedTurnstile-3` defines, unconditionally and
   independently of its own scoped-or-full decision, so a landing always gets a complete verdict list
   instead of stopping at the first red chunk.
 - **S8** — `.githooks/pre-push.test.sh` gains one arm per forcing predicate, one arm proving the
-  scoped path actually scopes, and one proving the no-halt export.
-- **S9** — the safety property is rewritten wherever it is stated: `AGENTS.md`, the playbook
-  template's diff-scope line, AND `tools/run-gates/run-gates.sh`'s own header comment, which states
-  the same claim and which `TOOL-aPacedTurnstile-1` ships into the kit and therefore to adopters.
+  scoped path actually scopes, one proving the no-halt export, and one asserting the lag constant in
+  the hook is a decimal integer at edit time (S6). It also gains an EXECUTED ASSERTION COUNTER in the
+  agreed shape, and this unit DELETES that suite's row from
+  `memory/project/testsuite-count-waivers.txt` in the same commit. Both halves or neither: the
+  registry reds on a waiver naming a suite that now complies, so a counter without the deletion and a
+  deletion without the counter are each a red, and AC10 was unsatisfiable while the row stood
+  (round 2's R18).
+- **S9** — the safety property is rewritten wherever it is stated, and the population is MEASURED
+  rather than enumerated: a whitespace-insensitive search for the claim across tracked product files
+  and the guides selects the carriers, and the search itself is what §6 grades. At this base it
+  selects seven, of which the first draft named three — the missed four are why this item stopped
+  enumerating. `AGENTS.md`. The playbook template's diff-scope line.
+  `tools/run-gates/run-gates.sh`'s own header comment, which `TOOL-aPacedTurnstile-1` ships into the
+  kit and therefore to adopters. **Two bullets of `parallel-coding-governance.domain-rules.md`**,
+  which state the once-at-the-push-boundary guarantee and name the pre-push hook as the sole mandated
+  full run — PRODUCT, received by every adopter, and the file the charter says is run in every Tier-2
+  review, so leaving it would have gov's own reviewers grading against a guarantee this unit deletes.
+  **`memory/guides/BUILD-METHOD.md` TOGETHER WITH its shipped source
+  `tools/memory-tree/BUILD-METHOD.template.md`** — edited as a pair and re-rendered, because
+  `kit-dogfood-parity.test.sh` compares exactly those two and reds on a one-sided edit. And
+  **`memory/guides/SESSION-KICKOFF.md`**, which states it a fourth time.
 - **S10** — close the one guard hole that is verified still open, named in
   `memory/builds/cKeyedLaunchpad/README.md` park 2 and in `cBriefedPilot-15`: the kit/dogfood parity
-  leg's guard omits `memory/guides/`, which is a file pair it actually validates.
+  leg's guard omits `memory/guides/`, which is a file pair it actually validates. **The hole has TWO
+  carriers and both are closed here.** gov's own row in `tools/gate-legs.json` is the one an earlier
+  draft fixed; `tools/memory-tree/kit.toml` declares the SAME leg for DEPLOYMENT with an even
+  narrower guard, and `govkit.py`'s emit verb copies a descriptor's declared guard verbatim into the
+  target's manifest. Fixing only gov's row leaves the half that SHIPS open, so an adopter taking
+  memory-tree plus the promoted run-gates kit receives a parity leg that skips when their own
+  build-method guide moves — the wrong-merge-verdict inversion this unit exists to bound, exported
+  rather than fixed. Nothing catches the divergence today: govkit's selfcheck joins descriptor gate
+  legs to the manifest by NAME only and never compares the two guards.
 
 ## 3. Non-goals (OUT)
 
@@ -80,9 +132,13 @@ move. That is strictly weaker. It is also, unlike today's property, MEASURABLE �
 The hook reads four fields from the run record and nothing else: the sha of the most recent run in
 which every leg ran and passed, that run's leg-manifest fingerprint, its TREE fingerprint, and a
 schema version it can refuse. The tree fingerprint is what predicate 0 joins against a fresh
-fingerprint of the pushed tip; without that join a green earned on a dirty working tree resets the
-lag counter, and the replacement property written into `AGENTS.md` becomes false while the record
-makes it look measured. Field names are owned by `TOOL-aPacedTurnstile-5`.
+fingerprint computed at the RECORDED sha. The dirty-tree hole an earlier draft gave as this join's
+justification is closed elsewhere and is not claimed here: `TOOL-aPacedTurnstile-5` S7 refuses to
+write the record at all unless the tree was clean at start, so a green earned on a dirty tree never
+becomes a record. What survives for predicate 0 is narrower and is worth stating exactly — a stored
+digest that no longer describes the tree at the sha it names, which is a hand-edited record or an
+object store rewritten under that sha. Field names are owned by `TOOL-aPacedTurnstile-5`, and the
+digest is computed by that unit's `tools/run-gates/gate-fingerprint.sh` and by nothing else.
 
 ### The decision
 
@@ -90,14 +146,18 @@ Evaluated in order; the first hit forces and stops.
 
 | # | predicate | reason string |
 |---|---|---|
-| 0 | the record's tree fingerprint does not equal a fresh fingerprint of the pushed tip | `the record describes a different tree` |
+| 0 | the record's tree fingerprint does not equal a fresh fingerprint computed AT THE RECORDED SHA | `the record describes a different tree` |
 | 1 | no run record, or it does not parse, or its schema version is unknown | `no usable run record` |
 | 2 | recorded manifest fingerprint differs from `git hash-object tools/gate-legs.json` | `the leg manifest changed` |
 | 3 | `git merge-base --is-ancestor` of recorded sha against the tip is non-zero | `the last full green is not an ancestor` |
 | 4 | `git rev-list --count` over recorded sha to tip exceeds `GATE_FULL_MAX_LAG` | `N commits since the last full bar` |
 | 5 | the pushed diff touches `tools/gate-legs.json` | `the leg manifest is in this diff` |
-| 6 | `GATE_FULL_MAX_LAG` is set to anything that is not a decimal integer | `unusable lag` |
-| 7 | this is a `push-main` retry attempt after the first | `a reconcile merge is not covered by the record` |
+| 6 | the pushed tip is a merge whose second parent is not an ancestor of the recorded green | `a reconcile merge is not covered by the record` |
+
+Seven rows, not eight. The row that forced full on a non-integer lag is gone, because S6 settles that
+no environment supplies the lag: a forcing row whose input cannot vary at run time is not a predicate,
+it is an edit-time invariant, and S8 arms it as one. Round 2's R20 found it as the single row of the
+table with no criterion while S8 promised one arm per row.
 
 **Every predicate fails toward FULL.** An absent, unreadable, unparseable or ambiguous record yields
 a full run, never a scoped one. This is the entire safety argument, and it is why each read is
@@ -124,7 +184,12 @@ cold start rather than a special case.
 | `AGENTS.md` | the gate-suite paragraph's safety-property sentence |
 | `parallel-coding-governance.template.md` | its diff-scope and full-bar sentence |
 | `tools/run-gates/run-gates.sh` | the header comment stating the same retired claim |
-| `tools/gate-legs.json` | S10's one guard row |
+| `parallel-coding-governance.domain-rules.md` | the two bullets stating the retired guarantee (S9) |
+| `memory/guides/BUILD-METHOD.md` + `tools/memory-tree/BUILD-METHOD.template.md` | the same claim, edited as a PAIR and re-rendered or kit/dogfood parity reds (S9) |
+| `memory/guides/SESSION-KICKOFF.md` | the fourth statement of the claim (S9) |
+| `tools/gate-legs.json` | S10's guard row — gov's carrier |
+| `tools/memory-tree/kit.toml` | S10's OTHER carrier: the same leg's declared guard, which govkit emits verbatim into a target (R7) |
+| `memory/project/testsuite-count-waivers.txt` | the pre-push suite's row, deleted beside S8's counter |
 
 ### Alternatives rejected
 
@@ -174,34 +239,64 @@ cold start rather than a special case.
   `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason naming the commit count.
 - **AC6** — When the record's manifest fingerprint disagrees with `git hash-object tools/gate-legs.json`,
   `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason `the leg manifest changed`.
-- **AC6b** — When the recorded tree fingerprint does not match a fresh fingerprint of the pushed tip,
-  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` and the reason
-  `the record describes a different tree` — predicate 0, the join without which a green earned on a
-  dirty tree silently resets the lag.
-- **AC6c** — When `tools/push-main.sh` retries after reconciling with origin,
-  `bash tools/push-main.test.sh` observes the retry gate running with `GATE_FULL=1`.
+- **AC6b** — When the record's stored tree fingerprint does not match a fresh fingerprint computed
+  AT THE RECORDED SHA, `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` and the reason
+  `the record describes a different tree`. **Its control is the other half and they are graded
+  together:** a record whose stored fingerprint DOES match at the recorded sha, on a tip whose tree
+  differs from that sha's, observes the gate running WITHOUT `GATE_FULL` — which is the criterion the
+  tip-joined spelling could not satisfy at the same time as AC1, and the reason round 2 called that
+  spelling a blocker. Without the second half this criterion is satisfied by a predicate 0 that fires
+  unconditionally.
+- **AC6c** — When the pushed tip is a merge whose second parent is not an ancestor of the recorded
+  green — the shape `tools/push-main.sh` produces when it reconciles and retries —
+  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason
+  `a reconcile merge is not covered by the record`. Graded in the HOOK's suite, not the lander's,
+  because the hook derives the fact from the commit it is handed and needs no channel from the
+  lander; `bash tools/push-main.test.sh` keeps only the end-to-end observation that a reconciled
+  retry lands green.
+- **AC6d** — When the hook forces a full run for a known reason, that run's record header carries the
+  SAME reason string under the declared key `TOOL-aPacedTurnstile-5` S2 defines — asserted in
+  `.githooks/pre-push.test.sh` against the header the runner wrote, not against the hook's stdout.
+  S5's durable half is otherwise satisfied by a stdout-only implementation, and §4 rests the whole
+  inversion on the record making "when did every leg last run, and on what sha" answerable
+  (round 2's R21).
 - **AC7** — When the retired claim is searched for after this lands, a WHITESPACE-INSENSITIVE search
   (the carriers hard-wrap the sentence across lines, so a line-anchored `grep` matches nothing today
-  and would pass unchanged) finds it in none of the three carriers — `AGENTS.md`,
-  `tools/run-gates/run-gates.sh` and `parallel-coding-governance.template.md` — AND a positive search
-  finds the replacement sentence naming `GATE_FULL_MAX_LAG` in each. The negative alone is satisfied
-  by any rewording, including one still false, and by a grep that never could have matched.
+  and would pass unchanged) finds it in NONE of the carriers S9 measures, AND a positive search finds
+  the replacement sentence naming `GATE_FULL_MAX_LAG` in each. Both halves are per-carrier, over the
+  MEASURED population and not a literal list: `AGENTS.md`, `tools/run-gates/run-gates.sh`,
+  `parallel-coding-governance.template.md`, `parallel-coding-governance.domain-rules.md`,
+  `memory/guides/BUILD-METHOD.md`, `tools/memory-tree/BUILD-METHOD.template.md` and
+  `memory/guides/SESSION-KICKOFF.md` at this base. The negative alone is satisfied by any rewording,
+  including one still false, and by a grep that never could have matched; an enumeration alone is
+  satisfied by editing three files and leaving four, which is what round 2's R8 found.
 - **AC8** — When the hook runs, it exports the no-halt flag regardless of which branch its forcing
   table took, asserted in `.githooks/pre-push.test.sh` on both the scoped and the forced path — so a
   landing never stops reporting at the first red chunk.
-- **AC9** — When `bash tools/run-gates/run-gates.test.sh` runs, the kit/dogfood parity leg's guard
-  names `memory/guides/`, and a fixture touching only `memory/guides/BUILD-METHOD.md` causes that leg
-  to RUN rather than skip — the hole `cKeyedLaunchpad` park 2 recorded, closed and armed.
+- **AC9** — When `bash tools/run-gates/run-gates.gov.test.sh` runs — the GOV-ONLY harness
+  `TOOL-aPacedTurnstile-1` S1 splits out, because this arm names a gov leg and would red on arrival in
+  an adopter tree — the kit/dogfood parity leg's guard names `memory/guides/`, and a fixture touching
+  only `memory/guides/BUILD-METHOD.md` causes that leg to RUN rather than skip.
+- **AC9b** — When `python tools/govkit/govkit.py selfcheck` runs, `tools/memory-tree/kit.toml`'s
+  declared guard for the kit/dogfood parity leg names `memory/guides/` too, and a fixture reverting it
+  to the narrow spelling reds — the SHIPPING carrier of the same hole. Both halves, or the hole is
+  closed in gov and exported to every adopter (round 2's R7).
 - **AC10** — When `bash tools/check-testsuite-counts.sh` runs, `.githooks/pre-push.test.sh` reports
-  an executed assertion count no lower than its recorded floor.
+  an executed assertion count no lower than its recorded floor AND the registry carries no row naming
+  that suite. The second clause is the half round 2's R18 found missing: the registry reds on a waiver
+  naming a suite that now complies, so the criterion was unsatisfiable while S8 added only arms, and
+  an implementation that added a counter without deleting the row traded one red for another.
 
 ## 7. Gates
 
 `bash .githooks/pre-push.test.sh` · `bash tools/push-main.test.sh` ·
 `bash tools/run-gates/run-gates.test.sh` (the post-move path — this unit lands seventh) ·
-`bash tools/check-testsuite-counts.sh` · `bash tools/check-playbook-parity.sh` ·
-`bash tools/memory-tree/check-memory-hygiene.sh` · `python tools/memory-tree/check-arms.py --check` ·
-and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.gov.test.sh` · `bash tools/check-testsuite-counts.sh` ·
+`bash tools/check-playbook-parity.sh` · `bash tools/memory-tree/check-memory-hygiene.sh` ·
+`python tools/memory-tree/check-arms.py --check` · `python tools/govkit/govkit.py selfcheck` ·
+`bash tools/memory-tree/kit-dogfood-parity.test.sh` ·
+and the full bar, `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — the POST-move path, which is
+what this unit runs at its own landing and which the last entry still spelled pre-move.
 
 ## 8. Open questions
 
@@ -250,6 +345,20 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-5 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-6 · 2026-08-18 · folded the round-2 spec audit. BLOCKER R1: predicate 0 joined the recorded
+  digest against a fresh fingerprint of the PUSHED TIP, and the digest moves on every commit, so it
+  fired on exactly the population predicates 3 and 4 admit — the scoped path was unreachable,
+  predicates 3-6 dead code, AC1 and AC6b mutually unsatisfiable, and both arms fixture-built so the
+  bar saw nothing. The join moves to the RECORDED sha and both S2b and §4 now state what it does and
+  does not buy. R15/R20: predicate 7 is derived from the tip's SHAPE rather than from a lander local
+  the hook cannot see, and the non-integer-lag row is deleted because S6 now settles that no
+  environment supplies the lag — an edit-time invariant with an arm, not a forcing row with none.
+  R7: S10 closes BOTH carriers of the guard hole, gov's manifest row and the kit descriptor govkit
+  emits verbatim, with AC9b arming the shipping half. R8: S9's carrier population is MEASURED, not
+  enumerated — it named three where the tree holds seven, two of them product. R10: AC9 moves to the
+  gov-only harness. R18: S8 gains the counter and the waiver-row deletion together. R21: AC6d reads
+  the forced-full reason back out of the record header. R26: §7's full-bar entry repointed past the
+  move.
 
 ## 10. Reuse audit
 

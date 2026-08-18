@@ -54,6 +54,14 @@ moved the set from FORKED to READY; before that sweep this table's classificatio
 driver's own computation disagreed. **The live rev of each spec is in the generated table below,
 not here** — restating it in this column is what let that column go stale once already.
 
+A SECOND audit then ran, because M4 keys on rev movement and every rev had moved since the only
+recorded verdict — which was round 1's BLOCKED. It returned BLOCKED again on 29 confirmed findings
+of 37 raised, recorded in `reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md`, and all 29
+are folded. It was worth running twice: nine of round 1's fixes had landed half, inverted, or in the
+wrong unit, and three of the sweep's own ratified answers turned out to be options written BEFORE
+the round-1 fold-in — including `-5`'s, which credited blocker F2's closure to a mechanism the
+fold-in had replaced and would have re-licensed the branch F2 named.
+
 | id | unit | classification | audit |
 |---|---|---|---|
 | TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | F1 blocker folded |
@@ -64,7 +72,8 @@ not here** — restating it in this column is what let that column go stale once
 | TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY | F4 blocker folded |
 | TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | F5 blocker folded |
 
-The five blockers, because they are the record of what the design got wrong before a line of code:
+The blockers, because they are the record of what the design got wrong before a line of code. Five
+from round 1, then one from round 2:
 
 | # | unit | the defect |
 |---|---|---|
@@ -73,6 +82,7 @@ The five blockers, because they are the record of what the design got wrong befo
 | F3 | `-5` | `gate-full-green`'s "failed nothing" precondition was the only one of its preconditions with no negative control, so an implementation that forgot it passed every arm |
 | F4 | `-6` | the unit had no position in the build order while changing the base every guard diffs against, leaving it undecidable which base the authoritative boundary would use |
 | F5 | `-7` | a full green earned on a DIRTY tree reset the lag counter, making the replacement property false while the record made it look measured |
+| R1 | `-7` | the fix for F5 overshot. Predicate 0 joined the recorded digest against a fresh fingerprint of the PUSHED TIP, and `-5` defines that digest over the committed tree object, so it fired on every push whose tree had moved — exactly the population predicates 3 and 4 admit. Both arms were fixture-built, so nothing on the bar noticed |
 
 ## Build order, and the dependency that forces each edge
 
@@ -129,6 +139,14 @@ The `kit/dogfood doc parity` leg guards on four paths but validates a pair that 
 it costs a wrong merge verdict. `-7` S10 therefore closes that hole inside this build rather than
 recording it as an accepted residual, and `-7` AC9 arms it.
 
+Round 2 found that hole has TWO carriers and S10 was closing one. `tools/memory-tree/kit.toml`
+declares the same leg for DEPLOYMENT with an even narrower guard, and govkit's emit verb copies a
+descriptor's declared guard verbatim into a target — so fixing gov's manifest row alone would leave
+the half that SHIPS open, and `-1` promotes the runner to a deployable kit precisely so adopters run
+this bar. The hole would have been exported rather than fixed, and nothing catches the divergence:
+govkit's selfcheck joins descriptor gate legs to the manifest by NAME only. S10 now names both
+carriers and AC9b arms the shipping one.
+
 Two things the design pass recommended that this build does NOT take, recorded because a refused
 recommendation is worth more on the record than off it:
 
@@ -148,13 +166,13 @@ ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aP
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-6 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
