@@ -33,8 +33,8 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --check)  MODE=check; shift ;;
     --target) [ $# -ge 2 ] || print_usage; TARGET=$2; shift 2 ;;
-    -h|--help) usage ;;
-    *) echo "adopt-run-gates: unknown argument '$1'" >&2; usage ;;
+    -h|--help) print_usage ;;
+    *) echo "adopt-run-gates: unknown argument '$1'" >&2; print_usage ;;
   esac
 done
 
@@ -82,42 +82,72 @@ if [ ! -f "$DECL" ]; then
   exit 0
 fi
 
-# The declared heads, read out of the target's own descriptor. A key that is absent is DECLARED
-# ABSENT and reported as such: an empty value silently comparing equal to nothing is how this class
-# of check passes by finding nothing.
-read_declared() {  # KEY -> the declared value, or empty
+# The declared templates, read out of the target's own descriptor.
+#
+# THE ARRAY FORM IS THE ONE THAT MATTERS, and the closing review's D2 is why this reads both. The
+# deployer's own reader ITERATES these keys, so what a target actually carries is
+# `observed_ran = ["GATE ok    {name}"]`. An earlier draft matched only the SCALAR form and returned
+# empty on an array — and empty took the "not declared" branch, which reported only because BOTH
+# keys were empty. Against a real array declaration with total runner drift it would have said
+# NOT ADOPTED and exited 0: failing OPEN, in the one arm whose whole job is to catch that drift.
+#
+# A key that is absent is DECLARED ABSENT and reported as such; an empty value silently comparing
+# equal to nothing is how this class of check passes by finding nothing.
+read_declared() {  # KEY -> every declared template, one per line
+  sed -n 's/^[[:space:]]*'"$1"'[[:space:]]*=[[:space:]]*\[\(.*\)\][[:space:]]*$/\1/p' "$DECL" \
+    | head -1 | grep -oE '"[^"]*"' | sed 's/^"//; s/"$//'
   sed -n 's/^[[:space:]]*'"$1"'[[:space:]]*=[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$DECL" | head -1
+}
+is_scalar() {  # KEY -> 0 when the descriptor declares it as a bare string
+  grep -qE '^[[:space:]]*'"$1"'[[:space:]]*=[[:space:]]*"' "$DECL"
 }
 RAN=$(read_declared observed_ran)
 FAILED=$(read_declared observed_failed)
 
 if [ -z "$RAN" ] && [ -z "$FAILED" ]; then
-  echo "adopt-run-gates: NOT ADOPTED — $DECL declares no [gate_runner] observation strings."
+  echo "adopt-run-gates: NOT ADOPTED — $DECL declares no [gate_runner] observation templates."
   echo "adopt-run-gates: Nothing written."
   exit 0
 fi
+
+rc=0
+for key in observed_ran observed_failed observed_skipped; do
+  is_scalar "$key" || continue
+  echo "adopt-run-gates: $key is declared as a STRING in $DECL; it must be an ARRAY of templates."
+  echo "adopt-run-gates: The deployer's reader ITERATES this key, so a string is walked character by"
+  echo "adopt-run-gates: character: the head becomes one character, no leg name is ever recovered,"
+  echo "adopt-run-gates: and every line is classified by whichever state is scanned first. Re-emit"
+  echo "adopt-run-gates: the declaration with 'govkit intake'."
+  rc=1
+done
 
 # The head is the literal prefix BEFORE the runner's own {name} placeholder. That placeholder is the
 # RUNNER's substitution, not the deployer's, so it passes through the seed verbatim and is stripped
 # here rather than resolved.
 extract_head() { printf '%s' "${1%%\{name\}*}"; }
 
-rc=0
-for pair in "observed_ran:$RAN" "observed_failed:$FAILED"; do
-  key=${pair%%:*}; val=${pair#*:}
-  [ -n "$val" ] || { echo "adopt-run-gates: $key is not declared in $DECL"; rc=1; continue; }
-  h=$(extract_head "$val")
-  [ -n "$h" ] || { echo "adopt-run-gates: $key declares '$val', which has no literal head before {name}"; rc=1; continue; }
-  if grep -qF -- "$h" "$RUNNER"; then
-    [ "$MODE" = check ] && echo "adopt-run-gates: ok   $key head '$h' still appears in $KITREL/run-gates.sh"
-  else
-    echo "adopt-run-gates: DRIFT — $key declares the head '$h', which no printf in"
-    echo "adopt-run-gates: $KITREL/run-gates.sh emits any more. The deployer reads this target's"
-    echo "adopt-run-gates: verdicts by matching that head, so it would report a bar that ran nothing"
-    echo "adopt-run-gates: rather than a bar whose format moved. Re-emit the declaration, or restore"
-    echo "adopt-run-gates: the runner's output strings."
-    rc=1
-  fi
+for key in observed_ran observed_failed; do
+  vals=$(read_declared "$key")
+  [ -n "$vals" ] || { echo "adopt-run-gates: $key is not declared in $DECL"; rc=1; continue; }
+  # EVERY template, not only the first: a declaration may carry several, and a drifted one sitting
+  # behind a matching one is exactly the silent case this check exists for.
+  while IFS= read -r val; do
+    [ -n "$val" ] || continue
+    h=$(extract_head "$val")
+    [ -n "$h" ] || { echo "adopt-run-gates: $key declares '$val', which has no literal head before {name}"; rc=1; continue; }
+    if grep -qF -- "$h" "$RUNNER"; then
+      [ "$MODE" = check ] && echo "adopt-run-gates: ok   $key head '$h' still appears in $KITREL/run-gates.sh"
+    else
+      echo "adopt-run-gates: DRIFT — $key declares the head '$h', which no printf in"
+      echo "adopt-run-gates: $KITREL/run-gates.sh emits any more. The deployer reads this target's"
+      echo "adopt-run-gates: verdicts by matching that head, so it would report a bar that ran nothing"
+      echo "adopt-run-gates: rather than a bar whose format moved. Re-emit the declaration, or restore"
+      echo "adopt-run-gates: the runner's output strings."
+      rc=1
+    fi
+  done <<EOF
+$vals
+EOF
 done
 
 if [ "$MODE" = check ]; then

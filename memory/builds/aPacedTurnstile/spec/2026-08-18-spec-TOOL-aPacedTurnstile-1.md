@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** CLOSED · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -411,6 +411,36 @@ recommendation; the reason each survived the veto order is recorded with it.
   eight, two of which no review round had caught. One scope item is honestly weaker than specced and
   is recorded in §8 rather than left implied: `adopt-run-gates.sh` has no WRITE path, because the
   declaration is emitted by `govkit intake` from `[gate_runner_seed]`.
+- rev-7 · 2026-08-18 · folded the CLOSING DIFF REVIEW, which landed BLOCKED on 12 distinct defects
+  — all in this unit's code, none in the records. Its headline is the finding worth keeping: the
+  full bar was GREEN at 73/73 while every defect lived on the far side of a seam the bar does not
+  cross — what the kit does in an ADOPTER's tree, at an ADOPTER's prefix, read by the DEPLOYER's own
+  reader. Promoting a script to a kit moves its failure surface somewhere gov's bar does not look,
+  and this spec did not say so.
+  BLOCKER D1, reproduced live: `[gate_runner_seed]` declared `observed_ran` as a TOML SCALAR and
+  `read_gate_verdicts` ITERATES it, so it walked the string character by character — the head became
+  `G`, no leg name was ever recovered, and because `observed_ran` is scanned first and `setdefault`
+  wins, no key could ever be red. A real `apply` exited 0 recording every line green while the
+  target's canary leg was genuinely RED. Fixed in all THREE places the review named: the seed
+  declares arrays, `cmd_intake` emits a list as a TOML array, and `validate_gate_runner` refuses a
+  scalar BY NAME so the next kit cannot repeat it.
+  D2: the adopter parsed only the scalar form, so against the array form a target really carries it
+  returned empty, took the not-declared branch, and would have said NOT ADOPTED and exited 0 under
+  total runner drift — failing OPEN in the one arm whose job is to catch that drift.
+  D3: the canary leg guarded on a file `apply` itself creates, wedging a target by its third apply.
+  D4/D5/D6: two SHIPPED harnesses spelled gov's install prefix, and arm 3j asserted a fact about
+  gov's `.githooks/pre-push` in the half contracted to be corpus-free — red on arrival in every
+  default install, since push-main is not in the default selection. The arm moved to the gov-only
+  harness, where a fact about gov's tree belongs.
+  D7: `--help` called an undefined function and never shifted, so it spun forever — collateral of
+  the lexicon rename, and the arm that would have caught it did not exist.
+  D9: `KITDIR` was derived AFTER `cd "$ROOT"`, so a relative invocation from a subdirectory
+  collapsed the manifest to `./gate-legs.json` and ran ZERO legs.
+  D8, D10, D11, D12 folded with them. The LEFT-SHIFT the blocker asked for is built and red-proved:
+  a seed-to-emit-to-read round trip in `tools/govkit/selftest.py`, parameterised over EVERY registry
+  entry declaring a `[gate_runner_seed]`, so it retires the family for kits that do not exist yet.
+  Reverting the seed to a scalar reds it with `recovered 'ATE ok' from 'GATE ok    memory hygiene'
+  via 'G'`.
 
 ## 10. Reuse audit
 

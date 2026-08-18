@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
 # The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
-#   bash tools/run-gates/run-gates.sh                # legs run CONCURRENTLY, width min(8, nproc)
-#   GATE_JOBS=1 bash tools/run-gates/run-gates.sh    # one worker — the serial bar, through this same pool
-# Legs live in tools/gate-legs.json (single source); this runner is a thin iterator over it.
+#   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, width min(8, nproc)
+#   GATE_JOBS=1 bash <prefix>/run-gates/run-gates.sh # one worker — the serial bar, through this same pool
+# Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
+# a thin iterator over it and holds no leg command of its own.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
@@ -11,6 +12,11 @@
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
 KIT_RUN_GATES_VERSION=1.0   # gov:kit run-gates@1.0
+# THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
+# cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
+# `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
+# manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
+KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 # The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
@@ -51,7 +57,7 @@ resolve_python() {
   return 1
 }
 # <<< resolve_python
-PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse tools/gate-legs.json"; exit 2; }
+PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
 fails=0; n=0; skips=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
@@ -65,7 +71,6 @@ fails=0; n=0; skips=0
 # directory has two spellings — `git rev-parse --show-toplevel` answers `C:/...` and `pwd` answers
 # `/c/...` — and a prefix strip across the two flavours silently leaves an ABSOLUTE path, which then
 # resolves to nothing. Never compare path strings across flavours.
-KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"

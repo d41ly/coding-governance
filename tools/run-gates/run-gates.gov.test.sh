@@ -63,7 +63,7 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=3
+FLOOR_ASSERTIONS=4
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -139,6 +139,15 @@ else
     fi
   done
 fi
+
+# ---- G3. the push boundary FORCES the full bar ---------------------------------------------------
+# MOVED here from the shipped canary by the closing review (D6). It asserts a fact about GOV's tree:
+# an adopter has no `.githooks/pre-push` unless they also took the push-main kit, which is NOT in the
+# default selection, so in the shipped half this arm was red on arrival in every default install.
+# The property it guards is still gov's and still worth guarding — a scoped authoritative run would
+# mean no run ever executes every leg against the tree that actually lands.
+a=$((a+1))
+grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push"   || { echo "gov-canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
 
 # ---- verdict -------------------------------------------------------------------------------------
 # The executed assertion count, in the shape tools/check-testsuite-counts.sh reads, against a floor

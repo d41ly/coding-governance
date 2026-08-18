@@ -1590,6 +1590,16 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
         r.fail(f"[gate_runner].grammar = '{gr.get('grammar')}' — only 'json-array' is implemented")
     if gr.get("dedupe_key") not in (None, "name"):
         r.fail(f"[gate_runner].dedupe_key = '{gr.get('dedupe_key')}' — only 'name' is implemented")
+    # The observation templates are ITERATED by `read_gate_verdicts`, so a scalar is not a
+    # near-miss — it is walked character by character and silently classifies every line green.
+    # Refused BY NAME here rather than left to the reader, because the reader's failure is silent
+    # and this one is not. The assertion is what stops the next kit repeating it.
+    for _obs in ("observed_ran", "observed_failed", "observed_skipped"):
+        if isinstance(gr.get(_obs), str):
+            r.fail(f"[gate_runner].{_obs} is a STRING; it must be an array of templates. Its only "
+                   f"consumer iterates it, so a string is walked character by character: the head "
+                   f"becomes one character, no leg name is ever recovered, and every line is "
+                   f"classified by whichever state is scanned first")
     if isinstance(gr.get("command"), str):
         r.fail("[gate_runner].command is a STRING; it must be an argv array. Splitting a shell "
                "string is a guess about quoting this tool has no way to check, so it refuses "
@@ -2855,12 +2865,19 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                  "# The runner's own {name} placeholder is deliberately intact: it is substituted by",
                  '# the runner at report time, not by this deployer.',
                  '[gate_runner]']
-        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env", "observed_ran", "observed_failed"):
-            if k in seed:
-                body.append(f'{k} = "{resolve_seed_value(seed[k])}"')
-        if "command" in seed:
-            cmd = resolve_seed_value(seed["command"])
-            body.append('command = [' + ", ".join(f'"{c}"' for c in cmd) + ']')
+        # A LIST is emitted as a TOML ARRAY; only a scalar is quoted. Quoting every value turned the
+        # seed's observation templates into strings, and `read_gate_verdicts` iterates them — so it
+        # walked each one character by character and could never report a red leg. The emitter and
+        # the reader had never met, because every arm on the bar hand-writes the array form.
+        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env",
+                  "observed_ran", "observed_failed", "observed_skipped", "command"):
+            if k not in seed:
+                continue
+            v = resolve_seed_value(seed[k])
+            if isinstance(v, list):
+                body.append(f'{k} = [' + ", ".join(f'"{x}"' for x in v) + ']')
+            else:
+                body.append(f'{k} = "{v}"')
 
     body += ['', '[policy]',
              '# on_baseline_red: proceed | refuse — a target leg already red BEFORE the install',

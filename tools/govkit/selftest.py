@@ -805,7 +805,11 @@ user_skills = "/tmp/gk-fake-skills"
             "    if code == 0:\n"
             "        print('GATE ok    %s' % l['name'])\n"
             "    else:\n"
-            "        print('GATE FAIL  %s (exit %d)' % (l['name'], code)); rc = 1\n"
+            # TWO spaces before the tail, matching the real runner's contract. The model printed
+            # the RETIRED single-space form, so the deployer's only executable model of a runner
+            # disagreed with the runner it models — a reader splitting on a double space could
+            # recover a leg name from the model that it could not recover from the real thing.
+            "        print('GATE FAIL  %s  (exit %d)' % (l['name'], code)); rc = 1\n"
             "raise SystemExit(rc)\n"
             "PY\n")
 
@@ -1547,6 +1551,64 @@ user_skills = "/tmp/gk-fake-skills"
             row = next((l for l in blk.stdout.splitlines() if "demo-rendered.md" in l), "")
             check("a rendered rule whose entry has a blocks_adopt hole is an ORDER",
                   row.strip().startswith("ORDER"), row or blk.stdout)
+
+    # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
+    #
+    # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written
+    # for one kit, so it retires the whole family including for kits that do not exist yet.
+    #
+    # What it caught, stated because an arm's motivating failure is the thing that keeps it honest:
+    # `[gate_runner_seed]` declared `observed_ran` as a TOML SCALAR, `cmd_intake` emitted every key
+    # by quoting it, and `read_gate_verdicts` ITERATES that key — so it walked the string character
+    # by character. The head became `G`, no leg name was ever recovered, and because `observed_ran`
+    # is scanned first and `setdefault` wins, no key could ever be red. A real `apply` exited 0
+    # recording every line green while the target's canary leg was genuinely RED. Nothing on the bar
+    # saw it: every other arm here hand-writes the ARRAY form, so the emitter and the reader had
+    # never met. This arm is where they meet.
+    import tomllib as seed_toml  # noqa: PLC0415
+    _gov = HERE.parent.parent
+
+    def load_seed_toml(path: pathlib.Path) -> dict:
+        with path.open("rb") as fh:
+            return seed_toml.load(fh)
+
+    def run_govkit(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(_gov / "tools" / "govkit" / "govkit.py"), *args],
+                              capture_output=True, text=True)
+
+    reg = load_seed_toml(_gov / "tools" / "govkit" / "registry.toml")
+    seeded = []
+    for e in reg.get("entry", []):
+        d = load_seed_toml(_gov / e["descriptor"])
+        if d.get("gate_runner_seed"):
+            seeded.append((e["id"], d["gate_runner_seed"]))
+    check("at least one registry entry declares a [gate_runner_seed] to round-trip",
+          bool(seeded), "no entry declares one — this arm would pass by finding nothing")
+    for eid, seed in seeded:
+        with tempfile.TemporaryDirectory() as td:
+            tgt = pathlib.Path(td) / "t"
+            (tgt / ".governance").mkdir(parents=True)
+            subprocess.run(["git", "init", "-q", "."], cwd=str(tgt), capture_output=True)
+            r = run_govkit("intake", "--target", str(tgt), "--kits", eid)
+            check(f"[{eid}] intake writes a descriptor", r.returncode == 0, r.stdout + r.stderr)
+            decl = (load_seed_toml(tgt / ".governance" / "deploy.toml").get("gate_runner") or {})
+            for key in ("observed_ran", "observed_failed"):
+                v = decl.get(key)
+                check(f"[{eid}] the emitted {key} is a LIST, which is what the reader iterates",
+                      isinstance(v, list) and bool(v),
+                      f"{key} = {v!r} — a string here is walked character by character")
+            # The round trip that matters: feed a line the runner really prints back through the
+            # reader's own head-extraction and assert the BARE LEG NAME comes back.
+            for key, sample in (("observed_ran", "GATE ok    memory hygiene"),
+                                ("observed_failed", "GATE FAIL  memory hygiene  (exit 1)")):
+                tmpl = (decl.get(key) or [None])[0]
+                got = None
+                if isinstance(tmpl, str):
+                    head = tmpl.split("{name}")[0]
+                    if sample.startswith(head) and len(sample) > len(head):
+                        got = sample[len(head):].strip().split("  ")[0].strip()
+                check(f"[{eid}] {key} recovers the bare leg name from a real runner line",
+                      got == "memory hygiene", f"recovered {got!r} from {sample!r} via {tmpl!r}")
 
     print()
     if FAILURES:

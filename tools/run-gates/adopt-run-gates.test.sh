@@ -19,7 +19,7 @@ ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 ADOPT="$KITDIR/adopt-run-gates.sh"
 
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=17
 n=0
 bad=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
@@ -46,8 +46,8 @@ write_decl() { # <target> <prefix> <ran-head> — writes the [gate_runner] decla
 prefix = "$2"
 [gate_runner]
 kind = "manifest"
-observed_ran = "$3{name}"
-observed_failed = "GATE FAIL  {name}"
+observed_ran = ["$3{name}"]
+observed_failed = ["GATE FAIL  {name}"]
 TOML
   ( cd "$1" && git add -A && git commit -qm decl ) >/dev/null 2>&1
 }
@@ -107,7 +107,7 @@ cat > "$T/.governance/deploy.toml" <<'TOML'
 prefix = "vendor"
 [gate_runner]
 kind = "manifest"
-observed_ran = "GATE ok    {name}"
+observed_ran = ["GATE ok    {name}"]
 TOML
 out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'observed_failed' \
@@ -128,6 +128,32 @@ echo "== 6. a --target that does not exist refuses before reading anything =="
 out=$( bash "$ADOPT" --check --target "$TMP/no-such-tree" 2>&1 ); rc=$?
 [ "$rc" = 2 ] && ok "an absent --target exits 2" \
   || nope "an absent --target did not exit 2 (rc=$rc): $out"
+
+echo "== 6b. a SCALAR observed_* is refused, because the deployer's reader ITERATES it =="
+T=$(build_target scalarform vendor)
+cat > "$T/.governance/deploy.toml" <<'TOML'
+prefix = "vendor"
+[gate_runner]
+kind = "manifest"
+observed_ran = "GATE ok    {name}"
+observed_failed = "GATE FAIL  {name}"
+TOML
+out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+if [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'must be an ARRAY'; then
+  ok "a scalar observed_* is refused by name (closing review D2/D1)"
+else
+  nope "a scalar observed_* was not refused (rc=$rc): $out"
+fi
+# ...and the control: the SAME heads in ARRAY form, with the SAME runner, must pass. Without this
+# the arm above is satisfied by an adopter that refuses every declaration it is given.
+T=$(build_target arrayform vendor)
+write_decl "$T" vendor 'GATE ok    '
+out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+[ "$rc" = 0 ] && ok "the same heads in ARRAY form still pass (the refusal is about the shape)"   || nope "the array form did not pass (rc=$rc): $out"
+
+echo "== 6c. --help terminates and prints usage =="
+out=$( timeout 10 bash "$ADOPT" --help 2>&1 ); rc=$?
+[ "$rc" = 2 ] && printf '%s' "$out" | grep -q 'usage:'   && ok "--help prints usage and exits 2 rather than spinning on an undefined function"   || nope "--help did not terminate cleanly (rc=$rc): $out"
 
 echo "== 7. the adopter derives its own prefix — no gov path is spelled in it =="
 grep -qE '^\s*KITDIR=\$\(cd "\$\(dirname "\$0"\)" && pwd\)' "$ADOPT" \

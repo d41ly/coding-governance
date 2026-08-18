@@ -55,7 +55,10 @@ means = "adopted"
 [[gate_leg]]
 name = "run-gates canary"
 argv = ["bash", "{kit}/run-gates.test.sh"]
-guard = ["{kit}/", "{prefix}/gate-legs.json"]
+# Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
+# `apply` itself creates in the target — so the leg's own arrival changed the file it guards on and
+# the target ended wedged. A guard may name what the leg READS, never what installing it WRITES.
+guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates evidence"
@@ -88,8 +91,16 @@ dedupe_key = "name"
 # promotion; a partial one is refused rather than silently accepted. The runner reads this
 # name to bypass every leg guard, which is what the push boundary sets.
 run_all_env = "GATE_FULL=1"
-observed_ran = "GATE ok    {name}"
-observed_failed = "GATE FAIL  {name}"
+# ARRAYS, not scalars, and the closing review's blocker is why. `read_gate_verdicts` iterates
+# `for tmpl in (gr.get(key) or [])`, so a STRING is walked CHARACTER BY CHARACTER: the head becomes
+# the single character `G`, no real leg name is ever recovered, and because `observed_ran` is scanned
+# first and `setdefault` wins, no key can ever be red. Reproduced: a real `apply` exited 0 recording
+# {'ATE FAIL': 'green', 'ATE ok': 'green', ...} while the target's canary leg was genuinely RED.
+observed_ran = ["GATE ok    {name}"]
+observed_failed = ["GATE FAIL  {name}"]
+# D8: without this the deployer's `skipped` state is unreachable and its DEAD-PROBE refusal is
+# structurally dead. The runner prints this verb on every guard-scoped run.
+observed_skipped = ["GATE skip  {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.

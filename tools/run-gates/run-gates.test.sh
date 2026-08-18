@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=35
+FLOOR_ASSERTIONS=37
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -101,10 +101,13 @@ import json, sys
 rows = [a for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
 ' "$LEGS_FILE")
+# ONE assertion over a population, counted once. Incrementing per iteration made the reported count
+# track the MANIFEST SIZE rather than the assertion set, so the floor would red the day a leg was
+# removed — a count that moves for reasons unrelated to the arms is not a count of the arms.
+n=$((n+1))
 while IFS= read -r p; do
   [ -z "$p" ] && continue
   if grep -qF -- "$p" "$KITREL/run-gates.sh"; then
-    n=$((n+1))
     echo "canary: leg script path '$p' is hardcoded in $KITREL/run-gates.sh — source it from $LEGS_FILE"; fail=1
   fi
 done <<<"$paths"
@@ -115,7 +118,9 @@ done <<<"$paths"
 SCRATCH=$(mktemp -d) || { echo "canary: cannot create a scratch dir"; exit 2; }
 trap 'rm -rf "$SCRATCH"' EXIT
 mkdir -p "$SCRATCH/tools/run-gates" "$SCRATCH/fx"
-cp "$ROOT/tools/run-gates/run-gates.sh" "$SCRATCH/tools/run-gates/run-gates.sh"
+# The runner is copied from THIS harness's own kit dir, not from gov's prefix. This file
+# SHIPS, and a hardcoded `tools/run-gates/` here made it red on arrival at any other prefix.
+cp "$KITDIR/run-gates.sh" "$SCRATCH/tools/run-gates/run-gates.sh"
 # EVERY leg sleeps, and that is load-bearing. With only one slow leg a serial run and a concurrent
 # run both cost about that leg, so arm 3c could not tell them apart — measured: forcing width 1 left
 # the canary green. Four sleeping legs make serial (6.5s) and concurrent (2s) genuinely diverge.
@@ -172,9 +177,9 @@ npeaks_now() { ls "$SCRATCH/fx/ts"/*.peak 2>/dev/null | grep -c . || true; }
 #     path, so the serial reading is not a second implementation that can drift.
 s1=$(run_scratch 1); peaks1=$(peaks_now); n1=$(npeaks_now)
 s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
+n=$((n+1))
 if [ "$s1" != "$s4" ]; then
   echo "canary: GATE_JOBS=1 and GATE_JOBS=4 disagree — concurrency changed the report"
-  n=$((n+1))
   diff <(printf '%s\n' "$s1") <(printf '%s\n' "$s4") | sed 's/^/    /'; fail=1
 fi
 
@@ -182,9 +187,9 @@ fi
 got=$(printf '%s\n' "$s4" | grep -c '^GATE ')
 ordered=$(printf '%s\n' "$s4" | grep '^GATE ' | sed 's/^GATE [a-z]*  *//')
 want=$'alpha slow\nbeta fast\ngamma fast\ndelta fast'
+n=$((n+1))
 if [ "$ordered" != "$want" ]; then
   echo "canary: legs did not report in manifest order under concurrency; got:"
-  n=$((n+1))
   printf '%s\n' "$ordered" | sed 's/^/    /'; fail=1
 fi
 n=$((n+1))
@@ -258,10 +263,10 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 #     HANG the bar rather than red it — converting a production hang into a hang on the gate.
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
+n=$((n+1))
+n=$((n+1))
   out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
-  n=$((n+1))
   [ "$trc" = 124 ] && { echo "canary: GATE_JOBS='$w' never terminated — the clamp let it spin"; fail=1; continue; }
-  n=$((n+1))
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
 done
@@ -292,11 +297,11 @@ for rep in 1 2 3 4; do
   o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 30/30 legs passed$' \
     || { echo "canary: the 30-leg width-1 fixture did not run — arm 3g proves nothing"
-         n=$((n+1))
+    n=$((n+1))
          printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; break; }
   case "$o" in
     *"(no result)"*) echo "canary: a healthy leg was reported (no result) — the reader gave up before its worker landed"
-                     n=$((n+1))
+    n=$((n+1))
                      printf '%s\n' "$o" | grep -E "no result|RED" | sed 's/^/    /'; fail=1; break ;;
   esac
 done
@@ -331,14 +336,14 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
 ( cd "$G" && git update-ref refs/remotes/origin/main HEAD \
   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 for w in 1 4; do
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
   o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
-  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^GATE skip  guarded  (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
     || { echo "canary: width $w did not tally the skip (expected 2/2 passed, 1 skipped)"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  n=$((n+1))
   [ "$(printf '%s\n' "$o" | grep '^GATE ' | sed -n 2p)" = "GATE skip  guarded  (unchanged vs main)" ] \
     || { echo "canary: width $w reported the skipped leg away from its manifest position"; fail=1; }
 done
@@ -353,20 +358,19 @@ grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
 #     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
 #     SAME fixture that skips without it, so the two readings differ only by the variable.
 for w in 1 4; do
+n=$((n+1))
+n=$((n+1))
   o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
-  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
     || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: GATE_FULL=1 at width $w still skipped a guarded leg"; fail=1; }
 done
 
-# 3j. the push boundary FORCES the full bar. The hook is the only place this is guaranteed, and a
-#     scoped authoritative run would mean no run ever executes every leg against the tree that lands.
-n=$((n+1))
-grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push" \
-  || { echo "canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
+# 3j MOVED to run-gates.gov.test.sh (G3). It asserted that GOV's `.githooks/pre-push` forces the
+#    full bar — a fact about gov's tree, sitting in the half whose whole contract is that every
+#    assertion holds in ANY tree. An adopter has no such hook unless they also took push-main, which
+#    is not in the default selection, so this arm was red on arrival in every default install.
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
