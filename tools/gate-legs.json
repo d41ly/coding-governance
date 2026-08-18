@@ -725,7 +725,10 @@
       "tools/govkit/matrix.py"
     ],
     "guard": [
-      "tools/govkit/"
+      "tools/govkit/",
+      "tools/playbook/",
+      "tools/check-microformats.sh",
+      "tools/check-line-length.sh"
     ]
   },
   {

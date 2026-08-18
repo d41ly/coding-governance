@@ -2,9 +2,15 @@
 """The acceptance matrix — the deployer driven against repo SHAPES, not against kits.
 
 WHAT THIS IS NOT. `selftest.py` grades MECHANISMS, one fixture per behaviour, and unit 3's
-deployability leg grades every registry ENTRY. This grades the four repo shapes the contract names,
+deployability leg grades every registry ENTRY. This grades the repo shapes the contract names,
 and it CITES those two rather than re-asserting what they already assert: plan-equals-apply and
 apply-twice stay with the deployability leg, and the per-mechanism arms stay in the selftest.
+
+SHAPE 5 IS THE ONE THAT EXECUTES WHAT WAS INSTALLED. The first four grade the install; the fifth
+grades the installed thing running. A Tier-2 review found all three of one build's newly shipped
+gates broken in a scratch install — two dying with an uncaught traceback where their own docstrings
+promised a Refusal — while gov's bar was green, because gov's bar runs every leg from gov's own root
+where every default resolves. A leg that has only ever executed in gov is an untested leg.
 
 EVERY ARM'S EXPECTED OUTCOME IS STATED HERE, in the table below, rather than read off the
 implementation. An arm with no stated expectation is a test written after the fact against itself,
@@ -21,10 +27,39 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import govkit  # noqa: E402 — the deployer's OWN descriptor reader and token resolver. A second copy
+               # here would be a second answer to "what argv does this leg actually get", which is
+               # precisely the question shape 5 exists to settle.
+
 HERE = pathlib.Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
 GOVKIT = HERE / "govkit.py"
 NL = chr(10)
 FAILURES: list[str] = []
+
+# ---------------------------------------------------------------------------------------- shape 5
+#: The selection, STATED with its reason: the playbook template, its renderer and the two gates that
+#: grade what the renderer produces. They are the entries whose legs run against a DEPLOYED artifact
+#: rather than against a kit's own fixtures, which is where a gov-only default strands an adopter.
+#: Widening this to the whole registry is a matter of supplying each entry's answers; every other
+#: entry's legs stay unexecuted here and that is a known ceiling, not an assertion about them.
+# ponytail: four entries, not the registry — widen when another entry's leg reads a deployed path.
+SCRATCH_KITS = ["playbook", "playbook-render", "check-microformats", "check-line-length"]
+
+#: EVERY DECLARED LEG'S EXPECTED VERDICT, stated here and never read off a run. Two of these are
+#: opt-in gates whose install-day answer is NOT-ADOPTED rather than a measurement, so "green" is the
+#: wrong assertion for them — a shape demanding green would be satisfied by a gate that measured
+#: nothing. The leg POPULATION is derived from the descriptors and asserted against these keys in
+#: both directions, so a leg added to one of these entries reds until someone states what it prints
+#: in a scratch install.
+SCRATCH_EXPECT = {
+    "playbook render wiring": "render-playbook OK — region matches a fresh render",
+    "micro-format definitions": "microformats OK —",
+    "micro-format gate selftest": "PASS (",
+    "line length": "NOT ADOPTED — no declaration at",
+    "line-length gate selftest": "PASS (",
+}
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -165,6 +200,84 @@ def main() -> int:
                 check("pre-existing-red repo, policy=refuse: and leaves NO receipt — the refusal "
                       "is at the baseline, before any write",
                       not (g / ".governance" / "install.json").exists(), "")
+
+        # SHAPE 5 — a scratch target that has just installed, running the legs it was GIVEN.
+        # EXPECTED: `apply` renders the charter region into the target's own AGENTS.md, and every
+        # gate leg the selected entries declare then runs THERE and prints the verdict stated in
+        # SCRATCH_EXPECT. Each arm asserts that message plus the absence of a Python traceback —
+        # never an exit code — because a traceback and a stated Refusal share rc=1, and telling them
+        # apart is the whole point of the shape.
+        shapes += 1
+        # RESOLVED, not `tmp / ...`. `tempfile` hands back an 8.3 short path on Windows
+        # (`C:\Users\DAILY-~1\...`), and one probe in the renderer echoes back whatever spelling the
+        # caller used — so `apply` and the leg saw two names for one directory and the arm reported
+        # a DRIFT that was the FIXTURE's, not the product's. The product's own sensitivity to that
+        # spelling is real and recorded; this shape is not the place it gets measured, because a
+        # fixture-induced red teaches the reader to distrust the arm.
+        g = tmp.resolve() / "scratch-install"
+        g.mkdir(parents=True, exist_ok=True)
+        (g / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
+        git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+        git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "base")
+
+        # The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every
+        # key gets a stub, whatever its class: for a `derived` row the probe still wins when it can
+        # see, and the stub is only the override the engine already honours when it cannot. A hand
+        # list here would go stale the first time the charter grew a placeholder — which is the
+        # rot this file's own header refuses.
+        pdesc = govkit.load_toml(ROOT / "tools" / "govkit" / "entries" / "playbook.kit.toml")
+        ans = {r["key"].lower(): "stated for the scratch install"
+               for r in pdesc.get("placeholder", [])}
+        ans["playbook_path"] = "docs/PARALLEL.md"
+        (g / ".governance").mkdir(exist_ok=True)
+        (g / ".governance" / "deploy.toml").write_text(
+            'gov_source = "."' + NL + 'prefix = "tools"' + NL + "drop_blocks = []" + NL
+            + "kits = [" + ", ".join('"%s"' % k for k in SCRATCH_KITS) + "]" + NL
+            + "[answers]" + NL
+            + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL,
+            encoding="utf-8", newline=NL)
+        git(g, "add", "-A"); git(g, "commit", "-qm", "governance")
+
+        p = run("apply", "--target", str(g), "--kits", ",".join(SCRATCH_KITS))
+        check("scratch install: the charter template lands at the operator's chosen path",
+              (g / "docs" / "PARALLEL.md").is_file(), p.stdout + p.stderr)
+        check("scratch install: apply RENDERS the region into the target's own charter",
+              (g / "AGENTS.md").is_file()
+              and "<!-- gov:playbook -->" in (g / "AGENTS.md").read_text(encoding="utf-8"),
+              p.stdout + p.stderr)
+
+        deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
+        rep = govkit.Report()
+        descs = govkit.read_descriptors(ROOT, govkit.load_toml(
+            ROOT / "tools" / "govkit" / "registry.toml"), rep)
+        legs: list[tuple[str, list[str]]] = []
+        for eid in SCRATCH_KITS:
+            d, _dp = descs[eid]
+            ctx = govkit.target_context(g, deploy, eid, d)
+            for leg in d.get("gate_leg", []):
+                argv, miss = [], []
+                for a in leg.get("argv", []):
+                    s, m = govkit.resolve_tokens(a, ctx)
+                    argv.append(s); miss += m
+                check("scratch install: leg '%s' argv resolves every token" % leg.get("name"),
+                      not miss, "unresolved: %s" % miss)
+                legs.append((leg.get("name"), argv))
+
+        # BOTH DIRECTIONS, so this table cannot drift from the descriptors it grades.
+        check("scratch install: the declared leg set and the stated expectations are the same set",
+              {n for n, _a in legs} == set(SCRATCH_EXPECT),
+              "declared=%s stated=%s" % (sorted(n for n, _a in legs), sorted(SCRATCH_EXPECT)))
+
+        for name, argv in legs:
+            want = SCRATCH_EXPECT.get(name)
+            if want is None:
+                continue
+            lp = subprocess.run(argv, cwd=str(g), capture_output=True, text=True)
+            out = (lp.stdout or "") + (lp.stderr or "")
+            check("scratch install: leg '%s' prints its stated verdict where it was installed"
+                  % name, want in out, out)
+            check("scratch install: leg '%s' answers with a message, not a traceback" % name,
+                  "Traceback (most recent call last)" not in out, out)
 
         print(f"govkit-matrix: {shapes} repo shape(s) exercised")
         if shapes == 0:
