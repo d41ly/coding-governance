@@ -78,7 +78,15 @@ ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL
 | [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-1 | 2026-08-18 |
 | [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-1 | 2026-08-18 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+
+Ids no record names: TOOL-aLoosenedCeiling-4.
+
+Ids no `spec-audit` record has ever named: TOOL-aLoosenedCeiling-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -98,4 +106,6 @@ Records live under `spec/`.
   - [2026-08-18-spec-TOOL-aLoosenedCeiling-2.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md)
   - [2026-08-18-spec-TOOL-aLoosenedCeiling-3.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md)
   - [2026-08-18-spec-TOOL-aLoosenedCeiling-4.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md)
+- **`reviews/`**
+  - [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md)
 <!-- /gen:build-docs -->
