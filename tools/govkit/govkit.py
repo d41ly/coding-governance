@@ -2815,6 +2815,53 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             '',
             '[answers]']
     body += [f'{k} = "{answers[k]}"' for k in need]
+    # the run-gates promotion spec's S9: emit the target's [gate_runner] declaration from the selected
+    # entry's [gate_runner_seed]. A declaration written at CONFIGURE time cannot reach the same run's
+    # leg-emission step, so leaving it to the operator means the first `apply` after adopting a
+    # runner silently takes the "ORDERED, not emitted" branch and exits 0 — the silent-green
+    # direction this deployer refuses by name everywhere else.
+    #
+    # PATH TOKENS ONLY. `{prefix}` and `{kit}` are the deployer's to resolve; the runner's own
+    # `{name}` placeholder passes through VERBATIM, because that substitution belongs to the runner
+    # at report time and resolving it here would write a declaration matching one leg's line.
+    seeds = [(k, descs[k][0].get("gate_runner_seed")) for k in selection
+             if isinstance(descs.get(k), tuple) and descs[k][0].get("gate_runner_seed")]
+    if len(seeds) > 1:
+        raise Refusal(
+            "the selection carries more than one [gate_runner_seed] (" +
+            ", ".join(k for k, _ in seeds) + "). A target has ONE [gate_runner]; emitting two would "
+            "silently keep whichever the writer wrote last. Select one runner kit"
+        )
+    if seeds:
+        eid, seed = seeds[0]
+        gctx = {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}"}
+
+        def resolve_seed_value(v):
+            if isinstance(v, str):
+                out, missing = resolve_tokens(v, gctx)
+                # `{name}` is the RUNNER's, not ours: it is expected to survive.
+                unresolved = [m for m in missing if m != "name"]
+                if unresolved:
+                    raise Refusal(
+                        f"[gate_runner_seed] in entry '{eid}' leaves {', '.join(unresolved)} "
+                        f"unresolved in {v!r}; a path with a brace still in it is not a path"
+                    )
+                return out
+            if isinstance(v, list):
+                return [resolve_seed_value(x) for x in v]
+            return v
+
+        body += ['', '# [gate_runner] — emitted from the ' + eid + " kit's [gate_runner_seed] (S9).",
+                 "# The runner's own {name} placeholder is deliberately intact: it is substituted by",
+                 '# the runner at report time, not by this deployer.',
+                 '[gate_runner]']
+        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env", "observed_ran", "observed_failed"):
+            if k in seed:
+                body.append(f'{k} = "{resolve_seed_value(seed[k])}"')
+        if "command" in seed:
+            cmd = resolve_seed_value(seed["command"])
+            body.append('command = [' + ", ".join(f'"{c}"' for c in cmd) + ']')
+
     body += ['', '[policy]',
              '# on_baseline_red: proceed | refuse — a target leg already red BEFORE the install',
              'on_baseline_red = "proceed"',

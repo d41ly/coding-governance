@@ -4,59 +4,108 @@
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-. "$ROOT/tools/lib/resolve-python.sh"
+# The resolver, INLINED byte-identically from tools/lib/resolve-python.sh -- this harness SHIPS
+# with the kit and tools/lib/ never travels. Enrols itself in the parity population, which is
+# grep-derived from the marker below (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S2).
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
+# the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
+# than written as a literal. A hardcoded count is the recorded failure this leg exists for.
+FLOOR_ASSERTIONS=35
+n=0
+# The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
+# `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
+# Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
+# --show-toplevel` answers `C:/...` and `pwd` answers `/c/...`, and a strip across the two
+# flavours leaves an ABSOLUTE path that resolves to nothing.
+KITDIR=$(cd "$(dirname "$0")" && pwd)
+ROOTN=$(cd "$ROOT" && pwd)
+KITREL=${KITDIR#"$ROOTN"/}
+LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
 #    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
 #    drop-sentinel (run-gates.sh skips it), and a launcher-only argv runs `bash </dev/null` = a silent
 #    no-op GATE ok — both are green-by-absence shapes this canary exists to forbid.
+n=$((n+1))
 "$PYBIN" -c '
 import json, sys
 try:
-    legs = json.load(open("tools/gate-legs.json"))
+    legs = json.load(open(sys.argv[1]))
 except Exception as e:
-    print("canary: gate-legs.json does not parse: %s" % e); sys.exit(1)
+    print("canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
 if not isinstance(legs, list) or not legs:
-    print("canary: gate-legs.json is empty or not a list"); sys.exit(1)
+    print("canary: %s is empty or not a list" % sys.argv[1]); sys.exit(1)
 ok = {"bash", "python", "python3", "node"}   # node joined with the workflow-script gates (U6)
 bad = [l.get("name", "?") for l in legs
        if not str(l.get("name", "")).strip() or not l.get("argv") or len(l["argv"]) < 2 or l["argv"][0] not in ok]
 if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
-' || fail=1
+' "$LEGS_FILE" || fail=1
 
 # 1b. every `guard` pathspec matches at least one TRACKED path. This is the quietest hole a guard can
 #     open: `git diff --quiet BASE -- does/not/exist` reports NO difference, so a leg guarded on a
 #     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring
 #     `GATE skip`. Checked against `git ls-files` rather than the filesystem, because the guard is a
 #     pathspec git resolves, and an untracked file is invisible to it.
+n=$((n+1))
 "$PYBIN" -c '
 import json, subprocess, sys
 tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
 bad = []
-for l in json.load(open("tools/gate-legs.json")):
+for l in json.load(open(sys.argv[1])):
     for g in l.get("guard", []):
         if not any(t == g or t.startswith(g) for t in tracked):
             bad.append("%s -> %s" % (l["name"], g))
 if bad:
     print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
     sys.exit(1)
-' || fail=1
+' "$LEGS_FILE" || fail=1
 
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —
 #    launcher tokens (bash/python/python3) and flags are excluded; the parse path is the manifest
 #    filename, not a leg path, so it never matches.
 paths=$("$PYBIN" -c '
 import json, sys
-rows = [a for l in json.load(open("tools/gate-legs.json")) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
+rows = [a for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
-')
+' "$LEGS_FILE")
 while IFS= read -r p; do
   [ -z "$p" ] && continue
-  if grep -qF -- "$p" tools/run-gates.sh; then
-    echo "canary: leg script path '$p' is hardcoded in run-gates.sh — source it from gate-legs.json"; fail=1
+  if grep -qF -- "$p" "$KITREL/run-gates.sh"; then
+    n=$((n+1))
+    echo "canary: leg script path '$p' is hardcoded in $KITREL/run-gates.sh — source it from $LEGS_FILE"; fail=1
   fi
 done <<<"$paths"
 
@@ -65,9 +114,8 @@ done <<<"$paths"
 #    bar, which would cost minutes and couple this canary to every other kit's health.
 SCRATCH=$(mktemp -d) || { echo "canary: cannot create a scratch dir"; exit 2; }
 trap 'rm -rf "$SCRATCH"' EXIT
-mkdir -p "$SCRATCH/tools/lib" "$SCRATCH/fx"
-cp "$ROOT/tools/run-gates.sh" "$SCRATCH/tools/run-gates.sh"
-cp "$ROOT/tools/lib/resolve-python.sh" "$SCRATCH/tools/lib/resolve-python.sh"
+mkdir -p "$SCRATCH/tools/run-gates" "$SCRATCH/fx"
+cp "$ROOT/tools/run-gates/run-gates.sh" "$SCRATCH/tools/run-gates/run-gates.sh"
 # EVERY leg sleeps, and that is load-bearing. With only one slow leg a serial run and a concurrent
 # run both cost about that leg, so arm 3c could not tell them apart — measured: forcing width 1 left
 # the canary green. Four sleeping legs make serial (6.5s) and concurrent (2s) genuinely diverge.
@@ -115,7 +163,7 @@ JSON
 
 # CLEARS fx/ts FIRST. Without it the width-1 run reads the width-4 run's records and the negative
 # control passes on stale evidence -- this repo's fixture-passes-by-finding-nothing class exactly.
-run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash tools/run-gates.sh 2>&1 ); }
+run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash tools/run-gates/run-gates.sh 2>&1 ); }
 # Read IMMEDIATELY after a run: the next run_scratch deletes these.
 peaks_now()  { cat "$SCRATCH/fx/ts"/*.peak 2>/dev/null | sort -rn | tr "\n" " "; }
 npeaks_now() { ls "$SCRATCH/fx/ts"/*.peak 2>/dev/null | grep -c . || true; }
@@ -126,6 +174,7 @@ s1=$(run_scratch 1); peaks1=$(peaks_now); n1=$(npeaks_now)
 s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
 if [ "$s1" != "$s4" ]; then
   echo "canary: GATE_JOBS=1 and GATE_JOBS=4 disagree — concurrency changed the report"
+  n=$((n+1))
   diff <(printf '%s\n' "$s1") <(printf '%s\n' "$s4") | sed 's/^/    /'; fail=1
 fi
 
@@ -135,8 +184,10 @@ ordered=$(printf '%s\n' "$s4" | grep '^GATE ' | sed 's/^GATE [a-z]*  *//')
 want=$'alpha slow\nbeta fast\ngamma fast\ndelta fast'
 if [ "$ordered" != "$want" ]; then
   echo "canary: legs did not report in manifest order under concurrency; got:"
+  n=$((n+1))
   printf '%s\n' "$ordered" | sed 's/^/    /'; fail=1
 fi
+n=$((n+1))
 [ "$got" = 4 ] || { echo "canary: expected 4 GATE lines from the scratch bar, got $got"; fail=1; }
 
 # 3c. concurrency actually OVERLAPS, asserted as a RENDEZVOUS rather than as elapsed time.
@@ -158,24 +209,32 @@ fi
 #
 #     EQUALITY, not "at least one pair overlapped": a pool clamped to width 2 satisfies any
 #     at-least-one form while being exactly the regression this arm exists to catch.
+n=$((n+1))
 [ "$n4" = 4 ] || { echo "canary: width-4 produced $n4 rendezvous record(s), not 4 - the arm would compare a smaller set than it claims"; fail=1; }
+n=$((n+1))
 [ "$n1" = 4 ] || { echo "canary: width-1 produced $n1 rendezvous record(s), not 4 - the arm would compare a smaller set than it claims"; fail=1; }
 # The peak is the FIRST field of the reverse-sorted list: the most legs any one leg ever saw at once.
 peak4=${peaks4%% *}; peak1=${peaks1%% *}
+n=$((n+1))
 [ "$peak4" = 4 ] || { echo "canary: width-4 peaked at $peak4 legs in flight, not 4 - the pool did not dispatch the batch together (peaks: $peaks4, wait ${RVWAIT_TICKS}x100ms)"; fail=1; }
 # THE NEGATIVE CONTROL, and it is what gives the line above its meaning: the same fixtures at width 1
 # must NEVER see a peer. Without it the arm passes on any implementation that writes a 4.
+n=$((n+1))
 [ "$peak1" = 1 ] || { echo "canary: width-1 peaked at $peak1 legs in flight, not 1 - the serial path overlapped, so the width-4 reading proves nothing (peaks: $peaks1)"; fail=1; }
 
 # 3d. a failing leg keeps its exit code, its indented output, and its row in the durable summary.
 cp "$SCRATCH/fx/bad.sh" "$SCRATCH/fx/mid.sh"
 red=$(run_scratch 4)
-printf '%s\n' "$red" | grep -q '^GATE FAIL  beta fast (exit 3)$' \
+n=$((n+1))
+printf '%s\n' "$red" | grep -q '^GATE FAIL  beta fast  (exit 3)$' \
   || { echo "canary: a failing leg lost its GATE FAIL line or exit code"; fail=1; }
+n=$((n+1))
 printf '%s\n' "$red" | grep -q '^    boom detail$' \
   || { echo "canary: a failing leg's output was not indented under its GATE FAIL line"; fail=1; }
+n=$((n+1))
 printf '%s\n' "$red" | grep -q '^gates RED — 3/4 legs failed$' \
   || { echo "canary: the RED verdict line did not tally the failing legs"; fail=1; }
+n=$((n+1))
 grep -q 'beta fast' "$SCRATCH/.git/gate-last-summary.txt" 2>/dev/null \
   || { echo "canary: the failing leg never reached gate-last-summary.txt"; fail=1; }
 printf '#!/usr/bin/env bash\n%s\nsleep 1.5\nexit 0\n' "$rendezvous" > "$SCRATCH/fx/mid.sh"   # restored WITH the rendezvous, or 3d leaves a fixture the later arms cannot use
@@ -184,6 +243,7 @@ printf '#!/usr/bin/env bash\n%s\nsleep 1.5\nexit 0\n' "$rendezvous" > "$SCRATCH/
 #     is written by every run and a half-written file after a kill is the expected state, not a bug.
 printf 'not\ta\tnumber\n\x00garbage\n' > "$SCRATCH/.git/gate-timings.tsv"
 corrupt=$(run_scratch 4)
+n=$((n+1))
 printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
   || { echo "canary: a corrupt gate-timings.tsv changed the verdict"; printf '%s\n' "$corrupt" | sed 's/^/    /'; fail=1; }
 
@@ -198,8 +258,10 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 #     HANG the bar rather than red it — converting a production hang into a hang on the gate.
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
-  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); trc=$?
+  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
+  n=$((n+1))
   [ "$trc" = 124 ] && { echo "canary: GATE_JOBS='$w' never terminated — the clamp let it spin"; fail=1; continue; }
+  n=$((n+1))
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
 done
@@ -212,9 +274,8 @@ done
 #     dispatches a worker and looks for its result immediately, which is the whole window. An earlier
 #     version of this arm used the 4-leg manifest at mixed widths, reproduced at 1-in-40, and let the
 #     pre-fix reader pass. Do not "simplify" this back to the shared fixture.
-mkdir -p "$SCRATCH/many/tools/lib" "$SCRATCH/many/fx"
-cp "$SCRATCH/tools/run-gates.sh" "$SCRATCH/many/tools/run-gates.sh"
-cp "$ROOT/tools/lib/resolve-python.sh" "$SCRATCH/many/tools/lib/resolve-python.sh"
+mkdir -p "$SCRATCH/many/tools/run-gates" "$SCRATCH/many/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$SCRATCH/many/tools/run-gates/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/many/fx/a.sh"
 "$PYBIN" -c '
 import json, sys
@@ -228,12 +289,14 @@ json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)
 #     parent scratch repo and the arm runs the 4-leg manifest at width 1: exactly the configuration
 #     the comment above forbids, reported green. So assert the run HAPPENED first.
 for rep in 1 2 3 4; do
-  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 30/30 legs passed$' \
     || { echo "canary: the 30-leg width-1 fixture did not run — arm 3g proves nothing"
+         n=$((n+1))
          printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; break; }
   case "$o" in
     *"(no result)"*) echo "canary: a healthy leg was reported (no result) — the reader gave up before its worker landed"
+                     n=$((n+1))
                      printf '%s\n' "$o" | grep -E "no result|RED" | sed 's/^/    /'; fail=1; break ;;
   esac
 done
@@ -246,9 +309,8 @@ done
 #     skipped regardless of the diff, the canonical green-while-checking-less shape this file exists
 #     to forbid — kept the whole suite green BY CONSTRUCTION rather than by luck.
 G="$SCRATCH/guarded"
-mkdir -p "$G/tools/lib" "$G/fx"
-cp "$SCRATCH/tools/run-gates.sh" "$G/tools/run-gates.sh"
-cp "$ROOT/tools/lib/resolve-python.sh" "$G/tools/lib/resolve-python.sh"
+mkdir -p "$G/tools/run-gates" "$G/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$G/tools/run-gates/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$G/fx/a.sh"
 cat > "$G/tools/gate-legs.json" <<'JSON'
 [
@@ -261,23 +323,28 @@ JSON
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
-o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash tools/run-gates.sh 2>&1 )
+o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 # Pass 2 with origin/HEAD pinned: the guard path resolves and the unchanged leg must SKIP.
 ( cd "$G" && git update-ref refs/remotes/origin/main HEAD \
   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 for w in 1 4; do
-  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
-  printf '%s\n' "$o" | grep -q '^GATE skip  guarded (unchanged vs main)$' \
+  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  n=$((n+1))
+  printf '%s\n' "$o" | grep -q '^GATE skip  guarded  (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
     || { echo "canary: width $w did not tally the skip (expected 2/2 passed, 1 skipped)"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  [ "$(printf '%s\n' "$o" | grep '^GATE ' | sed -n 2p)" = "GATE skip  guarded (unchanged vs main)" ] \
+  n=$((n+1))
+  [ "$(printf '%s\n' "$o" | grep '^GATE ' | sed -n 2p)" = "GATE skip  guarded  (unchanged vs main)" ] \
     || { echo "canary: width $w reported the skipped leg away from its manifest position"; fail=1; }
 done
 # C1: the skipped leg produced no timing this run. Its CACHED row from pass 1 must survive, or every
 # diff-scoped run blanks the dispatch hint the next full run needs.
+n=$((n+1))
 grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached timing row was dropped by the cache rewrite"; fail=1; }
 
@@ -286,16 +353,21 @@ grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
 #     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
 #     SAME fixture that skips without it, so the two readings differ only by the variable.
 for w in 1 4; do
-  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
     || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  n=$((n+1))
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: GATE_FULL=1 at width $w still skipped a guarded leg"; fail=1; }
 done
 
 # 3j. the push boundary FORCES the full bar. The hook is the only place this is guaranteed, and a
 #     scoped authoritative run would mean no run ever executes every leg against the tree that lands.
+n=$((n+1))
 grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push" \
   || { echo "canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
 
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
+[ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1

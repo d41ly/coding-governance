@@ -13,3 +13,4 @@
 
 lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
 hooks   not adopter-facing as a kit. It is reached through the agent-cap hook the playbook already names in §8.
+run-gates	the merge-bar runner. The playbook names the BAR as a project obligation rather than naming this kit: an adopter reaches it through govkit's default selection, and the three shipped files describe the gate discipline without prescribing gov's runner by name. Promoted from a registry exemption by the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`.

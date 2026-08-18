@@ -4,7 +4,7 @@
 #   bash tools/lib/pyrun.sh <script.py> [args...]
 #
 # WHY A SHIM EXISTS AT ALL. `tools/lib/resolve-python.sh` is source-and-call: `resolve_python()`
-# prints a launcher name and returns, it executes nothing. `tools/run-gates.sh` substitutes the
+# prints a launcher name and returns, it executes nothing. `tools/run-gates/run-gates.sh` substitutes the
 # resolved launcher into every manifest leg's argv, but GIT never goes through the runner — it execs
 # a `merge.<driver>.driver` command line itself — so that substitution cannot reach a merge driver
 # and this file is the only place the launcher gets resolved for one. Naming a launcher literally

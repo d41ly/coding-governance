@@ -88,7 +88,7 @@ def _gate_legs(doc: object) -> object:
 
 EXTRACTORS: dict[str, object] = {
     # The merge bar itself. The runner single-sources its legs from this artifact and
-    # tools/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
+    # tools/run-gates/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
     "gate-legs": lambda: m.json_artifact_inventory(
         ROOT / "tools" / "gate-legs.json", "gate-legs", _gate_legs
     ),
