@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
+ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 ---
 
 # aBranchedMandate — an unattended run stops needing its build landed first
@@ -19,7 +19,7 @@ The reproduction found **three** causes, not one. They fire in a fixed order, an
 report names fires last — so fixing only it leaves every worktree run still refused. All three are
 enumerated with their observed output in
 [`build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md`](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md),
-and the third has a committed fixture at [`build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh`](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) that exits 0 only
+and the third has a committed fixture at [`build/repro-c3.sh`](build/repro-c3.sh) that exits 0 only
 when it reproduces the specific refusal it is about.
 
 | | What refuses | Fires when | In the report? | Unit |
@@ -49,22 +49,11 @@ revision priced only the first and called it the whole price — the spec audit 
 the owner re-confirmed the change against the complete list on 2026-08-17. Units 1 and 2 carry no such
 trade: they are a missing normalisation and a report severity.
 
-The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
-it.
-
-
 ## Units — the authored roster (M2)
 
 One mechanism per unit. The `ids:` key above is a reservation range, not this roster.
 
 Each cell is a label, not a description. The unit's §1 Goal owns the full statement.
-
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
-| 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
-| 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
-| 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
 
 **The order is TOTAL, and it changed when unit 4 arrived.** Two constraints fix it.
 
@@ -77,6 +66,12 @@ later unit inherits that red until unit 4 lands.
 `TOOL-aBranchedMandate-1` still precedes `TOOL-aBranchedMandate-2`. Unit 2's whole argument is that
 the eol arm's exit status is unfunded — that no gate reds on CR any more — and that becomes true only
 when unit 1 lands. Landing unit 2 first would silence a signal still correctly predicting a red leg.
+
+**Units 5 and 6 were added AFTER the build first closed**, from findings this run measured about
+its own tooling rather than from the commissioning report. Both are Tier-1 and independent of
+each other and of units 1-4, so they carry no ordering constraint. A third finding was recorded
+with them and then RETRACTED on measurement — see the build folder's record; it is kept struck
+because how a wrong finding got written is worth more than its absence.
 
 `TOOL-aBranchedMandate-3` is last because it is the one that changes a ratified rule. That decision
 has been made, so its position is a build ordering rather than a gate on approval.
@@ -116,6 +111,49 @@ what was weighed rather than a menu.
   unit 3's S4 moves that count to ten. Whichever build lands second is changing a number the other
   build reasoned from, and the correct response is to stop and re-read, not to reconcile the number.
 
+## UNPARKED 2026-08-17 — the owner re-priced, and the park rested on a measurement error
+
+The park below stands as the record of what was refused and why, because a park that vanishes when
+it is answered is indistinguishable from one nobody made. Two corrections sit on top of it.
+
+**The owner re-priced and chose to build unit 4.** Asked whether the three-cost ratification still
+stood against the moved protocol, they answered build it. The run resumed at `SPECCING`.
+
+**And the park's load-bearing reason was WRONG.** It said S6b's obligation could not be re-pointed
+because the `for b in refs/remotes/…` loop it enumerates no longer existed. It does exist, at
+`check-unattended.sh:295` — the run grepped `for b in refs/remotes` against a source that spells it
+`for b in "refs/remotes/origin/$d"`, matched nothing, and read its own bad pattern as a restructure.
+All five assertions S6b names are intact. Of the five drift claims the park rested on, four held and
+this one did not, so the work was re-pointing rather than re-specification the whole time. The
+re-derived premises are in the spec's rev-6.
+
+## PARKED — unit 4 (`TOOL-aBranchedMandate-3`), by the unattended run of 2026-08-17
+
+Units 1 and 2 of the order (`TOOL-aBranchedMandate-4`, then `-1`, then `-2`) are CLOSED and landing.
+`TOOL-aBranchedMandate-3` is DEFERRED and NOT built. The stop-and-reconsider rule above fired, on
+both of the two values it names.
+
+**The question, unanswered on purpose.** Does the owner's ratification of unit 3 — given against a
+three-cost price list on 2026-08-17 — still stand now that the document carrying that price list has
+changed underneath it? `origin/main` gained `dClosedLexicon`'s unattended work mid-run: the kit
+version is 1.6 rather than the 1.5 F3 reasoned about, protocol section 2 gained a subsection, the
+leg gained a sixteenth check, and the `for b in refs/remotes/…` loop that S6b enumerates item by item
+no longer exists. The authored-fact count S4 moves from "seven" was already eight before this run
+started, so both this README's collision note and S4's arithmetic are off by one.
+
+**The options seen.** (a) Re-derive S6b and S4 against the merged leg and build it — rejected: S6b's
+obligation is to state the disposition of five assertions inside a loop that is gone, which is
+re-specifying a security predicate, not re-pointing a citation. (b) Build the mechanical parts and
+leave S6b — rejected: S6's rollout section requires the leg and the driver to land in one commit,
+so a half-built unit writes records that red the bar on the next push. (c) Park, land units 1 and 2,
+and hand the re-pricing back. **Taken.**
+
+**Why refused rather than decided.** M3 delegates fork resolution, not scope, and this is not a fork
+in any spec — it is whether a ratified price is still the price. Units 1 and 2 were always a
+deliverable subset: this README's own "What each unit is worth on its own" records that they fix
+every worktree failure that is not the authorization rule and spend no security property. Unit 3's
+full drift table is in its own §9 rev-5.
+
 ## Owner decisions — RESOLVED 2026-08-16
 
 The decision prior to every fork, because it is not a fork in any spec: **is the price in unit 3's
@@ -153,7 +191,7 @@ exactly one build.
 
 ## The spec audit — BLOCKED, folded at rev-3
 
-`reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md` records an M4 audit run as a five-lens workflow with
+`reviews/2026-08-16-review-aBranchedMandate-1.md` records an M4 audit run as a five-lens workflow with
 batched default-refute skeptics under the review protocol's caps: 45 raw findings, 36 confirmed,
 9 refuted, none unverified, deduplicated to 18. **Verdict BLOCKED, three blockers.** All 18 are folded;
 every spec is at rev-3 with its §9 line.
@@ -190,27 +228,19 @@ protocol never sees.
 **The fold itself is unreviewed**, by M4's stop rule: fixes are folded once and reviewing resumes only
 if the design moves again. A second audit is a decision, not an obligation.
 
+The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
+it.
 
-<!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling
-ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4
-
-| Unit | Status | Rev | Last change |
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | SPECCED | rev-3 | 2026-08-16 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
-
-Records live under `spec/`, `build/` and `reviews/`.
-
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
-| [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
-| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
-| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
-<!-- /gen:build-index -->
+| 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
+| 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
+| 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
+| 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
+| 5 | `TOOL-aBranchedMandate-12` | 1 | the gates-green arm's discarded child output |
+| 6 | `TOOL-aBranchedMandate-13` | 1 | build-complete's undifferentiated roster verdict |
+<!-- /roster:units -->
 
 <!-- gen:build-order -->
 
@@ -229,10 +259,43 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-16-spec-TOOL-aBranchedMandate-2.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md)
   - [2026-08-16-spec-TOOL-aBranchedMandate-3.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md)
   - [2026-08-17-spec-TOOL-aBranchedMandate-4.md](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md)
+  - [2026-08-18-spec-TOOL-aBranchedMandate-12.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md)
+  - [2026-08-18-spec-TOOL-aBranchedMandate-13.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md)
 - **`build/`**
   - [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh)
   - [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md)
+  - [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md)
 - **`reviews/`**
   - [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md)
   - [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md)
 <!-- /gen:build-docs -->
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
+
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | CLOSED | rev-7 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
+
+Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
+| [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
+| [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md) | journal | TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13 |
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 |
+| [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md) | diff-review | TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
+
+Ids no `spec-audit` record has ever named: TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13.
+<!-- /gen:build-index -->

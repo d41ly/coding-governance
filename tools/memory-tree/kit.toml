@@ -46,6 +46,11 @@ mutates_index = true
 code = 1
 probe = { must_exist = ".memory-tree.conf", must_not_exist = "{memory_root}/HYGIENE.md" }
 means = "seed-and-stop"
+# An ACCEPTED stop, not a failure: the adopter seeds the conf and stops BY DESIGN so a person edits
+# it before anything renders against the wrong values. Every correct first install ends here, so
+# treating it as a failure made `apply` exit non-zero on all of them. `refused-foreign-tree` below
+# carries no `ok` and stays a failure, which is the distinction this flag exists to draw.
+ok = true
 
 [[outcome]]
 code = 1
@@ -114,6 +119,11 @@ guard = []
 [[gate_leg]]
 name = "method-carriers self-test"
 argv = ["bash", "{kit}/check-method-carriers.test.sh"]
+guard = []
+
+[[gate_leg]]
+name = "build README slot contract"
+argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
 
 [[gate_leg]]

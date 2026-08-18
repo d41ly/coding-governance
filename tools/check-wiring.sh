@@ -6,6 +6,13 @@
 #   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder
 #   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
 #
+# SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
+# is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
+# arm, whose subject is a working copy while the committed bytes are already correct. Reusing
+# `UNWIRED` there would make the one word that means "this gates" stop meaning it, and a consumer
+# that treats a non-zero exit as a refusal — `.unattended.conf` declares this script as its
+# `WIRING_CHECK` — cannot tell the two apart from the status alone.
+#
 # Wiring the git hooks opts into running this repo's committed hooks (a git trust boundary). Auto-fix
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
@@ -272,10 +279,16 @@ $bad
 EOF
     return
   fi
+  # `note`, and NO `unwired++`. This arm's subject is a WORKING COPY: the committed bytes are LF on
+  # every node, so nothing in the repository is wrong and nothing is dormant. It gated once because
+  # the harm was real — one adopter byte-compared without normalising, and reported every line of an
+  # untouched file as drift. That adopter now normalises, so the exit status funded nothing while a
+  # consumer that reads it as a refusal (`WIRING_CHECK` in .unattended.conf) refused every run in a
+  # worktree carrying the artifact. The REPORT is what has value here; the status was the accident.
+  # If a renderer is ever found emitting CRLF into a committed file, this is the line to reopen.
   while IFS= read -r f; do
     [ -n "$f" ] || continue
-    echo "UNWIRED  eol       — $f holds CRLF despite its eol=lf pin; a byte-comparing gate will report every line as drift. Fix: bash tools/check-wiring.sh --fix"
-    unwired=$((unwired+1))
+    echo "note     eol       — $f holds CRLF despite its eol=lf pin; the committed bytes are LF, so this is a working-copy artifact and does not gate. Fix: bash tools/check-wiring.sh --fix"
   done <<EOF
 $bad
 EOF

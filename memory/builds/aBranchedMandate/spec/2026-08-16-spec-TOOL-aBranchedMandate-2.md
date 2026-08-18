@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-5 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -269,6 +269,18 @@ between revisions is indistinguishable from one that was answered off the record
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-17 · BUILT and CLOSED. One DIVERGENCE, recorded because the code moved before this
+  line did. S5 asked only that the driver-side arm be CHECKED, and it was — the message did not move,
+  so the arm and its signature stand and `ARMS_FLOORS` is unchanged. But AC4 asks that the declared
+  check's own output REACH the operator, and nothing asserted it: the existing check-4 arm declares
+  `WIRING_CHECK="false"`, which prints nothing, so it passes identically whether the driver forwards
+  that output or discards it. An arm was added declaring a check whose failure carries a distinctive
+  literal. It is negatively proven — with S4 reverted the suite reports `FAIL missing:` that literal.
+  S3 also gained a third arm beyond the two it names, asserting the gating label is gone from this
+  path, which is cheap and is the half a reader checks first.
+  S3's other clause — establish whether any consumer greps for the literal `UNWIRED` here — was
+  answered by MEASUREMENT rather than by an arm: a repo-wide grep finds no code consumer, only
+  records and this build's own specs. That is the fact F1 wanted and it needs no standing gate.
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
 - rev-2 · 2026-08-16 · F1 and F2 resolved by the owner; the label `note` folded into S1, S3 and §4's
   data model; F3 reclassified out of §8 into §4 with the reclassification recorded in place.

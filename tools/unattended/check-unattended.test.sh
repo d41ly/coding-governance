@@ -88,7 +88,17 @@ git add -A && git commit -q -m base --no-verify
 # branch is a ref the run can move with `git branch -f` — a reproduced way to make BASE equal HEAD.
 # It lives OUTSIDE the work tree, or `git clean -qfd` in reset_tree deletes it.
 ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
-git init -q --bare "$ORIGIN" && git remote add origin "$ORIGIN" && git push -q origin main
+# It must ADVERTISE a HEAD symref. Since TOOL-aBranchedMandate-3 the leg reads the remote rather
+# than any refs/remotes ref, and `git init --bare` leaves HEAD dangling — so without this line
+# ADV_HEAD is empty, check 15's second half is guarded off and check 9's ancestor-of-HEAD branch
+# is unreachable. The driver test carries the same line for the same reason.
+git init -q --bare "$ORIGIN"
+# SEPARATE LINES, not an && chain: chained, a non-zero from symbolic-ref silently skips the push,
+# `refs/remotes/origin/main` never exists, and the merge-base below resolves EMPTY — which showed
+# up as 33 arms failing with "records no BASE" rather than as anything about this line.
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+git remote add origin "$ORIGIN"
+git push -q origin main
 ANCHOR0=$(git rev-parse main)
 git checkout -q -b unit
 git commit -q --allow-empty -m "unit work" --no-verify
@@ -515,18 +525,33 @@ miss "$(run)" "recorded BASE"
 anchor_restore
 
 
-# ---- check 9: a base that RESOLVES but sits off the anchor's history. The run's own branch is
-# ---- exactly where such a commit lives, so this is the branch that replaced the equality test.
+# ---- check 9, S6c: the leg FAILS CLOSED when the remote advertises nothing. Without this branch
+# ---- the whole block was skipped, so every BASE predicate, check 15's second half and the check-13
+# ---- mandate assertion went silently absent on an unreachable remote — fail-OPEN under a comment
+# ---- promising the opposite. The control is the arms above, which pass with the remote reachable.
+reset_tree
+git remote set-url origin "$ORIGIN_DIR/gone.git"
+hit "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction"
+git remote set-url origin "$ORIGIN"
+miss "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published"
+
+# ---- check 9, S6: a base that RESOLVES but is PUBLISHED NOWHERE. The predicate moved from
+# ---- "ancestor of the anchor" to "ancestor of any tip the remote advertises", so the failing
+# ---- case is a commit on no advertised history at all — which is exactly where a commit the
+# ---- run authored on its own unpushed branch lives.
 reset_tree
 off=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m "a commit the run authored off the anchor")
 sed -i "s/^base: .*/base: $off/" memory/builds/tRun/RUN.md
-hit "$(run)" "a recorded BASE is not an ancestor of the anchor, so it names a commit off the history the anchor blesses — which is where a run's own commits live: recorded"
+hit "$(run)" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
 
 # ---- check 9: an ancestor of the ANCHOR that this working history does not build on. Two separate
 # ---- branches because they fail separately — the anchor can advance past a stale unit branch.
 reset_tree
 ahead=$(git commit-tree "$(git rev-parse "$ANCHOR0^{tree}")" -p "$ANCHOR0" -m ahead)
-git update-ref refs/remotes/origin/main "$ahead"
+# PUSHED, not update-ref'd. The old fixture moved `refs/remotes/origin/main`, which S6 no longer
+# reads, so the base was simply unpublished and check 9 refused one branch earlier. Reaching the
+# ancestor-of-HEAD branch needs a base that IS published and still off this working history.
+git push -q -f origin "$ahead:refs/heads/ahead" 2>/dev/null
 sed -i "s/^base: .*/base: $ahead/" memory/builds/tRun/RUN.md
 hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on"
 
@@ -536,7 +561,11 @@ hit "$(run)" "a recorded BASE is not an ancestor of HEAD, so the run-state file 
 # ---- fixture, no attacker anywhere in it.
 reset_tree
 git checkout -q main && git merge -q --no-ff unit -m "land the run"
-git update-ref refs/remotes/origin/main "$(git rev-parse main)"
+# PUSHED. The control used to move `refs/remotes/origin/main`, a ref S6 removed from this leg's
+# reads — so it stopped reproducing the merge-AND-PUSH state it exists for, and an is_published
+# mutated back to equality would have survived it silently. The push moves the ADVERTISED tip,
+# which is what the predicate now reads.
+git push -q -f origin main
 out=$(run); rc=$?
 same "a LANDED run-state record leaves the bar green" "$out" ""
 same "a LANDED run-state record exits 0" "$rc" "0"

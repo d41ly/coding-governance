@@ -91,7 +91,6 @@ REPORTING is always manifest order, so output is byte-stable whatever the width,
 absent cache costs wall clock only. Measured on node `a`: 335s serial to ~95s at width 8. Every leg's
 output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED run also leaves
 `gate-last-failure.txt`, which only the next RED run overwrites. Each leg:
-- `memory/` hygiene (20 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19 and 20 delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py`
 - build README slot contract — `gen_build_index.py --check-format`: authored slots precede the
   generated regions; prose after the first generated marker reds. UNGUARDED (grades the corpus)
 - `memory/` hygiene (21 checks, flat tree since kit 1.5; the engine's kit version is `KIT_MEMORY_TREE_VERSION` and is deliberately not repeated here — a version written in prose rots between bumps, and this one rotted twice in a day) — `tools/memory-tree/check-memory-hygiene.sh`; checks 9, 13-16, 17-19, 20 and 21's PARSE delegate to `gen_build_index.py`, `corpus_ids.py`, `gotchas.py` and `row_grammar.py` — 21 keeps its own fail branches in the shell, where the harness meta-gate can count them
@@ -136,6 +135,18 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - wiring-health self-test — `tools/check-wiring.test.sh` (`check-wiring.sh` detects/auto-wires unwired tools: `core.hooksPath`, agent-cap, the three-state `recall-opened` opt-in, and CRLF on the `eol=lf`-pinned `.claude/` renders — reported in `--check`, byte-rewritten in `--fix`)
 - agent-instructions wiring — `tools/agent-instructions/adopt-agent-instructions.sh --check`
 - memory-recall skill wiring — `tools/memory-recall/adopt-memory-recall.sh --check` (the rendered `.claude/skills/memory-recall/SKILL.md` still matches `.memory-tree.conf`)
+- recall floor — `python tools/memory-recall/check-recall.py`: grades the committed question set
+  `tools/memory-recall/recall-fixture.json` at the CELL `.memory-tree.conf`'s `RECALL_FLOOR` names,
+  and the value is DERIVED (the one-retirement worst case `(h-1)/(R-1)`) rather than read off the
+  day's score. Two predicates that must be able to red SEPARATELY: a per-id resolution assertion that
+  names an id the corpus no longer carries, and the ceiling-normalised floor itself. `bench.py`
+  always returns 0 and is byte-pinned, so this program is the exit code it cannot have — it imports
+  the scoring functions and edits nothing
+- recall floor arms — `python tools/memory-recall/test_recall_floor.py`: one arm per degradation,
+  including the two SINGLE-direction ones that are the whole claim (drop one home of a multi-homed
+  hitting target and only the floor reds; retire a non-hitting target and only the per-id assertion
+  does). GOV-ONLY and withheld from the kit payload with `check-recall.py` and the fixture, because
+  arms keyed on this repo's record ids are meaningless in an adopter's tree
 - drift-audit selftest — `python tools/drift-audit/selftest.py` (every gateable signal exercised twice: silent on a clean fixture, firing on a minimal violating one)
 - drift-audit wiring — `bash tools/drift-audit/adopt-drift-audit.sh --check` (the rendered Skill still matches `SKILL.template.md` + the conf; the project layer exists)
 - drift-audit records — `python tools/drift-audit/drift_report.py --check` (record-vs-reality signals at or under their shrink-only pins in `tools/drift-audit/drift_signals.py`). Two of them name an OPTIONAL kit — `lexicon_verbs_declared_but_unused` and `lexicon_ratified_older_than_language_surface` — and with no `.lexicon.conf` both report NOT ASKED rather than a clean zero, so an adopter without the lexicon inherits nothing live. The unused-verb pin is honestly non-zero: curation adds aspirational verbs, and it is the DELETION direction (a verb outliving the code that justified it) the signal exists for
@@ -145,7 +156,6 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   remote's own HEAD advertisement, never read from a local ref and never named by the environment —
   both of those were reproduced bypasses — and §9 of the protocol states plainly what a check running
   under the run's own uid can and cannot buy. Three legs: `tools/unattended/check-unattended.sh`
-  (sixteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   (eighteen checks — the declarations parse, the CORE phase and DoD sets have not shrunk below their
   floor, every phase is in the vocabulary, every claim carries a PRESENT witness, at most one run is
   live, the run-state file's generated region still equals the build README slice it is a COPY of,
@@ -168,7 +178,7 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   carries no surviving `{{`-shaped placeholder — template parity and placeholder completeness are
   two questions, and a conf that declares nothing for a key renders a Skill that is perfectly in
   sync and tells the agent to call `{{KEEPALIVE_CREATE}}`)
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (ten inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
+- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (ten inventories over the gate legs, kits, hooks, workflow scripts, skill engines, rendered skills, gotcha classes, guides, backlog shards and lexicon verbs: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 - playbook carrier parity — `tools/check-playbook-parity.sh` (+ `tools/check-playbook-parity.test.sh`):
   the playbook's claims about THIS repo, machine-checked in three classes that have each recurred
   after being fixed once — every tracked kit dir is named in the trio or carries a waiver row with a
@@ -188,7 +198,6 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   CP1252, so an em dash closes a string early). Byte-level; carries `--selftest`. Despite the
   name it does NOT lint gate logic — it is a source-hygiene scanner, and this line said otherwise
   until the closing review ran the kit.
-- codebase-map coverage + freshness — `python tools/codebase-map/test_codebase_map.py` (nine inventories over the gate legs, kits, hooks, workflow scripts, skills, gotcha classes, guides and backlog shards: a new moving part reds until a dossier claims it, and the generated artifacts byte-compare against a fresh render). The map is installed at the non-canonical `tools/` prefix, so `adopt-codebase-map.sh` refuses; the query tools need no environment set — see the map's own dossier under `memory/map/features/` for the remaining gaps
 - testsuite counts — `tools/check-testsuite-counts.sh` (+ `tools/check-testsuite-counts.test.sh`): every `*.test.sh` the BAR
   runs prints an executed assertion count in one agreed shape against a shrink-only floor. The
   population is DERIVED from `tools/gate-legs.json`, never hand-kept, and the non-compliant set is a

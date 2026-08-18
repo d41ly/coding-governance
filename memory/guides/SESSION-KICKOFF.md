@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T06:23:07+03:00 @ e56c2d0ce207bc725fc81a54646736b008621c4a
+last-audit: 2026-08-18T05:50:47+03:00 @ b8997bdff69299460d4e8888bb8b42fe6dd8bb50
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 22f3e12c1b470dda7e6103027f18382a6b8a069d
+last-body-change: 94a4150510cd853662016f34188dd5a8892f42fd
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -170,10 +170,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
 - A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
-- Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
-  assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
-  signal — pinned at 0 with ZERO slack, so an uncited leg reds immediately. Read the leg count
-  from `drift_report.py --check`, never from here: this line has now been wrong twice.
+- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar, not
+  this list. MEASURED 2026-08-18: map freshness, the kickoff ratchet, govkit selfcheck + selftest (a
+  leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]` row). The coverage
+  assert and handkept signal did NOT fire; this line claimed both and neither govkit gate.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
@@ -213,7 +213,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line in its head, or
   check 21 reds. Grammar and kinds: `memory/HYGIENE.md`, "Record bindings". The filename must PROJECT
   it — family, slug and ordinal of the lowest id it serves — so a record is named after its spec, not
-  after a round counter.
+  after a round counter. An ordinal that is a ROUND COUNTER instead makes the filename cite an id
+  nothing defines: check 14 reds and `gen_build_index.py` derives a phantom id into the README front
+  matter. Use the unit-tail form (`…-<slug>-1-round2.md`).
 - A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
   assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
   costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
@@ -224,7 +226,3 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
   TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
   the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
-- Naming a record `<date>-review-<FAMILY>-<slug>-<n>.md` where `n` is a round counter rather than a
-  DEFINED unit id makes the filename cite an id nothing defines: check 14 reds and
-  `gen_build_index.py` derives a phantom id into the README front matter. Use the unit-tail form
-  (`…-<slug>-1-round2.md`) so the ordinal stays the id the record serves.

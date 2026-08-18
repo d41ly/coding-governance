@@ -61,5 +61,17 @@ KICKOFF_EXITS=""
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="11"
 
+# Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
+# resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`
+# (that anchor first, then the tip the remote advertises for the run's OWN branch, provided it is an
+# ancestor of HEAD). ABSENT, BLANK or anything outside the set keeps `default-branch` — a
+# misspelling may not silently select either behaviour.
+#
+# `published` SPENDS three things: a run can authorize itself rather than only its successor, since
+# a branch push is not gated by the pre-push hook; the bar's BASE check widens for EVERY adopter,
+# because this file is a working-tree file the run can commit and so the leg cannot read it; and
+# roster integrity stops being enforceable on the branch anchor. Protocol section 1 carries them.
+ANCHOR_SCOPE=""
+
 PHASES_EXTRA=""
 DOD_EXTRA=""

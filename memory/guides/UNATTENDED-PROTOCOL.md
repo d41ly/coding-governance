@@ -29,8 +29,26 @@ their behalf (§10). Four properties, all mechanical:
   is §9.
 - **Only its SHAPE is checked.** It resolves at BASE, parses as front matter, and its `slug:` names
   the build. No gate can tell whether the owner meant it.
-- **Its ROSTER, when present, may not move under the run.** A Units table inside a roster marker pair
-  is compared across the BASE. Opt-in by presence; INTEGRITY, not a narrowing of the grant.
+- **Its ROSTER, when present, may not move under the run — on the DEFAULT-BRANCH anchor only.** A
+  Units table inside a roster marker pair is compared across the BASE. Opt-in by presence; INTEGRITY,
+  not a narrowing of the grant. **It does not hold on the second anchor**: there the BASE is a tip
+  the run itself pushed, so it can re-satisfy the comparison against its own new bytes.
+
+**A SECOND ANCHOR, when the project declares one.** `ANCHOR_SCOPE="published"` admits the tip the
+remote advertises for the run's OWN branch — used only when the README does not resolve at the
+merge-base, and only when that tip is an ancestor of HEAD. Absent, blank or misspelled keeps the
+strict anchor. Both anchors observe the endpoint the landing push goes to.
+
+**It spends THREE things, all put to the owner and accepted.** The first list carried only the first:
+
+1. **Self-authorization gets cheaper.** A branch push is not gated by the pre-push hook, so a run can
+   authorize ITSELF in two commands, where before it could only authorize its successor (cost 4).
+2. **The BAR weakens for adopters who never opt in.** The key gates the DRIVER and cannot gate the
+   leg: the conf is a working-tree file the run can commit, so a leg reading it would be reading its
+   subject's answer. The leg's BASE check therefore asks "published on the remote" in every repo.
+3. **Roster integrity becomes satisfiable by construction** on the branch anchor, as qualified above.
+
+None of the three is closed. What the design adds is VISIBILITY: the record names the anchor used.
 
 **What this costs, stated because the previous design paid none of it.** The authorization was once a
 block naming the build and both authorized actions, compared byte-for-byte across the BASE. Moving it
@@ -89,7 +107,7 @@ reds. The collision test runs with the other preconditions, so a name that alrea
 DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
 passed, because the rename is what makes the tree dirty.
 
-**Authored**, carrying exactly eight facts and nothing else. The file is CREATED by `--preflight`
+**Authored**, carrying exactly eleven facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
@@ -113,7 +131,16 @@ which is the test for belonging here:
    unit would otherwise change a landed run's answer retroactively. Freezing the ids at the moment of
    landing is what keeps a terminal record a record rather than a live query.
 
-Facts 5 through 7 are recorded as EVIDENCE and are never read back as inputs by this kit. They exist
+9. **The anchor KIND**, `default-branch` or `run-branch`, recorded by `--preflight`.
+10. **The branch ref name**, as the remote advertised it — present only when the second anchor fired.
+11. **The branch tip sha**, from that same advertisement, and present under the same condition.
+
+Facts 10 and 11 are ABSENT on a default-branch run, legally: the "nothing else" clause bounds what
+may appear, not what must. Fact 9 is always written.
+
+Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
+branching on the recorded anchor kind would take a security decision from a value its subject wrote,
+the class this kit has been burned by three times; the derivation is monotone instead. They exist
 so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is
 the only form of verification §9 concludes actually binds.
 
@@ -274,6 +301,7 @@ where this document says it may:
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
+| `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch` and `published`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `DIRECTIVES_EXTRA` | project directive members, appended to the core set |
 | `DIRECTIVES_FLOOR` | the shrink-only SIZE of the kit's core directive set. MANDATORY, for the reason `CORE_FLOOR` is |
@@ -305,6 +333,11 @@ kit's own reads and named where they sit: an object-substitution ref and a graft
 which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by their
 mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other tool
 reading the same objects.
+
+**What the second anchor changes here.** It opens no new class — §1 cost 4 already granted
+successor-authorization. It lowers that price to two commands and widens the leg's BASE check for
+every adopter. Neither is closed; what survives is what survived before, the leg re-run in a clone
+the run never touched.
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
 commits it — nothing binds the executing code to code an owner approved. A run that shims the

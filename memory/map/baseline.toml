@@ -25,8 +25,6 @@ gate-legs = [
   "harness arms (fail branches armed or pinned)",
   "kickoff-manifest ratchet",
   "manifest-check self-test",
-  "memory-recall kit selftest",
-  "memory-recall skill wiring",
   "pre-push self-test",
   "push-main self-test",
   "pytest-guardrails self-test",
@@ -43,7 +41,6 @@ kits = [
   "drift-audit",
   "gate-lint",
   "lib",
-  "memory-recall",
   "pytest-parallel-guardrails",
   "workflows",
 ]
@@ -61,7 +58,6 @@ skill-engines = [
 ]
 rendered-skills = [
   "drift-audit",
-  "memory-recall",
 ]
 gotcha-classes = [
   "absence-assertion-over-whole-file-text.md",
