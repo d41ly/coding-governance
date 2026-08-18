@@ -372,10 +372,45 @@ def all_kits(descs: dict[str, tuple[dict, str]]) -> list[str]:
     return sorted(e for e, (d, _) in descs.items() if d.get("selectable") != "conditional")
 
 
+def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> list[str]:
+    """Order a selection so a kit follows everything it `requires`. Alphabetical within a tier.
+
+    `requires` was DECLARED by `memory-recall` and read by nothing: every mode of
+    `resolve_selection` returned `sorted(...)`, so CONFIGURE ran adopters alphabetically and
+    `memory-recall` ran BEFORE `memory-tree` had seeded `.memory-tree.conf`. Its adopter exited 1,
+    govkit could not classify that code, and the default-selection apply arm failed on every node.
+    Running the same adopter by hand a moment later exited 0 — the ordering was the whole defect.
+
+    A dependency OUTSIDE the selection is not an error: `--kits drift-audit` is a legal install and
+    orders one entry. Only the edges among the selected ids constrain the order.
+
+    Kahn with an alphabetical ready-queue, so the result is deterministic and reduces to today's
+    alphabetical order whenever no edge applies. A cycle REFUSES rather than falling back to
+    alphabetical: an install order nobody can satisfy is not an order, and silently picking one is
+    how this class returns.
+    """
+    want = set(ids)
+    deps = {i: sorted({d for d in (descs[i][0].get("requires") or []) if d in want and d != i})
+            for i in ids}
+    out, placed = [], set()
+    while len(out) < len(ids):
+        ready = sorted(i for i in ids
+                       if i not in placed and all(d in placed for d in deps[i]))
+        if not ready:
+            stuck = sorted(i for i in ids if i not in placed)
+            raise Refusal(
+                f"`requires` has a cycle among {', '.join(stuck)} — refusing to invent an install "
+                f"order. Break the cycle in the descriptors; an order nobody can satisfy is not one"
+            )
+        out.extend(ready)
+        placed.update(ready)
+    return out
+
+
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                       kits: list[str]) -> list[str]:
     if mode == "all":
-        return all_kits(descs)
+        return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
         unknown = [k for k in kits if k not in descs]
         if unknown:
@@ -383,7 +418,7 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                 f"--kits names {', '.join(unknown)}, which {'is' if len(unknown) == 1 else 'are'} "
                 f"not a registry entry; the population is the registry, never a directory listing"
             )
-        return sorted(kits)
+        return derive_install_order(sorted(kits), descs)
     dk = default_kits(reg)
     if not dk:
         raise Refusal("registry.toml declares no [selection] default set, and this tool will not "
@@ -391,7 +426,7 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     missing = [k for k in dk if k not in descs]
     if missing:
         raise Refusal(f"the default set names {', '.join(missing)}, absent from the registry")
-    return sorted(dk)
+    return derive_install_order(sorted(dk), descs)
 
 
 # The negative lookbehind is load-bearing and was bought by a failing arm. A discharge probe is a
@@ -1651,7 +1686,7 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
-def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> str | None:
+def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> dict | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
     The exit-code collision is per BRANCH, not per kit: one shipped adopter exits 1 for six unrelated
@@ -1659,7 +1694,10 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
     `[[outcome]]` therefore declares what must and must not exist, and this RUNS that probe. Six
     descriptors declared these blocks and nothing read them, so an integer was the whole report.
 
-    Returns None when no declared outcome matches — reported as unclassified, never invented.
+    Returns the matching BLOCK, or None when none matches — reported as unclassified, never
+    invented. The block rather than its `means` string, because the caller needs `ok` too: a
+    descriptor declares whether a classified outcome is an ACCEPTED STOP or a failure, and reducing
+    it to a name here would throw that away.
     """
     for oc in desc.get("outcome", []):
         if oc.get("code") != rc:
@@ -1681,7 +1719,7 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
             if not ok:
                 break
         if ok:
-            return oc.get("means")
+            return oc
     return None
 
 
@@ -2116,6 +2154,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     outbox.mkdir(parents=True, exist_ok=True)
     orders: list[dict] = []
     configure_skipped: set[str] = set()
+    stopped_ok: set[str] = set()   # kits whose adopter stopped at a DECLARED, accepted outcome
     for eid in selection:
         d, _p = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -2168,10 +2207,22 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
         rc = subprocess.run(resolved, cwd=str(target), capture_output=True, text=True).returncode
-        means = classify_outcome(target, d, ctx, rc)
+        outcome = classify_outcome(target, d, ctx, rc)
+        means = outcome.get("means") if outcome else None
+        accepted = bool(outcome and outcome.get("ok"))
+        if accepted:
+            stopped_ok.add(eid)
         print(f"govkit apply — CONFIGURE {eid}: adopter exit {rc}"
-              + (f" — {means}" if means else ""))
-        if rc != 0 and means:
+              + (f" — {means}" if means else "")
+              + (" [accepted stop]" if accepted and rc != 0 else ""))
+        if rc != 0 and accepted:
+            # A DECLARED, ACCEPTED terminal state. `memory-tree` seeds `.memory-tree.conf` and stops
+            # by design so a person edits it before anything renders; that is a correct first
+            # install, and calling it a failure made `apply` exit non-zero on every one of them.
+            # The arm asserting a default-selection apply returns 0 was therefore unsatisfiable, and
+            # it landed red rather than being read as the contradiction it was.
+            pass
+        elif rc != 0 and means:
             # The `[[outcome]]` blocks were declared by six descriptors and read by ZERO code, so an
             # exit code shared by six unrelated branches was reported as an integer. A declared
             # meaning lets a fixture assert a MEANING, which is what the acceptance layer needs.
@@ -2197,6 +2248,13 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         n_rendered += 1
         dp = target / row["path"]
         if not dp.is_file():
+            if row.get("kit") in stopped_ok:
+                # Its adopter stopped at a DECLARED, accepted outcome, so it never reached the render.
+                # Reporting the absence here would be reporting the accepted stop a second time,
+                # under a name that reads like a defect.
+                print(f"govkit apply — OBSERVE {row['path']}: not rendered — "
+                      f"'{row['kit']}' stopped at an accepted outcome")
+                continue
             r.fail(f"'{row['path']}' is declared `rendered` by kit '{row['kit']}' and is absent "
                    f"after its adopter ran — the adopter owns those bytes and did not write them")
             continue
