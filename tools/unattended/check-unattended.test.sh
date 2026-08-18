@@ -1015,6 +1015,37 @@ mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DI
 hit "$(run)" "a parked waiver names a handle outside the effective directive set"
 reset_tree
 
+# ---- check 19: the authorization MODE, re-derived by the BAR rather than believed.
+# ---- TOOL-aPromptedMandate-1. The driver reads `authorized-by:` at BASE to decide which discipline
+# ---- binds a run; a value only the driver ever reads is a value only the driver can be wrong about.
+# ----
+# ---- THE FORGED DIRECTION, which is the whole reason the check exists: the record claims `prompt`
+# ---- while the README at its own recorded BASE declares nothing. Note this arm does NOT need
+# ---- `anchor_break` - it breaks the RECORD, not the anchor, and the anchor staying honest is
+# ---- exactly what makes the disagreement visible.
+reset_tree
+sed -i '/^base: /a mode: prompt' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare, so the discipline the run says bound it is not the one its authorization asked for:"
+reset_tree
+
+# ---- THE AGREEING DIRECTION. Without it the arm above passes over a check that fires on every
+# ---- record carrying a mode at all, which would red the bar for every honest prompt-mode run. The
+# ---- README has to gain the key AT THE ANCHOR, so this one does need `anchor_break`.
+add_mode() { sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md; }
+anchor_break add_mode
+sed -i '/^base: /a mode: prompt' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+anchor_restore
+
+# ---- ABSENT is outside the arm BY CONSTRUCTION, not by a waiver: every run-state file written
+# ---- before this unit carries no `mode:` line, and the leg's documented idiom is silence on
+# ---- absence. tRun's pristine record is exactly such a file.
+reset_tree
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The

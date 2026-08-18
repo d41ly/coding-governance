@@ -111,6 +111,14 @@ mutate memory/builds/tWrongSlug/README.md 's/^slug: tWrongSlug$/slug: someoneEls
 # tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
 # would have tested the dirty-tree refusal while claiming to test creation.
 readme tFresh
+# TOOL-aPromptedMandate-1 - the authorization MODE fixtures, both on MAIN for tFresh's reason. The
+# key is inserted AFTER `slug:` in both, deliberately: the parse this unit replaces printed the slug
+# and EXITED on its first match, so a fixture with the key FIRST would pass over the very defect the
+# re-shape exists to fix - and the arm would have proved nothing.
+readme tModeBad
+mutate memory/builds/tModeBad/README.md '/^slug: tModeBad$/a authorized-by: banana'
+readme tModeOk
+mutate memory/builds/tModeOk/README.md '/^slug: tModeOk$/a authorized-by: prompt'
 # TOOL-cBriefedPilot-4: the build-method carrier, which --preflight now REFUSES without. A stub,
 # because the driver tests existence and nothing else; the file whose sections have to resolve lives
 # in the LEG's fixture. It is created before the initial commit deliberately - every arm begins with
@@ -1663,11 +1671,37 @@ hit "$out" "no run-state file, so there is no run to park a decision against"
 same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
+# ---- check 44: the authorization mode is a CLOSED set, and a value outside it refuses rather than
+# ---- defaulting. Paired with a no-write arm, because "it printed a refusal" and "it changed
+# ---- nothing" are two claims - and this branch sits BEFORE the write gate precisely so both hold.
+reset_tree
+out=$(run --preflight tModeBad --keepalive-id k1)
+hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared"
+same "check 44 created no run-state file" "$([ -f memory/builds/tModeBad/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- the PASSING direction, which is the only thing that tells a WORKING reader from a dead one:
+# ---- with the key absent the record says `slug`, and with a dead parse it says `slug` too. This
+# ---- arm is the discriminator, and it is why the fixture orders the key after `slug:`.
+reset_tree
+out=$(run --preflight tModeOk --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tModeOk/RUN.md)" "mode: prompt"
+git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+
+# ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
+# ---- tFresh, an untouched fixture, so the arm cannot pass because of something this unit wrote.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tFresh/RUN.md)" "mode: slug"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=296
+FLOOR_ASSERTIONS=305
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

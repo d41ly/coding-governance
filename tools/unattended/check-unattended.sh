@@ -15,7 +15,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -442,6 +442,25 @@ while IFS= read -r f; do
         /^---[[:space:]]*\r?$/ { exit }
         /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
       [ "$dslug" = "$bslug" ] || fail 13 "a build README at its run's recorded BASE declares a different slug, so the folder was renamed or its README copied from another build: declared $dslug, folder $bslug"
+      # ---- 19: THE AUTHORIZATION MODE, re-derived here rather than believed. TOOL-aPromptedMandate-1.
+      # ---- A SECOND OPINION in check 13's own shape: the same blob, an independent parse, compared
+      # ---- against what the run recorded. The driver reads this key to DECIDE which discipline binds
+      # ---- a run; a value only the driver ever reads is a value only the driver can be wrong about.
+      # ----
+      # ---- PRESENCE-GUARDED, deliberately. Every run-state file written before this unit carries no
+      # ---- `mode:` line at all, and the leg's documented idiom is silence on absence - so a legacy
+      # ---- record is outside this arm by construction rather than by a waiver. What is NOT guarded
+      # ---- is the other direction: a record that HAS a mode must agree with the README, and an
+      # ---- absent key at BASE means `slug`, which is what the driver writes for it.
+      recmode=$(fact_of "$f" mode)
+      if [ -n "$recmode" ]; then
+        dmode=$(printf '%s\n' "$bb" | awk '
+          NR == 1 { next }
+          /^---[[:space:]]*\r?$/ { exit }
+          /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
+        [ -n "$dmode" ] || dmode=slug
+        [ "$recmode" = "$dmode" ] || fail 19 "a run-state file records an authorization mode the build README at its own recorded BASE does not declare, so the discipline the run says bound it is not the one its authorization asked for: $recmode against $dmode"
+      fi
     else
       fail 13 "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it: $rb in $bre"
     fi

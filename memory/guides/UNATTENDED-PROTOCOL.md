@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.6 -->
+<!-- gov:kit unattended@1.7 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -29,6 +29,14 @@ their behalf (§10). Four properties, all mechanical:
   is §9.
 - **Only its SHAPE is checked.** It resolves at BASE, parses as front matter, and its `slug:` names
   the build. No gate can tell whether the owner meant it.
+- **It may declare an authorization MODE, and that declaration is a RECORD rather than a verdict.**
+  An `authorized-by:` key in the front matter, over the closed set `prompt` / `slug`; absent is
+  `slug`, which is every build folder written before the key existed. `--preflight` reads it from the
+  blob at BASE and records it, and the merge bar re-derives it from that same blob independently — so
+  a run cannot record a discipline its own authorization did not carry. What this does NOT buy is
+  stated here rather than discovered: the key is a byte in a file, and §9's reduction applies to it
+  exactly as it applies to every other local input. It says which discipline the run declared it was
+  under, not that the declaration was true.
 - **Its ROSTER, when present, may not move under the run — on the DEFAULT-BRANCH anchor only.** A
   Units table inside a roster marker pair is compared across the BASE. Opt-in by presence; INTEGRITY,
   not a narrowing of the grant. **It does not hold on the second anchor**: there the BASE is a tip

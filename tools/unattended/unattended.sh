@@ -30,7 +30,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -194,6 +194,12 @@ fact() { # run-state file · key
 # party being pushed to, and the observation is RECORDED so a verifier off this machine can re-derive
 # the pin without trusting a byte the run wrote.
 AREF=""; ASHA=""; AURL=""
+# TOOL-aPromptedMandate-1 - the authorization MODE, read from the build README at the pinned BASE by
+# check_authorization and recorded by --preflight. An out-parameter with the return code as the
+# verdict, which is this file's idiom for every other derived value (observe_anchor, resolve_base,
+# trusted_base, dod_met). It is EVIDENCE and never an input: nothing in this kit branches on the
+# recorded value, for the reason anchor-kind carries in its own comment.
+AUTH_MODE=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -695,7 +701,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug
+  local slug="$1" base="$2" rel blob fmslug _fm
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -715,10 +721,28 @@ check_authorization() { # slug · base
     *) fail 7 "the blob at the pinned BASE is not a build README - front matter opens at line 1 and this does not, so the path resolved to something that is not a build: $base:$rel"
        return 1 ;;
   esac
-  fmslug=$(printf '%s\n' "$blob" | awk '
+  # TOOL-aPromptedMandate-1 - ONE read, TWO answers. The program this replaces printed the slug and
+  # EXITED on its first match, so a second arm below it could never run, and an arm placed above it
+  # starved `fmslug` of the value the refusal below compares - tripping the slug mismatch instead.
+  # Both keys are emitted KEY-TAGGED and nothing exits on a match; the front-matter close still
+  # terminates the scan, which is what bounds it. No second `GIT show`: one blob, one parse.
+  _fm=$(printf '%s\n' "$blob" | awk '
     NR == 1 { next }
     /^---[[:space:]]*\r?$/ { exit }
-    /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
+    /^slug:/ { v = $0; sub(/^slug:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "slug=" v; next }
+    /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }')
+  fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
+  AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
+  # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
+  # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
+  # default: defaulting an unrecognised mode to either member lets a typo select a discipline
+  # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
+  [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
+  case "$AUTH_MODE" in
+    prompt|slug) ;;
+    *) fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared: $AUTH_MODE"
+       return 1 ;;
+  esac
   if [ "$fmslug" != "$slug" ]; then
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
@@ -1278,6 +1302,12 @@ verb_preflight() { # slug · keepalive-id
   # re-preflight — the base stayed pinned while the anchor evidence beside it moved to whatever
   # the remote said today, so the record described two different observations as one.
   [ -n "$(fact "$rel" anchor-kind)" ] || set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  # TOOL-aPromptedMandate-1 - the authorization mode, PINNED ONCE for the reason anchor-kind is:
+  # written unconditionally it would drift on a re-preflight while the base it is evidence for
+  # stayed pinned. `slug` is the fallback because an unreachable check_authorization leaves the
+  # global empty, and preflight has already refused by then - the default never reaches disk on a
+  # run that got here without the read.
+  [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1
