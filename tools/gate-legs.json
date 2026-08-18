@@ -401,6 +401,29 @@
     ]
   },
   {
+    "name": "recall floor",
+    "argv": [
+      "python3",
+      "tools/memory-recall/check-recall.py"
+    ],
+    "guard": [
+      "tools/memory-recall/",
+      "memory/"
+    ]
+  },
+  {
+    "name": "recall floor arms",
+    "argv": [
+      "python3",
+      "tools/memory-recall/test_recall_floor.py"
+    ],
+    "guard": [
+      "tools/memory-recall/",
+      "memory/",
+      "tools/govkit/"
+    ]
+  },
+  {
     "name": "memory-recall skill wiring",
     "argv": [
       "bash",

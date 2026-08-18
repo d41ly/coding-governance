@@ -38,6 +38,10 @@ mutates_index = false
 code = 1
 probe = { must_exist = ".codebase-map.conf", must_not_exist = "{kit}/map_extractors.py" }
 means = "seeded-conf"
+# The same accepted first-run stop as memory-tree's: the conf is seeded and the operator decides the
+# inventory before extractors exist. The sibling outcome below is NOT marked, because its own name
+# admits it cannot tell a seed from a crash.
+ok = true
 
 [[outcome]]
 code = 1

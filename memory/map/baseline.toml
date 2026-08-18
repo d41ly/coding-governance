@@ -29,8 +29,6 @@ gate-legs = [
   "manifest-check self-test",
   "memory hygiene",
   "memory-hygiene self-test",
-  "memory-recall kit selftest",
-  "memory-recall skill wiring",
   "pre-push self-test",
   "push-main self-test",
   "pytest-guardrails self-test",
@@ -49,7 +47,6 @@ kits = [
   "drift-audit",
   "gate-lint",
   "lib",
-  "memory-recall",
   "memory-tree",
   "pytest-parallel-guardrails",
   "workflows",
@@ -68,7 +65,6 @@ skill-engines = [
 ]
 rendered-skills = [
   "drift-audit",
-  "memory-recall",
 ]
 gotcha-classes = [
   "absence-assertion-over-whole-file-text.md",

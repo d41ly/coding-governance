@@ -137,6 +137,60 @@ three honest states (kit not adopted · opt-in not taken · present but unmerged
 a permanent false alarm. Membership is decided by the log's `shown_paths` array rather than a
 `memory/` literal, so it works on any `MEMORY_ROOT`.
 
+## The recall floor (gov-only)
+
+`check-recall.py` grades a committed question set and exits non-zero when retrieval falls below a
+declared pin. It exists because `bench.py` computes every metric and ALWAYS returns 0 — its flag set
+is closed and `verbatim.json` pins it byte-for-byte — so the exit code has to live beside it. This
+program imports its scoring functions and edits nothing.
+
+```bash
+python check-recall.py                  # the merge-bar leg
+python check-recall.py --audit-fixture  # per-question homes, hits and overlap, plus the derivation
+python check-recall.py --data-dir DIR   # grade an already-extracted dir (what the arms use)
+```
+
+**The pin names a CELL, as one token**, because `bench.py` emits a matrix that spans 0.17 to 0.83 in
+a single run and a bare scalar names none of it:
+
+```
+RECALL_FLOOR="records:fts5:r@5>=0.81"
+```
+
+`fts5` because `query.py` ranks with `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)` and bench's `fts5` is that
+same unweighted expression — the reason is the source, not a score. The value is compared against the
+CEILING-NORMALISED figure, which reduces exactly to `h/R`: `h` questions that hit, `R` whose targets
+resolve at all.
+
+**0.81 is DERIVED, not observed.** Measured `h=10`, `R=12`, normalised 0.8333. The one-retirement
+worst case is `(h-1)/(R-1) = 0.8182`, so the pin sits just below it and the property it buys is that
+retiring one hitting record costs nothing. Retiring a NON-hitting one raises the score. A regression
+with no retirement (`9/12 = 0.75`) reds. Re-measure with `--audit-fixture`, which prints `h`, `R` and
+`(h-1)/(R-1)` beside the declared value. It reds in ONE direction — when the pin has become LOOSER
+than the worst case, i.e. unsafe. A pin left merely conservative is caught by the arms, which assert
+the literal `h=10 R=12`.
+
+**Two predicates, and each can red ALONE** — two checks that only ever fail together are one check
+wearing two names. `test_recall_floor.py` proves both directions on this corpus:
+
+| degradation | per-id | floor |
+|---|---|---|
+| drop one home of a multi-homed HITTING target | ok | RED (0.7500) |
+| retire a NON-hitting target entirely | RED, names the id | ok (0.9091) |
+| retire a HITTING target entirely | RED, names the id | ok (0.8182 — the derived headroom) |
+| drop the whole record file | RED | RED (0.2000) |
+
+**The fixture must not be a tautology.** Every question carries a `from` naming the record a person
+wrote that states its answer, and `--audit-fixture` measures content-term overlap against the union
+of the target's homes, redding above `OVERLAP_MAX`. A question copied from its own record scores
+~1.0 there; this set measures max 0.500.
+
+**None of this ships.** `kit.toml` withholds `recall-fixture.json`, `check-recall.py` and
+`test_recall_floor.py` through a `project-owned` rule claiming their destinations. A question set
+keyed on one repo's record ids grades nothing in another, and a floor copied from a foreign corpus is
+the same defect as a pin copied from one. An adopter who wants a floor authors their own fixture and
+measures their own value.
+
 ## Maintenance — three categories, three different stories
 
 - **Verbatim** — `bench.py`, `union.py`. Zero coupling on the query path, so they are re-pulled
