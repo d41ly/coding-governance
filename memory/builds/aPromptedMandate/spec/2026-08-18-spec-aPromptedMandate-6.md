@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm
 
-**Status:** SPECCED · rev-2 · 2026-08-18 · node a · Tier-1 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-1 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -157,6 +157,11 @@ none — the fork below is RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · built, six arms at 13 assertions. S2c's arm 5b as SPECCED could not work:
+  it said to drop the key from the README and re-preflight, but `mode:` and `base:` are both pinned
+  once, so neither moves and no disagreement is producible. The arm forges the RECORD instead — the
+  third fixture in this build that could not trigger its own rule, and the reason the suite asserts
+  fixture completeness before any arm perturbs it.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. Arm 4 asserted on output `--close` discards and
   could never fail (ids 22, 36) — replaced by the verdict-keyed pair S2b. A fifth prompt-mode arm
   added, because spec 1 §5 and spec 5 §5 banked coverage the closed four did not contain (id 20).

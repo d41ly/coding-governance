@@ -85,6 +85,11 @@ why = "undeclared or malformed reds the kit gate. For a faithful copy install th
 discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
 
 [[gate_leg]]
+name = "unattended cross-component"
+argv = ["bash", "{kit}/cross-component.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
 name = "unattended gate selftest"
 argv = ["bash", "{kit}/check-unattended.test.sh"]
 guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]

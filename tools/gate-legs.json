@@ -516,6 +516,17 @@
     ]
   },
   {
+    "name": "unattended cross-component",
+    "argv": [
+      "bash",
+      "tools/unattended/cross-component.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
+    ]
+  },
+  {
     "name": "run-gates canary",
     "argv": [
       "bash",

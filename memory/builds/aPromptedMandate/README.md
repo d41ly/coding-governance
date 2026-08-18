@@ -114,7 +114,7 @@ that may rewrite the rules it is authorized under has no rules.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-18 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7
 
 | Unit | Status | Rev | Last change |
@@ -124,7 +124,7 @@ ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL
 | [TOOL-aPromptedMandate-3 — the build method's research→test→choose section](spec/2026-08-18-spec-aPromptedMandate-3.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-5 — the Skill's prompt start path](spec/2026-08-18-spec-aPromptedMandate-5.md) | CLOSED | rev-4 | 2026-08-18 |
-| [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | SPECCED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | CLOSED | rev-3 | 2026-08-18 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 
