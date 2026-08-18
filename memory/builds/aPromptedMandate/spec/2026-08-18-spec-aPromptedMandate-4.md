@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-4 — the two mode-scoped directives
 
-**Status:** SPECCED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -138,7 +138,11 @@ and `.claude/skills/unattended/SKILL.md` (the table) · `.unattended.conf` +
   still resolves its `M12` section and does not report either new handle as absent from the table —
   arms A and B green over a correct implementation.
 - **AC4c** — When a project declares a `DIRECTIVES_EXTRA_TABLE` whose rows carry no scope column,
-  `bash tools/unattended/check-unattended.sh` exits 0.
+  `bash tools/unattended/check-unattended.sh` exits 0. Measured: zero check-16 failures.
+- **AC4d** — When the Skill's table and the registry disagree on any scope,
+  `bash tools/unattended/check-unattended.sh` fails by name — ONE branch, because a changed scope
+  cell puts the same handle in BOTH set differences and an only-in-table branch is unreachable
+  alone.
 - **AC5** — When `--preflight --waive researched --reason "<text>"` runs against a slug-mode build,
   the driver refuses BY NAME (the refusal text appears on stdout) and the run-state file is
   byte-unchanged. Both halves: rev-1 asserted only the second, which a driver that never evaluated
@@ -171,6 +175,11 @@ none — the forks below are RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · built. The both-ways scope join §4 specified collapsed to ONE branch on
+  measurement: a single changed scope cell lands the same handle in both differences, so the second
+  branch could never fire alone and its arm would have proved nothing — arm A already covers the
+  handle set in both directions. The audit's predicted breakage was reproduced BEFORE the fix: fed
+  three-field entries, arms A and B produced exactly four refusals over a correct implementation.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. §4's consumer enumeration was wrong in both
   directions — the `--waive` test needs no change and leg arms A and B both break on a three-field
   entry (ids 7, 30, 42); S7 and the splitter added. The evaluation ORDER of the scope refusal was

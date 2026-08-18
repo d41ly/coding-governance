@@ -102,7 +102,14 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
 #
 # Two handles may cite one section - the section is the carrier, not the rule.
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9"
+# TOOL-aPromptedMandate-4 - an entry is `<handle>:<section>[:<scope>]`. The THIRD field is the
+# layer's first CONDITIONAL member: `prompt` binds only a run whose authorization declared that
+# mode, `all` (the default, and what an absent field means) binds every run. Two-field entries are
+# therefore unchanged in meaning, which is what keeps every adopter's registry working untouched.
+#
+# The scope is NOT a project knob. A project may EXTEND the set; it may not narrow the core, and a
+# project-selectable scope is narrowing wearing a different name.
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
@@ -110,6 +117,19 @@ dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
 # for a --waive handle reads THIS, so the effective set is composed in one place rather than in each
 # consumer.
 directives() { printf '%s %s\n' "$DIRECTIVES_CORE" "$DIRECTIVES_EXTRA"; }
+# TOOL-aPromptedMandate-4 - ONE splitter for the three-field entry, so no consumer re-derives it.
+# The two-field default falls out of the shortest/longest-prefix pair rather than being tested for,
+# which is why it cannot disagree with itself: with no third field `${rest#*:}` returns `rest`.
+scope_of() { # handle -> its declared scope; `all` when the entry carries no third field
+  local p rest sc
+  for p in $(directives); do
+    case "$p" in "$1:"*) rest=${p#*:}; sc=${rest#*:}
+      [ "$sc" = "$rest" ] && sc=all
+      printf '%s' "$sc"; return ;;
+    esac
+  done
+  printf 'all'
+}
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -620,6 +640,20 @@ recorded_waivers() { # run-state file -> the handles already parked, sorted
   # handle the owner never waived — and refusal 38 compares against exactly this reading.
   sed -n 's/^[0-9][0-9-]*T[0-9:]*Z waiver · item \([^ ]*\) · reason .*$/\1/p' "$1" | sort -u
 }
+check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bound by
+  local n=${#WAIVE_ITEMS[@]} i=0 h sc
+  [ "$n" -gt 0 ] || return 0
+  while [ "$i" -lt "$n" ]; do
+    h=${WAIVE_ITEMS[$i]}; sc=$(scope_of "$h")
+    if [ "$sc" = prompt ] && [ "${AUTH_MODE:-}" != prompt ]; then
+      fail 45 "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it: $h"
+      return 1
+    fi
+    i=$((i + 1))
+  done
+  return 0
+}
+
 check_waivers() { # run-state file
   local rel="$1" n=${#WAIVE_ITEMS[@]} i=0 h r want have
   [ "$n" -gt 0 ] || return 0
@@ -1229,6 +1263,15 @@ verb_preflight() { # slug · keepalive-id
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  # TOOL-aPromptedMandate-4, S5 - the waiver SCOPE, and it CANNOT live in check_waivers: that runs
+  # before the authorization block above, where AUTH_MODE is unset for BOTH modes, so a refusal keyed
+  # there never fires for one spelling and always fires for the other. Placed here, after the read
+  # that produces the mode, for the same reason the anchor is observed before anything consuming it.
+  #
+  # Keyed on "the mode is not PROMPT" rather than on "the mode is slug": an UNDERIVABLE mode must
+  # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
+  # authorization read failed - which is the moment a silent grant would matter most.
+  check_waiver_scope || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }

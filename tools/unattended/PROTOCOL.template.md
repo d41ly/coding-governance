@@ -383,6 +383,19 @@ pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key
 was rejected: a project could then declare zero directives, which is a global waiver carrying no
 name, no reason and no record.
 
+**A directive may be SCOPED.** A registry entry is `<handle>:<section>[:<scope>]` over the closed set
+`all` / `prompt`. An absent third field is `all`, so every entry written before scopes existed keeps
+its meaning exactly. `all` binds every unattended run; `prompt` binds only a run whose build README
+declared `authorized-by: prompt`, because research and a solution test are obligations of a build
+whose solution was not given — imposing them on a run whose specs already chose one would be
+ceremony, not rigour.
+
+The scope is KIT-OWNED for the reason the set itself is: a project-selectable scope is a narrowing of
+the core wearing another name. A waiver of a `prompt`-scoped handle on a run that is not
+prompt-authorized is REFUSED rather than recorded, since a waiver relaxes a rule that never bound
+that run. That refusal is evaluated where the mode EXISTS — after the authorization read, not beside
+the other waiver checks — and an underivable mode refuses rather than grants.
+
 **This section names no handle.** The list an agent reads is the table in the rendered Skill, and
 naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both
 directions, so a handle in one and not the other is a refusal rather than a discrepancy nobody sees.

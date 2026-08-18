@@ -723,7 +723,7 @@ reset_tree
 # arms that run the driver live; nothing else in this file reads the remote's advertisement.
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 git checkout -q main
-printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n' > memory/guides/BUILD-METHOD.md
+printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n\n## M12\n' > memory/guides/BUILD-METHOD.md
 mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
@@ -1073,6 +1073,32 @@ hit "$out" "the protocol names no phase as a build-method pass kind, so the pass
 miss "$out" "the contract understates which positions the method names"
 reset_tree
 
+# TOOL-aPromptedMandate-4 - the SCOPE column, joined to the registry's third field. Both branches
+# were run against the live tree before being written here, and each fired with the text below.
+#
+# G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
+# the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
+# would have proved nothing. Arm A already covers the handle set in both directions.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
+
+# G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
+# green - the vacuity shape every other join in this leg carries a guard for.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/ | all | D/ | D/; s/ | prompt | D/ | D/'
+out=$(run)
+hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds exactly all or prompt"
+miss "$out" "the agent is told which runs a rule binds by a table that disagrees"
+
+# G, the PROJECT's own extra rows carry no scope column and must NOT red: the kit never asked an
+# adopter to write one, and the join is scoped to the CORE set for exactly that reason.
+reset_tree
+mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+miss "$(run)" "the Skill's directive table carries no scope cell this leg can read"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1083,7 +1109,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=174
+FLOOR_ASSERTIONS=182
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

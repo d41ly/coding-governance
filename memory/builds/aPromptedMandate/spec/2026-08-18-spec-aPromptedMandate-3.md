@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-3 — the build method's research→test→choose section
 
-**Status:** SPECCED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 

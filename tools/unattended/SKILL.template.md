@@ -24,19 +24,27 @@ distinction real.
    it; none of them restates one, and a cell here that grew into a rule would be a defect in this
    table rather than a second source of truth.
 
-   | Handle | What it names | Carrier | From |
-   |---|---|---|---|
-   | `minimal-prose` | the transcript rule under a mandate | M10 | D1 |
-   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | D2 |
-   | `forks-resolved` | when open questions are settled | M3 | D3 |
-   | `specs-reviewed` | the spec audit that precedes code | M4 | D4 |
-   | `reuse-first` | the recall and reuse obligation | M5 | D5 |
-   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | D6 |
-   | `passes-committed` | the commit boundary | M6 | D8 |
-   | `diff-reviewed` | the closing review of the cumulative diff | M8 | D7 |
-   | `land-once-done` | when a build may land | M8 | D8 |
-   | `conflicts-reconciled` | merge-conflict disposition | M8 | D8 |
-   | `wrap-up-derived` | how the wrap-up is composed | M9 | D8 |
+   | Handle | What it names | Carrier | Scope | From |
+   |---|---|---|---|---|
+   | `minimal-prose` | the transcript rule under a mandate | M10 | all | D1 |
+   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | all | D2 |
+   | `forks-resolved` | when open questions are settled | M3 | all | D3 |
+   | `specs-reviewed` | the spec audit that precedes code | M4 | all | D4 |
+   | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
+   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | all | D6 |
+   | `passes-committed` | the commit boundary | M6 | all | D8 |
+   | `diff-reviewed` | the closing review of the cumulative diff | M8 | all | D7 |
+   | `land-once-done` | when a build may land | M8 | all | D8 |
+   | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
+   | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
+   | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
+   | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+
+   **`Scope`** is which runs a directive binds. `all` binds every unattended run; `prompt` binds only
+   a run whose build README declared `authorized-by: prompt`, because research and a solution test
+   are obligations of a build whose solution was not given. A waiver of a `prompt`-scoped handle is
+   REFUSED on a slug-authorized run rather than recorded, since it would relax a rule that never
+   bound it.
 
    Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
    against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,

@@ -802,18 +802,28 @@ out=$(run --status tRun)
 miss "$out" "unbound variable"
 hit "$out" "phase "
 
-# ---- eleven pairs, read from the driver's OWN constant line — the same line the gate leg's
-# ---- core_of() parses, so a count here and a count there cannot disagree.
+# ---- THIRTEEN pairs, read from the driver's OWN constant line — the same line the gate leg's
+# ---- core_of() parses, so a count here and a count there cannot disagree. It was eleven until
+# ---- TOOL-aPromptedMandate-4 added the two prompt-scoped handles.
 dirline=$(grep '^DIRECTIVES_CORE=' "$SCRIPT")
 ndir=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*' | wc -l | tr -d ' ')
-same "the registry declares eleven handles" "$ndir" "11"
+same "the registry declares thirteen handles" "$ndir" "13"
 
 # ---- every handle POINTS at a build-method section and none of them restates one. The pointer is
 # ---- the whole design: a gloss grown into a condition would be the M1 defect this build exists to
 # ---- avoid, and a shape check is the cheapest thing that notices it happening.
+# ----
+# ---- The grammar admits an OPTIONAL third field since TOOL-aPromptedMandate-4, over the closed set
+# ---- `all|prompt` and nothing wider - a free-text third field would be exactly the gloss this arm
+# ---- exists to refuse, one colon further along.
 nbad=$(printf '%s\n' "$dirline" | sed -e 's/^DIRECTIVES_CORE="//' -e 's/"$//' | tr ' ' '\n' \
-       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+$' || true)
-same "every registry entry is handle:M-section and nothing else" "$nbad" "0"
+       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+(:(all|prompt))?$' || true)
+same "every registry entry is handle:M-section with at most a closed scope" "$nbad" "0"
+
+# ---- ...and the scope vocabulary is CLOSED at the source, so a typo cannot invent a third value
+# ---- that the arm above would then bless as legal grammar.
+nscope=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*:[a-z]*' | sed 's/.*://' | sort -u | grep -cvE '^(all|prompt)$' || true)
+same "no registry entry declares a scope outside all/prompt" "$nscope" "0"
 
 # ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
 # ---- it can silently not ship while the suite stays green.
@@ -1709,11 +1719,37 @@ hit "$(cat memory/builds/tFresh/RUN.md)" "mode: slug"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 reset_tree
 
+# ---- check 45: a waiver of a PROMPT-scoped directive on a run that is not prompt-authorized. The
+# ---- refusal cannot live in check_waivers, which runs BEFORE the authorization read that produces
+# ---- the mode - there AUTH_MODE is unset for both modes, so one spelling never fires and the other
+# ---- always does. These arms are what prove it is evaluated where the mode exists.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
+hit "$out" "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it:"
+same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
+# ---- waiver path wearing a scope's name.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1 --waive reuse-first --reason "owner accepted the silence")
+hit "$out" "preflight OK"
+hit "$out" "directive waived — reuse-first"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+
+# ---- ...and the PROMPT-scoped handle IS accepted on a prompt-authorized run, which is the whole
+# ---- point of the scope rather than a way to refuse things.
+reset_tree
+out=$(run --preflight tModeOk --keepalive-id k1 --waive researched --reason "the prompt named one solution")
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tModeOk/RUN.md)" "waiver · item researched"
+git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=307
+FLOOR_ASSERTIONS=315
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

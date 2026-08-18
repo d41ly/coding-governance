@@ -602,8 +602,29 @@ tmpl="$HERE/SKILL.template.md"
 # always accepted an extra handle — the driver composes both — while this join covered CORE alone,
 # so an extra was waivable by a verb and invisible to the agent, and the project could not fix that
 # by adding a table row because the Skill is rendered from a kit template. It has a row source now.
-core=$(printf '%s
-' $DIRECTIVES_CORE $DIRECTIVES_EXTRA | sort -u)
+# TOOL-aPromptedMandate-4 - a registry entry is now `<handle>:<section>[:<scope>]`, and everything
+# below consumes the TWO-field form: arm A comms `core` against the table's `handle:M<n>` pairs, and
+# arm B resolves the section as ${pair#*:}. Fed whole entries, both read `M12:prompt` as a section
+# and red on a CORRECT implementation - measured, four refusals, before this split existed.
+#
+# ONE splitter, here, rather than one per consumer. `corescope` is built from the CORE set alone: a
+# project's DIRECTIVES_EXTRA_TABLE rows are hand-authored and carry no scope column, and the join
+# below must not red an adopter for a column the kit never asked them to write.
+core=""; corescope=""
+for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  core="$core$_dh:$_ds
+"
+done
+for _de in $DIRECTIVES_CORE; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  corescope="$corescope$_dh:$_dc
+"
+done
+core=$(printf '%s' "$core" | grep . | sort -u)
+corescope=$(printf '%s' "$corescope" | grep . | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -662,6 +683,35 @@ else
     only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
     [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"
     [ -z "$only_tbl" ] || fail 16 "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: $only_tbl"
+    # TOOL-aPromptedMandate-4 - the SCOPE column, joined to the registry's third field. Scoped to the
+    # KIT table's rows: the handle set compared is the CORE set, so a project's own extra rows are
+    # outside this arm and an adopter is never redded for a column the kit did not ask them to write.
+    #
+    # ANTI-VACUITY FIRST. If the column is absent from every row the extraction is empty, and an
+    # empty-against-empty comparison is green - which is the shape this repo reds elsewhere by name.
+    # The guard is ordered ahead of the comparison for the reason arm A's and D's are.
+    tblscope=$(tr -d '\r' < "$tmpl" | awk -F'|' '
+      /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+        h = ""; sc = ""
+        for (i = 2; i <= NF; i++) {
+          cell = $i
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+          if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+          if (cell == "all" || cell == "prompt") sc = cell
+        }
+        if (h != "" && sc != "") print h ":" sc
+      }' | sort -u)
+    if [ -z "$tblscope" ]; then
+      fail 16 "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds exactly all or prompt"
+    else
+      # ONE branch, not a comm PAIR. Measured: changing a single scope cell puts the same handle in
+      # BOTH differences, so an only-in-table second branch cannot fire ALONE - it is reachable only
+      # alongside this one, or alongside arm A which already covers the handle set. A branch no
+      # fixture can isolate is a branch whose arm proves nothing, so there is one.
+      _cs=$(printf '%s' "$corescope" | tr '\n' ' ')
+      _ts=$(printf '%s' "$tblscope" | tr '\n' ' ')
+      [ "$corescope" = "$tblscope" ] || fail 16 "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it: $_cs against $_ts"
+    fi
   fi
   # Arm B: every cited section RESOLVES. SILENT when the carrier is absent — the leg grades the
   # TREE and an adopter may install this kit without the memory-tree one; the DRIVER is what grades
