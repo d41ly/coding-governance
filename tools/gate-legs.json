@@ -14,6 +14,14 @@
     ]
   },
   {
+    "name": "charter size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "AGENTS.md"
+    ]
+  },
+  {
     "name": "playbook parity",
     "argv": [
       "bash",

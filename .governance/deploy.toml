@@ -1,0 +1,42 @@
+# deploy.toml — gov's own answers, for gov's own charter. This repo is the first real target of
+# tools/playbook/, which is the point: a defect the fixture missed surfaces here rather than in
+# somebody else's tree.
+#
+# COMMITTED, because it is the standing authorization for an unattended re-render: it carries every
+# owner decision, so a later render reads answers rather than asking for them again.
+
+gov_source = "."
+prefix = "tools"
+
+# EVERY kit this repo carries, not `[selection] default`. That default is five entries against
+# thirteen tracked kit dirs, so a default intake would drop the unattended, drift-audit, lexicon and
+# agent-cap blocks out of gov's own charter while gov's bar goes on enforcing exactly those rules.
+kits = [
+  "playbook", "playbook-render", "kickoff-manifest", "memory-tree", "codebase-map",
+  "memory-recall", "drift-audit", "agent-instructions", "unattended", "lexicon",
+  "pytest-parallel-guardrails", "gate-lint", "govkit", "agent-cap", "review-harness",
+  "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
+]
+
+# EMPTY, and that is a measurement rather than an oversight: both fenceable project-property blocks
+# apply here. This fleet is multi-OS (four nodes, Windows and POSIX shells), and the security
+# section's outbound surface exists.
+drop_blocks = []
+
+[answers]
+# CI_FILE derives to nothing here: this repo has no .github/workflows yet, and wiring the bar into
+# CI needs a workflow-scoped push. The answer records that rather than letting a blank ship.
+ci_file = "none yet — the bar runs at the push boundary via .githooks/pre-push"
+variances_a = "remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths"
+stream_ownership = "no fixed ownership — a solo tooling repo, one stream per work-unit"
+doc_routing_table = "playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md"
+product_preamble = "coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships"
+repo_layout_map = "root holds the charter template and the runbook · tools/ the deployable kits · skills/session-kickoff/ the kickoff engine · memory/ the dogfooded memory tree"
+command_catalog = "bash tools/run-gates.sh (the bar) · GATE_JOBS=1 for the serial rollback · GATE_FULL=1 to ignore every leg guard · bash tools/push-main.sh (the lander)"
+product_context_home = "README.md, plus memory/DECISIONS.md for why anything is the way it is"
+gate_commands = "bash tools/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere"
+commit_trailer = "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+worktree_script = "none yet — worktrees are created by hand under .claude/worktrees/"
+kind_factory_map = "kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter"
+shared_primitives_location = "tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead"
+toolchain_notes = "bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009"

@@ -9,6 +9,7 @@
       "branch-guard self-test",
       "build README slot contract",
       "build-index selftest",
+      "charter size",
       "check-arms selftest",
       "check-wiring self-test",
       "codebase-map adopter e2e",
