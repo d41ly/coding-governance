@@ -80,6 +80,11 @@ hook's own README, leaving the two caps and the fact that a hook enforces them.
 
 One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
 
+The marker pair below is what the `build-complete` Definition-of-Done item reads. It does not
+introduce a second roster — it DELIMITS this one, so the driver and the build method join on the same
+region rather than on two readings of the same prose.
+
+<!-- roster:units -->
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `PLAY-aFusedCharter-1` | 2 | the converged document |
@@ -89,6 +94,7 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 | 5 | `PLAY-aFusedCharter-3` | 2 | `AGENTS.md` — the rendered region, and the admission cut that pays for it |
 | 6 | `TOOL-aFusedCharter-2` | 2 | the micro-format definition gate |
 | 7 | `TOOL-aFusedCharter-3` | 2 | the line-length gate |
+<!-- /roster:units -->
 
 ## The order is TOTAL
 
