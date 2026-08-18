@@ -435,5 +435,5 @@ surface in §6 is sound.
   carriers; neither was checked for render parity.
 - **`memory/backlog/*.md` completeness.** Rows were read where a finding named one; the backlog was
   not swept for further rows this set supersedes, so 74, 76, 81 and 85 are a floor, not a total.
-- **Node scope.** Everything was measured on node `a`'s worktree at this HEAD. Finding 70's
+- **Node scope.** Everything was measured on node `c`'s worktree at this HEAD. Finding 70's
   credential observations are node-specific by construction and were not reproduced here.
