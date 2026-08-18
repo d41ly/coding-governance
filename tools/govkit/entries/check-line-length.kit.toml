@@ -1,0 +1,41 @@
+# kit.toml — the line-length gate, declared as data. Read by tools/govkit/.
+#
+# A FLAT entry, modelled on check-placeholders. The gate and its self-test are depth-1 paths under
+# tools/, and selfcheck reds on any such path no entry claims.
+#
+# THE DECLARATION IS NOT SHIPPED. gov's tools/line-length-limits.txt names gov's own two subjects,
+# and neither path exists in an adopter's tree — where a row naming an absent path is a stale red. So
+# an adopter would red on install day, which is the failure this gate's own fork called decisive.
+# The target authors its own declaration; a subject with no row is graded at the 450 default and says
+# so. The precedent is check-install-prefix, whose registry ships seeded empty rather than copied.
+
+id = "check-line-length"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+version_from = { none = "it grades whatever a target declares and carries no behaviour of its own to version" }
+
+[[files]]
+include = ["check-line-length.sh", "check-line-length.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the declaration is the TARGET's to author; gov seeding its own rows would red an adopter on install day"
+
+[check]
+none = """
+the gate IS the check. Its leg runs it over whatever the target declared, and a second verb wrapping that would be one more thing to keep in step
+"""
+
+[[gate_leg]]
+name = "line length"
+argv = ["bash", "{prefix}/check-line-length.sh"]
+
+[[gate_leg]]
+name = "line-length gate selftest"
+argv = ["bash", "{prefix}/check-line-length.test.sh"]
+guard = ["{prefix}/check-line-length.sh", "{prefix}/check-line-length.test.sh"]

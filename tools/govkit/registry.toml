@@ -37,6 +37,10 @@ default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memor
 
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
+id = "check-line-length"
+descriptor = "tools/govkit/entries/check-line-length.kit.toml"
+
+[[entry]]
 id = "check-microformats"
 descriptor = "tools/govkit/entries/check-microformats.kit.toml"
 
@@ -138,6 +142,10 @@ kind = "flat"
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
+
+[[exempt]]
+path = "tools/line-length-limits.txt"
+why = "gov's OWN declaration, deliberately not shipped. It names gov's two subjects, neither of which exists in an adopter tree, where a row naming an absent path is a stale red — so seeding it would red an adopter on install day. The target authors its own, and a subject with no row is graded at the 450 default."
 
 [[exempt]]
 path = "tools/lib"

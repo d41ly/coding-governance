@@ -40,6 +40,24 @@
     ]
   },
   {
+    "name": "line length",
+    "argv": [
+      "bash",
+      "tools/check-line-length.sh"
+    ]
+  },
+  {
+    "name": "line-length gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-line-length.test.sh"
+    ],
+    "guard": [
+      "tools/check-line-length.sh",
+      "tools/check-line-length.test.sh"
+    ]
+  },
+  {
     "name": "playbook parity",
     "argv": [
       "bash",

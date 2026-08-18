@@ -68,7 +68,12 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 
-- The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed build folder as the authorization and its provenance properties, the run-state file's generated and authored halves, the phase vocabulary and its witnesses, the Definition of Done and its override, the keepalive split by actor, the default directive set and its named waiver, and the landing rule. It is NOT paraphrased here — a paraphrase and its source are two answers to one question, and the paraphrase is the copy that rots.
+- The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed
+  build folder as the authorization and its provenance properties, the run-state file's generated and
+  authored halves, the phase vocabulary and its witnesses, the Definition of Done and its override,
+  the keepalive split by actor, the default directive set and its named waiver, and the landing rule.
+  It is NOT paraphrased here — a paraphrase and its source are two answers to one question, and the
+  paraphrase is the copy that rots.
 
 ## §2 — Nodes, identity & IDs
 
@@ -125,7 +130,13 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   reporting a reassuring zero; a green audit must mean the checks ran, not that nothing was reported.
 - Retrieval over the decision corpus beats grepping it: ask a question, get the records that answer
   it, ranked. It ADDS to grep rather than replacing it — a symbol, caller or filename is still a grep.
-- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps + archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`; `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+- **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT
+  `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a
+  `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps +
+  archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front
+  matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name
+  and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`;
+  `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -211,7 +222,17 @@ matched its target population.
 - Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
 - Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
-- **CONCURRENCY ≤ 5, ALWAYS, and ≤5 verify agents TOTAL — two rules, not one.** A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a harness auto-cap does NOT protect you. Concurrency bounds how many run together; the total bounds how many exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the agent count. Enforce it mechanically at the tool call rather than inside the script, where no hook reaches — the `agent-cap` hook denies a raw primitive and any fan-out over a receiver it cannot PROVE bounded, and counts direct spawns, which is the only enforcement reaching a fan-out made outside a workflow script. It resolves a bound wherever it is written and denies one it cannot resolve; an array LITERAL of ≤5 elements (the lens fan) passes unmarked, and it fires on matcher `Workflow|Agent`, the exact pair — `Workflow` alone leaves direct spawns unguarded. The marker spellings and the resolvable-bound grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
+- **CONCURRENCY ≤ 5, ALWAYS, and ≤5 verify agents TOTAL — two rules, not one.** A wide fan trips the
+  SERVER rate limiter and kills whole phases for millions of tokens; a harness auto-cap does NOT
+  protect you. Concurrency bounds how many run together; the total bounds how many exist.
+  **CONSOLIDATE before you fan out:** batching grows the batch, never the agent count. Enforce it
+  mechanically at the tool call rather than inside the script, where no hook reaches — the `agent-cap`
+  hook denies a raw primitive and any fan-out over a receiver it cannot PROVE bounded, and counts
+  direct spawns, which is the only enforcement reaching a fan-out made outside a workflow script. It
+  resolves a bound wherever it is written and denies one it cannot resolve;
+  an array LITERAL of ≤5 elements (the lens fan) passes unmarked, and it fires on matcher `Workflow|Agent`, the exact pair —
+  `Workflow` alone leaves direct spawns unguarded. The marker spellings and the resolvable-bound
+  grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
@@ -221,7 +242,11 @@ matched its target population.
 - Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
-- Structured-output schemas so a malformed return can't force full regeneration (top output-token waste): write a large body to a file and return `{path, summary}`, forward-slash paths (never hand-serialize JSON — unescaped backslashes are the top breaker); restate the required keys in EVERY loop iteration; accept-and-ignore stray keys unless a stray key is actually harmful; on a validation failure feed back only the offending field, never "regenerate everything".
+- Structured-output schemas so a malformed return can't force full regeneration (top output-token
+  waste): write a large body to a file and return `{path, summary}`, forward-slash paths (never
+  hand-serialize JSON — unescaped backslashes are the top breaker); restate the required keys in EVERY
+  loop iteration; accept-and-ignore stray keys unless a stray key is actually harmful; on a validation
+  failure feed back only the offending field, never "regenerate everything".
 
 ## §9 — Security boundaries (apply to any new write path / surface)
 
@@ -264,7 +289,14 @@ matched its target population.
 - Decide the extension pattern before the SECOND instance — so #3..#N are data + a few overrides, never new plumbing.
 - A "kind" gets a factory/base, not copies: at instance #2, extract the shared contract into a definition helper/base — per-kind map: `{{KIND_FACTORY_MAP}}`.
 - One shared core, thin adapters: business logic + authorization in a single service core; HTTP/RPC/CLI/AI surfaces are thin adapters that cannot diverge (also how authz stays consistent, §9).
-- Single source of truth → generated artifacts (§7): the catalog of a kind's instances generates the schema/validator/manifest/docs; adding an instance = one edit + a drift gate. When the ONLY consumer is same-language, prefer runtime-derivation over a committed artifact: derive the set live in the check (glob/scan or a co-located marker) and commit NOTHING — there is nothing to keep fresh and drift is structurally impossible; commit + parity-gate an artifact ONLY when a cross-language/cross-layer consumer must read it (that boundary is the artifact's whole justification), and make that parity gate compare the committed artifact against a LIVE re-derivation, never generated-vs-generated (§10).
+- Single source of truth → generated artifacts (§7): the catalog of a kind's instances generates the
+  schema/validator/manifest/docs; adding an instance = one edit + a drift gate. When the ONLY consumer
+  is same-language, prefer runtime-derivation over a committed artifact: derive the set live in the
+  check (glob/scan or a co-located marker) and commit NOTHING — there is nothing to keep fresh and
+  drift is structurally impossible; commit + parity-gate an artifact ONLY when a
+  cross-language/cross-layer consumer must read it (that boundary is the artifact's whole
+  justification), and make that parity gate compare the committed artifact against a LIVE
+  re-derivation, never generated-vs-generated (§10).
 - Promote shared widgets the instant two features need them, on a two-tier ladder: product-generic presentational primitives → the shared kit (`{{SHARED_PRIMITIVES_LOCATION}}`); app-scoped shared widgets → that app's own kit; a feature re-implementing or re-styling a primitive locally is a smell.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
@@ -315,8 +347,25 @@ matched its target population.
 - Secrets: never print a real credential in chat — say where it lives; throwaway local-dev creds may ride the access-point line.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside).
-- **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`, which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not structure — it is neither required nor forbidden, and it is not part of the keyword set.
-- **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes. No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the linkification rule below, which breaks every shape carrying a link; and a list item cannot merge with its neighbour, which the two-line `BUILD`/`SPEC` pair depends on. The definition list therefore renders byte-identically to a correct emission minus its backticks — **copy the bullet, fill the angle brackets.**
+- **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword
+  from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE
+  and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No
+  parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only
+  glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the
+  ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`,
+  which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as
+  STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation
+  `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value
+  BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so
+  the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not
+  structure — it is neither required nor forbidden, and it is not part of the keyword set.
+- **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes.
+  No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last
+  field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the
+  linkification rule below, which breaks every shape carrying a link; and a list item cannot merge
+  with its neighbour, which the two-line `BUILD`/`SPEC` pair depends on. The definition list therefore
+  renders byte-identically to a correct emission minus its backticks — **copy the bullet, fill the
+  angle brackets.**
 
 <!-- microformats -->
 - `committed — <sha> · <branch> · <subject>`
@@ -332,7 +381,13 @@ matched its target population.
 - `⏳ — <what is running>`
 <!-- /microformats -->
 
-- **`BUILD` and `SPEC` are BINDING as an adjacent ordered pair**, emitted in the state block of EVERY final message while a build is in progress. This is the one rule in this section with no routine-length escape: a reader must never have to ask which build a message belongs to. `SPEC` is omitted before a spec exists and `left` then reads `unspecced`; its link label is the unit id, never the filename. `review` and `open` are build-wide over Tier-2 units only, and the whole clause drops for a build holding none. `Tier-<n>` on `BUILD` is the tier of the unit named by the CURRENT step, not the build's maximum.
+- **`BUILD` and `SPEC` are BINDING as an adjacent ordered pair**, emitted in the state block of EVERY
+  final message while a build is in progress. This is the one rule in this section with no
+  routine-length escape: a reader must never have to ask which build a message belongs to. `SPEC` is
+  omitted before a spec exists and `left` then reads `unspecced`; its link label is the unit id, never
+  the filename. `review` and `open` are build-wide over Tier-2 units only, and the whole clause drops
+  for a build holding none. `Tier-<n>` on `BUILD` is the tier of the unit named by the CURRENT step,
+  not the build's maximum.
 - Two shapes carry an OPTIONAL final field, marked `[ · …]` above: `merged`'s post-merge gate clause, present only when the scoped gate actually ran, and `SPEC`'s open-items clause. An optional field that is not marked optional is indistinguishable from a missing one.
 - Pre-send self-check (documented check — emission has no universal machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg? **is every micro-format a bare `- ` list item with no backticks, fence or bold?** would a tired reader parse every line in one pass?
 - The discipline is measured, not vibes: keep an audit script (`{{PROSE_AUDIT}}`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.

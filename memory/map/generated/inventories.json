@@ -34,6 +34,8 @@
       "lexicon naming predicates",
       "lexicon selftest",
       "lexicon wiring",
+      "line length",
+      "line-length gate selftest",
       "manifest-check self-test",
       "marker contract",
       "memory hygiene",
