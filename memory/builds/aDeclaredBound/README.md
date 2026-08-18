@@ -43,6 +43,8 @@ loud, and an unattributed raise reds the bar.
 
 ## Units
 
+<!-- roster:units -->
+
 | id | mechanism | tier |
 |---|---|---|
 | `TOOL-aDeclaredBound-1` | check 7's two entry budgets become conf keys | 2 |
@@ -50,6 +52,8 @@ loud, and an unattributed raise reds the bar.
 | `TOOL-aDeclaredBound-3` | `_RATCHET_LOOKBACK` moves to drift-audit's PROJECT LAYER, not a conf | 2 |
 | `TOOL-aDeclaredBound-4` | agent-cap reads a declaration; lowering is free, raising is attributed | 2 |
 | `TOOL-aDeclaredBound-5` | the agent-cap number is single-sourced — prose points, never restates | 2 |
+
+<!-- /roster:units -->
 
 **Why five units for four thresholds.** Unit 5 is not extra scope; it is what makes unit 4 honest.
 The number `5` is restated across the live document surface — the charter, the README, the BINDING

@@ -15,6 +15,8 @@ branch-sha: 75a664fbeedf0e9b41bbde56194d14ee37bc018d
 branch-ref: refs/heads/branch/adeclaredbound-unattended
 anchor-kind: run-branch
 keepalive: 16f3c9e0
+keepalive-reaped: yes
+parked-surfaced: yes
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 098bebd9876c8f2f61a528b5cc9ac0a6b5d7719a
 anchor-ref: refs/heads/main
