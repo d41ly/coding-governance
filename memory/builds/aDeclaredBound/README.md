@@ -41,20 +41,6 @@ already says this about checks running under a run's own uid, and this build say
 than implying a guarantee it cannot deliver. What the design buys is: lowering is free, raising is
 loud, and an unattributed raise reds the bar.
 
-## Units
-
-<!-- roster:units -->
-
-| id | mechanism | tier |
-|---|---|---|
-| `TOOL-aDeclaredBound-1` | check 7's two entry budgets become conf keys | 2 |
-| `TOOL-aDeclaredBound-2` | `SPEC10_CUTOFF` joins its three sibling cutoffs in the conf | 2 |
-| `TOOL-aDeclaredBound-3` | `_RATCHET_LOOKBACK` moves to drift-audit's PROJECT LAYER, not a conf | 2 |
-| `TOOL-aDeclaredBound-4` | agent-cap reads a declaration; lowering is free, raising is attributed | 2 |
-| `TOOL-aDeclaredBound-5` | the agent-cap number is single-sourced — prose points, never restates | 2 |
-
-<!-- /roster:units -->
-
 **Why five units for four thresholds.** Unit 5 is not extra scope; it is what makes unit 4 honest.
 The number `5` is restated across the live document surface — the charter, the README, the BINDING
 review protocol, the byte-gated playbook template, a map dossier and the shipped kickoff skill among
@@ -119,6 +105,20 @@ the predicate rather than by reordering: unit 5 asserts the pointer SHAPE, unit 
 reads-it half in the commit that makes the hook read the declaration. Reordering would reopen the
 window unit 5 exists to close — the declaration holding a value the documents contradict, including
 a BINDING protocol an agent is instructed to obey.
+
+## Units
+
+<!-- roster:units -->
+
+| id | mechanism | tier |
+|---|---|---|
+| `TOOL-aDeclaredBound-1` | check 7's two entry budgets become conf keys | 2 |
+| `TOOL-aDeclaredBound-2` | `SPEC10_CUTOFF` joins its three sibling cutoffs in the conf | 2 |
+| `TOOL-aDeclaredBound-3` | `_RATCHET_LOOKBACK` moves to drift-audit's PROJECT LAYER, not a conf | 2 |
+| `TOOL-aDeclaredBound-4` | agent-cap reads a declaration; lowering is free, raising is attributed | 2 |
+| `TOOL-aDeclaredBound-5` | the agent-cap number is single-sourced — prose points, never restates | 2 |
+
+<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 5 unit(s) · node a · opened 2026-08-18 · streams tooling
