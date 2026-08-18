@@ -85,7 +85,7 @@ deliberately does not restate it.
 | 4 | `TOOL-aBoundedVerdict-4` | 2 | the open-questions predicate, in both readers |
 | 5 | `TOOL-aBoundedVerdict-5` | 2 | a park verb |
 | 6 | `TOOL-aBoundedVerdict-2` | 2 | the halt code and verdict vocabularies |
-| 7 | `TOOL-aBoundedVerdict-1` | 2 | the review loop's convergence rule |
+| 7 | `TOOL-aBoundedVerdict-1` | 2 | the review loop's convergence rule and the promotion disposition |
 | 8 | `TOOL-aBoundedVerdict-14` | 2 | fold-scoped review rounds |
 | 9 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
 | 10 | *(id minted with its spec)* | 1 | close-path writes are staged and guarded |
@@ -247,7 +247,7 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-6 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-4 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
