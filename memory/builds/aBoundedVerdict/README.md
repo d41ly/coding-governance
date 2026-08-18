@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16
+ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19
 ---
 
 # aBoundedVerdict — an unattended run stops reviewing, stops stalling, and says why it stopped
@@ -90,9 +90,9 @@ deliberately does not restate it.
 | 9 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
 | 10 | `TOOL-aBoundedVerdict-15` | 1 | close-path writes are staged and guarded |
 | 11 | `TOOL-aBoundedVerdict-16` | 2 | the closing-review join: a diff-review, in range |
-| 12 | *(id minted with its spec)* | 2 | authorization survives a split fetch/push URL |
-| 13 | *(id minted with its spec)* | 1 | the two vacuous checks get subjects |
-| 14 | *(id minted with its spec)* | 1 | the protocol pair says what the code does |
+| 12 | `TOOL-aBoundedVerdict-17` | 2 | authorization survives a split fetch/push URL |
+| 13 | `TOOL-aBoundedVerdict-18` | 1 | the two vacuous checks get subjects |
+| 14 | `TOOL-aBoundedVerdict-19` | 1 | the protocol pair says what the code does |
 
 *An id appears here only once a conforming spec defines it — hygiene check 14 refuses a cited
 id nothing defines, which is the mechanical form of the method's "never build a MISSING unit".*
@@ -241,9 +241,9 @@ frozen where its subject can write it is `memory/gotchas/inputs-inside-the-subje
 authority stays the BASE blob, re-derived through git by both the driver and the leg.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-08-16 · streams tooling
+**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
-ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16
+ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -258,6 +258,9 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL
 | [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | SPECCED | rev-1 | 2026-08-19 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 
@@ -269,9 +272,9 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
 | [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
 
-Ids no record names: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16.
+Ids no record names: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19.
 
-Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16.
+Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -298,6 +301,9 @@ Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBounded
   - [2026-08-19-spec-TOOL-aBoundedVerdict-14.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md)
   - [2026-08-19-spec-TOOL-aBoundedVerdict-15.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md)
   - [2026-08-19-spec-TOOL-aBoundedVerdict-16.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-17.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-18.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-19.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md)
 - **`build/`**
   - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
   - [2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md)
