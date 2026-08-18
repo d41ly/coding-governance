@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-17
 streams: tooling
 roster: TOOL
-ids: TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3
+ids: TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxedShard-4
 ---
 
 # aRelaxedShard — the backlog budget stops being something rotation can pay
@@ -66,10 +66,14 @@ Three separate problems, not one.
 
 ## The unit set
 
-Classification per the build method, written before acting: unit 1 was **MISSING**, was authored this
-run, was audited at M4 twice, and is **READY** at rev-6. Every fork is resolved — F1, F3 and F5 ratified by
-the owner, F2 and F4 built on recommendations put to the owner and not overruled — and both audit rounds
-are folded, so building is the next pass.
+Two units. **`TOOL-aRelaxedShard-1` is BUILT and not landed**, at rev-7 and `INPROGRESS`: authored here,
+audited at M4 twice, both rounds folded, regrounded onto the default branch, then built and gate-verified.
+Its five forks are resolved — F1, F3 and F5 ratified by the owner; F2 and F4 built on recommendations put
+to the owner and not overruled. It stays `INPROGRESS` rather than `CLOSED` for two honest reasons: it is
+not landed, and F4's recommended fixture was never scoped and is not built.
+
+**`TOOL-aRelaxedShard-4` is the re-shape, authored 2026-08-18 and unreviewed.** It is the unit the owner
+sequenced second, and its own measurement turned both mechanisms it was sequenced FOR into non-goals.
 
 Both rounds are recorded under `reviews/`, and each owns its own shape measurements and finding list.
 Round 1 returned **BLOCKED** on 21 distinct defects; rev-2 is its fold. Its blocker RESCOPED the unit and
@@ -79,14 +83,23 @@ returned **CLEAN WITH FIXES** on 17 distinct defects with no blocker; rev-6 is i
 plainly that round 3 is not warranted because building is now the stricter test. Its sharpest finding was
 that two of the three arms rev-5 added to prevent a vacuous fixture were themselves vacuous.
 
-The owner sequenced two units. Unit 1 is the knob and the correction. The second is the re-shape —
-sharding a backlog below `FAMILY`, or a spill tier like the run-state file's — and its id is minted when
-its spec is authored rather than reserved here, so that nothing in this folder cites an id check 14
-would call an orphan.
+### What unit 2 found, and why it is not what it was sequenced to be
 
-The honest limit of unit 1, stated here because it is the thing an overview must not oversell: no byte
-cap compatible with a readable file buys a quarter of runway at this minting rate. Unit 1 buys weeks.
-The re-shape is what changes the slope, which is why the owner put it second rather than instead.
+Unit 1 bought about 24 days. Unit 2 was meant to shard the backlog below `FAMILY` or give it a spill tier.
+Measured first, both are the wrong shape:
+
+- **Minting runs 17.3 ids/day against closure at 10.6**, so the live set grows +6.7 rows/day, about
+  1,700 B/day, monotonically. A shard relocates that, a spill hides it, a bigger cap postpones it. Only
+  minting less or closing more changes the slope, and neither is a file layout.
+- **53 of the 82 rows name no kit at all.** Sharding by kit would put 65% in a catch-all and the largest
+  real cluster is 11% — one file with the same problem plus nine small ones.
+- **A spill tier is blocked on unit 1's F4**, the untested claim that rotating a backlog orphans the ids
+  its moved rows defined. Two units now depend on that answer and it has been carried on a reading since
+  2026-08-14.
+
+So `-4` proposes the smallest thing that acts on the real variable: build F4's fixture, and add a
+per-shard live-row drain signal against a shrink-only pin, so the growth becomes a decision rather than a
+discovery. Its §8 asks whether to build even that on 24 days of runway.
 
 ## Owner decision menu
 
@@ -134,12 +147,13 @@ are in this unit's prose sweep anyway, so S16 corrects the attribution while it 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-17 · streams tooling
-ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-17 · streams tooling
+ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxedShard-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | INPROGRESS | rev-7 | 2026-08-17 |
+| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-1 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
@@ -147,6 +161,10 @@ Records live under `spec/` and `reviews/`.
 |---|---|---|
 | [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md) | spec-audit | TOOL-aRelaxedShard-1 |
 | [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md) | spec-audit | TOOL-aRelaxedShard-1 |
+
+Ids no record names: TOOL-aRelaxedShard-4.
+
+Ids no `spec-audit` record has ever named: TOOL-aRelaxedShard-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -163,6 +181,7 @@ Records live under `spec/` and `reviews/`.
 
 - **`spec/`**
   - [2026-08-17-spec-TOOL-aRelaxedShard-1.md](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md)
+  - [2026-08-18-spec-TOOL-aRelaxedShard-4.md](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md)
 - **`reviews/`**
   - [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md)
   - [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md)
