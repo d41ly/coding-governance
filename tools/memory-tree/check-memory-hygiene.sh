@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.22   # gov:kit memory-tree@2.22 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.23   # gov:kit memory-tree@2.23 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -24,6 +24,14 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+# The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
+# that can be absent, so blank turns each of them off; this one SELECTS between two section canons
+# and check 12 must pick one for every spec it grades. An empty string compares earlier than every
+# date, so a blank declaration would silently demand the ten-section canon of every grandfathered
+# spec in the tree — which is the one thing the cutoff mechanism exists to prevent. Blank therefore
+# resolves FORWARD to this value, below the conf source (TOOL-aDeclaredBound-2).
+SPEC10_CUTOFF="2026-08-04"  # date; specs dated >= this take the TEN-section canon (check 12)
+_SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback below needs no second literal
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -43,6 +51,7 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 # the awk build and the ambient locale, which check 7 deliberately does not pin.
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
+: "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
 # the sibling classifier that asks this script for the index set gets a non-zero exit it turns into
 # its own named refusal rather than a set derived under a conf this script would not accept. This is
@@ -670,7 +679,11 @@ SPEC_CANON='## 1. Goal
 # §10 is date-gated exactly as the section canon itself is: a spec dated before SPEC10_CUTOFF keeps
 # the nine-section shape, so adopting reuse-audit never retroactively reds a landed spec. The kit
 # already ships tools/codebase-map/reuse_lookup.py; this is the check that makes anyone use it.
-SPEC10_CUTOFF="${SPEC10_CUTOFF:-2026-08-04}"
+# The DECLARATION moved up beside its three sibling cutoffs (TOOL-aDeclaredBound-2). It used to sit
+# here as `${SPEC10_CUTOFF:-<date>}`, which read the ENVIRONMENT after the conf had been sourced —
+# two channels for one value, and the only cutoff of the four with an env form. That form is
+# RETIRED: a conf declaration always won anyway, and an env override that outranks a committed
+# declaration leaves no diff behind.
 SPEC_CANON10="$SPEC_CANON
 ## 10. Reuse audit"
 # ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run

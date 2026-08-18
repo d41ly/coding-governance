@@ -1267,6 +1267,60 @@ for _k in $_engkeys READ_PATH_HEADROOM; do
   grep -qE "^$_k=" "$EX" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
 done
 
+# ---- SPEC10_CUTOFF is a CONF DECLARATION, and the environment no longer reaches it
+# ---- (TOOL-aDeclaredBound-2). Four runs over ONE nine-section spec dated 2026-08-01, which is
+# ---- BEFORE the shipped 2026-08-04: absent, declared-early, declared-blank, and hostile-env.
+# ---- The declared-early run is the only one that may speak, and it is what proves the other three
+# ---- are silent because the value said so rather than because check 12 was asleep.
+S10=$TMP/spec10
+mkdir -p "$S10"
+s10conf() {
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > "$S10/.memory-tree.conf"
+  [ -n "$1" ] && printf '%b' "$1" >> "$S10/.memory-tree.conf"
+  return 0
+}
+( cd "$S10" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  mkdir -p memory/builds/tTen/spec memory/backlog memory/project
+  printf '# r\n' > memory/README.md
+  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  printf -- '---\nslug: tTen\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tTen-1\n---\n\n# tTen\n' > memory/builds/tTen/README.md
+  { printf '# ARCH-tTen-1 — fixture\n\n**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n\n'
+    for h in '1. Goal' '2. Scope (IN)' '3. Non-goals (OUT)' '4. Design' '5. Production-readiness checklist' \
+             '6. Acceptance criteria' '7. Gates' '8. Open questions'; do
+      printf '## %s\n\nbody.\n\n' "$h"
+    done
+    # §9 carries the header's rev or check 12 reds for a reason that has nothing to do with the
+    # section canon — which is how the first cut of these arms measured the wrong thing three times.
+    printf '## 9. Revision log
+
+- rev-1 · 2026-08-01 · initial draft.
+'; } > memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md
+  git add -A && git commit -q -m ten --no-verify )
+
+# --- ABSENT: the shipped date applies, the spec predates it, the nine-section canon is enough.
+s10conf ''
+out=$(cd "$S10" && bash "$SCRIPT" 2>/dev/null)
+cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
+
+# --- DECLARED EARLIER than the spec: the ten-section canon is demanded and check 12 says so. This
+# --- arm is the one that can speak, so it is what makes the three silences mean something.
+s10conf 'SPEC10_CUTOFF="2026-07-01"\n'
+out=$(cd "$S10" && bash "$SCRIPT" 2>/dev/null)
+chit 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
+
+# --- DECLARED BLANK: resolves FORWARD to the shipped date, never to "off" and never to an empty
+# --- string that compares earlier than every date. Identical verdict to absent.
+s10conf 'SPEC10_CUTOFF=""\n'
+out=$(cd "$S10" && bash "$SCRIPT" 2>/dev/null)
+cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
+
+# --- HOSTILE ENV with nothing declared: the retired channel has no effect. Before this unit the
+# --- engine read `${SPEC10_CUTOFF:-<date>}` AFTER sourcing the conf, so this exact value would have
+# --- demanded the ten-section canon here and reds 13 grandfathered specs in the real corpus.
+s10conf ''
+out=$(cd "$S10" && SPEC10_CUTOFF=1999-01-01 bash "$SCRIPT" 2>/dev/null)
+cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -1301,7 +1355,7 @@ for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES BUILD_README_CAP_BYTES
     || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k"; st=1; }
 done
 
-FLOOR_ASSERTIONS=225
+FLOOR_ASSERTIONS=229
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

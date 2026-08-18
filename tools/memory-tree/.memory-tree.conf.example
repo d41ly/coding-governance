@@ -37,6 +37,11 @@ STREAMS_CUTOFF=""
 # Acceptance-witness ratchet (check 12): specs dated >= this must give every acceptance bullet a
 # backticked token. Set it AHEAD of your corpus so nothing lands retroactively red. Blank = off.
 SPEC_WITNESS_CUTOFF=""
+# The fourth cutoff, and the only one that ships WITH a value: it SELECTS between two spec section
+# canons rather than switching a rule on, so check 12 must pick one for every spec. Blank resolves
+# FORWARD to the kit's date rather than turning anything off. Raise it to grandfather more of your
+# corpus; lower it to ratchet an existing corpus toward the ten-section canon.
+SPEC10_CUTOFF="2026-08-04"
 
 # The document a session is pointed at before it touches code; check 16 derives the mandatory read
 # path from it. Usually AGENTS.md or CLAUDE.md.
