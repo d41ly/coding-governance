@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-2 — every session emits a shaped overview of its own state, and the shapes get one grammar
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -19,6 +19,13 @@ markdown-link syntax. No colon as a joiner or a label — a colon survives only 
 port. Placeholders are lowercase angle-bracket names. The grammar binds shape SYNTAX and never value
 BYTES: an opaque field such as a commit subject or a reason keeps whatever characters it has, so the
 bans do not reach inside one.
+
+**A deploy-time placeholder token inside a shape is a VALUE, not structure.** Two definition lines
+carry `{{DEFAULT_BRANCH}}`, and `TOOL-aFusedCharter-2` grades the UN-rendered ruleset, which keeps
+its placeholders permanently by design. S1's placeholder clause is about angle-bracket names, so a
+brace token is outside it: the gate neither requires nor forbids one, and it is not part of the
+derived keyword set. Saying so costs one sentence and removes the only reading under which the gate
+silently treats a deploy-time token as a malformed field.
 
 **The pinned glyph set is enumerated with its code points, and `TOOL-aFusedCharter-2` derives it from
 this enumeration rather than from a list in the gate.** An earlier draft said "five glyphs are
@@ -59,12 +66,25 @@ than unenforced. `committed` puts two fields ahead of the joiner. `pushed` carri
 `skipped` and `READY` use a colon as a label. `up` separates a credential with a slash. `gates GREEN`
 splits its keyword across the head.
 
-Three more violations an earlier draft's dispositions did not reach, each found by the spec audit and
-each fatal to a shape the gate would then have to grade: `merged` carries **no joiner at all** and a
-disposition touching only its trailing gate clause leaves it ungradeable; `⏳` keeps a field ahead of
-the joiner after its parenthetical drops, which is the same defect S4 already names for `committed`;
-and `READY` carries a bare unbracketed tier token that the placeholder rule does not admit, while its
-stated disposition addresses only the colon. `§4`'s Data model carries one row per shape with the
+Three violations round 1 found: `merged` carries **no joiner at all** and a disposition touching
+only its trailing gate clause leaves it ungradeable; `⏳` keeps a field ahead of the joiner after its
+parenthetical drops, the same defect S4 already names for `committed`; and `READY` carries a bare
+unbracketed tier token the placeholder rule does not admit while its disposition addresses only the
+colon.
+
+Round 2 found four MORE, by grading each rewritten shape against this spec's own bar rather than
+against its prose: `pushed` also carries **no joiner at all**, and its row addressed only the
+parenthetical, so the result still fails both the joiner-count and joiner-position predicates;
+`up` keeps a parenthesised field that S1 bans and the gate grades separately, while its row addressed
+only the credential slash; `unchanged` keeps a colon LABEL that S1 bans, while its row said only that
+the head becomes a bare keyword; and `skipped`'s row — colon label becomes the joiner — yields a
+second em dash on a line that already has one, failing the count predicate. `gates GREEN`'s two-word
+head is named as a violation in this scope item's prose and was disposed of nowhere.
+
+Every one of those would have been executed faithfully by a builder and reported red by
+`TOOL-aFusedCharter-2` on its first run, against a spec that says its first run is green. The
+Data model's table is therefore the contract, and a shape whose row does not make it gradeable is a
+defect in this spec rather than a judgement call at build time. `§4`'s Data model carries one row per shape with the
 complete change, and a shape whose row does not make it gradeable is a defect in this spec rather
 than a judgement call at build time.
 
@@ -124,13 +144,13 @@ line inside the block.
 | Shape | Disposition | What changes |
 |---|---|---|
 | `committed` | rewritten | fields move behind the joiner |
-| `pushed` | rewritten | the parenthetical becomes two separated fields |
+| `pushed` | rewritten | it carries NO joiner today — one is introduced and the head-adjacent fields move behind it; the parenthetical becomes two separated fields |
 | `merged` | rewritten | it carries NO joiner today — one is introduced, and the trailing gate clause becomes an optional separated field |
-| `gates GREEN` | rewritten | the leg list becomes separated fields |
-| `skipped` | SPLIT off `gates GREEN`, rewritten | it already sits in the block, glued to another shape's line; the colon label becomes the joiner |
-| `up` | rewritten | the slash before a credential becomes a separator |
+| `gates GREEN` | rewritten | the two-word head becomes one keyword with the status as a tail field, and the leg list becomes separated fields |
+| `skipped` | SPLIT off `gates GREEN`, rewritten | it already sits in the block glued to another shape's line; the colon label becomes the joiner AND the pre-existing trailing em dash becomes the separator, so the line carries exactly one joiner |
+| `up` | rewritten | the slash before a credential becomes a separator, AND the parenthesised tree field becomes a separated one |
 | `READY` | rewritten | the colon before the gate list becomes a separator, and the bare tier token becomes a bracketed placeholder |
-| `unchanged` | moved in, rewritten | the head becomes a bare keyword |
+| `unchanged` | moved in, rewritten | the head becomes a bare keyword AND the `delta:` colon label becomes a separated field |
 | `⏳` | rewritten | the estimate parenthetical drops AND the remaining field moves behind the joiner, which the drop alone does not do |
 | `BUILD` | NEW | S3 |
 | `SPEC` | NEW | S3 |
@@ -228,6 +248,12 @@ none — the fork below is RESOLVED and recorded in the build README.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft, written after the owner resolved F1 at kickoff.
+- rev-3 · 2026-08-18 · folded the round-2 spec audit. Four more shapes were still ungradeable after
+  their stated dispositions — `pushed` carries no joiner at all, `up` keeps a parenthesised field,
+  `unchanged` keeps a colon label, and `skipped`'s rewrite yielded two joiners — and `gates GREEN`'s
+  two-word head had no disposition at all. Every row now carries the complete change. S1 gains one
+  sentence admitting a deploy-time brace token inside a shape as a value rather than structure,
+  which the gate's subject makes unavoidable.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. S1 enumerates the five pinned glyphs and separates
   the ASCII alternation glyph, new S8 fences the definition list because the gate can key on neither
   a heading nor a column-zero marker, S4 gains the three incomplete dispositions the audit measured,

@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -67,18 +67,36 @@ and no longer fenced at all. The rationale is rewritten to the surviving categor
 what protects a long shape definition if one ever appears: nothing does, and the longest today is
 about 110 characters, so the exposure is named rather than covered.
 
-**S6 — Wrap the offenders this build creates, against a CHARACTER measurement.** At BASE, measured
-in characters after stripping carriage returns: the charter has 8 lines over 450, worst 1 047; the
-ruleset has **4**, worst 1 474; the companion has 8, worst 897. An earlier revision said five in the
-ruleset and cited 1 051 and 1 499 — those are byte figures, and one ruleset line measures 462 bytes
-but 449 characters, so it is already compliant and wrapping it would have been work against a number
-rather than against the rule. Those files are rewritten by `PLAY-aFusedCharter-1`, `-2` and `-3`, and
-this unit lands last precisely so it grades their output. Wrapping is not a content change: a wrapped
-line is still one rule, which the ruleset's own preamble states.
+**S6 — Wrap the offenders this build creates, against a CHARACTER measurement, and NEVER inside the
+rendered region.** At BASE, measured in characters after stripping carriage returns: the charter has
+8 lines over 450, worst 1 047; the ruleset has **4**, worst 1 474; the companion has 8, worst 897. An
+earlier revision said five in the ruleset and cited 1 051 and 1 499 — those are byte figures, and one
+ruleset line measures 462 bytes but 449 characters, so it is already compliant and wrapping it would
+have been work against a number rather than against the rule. Those files are rewritten by
+`PLAY-aFusedCharter-1`, `-2` and `-3`, and this unit lands last precisely so it grades their output.
+Wrapping is not a content change: a wrapped line is still one rule, which the ruleset's own preamble
+states.
 
-**S7 — A sibling self-test, and TWO manifest rows.** The gate row is unguarded or guarded on its
-subject paths — a guard naming only the gate and its test would skip the gate on exactly the diffs
-that rewrite a subject file — and the self-test row is guarded on the gate plus its test. The suite
+**Every one of the charter's eight long lines is inside the section `PLAY-aFusedCharter-3` S3
+deletes.** Measured: all eight sit in the gate-suite section. So by the time this unit runs, the
+charter's long lines are whatever the RENDERED REGION brings, and a hand-wrap inside that region is
+deleted by the next render and reds `bash tools/playbook/adopt-playbook.sh --check` in the meantime.
+The act is: wrap in the ruleset, re-render the charter, re-measure. This unit never edits a byte
+between the region markers.
+
+**Two literals inside the ruleset's longest line must survive the wrap.** That line is the
+concurrency bullet — 1 474 characters, this unit's primary target — and it is the single line both of
+`check-playbook-parity.sh`'s value-parity extractions match. `PLAY-aFusedCharter-1` S7 keeps them
+there deliberately; a wrap that splits either one across a newline makes its extraction match nothing
+and the gate reds on its own anti-vacuity arm. Wrap around them, and prove it by running that gate
+rather than by reading the line.
+
+**S7 — A sibling self-test, and TWO manifest rows.** The gate row is UNGUARDED. A guard naming only
+the gate and its test would skip the gate on exactly the diffs that rewrite a subject file, and
+"guarded on its subject paths" — offered as an equal alternative by an earlier revision — reds
+`govkit selfcheck`: its guard-class arm requires every pathspec to land in exactly one declared
+class, and a repo-root product file lands in none. The self-test row is guarded on the gate plus its
+test. The suite
 satisfies all three parts of the assertion-count contract: an anchored pass line carrying the count, a
 non-zero literal floor, and a reference proving the two meet. The gate, its test and the declaration
 are depth-1 paths under `tools/`, so they need a registry route: a new flat entry with
@@ -100,11 +118,18 @@ decisive. Both precedents in this tree cut the other way: `check-method-carriers
 and has the adopter's seeded from their own measured population, and `template-size-limits.txt` is a
 deployer EXEMPTION rather than a shipped seed.
 
-So the adopter writes the declaration from what it finds: it resolves the canonical instruction file
-the way the agent-instructions kit does, seeds one row for it at the default, and stops. A target with
-no row is graded at the default and says so, which S7 already arms. `WIRE-INTO-PROJECT.md` states the
-one thing an adopter needs: the default is 450, the declaration is where you change it, and the row
-is keyed by YOUR charter's path, which may not be named `AGENTS.md`.
+So the target AUTHORS its own declaration and gov seeds nothing — the `check-install-prefix`
+precedent, whose descriptor ships its registry as `generated`, "seeded empty rather than copied", with
+a reason recording that gov never seeds the target's registry. An earlier revision said "the adopter
+writes the declaration from what it finds", which named an actor that does not exist: this kit has no
+adopter script, Scope and Files touched create none, and the entry shape S7 copies declares
+`argv = []`. Rather than add an adopter for one row, the row is the target's to write, and a target
+with no row is graded at the default and says so — which S7 already arms.
+
+`WIRE-INTO-PROJECT.md` states the three things an adopter needs: the default is 450, the declaration
+is where you change it, and the row is keyed by YOUR charter's path, which may not be named
+`AGENTS.md`. The sibling `check-testsuite-counts` entry words the same instruction as "seeded by
+running the leg once and pasting what it names", and this one follows it.
 
 ## 3. Non-goals (OUT)
 
@@ -132,17 +157,15 @@ after a corrupt record reached an arithmetic expansion and died with an unbound-
 
 ### Inventory
 
-Measured at BASE with an awk pass over character length.
+**The offender population is stated once, in S6, and deliberately not repeated here.** An earlier
+revision carried a table whose caption claimed a character measurement while its rows held BYTE
+figures — 8/1 051 for the charter and 5/1 499 for the ruleset — which are the very numbers S6 was
+rewritten to correct, one screen apart in the same document. Two carriers for one measurement is the
+defect this whole build exists to remove, committed inside it.
 
-| Subject | Lines over 450 | Longest |
-|---|---|---|
-| the charter | 8 | 1 051 |
-| the ruleset | 5 | 1 499 |
-| the domain companion | 8 | — |
-
-The companion is not in the population because it ceases to exist. Its eight offenders become the
-ruleset's when `PLAY-aFusedCharter-1` folds it in, which is why S6's wrapping is sized against the
-converged file rather than against these two rows.
+The one fact that is not in S6: the companion is not in the population because it ceases to exist,
+and its eight offenders become the ruleset's when `PLAY-aFusedCharter-1` folds it in — which is why
+S6 sizes its work against the converged file rather than against any BASE-time row.
 
 ### Rollout
 
@@ -223,12 +246,22 @@ gate-leg keys, plus the wrapping in the two subject files.
   `tools/gate-legs.json`.
 - **AC13** — When `bash tools/check-testsuite-counts.sh` runs, the new suite is compliant on all
   three requirements with a non-zero floor equal to its measured arm count.
+- **AC14** — When S6's wrapping is complete, `bash tools/check-template-size.sh AGENTS.md` exits 0
+  against the ceiling `PLAY-aFusedCharter-3` S8 declared, and `bash tools/check-template-size.sh`
+  with no argument exits 0 against the ruleset's. This unit is the last to touch either file, so it
+  is the last chance to observe that S8's headroom actually absorbed the wrapping.
+- **AC15** — When S6 has wrapped the ruleset's longest line,
+  `bash tools/check-playbook-parity.sh` exits 0 — proving both value-parity extractions still match
+  after the wrap, which is the failure a wrap through either literal would cause.
 
 ## 7. Gates
 
 `run-gates canary` · `testsuite counts` and its self-test · `govkit selfcheck` and `govkit selftest` ·
 `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `harness arms` ·
-`template size <=48KiB` (S0 moves its high-water record) · the two new rows · the full bar.
+`template size <=48KiB` (S0 moves its high-water record, and S6's wrapping is re-measured against
+both declared subjects) · `playbook parity` (S6 wraps the line both its value-parity extractions
+match) · `playbook render wiring` (S6 must not wrap inside the rendered region) · the two new rows ·
+the full bar.
 
 ## 8. Open questions
 
@@ -249,6 +282,14 @@ none — the forks below are RESOLVED.
 
 - rev-1 · 2026-08-18 · initial draft. The offender counts are measured, and the companion's eight
   are noted as migrating into the ruleset rather than disappearing.
+- rev-3 · 2026-08-18 · folded the round-2 spec audit. S6 gains its two hard constraints: every one
+  of the charter's eight long lines sits inside the section `PLAY-aFusedCharter-3` deletes, so the
+  act is wrap-in-the-ruleset-and-re-render rather than edit-in-place; and the ruleset's longest line
+  is the one both parity extractions match, so a wrap through either literal reds that gate. S8 stops
+  naming an adopter this kit does not have and makes the declaration target-authored on the
+  `check-install-prefix` precedent. S7's guard alternative is deleted for redding `govkit selfcheck`.
+  The Inventory table is removed for duplicating and contradicting S6, §10 stops asserting the reuse
+  S5 refutes, and three ACs are added including the post-wrap ceiling re-measure.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. New S0 performs the size high-water `--bump` no unit
   owned; S8 stops shipping gov's declaration rows into adopter trees and seeds from the adopter's own
   tree instead; S6's offender figures are restated in CHARACTERS, which drops one ruleset line that
@@ -263,8 +304,11 @@ routes to `tools/check-template-size.sh` and `tools/template-size-limits.txt`, w
 order, keying discipline, named non-numeric failure and comment grammar this unit copies wholesale.
 That is the seam: the same problem shape already has a solved answer in this tree, and the only
 reason this is a second script rather than a mode of the first is stated in `§4`. The fence machine
-is reused from `check-memory-hygiene.sh`'s unfenced scanner rather than rewritten, since a second
-fence parser is a second thing to drift.
+is NOT reused: S5 measured that it is a private shell function nothing exports,
+that its own script already carries four inline copies, and that sourcing it across kits is forbidden
+here — so this gate writes a sixth copy and follows the precedent that keeps such copies honest, one
+shared case table with agreement proven across implementations. An earlier revision of this paragraph
+asserted the reuse S5 refutes.
 
 Recall terms used: `line length limit declared subject environment precedence charter instruction
 file adopter conf knob fence table character byte normalise`. The binding prior record is

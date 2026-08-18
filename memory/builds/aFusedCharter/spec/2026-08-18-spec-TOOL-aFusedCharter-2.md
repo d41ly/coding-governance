@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -68,8 +68,13 @@ An earlier revision said "one row with a guard naming the gate and its test", wh
 guard naming only the gate and its test SKIPS the gate on exactly the diffs that rewrite the
 micro-format block — the diffs it exists for. And the self-test got no row at all, so nothing ran it.
 Measured on the live manifest: every playbook-grading gate carries no guard, and only the self-test
-rows are guarded. So: the gate row is UNGUARDED (or guarded on the ruleset path), and the self-test
-row is guarded on the gate plus its test. `tools/govkit/entries/check-placeholders.kit.toml` is the
+rows are guarded. So: the gate row is UNGUARDED — **not "or guarded on the ruleset path", which an
+earlier revision offered as an equal alternative and which reds `govkit selfcheck`.** That gate's
+guard-class arm requires every guard pathspec to land in exactly one declared class, and a repo-root
+product file matches none of them: the converged ruleset is claimed by an entry's file rule rather
+than by an exemption prefix, so the class set comes back empty and the arm fails. All 27 distinct
+guards on the live manifest sit under `memory/`, `tools/`, `.githooks/`, `.claude/` or the kickoff
+tree. The self-test row is guarded on the gate plus its test. `tools/govkit/entries/check-placeholders.kit.toml` is the
 exact two-row shape to copy.
 
 **The assertion-count contract is three things, not one.** `check-testsuite-counts.sh` requires an
@@ -113,14 +118,19 @@ line, the clause it violated, and the offending substring. Its exit codes follow
 convention: 0 clean, 1 an offender, 2 could-not-run — and could-not-run is a NAMED failure rather
 than a silent zero, because a gate that cannot find its block would otherwise report a clean set.
 
-The `could not find the block` case is the one most likely to go wrong in practice, since it fires
-when someone renames a heading, and it must be loud. It is one of S5's arms.
+The `could not find the block` case is the one most likely to go wrong in practice, and it fires on
+the FENCE rather than on a heading: the pair removed, one side unclosed, or a duplicate pair in the
+file. An earlier revision described it as a renamed heading, which S1 had already established does
+not exist. It must be loud, and it is one of S5's arms.
 
 ### Migration
 
 None. The gate lands after `PLAY-aFusedCharter-2` has already brought every shape into compliance,
 so its first real run is green — which is exactly why S5's fixtures are the evidence it works, not
-that run.
+that run. **That greenness is a dependency, not a property.** Round 2 measured seven shapes whose
+dispositions did not make them gradeable; `PLAY-aFusedCharter-2` rev-3 completes them, and if any
+row is still incomplete when this unit lands, this gate reds on work a builder performed faithfully.
+The build order puts that unit three passes earlier for this reason.
 
 ### Alternatives rejected
 
@@ -168,8 +178,10 @@ key, and an unclaimed one reds `codebase-map coverage + freshness`.
   markdown link, it does not.
 - **AC4** — When a definition line uses a colon as a label, `bash tools/check-microformats.sh`
   exits 1; when a line carries a colon glued to a port value such as `:3200`, it does not.
-- **AC5** — When the block's heading is renamed so the anchor misses,
-  `bash tools/check-microformats.sh` exits 2 with a message naming the missing block — not 0.
+- **AC5** — When the fence pair is removed, left unclosed, or duplicated,
+  `bash tools/check-microformats.sh` exits 2 naming which of the three it found — not 0. The anchor
+  is the fence and not a heading, so all three are constructible arms; an earlier revision named a
+  renamed heading, which the section does not have.
 - **AC6** — When the extraction is broken so the derived keyword set is empty,
   `bash tools/check-microformats.sh` reds naming the frozen sentinel rather than grading cleanly.
 - **AC7** — When `bash tools/check-microformats.test.sh` runs it exits 0 and prints an executed
@@ -205,6 +217,11 @@ none — the fork below is RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · folded the round-2 spec audit. The "or guarded on the ruleset path"
+  alternative is deleted — it reds `govkit selfcheck`'s guard-class arm, because a repo-root product
+  file lands in no declared class. AC5 and the Data model stop keying on a heading rev-2 had already
+  established does not exist, and name the three fence failures instead. Migration records that this
+  gate's green first run is a dependency on `PLAY-aFusedCharter-2`'s completed dispositions.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. The gate keys on a fence rather than a heading the
   section does not have, S1a names its subject path now that the ruleset and the charter are two
   files, S2 gains a joiner-POSITION predicate and derives the glyph set from the ruleset's new

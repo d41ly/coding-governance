@@ -60,9 +60,11 @@ the last unit to touch the file.
 ## The four cuts, and the test each failed
 
 The admission test is the owner's: does this instruction shape an OVERALL session, regardless of
-project? Content that fails it leaves the ruleset.
+project? Content that fails it leaves the ruleset. Sizes below are CHARACTERS, like every other
+section inventory in this build — the size ceiling is in BYTES and the two differ by about one per
+cent over this corpus.
 
-| Cut | Bytes | Why it fails the test |
+| Cut | Characters | Why it fails the test |
 |---|---|---|
 | `§4` Runtime isolation and the verification harness | 1 950 | Port offsets, seeded databases and a UI harness recipe. It governs standing up a local stack, which most repos do not have. |
 | `§10`'s 25 recurring bug classes | 7 752 | A hand-kept generic list, half of it web and database specific. The mechanism that actually works is per-project and diff-scoped, and this repo already ships it. |
@@ -176,13 +178,13 @@ ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCh
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-4 | 2026-08-18 |
-| [PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session](spec/2026-08-18-spec-PLAY-aFusedCharter-1.md) | OPEN | rev-2 | 2026-08-18 |
-| [PLAY-aFusedCharter-2 — every session emits a shaped overview of its own state, and the shapes get one grammar](spec/2026-08-18-spec-PLAY-aFusedCharter-2.md) | OPEN | rev-2 | 2026-08-18 |
-| [PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest](spec/2026-08-18-spec-PLAY-aFusedCharter-3.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md) | OPEN | rev-2 | 2026-08-18 |
+| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-5 | 2026-08-18 |
+| [PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session](spec/2026-08-18-spec-PLAY-aFusedCharter-1.md) | OPEN | rev-3 | 2026-08-18 |
+| [PLAY-aFusedCharter-2 — every session emits a shaped overview of its own state, and the shapes get one grammar](spec/2026-08-18-spec-PLAY-aFusedCharter-2.md) | OPEN | rev-3 | 2026-08-18 |
+| [PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest](spec/2026-08-18-spec-PLAY-aFusedCharter-3.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md) | OPEN | rev-3 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 

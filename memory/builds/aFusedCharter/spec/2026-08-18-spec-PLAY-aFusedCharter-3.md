@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -11,9 +11,14 @@ read from the manifest.
 
 ## 2. Scope (IN)
 
-**S1 — Render this repo's own charter.** Write `.governance/deploy.toml` for this repo with its own
-answers, run `bash tools/playbook/adopt-playbook.sh`, and land the resulting `gov:playbook` region in
-`AGENTS.md`. This is the dogfood: the first real target of `DEPL-aFusedCharter-1` is this repo, and a
+**S1 — Render this repo's own charter, over the FULL kit selection.** Write `.governance/deploy.toml`
+for this repo, run `bash tools/playbook/adopt-playbook.sh`, and land the resulting `gov:playbook`
+region in `AGENTS.md`. The descriptor names every kit this repo actually carries, not
+`[selection] default` — that default is five entries against gov's thirteen tracked kit dirs, so a
+default intake would drop the unattended, drift-audit, lexicon and agent-cap blocks out of gov's own
+charter while gov's bar goes on enforcing exactly those rules. It also writes an EMPTY `drop_blocks`,
+because both fenceable project-property blocks apply here: this fleet is multi-OS and the security
+section's surface exists. This is the dogfood: the first real target of `DEPL-aFusedCharter-1` is this repo, and a
 defect the fixture missed surfaces here rather than in somebody else's tree.
 
 **S2 — Restructure the authored half into slots around the region.** What survives above the region:
@@ -81,12 +86,21 @@ without one, `core.autocrlf` decides its bytes per node and the render's answers
 fleet for no reason anybody can see. This unit verifies the pin took effect with `git check-attr`
 rather than assuming the row was written.
 
-**S8 — Declare a byte ceiling for the charter, over the WHOLE file.** The owner resolved this at
-the second fork round, so it is scope rather than a recommendation. One row in
-`tools/template-size-limits.txt` keyed on `AGENTS.md`, in that file's existing grammar, with the
-justification written beside the number the way every other row there carries its history. It is
+**S8 — Declare a byte ceiling for the charter, over the WHOLE file, AND wire the leg that enforces
+it.** The owner resolved this at the second fork round, so it is scope rather than a recommendation.
+One row in `tools/template-size-limits.txt`, keyed on `AGENTS.md`, in that file's existing grammar,
+with the justification beside the number the way every other row there carries its history. It is
 seeded at the LANDED measurement plus headroom rather than at a figure predicted here — this spec
 projects roughly 56 KB and a projection is not a measurement.
+
+**A declared row on its own is inert, and an earlier revision shipped exactly that.** The size gate
+takes its subject from a positional argument and consults the declaration FOR THAT SUBJECT ONLY, so a
+row nothing invokes the gate with is never read. There are three size legs on the bar today and none
+names the charter — the kickoff engine got its own leg with its own positional for precisely this
+reason. S8 therefore adds a fourth leg row invoking the gate with `AGENTS.md`, unguarded, and takes
+the registry route a new leg needs: the gate's script is a registry exemption rather than an entry
+file, so the leg is an `[[exempt_leg]]` row with its reason. Without this the ceiling is measured
+twice by hand at AC8 and AC9 and never again.
 
 **Why the whole file and not the authored half.** The alternative was to measure `AGENTS.md` minus
 the rendered region, so the region stayed priced by the ruleset's own 48 KiB gate and this ceiling
@@ -95,10 +109,12 @@ every turn, and that is the whole file. The apparent double-counting is the hone
 than a flaw — if the ruleset grows five kilobytes, gov's charter really did become five kilobytes
 more expensive to read, and a ceiling that hid that would be pricing the wrong thing.
 
-**The headroom has one named consumer.** `TOOL-aFusedCharter-3` lands after this unit and wraps every
-line over 450 characters in this file, which ADDS bytes — a newline and its indent per wrap, across
-eight lines. The seeded headroom absorbs that, and `TOOL-aFusedCharter-3` re-measures against the
-declared ceiling rather than assuming it still fits.
+**The headroom's consumer is smaller than an earlier revision priced it.** That revision budgeted a
+wrap across eight lines — but all eight of this file's over-length lines sit INSIDE the gate-suite
+section S3 deletes, so after this unit the charter's long lines are whatever the rendered region
+brings, and those are wrapped in the RULESET rather than here. The headroom is sized against the
+region's contribution, and `TOOL-aFusedCharter-3` re-measures against the declared ceiling rather
+than assuming it still fits.
 
 **S7 — Re-stamp the kickoff manifest.** `memory/guides/SESSION-KICKOFF.md` names `AGENTS.md` in
 `verify-paths` and states the charter is authoritative. Its `§B` claims are re-verified against the
@@ -155,7 +171,8 @@ they cannot diverge from their source without a leg saying so.
 
 S1 through S3 land in one commit: a tree with the region added and the gate-suite section still
 present would carry two answers about the bar, and a tree with the section cut and no region would
-carry neither. S4 lands in the same commit, because the signal reds between the two states.
+carry neither. S4 lands nothing — the retirement it used to perform is `TOOL-aFusedCharter-1` S10's
+and happens four passes earlier, which is what unblocks the three units between.
 
 ### Alternatives rejected
 
@@ -172,8 +189,11 @@ is the honest act and the file already has a precedent for it.
 ### Files touched (estimate)
 
 `AGENTS.md`, `.governance/deploy.toml` (new, committed — it is the standing authorization),
-`tools/drift-audit/drift_signals.py`, `tools/drift-audit/selftest.py`,
-`memory/guides/SESSION-KICKOFF.md`, and the converged ruleset for S5.
+`tools/template-size-limits.txt` and `tools/gate-legs.json` (S8's row and its leg),
+`tools/govkit/registry.toml` (S8's `[[exempt_leg]]`), `memory/guides/SESSION-KICKOFF.md`, and the
+converged ruleset for S5. **Neither drift-audit file is touched here** — an earlier revision listed
+both, and after S4's move one belongs to `TOOL-aFusedCharter-1` and the other is not edited by
+anybody.
 
 ## 5. Production-readiness checklist
 
@@ -188,8 +208,9 @@ is the honest act and the file already has a precedent for it.
 - observability — `bash tools/playbook/adopt-playbook.sh --check` is the standing observation that
   the region still matches its source.
 - risks — the region and the authored slots can be confused by a future editor, which is what the
-  markers and the check exist to prevent. S4 is the sharp edge: retiring a green signal in the same
-  commit that would red it must be visible in the commit message, not just in the diff.
+  markers and the check exist to prevent. The sharp edge used to be S4's retirement landing in the
+  same commit that would red the signal; that moved to `TOOL-aFusedCharter-1` S10, and the
+  commit-message visibility obligation moved with it rather than being dropped.
 - testing + left-shift gates — the render-parity leg arrives with `DEPL-aFusedCharter-1`; this unit
   is what makes it non-vacuous, because before S1 there is no region for it to compare.
 - migration / rollback — one commit, revertable; the region is delimited.
@@ -216,9 +237,13 @@ is the honest act and the file already has a precedent for it.
   `memory hygiene`, whose check 16 rules read the charter.
 - **AC7** — When the commit lands, `memory/guides/SESSION-KICKOFF.md` carries a re-stamped
   `last-audit` and the commit message carries the `manifest-audit` delta line.
-- **AC8** — When `bash tools/check-template-size.sh AGENTS.md` runs, it exits 0 and reports the
-  limit it resolved FROM `tools/template-size-limits.txt` rather than from the hard default — which
-  is observable because the printed limit equals the declared row and not `49152`.
+- **AC8** — When `bash tools/check-template-size.sh AGENTS.md` runs, it exits 0 and resolves its
+  limit FROM `tools/template-size-limits.txt` — observable through the ratchet line, which names the
+  key when it is unresolved and does not when it resolves. The printed limit alone cannot serve as
+  the observable unless the declared value differs from the gate's `49152` default.
+- **AC10** — When `bash tools/run-gates.sh` runs, a leg invokes the size gate with `AGENTS.md` as its
+  subject and is green; removing the declared row makes THAT leg print its unresolved-key line. A
+  declaration with no leg reading it is measured twice by hand and never again.
 - **AC9** — When the declared row is temporarily lowered below the landed size,
   `bash tools/check-template-size.sh AGENTS.md` reds naming the overage. A ceiling whose failing
   case has never been observed is an assertion about nothing, so this is checked before the row is
@@ -246,6 +271,12 @@ none — the fork below is RESOLVED.
 
 - rev-1 · 2026-08-18 · initial draft. S4 was added after measuring that the charter-completeness
   drift signal sits at a drained pin of zero and would red on seventy legs the moment S3 lands.
+- rev-4 · 2026-08-18 · folded the round-2 spec audit. S8 now wires the leg that reads the ceiling —
+  a declared row alone is inert, because the size gate consults the declaration only for the subject
+  it is invoked with and no leg named the charter. S1 states the kit selection, which `[selection]
+  default` would have got wrong by eight kits, and an empty `drop_blocks`. The headroom is repriced
+  against the population S3 actually leaves. Migration, risks and Files touched are cleaned after
+  S4's retirement moved out, including two drift-audit paths this unit does not touch.
 - rev-3 · 2026-08-18 · F1 resolved by the owner: the charter gets a whole-file byte ceiling. That
   flips a Non-goal into new scope S8, adds two acceptance criteria including the failing-case
   observation, records the rejected authored-half option as a Non-goal in its place, and names

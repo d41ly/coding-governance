@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -23,15 +23,33 @@ commit as S1 so no intermediate tree has a stub pointing at an absent file.
 
 **S3 — Repoint the four gates that name a path.**
 
-- `tools/check-template-size.sh` — the header's examples and the remedy string inside the
-  over-budget message, which tells the reader to move a section into the companion. The remedy
-  becomes: trim non-instructional prose, or drop a kit-conditional block.
-- `tools/check-playbook-parity.sh` — three variables (`TEMPLATE`, `CUSTOMIZE`, `DOMAIN`) become one,
-  the three-file existence precondition becomes one file, and S3 of that gate — the catalogue
+- `tools/check-template-size.sh` — **the default-subject assignment first**, because it is the
+  load-bearing one: the gate takes its subject from a positional defaulting to the old filename, and
+  the unargumented leg is the one that reads it. Unrepointed, that leg exits 2 on a missing file.
+  Then the header's examples, and the remedy string inside the over-budget message, which tells the
+  reader to move a section into the companion — the remedy becomes: trim non-instructional prose, or
+  drop a conditional block.
+- `tools/check-playbook-parity.sh` — three variables (`TEMPLATE`, `CUSTOMIZE`, `DOMAIN`) become
+  **two**, the converged ruleset and `WIRE-INTO-PROJECT.md`, and the existence precondition guards
+  **both** of them. An earlier revision said one variable and one file three sentences before saying
+  the haystack is two files; with no precondition on the second, an absent runbook reds `fail 4` for
+  seven kits with a wrong reason instead of exiting 2 with the right one. And S3 of that gate — the
+  catalogue
   arithmetic asserting `customize.md`'s placeholder counts — is DELETED, because its subject no
-  longer exists. Its S1 kit-coverage grep loses two of its three haystacks; the surviving haystack
+  longer exists. **Its success line is rewritten in the same edit.** That stage assigns three
+  counters the final print reads back, and the script runs under `set -u`, so deleting the stage and
+  leaving the print kills the gate with a shell error instead of a verdict — the named-failure
+  contract this tree enforces everywhere, broken in the gate that enforces it. The line also keeps
+  claiming the catalogue arithmetic holds, about a stage that no longer exists. Its S1 kit-coverage grep loses two of its three haystacks; the surviving haystack
   is the converged file plus `WIRE-INTO-PROJECT.md`, which is where `PLAY-aFusedCharter-1` S6 moves
   the kit prose. Without that second haystack the gate reds on seven kits the day it lands.
+  **Adding it reds a different arm, and the same edit must clear that too.** The waiver loop shares
+  its predicate with the coverage loop and fires when a waiver row names a kit the haystack DOES
+  document. Measured: `tools/hooks/` appears in none of the three playbook files and DOES appear in
+  `WIRE-INTO-PROJECT.md`, so the tracked `hooks` row in `tools/playbook-kit-waivers.txt` is valid
+  today and stale the instant the second haystack lands. S3 deletes that row in the same commit —
+  a path-string rewrite under S4 would not have reached it, because the row is a kit name and not a
+  path.
   Its `PAIRS` rows are NOT repointed: both take their stated side from the ruleset, and
   `PLAY-aFusedCharter-1` S7 keeps the two extracted literals in the file rather than moving them,
   which is the resolution of the audit's first blocker. Repointing them at
@@ -85,6 +103,10 @@ it ships. The three the spec audit found:
 - **The registry's reason string** for the playbook exemption, which says the parity gate reads this
   repo's customize arithmetic. S3 deletes that arithmetic, so the reason becomes false prose inside
   the file whose whole thesis is that declarations do not drift.
+- **Two registry exemption REASONS that state file counts.** One says kit dirs are deliberately not
+  named in the *three* shipped playbook files, which S2 makes one. The other scopes the size-limits
+  exemption to gov's *product template and kickoff engine*, and `PLAY-aFusedCharter-3` S8 adds a
+  third subject. Neither is reached by any gate, which is exactly why they are enumerated here.
 - **The entry's `version_from`**, which names the template by its old filename. `selfcheck` reds with
   *version_from names a file that does not exist*, and AC7's shape predicate would not have caught it
   because the entry would still parse.
@@ -155,6 +177,12 @@ declaration*, which is the honest reading and is what the kit's liveness rule as
 `tools/drift-audit/selftest.py` is not touched either: it carries no arms for this probe, its fixture
 already writes an empty `HANDKEPT`, and it already uses this very signal name as the literal its
 `DECLARED_EMPTY` arms exercise.
+
+**This commit carries the visibility obligation that moved with the scope item.** The retirement now
+lands four passes BEFORE the cut that would red the signal, so a reader of either commit sees only
+half the story. This commit's message states that the signal is being retired ahead of the unit that
+makes it necessary, and names `PLAY-aFusedCharter-3` S3 as that unit. `PLAY-aFusedCharter-3` carried
+this obligation while it owned the retirement and no longer does.
 
 ## 3. Non-goals (OUT)
 
@@ -238,13 +266,20 @@ The 31 live consumers above, plus the two deletions and one rename.
 - **AC2** — When `git log --follow coding-governance-agents.template.md` runs, it shows the
   pre-rename history, proving the move was a `git mv` and not an add-plus-delete.
 - **AC3** — When `bash tools/check-template-size.sh` runs with no argument, it measures
-  `coding-governance-agents.template.md` against `49152` — not against the hard default — which is
-  observable because the printed limit reads `49152` and the limits file's row names the new key.
+  `coding-governance-agents.template.md` and RESOLVES its limit from the declaration. The observable
+  is the ratchet line, not the limit: an unresolved key prints a no-ratchet line naming that key,
+  and a resolved one does not. The printed limit cannot serve — the gate's hard default is the same
+  49 152 as the declared row, so an earlier revision's "observable because the printed limit reads
+  49152" was true in both the good and the bad state. The row is additionally asserted by the gate's
+  OWN derived key rather than by the string in the file, because that derivation normalises through
+  a `cd && pwd` chain and a key that differs only in normalisation would read as present.
 - **AC4** — When `git check-attr text eol -- coding-governance-agents.template.md` runs, it reports
   `eol: lf`, proving the `.gitattributes` pattern still selects the renamed file.
 - **AC5** — When `bash tools/check-playbook-parity.sh` runs, it exits 0, its catalogue arm is gone,
-  and its kit-coverage arm searches the converged file and `WIRE-INTO-PROJECT.md` — verifiable by
-  redding it: delete a kit's mention from both and confirm the gate names that kit.
+  and its kit-coverage arm searches the converged file and `WIRE-INTO-PROJECT.md`. BOTH arms are
+  red-proved, because they fail for opposite reasons: delete a kit's mention from both haystacks and
+  the gate must name that kit, and re-add a waiver row for a kit the haystack now documents and the
+  gate must name that row as stale. The `hooks` row is the live instance of the second.
 - **AC6** — When `bash tools/check-placeholders.sh` runs it exits 0 over one carrier, and its
   `--check` mode still reds on a fixture pair carrying a surviving placeholder.
 - **AC7** — When `python tools/govkit/govkit.py selfcheck` runs it exits 0, with the playbook entry
@@ -290,6 +325,13 @@ none — both forks below are RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. The consumer inventory is measured, not recalled.
+- rev-5 · 2026-08-18 · folded the round-2 spec audit. S3 now deletes the stale `hooks` waiver row
+  the second haystack creates, rewrites the parity gate's success line so deleting the catalogue
+  stage cannot leave three counters unbound under `set -u`, names the size gate's default-subject
+  assignment as its first repoint, and corrects its own two-variables-versus-one contradiction. S5
+  gains two registry reason strings that state file counts. S10 takes on the commit-message
+  visibility obligation that moved with it out of `PLAY-aFusedCharter-3`. AC3's observable is
+  replaced because the old one could not fail, and AC5 red-proves both parity arms.
 - rev-4 · 2026-08-18 · F2 resolved by the owner: the parity gate's two value-parity rows keep
   taking their stated side from the playbook. No scope change — S3 and `PLAY-aFusedCharter-1` S7
   were both written against this outcome; the fork is now marked rather than pending.

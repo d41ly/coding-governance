@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -77,19 +77,24 @@ companion lists under its conditional-sections heading gets an HTML-comment fenc
 `DEPL-aFusedCharter-1` can drop it mechanically. Markers are comments, so an unrendered file reads
 correctly with every block present.
 
-**One namespace is not enough, and the spec audit is right about why.** Four of the companion's
-conditional rows are keyed on a PROJECT PROPERTY rather than on a kit: the security section's
-outbound-call lines drop when there is no such surface, the cross-OS section drops for a single-OS
-team, the design-system rules drop when there is no UI, and the persona is adjustable. The registry
-has no `security` or `cross-os` entry id, so fencing those with a kit id would name an id the
-renderer must refuse. `govkit` is a registry EXEMPTION rather than an entry, so a govkit fence would
-fail the same check.
+**One namespace is not enough, and TWO rows need the second — not four.** Round 1 said four
+project-property conditionals, and round 2 measured that wrong by half: `§4` and `§13` are DELETED
+OUTRIGHT by S2 and S4, so the companion row covering them has no subject left to fence, and the
+persona row is an EDIT instruction rather than a drop — a fence over `§15` would delete the voice
+section instead of adjusting it, which is not what that row asks for. The surviving two are the
+security section's outbound-call lines and the cross-OS section, about 1.7 KB together. The registry
+has no `security` or `cross-os` entry id, so neither can be fenced with a kit id, and `govkit` is a
+registry EXEMPTION rather than an entry so a govkit fence would fail the same check.
 
 - `<!-- kit:` id `-->` … `<!-- /kit:` id `-->` — the id is a `tools/govkit/registry.toml` entry id,
   and the renderer drops the block when the target did not select that kit.
-- `<!-- when:` key `-->` … `<!-- /when:` key `-->` — the key is a boolean answered in the target's
-  `deploy.toml`, and the renderer drops the block when the answer is false. This is the namespace
-  the four project-property rows use.
+- `<!-- when:` name `-->` … `<!-- /when:` name `-->` — the name is a BLOCK NAME, and the renderer
+  drops the block when that name is a MEMBER of the target's declared `drop_blocks` list. It is
+  membership, never truthiness: `govkit intake` writes every answer as a quoted string, so a key
+  "answered false" would arrive as the string `false` and read as true, and the block would survive.
+  That is the failure-that-reads-as-success this whole fencing design exists to prevent, arriving
+  through type coercion instead of through a name. A list has no such reading. Owner-resolved
+  2026-08-18; `DEPL-aFusedCharter-1` S3 and S4 own the mechanism.
 
 **S8's first deliverable is an ENUMERATION, not a fence.** The post-fold conditional set is not
 knowable from the companion's list, because S6 moves seven kit-advertisement bullets out of the
@@ -127,8 +132,9 @@ split is by mechanism, not by commit.
 **No micro-format content.** `PLAY-aFusedCharter-2` owns `§16`'s new block. This unit's `§16` work is
 only S5's fold.
 
-**No ceiling raise.** The converged file measures 43 998 bytes against a 49 152 ceiling. If a
-build-time measurement disagrees, that is a fork for the owner, never a constant edit.
+**No ceiling raise.** The converged file PROJECTS to about 44 400 bytes against a 49 152 ceiling.
+A projection is not a measurement and the composition depends on prose S6, S7 and S10 have not
+written yet, so if the built file disagrees that is a fork for the owner, never a constant edit.
 
 **`§9` and `§11` are not cut.** Both were tested against the admission test and pass: a security
 boundary governs any unit adding a write path, and the cross-OS rules govern any fleet with more
@@ -142,7 +148,9 @@ that survives keeps its words, except where S6 and S7 explicitly restate one.
 
 ### Inventory
 
-Measured at BASE. Section sizes are the ruleset's and the companion's, in bytes.
+Measured at BASE. Section sizes are the ruleset's and the companion's, **in CHARACTERS** — the size
+gate enforces BYTES, and over this corpus the two differ by roughly one per cent because of the
+non-ASCII glyphs. An earlier revision headed this column "bytes" while holding these figures.
 
 | Section | Ruleset | Companion | Disposition |
 |---|---|---|---|
@@ -165,7 +173,9 @@ Measured at BASE. Section sizes are the ruleset's and the companion's, in bytes.
 | `§16` output discipline | 4 712 | — | keep, plus S5's fold |
 | `§17` file references | 651 | — | FOLD into `§16` |
 
-Folded total, before S6, S7 and S10 adjust it: 43 998 bytes.
+Folded total, before S6, S7 and S10 adjust it: 43 998 characters, which is **about 44 400 bytes**
+— the figure the ceiling is actually compared against. Neither number is a measurement of the built
+file; AC2 measures that.
 
 ### Migration
 
@@ -224,8 +234,12 @@ one new record under `memory/builds/aFusedCharter/build/` holding S8's condition
   `grep -c 'Client/server validation divergence' parallel-coding-governance.template.md` returns `0`.
 - **AC5** — When the conditional blocks are marked, the enumeration S8 requires exists in the build
   folder, every id inside a `<!-- kit:` fence is a real entry id in `tools/govkit/registry.toml`,
-  every key inside a `<!-- when:` fence is answered in this repo's own `deploy.toml`, and every
-  opened fence is closed. No fence names `govkit`, which is an exemption rather than an entry.
+  every `<!-- when:` fence name appears in that enumeration and every enumerated name is fenced, and
+  every opened fence is closed. No fence names `govkit`, which is an exemption rather than an entry.
+  **The enumeration is the authority at THIS unit, and deliberately not `deploy.toml`** — that file
+  does not exist until `PLAY-aFusedCharter-3` S1, four passes later, so an earlier revision of this
+  criterion asserted against an artifact no tracked path yet holds. The declaration half is
+  `DEPL-aFusedCharter-1`'s and the answered-in-`deploy.toml` half is `PLAY-aFusedCharter-3`'s.
 - **AC6** — When the four adopted rules land, each is greppable in its stated section: the liveness
   rule contains `DEAD PROBE` and the derived-count rule contains `derives`.
 - **AC7** — When the seven kit-advertisement bullets are moved, every kit named in one is still
@@ -261,6 +275,12 @@ none — the forks below are RESOLVED and their resolutions are recorded in the 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft, written after the owner resolved F1 through F3 at kickoff.
+- rev-3 · 2026-08-18 · folded the round-2 spec audit. S8's second namespace becomes a MEMBERSHIP
+  list rather than a boolean, because govkit writes every answer as a quoted string and a false would
+  have read as true; its justification is corrected from four conditional rows to two, with the
+  persona row named as an edit rather than a drop. AC5 stops asserting against a `deploy.toml` that
+  does not exist until unit 5 and asserts against S8's own enumeration record instead. The Inventory
+  column is relabelled to characters and the projection restated in both units.
 - rev-2 · 2026-08-18 · folded the M4 spec audit. S7 keeps the two value-parity literals the gate
   extracts from this file and now CREATES the hooks README with a descriptor rule, S8 gains a second
   fence namespace for the four project-property conditionals plus a required enumeration pass and the
