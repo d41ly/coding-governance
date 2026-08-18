@@ -99,7 +99,7 @@ Measured first, both are the wrong shape:
 
 So `-4` proposes the smallest thing that acts on the real variable: build F4's fixture, and add a
 per-shard live-row drain signal against a shrink-only pin, so the growth becomes a decision rather than a
-discovery. Its §8 asks whether to build even that on 24 days of runway.
+discovery. Its §8 asks whether to build even that on 18 days of runway.
 
 ## Owner decision menu
 

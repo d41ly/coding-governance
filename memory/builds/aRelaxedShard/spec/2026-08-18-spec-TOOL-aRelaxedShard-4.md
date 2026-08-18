@@ -180,7 +180,7 @@ Bug classes for these paths: `fixture-passes-by-finding-nothing` (S4 and AC3 exi
 
 ## 8. Open questions
 
-### F1 — build this at all, on 24 days of runway?
+### F1 — build this at all, on 18 days of runway?
 
 The case FOR building now is that the slope is the actual defect, and it took a two-round audit and a
 blocked landing to see it. The case for waiting is that 18 days is still real and the backlog may drain on
