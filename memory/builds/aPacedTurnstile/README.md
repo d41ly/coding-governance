@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11
+ids: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
 ---
 
 # aPacedTurnstile — the merge bar gets an execution discipline
@@ -62,6 +62,18 @@ wrong unit, and three of the sweep's own ratified answers turned out to be optio
 the round-1 fold-in — including `-5`'s, which credited blocker F2's closure to a mechanism the
 fold-in had replaced and would have re-licensed the branch F2 named.
 
+A THIRD pass then re-reviewed that fold, which is what M8 asks for and which this build has now
+twice been repaid for. It returned BLOCKED on 23 confirmed of 25 raised
+(`reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md`), and all 23 are folded. **The
+recurring defect of this build is not in any one document: it is that a fix naming more than one
+carrier lands in one of them.** Round 1's F2 landed in the scope items and not in §4 or the
+criteria. Round 2 found nine of the same shape. Round 3 found the round-2 blocker fix had landed in
+`-7`, the consumer, and not in `-5`, which owns the interface it now calls — R19 gave the
+fingerprint helper a NAME and nobody gave it a SIGNATURE — plus two fixes that created fresh
+defects inside their own commit. Every remaining multi-carrier obligation in this set is therefore
+written as a MEASUREMENT or as a rule rather than as an enumeration, and where that was not possible
+the figure says in place that it is derived and has already moved.
+
 | id | unit | classification | audit |
 |---|---|---|---|
 | TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | F1 blocker folded |
@@ -82,6 +94,7 @@ from round 1, then one from round 2:
 | F3 | `-5` | `gate-full-green`'s "failed nothing" precondition was the only one of its preconditions with no negative control, so an implementation that forgot it passed every arm |
 | F4 | `-6` | the unit had no position in the build order while changing the base every guard diffs against, leaving it undecidable which base the authoritative boundary would use |
 | F5 | `-7` | a full green earned on a DIRTY tree reset the lag counter, making the replacement property false while the record made it look measured |
+| T1 | `-5`, `-7` | the fix for R1 landed in the CONSUMER, not the owner. `-7` said predicate 0 computes at the recorded sha by CALLING `-5`'s helper, while `-5` declared one digest over the live working tree with no sha argument. R19 gave that helper a NAME and nobody gave it a SIGNATURE |
 | R1 | `-7` | the fix for F5 overshot. Predicate 0 joined the recorded digest against a fresh fingerprint of the PUSHED TIP, and `-5` defines that digest over the committed tree object, so it fired on every push whose tree had moved — exactly the population predicates 3 and 4 admit. Both arms were fixture-built, so nothing on the bar noticed |
 
 ## Build order, and the dependency that forces each edge
@@ -162,17 +175,17 @@ recommendation is worth more on the record than off it:
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-18 · streams tooling
-ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11
+ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-5 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-6 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-5 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-6 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-6 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-7 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 

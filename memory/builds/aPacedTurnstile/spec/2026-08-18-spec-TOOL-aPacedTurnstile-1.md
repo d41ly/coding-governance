@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -15,8 +15,16 @@ instead of wiring legs into a runner the target is assumed to already own.
   `run-gates.test.sh`, `run-gates.evidence.test.sh`. `tools/gate-legs.json` does NOT move.
   **The canary SPLITS in the same move, and round 2's R10 is why.** `run-gates.test.sh` becomes the
   SHIPPED harness and keeps only assertions true in ANY tree; a new gov-only sibling
-  `tools/run-gates/run-gates.gov.test.sh` takes every arm keyed on THIS repo's corpus and is its own
-  gate leg, WITHHELD from the kit payload by the file rules S6 writes. Three siblings key arms on
+  `tools/run-gates/run-gates.gov.test.sh` takes every arm keyed on THIS repo's corpus. It is a leg in
+  GOV's `tools/gate-legs.json` and an `[[exempt_leg]]` row in the registry — **never a
+  `[[gate_leg]]` row in the descriptor**, which would be the fifth row S6 forbids and would be
+  blocker F1 under another name. It is withheld from the payload by a `project-owned` `[[files]]`
+  rule, following `tools/memory-recall/kit.toml`, which withholds `check-recall.py`,
+  `recall-fixture.json` and `test_recall_floor.py` the same way: that role is absent from the
+  landable set so `apply` never writes them, and CLAIMING the destination is what keeps the
+  deployer's selfcheck from seeing an unclaimed path. The `recall floor arms` exempt-leg row is the
+  precedent for the registry half, and its stated reason — arms keyed on this repo's own record ids
+  are meaningless in an adopter's tree — is this one's reason too. Three siblings key arms on
   gov's corpus unconditionally — `-3` AC6 on gov's six declared chunk names, `-6` on gov's
   network-calling leg names, `-7` AC9 on a gov leg's guard — and in an adopter tree the manifest is
   seeded empty and emitted from descriptors with no chunk key, so all three would red on arrival.
@@ -43,9 +51,14 @@ instead of wiring legs into a runner the target is assumed to already own.
   no stdout verb at all — it writes a header, per-leg rows, a verdict and ledger files, and its §3
   states it changes no verdict — while `-6` cites this contract by name for its reuse verbs
   (round 2's R27, in the section that defines the contract).
-- **S6** — write `tools/run-gates/kit.toml`: id, home, version_from, file rules, adopt, check,
-  outcome, FOUR `[[gate_leg]]` rows, the LF pin, and the `[gate_runner_seed]` table. FOUR, not five:
-  only the two repointed legs plus S7's adopter e2e and its `--check` exist when this unit lands.
+- **S6** — write `tools/run-gates/kit.toml`: id, home, version_from, file rules including the
+  `project-owned` rule that withholds S1's gov-only harness, adopt, check, outcome, FOUR
+  `[[gate_leg]]` rows, the LF pin, and the `[gate_runner_seed]` table. **FOUR because those are the
+  legs the kit SHIPS** — the two repointed legs plus S7's adopter e2e and its `--check`. That is the
+  RULE; an earlier draft gave a CENSUS of the legs existing at landing instead, which S1's gov-only
+  harness then falsified while leaving the count accidentally right (round 3's T19), and the same
+  census is what §4 Files touched and `TOOL-aPacedTurnstile-3` S2 both got wrong. A fifth leg does
+  exist on gov's bar at this landing and is correctly absent here because it never ships.
   `TOOL-aPacedTurnstile-4`'s turnstile suite is the fifth and that unit owns its row in BOTH
   carriers — a descriptor row naming a leg the manifest does not carry reds the deployer's selfcheck
   at this unit's own landing.
@@ -54,7 +67,12 @@ instead of wiring legs into a runner the target is assumed to already own.
   against a floor so it needs no waiver row.
 - **S8** — registry surgery in `tools/govkit/registry.toml`: add the entry, delete the three exempt
   path rows and the two exempt-leg rows naming run-gates, correct the `tools/lib` exemption's
-  now-false clause about the runner sourcing it, AND add this entry's id to `[selection].default`.
+  now-false clause about the runner sourcing it, add an `[[exempt_leg]]` row for S1's gov-only
+  harness carrying its reason, AND add this entry's id to `[selection].default`. The exempt-leg row
+  is not bookkeeping: a manifest leg claimed by no descriptor and covered by no exemption is exactly
+  what `tools/govkit/govkit.py` reds on, so without it `selfcheck` fails at this unit's own landing
+  — on a gate §7 lists and AC3 asserts green, in a rollout §4 mandates as ONE commit, which is the
+  mirror image of blocker F1 (round 3's T4).
   The `tools/gate-legs.json` exemption STAYS. The default-selection line is the work §8's second
   fork ratifies, and round 2's R11-R13 found it committed to in §8 and carried by no scope item, no
   files-touched row and no criterion — so it would have shipped unbuilt and silently. It closes the
@@ -136,7 +154,10 @@ tools/run-gates/
   run-gates.evidence.test.sh      the evidence arm
   run-gates.gov.test.sh           the GOV-ONLY arms, withheld from the payload (S1)
   gate-fingerprint.sh             TOOL-aPacedTurnstile-5's digest, shipped as its own executable
-                                  because .githooks/pre-push must compute the same one
+                                  in TWO forms over one implementation: no argument for the
+                                  runner's working-tree stamp, <rev> for .githooks/pre-push's
+                                  at-a-rev recomputation. Equal on a clean tree, which is the
+                                  only tree a record is written from
   adopt-run-gates.sh              + --check
   adopt-run-gates.test.sh         the adopter e2e, effects-gated
   gate-profiles.txt               TOOL-aPacedTurnstile-2's table, a kit seed file
@@ -187,10 +208,10 @@ sequenced last in the build for that reason.
 | `tools/run-gates.sh` and the two harnesses | moved, resolver inlined, manifest default derived, tails widened, assertion counters added |
 | `tools/run-gates/run-gates.gov.test.sh` | new — the gov-corpus arms split out of the shipped canary (S1) |
 | `tools/run-gates/adopt-run-gates.sh`, `adopt-run-gates.test.sh`, `kit.toml`, `README.md` | new |
-| `tools/govkit/registry.toml` | entry added, five rows deleted, one `why` corrected, the entry id added to `[selection].default` (S8) |
+| `tools/govkit/registry.toml` | entry added, five rows deleted, one `why` corrected, an `[[exempt_leg]]` row added for the gov-only harness, the entry id added to `[selection].default` (S8) |
 | `tools/govkit/govkit.py` | `cmd_intake` emits the runner declaration |
 | `tools/check-kit-versions.sh` | the new constant and marker pair |
-| `tools/gate-legs.json` | two argv repoints, TWO new legs — the adopter e2e and the wiring check |
+| `tools/gate-legs.json` | two argv repoints, THREE new legs — the adopter e2e, the wiring check, and S1's gov-only harness |
 | `.githooks/pre-push`, `.unattended.conf` and its example, `tools/lib/pyrun.sh` | path repoints |
 | `AGENTS.md` | gate-suite bullets and their script paths |
 | `tools/memory-tree/BUILD-METHOD.template.md` + `memory/guides/BUILD-METHOD.md` | the pre-move path, edited in the TEMPLATE and re-rendered as a pair (S10, R9) |
@@ -236,7 +257,10 @@ sequenced last in the build for that reason.
   `tools/run-gates/run-gates.sh` among the discovered copies and reports it byte-identical, with no
   edit to that file's own row table.
 - **AC3** — When `python tools/govkit/govkit.py selfcheck` runs after the surgery, it exits 0 with
-  `run-gates` among the entries and reports no stale exemption.
+  `run-gates` among the entries, reports no stale exemption, AND reports no manifest leg claimed by
+  no descriptor — the branch S1's gov-only harness would otherwise trip, since it is a bar leg that
+  deliberately ships nowhere. Its control is the same run with S8's `[[exempt_leg]]` row removed,
+  which must red naming that leg.
 - **AC4** — When a leg fails, the runner prints its name followed by two spaces and the tail, and
   splitting the remainder on a double space yields the bare leg name — asserted in
   `tools/run-gates/adopt-run-gates.test.sh` in those exact terms.
@@ -357,6 +381,15 @@ recommendation; the reason each survived the veto order is recorded with it.
   holds. R4/R5: S11 stops repointing the two count-waiver rows and DELETES them beside new counters,
   which is the only edit ordering that is green at every commit. R19: the kit layout names
   `gate-fingerprint.sh`. R27: S5's dependent list reads `-2`, `-3`, `-6`; `-5` adds no stdout verb.
+- rev-5 · 2026-08-18 · folded the round-3 blocker re-review. T4: S8 gains the `[[exempt_leg]]` row
+  for S1's gov-only harness, without which `govkit selfcheck` reds at this unit's own single-commit
+  landing on a manifest leg claimed by no descriptor — the mirror of blocker F1, created by the fold
+  for R10, and AC3 now carries the branch with its control. T19: S6's "FOUR, not five" is restated
+  as the RULE — four because those are the legs the kit SHIPS — rather than a census of the legs
+  existing at landing, which S1 falsified while leaving the count accidentally right. T8/T11: §4
+  Files touched said the manifest gains TWO new legs where this unit now adds three. T1: the kit
+  layout's gloss said the hook computes "the same one"; it computes the AT-A-REV form, and the two
+  forms are named.
 
 ## 10. Reuse audit
 

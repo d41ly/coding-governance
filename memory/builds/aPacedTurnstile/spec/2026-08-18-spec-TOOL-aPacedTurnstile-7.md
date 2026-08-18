@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -16,9 +16,19 @@ obligation instead of deleting it.
   ancestor of the pushed tip, or is more than `GATE_FULL_MAX_LAG` commits behind it.
 - **S2b** — the hook forces a full run when the record's TREE fingerprint does not equal a fresh
   fingerprint computed AT THE RECORDED SHA (predicate 0), and when the pushed tip is a merge whose
-  second parent is not an ancestor of the recorded green — the shape a `push-main` reconcile retry
-  produces (predicate 6). It computes that fingerprint by CALLING `TOOL-aPacedTurnstile-5`'s shipped
-  `tools/run-gates/gate-fingerprint.sh`, never by reimplementing the digest — two implementations of
+  second parent is not an ancestor of the recorded green (predicate 6). **That population is WIDER
+  than the reconcile retry that motivated it, and round 3's T12 is why this now says so.** Every
+  build landing on the default branch here is a merge commit, so the row fires on any first-attempt
+  landing whose recorded green was not earned on that exact second parent — not only on a retry. The
+  row is kept at that width, because a merge tip the record does not cover is exactly the case the
+  record cannot speak for; what changes is that the reason string names the real condition and AC6c
+  gains the negative half, so a row this broad cannot fire unconditionally without an arm noticing. It computes that fingerprint by CALLING `TOOL-aPacedTurnstile-5`'s shipped
+  `tools/run-gates/gate-fingerprint.sh` **in its AT-A-REV form, `gate-fingerprint.sh <recorded-sha>`**
+  — the form that unit's S5 declares, whose working-tree components are supplied empty and which is
+  therefore EQUAL to the no-argument form on a clean tree, which is the only tree S7 lets a record
+  be written from. The argument is the point: the no-argument form digests the live worktree, so
+  calling it from a pre-push hook takes the fingerprint at the pushed tip, which is round 2's
+  blocker verbatim. It is never reimplemented — two implementations of
   one digest disagree silently and then force full forever, which reads as caution rather than as the
   defect it is.
 
@@ -30,9 +40,11 @@ obligation instead of deleting it.
   unsatisfiable on a real push — while both arms, being fixture-built, stayed green. What predicate 0
   buys in its corrected form is stated rather than implied: it detects a record whose stored digest no
   longer describes the tree at the sha it names — a hand-edited record, or an object store rewritten
-  under that sha. It does NOT detect a dirty working tree, because `TOOL-aPacedTurnstile-5` S7 already
-  refuses to write the record unless the tree was clean at start, and that refusal is where the
-  dirty-tree hole is closed. Predicate 0 is not the clean-tree assertion and this spec no longer
+  under that sha. It does NOT detect a dirty working tree — true of the AT-A-REV form, whose
+  working-tree components are empty by construction, and NOT of the no-argument form, which is one
+  more reason the argument is named rather than left to a builder. The dirty-tree hole is closed
+  elsewhere: `TOOL-aPacedTurnstile-5` S7 refuses to write the record at all unless the tree was
+  clean at start. Predicate 0 is not the clean-tree assertion and this spec no longer
   claims it is.
 
   **Predicate 6 is derived from the tip's SHAPE and not from the lander.** The first spelling forced
@@ -48,7 +60,10 @@ obligation instead of deleting it.
 - **S5** — the decision and its reason are printed on one line, and passed to the runner in the
   environment so it lands in the record's header as a declared key. The first draft said "written to
   the run record" with no mechanism, which contradicted this unit's own non-goal of not owning the
-  record format and would have been cleared by the record's start-of-run reset in any case.
+  record format. The reason that survives is that one: the record's format and writer belong to
+  `TOOL-aPacedTurnstile-5`, so the hook declares the value and that unit's S2 key list carries it.
+  An earlier revision also cited the record's start-of-run reset, a mechanism `-5` no longer has —
+  its §8 now ratifies per-run directories with nothing cleared at start (round 3's T18).
 - **S6** — `GATE_FULL_MAX_LAG` is a SOURCE CONSTANT in `.githooks/pre-push` with its justification in
   a comment beside it. No sibling creates a runtime conf the hook could read: the kit descriptor is
   TOML a bash hook cannot parse, and the profile table's header forbids a coverage knob by rule. It
@@ -138,7 +153,11 @@ write the record at all unless the tree was clean at start, so a green earned on
 becomes a record. What survives for predicate 0 is narrower and is worth stating exactly — a stored
 digest that no longer describes the tree at the sha it names, which is a hand-edited record or an
 object store rewritten under that sha. Field names are owned by `TOOL-aPacedTurnstile-5`, and the
-digest is computed by that unit's `tools/run-gates/gate-fingerprint.sh` and by nothing else.
+digest is computed by that unit's `tools/run-gates/gate-fingerprint.sh` and by nothing else — in its
+AT-A-REV form, `gate-fingerprint.sh <recorded-sha>`, which that unit's S5 declares and which is
+EQUAL to the runner's no-argument form on the clean tree S7 requires before a record exists at all.
+The no-argument form here would digest the live worktree, which is the pushed tip, which is round
+2's blocker.
 
 ### The decision
 
@@ -152,7 +171,7 @@ Evaluated in order; the first hit forces and stops.
 | 3 | `git merge-base --is-ancestor` of recorded sha against the tip is non-zero | `the last full green is not an ancestor` |
 | 4 | `git rev-list --count` over recorded sha to tip exceeds `GATE_FULL_MAX_LAG` | `N commits since the last full bar` |
 | 5 | the pushed diff touches `tools/gate-legs.json` | `the leg manifest is in this diff` |
-| 6 | the pushed tip is a merge whose second parent is not an ancestor of the recorded green | `a reconcile merge is not covered by the record` |
+| 6 | the pushed tip is a merge whose second parent is not an ancestor of the recorded green | `a merge tip the record does not cover` |
 
 Seven rows, not eight. The row that forced full on a non-integer lag is gone, because S6 settles that
 no environment supplies the lag: a forcing row whose input cannot vary at run time is not a predicate,
@@ -220,7 +239,11 @@ cold start rather than a special case.
 - testing + left-shift gates — S8's arms, one per forcing predicate. The class left-shifts as the
   forcing table itself.
 - migration / rollback — no migration. Cold start forces full, which is correct.
-- user docs — S9, across all three carriers of the retired claim.
+- user docs — S9, across every carrier the measured search selects, seven at this base, two of them
+  product files an adopter receives and one of them the build-method guide edited as a pair with its
+  shipped template. Deliberately NOT a count restated here: this line read "all three carriers" for
+  one revision after S9 stopped enumerating three, which is the §5-contradicts-the-scope-item class
+  round 2 raised against `-5` (round 3's T13/T16/T23).
 
 ## 6. Acceptance criteria
 
@@ -253,13 +276,22 @@ cold start rather than a special case.
   `a reconcile merge is not covered by the record`. Graded in the HOOK's suite, not the lander's,
   because the hook derives the fact from the commit it is handed and needs no channel from the
   lander; `bash tools/push-main.test.sh` keeps only the end-to-end observation that a reconciled
-  retry lands green.
+  retry lands green. **Its control is the negative half, and it is required:** a merge tip whose
+  second parent IS an ancestor of the recorded green observes the gate running WITHOUT `GATE_FULL`.
+  Every landing on the default branch here is a merge, so without the control this row is satisfied
+  by a predicate that fires on all of them — the identical hole AC6b gained a control for in the
+  same fold (round 3's T12).
 - **AC6d** — When the hook forces a full run for a known reason, that run's record header carries the
   SAME reason string under the declared key `TOOL-aPacedTurnstile-5` S2 defines — asserted in
-  `.githooks/pre-push.test.sh` against the header the runner wrote, not against the hook's stdout.
-  S5's durable half is otherwise satisfied by a stdout-only implementation, and §4 rests the whole
-  inversion on the record making "when did every leg last run, and on what sha" answerable
-  (round 2's R21).
+  `tools/run-gates/run-gates.evidence.test.sh`, where the runner is really driven through
+  `GATE_LEGS` and where `-5` owns the header. **Not in `.githooks/pre-push.test.sh`:** that suite
+  stubs the gate through `GOV_GATE_CMD` so the bar never runs, which §10 leans on by name, so no
+  runner-written header exists there and the cheap implementation would be a stub echoing its own
+  environment into a file the arm then reads — certifying test code and leaving R21's gap open
+  (round 3's T6). The hook's own suite keeps the half it CAN observe: that the reason is exported to
+  the gate command's environment. S5's durable half is otherwise satisfied by a stdout-only
+  implementation, and §4 rests the whole inversion on the record making "when did every leg last
+  run, and on what sha" answerable.
 - **AC7** — When the retired claim is searched for after this lands, a WHITESPACE-INSENSITIVE search
   (the carriers hard-wrap the sentence across lines, so a line-anchored `grep` matches nothing today
   and would pass unchanged) finds it in NONE of the carriers S9 measures, AND a positive search finds
@@ -277,10 +309,18 @@ cold start rather than a special case.
   `TOOL-aPacedTurnstile-1` S1 splits out, because this arm names a gov leg and would red on arrival in
   an adopter tree — the kit/dogfood parity leg's guard names `memory/guides/`, and a fixture touching
   only `memory/guides/BUILD-METHOD.md` causes that leg to RUN rather than skip.
-- **AC9b** — When `python tools/govkit/govkit.py selfcheck` runs, `tools/memory-tree/kit.toml`'s
-  declared guard for the kit/dogfood parity leg names `memory/guides/` too, and a fixture reverting it
-  to the narrow spelling reds — the SHIPPING carrier of the same hole. Both halves, or the hole is
-  closed in gov and exported to every adopter (round 2's R7).
+- **AC9b** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, it asserts that
+  `tools/memory-tree/kit.toml`'s declared gate-leg guard for this leg names `memory/guides/`, and a
+  fixture reverting it to the narrow spelling reds. The arm lives in the memory-tree kit's own suite
+  because that is the kit whose descriptor carries the guard, and because **`govkit.py` performs no
+  such comparison** — its descriptor/manifest join reads the leg NAME only, exactly as S10's own
+  closing sentence says. An earlier spelling of this criterion demanded selfcheck red on that
+  fixture, which no scope item built and no existing arm could satisfy: an obligation named in prose
+  with no criterion that can fail, which is the R11-R13 shape reintroduced by the fix for a different
+  finding (round 3's T10). The descriptor-to-manifest guard JOIN — the thing that would catch this
+  class in general — is filed as `TOOL-aPacedTurnstile-12`, because building it here changes govkit's
+  contract inside a unit that only reads it, which is the same veto that sent `-1`'s selfcheck arm to
+  a follow-up.
 - **AC10** — When `bash tools/check-testsuite-counts.sh` runs, `.githooks/pre-push.test.sh` reports
   an executed assertion count no lower than its recorded floor AND the registry carries no row naming
   that suite. The second clause is the half round 2's R18 found missing: the registry reds on a waiver
@@ -312,12 +352,20 @@ recommendation; the reason each survived the veto order is recorded with it.
   records, together with the design pass's refused recommendation of `1` and the reason for
   refusing it: the owner's stated goal is to stop paying the full bar per landing, and `1` defers
   essentially all of that saving. The knob is one line and lowering it later needs no code.
-- **Whether `tools/push-main.sh` should force full on a retry.** RESOLVED (agent, 2026-08-18,
-  delegated): YES, and the first draft's answer was wrong. The lander retries by reconciling with
-  origin, which produces a MERGE commit whose content no recorded green describes — the recorded
-  green was earned on the pre-merge tip. Under the first draft's answer the retry re-ran the same
-  decision, found a fresh ancestor green, and scoped: the merge commit that actually reaches the
-  remote would have been the one commit never fully graded. Predicate 7 closes it.
+- **Where the reconcile-retry case is decided, and by which component.** RESOLVED (agent,
+  2026-08-18, delegated), and RESTATED after round 3's T5/T15/T20 in the numbering and the terms the
+  fold left the rest of this file in. The case is real and the first draft was wrong to scope it:
+  the lander retries by reconciling with origin, which produces a MERGE commit whose content no
+  recorded green describes, since the recorded green was earned on the pre-merge tip — so the commit
+  that actually reaches the remote would have been the one commit never fully graded. **But
+  `tools/push-main.sh` forces nothing and exports nothing.** It keeps its attempt counter as a plain
+  shell local, and the hook is a separate process git invokes and cannot see it, so a predicate
+  reading that counter would fail toward SCOPED when its signal was absent — against §4's "every
+  predicate fails toward FULL". The hook derives the same fact from the commit it is already handed:
+  **predicate 6**, a merge tip whose second parent is not an ancestor of the recorded green. There
+  is no predicate 7; the table runs 0-6. `tools/push-main.test.sh` keeps only the end-to-end
+  observation that a reconciled retry lands green, and AC6c grades the predicate in the HOOK's
+  suite.
 
 ## 9. Revision log
 
@@ -350,15 +398,30 @@ recommendation; the reason each survived the veto order is recorded with it.
   fired on exactly the population predicates 3 and 4 admit — the scoped path was unreachable,
   predicates 3-6 dead code, AC1 and AC6b mutually unsatisfiable, and both arms fixture-built so the
   bar saw nothing. The join moves to the RECORDED sha and both S2b and §4 now state what it does and
-  does not buy. R15/R20: predicate 7 is derived from the tip's SHAPE rather than from a lander local
-  the hook cannot see, and the non-integer-lag row is deleted because S6 now settles that no
-  environment supplies the lag — an edit-time invariant with an arm, not a forcing row with none.
+  does not buy. R15/R20: the reconcile-retry row is derived from the tip's SHAPE rather than from a
+  lander local the hook cannot see, and MOVES from 7 to 6 as the non-integer-lag row is deleted,
+  because S6 now settles that no environment supplies the lag — an edit-time invariant with an arm, not a forcing row with none.
   R7: S10 closes BOTH carriers of the guard hole, gov's manifest row and the kit descriptor govkit
   emits verbatim, with AC9b arming the shipping half. R8: S9's carrier population is MEASURED, not
   enumerated — it named three where the tree holds seven, two of them product. R10: AC9 moves to the
   gov-only harness. R18: S8 gains the counter and the waiver-row deletion together. R21: AC6d reads
   the forced-full reason back out of the record header. R26: §7's full-bar entry repointed past the
   move.
+- rev-7 · 2026-08-18 · folded the round-3 blocker re-review. T1/T2/T3: S2b now names the AT-A-REV
+  FORM with its argument, which is the half of the R1 fix that never landed — `-5` owned the helper
+  and was never given a signature, so this unit's corrected predicate named a computation the
+  interface could not perform, and the two paths of least resistance were the tip join and a second
+  implementation. The flat "does NOT detect a dirty working tree" is qualified to the form the hook
+  actually calls. T12: predicate 6's population is WIDER than the reconcile retry that motivated it
+  — every landing here is a merge — so the reason string names the real condition and AC6c gains the
+  negative half, the same control AC6b gained. T5/T15/T20: §8's second fork is restated in the hook's
+  terms and the current numbering; it still asked a lander question, answered YES for the lander, and
+  closed on a predicate 7 the renumbered table no longer has. T6: AC6d moves to the evidence suite,
+  which really drives the runner, because the hook's suite stubs the gate by design and §10 leans on
+  that. T10: AC9b is restated as what the memory-tree kit's own suite can observe, and the
+  descriptor-to-manifest guard join is filed as `TOOL-aPacedTurnstile-12`. T13/T16/T23: §5's
+  user-docs line stops restating a count S9 no longer carries. T18: the cross-reference to `-5`'s
+  deleted start-of-run reset is gone.
 
 ## 10. Reuse audit
 

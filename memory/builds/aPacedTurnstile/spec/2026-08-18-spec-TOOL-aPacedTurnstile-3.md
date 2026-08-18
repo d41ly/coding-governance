@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -17,11 +17,15 @@ longest-first dispatch and manifest-order reporting.
 - **S2** — EVERY leg in `tools/gate-legs.json` AS IT STANDS AT THE REORDER COMMIT gets an explicit
   chunk, and the rows are REORDERED so each chunk's rows are contiguous. Not "all 70": the manifest
   carries 70 at this spec's base and the reorder lands LAST in the build, by which point
-  `TOOL-aPacedTurnstile-1` has added its adopter e2e and its wiring check and
-  `TOOL-aPacedTurnstile-4` has added the turnstile suite — 73 rows. All three are added by units
+  `TOOL-aPacedTurnstile-1` has added its adopter e2e, its wiring check and its GOV-ONLY canary, and
+  `TOOL-aPacedTurnstile-4` has added the turnstile suite — 74 rows. All four are added by units
   sequenced BEFORE this commit, so no later pass picks them up, and a builder assigning from a
-  frozen table leaves exactly the three legs AC6's unconditional arm reds on (round 2's R17). The
-  three take `e2e`, `wiring` and `selftests` respectively. The default assignment is the table below,
+  frozen table leaves exactly the legs AC6's unconditional arm reds on (round 2's R17). They take
+  `e2e`, `wiring`, `selftests` and `selftests` respectively. **This figure has already moved once
+  INSIDE this build** — the fold for R10 gave `-1` a fourth leg and the correction for R17 froze a
+  number that fix had already invalidated (round 3's T7/T11) — so a builder computes it from the
+  manifest at the reorder commit, and S2's leading clause is the binding one: every leg the manifest
+  holds at that commit, whatever the count. The default assignment is the table below,
   whose per-chunk counts are the base-time measurement and are stated as such.
 - **S3** — the runner parses the key as an added field on the existing record-separated wire
   protocol, builds an ordered chunk list and a per-chunk index list, and REPORTS chunk by chunk: the
@@ -42,10 +46,22 @@ longest-first dispatch and manifest-order reporting.
 - **S7** — the durable summary and failure records gain a chunk roll-up including per-chunk wall
   time, which is banned from stdout but not from these files, and on a halt the list of chunks not
   reported.
-- **S8** — canary arms for chunk contiguity, the report grammar, the halt and its suppression, the
-  all-skipped chunk, and chunk-major dispatch. Existing arms keep their current assertions.
-- **S9** — `memory/guides/SESSION-KICKOFF.md`'s gate-command block gains the chunk contract and the
-  halt note. This unit owns that file for this build.
+- **S8** — arms for the report grammar, the halt and its suppression, the all-skipped chunk,
+  chunk-major dispatch and the interleaved-fixture reordering go in the SHIPPED canary, because all
+  of them are fixture-driven and true in any tree. The every-leg-carries-a-chunk assertion AND the
+  contiguity assertion over gov's REAL manifest go in `tools/run-gates/run-gates.gov.test.sh`, the
+  gov-only harness `TOOL-aPacedTurnstile-1` S1 splits out, matching AC6 and AC6b. An earlier draft
+  assigned contiguity to the canary, which is the file AC6 had just moved it out of — so a builder
+  working from §2 would have written it back and re-created the red-on-arrival R10 named (round 3's
+  T9). Existing arms keep their current assertions.
+- **S9** — `memory/guides/SESSION-KICKOFF.md`'s gate-command BLOCK gains the chunk contract and the
+  halt note. This unit owns that BLOCK for this build — not the file, which is now edited by three
+  units: `TOOL-aPacedTurnstile-1` S10 repoints four path spellings there including the
+  manifest-audit `watch:` line, and `TOOL-aPacedTurnstile-7` S9 rewrites the safety-property
+  sentence. The exclusive-ownership claim an earlier draft made was the set's only statement about
+  who may touch that file and it was false, so a builder on `-1` would have read it as licence to
+  skip the `watch:` repoint whose omission fails the kickoff ratchet (round 3's T17).
+  `TOOL-aPacedTurnstile-2` §3's non-goal already used this narrower wording.
 
 ## 3. Non-goals (OUT)
 
@@ -108,8 +124,8 @@ second field stays the duration for exactly this reason.
 ### Inventory — the default chunk assignment
 
 Six chunks, every index claimed exactly once. The counts below are MEASURED at this spec's base,
-where the manifest holds 70 legs; at the reorder commit it holds 73, and S2 names which chunk each
-of the three build-added legs takes. The table is the assignment, not a census — a frozen census is
+where the manifest holds 70 legs; at the reorder commit it holds 74, and S2 names which chunk each
+of the four build-added legs takes. The table is the assignment, not a census — a frozen census is
 the rot class the charter already records from govkit, where a spec twice stated a figure the tree
 then moved underneath.
 
@@ -187,8 +203,9 @@ to re-weaken AC6 to the conditional form the round-1 fix removed.
 | file | change |
 |---|---|
 | `tools/run-gates/run-gates.sh` | the parse field, the chunk-major key, the reader walk, the chunk verb, the halt |
-| `tools/run-gates/run-gates.test.sh` | S8's arms; existing arms restated in comment only |
-| `tools/gate-legs.json` | the chunk key on every leg the manifest holds at that commit (73, not the 70 at this base), and the reorder — last commit of the build |
+| `tools/run-gates/run-gates.test.sh` | S8's fixture-driven arms; existing arms restated in comment only |
+| `tools/run-gates/run-gates.gov.test.sh` | AC6's every-leg and contiguity assertions over gov's real manifest |
+| `tools/gate-legs.json` | the chunk key on every leg the manifest holds at that commit (74 by the current count against 70 at this base — DERIVED, and it has already moved once inside this build), and the reorder — last commit of the build |
 | `memory/guides/SESSION-KICKOFF.md` | the gate-command block |
 | `AGENTS.md` | the chunk contract sentence only |
 
@@ -273,7 +290,8 @@ to re-weaken AC6 to the conditional form the round-1 fix removed.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.test.sh` · `bash tools/run-gates/run-gates.evidence.test.sh` ·
+`bash tools/run-gates/run-gates.test.sh` · `bash tools/run-gates/run-gates.gov.test.sh` ·
+`bash tools/run-gates/run-gates.evidence.test.sh` ·
 `bash tools/check-testsuite-counts.sh` · `python tools/codebase-map/test_codebase_map.py` ·
 `bash tools/memory-tree/check-memory-hygiene.sh` · `python tools/govkit/govkit.py selfcheck` ·
 `bash tools/check-playbook-parity.sh`.
@@ -328,6 +346,16 @@ recommendation; the reason each survived the veto order is recorded with it.
   edit and the charter sentence, neither of which any criterion or gate observed. R29: §8's second
   resolution gave contiguity as the protection, which round 1 refuted by construction; the reason is
   restated as AC6's unconditional assertion. R4/R5: AC11 gains the registry clause.
+- rev-6 · 2026-08-18 · folded the round-3 blocker re-review. T7/T11: the leg arithmetic R17 fixed
+  moved again in the same fold, because the fix for R10 gave `TOOL-aPacedTurnstile-1` a fourth
+  manifest leg — 73 becomes 74, the gov-only canary takes `selftests`, and both carriers now say the
+  figure is DERIVED and has already moved once, with S2's count-free leading clause named as the
+  binding one. T9/T22: this unit alone of the four carrying the gov harness was never swept — §7
+  gains it, §4 Files touched gains its row, and S8 stops assigning the contiguity arm to the shipped
+  canary AC6 had just moved it out of, which would have re-created the red-on-arrival R10 named.
+  T17: S9's exclusive-ownership claim over the kickoff guide is narrowed to the gate-command BLOCK,
+  since `-1` and `-7` both edit that file and one of those edits is the `watch:` line whose omission
+  fails the kickoff ratchet.
 
 ## 10. Reuse audit
 

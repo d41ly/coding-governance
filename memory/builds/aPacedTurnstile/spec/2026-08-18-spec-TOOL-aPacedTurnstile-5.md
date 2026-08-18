@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -16,8 +16,15 @@ including after a crash.
   one for a concurrent reader. The per-run uniqueness is preserved deliberately, not incidentally:
   the completion file is the DISPATCH SUPPRESSOR, not a log, so a leftover one at a fixed path would
   make the runner skip a leg and print it green. Creating the run directory fails the run the way
-  the `mktemp -d` it replaces already does; retention of older run dirs is bounded by a sweep that
-  runs AFTER the verdict file is written, never before the first leg dispatches.
+  the `mktemp -d` it replaces already does. **Retention is `GATE_RUN_KEEP=5` run directories**, a
+  DECLARED constant with its reasoning beside it in `TOOL-aPacedTurnstile-4` S8's shape rather than
+  an unnamed number: five is enough that a crashed run's record — the one with a header and no
+  verdict — survives the two or three ordinary runs an operator does before they come back to look
+  at it, and small enough that a record of a header, one row per leg and a verdict cannot grow the
+  git dir without practical limit. The sweep to that bound runs AFTER the verdict file is written,
+  never before the first leg dispatches. Round 3's T14/T21: R6's fix asked for the bound AND its
+  criterion, and only the criterion landed, so AC15 graded "the declared retention bound" against a
+  declaration nothing made.
   **The two directories have separate lifetimes and separate owners, and round 2's R2/R3 are why
   this is now stated rather than implied.** `<git-dir>/gate-run/` is the DURABLE record: this unit
   owns it, the EXIT trap stops covering it, and the only deleter is the post-verdict sweep named
@@ -47,7 +54,27 @@ including after a crash.
   Its ABSENCE is the crash signal, and is the only crash signal needed.
 - **S5** — a fingerprint helper computing one digest over the committed tree object plus the
   porcelain status lines plus the blob hashes of every dirty-or-untracked file that still exists.
-  Over-sensitive by construction, never under-sensitive; empty on any failure. It ships as
+  Over-sensitive by construction, never under-sensitive; empty on any failure.
+  **It takes an optional REV argument, and round 3's blocker T1 is why this signature is declared
+  here rather than left to a builder.** Two forms, one implementation:
+
+  - `gate-fingerprint.sh` with no argument — the WORKING-TREE form. All three components: the tree
+    object at `HEAD`, the sorted porcelain lines, the dirty-or-untracked blob hashes. This is what
+    the runner stamps into the header and into `gate-full-green`.
+  - `gate-fingerprint.sh <rev>` — the AT-A-REV form. The tree object at `<rev>`, and the other two
+    components supplied EMPTY rather than omitted, so both forms hash the same input arity. This is
+    what `.githooks/pre-push` calls for `TOOL-aPacedTurnstile-7`'s predicate 0.
+
+  **The binding property, and the whole reason the two forms exist:** on a CLEAN tree the two forms
+  produce the SAME value, because the porcelain component and the dirty-blob set are empty in both.
+  S7 refuses to write `gate-full-green` unless the tree was clean at start, so every recorded digest
+  is one the rev form reproduces at the sha it names. Without this, `-7`'s corrected predicate 0
+  names a computation this interface cannot perform, and a builder's three options are: call the
+  no-argument form from the hook, which takes the digest at the pushed tip and is round 2's blocker
+  R1 restored verbatim; reimplement an at-a-rev digest inside the hook, which is the
+  two-answers-to-one-question class this item exists to prevent and which fails toward FULL forever;
+  or invent the mode, where an arity mismatch between the two makes predicate 0 fire
+  unconditionally. Round 2's R19 gave the helper a name; the signature is what was still missing. It ships as
   `tools/run-gates/gate-fingerprint.sh` — its OWN executable inside the kit, named here by repo
   identifier and spelled identically in `TOOL-aPacedTurnstile-7` S2b and in
   `TOOL-aPacedTurnstile-1`'s kit-dir layout — rather than as a function private to the runner,
@@ -154,6 +181,15 @@ One digest over three things: the committed tree object, the sorted porcelain st
 blob hashes of every dirty-or-untracked file that still exists. Measured on this repo: the status
 plus hash-object pass completes in 0.41 s, once per run rather than per leg.
 
+**Two invocation forms over that one definition, per S5.** With no argument the tree object is
+`HEAD`'s and the other two components are measured from the live worktree — the runner's form. With
+a `<rev>` argument the tree object is that rev's and the other two components are supplied EMPTY,
+which is the form `.githooks/pre-push` calls. They are EQUAL on a clean tree, since the porcelain
+and dirty-blob components are empty in both, and that equality is what lets `TOOL-aPacedTurnstile-7`
+recompute a recorded digest at the sha the record names. Empty rather than OMITTED is the load-
+bearing word: an at-a-rev form that hashed one component where the working-tree form hashes three
+would mismatch unconditionally, and predicate 0 would force full forever while reading as caution.
+
 The porcelain lines carry deletions and renames that a blob list cannot, and a path containing a
 newline arrives quoted but still CHANGES when the path changes. That asymmetry is the whole
 contract: **the fingerprint may be over-sensitive, never under-sensitive.** A false difference costs
@@ -191,7 +227,7 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
 | file | change |
 |---|---|
 | `tools/run-gates/run-gates.sh` | destination, trap narrowing, header, per-leg row, verdict, ledger, post-verdict sweep |
-| `tools/run-gates/gate-fingerprint.sh` | NEW — S5's digest, shipped as its own executable and called by the runner and by `.githooks/pre-push` |
+| `tools/run-gates/gate-fingerprint.sh` | NEW — S5's digest in BOTH forms: no argument for the runner's working-tree stamp, `<rev>` for the hook's at-a-rev recomputation, equal on a clean tree |
 | `tools/run-gates/run-gates.evidence.test.sh` | S9's arms |
 | `tools/run-gates/run-gates.test.sh` | S10's pinned key set |
 | `tools/gate-legs.json` | the `impure` key on the measured legs |
@@ -269,12 +305,22 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   runner: without a pinned id the plant lands in a directory the run never opens, so the arm passes
   by finding nothing and proves the opposite of what it claims. A second plant at the retired FLAT
   path must also be ignored.
-- **AC15** — When a run completes, run directories older than the declared retention bound are gone
-  and the current one and its predecessor remain, asserted in
-  `tools/run-gates/run-gates.evidence.test.sh` against a fixture carrying more than the bound. Its
-  control is the same fixture with the run KILLED before the verdict is written: nothing is swept,
-  because the sweep runs after the verdict and never before dispatch. Without this pair the bound S1
-  states has no owner and the record grows without limit (round 2's R6).
+- **AC15** — When a run completes against a fixture carrying more than `GATE_RUN_KEEP` run
+  directories, exactly `GATE_RUN_KEEP` remain and they are the most recent, asserted in
+  `tools/run-gates/run-gates.evidence.test.sh` and graded against that constant BY NAME rather than
+  against a bound stated only in this criterion. Its control is the same fixture with the run KILLED
+  before the verdict is written: nothing is swept, because the sweep runs after the verdict and never
+  before dispatch. Without the named constant the criterion is satisfied by any bound a builder
+  picks, including one above the fixture's size, which passes by finding nothing (round 2's R6,
+  round 3's T14/T21).
+- **AC17** — When `tools/run-gates/gate-fingerprint.sh` is invoked with no argument on a CLEAN tree
+  and with `HEAD` as its rev argument, the two invocations print the SAME digest; and when the tree
+  is made dirty, they DIFFER, with the rev form unchanged from its clean-tree value. Asserted in
+  `tools/run-gates/run-gates.evidence.test.sh`. Both halves: the equality alone is satisfied by a rev
+  form that ignores its argument, and the difference alone by two unrelated digests. This is the
+  criterion `TOOL-aPacedTurnstile-7`'s predicate 0 rests on — the recorded value must be reproducible
+  at the sha it names — and without it the blocker returns in its most expensive form, an
+  unconditional mismatch that reads as caution (round 3's T1).
 - **AC16** — When a fixture leg emits a token the runner's redaction masks, the DURABLE per-leg
   output copy under the run directory contains only the masked form, and both that file's mode and
   the run directory's mode are the restrictive ones the existing per-leg log already uses — asserted
@@ -361,6 +407,16 @@ recommendation; the reason each survived the veto order is recorded with it.
   security line said the new files carry no command output while S3 said they do; corrected, with
   AC16 observing the masking and both modes. R4/R5: AC12 gains the registry clause and the counters
   move to `-1`, which owns the waiver rows.
+- rev-6 · 2026-08-18 · folded round 3's BLOCKER T1/T2/T3, which is the R1 fix not landing whole.
+  R19 gave `gate-fingerprint.sh` a name and nobody gave it a SIGNATURE, so `-7`'s corrected
+  predicate 0 named a computation this interface could not perform. S5 now declares two forms of one
+  implementation — no argument for the runner's working-tree stamp, `<rev>` for the hook's
+  recomputation, the working-tree components supplied EMPTY rather than omitted so both hash the
+  same arity — with the binding property that on a clean tree they are EQUAL, which is what makes
+  S7's clean-at-start refusal the thing that guarantees every recorded digest is reproducible at its
+  own sha. AC17 arms both halves. T14/T21: the retention bound R6 asked for is declared as
+  `GATE_RUN_KEEP=5` with its reasoning, in `-4` S8's shape, and AC15 grades it by name instead of
+  grading a declaration nothing made.
 
 ## 10. Reuse audit
 
