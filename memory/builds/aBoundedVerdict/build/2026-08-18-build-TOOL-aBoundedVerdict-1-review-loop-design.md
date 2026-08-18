@@ -14,15 +14,16 @@ The loop's exit condition has never once been reached in this corpus.
 
 | verdict | records |
 |---|---|
-| `BLOCKED` (bare, or with a count suffix) | 38 |
+| `BLOCKED` (bare, or with a count suffix) | 36 |
 | `CLEAN WITH FIXES` | 6 |
 | **`CLEAN`** | **0** |
 | a bare `## Verdict` heading carrying no token | 9 |
+| a `## Verdict …` line that is a section heading, not a verdict | 2 |
 | outside the method's vocabulary — `CHANGES REQUESTED` ×4, `SHIP WITH FIXES`, `PASS WITH FINDINGS` | 6 |
 
 `memory/guides/BUILD-METHOD.md:104-105` states the only exit: *"once a synthesis pass calls the design
 clean, stop reviewing that spec."* The token that satisfies it appears **0 times in 90 records**.
-`BLOCKED` is 42% of the corpus and `M8` gives it no disposition at all — `:198` says "Fix every
+`BLOCKED` is 40% of the corpus and `M8` gives it no disposition at all — `:198` says "Fix every
 blocker, then re-review the FIX", which is an instruction to loop, not an exit.
 
 Round counts follow from that: `dClosedLexicon` 10 records (the run reached ABORTED), `aFoldedQuarry`
@@ -31,6 +32,10 @@ Round counts follow from that: `dClosedLexicon` 10 records (the run reached ABOR
 **So the flat two-round cap was treating the wrong variable.** A cap does not give the loop an exit; it
 relocates the stall from round 8 to round 2, which is the failure the owner reported. The cap is
 withdrawn as the mechanism, not merely re-tuned.
+
+*Corrected 2026-08-19 by the M4 spec audit: the `BLOCKED` row read 38 in the first cut, which absorbed
+the two records whose `## Verdict …` line is a section heading rather than a verdict. Re-derived with
+an anchored token match at 36. The zero is the load-bearing figure and it re-verified unchanged.*
 
 ## 2. Why round two re-reads everything (owner issue 3)
 

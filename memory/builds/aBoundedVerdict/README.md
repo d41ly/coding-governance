@@ -204,7 +204,7 @@ of the close path ran behind that design and confirmed 32 defects, 3 of them blo
 source every new unit below derives from.
 
 **The reversal in one line.** The cap bound the wrong variable. Over 90 tracked review records the
-only exit the method states — a literal clean verdict — occurs **zero** times, while `BLOCKED` is 38
+only exit the method states — a literal clean verdict — occurs **zero** times, while `BLOCKED` is 36
 and has no disposition anywhere. A count does not give a loop an exit; it moves the stall earlier.
 
 **Why the build grew from five units to fourteen.** The owner's second report — closing "faces
@@ -247,7 +247,7 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-6 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-7 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-5 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-6 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |

@@ -1,11 +1,11 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** SPECCED · rev-7 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
 The build method's review loop has no reachable exit — over 90 tracked review records the literal
-clean verdict it names as the only exit occurs **zero** times, while `BLOCKED` is 38 of 90 and has no
+clean verdict it names as the only exit occurs **zero** times, while `BLOCKED` is 36 of 90 and has no
 disposition anywhere. Give the loop an exit that CAN be reached: a round ends the loop when its
 confirmed blockers are empty or when they stop shrinking, and a blocker that survives that exit
 becomes a spec unit in the build and is resolved rather than re-reviewed.
@@ -105,7 +105,7 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
 
 | verdict | records |
 |---|---|
-| `BLOCKED`, bare or suffixed | 38 |
+| `BLOCKED`, bare or suffixed | 36 |
 | `CLEAN WITH FIXES` | 6 |
 | **`CLEAN`** | **0** |
 | a bare `## Verdict` heading with no token | 9 |
@@ -385,7 +385,7 @@ figure as authority.
 - rev-6 · 2026-08-19 · **the cap is withdrawn on the owner's instruction and replaced by a convergence
   predicate, and the residual-blocker disposition becomes PROMOTION to a spec unit.** Grounds are
   measured, not argued: the method's only stated exit occurs 0 times in 90 review records while
-  `BLOCKED` is 38, so a count bounded a loop that had no exit and moved the stall earlier — which is
+  `BLOCKED` is 36, so a count bounded a loop that had no exit and moved the stall earlier — which is
   the failure the owner reported. Changes: the title and §1; S1 becomes the predicate and S1a demotes
   the constant to a backstop that reaching is itself a defect; S2 gains `--blockers` and reports a loop
   state instead of refusing a round; S6 gains the non-decreasing clause; S8 becomes promotion and
@@ -397,6 +397,12 @@ figure as authority.
   termination is likely and unproven. F1 is re-opened in the new frame and resolved; F3 becomes
   writable and supersedes a backlog row; F4 is new and is the owner's. The read-path figures are
   re-measured at this base rather than carried.
+- rev-7 · 2026-08-19 · the M4 spec audit's count correction, folded before any code. `BLOCKED` is
+  **36** of 90, not 38: the first count read a `uniq -c` listing and absorbed the two records whose
+  `## Verdict …` line is a SECTION HEADING (`Verdict up front`, `Verdict and landing order`) into the
+  suffixed-BLOCKED group. Re-derived with an anchored token match. The argument is unchanged and the
+  headline number was never the disputed one — bare `CLEAN` is 0 of 90, re-verified — but a spec that
+  will be built from may not carry a number that does not reproduce.
 
 ## 10. Reuse audit
 
