@@ -1297,22 +1297,28 @@ verb_preflight() { # slug · keepalive-id
     echo "unattended: retired the finished record — $rel -> $arch"
   fi
 
-  # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
-  # then discovers a refusal has already changed the state the refusal was about.
-  if [ ! -f "$rel" ]; then
-    scaffold_runmd "$slug" || { fail 9 "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in: $rel"; return 1; }
-  fi
-
   # The unit list is DERIVED at read time, never copied here. A copy has to be refreshed by
   # something, and the only writer was this verb — which refuses once a run is live. So an ordinary
   # pass (a spec rev bump moves the build index) left the copy stale with no reachable way to repair
   # it, and the refusal named a remedy that did not exist. Deriving removes the class rather than
-  # adding a verb to service it. Both markers are still VALIDATED here, because a malformed pair is
+  # adding a verb to service it. Both markers are still VALIDATED, because a malformed pair is
   # something to refuse rather than to guess around.
+  #
+  # TOOL-aPromptedMandate-6 fold, review M1 - the README's pair is validated BEFORE the scaffold, not
+  # after it. The comment below has always said the run-state file is created after EVERY precondition
+  # passed, and this one ran later, so a malformed README left an orphan untracked RUN.md behind a
+  # refusal - and the retry then met the DIRTY-TREE refusal instead, naming a cause that was this
+  # verb's own leftover. Observed during this build's first manual reproduction.
   src=$(readme_of "$slug")
   if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
     fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
     return 1
+  fi
+
+  # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
+  # then discovers a refusal has already changed the state the refusal was about.
+  if [ ! -f "$rel" ]; then
+    scaffold_runmd "$slug" || { fail 9 "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in: $rel"; return 1; }
   fi
   if ! region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1; then
     fail 9 "the run-state file's generated markers are malformed — exactly one open and one close, close after open: $rel"

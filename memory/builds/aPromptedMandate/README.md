@@ -132,6 +132,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 |---|---|---|
 | [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md) | research | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 |
 | [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
+| [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -157,4 +158,5 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md)
 - **`reviews/`**
   - [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md)
+  - [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md)
 <!-- /gen:build-docs -->

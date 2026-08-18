@@ -27,3 +27,25 @@ is checked against the classifier before the arm is trusted — a report mode ex
 No machine gate: this is a review discipline, not a source-level pattern. The nearest mechanical
 protection is that every arm names a branch message, so an arm whose fixture stops working fails
 instead of passing.
+
+## The sub-shape that recurs: the fixture trips an EARLIER guard
+
+Measured four times in one build (`aPromptedMandate`, 2026-08-18), each time on a first attempt. The
+fixture looks exactly like the failing state and never reaches the branch under test, because some
+precondition ordered ahead of it refuses first:
+
+- a README edited in the WORKING COPY, where the checker reads the blob at a pinned BASE — the pin
+  does not move, so the edit is invisible and the arm reports nothing;
+- a fixture authored on the UNIT BRANCH for a check that runs after the authorization, which refuses
+  at `fail 6` before the region validation is reached;
+- a re-run used to produce a disagreement between two facts that are both PINNED ONCE, so neither
+  moves and no disagreement is producible;
+- an arm asserting a sibling branch's message: the regression it guards emits a DIFFERENT string, so
+  the arm is green over the broken implementation.
+
+Two of the four were green-and-wrong rather than loudly missing, and one of those shipped into a
+commit and was caught by a closing review rather than by the suite.
+
+**The tell** is that a passing arm and a never-reached arm look identical. So: break the subject
+DELIBERATELY and watch the arm's own message appear, before writing the arm. If the refusal that
+appears names something else, the fixture is testing that something else.

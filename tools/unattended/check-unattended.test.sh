@@ -1096,7 +1096,13 @@ mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M
 mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
 mkdir -p memory/project
 printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
-miss "$(run)" "the Skill's directive table carries no scope cell this leg can read"
+# The DISCRIMINATING string, not the vacuity one. Reproduced both ways in a scratch repo: with the
+# exclusion broken (`corescope` built from CORE **plus** EXTRA) the leg reds with the DISAGREEMENT
+# message naming `house-style:all`, while the vacuity string appears zero times in either build -
+# `tblscope` reads the kit template only, so that branch is unreachable here. The arm was green over
+# the broken implementation, which is the fixture-passes-by-finding-nothing class this leg's own
+# comments cite, committed in an arm written to guard against it.
+miss "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows"
 reset_tree
 
 # TOOL-aPromptedMandate-5 - check 20, the PROMPT path ordered inside its OWN section. Check 18
@@ -1133,6 +1139,27 @@ mutate tools/unattended/SKILL.template.md 's/^## Start a run from a PROMPT$/## N
 miss "$(run)" "the Skill's prompt path does not name all three of its ordered steps"
 reset_tree
 
+# TOOL-aPromptedMandate-6 fold — the three predicates the CLOSING REVIEW asked for. Each was measured
+# firing against the live tree before its arm was written, which is the claim that failed for exactly
+# one arm in this build and is why these say so explicitly.
+#
+# I, review H1: a floor BELOW the kit's own core count. This build SHIPPED that state - the bump to
+# 13 was reverted by a `git checkout --` during an unrelated probe and arm C passed, because it only
+# asked whether the count met the floor and never whether the floor met the kit.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_FLOOR="13"$/DIRECTIVES_FLOOR="11"/'
+hit "$(run)" "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it:"
+
+# I, review L2: a PROJECT-declared scope. Two carriers say the scope is kit-owned; nothing enforced
+# it, because scope_of composes core PLUS extra and would have honoured this silently.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9:prompt"/'
+hit "$(run)" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
+
+# I, review L3: a pass kind outside the vocabulary. The both-ways join to the protocol cannot see it
+# - both sides would agree on the same wrong token, which is the two-derived-values class.
+reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
+hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1143,7 +1170,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=194
+FLOOR_ASSERTIONS=200
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

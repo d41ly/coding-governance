@@ -119,6 +119,11 @@ readme tModeBad
 mutate memory/builds/tModeBad/README.md '/^slug: tModeBad$/a authorized-by: banana'
 readme tModeOk
 mutate memory/builds/tModeOk/README.md '/^slug: tModeOk$/a authorized-by: prompt'
+# review M1's subject: a README whose generated marker pair is UNPAIRED. On MAIN for tFresh's
+# reason - authored on the unit branch it never resolves at BASE, so check_authorization refuses
+# first and the region validation this arm is about is never reached. Measured.
+readme tUnpaired
+mutate memory/builds/tUnpaired/README.md 's|^<!-- /gen:build-index -->$||'
 # TOOL-cBriefedPilot-4: the build-method carrier, which --preflight now REFUSES without. A stub,
 # because the driver tests existence and nothing else; the file whose sections have to resolve lives
 # in the LEG's fixture. It is created before the initial commit deliberately - every arm begins with
@@ -1743,6 +1748,16 @@ out=$(run --preflight tModeOk --keepalive-id k1 --waive researched --reason "the
 hit "$out" "preflight OK"
 hit "$(cat memory/builds/tModeOk/RUN.md)" "waiver · item researched"
 git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+reset_tree
+
+# ---- review M1: a malformed build README must leave NO run-state file behind. `scaffold_runmd` ran
+# ---- BEFORE this validation, so the refusal fired over a tree the verb had already changed - and
+# ---- the retry then met the DIRTY-TREE refusal, naming a cause that was this verb's own leftover.
+# ---- The adjacent comment claimed the scaffold happens after every precondition; it now does.
+reset_tree
+out=$(run --preflight tUnpaired --keepalive-id k1)
+hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
+same "a malformed README leaves no orphan run-state file" "$([ -f memory/builds/tUnpaired/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build

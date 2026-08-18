@@ -156,9 +156,14 @@ rather than a claim in a transcript nobody reads.
    has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
    file, and the kickoff engine's Step 5b exit 5 does not reach here — it is scoped to a run already
    started. Nothing staged, nothing committed, nothing to clean up.
-3. **Write the build folder.** `{{MEMORY_ROOT}}/builds/<slug>/README.md` with front matter carrying
-   the slug, the streams value, and **`authorized-by: prompt`** — the key that records which
-   discipline bound this run, and which the merge bar re-derives from this same file. Carry the
+3. **Write the build folder.** `{{MEMORY_ROOT}}/builds/<slug>/README.md`. **Front matter needs ALL
+   SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
+   **`authorized-by: prompt`**, the key recording which discipline bound this run, which the merge
+   bar re-derives from this same file. **And the body needs the generated-region marker pair**,
+   `<!-- gen:build-index -->` and its close, or preflight refuses at step 5 with *the build README's
+   generated markers are malformed*: the unit list is DERIVED from that region, so an unpaired marker
+   is not something the driver guesses around. Every one of these is checked AFTER the push, where
+   there is no owner turn left to ask about it. Carry the
    owner's prose VERBATIM under its own heading, and every clarification with its answer. The roster
    may be provisional: a roster that grows after preflight draws no refusal on this anchor, because
    your own push re-satisfies the comparison.

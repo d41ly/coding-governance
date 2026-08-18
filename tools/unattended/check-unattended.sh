@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. EIGHTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. TWENTY checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -683,6 +683,15 @@ else
     only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
     [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"
     [ -z "$only_tbl" ] || fail 16 "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: $only_tbl"
+    # TOOL-aPromptedMandate-6 fold, review L2 - the scope is KIT-OWNED, and two carriers say so. It
+    # was enforceable only by convention: `scope_of` composes core PLUS extra, so a project could
+    # declare `house-style:M9:prompt` and select a binding the protocol says it may not. Refused here
+    # rather than silently honoured, which keeps the documents true.
+    for _xe in $DIRECTIVES_EXTRA; do
+      case "${_xe#*:}" in *:*)
+        fail 16 "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name: $_xe" ;;
+      esac
+    done
     # TOOL-aPromptedMandate-4 - the SCOPE column, joined to the registry's third field. Scoped to the
     # KIT table's rows: the handle set compared is the CORE set, so a project's own extra rows are
     # outside this arm and an adopter is never redded for a column the kit did not ask them to write.
@@ -726,6 +735,14 @@ else
 fi
 # Arm C: the floor. Mirrors CORE_FLOOR's two branches — undeclared and malformed are both refusals,
 # because either one leaves the pin unenforced while the conf still looks configured.
+# TOOL-aPromptedMandate-6 fold, review H1 - a floor BELOW the kit's own core count is SLACK BY
+# CONSTRUCTION and cannot fire on the deletion it exists to catch. This build shipped exactly that:
+# the bump to 13 was reverted by a `git checkout --` during an unrelated probe, and arm C passed
+# because it only ever asked whether the count met the floor, never whether the floor met the kit.
+_ndc=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+if [ -n "$DIRECTIVES_FLOOR" ] && [ "$DIRECTIVES_FLOOR" -lt "$_ndc" ] 2>/dev/null; then
+  fail 16 "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it: $DIRECTIVES_FLOOR against $_ndc"
+fi
 if [ -z "$DIRECTIVES_FLOOR" ]; then
   fail 16 "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
 else
@@ -771,7 +788,15 @@ if [ -f "$proto" ]; then
     if [ -z "$ppk" ]; then
       fail 16 "the protocol names no phase as a build-method pass kind, so the pass-kind join would compare the driver's subset against nothing and pass by finding nothing; the anchor is the line ending 'PASS kinds:'"
     else
-      pkcore=$(printf '%s\n' $PHASES_PASSKIND | sort -u)
+      # TOOL-aPromptedMandate-6 fold, review L3 - the subset relation, never asserted. A pass-kind
+    # naming a phase no run can occupy publishes a position the vocabulary does not carry, and the
+    # both-ways join to the protocol cannot see it: both sides would agree on the same wrong token.
+    for _pk in $PHASES_PASSKIND; do
+      case " $PHASES_CORE " in *" $_pk "*) ;;
+        *) fail 16 "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy: $_pk" ;;
+      esac
+    done
+    pkcore=$(printf '%s\n' $PHASES_PASSKIND | sort -u)
       kd1=$(comm -23 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
       kd2=$(comm -13 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
       [ -z "$kd1" ] || fail 16 "the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names: $kd1"
