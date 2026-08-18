@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -36,19 +36,31 @@ not from the section. What survives is what a session cannot get anywhere else:
 - one line stating that the leg list is `tools/gate-legs.json` and each leg's rationale is its own
   script header, with the map dossiers as the third carrier.
 
-What goes: the seventy per-leg paragraphs. Each one's content already has an owner — the manifest
-owns membership, the script header owns the why, and `memory/map/features/` owns the machinery.
+What goes: the per-leg bullets. There are 46 top-level bullets covering 70 legs — a bullet
+legitimately groups several legs, which is why the drift probe over this section matches on script
+paths rather than counting bullets, and why an earlier revision's "seventy per-leg paragraphs"
+described a structure the section does not have. Each bullet's content already has an owner: the
+manifest owns membership, the script header owns the why, and `memory/map/features/` owns the
+machinery.
 
-**S4 — Retire the charter-completeness drift signal, by declaring its population empty.**
-`_charter_mentions_every_leg` in `tools/drift-audit/drift_signals.py` asserts that the gate-suite
-section cites every leg's argv script path. Its pin is `0` and it is green today, so S3 reds it on
-seventy legs at once. The signal is not weakened and its pin is not raised: its POPULATION is
-declared empty, the way `ledger_rows_contradicting_git` already is in the same file and for the same
-reason — the record it graded no longer exists. The comment records that the charter stopped making
-the claim, so there is nothing left to disagree with the source. Per the kit's liveness rule the
-declaration must read as NOT ASKED rather than as a clean zero, since a signal quietly reporting
-zero over an empty population is the reassuring-nothing shape drift-audit exists to refuse.
-`tools/drift-audit/selftest.py`'s arms for that signal retire with it.
+**S4 — The charter-completeness signal is already retired by the time this unit runs, and that is
+deliberate.** `_charter_mentions_every_leg` asserts that the gate-suite section cites every leg's
+argv script path; it measures `0 of 70` against a pin of `0` and is gateable, so S3 would red it on
+seventy legs at once. The retirement is `TOOL-aFusedCharter-1` S10's, not this unit's, because three
+units BEFORE this one add a gate leg and each would red the same zero-pin signal with no unit owning
+the fix — the spec audit's third blocker. This unit therefore inherits a retired signal and asserts
+that inheritance rather than performing it, which AC4 covers.
+
+An earlier revision of this scope item performed the retirement here AND got the mechanism wrong in
+three ways, all corrected in `TOOL-aFusedCharter-1` S10 and recorded here so the correction is not
+lost with the move. The probe is one row in a `HANDKEPT` list, so the edit is a row DELETION plus a
+SIGNAL name added to `DECLARED_EMPTY` — not "declaring a probe's population empty". That renders as
+*empty by declaration*, which is the right reading; `NOT ASKED` is a different engine flag that makes
+the signal non-gateable, and the engine's own comment records rejecting that route for this case
+deliberately, so the earlier text contradicted its own acceptance criterion. And
+`tools/drift-audit/selftest.py` carries NO arms for this probe — its fixture already writes an empty
+`HANDKEPT` and already uses this signal's name as the literal its `DECLARED_EMPTY` arms exercise — so
+"its arms retire with it" named work that does not exist.
 
 **S5 — Amend the gates rule the cut depends on.** The output-discipline rule currently says a green
 gate line enumerates every expected leg. After S3 the charter no longer holds that list, so the rule
@@ -62,6 +74,12 @@ charter today carries no voice section, no output discipline, no session-executi
 micro-formats; a session reading only `AGENTS.md` gets none of them. After S1 all four arrive inside
 the region. This scope item is the acceptance of that, not separate work: it is named because it is
 half the reason the owner opened the session, and a spec that leaves it implicit cannot be checked.
+
+**S6a — `.governance/deploy.toml` needs a line-ending pin, and a place in the deployer's surface.**
+It is a new committed file this unit creates, and `TOOL-aFusedCharter-1` S4b adds its `eol=lf` row —
+without one, `core.autocrlf` decides its bytes per node and the render's answers differ across the
+fleet for no reason anybody can see. This unit verifies the pin took effect with `git check-attr`
+rather than assuming the row was written.
 
 **S7 — Re-stamp the kickoff manifest.** `memory/guides/SESSION-KICKOFF.md` names `AGENTS.md` in
 `verify-paths` and states the charter is authoritative. Its `§B` claims are re-verified against the
@@ -92,7 +110,12 @@ target of every check keyed on it.
 
 Measured at BASE.
 
-| Part | Bytes | After |
+Sizes are CHARACTERS, and the column says so because an earlier revision headed it "Bytes" while
+holding character counts — the file's byte total is 33 413 against 33 146 characters, and nothing was
+mis-measured, only mislabelled. The distinction matters downstream: `check-template-size.sh` enforces
+bytes.
+
+| Part | Characters | After |
 |---|---|---|
 | preamble | 933 | authored, kept |
 | what ships here | 2 399 | authored, kept |
@@ -162,9 +185,10 @@ is the honest act and the file already has a precedent for it.
 - **AC3** — When the charter is read, its voice, output-discipline, session-hygiene and
   micro-format rules are present — `grep -c 'BUILD — ' AGENTS.md` returns at least `1`, proving S6
   arrived through the render rather than by hand.
-- **AC4** — When `python tools/drift-audit/drift_report.py --check` runs it exits 0, and the
-  charter-completeness signal reports its population as declared-empty rather than as zero
-  offenders; `python tools/drift-audit/selftest.py` exits 0 with that signal's arms removed.
+- **AC4** — When `python tools/drift-audit/drift_report.py --check` runs after this unit's cut, it
+  exits 0 and the signal renders with the literal `empty by declaration` rather than as zero
+  offenders. `python tools/drift-audit/selftest.py` exits 0 UNCHANGED — it carries no arms for this
+  probe, and an earlier revision that expected to remove some named work that is not there.
 - **AC5** — When the surviving gate-suite remnant is read, each of S3's six survivors is present and
   no per-leg paragraph is — `grep -c 'check-verdict-epoch' AGENTS.md` returns `0` while
   `grep -c 'gate-legs.json' AGENTS.md` returns at least `1`.
@@ -191,6 +215,11 @@ is the honest act and the file already has a precedent for it.
 
 - rev-1 · 2026-08-18 · initial draft. S4 was added after measuring that the charter-completeness
   drift signal sits at a drained pin of zero and would red on seventy legs the moment S3 lands.
+- rev-2 · 2026-08-18 · folded the M4 spec audit. S4's retirement MOVES to `TOOL-aFusedCharter-1` S10,
+  because three earlier units add a gate leg and would each red the same zero-pin signal; its three
+  wrong mechanism facts are corrected and recorded here rather than lost with the move. New S6a pins
+  the new committed descriptor's line endings, the Inventory column is relabelled to characters, and
+  the "seventy per-leg paragraphs" figure is corrected to 46 bullets over 70 legs.
 
 ## 10. Reuse audit
 

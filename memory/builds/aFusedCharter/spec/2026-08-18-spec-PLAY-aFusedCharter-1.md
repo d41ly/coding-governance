@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 
@@ -38,23 +38,70 @@ disappears. Sections are NOT renumbered: `§4`, `§10`, `§13` and `§17` become
 renumbering breaks every cross-reference in the file and every citation of this playbook in this
 repo's records.
 
-**S6 — Move the kit-advertisement prose to `WIRE-INTO-PROJECT.md`.** Seven bullets currently sell a
+**S6 — Move the kit-advertisement prose to `WIRE-INTO-PROJECT.md`, and add one sentence that is not
+a move.** The `lexicon` kit is named in NO surviving carrier: measured with the parity gate's own
+predicate, its only mention across the trio is in `parallel-coding-governance.customize.md`, which
+this build deletes, and it holds no waiver row. `WIRE-INTO-PROJECT.md` therefore gains a lexicon
+sentence as an ADDITION, or the kit-coverage arm reds the day the companion goes. Seven bullets
+currently sell a
 kit rather than state a rule: `§5`'s codebase-map, drift-audit and memory-recall bullets, `§6`'s
 agent-instructions bullet, and `§7`'s pytest-parallel-guardrails, gate-lint and govkit bullets. Each
 leaves behind the RULE it exists to enforce, stated without naming the kit, and its adoption case
 moves to the runbook section that installs it. The memory-tree bullet in `§5` stays: it is marked
 REQUIRED and `§5` and `§6` are both written against it.
 
-**S7 — Move `§8`'s agent-cap hook grammar to `tools/hooks/README.md`.** The bullet retains: at most
-five agents in a verify stage and at most five running at once, they are two rules and not one,
-batching grows the batch and never the agent count, and a hook enforces both at the tool call. The
-marker spellings, the resolvable-bound rules and the direct-spawn slot accounting move out.
+**S7 — Move `§8`'s agent-cap hook grammar to `tools/hooks/README.md`, keeping two literals behind.**
+The bullet retains: at most five agents in a verify stage and at most five running at once, they are
+two rules and not one, batching grows the batch and never the agent count, and a hook enforces both
+at the tool call. The marker spellings, the resolvable-bound rules and the direct-spawn slot
+accounting move out. The bullet measures 1 474 characters today and is the file's longest.
 
-**S8 — Add kit-conditional block markers.** Every block the customize companion currently lists
-under its conditional-sections heading gets an HTML-comment fence naming the kit that justifies it,
-in the shape `<!-- kit:` id `-->` … `<!-- /kit:` id `-->`, so `DEPL-aFusedCharter-1` can drop it
-mechanically. Markers are comments, so an unrendered file reads correctly with every block present.
-The kit ids are `tools/govkit/registry.toml`'s entry ids, not free text.
+**Two literal strings in that bullet CANNOT move, and this is the spec audit's first blocker.**
+`tools/check-playbook-parity.sh`'s `PAIRS` declares two value-parity rows and BOTH take their stated
+side from this file. Both extractions match exactly one line in the whole trio — the concurrency
+bullet — and they read `array LITERAL of` a bound `elements` and the backticked hook matcher naming
+both tool names. Move them and the gate hits its own anti-vacuity arm, which reds when an extraction
+matches NOTHING. The retained bullet therefore carries both literals VERBATIM, in a form those two
+`sed` extractions still match, and the build verifies that by RUNNING the gate rather than by reading
+the bullet.
+
+**`tools/hooks/README.md` does not exist and creating it is not free.** `git ls-files tools/hooks/`
+returns three files, and that kit declares a non-flat `home`, so `govkit selfcheck`'s arm over
+tracked files under a non-flat home reds on any file no `[[files]]` rule claims. S7 therefore CREATES
+the README and adds a fourth `[[files]]` rule to `tools/hooks/kit.toml` shipping it — otherwise the
+moved grammar either reds the deployer or is deleted rather than moved, and an adopter installing
+`agent-cap` receives the hook without the grammar it enforces.
+
+**S8 — Add conditional block markers, in TWO declared namespaces.** Every block the customize
+companion lists under its conditional-sections heading gets an HTML-comment fence, so
+`DEPL-aFusedCharter-1` can drop it mechanically. Markers are comments, so an unrendered file reads
+correctly with every block present.
+
+**One namespace is not enough, and the spec audit is right about why.** Four of the companion's
+conditional rows are keyed on a PROJECT PROPERTY rather than on a kit: the security section's
+outbound-call lines drop when there is no such surface, the cross-OS section drops for a single-OS
+team, the design-system rules drop when there is no UI, and the persona is adjustable. The registry
+has no `security` or `cross-os` entry id, so fencing those with a kit id would name an id the
+renderer must refuse. `govkit` is a registry EXEMPTION rather than an entry, so a govkit fence would
+fail the same check.
+
+- `<!-- kit:` id `-->` … `<!-- /kit:` id `-->` — the id is a `tools/govkit/registry.toml` entry id,
+  and the renderer drops the block when the target did not select that kit.
+- `<!-- when:` key `-->` … `<!-- /when:` key `-->` — the key is a boolean answered in the target's
+  `deploy.toml`, and the renderer drops the block when the answer is false. This is the namespace
+  the four project-property rows use.
+
+**S8's first deliverable is an ENUMERATION, not a fence.** The post-fold conditional set is not
+knowable from the companion's list, because S6 moves seven kit-advertisement bullets out of the
+ruleset entirely and a row whose block has left has nothing to fence. The build therefore enumerates
+the surviving conditional blocks against the folded file BEFORE writing any fence, and records that
+enumeration in the build folder. The spec audit left this open precisely because it cannot be sized
+from the specs, and guessing it is how a fence lands over a block that is no longer there.
+
+**One conditional subject is an inline mid-sentence clause, not a block.** The unattended landing
+rule is a clause inside a sentence. S8 lifts it onto its own line before fencing it, rather than
+teaching the renderer to drop an inline span — a span-dropping renderer has to reflow the sentence
+around it, which is a second mechanism for one clause.
 
 **S9 — Rewrite the preamble.** It currently describes the two-file deploy and the nine companion
 checklists. It becomes: what the file is, that filling it is `DEPL-aFusedCharter-1`'s job and not a
@@ -85,7 +132,8 @@ build-time measurement disagrees, that is a fork for the owner, never a constant
 
 **`§9` and `§11` are not cut.** Both were tested against the admission test and pass: a security
 boundary governs any unit adding a write path, and the cross-OS rules govern any fleet with more
-than one operating system. Both are already project-conditional and the renderer can drop them.
+than one operating system. Both are already project-conditional, and S8's `when:` namespace is what actually lets the renderer
+drop them, since neither has a kit id it could be fenced with.
 
 **No rewriting of surviving rules for style.** Deletion, folding and the ten S-items above. A rule
 that survives keeps its words, except where S6 and S7 explicitly restate one.
@@ -142,7 +190,8 @@ that is the shape being retired, one level down.
 
 `parallel-coding-governance.template.md` (rewritten), `parallel-coding-governance.domain-rules.md`
 (emptied — deleted as a tracked path by `TOOL-aFusedCharter-1`), `WIRE-INTO-PROJECT.md` (S6),
-`tools/hooks/README.md` (S7).
+`tools/hooks/README.md` (S7, CREATED), `tools/hooks/kit.toml` (S7, a fourth `[[files]]` rule), and
+one new record under `memory/builds/aFusedCharter/build/` holding S8's conditional-block enumeration.
 
 ## 5. Production-readiness checklist
 
@@ -165,23 +214,36 @@ that is the shape being retired, one level down.
   returns `0` and every surviving companion bullet is present once in the converged file.
 - **AC2** — When `bash tools/check-template-size.sh` runs against the converged file, it exits 0 and
   prints a byte count under `49152`; the printed number, not this spec's estimate, is the record.
-- **AC3** — When `grep -nE '^## .(4|13|17) ' parallel-coding-governance.template.md` runs it returns
-  nothing, and the same pattern over `(10|16)` returns both headings.
+- **AC3** — When the section headings are enumerated with `grep -nE '^## '`, the four cut numbers are
+  absent and the retained bug-class and output-discipline headings are present. The check is written
+  against that enumerated output rather than as a regex containing the section glyph: that glyph is
+  two UTF-8 bytes, and the same pattern was MEASURED returning 3 matches under `LC_ALL=C.UTF-8` and
+  0 under `LC_ALL=C` and under this node's ambient environment — so a regex form would satisfy its
+  negative half over the UNCHANGED file and fail its positive half after correct work.
 - **AC4** — When the surviving bug-class section is read it states one rule and names no class, so
   `grep -c 'Client/server validation divergence' parallel-coding-governance.template.md` returns `0`.
-- **AC5** — When the conditional blocks are marked, every kit id inside a `<!-- kit:` fence is a real
-  entry id in `tools/govkit/registry.toml`, and every opened fence is closed.
+- **AC5** — When the conditional blocks are marked, the enumeration S8 requires exists in the build
+  folder, every id inside a `<!-- kit:` fence is a real entry id in `tools/govkit/registry.toml`,
+  every key inside a `<!-- when:` fence is answered in this repo's own `deploy.toml`, and every
+  opened fence is closed. No fence names `govkit`, which is an exemption rather than an entry.
 - **AC6** — When the four adopted rules land, each is greppable in its stated section: the liveness
   rule contains `DEAD PROBE` and the derived-count rule contains `derives`.
 - **AC7** — When the seven kit-advertisement bullets are moved, every kit named in one is still
   reachable from `WIRE-INTO-PROJECT.md`, so `bash tools/check-playbook-parity.sh` reports no kit
-  newly unnamed. Checked after `TOOL-aFusedCharter-1` amends that gate's file list.
+  newly unnamed AND its two value-parity rows still resolve. Checked by RUNNING that gate after
+  `TOOL-aFusedCharter-1` amends its file list, never by reading the bullets.
+- **AC8** — When `lexicon` is searched for across the surviving carriers with the parity gate's own
+  predicate, it is named in one. It is reachable today ONLY from
+  `parallel-coding-governance.customize.md`, which this build deletes, and it has no row in
+  `tools/playbook-kit-waivers.txt` — so without a new sentence the kit-coverage arm reds on it.
+- **AC9** — When `python tools/govkit/govkit.py selfcheck` runs after S7, it exits 0 with
+  `tools/hooks/README.md` claimed by a `[[files]]` rule in that kit's descriptor.
 
 ## 7. Gates
 
 `template size <=48KiB` · `playbook parity` · `playbook placeholder catalogue` · `memory hygiene` ·
-`install-prefix (shipped surface)` · `codebase-map coverage + freshness` · the full bar at the push
-boundary. No new leg.
+`install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `govkit selfcheck` (S7
+creates a file under a non-flat kit home) · the full bar at the push boundary. No new leg.
 
 ## 8. Open questions
 
@@ -199,6 +261,12 @@ none — the forks below are RESOLVED and their resolutions are recorded in the 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft, written after the owner resolved F1 through F3 at kickoff.
+- rev-2 · 2026-08-18 · folded the M4 spec audit. S7 keeps the two value-parity literals the gate
+  extracts from this file and now CREATES the hooks README with a descriptor rule, S8 gains a second
+  fence namespace for the four project-property conditionals plus a required enumeration pass and the
+  inline-clause lift, S6 gains the lexicon sentence that is an addition rather than a move, AC3 is
+  rewritten off a locale-dependent regex, and three ACs are added for what the audit found
+  unobserved.
 
 ## 10. Reuse audit
 

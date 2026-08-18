@@ -1,6 +1,6 @@
 # DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
 
 ## 1. Goal
 
@@ -11,13 +11,30 @@ selection, and writes the result into the target's charter as a re-renderable re
 
 ## 2. Scope (IN)
 
-**S1 — Ship a `tools/playbook/` kit** holding `render_playbook.py` (the engine) and
-`adopt-playbook.sh` (the adopter and its `--check` mode). This is the kit shape every other adopter
-in this repo already has, and it is why the playbook entry's `why_no_adopter` reason retires with it.
+**S1 — Ship a `tools/playbook/` kit under a NEW registry entry id, `playbook-render`.** It holds
+`render_playbook.py` (the engine) and `adopt-playbook.sh` (the adopter and its `--check` mode). This
+is the kit shape every other adopter in this repo already has.
+
+**The id must be new, and an earlier revision left that ambiguous.** `tools/govkit/registry.toml`
+already declares an entry `playbook` — the root files this build renames — and `read_descriptors()`
+keys its map by id with no duplicate predicate, so a second `playbook` entry would SILENTLY shadow
+the first and the shadowed entry's claimed files would then red as unclaimed surface. The registry's
+`[surface]` also globs `tools/*`, so `tools/playbook/` must be an entry or an exemption either way.
+S7 below says which of the two entries gains an `[adopt] argv` and which keeps the hole, because
+"the entry" was ambiguous across two entries.
+
+**S1a — Name the leg's registry route, rather than leaving it to the build.** `govkit selfcheck`
+fails a gate leg claimed by no descriptor and carried by no `[[exempt_leg]]`, and fails one that is
+BOTH. The `playbook render wiring` leg and the kit's self-test are declared as `[[gate_leg]]` rows in
+`playbook-render`'s own descriptor. `tools/playbook/` also joins the derived kit set that
+`check-playbook-parity.sh` grades, so the playbook or `WIRE-INTO-PROJECT.md` must NAME it, or it
+needs a row in `tools/playbook-kit-waivers.txt` — the same trap `PLAY-aFusedCharter-1` S6 hits for
+the lexicon kit.
 
 **S2 — Declare every placeholder as data, in three classes.** The declaration is a `[[placeholder]]`
-array in `tools/govkit/entries/playbook.kit.toml`, beside the entry it describes rather than in a
-file of its own, because `needed_answers()` in `tools/govkit/govkit.py` already reads descriptors to
+array in `tools/govkit/entries/playbook.kit.toml` — the `playbook` entry, not the new
+`playbook-render` one, because the placeholders describe the ARTIFACT that entry ships and
+`needed_answers()` quantifies over every selected descriptor either way — because `needed_answers()` in `tools/govkit/govkit.py` already reads descriptors to
 decide what `intake` must ask for. Each row carries a key, a class, and one line of guidance — the
 useful residue of the retiring companion.
 
@@ -36,19 +53,35 @@ live only inside a conditional block: a row carries an optional gating kit id, a
 unselected kit is not asked for. Without that, `intake` demands a design-token path from a target
 that selected no design system.
 
-**S4 — Drop conditional blocks by selection.** `PLAY-aFusedCharter-1` S8 fences each block with an
-HTML comment naming the kit that justifies it. The renderer reads `deploy.toml`'s kit list and
-deletes every fenced block whose kit is not in it, fences included. A fence naming a kit id that is
-not a registry entry is a REFUSAL, not a skip — an unrecognised id would otherwise mean the block
-always survives, which is the failure that reads as success.
+**S4 — Drop conditional blocks, over BOTH fence namespaces.** `PLAY-aFusedCharter-1` S8 fences each
+block in one of two namespaces, because four of the conditionals are keyed on a project property that
+has no kit id to name. The renderer drops a `kit:` block whose id is absent from `deploy.toml`'s kit
+list, and a `when:` block whose boolean key answers false. A `kit:` fence naming an id that is not a
+registry entry is a REFUSAL, and so is a `when:` fence naming a key the descriptor declares nowhere —
+never a skip, because an unrecognised name would otherwise mean the block always survives, which is
+the failure that reads as success.
 
 **S5 — Write into a marker region, never over a file.** The render lands between
 `<!-- gov:playbook -->` and its closing marker inside the target's charter. Absent charter: create
 it holding only the region. Present charter with no region: append the region and leave every
 authored byte alone. Present charter with a region: replace the region's contents and nothing else.
-This is the same marker-region contract `tools/memory-tree/gen_build_index.py` already ships and
-`tools/memory-tree/marker-contract.test.sh` already grades, and this unit uses that contract rather
-than inventing a second one.
+**The renderer carries its OWN reader, and an earlier revision claimed otherwise on two counts.**
+`gen_build_index.py`'s region helper RAISES when no marker pair is present, so it serves neither the
+absent-charter state nor the charter-without-a-region state — region CREATION lives in that script's
+build-README slot walk, not in the helper. And `marker-contract.test.sh` slices four reader bodies BY
+HAND against one case table; a fifth reader is invisible to it until it is added, and that test's own
+header states the design is several implementations proven to agree rather than one shared
+implementation, because a cross-kit edge is what it forbids. So this unit writes a fifth reader,
+obeys the CONTRACT rather than reusing the code, and adds itself as a fifth column to that case
+table — with an acceptance criterion on the reader count, so a sixth reader cannot land unnoticed.
+
+**S5a — The comparison normalises line endings before it compares.** Measured on this node,
+`core.autocrlf` is `true` and `AGENTS.md` carries no `eol` attribute: its committed blob holds zero
+carriage returns and its worktree copy holds 302, while the ruleset is pinned `eol: lf`. A render
+from an LF source byte-compared against a CRLF charter mismatches on every line, on every node.
+`TOOL-aFusedCharter-1` S4b adds the missing `.gitattributes` pins; this unit ALSO normalises before
+comparing, because an adopter has not adopted gov's `.gitattributes` and a pin nobody applied
+protects nobody.
 
 **S6 — `--check`, and a gate leg.** `adopt-playbook.sh --check` re-renders from the shipped template
 and the target's own answers and byte-compares against the region in the charter, exiting non-zero
@@ -59,10 +92,25 @@ region — because template parity and placeholder completeness are two question
 declaring nothing for a key renders a region that is perfectly in sync and still tells the agent to
 invoke a placeholder's name.
 
-**S7 — Close the `playbook-placeholders` hole.** The entry declares an authoring hole whose
-discharge probe greps the deployed files for a surviving placeholder. With a renderer, the hole is
-discharged by the adopter rather than by an operator, so the entry gains an `[adopt] argv`, loses
-`why_no_adopter`, and the `[check] none` reason is replaced by the adopter's real argv.
+**S7 — RETIRE the `playbook-placeholders` hole rather than closing it, and say which entry changes
+what.** The hole's discharge probe greps `{playbook_path}` — the UN-RENDERED template, which must
+keep its placeholders permanently by design — so it can never come true, and an earlier revision's
+"the hole is discharged by the adopter" was not reachable. Worse, the render now lands in the
+target's CHARTER, which that entry has no file rule and no token for, so there is nothing for the
+probe to point at either. The question the hole was asking is now owned by S6's `--check`, whose
+second predicate is exactly *did a placeholder survive the render*. So the hole is deleted from the
+`playbook` entry, and the `playbook` entry keeps its `seed` file rule and nothing else. The
+`[adopt] argv` belongs to the NEW `playbook-render` entry, which is the one with an adopter.
+
+**S7a — State what the new leg DOES on this repo's tree before unit 5 exists.** Every comparable
+wiring leg runs unguarded against gov's own tree and expects a rendered artifact to be there. This
+one has nothing to compare until `PLAY-aFusedCharter-3` writes `.governance/deploy.toml` and the
+region — and this spec's Non-goals forbid rendering gov's charter here, while Migration says a target
+with no descriptor is TOLD TO RUN INTAKE, which is a refusal and therefore a red leg. The leg
+therefore exits 0 with an explicit `not adopted here yet` line when no descriptor exists, in the same
+shape `tools/lexicon/lexicon.py` uses for an unadopted project, and flips to a real comparison the
+moment unit 5 lands. AC11 covers both states, so the leg is never green for the reason that nothing
+was measured.
 
 **S8 — Retire `parallel-coding-governance.customize.md`, moving what a program cannot do.** Three
 kinds of content survive and each has a destination. The per-placeholder guidance becomes the
@@ -71,7 +119,10 @@ kit ids. What remains is genuinely non-mechanical and moves to `WIRE-INTO-PROJEC
 calls about which kits a project should adopt, the note that the memory tree is not droppable
 because two sections are written against it, the re-pull procedure, and the warning that a dropped
 block whose kit is absent leaves a rule nothing can make true. `TOOL-aFusedCharter-1` performs the
-`git rm`.
+`git rm`, and it does so three passes before this unit runs — so this unit reads the companion at the
+build's pinned BASE rather than from the worktree. Stating that here is not pedantry: an earlier
+revision had each of the two specs deferring the deletion to the other, which reads as if the file
+were still present when the harvest happens.
 
 ## 3. Non-goals (OUT)
 
@@ -107,7 +158,16 @@ why = "the one command that runs the whole local bar"
 
 Classes and their contract: `derived` names a probe function in `render_playbook.py`; `asked`
 carries no probe and no default; `defaulted` carries a `default` string. An optional `kit` field
-gates the row on a selected kit. A row whose class is `derived` and whose probe returns nothing
+gates the row on a selected kit, and an optional `when` field gates it on a boolean answer, matching
+the two fence namespaces `PLAY-aFusedCharter-1` S8 declares.
+
+**Two spellings meet here and exactly one place folds them.** govkit's token regex matches lowercase
+brace tokens, so `needed_answers()` returns and `deploy.toml`'s answers table stores LOWERCASE keys,
+while a playbook placeholder is written in upper case. The declaration's `key` is written in the
+placeholder's own upper-case spelling; the fold to the answers-table spelling happens once, in
+`needed_answers()`, and the renderer folds the same way when it looks a value up. Naming the single
+fold site is the whole point — two independent case conversions is how a key silently fails to
+match. A row whose class is `derived` and whose probe returns nothing
 falls through to REFUSAL, never to a default it did not declare — a probe that quietly returns the
 empty string is how a charter ships with a blank where a branch name belongs.
 
@@ -221,18 +281,39 @@ Edited: `tools/govkit/entries/playbook.kit.toml`, `tools/govkit/govkit.py` (S3 o
   run, both exit 0 with the playbook entry declaring an adopter and no `why_no_adopter`.
 - **AC10** — When `python tools/govkit/matrix.py` runs, the renderer's arms pass against all four
   repo shapes, each asserting a message or an on-disk effect.
+- **AC11** — When the `playbook render wiring` leg runs on THIS repo before unit 5 lands, it exits 0
+  printing an explicit not-adopted line; after unit 5 lands it performs a real comparison, verified by
+  editing a byte inside the region and confirming it reds. A leg that is green in both states for the
+  same reason is measuring nothing.
+- **AC12** — When `python tools/govkit/govkit.py selfcheck` runs, the two entries are distinct:
+  `playbook` carries a `seed` file rule and no hole, `playbook-render` carries the adopter and both
+  `[[gate_leg]]` rows, and no id is declared twice.
+- **AC13** — When `bash tools/memory-tree/marker-contract.test.sh` runs, its case table drives FIVE
+  readers including this renderer's, and its stated reader count equals the number it drives.
+- **AC14** — When a charter with CRLF line endings is compared against an LF render, `--check` exits
+  0; it reds only on a real content difference. Checked with a fixture whose only difference is the
+  line ending.
 
 ## 7. Gates
 
 `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` ·
 `install-prefix (shipped surface)` · `playbook parity` · `codebase-map coverage + freshness` ·
-`kit version markers` · `testsuite counts` · `run-gates canary` · the new
-`playbook render wiring` leg · the full bar. A new kit dir and a new leg together trip a growing set
-of meta-gates, so the full bar is the instrument rather than this list.
+`kit version markers` · `testsuite counts` · `run-gates canary` · `drift-audit records` ·
+`naming lexicon` · the new `playbook render wiring` leg · the full bar. A new kit dir and a new leg
+together trip a growing set of meta-gates, so the full bar is the instrument rather than this list.
+
+Two of those are here because the spec audit found them missing. `drift-audit records` is gateable
+against a zero pin that this unit's new leg would trip if `TOOL-aFusedCharter-1` S10 had not already
+retired the signal — it is listed so the dependency is visible rather than assumed. And
+`naming lexicon` runs on any diff under `tools/`, with a Python parser coverage mode and a shrink-only
+verb-offender pin, so `render_playbook.py`'s definitions must lead with a verb from the declared
+table; `render`, `derive`, `read`, `check` and `resolve` are all already in it, so compliance is free
+if the spec says so and expensive if it does not.
 
 ## 8. Open questions
 
-none — the forks below are RESOLVED.
+none blocking — F1 through F3 are RESOLVED; F4 is an OWNER fork with a recommendation the build can
+proceed on.
 
 - **F1 — where does the renderer live?** RESOLVED (agent, 2026-08-18, delegated by the build's
   stated order): a `tools/playbook/` kit with an adopter, on the tie-break that reuses an existing
@@ -244,11 +325,25 @@ none — the forks below are RESOLVED.
 - **F3 — does the render-parity check need its own gate?** RESOLVED (agent, 2026-08-18, delegated):
   no. `--check` on the adopter is this repo's established wiring-leg idiom and three kits already
   use it. This removes a unit an earlier draft of the build carried.
+- **F4 — does the target descriptor belong at `.governance/deploy.toml`, or at a repo-root
+  `.playbook.conf` matching this tree's four other conf files?** Recommendation: keep
+  `.governance/deploy.toml`. It is govkit's existing location, `intake` already writes it and refuses
+  to overwrite it, and moving it would change a deployer contract for cosmetic consistency. The spec
+  audit flagged that it was never compared against the root-conf convention, which is fair — the
+  comparison is made here and comes out for the status quo. Raised rather than taken because the
+  descriptor is a committed authorization artifact, and where it lives is the owner's call.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft. F3's resolution folded the render-parity gate into this
   unit's `--check`, which is why the build roster carries seven units and not eight.
+- rev-3 · 2026-08-18 · folded the M4 spec audit. The kit gets its own registry id because a second
+  `playbook` entry would silently shadow the existing one; S7 RETIRES the placeholder hole rather
+  than closing it, because its probe targets the un-rendered template and can never come true; S5's
+  claim to reuse the marker-region implementation is corrected to reuse the CONTRACT and add a fifth
+  reader to its case table; new S5a and S1a and S7a cover line-ending normalisation, the leg's
+  registry route and the leg's behaviour before unit 5 exists; the two token spellings get one named
+  fold site; and four ACs are added.
 - rev-2 · 2026-08-18 · the Inventory stated a placeholder count of 27 over a table enumerating 27,
   and the measured set is 28 — the per-node variances row was missing from the table and from the
   count. The count is deleted rather than corrected, per the rule the same paragraph states, and

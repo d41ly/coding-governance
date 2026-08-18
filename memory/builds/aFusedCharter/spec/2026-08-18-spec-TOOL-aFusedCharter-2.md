@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -10,11 +10,23 @@ drifting back into shapes nobody can parse.
 
 ## 2. Scope (IN)
 
-**S1 — A parser over the block, not over the file.** The gate locates the definition list by the
-same anchor a reader uses — the grammar paragraph's heading and the list that follows it — and grades
-only those lines. A whole-file scan for shape-like text would match every emission quoted in a
-record and every example in a runbook, which is the absence-assertion-over-whole-file-text class
-this repo has on record.
+**S1 — A parser over the fenced block, keyed on a delimiter and on nothing else.** An earlier
+revision keyed on "the grammar paragraph's heading and the list that follows it", and the spec audit
+measured that there IS no heading: the definitions are a two-space-indented backticked sub-list
+hanging off one prose bullet. Keying on a column-zero list marker fails too, because
+`PLAY-aFusedCharter-2` S2 de-indents the definitions into siblings of the section's own prose rules
+and `PLAY-aFusedCharter-1` S5 folds two more column-zero bullets into the same range. So
+`PLAY-aFusedCharter-2` S8 wraps the definition list in an HTML-comment fence pair, and this gate
+keys on THAT. A whole-file scan for shape-like text would match every emission quoted in a record and
+every example in a runbook, which is the absence-assertion-over-whole-file-text class this repo has
+on record.
+
+**S1a — Name the subject path explicitly.** After `TOOL-aFusedCharter-1` the ruleset and the rendered
+charter are different files that both carry the block. The gate's subject is the RULESET —
+`coding-governance-agents.template.md` — because that is the source, and the charter's copy is proved
+equal to it by `bash tools/playbook/adopt-playbook.sh --check` rather than graded twice. The path is
+resolved the way every other gate here resolves one, from the repo root, and is stated in the gate's
+own usage header.
 
 **S2 — One predicate per grammar clause, each able to red separately.** The clauses are
 `PLAY-aFusedCharter-2` S1's, and the gate implements them as distinct failures because a single
@@ -22,11 +34,18 @@ this repo has on record.
 
 - the head is one keyword from the closed set, with its declared case;
 - the joiner appears exactly once;
+- **the joiner is positioned so that nothing but the head precedes it** — a separate predicate,
+  because three shapes fail on position while satisfying the count, and one carries no joiner at all;
 - tail fields are separated only by the declared separator;
 - no parentheses outside markdown-link syntax;
 - no colon acting as a joiner or a label;
-- only the five pinned glyphs appear as structure;
+- only the pinned glyphs appear as structure;
 - placeholders are lowercase angle-bracket names, alternation written with the declared glyph.
+
+The pinned glyph set and the alternation glyph are DERIVED from `PLAY-aFusedCharter-2` S1's
+enumeration in the ruleset, by the same rule S3 states for the keyword set. An earlier revision
+undertook to grade "the five pinned glyphs" and "the declared separator" against a document that
+enumerated neither, which is a predicate with no carrier.
 
 **S3 — Derive the closed keyword set from the block, never from a list in the gate.** The set is
 whatever the definition lines lead with. A hand-typed copy inside the gate would be a mirror of the
@@ -43,10 +62,31 @@ anti-vacuity arms, each feeding a fixture block that violates exactly one clause
 gate names THAT clause. A gate is not landed until its failing case has been observed, and a gate
 with seven predicates needs seven observations, not one.
 
-**S6 — Wire it as a leg, and print an assertion count.** One row in `tools/gate-legs.json` with a
-guard naming the gate and its test. The self-test prints its executed assertion count in the agreed
-shape, because `tools/check-testsuite-counts.sh` derives its population from that manifest and a new
-suite printing no count reds it.
+**S6 — Wire it as TWO rows with different guards, and satisfy the count contract exactly.**
+
+An earlier revision said "one row with a guard naming the gate and its test", which is wrong twice. A
+guard naming only the gate and its test SKIPS the gate on exactly the diffs that rewrite the
+micro-format block — the diffs it exists for. And the self-test got no row at all, so nothing ran it.
+Measured on the live manifest: every playbook-grading gate carries no guard, and only the self-test
+rows are guarded. So: the gate row is UNGUARDED (or guarded on the ruleset path), and the self-test
+row is guarded on the gate plus its test. `tools/govkit/entries/check-placeholders.kit.toml` is the
+exact two-row shape to copy.
+
+**The assertion-count contract is three things, not one.** `check-testsuite-counts.sh` requires an
+anchored pass line carrying the count, a literal floor assignment that is not zero, and a reference
+proving the two meet. A suite built to the earlier revision's words — "prints an assertion count" —
+lands non-compliant and reds a leg this spec lists in `§7`. The floor is seeded at the MEASURED arm
+count once the arms exist.
+
+**S6a — Route the leg and the files through the registry, deliberately.** `govkit selfcheck` fails a
+leg claimed by no descriptor and carried by no exemption, and fails one that is both. It also reds on
+a tracked depth-1 path under `tools/` that no entry claims — and the gate, its test and its subject
+are all such paths. This gate ships as a new FLAT entry with `selectable = "conditional"`, modelled on
+`check-placeholders`, holding both `[[gate_leg]]` rows. Conditional matters: the gate grades a
+shipped product file, so an adopter who takes the playbook should be able to take the gate, and an
+adopter who does not should not have it forced by `--all`. This resolves the tension the audit found
+between `§4`'s Alternatives-rejected, which argues against shipping the gate inside the memory-tree
+kit, and a scope that assumed a descriptor without naming one.
 
 ## 3. Non-goals (OUT)
 
@@ -96,9 +136,11 @@ definitions, one file over from the definitions.
 
 ### Files touched (estimate)
 
-New: `tools/check-microformats.sh` and `tools/check-microformats.test.sh`.
-Edited: `tools/gate-legs.json`, the govkit descriptor that must claim the two new files, and a map
-dossier claim.
+New: `tools/check-microformats.sh`, `tools/check-microformats.test.sh`, and
+`tools/govkit/entries/check-microformats.kit.toml`.
+Edited: `tools/gate-legs.json` (two rows), `tools/govkit/registry.toml` (the new entry), and a map
+dossier claim for the new gate-leg keys — the coverage inventory requires a dossier claim per new
+key, and an unclaimed one reds `codebase-map coverage + freshness`.
 
 ## 5. Production-readiness checklist
 
@@ -134,13 +176,23 @@ dossier claim.
   assertion count in the shape `tools/check-testsuite-counts.sh` accepts, with one arm per S2
   predicate and both S3 arms.
 - **AC8** — When `bash tools/run-gates.test.sh` and `python tools/govkit/govkit.py selfcheck` run,
-  both exit 0 with the new leg declared and its files claimed.
+  both exit 0 with BOTH new legs declared in one new descriptor and every new depth-1 path claimed.
+- **AC9** — When a diff touches only the ruleset's micro-format block, the gate leg RUNS — verified
+  by driving `tools/run-gates.sh` over that path set, not by reading the guard in
+  `tools/gate-legs.json`. A guard that skips the gate on its own subject is the failure this AC
+  exists to catch.
+- **AC10** — When `bash tools/check-testsuite-counts.sh` runs, the new suite is compliant on all
+  three of its requirements, with a non-zero floor equal to the measured arm count.
+- **AC11** — When a shape carries its joiner in the wrong POSITION while carrying exactly one, the
+  gate reds on the position predicate specifically — the three shapes whose dispositions
+  `PLAY-aFusedCharter-2` S4 corrects are the fixtures.
 
 ## 7. Gates
 
-`run-gates canary` · `testsuite counts` · `govkit selfcheck` · `codebase-map coverage + freshness` ·
-`install-prefix (shipped surface)` · `harness arms` · the new leg itself · the full bar. Adding a leg
-trips a growing set of meta-gates, so the full bar is the instrument.
+`run-gates canary` · `testsuite counts` and its self-test · `govkit selfcheck` and `govkit selftest` ·
+`codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `harness arms` ·
+`kit version markers` · the new leg itself · the full bar. Adding a leg trips a growing set of
+meta-gates, so the full bar is the instrument.
 
 ## 8. Open questions
 
@@ -153,6 +205,11 @@ none — the fork below is RESOLVED.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the M4 spec audit. The gate keys on a fence rather than a heading the
+  section does not have, S1a names its subject path now that the ruleset and the charter are two
+  files, S2 gains a joiner-POSITION predicate and derives the glyph set from the ruleset's new
+  enumeration, S6 becomes two manifest rows with different guards plus the three-part count
+  contract, new S6a picks the registry route as a conditional flat entry, and four ACs are added.
 
 ## 10. Reuse audit
 
