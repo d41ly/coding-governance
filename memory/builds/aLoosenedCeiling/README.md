@@ -35,8 +35,13 @@ two live ceilings that are at the wall.
 | coding-governance | 86394 B over 6 files | 86476 | **82 B** |
 | NicoCares (`incms/main/vendor/nicocares-package`) | 109998 B over 7 files | 110000 | **2 B** |
 
-Both headroom figures in the table above are the measurement at this build's BASE. They are already
-spent: the 82 B went to this build's own generated index row before a line of code was written.
+Both headroom figures in the table above are the measurement at this build's ORIGINAL base, and
+both are already spent — the 82 B went to this build's own generated index row before a line of
+code was written. The default branch then moved seventeen commits underneath the build and had
+already raised this repo's ceiling to 107418 on its own, in a merge-induced raise that kept the
+20480 headroom and explicitly declined to change the policy mid-reconcile. Unit 3 is therefore the
+SIXTH movement of that comment block rather than the fifth, and its number is re-derived on the
+merged tree: 107418 -> 112987, which is 87387 B measured after the merge plus the new 25600.
 
 ## Units
 
@@ -121,7 +126,7 @@ ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL
 |---|---|---|---|
 | [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | OPEN | rev-3 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-2 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.

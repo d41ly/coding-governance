@@ -226,17 +226,17 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the pre-build survey. The abort-rather-than-fail choice in S3 is
+  confirmed by measurement rather than assumed (Inventory); S9 added, because the failure message
+  is an armed signature and rewording it silently breaks the arm; the doc carriers were found to
+  be more numerous and one of them derivational rather than literal (Files touched); and the
+  adopter whose fork this unit dissolves is named in Migration.
 - rev-3 · 2026-08-18 · folded spec-audit round 1. The goal claimed check 16 rule 3 cross-references
   the cap value; it reads only set membership. AC4 named a leg that runs nothing, and AC3 and AC5
   were satisfied by an unchanged tree. S3 gained the channel and status the arm needs, S4 the right
   reason for its placement, S6 the invocation count and S6b the default-tier arms the Inventory gap
   actually asks for. The awk failure modes in section 4 were stated backwards: the silent-green one
   is the non-numeric binding. Check 6 has two failure call sites, not one.
-- rev-2 · 2026-08-18 · folded the pre-build survey. The abort-rather-than-fail choice in S3 is
-  confirmed by measurement rather than assumed (Inventory); S9 added, because the failure message
-  is an armed signature and rewording it silently breaks the arm; the doc carriers were found to
-  be more numerous and one of them derivational rather than literal (Files touched); and the
-  adopter whose fork this unit dissolves is named in Migration.
 
 ## 10. Reuse audit
 

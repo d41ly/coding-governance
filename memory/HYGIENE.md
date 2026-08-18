@@ -63,7 +63,10 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
   files; a second full spelling of it is how the `guides/` half went missing once.
-- **File caps:** index + generated files ≤ 20 KB AND ≤ 250 lines. `archive/` is wholly exempt.
+- **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
+  `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`). The shipped defaults are
+  20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, and 25 KB with no line cap
+  for a build README. `archive/` is wholly exempt.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
@@ -125,7 +128,12 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    variable, because two hand-copied EREs for one grammar had already diverged (grandfather:
    `legacy-files.txt`).
 6. **index size caps** — TWO classes, because prose and rows fail for different reasons. Row
-   documents ≤ 20 KB / ≤ 250 lines; `guides/*.md` ≤ 60 KB / ≤ 750 lines (grandfather:
+   documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
+   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
+   `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
+   line cap for that class. A cap that is not a whole number, or a zero BYTE cap, is refused before
+   any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
+   measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
    and check 16 refuses a charter-cited file that nothing caps — but for a guide the LINE count is a
    proxy, and check 16's `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed
@@ -173,7 +181,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
     (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
 16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
-    from the charter's own text through three token arms. The total stays under `READ_PATH_CEILING`
+    from the charter's own text through three token arms. `--measure` prints a ceiling as the
+    measured total plus `READ_PATH_HEADROOM`, which is ADVICE for the author pasting the pin back;
+    the CHECK compares against `READ_PATH_CEILING` alone, because a ceiling computed from a headroom
+    would let a growing corpus raise its own budget. The total stays under `READ_PATH_CEILING`
     (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
     `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
 
@@ -309,7 +320,7 @@ If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tr
 `affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
 freshly-adopted map),
 `features/`, `generated/`; `README.md`,
-`FOUNDATION.md` and `features/*.md` carry the size caps (check 6: 20 KB / 250 lines) but are
+`FOUNDATION.md` and `features/*.md` carry the row-document size caps (check 6, `INDEX_CAP_*`) but are
 entry-budget exempt (check 7) — dossiers are detail files. A dossier over cap is SPLIT into two
 dossiers (never rotated; the map gate requires `FOUNDATION.md` in place). The map's
 coverage/freshness enforcement is its own test file, not this script.

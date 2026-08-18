@@ -77,7 +77,7 @@ headroom half of that arithmetic is a constant in this repo's copy of the kit. M
   enforce: an aggregate ceiling only measures anything while it binds tighter than the sum of the
   per-class caps over the read-path members. Raising the shipped headroom moves every adopter a
   little closer to that line. It is not crossed in this repo — the capped members' caps sum to
-  286720 against a 111994 ceiling — and unit 4 shows an adopter where the ratio is the live
+  286720 against a 112987 ceiling — and unit 4 shows an adopter where the ratio is the live
   question. Stated here so the risk is on the record rather than discovered by an adopter.
 - This unit does not move any repo's `READ_PATH_CEILING`. That is unit 3 for this repo and unit 4
   for the adopter. Keeping them separate is what lets a reviewer see the knob and the turning of
@@ -218,6 +218,11 @@ recorded in section 4.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the pre-build survey. Three corrections, none to the design: the
+  defaults dict entry is load-bearing rather than tidy (S1); the verdict-epoch leg watches the
+  delegates too and the live doc copies move only through the render mode (S6); and `do_measure`
+  has no existing coverage, so S4 is first coverage (Inventory). The ceiling-value carriers the
+  survey found — a backlog row and a docstring example — moved to unit 3, which owns that number.
 - rev-3 · 2026-08-18 · folded spec-audit round 1. AC1 was vacuous and its precondition unreachable;
   S5 would have written a false rule into the hygiene rule-set; S6 gained the topological ordering
   the verdict-epoch leg actually enforces; and section 10's prior-art citation named a record that
@@ -225,11 +230,6 @@ recorded in section 4.
   in a sibling module of this kit, thirty lines below the seam this spec's own reuse audit cited,
   and three bare parses in this very file raise the traceback S3 forbids. Also: the conf line this
   spec and unit 3 both claimed is now unit 3's alone.
-- rev-2 · 2026-08-18 · folded the pre-build survey. Three corrections, none to the design: the
-  defaults dict entry is load-bearing rather than tidy (S1); the verdict-epoch leg watches the
-  delegates too and the live doc copies move only through the render mode (S6); and `do_measure`
-  has no existing coverage, so S4 is first coverage (Inventory). The ceiling-value carriers the
-  survey found — a backlog row and a docstring example — moved to unit 3, which owns that number.
 
 ## 10. Reuse audit
 

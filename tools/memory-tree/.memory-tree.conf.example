@@ -54,6 +54,13 @@ DEAD_PATH_PIN=""
 # The charter's read path under MEMORY_ROOT, in bytes, plus headroom. One-sided: a session's
 # mandatory reading is a budget, and a new binding doc spends from it visibly.
 READ_PATH_CEILING=""
+# The headroom `--measure` ADDS to the measured total when it prints a ceiling for you to paste
+# above. Advice to an author, never an input to check 16 — that check compares the measured total
+# against READ_PATH_CEILING alone, because a ceiling COMPUTED from a headroom would let a growing
+# corpus raise its own budget. ABSENT = the kit's default, which is larger than one member of the
+# largest class on a typical read path. Declare your own if your tree grows continuously rather
+# than in rare jumps: a headroom that cannot absorb one more binding document absorbs nothing.
+READ_PATH_HEADROOM=""
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.

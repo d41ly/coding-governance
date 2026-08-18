@@ -24,7 +24,30 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+# Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
+# reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
+# in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
+# and an adopter should not have to fork a kit script they re-pull on every release. A LINE cap of 0
+# means no independent line cap for that class. Validated below: awk compares a bad -v binding
+# silently, so an unvalidated typo here is a gate that reds everything or nothing with no message.
+INDEX_CAP_BYTES=20480         ; INDEX_CAP_LINES=250
+GUIDE_CAP_BYTES=61440         ; GUIDE_CAP_LINES=750
+BUILD_README_CAP_BYTES=25600  ; BUILD_README_CAP_LINES=0
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
+# The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
+# the sibling classifier that asks this script for the index set gets a non-zero exit it turns into
+# its own named refusal rather than a set derived under a conf this script would not accept. This is
+# an ABORT, not a check failure: a gate that cannot read its own thresholds has not found a hygiene
+# regression, it has failed to run. Same channel and status as the no-python abort below.
+_capbad=""
+for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES; do
+  eval "_v=\${$_k-}"
+  case "$_v" in
+    *[!0-9]*|"") _capbad="$_capbad $_k='$_v' (not a whole number)" ;;
+    0) case "$_k" in *_BYTES) _capbad="$_capbad $_k=0 (a zero byte cap reds every file in its class)" ;; esac ;;
+  esac
+done
+[ -n "$_capbad" ] && { echo "HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # codebase-map kit interop: when its MAP_ROOT is a DIRECT child of this tree (e.g. memory/map),
@@ -352,9 +375,9 @@ index_set() {
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
     # A BUILD README is ROWS, not prose — TOOL-aWidenedGuide-1 split the cap by CLASS on exactly that
     # distinction, and after the generated surface landed this file is four rendered regions plus one
-    # bounded authored block. It carries its OWN tier below (25600 B, 350 chars, and no independent
-    # line cap), because the 20480/250 tier was measured against a corpus in which these files were
-    # not members at all.
+    # bounded authored block. It carries its OWN tier below (BUILD_README_CAP_*, plus check 7's 350
+    # chars) rather than the row-document tier, which was measured against a corpus in which these
+    # files were not members at all. The numbers live at the top of this file, declared once.
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/README\.md$"
     # RUN.md (2.3): the run-state file is capped like every other index. It is designed to GROW —
     # a parked entry per refused decision — so the cap is the point, not an accident: the protocol
@@ -383,22 +406,30 @@ if [ -n "$sel6" ]; then
   clines=$(printf '%s\n' "$sel6" | xargs -r wc -l)
   # PER-CLASS CAPS, and the split is between PROSE and ROWS. A guide is a document the charter points
   # a session at and reads end to end; an index is a row set that a curation sweep prunes. They shared
-  # one 250-line limit, and for a guide that limit is a PROXY for the read budget rather than the
-  # budget itself — check 16's `READ_PATH_CEILING` is the real one, it is measured in bytes, and it is
-  # not relaxed here. So guides carry 3x and every row document keeps the original cap: tripling the
-  # allowance for a backlog shard or a map dossier would loosen a curation discipline nobody asked to
-  # loosen, and the two classes fail for different reasons.
-  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" '
+  # one line limit, and for a guide that limit is a PROXY for the read budget rather than the budget
+  # itself — check 16's `READ_PATH_CEILING` is the real one, it is measured in bytes, and it is not
+  # relaxed here. So a guide is allowed more than a row document, and tripling the allowance for a
+  # backlog shard or a map dossier would loosen a curation discipline nobody asked to loosen: the two
+  # classes fail for different reasons. The NUMBERS are declared at the top of this file and
+  # overridable per project; the shipped ratio is 3x, but a project that moves one key and not the
+  # other changes that, which is why this comment states the relation as an allowance and not as an
+  # arithmetic identity.
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/" \
+          -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES" \
+          -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES" \
+          -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES" '
     FNR==NR { if ($NF!="total") b[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
-            cb = 20480; cl = 250
-            if (index(f, gp) == 1) { cb = 61440; cl = 750 }
-            # A build README: its own tier, and cl=0 means NO independent line cap. The line count is
-            # whatever fits the byte budget at the per-line width, so there is no third number to
-            # drift against the other two.
-            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = 25600; cl = 0 }
+            # +0 on every binding: awk compares an unset or non-numeric -v as a STRING, which reds
+            # nothing at all. The validation at conf load is what makes these numbers; this is belt.
+            cb = icb+0; cl = icl+0
+            if (index(f, gp) == 1) { cb = gcb+0; cl = gcl+0 }
+            # A build README: its own tier, and a 0 line cap means NO independent line cap. The line
+            # count is whatever fits the byte budget at the per-line width, so there is no third
+            # number to drift against the other two.
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0 }
             if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
               if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
               else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }

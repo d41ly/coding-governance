@@ -1013,6 +1013,106 @@ cblock "$out" 21 | grep -qF '2026-08-01-review-ARCH-tOne-1-f.md' \
 out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
 chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus'
 
+# ---- CHECK 6 — the per-class caps are DECLARATIONS (TOOL-aLoosenedCeiling-2).
+# ---- Every arm runs BOTH DIRECTIONS OVER ONE FIXTURE: the same file is silent at a loose cap and
+# ---- named at a tight one. A one-directional arm over a tunable threshold proves nothing, because a
+# ---- fixture under every cap passes whatever the cap says.
+# ---- c6run() exists because the first cut of this block was itself the defect it guards against.
+# ---- Its conf helper interpolated with %s, so a `\n` reached the file as two literal characters,
+# ---- every declared-cap run aborted at status 2 with NO output, and each `cnot` read that silence
+# ---- as "under the cap". Four arms passed by finding nothing. So the status is now asserted on
+# ---- every run: a gate that refused to start is not a gate that found nothing.
+C6=$TMP/caps
+mkdir -p "$C6"
+c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and asserts the gate RAN
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > "$C6/.memory-tree.conf"
+  [ -n "$1" ] && printf '%b' "$1" >> "$C6/.memory-tree.conf"
+  out=$(cd "$C6" && bash "$SCRIPT" 2>/dev/null); c6rc=$?
+  n=$((n+1))
+  [ "$c6rc" != 2 ] || { echo "FAIL check-6 caps '$1' aborted the gate (status 2); a silent run below would prove nothing"; st=1; }
+}
+( cd "$C6" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong
+  printf '# r\n' > memory/README.md
+  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  # ONE seq, reused. Building each line with its own command substitution cost this suite minutes.
+  # 250 chars keeps every row under check 7's 300-char budget, so only check 6 speaks.
+  R=$(printf 'y%.0s' $(seq 1 246))
+  rows() { i=1; while [ "$i" -le "$1" ]; do printf -- '- %s\n' "$R"; i=$((i+1)); done; }
+  fm() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n\n' "$1" "$1" "$1"; }
+  # (a) a GUIDE between the row-document cap and the guide cap: silent by default, named when the
+  #     guide cap is declared below its size. ~30 KB over ~120 lines, so no line cap can be what fires.
+  { printf '# tmid guide\n\n'; rows 120; } > memory/guides/tmid.md
+  # (b) a ROW DOCUMENT over the shipped index cap: named by default, silent when the index cap is
+  #     declared above its size. ~25 KB, ~100 lines — the BYTE cap is what fires, not the line cap.
+  { printf '# ARCH backlog\n\n'; rows 100; } > memory/backlog/ARCH.md
+  # (c) a BUILD README over the shipped build-README byte cap with NOTHING declared. This is the arm
+  #     for the DEFAULT tier, which no arm in this suite reached before.
+  { fm tBig; rows 120; } > memory/builds/tBig/README.md
+  # (d) a BUILD README with more lines than the row-document tier allows and well under its OWN byte
+  #     cap. Its silence is the proof that a zero LINE cap means NO line cap rather than a cap of zero.
+  { fm tLong; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/README.md
+  git add -A && git commit -q -m caps --no-verify )
+
+# --- DEFAULTS, nothing declared: (b) and (c) are named, (a) and (d) are silent.
+c6run ''
+chit 6 'memory/backlog/ARCH.md'
+chit 6 'memory/builds/tBig/README.md'
+cnot 6 'memory/guides/tmid.md'
+cnot 6 'memory/builds/tLong/README.md'
+n=$((n+1))
+cblock "$out" 6 | grep -qE 'memory/backlog/ARCH\.md \([0-9]+B [0-9]+L > 20480B/250L\)' \
+  || { echo "FAIL check 6 named the row document but not against the SHIPPED 20480B/250L default"; st=1; }
+n=$((n+1))
+cblock "$out" 6 | grep -qE 'memory/builds/tBig/README\.md \([0-9]+B > 25600B; no line cap for this class\)' \
+  || { echo "FAIL check 6 named the build README but not against the SHIPPED 25600B default, or printed a line cap for a class that has none"; st=1; }
+
+# --- the GUIDE cap declared BELOW the fixture: the file that was silent is now named, AGAINST THE
+# --- DECLARED number — which is what proves the binding reached awk rather than the default surviving.
+c6run 'GUIDE_CAP_BYTES=25000\nGUIDE_CAP_LINES=700\n'
+chit 6 'memory/guides/tmid.md'
+n=$((n+1))
+cblock "$out" 6 | grep -qE 'memory/guides/tmid\.md \([0-9]+B [0-9]+L > 25000B/700L\)' \
+  || { echo "FAIL check 6 named the guide but not against the DECLARED cap 25000B/700L"; st=1; }
+
+# --- the INDEX cap declared ABOVE the fixture: the row document that was named goes silent, and a
+# --- key that is not the build README's leaves that class exactly where it was.
+c6run 'INDEX_CAP_BYTES=40000\n'
+cnot 6 'memory/backlog/ARCH.md'
+chit 6 'memory/builds/tBig/README.md'
+
+# --- the BUILD-README cap declared above its fixture: named becomes silent, and the row document is
+# --- untouched by a key that is not its own.
+c6run 'BUILD_README_CAP_BYTES=60000\n'
+cnot 6 'memory/builds/tBig/README.md'
+chit 6 'memory/backlog/ARCH.md'
+
+# --- a zero LINE cap is LEGAL, and is not the same declaration as a zero byte cap. Without this the
+# --- refusal below could have been written as "any zero is malformed", which would have made the
+# --- build-README class undeclarable in the very conf this unit added.
+c6run 'INDEX_CAP_LINES=0\n'
+cnot 6 'memory/builds/tLong/README.md'
+
+# --- MALFORMED and ZERO-BYTE caps ABORT rather than fail a check. Own capture, because the shared
+# --- idiom discards stderr and the status, and the whole point is that a gate which cannot read its
+# --- thresholds must not report a clean tree. Asserted on stdout AND the status: either alone passes
+# --- under the wrong choice of channel.
+for _bad in 'GUIDE_CAP_BYTES=abc' 'INDEX_CAP_LINES=' 'INDEX_CAP_BYTES=0' 'GUIDE_CAP_LINES=-5'; do
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n%s\n' "$_bad" > "$C6/.memory-tree.conf"
+  outc=$(cd "$C6" && bash "$SCRIPT" 2>/dev/null); rcc=$?
+  n=$((n+1))
+  [ "$rcc" = 2 ] || { echo "FAIL a malformed check-6 cap ($_bad) exited $rcc, not the cannot-run status 2"; st=1; }
+  n=$((n+1))
+  printf '%s\n' "$outc" | grep -qF 'HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:' \
+    || { echo "FAIL a malformed check-6 cap ($_bad) printed no cannot-run line on stdout"; st=1; }
+  n=$((n+1))
+  printf '%s\n' "$outc" | grep -qF "${_bad%%=*}" \
+    || { echo "FAIL the cannot-run line did not name the offending key ${_bad%%=*}"; st=1; }
+  n=$((n+1))
+  printf '%s\n' "$outc" | grep -qF 'HYGIENE check' \
+    && { echo "FAIL a malformed check-6 cap ($_bad) reported check findings instead of refusing to run"; st=1; }
+done
+
 # ---- the verdict, printed AFTER the last arm. Upstream printed PASS ~150 lines early and landed a
 # ---- red merge bar because the head of the output said success.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23, and it closes TOOL-cTracedPromise-4 rather than
@@ -1037,7 +1137,7 @@ chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no
 # Floored shrink-only, because an arm stranded past an `exit` stays in the file and only a runtime
 # total can see it go dark.
 n=$((n+1))
-FLOOR_ASSERTIONS=136
+FLOOR_ASSERTIONS=179
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

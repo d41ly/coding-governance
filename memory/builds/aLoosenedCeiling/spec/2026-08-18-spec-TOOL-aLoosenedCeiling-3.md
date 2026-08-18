@@ -1,17 +1,19 @@
 # TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-1 · base 5498254b · streams tooling
 
 ## 1. Goal
 
-Move this repo's `READ_PATH_CEILING` from 86476 to 111994 — the measured read path plus the
-headroom default unit 1 establishes — and record the movement beside the number, in the register
-the key's existing comment block already uses.
+Move this repo's `READ_PATH_CEILING` to the measured read path plus the headroom default unit 1
+establishes, and record the movement beside the number in the register the key's comment block
+already uses. The measurement is taken at the branch's current ground, which moved once during the
+build: see section 4.
 
 ## 2. Scope (IN)
 
-- **S1** — `.memory-tree.conf` declares the new ceiling.
-- **S2** — the comment block above it gains the fifth movement's entry: what was measured, what the
+- **S1** — `.memory-tree.conf` declares the new ceiling: 112987, which is 87387 B measured on the
+  merged tree plus 25600.
+- **S2** — the comment block above it gains the SIXTH movement's entry: what was measured, what the
   headroom is, why the headroom convention itself moved, and that no read-path member was trimmed
   to get here. The block is a running record and existing entries are not rewritten.
 - **S3** — the conf declares `READ_PATH_HEADROOM` explicitly at the new default, so the arithmetic
@@ -38,27 +40,39 @@ the key's existing comment block already uses.
 
 ## 4. Design
 
-Measured at this unit's base: 86394 B over six members, against a ceiling of 86476. Eighty-two
-bytes of headroom, which is less than one decision row. The build that contains this unit appends
+Measured at this unit's ORIGINAL base: 86394 B over six members against a ceiling of 86476.
+Eighty-two bytes of headroom, less than one decision row. The build that contains this unit appends
 rows to `memory/DECISIONS.md`, and that file is a read-path member, so the ceiling has to move
 before the next FULL hygiene run after such an append. Not before the commit: the pre-commit leg
 runs the staged fast path, which skips the delegation check 16 lives behind, so the deadline is
 the next unstaged run and not the commit hook.
 
+**Then the ground moved, and this is the part worth recording.** Midway through the build the
+default branch advanced seventeen commits and had ALREADY raised this ceiling — to 107418, in a
+merge-induced raise that kept the 20480 headroom and said in its own note that inventing a new
+headroom policy mid-reconcile is how scaffolding becomes the norm. That was the right call there.
+It also means this unit is no longer the fifth movement of that comment block; it is the SIXTH,
+and it answers with a spec the policy question the fifth deliberately left open.
+
+Both narratives survive in the conf. The number is RE-DERIVED on the merged tree rather than
+carried forward: 107418 -> 112987, which is 87387 B measured after the merge plus 25600. Carrying
+the original 111994 would have pinned a budget against a tree that no longer exists — the same
+discipline the fifth movement applied to the fourth.
+
 **Ordering consequence, and the reason this unit is sequenced first among the pin movements:** the
 raise lands in or before the commit that first grows a read-path member. A run that appends the
 decision row first and raises afterwards spends a red gate to learn something already known here.
 
-New value: 86394 measured plus 25600 headroom is 111994. The headroom convention moved from 20480
-in unit 1, and the two halves are recorded together so a later reader is not left inferring which
-number changed.
+The headroom convention moves from 20480 to 25600 in unit 1, and both halves are recorded together
+so a later reader is not left inferring which number changed.
 
-**Measured at the BASE, not at the close.** This build grows the read path itself — a generated
+**Measured at the GROUND, not at the close.** This build grows the read path itself — a generated
 index row for its own build folder, then its decision rows — and a ceiling sized from the closing
-measurement would hand the build a budget shaped around what it had already spent. The base
-measurement is the honest input, and this build's own growth spends from the headroom, which is
-what headroom is for. The eighty-two bytes were in fact consumed by the generated index row before
-this unit's edit landed, so the ordering claim above is an observation and not a prediction.
+measurement would hand the build a budget shaped around what it had already spent. The ground is
+the honest input, and this build's own growth spends from the headroom, which is what headroom is
+for. The eighty-two bytes at the original base were in fact consumed by the generated index row
+before this unit's first edit landed, so the ordering claim above is an observation rather than a
+prediction. The re-derivation after the merge follows the same rule against the new ground.
 
 This repo's read path is six files, four of them guides the charter names as binding. The largest
 is 25036 B. The previous headroom could not absorb one more member of that class, and this build
@@ -79,16 +93,18 @@ the conf's own comment block already records as the third movement.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/memory-tree/corpus_ids.py --report` runs on this repo, the read-path
-  total is under the declared 111994 with at least 20000 B of margin.
-- **AC2** — When `.memory-tree.conf` is read, its comment block states the base measurement 86394
+  total is under the declared 112987 with at least 20000 B of margin.
+- **AC2** — When `.memory-tree.conf` is read, its comment block states the ground measurement 87387
   and the headroom 25600, and those two sum to the declared `READ_PATH_CEILING`. This is an
-  identity against the recorded base, NOT a comparison with `--measure`: that tool re-measures the
-  live tree, which section 4 says will keep growing, so the two numbers agree only at the instant
-  of the base measurement and the first draft of this criterion was false the day it was written.
+  identity against the recorded ground, NOT a comparison with `--measure`: that tool re-measures
+  the live tree, which section 4 says will keep growing, so the two numbers agree only at the
+  instant of the measurement, and the first draft of this criterion was false the day it was
+  written.
 - **AC3** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs after this build appends its
   decision rows, check 16 is silent.
-- **AC4** — When `grep -rn 86476 memory/backlog/ .memory-tree.conf` runs, no live carrier still
-  states the old ceiling as current.
+- **AC4** — When `grep -rn '86476\|107418' memory/backlog/` runs, no live carrier states a
+  superseded ceiling as current. The conf itself keeps every superseded figure on purpose: that
+  block is a running history and each movement names the value it replaced.
 
 ## 7. Gates
 
@@ -108,6 +124,10 @@ none.
   111994. Restated as the at-base identity. S3 gained the inert-window statement the conf now also
   carries, S4 the stale-carrier obligation unit 1's rev-2 handed here, and S5 the check-6 wall no
   spec in the set had named. AC1 states its margin as a number rather than as a judgement.
+- rev-3 · 2026-08-18 · folded the reconcile. The default branch had already raised this ceiling to
+  107418 while the build was in its review pass, so this unit is the SIXTH movement rather than the
+  fifth, and its number is re-derived on the merged tree (87387 + 25600 = 112987) instead of being
+  carried forward from a base that no longer exists. AC4 widened to both superseded figures.
 
 ## 10. Reuse audit
 
