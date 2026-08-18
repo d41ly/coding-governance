@@ -22,6 +22,24 @@
     ]
   },
   {
+    "name": "micro-format definitions",
+    "argv": [
+      "bash",
+      "tools/check-microformats.sh"
+    ]
+  },
+  {
+    "name": "micro-format gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-microformats.test.sh"
+    ],
+    "guard": [
+      "tools/check-microformats.sh",
+      "tools/check-microformats.test.sh"
+    ]
+  },
+  {
     "name": "playbook parity",
     "argv": [
       "bash",

@@ -42,6 +42,8 @@
       "memory-recall skill wiring",
       "method carriers (every pointer declared)",
       "method-carriers self-test",
+      "micro-format definitions",
+      "micro-format gate selftest",
       "placeholder-catalogue self-test",
       "playbook parity",
       "playbook parity selftest",

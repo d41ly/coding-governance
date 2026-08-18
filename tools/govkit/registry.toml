@@ -37,6 +37,10 @@ default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memor
 
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
+id = "check-microformats"
+descriptor = "tools/govkit/entries/check-microformats.kit.toml"
+
+[[entry]]
 id = "playbook-render"
 descriptor = "tools/playbook/kit.toml"
 

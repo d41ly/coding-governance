@@ -8,7 +8,7 @@ streams = ["playbook", "tooling"]
 decisions = ["TOOL-aSiftedPlaybook-1"]
 
 [claims]
-gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "charter size"]
+gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "charter size", "micro-format definitions", "micro-format gate selftest"]
 kits = ["playbook"]
 git-hooks = []
 workflow-scripts = []

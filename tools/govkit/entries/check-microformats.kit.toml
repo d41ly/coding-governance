@@ -1,0 +1,43 @@
+# kit.toml — the micro-format definition gate, declared as data. Read by tools/govkit/.
+#
+# A FLAT entry, modelled on check-placeholders: the gate, its self-test and its subject are all
+# depth-1 paths under tools/, and selfcheck reds on any such path no entry claims.
+#
+# `selectable = "conditional"` and it matters. This gate grades a block inside the SHIPPED charter,
+# so an adopter who takes the charter should be able to take the gate — and an adopter who does not
+# should not have it forced on them by `--all`.
+
+id = "check-microformats"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+requires = ["playbook"]
+# No constant: this gate versions with the CHARTER whose block it grades, not on its own clock. A
+# second version to keep in step would be a second thing to drift, and the grammar it enforces is
+# stated in that document rather than here.
+version_from = { none = "it grades a block in the charter and versions with it, carrying no independent constant" }
+
+[[files]]
+include = ["check-microformats.sh", "check-microformats.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "a gate needs no adoption step; it reads the charter template wherever the playbook entry put it"
+
+[check]
+none = """
+the gate IS the check. Running it over a target's own charter is what the gate leg does, and a second verb wrapping it would be one more thing to keep in step
+"""
+
+[[gate_leg]]
+name = "micro-format definitions"
+argv = ["bash", "{prefix}/check-microformats.sh"]
+
+[[gate_leg]]
+name = "micro-format gate selftest"
+argv = ["bash", "{prefix}/check-microformats.test.sh"]
+guard = ["{prefix}/check-microformats.sh", "{prefix}/check-microformats.test.sh"]
