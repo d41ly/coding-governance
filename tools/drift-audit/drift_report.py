@@ -716,7 +716,12 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
 _TERMINAL_STATUSES = ("CLOSED", "WONTDO")
 
 
-def signal_live_backlog_rows(ctx) -> dict:
+# NAMED `build_`, NOT `signal_`, deliberately. Its eight siblings in SIGNALS all lead with `signal`,
+# which is a NOUN and not in `.lexicon.conf`'s VERBS table — they sit inside `VERB_OFFENDER_PIN` as
+# grandfathered debt that `TOOL-aWiredReckoning-1` will curate. A new definition can be named right for
+# free, and adding a ninth offender to spare a symmetry break would be paying the debt down in the wrong
+# direction. `build` is the declared verb for "create a new value and return it", which is what this does.
+def build_live_backlog_rows(ctx) -> dict:
     """Live (non-terminal) rows per backlog shard, reported per shard and never gated."""
     shard_dir = f"{ctx.memory_root}/backlog"
     tracked = [ln for ln in ctx.git.run("ls-files", f"{shard_dir}/").stdout.splitlines() if ln.strip()]
@@ -759,7 +764,7 @@ def signal_live_backlog_rows(ctx) -> dict:
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
-           signal_live_backlog_rows]
+           build_live_backlog_rows]
 
 
 # --------------------------------------------------------------------------------------------

@@ -207,7 +207,10 @@ PINS: dict[str, int] = {
     # Do not turn this gateable without also declaring it in the shipped conf template. A signal
     # absent from an adopter's PINS falls back to tolerance 0, so a gateable version reds their first
     # `--check` on one open row.
-    "live_backlog_rows_per_shard": 81,
+    # 81 -> 89. RAISED at the reground onto main, and by the signal doing its job on its first real
+    # merge: two branches' live rows united, and neither side was over its own watermark. Same shape
+    # as READ_PATH_CEILING in this same reconcile, one budget over.
+    "live_backlog_rows_per_shard": 89,
     "lexicon_ratified_older_than_language_surface": 0,
 }
 
