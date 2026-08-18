@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7
+ids: TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7 TOOL-aWalkedCorpus-8 TOOL-aWalkedCorpus-9 TOOL-aWalkedCorpus-10
 ---
 
 # aWalkedCorpus — one walk over the corpus, and something that grades it
@@ -25,7 +25,7 @@ The table below is GENERATED from the status header of every spec in this folder
 hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7
+**Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7 TOOL-aWalkedCorpus-8 TOOL-aWalkedCorpus-9 TOOL-aWalkedCorpus-10
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

@@ -1425,6 +1425,49 @@ user_skills = "/tmp/gk-fake-skills"
             check("...and the same rule derives COVERED when a sibling writes that path",
                   _gk.derive_rule_kind("demo", {}, _po, "a.md", {"a.md"}, set(), _rep) == "covered",
                   "expected 'covered'")
+            # `requires` ORDERS THE INSTALL, and did not until it was measured. Every mode of
+            # resolve_selection returned sorted(...), so CONFIGURE ran adopters alphabetically and
+            # `memory-recall` -- which declares requires = ["memory-tree"] -- ran BEFORE the conf it
+            # reads existed. Its adopter exited 1, govkit could not classify that code, and the
+            # default-selection arm below failed on every node while the same adopter run by hand a
+            # moment later exited 0. Keyed on the FUNCTION so no entry edit can hide it.
+            _descs2 = {
+                "b-kit": ({"requires": ["z-kit"]}, "b"),
+                "z-kit": ({}, "z"),
+                "a-kit": ({}, "a"),
+            }
+            _ordered = _gk.derive_install_order(["a-kit", "b-kit", "z-kit"], _descs2)
+            check("a kit is ordered AFTER everything it `requires`",
+                  _ordered.index("z-kit") < _ordered.index("b-kit"), str(_ordered))
+            check("...and independent kits keep alphabetical order",
+                  _ordered[0] == "a-kit", str(_ordered))
+            check("...and a dependency outside the selection is not an error",
+                  _gk.derive_install_order(["b-kit"], _descs2) == ["b-kit"], "a lone kit must install")
+            _cyc = {"x": ({"requires": ["y"]}, "x"), "y": ({"requires": ["x"]}, "y")}
+            try:
+                _gk.derive_install_order(["x", "y"], _cyc)
+                _cycled = False
+            except _gk.Refusal:
+                _cycled = True
+            check("...and a `requires` CYCLE refuses rather than picking an order",
+                  _cycled, "a cycle fell through to some arbitrary order")
+
+            # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
+            # every correct first install exits 1 there; calling that a failure made a default-selection
+            # apply unable to return 0, and the arm asserting it does landed RED rather than being read
+            # as the contradiction it was. The flag is per-OUTCOME, so `refused-foreign-tree` -- same
+            # exit code, same kit -- stays a failure.
+            import tomllib as _toml  # noqa: PLC0415
+            _mt = _toml.loads((HERE.parent / "memory-tree" / "kit.toml").read_text(encoding="utf-8"))
+            _outs = {o.get("means"): o for o in _mt.get("outcome", [])}
+            check("memory-tree declares seed-and-stop as an ACCEPTED outcome",
+                  _outs.get("seed-and-stop", {}).get("ok") is True, str(list(_outs)))
+            check("...and refused-foreign-tree is NOT accepted, at the same exit code",
+                  _outs.get("refused-foreign-tree", {}).get("ok") is not True
+                  and _outs.get("refused-foreign-tree", {}).get("code")
+                      == _outs.get("seed-and-stop", {}).get("code"),
+                  str(_outs))
+
             check("...and the ORDER/COVERED pair is not one answer twice",
                   _gk.derive_rule_kind("demo", {}, _po, "a.md", set(), set(), _rep)
                   != _gk.derive_rule_kind("demo", {}, _po, "a.md", {"a.md"}, set(), _rep),

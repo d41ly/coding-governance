@@ -533,6 +533,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_install_order",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
