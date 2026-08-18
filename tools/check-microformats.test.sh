@@ -74,24 +74,34 @@ arm "a duplicated fence pair is cannot-run" cannot \
 # --- the anti-vacuity pair
 arm "a fenced block with no definition is cannot-run" cannot \
   "encloses no definition line" '/^- `/d'
+# Every `want` below is the branch's ENTIRE literal signature, up to its first interpolation — not a
+# readable prefix of it. The harness meta-gate requires that, and for a reason: an arm asserting a
+# prefix keeps passing after the sentence it was written for has been rewritten around it, so the
+# branch silently loses its only proof. A literal word between the sentence and the first
+# interpolation is part of the signature too.
 arm "a derivation missing its sentinel reds" red \
-  "lost its frozen sentinel member" 's/^- `committed/- `landed/'
+  "the keyword derivation lost its frozen sentinel member, so the derivation is broken rather than the block being empty: expected to find" \
+  's/^- `committed/- `landed/'
 
 # --- one arm per grammar clause
 arm "a second joiner reds on the count" red \
-  "joiners rather than exactly one" 's/· <branch> ·/— <branch> ·/'
+  "joiners rather than exactly one, so its head and tail cannot be told apart" \
+  's/· <branch> ·/— <branch> ·/'
 arm "a field ahead of the joiner reds on POSITION" red \
-  "puts a field ahead of its joiner" 's/^- `committed — /- `committed <sha> — /'
+  "a definition puts a field ahead of its joiner, so the head is not one keyword" \
+  's/^- `committed — /- `committed <sha> — /'
 arm "a bare parenthesis reds" red \
-  "carries a bare parenthesis" 's/· <subject>/· (<subject>)/'
+  "a definition carries a bare parenthesis, which the grammar admits only as markdown-link syntax" \
+  's/· <subject>/· (<subject>)/'
 arm "a markdown link does NOT red as a parenthesis" ok "" \
   's/· <subject>/· [<x>](<y>)/'
 arm "a colon label reds" red \
-  "uses a colon as a label" 's/· <branch>/· branch: <branch>/'
+  "a definition uses a colon as a label, which the grammar admits only glued to a value" \
+  's/· <branch>/· branch: <branch>/'
 arm "a colon glued to a value does NOT red" ok "" \
   's/· <branch>/· :<port>/'
 arm "an upper-case placeholder reds" red \
-  "not a lowercase angle-bracket name" 's/<subject>/<SUBJECT>/'
+  "a placeholder is not a lowercase angle-bracket name" 's/<subject>/<SUBJECT>/'
 
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then
@@ -104,4 +114,4 @@ if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"
   exit 1
 fi
-printf 'PASS (%d assertions)\n' "$ASSERTIONS"
+echo "PASS ($ASSERTIONS assertions)"

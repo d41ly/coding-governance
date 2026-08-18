@@ -23,7 +23,14 @@ git -C "$W" init -q 2>/dev/null
 git -C "$W" config user.email t@t; git -C "$W" config user.name t
 cp "$GATE" "$W/tools/check-line-length.sh"
 
-PY=python
+# RESOLVED, never named. The repo-wide ban exists because the MS-Store `python3` stub answers
+# `command -v` and exits 9009 without executing anything — being on PATH is not evidence, running is.
+PY=""
+for _c in "${GOV_PYTHON:-}" python3 python py; do
+  [ -n "$_c" ] || continue
+  if "$_c" -c "import sys" >/dev/null 2>&1; then PY=$_c; break; fi
+done
+[ -n "$PY" ] || { echo "check-line-length.test: no usable python launcher; each candidate was RUN"; exit 2; }
 line() { "$PY" -c "import sys;sys.stdout.write(sys.argv[1]*int(sys.argv[2])+chr(10))" "$1" "$2"; }
 
 reset() {                      # a subject the gate passes on, and a declaration naming it
@@ -48,8 +55,12 @@ arm() {
 reset
 arm "control · a short subject passes" 0 "0 over 450" ""
 
+# The `want` strings for red arms are each the branch's ENTIRE literal signature up to its first
+# interpolation, which the harness meta-gate requires. An arm asserting a readable prefix keeps
+# passing after the sentence it was written for is rewritten around it, and the branch quietly loses
+# its only proof.
 reset; line y 451 >> "$W/subject.md"
-arm "an over-length line reds naming the line and its length" 1 "is 451 characters" ""
+arm "an over-length line reds naming the line and its length" 1 "a subject carries line(s) over its limit of" ""
 
 reset; line y 450 >> "$W/subject.md"
 arm "exactly at the limit passes" 0 "0 over 450" ""
@@ -79,10 +90,12 @@ reset; line — 400 >> "$W/subject.md"
 arm "a non-ASCII line is measured in CHARACTERS, not bytes" 0 "0 over 450" ""
 
 reset; printf 'subject.md\t450\ngone.md\t450\n' > "$W/tools/line-length-limits.txt"
-arm "a row naming an ABSENT path reds as stale" 1 "is stale" ""
+arm "a row naming an ABSENT path reds as stale" 1 \
+  "the declaration names a subject that does not exist, so its row excuses nothing and is stale" ""
 
 reset; printf 'subject.md\tlots\n' > "$W/tools/line-length-limits.txt"
-arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 "is not a number" ""
+arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 \
+  "the declared line limit for this subject is not a number, so the comparison below would be against text: '" ""
 
 reset; printf '# only a comment\n' > "$W/tools/line-length-limits.txt"
 arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" ""
@@ -96,4 +109,4 @@ if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-line-length.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"; exit 1
 fi
-printf 'PASS (%d assertions)\n' "$ASSERTIONS"
+echo "PASS ($ASSERTIONS assertions)"
