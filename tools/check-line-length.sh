@@ -31,7 +31,17 @@
 # would be the cross-kit edge this repo forbids. The precedent that keeps such copies honest is one
 # shared case table with agreement proven across implementations.
 #
-# Exit 0 = every subject within its limit · 1 = an offender or a stale row · 2 = could not run.
+# NOT ADOPTED IS EXIT 0, and only when the declaration is ABSENT and no subject was named. This gate
+# is opt-in — the declaration is deliberately withheld from the kit payload, because gov's rows name
+# gov's paths and a row naming an absent path is a stale red — so an adopter installs it with no
+# declaration at all, and an install-day exit 2 is the very failure that withholding was meant to
+# prevent. It is the `tools/lexicon/lexicon.py` posture and it is announced rather than silent. The
+# vacuity it would otherwise open is closed elsewhere: gov's own declaration is a govkit `[[exempt]]`
+# row, and selfcheck reds on an exemption whose path is gone, so deleting it here cannot go quiet.
+# A declaration that EXISTS and selects nothing is still exit 2 — that is an authoring error, not an
+# unadopted gate, and it is the anti-vacuity arm.
+#
+# Exit 0 = every subject within its limit, or not adopted · 1 = an offender or a stale row · 2 = could not run.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-line-length: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
@@ -101,7 +111,13 @@ if [ "$#" -gt 0 ]; then
   subjects=$1
   POSITIONAL_LIMIT=${2:-}
 else
-  [ -f "$DECL" ] || { echo "check-line-length: no declaration at $DECL and no subject given"; exit 2; }
+  if [ ! -f "$DECL" ]; then
+    echo "check-line-length: NOT ADOPTED — no declaration at $DECL and no subject given, so this"
+    echo "check-line-length: tree has named nothing to grade. Write one TAB-separated <path> <chars>"
+    echo "check-line-length: row in that file to adopt the gate, and this leg starts measuring."
+    echo "check-line-length: A subject with no row of its own is graded at the $HARD_DEFAULT default."
+    exit 0
+  fi
   subjects=$(grep -vE '^[[:space:]]*(#|$)' "$DECL" | awk -F'\t' '{print $1}')
   POSITIONAL_LIMIT=
 fi

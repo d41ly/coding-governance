@@ -30,6 +30,16 @@ Both namespaces REFUSE rather than skip: a `kit:` fence naming a non-entry, a `w
 undeclared block, and a `drop_blocks` member matching no fence are each a refusal. An unrecognised
 name that merely left the block in place would be a silent no-op.
 
+WHERE THE INPUTS COME FROM, AND WHY IT IS NOT `__file__`'s GRANDPARENT. This engine ships into a
+target at `{prefix}/playbook/`, so its grandparent there is the TARGET's repo root — which holds
+neither `tools/govkit/entries/playbook.kit.toml` (a registry exemption that never lands in a target)
+nor a repo-root charter template (the deployer lands it at the operator-chosen `playbook_path`).
+Resolving from the grandparent worked in gov and died in every adopter with an uncaught
+FileNotFoundError, straight past `main`'s `except Refusal`. So: the DECLARATIONS are read from beside
+the engine when the kit shipped them there and from gov's own tree otherwise, the TEMPLATE from the
+target's `playbook_path` answer when it has one, and every one of those reads REFUSES naming the path
+it wanted. A missing input is a stated reason, never a traceback.
+
 THE REGION READER IS THIS FILE'S OWN. The memory-tree kit's region helper RAISES when no marker pair
 is present, so it serves neither the absent-charter nor the charter-without-a-region state. This
 engine therefore CONFORMS to the marker-region contract and adds a fifth reader to its case table; it
@@ -252,16 +262,50 @@ def build_region(charter: str | None, body: str) -> str:
 
 
 # --------------------------------------------------------------------------- the render
-def load_declarations(gov_root: Path) -> tuple[dict, list[dict], set[str]]:
-    desc = tomllib.loads((gov_root / 'tools' / 'govkit' / 'entries' / 'playbook.kit.toml')
-                         .read_text(encoding='utf-8'))
-    reg = tomllib.loads((gov_root / 'tools' / 'govkit' / 'registry.toml').read_text(encoding='utf-8'))
+def read_input(path: Path, what: str) -> str:
+    """Read a REQUIRED input, or refuse naming the path. Every miss here used to be a traceback."""
+    try:
+        return path.read_text(encoding='utf-8')
+    except OSError as e:
+        raise Refusal(f'{what} is not readable at {path.as_posix()} ({e.strerror}). Supply that '
+                      f'path — the render has nothing to read and will not guess one')
+
+
+def declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, Path]:
+    """The descriptor and the registry, from the INSTALLED layout first and gov's own second.
+
+    An installed kit carries both beside the engine, because `tools/govkit/` is a registry exemption
+    that never lands in a target. Gov has no copy beside the engine and falls through to its own
+    tree, which is what keeps one source of truth for these two files.
+    """
+    desc = engine_dir / 'playbook.kit.toml'
+    reg = engine_dir / 'registry.toml'
+    return (desc if desc.is_file() else gov_root / 'tools' / 'govkit' / 'entries' / desc.name,
+            reg if reg.is_file() else gov_root / 'tools' / 'govkit' / reg.name)
+
+
+def template_path(gov_root: Path, target: Path, answers: dict) -> Path:
+    """The charter TEMPLATE this render reads.
+
+    The deployer lands it at the operator-chosen `playbook_path`, so that answer is authoritative
+    when a target has one — and when it names a file that is not there, the read REFUSES rather than
+    silently falling back to gov's copy, which would render somebody else's template.
+    """
+    p = answers.get('playbook_path')
+    if isinstance(p, str) and p:
+        return target / p
+    return gov_root / 'coding-governance-agents.template.md'
+
+
+def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict], set[str]]:
+    desc = tomllib.loads(read_input(desc_path, "the playbook entry's descriptor"))
+    reg = tomllib.loads(read_input(reg_path, 'the govkit registry'))
     entries = {e['id'] for e in reg.get('entry', [])}
     return desc, desc.get('block', []), entries
 
 
-def render(gov_root: Path, target: Path, template: Path) -> tuple[str, list[str]]:
-    desc, blocks, entries = load_declarations(gov_root)
+def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[str]]:
+    desc, blocks, entries = load_declarations(*declaration_paths(engine_dir, gov_root))
     dep = target / '.governance' / 'deploy.toml'
     if not dep.is_file():
         raise Refusal(f'{dep.as_posix()} does not exist. Run `govkit intake` first — it writes the '
@@ -277,7 +321,8 @@ def render(gov_root: Path, target: Path, template: Path) -> tuple[str, list[str]
             raise Refusal(f'drop_blocks names `{d}`, which the descriptor declares nowhere. A member '
                           f'that drops nothing is a typo or a block that has already gone')
 
-    text = template.read_text(encoding='utf-8')
+    template = template_path(gov_root, target, answers)
+    text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
     for d in drop_names:
         if ('when', d) not in present:
@@ -347,9 +392,9 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--check', action='store_true')
     a = ap.parse_args(argv)
 
-    gov_root = Path(__file__).resolve().parent.parent.parent
+    engine_dir = Path(__file__).resolve().parent
+    gov_root = engine_dir.parent.parent
     target = Path(a.target).resolve()
-    template = gov_root / 'coding-governance-agents.template.md'
     charter_path = target / a.charter
 
     # NOT ADOPTED is exit 0, and only in --check. A wiring leg runs unguarded against a tree that
@@ -363,7 +408,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     try:
-        body, notes = render(gov_root, target, template)
+        body, notes = render(engine_dir, gov_root, target)
     except Refusal as e:
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1

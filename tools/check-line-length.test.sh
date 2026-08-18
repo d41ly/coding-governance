@@ -100,11 +100,20 @@ arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 \
 reset; printf '# only a comment\n' > "$W/tools/line-length-limits.txt"
 arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" ""
 
+# THE INSTALL-DAY PAIR, and the two must land on DIFFERENT verdicts. The kit withholds the
+# declaration on purpose — gov's rows name gov's paths, and a row naming an absent path is a stale
+# red — so ABSENT is the shape every adopter starts in, and the exit 2 it used to get there was the
+# very failure the withholding was made to prevent. Measured in a scratch install before this arm
+# existed. Its neighbour above is what stops this one being read as "an empty population is fine".
+reset; rm -f "$W/tools/line-length-limits.txt"
+arm "an ABSENT declaration is NOT ADOPTED at exit 0, not a red install day" 0 \
+  "NOT ADOPTED — no declaration at" ""
+
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then
   printf 'check-line-length.test.sh FAILED — %d arm(s)\n' "$FAILED"; exit 1
 fi
-FLOOR_ASSERTIONS=13
+FLOOR_ASSERTIONS=14
 if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-line-length.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"; exit 1

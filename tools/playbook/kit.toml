@@ -20,6 +20,25 @@ include = ["**"]
 role = "engine"
 to = "{prefix}/playbook/{relpath}"
 
+# THE ENGINE'S DECLARATIONS TRAVEL WITH IT. `render_playbook.py` reads the placeholder classes, the
+# `when:` block names and the registry's entry-id set; all three live under `tools/govkit/`, which is
+# a registry `[[exempt]]` path that never lands in a target. Shipping the engine without them is what
+# made an adopter's first `--check` die with an uncaught FileNotFoundError — reproduced in a scratch
+# install. These are `root_relative` rules pointing at the REAL files rather than copies, so there is
+# one source of truth and nothing to keep in step; gov itself has no copy beside the engine and reads
+# its own tree, which is the fall-through `declaration_paths()` documents.
+[[files]]
+include = ["tools/govkit/entries/playbook.kit.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/playbook.kit.toml"
+
+[[files]]
+include = ["tools/govkit/registry.toml"]
+root_relative = true
+role = "engine"
+to = "{prefix}/playbook/registry.toml"
+
 [adopt]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
 mutates_index = false

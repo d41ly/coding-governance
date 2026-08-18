@@ -33,9 +33,14 @@ none = """
 the gate IS the check. Running it over a target's own charter is what the gate leg does, and a second verb wrapping it would be one more thing to keep in step
 """
 
+# THE SUBJECT IS PASSED, never defaulted, in a target. The gate's own default is gov's repo-root
+# filename, and the `playbook` entry lands the charter at the operator-chosen `{playbook_path}` — so
+# a leg carrying no argument resolved to a path no adopter has and exited 2 on install day
+# (reproduced in a scratch install). `{playbook_path}` is already an intake answer this entry's
+# `requires` guarantees; the plumbing existed and was simply not connected.
 [[gate_leg]]
 name = "micro-format definitions"
-argv = ["bash", "{prefix}/check-microformats.sh"]
+argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
 
 [[gate_leg]]
 name = "micro-format gate selftest"

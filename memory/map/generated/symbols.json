@@ -543,6 +543,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "declaration_paths",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "declares",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -1678,6 +1683,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_input",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2531,6 +2541,11 @@
       "id": "target_context",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "template_path",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "terms",

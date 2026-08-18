@@ -48,8 +48,13 @@ installation is a copy to an owner-chosen path and there is no adopter. What nee
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+# The pin names the DESTINATION, `{playbook_path}`, not a directory plus gov's own filename. The
+# `{playbook_dir}/...` spelling was a leftover from a two-file deploy: `{playbook_dir}` is an answer
+# no `[[files]]` rule, leg or probe needs, so `intake` never asked for it and `apply` then REFUSED
+# every install of this entry — and supplying it by hand produced a pin naming a path the target does
+# not have. Both measured in a scratch install.
 [[lf_pin]]
-pattern = "{playbook_dir}/coding-governance-agents.template.md"
+pattern = "{playbook_path}"
 why = "under a strict byte gate"
 
 # ---------------------------------------------------------------- the DECLARATION the renderer reads
