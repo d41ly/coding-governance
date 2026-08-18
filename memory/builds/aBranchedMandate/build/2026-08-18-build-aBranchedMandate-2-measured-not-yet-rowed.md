@@ -29,16 +29,20 @@ It is the SAME defect `TOOL-aBranchedMandate-2`'s S4 fixed one function away for
 that unit fixed the one call site its spec named without grepping for siblings. The fix is the same
 shape: capture, and surface indented under the refusal.
 
-## 3. `gate-logs/` and `gate-last-failure.txt` are shared across every worktree of the repo
+## 3. RETRACTED — `gate-logs/` is NOT shared across worktrees
 
-Both resolve through `git rev-parse --git-common-dir`, so concurrent bars from different worktrees of
-the same repo write the same per-leg logs and the same failure file. `AGENTS.md` states that
-`gate-last-failure.txt` is overwritten "only by the next RED run", which holds only on a
-single-worktree machine.
+**This finding was wrong and is kept, struck, rather than deleted.** It claimed both paths resolve
+through `git rev-parse --git-common-dir` and are therefore shared by every worktree of the repo.
 
-Measured twice on node `a`, and it misled this run both times: leg logs timestamped ten hours earlier
-were read as evidence of the current run's progress, and `gate-last-failure.txt` named
-`unattended adopter e2e` — a leg this run's diff never touched — while the real failure was elsewhere.
+`tools/run-gates.sh:34` uses `git rev-parse --git-dir`, which in a linked worktree resolves to
+`.git/worktrees/<name>` — per-worktree, exactly as it should be. Measured here: `--git-dir` gives
+`…/.git/worktrees/unattended-abranched-mandate-62b947` holding 70 leg logs of this worktree's own,
+while `--git-common-dir` gives `…/.git` holding 71 that belong to the PRIMARY tree. `AGENTS.md`'s
+claim that `gate-last-failure.txt` is overwritten "only by the next RED run" is correct.
 
-**Fix shape:** key the log dir on the worktree (`git rev-parse --git-dir`), or stamp each run and
-have readers match the stamp.
+**How the mistake happened, because that is the reusable part.** Both times I inspected the logs I
+typed `--git-common-dir` myself and then read what I found there as the writer's output. The
+ten-hour-old leg logs and the `unattended adopter e2e` failure record were the primary tree's, and
+both were accurate records of ITS runs. I diagnosed the tool from a directory the tool never writes
+to, and then reported the tool as defective — twice, in two separate turns, without once checking
+which path the source actually composes.
