@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-aRelaxedShard-4 · the backlog's bound is its LIVE ROW COUNT, not its byte cap: rotation carries forward every non-terminal row. `live_backlog_rows_per_shard` reports it per shard, REPORT-ONLY — a pin on an unguarded merge leg is a scheduled refusal. Sharding rejected on the slope
 - TOOL-aRelaxedShard-1 · check 6's row cap is DECLARED (`ROW_DOC_CAP_BYTES`, `DOSSIER_CAP_BYTES`; both ship at 20480) and the row class loses its LINE bound. Reverses aWidenedGuide-1 knowingly: the bound DID bind, on 22 of 29 row documents. Blank resolves forward, never off
 - TOOL-aSiftedPlaybook-1 · ceiling 32768->49152 (owner); a high-water ratchet keyed by file replaces its forcing function; baseline.toml's shrink-only rule reversed in place, dated in-header. Falsifies: PLAY-aCandidStub-1 §3, TOOL-aGuardedTally-1, PLAY-aPrunedCeremony-1 RD7, aCandidStub review 19
 - TOOL-aMendedLedger-8 · U9 REPLACES the merge driver's algorithm rather than patching it a fourth time: two planes split by row SHAPE, structure delegated to `git merge-file`, only the row set key-merged, recombined via a token skeleton. The bar is a live control per case

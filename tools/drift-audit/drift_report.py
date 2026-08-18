@@ -694,9 +694,72 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
             "langs_commit": langs_sha}
 
 
+# --------------------------------------------------------------------------------------------
+# Signal 9 — live backlog rows per shard (TOOL-aRelaxedShard-4)
+#
+# The bound that actually moves. Rotation carries forward every non-terminal row, so a shard's FLOOR
+# is its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the
+# byte cap. That is how `TOOL-cSettledDocket-16` and `TOOL-aRelaxedShard-1` happened, twice, and
+# neither the byte cap nor the map ratchet can see it coming.
+#
+# REPORT-ONLY, deliberately. `drift-audit records` is an unguarded merge-bar leg, so a pin set N days
+# ahead of today's count becomes a scheduled refusal: the day the count crosses it every merge reds
+# until someone raises the pin or closes rows, which is the refusal this signal exists to make
+# unnecessary. `shrink_only_lists_not_shrinking` runs the same way for the same reason. If a later
+# unit gates this, it must pin a MEASURED value with a movement rule AND declare that pin in the
+# shipped conf template — a signal absent from an adopter's PINS falls back to tolerance 0, so a
+# gateable version would red their first run on one open row.
+#
+# The terminal set is SPELLED HERE. `.memory-tree.conf` declares no status vocabulary and no sibling
+# module exposes one, so there is nothing to borrow; the engine already hardcodes the same tokens for
+# hygiene check 8. Naming the duplication beats claiming a reuse that does not exist.
+_TERMINAL_STATUSES = ("CLOSED", "WONTDO")
+
+
+def signal_live_backlog_rows(ctx) -> dict:
+    """Live (non-terminal) rows per backlog shard, reported per shard and never gated."""
+    shard_dir = f"{ctx.memory_root}/backlog"
+    tracked = [ln for ln in ctx.git.run("ls-files", f"{shard_dir}/").stdout.splitlines() if ln.strip()]
+    rows = []
+    for rel in sorted(tracked):
+        if not rel.endswith(".md"):
+            continue
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            # Tracked but absent from the worktree. Distinguishable from an empty shard on purpose:
+            # a missing file is a different fact from a drained one.
+            rows.append({"shard": rel, "live": None, "total": None, "note": "tracked but not on disk"})
+            continue
+        entries = [ln for ln in text.splitlines() if ln.startswith("- ")]
+        live = [ln for ln in entries
+                if not any(f"· {t} ·" in ln or f"· {t}·" in ln for t in _TERMINAL_STATUSES)]
+        rows.append({"shard": rel, "live": len(live), "total": len(entries)})
+    judgeable = [r for r in rows if r["live"] is not None]
+    return {
+        "signal": "live_backlog_rows_per_shard",
+        # The value is the LARGEST shard's live count, and `detail` carries every shard so a total can
+        # never hide one growing inside another. A single aggregate is the mistake ARMS_FLOORS was
+        # split per-gate to avoid.
+        "value": max((r["live"] for r in judgeable), default=0),
+        "of": len(rows),
+        # The threshold comes from the project layer, and for a NON-GATEABLE signal the status line
+        # compares against `tolerance` rather than `pin` (see the report loop), so it is read here.
+        # Absent, it is 0 and every non-empty shard reads "out of tolerance" — which trains a reader
+        # to ignore the line, the failure mode this signal is supposed to cure.
+        "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+        "gateable": False,
+        # A tree with no backlog shards at all cannot move this signal, so it reports DEAD rather than
+        # a reassuring 0 — the liveness assertion every signal here carries.
+        "live": bool(judgeable),
+        "detail": rows,
+    }
+
+
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
-           signal_lexicon_verbs_unused, signal_lexicon_ratified_stale]
+           signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
+           signal_live_backlog_rows]
 
 
 # --------------------------------------------------------------------------------------------

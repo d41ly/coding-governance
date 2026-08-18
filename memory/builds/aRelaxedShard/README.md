@@ -147,18 +147,19 @@ are in this unit's prose sweep anyway, so S16 corrects the attribution while it 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-17 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-17 · streams tooling
 ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxedShard-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | INPROGRESS | rev-7 | 2026-08-17 |
-| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | CLOSED | rev-8 | 2026-08-17 |
+| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | CLOSED | rev-4 | 2026-08-18 |
 
-Records live under `spec/` and `reviews/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
+| [2026-08-18-build-TOOL-aRelaxedShard-4-census.md](build/2026-08-18-build-TOOL-aRelaxedShard-4-census.md) | research | TOOL-aRelaxedShard-4 |
 | [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md) | spec-audit | TOOL-aRelaxedShard-1 |
 | [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md) | spec-audit | TOOL-aRelaxedShard-1 |
 | [2026-08-18-review-TOOL-aRelaxedShard-4.md](reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md) | spec-audit | TOOL-aRelaxedShard-4 |
@@ -179,6 +180,8 @@ Records live under `spec/` and `reviews/`.
 - **`spec/`**
   - [2026-08-17-spec-TOOL-aRelaxedShard-1.md](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md)
   - [2026-08-18-spec-TOOL-aRelaxedShard-4.md](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md)
+- **`build/`**
+  - [2026-08-18-build-TOOL-aRelaxedShard-4-census.md](build/2026-08-18-build-TOOL-aRelaxedShard-4-census.md)
 - **`reviews/`**
   - [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md)
   - [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md)

@@ -66,6 +66,10 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
 - **File caps:** index + generated files carry a DECLARED byte bound and no line bound; only
   `guides/*.md` still carry both. The byte bounds are `ROW_DOC_CAP_BYTES` and `DOSSIER_CAP_BYTES` in
   `.memory-tree.conf`, and rule 6 below names all four classes. `archive/` is wholly exempt.
+- **The live-row floor.** Because rotation carries forward every non-terminal row, a shard's floor is
+  its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the cap.
+  So the number that actually bounds a shard is its LIVE ROW COUNT, and `drift-audit` reports that per
+  shard on every run (`live_backlog_rows_per_shard`, report-only). `TOOL-aRelaxedShard-4`.
 - **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
   whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
   non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still

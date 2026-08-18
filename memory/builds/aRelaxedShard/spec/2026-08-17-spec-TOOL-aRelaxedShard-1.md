@@ -1,6 +1,6 @@
 # TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds
 
-**Status:** INPROGRESS · rev-7 · 2026-08-17 · node a · Tier-2 · base 52f9bbb0 · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-8 · 2026-08-17 · node a · Tier-2 · base 52f9bbb0 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -485,17 +485,21 @@ key**, which is `DOSSIER_CAP_BYTES` in S1b. It costs one more number to measure 
 an adopter the ability to set a dossier bound different from the one gov measured — the same argument that
 made the row cap a key rather than a constant.
 
-### F2 — absent-and-blank semantics · recommendation not overruled
+### F2 — absent-and-blank semantics · RESOLVED (agent, 2026-08-18, standing recommendation, built and armed)
 
 Absent and blank both resolve to the shipped default; no value disables the bound. Put to the owner in
 the 2026-08-17 hand-back with F1 and F5 and not overruled, so S2 builds it. This is the policy-ceiling
 idiom rather than the measured-pin idiom, and it needs the explicit re-normalisation S2 specifies.
 
-### F4 — the stale rotation claim · recommendation not overruled
+### F4 — the stale rotation claim · RESOLVED (agent, 2026-08-18, built by TOOL-aRelaxedShard-4 S2)
 
-Confirm by fixture in this unit that rotating a backlog does not orphan the ids the moved rows defined.
-Put to the owner in the same hand-back and not overruled. Two arms in a suite this unit already edits,
-and the re-shape unit's options depend on the answer.
+Settled, and NOT in this unit — `TOOL-aRelaxedShard-4` S2 built it, because that unit could not evaluate
+a spill tier without the answer. The recorded claim is FALSE as stated and true on a different axis.
+Rotating between two TRACKED paths cannot orphan an id: check 14 is `cites` minus `defs`, a backlog row
+defines and cites its own id on one line, and 83 ids in this corpus are defined only under `archive/` with
+zero orphans. What DOES orphan them is corpus MEMBERSHIP — an archive present on disk but not staged —
+which is the state `cSteadyMetronome` actually saw. Both directions are armed and red-proved in
+`tools/memory-tree/check-memory-hygiene.test.sh`.
 
 ## 9. Revision log
 
@@ -562,6 +566,12 @@ and the re-shape unit's options depend on the answer.
   classes" against an engine with three, so S14 is a repair and not only a description. Every line anchor
   the spec cites was re-derived — the cap block is `:391-405`, `ex7` is `:419`, the map additions are
   `:347-349`, rule 6 is `:127-136` and the dossier sentence is `:312`. Status moves to INPROGRESS.
+
+- rev-8 · 2026-08-18 · F4 RESOLVED and the unit CLOSED. F4 was settled by `TOOL-aRelaxedShard-4` S2
+  rather than here, and the answer inverted it: the recorded claim is false as stated — rotation between
+  two tracked paths cannot orphan an id — and true on corpus MEMBERSHIP, an archive present but unstaged.
+  Both arms are red-proved. F2 is marked resolved on the standing recommendation it was built and armed
+  under, with the AGENT named as resolver rather than the owner, who did not itemise it.
 
 ## 10. Reuse audit
 

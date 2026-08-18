@@ -1,6 +1,6 @@
 # TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 86eefd8e · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 86eefd8e · streams tooling
 
 ## 1. Goal
 
@@ -221,7 +221,7 @@ Bug classes for these paths: `fixture-passes-by-finding-nothing` (S4 and AC3 exi
 
 ## 8. Open questions
 
-### F1 — build this at all, on 18 days of runway?
+### F1 — build this at all · RESOLVED (owner, 2026-08-18): build it
 
 The case FOR building now is that the slope is the actual defect, and it took a two-round audit and a
 blocked landing to see it. The case for waiting is that 18 days is still real and the backlog may drain on
@@ -232,7 +232,7 @@ unit's own authoring pass, which is itself an argument for a signal that tracks 
 depend on, and it is two arms. S3 is small and makes the slope visible. Defer any layout change until
 the signal has produced data, which is the opposite of the order this build has been forced to work in.
 
-### F2 — is this signal GATEABLE at all, or report-only?
+### F2 — gateable or report-only · RESOLVED (agent, 2026-08-18): report-only
 
 rev-2 asked where the pin lives and answered `drift_signals.py`, which is right for a PIN but ducked the
 real question. `drift-audit records` is an UNGUARDED merge-bar leg, so a gateable signal pinned N days
@@ -249,7 +249,7 @@ the trend be visible without arming a refusal nobody scheduled. If a later unit 
 pin a MEASURED value with a movement rule, which is the thing §5 says is mandatory and no rev-2 scope
 item built.
 
-### F3 — one signal entry per shard, or one aggregate?
+### F3 — per-shard or aggregate · RESOLVED (agent, 2026-08-18): per shard, one scalar pin
 
 The signal is per-shard by construction, but the PIN could be a single number. `PLAY`, `KICK` and `DEPL`
 hold 9, 4 and 11 rows.
@@ -294,6 +294,14 @@ shrink-only guard and could be weakened silently — the exact failure the signa
   with zero orphans, so rev-2's rotation arm was green by arithmetic. Also: base sha corrected to a
   resolvable one, §10's borrowed-vocabulary claim retracted, the adopter migration hazard stated, S1 given
   a criterion, S5 reduced from a paragraph to a pointer, and AC2 re-pointed at report-only behaviour.
+
+- rev-4 · 2026-08-18 · BUILT and CLOSED. S1 committed the derivation as commands at
+  `build/2026-08-18-build-TOOL-aRelaxedShard-4-census.md`; S2 armed F4 on corpus membership and is
+  red-proved, because staging the archive fails the second arm; S3 added `signal_live_backlog_rows` to the
+  ENGINE with its pin and ratchet row in the project layer, reporting 81 across 4 shards at `ok`; S4 added
+  eight arms, red-proved by making the signal count entries instead of live rows; S5 added one pointing
+  sentence to both HYGIENE carriers. The hygiene suite floor moved 153 to 155. F1 is the owner's; F2 and
+  F3 name the AGENT as resolver, because the owner said "build unit 2" without itemising them.
 
 ## 10. Reuse audit
 

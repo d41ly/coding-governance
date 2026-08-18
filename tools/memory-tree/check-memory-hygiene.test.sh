@@ -972,6 +972,47 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 # ----     claimant of an id another build defines. That is why the authored region cites ids inline
 # ----     in PROSE. tRunOk is the control and cites the SAME id that way, so the arm cannot be
 # ----     satisfied by a check 13 that merely said something.
+# ---- (d2) ROTATION AND CORPUS MEMBERSHIP (TOOL-aRelaxedShard-4, settling TOOL-aRelaxedShard-1 F4).
+# ----      cSteadyMetronome recorded that rotating a backlog shard to `archive/` ORPHANS every id the
+# ----      moved rows defined, and a rotation was reverted on that report. Rotation between two
+# ----      TRACKED paths cannot do that: check 14 is `cites` minus `defs`, a backlog row defines AND
+# ----      cites its own id on one line, and `corpus_ids.py` walks `git ls-files` with no `archive/`
+# ----      exclusion. Measured on the live corpus, 83 ids are defined only under `archive/` and none
+# ----      is an orphan. So an arm that rotates and asserts zero orphans is green by ARITHMETIC.
+# ----
+# ----      The axis that CAN fail is corpus MEMBERSHIP. `git ls-files` is the corpus, so an archive
+# ----      that exists on disk but is not staged contributes no definitions while the live shard's
+# ----      copy is already gone — and the citations survive, because the moved ids are cited from
+# ----      outside the archive. Both states are built here from the SAME rotation, so the pair
+# ----      isolates membership rather than the move.
+A=$TMP/rotarchive
+mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
+( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# legacy\n' > memory/project/legacy-files.txt
+  printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
+  printf '# ARCH-tRot-1 — the owning unit\n\nIt cites ARCH-tMoved-1 in prose, so the moved id is CITED from outside the archive.\n' > memory/builds/tRot/spec/2026-08-01-spec-tRot-1.md
+  # The live shard AFTER the rotation: the moved row is gone from here in both states below.
+  printf '# ARCH backlog\n\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
+  printf '# rotated\n\n- ARCH-tMoved-1 · CLOSED · the moved row, which DEFINES its own id on this line\n' > memory/archive/ARCH.2026-08-01.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m rotated --no-verify )
+outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
+n=$((n+1))
+# NOT cblock: check 14 emits a one-line `HYGIENE check 14: id ... is cited but never defined`,
+# and cblock keys on the `HYGIENE check <n> FAILED` block header, so it returns nothing here and
+# BOTH arms would pass by finding nothing. Measured before trusting either direction.
+grep -qF 'ARCH-tMoved-1' <<<"$outa" \
+  && { echo "FAIL check 14 called a rotated-and-STAGED id an orphan — rotation between two tracked paths cannot orphan anything, so this is the arithmetic going wrong"; st=1; }
+# ---- ...and now the SAME rotation with the archive unstaged. This is the state cSteadyMetronome saw.
+n=$((n+1))
+( cd "$A" && git rm -q --cached memory/archive/ARCH.2026-08-01.md >/dev/null 2>&1 \
+    && git commit -q -m "archive present but untracked" --no-verify )
+outb=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
+grep -qF 'ARCH-tMoved-1' <<<"$outb" \
+  || { echo "FAIL check 14 did NOT flag a rotated id whose archive is present-but-unstaged — the corpus is git ls-files, so that id has no definition and this is the one state where rotation really does orphan"; st=1; }
+
 R=$TMP/runanchor
 mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
          "$R/memory/backlog" "$R/memory/project"
@@ -1112,7 +1153,7 @@ for _k in ROW_DOC_CAP_BYTES DOSSIER_CAP_BYTES; do
   grep -qE "^${_k}=\"[0-9]+\"" "$HERE/.memory-tree.conf.example" \n    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k with a value — an adopter would inherit a key the engine reads and their conf never mentions"; st=1; }
 done
 
-FLOOR_ASSERTIONS=153
+FLOOR_ASSERTIONS=155
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
