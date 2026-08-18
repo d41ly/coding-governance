@@ -50,12 +50,12 @@
 - TOOL-dClosedLexicon-2 · SPECCED · wires the verb table into the codebase-map ratchet and two drift-audit signals; adds no new gate leg, and records that the ratchet DELETION direction is the load-bearing half → `builds/dClosedLexicon/`
 - TOOL-dClosedLexicon-14 · OPEN · govkit `check` printed `playbook: landed-but-inert` and exited 0 over a target where the playbook was never installed: the hole's `! grep -qE …` over two ABSENT files turns grep's rc 2 into success. Green-by-absence in a verb whose whole job is verifying
 - TOOL-dClosedLexicon-15 · OPEN · the `playbook` entry declares both files `project-owned`, which is not landable, while its own `why_no_adopter` says "installation is a copy to an owner-chosen path" — so the DEFAULT selection installs no playbook. One of the two is wrong; OWNER-facing
-- TOOL-aBranchedMandate-5 · OPEN · `adopt-drift-audit.sh` diffs its render with no `[ -s ]` test, so an empty render against an equally empty Skill PASSES; both sibling adopters guard it
-- TOOL-aBranchedMandate-6 · OPEN · `tools/memory-recall/selftest.py`'s cleanup cannot remove read-only git objects on Windows, so every run leaks its scratch repos — 3,616 measured on node `a`
-- TOOL-aBranchedMandate-8 · OPEN · `--preflight` OVERWRITES a live non-terminal run-state file, losing the keepalive id and re-pinning the anchor. Rotation retires a TERMINAL record; a live one is clobbered
-- TOOL-aBranchedMandate-9 · OPEN · `--preflight`'s rotation and scaffold run BEFORE two region checks and the set_fact block that each return 1, stranding the record with no repair verb
-- TOOL-aBranchedMandate-10 · OPEN · `map_extractors.template.py` unions the two JS scans with a bare `+`, contradicting its own dedupe instruction one line above
-- TOOL-aBranchedMandate-11 · OPEN · `govkit.py`'s `blocked` skip reason is unreachable behind `cmd_apply`'s early merged-rule refusal; the selftest asserts the refusal, not the skip
+- TOOL-aBranchedMandate-5 · OPEN · `adopt-drift-audit.sh` diffs its render with no `[ -s ]` test, so empty-vs-empty PASSES; both sibling adopters guard it
+- TOOL-aBranchedMandate-6 · OPEN · `memory-recall` selftest cleanup cannot remove read-only git objects on Windows; 3,616 leaked scratch repos
+- TOOL-aBranchedMandate-8 · OPEN · `--preflight` OVERWRITES a live non-terminal run-state file, losing the keepalive id and re-pinning the anchor
+- TOOL-aBranchedMandate-9 · OPEN · `--preflight`'s rotation and scaffold run BEFORE checks that can return 1, stranding the record with no repair verb
+- TOOL-aBranchedMandate-10 · OPEN · `map_extractors.template.py` unions the two JS scans with a bare `+`, contradicting its own dedupe line above
+- TOOL-aBranchedMandate-11 · OPEN · `govkit.py`'s `blocked` skip reason is unreachable behind `cmd_apply`'s early merged-rule refusal
 - TOOL-cBriefedPilot-23 · OPEN · a newline in an `--override` or `--abort` reason forges a second parked line, because `park()` writes it verbatim into a region with a line grammar
 - TOOL-cBriefedPilot-24 · OPEN · `--plan` cannot see a unit BUILT on the run's branch but not landed: specs stay OPEN until the build lands (measured — cKeyedLaunchpad has 7 built units, all OPEN), so `next:
 - TOOL-cBriefedPilot-25 · OPEN · only `--preflight` re-splices RUN.md's generated region and it refuses a dirty tree, so a mid-run edit to the build README strands the copy until the tree is clean and the keepalive id is to hand
@@ -83,3 +83,5 @@
 - TOOL-aWalkedCorpus-10 · OPEN · codebase-map's `seeded-extractors-or-crashed` outcome stays unmarked because its NAME admits it cannot tell a seed from a crash. Split it in two so the seeding half can be an accepted stop, or rename it to what it detects
 - TOOL-aWalkedCorpus-5 · OPEN · govkit selfcheck partitions gate-leg guard pathspecs into four PREFIX classes and a repo-root file (.memory-tree.conf) lands in none, so a leg cannot guard on a root conf. Hit wiring the recall floor; the guard was narrowed instead
 - TOOL-aWalkedCorpus-4 · OPEN · memory-recall selftest.py mints its two synthetic corpus ids in a LIVE family, so any record quoting them trips hygiene check 14 as orphans. Sibling fixtures use a dead family. Hit twice in one hour: a review record, then the row recording it
+- TOOL-aBranchedMandate-12 · SPECCED · `--close` discards `$GATE_CMD`'s output, so a blocked close names no leg
+- TOOL-aBranchedMandate-13 · SPECCED · `build-complete` reports a bare unmet when the README has no roster region

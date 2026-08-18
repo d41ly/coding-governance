@@ -385,6 +385,9 @@ resolve_base() { # readme path (may be empty) -> sets RB_BASE, ANCHOR_KIND, BREF
 # printed only the downstream symptom and never said why. Separating the value channel from the
 # message channel is the fix, and it is why this function returns 0/1 and sets `TB`.
 TB=""
+# Set by dod_met when an unmet item has something to SAY beyond its name; verb_close prints it
+# indented under the refusal and clears it. Empty means the item had nothing to add.
+DOD_OUT=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -1412,6 +1415,12 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         fail 13 "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict: $item"
       else
         fail 13 "a machine-checked DoD item is unmet, so --close blocks: $item"
+        # What the item had to SAY, indented under the refusal that is still the headline. The
+        # bar's own output for gates-green; the missing region for build-complete. Empty for an
+        # item with nothing to add, so this prints nothing rather than a blank indent block.
+        [ -n "${DOD_OUT:-}" ] && printf '%s
+' "$DOD_OUT" | sed 's/^/    /'
+        DOD_OUT=""
       fi
     fi
   done
@@ -1443,7 +1452,14 @@ dod_met() { # slug · run-state file · item · checker
       # merge-base is the thing this item exists to refuse.
       [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" >/dev/null 2>&1 ;;
     gates-green)
-      [ -n "$GATE_CMD" ] && $GATE_CMD >/dev/null 2>&1 ;;
+      # SURFACED, not discarded. `>/dev/null 2>&1` meant a blocked --close reported THAT the bar was
+      # red and never WHICH leg, and recovering the name cost a second full bar run every time.
+      # Sibling of the seam check_wiring already uses for $WIRING_CHECK -- TOOL-aBranchedMandate-2
+      # fixed that call site and did not grep for this one.
+      DOD_OUT=""
+      [ -n "$GATE_CMD" ] || return 1
+      DOD_OUT=$($GATE_CMD 2>&1) && { DOD_OUT=""; return 0; }
+      return 1 ;;
     records-current)
       # The unit list is DERIVED from the build README, so "current" is not a comparison between two
       # copies — it is the ABSENCE of a second copy, plus BOTH marker pairs being well-formed. This
@@ -1469,8 +1485,15 @@ dod_met() { # slug · run-state file · item · checker
       # No new fail branch: this reports through verb_close's fail 13, which already prints the
       # exact --override spelling. A waiver on `land-once-done` relaxes the DIRECTIVE and never this
       # item, so a run that waived it still owes --override build-complete at close.
-      region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1 \
-        && [ -n "$(roster_ids "$slug")" ] \
+      # THE ROSTER REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
+      # README predating this item failed with a bare "unmet" and nothing said a marker pair was what
+      # it wanted -- which is every build folder in this tree older than the item.
+      if ! region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
+        DOD_OUT="the build README carries no well-formed roster marker pair, and build-complete reads the roster from that region: $(readme_of "$slug")"
+        return 1
+      fi
+      DOD_OUT=""
+      [ -n "$(roster_ids "$slug")" ] \
         && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
         && [ -n "$(unit_rows "$(readme_of "$slug")")" ] \
         && [ -z "$(nonterminal_units "$(readme_of "$slug")")" ] ;;

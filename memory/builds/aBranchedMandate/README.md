@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
+ids: TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 ---
 
 # aBranchedMandate — an unattended run stops needing its build landed first
@@ -53,7 +53,7 @@ The table below is GENERATED from the status header of every spec in this folder
 it.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling · ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -61,6 +61,8 @@ it.
 | [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
 | [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | CLOSED | rev-7 | 2026-08-17 |
 | [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | SPECCED | rev-1 | 2026-08-18 |
+| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | SPECCED | rev-1 | 2026-08-18 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 <!-- /gen:build-index -->
@@ -78,6 +80,8 @@ Each cell is a label, not a description. The unit's §1 Goal owns the full state
 | 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
 | 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
 | 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
+| 5 | `TOOL-aBranchedMandate-12` | 1 | the gates-green arm's discarded child output |
+| 6 | `TOOL-aBranchedMandate-13` | 1 | build-complete's undifferentiated roster verdict |
 <!-- /roster:units -->
 
 **The order is TOTAL, and it changed when unit 4 arrived.** Two constraints fix it.
@@ -91,6 +95,12 @@ later unit inherits that red until unit 4 lands.
 `TOOL-aBranchedMandate-1` still precedes `TOOL-aBranchedMandate-2`. Unit 2's whole argument is that
 the eol arm's exit status is unfunded — that no gate reds on CR any more — and that becomes true only
 when unit 1 lands. Landing unit 2 first would silence a signal still correctly predicting a red leg.
+
+**Units 5 and 6 were added AFTER the build first closed**, from findings this run measured about
+its own tooling rather than from the commissioning report. Both are Tier-1 and independent of
+each other and of units 1-4, so they carry no ordering constraint. A third finding was recorded
+with them and then RETRACTED on measurement — see the build folder's record; it is kept struck
+because how a wrong finding got written is worth more than its absence.
 
 `TOOL-aBranchedMandate-3` is last because it is the one that changes a ratified rule. That decision
 has been made, so its position is a build ordering rather than a gate on approval.
