@@ -76,26 +76,6 @@ moves to `WIRE-INTO-PROJECT.md`, which is where a reader deciding what to instal
 and `§8`'s 1 499-character bullet spelling the `agent-cap` hook's marker grammar moves to that
 hook's own README, leaving the two caps and the fact that a hook enforces them.
 
-## Units — the authored roster (M2)
-
-One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
-
-The marker pair below is what the `build-complete` Definition-of-Done item reads. It does not
-introduce a second roster — it DELIMITS this one, so the driver and the build method join on the same
-region rather than on two readings of the same prose.
-
-<!-- roster:units -->
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `PLAY-aFusedCharter-1` | 2 | the converged document |
-| 2 | `TOOL-aFusedCharter-1` | 2 | the file-surface migration and every consumer of it |
-| 3 | `PLAY-aFusedCharter-2` | 2 | the session-slug micro-format block |
-| 4 | `DEPL-aFusedCharter-1` | 2 | the playbook renderer — the deploy path becomes a program |
-| 5 | `PLAY-aFusedCharter-3` | 2 | `AGENTS.md` — the rendered region, and the admission cut that pays for it |
-| 6 | `TOOL-aFusedCharter-2` | 2 | the micro-format definition gate |
-| 7 | `TOOL-aFusedCharter-3` | 2 | the line-length gate |
-<!-- /roster:units -->
-
 ## The order is TOTAL
 
 **Units 1 and 2 land in ONE pass.** Unit 1 deletes `parallel-coding-governance.domain-rules.md`, and
@@ -177,6 +157,26 @@ The owner's correction that produced the first row is recorded because it refute
 session proposed: `AGENTS.md` cannot import a second playbook file, because `@`-imports are Claude
 Code syntax and `AGENTS.md` exists precisely so that Codex, Cursor, Copilot and Windsurf read it
 NATIVELY — those tools would render the import line as literal text.
+
+## Units — the authored roster (M2)
+
+One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
+
+The marker pair below is what the `build-complete` Definition-of-Done item reads. It does not
+introduce a second roster — it DELIMITS this one, so the driver and the build method join on the same
+region rather than on two readings of the same prose.
+
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `PLAY-aFusedCharter-1` | 2 | the converged document |
+| 2 | `TOOL-aFusedCharter-1` | 2 | the file-surface migration and every consumer of it |
+| 3 | `PLAY-aFusedCharter-2` | 2 | the session-slug micro-format block |
+| 4 | `DEPL-aFusedCharter-1` | 2 | the playbook renderer — the deploy path becomes a program |
+| 5 | `PLAY-aFusedCharter-3` | 2 | `AGENTS.md` — the rendered region, and the admission cut that pays for it |
+| 6 | `TOOL-aFusedCharter-2` | 2 | the micro-format definition gate |
+| 7 | `TOOL-aFusedCharter-3` | 2 | the line-length gate |
+<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-18 · streams playbook+tooling+deployer
