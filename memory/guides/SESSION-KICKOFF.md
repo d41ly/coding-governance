@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T03:34:30+03:00 @ 43eb6b101f5fefe3b04c06302db80c8bbe022f5f
+last-audit: 2026-08-18T03:44:24+03:00 @ a39b2ef8285772069b9579ce9733fef021c529ed
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 23e3484abcf1edfe7fe058ff02e8db331e952716
+last-body-change: a39b2ef8285772069b9579ce9733fef021c529ed
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
