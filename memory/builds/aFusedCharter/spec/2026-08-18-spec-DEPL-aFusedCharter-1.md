@@ -1,6 +1,6 @@
 # DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
+**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
 
 ## 1. Goal
 
@@ -31,8 +31,16 @@ ordering while dropping a dependency that is outside the selection. The `[[place
 every ungated `asked` key with no renderer to consume them — and `intake` refuses to overwrite the
 `deploy.toml` it just wrote, so the operator cannot simply re-run it. The reverse selection installs
 a renderer with no declarations to read. `playbook-render` declares `requires = ["playbook"]`, and
-this spec states whether it joins `[selection] default`: it does, because a target taking the
-playbook and not the thing that renders it receives a file full of placeholders.
+this spec states whether it joins `[selection] default`: **it does NOT**, and rev-6 reverses rev-5
+on measured evidence.
+
+Joining the default makes `apply` over the default selection RUN the renderer, and the renderer's
+correct behaviour on a target that has no answers for it yet is to REFUSE — so a first install over
+the default exits non-zero for a reason that is not a defect. Measured: adding it to the default set
+reds `govkit selftest`'s `apply over the DEFAULT selection ran` arm, and removing it restores every
+arm. The coupling that actually matters is `requires`, which fires the moment an operator selects
+the renderer, and the placeholder hole already covers the target that takes the template alone. An
+adopter opts into rendering; they are not opted in by a default that then refuses at them.
 
 **S1a — Name the leg's registry route, rather than leaving it to the build.** `govkit selfcheck`
 fails a gate leg claimed by no descriptor and carried by no `[[exempt_leg]]`, and fails one that is
@@ -353,7 +361,9 @@ Edited: `tools/govkit/entries/playbook.kit.toml`, `tools/govkit/govkit.py` (S3, 
   names it.
 - **AC15** — When a selection names `playbook-render` alone, the resolver pulls in `playbook`; when
   it names `playbook` alone, `intake` does not demand answers for a renderer the target is not
-  installing. Both directions are observed, because the coupling is what S1b adds.
+  installing. Both directions are observed, because the coupling is what S1b adds. And
+  `python tools/govkit/selftest.py` holds every arm, including `apply over the DEFAULT selection
+  ran` — which is the arm that measures whether the renderer belongs in that default at all.
 - **AC16** — When `deploy.toml` carries a `drop_blocks` member naming no declared block, `intake`
   refuses naming it; when it names a declared block, that block and its fences are absent from the
   render and every other block is present.
@@ -407,6 +417,11 @@ none — all four forks below are RESOLVED.
 
 - rev-1 · 2026-08-18 · initial draft. F3's resolution folded the render-parity gate into this
   unit's `--check`, which is why the build roster carries seven units and not eight.
+- rev-6 · 2026-08-18 · S1b reversed on measured evidence during the build: `playbook-render` does
+  NOT join `[selection] default`. Joining it makes `apply` over the default run a renderer that
+  correctly refuses on a target with no answers yet, which reds `govkit selftest`'s default-selection
+  arm; `requires` is the coupling that matters and it fires on explicit selection. AC15 gains the
+  selftest observation that decides it.
 - rev-5 · 2026-08-18 · folded the round-2 spec audit. `when:` fences become MEMBERSHIP in a
   `drop_blocks` list rather than booleans, because intake writes every answer as a quoted string and
   a false would have read as true; new S3 text gives the fence names a `[[block]]` declaration array

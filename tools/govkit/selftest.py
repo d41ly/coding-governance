@@ -433,9 +433,10 @@ def main() -> int:
         pb = make_target(tmp / "u1b", DEPLOY_FULL)
         run("apply", "--target", str(pb), "--kits", "playbook")
         recpb = json.loads((pb / ".governance" / "install.json").read_text(encoding="utf-8"))
-        check("the playbook entry lands its two files",
-              (pb / "docs" / "PARALLEL.md").is_file()
-              and (pb / "docs" / "coding-governance-agents.template.md").is_file(),
+        # ONE file since v3.0. The charter converged and its domain companion was deleted, so an arm
+        # asserting a PAIR here was asserting the shape of a product that no longer ships.
+        check("the playbook entry lands its one file",
+              (pb / "docs" / "PARALLEL.md").is_file(),
               str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
         check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
               all(f["role"] == "seed" for f in recpb["files"] if f["kit"] == "playbook"),
@@ -1402,8 +1403,8 @@ user_skills = "/tmp/gk-fake-skills"
             # govkit has no kind meaning "in the kit dir, deliberately not in the payload", so the
             # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
             # TOOL-aWalkedCorpus-6 rather than papered over here.
-            check("...and the playbook pair previews as seed WRITES, not as orders",
-                  marks.get("write|seed") == 4 and marks.get("ORDER|project-owned") == 3,
+            check("...and the playbook file previews as a seed WRITE, not as an order",
+                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 3,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
