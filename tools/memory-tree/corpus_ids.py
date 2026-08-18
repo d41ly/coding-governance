@@ -44,6 +44,14 @@ HYGIENE = HERE / "check-memory-hygiene.sh"
 # the kits somewhere other than `tools/` still finds it.
 GRAMMAR_DIR = HERE.parent / "memory-recall"
 
+# The headroom `--measure` ADDS to the measured read path when it prints a ceiling to paste into
+# .memory-tree.conf. Advice to an author, never an input to check 16: that check compares the
+# measured total against READ_PATH_CEILING alone, because a ceiling COMPUTED from a headroom
+# would let a growing corpus raise its own budget. Overridable per project as READ_PATH_HEADROOM.
+# 20480 until TOOL-aLoosenedCeiling-1: it had become smaller than a single member of the largest
+# class on a real read path, and absorbing one more member of that class is what headroom is for.
+DEFAULT_READ_PATH_HEADROOM = 25600
+
 REGISTRY = "project/corpus-path-unresolved.txt"
 WAIVER = "project/id-orphan-waiver.txt"
 
@@ -72,6 +80,7 @@ def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": "AGENTS.md",
         "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_CEILING": "", "READ_PATH_WAIVER": "",
+        "READ_PATH_HEADROOM": "",
         "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
     p = os.path.join(root, ".memory-tree.conf")
@@ -83,6 +92,30 @@ def load_conf(root: str) -> dict:
             k, _, v = line.partition("=")
             conf[k.strip()] = v.strip().strip('"').strip("'")
     return conf
+
+
+def _conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> int:
+    """The integer bound to `key`, or a named Problem — never a raw ValueError traceback.
+
+    The contract is `row_grammar.pin_of`'s, deliberately: EMPTY means the default, because a key
+    an adopter never wrote must not be a refusal, and anything else that is not a decimal integer
+    at or above `minimum` is a named failure. Three call sites here used to parse their own value
+    with a bare `int()`, so a typo in a project conf raised a traceback out of a gate — which the
+    module docstring already forbids. One accessor, four keys.
+
+    `minimum` is 0 for the COUNT pins, where zero is the strict end and a legal value, and 1 for
+    the two byte figures, where zero is meaningless: a zero ceiling is permanently red and a zero
+    headroom prints a pin equal to the measured total, which reds on the next byte added.
+    """
+    raw = conf.get(key, "").strip()
+    if raw == "":
+        if default is None:
+            raise Problem(f"corpus_ids: {key} is not declared in .memory-tree.conf")
+        return default
+    if not raw.isdigit() or int(raw) < minimum:
+        raise Problem(f"corpus_ids: {key} must be a whole number of at least {minimum}, "
+                      f"got {raw!r}")
+    return int(raw)
 
 
 def armed(conf: dict) -> bool:
@@ -372,7 +405,7 @@ def checks(w: dict) -> list:
         for i in waived:
             if i not in orphans:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
-        pin = int(conf["ORPHAN_ID_PIN"])
+        pin = _conf_int(conf, "ORPHAN_ID_PIN")
         if len(waived) > pin:
             bad.append(f"check 14: the orphan waiver holds {len(waived)} rows, pinned at {pin} (shrink-only)")
 
@@ -405,7 +438,7 @@ def checks(w: dict) -> list:
         for key, (count, ln) in sorted(measured.items()):                      # rule 1, new side
             if key not in seen:
                 bad.append(f"check 15 rule 1: {key[0]}:{ln} cites {key[1]}, which resolves to nothing and has no row in {m}/{REGISTRY}")
-        pin = int(conf["DEAD_PATH_PIN"])
+        pin = _conf_int(conf, "DEAD_PATH_PIN")
         if len(rows) > pin:                                                    # rule 2
             bad.append(f"check 15 rule 2: the dead-path registry holds {len(rows)} rows, pinned at {pin} (shrink-only)")
 
@@ -415,7 +448,7 @@ def checks(w: dict) -> list:
         capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
         waived = set(conf["READ_PATH_WAIVER"].split())
         total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-        ceiling = int(conf["READ_PATH_CEILING"])
+        ceiling = _conf_int(conf, "READ_PATH_CEILING", minimum=1)
         if total > ceiling:
             bad.append(f"check 16: the charter's read path is {total} B, ceiling {ceiling} B "
                        f"({len(members)} files) — trim it or raise the ceiling in a commit that says why")
@@ -451,17 +484,27 @@ def do_report(root: str, conf: dict) -> int:
     return 0
 
 
-def do_measure(root: str, conf: dict) -> int:
-    """Print the pins to WRITE INTO .memory-tree.conf. Measured against THIS corpus — a pin copied
-    from a larger tree is either vacuous or permanently red."""
+def _measure_lines(root: str, conf: dict) -> list:
+    """The pins to WRITE INTO .memory-tree.conf, as strings. Split out from the verb below so the
+    selftest can ASSERT them: the arm helper compares a return value, and a verb that prints and
+    returns 0 is unobservable to it — which is why nothing exercised this path for its whole life."""
     w = walk(root, conf)
     orphans = sorted(set(w["cites"]) - set(w["defs"]))
     members, _ = read_set(w)
     total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-    headroom = 20480
-    print(f'ORPHAN_ID_PIN="{len(orphans)}"')
-    print(f'DEAD_PATH_PIN="{len(w["dead"])}"')
-    print(f'READ_PATH_CEILING="{total + headroom}"   # measured {total} B + {headroom} B headroom')
+    headroom = _conf_int(conf, "READ_PATH_HEADROOM", DEFAULT_READ_PATH_HEADROOM, minimum=1)
+    return [
+        f'ORPHAN_ID_PIN="{len(orphans)}"',
+        f'DEAD_PATH_PIN="{len(w["dead"])}"',
+        f'READ_PATH_CEILING="{total + headroom}"   # measured {total} B + {headroom} B headroom',
+    ]
+
+
+def do_measure(root: str, conf: dict) -> int:
+    """Print the pins to WRITE INTO .memory-tree.conf. Measured against THIS corpus — a pin copied
+    from a larger tree is either vacuous or permanently red."""
+    for line in _measure_lines(root, conf):
+        print(line)
     return 0
 
 
@@ -704,6 +747,28 @@ def do_selftest() -> int:
         c7b = dict(c7); c7b["READ_PATH_CEILING"] = "1"
         arm("check 16 catches a read path over its ceiling", "ceiling 1 B",
             lambda: "\n".join(checks(walk(t7, c7b))))
+        # --- the measure verb's headroom. Every arm rides the SAME t7 fixture, so the only thing
+        # --- varying between them is the declaration under test. The `want` strings are LITERALS
+        # --- rather than interpolations of DEFAULT_READ_PATH_HEADROOM: an arm that re-types the
+        # --- constant it is checking agrees with itself whatever the constant says.
+        arm("--measure adds the SHIPPED default when no headroom is declared", "+ 25600 B headroom",
+            lambda: "\n".join(_measure_lines(t7, c7)))
+        c7h = dict(c7); c7h["READ_PATH_HEADROOM"] = "40960"
+        arm("--measure adds a DECLARED headroom in place of the default", "+ 40960 B headroom",
+            lambda: "\n".join(_measure_lines(t7, c7h)))
+        c7i = dict(c7); c7i["READ_PATH_HEADROOM"] = "twenty thousand"
+        arm("a malformed headroom is a named refusal, not a traceback",
+            "READ_PATH_HEADROOM must be a whole number of at least 1",
+            lambda: "\n".join(_measure_lines(t7, c7i)))
+        c7j = dict(c7); c7j["READ_PATH_HEADROOM"] = "0"
+        arm("a zero headroom is refused, since it prints a ceiling equal to the measured total",
+            "READ_PATH_HEADROOM must be a whole number of at least 1",
+            lambda: "\n".join(_measure_lines(t7, c7j)))
+        c7k = dict(c7); c7k["READ_PATH_CEILING"] = "not a number"
+        arm("a malformed ceiling is a named refusal too, which a bare int() never gave",
+            "READ_PATH_CEILING must be a whole number of at least 1",
+            lambda: "\n".join(checks(walk(t7, c7k))))
+
         c7c = dict(c7); c7c["CHARTER"] = "NOPE.md"
         arm("a missing charter is a named error", "is not a tracked file",
             lambda: "\n".join(checks(walk(t7, c7c))))
