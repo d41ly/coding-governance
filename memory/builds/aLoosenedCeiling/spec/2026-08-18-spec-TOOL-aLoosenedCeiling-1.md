@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -10,7 +10,9 @@ headroom half of that arithmetic is a constant in this repo's copy of the kit. M
 
 ## 2. Scope (IN)
 
-- **S1** — `load_conf` gains `READ_PATH_HEADROOM` with the shipped default `25600`.
+- **S1** — `load_conf` gains `READ_PATH_HEADROOM` with the shipped default `25600`. The key must
+  be present in that defaults dict whatever else happens: every consumer indexes `conf` directly,
+  so a key the dict does not carry is a `KeyError` rather than a missing setting.
 - **S2** — `do_measure` reads the declaration instead of its own literal, and the comment it prints
   beside the number continues to name both halves of the sum, so the written pin still carries its
   own derivation.
@@ -23,9 +25,12 @@ headroom half of that arithmetic is a constant in this repo's copy of the kit. M
 - **S5** — the shipped `tools/memory-tree/.memory-tree.conf.example` declares the key, commented in
   the register that file already uses, and `tools/memory-tree/HYGIENE.template.md` plus this repo's
   installed `memory/HYGIENE.md` describe check 16's budget as measured-plus-declared-headroom.
-- **S6** — `KIT_MEMORY_TREE_VERSION` and every marker spelling it move together, because a
-  non-comment line of the hygiene engine or its siblings moving is what the verdict-epoch leg
-  watches.
+- **S6** — `KIT_MEMORY_TREE_VERSION` moves, and so does every marker spelling it. The verdict-epoch
+  leg counts an added or removed line whose first non-space character is not a comment marker, in
+  the engine OR in its declared delegates, and `corpus_ids.py` is one of those delegates. The
+  spellings are the constant and its inline marker, the three shipped template headers, and the
+  three live copies rendered from them — and the live copies move only through the parity
+  harness's render mode, never by hand.
 
 ## 3. Non-goals (OUT)
 
@@ -64,6 +69,19 @@ member of that class, and absorbing that is the only thing headroom is for. 2560
 tier up on the same binary scale the neighbouring caps use, and it exceeds the largest present
 member. It is the owner's number. This paragraph records the measurement that supports it.
 
+### Inventory
+
+`do_measure` has no selftest coverage at all today: no arm in `--selftest` reaches it, and the
+constant this unit replaces has therefore never been exercised. S4 is the first coverage of that
+function rather than an extension of existing coverage, which is why it is written as three arms
+over one fixture rather than as an assertion bolted to an existing one.
+
+The unit adds no PUBLIC module-level name. The codebase map indexes public top-level definitions
+under the tool root and byte-compares its generated inventory, so a new public function here
+would red the map's freshness leg until the map is re-rendered and the key claimed by a dossier.
+The default belongs in a module constant and the parsing belongs inside `do_measure`, which
+keeps the public surface unchanged.
+
 ### Migration
 
 An absent key means the shipped default, so every adopter tree keeps working with no edit. An
@@ -77,7 +95,8 @@ recorded decisions.
 - `tools/memory-tree/.memory-tree.conf.example` — the declaration and its comment.
 - `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md` — check 16's description.
 - `.memory-tree.conf` — the key, declared at this repo's chosen value.
-- `tools/memory-tree/check-memory-hygiene.sh` and every carrier of the kit version marker.
+- `tools/memory-tree/check-memory-hygiene.sh`, the three `*.template.md` headers in the kit, and
+  the three live copies re-rendered from them.
 
 ### Alternatives rejected
 
@@ -142,6 +161,11 @@ recorded in section 4.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the pre-build survey. Three corrections, none to the design: the
+  defaults dict entry is load-bearing rather than tidy (S1); the verdict-epoch leg watches the
+  delegates too and the live doc copies move only through the render mode (S6); and `do_measure`
+  has no existing coverage, so S4 is first coverage (Inventory). The ceiling-value carriers the
+  survey found — a backlog row and a docstring example — moved to unit 3, which owns that number.
 
 ## 10. Reuse audit
 

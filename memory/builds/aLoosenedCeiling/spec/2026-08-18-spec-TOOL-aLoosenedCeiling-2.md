@@ -1,6 +1,6 @@
 # TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
 
 ## 1. Goal
 
@@ -29,7 +29,10 @@ kit script they re-pull on every update.
   this repo's installed `memory/HYGIENE.md` describe check 6's caps as declarations with these
   defaults, rather than as fixed numbers.
 - **S8** — `KIT_MEMORY_TREE_VERSION` and its markers move, because non-comment lines of the engine
-  move.
+  move. Shared with unit 1, which states the mechanics.
+- **S9** — check 6's failure message is not reworded. Its full literal signature is what arms the
+  check in the harness meta-gate, and the arm names that text; the message keeps saying which cap
+  was applied, which is what makes a declared-cap arm assertable at all.
 
 ## 3. Non-goals (OUT)
 
@@ -72,14 +75,35 @@ misconfiguration, never an intent. A zero LINE cap is accepted because it alread
 
 ### Inventory
 
-The awk program at present derives `cb` and `cl` from three literals-bearing branches. After the
-change it derives them from six `-v` names and the same three branches, so the control flow is
-byte-for-byte the same shape and only the source of the numbers moves.
+The awk program at present derives `cb` and `cl` from three literal-bearing branches. After the
+change it derives them from six `-v` names and the same three branches, so the control flow keeps
+its shape and only the source of the numbers moves.
+
+Two measured facts shape the arms. First, the harness meta-gate scores this engine at nineteen
+branches and nineteen armed, and check 6 has exactly one failure call site, so the awk
+parameterization adds nothing to that population — which is the whole reason S3 aborts rather
+than failing a check. Second, the existing check-6 arms are unaffected: every scratch conf in the
+harness declares none of the six keys, so the engine's built-in defaults apply and the fixtures
+tuned to 760, 400 and 265 lines keep their present verdicts.
+
+The gap S6 closes is real and already recorded against this repo: there is NO arm anywhere today
+for the build-README tier — neither its byte cap nor the absence of a line cap is exercised. A
+prior review filed that as a medium finding. Making the tier declarable without arming it would
+leave the same hole with a knob on it.
+
+The suite's assertion floor is a minimum rather than an equality, so added arms need no floor
+edit; the count itself is derived by the harness, not written.
 
 ### Migration
 
-Every adopter conf that declares none of the six keys behaves identically. There is no retrofit and
-no re-measure.
+Every adopter conf that declares none of the six keys behaves identically. There is no retrofit
+and no re-measure.
+
+One adopter is worth naming because it is the case that motivates the unit. The NicoCares package
+repo carries a hand-maintained fork of this awk block — a single flat tier replacing the three
+classes — tagged as a carve-out its own source instructs the next adopter to re-apply on every
+kit release. These keys are exactly what would let that ruling be a declaration instead of a
+fork. Unit 4 does not perform that re-adopt, and says why.
 
 ### Files touched (estimate)
 
@@ -87,7 +111,13 @@ no re-measure.
   the kit version constant.
 - `tools/memory-tree/check-memory-hygiene.test.sh` — S6's arms and its assertion count.
 - `tools/memory-tree/.memory-tree.conf.example` — six declarations and their comment.
-- `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md` — check 6's description.
+- `tools/memory-tree/HYGIENE.template.md` — check 6's description, in the THREE places one file
+  states the same row-document cap, plus the build-README class it omits entirely. `memory/HYGIENE.md`
+  moves only as the render of that template, never edited directly.
+- `tools/memory-tree/check-memory-hygiene.sh`'s own comment block above the awk, which restates
+  all three tiers about forty lines from the code that owned them, and the sentence deriving the
+  guide cap as three times the row cap — a relation that holds only while both keys keep their
+  defaults, and which becomes false the moment an adopter uses the knob.
 - Kit version marker carriers.
 
 ### Alternatives rejected
@@ -156,6 +186,11 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the pre-build survey. The abort-rather-than-fail choice in S3 is
+  confirmed by measurement rather than assumed (Inventory); S9 added, because the failure message
+  is an armed signature and rewording it silently breaks the arm; the doc carriers were found to
+  be more numerous and one of them derivational rather than literal (Files touched); and the
+  adopter whose fork this unit dissolves is named in Migration.
 
 ## 10. Reuse audit
 
