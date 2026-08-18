@@ -1,0 +1,218 @@
+# PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session
+
+**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+
+## 1. Goal
+
+Fold `parallel-coding-governance.domain-rules.md` back into the operating ruleset, delete the
+sections that govern a project's domain rather than a session's conduct, and mark what remains so a
+renderer can drop the parts a target has no kit for. The product becomes one file an adopter
+receives whole, instead of a ruleset plus a companion that keeps falling out of the deploy path.
+
+## 2. Scope (IN)
+
+**S1 — Fold every `§`-stub into its own section.** Six sections in the ruleset are stubs whose body
+lives in the companion: `§1`, `§7`, `§8`, `§9`, `§11`, `§12`. For each, delete the
+`… → parallel-coding-governance.domain-rules.md §N. LOAD when …` bullet and append the companion
+section's bullets in their existing order under the same heading. The companion's own preamble,
+which explains the split and the lockstep re-pull, is deleted with it — after this unit there is no
+second file to re-pull.
+
+**S2 — Delete `§4` whole**, both carriers. Port offsets, one-server-per-canonical-port, build-time
+versus runtime configuration, the monorepo launch-scope trap, the full-stack verify recipe, the
+per-node harness pin and the harness false-signal list. Its three placeholders `{{PORT_OFFSET}}`,
+`{{BUILD_TIME_BAKES}}` and `{{VERIFY_RECIPE}}` go with it. `§8`'s "verify before done" rule
+currently offers "the `§4` harness" as one of three witnesses; that clause loses the third option
+and keeps the other two.
+
+**S3 — Delete `§10`'s twenty-five bug classes**, replacing both the stub and the companion body with
+a single rule under the retained heading: every Tier-2 review runs the project's own recurring-class
+checklist, and every confirmed finding is left-shifted into a gate or into that checklist. The rule
+names no kit; a project without one has a documented manual checklist and the rule still reads true.
+
+**S4 — Delete `§13` whole**, both carriers, with its seven placeholders.
+
+**S5 — Fold `§17` into `§16`** as two bullets at the end of the micro-format section — the clickable
+link format, and the session-cwd href resolution with its worktree-segment trap. The `§17` heading
+disappears. Sections are NOT renumbered: `§4`, `§10`, `§13` and `§17` become absent numbers, because
+renumbering breaks every cross-reference in the file and every citation of this playbook in this
+repo's records.
+
+**S6 — Move the kit-advertisement prose to `WIRE-INTO-PROJECT.md`.** Seven bullets currently sell a
+kit rather than state a rule: `§5`'s codebase-map, drift-audit and memory-recall bullets, `§6`'s
+agent-instructions bullet, and `§7`'s pytest-parallel-guardrails, gate-lint and govkit bullets. Each
+leaves behind the RULE it exists to enforce, stated without naming the kit, and its adoption case
+moves to the runbook section that installs it. The memory-tree bullet in `§5` stays: it is marked
+REQUIRED and `§5` and `§6` are both written against it.
+
+**S7 — Move `§8`'s agent-cap hook grammar to `tools/hooks/README.md`.** The bullet retains: at most
+five agents in a verify stage and at most five running at once, they are two rules and not one,
+batching grows the batch and never the agent count, and a hook enforces both at the tool call. The
+marker spellings, the resolvable-bound rules and the direct-spawn slot accounting move out.
+
+**S8 — Add kit-conditional block markers.** Every block the customize companion currently lists
+under its conditional-sections heading gets an HTML-comment fence naming the kit that justifies it,
+in the shape `<!-- kit:` id `-->` … `<!-- /kit:` id `-->`, so `DEPL-aFusedCharter-1` can drop it
+mechanically. Markers are comments, so an unrendered file reads correctly with every block present.
+The kit ids are `tools/govkit/registry.toml`'s entry ids, not free text.
+
+**S9 — Rewrite the preamble.** It currently describes the two-file deploy and the nine companion
+checklists. It becomes: what the file is, that filling it is `DEPL-aFusedCharter-1`'s job and not a
+reader's, that a wrapped line is still one rule, and where version history lives.
+
+**S10 — Adopt four rules `AGENTS.md` states better than the ruleset does.** Each is a rule this
+repo learned and the shipped playbook does not carry. They land as bullets in the named section.
+`§6`: a value stated in prose beside the source that owns it rots between changes — point at the
+source or gate the pair. `§7`: a gate's own header states what it does NOT check, because a
+structural check reads as a semantic one to everybody who did not write it. `§7`: a probe that
+cannot move says so — a signal with no liveness assertion reports a reassuring zero when it is
+broken. `§7`: no count of a derived population is written in prose; the checker derives it.
+
+## 3. Non-goals (OUT)
+
+**No renumbering.** See S5.
+
+**No rename, and no consumer repointed here.** The file keeps its current name through this unit and
+`TOOL-aFusedCharter-1` owns the rename, the deletion of the sibling files as tracked paths, and
+every gate, registry, dossier and conf that names them. The two units share one landing pass; the
+split is by mechanism, not by commit.
+
+**No micro-format content.** `PLAY-aFusedCharter-2` owns `§16`'s new block. This unit's `§16` work is
+only S5's fold.
+
+**No ceiling raise.** The converged file measures 43 998 bytes against a 49 152 ceiling. If a
+build-time measurement disagrees, that is a fork for the owner, never a constant edit.
+
+**`§9` and `§11` are not cut.** Both were tested against the admission test and pass: a security
+boundary governs any unit adding a write path, and the cross-OS rules govern any fleet with more
+than one operating system. Both are already project-conditional and the renderer can drop them.
+
+**No rewriting of surviving rules for style.** Deletion, folding and the ten S-items above. A rule
+that survives keeps its words, except where S6 and S7 explicitly restate one.
+
+## 4. Design
+
+### Inventory
+
+Measured at BASE. Section sizes are the ruleset's and the companion's, in bytes.
+
+| Section | Ruleset | Companion | Disposition |
+|---|---|---|---|
+| `§0` TL;DR | 1 403 | — | keep; the runtime-isolation clause in its streams bullet drops |
+| `§1` lifecycle | 3 601 | 1 384 | fold |
+| `§2` nodes and IDs | 2 666 | — | keep |
+| `§3` streams and worktrees | 1 873 | — | keep |
+| `§4` runtime and harness | 396 | 1 554 | DELETE |
+| `§5` memory and docs | 3 499 | — | keep, minus S6 |
+| `§6` decisions and backlogs | 2 571 | — | keep, minus S6, plus one S10 rule |
+| `§7` gates | 4 339 | 1 262 | fold, minus S6, plus three S10 rules |
+| `§8` review protocol | 4 127 | 525 | fold, minus S7 |
+| `§9` security | 566 | 2 414 | fold |
+| `§10` bug classes | 330 | 7 752 | DELETE body, keep one rule |
+| `§11` cross-OS | 396 | 1 427 | fold |
+| `§12` architecture | 676 | 3 943 | fold |
+| `§13` design system | 382 | 1 977 | DELETE |
+| `§14` session hygiene | 1 879 | — | keep |
+| `§15` voice | 1 117 | — | keep |
+| `§16` output discipline | 4 712 | — | keep, plus S5's fold |
+| `§17` file references | 651 | — | FOLD into `§16` |
+
+Folded total, before S6, S7 and S10 adjust it: 43 998 bytes.
+
+### Migration
+
+The fold is mechanical enough to be checked rather than eyeballed. Before deleting the companion,
+enumerate its bullets; after folding, assert that every bullet whose section survives appears once
+in the converged file. This is a build-time check the author runs, not a shipped gate — the shipped
+gate is `TOOL-aFusedCharter-2`'s, over a different property.
+
+### Alternatives rejected
+
+**Keep the companion and fix its deploy path instead.** Rejected by the owner's framing: the split's
+cost is not only that the companion gets dropped, it is that two files carrying one version marker
+in lockstep is a second answer to one question. The stub indirection also costs a load decision per
+session, which is the thing this ruleset elsewhere refuses to spend.
+
+**Renumber to close the gaps.** Rejected in S5's terms.
+
+**Move `§4`, `§10` and `§13` to an optional non-deployed reference file.** Rejected by the owner:
+that is the shape being retired, one level down.
+
+### Files touched (estimate)
+
+`parallel-coding-governance.template.md` (rewritten), `parallel-coding-governance.domain-rules.md`
+(emptied — deleted as a tracked path by `TOOL-aFusedCharter-1`), `WIRE-INTO-PROJECT.md` (S6),
+`tools/hooks/README.md` (S7).
+
+## 5. Production-readiness checklist
+
+- security — `§9` survives whole and gains nothing; the deleted sections carry no security rule.
+- perf / scale — N/A, a document.
+- a11y — N/A for the document itself. `§13`'s deletion removes the contrast-gate rule from the
+  shipped product, which is a real loss for UI adopters and is named as a follow-up.
+- i18n — N/A.
+- error / empty / loading states — N/A.
+- observability — the converged file's size is observable through the existing size gate.
+- risks — the fold can silently drop a bullet, and the Migration check above is the mitigation.
+  Landing without `TOOL-aFusedCharter-1` reds three legs; the build README makes the two one pass.
+- testing + left-shift gates — no new gate here. `TOOL-aFusedCharter-2` and `-3` add them.
+- migration / rollback — a document edit; `git revert` restores both files.
+- user docs — `WIRE-INTO-PROJECT.md` receives S6 and is itself the user doc.
+
+## 6. Acceptance criteria
+
+- **AC1** — When the fold is complete, `grep -c 'domain-rules' parallel-coding-governance.template.md`
+  returns `0` and every surviving companion bullet is present once in the converged file.
+- **AC2** — When `bash tools/check-template-size.sh` runs against the converged file, it exits 0 and
+  prints a byte count under `49152`; the printed number, not this spec's estimate, is the record.
+- **AC3** — When `grep -nE '^## .(4|13|17) ' parallel-coding-governance.template.md` runs it returns
+  nothing, and the same pattern over `(10|16)` returns both headings.
+- **AC4** — When the surviving bug-class section is read it states one rule and names no class, so
+  `grep -c 'Client/server validation divergence' parallel-coding-governance.template.md` returns `0`.
+- **AC5** — When the conditional blocks are marked, every kit id inside a `<!-- kit:` fence is a real
+  entry id in `tools/govkit/registry.toml`, and every opened fence is closed.
+- **AC6** — When the four adopted rules land, each is greppable in its stated section: the liveness
+  rule contains `DEAD PROBE` and the derived-count rule contains `derives`.
+- **AC7** — When the seven kit-advertisement bullets are moved, every kit named in one is still
+  reachable from `WIRE-INTO-PROJECT.md`, so `bash tools/check-playbook-parity.sh` reports no kit
+  newly unnamed. Checked after `TOOL-aFusedCharter-1` amends that gate's file list.
+
+## 7. Gates
+
+`template size <=48KiB` · `playbook parity` · `playbook placeholder catalogue` · `memory hygiene` ·
+`install-prefix (shipped surface)` · `codebase-map coverage + freshness` · the full bar at the push
+boundary. No new leg.
+
+## 8. Open questions
+
+none — the forks below are RESOLVED and their resolutions are recorded in the build README.
+
+- **F1 — how does `AGENTS.md` relate to the converged file?** RESOLVED (owner, 2026-08-18): a
+  `gov:playbook` marker region holding the render, with project content in authored slots outside
+  it. Owned by `PLAY-aFusedCharter-3`; this unit only has to leave the file renderable.
+- **F2 — what happens to the twenty-five bug classes?** RESOLVED (owner, 2026-08-18): deleted
+  outright. They are not seeded into any kit, and the mechanism that replaces them is the project's
+  own per-path checklist.
+- **F3 — which further trims?** RESOLVED (owner, 2026-08-18): the kit-advertisement prose, the
+  agent-cap hook grammar, and `§17` folded into `§16`. `§9` and `§11` stay.
+
+## 9. Revision log
+
+- rev-1 · 2026-08-18 · initial draft, written after the owner resolved F1 through F3 at kickoff.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "the governance playbook and the gates over its claims"`
+routes to `memory/map/features/playbook.md`, which owns the size gate, the parity gate and the
+placeholder gate. This unit extends the SUBJECT those gates measure and adds no seam of its own; the
+seams it must not break are `tools/check-template-size.sh`'s per-subject key in
+`tools/template-size-limits.txt` and `tools/check-playbook-parity.sh`'s three-file precondition,
+both repointed by `TOOL-aFusedCharter-1`.
+
+`python tools/memory-recall/query.py` was run with terms
+`playbook template companion customize domain-rules agnostic adopter externalize byte gate section stub kit wiring marker lockstep`.
+The binding prior records are `PLAY-aCandidStub-1`, whose fifteen convergence defects were all
+caused by the three-file split, and `TOOL-aSiftedPlaybook-1`, which raised the ceiling to 48 KiB and
+replaced it with a high-water ratchet — the headroom this unit spends exists because of that unit.
+`PLAY-aCandidStub-2` is an OPEN row asking to externalize `§14`; this unit moves the opposite way
+and that row needs a disposition at landing.

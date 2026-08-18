@@ -11,6 +11,7 @@ terminal status. Nothing here is edited by hand.
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
+| [aFusedCharter](builds/aFusedCharter/README.md) | OPEN | a | 2026-08-18 | playbook+tooling+deployer | 7 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | OPEN | a | 2026-08-18 | tooling | 10 |
