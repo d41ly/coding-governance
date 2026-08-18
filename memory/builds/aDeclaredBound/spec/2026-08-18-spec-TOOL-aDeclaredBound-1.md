@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -12,11 +12,18 @@ established for check 6's size caps sixty lines away.
 ## 2. Scope (IN)
 
 - **S1** — two keys, `ENTRY_CAP_CHARS` and `BUILD_README_ENTRY_CAP_CHARS`, defaulted to 300 and 350,
-  declared in the same block as check 6's six cap keys so one conf source overrides all eight.
+  declared in the same block as check 6's EIGHT existing cap keys so one conf source overrides all
+  ten. Eight, not six: `DOSSIER_CAP_BYTES` and `DOSSIER_CAP_LINES` landed after the previous build,
+  with `TOOL-aRelaxedShard-1`, and a spec that counts them wrong writes a wrong loop.
 - **S2** — the awk receives both through `-v` bindings and holds no literal.
-- **S3** — both keys join the EXISTING validation loop rather than gaining a second one. That loop
-  already rejects a non-numeric value and a zero BYTE cap, aborting at status 2 on stdout; an entry
-  budget of zero is the same category as a zero byte cap, since it reds every line in the class.
+- **S3** — both keys join the EXISTING validation loop, and the loop's ZERO arm widens to reach
+  them. As it stands that arm selects on `*_BYTES`, so a char key matches no arm: a declared 0
+  would validate clean and then red every measured line, which is the silent-misconfiguration
+  outcome the loop exists to stop. The case pattern gains the char keys with their own message.
+- **S3b** — the abort BANNER changes, because it names check 6 and will now also speak for check 7.
+  That banner is an `echo` rather than a `fail` branch, so `check-arms.py` cannot notice a stale
+  arm for it; the hand-written arm that asserts its text moves in the SAME commit or the assertion
+  silently stops matching.
 - **S4** — the failure message stops carrying the number. It currently reads `index entry lines over
   300 chars`, which is a THIRD copy of the value and is also the check's armed signature. The
   message becomes cap-free; the per-row detail line already prints `(N chars > CAP)` and keeps doing
@@ -33,14 +40,18 @@ established for check 6's size caps sixty lines away.
   as the render.
 - **S8** — `memory/project/curation-debt.txt`'s header, which restates `25600 B / 350 chars` as
   prose, stops naming the entry figure.
+- **S9** — the kit-version ordering is stated HERE, not only in the build README. `check-verdict-epoch.sh` is TOPOLOGICAL: the newest behaviour-bearing commit across the engine and its delegates must be an ancestor of, or equal to, the commit that changes
+  `KIT_MEMORY_TREE_VERSION`. Units 1 and 2 both move that engine, so the LATER of the two carries the single bump and the earlier carries none. `TOOL-aLoosenedCeiling-1` folded
+  exactly this finding at rev-3 after leaving the ordering in a README where neither spec repeated it.
+
 
 ## 3. Non-goals (OUT)
 
 - No default changes. 300 and 350 are what every adopter who declares nothing keeps.
+- Check 6's eight caps are not re-opened. Six landed with `TOOL-aLoosenedCeiling-2` and two with
+  `TOOL-aRelaxedShard-1`; this unit extends their shared validation loop and changes none of them.
 - `ex7` is untouched: the guides, `RUN.md` and map-dossier exemptions select which files are graded,
   not how long a line may be, and this unit does not make the EXEMPTION list adjustable.
-- Check 6's caps are not re-opened. They landed in the previous build and this unit only extends
-  their validation loop to cover two more keys.
 - No new class. The two tiers check 7 already has are the two tiers it keeps.
 
 ## 4. Design
@@ -108,8 +119,9 @@ which is why S5 is a scope item rather than an implementation note.
   observes a 320-character fixture line named in a row document and silent in a build README, which
   is the 300/350 split still applying from the shipped defaults.
 - **AC3** — When a fixture declares a non-numeric or zero entry budget, `bash
-  tools/memory-tree/check-memory-hygiene.sh` exits 2 with the offending key on stdout, through the
-  same abort the six check-6 keys use.
+  tools/memory-tree/check-memory-hygiene.test.sh` observes the abort's MESSAGE naming the offending
+  key, not merely exit 2 — the status alone cannot tell a widened zero arm from an unwidened one,
+  since a non-numeric value already aborts today.
 - **AC4** — When `python tools/memory-tree/check-arms.py` runs, check 7's branch is armed against
   the message's NEW text, and no branch of the engine has become unarmed.
 - **AC5** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, the edited template and
@@ -130,6 +142,11 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded spec-audit round 1. The key count was six and is eight, so this unit
+  makes ten. The zero arm selects on `*_BYTES` and would not have reached either char key, which
+  made AC3 pass over an unbuilt guard. The abort banner names check 6 and its arm is hand-written
+  rather than meta-gated, so S3b now moves it. S9 states the kit-version ordering that lived only
+  in the README, which is the finding the previous build folded at ITS rev-3.
 
 ## 10. Reuse audit
 

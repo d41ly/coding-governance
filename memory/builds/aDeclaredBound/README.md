@@ -17,7 +17,7 @@ The owner picked four from that survey. This build specs them.
 | threshold | today | where |
 |---|---|---|
 | check 7's entry budget | `300`, and `350` for a build README | `check-memory-hygiene.sh` awk, and a third copy inside the failure message |
-| `SPEC10_CUTOFF` | `2026-08-04`, env-overridable | a shell default in the same engine, while its THREE siblings are conf keys |
+| `SPEC10_CUTOFF` | `2026-08-04`, settable through TWO channels | a shell default read AFTER the conf source, while its three siblings are assigned before it |
 | `_RATCHET_LOOKBACK` | `14` | `drift_report.py` module constant |
 | agent-cap's `CAP` / `MAX_VERIFIERS` / `MAX_LENSES` | `5` each | `agent-cap.js` file constants, deliberately not overridable |
 
@@ -52,12 +52,30 @@ loud, and an unattributed raise reds the bar.
 | `TOOL-aDeclaredBound-5` | the agent-cap number is single-sourced — prose points, never restates | 2 |
 
 **Why five units for four thresholds.** Unit 5 is not extra scope; it is what makes unit 4 honest.
-The number `5` is restated in at least eight live carriers — the charter, the README, the BINDING
+The number `5` is restated across the live document surface — the charter, the README, the BINDING
 review protocol, the byte-gated playbook template, a map dossier and the shipped kickoff skill among
 them. The moment the value is adjustable, every one of those becomes a second answer to a question
 that now has a declared first answer. This repo already ruled on that shape for the kit version:
 *"a version written in prose rots between bumps, and this one rotted twice in a day."* Unit 4 without
 unit 5 ships a knob whose documentation is wrong for anyone who turns it.
+
+## What the round-1 spec audit changed
+
+Verdict BLOCKED, 33 findings, two of them blockers, and the record is under `reviews/`. The two
+that changed the DESIGN rather than the wording:
+
+- **Unit 5 cannot strip the digit from the review protocol.** `check-protocol-parity.test.sh`
+  greps for that exact literal as a deliberate anti-vacuity arm. It is now unit 5's S2 and the
+  first thing the build decides, with a recommendation and a stated alternative.
+- **Unit 4's ratchet could not fire.** `drift_report.py` skips a file absent at the base ref,
+  and the first draft deliberately left `.agent-cap.conf` uncommitted — so the first raise, the
+  one the ratchet exists for, would never have been compared. The file is now committed at the
+  shipped values.
+
+Three more worth naming: unit 4 was specifying a resolver `agent-cap.js` already contains; its
+attribution grammar named no key while all three bounds default to the same number; and unit 5's
+carrier inventory was wrong in BOTH directions — one listed file has no cap site at all and four
+live carriers were missing. The invented total is gone; the build measures.
 
 ## Order
 
@@ -75,13 +93,17 @@ ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDecl
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-2 | 2026-08-18 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -102,4 +124,6 @@ Records live under `spec/`.
   - [2026-08-18-spec-TOOL-aDeclaredBound-3.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md)
   - [2026-08-18-spec-TOOL-aDeclaredBound-4.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md)
   - [2026-08-18-spec-TOOL-aDeclaredBound-5.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md)
+- **`reviews/`**
+  - [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md)
 <!-- /gen:build-docs -->

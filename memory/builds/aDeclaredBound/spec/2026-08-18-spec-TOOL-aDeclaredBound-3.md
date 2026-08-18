@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -12,6 +12,11 @@ drift-audit's PROJECT LAYER, which is the seam this kit already declares for per
 
 - **S1** — `drift_signals.py` may declare `RATCHET_LOOKBACK`. The engine reads it with a defaulting
   accessor, so an adopter's layer that predates the key keeps 14 and does not fail to import.
+- **S1b** — the call path is named, because the value is consumed two frames below where it is
+  read. `_justified` uses it for the window and `ratchet_findings` interpolates it into the
+  message, and the latter receives a LIST of ratchets rather than the layer module. Both gain a
+  lookback parameter defaulted to the shipped 14, resolved once at the layer-load site and threaded
+  down. Without this the declaration has nowhere to arrive.
 - **S2** — NOT a conf key. `drift_report.py`'s own docstring says `NO SECOND CONF` and reads the
   corpus root from `.memory-tree.conf` precisely so it never grows one. The project layer is where
   this kit already puts `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS` and the ratchet
@@ -53,12 +58,18 @@ can carry its justification as a comment in the same register as everything arou
 
 ### Why it is worth declaring at all
 
-The window is not a style preference. `TOOL-aLoosenedCeiling-3` wrote a six-paragraph justification
-above a raised ceiling and came within two lines of pushing the required `<old> -> <new>` literal
-out of the window — at which point the gate would have reported an unjustified weakening over a
-justification that was right there. A repo whose comment convention is denser than this one needs a
-wider window, and a repo with terse pins might want a narrower one so a justification for a
-DIFFERENT pin cannot be read as this one's.
+The window is not a style preference, but the first draft's evidence for that was wrong and is
+replaced here rather than quietly dropped. It claimed `TOOL-aLoosenedCeiling-3` came within two
+lines of pushing its `<old> -> <new>` literal out of the window. Measured at every commit carrying
+that literal: the justification sits at `.memory-tree.conf:107` and the key at line 113 — a
+distance of 6 against a window of 14, so the margin was 8 lines and never close.
+
+What survives is the argument that does not depend on a near miss. The window's width is a
+statement about a repo's COMMENT DENSITY, and this one's is unusual: that same conf carries a
+six-paragraph running history above a single key. A repo that writes one-line justifications wants
+a narrower window, so a justification for a DIFFERENT pin further up cannot be read as this one's;
+a repo denser than this one wants a wider one. Fourteen is a measurement of gov's habits that every
+adopter currently inherits.
 
 ### Migration
 
@@ -92,9 +103,8 @@ required-attribute list does not grow, so no existing layer becomes invalid.
 - a11y · i18n — N/A.
 - error / empty / loading states — S4 covers a declared-but-invalid value; an absent one is the
   default by design.
-- observability — the ratchet's failure message already quotes the required `<old> -> <new>` form;
-  it should also say how far it looked, or an operator whose justification sits just outside the
-  window is told to write text they already wrote.
+- observability — the message ALREADY names the window and interpolates the constant, so this unit
+  inherits that for free rather than adding it. The first draft described the property as missing.
 - risks — a narrowed window silently stops excusing justifications that used to pass, which reds
   rather than passes, so the failure direction is safe.
 - testing + left-shift gates — S5's both-directions arms.
@@ -109,13 +119,16 @@ required-attribute list does not grow, so no existing layer becomes invalid.
 - **AC2** — When a fixture layer declares nothing, `python tools/drift-audit/selftest.py` observes
   the shipped 14 applying: a justification 14 lines above the pin passes and one at 15 fails, over
   the same fixture.
-- **AC3** — When a fixture layer declares a non-integer, `python tools/drift-audit/drift_report.py
-  --check` prints a named refusal naming the attribute and does not raise.
+- **AC3** — When a fixture layer declares a non-integer, `python tools/drift-audit/selftest.py`
+  observes a named refusal naming the attribute, with no traceback. The observer is the selftest
+  and not `--check`, because `load_project_layer` resolves `drift_signals.py` from the KIT DIR: a
+  `--check` run in this tree can only ever load gov's own layer, so it cannot see a fixture.
 - **AC4** — When `python tools/drift-audit/drift_report.py --check` runs on this repo with the layer
   declaring 14 explicitly, the signal set is byte-identical to its output before this unit.
-- **AC5** — When the ratchet fires, the text `python tools/drift-audit/drift_report.py --check`
-  prints states the window it searched, so an operator whose justification sits just outside it is
-  not told to write a sentence they already wrote.
+- **AC5** — When a fixture layer declares a window OTHER than 14 and the ratchet fires, `python
+  tools/drift-audit/selftest.py` observes the message naming THAT number. Stated differentially on
+  purpose: the message already names 14 today, so an absolute form would be green before a line of
+  this unit is written.
 
 ## 7. Gates
 
@@ -130,6 +143,12 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded spec-audit round 1. The motivating measurement was wrong — the margin
+  was 8 lines, not 2 — and section 4 now carries the measured figure and the argument that does not
+  rest on a near miss. Section 5 claimed the message lacks a property it already has, and AC5 was
+  green before the unit started; both restated differentially. S1b names the call path, since the
+  value is consumed two frames below where it is read. AC3's observer changed, because the layer
+  loads from the kit dir and `--check` cannot see a fixture.
 
 ## 10. Reuse audit
 
