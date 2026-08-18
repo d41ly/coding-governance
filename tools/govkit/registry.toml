@@ -150,7 +150,7 @@ why = "gov's own gate runner. A spec non-goal: govkit wires legs into the runner
 
 [[exempt]]
 path = "tools/gate-legs.json"
-why = "gov's own 49-leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
+why = "gov's own leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
 
 [[exempt]]
 path = "tools/run-gates.test.sh"
@@ -214,6 +214,18 @@ why = "the deploy-time placeholder catalog. The runbook's own words are 'read it
 name = "branch-guard self-test"
 why = """
 gov's own red/green proof of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file, and the path it drives is already a registry exemption for that reason.
+"""
+
+[[exempt_leg]]
+name = "recall floor"
+why = """
+gov's own recall-quality floor. The question set it grades is keyed on gov record ids and the value it compares against was MEASURED on this corpus, so both are meaningless in an adopter's tree — a pin copied from another corpus is the class `memory/gotchas/pin-copied-from-another-corpus.md` names. `tools/memory-recall/kit.toml` withholds `check-recall.py` and `recall-fixture.json` from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs. An adopter who wants a floor authors their own fixture and measures their own value; that adoption path is the parked half of `TOOL-aWalkedCorpus-3` section 8.
+"""
+
+[[exempt_leg]]
+name = "recall floor arms"
+why = """
+the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
 """
 
 [[exempt_leg]]
@@ -284,12 +296,6 @@ why = "the deployer itself, which never travels"
 name = "govkit acceptance matrix"
 why = """
 a gov-internal harness over gov's OWN deployer, which never travels into a target. It drives the deployer against four repo SHAPES; an adopter has one repo and receives no deployer, so there is nothing there for it to exercise.
-"""
-
-[[exempt_leg]]
-name = "template size <=48KiB"
-why = """
-gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
 """
 
 [[exempt_leg]]

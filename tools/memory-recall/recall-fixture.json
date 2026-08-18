@@ -1,0 +1,96 @@
+{
+  "_README": [
+    "The graded question set for tools/memory-recall/check-recall.py. Each question is one a session",
+    "would ask BEFORE knowing the record exists, and `expected_ids` are the records that answer it.",
+    "",
+    "PROVENANCE RULE: every question's answer was determined by a person writing a record that states",
+    "it, cited in `from`. It is deliberately wider than 'a landed spec's SS10 recall probe' -- that pool",
+    "was measured at 8 specs, 3 naming ids, 2 of those citing the id as a recorded MISS, which is one",
+    "usable spec. A DECISIONS row, a backlog row or a closing-review row all qualify.",
+    "",
+    "THE RULE THIS FILE EXISTS TO NOT BREAK: a question written by reading what the index returns is a",
+    "tautology -- it passes on the day it lands and can never fall for a real reason. Questions here",
+    "are written from the RECORD, in a session's vocabulary, not from a result list.",
+    "`check-recall.py --audit-fixture` measures that mechanically as content-term overlap against the",
+    "target's own text and reds above OVERLAP_MAX. See memory/gotchas/fixture-passes-by-finding-nothing.md.",
+    "",
+    "`hits` records whether the question is answered at the pinned cell TODAY. It is not an input to",
+    "the SCORE -- nothing in the grading path reads it -- but `--audit-fixture` compares it against the",
+    "measurement and reds on a disagreement, so it is documentation a gate keeps honest. The two",
+    "misses are in the set precisely because they fail."
+  ],
+  "queries": [
+    {
+      "query": "why can a mandate check not fall back to the current commit when the merge base will not resolve",
+      "expected_ids": ["TOOL-aUnmannedHelm-5"],
+      "from": "memory/builds/aWrittenMethod/spec/2026-08-11-spec-aWrittenMethod-2.md SS10 recall probe, answered by the memory/DECISIONS.md row",
+      "hits": true
+    },
+    {
+      "query": "why is the floor on the phase set a number instead of a list of required names",
+      "expected_ids": ["TOOL-aUnmannedHelm-6"],
+      "from": "memory/builds/aWrittenMethod/spec/2026-08-11-spec-aWrittenMethod-2.md SS10 recall probe, answered by the memory/DECISIONS.md row",
+      "hits": true
+    },
+    {
+      "query": "is a remote tracking ref safe to trust as evidence of what the server says",
+      "expected_ids": ["TOOL-aStandingWrit-2"],
+      "from": "memory/DECISIONS.md -- 'an anchor is only as trustworthy as the cheapest way to move it'",
+      "hits": true
+    },
+    {
+      "query": "what goes wrong when the name of the default branch comes from an environment variable",
+      "expected_ids": ["TOOL-aStandingWrit-4"],
+      "from": "memory/DECISIONS.md -- 'a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN'",
+      "hits": true
+    },
+    {
+      "query": "why did a timing based check block pushes on a tree it had already passed",
+      "expected_ids": ["TOOL-cSteadyMetronome-1"],
+      "from": "memory/DECISIONS.md -- 'a gate asserts what the SUBJECT does, never what the NODE does'",
+      "hits": true
+    },
+    {
+      "query": "should a long prose document and a table of rows get the same size budget",
+      "expected_ids": ["TOOL-aWidenedGuide-1"],
+      "from": "memory/DECISIONS.md -- 'the index cap splits by CLASS'",
+      "hits": true
+    },
+    {
+      "query": "why does assigning a command substitution to a variable hide the command failure",
+      "expected_ids": ["TOOL-aWrittenMethod-4"],
+      "from": "memory/DECISIONS.md -- 'a substitution reports the LAST command's status'",
+      "hits": true
+    },
+    {
+      "query": "what breaks when a shell replacement string contains an ampersand",
+      "expected_ids": ["TOOL-aWrittenMethod-6"],
+      "from": "memory/DECISIONS.md -- 'bash 5.1 gave pattern-substitution's REPLACEMENT a sed-like ampersand'",
+      "hits": true
+    },
+    {
+      "query": "which files does the wiring checker actually watch for line ending damage",
+      "expected_ids": ["TOOL-aUnmannedHelm-10"],
+      "from": "memory/DECISIONS.md -- 'CRLF reaches past everything that watches for it'",
+      "hits": false
+    },
+    {
+      "query": "are documents split by whether they came from a template or by section",
+      "expected_ids": ["TOOL-aMouldedFolio-1"],
+      "from": "memory/DECISIONS.md -- 'the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION'",
+      "hits": false
+    },
+    {
+      "query": "why must an adopter script refuse before it reads any configuration",
+      "expected_ids": ["TOOL-aUnmannedHelm-9"],
+      "from": "memory/DECISIONS.md -- 'an adopter's refusals are ordered before it READS anything'",
+      "hits": true
+    },
+    {
+      "query": "can a plain phase move put a run into its final state",
+      "expected_ids": ["TOOL-cFinalBerth-1"],
+      "from": "memory/DECISIONS.md -- 'a terminal phase is written by a verb that EVALUATES what it claims'",
+      "hits": true
+    }
+  ]
+}

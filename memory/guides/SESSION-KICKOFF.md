@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T03:40:00+03:00 @ 6382c56476029a7ac1e5c133b992a0883beb124c
+last-audit: 2026-08-18T03:50:00+03:00 @ 94a4150510cd853662016f34188dd5a8892f42fd
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6382c56476029a7ac1e5c133b992a0883beb124c
+last-body-change: 94a4150510cd853662016f34188dd5a8892f42fd
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -174,10 +174,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
 - A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
-- Adding ONE gate leg trips FOUR gates at once, worth doing in one pass: the codebase-map coverage
-  assert, the map freshness byte-compare, the kickoff-manifest ratchet, and drift-audit's handkept
-  signal — pinned at 0 with ZERO slack, so an uncited leg reds immediately. Read the leg count
-  from `drift_report.py --check`, never from here: this line has now been wrong twice.
+- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar, not
+  this list. MEASURED 2026-08-18: map freshness, the kickoff ratchet, govkit selfcheck + selftest (a
+  leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]` row). The coverage
+  assert and handkept signal did NOT fire; this line claimed both and neither govkit gate.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
