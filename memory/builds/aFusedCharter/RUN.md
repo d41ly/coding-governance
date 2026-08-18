@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e2bfe3f8a2571e99d12c65bf0c0652673cb174eb
+witness: e1919b284f0eb6fe70cd5961269ea44117cdfda5
 phase: BUILDING
 branch-sha: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 branch-ref: refs/heads/branch/governance-template-convergence-91c2c6
