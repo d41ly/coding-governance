@@ -1,0 +1,32 @@
+# kit.toml — the playbook RENDERER, declared as data. Read by tools/govkit/.
+#
+# A SEPARATE entry id from `playbook`, which ships the template itself. `read_descriptors()` keys its
+# map by id with no duplicate predicate, so a second entry named `playbook` would SILENTLY shadow the
+# first and the shadowed entry's claimed files would then red as unclaimed surface.
+
+id = "playbook-render"
+scope = "repo"
+kind = "dir"
+home = "tools/playbook"
+version_from = { file = "render_playbook.py", pattern = "^KIT_PLAYBOOK_RENDER_VERSION = " }
+
+# The declarations this engine reads live on the `playbook` entry, beside the artifact they describe,
+# and `needed_answers()` quantifies over every selected descriptor either way. So a target taking the
+# renderer without the template would have an engine and nothing to read.
+requires = ["playbook"]
+
+[[files]]
+include = ["**"]
+role = "engine"
+to = "{prefix}/playbook/{relpath}"
+
+[adopt]
+argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
+mutates_index = false
+
+[check]
+argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
+
+[[gate_leg]]
+name = "playbook render wiring"
+argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]

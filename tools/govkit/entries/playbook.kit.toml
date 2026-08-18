@@ -49,3 +49,188 @@ installation is a copy to an owner-chosen path and there is no adopter. What nee
 [[lf_pin]]
 pattern = "{playbook_dir}/coding-governance-agents.template.md"
 why = "under a strict byte gate"
+
+# ---------------------------------------------------------------- the DECLARATION the renderer reads
+# Every placeholder in the charter template, in one of three classes. This array replaces the prose
+# catalogue the deploy companion used to carry: a catalogue and a program are two answers to one
+# question, and the catalogue is the copy that rots.
+#
+# NO COUNT APPEARS HERE. `render_playbook.py` quantifies over what the template actually holds and
+# refuses on a placeholder no row declares, so the population is derived on every run. Two revisions
+# of the spec stated a figure and both were wrong when read.
+
+[[placeholder]]
+key = "PROJECT_NAME"
+class = "derived"
+probe = "project_name"
+why = "the repo this charter governs"
+
+[[placeholder]]
+key = "DEFAULT_BRANCH"
+class = "derived"
+probe = "default_branch"
+why = "the shared integration branch, observed from the remote rather than assumed to be main"
+
+[[placeholder]]
+key = "MEMORY_ROOT"
+class = "derived"
+probe = "memory_root"
+why = "the memory tree's root, from the memory-tree conf that already declares it"
+
+[[placeholder]]
+key = "MEMORY_DISCIPLINES"
+class = "derived"
+probe = "memory_disciplines"
+why = "the closed stream enum, from the same conf — never a list of directories"
+
+[[placeholder]]
+key = "ID_FAMILIES"
+class = "derived"
+probe = "id_families"
+why = "the id families, from the same conf, so the charter and the records share one scheme"
+
+[[placeholder]]
+key = "CI_FILE"
+class = "derived"
+probe = "ci_file"
+why = "the workflow file the bar is wired into"
+
+[[placeholder]]
+key = "GATE_RUNNER"
+class = "derived"
+probe = "gate_runner"
+why = "the one command that runs the whole local bar"
+
+[[placeholder]]
+key = "LEXICON_CONF"
+class = "derived"
+probe = "lexicon_conf"
+kit = "lexicon"
+why = "the naming declaration's path; only reachable when the lexicon block survives"
+
+[[placeholder]]
+key = "TAG_A"
+class = "derived"
+probe = "node_tag"
+why = "this node's registry tag"
+
+[[placeholder]]
+key = "MACHINE_A"
+class = "derived"
+probe = "machine"
+why = "this node's machine and user, which is how a node identifies itself — never a path"
+
+[[placeholder]]
+key = "PRIMARY_TREE_A"
+class = "derived"
+probe = "primary_tree"
+why = "where the default branch lives on this node"
+
+[[placeholder]]
+key = "WORKTREE_ROOT_A"
+class = "derived"
+probe = "worktree_root"
+why = "where this node's per-unit worktrees are rooted"
+
+# --- asked. The renderer refuses rather than guessing; that posture is govkit's, inherited here.
+
+[[placeholder]]
+key = "VARIANCES_A"
+class = "asked"
+why = "this node's per-node quirks — a credential scope, a harness launch config. NOT derivable even for the current node: it is knowledge the operator has and the tree does not"
+
+[[placeholder]]
+key = "STREAM_OWNERSHIP"
+class = "asked"
+why = "which node owns which stream"
+
+[[placeholder]]
+key = "DOC_ROUTING_TABLE"
+class = "asked"
+why = "work-area to doc tree to id families to backlog"
+
+[[placeholder]]
+key = "PRODUCT_PREAMBLE"
+class = "asked"
+why = "what the software is, its deployment model, its major runtime pieces"
+
+[[placeholder]]
+key = "REPO_LAYOUT_MAP"
+class = "asked"
+why = "each top-level dir and its role, so sessions never re-derive where things live"
+
+[[placeholder]]
+key = "COMMAND_CATALOG"
+class = "asked"
+why = "the one-true invocation for install, dev, migrations, seeding, format and lint"
+
+[[placeholder]]
+key = "PRODUCT_CONTEXT_HOME"
+class = "asked"
+why = "where business and product context lives, so sessions locate it instead of asking"
+
+[[placeholder]]
+key = "GATE_COMMANDS"
+class = "asked"
+why = "the merge bar's legs. Derivable-looking and deliberately asked: a wrong gate list is a charter that lies about what green means"
+
+[[placeholder]]
+key = "COMMIT_TRAILER"
+class = "asked"
+why = "the mandated attribution trailer every agent commit ends with"
+
+[[placeholder]]
+key = "WORKTREE_SCRIPT"
+class = "asked"
+why = "the one script that bootstraps a sibling worktree"
+
+[[placeholder]]
+key = "KIND_FACTORY_MAP"
+class = "asked"
+why = "per-kind factory or base, so instance three onward is data rather than plumbing"
+
+[[placeholder]]
+key = "SHARED_PRIMITIVES_LOCATION"
+class = "asked"
+why = "where product-generic primitives live on the promotion ladder"
+
+[[placeholder]]
+key = "TOOLCHAIN_NOTES"
+class = "asked"
+kit = "cross-os"
+why = "pinned toolchain versions and the one-true way to run gates per OS"
+
+# --- defaulted. The render RECORDS that it defaulted, because a default silently identical to an
+# --- answer is how an operator ships a value they never chose.
+
+[[placeholder]]
+key = "HELP_DIR"
+class = "defaulted"
+default = "help/"
+why = "where the user-facing page per feature lives"
+
+[[placeholder]]
+key = "REVIEW_DIR"
+class = "defaulted"
+default = "memory/reviews/"
+why = "where a Tier-2 run is persisted as an in-repo artifact"
+
+[[placeholder]]
+key = "PROSE_AUDIT"
+class = "defaulted"
+default = "none yet — the thresholds still bind"
+why = "the audit script that quantifies chat-prose waste"
+
+# ---------------------------------------------------------------- the fenceable blocks
+# `when:` fences name a PROJECT PROPERTY that no kit governs, so they cannot be validated against the
+# registry. This is that namespace's declaration, and `drop_blocks` in a target's deploy.toml is
+# checked against it in both directions: a member naming nothing here refuses, and a fence naming
+# nothing here refuses too.
+
+[[block]]
+name = "security-outbound"
+why = "the outbound-call and stored-content rules. Drop them where the project has no such surface."
+
+[[block]]
+name = "cross-os"
+why = "the cross-OS and toolchain section. Drop it for a single-OS team."

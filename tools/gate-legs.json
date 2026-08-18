@@ -680,5 +680,15 @@
       "bash",
       "tools/check-testsuite-counts.test.sh"
     ]
+  },
+  {
+    "name": "playbook render wiring",
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--target",
+      ".",
+      "--check"
+    ]
   }
 ]
