@@ -63,9 +63,11 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
 - **S8** — **at the exit, every confirmed unfixed blocker is PROMOTED to a spec unit in this build**,
   specced at its tier, built, and closed. It is not parked, not waived, and not re-reviewed. This is
   legal under M6's pass vocabulary already — "a spec authored" and "a unit built" are both passes —
-  and it is made legal in the kit by `TOOL-aBoundedVerdict-11`, whose append-admitting comparison of
-  the generated units region is what lets a run add a unit without failing the non-overridable
-  authorization check.
+  and it is made legal in the kit by `TOOL-aBoundedVerdict-11`, whose comparison of the generated
+  units region's unit-ID SET (BASE ⊆ HEAD) is what lets a run add a unit without failing the
+  non-overridable authorization check. That comparison is over IDS, not row bytes, and it must stay
+  so: the region carries each unit's status and rev, which move as this unit's own promotions are
+  built, so a byte-level test would refuse the run that promoted.
 - **S8a** — a promoted unit is reviewed as a SPEC (M4), not by re-running the closing diff review.
   That is the whole reason promotion terminates: a spec audit is one unit's document, and the closing
   diff review runs once more at the end, scoped to the fold per `TOOL-aBoundedVerdict-14`.
@@ -403,7 +405,7 @@ The seam is `park()` and the parked region's kind taxonomy — this unit adds a 
 `TOOL-aBoundedVerdict-5` specced. That divergence is real and is recorded against unit 5 rather than
 here.
 
-The second seam, new at rev-6, is `TOOL-aBoundedVerdict-11`'s append-admitting comparison of the
+The second seam, new at rev-6, is `TOOL-aBoundedVerdict-11`'s unit-ID-set comparison of the
 generated units region. S8's promotion is not implementable without it: `check_authorization` refuses a
 run that changes its own roster, and `verb_close` refuses to override that item. Naming the dependency
 here is what keeps this unit from re-deriving a scope-integrity mechanism it does not own.

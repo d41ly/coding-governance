@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -29,10 +29,11 @@ instead of by row shape.
   gate leg gains a check that every build README carries exactly one well-formed pair.
 - **S6** — the owner's ratified resolution for the authored `roster:units` pair: the frozen
   AUTHORIZATION scope stops being an authored region of a mutable file. `check_authorization`
-  compares the generated units region as it stood in the BASE blob against the same region at HEAD,
-  admitting rows ADDED and refusing any row CHANGED or REMOVED — which is what makes the promotion
-  disposition in `TOOL-aBoundedVerdict-1` legal without weakening the property that a run may not
-  rewrite the scope it was authorized for.
+  compares the **set of unit IDS** extracted from the generated units region in the BASE blob against
+  the same set at HEAD, and requires the BASE set to be a SUBSET of the HEAD set — additions
+  admitted, removals refused. It compares the id set and **not the row bytes**; rev-2 corrects rev-1,
+  which said "refusing any row CHANGED", and §4 states why that would have refused every run that did
+  any work.
 - **S7** — the disarmed control is re-armed: one driver test arm has `build-complete` and
   `closing-review-recorded` BOTH met with no `--override` at all, over a fixture whose README is
   re-rendered and whose `reviews/` holds a tracked record.
@@ -84,6 +85,33 @@ that links into `spec/` re-opens the same hole silently. It is kept as the migra
 reader (Rollout, below), where its blast radius is one release and its correctness is measurable
 against the corpus it ships against.
 
+### Why the comparison is over IDS and not over row bytes
+
+Rev-1 specified a byte-level comparison admitting added rows and refusing changed ones. **That was
+wrong, and measurably so.** The two regions do not have the same stability:
+
+| region | a row looks like | moves when |
+|---|---|---|
+| authored `roster:units` | `\| 1 \| \`TOOL-X-4\` \| 2 \| mechanism \|` | someone hand-edits it |
+| generated units region | `\| [TOOL-X-1 — title]` then a spec link, then `\| CLOSED \| rev-4 \| 2026-08-17 \|` | **any unit's status, rev or date changes** |
+
+The authored region works as a frozen scope precisely because it carries no status, no rev and no
+date. The generated one carries all three, rendered from each spec's status header — so building a
+unit moves its row from `SPECCED · rev-1` to `CLOSED · rev-3` and re-renders the date. A byte-level
+"no row changed" test would therefore refuse **every run that built anything**, on the
+non-overridable item, which is strictly worse than the defect it replaces: it would convert
+"unsatisfiable for a build carrying a roster" into "unsatisfiable for any build that does work".
+
+The id SET is the right invariant because it is what the scope actually IS. Which units the run may
+work on is frozen; everything else in a row — status, rev, date, title, the spec's filename — is
+DERIVED from a document the run is authorized to edit, and freezing a derived value would freeze the
+work itself. So: extract ids from both sides with the same extraction, require BASE ⊆ HEAD.
+
+What this deliberately does not catch, stated rather than discovered later: a row whose id is
+unchanged but whose spec LINK now points at a different file. That is a re-pointing rather than a
+scope change, the title moves with the spec's own H1 for legitimate reasons, and including either in
+the comparison reintroduces exactly the churn this correction removes.
+
 ### Inventory
 
 | Concern | Today | After |
@@ -93,7 +121,7 @@ against the corpus it ships against.
 | `build-complete` on a build with a review | cannot pass, 49/49 builds | passes when its units are terminal |
 | `--status` next unit | may name a journal or a review record | names a unit or says there is none |
 | `units-at-landing` | would freeze record filenames into a terminal record | freezes unit ids |
-| the frozen authorization scope | an AUTHORED region of a mutable file, opt-in by presence | the GENERATED region, compared BASE→HEAD, append-admitting |
+| the frozen authorization scope | an AUTHORED region of a mutable file, opt-in by presence | the generated region's unit-ID SET, BASE ⊆ HEAD |
 | a build README with no units region | legal, and silently unclosable | refused at `--preflight`, with the render command named |
 
 ### Migration
@@ -196,8 +224,12 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
 - **AC6** — When `--preflight` runs against a build whose README carries no units pair, it refuses
   and its message contains `gen_build_index.py --write`.
 - **AC7** — When a run appends a unit row to the generated region, `check_authorization` returns 0;
-  when it changes or deletes an existing row, `check_authorization` refuses. Two arms, both
-  directions, in `tools/unattended/unattended.test.sh`.
+  when it DELETES one, it refuses. Two arms, both directions, in
+  `tools/unattended/unattended.test.sh`.
+- **AC7a** — When an existing unit's status moves `SPECCED` → `CLOSED` and its rev bumps, and the
+  region is re-rendered by `python tools/memory-tree/gen_build_index.py --write`,
+  `check_authorization` returns 0 — the arm that proves the comparison is over ids and not bytes, and
+  the one that fails against rev-1's design.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` runs over a fixture tree holding one
   build README with no units pair, it reds naming that file; over the real tree it is clean.
 - **AC9** — When `bash tools/memory-tree/marker-contract.test.sh` runs, its case table drives the new
@@ -246,6 +278,15 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's blocker 1·8·27 and from
   the owner's ratified resolution recorded in the design pass. F1 and F2 resolved under the
   delegated fork rule with their grounds stated; F3 raised to the owner as a scope fork.
+- rev-2 · 2026-08-19 · **S6's comparison corrected from row bytes to the unit-ID SET, before any
+  code was written.** Found by verifying rev-1's own claim against the two regions rather than
+  assuming it: the authored region carries id, tier and a mechanism label and is stable across a
+  build, while the generated region carries STATUS, REV and a last-change date rendered from each
+  spec's header. A byte-level "no row changed" test over the generated region would have refused
+  every run that built anything — on the one item `verb_close` will not override — which is a worse
+  failure than the one this unit exists to fix. AC7 is split and AC7a is new: it re-renders a
+  status-and-rev change and asserts the check still passes, which is the arm rev-1's design fails.
+  The limit of an id-set comparison is stated in §4 rather than left to be discovered.
 
 ## 10. Reuse audit
 
