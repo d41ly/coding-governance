@@ -21,10 +21,6 @@ No row existed. That is a claim that drifted from its source, inside the build w
 `PLAY-aDeclaredCeiling-1` corrected exactly that shape in a landed record — and it is why this build
 exists at all rather than the cleanup simply being scheduled.
 
-The table below is GENERATED from the status header of every spec in this folder — do not
-hand-edit it.
-
-
 ## Units — the authored roster (M2)
 
 One mechanism per unit. The `ids:` key above is an OUTPUT, not this roster.
@@ -67,6 +63,9 @@ rather than widening.
 - **A floor is measured, never chosen.** Unit 2 pins whatever the tree actually scores, and the
   number's provenance is the run that produced it. A floor set to a value nobody measured is a
   decoration, and this repo already names that anti-pattern.
+
+The table below is GENERATED from the status header of every spec in this folder — do not
+hand-edit it.
 
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-08-16 · streams tooling

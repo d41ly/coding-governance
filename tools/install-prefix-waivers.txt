@@ -7,10 +7,10 @@
 # legacy, preserved for adopters carrying a pre-1.1 gate file the maintenance rule never overwrites.
 
 .githooks/pre-commit:39                 dual-spelling: the hygiene leg locates its gate at either prefix
-tools/check-wiring.sh:158               dual-spelling probe: memory-recall fragment, both layouts
-tools/check-wiring.sh:305               dual-spelling probe: the merge driver, both layouts
-tools/check-wiring.sh:314               launcher probe: the gov-internal shim is the fallback after the kit launcher
-tools/check-wiring.sh:337               prose naming the gov-internal shim's own dependency
+tools/check-wiring.sh:165               dual-spelling probe: memory-recall fragment, both layouts
+tools/check-wiring.sh:318               dual-spelling probe: the merge driver, both layouts
+tools/check-wiring.sh:327               launcher probe: the gov-internal shim is the fallback after the kit launcher
+tools/check-wiring.sh:350               prose naming the gov-internal shim's own dependency
 tools/codebase-map/map_lib.py:1244      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal

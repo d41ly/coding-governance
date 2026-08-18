@@ -18,6 +18,10 @@ memory/builds/aRuledFrontispiece/README.md
 # exactly ONE row qualifies, so rotating sheds less than the rotation note it must add. This is
 # TOOL-cSettledDocket-16 arriving — "new rows are now paid for by shortening old ones" — and paying
 # that fee by trimming 1 KB of other builds' prose mid-merge is the wrong moment, on the same
-# reasoning the aRuledFrontispiece row above already carries. Drains when the TOOL index is curated
-# or the shard is split.
+# reasoning the aRuledFrontispiece row above already carries.
+# BLAST RADIUS, stated because a debt row is wider than the failure that earned it: this silences
+# checks 6, 7 AND 8 on TOOL.md, not just the byte cap. MEASURED before listing it — the hygiene
+# run that caught check 6 reported neither 7 nor 8, and the longest row is exactly 300 chars
+# against a 300 budget. So nothing is hidden today, but that row is AT the limit and the check
+# that would catch it going over is now off. Drains when the TOOL index is curated or split.
 memory/backlog/TOOL.md

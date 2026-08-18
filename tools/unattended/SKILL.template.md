@@ -48,6 +48,13 @@ distinction real.
    `{{MEMORY_ROOT}}/builds/<slug>/README.md` committed before your branch existed is the whole
    precondition. Preflight refuses a build folder you created, because a run that authorizes itself
    has no authorization. You also do not create the run-state file: preflight does that.
+   **If the build is not on the default branch, PUSH YOUR BRANCH FIRST.** Where the project declares
+   `ANCHOR_SCOPE="published"`, a build folder that does not resolve at the merge-base is looked for
+   at the tip the remote advertises for the branch you are on — so an unpushed commit authorizes
+   nothing, and the refusal you would otherwise meet names the branch the remote does not advertise.
+   Where the project declares nothing, or anything else, only the default-branch anchor counts and
+   the build has to be landed first. This is a weaker anchor and the run-state file records which one
+   authorized it; the protocol's section 1 states what it costs.
    **A build that has already been run once is not closed to you.** If its `RUN.md` reached a
    terminal phase, preflight RETIRES that record to `RUN.<phase>.<blob8>.md` beside it and starts you
    a fresh one — it says so on stdout, naming both paths. You do not move, edit or delete a finished

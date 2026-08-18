@@ -964,6 +964,54 @@ def t_skill_drift_reds():
         cleanup(root)
 
 
+@check("a CRLF working copy is not drift, content still is, and an empty render never matches")
+def test_crlf_working_copy_is_not_drift():
+    """The CRLF is written DELIBERATELY, never inherited.
+
+    A fixture that creates a git worktree and hopes for CRLF passes with the normalisation
+    reverted — measured — which is the `fixture-passes-by-finding-nothing` class. The content
+    mutation goes PAST line 40 because that is this script's diff-truncation window: with the
+    normalisation reverted the CR-only noise fills the window and pushes the real drift out of it,
+    so its absence there is what discriminates.
+    """
+    root, kitdir = make_repo()
+    try:
+        copy_extra(kitdir, *SURFACE)
+        assert adopt(root, kitdir, "--scaffold").returncode == 0
+        skill = root / SKILL_REL
+        lf = skill.read_bytes()
+        assert b"\r\n" not in lf, "the render itself carries CRLF, so this fixture would prove nothing"
+
+        skill.write_bytes(lf.replace(b"\n", b"\r\n"))
+        proc = adopt(root, kitdir, "--check")
+        out = proc.stdout + proc.stderr
+        assert proc.returncode == 0, (
+            "--check reds on a CRLF working copy of .claude/skills/memory-recall/SKILL.md, "
+            f"which is a checkout artifact and not drift:\n{out}"
+        )
+
+        lines = lf.split(b"\n")
+        assert len(lines) > 45, f"the render is {len(lines)} lines; the mutation has no home past 40"
+        lines[44] += b" ZZQUUX"
+        skill.write_bytes(b"\n".join(lines).replace(b"\n", b"\r\n"))
+        proc = adopt(root, kitdir, "--check")
+        out = proc.stdout + proc.stderr
+        assert proc.returncode != 0, f"--check greened on real content drift under CRLF:\n{out}"
+        assert "ZZQUUX" in out, f"the truncated diff does not name what drifted:\n{out}"
+
+        # The empty-render refusal that comes WITH the normalising seam: without it, an empty
+        # render compared to an equally empty Skill is a match, and the leg certifies nothing.
+        (kitdir / "SKILL.template.md").write_bytes(b"")
+        skill.write_bytes(b"")
+        proc = adopt(root, kitdir, "--check")
+        out = proc.stdout + proc.stderr
+        assert proc.returncode != 0, f"an empty render matched an equally empty Skill:\n{out}"
+        assert "EMPTY" in out, out
+        return "CRLF -> 0; CRLF + content -> 1 naming it; empty render -> 1"
+    finally:
+        cleanup(root)
+
+
 @check("the rendered Skill augments grep, prints only real flags, and claims no kickoff step")
 def t_skill_description_invariants():
     """AC18's three invariants, all of one class: the description is the whole trigger mechanism.
@@ -1237,7 +1285,8 @@ def main() -> int:
         t_budget_build_in_flight, t_budget_marker_ttl,
         t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
         t_python3_only,
-        t_scaffold_converges, t_skill_drift_reds, t_skill_description_invariants, t_hook_test,
+        t_scaffold_converges, t_skill_drift_reds, test_crlf_working_copy_is_not_drift,
+        t_skill_description_invariants, t_hook_test,
         t_version_marker, t_verbatim_files, t_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,

@@ -245,10 +245,25 @@ cp .claude/skills/x/logo.png "$D/logo.before"
 # needed `rm` first. Rewriting the bytes is correct in BOTH states, which is why it is what --fix
 # does. Do not "simplify" it back.
 out=$(chk --check); rc=$?
-{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  eol' && printf '%s' "$out" | grep -q 'SKILL.md'; } \
-  && ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 1 || ck "AC9 CRLF on a pinned .claude/ file -> UNWIRED, exit 1" 0
+# REPORTS, does NOT gate. The committed bytes are LF, so nothing in the repository is wrong and
+# nothing is dormant — and a consumer that reads the exit status as a refusal (.unattended.conf
+# declares this script as its WIRING_CHECK) refused every run in a worktree carrying the artifact.
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'note     eol' && printf '%s' "$out" | grep -q 'SKILL.md'; } \
+  && ck "AC9 CRLF on a pinned .claude/ file -> note, exit 0" 1 || ck "AC9 CRLF on a pinned .claude/ file -> note, exit 0" 0
+printf '%s' "$out" | grep -q 'UNWIRED  eol' \
+  && ck "AC9 the eol arm no longer spells the gating label" 0 || ck "AC9 the eol arm no longer spells the gating label" 1
 printf '%s' "$out" | grep -q 'memory/NOTES.md' \
   && ck "AC9 --check stays inside its bound" 0 || ck "AC9 --check stays inside its bound" 1
+# THE SIBLING, and without it the arm above is indistinguishable from having DELETED the eol arm:
+# a genuinely dormant item in the SAME run, with the same CRLF still present, still gives rc 1 and
+# still names itself. `--check` never sets config, so unsetting here does not leak into the arms
+# below; it is restored immediately.
+git config --unset core.hooksPath
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  hooks' && printf '%s' "$out" | grep -q 'note     eol'; } \
+  && ck "AC9 a dormant item in the same run still gates, alongside the note" 1 \
+  || ck "AC9 a dormant item in the same run still gates, alongside the note" 0
+git config core.hooksPath .githooks
 # --session REPORTS; only --fix rewrites. A SessionStart hook editing file bytes unattended is a far
 # bigger act than setting an unset git config, which is all --session was ever allowed to do.
 chk --session >/dev/null
@@ -276,7 +291,7 @@ printf 'a\nb\n' > ".claude/skills/my skill/SKILL.md"
 git add -A; git commit -q -m spaced
 printf 'a\r\nb\r\n' > ".claude/skills/my skill/SKILL.md"
 out=$(chk --check); rc=$?
-{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'my skill/SKILL.md'; } \
+{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'my skill/SKILL.md'; } \
   && ck "AC9 a Skill path with a space is still seen" 1 || ck "AC9 a Skill path with a space is still seen" 0
 chk --fix >/dev/null
 LC_ALL=C grep -qU $'\r' ".claude/skills/my skill/SKILL.md" \
