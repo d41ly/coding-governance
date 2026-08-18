@@ -71,12 +71,14 @@ One mechanism per unit. The `ids:` key above is a reservation range, not this ro
 
 Each cell is a label, not a description. The unit's §1 Goal owns the full statement.
 
+<!-- roster:units -->
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
 | 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
 | 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
 | 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
+<!-- /roster:units -->
 
 **The order is TOTAL, and it changed when unit 4 arrived.** Two constraints fix it.
 
