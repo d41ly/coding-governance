@@ -153,7 +153,7 @@ ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxed
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | INPROGRESS | rev-7 | 2026-08-17 |
-| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | OPEN | rev-3 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
@@ -161,10 +161,7 @@ Records live under `spec/` and `reviews/`.
 |---|---|---|
 | [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md) | spec-audit | TOOL-aRelaxedShard-1 |
 | [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md) | spec-audit | TOOL-aRelaxedShard-1 |
-
-Ids no record names: TOOL-aRelaxedShard-4.
-
-Ids no `spec-audit` record has ever named: TOOL-aRelaxedShard-4.
+| [2026-08-18-review-TOOL-aRelaxedShard-4.md](reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md) | spec-audit | TOOL-aRelaxedShard-4 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -185,4 +182,5 @@ Ids no `spec-audit` record has ever named: TOOL-aRelaxedShard-4.
 - **`reviews/`**
   - [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md)
   - [2026-08-17-review-TOOL-aRelaxedShard-1.md](reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md)
+  - [2026-08-18-review-TOOL-aRelaxedShard-4.md](reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md)
 <!-- /gen:build-docs -->

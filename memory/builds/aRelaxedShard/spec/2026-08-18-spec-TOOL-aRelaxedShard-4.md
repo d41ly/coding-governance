@@ -1,6 +1,6 @@
 # TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 86eefd8f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 86eefd8e · streams tooling
 
 ## 1. Goal
 
@@ -14,20 +14,25 @@ first job is to establish what the lever actually is.
 - **S1** — The measurement of record: mint rate, closure rate and net live growth for the tooling
   backlog, derived from git rather than estimated, committed so a later session can re-run the
   derivation instead of re-inventing it. §4 carries today's numbers.
-- **S2** — `TOOL-aRelaxedShard-1` fork F4 BUILT, because this unit cannot evaluate a spill tier without
-  it. Two arms: rotating a backlog shard to `archive/` does not orphan the ids the moved rows defined,
-  and a sibling fixture proving that arm can fail. The claim that it DOES orphan them is recorded in
-  `memory/builds/cSteadyMetronome/README.md`, was the reason a rotation was once reverted, and reading
-  `corpus_ids.py` contradicts it — a reading is not a fixture.
-- **S3** — A drain signal in `tools/drift-audit/drift_signals.py`: live non-terminal rows PER backlog
-  shard, against a shrink-only pin, so the live set cannot grow indefinitely without a recorded
-  decision. This is the repo's native idiom and it keys on the variable that actually moves.
+- **S2** — `TOOL-aRelaxedShard-1` fork F4 BUILT, along the axis that can actually fail. Rotating between
+  two TRACKED paths under the memory root cannot orphan an id by construction, so the arm varies CORPUS
+  MEMBERSHIP instead: archive staged (no orphans) against archive present-but-unstaged (the moved ids ARE
+  orphans). That second state is the one under which `cSteadyMetronome`'s report reproduces, which makes
+  this a settlement of F4 rather than a restatement of it.
+- **S3** — A drain signal for live non-terminal rows per backlog shard. **It spans TWO files, and
+  rev-2 named the wrong one.** The implementation goes in the shipped ENGINE,
+  `tools/drift-audit/drift_report.py`: signal functions live there and the set is a hardcoded
+  module-level `SIGNALS` list at `:697`. The project layer `tools/drift-audit/drift_signals.py` cannot
+  host one — `load_project_layer()` validates it for exactly four attributes (`PRODUCT_GLOBS`,
+  `SHRINK_ONLY`, `HANDKEPT`, `PINS`) and there is no registration hook. So the engine gets the function
+  and the project layer gets only its pin entries.
 - **S4** — That signal's arms in `tools/drift-audit/selftest.py`, both directions: silent on a fixture
   under its pin, firing on a minimal one over it.
-- **S5** — `memory/HYGIENE.md` and its kit template gain one paragraph under "Index budgets, caps,
-  rotation": rotation carries forward every non-terminal row, so a shard's floor is its live set, and
-  the bound that matters is therefore the live-row count rather than the byte cap. Both carriers stay in
-  lockstep.
+- **S5** — `memory/HYGIENE.md` and its kit template gain ONE SENTENCE that points rather than restates:
+  the section already says rotation carries forward every non-terminal row, so the addition is only that
+  this makes the live-row count the bound that matters and that drift-audit reports it per shard. Both
+  carriers stay in lockstep. rev-2 specified a paragraph that re-stated the carry-forward rule the same
+  section already carries and defined the terminal set a second time.
 
 ## 3. Non-goals (OUT)
 
@@ -38,8 +43,10 @@ first job is to establish what the lever actually is.
   unit does not touch check 6 at all.
 - **Curating the existing 82 rows.** A sweep is work, not mechanism, and mixing the two makes the diff
   unreviewable. If the pin S3 sets is below today's count, that sweep is its own commit.
-- **The other three families.** `PLAY`, `KICK` and `DEPL` hold 9, 4 and 11 rows and have no growth
-  problem. The signal covers them because it is per-shard; nothing here curates them.
+- **The other three families.** `PLAY`, `KICK` and `DEPL` hold **6, 1 and 6 rows** and have no growth
+  problem. The signal covers them because it is per-shard; nothing here curates them. rev-2 said 9, 4
+  and 11, which were `wc -l` LINE counts read off the files and mislabelled as rows — the same
+  convenient-proxy error that put a character count in unit 1's §4, one measurement later.
 
 ## 4. Design
 
@@ -54,28 +61,40 @@ which is most of them.
 | quantity | measured (census) |
 |---|---|
 | distinct ids ever minted | 170 |
-| now terminal | 91 |
-| still live | 79 |
+| now terminal | 89 (88 CLOSED, 1 WONTDO) |
+| still live | 81 |
 | ids minted | 18.9 / day |
-| rows reaching a terminal status | 10.1 / day |
-| **net live growth** | **+8.8 rows / day, about 2,233 B / day** |
-| mean row length | 253.7 B by `wc -c` |
+| rows reaching a terminal status | 9.9 / day |
+| **net live growth** | **+9.0 rows / day, about 2,228 B / day** |
+| mean row length | **247.6 B** by `wc -c`, measured on today's 82 rows |
 | shard today | 20,940 B · 82 rows · 34.1% of 61,440 |
-| runway to the declared cap | about 18 days |
+| runway to the declared cap | **11 to 26 days — see below** |
 
-Three of the 170 are this build's own rows and the window is approximate at its edges; neither moves the
-conclusion, because what matters is the GAP between the two rates and both methods agree on its sign and
-rough size.
+Two of the 170 are this build's own rows. rev-2 reported 91 terminal and 79 live, which did not
+reproduce, and carried 253.7 B/row over from unit 1's 73-row measurement instead of re-measuring on the
+82 rows this table describes.
 
-**Closure trails minting by nearly half, so the live set grows monotonically.** That one fact is what
+**The runway is a RANGE, not a point, and rev-2 was wrong to state one.** Four methods over the same
+corpus give +6.2, +6.7, +9.0 and a trailing-three-day figure that implies about 11 days. Daily net runs
+from +1 to +25 and arrives in merge STEPS rather than as a slope: one day of this window consumed 15.8%
+of the remaining headroom by itself. So the honest statement is 11 days at the recent rate, 26 at the
+gentlest method, and the spread is itself an argument for measuring continuously rather than
+re-deriving by hand — which is what S3 is for.
+
+**Closure trails minting by about half, so the live set grows monotonically.** That one fact is what
 makes both candidate mechanisms the wrong shape: a shard relocates the growth, a spill hides it, and a
 larger cap postpones it. Only minting less or closing more changes the slope, and neither of those is a
 file layout.
 
 ### Why sharding below FAMILY is rejected
 
-A sub-shard needs a partition the rows actually fall into, and they do not. Measured over all 82 rows, by
-which kit or area each row names:
+**rev-2 rejected sharding on two grounds and only one of them was sound. This is the sound one, and it
+is sufficient: a sub-shard does not change the slope.** Splitting 82 rows across ten files leaves the
+same +9.0 rows/day arriving, now spread over ten carriers, plus an id space split across them and ten
+files to read instead of one. Nothing about the partition changes that arithmetic.
+
+The unsound ground is recorded here rather than deleted, because it is a measurement trap worth naming.
+rev-2 counted, per row, whether the row's text SPELLED a kit's directory name:
 
 | area | rows |
 |---|---|
@@ -87,9 +106,15 @@ which kit or area each row names:
 | `codebase-map` | 1 |
 | **names no kit at all** | **53** |
 
-**65% of rows would land in a catch-all shard** and the largest real cluster is 11%. Sharding here
-produces one file with the same problem plus nine small ones, and splits the id space across carriers
-for no gain. The measurement lives in this spec so the option cannot be re-proposed without new data.
+That yields 53 rows in a catch-all and an 11% largest cluster — and it measures whether an AUTHOR HAPPENED
+TO SPELL A PATH, not which area a row concerns. Re-measured by topic keywords instead, only **13 rows
+(16%) match nothing** and the largest cluster is `memory-tree` at **44 rows (54%)**. A natural partition
+therefore DOES exist, and the buckets overlap, so the table above is a per-kit tally and not a partition:
+its rows sum to 86 over 82 because four rows name two kits.
+
+So sharding is rejected on the slope alone. If a later unit wants to shard for READABILITY rather than
+for growth, this measurement supports it and this spec does not stand in the way — what it forecloses is
+sharding as a remedy for the budget.
 
 ### Why a spill tier is not this unit's answer either
 
@@ -115,7 +140,8 @@ byte cap in `TOOL-aRelaxedShard-1` and what should have happened.
 
 | path | change | forced by |
 |---|---|---|
-| `tools/drift-audit/drift_signals.py` | the live-row signal and its per-shard pin | S3 |
+| `tools/drift-audit/drift_report.py` | the signal function and its `SIGNALS` entry | S3 |
+| `tools/drift-audit/drift_signals.py` | the per-shard entries only — it cannot host a signal | S3 |
 | `tools/drift-audit/selftest.py` | both arms | S4 |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | F4's rotation arms | S2 |
 | `memory/HYGIENE.md` · `tools/memory-tree/HYGIENE.template.md` | the floor paragraph | S5 |
@@ -133,7 +159,8 @@ byte cap in `TOOL-aRelaxedShard-1` and what should have happened.
 ## 5. Production-readiness checklist
 
 - **security** — N/A. A reporting signal over tracked text; no new input and no write path.
-- **perf / scale** — One pass over the backlog shards, which drift-audit already reads. Seconds.
+- **perf / scale** — One new pass over the backlog shards. drift-audit does NOT read them today, so this
+  is added work rather than reused work; it is a `git ls-files` slice and a line scan, still seconds.
 - **a11y** — N/A. A CLI signal with no user interface.
 - **i18n** — N/A, and it must stay that way: the row count is a line count over a status vocabulary, so
   nothing here may acquire a locale-sensitive comparison.
@@ -147,20 +174,34 @@ byte cap in `TOOL-aRelaxedShard-1` and what should have happened.
   rule, or S3 becomes the refusal §4's alternatives already rejected.
 - **testing + left-shift gates** — S4, plus S2, which left-shifts a claim carried on reading alone since
   2026-08-14.
-- **migration / rollback** — None. The signal is additive and reverting is one commit.
+- **migration / rollback** — None for gov; NOT none for adopters, which rev-2 got wrong. A signal absent
+  from an adopter's `PINS` falls back to a tolerance of 0, and the shipped template declares no pins, so a
+  GATEABLE backlog-row signal would red every adopter's first `--check` the moment they have one open row.
+  `gateable: False` per F2 removes that hazard; if a later unit gates it, the shipped template must
+  declare a pin in the same change.
 - **user docs** — S5 only. No end-user surface.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/drift-audit/drift_report.py --check` runs, it prints live non-terminal row
-  counts PER backlog shard against a pin, and the tooling shard's figure agrees with
-  `grep -cE '^- TOOL-' memory/backlog/TOOL.md` less its terminal rows.
-- **AC2** — When a fixture shard exceeds its pin, `drift_report.py --check` exits non-zero naming that
-  shard, and when it sits under, the signal is silent. Both arms live in
+  counts PER backlog shard, and the tooling shard's figure agrees with
+  `grep -cE '^- TOOL-' memory/backlog/TOOL.md` less its terminal rows. Report-only per F2, so the exit
+  code does not move on it.
+- **AC1b** — S1's measurement is committed as a runnable derivation rather than prose: the command that
+  produced §4's census lives at `build/2026-08-18-build-TOOL-aRelaxedShard-4-census.md` and re-running it
+  reproduces the table at the stated base. rev-2 left S1 with no criterion and no carrier, and its figures
+  have already moved twice.
+- **AC2** — When a fixture shard's live count is high, `drift_report.py` REPORTS the figure and the exit
+  code does not move; when the shard is empty it reports 0 rather than DEAD PROBE; and when a family has
+  no shard file at all that is distinguishable from an empty one. All three arms live in
   `python tools/drift-audit/selftest.py`.
-- **AC3** — When a fixture backlog shard is rotated to `archive/` with its terminal rows moved,
-  `bash tools/memory-tree/check-memory-hygiene.sh` reports NO orphaned ids, and a sibling fixture proves
-  that arm can fail — so F4 is settled by observation rather than by reading `corpus_ids.py`.
+- **AC3** — F4 is settled along the axis that can actually fail: CORPUS MEMBERSHIP, not rotation. In one
+  fixture the rotated archive is STAGED and `bash tools/memory-tree/check-memory-hygiene.sh` reports no
+  orphaned ids; in a second the archive file exists on disk but is NOT staged, and the same command
+  reports the moved ids as orphans. Rotating between two TRACKED paths under the memory root cannot
+  orphan anything — check 14 is `cites` minus `defs`, a backlog row defines and cites its own id on one
+  line, and 83 ids in this corpus are defined only inside `archive/` with zero orphans today. So the
+  green-only arm rev-2 specified is green by arithmetic and proves nothing.
 - **AC4** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, `memory/HYGIENE.md` and its
   template carry S5's floor paragraph identically.
 - **AC5** — When `GATE_FULL=1 bash tools/run-gates.sh` runs at the push boundary it is green apart from
@@ -191,23 +232,32 @@ unit's own authoring pass, which is itself an argument for a signal that tracks 
 depend on, and it is two arms. S3 is small and makes the slope visible. Defer any layout change until
 the signal has produced data, which is the opposite of the order this build has been forced to work in.
 
-### F2 — where the live-row pin lives, and what it is set to
+### F2 — is this signal GATEABLE at all, or report-only?
 
-Either a `drift_signals.py` constant beside the other pins, or a `.memory-tree.conf` key, which would
-make it an adopter-facing declaration like the two caps `-1` added.
+rev-2 asked where the pin lives and answered `drift_signals.py`, which is right for a PIN but ducked the
+real question. `drift-audit records` is an UNGUARDED merge-bar leg, so a gateable signal pinned N days
+ahead of today's count becomes a scheduled refusal: the day the count crosses it, every merge reds until
+someone raises the pin or closes rows. That is the refusal §4's alternatives already rejected, arriving
+on a timer.
 
-**Recommendation: a `drift_signals.py` constant.** Those two caps are adopter-facing because they gate a
-merge; this is a drift REPORT about gov's own records, and drift-audit's pins already live there. Set it
-at today's count plus about one week of measured growth — roughly 141 rows — so it fires on a trend
-rather than on the next row filed.
+The file's own precedent for a population that legitimately grows is `gateable: False` — report the
+number, never block on it — and `shrink_only_lists_not_shrinking` already runs that way at
+"out of tolerance (report only)".
 
-### F3 — one pin for all families, or one per shard?
+**Recommendation: `gateable: False`, and NO forecast pin.** Report live rows per shard every run, and let
+the trend be visible without arming a refusal nobody scheduled. If a later unit wants it gated, it can
+pin a MEASURED value with a movement rule, which is the thing §5 says is mandatory and no rev-2 scope
+item built.
+
+### F3 — one signal entry per shard, or one aggregate?
 
 The signal is per-shard by construction, but the PIN could be a single number. `PLAY`, `KICK` and `DEPL`
 hold 9, 4 and 11 rows.
 
-**Recommendation: one pin per shard, three of them generous.** A single pin lets tooling's growth hide
-inside a total, which is the aggregation mistake this repo has already fixed once in `ARMS_FLOORS`.
+**Recommendation: report per shard, and if a pin is ever added make it one SCALAR key per shard.** The
+ratchet guard covers SCALARS ONLY and says so: the compound floors `ARMS_FLOORS` and `CORE_FLOOR` are
+excluded because they need a per-member diff. A compound per-shard pin would therefore sit OUTSIDE the
+shrink-only guard and could be weakened silently — the exact failure the signal exists to prevent.
 
 ## 9. Revision log
 
@@ -225,13 +275,34 @@ inside a total, which is the aggregation mistake this repo has already fixed onc
   because it is the one a later session reaches for first. Nothing else moved: both §3 rejections rest on
   the GAP between the rates, which both methods agree on.
 
+- rev-3 · 2026-08-18 · folded the M4 audit at `reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md` —
+  verdict BLOCKED, 47 raw, 37 confirmed, 10 refuted, precision 0.79, 3 of 3 lenses, 19 distinct defects
+  including two blockers. **B1: the signal cannot live where rev-2 put it.** Signals are functions in the
+  shipped engine `drift_report.py` with a hardcoded `SIGNALS` list; the project layer is validated for four
+  attributes and has no registration hook, so S3 now spans both files and names each. **B2: the
+  sibling-family counts were `wc -l` output mislabelled as rows** — 6, 1 and 6, not 9, 4 and 11, the same
+  convenient-proxy error as unit 1's character count one measurement earlier. The census did not reproduce
+  either: 89 terminal and 81 live, closure 9.9/day, net +9.0/day, and row length re-measured on today's 82
+  rows at 247.6 B rather than carried from unit 1's 73. The runway became a RANGE, 11 to 26 days across
+  four methods, because daily net runs +1 to +25 in merge steps and a point estimate over that is fiction.
+  §4's sharding rejection NARROWED to the ground that survives — a shard does not change the slope — after
+  the audit showed the 65%-catch-all figure measured whether an author spelled a directory name: by topic,
+  13 rows match nothing and the largest cluster is 54%. F2 was re-asked as the question it actually is,
+  gateable or report-only, and answers report-only, because a forecast pin on an unguarded merge-bar leg is
+  a scheduled refusal and this file's precedent for a growing population is `gateable: False`. AC3 moved
+  onto corpus membership, the only axis where F4 can fail: 83 ids here are defined only under `archive/`
+  with zero orphans, so rev-2's rotation arm was green by arithmetic. Also: base sha corrected to a
+  resolvable one, §10's borrowed-vocabulary claim retracted, the adopter migration hazard stated, S1 given
+  a criterion, S5 reduced from a paragraph to a pointer, and AC2 re-pointed at report-only behaviour.
+
 ## 10. Reuse audit
 
 **The seam this unit extends** is `tools/drift-audit/drift_signals.py`, which already holds shrink-only
 pins with their movements recorded beside them, already walks the memory tree, and already reports
-per-item detail under `--json`. S3 is one more signal in that file, not a new tool. The status
-vocabulary it counts against is `.memory-tree.conf`'s, read the way `row_grammar.py` reads it, so the
-terminal-status set is not spelled a second time.
+per-item detail under `--json`. S3 is one more signal in that file, not a new tool. **The terminal-status set has to be spelled here**, and rev-2 was wrong
+to say otherwise: `.memory-tree.conf` declares no status vocabulary and `row_grammar.py` reads none, so
+there is nothing to borrow. The engine already hardcodes the same seven tokens for check 8; this is a
+second spelling, it is unavoidable, and naming it beats the false claim that it was reused.
 
 `python tools/codebase-map/reuse_lookup.py "count live backlog rows per shard against a pin"` and the
 recall probe were both run before authoring. The recall terms, recorded so M7 can re-run them: `backlog
