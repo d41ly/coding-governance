@@ -50,35 +50,8 @@ the owner re-confirmed the change against the complete list on 2026-08-17. Units
 trade: they are a missing normalisation and a report severity.
 
 
-<!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
-<!-- /gen:build-order -->
 
-<!-- gen:build-edges -->
-
-*This build declares no parent and no build declares it as one.*
-<!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aBranchedMandate-1.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md)
-  - [2026-08-16-spec-TOOL-aBranchedMandate-2.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md)
-  - [2026-08-16-spec-TOOL-aBranchedMandate-3.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md)
-  - [2026-08-17-spec-TOOL-aBranchedMandate-4.md](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md)
-  - [2026-08-18-spec-TOOL-aBranchedMandate-12.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md)
-  - [2026-08-18-spec-TOOL-aBranchedMandate-13.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md)
-- **`build/`**
-  - [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh)
-  - [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md)
-  - [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md)
-<!-- /gen:build-docs -->
 
 ## Units — the authored roster (M2)
 
@@ -272,6 +245,36 @@ if the design moves again. A second audit is a decision, not an obligation.
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
 it.
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-docs -->
+
+- **`spec/`**
+  - [2026-08-16-spec-TOOL-aBranchedMandate-1.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md)
+  - [2026-08-16-spec-TOOL-aBranchedMandate-2.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md)
+  - [2026-08-16-spec-TOOL-aBranchedMandate-3.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md)
+  - [2026-08-17-spec-TOOL-aBranchedMandate-4.md](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md)
+  - [2026-08-18-spec-TOOL-aBranchedMandate-12.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md)
+  - [2026-08-18-spec-TOOL-aBranchedMandate-13.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md)
+- **`build/`**
+  - [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh)
+  - [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md)
+  - [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md)
+- **`reviews/`**
+  - [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md)
+  - [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md)
+<!-- /gen:build-docs -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling
