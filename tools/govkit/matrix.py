@@ -47,12 +47,12 @@ FAILURES: list[str] = []
 # ponytail: four entries, not the registry — widen when another entry's leg reads a deployed path.
 SCRATCH_KITS = ["playbook", "playbook-render", "check-microformats", "check-line-length"]
 
-#: EVERY DECLARED LEG'S EXPECTED VERDICT, stated here and never read off a run. Two of these are
-#: opt-in gates whose install-day answer is NOT-ADOPTED rather than a measurement, so "green" is the
-#: wrong assertion for them — a shape demanding green would be satisfied by a gate that measured
-#: nothing. The leg POPULATION is derived from the descriptors and asserted against these keys in
-#: both directions, so a leg added to one of these entries reds until someone states what it prints
-#: in a scratch install.
+#: EVERY DECLARED LEG'S EXPECTED VERDICT, stated here and never read off a run. They are not all
+#: "green": `line length` is an opt-in gate whose install-day answer is NOT ADOPTED rather than a
+#: measurement, and demanding green from it would be demanding that a gate certify a population it
+#: was never given. The leg POPULATION is derived from the descriptors and asserted against these
+#: keys in both directions, so a leg added to one of these entries reds until someone states what it
+#: prints in a scratch install.
 SCRATCH_EXPECT = {
     "playbook render wiring": "render-playbook OK — region matches a fresh render",
     "micro-format definitions": "microformats OK —",

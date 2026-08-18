@@ -271,7 +271,7 @@ def read_input(path: Path, what: str) -> str:
                       f'path — the render has nothing to read and will not guess one')
 
 
-def declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, Path]:
+def resolve_declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, Path]:
     """The descriptor and the registry, from the INSTALLED layout first and gov's own second.
 
     An installed kit carries both beside the engine, because `tools/govkit/` is a registry exemption
@@ -284,7 +284,7 @@ def declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, Path]:
             reg if reg.is_file() else gov_root / 'tools' / 'govkit' / reg.name)
 
 
-def template_path(gov_root: Path, target: Path, answers: dict) -> Path:
+def resolve_template_path(gov_root: Path, target: Path, answers: dict) -> Path:
     """The charter TEMPLATE this render reads.
 
     The deployer lands it at the operator-chosen `playbook_path`, so that answer is authoritative
@@ -305,7 +305,7 @@ def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict]
 
 
 def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[str]]:
-    desc, blocks, entries = load_declarations(*declaration_paths(engine_dir, gov_root))
+    desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep = target / '.governance' / 'deploy.toml'
     if not dep.is_file():
         raise Refusal(f'{dep.as_posix()} does not exist. Run `govkit intake` first — it writes the '
@@ -321,7 +321,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
             raise Refusal(f'drop_blocks names `{d}`, which the descriptor declares nowhere. A member '
                           f'that drops nothing is a typo or a block that has already gone')
 
-    template = template_path(gov_root, target, answers)
+    template = resolve_template_path(gov_root, target, answers)
     text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
     for d in drop_names:
