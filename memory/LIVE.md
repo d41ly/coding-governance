@@ -8,7 +8,7 @@ terminal status. Nothing here is edited by hand.
 |---|---|---|---|---|---|
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
 | [aBoundedVerdict](builds/aBoundedVerdict/README.md) | SPECCED | a | 2026-08-16 | tooling | 10 |
-| [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 5 |
+| [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
 | [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |

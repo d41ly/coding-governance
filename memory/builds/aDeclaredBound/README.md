@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5
+ids: TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 TOOL-aDeclaredBound-6
 ---
 
 # aDeclaredBound — four hardcoded thresholds become declarations, and one of them gets a guard rail
@@ -89,20 +89,21 @@ They sequence; the bump rides the later of the two, because the verdict-epoch le
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 5 unit(s) · node a · opened 2026-08-18 · streams tooling
-ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5
+ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 TOOL-aDeclaredBound-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | OPEN | rev-2 | 2026-08-18 |
 | [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | OPEN | rev-2 | 2026-08-18 |
 | [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-4 | 2026-08-18 |
 
-Records live under `spec/` and `reviews/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
+| [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md) | research | TOOL-aDeclaredBound-5 |
 | [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
 <!-- /gen:build-index -->
 
@@ -124,6 +125,8 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-18-spec-TOOL-aDeclaredBound-3.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md)
   - [2026-08-18-spec-TOOL-aDeclaredBound-4.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md)
   - [2026-08-18-spec-TOOL-aDeclaredBound-5.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md)
+- **`build/`**
+  - [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md)
 - **`reviews/`**
   - [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md)
 <!-- /gen:build-docs -->

@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -241,14 +241,22 @@ boundary.
 
 ## 8. Open questions
 
+RESOLVED (owner, 2026-08-18): the shaped comment line, and the repo root for the declaration.
+
 - **The attribution line is not a credential.** An agent can type `(owner, <date>)` as easily as a
   person can, so S4 is a speed bump and an audit artifact rather than an authorisation check. The
   design takes that as acceptable because the binding control is diff review, per section 4. The
   owner may prefer a stronger form — a signed commit trailer, or a value that must match something
   outside the repository — and that is a decision about how much ceremony a rare edit deserves.
-  RECOMMENDATION: ship the shaped comment. It is the only form that costs nothing when unused, and
-  the two stronger options both put a per-node setup burden on every adopter to raise a bound most
-  of them will never touch.
+  RESOLVED (owner, 2026-08-18): the shaped comment. The owner took the stated limit — it proves a
+  raise was deliberate, not that the owner authorised it — and accepted it, because the two
+  stronger forms tax every adopter's setup for an edit most will never make, and an unattended run
+  on a node without signing configured would simply fail.
+- **Where the declaration lives.** RESOLVED (owner, 2026-08-18): the repo root, on the
+  prefix-independence reasoning in section 4 rather than the false one the first draft gave. The
+  alternative was the kit home, which matches the numerically dominant precedent; it loses because
+  a hook deployed away from its kit cannot reconstruct an install prefix, and this repo has already
+  paid for that mistake once. S13's deployer rows are the accepted cost.
 
 ## 9. Revision log
 
@@ -263,6 +271,8 @@ boundary.
   refusal message this build makes false. S12 and S13 are gates the unit would otherwise have
   redded: the playbook-parity extraction and the deployer's surface declaration. Section 4's
   root-versus-kit justification was false and is replaced with the one that survives measurement.
+- rev-3 · 2026-08-18 · both forks put to the owner and RESOLVED: the shaped comment line, and the
+  repo root. No design change — the owner ratified what section 4 already argued for.
 
 ## 10. Reuse audit
 

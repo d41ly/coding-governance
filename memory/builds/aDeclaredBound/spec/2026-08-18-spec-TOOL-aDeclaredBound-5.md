@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -14,12 +14,17 @@ deal first with the one a gate is holding in place.
 - **S1** — the population is MEASURED as the first act of the build. The table in section 4 is what
   one grep found at the base sha, it was wrong in both directions when the audit re-ran it, and it
   is recorded as evidence rather than as a contract.
-- **S2** — the gate-held assertion is resolved BEFORE any prose moves.
-  `memory/guides/REVIEW-PROTOCOL.md` carries the literal `≤5 verify-stage agents TOTAL`, and
-  `tools/workflows/check-protocol-parity.test.sh` greps for exactly that string. Stripping the digit
-  reds a bar leg. The leg's own comment argues that a digit-free phrase is the failure mode it
-  exists to catch, so this is not a matter of updating a literal — it is a decision about what that
-  leg asserts, and it is this unit's first scope item rather than a discovery made mid-build.
+- **S2** — `memory/guides/REVIEW-PROTOCOL.md` loses the digit and gains a POINTER, and
+  `tools/workflows/check-protocol-parity.test.sh` gets a NEW anti-vacuity predicate to replace
+  the frozen literal it greps for today. Ratified by the owner over the cheaper alternative of
+  keeping the number as a declared pair. This is the first scope item because the leg reds the
+  moment the prose moves, and because the replacement predicate is the unit's only genuinely new
+  machinery.
+- **S2b** — the replacement predicate asserts what the old literal was protecting, which is NOT
+  the number. The leg's comment records the real fear: a protocol that states no bound is a
+  protocol an agent cannot check itself against. So the predicate is TWO-PART — the section that
+  states the fan-out rule names the conf KEY and the FILE, and the named file is one the hook
+  actually reads. The second half is what stops the arm degrading into a spellcheck.
 - **S3** — `tools/workflows/REVIEW-PROTOCOL.template.md` moves with the installed copy. Parity diffs
   the two; editing one is editing half a pair.
 - **S4** — a carrier that states the ENFORCED cap stops stating a number and points at the hook.
@@ -34,8 +39,17 @@ deal first with the one a gate is holding in place.
   TOTAL` appears in several live carriers AND in frozen records, so a text-keyed waiver written for
   a frozen record would silence every live carrier sharing the sentence. The first draft asked for
   one registry doing both jobs, which the audit showed is unsound.
-- **S8** — the gate refuses an EMPTY population rather than passing, and its self-test carries a red
-  fixture, a green control and a stale-waiver arm for each of the two mechanisms.
+- **S8** — the gate refuses an EMPTY population rather than passing, and its self-test carries a
+  red fixture, a green control and a stale-waiver arm for each of the two mechanisms.
+- **S9** — the scanner requires a BOUND WORD adjacent to the number, and scans MARKDOWN ONLY.
+  Both are measured decisions rather than guesses; the measurement is recorded under `build/`.
+  The bound word is what separates an assertion from a measurement, and markdown-only is what
+  keeps test fixtures, version regexes and the node-registry row out of the population. Together
+  they take the false-positive rate from about 64% to zero over this corpus.
+- **S10** — the gate's header states its two blind spots in the register
+  `check-method-carriers.sh` uses about its own: the noun list is a LIST, so a carrier phrased
+  outside it is invisible; and executable files are out of scope, so a bound stated in a comment
+  inside a harness is not seen. Both were OBSERVED during the measurement rather than imagined.
 
 ## 3. Non-goals (OUT)
 
@@ -48,25 +62,24 @@ deal first with the one a gate is holding in place.
 
 ## 4. Design
 
-### The gate-held assertion, and why it is scope item two
+### The gate-held assertion, and what replaces it
 
-`check-protocol-parity.test.sh` asserts the protocol still contains `≤5 verify-stage agents TOTAL`.
-That is a deliberate anti-vacuity arm: the leg's comment records that a digit-free paraphrase is
-precisely the drift it was written to catch, because a protocol that says "the declared cap" without
-a number is a protocol an agent cannot check itself against.
+`check-protocol-parity.test.sh` asserts the protocol still contains the bare literal. That is a
+deliberate anti-vacuity arm: the leg's comment records that a digit-free paraphrase is precisely
+the drift it was written to catch, because a protocol saying "the declared cap" without saying
+what to read is a protocol an agent cannot check itself against.
 
-So this unit cannot simply strip that line, and the build must choose:
+The owner ratified replacing the digit with a pointer and rebuilding that arm, over the cheaper
+option of keeping the number as a declared pair. That is the more expensive path and it buys the
+thing this unit exists for: afterwards the number lives in exactly ONE place, and the BINDING
+document an agent reads sends it there rather than carrying a copy a declared pair would keep
+merely CORRECT.
 
-1. **Keep the number in the protocol and make it a declared pair**, as S5 does for the playbook —
-   the protocol states the SHIPPED default and the parity leg's literal becomes a resolved pair
-   rather than a frozen string. This keeps the anti-vacuity property and costs one more pair.
-2. **Replace the digit with a pointer and give the leg a new anti-vacuity predicate** — the protocol
-   must contain a reference to the declaration, and the leg asserts the reference rather than the
-   digit.
-
-RECOMMENDATION: option 1. It preserves an arm written for a real defect, it is the same mechanism S5
-already needs for the playbook, and option 2 rebuilds an anti-vacuity predicate from scratch to save
-one number in one file.
+The replacement is NOT "assert a reference exists". A pointer to the wrong thing, or a pointer
+in a section that no longer states the rule, would pass such a check while leaving the protocol
+as unusable as a bare paraphrase. Hence S2b's two-part predicate. The second half — that the
+named file is one the hook actually reads — is what keeps the arm from becoming a spellcheck,
+and it is the reason this option costs more than the one it displaced.
 
 ### Inventory, measured and then corrected
 
@@ -95,12 +108,25 @@ declaration can hold a value the documents contradict, including a BINDING proto
 instructed to obey. The second order also makes this unit look optional, which is how it would get
 dropped.
 
-### What the gate can and cannot see
+### What the gate can and cannot see, measured
 
-It scans for a digit adjacent to fan-out vocabulary. It will not catch "no more than five agents"
-in words, and it will not catch a paraphrase that implies a bound without stating one — the same
-limit `tools/check-method-carriers.sh` states about itself. The gate's header says so rather than
-letting a reader infer completeness.
+The pattern was written and run before this unit was scheduled, at the owner's instruction. Three
+passes: 276 matching lines across 634 files unfiltered; 55 after S6's frozen-tree exclusion, of
+which 30 were false positives; and 18 after S9's two tightenings, of which ZERO are false
+positives. The 18 land in the ten carriers this section's table names. Full working, including
+the classification of all 55, is in `build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md`.
+
+Two blind spots, both OBSERVED rather than predicted, and both S10's to declare:
+
+The noun list is a list. The first tightened pattern silently lost `≤5 batched default-refute
+skeptics` in the protocol, twice, because "skeptics" was not in it. A carrier phrased outside the
+vocabulary is invisible, which is why S1 measures rather than trusting the gate to enumerate.
+
+Markdown-only has a live cost and here it is: `tools/workflows/tier2-review.js` says `≤5
+concurrent` on line 7 and `ONE ≤6-wide wave` on line 128, while its code fans at 5. Stale prose
+inside the harness the BINDING protocol points at, predating this build, and a markdown-only gate
+cannot see it. Filed as a backlog row rather than folded in, because widening the scope to catch
+one comment is what the 64% rate was made of.
 
 ### Files touched (estimate)
 
@@ -123,28 +149,31 @@ The carriers above, `tools/workflows/check-protocol-parity.test.sh` per S2's dec
 - a11y · i18n — N/A.
 - error / empty / loading states — S8's empty-population refusal.
 - observability — the gate names file, line and matched text.
-- risks — the honest one is BUILDABILITY: nobody has written the pattern, so its false-positive rate
-  over the workflow harnesses and the frozen trees is unmeasured, and the audit named this the
-  largest open cost in the build. The first pass measures it before the prose edits begin, and a
-  rate that makes the registry a chore is a reason to reconsider option 2 in section 4.
+- risks — buildability was the audit's largest open cost and is now MEASURED at zero false
+  positives over 18 hits, so the waiver registry S7 provides may well ship empty. What replaces
+  that risk is the false-NEGATIVE one in section 4: a zero-FP pattern is a narrow pattern, and
+  narrowness is why it missed two real carriers on its first tightening.
 - testing + left-shift gates — the gate IS the left-shift; S8 arms both waiver mechanisms.
 - migration / rollback — delete the leg row; the prose edits stand alone.
 - user docs — the carriers are the docs.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/check-agent-cap-restatement.sh` runs BEFORE this unit's prose edits, it
-  names the carriers S1 measured; after them, it is silent. The first half is what proves the
-  pattern fires rather than passing by finding nothing.
+- **AC1** — When `bash tools/check-agent-cap-restatement.sh` runs BEFORE this unit's prose edits,
+  it names 18 sites across ten files, matching the measurement recorded under `build/`; after
+  them, it is silent. The first half is what proves the pattern fires rather than passing by
+  finding nothing, and the figure is an observation to reproduce rather than a target to hit.
 - **AC2** — When a fixture adds a bare fan-out assertion to a live carrier, `bash
   tools/check-agent-cap-restatement.test.sh` observes the gate naming it, and the line-count
   sentence in `skills/session-kickoff/SKILL.md` stays silent as the green control.
 - **AC3** — When a live waiver row's matched text is gone, `bash
   tools/check-agent-cap-restatement.test.sh` observes the gate reding as stale; and when a frozen
   path prefix selects nothing, it reds the same way.
-- **AC4** — When `bash tools/workflows/check-protocol-parity.test.sh` runs after S2's decision, it
-  is green and its assertion is not vacuous — either a resolved pair or the new predicate, per the
-  option chosen.
+- **AC4** — When `bash tools/workflows/check-protocol-parity.test.sh` runs it is green; when a
+  fixture protocol carries the rule as a bare paraphrase with NO pointer, the same harness
+  observes it reding; and when a fixture names a conf key the hook does not read, it reds too.
+  All three: the first proves the arm survived the rewrite, the other two prove it did not
+  degrade into asserting that some backticked token is present.
 - **AC5** — When `bash tools/check-playbook-parity.sh` runs, S5's shipped-default pair resolves and
   matches the hook's constant, and an unresolvable pair reds rather than comparing empty to empty.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh`, `python
@@ -165,15 +194,27 @@ bash tools/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
 
-- **Section 4's two options for the gate-held assertion.** RESOLVED (agent, 2026-08-18, delegated by
-  nothing — recorded as a RECOMMENDATION rather than a ratification): option 1, keep the number in
-  the protocol as a declared pair. The owner should overrule if they would rather the protocol
-  carried no digit at all, because that is a judgement about what an agent can check itself against
-  and not a technical one.
+RESOLVED (owner, 2026-08-18): the pointer and a new predicate.
+
+- **Section 4's two options for the gate-held assertion.** RESOLVED (owner, 2026-08-18): option
+  2 — the protocol carries a POINTER and no digit, and the parity leg gets a new anti-vacuity
+  predicate. This OVERRULES the agent's recommendation of option 1, which was argued on cost.
+  The owner's reading is the one this unit's own goal implies: a declared pair keeps the number
+  correct in two places, and the point of the unit is for it to exist in one. S2b states what
+  the replacement must assert, so the rebuild does not quietly weaken what it replaces.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-4 · 2026-08-18 · folded the gate measurement the owner ordered before any build. S9 fixes
+  the two tightenings that take the false-positive rate from 64% to zero, S10 makes the gate
+  declare the two blind spots the measurement exposed, section 4 carries the numbers, and AC1
+  now names a figure to reproduce. The measurement also found stale prose in `tier2-review.js`
+  that this unit's scope deliberately cannot see; filed rather than absorbed.
+- rev-3 · 2026-08-18 · fork put to the owner and RESOLVED AGAINST the recommendation: the
+  protocol loses the digit and the parity leg is rebuilt. S2 stops being a menu, S2b states what
+  the new predicate must assert, section 4 is rewritten around the ratified path, and AC4 gains
+  the three-part form that keeps the rebuilt arm from degrading into a spellcheck.
 - rev-2 · 2026-08-18 · folded spec-audit round 1, which BLOCKED on this unit. Stripping the digit
   from the review protocol reds `check-protocol-parity.test.sh`, whose assertion is a deliberate
   anti-vacuity arm; that is now S2 and the first thing the build decides. S3 adds the template half
