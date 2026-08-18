@@ -263,7 +263,7 @@ figure as authority.
 
 - **security** — N/A as a surface. The trust boundary is stated in §4 rather than left implicit. One
   note: S8's promotion widens what a run may add to its own build, and the property that keeps it
-  honest lives in `TOOL-aBoundedVerdict-11`'s append-admitting comparison, not here.
+  honest lives in `TOOL-aBoundedVerdict-11`'s unit-ID-set comparison, not here.
 - **perf / scale** — N/A. One appended line per round; the predicate reads a bounded line set.
 - **a11y** — N/A.
 - **i18n** — the verdict tokens are identifiers.
