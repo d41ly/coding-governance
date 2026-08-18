@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact
 
-**Status:** SPECCED · rev-3 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-16
+**Status:** CLOSED · rev-4 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-16
 
 ## 1. Goal
 
@@ -55,8 +55,15 @@ The fourth column is here because the audit found §5 asserting a guard this ado
 | Adopter | Pin | CR-normalising comparison | Empty-render refusal | `--check` here |
 |---|---|---|---|---|
 | `tools/unattended/adopt-unattended.sh` | yes | yes | yes | exit 0 |
-| `tools/drift-audit/adopt-drift-audit.sh` | yes | yes | yes | exit 0 |
+| `tools/drift-audit/adopt-drift-audit.sh` | yes | yes | **no** | exit 0 |
 | `tools/memory-recall/adopt-memory-recall.sh` | yes | **no** | **no** | **exit 1** |
+
+The drift-audit cell said `yes` until it was re-measured at build time: `adopt-drift-audit.sh:129-138`
+renders to a temp file and diffs it with no `[ -s ]` test anywhere in the script, so only
+`adopt-unattended.sh:170` carries the refusal. That does not move S5 — this unit adds the guard here
+either way, and the sibling it is ported from is the one that has it. What it does move is the
+argument's SHAPE: the guard is one adopter's practice, not two adopters' convention, and the third
+adopter's gap is a real one nobody has scoped. The row for it is in `memory/backlog/TOOL.md`.
 
 The failure was confirmed to be line endings alone and nothing else. The Skill holds CRLF on 89 of
 89 lines. With CR stripped from the working copy, `--check` prints
@@ -169,6 +176,12 @@ none — the fork below is RESOLVED.
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
 - rev-2 · 2026-08-16 · F1 resolved by the owner; S3, §4's file table and §7's gate list now name
   `tools/memory-recall/selftest.py` instead of deferring to the fork.
+- rev-4 · 2026-08-17 · BUILT and CLOSED. §4's Inventory claimed `adopt-drift-audit.sh` carries an
+  empty-render refusal; re-measured at build time it does not, and the cell plus the paragraph under
+  it are corrected — the same class the audit's C11 caught one cell to the left. No scope moved: S5
+  is unchanged and the seam it ports from is `adopt-unattended.sh:170`, which does have the guard.
+  All six acceptance criteria observed, AC4 by reverting S1/S2 in a scratch copy rather than by
+  reading the code.
 - rev-3 · 2026-08-16 · folded the spec audit recorded under this build's `reviews/`. Its C1 refuted
   this spec's causal premise: `git worktree add` does NOT land CRLF, so AC3 was already green with S1
   reverted and AC5 was unsatisfiable — both re-keyed to a CONSTRUCTED fixture, and S3 says so. C11:

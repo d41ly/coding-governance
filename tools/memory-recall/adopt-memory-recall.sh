@@ -9,6 +9,14 @@
 # than shipped. `--check` re-renders and diffs, which is how a `FAMILIES` edit that nobody
 # re-rendered turns into a red leg instead of a silently stale trigger.
 #
+# The on-disk side of that diff is CR-NORMALISED, and the render side is LF by construction. A
+# byte-comparing gate needs BOTH halves: the `eol=lf` pin so the committed bytes are right, AND
+# normalisation in the comparison so a working copy that carries CRLF does not report every line of
+# an untouched file as drift. Deleting the `tr` because the pin "already handles it" restores a red
+# leg on a file nobody edited — that is what this normalisation was added for, not redundancy.
+# The `[ -s ]` refusal above it belongs to the same seam: without it an empty render compared to an
+# equally empty Skill is a PASS, which is the green-by-absence shape this kit refuses.
+#
 # `--with-hook` is the ONLY way the `recall-opened` PostToolUse hook is installed. Skipping it is a
 # supported end state: a hook file copied in but never merged into settings.json reads as UNWIRED
 # forever, which is the fastest way to train every node to ignore the wiring verifier.
@@ -146,12 +154,16 @@ fi
 
 if [ "$mode" = "--check" ]; then
   [ -f "$SKILL" ] || { echo "memory-recall: $SKILL not rendered — run $REL/adopt-memory-recall.sh --scaffold"; exit 1; }
-  if render | diff -q - "$SKILL" >/dev/null 2>&1; then
+  TMP="$(mktemp)" || exit 2
+  trap 'rm -f "$TMP"' EXIT
+  render > "$TMP"
+  [ -s "$TMP" ] || { echo "memory-recall: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
+  if diff -q <(tr -d '\r' < "$SKILL") "$TMP" >/dev/null 2>&1; then
     echo "ok       memory-recall skill — SKILL.md matches the conf (FAMILIES: $families)"
     exit 0
   fi
   echo "memory-recall: .claude/skills/memory-recall/SKILL.md has DRIFTED from .memory-tree.conf."
-  render | diff -u "$SKILL" - | head -40
+  diff -u <(tr -d '\r' < "$SKILL") "$TMP" | head -40
   echo "Fix: $REL/adopt-memory-recall.sh --scaffold"
   exit 1
 fi

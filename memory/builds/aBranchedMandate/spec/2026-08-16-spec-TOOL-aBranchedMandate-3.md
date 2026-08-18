@@ -1,6 +1,6 @@
 # TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-7 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -61,10 +61,13 @@ document that already states what the first one costs.
   case. A guard whose widening is untested is a guard nobody notices going vacuous.
 - **S4** — the run-state file records `anchor-kind`, plus the branch ref and tip that were observed.
   Protocol section 2 enumerates its authored facts individually, counting one anchor observation as
-  three, so at that granularity the count moves from **seven to ten** — not the eight an earlier
-  revision wrote. S4 maps each new key to a numbered item and states how the two conditional ones are
-  admitted when absent, since section 2's "nothing else" clause is unconditional today. The count
-  lives in one place and moves in both copies of the protocol together.
+  three, so at that granularity the count moves from **eight to eleven** — re-measured at `84825c3`,
+  where §2 reads "exactly eight facts" and enumerates 1..8, the eighth being the roster frozen at
+  landing. Two earlier revisions wrote this wrong in the same direction: rev-3 said seven-to-ten and
+  rev-5 corrected only the first half of it. S4 maps each new key to a numbered item and states how
+  the two conditional ones are admitted when absent, since section 2's "nothing else" clause is
+  unconditional today. The count lives in one place and moves in both copies of the protocol
+  together.
 - **S5** — a new declaration `ANCHOR_SCOPE` in `.unattended.conf`, over the closed value set
   `default-branch` and `published`, selects the scope. Absent, blank, or any value outside the set is
   a REFUSAL to widen: an adopter who declares nothing keeps the strict anchor, and a misspelling
@@ -86,11 +89,14 @@ document that already states what the first one costs.
   attacker"), and `trusted_base` carries the same lesson. Reachability is the form that survives the
   run doing the thing the design tells it to do.
 - **S6b** — S6 states, item by item, the disposition of everything else inside the loop it rewrites.
-  `tools/unattended/check-unattended.sh:269-316` is ONE `for b in refs/remotes/...` loop carrying
-  five things: the not-a-commit refusal, the ancestor-of-anchor test S6 replaces, the
-  ancestor-of-HEAD test, the phase-keyed `rb != HEAD` refusal, and — nested inside the same loop —
-  check 15's SECOND HALF, which compares the LANDED witness against that loop's `$b` and whose own
-  comment says it is inside the loop because it needs the anchor. S6's replacement predicate needs no
+  The loop is at `tools/unattended/check-unattended.sh:295`, spelled
+  `for b in "refs/remotes/origin/$d" "refs/remotes/$d"`, and carries five things, re-measured at
+  `84825c3`: the not-a-commit refusal (`:305`), the ancestor-of-anchor test S6 replaces (`:307`),
+  the ancestor-of-HEAD test (`:309`), the phase-keyed `rb != HEAD` refusal (`:322`, whose phase set
+  is now `LANDING|LANDED|VERIFYING` — `ABORTED` was removed upstream because an aborted run
+  authorizes no landing), and — nested inside the same loop — check 15's SECOND HALF (`:338`), which
+  compares the LANDED witness against that loop's `$b` and whose own comment says it is inside the
+  loop because it needs the anchor. S6's replacement predicate needs no
   `$b`, so the loop cannot survive as written. Deletion would be loud, because the sibling self-test
   arms both check 15's second half and the phase-keyed clause. RE-ANCHORING would be silent:
   `ARMS_FLOORS` counts branches and textual arms, so a `fail 15` left comparing against the wrong
@@ -265,10 +271,11 @@ a conforming build README to resolve there.
 | `anchor-kind` | absent | `default-branch` or `run-branch` |
 | `branch-ref` · `branch-sha` | absent | the second observation, when it was used |
 
-Protocol section 2 states the authored region carries "exactly seven facts and nothing else", and
-enumerates them 1..7 — counting one anchor observation as THREE separately numbered facts. At that
-same granularity this table's three new keys make the count **ten**, not the eight an earlier
-revision of S4 claimed. S4 now states the real count and maps each new key to a numbered item,
+Protocol section 2 states the authored region carries "exactly eight facts and nothing else", and
+enumerates them 1..8 — counting one anchor observation as THREE separately numbered facts, and the
+eighth being the roster frozen at landing. At that same granularity this table's three new keys make
+the count **eleven**. Re-measured at `84825c3`; rev-3 wrote seven-to-ten and rev-5 caught only half
+of it. S4 now states the real count and maps each new key to a numbered item,
 including how the two conditional ones are admitted when absent, because section 2's "nothing else"
 clause is unconditional today. The count appears in one place only, and both protocol copies move
 together — check 10 byte-compares them against each other, so a wrong count is identical in both and
@@ -532,6 +539,80 @@ was a cost the owner was not shown when they priced the unit.
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-17 · BUILT and CLOSED. The closing review (`reviews/2026-08-17-review-aBranchedMandate-4.md`)
+  returned 19 raw / 13 confirmed, deduplicating to SEVEN defects: 1 blocker, 1 high, 4 medium, 1 low.
+  All seven are folded and both sibling self-tests are green — driver 311 assertions, leg 178.
+
+  **The blocker was a fail-OPEN under a comment claiming fail-CLOSED.** S6c's advertisement block
+  carried no `else`, so a remote that did not answer skipped every check-9 BASE predicate, check 15's
+  second half and — through the `rb` gate — the check-13 mandate assertion. Reproduced offline
+  exiting 0 on a forged base, and a REGRESSION: the pre-S6 leg read local refs and still checked
+  something. Every arm in this unit passed throughout because every fixture had a reachable remote,
+  which is the `fixture-passes-by-finding-nothing` class the bug-class checklist had pre-selected for
+  this exact diff. The fail-closed branch is now armed, with a reachable-remote control beside it.
+
+  The other six: the leg took whichever remote sorted first with none of the driver's check-24/25
+  endpoint guards (now exactly one remote, or the fail-closed branch reports it); `$b` was not proved
+  present locally, reding three honest LANDED records; `anchor-kind`/`branch-ref`/`branch-sha` were
+  written unconditionally while `base` is pinned once, so a re-preflight drifted the evidence off the
+  pin; the lifecycle control still moved `refs/remotes/origin/main`, a ref S6 removed from the leg's
+  reads, so an `is_published`-mutated-to-equality would have survived it; `observe_branch` went DEAD
+  in the resolve_base refactor with four byte-identical twin `fail` branches scored ARMED; and two
+  `ls-remote` round-trips ran even with no run-state file.
+
+  **`ARMS_FLOORS` moved twice and the second move was DOWN**: 71:70 -> 83:80 raised a floor over the
+  dead `observe_branch`, which is the inversion of what a ratchet is for; removing it and adding the
+  fail-closed branch settles the pair at 79:76, with the leg at 66:66.
+
+  The review's own root-cause line is the accurate one: an observation replaced a construction and
+  the new source's failure modes were handled at one site out of three.
+
+- rev-6 · 2026-08-17 · **UNPARKED — the owner re-priced and said build it, and one of rev-5's five
+  drift claims was WRONG.** The premises are re-measured here rather than re-asserted:
+
+  | rev-5 claimed | Measured at `84825c3` |
+  |---|---|
+  | the `for b in refs/remotes/…` loop S6b enumerates is GONE | **FALSE.** It is at `check-unattended.sh:295`. rev-5's grep pattern was `for b in refs/remotes`; the source spells it `for b in "refs/remotes/origin/$d"`, with a quote, so the pattern matched nothing and the absence was read as a restructure. All five assertions are intact — `:305` not-a-commit, `:307` ancestor-of-anchor, `:309` ancestor-of-HEAD, `:322` the phase-keyed `rb != HEAD`, `:338` check 15's second half |
+  | §2 carries seven authored facts, S4 moves it to ten | right that it is stale, wrong in the same direction as the build README: it is **eight**, so S4 moves it to **eleven** |
+  | the leg gained a sixteenth check | right |
+  | `KIT_UNATTENDED_VERSION` is already 1.6 | right, moved by node `d`; F3 is moot rather than answered |
+  | protocol §2 gained a subsection | right, the `--preflight` record rotation |
+
+  So S6b is **re-pointing, not re-specification**, which was rev-5's stated reason for parking. Two
+  things in it did move and are folded: item 4's phase set is now `LANDING|LANDED|VERIFYING`
+  (`ABORTED` was removed upstream, with its reason in place), and every line citation in §2 and §4
+  is re-derived above rather than carried.
+
+  Also folded: `--park` now EXISTS as a verb (`verb_park`, upstream's `TOOL-cSettledDocket-1`), so
+  §2's fact 3 discriminates four parked kinds. Nothing in this unit depends on it; it is recorded
+  because rev-5 leaned on its absence when choosing where to write the park.
+- rev-5 · 2026-08-17 · **PARKED by the unattended run that built units 1 and 2**, and not built. No
+  design decision in this spec is withdrawn: every fork stays RESOLVED and the owner's ratification of
+  the rule change stands. What moved is the GROUND the spec measures against — `origin/main` gained
+  `dClosedLexicon`'s unattended work while this run was in flight, and the build README's
+  stop-and-reconsider rule names two of the moved values by name. Measured against the merge at
+  `9cb6b46`:
+
+  | Premise | This spec says | Measured after the merge |
+  |---|---|---|
+  | protocol §2 authored-fact count | "exactly seven", S4 moves it to ten | already **eight**; S4's arithmetic and the `cBriefedPilot` "no eighth authored fact" collision it cites are both off by one |
+  | the loop S6b enumerates | ONE `for b in refs/remotes/…` loop at `:269-316` carrying five things | **no such loop exists**; the leg was restructured and check 9 now derives `d` from `GOV_DEFAULT_BRANCH` directly |
+  | leg check ordinals | `fail 1`…`fail 15`, and §4 expects the `AGENTS.md` "fifteen checks" claim to stand | `fail 16` exists; `AGENTS.md` already says sixteen |
+  | `KIT_UNATTENDED_VERSION` | do not bump; node `c` moves it to 1.5 (F3) | already **1.6**, moved by node `d`, so F3's question is moot rather than answered |
+  | protocol §2 body, which S8 edits | as read at rev-4 | gained a whole subsection, the `--preflight` record rotation |
+
+  **Why parked rather than re-derived.** S6b is not a citation that can be re-pointed: its whole
+  obligation is to state, item by item, the disposition of five assertions inside a loop that is gone,
+  and re-deriving it is re-specifying a security predicate on a file another node has just
+  restructured and may still be in flight on. S4's count and F3's version are mechanical, but they are
+  not the blocker. The blocker is that this unit spends three ratified properties against a price list
+  the owner approved, and the document that carries that price list has changed twice underneath it.
+  Re-pricing is the owner's turn, which is exactly the turn an unattended run does not have.
+
+  **What is NOT claimed.** Nothing here says the design is wrong. S1, S2, S5, S11 and S12 read as
+  sound against the merged driver — `resolve_base`, `trusted_base`, `check_authorization` and
+  `observe_anchor` all still exist with the shapes §4's Inventory describes. The unit is deliverable
+  after S6b and S4 are re-derived against the current leg and the owner re-confirms the price.
 - rev-1 · 2026-08-16 · initial draft, from the reproduction recorded under this build's `build/`.
 - rev-2 · 2026-08-16 · all four forks resolved by the owner. F1's pick folded into S5 as a closed
   value set with its refusals, and into S9 as an arm; F2's into the new S10 and §3's non-goal; F3's
