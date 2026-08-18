@@ -80,7 +80,12 @@ def read_conf(root: Path, name: str, key: str) -> str:
 
 
 def derive_project_name(root: Path, _a: dict) -> str:
-    return root.resolve().name
+    # The PRIMARY tree's name, never the current directory's. `root.resolve().name` answers whatever
+    # worktree the render ran in, so a render from a throwaway branch dir baked that dir's name into a
+    # committed charter as the product's identity — and the next render from anywhere else produced a
+    # different region, redding the unguarded wiring leg. Same worktree-sensitivity `derive_primary_tree`
+    # already carries a comment about, missed one function away.
+    return Path(derive_primary_tree(root, _a)).name or root.resolve().name
 
 
 def derive_default_branch(root: Path, _a: dict) -> str:
@@ -129,10 +134,11 @@ def derive_node_tag(_r: Path, _a: dict) -> str:
     return 'a'
 
 
-def derive_machine(_r: Path, _a: dict) -> str:
-    user = os.environ.get('USERNAME') or os.environ.get('USER') or ''
-    host = os.environ.get('COMPUTERNAME') or os.environ.get('HOSTNAME') or ''
-    return f'{user} @ {host}'.strip(' @') if (user or host) else ''
+# NO `derive_machine`. It read $USERNAME/$COMPUTERNAME and baked one node's identity into a charter
+# committed to a shared remote, so every other node's render differed and the unguarded wiring leg
+# red for them — and the only in-band fix rewrites a file with no row-merge driver, hard-conflicting
+# on every cross-node merge. MACHINE_A is an ASKED placeholder now: the node registry is fleet data
+# the operator states, exactly like VARIANCES_A beside it. Ambient environment is not a derivation.
 
 
 def derive_primary_tree(root: Path, _a: dict) -> str:
@@ -162,7 +168,6 @@ PROBES = {
     'gate_runner': derive_gate_runner,
     'lexicon_conf': derive_lexicon_conf,
     'node_tag': derive_node_tag,
-    'machine': derive_machine,
     'primary_tree': derive_primary_tree,
     'worktree_root': derive_worktree_root,
 }

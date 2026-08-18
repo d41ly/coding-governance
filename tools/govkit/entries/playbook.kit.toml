@@ -116,9 +116,8 @@ why = "this node's registry tag"
 
 [[placeholder]]
 key = "MACHINE_A"
-class = "derived"
-probe = "machine"
-why = "this node's machine and user, which is how a node identifies itself — never a path"
+class = "asked"
+why = "this node's machine and user, which is how a node identifies itself. ASKED, not derived: a probe reading $USERNAME/$COMPUTERNAME bakes one node's identity into a charter committed to a shared remote, so every other node's render differs and the wiring leg reds for them. Fleet data is stated, not sniffed"
 
 [[placeholder]]
 key = "PRIMARY_TREE_A"

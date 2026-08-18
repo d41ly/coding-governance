@@ -24,6 +24,9 @@ kits = [
 drop_blocks = []
 
 [answers]
+# STATED, not sniffed. A probe reading the environment baked node `a`'s identity into a charter on a
+# shared remote; the registry is fleet data and every node's row is authored.
+machine_a = "daily-agent"
 # CI_FILE derives to nothing here: this repo has no .github/workflows yet, and wiring the bar into
 # CI needs a workflow-scoped push. The answer records that rather than letting a blank ship.
 ci_file = "none yet — the bar runs at the push boundary via .githooks/pre-push"

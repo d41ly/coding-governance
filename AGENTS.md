@@ -150,7 +150,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
   | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
-  | `a` | `daily-agent @ COMPEETO-AGENT` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths` |
+  | `a` | `daily-agent` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths` |
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.
@@ -219,7 +219,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
 - Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md` (work-area → doc tree → id families → backlog).
 - Logs are two-tier for token scoping: a one-line-per-decision index pointing at per-decision detail files; open details only for the areas you touch.
-- The instantiated doc opens with a compact product-identity preamble for `governance-template-convergence-91c2c6` (`coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships`: what the software is, deployment model, major runtime pieces).
+- The instantiated doc opens with a compact product-identity preamble for `coding-governance` (`coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships`: what the software is, deployment model, major runtime pieces).
 - The instantiated doc carries the repo-layout map (`root holds the charter template and the runbook · tools/ the deployable kits · skills/session-kickoff/ the kickoff engine · memory/ the dogfooded memory tree`: each top-level dir + its role and the core/adapter relationships) — sessions never re-derive where things live.
 - The instantiated doc carries the everyday-command catalog (`bash tools/run-gates.sh (the bar) · GATE_JOBS=1 for the serial rollback · GATE_FULL=1 to ignore every leg guard · bash tools/push-main.sh (the lander)`: install, dev servers, migrations, artifact regeneration, seeding, the one formatter/linter per language) — sessions never re-derive the one-true invocation.
 - Pin one in-repo home for business/product context (`README.md, plus memory/DECISIONS.md for why anything is the way it is`: brand, positioning, specs) so sessions locate it instead of asking.
