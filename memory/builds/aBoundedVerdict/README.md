@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
+ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13
 ---
 
 # aBoundedVerdict — an unattended run stops reviewing, stops stalling, and says why it stopped
@@ -241,8 +241,9 @@ frozen where its subject can write it is `memory/gotchas/inputs-inside-the-subje
 authority stays the BASE blob, re-derived through git by both the driver and the leg.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-16 · streams tooling
-ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
+**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
+ids TOOL-aBoundedVerdict-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -251,6 +252,9 @@ ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aB
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-5 | 2026-08-17 |
+| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-1 | 2026-08-19 |
 
 Records live under `spec/`, `build/` and `reviews/`.
 
@@ -261,6 +265,10 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md) | research | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 |
 | [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
 | [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
+
+Ids no record names: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13.
+
+Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -281,6 +289,9 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-16-spec-TOOL-aBoundedVerdict-3.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md)
   - [2026-08-16-spec-TOOL-aBoundedVerdict-4.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md)
   - [2026-08-16-spec-TOOL-aBoundedVerdict-5.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-11.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-12.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md)
+  - [2026-08-19-spec-TOOL-aBoundedVerdict-13.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md)
 - **`build/`**
   - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
   - [2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md)
