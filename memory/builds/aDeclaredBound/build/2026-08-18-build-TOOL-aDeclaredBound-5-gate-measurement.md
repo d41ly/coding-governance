@@ -95,3 +95,12 @@ predicate, which is why round 2 called this a blocker rather than a tidy-up.
 does the direction of the tightening: requiring a bound word does separate an assertion from a
 measurement, and every false positive it removed was a measurement. What is withdrawn is the claim
 that this record contains enough to reproduce any of it.
+
+**A third fault, in the evidence for the markdown-only decision.** The enumeration above lists
+"the node registry row naming the machine `agent-0`" among the fifteen false positives that
+markdown-only removed. It cannot have removed it: the surviving carrier is `AGENTS.md:63`, which
+is markdown and stays in the pass-3 population; the only other live matches were two archive
+ledger files already excluded a pass earlier by the frozen-tree rule. That enumeration is the
+only itemised evidence offered for a decision the spec calls measured rather than guessed, so
+the class list needs re-deriving before it can carry that weight.
+

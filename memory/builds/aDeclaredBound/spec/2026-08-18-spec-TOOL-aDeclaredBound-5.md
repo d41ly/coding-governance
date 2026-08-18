@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
+**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -20,20 +20,44 @@ deal first with the one a gate is holding in place.
   keeping the number as a declared pair. This is the first scope item because the leg reds the
   moment the prose moves, and because the replacement predicate is the unit's only genuinely new
   machinery.
-- **S2b** — the replacement predicate asserts what the old literal was protecting, which is NOT
-  the number. The leg's comment records the real fear: a protocol that states no bound is a
-  protocol an agent cannot check itself against. So the predicate is TWO-PART — the section that
-  states the fan-out rule names the conf KEY and the FILE, and the named file is one the hook
-  actually reads. The second half is what stops the arm degrading into a spellcheck.
+- **S2b** — the replacement predicate asserts what the old literal was protecting, which is NOT the
+  number. It is SPLIT BY LANDING, ratified by the owner, because its two halves depend on different
+  units. **This unit asserts the POINTER SHAPE only**: every section that states a fan-out bound
+  names the file that resolves it, which is `tools/hooks/agent-cap.js` today. **Unit 4 adds the
+  reads-it half** — that the named declaration is one the hook actually reads — in the same commit
+  that makes the hook read it. Rev-4 required both halves here, and neither the conf key nor the
+  read exists until unit 4 lands, so the predicate could not be satisfied at this unit's own
+  commit while §3 forbids touching the hook.
+- **S2c** — the predicate is PER RULE, not per document. The protocol states two bounds in two
+  sections — a verify-stage total and a concurrency limit — and §3 insists they stay two rules
+  because conflating them was a real defect. One predicate over "the section" cannot bind both, so
+  each section that states a bound is checked for its own pointer.
+- **S2d** — the CODE-SHAPED sites keep their digits, with the reason stated rather than left to the
+  scanner's silence. The protocol instructs an agent to inline a bounded call with a literal width;
+  that literal is the argument the hook resolves at the call site, not a restatement of the rule.
+  No bound word is adjacent, so S9's scanner never sees them — which means the gate cannot arbitrate
+  this and the spec must.
 - **S3** — `tools/workflows/REVIEW-PROTOCOL.template.md` moves with the installed copy. Parity diffs
   the two; editing one is editing half a pair.
-- **S4** — a carrier that states the ENFORCED cap stops stating a number and points at the hook.
-- **S5** — a carrier that states the KIT'S SHIPPED DEFAULT may keep the number. That is a fact about
-  the kit, changes only with a kit release, and becomes a declared pair in
-  `tools/check-playbook-parity.sh`, which already exists to assert that a value a document states
-  equals the source that owns it.
+- **S4** — a carrier that states the ENFORCED cap stops stating a number and points at the file that
+  resolves the bound. Same target as S2b's pointer-shape half, named identically in both, because
+  rev-4 gave the protocol one target and the other carriers another and said which nowhere.
+- **S5** — a carrier that states the KIT'S SHIPPED DEFAULT may keep the number, and the test is the
+  SENTENCE rather than the file. Rev-4 applied this to the governance template wholesale, which is
+  wrong: that template states the ENFORCED rule in at least three places and never says what the
+  kit ships, so "changes only with a kit release" is false for every one of them. Those become S4
+  carriers. S5 keeps only a sentence literally phrased as the shipped default, and the pair's
+  extraction reads a constant carrying an in-file comment saying it is the default and not the
+  enforced bound.
+- **S5b** — the declared-pair guarantee is GOV-LOCAL and buys an adopter nothing. The parity gate
+  compares the template against this repo's own hook and runs in no adopter tree. Said here because
+  S5 otherwise reads as protection that ships.
 - **S6** — FROZEN trees are excluded by PATH PREFIX, not by matched text: `memory/builds/`,
-  `memory/archive/`, `memory/gotchas/`. These describe what was true when written.
+  `memory/archive/`, `memory/gotchas/`, and `memory/backlog/`. The fourth was missing and is not a
+  waiver case: a backlog row QUOTES a carrier to describe work outstanding, and this build's own
+  row for the stale `≤6` in a harness would have been flagged by its own gate. Append-only records
+  of past or pending state are the class, and stating it as a prefix keeps AC3's stale-prefix arm
+  covering it.
 - **S7** — LIVE exceptions are waived by MATCHED TEXT in a shrink-only registry, with a reason per
   row. The two mechanisms are separate because they cannot be one: the phrase `at most 5 agents
   TOTAL` appears in several live carriers AND in frozen records, so a text-keyed waiver written for
@@ -41,11 +65,14 @@ deal first with the one a gate is holding in place.
   one registry doing both jobs, which the audit showed is unsound.
 - **S8** — the gate refuses an EMPTY population rather than passing, and its self-test carries a
   red fixture, a green control and a stale-waiver arm for each of the two mechanisms.
-- **S9** — the scanner requires a BOUND WORD adjacent to the number, and scans MARKDOWN ONLY.
-  Both are measured decisions rather than guesses; the measurement is recorded under `build/`.
-  The bound word is what separates an assertion from a measurement, and markdown-only is what
-  keeps test fixtures, version regexes and the node-registry row out of the population. Together
-  they take the false-positive rate from about 64% to zero over this corpus.
+- **S9** — the scanner has THREE constraints and all three are written here, because rev-4 named
+  two and the measurement record named two while the run that produced its figure used three.
+  (a) a BOUND WORD adjacent to the number, from the alternation the record lists; (b) a fan-out
+  NOUN following it, from a closed list — `agents`, `verifiers`, `lens`/`lenses`, `skeptics`,
+  `concurrent`, `per verify stage`, `are verify-stage`, `ever run`, `batched`; (c) MARKDOWN ONLY.
+  The noun list is the one that was load-bearing and undocumented: without it the pattern matches
+  54 lines across 23 files rather than 19 across 11, and it matches the very line AC2 names as the
+  gate's green control.
 - **S10** — the gate's header states its two blind spots in the register
   `check-method-carriers.sh` uses about its own: the noun list is a LIST, so a carrier phrased
   outside it is invisible; and executable files are out of scope, so a bound stated in a comment
@@ -160,9 +187,10 @@ The carriers above, `tools/workflows/check-protocol-parity.test.sh` per S2's dec
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash tools/check-agent-cap-restatement.sh` runs BEFORE this unit's prose edits,
-  it names 18 sites across ten files, matching the measurement recorded under `build/`; after
-  them, it is silent. The first half is what proves the pattern fires rather than passing by
-  finding nothing, and the figure is an observation to reproduce rather than a target to hit.
+  its output equals the CLASSIFIED HIT LIST the build re-measures and records under `build/` at
+  this build's own base; after the edits, it is silent. Not a bare integer: rev-4 pinned the build
+  to "18 sites across ten files", which no documented pattern reproduced and which had already
+  moved with the corpus by the time it was written.
 - **AC2** — When a fixture adds a bare fan-out assertion to a live carrier, `bash
   tools/check-agent-cap-restatement.test.sh` observes the gate naming it, and the line-count
   sentence in `skills/session-kickoff/SKILL.md` stays silent as the green control.
@@ -206,6 +234,15 @@ RESOLVED (owner, 2026-08-18): the pointer and a new predicate.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-5 · 2026-08-18 · folded spec-audit round 2, which BLOCKED on this unit twice. The ratified
+  predicate could not be satisfied at this unit's own landing commit, because its second half needs
+  a conf key and a hook read that unit 4 mints later; the owner ratified SPLITTING IT BY LANDING
+  and S2b now carries the pointer-shape half alone. S2c makes it per-rule, since the protocol
+  states two bounds and §3 insists they stay two. S2d gives the code-shaped sites a stated
+  disposition the scanner cannot supply. S5 was applied to a template that states the enforced rule
+  rather than a shipped default, and S5b says the pair buys an adopter nothing. S6 gains the
+  backlog prefix, which this build's own row would otherwise have tripped. S9 states the third
+  constraint — the noun list — without which the pattern matches the line AC2 needs silent.
 - rev-4 · 2026-08-18 · folded the gate measurement the owner ordered before any build. S9 fixes
   the two tightenings that take the false-positive rate from 64% to zero, S10 makes the gate
   declare the two blind spots the measurement exposed, section 4 carries the numbers, and AC1

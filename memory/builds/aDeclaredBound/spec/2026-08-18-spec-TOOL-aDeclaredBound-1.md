@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -26,8 +26,10 @@ established for check 6's size caps sixty lines away.
   silently stops matching.
 - **S4** — the failure message stops carrying the number. It currently reads `index entry lines over
   300 chars`, which is a THIRD copy of the value and is also the check's armed signature. The
-  message becomes cap-free; the per-row detail line already prints `(N chars > CAP)` and keeps doing
-  so, which is where a reader learns which cap applied.
+  replacement is `index entry lines over their declared cap`, and the constraint on it is
+  mechanical rather than editorial: `check-arms.py` drops interpolations and takes the LONGEST
+  surviving literal run, and refuses a run under twelve characters. The per-row detail line already
+  prints the applied cap and keeps doing so, which is where a reader learns which one bound them.
 - **S5** — the arm that names that signature moves in the SAME commit. It is a literal-text arm and
   the harness meta-gate keys on it, so a reworded message with an unmoved arm is a check that reds
   nothing and reports armed.
@@ -40,6 +42,13 @@ established for check 6's size caps sixty lines away.
   as the render.
 - **S8** — `memory/project/curation-debt.txt`'s header, which restates `25600 B / 350 chars` as
   prose, stops naming the entry figure.
+- **S10** — one acceptance criterion observes the shipped conf example. Neither this unit nor unit
+  2 had one at rev-2, which is round 1's finding 23 surviving two folds, and the example is already
+  wrong in two ways it would have caught: it declares `ROW_DOC_CAP_BYTES`, which the engine never
+  reads, and omits `DOSSIER_CAP_LINES` entirely.
+- **S11** — the harness's hand-kept key list is DERIVED from the engine's own loop rather than
+  restated. It covers seven of the engine's eight keys today; adding two more by hand is the same
+  failure a third time, and deriving it drains the existing gap in the same commit.
 - **S9** — the kit-version ordering is stated HERE, not only in the build README. `check-verdict-epoch.sh` is TOPOLOGICAL: the newest behaviour-bearing commit across the engine and its delegates must be an ancestor of, or equal to, the commit that changes
   `KIT_MEMORY_TREE_VERSION`. Units 1 and 2 both move that engine, so the LATER of the two carries the single bump and the earlier carries none. `TOOL-aLoosenedCeiling-1` folded
   exactly this finding at rev-3 after leaving the ordering in a README where neither spec repeated it.
@@ -65,8 +74,11 @@ established for check 6's size caps sixty lines away.
 
 ### Inventory
 
-Three sites hold the number today: the awk's `cap` assignment, its build-README override, and the
-`fail 7` message. The message is the interesting one, because `TOOL-aLoosenedCeiling-2` explicitly
+Three APPLYING sites hold the number today: the awk's `cap` assignment, its build-README override, and
+the `fail 7` message. Three IN-FILE COMMENTS also restate 300 or 350 and become wrong for a
+declaring adopter, which is the same argument S4 uses about the message, so they move too. One
+further mention is a corpus MEASUREMENT — the note that the widest authored lines sit between 300
+and 331 — and correctly stays, because it records what was measured rather than what is enforced. The message is the interesting one, because `TOOL-aLoosenedCeiling-2` explicitly
 declined to reword check 6's message for exactly the reason that applies here — it is armed on its
 full literal text. The difference is that check 6's message never carried a cap value, so leaving it
 alone cost nothing; check 7's does, so leaving it alone would ship a message that lies to any
@@ -81,7 +93,7 @@ which is why S5 is a scope item rather than an implementation note.
 ### Files touched (estimate)
 
 - `tools/memory-tree/check-memory-hygiene.sh` — two defaults, two `-v` bindings, the validation
-  loop's key list, the message.
+  loop's key list, the message, and the three in-file comments that restate a cap.
 - `tools/memory-tree/check-memory-hygiene.test.sh` — S5's arm and S6's arms, and its floor.
 - `tools/memory-tree/.memory-tree.conf.example` and `HYGIENE.template.md`.
 - `memory/project/curation-debt.txt` — the header sentence only; the registry rows are untouched.
@@ -126,6 +138,9 @@ which is why S5 is a scope item rather than an implementation note.
   the message's NEW text, and no branch of the engine has become unarmed.
 - **AC5** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, the edited template and
   the rendered `memory/HYGIENE.md` agree.
+- **AC6** — When `grep -cE '^(ENTRY|BUILD_README_ENTRY)_CAP_CHARS=' tools/memory-tree/.memory-tree.conf.example`
+  runs, it returns 2, and when the engine's key loop and the harness's assertion loop are compared,
+  the harness's list is derived from the engine's rather than typed beside it.
 
 ## 7. Gates
 
@@ -142,7 +157,12 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
-- rev-2 · 2026-08-18 · folded spec-audit round 1. The key count was six and is eight, so this unit
+- rev-2 · 2026-08-18 · folded spec-audit round 1.
+- rev-3 · 2026-08-18 · folded spec-audit round 2. S4 names the replacement string and the
+  twelve-character longest-literal-run constraint `check-arms.py` imposes on it, which the rev-2
+  wording left a builder to discover. The inventory was three sites and is three plus three
+  comments. S10 and S11 close round 1's finding 23, which had survived a fold: nothing observed the
+  shipped example, and the example is already wrong in two ways. The key count was six and is eight, so this unit
   makes ten. The zero arm selects on `*_BYTES` and would not have reached either char key, which
   made AC3 pass over an unbuilt guard. The abort banner names check 6 and its arm is hand-written
   rather than meta-gated, so S3b now moves it. S9 states the kit-version ordering that lived only

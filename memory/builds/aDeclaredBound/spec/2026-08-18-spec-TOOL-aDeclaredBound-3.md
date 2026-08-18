@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -12,6 +12,10 @@ drift-audit's PROJECT LAYER, which is the seam this kit already declares for per
 
 - **S1** — `drift_signals.py` may declare `RATCHET_LOOKBACK`. The engine reads it with a defaulting
   accessor, so an adopter's layer that predates the key keeps 14 and does not fail to import.
+- **S1c** — the hook's attribution window in unit 4 is a SEPARATE number from this one, and both
+  specs say so. An adopter who narrows `RATCHET_LOOKBACK` and leaves the hook's window wide gets
+  attribution lines the hook accepts and the ratchet reds on. They are independent by design here;
+  coupling them would make this unit a dependency of unit 4, which the build's order does not have.
 - **S1b** — the call path is named, because the value is consumed two frames below where it is
   read. `_justified` uses it for the window and `ratchet_findings` interpolates it into the
   message, and the latter receives a LIST of ratchets rather than the layer module. Both gain a
@@ -88,9 +92,13 @@ required-attribute list does not grow, so no existing layer becomes invalid.
 ### Alternatives rejected
 
 - **A conf key.** Rejected under S2 and the reasoning above.
-- **Per-ratchet windows.** Rejected as unrequested and speculative: nothing in this corpus has two
-  pins whose justifications compete for one window, and the shape can be added later without
-  changing the single-number form into a wrong one.
+- **Per-ratchet windows.** Rejected on SCOPE, and the premise the first draft rejected them on was
+  false. It said nothing in this corpus has two pins whose justifications compete for one window;
+  measured, `ORPHAN_ID_PIN` and `DEAD_PATH_PIN` sit three lines apart at the same value, both
+  declared `weakens: "up"`, so either one's justification is inside the other's fourteen-line
+  window. Unit 4 then makes the competing-window case the DEFAULT shape, with three keys at one
+  value in one small file. The rejection still stands on scope — a per-key window is a bigger
+  mechanism than this unit — but it can no longer stand on the claim that the case does not arise.
 - **Search the whole comment block above the pin, unbounded.** Rejected: the window's purpose is
   that a justification for a DIFFERENT number, further up the same block, must not be mistaken for
   this one's. Unbounded is not a wider window, it is no window.
@@ -143,7 +151,12 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
-- rev-2 · 2026-08-18 · folded spec-audit round 1. The motivating measurement was wrong — the margin
+- rev-2 · 2026-08-18 · folded spec-audit round 1.
+- rev-3 · 2026-08-18 · folded spec-audit round 2. The per-ratchet-window rejection rested on a
+  premise the corpus contradicts — two pins three lines apart already compete for one window — so
+  it now rests on scope, which is the reason that survives. S1c states that unit 4's hook window is
+  a separate number, which neither spec said and which an adopter narrowing one would discover the
+  hard way. The motivating measurement was wrong — the margin
   was 8 lines, not 2 — and section 4 now carries the measured figure and the argument that does not
   rest on a near miss. Section 5 claimed the message lacks a property it already has, and AC5 was
   green before the unit started; both restated differentially. S1b names the call path, since the

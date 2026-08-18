@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
@@ -39,6 +39,14 @@ three one way and one another.
   three siblings all treat blank as "check off"; this one cannot, because §10 is part of a canon
   selection rather than a check of its own, and an empty cutoff makes every date compare as
   after it.
+- **S7** — the kit-version ordering is stated HERE, not only in the build README.
+  `check-verdict-epoch.sh` is TOPOLOGICAL: the newest behaviour-bearing commit across the engine
+  and its delegates must be an ancestor of, or equal to, the commit that changes
+  `KIT_MEMORY_TREE_VERSION`. Units 1 and 2 both move that engine. **Unit 1 lands FIRST and carries
+  no bump; unit 2 lands second and its commit carries the single bump.** Naming which is later is
+  the half rev-2 left out, and the earlier unit's own commit reds that leg until the later lands.
+- **S8** — one acceptance criterion observes the shipped conf example, shared in purpose with unit
+  1's S10 and separately owed here because this unit adds a key to the same file.
 
 ## 3. Non-goals (OUT)
 
@@ -46,9 +54,6 @@ three one way and one another.
 - Check 12's other three cutoffs are untouched.
 - The nine-section and ten-section canons themselves are untouched; this unit changes where the
   selector's date comes from, not what either canon contains.
-- **S7** — the kit-version ordering is stated HERE, not only in the build README. `check-verdict-epoch.sh` is TOPOLOGICAL: the newest behaviour-bearing commit across the engine and its delegates must be an ancestor of, or equal to, the commit that changes
-  `KIT_MEMORY_TREE_VERSION`. Units 1 and 2 both move that engine, so the LATER of the two carries the single bump and the earlier carries none. `TOOL-aLoosenedCeiling-1` folded
-  exactly this finding at rev-3 after leaving the ordering in a README where neither spec repeated it.
 
 
 ## 4. Design
@@ -118,6 +123,8 @@ that taught the channel stops teaching it in the same release that removes it.
 - **AC4** — When `grep -n 'env-overridable' memory/TEMPLATE-SPEC.md` runs, it returns nothing.
 - **AC5** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, the spec template and its
   render agree.
+- **AC6** — When `grep -c '^SPEC10_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` runs, it
+  returns 1.
 
 ## 7. Gates
 
@@ -134,7 +141,11 @@ rather than left open, because the survey's whole finding was that two channels 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
-- rev-2 · 2026-08-18 · folded spec-audit round 1. S1 asked for one statement that had to be in two
+- rev-2 · 2026-08-18 · folded spec-audit round 1.
+- rev-3 · 2026-08-18 · folded spec-audit round 2. The kit-version item was filed under Non-goals,
+  where a builder reading section 3 as authoritative would drop it — it is now S7 inside section 2,
+  and it NAMES the order rather than saying "the later of the two" and leaving the pair
+  unresolved. S8 adds the example-conf observation neither unit had. S1 asked for one statement that had to be in two
   places at once: env-immunity requires an assignment ABOVE the conf source, and blank-resolves-
   forward requires a fallback BELOW it. Split. S1b records that a conf declaration already wins
   today, so the defect is two channels rather than none. Section 10's no-new-mechanism claim was
