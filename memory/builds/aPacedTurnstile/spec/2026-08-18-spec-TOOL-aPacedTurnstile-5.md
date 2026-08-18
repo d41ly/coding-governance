@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -11,17 +11,26 @@ including after a crash.
 
 ## 2. Scope (IN)
 
-- **S1** — the per-leg completion files move from the `mktemp -d` scratch dir to
-  `<git-dir>/gate-run/`, cleared at the START of each run and not deleted at its end. The worker
-  already writes them; only the destination and the trap change.
-- **S2** — `<git-dir>/gate-run/header` is written BEFORE the first leg dispatches, in a
+- **S1** — the per-leg completion files move from the `mktemp -d` scratch dir to a PER-RUN
+  directory `<git-dir>/gate-run/<run-id>/`, with `<git-dir>/gate-run/current` naming the in-flight
+  one for a concurrent reader. The per-run uniqueness is preserved deliberately, not incidentally:
+  the completion file is the DISPATCH SUPPRESSOR, not a log, so a leftover one at a fixed path would
+  make the runner skip a leg and print it green. Creating the run directory fails the run the way
+  the `mktemp -d` it replaces already does; retention of older run dirs is bounded by a sweep.
+- **S2** — `<git-dir>/gate-run/<run-id>/header` is written BEFORE the first leg dispatches, in a
   key-per-line grammar, carrying the schema version, run id, start time, head, base and how the base
-  was resolved, the tree fingerprint, the manifest path and its blob hash, the full-run flag, the
-  resolved width, the leg count, and the worktree path.
+  was resolved, the tree fingerprint, whether the tree was CLEAN at start, the manifest path and its
+  blob hash, the full-run flag and the reason it was forced, the resolved width, the resolved
+  DISPATCH ORDER, the leg count, and the worktree path. The dispatch order is here rather than in
+  `TOOL-aPacedTurnstile-3` because this unit already writes the header at the point that value is in
+  scope, and a record's key set must stay single-sourced; that unit's ordering criteria read it.
 - **S3** — each worker writes one TSV row per leg alongside the files it already writes — name,
   status, rc, seconds, started, ended, input key — through the same temp-then-rename the worker
-  already uses for its completion signal.
-- **S4** — `<git-dir>/gate-run/verdict` is written last, carrying the end time, verdict, and the
+  already uses for its completion signal. The per-leg OUTPUT copy the worker also writes becomes
+  durable by this move, so it takes the same redaction and the same restrictive mode the existing
+  per-leg log already has; a durable copy of command output that skips the masking its sibling
+  applies is a credential leak the current scratch-dir lifetime was hiding.
+- **S4** — `<git-dir>/gate-run/<run-id>/verdict` is written last, carrying the end time, verdict, and the
   ran / failed / skipped / reused tallies plus the end-of-run fingerprint and whether the tree moved.
   Its ABSENCE is the crash signal, and is the only crash signal needed.
 - **S5** — a fingerprint helper computing one digest over the committed tree object plus the
@@ -32,8 +41,12 @@ including after a crash.
   edit. The carry-forward merge for guard-skipped legs is kept exactly as written, and the rewrite
   becomes an atomic rename rather than a copy.
 - **S7** — `<git-dir>/gate-full-green` is written ONLY when the run failed nothing, skipped nothing,
-  reused nothing, and the tree did not move. This is the file `TOOL-aPacedTurnstile-7` reads, and
-  those four preconditions are what make it mean what its name says.
+  reused nothing, the tree did not move, AND the tree was CLEAN when the run started. This is the
+  file `TOOL-aPacedTurnstile-7` reads, and those five preconditions are what make it mean what its
+  name says. The clean-tree precondition is the one the spec audit found missing: a developer's
+  ordinary full run on a dirty tree would otherwise stamp a green that the push boundary then treats
+  as proof about a tree nobody ever tested. Each precondition carries its own negative control,
+  because an implementation that forgets ONE of them passes every arm written for the others.
 - **S8** — `tools/gate-legs.json` gains an optional `impure` key carrying reason strings, seeded from
   MEASUREMENT rather than guess: the unattended legs call out to the remote, so their verdicts are a
   function of the remote as well as of the tree.
@@ -202,8 +215,17 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
   the tree as moved and `<git-dir>/gate-full-green` is not written.
 - **AC10** — When a leg row in `tools/gate-legs.json` carries a key outside the pinned known set,
   `bash tools/run-gates/run-gates.test.sh` exits non-zero naming that key.
-- **AC11** — When `python tools/govkit/govkit.py selfcheck` runs, the `impure` key is accepted by the
-  manifest reader and the declared legs are the measured ones.
+- **AC11** — When a run REDS, `<git-dir>/gate-full-green` is neither written nor updated, asserted in
+  `tools/run-gates/run-gates.evidence.test.sh` against a pre-existing file from an earlier green — so
+  the arm distinguishes not-written from not-updated. This is the precondition the push-boundary
+  inversion rests on and it was the only one of the five with no negative control.
+- **AC13** — When the working tree is DIRTY at the start of an otherwise fully green run,
+  `<git-dir>/gate-full-green` is not written, asserted in
+  `tools/run-gates/run-gates.evidence.test.sh`.
+- **AC14** — When a stale completion file for leg index 3 is planted before a run starts, that leg
+  still EXECUTES and its reported verdict is the one it produced this run — asserted in
+  `tools/run-gates/run-gates.evidence.test.sh`, because the completion file suppresses dispatch and a
+  stale one would print a green nobody earned.
 - **AC12** — When `bash tools/check-testsuite-counts.sh` runs, both moved harnesses report their
   executed assertion counts at or above their floors.
 
@@ -226,6 +248,15 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit. The record directory becomes PER-RUN: at a fixed path
+  a leftover completion file is not a stale log but a stale DISPATCH SUPPRESSOR, so the leg never
+  runs and the bar prints it green — and two sibling units add exactly the writers that outlive a run
+  (BLOCKER F2). `gate-full-green` gains a fifth precondition, a CLEAN tree at start, without which a
+  developer's ordinary dirty-tree full run stamps a green the push boundary treats as proof about a
+  tree nobody tested (BLOCKER F5). The failed-nothing precondition gains the negative control it was
+  the only one of the five to lack (BLOCKER F3). The header gains the dispatch-order and
+  forced-reason keys two siblings read (F13, F25), and the retargeted per-leg output copy inherits
+  the redaction its sibling log already has (F39).
 
 ## 10. Reuse audit
 

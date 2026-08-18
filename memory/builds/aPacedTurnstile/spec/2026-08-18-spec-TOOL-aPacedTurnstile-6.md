@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -18,10 +18,17 @@ is graded on what it actually changed.
   but over the whole-tree fingerprint, because an unguarded leg declares that it reads everything.
 - **S3** — a fourth report verb for a reused leg, padded to the same column as the existing three and
   following `TOOL-aPacedTurnstile-1`'s two-space tail contract.
-- **S4** — a leg declaring `impure` never gets an input key and can never be reused.
-- **S5** — the base becomes the merge-base of HEAD against the default branch, replacing the origin
-  tip. `GATE_BASE` still outranks everything, and an unresolvable base still fails safe to running
-  every leg.
+- **S4** — a leg declaring `impure` never gets an input key and can never be reused. The key is
+  DECLARED by `TOOL-aPacedTurnstile-5`, which owns the manifest's key set; this unit owns its VALUES,
+  measured rather than guessed, and the structural arm in S8. Two units touching one key with no
+  stated authority is how a manifest ends up with two provenances for one field.
+- **S5** — the base becomes `git merge-base HEAD "origin/$DEFBR"`, replacing the origin tip, where
+  the default branch is OBSERVED from the remote and never taken from a local ref. `GATE_BASE` still
+  outranks everything; an unresolvable base still fails safe to running every leg; and a base that
+  resolves EQUAL TO HEAD is refused and falls back to running everything, because on the default
+  branch itself the merge-base is degenerate and would otherwise scope every leg away. That last
+  clause is the `TOOL-cFinalBerth-2` class, and taking the merge-base against a local branch is how
+  the form this unit adopts reaches it.
 - **S6** — a canary arm for the case that actually distinguishes the two base semantics: a guard-
   unchanged leg on a DIVERGED branch skips against the merge-base where it would have run against
   the tip.
@@ -30,7 +37,12 @@ is graded on what it actually changed.
   reuse is off unless asked.
 - **S8** — a structural canary arm: a leg whose own script directly calls out to the network must
   carry an `impure` declaration, with the gate's header stating plainly that it sees a direct call
-  and not a call through a driver.
+  and not a call through a driver. The matcher is WRAPPER-AWARE, because the motivating files route
+  their remote calls through a shell function rather than the bare command, and a matcher that only
+  sees the bare spelling finds nothing in exactly the files that motivated it. It carries the
+  anti-vacuity assertion the lexicon and playbook-parity gates already use: the scan over the real
+  manifest must resolve the known network-calling legs BY NAME, and print `DEAD PROBE` and red when
+  its match set is empty.
 
 ## 3. Non-goals (OUT)
 
@@ -196,6 +208,12 @@ so the rollback state is the shipped state and every arm runs against it.
 - **AC8** — When `GATE_BASE` is set explicitly, it still outranks the merge-base derivation.
 - **AC9** — When the base cannot be resolved at all, every leg runs, asserted in
   `tools/run-gates/run-gates.test.sh`.
+- **AC9b** — When the run is ON the default branch, so the merge-base against it is HEAD itself, the
+  base is refused and every leg runs — asserted in `tools/run-gates/run-gates.test.sh`. Without this
+  the adopted merge-base form scopes the entire bar away on the one branch that matters most.
+- **AC12** — When the structural network matcher is run over `tools/gate-legs.json`, it resolves the
+  known network-calling legs by name, and when its match set is emptied it prints `DEAD PROBE` and
+  exits non-zero — the anti-vacuity control, without which S8 passes by finding nothing.
 - **AC10** — When a leg's own script directly calls out to the network and carries no `impure`
   declaration, `bash tools/run-gates/run-gates.test.sh` exits non-zero naming that leg.
 - **AC11** — When a run reuses any leg, `<git-dir>/gate-full-green` is not written, so the fact
@@ -225,6 +243,11 @@ so the rollback state is the shipped state and every arm runs against it.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit: S5 names the ref it takes the merge-base against and
+  refuses a degenerate base equal to HEAD, the `TOOL-cFinalBerth-2` class the adopted form otherwise
+  inherits (F22, F23); S8's matcher becomes wrapper-aware and carries a `DEAD PROBE` anti-vacuity
+  control, having found zero sites in the very files that motivated it (F24); S4 states which unit
+  owns the `impure` key against which owns its values (F41).
 
 ## 10. Reuse audit
 

@@ -46,25 +46,36 @@ list` shows eleven live worktrees on this node.
 
 ## Units
 
-All seven were MISSING at kickoff and were authored in this build's design pass, which makes every
-one of them UNREVIEWED by definition until the spec audit records a verdict naming it.
+All seven were MISSING at kickoff, were authored in this build's design pass, and were then audited
+by `reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md`, which returned **BLOCKED** on five
+blockers. All five are folded in, each as a rev bump with its §9 line.
 
-| id | unit | classification |
+| id | unit | classification | audit |
+|---|---|---|---|
+| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY | rev-2, F1 blocker folded |
+| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY | rev-2 |
+| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY | rev-2 |
+| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY | rev-2 |
+| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY | rev-2, F2/F3/F5 blockers folded |
+| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY | rev-2, F4 blocker folded |
+| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | rev-3, F5 blocker folded |
+
+The five blockers, because they are the record of what the design got wrong before a line of code:
+
+| # | unit | the defect |
 |---|---|---|
-| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY, unreviewed |
-| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY, unreviewed |
-| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY, unreviewed |
-| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY, unreviewed |
-| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY, unreviewed |
-| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY, unreviewed |
-| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY, unreviewed |
+| F1 | `-1` | the descriptor declared five gate-leg rows when only four legs exist at its landing, which reds the deployer's selfcheck on the unit's own commit |
+| F2 | `-5` | moving the per-leg completion file to a FIXED path turns a leftover into a false GREEN — that file is the dispatch suppressor, not a log, and two sibling units add exactly the writers that outlive a run |
+| F3 | `-5` | `gate-full-green`'s "failed nothing" precondition was the only one of its preconditions with no negative control, so an implementation that forgot it passed every arm |
+| F4 | `-6` | the unit had no position in the build order while changing the base every guard diffs against, leaving it undecidable which base the authoritative boundary would use |
+| F5 | `-7` | a full green earned on a DIRTY tree reset the lag counter, making the replacement property false while the record made it look measured |
 
 ## Build order, and the dependency that forces each edge
 
 Derived by the design pass's reconciliation, not chosen for convenience.
 
 ```
--1  →  -2  →  -5  →  -3 (runner)  →  -4  →  -7  →  -3 (manifest reorder)
+-1  →  -2  →  -5  →  -6  →  -3 (runner)  →  -4  →  -7  →  -3 (manifest reorder)
 ```
 
 | edge | what forces it |
@@ -72,10 +83,16 @@ Derived by the design pass's reconciliation, not chosen for convenience.
 | `-1` first | it moves the runner and both harnesses, so every other unit's paths, gate commands and waiver rows are wrong until it lands; it also fixes the report-tail contract the other three extend |
 | `-1` → `-2` | the profile knob is inserted directly above a clamp block that must not move, and it must sit in the moved file |
 | `-2` → `-5` | the record writer gains the profile line; sequencing the record first means re-editing it |
-| `-5` → `-3` | chunk dispatch reads durations from the ledger `-5` renames, so coding against the old name codes against a name about to move |
+| `-5` → `-6` | `-6` reads the ledger and the input key `-5` writes, and cannot be built against a record that does not exist |
+| `-6` → `-3` | `-6` changes the base every guard diffs against, and `-3`'s chunk-skip reporting is graded against that base |
 | `-3` → `-4` | the halt kills live workers, and beacon release must be proven on that path |
-| `-4` → `-7` | `-7` reads the full-green record `-5` writes, and is the only unit that changes what the authoritative run covers, so it lands after everything it grades |
+| `-4` → `-7` | `-7` reads the full-green record `-5` writes and inherits the base `-6` sets; it is the only unit that changes what the authoritative run covers, so it lands after everything it grades |
 | everything → `-3` manifest | the reorder rewrites every row of a file four units add rows to, and the row-keyed merge driver does not cover JSON |
+
+`-6` was absent from this chain in the first draft, which the spec audit raised as a blocker: the
+unit changes the base `changed()` diffs against, `-7` consumes `changed()` and declares it unchanged,
+and with no sequenced position it was undecidable from the record which base the authoritative
+boundary would run on.
 
 ## Owner decisions already taken
 
@@ -127,15 +144,19 @@ ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aP
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-3 | 2026-08-18 |
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -158,4 +179,6 @@ Records live under `spec/`.
   - [2026-08-18-spec-TOOL-aPacedTurnstile-5.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md)
   - [2026-08-18-spec-TOOL-aPacedTurnstile-6.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md)
   - [2026-08-18-spec-TOOL-aPacedTurnstile-7.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md)
+- **`reviews/`**
+  - [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md)
 <!-- /gen:build-docs -->

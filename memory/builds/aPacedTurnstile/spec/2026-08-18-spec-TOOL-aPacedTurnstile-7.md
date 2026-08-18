@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -18,11 +18,18 @@ obligation instead of deleting it.
   in which a guard can be narrowed.
 - **S4** — the hook forces a full run when the recorded leg-manifest fingerprint differs from
   `git hash-object tools/gate-legs.json` at the pushed tip.
-- **S5** — the decision and its reason are printed on one line and written to the run record.
-- **S6** — `GATE_FULL_MAX_LAG` is defaulted in `.githooks/pre-push` itself with its justification in a
-  comment beside it, the shape `GOV_DEFAULT_BRANCH` already uses. No sibling unit creates a runtime
-  conf the hook could read: the kit descriptor is TOML the bash hook cannot parse, and the profile
-  table's own header forbids a coverage knob by rule.
+- **S5** — the decision and its reason are printed on one line, and passed to the runner in the
+  environment so it lands in the record's header as a declared key. The first draft said "written to
+  the run record" with no mechanism, which contradicted this unit's own non-goal of not owning the
+  record format and would have been cleared by the record's start-of-run reset in any case.
+- **S6** — `GATE_FULL_MAX_LAG` is a SOURCE CONSTANT in `.githooks/pre-push` with its justification in
+  a comment beside it. No sibling creates a runtime conf the hook could read: the kit descriptor is
+  TOML a bash hook cannot parse, and the profile table's header forbids a coverage knob by rule. It
+  is deliberately NOT the `GOV_DEFAULT_BRANCH` shape, which the spec audit showed does not exist as
+  described and would be fail-OPEN here — an environment value that widens the lag leaves no diff
+  behind, which is the defeatable class `TOOL-aStandingWrit-4` recorded in this very hook. If an
+  environment value is honoured at all it is CLAMPED and validated, and anything non-integer forces
+  full rather than being ignored.
 - **S7** — the hook exports the no-halt flag `TOOL-aPacedTurnstile-3` defines, unconditionally and
   independently of its own scoped-or-full decision, so a landing always gets a complete verdict list
   instead of stopping at the first red chunk.
@@ -63,9 +70,12 @@ move. That is strictly weaker. It is also, unlike today's property, MEASURABLE �
 
 ### Data model
 
-The hook reads three fields from the run record and nothing else: the sha of the most recent run in
-which every leg in the manifest ran and passed, that run's leg-manifest fingerprint, and a schema
-version it can refuse. Field names are owned by `TOOL-aPacedTurnstile-5`.
+The hook reads four fields from the run record and nothing else: the sha of the most recent run in
+which every leg ran and passed, that run's leg-manifest fingerprint, its TREE fingerprint, and a
+schema version it can refuse. The tree fingerprint is what predicate 0 joins against a fresh
+fingerprint of the pushed tip; without that join a green earned on a dirty working tree resets the
+lag counter, and the replacement property written into `AGENTS.md` becomes false while the record
+makes it look measured. Field names are owned by `TOOL-aPacedTurnstile-5`.
 
 ### The decision
 
@@ -73,11 +83,14 @@ Evaluated in order; the first hit forces and stops.
 
 | # | predicate | reason string |
 |---|---|---|
+| 0 | the record's tree fingerprint does not equal a fresh fingerprint of the pushed tip | `the record describes a different tree` |
 | 1 | no run record, or it does not parse, or its schema version is unknown | `no usable run record` |
 | 2 | recorded manifest fingerprint differs from `git hash-object tools/gate-legs.json` | `the leg manifest changed` |
 | 3 | `git merge-base --is-ancestor` of recorded sha against the tip is non-zero | `the last full green is not an ancestor` |
 | 4 | `git rev-list --count` over recorded sha to tip exceeds `GATE_FULL_MAX_LAG` | `N commits since the last full bar` |
 | 5 | the pushed diff touches `tools/gate-legs.json` | `the leg manifest is in this diff` |
+| 6 | `GATE_FULL_MAX_LAG` is set to anything that is not a decimal integer | `unusable lag` |
+| 7 | this is a `push-main` retry attempt after the first | `a reconcile merge is not covered by the record` |
 
 **Every predicate fails toward FULL.** An absent, unreadable, unparseable or ambiguous record yields
 a full run, never a scoped one. This is the entire safety argument, and it is why each read is
@@ -132,9 +145,10 @@ cold start rather than a special case.
 - observability — S5 is the observability: the reason string is printed and recorded.
 - risks (concurrency, data-loss, rollback hazards) — the residual risk is a too-narrow guard landing
   a wrong verdict inside the lag window. Rollback is one line.
-- testing + left-shift gates — S7's arms. The class left-shifts as the forcing table itself.
+- testing + left-shift gates — S8's arms, one per forcing predicate. The class left-shifts as the
+  forcing table itself.
 - migration / rollback — no migration. Cold start forces full, which is correct.
-- user docs — S8.
+- user docs — S9, across all three carriers of the retired claim.
 
 ## 6. Acceptance criteria
 
@@ -145,16 +159,26 @@ cold start rather than a special case.
 - **AC3** — When the pushed diff touches `tools/gate-legs.json`, `bash .githooks/pre-push.test.sh`
   observes `GATE_FULL=1` and the reason `the leg manifest is in this diff`.
 - **AC4** — When the recorded full-green sha is not an ancestor of the pushed tip,
-  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1`.
+  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason
+  `the last full green is not an ancestor`. The reason string is part of the criterion because
+  predicate 1 also yields `GATE_FULL=1`, so the flag alone cannot tell the arms apart, and each
+  fixture's record is asserted to PARSE before the predicate under test is triggered.
 - **AC5** — When more commits than `GATE_FULL_MAX_LAG` separate the recorded green from the tip,
-  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1`.
+  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason naming the commit count.
 - **AC6** — When the record's manifest fingerprint disagrees with `git hash-object tools/gate-legs.json`,
-  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1`.
-- **AC7** — When the retired claim is searched for after this lands,
-  `grep -rc 'only ever scope a NON-authoritative run' AGENTS.md tools/run-gates/run-gates.sh` returns
-  zero for BOTH files, AND a positive grep finds the replacement sentence naming
-  `GATE_FULL_MAX_LAG` in each. The negative alone is satisfied by any rewording, including one still
-  false, which is why the positive half is part of the same criterion.
+  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason `the leg manifest changed`.
+- **AC6b** — When the recorded tree fingerprint does not match a fresh fingerprint of the pushed tip,
+  `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` and the reason
+  `the record describes a different tree` — predicate 0, the join without which a green earned on a
+  dirty tree silently resets the lag.
+- **AC6c** — When `tools/push-main.sh` retries after reconciling with origin,
+  `bash tools/push-main.test.sh` observes the retry gate running with `GATE_FULL=1`.
+- **AC7** — When the retired claim is searched for after this lands, a WHITESPACE-INSENSITIVE search
+  (the carriers hard-wrap the sentence across lines, so a line-anchored `grep` matches nothing today
+  and would pass unchanged) finds it in none of the three carriers — `AGENTS.md`,
+  `tools/run-gates/run-gates.sh` and `parallel-coding-governance.template.md` — AND a positive search
+  finds the replacement sentence naming `GATE_FULL_MAX_LAG` in each. The negative alone is satisfied
+  by any rewording, including one still false, and by a grep that never could have matched.
 - **AC8** — When the hook runs, it exports the no-halt flag regardless of which branch its forcing
   table took, asserted in `.githooks/pre-push.test.sh` on both the scoped and the forced path — so a
   landing never stops reporting at the first red chunk.
@@ -166,7 +190,8 @@ cold start rather than a special case.
 
 ## 7. Gates
 
-`bash .githooks/pre-push.test.sh` · `bash tools/push-main.test.sh` · `bash tools/run-gates.test.sh` ·
+`bash .githooks/pre-push.test.sh` · `bash tools/push-main.test.sh` ·
+`bash tools/run-gates/run-gates.test.sh` (the post-move path — this unit lands seventh) ·
 `bash tools/check-testsuite-counts.sh` · `bash tools/check-playbook-parity.sh` ·
 `bash tools/memory-tree/check-memory-hygiene.sh` · `python tools/memory-tree/check-arms.py --check` ·
 and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
@@ -178,13 +203,25 @@ and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
   This repo took 13 commits between `origin/main` and the current tip inside a single build, so `10`
   forces roughly one full bar per build rather than one per push, which is the granularity at which
   both parked records would still have been caught.
-- **Whether `tools/push-main.sh` should force full on its final retry.** The lander already re-gates
-  after reconciling with origin. Recommendation: no. The retry re-runs the same decision, and forcing
-  there would silently restore per-push fullness for the only path that reaches the remote.
+- **Whether `tools/push-main.sh` should force full on a retry.** RESOLVED (agent, 2026-08-18,
+  delegated): YES, and the first draft's answer was wrong. The lander retries by reconciling with
+  origin, which produces a MERGE commit whose content no recorded green describes — the recorded
+  green was earned on the pre-merge tip. Under the first draft's answer the retry re-ran the same
+  decision, found a fresh ancestor green, and scoped: the merge commit that actually reaches the
+  remote would have been the one commit never fully graded. Predicate 7 closes it.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-3 · 2026-08-18 · folded the spec audit. Predicate 0 joins the record's tree fingerprint to the
+  pushed tip, without which a full green earned on a dirty tree reset the lag counter (BLOCKER F5,
+  F30). Predicate 7 forces full on a push-main retry, whose reconcile merge commit no recorded green
+  describes — the first draft's §8 answer was wrong and is rewritten (F29). The lag becomes a source
+  constant rather than the cited `GOV_DEFAULT_BRANCH` shape, which does not exist as described and
+  would be fail-OPEN (F26). AC4 through AC6 gain their reason strings, because the flag alone cannot
+  tell the predicates apart (F28). AC7 becomes whitespace-insensitive and covers all three carriers,
+  having been a line-anchored grep that could never have matched a hard-wrapped sentence (F27, F42).
+  S5's durable half gains a mechanism (F25); the gate list is repointed past `-1`'s move (F43).
 - rev-2 · 2026-08-18 · folded the design-set reconciliation. The lag default moves into the hook
   because no sibling creates a conf a bash hook can read; the no-halt export is added, because
   `TOOL-aPacedTurnstile-3`'s halt fires when the full-run flag is unset and this unit makes the

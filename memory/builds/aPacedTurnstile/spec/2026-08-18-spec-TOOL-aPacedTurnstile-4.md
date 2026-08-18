@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -29,7 +29,9 @@ session QUEUES with visible position instead of running a competing 873 s bar.
 - **S7** — waiter output: a line on entry, on every position change, and otherwise on a slow tick,
   plus a durable status file removed on release.
 - **S8** — a bounded wait that fails OPEN: on expiry, print loudly, drop the ticket, and run
-  unqueued. The turnstile never contributes a non-zero exit.
+  unqueued. The bound is a DECLARED value with its reasoning beside it, not an unnamed number, and it
+  is stated against the measured 873 s full bar it must outlast. The turnstile never contributes a
+  non-zero exit.
 - **S9** — nested-run safety with NO exemption predicate on the primary path, because the key
   derivation already separates them, plus an exported lineage marker as a backstop for future
   callers.
@@ -134,6 +136,12 @@ it to catch interrupt, terminate and hangup fixes that leak as well as releasing
 re-reads the holder's nonce and removes it only on a match; it removes its own ticket
 unconditionally, which is safe because the name is unique.
 
+One premise here depends on a sibling and is stated rather than assumed: `TOOL-aPacedTurnstile-5`
+retargets the scratch directory into the git dir and drops the cleanup this trap performs. The
+widened trap therefore releases the beacon and sweeps the run directory, and the two units must agree
+on which of them owns the cleanup line — this one does, because it is the unit that widens the
+signal set.
+
 A hard kill runs no trap at all. That case is exactly what the reaper exists for, and an arm proves
 recovery within one poll tick rather than after the TTL.
 
@@ -212,17 +220,27 @@ already fails open, so the degraded state and the rollback state are the same an
 
 ## 6. Acceptance criteria
 
-- **AC1** — When two runners start against one scratch common dir, `bash tools/run-gates/run-gates.turnstile.test.sh`
-  observes their leg execution windows NOT overlapping.
-- **AC2** — When the same two runners are started with the turnstile disabled, the suite observes
-  the windows DO overlap — the negative control in `tools/run-gates/run-gates.turnstile.test.sh`,
-  without which AC1 passes on an implementation that serializes by accident.
+- **AC1** — When two runners start against one scratch common dir,
+  `bash tools/run-gates/run-gates.turnstile.test.sh` observes the PEAK number of simultaneous holders
+  as exactly 1, recorded by the fixture legs themselves through the rendezvous preamble the existing
+  canary already uses. NOT an intersection of recorded start and end timestamps: that shape was
+  retired by name in `TOOL-cSteadyMetronome-1` after it graded the node rather than the runner and
+  red three consecutive pushes on a tree it had already passed.
+- **AC2** — When the same two runners are started with the turnstile disabled, the suite observes a
+  peak above 1 — the negative control in `tools/run-gates/run-gates.turnstile.test.sh`, without which
+  AC1 passes on an implementation that serializes by accident.
 - **AC3** — When a holder is killed with an uncatchable signal, the next waiter claims within one
   poll tick, and the reap reason recorded is the dead PID rather than the TTL — asserted in
   `tools/run-gates/run-gates.turnstile.test.sh`.
-- **AC4** — When a holder's PID is still live but its heartbeat is older than the TTL, the next
-  waiter reaps and claims — armed in `tools/run-gates/run-gates.turnstile.test.sh` with the PID
-  branch disabled, so the two signals are proven independently.
+- **AC4** — When a holder's PID is live AND answering, but its heartbeat has been forced older than
+  the TTL, the next waiter reaps and claims, and the recorded reap reason is the TTL rather than the
+  dead PID — asserted in `tools/run-gates/run-gates.turnstile.test.sh` against the UNMODIFIED runner.
+  A variant with the PID branch disabled is kept only as a supplementary arm: an arm that edits the
+  code under test proves a mutant serializes, not that the shipped nesting does.
+- **AC4b** — When a holder's legs run longer than the TTL while it keeps refreshing, it is still
+  held at the end of the run and a waiter polling across that whole window never claims — driven at a
+  scaled-down TTL in `tools/run-gates/run-gates.turnstile.test.sh`. Without this, every reaping arm is
+  satisfied by a reaper that reaps everything.
 - **AC5** — When three runners queue, they acquire in ticket order, asserted in
   `tools/run-gates/run-gates.turnstile.test.sh` against the recorded acquisition sequence.
 - **AC6** — When a waiter is queued, it prints its position on entry and again on every change, and
@@ -261,6 +279,12 @@ already fails open, so the degraded state and the rollback state are the same an
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit: AC1 and AC2 move from timestamp-interval intersection
+  to the rendezvous peak, the shape `TOOL-cSteadyMetronome-1` established after the interval form was
+  measured to grade the node instead of the runner (F18); AC4 is restated against the unmodified
+  runner, having tested a mutant (F19); AC4b arms the heartbeat, without which every reaping arm is
+  satisfied by a reaper that reaps everything (F17); the wait bound becomes a declared value (F37);
+  the trap's interaction with `TOOL-aPacedTurnstile-5`'s retargeting is stated (F38).
 
 ## 10. Reuse audit
 
@@ -273,7 +297,11 @@ existing reader loop, so no new call site is created. The trap widening repairs 
 that exists today on terminate and hangup.
 
 Recall terms used: gate, leg, verdict, reuse, cache, lock, beacon, queue, concurrent, session,
-worktree, scoped, diff, GATE_FULL, guard, skip. The probe returned no prior runtime-lock record,
-which is the answer recorded rather than a failure to retry; `TOOL-aBoundedVerdict-10` supplied the
-observed wedged-but-alive case that makes the heartbeat branch necessary, and the aBranchedMandate
-struck finding supplied the per-worktree-versus-common-dir lesson.
+worktree, scoped, diff, GATE_FULL, guard, skip. The probe returned no prior runtime-LOCK record,
+which is the answer recorded rather than a failure to retry. It did return prior art this unit is
+bound by, and the first draft's flat "no prior record" line was wrong: `TOOL-cSteadyMetronome-1`
+retired timestamp-interval concurrency assertions by name and supplies the rendezvous shape AC1 and
+AC2 now use, and `TOOL-cFinalBerth-5` records the same class as a ratio arm flipping run to run.
+`TOOL-aBoundedVerdict-10` supplied the observed wedged-but-alive case that makes the heartbeat branch
+necessary, and the aBranchedMandate struck finding supplied the per-worktree-versus-common-dir
+lesson.

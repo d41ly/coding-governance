@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -13,9 +13,12 @@ instead of wiring legs into a runner the target is assumed to already own.
 
 - **S1** — create `tools/run-gates/` and `git mv` three files into it: `run-gates.sh`,
   `run-gates.test.sh`, `run-gates.evidence.test.sh`. `tools/gate-legs.json` does NOT move.
-- **S2** — cut the `tools/lib/` dependency: replace the `. "$ROOT/tools/lib/resolve-python.sh"`
-  line with the marker-delimited canonical block, byte-identical, and drop the scratch-builder lines
-  in the canary that copy the resolver into a `tools/lib/` it no longer needs.
+- **S2** — cut the `tools/lib/` dependency in EVERY shipped file that has one. The runner's source
+  line becomes the marker-delimited canonical block, byte-identical; `run-gates.test.sh` carries one
+  too, because it sources the resolver itself and a kit that ships a harness which cannot start
+  without `tools/lib/` has not been made deployable. Both copies enrol themselves in the parity
+  population, which is grep-derived. The scratch-builder lines that copy the resolver into a
+  `tools/lib/` the kit no longer needs are dropped.
 - **S3** — derive the manifest default from the kit dir's own position rather than hardcoding
   `tools/gate-legs.json`, so a one-segment install at either prefix resolves its sibling. `GATE_LEGS`
   still outranks the derivation.
@@ -26,7 +29,11 @@ instead of wiring legs into a runner the target is assumed to already own.
   forbidding a double space inside any leg NAME. This is the output contract
   `TOOL-aPacedTurnstile-2`, `-3` and `-5` all extend, and this unit owns it.
 - **S6** — write `tools/run-gates/kit.toml`: id, home, version_from, file rules, adopt, check,
-  outcome, FIVE `[[gate_leg]]` rows, the LF pin, and the `[gate_runner_seed]` table.
+  outcome, FOUR `[[gate_leg]]` rows, the LF pin, and the `[gate_runner_seed]` table. FOUR, not five:
+  only the two repointed legs plus S7's adopter e2e and its `--check` exist when this unit lands.
+  `TOOL-aPacedTurnstile-4`'s turnstile suite is the fifth and that unit owns its row in BOTH
+  carriers — a descriptor row naming a leg the manifest does not carry reds the deployer's selfcheck
+  at this unit's own landing.
 - **S7** — write `tools/run-gates/adopt-run-gates.sh` with `--check`, plus
   `tools/run-gates/adopt-run-gates.test.sh` gated on EFFECTS, printing its executed assertion count
   against a floor so it needs no waiver row.
@@ -42,8 +49,10 @@ instead of wiring legs into a runner the target is assumed to already own.
 - **S11** — the two obligations a new kit dir creates on day one: a row in
   `tools/playbook-kit-waivers.txt` or coverage in the playbook trio, and the two repointed rows in
   `memory/project/testsuite-count-waivers.txt`.
-- **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and this build's new
-  gate-leg keys, and drop the now-claimed row from `memory/map/baseline.toml`.
+- **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and the gate-leg keys
+  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`. It does not claim
+  `TOOL-aPacedTurnstile-4`'s turnstile leg, which does not exist for four more units and would red
+  the map's stale-claim predicate; that unit adds its own key to this dossier when it lands.
 
 ## 3. Non-goals (OUT)
 
@@ -136,7 +145,7 @@ sequenced last in the build for that reason.
 | `tools/govkit/registry.toml` | entry added, five rows deleted, one `why` corrected |
 | `tools/govkit/govkit.py` | `cmd_intake` emits the runner declaration |
 | `tools/check-kit-versions.sh` | the new constant and marker pair |
-| `tools/gate-legs.json` | two argv repoints, three new legs |
+| `tools/gate-legs.json` | two argv repoints, TWO new legs — the adopter e2e and the wiring check |
 | `.githooks/pre-push`, `.unattended.conf` and its example, `tools/lib/pyrun.sh` | path repoints |
 | `AGENTS.md` | gate-suite bullets and their script paths |
 | `tools/playbook-kit-waivers.txt`, `memory/project/testsuite-count-waivers.txt` | the day-one rows |
@@ -173,7 +182,8 @@ sequenced last in the build for that reason.
 
 - **AC1** — When a scratch repo carrying only `tools/run-gates/` and a two-leg manifest is built
   with no `tools/lib/` directory at all, `bash tools/run-gates/run-gates.sh` exits 0 and prints
-  `GATE ok` for both legs.
+  `GATE ok` for both legs, AND every `*.test.sh` the kit ships also runs to completion in that same
+  `tools/lib`-free tree — the runner starting alone is not evidence the KIT starts alone.
 - **AC2** — When `bash tools/lib/resolve-python.test.sh` runs, its parity stage enumerates
   `tools/run-gates/run-gates.sh` among the discovered copies and reports it byte-identical, with no
   edit to that file's own row table.
@@ -205,6 +215,9 @@ sequenced last in the build for that reason.
   playbook trio or carries its row in `tools/playbook-kit-waivers.txt`, and the gate exits 0.
 - **AC12** — When `python tools/drift-audit/drift_report.py --check` runs after `AGENTS.md` is
   repointed, it exits 0: every leg whose script path the charter names is spelled at its new path.
+- **AC13** — When `KIT_RUN_GATES_VERSION` is deleted, or bumped in the constant without its marker,
+  `bash tools/check-kit-versions.sh` exits 1 naming that constant — the red-proof the comparable kit
+  pairs already carry, without which S4's named gate passes on a marker nobody checks.
 
 ## 7. Gates
 
@@ -236,6 +249,13 @@ sequenced last in the build for that reason.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit: `kit.toml` declares FOUR gate-leg rows, not five —
+  the fifth names a leg that does not exist for four more units and would red the deployer's
+  selfcheck at this unit's own landing (BLOCKER F1); S2 inlines the resolver into the shipped canary
+  too, which otherwise kept the gov-internal dependency this unit exists to cut, and AC1 widens to
+  run every shipped harness in the dependency-free tree (F7); AC13 red-proves the version marker,
+  whose named gate was a hand-kept list nothing tested (F6); S12 stops claiming a sibling's map key
+  four units early (F31).
 
 ## 10. Reuse audit
 

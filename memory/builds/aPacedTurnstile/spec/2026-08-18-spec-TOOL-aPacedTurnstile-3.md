@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -18,13 +18,18 @@ longest-first dispatch and manifest-order reporting.
   rows are contiguous. The default assignment is the six-chunk table below.
 - **S3** — the runner parses the key as an added field on the existing record-separated wire
   protocol, builds an ordered chunk list and a per-chunk index list, and REPORTS chunk by chunk: the
-  legs of a chunk in manifest order, then one chunk verdict line.
+  legs of a chunk in manifest order, then one chunk verdict line. The resolved dispatch order is
+  written into the run record's header, which `TOOL-aPacedTurnstile-5` owns and this unit's ordering
+  criteria read; that key is declared THERE, so the record's key set stays single-sourced.
 - **S4** — dispatch becomes CHUNK-MAJOR, with an escape hatch for long poles so a single very slow
   leg still starts at time zero. Without a timing cache every duration is zero, the pole set is
   empty, and the order is pure chunk-major.
 - **S5** — a chunk whose verdict is RED halts the run at the chunk BOUNDARY, never mid-chunk, unless
-  the run is authoritative. Remaining chunks each print one not-reported line, still-live workers are
-  killed, and the exit is 1.
+  the run is authoritative. Remaining chunks each print one not-reported line, still-live workers and
+  THEIR DESCENDANTS are killed, and the exit is 1. Killing the shell's job is not enough: a leg runs
+  through a command substitution and spawns its own children, so the halt records each leg's real pid
+  and signals the process group rather than the job. Otherwise a halted run leaves scratch repos and
+  live git processes behind, and the beacon release `TOOL-aPacedTurnstile-4` depends on never runs.
 - **S6** — a chunk in which every leg was skipped reports as skipped, never as green, and never
   halts the run.
 - **S7** — the durable summary and failure records gain a chunk roll-up including per-chunk wall
@@ -87,8 +92,10 @@ The resolved width is passed to the parser so the pole threshold can be derived 
 
 A long pole is a leg whose cached duration is at least the total cached duration divided by the
 width. Measured on node `a`: the total is 4018 s at width 8, so the threshold is 502 s and the pole
-set is exactly `unattended driver selftest` at 659.9 s. It starts at time zero; the other seven
-workers run chunk-major. Durations come from the ledger `TOOL-aPacedTurnstile-5` renames, whose
+set is TWO legs — `unattended driver selftest` at 659.9 s and `unattended gate selftest` at 634.6 s.
+Both start at time zero; the other six workers run chunk-major. The first draft said one leg, which
+undercounted the set by half and would have let the first-batch arm pass while describing the wrong
+set. Durations come from the ledger `TOOL-aPacedTurnstile-5` renames, whose
 second field stays the duration for exactly this reason.
 
 ### Inventory — the default chunk assignment
@@ -206,9 +213,14 @@ and the row-keyed merge driver does not cover JSON.
   `tools/run-gates/run-gates.test.sh`.
 - **AC5** — When every leg of a chunk is skipped, that chunk reports as skipped rather than green,
   and the run does not halt there, asserted in `tools/run-gates/run-gates.test.sh`.
-- **AC6** — When chunks are declared, `bash tools/run-gates/run-gates.test.sh` asserts they are
-  contiguous in `tools/gate-legs.json`, and a deliberately interleaved fixture manifest still
-  reports each chunk's legs together.
+- **AC6** — When `bash tools/run-gates/run-gates.test.sh` runs, it asserts UNCONDITIONALLY that every
+  leg in `tools/gate-legs.json` carries a `chunk` whose value is one of the declared six, that the
+  chunks are contiguous, and that a deliberately interleaved fixture manifest still reports each
+  chunk's legs together. Stated unconditionally because a criterion beginning "when chunks are
+  declared" makes the arm conditional on the very thing it exists to enforce.
+- **AC12** — When a run halts at a chunk boundary, no descendant process of any killed leg survives —
+  asserted in `tools/run-gates/run-gates.test.sh` against a fixture leg that spawns a child. Asserting
+  the printed lines and the exit code says nothing about what is still running.
 - **AC7** — When the timing ledger is absent, dispatch order is pure chunk-major, asserted against
   the dispatch order `<git-dir>/gate-run/header` carries.
 - **AC8** — When the ledger is present, a leg whose duration reaches the pole threshold is
@@ -242,6 +254,11 @@ and the row-keyed merge driver does not cover JSON.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit: the dispatch-order key is declared in
+  `TOOL-aPacedTurnstile-5`'s header rather than read from a field no unit wrote (F12, F13); the halt
+  signals the process group, because killing the shell's job leaves the leg and its children running
+  (F16); AC6 becomes unconditional and gains the every-leg-carries-a-chunk assertion (F15, F36); the
+  pole set is corrected from one leg to two (F34).
 
 ## 10. Reuse audit
 

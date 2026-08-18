@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -204,9 +204,19 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 - **AC10** — When the existing width-1 against width-4 equivalence arm runs, it filters the
   `gate profile: ` line BY NAME and a companion arm asserts the line was present to filter, so the
   filter cannot hide the line disappearing.
-- **AC11** — When `grep -c 'width min(8, nproc)' AGENTS.md` runs after this lands it returns zero,
-  and the charter states the measured 873 s wall against the 4018 s leg-sum instead of the retired
-  figure.
+- **AC11** — When the charter is read after this lands, a POSITIVE search finds the measured pair —
+  873 s wall against the 4018 s leg-sum — in `AGENTS.md`, and finds no surviving `335s` or `95s`
+  figure. Stated positively because the negative half alone is already true at this build's base: the
+  charter backticks its width formula, so a plain `grep -c` for the bare formula returns zero today
+  and would pass unchanged.
+- **AC12** — When a hardware seam is given a twenty-digit value or a non-numeric one, the length
+  bound rejects it, the run still completes, and every leg still runs at a clamped width — asserted
+  in `tools/run-gates/run-gates.test.sh`, because that bound is the guard against the int64-overflow
+  hang and nothing else observes it.
+- **AC13** — When a fixture `PATH` shim makes the FIRST core source and the FIRST RAM source exit
+  non-zero, the runner still resolves a profile and tags the line with the sources it tried —
+  asserted in `tools/run-gates/run-gates.test.sh`. The seams that bypass detection cannot prove the
+  detection chain works, which is what AC2 and AC3 alone were doing.
 
 ## 7. Gates
 
@@ -230,6 +240,10 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the spec audit: AC11 restated positively, since its negative half was
+  already satisfied at this build's base (F9, F10, F11); AC12 and AC13 added, because the detection
+  chain and its length bound were specified and never observed — both existing criteria drove the
+  bypass seams instead (F8).
 
 ## 10. Reuse audit
 
