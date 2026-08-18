@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -19,18 +19,26 @@ obligation instead of deleting it.
 - **S4** — the hook forces a full run when the recorded leg-manifest fingerprint differs from
   `git hash-object tools/gate-legs.json` at the pushed tip.
 - **S5** — the decision and its reason are printed on one line and written to the run record.
-- **S6** — `GATE_FULL_MAX_LAG` is a declared conf value with a shipped default, never a literal in
-  the hook.
-- **S7** — `.githooks/pre-push.test.sh` gains one arm per forcing predicate and one arm proving the
-  scoped path actually scopes.
-- **S8** — `AGENTS.md` and the playbook template's diff-scope line are rewritten: the safety property
-  they state today becomes false, and the weaker true one replaces it.
+- **S6** — `GATE_FULL_MAX_LAG` is defaulted in `.githooks/pre-push` itself with its justification in a
+  comment beside it, the shape `GOV_DEFAULT_BRANCH` already uses. No sibling unit creates a runtime
+  conf the hook could read: the kit descriptor is TOML the bash hook cannot parse, and the profile
+  table's own header forbids a coverage knob by rule.
+- **S7** — the hook exports the no-halt flag `TOOL-aPacedTurnstile-3` defines, unconditionally and
+  independently of its own scoped-or-full decision, so a landing always gets a complete verdict list
+  instead of stopping at the first red chunk.
+- **S8** — `.githooks/pre-push.test.sh` gains one arm per forcing predicate, one arm proving the
+  scoped path actually scopes, and one proving the no-halt export.
+- **S9** — the safety property is rewritten wherever it is stated: `AGENTS.md`, the playbook
+  template's diff-scope line, AND `tools/run-gates/run-gates.sh`'s own header comment, which states
+  the same claim and which `TOOL-aPacedTurnstile-1` ships into the kit and therefore to adopters.
+- **S10** — close the one guard hole that is verified still open, named in
+  `memory/builds/cKeyedLaunchpad/README.md` park 2 and in `cBriefedPilot-15`: the kit/dogfood parity
+  leg's guard omits `memory/guides/`, which is a file pair it actually validates.
 
 ## 3. Non-goals (OUT)
 
-- Changing what any leg asserts, or editing any leg's `guard`. Widening a too-narrow guard is a
-  separate concern with its own blast radius, and `memory/builds/cKeyedLaunchpad/README.md` parked
-  exactly that.
+- Changing what any leg asserts. Widening guards in general stays out: S10 closes the ONE hole that
+  is verified open and recorded twice, and does not open a survey of the other 41.
 - The run record's format, location and writer. That is `TOOL-aPacedTurnstile-5`; this unit is a
   consumer and states only what it reads.
 - Removing `GATE_FULL`. It stays as the manual escape and as the mechanism this unit sets.
@@ -91,11 +99,12 @@ cold start rather than a special case.
 
 | file | change |
 |---|---|
-| `.githooks/pre-push` | the decision block replaces the unconditional export |
-| `.githooks/pre-push.test.sh` | one arm per predicate, plus the scoped-path arm |
+| `.githooks/pre-push` | the decision block, the lag default with its comment, the no-halt export |
+| `.githooks/pre-push.test.sh` | one arm per predicate, the scoped-path arm, the no-halt arm |
 | `AGENTS.md` | the gate-suite paragraph's safety-property sentence |
 | `parallel-coding-governance.template.md` | its diff-scope and full-bar sentence |
-| the run-gates kit conf | `GATE_FULL_MAX_LAG` and its shipped default |
+| `tools/run-gates/run-gates.sh` | the header comment stating the same retired claim |
+| `tools/gate-legs.json` | S10's one guard row |
 
 ### Alternatives rejected
 
@@ -141,10 +150,19 @@ cold start rather than a special case.
   `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1`.
 - **AC6** — When the record's manifest fingerprint disagrees with `git hash-object tools/gate-legs.json`,
   `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1`.
-- **AC7** — When the charter is read after this lands, `grep -c 'only ever scope a NON-authoritative run' AGENTS.md`
-  returns zero.
-- **AC8** — When `bash tools/check-testsuite-counts.sh` runs, `.githooks/pre-push.test.sh` reports an
-  executed assertion count no lower than its recorded floor.
+- **AC7** — When the retired claim is searched for after this lands,
+  `grep -rc 'only ever scope a NON-authoritative run' AGENTS.md tools/run-gates/run-gates.sh` returns
+  zero for BOTH files, AND a positive grep finds the replacement sentence naming
+  `GATE_FULL_MAX_LAG` in each. The negative alone is satisfied by any rewording, including one still
+  false, which is why the positive half is part of the same criterion.
+- **AC8** — When the hook runs, it exports the no-halt flag regardless of which branch its forcing
+  table took, asserted in `.githooks/pre-push.test.sh` on both the scoped and the forced path — so a
+  landing never stops reporting at the first red chunk.
+- **AC9** — When `bash tools/run-gates/run-gates.test.sh` runs, the kit/dogfood parity leg's guard
+  names `memory/guides/`, and a fixture touching only `memory/guides/BUILD-METHOD.md` causes that leg
+  to RUN rather than skip — the hole `cKeyedLaunchpad` park 2 recorded, closed and armed.
+- **AC10** — When `bash tools/check-testsuite-counts.sh` runs, `.githooks/pre-push.test.sh` reports
+  an executed assertion count no lower than its recorded floor.
 
 ## 7. Gates
 
@@ -167,6 +185,13 @@ and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
 ## 9. Revision log
 
 - rev-1 · 2026-08-18 · initial draft.
+- rev-2 · 2026-08-18 · folded the design-set reconciliation. The lag default moves into the hook
+  because no sibling creates a conf a bash hook can read; the no-halt export is added, because
+  `TOOL-aPacedTurnstile-3`'s halt fires when the full-run flag is unset and this unit makes the
+  landing run frequently unset, which would have made a landing fail-fast; the retired safety claim
+  is chased into the runner's own header comment, which ships to adopters; the one verified-open
+  guard hole is closed here rather than left as a recorded residual; and AC7 gains its positive
+  half, having been satisfiable by any rewording.
 
 ## 10. Reuse audit
 

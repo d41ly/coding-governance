@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-7
+ids: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7
 ---
 
 # aPacedTurnstile — the merge bar gets an execution discipline
@@ -46,15 +46,36 @@ list` shows eleven live worktrees on this node.
 
 ## Units
 
+All seven were MISSING at kickoff and were authored in this build's design pass, which makes every
+one of them UNREVIEWED by definition until the spec audit records a verdict naming it.
+
 | id | unit | classification |
 |---|---|---|
-| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | MISSING |
-| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | MISSING |
-| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | MISSING |
-| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | MISSING |
-| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | MISSING |
-| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | MISSING |
-| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | MISSING |
+| TOOL-aPacedTurnstile-1 | `run-gates` promoted from gov-internal script to a deployable kit | READY, unreviewed |
+| TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY, unreviewed |
+| TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY, unreviewed |
+| TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY, unreviewed |
+| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY, unreviewed |
+| TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY, unreviewed |
+| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY, unreviewed |
+
+## Build order, and the dependency that forces each edge
+
+Derived by the design pass's reconciliation, not chosen for convenience.
+
+```
+-1  →  -2  →  -5  →  -3 (runner)  →  -4  →  -7  →  -3 (manifest reorder)
+```
+
+| edge | what forces it |
+|---|---|
+| `-1` first | it moves the runner and both harnesses, so every other unit's paths, gate commands and waiver rows are wrong until it lands; it also fixes the report-tail contract the other three extend |
+| `-1` → `-2` | the profile knob is inserted directly above a clamp block that must not move, and it must sit in the moved file |
+| `-2` → `-5` | the record writer gains the profile line; sequencing the record first means re-editing it |
+| `-5` → `-3` | chunk dispatch reads durations from the ledger `-5` renames, so coding against the old name codes against a name about to move |
+| `-3` → `-4` | the halt kills live workers, and beacon release must be proven on that path |
+| `-4` → `-7` | `-7` reads the full-green record `-5` writes, and is the only unit that changes what the authoritative run covers, so it lands after everything it grades |
+| everything → `-3` manifest | the reorder rewrites every row of a file four units add rows to, and the row-keyed merge driver does not cover JSON |
 
 ## Owner decisions already taken
 
@@ -79,13 +100,40 @@ that backstop — `memory/builds/cBriefedPilot/spec/2026-08-14-spec-cBriefedPilo
 `GATE_FULL=1` would catch it. TOOL-aPacedTurnstile-7 owns that inversion and must replace the
 backstop rather than delete it.
 
+The design pass sharpened this into the build's single largest risk, and it is sharper than the
+kickoff framing: **`-7` removes the only mechanism that has ever caught a too-narrow guard, in the
+same build in which three units widen the guard surface — and one such hole is verified still open.**
+The `kit/dogfood doc parity` leg guards on four paths but validates a pair that includes
+`memory/guides/BUILD-METHOD.md`, which is in none of them. Today that costs a late signal; after `-7`
+it costs a wrong merge verdict. `-7` S10 therefore closes that hole inside this build rather than
+recording it as an accepted residual, and `-7` AC9 arms it.
+
+Two things the design pass recommended that this build does NOT take, recorded because a refused
+recommendation is worth more on the record than off it:
+
+- It recommended shipping `GATE_FULL_MAX_LAG` at `1` — behaviourally today's bar — and lowering it
+  only once the record shows how often a scoped verdict differed from the full run it replaced. The
+  argument is that `-7`'s value is measurability, and taking the saving before the measurement exists
+  spends the property that was supposed to justify spending it. This build ships `10` instead,
+  because the owner's stated goal is to stop paying 873 s per landing and a default of `1` defers
+  essentially all of that. The knob is one line, the record makes the comparison observable, and
+  lowering it later needs no code.
+- It recommended keeping `-5` and `-6` as one spec. Refused in `-6` §8, with the reason recorded
+  there: the split isolates the half a reviewer must be hostile toward.
+
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-18 · streams tooling
-ids TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-7
+**Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-18 · streams tooling
+ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-2 | 2026-08-18 |
 
 Records live under `spec/`.
 <!-- /gen:build-index -->
@@ -103,5 +151,11 @@ Records live under `spec/`.
 <!-- gen:build-docs -->
 
 - **`spec/`**
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-1.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md)
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-2.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md)
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-3.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md)
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-4.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md)
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-5.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md)
+  - [2026-08-18-spec-TOOL-aPacedTurnstile-6.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md)
   - [2026-08-18-spec-TOOL-aPacedTurnstile-7.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md)
 <!-- /gen:build-docs -->
