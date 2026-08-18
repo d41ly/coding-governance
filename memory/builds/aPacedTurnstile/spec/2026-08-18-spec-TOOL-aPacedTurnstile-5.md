@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -251,13 +251,23 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the record directory is cleared at the start of a run or kept as a rolling history.**
   Options: clear each run (one run's state, simple, and the crash signal stays unambiguous), or keep
   N runs. Recommendation: clear. The ledger already carries cross-run history keyed per leg, and a
   rolling directory needs a retention policy nobody has asked for.
+  RESOLVED (agent, 2026-08-18, delegated): clear it each run. The ledger already carries
+  cross-run history keyed per leg, so the rolling option adds no acceptance criterion this spec
+  states while adding a retention policy nobody has asked for - and a leftover file in this
+  directory is the F2 blocker's false-GREEN class, which clearing is what closes.
 - **Whether `impure` carries reason strings or a bare boolean.** Recommendation: reason strings. A
   bare `true` is a claim with no evidence beside it, and this tree's settled pattern for a waiver is
   that it names its reason.
+  RESOLVED (agent, 2026-08-18, delegated): reason strings. It is the more feature-rich option -
+  a bare `true` is a claim with no evidence beside it - and it matches this tree's settled
+  pattern that a waiver names its own reason.
 
 ## 9. Revision log
 
@@ -280,6 +290,9 @@ nothing reads it until `TOOL-aPacedTurnstile-6` lands.
   the only one of the five to lack (BLOCKER F3). The header gains the dispatch-order and
   forced-reason keys two siblings read (F13, F25), and the retargeted per-leg output copy inherits
   the redaction its sibling log already has (F39).
+- rev-4 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

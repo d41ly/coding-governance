@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -205,11 +205,18 @@ and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **The shipped default for `GATE_FULL_MAX_LAG`.** Options are `1` (full on nearly every push, so
   almost no saving), `10`, `25`, or a time bound rather than a commit bound. Recommendation: `10`.
   This repo took 13 commits between `origin/main` and the current tip inside a single build, so `10`
   forces roughly one full bar per build rather than one per push, which is the granularity at which
   both parked records would still have been caught.
+  RESOLVED (agent, 2026-08-18, delegated): `10`. This is the disposition the build README already
+  records, together with the design pass's refused recommendation of `1` and the reason for
+  refusing it: the owner's stated goal is to stop paying the full bar per landing, and `1` defers
+  essentially all of that saving. The knob is one line and lowering it later needs no code.
 - **Whether `tools/push-main.sh` should force full on a retry.** RESOLVED (agent, 2026-08-18,
   delegated): YES, and the first draft's answer was wrong. The lander retries by reconciling with
   origin, which produces a MERGE commit whose content no recorded green describes — the recorded
@@ -240,6 +247,9 @@ and the full bar, `GATE_FULL=1 bash tools/run-gates.sh`.
   is chased into the runner's own header comment, which ships to adopters; the one verified-open
   guard hole is closed here rather than left as a recorded residual; and AC7 gains its positive
   half, having been satisfiable by any rewording.
+- rev-5 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

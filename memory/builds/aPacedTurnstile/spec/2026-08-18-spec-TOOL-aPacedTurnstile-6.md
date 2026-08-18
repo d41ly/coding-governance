@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -227,6 +227,9 @@ so the rollback state is the shipped state and every arm runs against it.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether this unit and `TOOL-aPacedTurnstile-5` should be one spec.** The design research
   recommended one, on the argument that the consumers are the reason the record's fields exist, and
   that specifying an emitter without them produces fields nobody has had to read. RESOLVED (agent,
@@ -239,6 +242,9 @@ so the rollback state is the shipped state and every arm runs against it.
 - **Whether the structural network-call arm should walk two hops.** Recommendation: no. A graph
   walker does not earn itself for a three-leg population, and the gate states its own one-hop
   ceiling in its header the way `check-method-carriers.sh` already does.
+  RESOLVED (agent, 2026-08-18, delegated): no. A graph walker does not earn itself over a
+  three-leg population, and the gate states its own one-hop ceiling in its header the way
+  `check-method-carriers.sh` already does, so the limit is declared rather than discovered.
 
 ## 9. Revision log
 
@@ -250,6 +256,9 @@ so the rollback state is the shipped state and every arm runs against it.
   inherits (F22, F23); S8's matcher becomes wrapper-aware and carries a `DEAD PROBE` anti-vacuity
   control, having found zero sites in the very files that motivated it (F24); S4 states which unit
   owns the `impure` key against which owns its values (F41).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

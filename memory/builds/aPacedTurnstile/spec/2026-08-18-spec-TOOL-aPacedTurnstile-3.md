@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -242,6 +242,9 @@ and the row-keyed merge driver does not cover JSON.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the first verdict timing belongs in acceptance at all.** The research brief proposed an
   acceptance criterion asserting the first chunk verdict appears within about 90 s. RESOLVED (agent,
   2026-08-18, delegated): it does not. That is a wall-clock assertion on the real bar graded against
@@ -251,6 +254,10 @@ and the row-keyed merge driver does not cover JSON.
 - **Whether `rest` is a legal chunk in gov's own manifest.** Recommendation: no. Every gov leg gets
   an explicit chunk and the contiguity arm makes an unclaimed leg visible; the default exists for
   adopters and for the no-chunk rollback path.
+  RESOLVED (agent, 2026-08-18, delegated): no. Every gov leg gets an explicit chunk, and the
+  contiguity arm is what makes an unclaimed leg visible; a default that silently absorbs one
+  would make the arm unable to fail. `rest` stays in the kit for adopters and for the no-chunk
+  rollback path, which is where its value is.
 
 ## 9. Revision log
 
@@ -263,6 +270,9 @@ and the row-keyed merge driver does not cover JSON.
   signals the process group, because killing the shell's job leaves the leg and its children running
   (F16); AC6 becomes unconditional and gains the every-leg-carries-a-chunk assertion (F15, F36); the
   pole set is corrected from one leg to two (F34).
+- rev-4 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

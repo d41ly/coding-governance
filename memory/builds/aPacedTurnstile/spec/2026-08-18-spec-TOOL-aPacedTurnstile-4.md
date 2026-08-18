@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -270,11 +270,22 @@ already fails open, so the degraded state and the rollback state are the same an
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the TTL should be lowered once the heavy legs are sharded.** The default is set well
   above the 659.9 s floor deliberately. Recommendation: leave it, with the measurement written beside
   the constant, and let the sharding build lower it against its own number.
+  RESOLVED (agent, 2026-08-18, delegated): leave it, with the measurement written beside the
+  constant. Lowering it against a floor this build does not move would be tuning to a number the
+  sharding build is about to invalidate, and the constant's comment is what carries the reason
+  forward to that build.
 - **Whether an uncontended run should skip the ticket for speed.** Recommendation: no, as argued
   above — the barging hole costs more than the create.
+  RESOLVED (agent, 2026-08-18, delegated): no - every run takes the ticket. The barging hole
+  costs more than the create, and section 3 rules that every failure mode of this unit must be
+  "slower" or "unqueued" and never "checked less"; a skip path is the one shape that can
+  violate it.
 
 ## 9. Revision log
 
@@ -285,6 +296,9 @@ already fails open, so the degraded state and the rollback state are the same an
   runner, having tested a mutant (F19); AC4b arms the heartbeat, without which every reaping arm is
   satisfied by a reaper that reaps everything (F17); the wait bound becomes a declared value (F37);
   the trap's interaction with `TOOL-aPacedTurnstile-5`'s retargeting is stated (F38).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

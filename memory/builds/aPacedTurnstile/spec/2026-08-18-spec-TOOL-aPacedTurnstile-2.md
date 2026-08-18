@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -227,15 +227,26 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the middle row should differ from the built-in formula at all.** It is behaviour-neutral
   as specced, which makes it easy to review and easy to call pointless. Recommendation: keep it
   neutral. Its purpose is the RAM threshold that stops a high-core, low-RAM box selecting the
   capable row, and changing the 4-core width at the same time would confound the one measurement
   that matters.
+  RESOLVED (agent, 2026-08-18, delegated): keep it behaviour-neutral. Moving the 4-core width in
+  the same unit would confound the RAM-threshold measurement that is the row's whole purpose,
+  and a knob whose first landing is also its first behaviour change has no control.
 - **Whether the per-leg timeout ships in this unit or waits for a measurement.** Recommendation:
   ship the mechanism with every row at off, proven by a fixture. `TOOL-aBoundedVerdict-10` is an
   observed hang that wedged a whole bar, so the mechanism has a recorded motivating failure even
   though the value does not yet have a measurement.
+  RESOLVED (agent, 2026-08-18, delegated): ship the mechanism now, every row's value OFF, proven
+  by a fixture. This is the more feature-rich option under M3 - it satisfies the stated
+  acceptance criteria and leaves no follow-up open - and it survives every veto, because an
+  off-by-default knob widens no surface. `TOOL-aBoundedVerdict-10` is the recorded hang that
+  motivates the mechanism; the VALUE still waits for a measurement, which is what off means.
 
 ## 9. Revision log
 
@@ -244,6 +255,9 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
   already satisfied at this build's base (F9, F10, F11); AC12 and AC13 added, because the detection
   chain and its length bound were specified and never observed — both existing criteria drove the
   bypass seams instead (F8).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 

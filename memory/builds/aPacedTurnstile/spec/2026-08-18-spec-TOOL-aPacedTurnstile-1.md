@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -233,18 +233,32 @@ sequenced last in the build for that reason.
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Where the leg manifest lives.** Options: keep it at its current path with the runner deriving it
   as the kit dir's sibling, or move it inside the kit. Recommendation: keep it. Moving it would
   invalidate its exemption row, break its LF pin, and touch four other consumers for no gain, while
   the sibling derivation already gives an adopter the same shape at either prefix.
+  RESOLVED (agent, 2026-08-18, delegated): keep it at its current path, with the runner
+  deriving it as the kit dir's sibling. The other option does not reach the feature-richness
+  test - M3 veto 1 discards it first, because section 3 puts moving `tools/gate-legs.json` OUT
+  by name and an option that violates a written non-goal is discarded before it is compared.
 - **How the pre-push hook's dependence on the runner is enforced.** A `requires` edge only ORDERS a
   selection; it does not pull a missing kit in, so a target can still receive a merge-bar hook
   without the merge bar. Options: add the runner to the default selection, add a selfcheck arm that
   an entry spelling another entry's command must hard-depend on it, or rely on the wiring leg to red
   in the target. Recommendation: the default-selection line here, with the selfcheck arm filed as
   its own govkit unit rather than built into this spec.
+  RESOLVED (agent, 2026-08-18, delegated): the default-selection line in this unit, with the
+  selfcheck arm filed as its own govkit unit rather than built here. Adding the arm inside this
+  spec would change another kit's contract mid-unit, which M3 veto 2 reaches as a governance
+  carrier change. The follow-up is filed as `TOOL-aPacedTurnstile-11` so the deferral is a row
+  in the backlog and not a sentence in a spec nobody re-reads.
 - **Whether the `tools/gate-legs.json` exemption also comes out.** Recommendation: no — its stated
   reason survives the promotion unchanged.
+  RESOLVED (agent, 2026-08-18, delegated): no. Its stated reason survives the promotion
+  unchanged, and section 3 already carries the same disposition as a non-goal.
 
 ## 9. Revision log
 
@@ -256,6 +270,9 @@ sequenced last in the build for that reason.
   run every shipped harness in the dependency-free tree (F7); AC13 red-proves the version marker,
   whose named gate was a hand-kept list nothing tested (F6); S12 stops claiming a sibling's map key
   four units early (F31).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
 
 ## 10. Reuse audit
 
