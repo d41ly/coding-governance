@@ -33,10 +33,14 @@ fixture() {
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/tools/check-playbook-parity.sh"
   : > "$d/tools/memory-tree/engine.sh"
-  printf 'const MAX_LENSES = 5\n' > "$d/tools/hooks/agent-cap.js"
+  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/tools/hooks/agent-cap.js"
   printf '{ "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent" } ] } }\n' > "$d/.claude/settings.json"
   # The trio. The template names memory-tree and carries both stated values; hooks is waived.
-  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\ntools/memory-tree/ is the kit\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\n' \
+  # Every declared pair's STATED side must appear here, or its anti-vacuity arm reds on the valid-
+  # fixture control -- which is exactly what that arm is for. Three pairs were added when the
+  # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
+  # population; the control failed, correctly, until the fixture carried their sentences.
+  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\ntools/memory-tree/ is the kit\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
     | sed 's/<=/≤/' > "$d/parallel-coding-governance.template.md"
   printf 'companion {{MEMORY_ROOT}}\n' > "$d/parallel-coding-governance.domain-rules.md"
   {

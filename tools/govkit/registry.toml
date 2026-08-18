@@ -128,6 +128,11 @@ descriptor = "tools/govkit/entries/check-kit-versions.kit.toml"
 kind = "flat"
 
 [[entry]]
+id = "check-agent-cap-restatement"
+descriptor = "tools/govkit/entries/check-agent-cap-restatement.kit.toml"
+kind = "flat"
+
+[[entry]]
 id = "check-install-prefix"
 descriptor = "tools/govkit/entries/check-install-prefix.kit.toml"
 kind = "flat"

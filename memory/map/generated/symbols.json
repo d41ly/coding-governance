@@ -2618,6 +2618,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_ratchet_lookback",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_ratchet_message_states_its_window",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"

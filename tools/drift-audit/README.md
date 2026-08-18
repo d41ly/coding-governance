@@ -54,7 +54,12 @@ Then, in order:
 
 1. Fill `tools/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
 2. Run `python tools/drift-audit/drift_report.py`.
-3. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
+3. **`RATCHET_LOOKBACK` is optional and shipped at 14** — how many lines above a ratcheted pin the
+   gate looks for the `<old> -> <new>` justification that excuses a weakening move. Narrow it if
+   your pins sit close together, so a justification for a DIFFERENT pin cannot be read as this
+   one's; widen it if your repo writes long justifications above a pin. This tree has two pins
+   three lines apart at the same value, which is the case that makes the first half real.
+4. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
    a live regression on day one; a pin below it reds the bar on work nobody did.
 4. Wire `--check` into your gate manifest.
 
@@ -64,7 +69,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `RATCHET_LOOKBACK` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -134,7 +139,7 @@ works it prints `SKIP` and tallies it. It never prints `ok` for an arm that did 
 | Tier | Cost | Answers |
 |---|---|---|
 | 0 | seconds, 0 agents | Are the records still true? Which pins moved? |
-| 1 | ~20 min, ≤5 agents | Why did a signal move? Is an instrument blind? |
+| 1 | ~20 min, one bounded wave | Why did a signal move? Is an instrument blind? |
 | 2 | hours, ~22 agents | Dead / unwired / duplicated code, and everything above |
 
 In the founding audit, **Tier 0 alone produced the blocker, the vacuous-metric lead and the entire

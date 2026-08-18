@@ -63,10 +63,37 @@ fi
 # A parity check that compares two empty files passes. Assert the population is real: the live copy
 # must carry the rule this document exists to state, or "in parity" means "both are wrong".
 #
-# THE NUMBER, not the digit-free phrase. `verify-stage agents TOTAL` survives every edit that changes
-# the cap — the live copy could read "≤50 verify-stage agents TOTAL", the shipped copy could be
-# re-rendered to match, and both halves of this gate would go green over a document that no longer
-# states the rule the hook enforces. The assertion has to be able to fail on the thing that matters.
-grep -qF '≤5 verify-stage agents TOTAL' "$LIVE" \
-  || { echo "protocol-parity: $LIVE no longer states the hard cap AT ITS NUMBER (expected the literal '≤5 verify-stage agents TOTAL') — parity over the wrong content"; exit 1; }
+# THE POINTER, per RULE. This arm used to freeze the literal cap as a digit, on the reasoning that a
+# digit-free paraphrase is the drift it exists to catch. That reasoning was right and its instrument
+# was the weaker half of it: a document that RESTATES the number is itself a second answer, and a
+# reader holding a stale copy cannot tell which of the two binds. The property that needs protecting
+# is unchanged — a protocol stating a bound it does not say how to READ is a protocol an agent
+# cannot check itself against.
+#
+# PER RULE and not per document. This protocol states TWO bounds in two sections, and
+# memory/gotchas/concurrency-is-not-a-budget.md exists because conflating them was a real defect; one
+# predicate over "the document" would let either section lose its pointer while the other carried the
+# gate. Each section that states a bound names the resolver within its OWN body.
+#
+# This is the POINTER-SHAPE half and deliberately only that half: it asserts each section NAMES its
+# resolver, never that the named file resolves anything. The second half — that the pointed-at
+# carrier is one the hook actually reads — belongs to the commit that makes the hook read it, and no
+# such commit exists yet.
+_p_bad=0
+for _sec in 'The hard cap' 'Concurrency'; do
+  # `next` DROPS the heading from the body. Without it this arm graded the heading line, and both
+  # headings already contain the literal `agent-cap.js` -- so `grep -qF` passed on the heading no
+  # matter what the body said, and the arm could not detect the body losing its pointer. A predicate
+  # that reads its own subject line is this repo's vacuity class wearing the shape of a section scan.
+  _body=$(awk -v want="$_sec" '
+      /^## / { inb = (index($0, want) > 0) ? 1 : 0; next }
+      inb { print }' "$LIVE")
+  if [ -z "$_body" ]; then
+    echo "protocol-parity: $LIVE has no '## $_sec ...' section, so this pointer arm would pass by finding nothing"
+    _p_bad=1; continue
+  fi
+  printf '%s\n' "$_body" | grep -qF 'agent-cap.js' \
+    || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
+done
+[ "$_p_bad" = 0 ] || exit 1
 echo "protocol-parity: in parity — $LIVE == $SHIP rendered for '$KITREL'"

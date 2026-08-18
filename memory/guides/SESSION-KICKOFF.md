@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-18T21:48:31+03:00 @ 098bebd9876c8f2f61a528b5cc9ac0a6b5d7719a
+last-audit: 2026-08-19T00:56:47+03:00 @ 098bebd9876c8f2f61a528b5cc9ac0a6b5d7719a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5d2c32fe9e2c6165b84b14a275d138585b15b22a
+last-body-change: 6ec8449b810c4507396ea5b088365339163256dd
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -150,6 +150,13 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
   `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
   concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
+- A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
+  matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
+  zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.
+- Two constants that COINCIDE are not pinned equal. Ownership belongs to the one that CHANGES THE
+  OUTCOME — verify by moving it, not by reading it.
+- An exclusion is only as wide as the control it defers to, and a guard that a binding pair EXISTS
+  is not a guard that it COVERS. Prefer deleting an exclusion to widening its justification.
 - Editing `.claude/settings.json` takes effect MID-SESSION — hooks are re-read, not snapshotted at
   start. Measured 2026-08-10 with a throwaway `PreToolUse` hook that fired on the call which checked
   for it. Do not skip the liveness half of such a probe.
