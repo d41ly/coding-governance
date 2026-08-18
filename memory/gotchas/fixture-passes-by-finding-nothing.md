@@ -46,6 +46,18 @@ precondition ordered ahead of it refuses first:
 Two of the four were green-and-wrong rather than loudly missing, and one of those shipped into a
 commit and was caught by a closing review rather than by the suite.
 
+Two more from the same build, both in arms written to guard against this very class:
+
+- **a boundary value that disables the instrument.** An arm forced its subject to time out with
+  `timeout 0` — and a zero duration in coreutils means NO LIMIT, not an instant one. Measured:
+  `timeout 0 sleep 2` exits 0, `timeout 0.05 sleep 2` exits 124. The control finished, the wrong
+  branch fired, and the arm reported that its two outcomes were indistinguishable. It caught its own
+  author.
+- **a bespoke fixture where the suite already had one.** Arms hand-rolled their tree with the generic
+  reset helper while a purpose-built helper existed two hundred lines up. The hand-rolled tree left
+  the unit non-terminal and the roster region absent, so the positive arms measured those rather than
+  the subject. Look for an existing `<subject>open`-shaped helper before building state.
+
 **The tell** is that a passing arm and a never-reached arm look identical. So: break the subject
 DELIBERATELY and watch the arm's own message appear, before writing the arm. If the refusal that
 appears names something else, the fixture is testing that something else.

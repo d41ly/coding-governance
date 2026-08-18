@@ -660,6 +660,39 @@ out=$(run --close tRun)
 hit "$out" "build-complete"
 miss "$out" "records-current"
 
+# ---- TOOL-aPromptedMandate-12: the selector reads the UNITS table, not the whole region. The
+# ---- generated region renders TWO tables and the old `^| [` took both, so every review record M4
+# ---- mandates and the closing review M8 mandates counted as a non-terminal unit - the item was
+# ---- unsatisfiable for any build that followed the method. Measured on builds that had already
+# ---- LANDED: aBranchedMandate 13 rows against 6 units, aStandingWrit 3 against 1.
+# ----
+# ---- These run on the build-complete fixture, whose unit is CLOSED and whose roster pair exists.
+# ---- Written against `reset_tree` instead, both positive arms failed on the fixture's own OPEN
+# ---- unit and term 1's missing roster - measuring the fixture rather than the subject.
+bcopen
+printf '| [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |\n' >> memory/builds/tRun/README.md
+printf '| [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |\n' >> memory/builds/tRun/RUN.md
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
+hit  "$out" "close OK"
+miss "$out" "build-complete"
+
+# ...and the SECOND reader agrees. `verb_status` open-coded the same pipeline and never called the
+# helper, so narrowing one left --close and --status disagreeing about one region. Before this,
+# --status on a landed build offered a `build/` record filename as the next unit.
+out=$(run --status tRun)
+miss "$out" "2026-08-01-review-ARCH-tRun-1-x.md"
+hit  "$out" "(no non-terminal unit)"
+
+# ---- a unit title containing `]` is STILL selected. `[^]]*` stops at the first one, and a dropped
+# ---- unit row is a false GREEN: nonterminal_units cannot see it, so build-complete passes over an
+# ---- unfinished unit. The spec audit caught this before the code was written.
+bcopen
+sed -i 's/ARCH-tRun-1 — the unit\]/ARCH-tRun-1 — the [bracketed] unit]/' memory/builds/tRun/README.md
+sed -i 's/ARCH-tRun-1 — the unit\]/ARCH-tRun-1 — the [bracketed] unit]/' memory/builds/tRun/RUN.md
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
+hit  "$out" "close OK"
+miss "$out" "build-complete"
+
 # the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
 # afterwards. A blocking gate whose override nobody can read is not a gate.
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "shipping 1 of 2 units deliberately")

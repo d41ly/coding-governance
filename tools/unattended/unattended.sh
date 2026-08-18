@@ -974,7 +974,20 @@ missing_units() { # slug · dir
 # Reads the BUILD README's pair — the one home of the unit list since main's redesign removed the
 # run-state copy and required that region to be EMPTY. Pointing these at the emptied region made
 # `build-complete` unsatisfiable: a check that cannot PASS, caught by its own green control.
-unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \['; }
+# TOOL-aPromptedMandate-12 - the generated region renders TWO tables: the UNITS and the RECORDS.
+# Selecting every `^| [` row took both, so every review record M4 mandates and the closing review M8
+# mandates counted as a non-terminal unit and `build-complete` could never be met by a build that
+# followed the method. Measured on builds that had already LANDED: aBranchedMandate 13 rows against
+# 6 units, aStandingWrit 3 against 1.
+#
+# The discriminator is the LINK TARGET, which is what M2 already uses to define a unit's spec, so
+# this selector and that definition move together. Filtering on a status token instead would work
+# today and rot the moment a record's kind column holds a word that looks like one.
+#
+# `.*` and NOT `[^]]*`: a negated class stops at the first `]`, so a unit whose title contains one
+# would be DROPPED - and a dropped unit row is a false GREEN, because nonterminal_units cannot see it
+# and build-complete passes over an unfinished unit. Greedy `.*` takes the last `](spec/` on the line.
+unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \[.*\]\(spec/'; }
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 
 verb_plan() { # slug
@@ -1421,7 +1434,13 @@ verb_status() { # slug
   # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
   # from a copy inside this file, which is exactly the staleness that design removes — main's
   # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
-  unit=$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null          | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1          | sed -e 's/^| \[//' -e 's/\].*//')
+  # TOOL-aPromptedMandate-12 - through `nonterminal_units`, not a second copy of its pipeline. This
+  # line open-coded the identical `region | grep | grep -v | head -1 | sed` and never called either
+  # helper, so narrowing `unit_rows` alone would have left --close reading the units table while
+  # --status and --resume kept reading the records table - two answers to one question about one
+  # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
+  # --status on a landed build offered a `build/` record filename as the next unit.
+  unit=$(nonterminal_units "$(readme_of "$slug")" | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave

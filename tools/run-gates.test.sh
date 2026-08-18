@@ -196,13 +196,83 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 #     The `timeout` is the point, not defensive noise: before the length bound, the 20-digit value
 #     made the runner spin forever having executed ZERO legs, so without a timeout this arm would
 #     HANG the bar rather than red it — converting a production hang into a hang on the gate.
+# TOOL-aPromptedMandate-13 - the budget is a VARIABLE so the two branches below are reachable by the
+# harness. Both fire only when `timeout` expires, and on a healthy host it never does, so with a
+# hardcoded 60 the outcomes this arm distinguishes could not be exercised at all - a deliverable
+# whose own acceptance is unobservable, which is the unfailable-check class one level up.
+CLAMP_BUDGET=${CLAMP_BUDGET:-60}
+# The width the clamp is SUPPOSED to yield, mirroring run-gates.sh:81-82 INCLUDING ITS CASE ORDER:
+# `*[!0-9]*` is tested FIRST there, so `nonsense` (8 chars) clamps to 1 and not to 64 despite also
+# matching `?????*`. Getting that order wrong would send the control to the wrong width and quietly
+# restore the very mis-inference this unit removes.
+clamp_target() {
+  case "$1" in
+    *[!0-9]*) echo 1 ;;
+    ?????*)   echo 64 ;;
+    *)        [ "$1" -lt 1 ] 2>/dev/null && echo 1 || echo "$1" ;;
+  esac
+}
+# THE LIVE CONTROL, as a function so the suite can drive BOTH its outcomes rather than wait for an
+# unlucky host. Exit 124 says the budget expired and NOTHING about why; the message this replaces
+# asserted a spinning clamp from it. The control runs the SAME fixture at the width the clamp should
+# have produced, so the clamp path is the only difference between subject and control.
+#
+# MEASURED 2026-08-18: under four concurrent full bars this arm accused the clamp for 0, -3 and
+# nonsense, and the same canary exits 0 in isolation. Three malformed widths do not all start
+# spinning and then all stop.
+#
+# It PRINTS the verdict and returns non-zero for either outcome - undecidable FAILS too, because an
+# arm that could not look has not looked, and scoring that green is fixture-passes-by-finding-nothing
+# with the machine blamed for the fixture. The caller owns `fail`, so the self-test below can call
+# this in a subshell and read the message without reddening the suite.
+clamp_expired_verdict() { # width-input -> prints the verdict, always returns 1
+  local w="$1" ctw ctl crc
+  ctw=$(clamp_target "$w")
+  ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); crc=$?
+  if [ "$crc" = 124 ]; then
+    echo "canary: GATE_JOBS='$w' and its width-$ctw control BOTH expired - this host could not finish the fixture at any width, so the clamp is unproven either way"
+  else
+    echo "canary: GATE_JOBS='$w' never terminated while its width-$ctw control finished - the clamp let it spin"
+  fi
+  return 1
+}
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
-  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout 60 bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); trc=$?
-  [ "$trc" = 124 ] && { echo "canary: GATE_JOBS='$w' never terminated — the clamp let it spin"; fail=1; continue; }
+  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates.sh" 2>&1); trc=$?
+  if [ "$trc" = 124 ]; then
+    clamp_expired_verdict "$w"
+    fail=1; continue
+  fi
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
 done
+
+# 3f-bis. TOOL-aPromptedMandate-13: BOTH outcomes of the expiry verdict, driven by the budget knob
+#        rather than by an unlucky host. Without this the two branches ship unreachable, which is the
+#        unfailable-check class the unit exists to remove, one level up. Each runs in a SUBSHELL so
+#        the `return 1` it is supposed to emit is OBSERVED here instead of reddening this suite.
+#
+#        UNDECIDABLE: a budget nothing can finish inside makes the control expire too, and the
+#        verdict must decline to blame the clamp.
+#
+#        `0.05`, NOT `0`. MEASURED on this node: `timeout 0 sleep 2` exits 0 - a zero duration means
+#        NO LIMIT in coreutils, not an instant one. Written as 0 this arm ran the control with the
+#        timeout disabled, the control finished, the spun branch fired, and the arm reported the
+#        defect it was written to catch. It caught it in MY code, which is the arm working.
+v=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
+case "$v" in
+  *"BOTH expired"*|*"unproven either way"*) ;;
+  *) echo "canary: the expiry verdict did not report an undecidable host when its own control expired: $v"; fail=1 ;;
+esac
+#        SPUN: a budget the control comfortably finishes inside leaves the clamp as the difference.
+v=$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )
+case "$v" in
+  *"the clamp let it spin"*) ;;
+  *) echo "canary: the expiry verdict did not blame the clamp when its control finished: $v"; fail=1 ;;
+esac
+#        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
+[ "$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )" != "$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )" ] \
+  || { echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1; }
 
 # 3g. a healthy leg is NEVER reported "(no result)" — the reader must not conclude a still-pending
 #     leg is dead just because no job is RUNNING at the instant it looks.

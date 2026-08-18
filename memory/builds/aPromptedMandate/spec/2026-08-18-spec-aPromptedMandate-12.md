@@ -1,6 +1,6 @@
 # TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region
 
-**Status:** SPECCED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 

@@ -118,15 +118,15 @@ that may rewrite the rules it is authorized under has no rules.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
+**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12
 ids TOOL-aPromptedMandate-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPromptedMandate-1 — the prompt-mode declaration, and where it is carried](spec/2026-08-18-spec-aPromptedMandate-1.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-12.md) | SPECCED | rev-2 | 2026-08-18 |
-| [TOOL-aPromptedMandate-13 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-13.md) | SPECCED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-13 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
 | [TOOL-aPromptedMandate-2 — the RESEARCHING and TESTING phases](spec/2026-08-18-spec-aPromptedMandate-2.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-3 — the build method's research→test→choose section](spec/2026-08-18-spec-aPromptedMandate-3.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | CLOSED | rev-3 | 2026-08-18 |
