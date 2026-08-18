@@ -23,8 +23,9 @@ that PRODUCES a ceiling and everything check 16 leans on to decide a member is w
 | 25600 B / no line cap | same awk | a build README's cap |
 
 An adopter can therefore raise the aggregate budget and still be unable to let a single guide grow,
-because the per-member cap that check 16 rule 3 cross-references is a constant in someone else's
-repo. This build makes all four adjustable, raises the shipped headroom default, and re-derives the
+because the per-member cap is a constant in someone else's repo. The two constraints are separate:
+check 16 bounds the read path's TOTAL, and check 6 bounds how large any one member may get. This
+build makes all four numbers adjustable, raises the shipped headroom default, and re-derives the
 two live ceilings that are at the wall.
 
 ## Why now — both live ceilings are one edit from red
@@ -33,6 +34,9 @@ two live ceilings that are at the wall.
 |---|---|---|---|
 | coding-governance | 86394 B over 6 files | 86476 | **82 B** |
 | NicoCares (`incms/main/vendor/nicocares-package`) | 109998 B over 7 files | 110000 | **2 B** |
+
+Both headroom figures in the table above are the measurement at this build's BASE. They are already
+spent: the 82 B went to this build's own generated index row before a line of code was written.
 
 ## Units
 
@@ -43,10 +47,35 @@ two live ceilings that are at the wall.
 | `TOOL-aLoosenedCeiling-3` | this repo's own ceiling, re-derived at the new headroom | `.memory-tree.conf` |
 | `TOOL-aLoosenedCeiling-4` | the NicoCares adopter's ceiling, 110000 to 241070, from its own measured burn | a separate repo |
 
-Units 1 and 2 are independent mechanisms in two different languages, and are Tier-2 because each
-changes a kit's contract. Units 3 and 4 are Tier-1: each moves one declared value and its
-justification. Unit 3 depends on unit 1, in that its number is what the new default produces. Unit
-4 depends on nothing here.
+Units 1 and 2 are Tier-2 because each changes a kit's contract; units 3 and 4 are Tier-1, each
+moving one declared value and its justification.
+
+**M2 classification, and the ordering the specs actually have.** All four were MISSING at kickoff
+and were authored this run, so all four were unreviewed by definition until the round-1 audit.
+
+| unit | classified | ordering |
+|---|---|---|
+| 1 | MISSING then READY at rev-3 | its commit carries the single kit-version bump, AFTER unit 2's engine edit |
+| 2 | MISSING then READY at rev-3 | engine edit lands FIRST; the verdict-epoch leg is topological, not a count |
+| 3 | MISSING then READY at rev-2 | LANDED FIRST, before its own review — see the deviation below |
+| 4 | MISSING then READY at rev-2 | independent of the other three; a different repository |
+
+Units 1 and 2 are independent in MECHANISM — two languages, two files — but not in WRITE SET: they
+share the hygiene engine, the shipped conf example, the hygiene doc carriers and every kit-version
+marker. M6 keys parallelism on the write set, so they sequence.
+
+Unit 3 does not DEPEND on unit 1 in the ordering sense. It consumes the constant unit 1 chooses and
+lands first anyway, so it hard-codes a number unit 1 will later make derivable. That inversion is
+recorded rather than hidden, and the conf comment names the window in which its declared
+`READ_PATH_HEADROOM` is read by nothing.
+
+**The deviation from M4, stated plainly.** Unit 3's conf edit landed in the spec-authoring commit,
+before any review of its spec, which the build method's hard floor otherwise forbids. The reason:
+creating this build folder rendered a row into the generated index, that index is a read-path
+member, and it consumed the last 82 B — so check 16 was red on the build's own bookkeeping before
+the spec set was complete. The alternative was to leave the bar red across the review pass. The
+round-1 audit reviewed the spec afterwards and found its AC2 unsatisfiable, which is exactly the
+cost of building ahead of the review; the fix is folded at rev-2.
 
 ## What the pre-build survey changed
 
@@ -67,16 +96,33 @@ The survey also confirmed, by measurement rather than by assumption, that parame
 awk adds no branch to the harness meta-gate's population, and that every scratch conf in the hygiene
 harness declares none of the new keys — so the existing arms keep their verdicts.
 
+## What the round-1 spec audit changed
+
+Four lenses and a verifying synthesis returned **BLOCKED** with 32 findings, and refuted six of
+their own claims on re-check. The record is under `reviews/`. The five that changed the most:
+
+| finding | landed |
+|---|---|
+| Unit 3's AC2 demanded the measure verb print the conf's value, while its own section 4 pins from the BASE and the verb re-measures live — false when the change is right | unit 3 AC2, restated as an at-base identity |
+| Unit 1's AC1 preconditioned on this repo declaring no headroom, which unit 3 mandates it does; run as written it could not see the shipped default at all | unit 1 AC1 and AC2, with the absent-key case moved to a fixture |
+| `pin_of` in `row_grammar.py` already implements unit 1's whole S3 contract, and three bare parses in `corpus_ids.py` raise the traceback S3 forbids | unit 1 S3b: one private accessor for all four keys |
+| Unit 2's AC4 named a leg that RUNS NOTHING, so it was green whether six arms were added or zero | unit 2 AC4, pointed at the harness with a named count |
+| The verdict-epoch leg is topological, so an unordered kit-version bump between units 1 and 2 reds the leg both specs claim green | unit 1 S6 and unit 2 S8: unit 2's engine edit lands first |
+
+Two facts this build had asserted and could not support: unit 1's section 10 cited a record that
+decided the OPPOSITE of what it was quoted for, and unit 4's account of the adopter's stale comment
+block was wrong in both halves. Both are corrected at the rev the audit produced.
+
 <!-- gen:build-index -->
 **Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | OPEN | rev-2 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-1 | 2026-08-18 |
-| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-1 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-1 — the read-path headroom becomes a declaration, and its default rises](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-2 — check 6's per-class caps become adopter declarations](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md) | OPEN | rev-3 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-3 — this repo's read-path ceiling, re-derived at the new headroom](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md) | OPEN | rev-2 | 2026-08-18 |
+| [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | OPEN | rev-2 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
