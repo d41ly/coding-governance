@@ -1,20 +1,25 @@
 # TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
-`--close` is the only phase writer in the driver that does not stage what it wrote, so `--landed`
-then refuses on the dirt `--close` created and blames the tree; the two agent-attested Definition-of-
-Done items have no writer at all, so the documented sole exit from a wedged run is reachable only by
+Two of the driver's five phase writers do not stage what they wrote — `--close` and `--phase` — so
+`--landed` then refuses on the dirt `--close` created and blames the tree; the two agent-attested
+Definition-of-Done items have no writer at all, so the documented sole exit from a wedged run is reachable only by
 hand-editing the file the kit calls generated; and the override park is the one park caller with no
 bypass-flag guard, so a truthful reason permanently reds the bar on a record no verb rewrites. Close
 the three.
 
 ## 2. Scope (IN)
 
-- **S1** — `verb_close` calls `stage_or_fail` after its phase write, as the driver's four other phase
-  writers do. Today it writes `LANDING` and the override park rows and stages neither.
+- **S1** — `verb_close` calls `stage_or_fail` after its phase write, and so does `verb_phase`. Today
+  `--close` writes `LANDING` and the override park rows and stages neither, and `--phase` writes an
+  arbitrary phase and stages nothing. **Measured at rev-2**: `set_fact "$rel" phase` has five call
+  sites (`:1023`, `:1069`, `:1133`, `:1288`, `:1442`); `stage_or_fail` has four (`:1080`, `:1136`,
+  `:1303`, `:1598`) and `:1598` is inside `verb_park`, which writes no phase. So **three of five
+  stage** — rev-1's "the only phase writer that does not" was wrong, and S4's source rule would have
+  reddened on `verb_phase` on the very diff that landed it.
 - **S2** — an `--attest <slug> --item <item>` verb writes an agent-attested Definition-of-Done key
   through `set_fact` and stages it, refusing any item whose checker is not `agent`. It writes the
   RECORD KEY, so the `parked-decisions-surfaced` / `parked-surfaced:` mismatch cannot be reproduced by
@@ -24,7 +29,9 @@ the three.
   written — the loop that already validates every override pair before acting on any of them.
 - **S4** — a source-level arm: every `park()` call site is preceded by the bypass guard, and every
   phase write is followed by `stage_or_fail`. Both are one-line rules over a single file, and both are
-  the class that returned here because the fix was made at one call site and not made a rule.
+  the class that returned here because the fix was made at one call site and not made a rule. The
+  rule lands AFTER S1 has fixed BOTH omissions — rev-1 assumed one violator, and a meta-gate written
+  against a two-violator tree reds on its own diff.
 
 ## 3. Non-goals (OUT)
 
@@ -50,8 +57,9 @@ says so. So an unstaged `LANDING` phase is invisible to every leg check. Worse, 
 `check_clean` then refuses because the tree is dirty, and the dirt is `--close`'s own write: a verb
 refusing on the previous verb's uncommitted output, with a message that blames the operator's tree.
 
-Four phase writers stage. One does not. That asymmetry is S4's whole justification: the rule exists,
-it is followed four times, and nothing enforces it.
+Three phase writers of five stage. That ratio is S4's whole justification: the rule exists, it is
+followed three times out of five, and nothing enforces it. Rev-1 said four-of-five and named one
+omission; the audit measured two, and a meta-gate written to the wrong ratio reds on itself.
 
 ### Why the two agent keys need a verb
 
@@ -70,12 +78,13 @@ never spells a key.
 
 | Concern | Today | After |
 |---|---|---|
-| `--close`'s phase write | unstaged, invisible to every leg | staged, as four other writers do |
+| `--close`'s phase write | unstaged, invisible to every leg | staged, as three other writers do |
 | `--close`'s override park rows | unstaged | staged with the phase |
 | `--landed` after `--close` | refuses on `--close`'s dirt, blaming the tree | proceeds |
 | the two agent-attested keys | no writer; hand-edit required | `--attest`, which writes the record key |
 | the override park's reason | no bypass guard; a truthful reason reds the bar forever | refused before anything is written |
-| the guard and stage rules | followed 3-of-4 and 4-of-5 | asserted at source |
+| the guard and stage rules | followed 3-of-4 and 3-of-5 | asserted at source |
+| `--phase`'s write | unstaged, and unnoticed until this audit | staged |
 
 ### Migration
 
@@ -126,8 +135,10 @@ sections stop implying a hand-edit) · `.memory-tree.conf` (`ARMS_FLOORS`) · th
   record, on an undeclared item, and on a machine-checked item are four distinct refusals.
 - **observability** — S1's effect is observable only as `--landed` no longer refusing, so the arm must
   assert the SEQUENCE `--close` then `--landed`, not each verb alone. That is the arm that fails today.
-- **risks** — low. The one hazard is S4's source rule being written as a whole-file grep, which reds on
-  the comment documenting its own fix (`memory/gotchas/absence-assertion-over-whole-file-text.md`).
+- **risks** — low. Two hazards. S4's source rule written as a whole-file grep reds on the comment
+  documenting its own fix (`memory/gotchas/absence-assertion-over-whole-file-text.md`). And S4 landing
+  before S1 has fixed BOTH omissions reds on `verb_phase` — the ordering point rev-1 missed by
+  believing there was one violator.
 - **testing + left-shift gates** — S4 is the left-shift, and the sequence arm in the observability line
   is what proves S1.
 - **migration / rollback** — none; revert is per-scope-item.
@@ -150,8 +161,12 @@ sections stop implying a hand-edit) · `.memory-tree.conf` (`ARMS_FLOORS`) · th
 - **AC6** — When `--abort` is run after `--attest` has written both agent keys, it proceeds; the arm
   that proves the documented exit is reachable without a hand-edit.
 - **AC7** — When S4's source arms run, they red against a fixture copy of the driver with the
-  `stage_or_fail` removed from `verb_close` and with a `park()` call site stripped of its guard —
-  two red fixtures, because a source rule with no red fixture passes by finding nothing.
+  `stage_or_fail` removed from `verb_close`, a second with it removed from `verb_phase`, and a third
+  with a `park()` call site stripped of its guard — THREE red fixtures, because a source rule with no
+  red fixture passes by finding nothing and rev-1's single fixture was built on a one-violator
+  assumption.
+- **AC7a** — When `--phase` writes a phase, `git diff --cached --name-only` names the run-state file;
+  the second staging arm, which rev-1 did not have because it did not know `verb_phase` omitted it.
 
 ## 7. Gates
 
@@ -181,6 +196,13 @@ moves) · `python tools/memory-tree/check-arms.py` · `tools/check-testsuite-cou
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-19 · folded the M4 spec audit. **The premise was wrong by one**: `--close` is not
+  the only phase writer that skips staging — `verb_phase` skips it too, so three of five stage rather
+  than four. Corrected at every site rev-1 spelled it (§1, S1, §4, §5) and, more importantly, in S4
+  and AC7: the source rule would have reddened on `verb_phase` on the diff that landed it, and AC7's
+  single red fixture was built on a one-violator assumption. AC7a is new and observes the second
+  staging fix. The bypass-guard fraction rev-1 gave was correct and is unchanged: three of four park
+  callers carry it, the `--close` override at `:1435` being the exception.
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's highs 11 and mediums 13 and
   20, consolidated as one mechanism — what the close path writes and whether a verb can reach it —
   because all three leave the record in a state no verb can advance. Tier 1: three local changes and

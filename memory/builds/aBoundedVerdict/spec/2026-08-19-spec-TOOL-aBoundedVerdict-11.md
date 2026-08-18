@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -34,15 +34,37 @@ instead of by row shape.
   admitted, removals refused. It compares the id set and **not the row bytes**; rev-2 corrects rev-1,
   which said "refusing any row CHANGED", and §4 states why that would have refused every run that did
   any work.
+- **S6a** — an ABSENT `gen:build-units` pair at BASE is a REFUSAL, not an empty set. A subset test is
+  vacuously true over an empty BASE, so inheriting the opt-in-by-presence guard at
+  `unattended.sh:731` would keep exactly the hole S6 exists to close — and every BASE before S5's
+  migration render, every adopter tree and every run pinned earlier is that case. The refusal names
+  the render command, as S4's does. Rev-2's Inventory promised the opt-in "goes away" and did not say
+  how; this is how.
+- **S6b** — what S6 buys is SCOPED, because `.unattended.conf` here declares
+  `ANCHOR_SCOPE="published"`. On the DEFAULT-BRANCH anchor the BASE blob is outside the run's reach
+  and the comparison is a real integrity check. On the BRANCH anchor it is not — the run pushed that
+  tip — and the conf's own comment and `memory/guides/UNATTENDED-PROTOCOL.md:32-35` already say
+  roster integrity stops being enforceable there. S6 states this rather than reading as if it closed
+  the self-certification hole on this repo, which it does not.
+- **S8** — **the AUTHORED `roster:units` pair is RETIRED, and this unit owns it.** Rev-2 left it
+  standing and rev-3 corrects that, because `build-complete`'s FIRST term reads it
+  (`unattended.sh:1495`) and so do `roster_ids` (`:889-890`), `missing_units` through it,
+  `verb_plan` (`:928-929`) and `check_authorization` (`:731-738`) — five readers, none of them among
+  the three call sites S2 re-points. So the build's headline goal, an item that can pass, was owned
+  by no unit in the set. Measured: of 49 build folders only FOUR carry the authored pair, and
+  `memory/builds/aBoundedVerdict/README.md` is not one of them, so this build could not close itself.
+  All five readers move to the generated units region; the authored pair stops being read by
+  anything. This RESOLVES F3 rather than raising it — see §8.
 - **S7** — the disarmed control is re-armed: one driver test arm has `build-complete` and
   `closing-review-recorded` BOTH met with no `--override` at all, over a fixture whose README is
   re-rendered and whose `reviews/` holds a tracked record.
 
 ## 3. Non-goals (OUT)
 
-- **The authored `roster:units` pair is not deleted in this unit.** It keeps its meaning for the
-  builds that carry one until the migration in S5 completes; retiring it is the follow-up the
-  revision log names, and doing both in one unit makes the migration unreviewable.
+- **The four READMEs carrying an authored `roster:units` pair keep their bytes.** S8 retires the
+  pair by removing its READERS, not by editing the corpus: a region nothing reads is inert, and
+  deleting text from four build records to satisfy a code change is the wrong direction. What is OUT
+  is any rewrite of those four files.
 - No change to the Records table's content, position, or the two coverage joins
   `TOOL-aTetheredRecord-5` added. This unit does not relitigate that unit's design; it gives the
   driver an address so the two kits stop sharing one selector.
@@ -133,8 +155,9 @@ never demands one, which is what lets the pair ship without re-rendering the cor
 commit. So the migration is a single `--write` pass, and S5's leg check is what makes it permanent.
 
 **The seven tracked run-state files.** Four are LANDED and two of those carry a `units-at-landing`
-fact frozen BEFORE the regression reached their READMEs — both measured clean, six ids each, no
-record filenames. So no terminal record needs repair, and this unit MUST NOT rewrite one: a frozen
+fact frozen BEFORE the regression reached their READMEs — both measured clean and free of record
+filenames — `aBranchedMandate` carries six ids and `aDeclaredCeiling` four, re-counted at rev-3 after
+a review found "six ids each" wrong for the second. So no terminal record needs repair, and this unit MUST NOT rewrite one: a frozen
 fact is a record, and re-deriving it from today's README would replace an accurate answer with a
 reconstruction. The three ABORTED records freeze nothing.
 
@@ -183,9 +206,14 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
 
 ## 5. Production-readiness checklist
 
-- **security** — S6 is the security-relevant half. The append-admitting comparison must refuse a
-  CHANGED row, not merely detect a shorter list; a run that edits an existing unit's id or status
-  and appends a row must be refused. Arm both directions.
+- **security** — S6 is the security-relevant half, and rev-3 REWRITES this bullet, which still
+  instructed the rule rev-2 had already deleted. The comparison refuses a REMOVED id and admits an
+  added one; it must NOT refuse a changed status or rev, because a promoted unit under
+  `TOOL-aBoundedVerdict-1` S8 is authored `SPECCED` and closed `CLOSED` inside one run, and refusing
+  that is refusing the promotion. What survives from the old wording is the RENAME case: editing an
+  existing unit's id removes a BASE id and is refused by the subset test on that ground. Arm removal,
+  rename, addition, and a status-plus-rev move — four arms, the fourth being the one rev-1's design
+  fails.
 - **perf / scale** — N/A. One extra `region` call per read, on files measured in kilobytes.
 - **a11y** — N/A, no user surface.
 - **i18n** — N/A.
@@ -211,7 +239,10 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
   tracked build README carries exactly one well-formed `gen:build-units` pair, and
   `python tools/memory-tree/gen_build_index.py --check` is clean.
 - **AC2** — When the driver's unit helper runs over `memory/builds/aBranchedMandate/README.md`, it
-  returns 4 unit rows and 0 non-terminal, against the 13 and 7 the shipped `unit_rows` returns today.
+  returns **6** unit rows and 0 non-terminal, against the 13 and 7 the shipped `unit_rows` returns
+  today. Re-measured at rev-3: restricting the shipped selector to rows whose link target is under
+  `spec/` — which is what `gen:build-units` holds — gives six, all CLOSED, corroborated by that
+  README's own generated status line. Rev-2's 4 was another build's number.
 - **AC3** — When `bash tools/unattended/unattended.sh --status aBranchedMandate` runs, the `next`
   field names a unit id or the literal no-non-terminal-unit text, and never a path under `build/`,
   `reviews/` or `prompts/`.
@@ -232,6 +263,14 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
   the one that fails against rev-1's design.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` runs over a fixture tree holding one
   build README with no units pair, it reds naming that file; over the real tree it is clean.
+- **AC8a** — When `--close` runs against a fixture build whose README carries NO authored
+  `roster:units` pair and a well-formed `gen:build-units` pair with every unit terminal,
+  `build-complete` is MET — the S8 arm, which fails against the shipped driver because its first
+  term reads the authored pair. `grep -c ROSTER_OPEN tools/unattended/unattended.sh` counts no
+  remaining reader outside the constant's own definition.
+- **AC8b** — When the pinned BASE's README carries no `gen:build-units` pair, `check_authorization`
+  REFUSES naming the render command — the S6a arm, which fails under a plain subset test because an
+  empty BASE set satisfies it.
 - **AC9** — When `bash tools/memory-tree/marker-contract.test.sh` runs, its case table drives the new
   region through every live reader of the generated-region markers.
 - **AC10** — When the two existing `units-at-landing` facts are compared before and after this unit,
@@ -265,13 +304,19 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
   which for a single-repo corpus is one commit. **Recommendation: ship it, delete it in step 4.**
   The corpus is one repo today, but the kit is deployable, and an adopter's tree migrates on their
   schedule rather than in our commit.
+  RESOLVED (agent, 2026-08-19, delegated): ship it, delete it at step 4. Mechanism-only fork; the
+  mark is added at rev-3 after the audit found five specs in this set claiming resolutions their §8
+  did not carry.
 
-- **F3 — OWNER, not delegated. Does the authored `roster:units` pair get retired, and when?**
-  This unit deliberately leaves it standing (§3). Retiring it removes the last authored-region
-  dependency from the authorization path and invalidates nothing, because S6 replaces what it was
-  for; keeping it means two regions can disagree about a build's scope, which is the class this
-  build keeps finding. The options differ in what gets built, so §3's fork rule sends it to the
-  owner rather than resolving it here.
+- **F3 — does the authored `roster:units` pair get retired, and when?** Rev-2 raised this to the
+  owner and left the pair standing. Rev-3 resolves it as S8, and the reason it stopped being an owner
+  fork is that leaving it standing was not a smaller option — it was an incomplete one. The spec
+  audit measured that `build-complete`'s first term and four other readers read that pair, none of
+  them among the three call sites S2 re-points, so "leave it standing" left this unit's own §1 goal
+  unowned and this build unable to close itself. The options did not differ in what gets built; one
+  of them simply did not deliver the unit.
+  RESOLVED (agent, 2026-08-19, delegated): retired, as S8. Not a scope widening — the alternative
+  failed to deliver §1.
 
 ## 9. Revision log
 
@@ -287,6 +332,21 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
   failure than the one this unit exists to fix. AC7 is split and AC7a is new: it re-renders a
   status-and-rev change and asserts the check still passes, which is the arm rev-1's design fails.
   The limit of an id-set comparison is stated in §4 rather than left to be discovered.
+
+- rev-3 · 2026-08-19 · folded the M4 spec audit (BLOCKED, 81 confirmed, 5 of them this unit's).
+  **S8 is new and was the blocker**: `build-complete`'s first term reads the AUTHORED roster pair, as
+  do `roster_ids`, `missing_units`, `verb_plan` and `check_authorization` — five readers, none among
+  the three call sites S2 re-points — so rev-2 left this unit's own §1 goal owned by nobody, and F3
+  went to the owner as a choice when one of its options simply did not deliver the unit. F3 now
+  resolves as S8, with AC8a. **S6a is new**: a subset test is vacuously true over an ABSENT BASE
+  pair, which is every pre-migration BASE and every adopter tree, so absence is a refusal — rev-2's
+  Inventory promised the opt-in went away without saying how. **S6b is new**: under this repo's
+  declared `published` anchor the BASE blob is NOT outside the run's reach, and S6 read as if it
+  closed that hole everywhere. **The security bullet is rewritten**: it still mandated refusing a
+  CHANGED row, which rev-2 had replaced and which would refuse the promotion this unit exists to
+  permit. **AC2 is re-measured**: six spec-linked rows for `aBranchedMandate`, not four — four was
+  another build's number — and Migration's "six ids each" was wrong for the second frozen roster,
+  which carries four. F2 gains the resolution mark its rev log already claimed.
 
 ## 10. Reuse audit
 

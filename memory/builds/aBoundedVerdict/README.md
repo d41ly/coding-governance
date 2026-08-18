@@ -88,7 +88,7 @@ deliberately does not restate it.
 | 7 | `TOOL-aBoundedVerdict-1` | 2 | the review loop's convergence rule and the promotion disposition |
 | 8 | `TOOL-aBoundedVerdict-14` | 2 | fold-scoped review rounds |
 | 9 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
-| 10 | `TOOL-aBoundedVerdict-15` | 1 | close-path writes are staged and guarded |
+| 10 | `TOOL-aBoundedVerdict-15` | 1 | close-path writes are staged and guarded — **and see the ordering note below: `-5` and `-3` both depend on its `--attest`, so it moves ahead of both at build time** |
 | 11 | `TOOL-aBoundedVerdict-16` | 2 | the closing-review join: a diff-review, in range |
 | 12 | `TOOL-aBoundedVerdict-17` | 2 | authorization survives a split fetch/push URL |
 | 13 | `TOOL-aBoundedVerdict-18` | 1 | the two vacuous checks get subjects |
@@ -96,6 +96,13 @@ deliberately does not restate it.
 
 *An id appears here only once a conforming spec defines it — hygiene check 14 refuses a cited
 id nothing defines, which is the mechanical form of the method's "never build a MISSING unit".*
+
+**Ordering correction, 2026-08-19 (spec audit).** The numbers above are a dependency order and two of
+them are wrong: `-5` S6 names `-15`'s `--attest --value` as the writer it needs, and `-3`'s halt path
+reaches `--abort`, which requires the two agent keys `--attest` writes. `-15` declares no dependency
+of its own, so it moves ahead of both. Both dependencies are SOFT — the keys are hand-editable, so the
+cost of the old order is a hand-edit rather than a block — which is why this is recorded as a
+correction here rather than a re-numbering of a table two other documents cite.
 
 **The order is a dependency order, not a preference.** Unit 4 hardens the predicate that decides
 whether a fork is resolved; until it does, every rule the later units write about forks is
@@ -138,13 +145,17 @@ concurrently — and their write sets intersect in the protocol document, so the
   changed with no re-stamp at or after the change. `memory/guides/SESSION-KICKOFF.md` is in all five
   units' Files-touched lists for that reason — it was in three when this rule was written, which is
   the rule asserting its own compliance rather than having it.
-- **The charter read-path budget is shared by four of the five units, and the spender set is stated
-  HERE and nowhere else.** Measured at base: 70262 bytes against a ceiling of 86476, so 16214 bytes
-  of headroom. `TOOL-aBoundedVerdict-1` and `TOOL-aBoundedVerdict-3` grow the build method;
-  `TOOL-aBoundedVerdict-2`, `TOOL-aBoundedVerdict-3` and `TOOL-aBoundedVerdict-5` grow the unattended
-  protocol, which is itself a read-path member at 18214 bytes. Two specs previously each named the
-  total and named only each other as the other spender, which is how a shared budget gets spent
-  twice. No spec carries the figure as authority: the builder re-measures with the corpus reporter.
+- **The charter read-path budget is shared, and the spender set is stated HERE and nowhere else.**
+  **Re-measured 2026-08-19 at this build's declared base**, because the figures this bullet carried
+  were against a RETIRED ceiling and a builder trusting them believed in headroom that did not exist:
+  `python tools/memory-tree/corpus_ids.py --report` gives **91997 bytes against a ceiling of 112987**
+  (`.memory-tree.conf`), so **20990 bytes of headroom**, with `UNATTENDED-PROTOCOL.md` at 27582 and
+  `BUILD-METHOD.md` at 17460. The old 70262-against-86476 and the 72122-against-86476 in
+  `TOOL-aBoundedVerdict-3` were both against 86476, which is no longer the ceiling.
+  The spender set is now SEVEN units, not four: `-1`, `-3` and `-14` grow the build method; `-2`,
+  `-3`, `-5`, `-11` and `-19` grow the unattended protocol. Two specs previously each named the total
+  and named only each other as the other spender, which is how a shared budget gets spent twice. No
+  spec carries the figure as authority: the builder re-measures with the corpus reporter.
 - **Two units move the unattended leg's own check count**, which is stated in the leg's header and
   again in the charter's gate-suite bullet and observed by no gate. They state their moves one apart
   rather than both writing the same number.
@@ -223,7 +234,7 @@ the rest of the confirmed set.
 | `-1` | **THIN by reversal** | its design is withdrawn; rev-6 replaces the cap with the convergence rule and deletes the S8 the audit found vacuous |
 | `-5` | **THIN** | its S1 spells a three-field `--park` and its S5 a decision-only count; the verb that shipped under `TOOL-cSettledDocket-1` has two fields and counts four kinds, so the spec and the code disagree |
 | `-2` | **READY, widening** | gains the verdict-token half — the vocabulary a machine can read is the same problem one document over |
-| `-3` | **READY, widening** | gains an `--attest` verb and the sentence that says which item cannot be overridden |
+| `-3` | **READY** | unchanged in scope. Its rev-6 adds two cross-references only: its halt path reaches `--abort`, whose agent keys `-15`'s `--attest` writes, and the review-side analogue of its park rule is `-1` S9. `--attest` is `-15`'s and the non-overridable sentence is `-19`'s — an earlier draft of this row gave both to `-3`, which would have put two units on one mechanism |
 | `-4` | **READY** | unchanged by any of this |
 
 ### What the audit changed about the dependency order
@@ -248,15 +259,15 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-7 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-5 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-6 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-6 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-6 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | SPECCED | rev-2 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-7 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | SPECCED | rev-3 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-1 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | SPECCED | rev-1 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | SPECCED | rev-2 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-1 | 2026-08-19 |
@@ -271,10 +282,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md) | research | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 |
 | [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
 | [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
-
-Ids no record names: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19.
-
-Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19.
+| [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -311,4 +319,5 @@ Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-11 TOOL-aBounded
 - **`reviews/`**
   - [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md)
   - [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md)
+  - [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md)
 <!-- /gen:build-docs -->

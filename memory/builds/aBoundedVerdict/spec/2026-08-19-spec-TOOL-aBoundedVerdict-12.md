@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -29,9 +29,23 @@ that cannot read the cause either stalls or reaches for the one override the kit
   `parked-decisions-surfaced` is read from a line spelled `parked-surfaced:`, so an operator obeying
   the refusal writes a key nothing reads. `--abort` already carries the mapping and the sentence; this
   is that fix at the call site its author did not grep for.
-- **S6** — a meta-gate: no `dod_met` arm may reach a `return 1` without having set `DOD_OUT`, asserted
-  at source level over the arm bodies. The two agent-attested arms are the declared exemption, because
-  their cause is the absent attestation and the refusal already says so.
+- **S6** — a meta-gate over `dod_met`'s arm bodies, and **rev-2 rewrites its predicate because rev-1's
+  was vacuous.** A literal `return 1` appears in exactly TWO arms (`gates-green` at `:1464`/`:1466`
+  and `build-complete` at `:1497`) — and those are the two arms that already set `DOD_OUT`. Six arms
+  fail by falling off the end of the case arm with a false test, so "no arm reaches a `return 1`
+  without setting `DOD_OUT`" is satisfied by every arm today: the
+  `fixture-passes-by-finding-nothing` class this very spec warns about, in this very spec. The rule
+  is therefore on the arm's FAILING EXIT however it is spelled, and it requires a NON-EMPTY message —
+  `gates-green` clears `DOD_OUT` to the empty string on success, so a non-empty test is what
+  distinguishes "reported" from "cleared". The `*)` project-item arm at `:1533` is a ninth arm and is
+  a THIRD declared exemption alongside the two agent-attested ones, because the kit knows nothing
+  about a project item's failure mode.
+- **S6a** — the target is stated honestly: S1-S5 give a message to `gates-green`, `build-complete`,
+  `closing-review-recorded` and the two agent items. `records-current`, `landed-via-lander` and
+  `authorization-reachable` are NOT in this unit's scope — `authorization-reachable`'s cause is
+  printed by S2 rather than carried in `DOD_OUT`, and the other two are
+  `TOOL-aBoundedVerdict-18`'s. So S6's rule is scoped to the arms this unit gives messages to, and
+  rev-1's "0 of 8, plus 2 exemptions" was unreachable inside this unit's own scope.
 - **S7** — one progress line before the prologue, so a close that is about to spend a network
   round-trip has printed something first.
 
@@ -169,8 +183,11 @@ constant.
 - **AC5** — When `--close` blocks on `parked-decisions-surfaced`, its message contains
   `parked-surfaced` — the key an operator must actually write.
 - **AC6** — When `grep -c 'DOD_OUT=' tools/unattended/unattended.sh` is compared before and after,
-  the count rises by at least four, and no arm of `dod_met` reaches `return 1` without an assignment
-  — asserted at source level by S6's arm, which fails against the shipped driver.
+  the count rises by at least four, and every arm in S6's scoped population reaches its failing exit
+  with a NON-EMPTY `DOD_OUT` — asserted at source level by S6's arm. Rev-2: the arm must red against
+  a fixture in which one in-scope arm falls off the end of its case with no assignment, because
+  rev-1's predicate was satisfied by the shipped driver and the criterion claiming otherwise was
+  false.
 - **AC7** — When the eight `dod_met` arms are each driven to failure, eight distinguishable outputs
   result: six naming a cause and two naming an absent attestation and its key.
 - **AC8** — When `--close` is invoked, a line is printed before any network call, observed by
@@ -215,6 +232,15 @@ documents its own fix — `memory/gotchas/absence-assertion-over-whole-file-text
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-19 · folded the M4 spec audit. **S6's predicate was vacuous and is rewritten.** A
+  literal `return 1` appears in only two `dod_met` arms and both already set `DOD_OUT`; the other six
+  fail by falling off the end of their case arm, so rev-1's rule was satisfied by every arm on the
+  shipped driver and AC6's "fails against the shipped driver" was false. The rule now keys on the
+  arm's FAILING EXIT however spelled and requires a NON-EMPTY message, because `gates-green` clears
+  the variable on success. S6a is new and states the scope honestly: three arms rev-1's "0 of 8"
+  target implied are not in this unit's reach, two of them being another unit's. The `*)` project-item
+  arm becomes a third declared exemption. This is the class this spec warns about, found inside this
+  spec.
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's blocker 15·9·28 and highs
   4·10·16, 5, 3 and low 26, consolidated because they are one mechanism — the close path's message
   channel — and the audit's own verdict names them that way. F1 and F2 resolved under the delegated

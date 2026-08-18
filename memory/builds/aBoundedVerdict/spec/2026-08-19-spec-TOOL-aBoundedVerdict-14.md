@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -20,10 +20,13 @@ round N to the fold round N-1 introduced, and hand it what round N-1 already con
   one at round 1. The default `origin/main` is a moving ref, which the method forbids two paragraphs
   above the invocation it documents; a string check enforces it without the harness needing repo
   access, which it does not have.
-- **S4** — the report the harness writes names the resolved base AND the tip, both as shas, so round
-  N+1 has an immutable scope boundary to read. Today it writes `${base}...${head}` where `head`
-  defaults to the literal `HEAD` — a moving ref recorded as provenance. Measured: of 90 review
-  records, 25 name a range and none names a usable tip.
+- **S4** — the report names the resolved base AND the tip, both as shas, so round N+1 has an
+  immutable scope boundary to read. Today the harness instructs `${base}...${head}` where `head`
+  defaults to the literal `HEAD` (`tier2-review.js:66`) — a moving ref recorded as provenance, and
+  that is the defect. **Rev-2 corrects rev-1's supporting measurement**, which was false in its
+  load-bearing half: ELEVEN records do name a `sha..sha` range, so "none names a usable tip" is
+  refuted. What holds is that a HARNESS-written record pins a moving ref by default, and that no
+  record's tip is derivable when it does.
 - **S5** — `BUILD-METHOD.md` M8 gains the fix-round invocation: round 1 from the run's pinned BASE to
   the tip; round N>1 from round N-1's recorded tip to the current tip, with round N-1's confirmed
   findings passed as `priorFindings`. The existing sentence "re-review the FIX, not the diff again"
@@ -32,9 +35,15 @@ round N to the fold round N-1 introduced, and hand it what round N-1 already con
   synthesis returns `report: null` with a `complete`-shaped note and every confirmed finding is lost
   with nothing logged. Mirror the existing guard: set an `UNVERIFIED:` note and `log()` the confirmed
   list so the findings survive in the transcript.
-- **S7** — the harness writes a `**Serves:**` line carrying its KIND. It currently writes one with no
-  kind token, so hygiene check 21 reds on every closing review record until a human edits it — and M8
-  already makes the agent rename the file, so the kind belongs in the harness that knows it.
+- **S7** — the harness's SYNTH PROMPT instructs the record's binding line, kind and ids included.
+  **Rev-2 corrects rev-1's premise, which was wrong in both halves**: `grep -ni serves
+  tools/workflows/tier2-review.js` returns nothing, so the harness writes no binding line at all —
+  and it does not write the record either, it instructs the synth AGENT to write it (`:307`). So the
+  work is a prompt change, and the observable is the agent's output. The line must carry BOTH a kind
+  and at least one id: a kind with no id is MALFORMED under `memory/HYGIENE.md`'s grammar, so
+  emitting `**Serves:** diff-review` alone would trade a missing line for an unparseable one. The
+  FILENAME's id projection stays with M8's rename, which check 21's fourth branch also requires and
+  which a harness with no repo access cannot perform.
 
 ## 3. Non-goals (OUT)
 
@@ -171,9 +180,11 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 - **AC4** — When the synthesis agent returns null, the harness's return value carries a note beginning
   `UNVERIFIED:` and the confirmed findings appear in the `log()` stream; against the shipped harness the
   note reads as a completed run.
-- **AC5** — When a closing review record is written by the harness, its `**Serves:**` line contains
-  `diff-review`, and `bash tools/memory-tree/check-memory-hygiene.sh` check 21 is clean over it with no
-  hand edit.
+- **AC5** — When a review is run end to end, the record the synth agent writes opens with a
+  `**Serves:**` line containing `diff-review` AND at least one id, and
+  `bash tools/memory-tree/check-memory-hygiene.sh` check 21 is clean over it once M8's rename has
+  been performed. Rev-2: the rename stays a hand step — check 21's fourth branch requires the
+  FILENAME to project an id, and the harness has no repo access to rename anything.
 - **AC6** — When `memory/guides/BUILD-METHOD.md` and
   `tools/memory-tree/BUILD-METHOD.template.md` are compared, M8's fix-round invocation is present and
   byte-identical in both, and `bash tools/memory-tree/kit-dogfood-parity.test.sh` is clean.
@@ -216,6 +227,14 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-19 · folded the M4 spec audit. **S7's premise was wrong in both halves**: the
+  harness writes no binding line at all rather than a kind-less one, and it does not write the record
+  — it instructs the synth agent to. So the change is to the prompt and the observable is the agent's
+  output; and the line must carry a kind AND an id, because a kind alone is malformed under the
+  binding grammar. AC5 is rewritten and the filename rename stays with M8, which check 21 also
+  requires and a harness with no repo access cannot do. **S4's measurement is corrected**: eleven
+  records DO name a sha-to-sha range, refuting rev-1's "none names a usable tip". The defect that
+  survives is the harness default writing the literal `HEAD`.
 - rev-1 · 2026-08-19 · initial draft. Derived from the owner's third report and from the close-path
   audit's highs 23 and 22, plus `TOOL-aLoosenedCeiling-6` from the TOOL backlog, which S7 closes. F1
   and F2 resolved under the delegated fork rule; F3 raised to the owner as a scope fork.

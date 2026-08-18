@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-5 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -25,9 +25,14 @@ stopped without reading prose.
 - **S2** — `--abort <slug> --reason <text> --code <CODE>`, with the code REQUIRED and validated
   against the effective vocabulary. An unlisted code is refused naming the legal set.
 - **S3** — the code is recorded as an AUTHORED FACT through the existing fact writer, not buried in
-  the reason prose, so a reader is a field read rather than a parse. It is therefore the region's
-  NINTH fact, and S7 moves the pin that says eight rather than leaving the spec silently in breach
-  of it. The justification is the protocol's own membership test — nothing in the tree derives the
+  the reason prose, so a reader is a field read rather than a parse. It is therefore a NEW fact, and S7 moves
+  whatever ordinal the pin currently states rather than leaving the spec silently in breach of it.
+  **Rev-6 deletes every ordinal this spec used to spell.** The live pin reads ELEVEN — measured at
+  `memory/guides/UNATTENDED-PROTOCOL.md:110` and `tools/unattended/PROTOCOL.template.md:110`, with an
+  enumeration running 1..11 beneath it — so the halt code is the twelfth, not the ninth this spec
+  said, and not the eighth or seventh it said elsewhere. The ordinal is READ AT BUILD TIME from the
+  carrier and is never restated here: the pin's history across its carriers is non-monotone, so a
+  number written into a spec is a number that was true once. The justification is the protocol's own membership test — nothing in the tree derives the
   code, and only the run knows it — and the shape: a halt code is a per-run SINGLETON that three
   readers read by key, which is what a fact is for. **The in-tree precedent is now exact**: the
   eighth fact, the roster frozen at landing, is a singleton written by a TERMINAL verb, which is the
@@ -82,6 +87,11 @@ stopped without reading prose.
   FIRST line of a review record, adds it to `memory/HYGIENE.md` check 5's grammar for `diff-review` and
   `spec-audit` records, and makes `TOOL-aBoundedVerdict-1`'s `--review` verb accept exactly that set.
   **Forward-only**: no retrofit of the 90, for the reason §3 already gives about existing records.
+  S10's write set is `memory/HYGIENE.md` (check 5's grammar),
+  `tools/memory-tree/check-memory-hygiene.sh` and its sibling test, and
+  `tools/memory-tree/HYGIENE.template.md` — none of which rev-5 declared, which is why rev-6 adds
+  them to Files touched and gives S10 its own acceptance criteria. A scope item with no observable
+  and no declared write set is half a unit.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
   arm asserts they cannot silently stop carrying it. No existing gate joins a documented invocation
   to the driver's argument set — the adopter check, the protocol parity check and the kickoff-engine
@@ -98,7 +108,7 @@ stopped without reading prose.
   silently.
 - No code on the landed terminal. A landing needs no reason.
 - No code on a park. Parking is unit 5's mechanism and a park is not a halt.
-- No retrofit of existing terminal records BEYOND the one §4 enumerates. Exactly one tracked record
+- No retrofit of existing terminal records BEYOND the ones §4 enumerates. Exactly one tracked record
   claims the aborted terminal without a code, it is named, and it is migrated by this unit's commit.
   A blanket no-retrofit rule was the rev-3 position and rested on a population that was zero at the
   old base and is not at this one.

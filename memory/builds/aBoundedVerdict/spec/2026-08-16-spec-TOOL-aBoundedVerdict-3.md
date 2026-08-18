@@ -136,13 +136,13 @@ and it is real for that reason and not because a gate would catch it. S2, S4, S5
 rules and will not fit in the 14 lines M1's own budget leaves, so the displacement is identified and
 made in the same commit.
 
-The MECHANICAL budget is the charter read-path ceiling: 72122 bytes measured AT THE MERGE BASE
-against 86476, so **14354 bytes of headroom** — 1860 less than this spec first stated, because the
-protocol grew under it while the spec was open. This unit spends from it twice, growing both the method and the
-unattended protocol, and it is not the only spender — the full set is stated ONCE in the build
-README's cross-unit rules rather than in each spec, because two specs each naming the total and each
-other is how a shared budget gets spent twice. The builder re-measures with the corpus reporter
-before spending.
+The MECHANICAL budget is the charter read-path ceiling. **This spec no longer carries the figure**:
+rev-6 removed a total measured against a ceiling of 86476 that has since been retired, which is a
+number that was true once and then quietly stopped being — the exact failure mode the "stated ONCE"
+rule exists to prevent, reproduced by a spec that stated the rule. The live pair is in the build
+README's cross-unit rules, re-measured at this base, and the builder reads it from
+`python tools/memory-tree/corpus_ids.py --report` before spending. This unit spends from it twice,
+growing both the method and the unattended protocol, and it is one of seven spenders.
 
 ## 5. Production-readiness checklist
 
