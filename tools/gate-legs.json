@@ -519,7 +519,7 @@
     "name": "run-gates canary",
     "argv": [
       "bash",
-      "tools/run-gates.test.sh"
+      "tools/run-gates/run-gates.test.sh"
     ],
     "guard": [
       "tools/",
@@ -531,12 +531,42 @@
     "name": "run-gates evidence",
     "argv": [
       "bash",
-      "tools/run-gates.evidence.test.sh"
+      "tools/run-gates/run-gates.evidence.test.sh"
     ],
     "guard": [
       "tools/",
       "tools/lib/"
     ]
+  },
+  {
+    "name": "run-gates gov canary",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-gates.gov.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/",
+      "tools/gate-legs.json"
+    ]
+  },
+  {
+    "name": "run-gates adopter e2e",
+    "argv": [
+      "bash",
+      "tools/run-gates/adopt-run-gates.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/"
+    ]
+  },
+  {
+    "name": "run-gates wiring",
+    "argv": [
+      "bash",
+      "tools/run-gates/adopt-run-gates.sh",
+      "--check"
+    ],
+    "guard": []
   },
   {
     "name": "install-prefix (shipped surface)",

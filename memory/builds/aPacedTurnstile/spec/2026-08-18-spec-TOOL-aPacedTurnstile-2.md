@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -209,10 +209,32 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
   figure. Stated positively because the negative half alone is already true at this build's base: the
   charter backticks its width formula, so a plain `grep -c` for the bare formula returns zero today
   and would pass unchanged.
+- **AC11b** — When the charter is read after this lands, a search for the BACKTICKED width formula —
+  the spelling that is actually in the file — returns zero, AND a positive search finds the
+  replacement sentence naming `tools/run-gates/gate-profiles.txt` as the source of the width. S8
+  names TWO claims to repair and the round-1 fix armed only the figure; round 2's R23 found the
+  defect had been RELOCATED from the figure half to the formula half by the fix for it, so S8 could
+  land half done with AC11 green and the charter would go on stating a width formula the runner no
+  longer uses — which is the claim this unit exists to falsify. Nothing else observes it: the
+  playbook-parity gate grades the playbook files rather than the charter, and drift-audit's charter
+  signal joins leg SCRIPT PATHS.
 - **AC12** — When a hardware seam is given a twenty-digit value or a non-numeric one, the length
   bound rejects it, the run still completes, and every leg still runs at a clamped width — asserted
   in `tools/run-gates/run-gates.test.sh`, because that bound is the guard against the int64-overflow
   hang and nothing else observes it.
+- **AC12b** — When the profile table carries a MALFORMED row, the runner exits 2 naming the file and
+  the offending line number, asserted in `tools/run-gates/run-gates.test.sh` against a fixture table.
+  S6 declares four refusals and S7 says the canary covers "every refusal", but §6 armed two; this is
+  the one that matters most, because §4's own argument is that a silently ignored knob is a knob the
+  operator believes they set, and this table is the declared home for every future knob (round 2's
+  R25).
+- **AC12c** — When the profile table matches NOTHING — a fixture table with its mandatory catch-all
+  last row removed — the runner exits 2 naming the file, rather than falling through to the built-in
+  formula. The fixture is load-bearing: against any table keeping §4's catch-all this refusal is
+  unreachable, so an arm driving the real table would pass by finding nothing, which is this repo's
+  `memory/gotchas/fixture-passes-by-finding-nothing.md` class. The ABSENT-table fallback stays a
+  fallback and is graded separately; absent and unmatchable are different states and only one of
+  them is an operator error.
 - **AC13** — When a fixture `PATH` shim makes the FIRST core source and the FIRST RAM source exit
   non-zero, the runner still resolves a profile and tags the line with the sources it tried —
   asserted in `tools/run-gates/run-gates.test.sh`. The seams that bypass detection cannot prove the
@@ -227,15 +249,26 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the middle row should differ from the built-in formula at all.** It is behaviour-neutral
   as specced, which makes it easy to review and easy to call pointless. Recommendation: keep it
   neutral. Its purpose is the RAM threshold that stops a high-core, low-RAM box selecting the
   capable row, and changing the 4-core width at the same time would confound the one measurement
   that matters.
+  RESOLVED (agent, 2026-08-18, delegated): keep it behaviour-neutral. Moving the 4-core width in
+  the same unit would confound the RAM-threshold measurement that is the row's whole purpose,
+  and a knob whose first landing is also its first behaviour change has no control.
 - **Whether the per-leg timeout ships in this unit or waits for a measurement.** Recommendation:
   ship the mechanism with every row at off, proven by a fixture. `TOOL-aBoundedVerdict-10` is an
   observed hang that wedged a whole bar, so the mechanism has a recorded motivating failure even
   though the value does not yet have a measurement.
+  RESOLVED (agent, 2026-08-18, delegated): ship the mechanism now, every row's value OFF, proven
+  by a fixture. This is the more feature-rich option under M3 - it satisfies the stated
+  acceptance criteria and leaves no follow-up open - and it survives every veto, because an
+  off-by-default knob widens no surface. `TOOL-aBoundedVerdict-10` is the recorded hang that
+  motivates the mechanism; the VALUE still waits for a measurement, which is what off means.
 
 ## 9. Revision log
 
@@ -244,6 +277,16 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
   already satisfied at this build's base (F9, F10, F11); AC12 and AC13 added, because the detection
   chain and its length bound were specified and never observed — both existing criteria drove the
   bypass seams instead (F8).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
+- rev-4 · 2026-08-18 · folded the round-2 spec audit. R23: AC11b restores S8's width-formula half.
+  The round-1 fix restated AC11 positively for the FIGURE and dropped the formula, relocating the
+  defect rather than closing it — S8 could land half done with every criterion green while the
+  charter went on stating a width formula the runner no longer uses. R25: AC12b and AC12c arm the
+  two declared refusals §6 left unobserved, the malformed row and the table that matches nothing;
+  the second needs a fixture table with no catch-all, because against §4's mandatory catch-all the
+  refusal is unreachable and the arm would pass by finding nothing.
 
 ## 10. Reuse audit
 

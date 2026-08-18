@@ -16,11 +16,17 @@ set -u
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-RUNNER="$ROOT/tools/run-gates.sh"
+RUNNER="$ROOT/tools/run-gates/run-gates.sh"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 bad=0
-ok()   { echo "  ok   — $1"; }
-nope() { echo "  FAIL — $1"; bad=1; }
+# the run-gates promotion spec's S11. The count is INCREMENTED where the assertions actually happen -- in the
+# two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
+# literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
+# `PASS (130 assertions)` for its whole life with no counter behind it.
+FLOOR_ASSERTIONS=11
+n=0
+ok()   { n=$((n+1)); echo "  ok   — $1"; }
+nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
 
 # mk_legs <file> <json-array-body>
 mk_legs() { printf '[%s]\n' "$2" > "$1"; }
@@ -148,5 +154,7 @@ else
 fi
 
 echo
-if [ "$bad" = 0 ]; then echo "PASS (run-gates evidence durability)"; else echo "FAIL (run-gates evidence durability)"; fi
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
+[ "$bad" = 0 ] && echo "PASS ($n assertions)"
+[ "$bad" = 0 ] || echo "FAIL (run-gates evidence durability, $n assertions)"
 exit "$bad"

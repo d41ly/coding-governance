@@ -14,7 +14,7 @@ terminal status. Nothing here is edited by hand.
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
 | [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
-| [aPacedTurnstile](builds/aPacedTurnstile/README.md) | OPEN | a | 2026-08-18 | tooling | 10 |
+| [aPacedTurnstile](builds/aPacedTurnstile/README.md) | OPEN | a | 2026-08-18 | tooling | 15 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aSealedCaravan](builds/aSealedCaravan/README.md) | INPROGRESS | a | 2026-08-10 | deployer+tooling | 10 |

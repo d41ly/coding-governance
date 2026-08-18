@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -36,8 +36,12 @@ session QUEUES with visible position instead of running a competing 873 s bar.
   derivation already separates them, plus an exported lineage marker as a backstop for future
   callers.
 - **S10** — a new gated leg, `tools/run-gates/run-gates.turnstile.test.sh`, driven against scratch
-  repos through the manifest seam and never against the real bar, registered in the manifest and in
-  the kit's descriptor.
+  repos through the manifest seam and never against the real bar, registered in the manifest, in the
+  kit's descriptor, AND in `memory/map/features/run-gates.md` as a claim line for this leg's key.
+  The third registration is not optional bookkeeping: the codebase-map gate-leg inventory reds on an
+  unclaimed key, that test is in this unit's own §7, and `TOOL-aPacedTurnstile-1` S12 explicitly
+  declines the key — "that unit adds its own key to this dossier when it lands" — so the obligation
+  was assigned by one unit and accepted by none until round 2's R16 found it.
 
 ## 3. Non-goals (OUT)
 
@@ -47,9 +51,10 @@ session QUEUES with visible position instead of running a competing 873 s bar.
 - Touching the per-worktree evidence paths. A struck, retained finding in
   `memory/builds/aBranchedMandate/build/` records a previous claim that those were shared, which was
   wrong and was kept as a lesson.
-- A separate map dossier. `TOOL-aPacedTurnstile-1` authors one dossier for this kit and this leg's
-  key is claimed there; a second dossier would double-claim a key `memory/map/FOUNDATION.md` already
-  owns.
+- A separate map dossier. `TOOL-aPacedTurnstile-1` authors ONE dossier for this kit and THIS unit
+  adds its own leg's claim line to it under S10; a second dossier would double-claim a key
+  `memory/map/FOUNDATION.md` already owns. The passive "is claimed there" is what let the claim
+  belong to nobody — the accepting half of `-1` S12's hand-off is S10, stated in the active.
 - An exemption row for the new suite. It lands inside the kit directory, which the kit's file rule
   already claims.
 
@@ -136,11 +141,24 @@ it to catch interrupt, terminate and hangup fixes that leak as well as releasing
 re-reads the holder's nonce and removes it only on a match; it removes its own ticket
 unconditionally, which is safe because the name is unique.
 
-One premise here depends on a sibling and is stated rather than assumed: `TOOL-aPacedTurnstile-5`
-retargets the scratch directory into the git dir and drops the cleanup this trap performs. The
-widened trap therefore releases the beacon and sweeps the run directory, and the two units must agree
-on which of them owns the cleanup line — this one does, because it is the unit that widens the
-signal set.
+One premise here depends on a sibling and is stated rather than assumed, and round 2's R2/R3
+corrected it in both directions. `TOOL-aPacedTurnstile-5` retargets the per-leg COMPLETION FILES
+into `<git-dir>/gate-run/<run-id>/`; it does NOT retarget the `mktemp -d` scratch, which survives and
+still holds the timings temporaries. So there are two directories with two lifetimes:
+
+- **The `mktemp -d` scratch belongs to this trap.** The widened trap releases the beacon and sweeps
+  the scratch dir, on EXIT and now also on INT, TERM and HUP. That is the leak the round-1 finding
+  actually named, and it is this unit's to close because it is the unit that widens the signal set.
+- **`<git-dir>/gate-run/` belongs to `TOOL-aPacedTurnstile-5` and this trap never touches it.** It is
+  the durable record, its only deleter is that unit's post-verdict sweep, and nothing clears it at
+  the start of a run.
+
+The earlier spelling — "the widened trap therefore releases the beacon and sweeps the run directory"
+— claimed the cleanup line for this unit with the ownership REVERSED, on a premise about `-5` that
+its text does not support. This unit lands sixth, after `-5` and `-3`, so the reversed version would
+have won by default and deleted the record on every clean exit and on all three caught signals —
+every path except the crash the record exists to make readable — reddening `-5` AC3 and `-3`
+AC7/AC8 on the bar the moment it landed.
 
 A hard kill runs no trap at all. That case is exactly what the reaper exists for, and an arm proves
 recovery within one poll tick rather than after the TTL.
@@ -188,6 +206,7 @@ already fails open, so the degraded state and the rollback state are the same an
 | `tools/run-gates/run-gates.turnstile.test.sh` | new — the suite, driven against scratch repos |
 | `tools/gate-legs.json` | the new leg |
 | `tools/run-gates/kit.toml` | the fifth gate-leg row |
+| `memory/map/features/run-gates.md` | this leg's claim line — the key `TOOL-aPacedTurnstile-1` S12 explicitly declined and left to this unit (R16) |
 | `AGENTS.md` | the turnstile bullet |
 
 ### Alternatives rejected
@@ -270,11 +289,22 @@ already fails open, so the degraded state and the rollback state are the same an
 
 ## 8. Open questions
 
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
+
 - **Whether the TTL should be lowered once the heavy legs are sharded.** The default is set well
   above the 659.9 s floor deliberately. Recommendation: leave it, with the measurement written beside
   the constant, and let the sharding build lower it against its own number.
+  RESOLVED (agent, 2026-08-18, delegated): leave it, with the measurement written beside the
+  constant. Lowering it against a floor this build does not move would be tuning to a number the
+  sharding build is about to invalidate, and the constant's comment is what carries the reason
+  forward to that build.
 - **Whether an uncontended run should skip the ticket for speed.** Recommendation: no, as argued
   above — the barging hole costs more than the create.
+  RESOLVED (agent, 2026-08-18, delegated): no - every run takes the ticket. The barging hole
+  costs more than the create, and section 3 rules that every failure mode of this unit must be
+  "slower" or "unqueued" and never "checked less"; a skip path is the one shape that can
+  violate it.
 
 ## 9. Revision log
 
@@ -285,6 +315,18 @@ already fails open, so the degraded state and the rollback state are the same an
   runner, having tested a mutant (F19); AC4b arms the heartbeat, without which every reaping arm is
   satisfied by a reaper that reaps everything (F17); the wait bound becomes a declared value (F37);
   the trap's interaction with `TOOL-aPacedTurnstile-5`'s retargeting is stated (F38).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
+- rev-4 · 2026-08-18 · folded the round-2 spec audit. R2/R3: §4's sibling-premise paragraph was
+  factually wrong about `TOOL-aPacedTurnstile-5` — that unit retargets the per-leg COMPLETION FILES,
+  not the `mktemp -d` scratch, which survives and still holds the timings temporaries — and it
+  claimed the cleanup line for this unit with the ownership REVERSED. Since this unit lands sixth,
+  the reversed version would have won by default and swept the durable record on every clean exit
+  and on INT, TERM and HUP, reddening `-5` AC3 and `-3` AC7/AC8 at its own landing. The two
+  directories now have one owner each, stated in both files. R16: S10 accepts the map claim line
+  `-1` S12 declines, §4 Files touched carries the dossier, and §3's non-goal stops saying "is
+  claimed there" in the passive with no owner.
 
 ## 10. Reuse audit
 

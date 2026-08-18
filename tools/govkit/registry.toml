@@ -34,7 +34,7 @@ globs = [
 # The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
 # non-conditional entry) and is deliberately not written down anywhere.
 [selection]
-default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall"]
+default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall", "run-gates"]
 
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
@@ -48,6 +48,10 @@ descriptor = "tools/codebase-map/kit.toml"
 [[entry]]
 id = "memory-recall"
 descriptor = "tools/memory-recall/kit.toml"
+
+[[entry]]
+id = "run-gates"
+descriptor = "tools/run-gates/kit.toml"
 
 [[entry]]
 id = "drift-audit"
@@ -136,29 +140,18 @@ kind = "flat"
 path = "tools/lib"
 why = """
 Not a kit. It has no README, no version constant and no adopter, and it ships nothing: it is
-gov-internal. `resolve-python.sh` is the canon every inline copy in every kit is gated against, and
-`tools/run-gates.sh` sources it at runtime — which is why the gate-runner cluster is exempt too
-rather than deployable-but-broken. TOOL-aSealedCaravan-1 S9 gave the memory-tree kit its own
+gov-internal. `resolve-python.sh` is the canon every inline copy in every kit is gated against. The gate-runner
+cluster USED to be exempt because it sourced this path at runtime and so could not travel;
+the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` inlined the canonical block into every shipped file that had one and promoted
+run-gates to an entry, so that reason is retired rather than repeated. TOOL-aSealedCaravan-1 S9 gave the memory-tree kit its own
 launcher, so nothing under here ever needs to travel. The `merge.rows.driver` argument earlier
 revisions of the spec gave for this exemption is STALE and is not repeated: that config now names a
 kit-internal launcher.
 """
 
 [[exempt]]
-path = "tools/run-gates.sh"
-why = "gov's own gate runner. A spec non-goal: govkit wires legs into the runner a target already has, and this one is not deployable as it stands — it sources tools/lib/, the permanently exempt directory, and exits 2 with zero legs run when that path is absent."
-
-[[exempt]]
 path = "tools/gate-legs.json"
 why = "gov's own leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
-
-[[exempt]]
-path = "tools/run-gates.test.sh"
-why = "the gate runner's own canary; travels with the runner, which is exempt."
-
-[[exempt]]
-path = "tools/run-gates.evidence.test.sh"
-why = "the gate runner's own evidence arm; travels with the runner, which is exempt."
 
 [[exempt]]
 path = "tools/check-template-size.sh"
@@ -253,15 +246,9 @@ grades tools/lib/, the permanently exempt gov-internal directory, plus the inlin
 """
 
 [[exempt_leg]]
-name = "run-gates canary"
+name = "run-gates gov canary"
 why = """
-gov's own gate runner's canary; the runner is a registry exemption and the canary travels with it.
-"""
-
-[[exempt_leg]]
-name = "run-gates evidence"
-why = """
-gov's own gate runner's evidence arm; travels with the runner, which is exempt.
+the GOV-ONLY arms of the run-gates canary, gov-only for the reason the recall-floor pair above is: each arm is keyed on THIS repo's corpus — gov's declared chunk names, gov's network-calling leg names, a named gov leg's guard — so in any other tree they would red on absence rather than on behaviour. `tools/run-gates/kit.toml` withholds the file from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs, and the harness REFUSES (exit 2) rather than passing when the manifest it is pointed at is not gov's. The SHIPPED canary keeps every assertion true in any tree and is claimed, as a [[gate_leg]] of the run-gates entry.
 """
 
 [[exempt_leg]]

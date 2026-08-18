@@ -1,0 +1,112 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`
+# under memory/builds/aPacedTurnstile/spec/.
+#
+# WHY THIS KIT EXISTS AT ALL. The runner was a registry EXEMPTION with two stated reasons, both
+# exact: it sourced tools/lib/, which is gov-internal and never travels, and with that path absent
+# it exited 2 having run ZERO legs. So `govkit apply` wired legs into a runner the target was
+# assumed to already own, and a target that owned none received a merge bar that could not start.
+# S2 cut the dependency by inlining the resolver into every shipped file that had one; this
+# descriptor is what makes the result deployable.
+
+id = "run-gates"
+home = "tools/run-gates"
+scope = "repo"
+version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
+requires = []
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THE GOV-ONLY HARNESS IS WITHHELD. Its arms are keyed on THIS repo's corpus — gov's declared chunk
+# names, gov's network-calling leg names, a gov leg's guard — and in an adopter tree the manifest is
+# seeded empty and emitted from descriptors, so every one of them would red on arrival. That is
+# memory/gotchas/pin-copied-from-another-corpus.md, the class this kit's own spec refuses by name
+# when it declines to seed an adopter with gov's leg names.
+#
+# Withheld by CLAIMING the destination, exactly as tools/memory-recall/kit.toml withholds
+# check-recall.py, recall-fixture.json and test_recall_floor.py: govkit has no `exclude` key, a `**`
+# rule's pool drops only what another rule owns, and `project-owned` is absent from the landable
+# roles so `apply` never writes it. It is a leg on GOV's bar and carries an [[exempt_leg]] row in
+# tools/govkit/registry.toml — deliberately NOT a [[gate_leg]] below, because a descriptor row
+# naming a leg the target's manifest cannot carry is what reds the deployer's selfcheck.
+[[files]]
+include = ["run-gates.gov.test.sh"]
+role = "project-owned"
+
+[adopt]
+argv = ["bash", "{kit}/adopt-run-gates.sh"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = "{kit}/run-gates.sh" }
+means = "adopted"
+
+# FOUR gate legs, and four is the RULE rather than a census: these are the legs the kit SHIPS. A
+# fifth harness — the gov-only canary above — exists on gov's own bar at this kit's landing and is
+# correctly absent here because it travels nowhere. the turnstile unit's turnstile suite is a
+# genuine fifth row and THAT unit adds it, to this file and to the manifest together: a descriptor
+# row naming a leg the manifest does not carry reds selfcheck at the adding unit's own landing,
+# which is the round-1 blocker this file was rewritten to avoid.
+[[gate_leg]]
+name = "run-gates canary"
+argv = ["bash", "{kit}/run-gates.test.sh"]
+# Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
+# `apply` itself creates in the target — so the leg's own arrival changed the file it guards on and
+# the target ended wedged. A guard may name what the leg READS, never what installing it WRITES.
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "run-gates evidence"
+argv = ["bash", "{kit}/run-gates.evidence.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "run-gates adopter e2e"
+argv = ["bash", "{kit}/adopt-run-gates.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "run-gates wiring"
+argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
+guard = []
+
+# The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
+# entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in
+# `observed_ran` passes through verbatim, because it is the RUNNER's substitution and not the
+# deployer's. Without this the first `apply` after adopting the runner silently takes the
+# "ORDERED, not emitted" branch and exits 0 — the silent-green direction this deployer refuses by
+# name everywhere else.
+[gate_runner_seed]
+kind = "manifest"
+grammar = "json-array"
+file = "{prefix}/gate-legs.json"
+command = ["bash", "{kit}/run-gates.sh"]
+dedupe_key = "name"
+# The environment that makes a run TOTAL. Required by the deployer for a complete `manifest`
+# promotion; a partial one is refused rather than silently accepted. The runner reads this
+# name to bypass every leg guard, which is what the push boundary sets.
+run_all_env = "GATE_FULL=1"
+# ARRAYS, not scalars, and the closing review's blocker is why. `read_gate_verdicts` iterates
+# `for tmpl in (gr.get(key) or [])`, so a STRING is walked CHARACTER BY CHARACTER: the head becomes
+# the single character `G`, no real leg name is ever recovered, and because `observed_ran` is scanned
+# first and `setdefault` wins, no key can ever be red. Reproduced: a real `apply` exited 0 recording
+# {'ATE FAIL': 'green', 'ATE ok': 'green', ...} while the target's canary leg was genuinely RED.
+observed_ran = ["GATE ok    {name}"]
+observed_failed = ["GATE FAIL  {name}"]
+# D8: without this the deployer's `skipped` state is unreachable and its DEAD-PROBE refusal is
+# structurally dead. The runner prints this verb on every guard-scoped run.
+observed_skipped = ["GATE skip  {name}"]
+
+# Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
+# manifest a shell script parses; a CRLF script does not execute.
+[[lf_pin]]
+pattern = "{kit}/*.sh"
+why = "a CRLF shell script does not execute"
+[[lf_pin]]
+pattern = "{prefix}/gate-legs.json"
+why = "the runner parses it through python with LF-only byte writes, and the canary byte-compares its rows"

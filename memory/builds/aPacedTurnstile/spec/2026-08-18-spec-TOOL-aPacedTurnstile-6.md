@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point
 
-**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -42,7 +42,13 @@ is graded on what it actually changed.
   sees the bare spelling finds nothing in exactly the files that motivated it. It carries the
   anti-vacuity assertion the lexicon and playbook-parity gates already use: the scan over the real
   manifest must resolve the known network-calling legs BY NAME, and print `DEAD PROBE` and red when
-  its match set is empty.
+  its match set is empty. **That name-keyed half lands in the GOV-ONLY harness
+  `tools/run-gates/run-gates.gov.test.sh` that `TOOL-aPacedTurnstile-1` S1 splits out, not in the
+  shipped canary.** gov's network-calling legs do not exist in an adopter tree, so a shipped arm
+  demanding them by name — or reading an empty match set as `DEAD PROBE` — reds on arrival in every
+  target, which is the `pin-copied-from-another-corpus` class `-1` §3 refuses by name. The MATCHER
+  itself and the missing-declaration arm are tree-agnostic and stay in the shipped canary; only the
+  gov-corpus expectations move (round 2's R10).
 
 ## 3. Non-goals (OUT)
 
@@ -156,7 +162,8 @@ so the rollback state is the shipped state and every arm runs against it.
 | file | change |
 |---|---|
 | `tools/run-gates/run-gates.sh` | the reuse decision in the existing serial pre-pass, the key, the verb, the base |
-| `tools/run-gates/run-gates.test.sh` | S6's diverged-base arm, S8's structural arm |
+| `tools/run-gates/run-gates.test.sh` | S6's diverged-base arm, S8's structural matcher and its tree-agnostic arms |
+| `tools/run-gates/run-gates.gov.test.sh` | S8's gov-corpus expectations: the leg names and the `DEAD PROBE` control |
 | `tools/run-gates/run-gates.evidence.test.sh` | S7's reuse arms |
 | `tools/gate-legs.json` | the measured `impure` values |
 
@@ -200,8 +207,14 @@ so the rollback state is the shipped state and every arm runs against it.
 - **AC4** — When a leg is declared `impure`, it is never reused even on a byte-identical tree.
 - **AC5** — When a leg's previous row records a failure, it is never reused, asserted in
   `tools/run-gates/run-gates.evidence.test.sh`.
-- **AC6** — When `GATE_REUSE` is unset, no leg is reused and stdout is byte-identical to a run
-  against a manifest carrying no reuse state.
+- **AC6** — When `GATE_REUSE` is unset AND an immediately preceding green run left ledger rows that
+  WOULD match this run's keys — the precondition AC1 already states and this one did not — no leg is
+  reused and stdout is byte-identical to the control, which is that same tree run with the ledger
+  removed. Without the precondition both clauses pass by finding nothing on a cold ledger, which is
+  this repo's `memory/gotchas/fixture-passes-by-finding-nothing.md` class in the ONE criterion
+  guarding the opt-in default — and that default is §4's boundary rule, that an advisory input may
+  cause less work only on an opt-in, non-authoritative run. Stated this way, a leaked default shows
+  up as reuse verbs on the subject run's stdout (round 2's R28).
 - **AC7** — When the branch has DIVERGED from the default branch, a leg whose guard paths are
   unchanged since the branch point skips, where the same leg against the origin tip would run —
   asserted in `tools/run-gates/run-gates.test.sh`.
@@ -211,9 +224,16 @@ so the rollback state is the shipped state and every arm runs against it.
 - **AC9b** — When the run is ON the default branch, so the merge-base against it is HEAD itself, the
   base is refused and every leg runs — asserted in `tools/run-gates/run-gates.test.sh`. Without this
   the adopted merge-base form scopes the entire bar away on the one branch that matters most.
-- **AC12** — When the structural network matcher is run over `tools/gate-legs.json`, it resolves the
-  known network-calling legs by name, and when its match set is emptied it prints `DEAD PROBE` and
-  exits non-zero — the anti-vacuity control, without which S8 passes by finding nothing.
+- **AC12** — When `bash tools/run-gates/run-gates.gov.test.sh` runs, the structural network matcher
+  over `tools/gate-legs.json` resolves gov's known network-calling legs BY NAME, and when its match
+  set is emptied it prints `DEAD PROBE` and exits non-zero — the anti-vacuity control, without which
+  S8 passes by finding nothing. In the gov-only harness because the leg NAMES are gov's corpus
+  (round 2's R10).
+- **AC12b** — When `bash tools/run-gates/run-gates.test.sh` — the SHIPPED canary — runs against a
+  scratch manifest whose legs are none of gov's, the matcher still resolves a fixture leg that calls
+  out through a wrapper and exits 0 on a manifest where that leg carries its declaration. The
+  wrapper-awareness S8 argues for is a property of the MATCHER and is graded in any tree; only the
+  expectation about which real legs exist is gov's.
 - **AC10** — When a leg's own script directly calls out to the network and carries no `impure`
   declaration, `bash tools/run-gates/run-gates.test.sh` exits non-zero naming that leg.
 - **AC11** — When a run reuses any leg, `<git-dir>/gate-full-green` is not written, so the fact
@@ -221,11 +241,15 @@ so the rollback state is the shipped state and every arm runs against it.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.test.sh` · `bash tools/run-gates/run-gates.evidence.test.sh` ·
+`bash tools/run-gates/run-gates.test.sh` · `bash tools/run-gates/run-gates.gov.test.sh` ·
+`bash tools/run-gates/run-gates.evidence.test.sh` ·
 `bash tools/check-testsuite-counts.sh` · `bash tools/memory-tree/check-verdict-epoch.sh` ·
 `python tools/memory-tree/check-arms.py --check` · `bash tools/memory-tree/check-memory-hygiene.sh`.
 
 ## 8. Open questions
+
+none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
 
 - **Whether this unit and `TOOL-aPacedTurnstile-5` should be one spec.** The design research
   recommended one, on the argument that the consumers are the reason the record's fields exist, and
@@ -239,6 +263,9 @@ so the rollback state is the shipped state and every arm runs against it.
 - **Whether the structural network-call arm should walk two hops.** Recommendation: no. A graph
   walker does not earn itself for a three-leg population, and the gate states its own one-hop
   ceiling in its header the way `check-method-carriers.sh` already does.
+  RESOLVED (agent, 2026-08-18, delegated): no. A graph walker does not earn itself over a
+  three-leg population, and the gate states its own one-hop ceiling in its header the way
+  `check-method-carriers.sh` already does, so the limit is declared rather than discovered.
 
 ## 9. Revision log
 
@@ -250,6 +277,17 @@ so the rollback state is the shipped state and every arm runs against it.
   inherits (F22, F23); S8's matcher becomes wrapper-aware and carries a `DEAD PROBE` anti-vacuity
   control, having found zero sites in the very files that motivated it (F24); S4 states which unit
   owns the `impure` key against which owns its values (F41).
+- rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
+  place per M3, and the section's first non-blank line made machine-legal so the classifier
+  reads this unit as READY instead of FORKED.
+- rev-4 · 2026-08-18 · folded the round-2 spec audit. R10: S8's anti-vacuity control demands gov's
+  network-calling legs BY NAME and reads an empty match set as `DEAD PROBE`, which reds on arrival
+  in any adopter tree once `TOOL-aPacedTurnstile-1` makes the canary shippable; the gov-corpus
+  expectations move to that unit's gov-only harness and AC12b keeps the wrapper-aware MATCHER graded
+  in any tree, since wrapper-awareness is a property of the matcher and not of gov's corpus. R28:
+  AC6 gains the precondition AC1 already states — a preceding green whose rows would match — because
+  on a cold ledger both of its clauses passed by finding nothing, in the one criterion guarding the
+  opt-in default that §4's boundary rule rests on.
 
 ## 10. Reuse audit
 

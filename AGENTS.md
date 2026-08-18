@@ -72,7 +72,7 @@ rendered by `gen_build_index.py` from build front matter and every spec's status
 authored session ledger: the sharded per-node one retired at playbook v2.4 / memory-tree kit 1.8 and
 its shards sit frozen under `memory/archive/`.
 
-## The gate suite (the merge bar) — `bash tools/run-gates.sh`
+## The gate suite (the merge bar) — `bash tools/run-gates/run-gates.sh`
 
 The full bar is green at the push boundary; earlier runs are diff-scoped, and now MECHANICALLY so.
 Each self-test leg carries a `guard` in `tools/gate-legs.json` naming the kit dir it exercises, so a
@@ -127,8 +127,9 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
 - install prefix — `tools/check-install-prefix.sh` (+ `tools/check-install-prefix.test.sh`): nothing this repo SHIPS may spell a root-install kit path. Kits install at `tools/<kit>/` in a target (ONE segment — the codebase-map gate template resolves no deeper), every engine derives its own prefix, and what actually strands an adopter is a path SPELLED in something they receive: a runbook step, a usage header, a remedy string, a rendered artifact. Those fail quietly — a `tools/` install used to scaffold the adopter's own committed hygiene rule-set document with seven dead kit paths while the hygiene gate exited 0. The kit-name alternation is DERIVED from the tracked `tools/*` dirs; `*.test.sh`/`selftest.py` are excluded because they build root installs on purpose to prove the dual-spelling support kept for the not-retrofitted adopters; deliberate spellings live in the shrink-only `tools/install-prefix-waivers.txt` (11 today) and a waiver whose hit is gone reds as stale
 - verifier fan-out — `tools/workflows/check-verifier-fanout.sh` (+ `.test.sh`) and the protocol's kit/dogfood parity, `tools/workflows/check-protocol-parity.test.sh`
 - review-harness gates — `tools/workflows/check-review-join.sh` (no ref-keyed verdict join survives in any `tools/**/*.js` git can see — tracked OR untracked-and-unignored), `tools/workflows/check-workflow-syntax.js` (every workflow script parses as the async-function body its runtime evaluates), + `check-review-join.test.sh`
-- run-gates canary — `tools/run-gates.test.sh` (the legs are single-sourced from `tools/gate-legs.json`; the canary asserts the manifest is well-formed and `run-gates.sh` hardcodes no leg command)
-- run-gates evidence — `tools/run-gates.evidence.test.sh` (a red leg's own output survives on disk under `<gitdir>/gate-logs/`, the durable summary POINTS at it, and `gate-last-failure.txt` outlives a green re-run; drives the runner through `GATE_LEGS` so it never re-enters the real bar)
+- run-gates canary — `tools/run-gates/run-gates.test.sh` (the legs are single-sourced from the manifest the runner DERIVES as its kit dir's sibling; the canary asserts it is well-formed and that `run-gates.sh` hardcodes no leg command). It SHIPS, so every arm in it is true in any tree; the arms keyed on gov's own corpus live in `tools/run-gates/run-gates.gov.test.sh`, which is withheld from the kit payload by a `project-owned` rule and REFUSES rather than passing when pointed at a manifest that is not gov's
+- run-gates evidence — `tools/run-gates/run-gates.evidence.test.sh` (a red leg's own output survives on disk under `<gitdir>/gate-logs/`, the durable summary POINTS at it, and `gate-last-failure.txt` outlives a green re-run; drives the runner through `GATE_LEGS` so it never re-enters the real bar)
+- run-gates adopter e2e + wiring — `tools/run-gates/adopt-run-gates.test.sh` and `tools/run-gates/adopt-run-gates.sh --check`: the runner is a DEPLOYABLE KIT (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), so `--check` asserts a target's `[gate_runner]` declaration still matches the heads this runner's `printf`s emit — when the output moves and the declaration does not, the deployer reports a bar that ran nothing rather than one whose format changed. The e2e is gated on EFFECTS, and its mutation arm is what stops the NOT-ADOPTED path being satisfied by a `--check` that does nothing
 - branch guard self-test — `.githooks/pre-commit.test.sh` (the pre-commit refuses primary-tree commits off the default branch)
 - pre-push self-test — `.githooks/pre-push.test.sh` (the pre-push runs the full bar on a default-branch push, blocks a red one)
 - push-main self-test — `tools/push-main.test.sh` (the lander reconciles origin before the gate, retries a mid-gate race capped, aborts a conflict; the hook refuses a raw default-branch push)
@@ -270,12 +271,12 @@ output is persisted per-leg under `<git-dir>/gate-logs/`, redacted, and a RED ru
   claim that no other leg has a harness — a self-test nobody cites is a leg nobody notices going quiet.
 
 The full bar's authoritative run is the tracked **`.githooks/pre-push`** hook: a push to the default
-branch runs `tools/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated
+branch runs `tools/run-gates/run-gates.sh` once and blocks a red push (classify on the remote ref; the validated
 tree must be the pushed tip; `GOV_GATE_CMD` overrides the gate for testing; `--no-verify` bypasses).
 Earlier runs (DoR, post-merge) are diff-scoped. The active hooks are the tracked `.githooks/` dir via
 `core.hooksPath`, NOT an out-of-tree copy, so there is no staleness-drift class here (the
 `WIRE-INTO-PROJECT.md` copy-install path would reintroduce it — a scoped follow-up). Wire into CI by
-running `tools/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a follow-up). A tracked
+running `tools/run-gates/run-gates.sh` in a workflow (needs a `workflow`-scoped push — a follow-up). A tracked
 pre-commit fast leg is in `.githooks/` (install: `git config core.hooksPath .githooks`) — it also
 enforces the §3 branch guard (refuses a primary-tree commit off the default branch; pin with
 `GOV_DEFAULT_BRANCH`, override with `--no-verify`). A SessionStart hook in `.claude/settings.json`

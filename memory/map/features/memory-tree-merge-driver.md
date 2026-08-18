@@ -139,7 +139,7 @@ ids with no change here.
 `tools/lib/pyrun.sh` is a shim over `tools/lib/resolve-python.sh`, not a second resolver: it sources
 the canonical block rather than inlining it, so it is deliberately absent from the inline-copy parity
 population (which is derived by `git grep -l '^# >>> resolve_python'`). It exists because
-`resolve_python` is source-and-call and git never goes through `tools/run-gates.sh`, so the runner's
+`resolve_python` is source-and-call and git never goes through `tools/run-gates/run-gates.sh`, so the runner's
 `$PYBIN` substitution cannot reach a merge driver.
 
 `tools/check-wiring.sh`'s `first_of` supplies the two-layout path resolution both the driver and its
@@ -194,4 +194,4 @@ wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-install
 ## Reuse affordance
 
 seam: merge-rows.skeleton — reuse for any three-way merge where SOME lines must be merged by key and the rest positionally: project each input to a token list, let `git merge-file` merge that, key-merge the tokens separately, recombine. Extend via a second line-class predicate, never by re-deriving placement. (This replaces the retired `merge-rows.split_regions` seam, which offered the three-region prose-then-rows model — withdrawn with kit 2.2 because that model is what the two planes replace.)
-seam: pyrun.sh — reuse whenever a tool OUTSIDE `tools/run-gates.sh` must run a python script (a git driver, a hook, an editor integration); extend by calling it, never by naming a launcher.
+seam: pyrun.sh — reuse whenever a tool OUTSIDE `tools/run-gates/run-gates.sh` must run a python script (a git driver, a hook, an editor integration); extend by calling it, never by naming a launcher.
