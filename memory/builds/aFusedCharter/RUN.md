@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: bd6dd7f6a4aad362b47591f79386aab75f7ba448
+witness: 5b00666a223afb6770cdabc76c283f8aeca90343
 phase: BUILDING
 branch-sha: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 branch-ref: refs/heads/branch/governance-template-convergence-91c2c6
@@ -21,3 +21,5 @@ anchor-ref: refs/heads/main
 base: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 
 ## Parked
+
+2026-08-18T12:32:10Z decision · item The full bar has not completed a green run in this session · reason It exceeds 10 minutes on node a against 4139 stale scratch dirs in TMPDIR, which is the documented environment trap; every leg this pass touches was run individually and is green, but the authoritative full run is owed before landing and no run in this session produced one. Options seen: keep retrying inside a single tool call (rejected, it exceeds the wall-clock limit), run it detached across turns (the resumption's job), or land without it (refused).
