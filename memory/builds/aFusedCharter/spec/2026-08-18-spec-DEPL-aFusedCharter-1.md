@@ -1,13 +1,13 @@
 # DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires
 
-**Status:** OPEN · rev-1 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
+**Status:** OPEN · rev-2 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
 
 ## 1. Goal
 
-Replace `parallel-coding-governance.customize.md` — prose instructing a human agent to fill 27
-placeholders and hand-delete ten conditional blocks — with a renderer that derives what the target
-repo can answer, refuses what it cannot, drops the blocks the target has no kit for, and writes the
-result into the target's charter as a re-renderable region.
+Replace `parallel-coding-governance.customize.md` — prose instructing a human agent to fill every
+placeholder by hand and delete the conditional blocks their project has no kit for — with a renderer
+that derives what the target repo can answer, refuses what it cannot, drops those blocks by
+selection, and writes the result into the target's charter as a re-renderable region.
 
 ## 2. Scope (IN)
 
@@ -113,19 +113,29 @@ empty string is how a charter ships with a blank where a branch name belongs.
 
 ### Inventory
 
-The 27 placeholders surviving `PLAY-aFusedCharter-1`'s cuts, by class. Counts are stated nowhere in
-the shipped files: `adopt-playbook.sh --check` derives every population figure, because a count
-written in prose beside a table rots between edits and this repo has that defect on record twice.
+The placeholders surviving `PLAY-aFusedCharter-1`'s cuts, by class. **No count appears here or in any
+shipped file** — `adopt-playbook.sh --check` derives every population figure. A count written in
+prose beside a table rots between edits, and this spec proved it: an earlier revision said 27 over a
+table that enumerated 27 while the measured set was 28, because the table had silently dropped the
+per-node variances row. The table below is the enumeration and the measurement is the authority.
 
 | Class | Members |
 |---|---|
 | derived | project name · default branch · memory root, disciplines and id families from the memory-tree conf · the CI workflow file · the gate runner · the lexicon conf's presence · this node's tag, machine, primary tree and worktree root |
-| asked | stream ownership · the doc routing table · the product preamble · the repo layout map · the command catalog · the product context home · gate commands · the commit trailer · the worktree script · the kind-factory map · shared primitives location · toolchain notes |
+| asked | stream ownership · per-node variances · the doc routing table · the product preamble · the repo layout map · the command catalog · the product context home · gate commands · the commit trailer · the worktree script · the kind-factory map · shared primitives location · toolchain notes |
 | defaulted | help dir · review dir · prose audit |
 
 The fleet rows are the interesting case: the CURRENT node is derivable from hostname, username and
-the repo root, and every OTHER node is not derivable at all. The renderer therefore derives one row
-and asks whether more exist, rather than pretending a one-node registry is complete.
+the repo root, and every OTHER node is not derivable at all — and the per-node variances column is
+not derivable even for this node, since a credential quirk or a harness launch config is knowledge
+the operator has and the tree does not. The renderer therefore derives one row, asks for its
+variances, and asks whether more nodes exist, rather than pretending a one-node registry is complete.
+
+The measurement itself is worth stating once, because two of this build's units depend on it: the
+union of both current files is 38 distinct placeholders with exactly one shared between them, and
+the two deleted sections account for ten. Convergence also dissolves the shared/disjoint problem
+entirely — with one file there is no second carrier for a placeholder to be shared with, which is
+why `TOOL-aFusedCharter-1` S3 can delete the catalogue-arithmetic arm rather than repoint it.
 
 ### Migration
 
@@ -239,6 +249,10 @@ none — the forks below are RESOLVED.
 
 - rev-1 · 2026-08-18 · initial draft. F3's resolution folded the render-parity gate into this
   unit's `--check`, which is why the build roster carries seven units and not eight.
+- rev-2 · 2026-08-18 · the Inventory stated a placeholder count of 27 over a table enumerating 27,
+  and the measured set is 28 — the per-node variances row was missing from the table and from the
+  count. The count is deleted rather than corrected, per the rule the same paragraph states, and
+  the missing member is added to the asked class.
 
 ## 10. Reuse audit
 

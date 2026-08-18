@@ -129,7 +129,7 @@ ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCh
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-1 | 2026-08-18 |
+| [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | OPEN | rev-2 | 2026-08-18 |
 | [PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session](spec/2026-08-18-spec-PLAY-aFusedCharter-1.md) | OPEN | rev-1 | 2026-08-18 |
 | [PLAY-aFusedCharter-2 — every session emits a shaped overview of its own state, and the shapes get one grammar](spec/2026-08-18-spec-PLAY-aFusedCharter-2.md) | OPEN | rev-1 | 2026-08-18 |
 | [PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest](spec/2026-08-18-spec-PLAY-aFusedCharter-3.md) | OPEN | rev-1 | 2026-08-18 |
