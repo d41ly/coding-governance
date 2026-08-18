@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-8 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -84,7 +84,12 @@ obligation instead of deleting it.
   instead of stopping at the first red chunk.
 - **S8** — `.githooks/pre-push.test.sh` gains one arm per forcing predicate, one arm proving the
   scoped path actually scopes, one proving the no-halt export, and one asserting the lag constant in
-  the hook is a decimal integer at edit time (S6). It also gains an EXECUTED ASSERTION COUNTER in the
+  the hook is a decimal integer at edit time (S6). **One arm of this unit lands in a SIBLING's
+  suite**: AC6d's header assertion goes in `tools/run-gates/run-gates.evidence.test.sh`, because
+  that is the harness which really drives the runner and because `TOOL-aPacedTurnstile-5` owns the
+  header — the hook's own suite stubs the gate by design. Named here rather than only in the
+  criterion, because §4 Files touched is what a builder derives the commit's edits from and a
+  cross-unit arm recorded in neither unit is an arm nobody writes (round 4's V4). It also gains an EXECUTED ASSERTION COUNTER in the
   agreed shape, and this unit DELETES that suite's row from
   `memory/project/testsuite-count-waivers.txt` in the same commit. Both halves or neither: the
   registry reds on a waiver naming a suite that now complies, so a counter without the deletion and a
@@ -114,7 +119,13 @@ obligation instead of deleting it.
   memory-tree plus the promoted run-gates kit receives a parity leg that skips when their own
   build-method guide moves — the wrong-merge-verdict inversion this unit exists to bound, exported
   rather than fixed. Nothing catches the divergence today: govkit's selfcheck joins descriptor gate
-  legs to the manifest by NAME only and never compares the two guards.
+  legs to the manifest by NAME only and never compares the two guards. **So this unit also writes
+  the arm**, in `tools/govkit/selftest.py`, which already parses every descriptor: an assertion that
+  this leg's declared guard names `memory/guides/`, with a narrow-spelling fixture as its control.
+  Stated as a scope obligation and not only in AC9b, because the criterion alone is the R11-R13
+  shape one level down — it can fail, but nothing tells the builder to write it (round 4's V5). The
+  GENERAL descriptor-to-manifest guard join stays out and is `TOOL-aPacedTurnstile-12`; this is one
+  assertion about one leg.
 
 ## 3. Non-goals (OUT)
 
@@ -208,6 +219,8 @@ cold start rather than a special case.
 | `memory/guides/SESSION-KICKOFF.md` | the fourth statement of the claim (S9) |
 | `tools/gate-legs.json` | S10's guard row — gov's carrier |
 | `tools/memory-tree/kit.toml` | S10's OTHER carrier: the same leg's declared guard, which govkit emits verbatim into a target (R7) |
+| `tools/run-gates/run-gates.evidence.test.sh` | AC6d's header arm — a CROSS-UNIT edit into `TOOL-aPacedTurnstile-5`'s suite, because that unit owns the header and the hook's own suite stubs the gate (V4) |
+| `tools/govkit/selftest.py` | S10's guard assertion over `tools/memory-tree/kit.toml` and its narrow-spelling control (V5) |
 | `memory/project/testsuite-count-waivers.txt` | the pre-push suite's row, deleted beside S8's counter |
 
 ### Alternatives rejected
@@ -236,8 +249,9 @@ cold start rather than a special case.
 - observability — S5 is the observability: the reason string is printed and recorded.
 - risks (concurrency, data-loss, rollback hazards) — the residual risk is a too-narrow guard landing
   a wrong verdict inside the lag window. Rollback is one line.
-- testing + left-shift gates — S8's arms, one per forcing predicate. The class left-shifts as the
-  forcing table itself.
+- testing + left-shift gates — S8's arms: one per forcing predicate, the scoped-path arm, the
+  no-halt arm, the edit-time lag-constant arm, and AC6d's header arm in the sibling evidence suite.
+  The class left-shifts as the forcing table itself.
 - migration / rollback — no migration. Cold start forces full, which is correct.
 - user docs — S9, across every carrier the measured search selects, seven at this base, two of them
   product files an adopter receives and one of them the build-method guide edited as a pair with its
@@ -271,9 +285,9 @@ cold start rather than a special case.
   spelling a blocker. Without the second half this criterion is satisfied by a predicate 0 that fires
   unconditionally.
 - **AC6c** — When the pushed tip is a merge whose second parent is not an ancestor of the recorded
-  green — the shape `tools/push-main.sh` produces when it reconciles and retries —
+  green — of which the `tools/push-main.sh` reconcile retry is ONE INSTANCE, not the population —
   `bash .githooks/pre-push.test.sh` observes `GATE_FULL=1` AND the reason
-  `a reconcile merge is not covered by the record`. Graded in the HOOK's suite, not the lander's,
+  `a merge tip the record does not cover`. Graded in the HOOK's suite, not the lander's,
   because the hook derives the fact from the commit it is handed and needs no channel from the
   lander; `bash tools/push-main.test.sh` keeps only the end-to-end observation that a reconciled
   retry lands green. **Its control is the negative half, and it is required:** a merge tip whose
@@ -309,10 +323,13 @@ cold start rather than a special case.
   `TOOL-aPacedTurnstile-1` S1 splits out, because this arm names a gov leg and would red on arrival in
   an adopter tree — the kit/dogfood parity leg's guard names `memory/guides/`, and a fixture touching
   only `memory/guides/BUILD-METHOD.md` causes that leg to RUN rather than skip.
-- **AC9b** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, it asserts that
+- **AC9b** — When `python tools/govkit/selftest.py` runs, it asserts that
   `tools/memory-tree/kit.toml`'s declared gate-leg guard for this leg names `memory/guides/`, and a
-  fixture reverting it to the narrow spelling reds. The arm lives in the memory-tree kit's own suite
-  because that is the kit whose descriptor carries the guard, and because **`govkit.py` performs no
+  fixture reverting it to the narrow spelling reds. The arm lives THERE and not in
+  `kit-dogfood-parity.test.sh`, which round 4's V5 established is a bash document-differ whose whole
+  declared contract is two rendered documents and which reads no `kit.toml` at all — putting a TOML
+  read inside it would be a new capability in the wrong host. `tools/govkit/selftest.py` already
+  parses every descriptor. The arm is an obligation of S10, not only of this criterion, and **`govkit.py` performs no
   such comparison** — its descriptor/manifest join reads the leg NAME only, exactly as S10's own
   closing sentence says. An earlier spelling of this criterion demanded selfcheck red on that
   fixture, which no scope item built and no existing arm could satisfy: an obligation named in prose
@@ -334,7 +351,7 @@ cold start rather than a special case.
 `bash tools/run-gates/run-gates.gov.test.sh` · `bash tools/check-testsuite-counts.sh` ·
 `bash tools/check-playbook-parity.sh` · `bash tools/memory-tree/check-memory-hygiene.sh` ·
 `python tools/memory-tree/check-arms.py --check` · `python tools/govkit/govkit.py selfcheck` ·
-`bash tools/memory-tree/kit-dogfood-parity.test.sh` ·
+`python tools/govkit/selftest.py` · `bash tools/memory-tree/kit-dogfood-parity.test.sh` ·
 and the full bar, `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — the POST-move path, which is
 what this unit runs at its own landing and which the last entry still spelled pre-move.
 
@@ -422,6 +439,15 @@ recommendation; the reason each survived the veto order is recorded with it.
   descriptor-to-manifest guard join is filed as `TOOL-aPacedTurnstile-12`. T13/T16/T23: §5's
   user-docs line stops restating a count S9 no longer carries. T18: the cross-reference to `-5`'s
   deleted start-of-run reset is gone.
+- rev-8 · 2026-08-18 · folded round 4, which returned CLEAN WITH FIXES — the T1 blocker closed
+  WHOLE across all seven carriers, and nothing here of that grade. V1: AC6c still asserted the
+  RETIRED reason literal and the narrow push-main gloss that S2b and §4's table were rewritten in
+  the same commit to reject, so no implementation satisfied both binding carriers and the cheapest
+  field repair would have restored T12. V4: AC6d's move to the sibling evidence suite landed in the
+  criterion alone — S8, §5 and §4 Files touched now carry the cross-unit arm, since a cross-unit arm
+  recorded in neither unit is an arm nobody writes. V5: AC9b named a bash document-differ that reads
+  no `kit.toml`; it points at `tools/govkit/selftest.py`, which already parses every descriptor, and
+  S10 states the arm as an obligation rather than leaving it in the criterion alone.
 
 ## 10. Reuse audit
 

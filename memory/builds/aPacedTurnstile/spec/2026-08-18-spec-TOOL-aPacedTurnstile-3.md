@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -99,7 +99,10 @@ than commoner. The arm guarding that race stays regardless.
 ### Data model
 
 One optional slug per leg. Order is first appearance. Chunks are required to be CONTIGUOUS in gov's
-own manifest, asserted by a canary arm, because contiguity is what makes "report order equals
+own manifest, asserted in `tools/run-gates/run-gates.gov.test.sh` (AC6) rather than in the SHIPPED
+canary, because gov's six declared chunk names are gov's corpus — the bare word "canary" names two
+harnesses in this file and S8 and AC6b already distinguish them by path. Contiguity is what makes
+"report order equals
 manifest order" a theorem rather than a second rule. The RUNNER is nevertheless tolerant of
 non-contiguity, grouping by first appearance and reporting each chunk's members in manifest order —
 needed because the deployer appends emitted rows kit by kit, so an adopter's manifest can interleave
@@ -356,6 +359,10 @@ recommendation; the reason each survived the veto order is recorded with it.
   T17: S9's exclusive-ownership claim over the kickoff guide is narrowed to the gate-command BLOCK,
   since `-1` and `-7` both edit that file and one of those edits is the `watch:` line whose omission
   fails the kickoff ratchet.
+- rev-7 · 2026-08-18 · folded round 4's V6: §4 Data model was T9's fourth carrier and the one the
+  round-3 fold missed — it still assigned contiguity to "a canary arm" while AC6, AC6b, S8, §7 and
+  the files-touched row all name the harness by path. It now names it too, and stops using the bare
+  word for both harnesses.
 
 ## 10. Reuse audit
 

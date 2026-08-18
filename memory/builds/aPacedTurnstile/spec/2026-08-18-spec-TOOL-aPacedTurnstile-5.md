@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -90,7 +90,16 @@ including after a crash.
   edit. The carry-forward merge for guard-skipped legs is kept exactly as written, and the rewrite
   becomes an atomic rename rather than a copy.
 - **S7** — `<git-dir>/gate-full-green` is written ONLY when the run failed nothing, skipped nothing,
-  reused nothing, the tree did not move, AND the tree was CLEAN when the run started. This is the
+  reused nothing, the tree did not move, AND the tree was CLEAN when the run started. **CLEAN means
+  exactly `git status --porcelain` EMPTY, untracked-and-unignored files included** — the same
+  predicate §4 computes the fingerprint's own porcelain component from, and it is spelled out here
+  because S5's binding property is exactly as strong as this precondition and nothing else in the set
+  defines the word. The obvious `git diff --quiet` pair ignores untracked files and would satisfy
+  every other word of this item with a `??` line present; the record would then carry a digest whose
+  porcelain and dirty-blob components are NON-empty, which the rev form cannot reproduce at any sha,
+  so predicate 0 would mismatch on every later push and force full forever while printing `the record
+  describes a different tree` — the blocker back in its unconditional-mismatch form, and neither AC17
+  (which grades the helper) nor a diff-only fixture could see it (round 4's V3). This is the
   file `TOOL-aPacedTurnstile-7` reads, and those five preconditions are what make it mean what its
   name says. The clean-tree precondition is the one the spec audit found missing: a developer's
   ordinary full run on a dirty tree would otherwise stamp a green that the push boundary then treats
@@ -228,7 +237,7 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
 |---|---|
 | `tools/run-gates/run-gates.sh` | destination, trap narrowing, header, per-leg row, verdict, ledger, post-verdict sweep |
 | `tools/run-gates/gate-fingerprint.sh` | NEW — S5's digest in BOTH forms: no argument for the runner's working-tree stamp, `<rev>` for the hook's at-a-rev recomputation, equal on a clean tree |
-| `tools/run-gates/run-gates.evidence.test.sh` | S9's arms |
+| `tools/run-gates/run-gates.evidence.test.sh` | S9's arms, plus AC15/AC16/AC17. `TOOL-aPacedTurnstile-7` also lands ONE arm here — AC6d's, reading the forced-full reason out of the header this unit writes — because that unit's own suite stubs the gate. Recorded on both sides so the file has one ownership statement (V4) |
 | `tools/run-gates/run-gates.test.sh` | S10's pinned key set |
 | `tools/gate-legs.json` | the `impure` key on the measured legs |
 | `AGENTS.md` | the durable-evidence bullet gains the record |
@@ -297,7 +306,11 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   inversion rests on and it was the only one of the five with no negative control.
 - **AC13** — When the working tree is DIRTY at the start of an otherwise fully green run,
   `<git-dir>/gate-full-green` is not written, asserted in
-  `tools/run-gates/run-gates.evidence.test.sh`.
+  `tools/run-gates/run-gates.evidence.test.sh`, **across TWO fixtures whose only difference is what
+  makes them dirty**: one with a modified tracked file, and one whose ONLY dirtiness is an untracked,
+  unignored file. The second is the fixture that separates S7's definition of CLEAN from the
+  `git diff --quiet` reading, and without it the two definitions are graded identically while
+  selecting genuinely different populations (round 4's V3).
 - **AC14** — When the run id is pinned through a test seam and a stale completion file for leg index
   3 is planted INSIDE that exact run directory before the run starts, that leg still EXECUTES and its
   reported verdict is the one it produced this run — asserted in
@@ -313,9 +326,18 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   before dispatch. Without the named constant the criterion is satisfied by any bound a builder
   picks, including one above the fixture's size, which passes by finding nothing (round 2's R6,
   round 3's T14/T21).
-- **AC17** — When `tools/run-gates/gate-fingerprint.sh` is invoked with no argument on a CLEAN tree
-  and with `HEAD` as its rev argument, the two invocations print the SAME digest; and when the tree
-  is made dirty, they DIFFER, with the rev form unchanged from its clean-tree value. Asserted in
+- **AC17** — Three invocations, and the third is the one that binds the ARGUMENT. (a) With no
+  argument on a CLEAN tree and with `HEAD` as its rev argument, the two print the SAME digest.
+  (b) When the tree is made dirty, they DIFFER, with the rev form unchanged from its clean-tree
+  value. (c) **On a clean tree with at least two commits whose trees differ, the helper at `HEAD~1`
+  DIFFERS from the helper at `HEAD`, and equals the no-argument form measured with that rev checked
+  out clean.** Without (c) an implementation that computes the tree object at HEAD unconditionally
+  and reads the argument COUNT only — to decide whether to include the porcelain and dirty-blob
+  components — passes (a) and (b) including (b)'s unchanged-rev clause, and the argument is dead.
+  That form is precisely what restores round 2's blocker: the hook calls at the recorded sha, gets
+  the digest at the tip, and predicate 0 fires on every push whose tree moved. It fails toward FULL,
+  so no leg reds. (c) is the only assertion in the seven specs that invokes the helper at a rev whose
+  tree differs from HEAD's (round 4's V2). Asserted in
   `tools/run-gates/run-gates.evidence.test.sh`. Both halves: the equality alone is satisfied by a rev
   form that ignores its argument, and the difference alone by two unrelated digests. This is the
   criterion `TOOL-aPacedTurnstile-7`'s predicate 0 rests on — the recorded value must be reproducible
@@ -417,6 +439,17 @@ recommendation; the reason each survived the veto order is recorded with it.
   own sha. AC17 arms both halves. T14/T21: the retention bound R6 asked for is declared as
   `GATE_RUN_KEEP=5` with its reasoning, in `-4` S8's shape, and AC15 grades it by name instead of
   grading a declaration nothing made.
+- rev-7 · 2026-08-18 · folded round 4. V2: AC17 named the argument-ignoring hazard in its own text
+  and then armed only the worktree-reading half of it — both its invocations were at HEAD, so a
+  helper computing at HEAD unconditionally and reading only the ARGUMENT COUNT passed both halves
+  with the parameter dead, which is exactly the shape that restores round 2's blocker. A third
+  invocation at a rev whose tree differs is now the one assertion in the set that binds the argument.
+  V3: S7 defines CLEAN as `git status --porcelain` EMPTY with untracked included — the same predicate
+  the fingerprint's own porcelain component uses — because S5's whole binding property rests on it
+  and nothing in the set defined the word; the `git diff --quiet` reading would record a digest the
+  rev form can never reproduce. AC13 gains the untracked-only fixture that separates the two
+  definitions. V4: §4's row for the evidence suite names `TOOL-aPacedTurnstile-7`'s cross-unit AC6d
+  arm, so the file has one ownership statement rather than two units editing it silently.
 
 ## 10. Reuse audit
 

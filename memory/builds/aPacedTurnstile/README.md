@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
+ids: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12 TOOL-aPacedTurnstile-13
 ---
 
 # aPacedTurnstile — the merge bar gets an execution discipline
@@ -80,12 +80,13 @@ the figure says in place that it is derived and has already moved.
 | TOOL-aPacedTurnstile-2 | hardware profiles — a declared table, auto-selected | READY | — |
 | TOOL-aPacedTurnstile-3 | ordered chunks, each reported before the next starts | READY | — |
 | TOOL-aPacedTurnstile-4 | the beacon and the queue — one bar per repo at a time | READY | — |
-| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY | F2/F3/F5 blockers folded |
+| TOOL-aPacedTurnstile-5 | the run record — the durable status emitter | READY | F2/F3/F5 and T1 blockers folded |
 | TOOL-aPacedTurnstile-6 | resume from a failed leg, diff-only re-runs, worktree scoping | READY | F4 blocker folded |
-| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | F5 blocker folded |
+| TOOL-aPacedTurnstile-7 | the push boundary becomes diff-scoped | READY | F5, R1 and T1 blockers folded |
 
 The blockers, because they are the record of what the design got wrong before a line of code. Five
-from round 1, then one from round 2:
+from round 1, one from round 2, one from round 3 — and the round-4 pass found none, which is where
+the design closed:
 
 | # | unit | the defect |
 |---|---|---|
@@ -94,8 +95,8 @@ from round 1, then one from round 2:
 | F3 | `-5` | `gate-full-green`'s "failed nothing" precondition was the only one of its preconditions with no negative control, so an implementation that forgot it passed every arm |
 | F4 | `-6` | the unit had no position in the build order while changing the base every guard diffs against, leaving it undecidable which base the authoritative boundary would use |
 | F5 | `-7` | a full green earned on a DIRTY tree reset the lag counter, making the replacement property false while the record made it look measured |
-| T1 | `-5`, `-7` | the fix for R1 landed in the CONSUMER, not the owner. `-7` said predicate 0 computes at the recorded sha by CALLING `-5`'s helper, while `-5` declared one digest over the live working tree with no sha argument. R19 gave that helper a NAME and nobody gave it a SIGNATURE |
 | R1 | `-7` | the fix for F5 overshot. Predicate 0 joined the recorded digest against a fresh fingerprint of the PUSHED TIP, and `-5` defines that digest over the committed tree object, so it fired on every push whose tree had moved — exactly the population predicates 3 and 4 admit. Both arms were fixture-built, so nothing on the bar noticed |
+| T1 | `-5`, `-7` | the fix for R1 landed in the CONSUMER, not the owner. `-7` said predicate 0 computes at the recorded sha by CALLING `-5`'s helper, while `-5` declared one digest over the live working tree with no sha argument. R19 gave that helper a NAME and nobody gave it a SIGNATURE |
 
 ## Build order, and the dependency that forces each edge
 
@@ -176,16 +177,17 @@ recommendation is worth more on the record than off it:
 <!-- gen:build-index -->
 **Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
+ids TOOL-aPacedTurnstile-13
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | OPEN | rev-5 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-6 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-6 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-7 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-8 | 2026-08-18 |
 
 Records live under `spec/` and `reviews/`.
 
