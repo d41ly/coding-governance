@@ -49,26 +49,11 @@ revision priced only the first and called it the whole price — the spec audit 
 the owner re-confirmed the change against the complete list on 2026-08-17. Units 1 and 2 carry no such
 trade: they are a missing normalisation and a report severity.
 
-
-
-
-
 ## Units — the authored roster (M2)
 
 One mechanism per unit. The `ids:` key above is a reservation range, not this roster.
 
 Each cell is a label, not a description. The unit's §1 Goal owns the full statement.
-
-<!-- roster:units -->
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
-| 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
-| 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
-| 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
-| 5 | `TOOL-aBranchedMandate-12` | 1 | the gates-green arm's discarded child output |
-| 6 | `TOOL-aBranchedMandate-13` | 1 | build-complete's undifferentiated roster verdict |
-<!-- /roster:units -->
 
 **The order is TOTAL, and it changed when unit 4 arrived.** Two constraints fix it.
 
@@ -245,6 +230,17 @@ if the design moves again. A second audit is a decision, not an obligation.
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit
 it.
+
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aBranchedMandate-4` | 2 | the adopter's repo-membership derivation |
+| 2 | `TOOL-aBranchedMandate-1` | 1 | one adopter's missing CR normalisation |
+| 3 | `TOOL-aBranchedMandate-2` | 2 | the eol arm's report severity, and the driver's remedy line |
+| 4 | `TOOL-aBranchedMandate-3` | 2 | the second authorization anchor |
+| 5 | `TOOL-aBranchedMandate-12` | 1 | the gates-green arm's discarded child output |
+| 6 | `TOOL-aBranchedMandate-13` | 1 | build-complete's undifferentiated roster verdict |
+<!-- /roster:units -->
 
 <!-- gen:build-order -->
 
