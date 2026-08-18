@@ -309,20 +309,32 @@ matched its target population.
 - Gates: one line when green, enumerating EVERY expected leg (the standing merge bar + any gates named at DoR); a leg not run is written `skipped: <leg> — <why>`, never omitted (the green-by-absence class); a failed leg = prose, above everything else.
 - Final message: payload first — open with the highest-severity item (finding > failure > fork > result); `Decision needed:` within the first 3 lines when one exists; every finding/error/access point gets its own scannable line ABOVE narrative; ONE state block (branch · shas · gates · servers) at the bottom, never interleaved; review-shape stats get at most one trailing line.
 - Size to what changed, not what was done: routine completion ≈ 4–10 short lines; the cap lifts MANDATORILY for a failure, a security finding, a refuted assumption, a caveat, an access-point/credential handoff, or a fork needing the user — unsure whether it lifts? Lift.
-- Never deliver the same content twice: a doc you wrote gets a correct link + a ≤3-line delta, not a paste; an already-delivered digest gets `unchanged since <link> — delta: <…|none>`; overrides: an explicit ask wins, bodies ≤~15 lines may be pasted, a fresh session greps the decision log first.
+- Never deliver the same content twice: a doc you wrote gets a correct link + a ≤3-line delta, not a paste; an already-delivered digest gets the `unchanged` shape; overrides: an explicit ask wins, bodies ≤~15 lines may be pasted, a fresh session greps the decision log first.
 - Kickoff/DoR reporting = one bookkeeping line (the `READY` micro-format) + ONLY the unresolved open questions; never restate scope/AC/protocol already in the plan doc; a scope-approval menu IS the open questions — never capped or link-only'd.
 - Facts land on disk before the wrap-up: build front matter, the memory note, and shas are written BEFORE the final message is composed — a dead turn may lose prose, never facts.
 - Secrets: never print a real credential in chat — say where it lives; throwaway local-dev creds may ride the access-point line.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
-- Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside):
-  - `committed <sha> <branch> — <subject>`
-  - `pushed <remote>/{{DEFAULT_BRANCH}} <old>..<new> (ff, N commits)`
-  - `merged --no-ff <branch> → {{DEFAULT_BRANCH}} <sha> · post-merge gates GREEN`
-  - `gates GREEN — <every leg, with tallies>` · `skipped: <leg> — <why>`
-  - `up — <service> :<port> (<tree>) · … · admin <user> / <pw-or-where-it-lives>`
-  - `READY — <slug> · node <tag> · <branch> off <sha> · Tier-N · gates: <list>`
-  - `⏳ <what's running> (~<est>) — results land in the final message`
-- Pre-send self-check (documented check — prose has no machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg? would a tired reader parse every line in one pass?
+- Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside).
+- **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`, which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not structure — it is neither required nor forbidden, and it is not part of the keyword set.
+- **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes. No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the linkification rule below, which breaks every shape carrying a link; and a list item cannot merge with its neighbour, which the two-line `BUILD`/`SPEC` pair depends on. The definition list therefore renders byte-identically to a correct emission minus its backticks — **copy the bullet, fill the angle brackets.**
+
+<!-- microformats -->
+- `committed — <sha> · <branch> · <subject>`
+- `pushed — <remote>/{{DEFAULT_BRANCH}} · <old>..<new> · ff · <n> commits`
+- `merged — --no-ff <branch> → {{DEFAULT_BRANCH}} · <sha>[ · post-merge gates GREEN]`
+- `gates — GREEN · <leg> · <leg> …`
+- `skipped — <leg> · <why>`
+- `up — <service> :<port> · <tree> · admin <user> · pw <pw-or-where-it-lives>`
+- `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
+- `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
+- `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
+- `unchanged — since <link> · delta <text|none>`
+- `⏳ — <what is running>`
+<!-- /microformats -->
+
+- **`BUILD` and `SPEC` are BINDING as an adjacent ordered pair**, emitted in the state block of EVERY final message while a build is in progress. This is the one rule in this section with no routine-length escape: a reader must never have to ask which build a message belongs to. `SPEC` is omitted before a spec exists and `left` then reads `unspecced`; its link label is the unit id, never the filename. `review` and `open` are build-wide over Tier-2 units only, and the whole clause drops for a build holding none. `Tier-<n>` on `BUILD` is the tier of the unit named by the CURRENT step, not the build's maximum.
+- Two shapes carry an OPTIONAL final field, marked `[ · …]` above: `merged`'s post-merge gate clause, present only when the scoped gate actually ran, and `SPEC`'s open-items clause. An optional field that is not marked optional is indistinguishable from a missing one.
+- Pre-send self-check (documented check — emission has no universal machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg? **is every micro-format a bare `- ` list item with no backticks, fence or bold?** would a tired reader parse every line in one pass?
 - The discipline is measured, not vibes: keep an audit script (`{{PROSE_AUDIT}}`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.
 - Cite files in user-aimed output in the ONE link format your client actually linkifies (commonly GFM `[text](path)`), forward-slashed throughout — verify once by clicking; bare/absolute/mixed-separator paths are dead copy-paste strings in many clients.
 - Resolve hrefs from the SESSION working directory — in the §3 layout the session often opens at the worktrees' PARENT, so a repo-root-relative href silently drops the worktree segment and points at nothing; prefix the worktree folder. (Repo-internal doc prose keeps §6's repo-root-relative convention — two conventions, two audiences.)
