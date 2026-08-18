@@ -452,6 +452,14 @@ while IFS= read -r f; do
       # ---- record is outside this arm by construction rather than by a waiver. What is NOT guarded
       # ---- is the other direction: a record that HAS a mode must agree with the README, and an
       # ---- absent key at BASE means `slug`, which is what the driver writes for it.
+      # ----
+      # ---- WHAT THIS IS NOT, against `second-implementation-is-not-a-second-opinion`. It does not
+      # ---- recompute the driver's answer from the driver's inputs: it compares the driver's OUTPUT
+      # ---- (the recorded `mode:`) against the driver's INPUT (the README at BASE), which is a
+      # ---- provenance question and not an arithmetic one. The residual is the SHARED PARSE: both
+      # ---- sides read the key with an awk of the same shape, so a parse that is wrong the same way
+      # ---- twice agrees wrongly. That is smaller than the class it belongs to - a forged RECORD is
+      # ---- still caught, which is the threat - and it is stated here rather than left to be found.
       recmode=$(fact_of "$f" mode)
       if [ -n "$recmode" ]; then
         dmode=$(printf '%s\n' "$bb" | awk '
