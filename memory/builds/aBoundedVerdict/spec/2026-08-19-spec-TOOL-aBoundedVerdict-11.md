@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** SPECCED · rev-5 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -44,8 +44,12 @@ instead of by row shape.
   run — `git show 098bebd9:memory/builds/aBoundedVerdict/README.md | grep -c gen:build-units` returns
   0 — so an uncutoff S6a refuses `authorization-reachable`, which `verb_close` will not override, and
   the run that implements the unit can never close. A `UNITS_REGION_CUTOFF` date in
-  `.memory-tree.conf`, in the idiom this repo already uses three times (`STREAMS_CUTOFF`,
-  `SPEC10_CUTOFF`, `SPEC_WITNESS_CUTOFF`): a BASE committed before it inherits presence-based opt-in,
+  **`.unattended.conf`**, in the idiom this repo already uses three times (`STREAMS_CUTOFF`,
+  `SPEC10_CUTOFF`, `SPEC_WITNESS_CUTOFF`) — rev-6 corrects rev-5, which put it in
+  `.memory-tree.conf`: the driver sources `.unattended.conf` and NOTHING else, so a cutoff there
+  would be unreadable by the only consumer, and adding a second conf source is the cross-kit
+  dependency §4's Alternatives already rejects on the ground that this kit ships without the
+  memory-tree kit: a BASE committed before it inherits presence-based opt-in,
   a BASE at or after it must carry the pair. The cutoff is the migration render's own date, so every
   BASE that could carry the region is held to it and no earlier one is.
 - **S6b** — what S6 buys is SCOPED, because `.unattended.conf` here declares
@@ -210,7 +214,7 @@ BASE-blob against HEAD rather than against any recorded copy.
 `tools/memory-tree/gen_build_index.py` (the region and its `GEN_REGIONS` entry) ·
 `tools/memory-tree/marker-contract.test.sh` (a fourth reader joins the case table) ·
 `tools/unattended/unattended.sh` (the helper, three call sites, `--preflight`, `check_authorization`) ·
-`.memory-tree.conf` (`UNITS_REGION_CUTOFF`) ·
+`.unattended.conf` and `.unattended.conf.example` (`UNITS_REGION_CUTOFF`) ·
 `tools/unattended/unattended.test.sh` (S7's re-armed control, plus arms per new refusal) ·
 `tools/unattended/check-unattended.sh` + `.test.sh` (S5's check) ·
 `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` (the roster
@@ -406,6 +410,11 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
   times. AC8b is qualified and AC8c is new — the bootstrap arm, asserted against this run's real base,
   which an implementation without the cutoff fails. Recorded as a risk in §5 with how it was found:
   by attempting the build, not by reading the spec again.
+- rev-6 · 2026-08-19 · the cutoff moves from `.memory-tree.conf` to `.unattended.conf`, found while
+  implementing S6a. The driver sources `.unattended.conf` and nothing else, so rev-5's home was
+  unreadable by the only thing that needs it — and giving the driver a second conf source is exactly
+  the cross-kit dependency this unit's own Alternatives reject, because the unattended kit ships
+  without the memory-tree kit. Third defect in this unit found by building rather than re-reading.
 
 ## 10. Reuse audit
 

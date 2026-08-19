@@ -116,6 +116,12 @@ GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
 # machine-locatable. Locating it structurally instead - the slice between one heading and the next -
 # was the cheaper option and was refused: a renamed heading silently empties the comparison, which is
 # a check that passes by finding nothing.
+# TOOL-aBoundedVerdict-11 S8 - NARROWED, not retired. Four of the authored pair's five readers moved
+# to the GENERATED units region: the authorization scope comparison, `--plan`'s malformed-pair refusal,
+# and `build-complete`'s presence and non-empty terms. The FIFTH stays - `roster_ids`, which feeds
+# `missing_units` - because an authored plan is the only thing that can name a unit nobody has specced
+# yet, and reading the generated region there made the difference empty by construction. Absent, the
+# pair costs nothing. The spec said RETIRED; that was wrong and is corrected there too.
 ROSTER_OPEN='<!-- roster:units -->'; ROSTER_CLOSE='<!-- /roster:units -->'
 # TOOL-aBoundedVerdict-11 S1/S2 - the GENERATED units region, nested inside the build-index pair.
 # Addressed BY NAME. The three readers below used to select unit rows out of the enclosing region by
@@ -730,24 +736,55 @@ check_authorization() { # slug · base
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
   fi
-  # S8 - the roster region, when the BASE carries one. OPT-IN by presence, which is F1's ratified
-  # shape: a build without the markers is authorized on existence alone, exactly as before.
+  # TOOL-aBoundedVerdict-11 S6/S6a/S6b - the frozen scope is the GENERATED units region's unit-ID SET,
+  # compared BASE -> HEAD and required to be a SUBSET. Additions admitted, removals refused. This
+  # REPLACES the authored roster pair's byte comparison, which S8 retires by deleting this reader; the
+  # four build READMEs that carry such a pair keep their bytes, because a region nothing reads is inert.
   #
-  # PRESENCE is decided by grepping for the open marker, NOT by `region`'s exit status. `region` exits
-  # 3 for "absent" AND for "malformed or duplicated", and treating that one status as "absent" is how
-  # a second block once went uncompared - the discarded-signal defect this kit has already paid for.
-  if printf '%s\n' "$blob" | grep -qF -- "$ROSTER_OPEN"; then
-    local ra rb
-    if ! ra=$(printf '%s\n' "$blob" | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
-      fail 20 "the build README at the pinned BASE carries a roster marker but not exactly one well-formed pair, so there is no single scope to compare against: $base:$rel"
+  # WHY IDS AND NOT BYTES. A row carries the unit's status, rev and last-change date, all rendered from
+  # its spec header, so they move whenever a unit is built. A byte-level "no row changed" test would
+  # refuse every run that BUILT anything, on the one item `verb_close` will not override - strictly
+  # worse than the opt-in hole it replaces. The id set IS the scope: which units the run may work on is
+  # frozen, and everything else in a row is derived from a document the run is authorized to edit. A
+  # RENAMED id is still refused, because renaming removes a BASE id.
+  #
+  # WHY A CUTOFF (S6a). A run's BASE is pinned BEFORE its own work, so the BASE of the run that lands
+  # the migration render cannot carry the region this check wants. Without the cutoff the unit is
+  # unlandable by ANY run - measured on the run that built it, the BASE blob carried no pair at all -
+  # so a BASE committed before UNITS_REGION_CUTOFF keeps presence-based opt-in.
+  #
+  # WHAT THIS BUYS, SCOPED (S6b). On the DEFAULT-BRANCH anchor the BASE blob is outside the run's reach
+  # and this is a real integrity check. On the BRANCH anchor it is NOT - the run pushed that tip - and
+  # `.unattended.conf`'s own comment plus the protocol's section 1 already say roster integrity stops
+  # being enforceable there. This check does not close that hole and must not read as though it did.
+  #
+  # PRESENCE is decided by grepping for the open marker, NOT by `region`'s exit status. `region` exits 3
+  # for "absent" AND for "malformed or duplicated", and treating that one status as "absent" is how a
+  # second block once went uncompared - the discarded-signal defect this kit has already paid for.
+  if printf '%s\n' "$blob" | grep -qF -- "$UNITS_OPEN"; then
+    local ub uh miss
+    if ! ub=$(printf '%s\n' "$blob" | region - "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null); then
+      fail 20 "the build README at the pinned BASE carries a units marker but not exactly one well-formed pair, so there is no single scope to compare against: $base:$rel"
       return 1
     fi
-    if ! rb=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
-      fail 20 "the working copy's build README does not carry exactly one well-formed roster pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
+    if ! uh=$(region "$rel" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null); then
+      fail 20 "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
       return 1
     fi
-    if [ "$ra" != "$rb" ]; then
-      fail 20 "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized: $rel"
+    miss=$(comm -23 <(printf '%s\n' "$ub" | _ids_of) <(printf '%s\n' "$uh" | _ids_of) | tr '\n' ' ' | sed 's/[[:space:]]*$//')
+    if [ -n "$miss" ]; then
+      fail 20 "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for; additions are admitted and removals are not: $miss"
+      return 1
+    fi
+  elif [ -n "${UNITS_REGION_CUTOFF:-}" ]; then
+    local bdate
+    bdate=$(GIT show -s --format=%cs "$base" 2>/dev/null)
+    # `sort -C` exits 0 when its input is ALREADY SORTED, so cutoff-then-bdate sorted means
+    # bdate >= cutoff — exactly the refusal condition. The first cut NEGATED this and therefore
+    # refused every BASE before the cutoff while admitting every one after: the precise inversion
+    # the cutoff exists to prevent, and it would have refused the run that built this unit.
+    if [ -n "$bdate" ] && printf '%s\n%s\n' "$UNITS_REGION_CUTOFF" "$bdate" | sort -C; then
+      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: the --write mode of tools/memory-tree/gen_build_index.py"
       return 1
     fi
   fi
@@ -890,11 +927,30 @@ plan_state() { # spec file -> prints the M2 state
 #
 # The ids are matched against the build's OWN slug. A looser pattern would mint units out of prose:
 # a roster row citing a sibling build's id names a DEPENDENCY, not a unit of this build.
-roster_ids() { # slug
+# TOOL-aBoundedVerdict-11 S8, CORRECTED mid-build. This reads the AUTHORED pair, deliberately: it is
+# the only carrier of a unit that is PLANNED and has no spec yet. Pointing it at the generated region
+# made `missing_units` a TAUTOLOGY - that region is rendered FROM the specs that exist, so roster_ids
+# became a subset of spec_ids by construction and the difference was empty always. Same class as
+# memory/gotchas/assertion-between-two-derived-values.md, and the M6 checklist named that class for
+# the very diff that introduced it.
+#
+# The two questions are SPLIT rather than merged. Authorization, the presence term and terminality read
+# the GENERATED region, which is what makes them satisfiable without a hand-edit. The
+# planned-but-unspecced question keeps the authored pair: absent, `missing_units` is trivially
+# satisfied, which is the status quo for 45 of 49 builds and weakens nothing that worked before.
+roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecced units
   local slug="$1" rel; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
   grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
   region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null \
+    | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+}
+# The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
+# uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
+unit_ids_of() { # slug
+  local slug="$1" rel; rel=$(readme_of "$slug")
+  [ -f "$rel" ] || return 0
+  region "$rel" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null \
     | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
 }
 # The ids verb_plan already derives, lifted so the listing and the join cannot disagree about what a
@@ -927,6 +983,9 @@ unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
   printf '%s\n' "$out" | grep -E '^\| \['
 }
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
+# TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
+# two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
+_ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
 # S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
 # exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
 # status as "absent", so the message names both possibilities and the repair.
@@ -952,9 +1011,9 @@ verb_plan() { # slug
   # the branch's signature, and a $( ) inside the message lands IN that signature - so no arm can
   # ever match it. Same class as the positional trap this repo already documents.
   local _rmp; _rmp=$(readme_of "$slug")
-  if grep -qF -- "$ROSTER_OPEN" "$_rmp" 2>/dev/null; then
-    if ! region "$_rmp" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
-      fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
+  if grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
+    if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+      fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
       return 1
     fi
   fi
@@ -1521,15 +1580,21 @@ dod_met() { # slug · run-state file · item · checker
       # No new fail branch: this reports through verb_close's fail 13, which already prints the
       # exact --override spelling. A waiver on `land-once-done` relaxes the DIRECTIVE and never this
       # item, so a run that waived it still owes --override build-complete at close.
-      # THE ROSTER REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
+      # THE UNITS REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
       # README predating this item failed with a bare "unmet" and nothing said a marker pair was what
       # it wanted -- which is every build folder in this tree older than the item.
-      if ! region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
-        DOD_OUT="the build README carries no well-formed roster marker pair, and build-complete reads the roster from that region: $(readme_of "$slug")"
+      #
+      # TOOL-aBoundedVerdict-11 S8 - the GENERATED region, so this term stops being a hand-edit away
+      # from satisfiable. Before it, the term read the AUTHORED roster pair, which only four of 49
+      # build folders carried and which nothing creates: the item was unmeetable on the rest, and the
+      # only exit was `--override build-complete`, the run authorizing itself past the one item that
+      # means the build is done.
+      if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
         return 1
       fi
       DOD_OUT=""
-      [ -n "$(roster_ids "$slug")" ] \
+      [ -n "$(unit_ids_of "$slug")" ] \
         && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
         && [ -n "$(unit_rows "$(readme_of "$slug")")" ] \
         && [ -z "$(nonterminal_units "$(readme_of "$slug")")" ] ;;

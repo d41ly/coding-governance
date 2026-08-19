@@ -261,6 +261,17 @@ roster() { # slug · body   (pure shell: a python launcher here is unresolved, a
 ' '<!-- roster:units -->' "$2" '<!-- /roster:units -->' >> "memory/builds/$1/README.md"
 }
 
+# TOOL-aBoundedVerdict-11 - the GENERATED pair's fixture writer. The authorization scope moved off the
+# authored roster onto this region, so the arms below drive THIS. Appends a second pair when the
+# README already has one, which is exactly what the duplicate-pair arms need.
+units() { # slug · body
+  printf '
+%s
+%s
+%s
+' '<!-- gen:build-units -->' "$2" '<!-- /gen:build-units -->' >> "memory/builds/$1/README.md"
+}
+
 # green control FIRST: a roster present at BASE and untouched must authorize.
 reset_tree; git checkout -qf main; roster tRun "1. the first unit"
 git add -A >/dev/null && git commit -q -m roster --no-verify && git push -q -f origin main
@@ -273,24 +284,46 @@ out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "preflight OK"
 miss "$out" "rewrote the scope"
 
-# ...the run EDITS its own scope. Same tree, one line changed.
+# ...the run REMOVES a unit from its own scope. TOOL-aBoundedVerdict-11 S6: the comparison is the
+# unit-ID SET and BASE must be a SUBSET of HEAD, so a DELETED id is the refusal and an added one is
+# admitted. The old arm mutated PROSE inside the roster and asserted a byte difference; under the id
+# comparison that prose edit is correctly no longer a scope change, so the arm's SUBJECT moves rather
+# than its wording.
 rreset
-mutate memory/builds/tRun/README.md 's|^1\. the first unit$|1. a unit the owner never wrote|'
-hit "$(run --preflight tRun --keepalive-id k1)" "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized"
+mutate memory/builds/tRun/README.md '/ARCH-tRun-1/d'
+hit "$(run --preflight tRun --keepalive-id k1)" "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for"
+
+# ...and the twin the id comparison exists to ADMIT: a row whose STATUS and REV moved, which is what
+# every build does to its own units, and which a byte comparison would have refused. Without this arm
+# the subset test is indistinguishable from the byte test it replaced.
+rreset
+mutate memory/builds/tRun/README.md 's/| OPEN | rev-1 |/| CLOSED | rev-3 |/'
+git add -A >/dev/null && git commit -q -m statusmoved --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "absent from it now"
+
+# ...and an ADDED unit is admitted, which is what makes the promotion disposition legal.
+rreset
+mutate memory/builds/tRun/README.md 's#^| \[ARCH-tRun-1#| [ARCH-tRun-9 — promoted](spec/nine.md) | OPEN | rev-1 | 2026-08-01 |\n| [ARCH-tRun-1#'
+git add -A >/dev/null && git commit -q -m unitadded --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "absent from it now"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
 rreset
-roster tRun "1. a second roster nobody granted"
-hit "$(run --preflight tRun --keepalive-id k1)" "the working copy's build README does not carry exactly one well-formed roster pair while the pinned BASE does, so the scope this run is executing against cannot be compared"
+units tRun "| [ARCH-tRun-1 — a second region nobody granted](spec/one.md) | OPEN | rev-1 | 2026-08-01 |"
+hit "$(run --preflight tRun --keepalive-id k1)" "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared"
 git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
 
 # ...and the BASE side MALFORMED: two pairs committed to the anchor. Without this arm the
 # grep-for-presence test and the well-formedness check cannot be told apart.
-git checkout -qf main; roster tRun "1. one"; roster tRun "2. two"
-git add -A >/dev/null && git commit -q -m tworoster --no-verify && git push -q -f origin main
+git checkout -qf main; units tRun "| [ARCH-tRun-1 — one](spec/one.md) | OPEN | rev-1 | 2026-08-01 |"
+git add -A >/dev/null && git commit -q -m tworegion --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-hit "$(run --preflight tRun --keepalive-id k1)" "the build README at the pinned BASE carries a roster marker but not exactly one well-formed pair, so there is no single scope to compare against"
+hit "$(run --preflight tRun --keepalive-id k1)" "the build README at the pinned BASE carries a units marker but not exactly one well-formed pair, so there is no single scope to compare against"
 git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
 
 # ...and ABSENT at BASE is still authorized - the opt-in half, without which every existing build breaks.
@@ -613,16 +646,18 @@ miss "$out" "build-complete"
 # term 1 — no well-formed roster pair. A COMPLETENESS check cannot borrow check_authorization's
 # opt-in-by-presence disposition: on this tree 1 of 35 build READMEs carries the pair, so an opt-in
 # build-complete would be vacuously true for 34 of them and blind in the case it exists for.
-bcopen; sed -i "/roster:units/d" memory/builds/tRun/README.md
+bcopen; sed -i "/gen:build-units/d" memory/builds/tRun/README.md
 out=$(run --close tRun)
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
 hit "$out" "build-complete"
 # TOOL-aBranchedMandate-13: and it says WHICH region. The five terms were ANDed into one verdict,
 # so this case reported a bare "unmet" -- the state of every build README older than the item.
-hit "$out" "the build README carries no well-formed roster marker pair"
+hit "$out" "the build README carries no well-formed units marker pair"
 
-# term 2 — the pair is well-formed and names no id at all.
-bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. a plan with no id in it/' memory/builds/tRun/README.md
+# term 2 — the pair is well-formed and names no id at all. TOOL-aBoundedVerdict-11 S8: this term now
+# reads the GENERATED region's ids (`unit_ids_of`) rather than the authored plan, so the id has to be
+# taken out of the rendered unit ROW. The authored plan keeps its own term, which is term 3.
+bcopen; sed -i 's#^| \[ARCH-tRun-1 — the unit#| [a rendered row carrying no id#' memory/builds/tRun/README.md
 hit "$(run --close tRun)" "build-complete"
 
 # term 3 — the roster names a unit nobody specced. This is the ONLY term that can see it: the
@@ -1064,10 +1099,11 @@ hit "$out" "roster: the README roster region"
 # ---- discarded-signal defect this kit has already shipped once.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
-roster tPlan "1. one"; roster tPlan "2. a second pair nobody granted"
+# `readme` already renders ONE units pair, so one more makes the malformed case the refusal is about.
+units tPlan "| [ARCH-tPlan-1 — a second pair nobody granted](spec/one.md) | OPEN | rev-1 | 2026-08-01 |"
 fixture
 out=$(run --plan tPlan)
-hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice:"
+hit "$out" "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice:"
 miss "$out" "ARCH-tPlan-1"
 
 # ---- no roster marker at all: today's output, today's sentence, and the caveat is then TRUE.
