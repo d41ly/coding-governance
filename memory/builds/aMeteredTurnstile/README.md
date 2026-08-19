@@ -45,7 +45,7 @@ ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 T
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | INPROGRESS | rev-2 | 2026-08-20 |
+| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | INPROGRESS | rev-3 | 2026-08-20 |
 
 Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->

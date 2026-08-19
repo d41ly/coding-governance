@@ -1,6 +1,6 @@
 # TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess
 
-**Status:** INPROGRESS · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 ## 1. Goal
 
@@ -160,6 +160,8 @@ ratchet, and `memory hygiene` for this build folder and spec.
 
 ## 8. Open questions
 
+none — the three forks below are RESOLVED (agent, 2026-08-20, delegated) and marked in place.
+
 - **F1 — does the profiler run the bar, or attach to a run the operator starts?** Running it is simpler
   and makes width and `GATE_FULL` state facts rather than guesses. Attaching would let a push-boundary
   run be profiled for free, but it requires the runner to emit a marker, which §3 forbids.
@@ -175,6 +177,9 @@ ratchet, and `memory hygiene` for this build folder and spec.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-3 · 2026-08-20 · §8 gained a machine-legal first line. All three forks were already marked
+  RESOLVED in place, but the classifier reads §8's first non-blank line and nothing else, so the unit
+  read FORKED to `--plan` while being materially resolved. No option changed.
 - rev-2 · 2026-08-20 · folded workflow `wf_385dfe29-e10`. AC2 and AC3 rewrote a wall-clock-against-a-
   literal assertion into an ordering-and-classification one, the arm class `TOOL-cFinalBerth-5` and
   `TOOL-aTimedTurnstile-8` retired twice. §3 gained the `TOOL-aPacedTurnstile-5` overlap and the
