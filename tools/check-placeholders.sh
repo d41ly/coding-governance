@@ -70,3 +70,9 @@ fi
 marker=$(grep -oE '<!-- governance-template: v[0-9]+\.[0-9]+ -->' "$TEMPLATE" | head -1)
 
 [ "$rc" -eq 0 ] && echo "check-placeholders OK — one marker carrier at $marker"
+# EXPLICIT, and it was deleted. Without it this mode's verdict is the LAST COMMAND's status, correct
+# today only by short-circuit accident: `rc=1` makes the `[` fail and the AND-list returns 1. Any line
+# appended below — a trailing echo, a cleanup `rm -f`, a `trap`, a bare `true` — makes the marker gate
+# always-green while still printing its failure text, and the bar runs this script bare. The `--check`
+# branch above already ends this way; two modes producing a verdict by two mechanisms is the asymmetry.
+exit "$rc"

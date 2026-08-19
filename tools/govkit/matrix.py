@@ -55,6 +55,9 @@ SCRATCH_KITS = ["playbook", "playbook-render", "check-microformats", "check-line
 #: prints in a scratch install.
 SCRATCH_EXPECT = {
     "playbook render wiring": "render-playbook OK — region matches a fresh render",
+    # The arm COUNT is deliberately not stated: it moves every time the engine gains a predicate,
+    # and a number here would make each new arm red this table for no reason it can name.
+    "playbook render selftest": "render_playbook.selftest OK",
     "micro-format definitions": "microformats OK —",
     "micro-format gate selftest": "PASS (",
     "line length": "NOT ADOPTED — no declaration at",

@@ -11,10 +11,14 @@ prefix = "tools"
 # EVERY kit this repo carries, not `[selection] default`. That default is five entries against
 # thirteen tracked kit dirs, so a default intake would drop the unattended, drift-audit, lexicon and
 # agent-cap blocks out of gov's own charter while gov's bar goes on enforcing exactly those rules.
+#
+# `govkit` was a member and is not one now: it is a registry `[[exempt]]` path — the deployer itself,
+# never installed into a target — so it is not an entry id and it selected nothing. The renderer
+# grades this array against the registry as of the closing review, which is what surfaced it.
 kits = [
   "playbook", "playbook-render", "kickoff-manifest", "memory-tree", "codebase-map",
   "memory-recall", "drift-audit", "agent-instructions", "unattended", "lexicon",
-  "pytest-parallel-guardrails", "gate-lint", "govkit", "agent-cap", "review-harness",
+  "pytest-parallel-guardrails", "gate-lint", "agent-cap", "review-harness",
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
 ]
 

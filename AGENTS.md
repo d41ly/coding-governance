@@ -151,7 +151,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
   | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
-  | `a` | `daily-agent` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths` |
+  | `a` | `daily-agent` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths |
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.

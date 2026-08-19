@@ -90,6 +90,12 @@ arm "a second joiner reds on the count" red \
 arm "a field ahead of the joiner reds on POSITION" red \
   "a definition puts a field ahead of its joiner, so the head is not one keyword" \
   's/^- `committed — /- `committed <sha> — /'
+# THE GLYPH HEAD, which had a named exemption nothing exercised. The gate carried
+# `[ "$head" = "⏳" ] ||` inside a case arm selecting heads that CONTAIN A SPACE — mutually exclusive
+# by construction, so the escape could not be taken and no fixture ever put ⏳ in front of the gate.
+# The exemption is gone; this arm is the proof the glyph passes on the predicate's own terms.
+arm "a ⏳ head passes the POSITION predicate with no exemption" ok "" \
+  's/^- `SPEC — .*/- `⏳ — <n> · <what>`/'
 arm "a bare parenthesis reds" red \
   "a definition carries a bare parenthesis, which the grammar admits only as markdown-link syntax" \
   's/· <subject>/· (<subject>)/'
@@ -108,7 +114,7 @@ if [ "$FAILED" -ne 0 ]; then
   printf 'check-microformats.test.sh FAILED — %d arm(s)\n' "$FAILED"
   exit 1
 fi
-FLOOR_ASSERTIONS=13
+FLOOR_ASSERTIONS=14
 if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-microformats.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"

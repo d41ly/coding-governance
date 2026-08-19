@@ -3,6 +3,7 @@
 #
 #   bash tools/playbook/adopt-playbook.sh --target <repo>            # write the region
 #   bash tools/playbook/adopt-playbook.sh --target <repo> --check    # assert it still matches
+#   bash tools/playbook/adopt-playbook.sh --selftest                 # the engine's own arms
 #
 # This is the shape every other adopter in this repo has, which is why the playbook entry no longer
 # carries a `why_no_adopter` reason: installation stopped being a copy an operator finishes by hand.
@@ -50,8 +51,9 @@ PY_BIN=$(resolve_python "${PLAYBOOK_PY:-}") || exit 2
 # adopter can see that `--check` exists without opening the Python. The engine parses argv itself;
 # this case is a declaration, not a second parser.
 case " $* " in
-  *" --check "*) : ;;   # assert the region still matches a fresh render, and that none survived
-  *)             : ;;   # write the region
+  *" --selftest "*) : ;;   # the engine's arms, over its own temp fixtures — no target is read
+  *" --check "*)    : ;;   # assert the region still matches a fresh render, and that none survived
+  *)                : ;;   # write the region
 esac
 
 exec "$PY_BIN" "$HERE/render_playbook.py" "$@"

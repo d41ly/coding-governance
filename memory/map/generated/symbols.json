@@ -2148,6 +2148,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "selftest",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "settings_merge_src",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -2261,6 +2266,11 @@
       "id": "structure_identity",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "substitute",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "subtokens",

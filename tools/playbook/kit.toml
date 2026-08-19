@@ -49,3 +49,12 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 [[gate_leg]]
 name = "playbook render wiring"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
+
+# THE ENGINE'S OWN ARMS, and an adopter receives them because they are about the ENGINE rather than
+# about gov: every fixture is written into a temp dir by the selftest itself, so there is no gov path
+# to strand a target on. It is the arm set for the two predicates a closing review found certifying
+# without measuring — an unrecognised `kits` member silently deleting a charter section, and a value
+# substituted verbatim into a markdown table row.
+[[gate_leg]]
+name = "playbook render selftest"
+argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]

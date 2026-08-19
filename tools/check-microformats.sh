@@ -70,8 +70,14 @@ while IFS= read -r line; do
   fi
   # ---- the joiner's POSITION: nothing but the head precedes it. A separate predicate from the
   # ---- count, because three shapes once satisfied the count while failing the position.
+  # THERE IS NO ⏳ EXEMPTION HERE, and there used to be one that could not be taken. The arm read
+  # `[ "$head" = "⏳" ] || fail 3`, guarded by a case matching heads that CONTAIN A SPACE — and the
+  # hourglass head is three bytes with no space in it, so the case never selected it and the equality
+  # was never evaluated. Re-derived over the live block: all heads print space-free. The glyph passes
+  # this predicate the same way every keyword does, by being one token; the exemption only told a
+  # reader it was special. `memory/gotchas/armed-but-unreachable-rule.md` is the class.
   case "$head" in
-    *" "*) [ "$head" = "⏳" ] || fail 3 "a definition puts a field ahead of its joiner, so the head is not one keyword: $body" ;;
+    *" "*) fail 3 "a definition puts a field ahead of its joiner, so the head is not one keyword: $body" ;;
   esac
   # ---- parentheses, outside markdown-link syntax
   stripped=$(printf '%s' "$body" | sed -E 's/\[[^]]*\]\([^)]*\)//g')

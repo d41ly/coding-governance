@@ -85,10 +85,17 @@ PY_BIN=$(resolve_python "${LINELEN_PY:-}") || exit 2
 # The offender scanner. One python invocation, because the fence machine has to be a real parser and
 # `awk` in the C locale counts BYTES rather than characters.
 SCAN=$(mktemp); trap 'rm -f "$SCAN"' EXIT
+#
+# IT EXITS 3 WHEN IT GRADED NOTHING. An empty result is two different answers — "no line is over the
+# limit" and "no line was looked at" — and the shell can only tell them apart if the scanner says so.
+# A subject that is empty, or that is one long fenced block, measures zero lines and the gate used to
+# print `line-length OK` over it. That is the certify-without-measuring class, so a zero-line
+# population is a DEAD PROBE and says so.
 cat > "$SCAN" <<'PYSCAN'
 import sys
 path, limit = sys.argv[1], int(sys.argv[2])
 fence = None
+graded = 0
 for n, raw in enumerate(open(path, encoding='utf-8', errors='replace'), 1):
     line = raw.rstrip()
     stripped = line.lstrip()
@@ -100,8 +107,10 @@ for n, raw in enumerate(open(path, encoding='utf-8', errors='replace'), 1):
         if stripped.startswith(fence):
             fence = None
         continue
+    graded += 1
     if len(line) > limit:
         print(f'{n}:{len(line)}')
+sys.exit(3 if graded == 0 else 0)
 PYSCAN
 
 count_over() { "$PY_BIN" "$SCAN" "$1" "$2"; }
@@ -145,7 +154,26 @@ for f in $subjects; do
   if [ -z "$POSITIONAL_LIMIT" ] && [ -z "$declared" ]; then
     src="the environment"; [ -z "${LINE_MAX:-}" ] && src="the default"
   fi
-  over=$(count_over "$f" "$limit")
+  # THE RESOLVED limit is validated, not just the declared one. Check 1 above covers `$declared`
+  # alone, and the other two documented invocations — the positional $2 and LINE_MAX — reached the
+  # scanner unchecked: `bash tools/check-line-length.sh AGENTS.md abc` printed a ValueError traceback
+  # and then `line-length OK — AGENTS.md: 0 over 0 characters`, rc=0.
+  if ! printf '%s' "$limit" | grep -qE '^[0-9]+$'; then
+    fail 4 "the line limit is not a number, so nothing could be compared against it: '$limit' for $f, resolved from $src"
+    continue
+  fi
+  # THE SCANNER'S STATUS IS THE MEASUREMENT'S PROVENANCE, and it used to be discarded. `over` is
+  # empty on a crash exactly as it is on a clean subject — bad limit, unreadable file, interpreter
+  # death, a deleted temp scan — so every one of those printed OK. Two branches, because "it did not
+  # run" and "it ran and saw no gradeable line" are two different things a reader must not confuse.
+  over=$(count_over "$f" "$limit"); scan_rc=$?
+  if [ "$scan_rc" -eq 3 ]; then
+    fail 5 "the scanner reached no gradeable line in this subject, so a clean verdict would certify a measurement that never happened: $f"
+    continue
+  elif [ "$scan_rc" -ne 0 ]; then
+    fail 6 "the offender scan did not run for this subject, so no line was measured and OK would be a lie: $f (scanner exit $scan_rc)"
+    continue
+  fi
   n=$(printf '%s\n' "$over" | grep -c . || true)
   if [ "$n" -gt 0 ]; then
     fail 3 "a subject carries line(s) over its limit of $limit characters, resolved from $src: $f"

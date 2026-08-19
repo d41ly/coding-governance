@@ -754,5 +754,16 @@
       ".",
       "--check"
     ]
+  },
+  {
+    "name": "playbook render selftest",
+    "guard": [
+      "tools/playbook/"
+    ],
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--selftest"
+    ]
   }
 ]

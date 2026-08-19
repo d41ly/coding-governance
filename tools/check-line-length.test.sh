@@ -100,6 +100,31 @@ arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 \
 reset; printf '# only a comment\n' > "$W/tools/line-length-limits.txt"
 arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" ""
 
+# ---------------------------------------------------------------- certify-without-measuring
+# THE FOUR ARMS BELOW ARE ONE CLASS: the gate printed `line-length OK … 0 over 0 characters` and
+# exited 0 in every one of them. `over` is empty on a clean subject and empty on a crashed scanner,
+# and the shell discarded the status that told them apart. Each arm asserts a NON-ZERO verdict, so a
+# regression cannot pass by printing the right words.
+reset; line y 300 >> "$W/subject.md"
+arm "a non-numeric POSITIONAL limit is a named failure, not a certified zero" 1 \
+  "the line limit is not a number, so nothing could be compared against it: '" "" subject.md abc
+
+reset; line y 10 > "$W/other.md"
+arm "a non-numeric LINE_MAX is a named failure, not a certified zero" 1 \
+  "the line limit is not a number, so nothing could be compared against it: '" "LINE_MAX=abc" other.md
+
+# A subject whose every line sits inside a fence measures ZERO lines. Empty-population is the
+# vacuity this tree bans by name: the old gate printed OK over a file it graded nothing in.
+reset; { printf '```\n'; line y 600; printf '```\n'; } > "$W/subject.md"
+arm "a subject with NO gradeable line is a dead probe, not a clean verdict" 1 \
+  "the scanner reached no gradeable line in this subject, so a clean verdict would certify a measurement that never happened" ""
+
+# The interpreter dies AFTER the resolver's probe accepted it — the shape a resolver cannot catch.
+reset
+printf '#!/usr/bin/env bash\n[ "$1" = "-c" ] && exit 0\nexit 4\n' > "$W/deadpy"; chmod +x "$W/deadpy"
+arm "a scanner that dies mid-run is a named failure, not a certified zero" 1 \
+  "the offender scan did not run for this subject, so no line was measured and OK would be a lie" "LINELEN_PY=$W/deadpy"
+
 # THE INSTALL-DAY PAIR, and the two must land on DIFFERENT verdicts. The kit withholds the
 # declaration on purpose — gov's rows name gov's paths, and a row naming an absent path is a stale
 # red — so ABSENT is the shape every adopter starts in, and the exit 2 it used to get there was the
@@ -113,7 +138,7 @@ printf '\n'
 if [ "$FAILED" -ne 0 ]; then
   printf 'check-line-length.test.sh FAILED — %d arm(s)\n' "$FAILED"; exit 1
 fi
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=18
 if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-line-length.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"; exit 1

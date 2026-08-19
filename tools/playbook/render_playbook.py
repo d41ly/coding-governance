@@ -27,8 +27,17 @@ under every natural reading — and the block would survive. That is the failure
 arriving through type coercion rather than through a name. Membership has no such reading.
 
 Both namespaces REFUSE rather than skip: a `kit:` fence naming a non-entry, a `when:` fence naming an
-undeclared block, and a `drop_blocks` member matching no fence are each a refusal. An unrecognised
-name that merely left the block in place would be a silent no-op.
+undeclared block, a `drop_blocks` member matching no fence, and a `kits` member that is not a
+registry entry id are each a refusal. An unrecognised name that merely left the block in place would
+be a silent no-op.
+
+THE TWO NAMESPACES ARE NOT SYMMETRIC ON THE FENCE SIDE, and that is measured rather than sloppy. A
+`drop_blocks` member matching no fence is a typo by construction — the list exists only to name
+fences. A `kits` member matching no fence is the NORMAL case: gov selects twenty entries and the
+charter carries three `kit:` fences, because most kits have no conditional ruleset. So `kits` is
+graded against the REGISTRY, which is the population it is drawn from, and an empty `kits` under an
+existing deploy.toml is itself a refusal — it silently drops every conditional block, and intake
+cannot write one (`resolve_selection` refuses an empty selection), so it can only be a hand edit.
 
 WHERE THE INPUTS COME FROM, AND WHY IT IS NOT `__file__`'s GRANDPARENT. This engine ships into a
 target at `{prefix}/playbook/`, so its grandparent there is the TARGET's repo root — which holds
@@ -217,26 +226,56 @@ def check_fences(text: str, entries: set[str], blocks: set[str]) -> list[tuple[s
 
 def remove_fenced(text: str, drop: set[tuple[str, str]]) -> str:
     """Remove every fenced block whose (namespace, name) is in `drop`, fences included."""
-    out, skip_depth, keep_fences = [], 0, True
+    out, skip_depth = [], 0
     for line in text.splitlines(keepends=True):
         m = OPEN_RE.match(line.rstrip('\n'))
         if m:
             key = (m.group(1), m.group(2))
             if skip_depth or key in drop:
                 skip_depth += 1
-                continue
-            keep_fences = False  # a surviving block loses its markers in the render
-            continue
+            continue          # a SURVIVING block loses its markers; a dropped one loses its body too
         m = CLOSE_RE.match(line.rstrip('\n'))
         if m:
             if skip_depth:
                 skip_depth -= 1
-                continue
             continue
         if not skip_depth:
             out.append(line)
-    del keep_fences
     return ''.join(out)
+
+
+# --------------------------------------------------------------------------- substitution
+TABLE_ROW_RE = re.compile(r'^[ \t]*\|')
+
+
+def substitute(text: str, key: str, val: str) -> str:
+    """Replace every `{{KEY}}` with `val`, escaped for the HOST CONTEXT of each occurrence.
+
+    A markdown TABLE ROW is a structured host and a verbatim substitution corrupts it: an unescaped
+    `|` opens a cell the template never declared, and a newline ends the row early. Measured on gov's
+    own §2 node registry, which is the table an agent is told to identify its node from.
+
+    Per OCCURRENCE, not per key: one key can land in a table cell and in prose in the same charter,
+    and `\\|` in prose is a backslash a reader sees. What is NOT handled, said plainly rather than
+    implied away: a backtick in a value the TEMPLATE wrapped in backticks mangles the code span, and
+    no escape fixes that inside one — CommonMark's answer is a longer delimiter run, which is the
+    template author's decision. The fix for that class is to stop wrapping free-text cells, which is
+    what `{{VARIANCES_A}}` now is.
+    """
+    token = '{{' + key + '}}'
+    if token not in text:
+        return text
+    out = []
+    for line in text.split('\n'):
+        if token in line and TABLE_ROW_RE.match(line):
+            if '\n' in val or '\r' in val:
+                raise Refusal(f'the answer for {key} carries a newline and the template puts it in a '
+                              f'table row, which the newline would end early. Give a single-line '
+                              f'answer for a cell')
+            out.append(line.replace(token, val.replace('|', r'\|')))
+        else:
+            out.append(line.replace(token, val))
+    return '\n'.join(out)
 
 
 # --------------------------------------------------------------------------- the region reader
@@ -315,6 +354,22 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
     kits = set(cfg.get('kits') or [])
     drop_names = list(cfg.get('drop_blocks') or [])
 
+    # THE `kits` ARRAY IS GRADED, and it was not. A member is a registry entry id — that is the
+    # population it is drawn from — and an unrecognised one selects nothing, so the whole kit section
+    # it was meant to keep is DROPPED and `--check` re-renders from the same file and stays green
+    # forever. Measured: rewriting `codebase-map` to `codebasemap` deleted the entire codebase-map
+    # ruleset from the charter with no word said. The adjacent `drop_blocks` loop refused exactly
+    # this shape two lines down; the symmetry gap between them is the defect.
+    if not kits:
+        raise Refusal(f'{dep.as_posix()} declares no `kits`, so every kit: fence in the template '
+                      f'would drop and the charter would lose every conditional ruleset silently. '
+                      f'Intake cannot write an empty selection, so this is a hand edit')
+    unknown = sorted(k for k in kits if k not in entries)
+    if unknown:
+        raise Refusal(f'`kits` names {", ".join(unknown)}, which {"is" if len(unknown) == 1 else "are"} '
+                      f'not a registry entry id. An unrecognised member selects nothing, so a kit '
+                      f'fence it was meant to keep drops instead — the failure that reads as success')
+
     declared_blocks = {b['name'] for b in blocks}
     for d in drop_names:
         if d not in declared_blocks:
@@ -378,19 +433,124 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
                 notes.append(f'answered  {key}')
         else:
             raise Refusal(f'{key} declares class `{cls}`, which is not derived, asked or defaulted')
-        text = text.replace('{{' + key + '}}', str(val))
+        text = substitute(text, key, str(val))
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
     return text, notes
 
 
+# --------------------------------------------------------------------------- the arms
+# WHY THE FIXTURE IS NOT GOV'S OWN TREE. Every arm below is about a WRONG input, and gov's committed
+# `deploy.toml` is a right one — so proving a refusal here would mean corrupting the repo's own
+# answers and putting them back. The fixture is a three-file scratch target instead: a descriptor, a
+# registry and a template, each holding only what the arm under test reads.
+DESC_FIXTURE = '''
+[[placeholder]]
+key = "VARIANCES_A"
+class = "asked"
+
+[[block]]
+name = "security"
+'''
+REG_FIXTURE = '[[entry]]\nid = "lexicon"\n\n[[entry]]\nid = "codebase-map"\n'
+TPL_FIXTURE = '''| Tag | Variances |
+|-----|-----------|
+| `a` | {{VARIANCES_A}} |
+
+<!-- kit:codebase-map -->
+the codebase-map ruleset
+<!-- /kit:codebase-map -->
+'''
+
+
+def _fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
+    """Write a scratch engine dir + target and return both. `kits` is TOML array source."""
+    eng, tgt = tmp / 'engine', tmp / 'target'
+    (eng).mkdir(parents=True, exist_ok=True)
+    (tgt / '.governance').mkdir(parents=True, exist_ok=True)
+    (eng / 'playbook.kit.toml').write_text(DESC_FIXTURE, encoding='utf-8')
+    (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
+    (tgt / 'CHARTER.md').write_text(TPL_FIXTURE, encoding='utf-8')
+    (tgt / '.governance' / 'deploy.toml').write_text(
+        f'kits = {kits}\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+        f'variances_a = {variances}\n', encoding='utf-8')
+    return eng, tgt
+
+
+def selftest() -> int:
+    import tempfile
+    passed, failed = 0, 0
+
+    def arm(name: str, kits: str, variances: str, want: str | None, in_body: str = ''):
+        nonlocal passed, failed
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = _fixture(Path(td), kits, variances)
+            try:
+                body, _ = render(eng, Path(td), tgt)
+                got = None
+            except Refusal as e:
+                body, got = '', str(e)
+        if want is None:
+            ok = got is None and in_body in body
+            detail = f'refused: {got}' if got else f'body lacks {in_body!r}'
+        else:
+            ok = got is not None and want in got
+            detail = 'no refusal at all' if got is None else f'refused with: {got}'
+        if ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL {name} — {detail}')
+    ok_kits, ok_var = '["codebase-map", "lexicon"]', '"plain"'
+
+    # H2 — the `kits` array is graded against the registry, in both failing directions.
+    arm('a green render survives its own fixture', ok_kits, ok_var, None,
+        in_body='the codebase-map ruleset')
+    arm('a misspelled kit id is a refusal, not a silently dropped section',
+        '["codebasemap", "lexicon"]', ok_var, 'not a registry entry id')
+    arm('the misspelling does NOT reach the render', '["codebasemap"]', ok_var, 'codebasemap')
+    arm('an empty kits array is a refusal, not a charter with every block dropped',
+        '[]', ok_var, 'declares no `kits`')
+
+    # M2 — substitution into a table row is escaped, and a newline in a cell is refused.
+    arm('a pipe in a table-cell answer is escaped, so the row keeps its cells',
+        ok_kits, '"a | pipe"', None, in_body=r'| `a` | a \| pipe |')
+    arm('a backtick in a table-cell answer survives as its own code span',
+        ok_kits, '"remote `origin`"', None, in_body='| `a` | remote `origin` |')
+    arm('a newline in a table-cell answer is a refusal',
+        ok_kits, '"""two\nlines"""', 'carries a newline')
+
+    # The escape is per OCCURRENCE: prose must not gain a backslash.
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _fixture(Path(td), ok_kits, '"a | pipe"')
+        (tgt / 'CHARTER.md').write_text('prose {{VARIANCES_A}} here\n', encoding='utf-8')
+        body, _ = render(eng, Path(td), tgt)
+        if body.strip() == 'prose a | pipe here':
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL a pipe in PROSE is left alone — got {body.strip()!r}')
+
+    if failed:
+        print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
+        return 1
+    print(f'render_playbook.selftest OK — {passed} arm(s)')
+    return 0
+
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument('--target', required=True)
+    ap.add_argument('--target')
     ap.add_argument('--charter', default='AGENTS.md')
     ap.add_argument('--check', action='store_true')
+    ap.add_argument('--selftest', action='store_true')
     a = ap.parse_args(argv)
+
+    if a.selftest:
+        return selftest()
+    if not a.target:
+        ap.error('--target is required')
 
     engine_dir = Path(__file__).resolve().parent
     gov_root = engine_dir.parent.parent

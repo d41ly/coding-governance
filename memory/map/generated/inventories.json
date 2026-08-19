@@ -52,6 +52,7 @@
       "playbook parity",
       "playbook parity selftest",
       "playbook placeholder catalogue",
+      "playbook render selftest",
       "playbook render wiring",
       "pre-push self-test",
       "push-main self-test",
