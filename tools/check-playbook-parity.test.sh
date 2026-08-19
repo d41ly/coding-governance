@@ -35,20 +35,22 @@ fixture() {
   : > "$d/tools/memory-tree/engine.sh"
   printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/tools/hooks/agent-cap.js"
   printf '{ "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent" } ] } }\n' > "$d/.claude/settings.json"
-  # The trio. The template names memory-tree and carries both stated values; hooks is waived.
+  # The trio. hooks is waived; memory-tree is documented, and it is documented in the RUNBOOK.
+  #
+  # TWO haystack files since v3.0, and this fixture carried only one — every arm below exited 2 on
+  # the gate's own two-file precondition, control included, so thirteen red proofs were proving
+  # nothing but a missing file. The kit line sits in the runbook rather than the template ON PURPOSE:
+  # written into the template, an empty WIRE-INTO-PROJECT.md would satisfy the precondition while no
+  # arm depended on a byte of it, and a haystack half nothing reads is the green-by-absence shape
+  # this gate exists to refuse. Here, emptying the runbook reds `memory-tree` as undocumented.
+  #
   # Every declared pair's STATED side must appear here, or its anti-vacuity arm reds on the valid-
   # fixture control -- which is exactly what that arm is for. Three pairs were added when the
   # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
   # population; the control failed, correctly, until the fixture carried their sentences.
-  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\ntools/memory-tree/ is the kit\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
+  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
     | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
-  printf 'companion {{MEMORY_ROOT}}\n' > "$d/parallel-coding-governance.domain-rules.md"
-  {
-    printf '2 in total: 2 in the template and 1 in the companion.\n'
-    printf '**1 shared: `{{MEMORY_ROOT}}`**\n'
-    printf '### In `coding-governance-agents.template.md` — 2\n'
-    printf '### In `parallel-coding-governance.domain-rules.md` — 1\n'
-  } > "$d/parallel-coding-governance.customize.md"
+  printf 'runbook {{MEMORY_ROOT}}\nadopt tools/memory-tree/ into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
   printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/tools/playbook-kit-waivers.txt"
   git -C "$d" add -A >/dev/null 2>&1
   git -C "$d" commit -qm f >/dev/null 2>&1

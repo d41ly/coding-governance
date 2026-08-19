@@ -11,13 +11,17 @@
 #
 # Seeded 2026-08-18 from the measured population, after the v3.0 carriers were repointed — so the
 # leg landed green over the tree it was written against rather than over an assumption about it.
+#
+# A ROW IS KEYED BY LINE, so a merge that lands another branch's edits ABOVE a carrier moves it and
+# the row goes stale — the row is then re-stamped to the line the same carrier now sits on, which is
+# not a widening: the count is unchanged and the carrier text is identical. Re-stamp only after
+# reading BOTH lines; if the text differs, the old carrier is gone and the row is deleted instead.
 
-.memory-tree.conf:174                              history: why an ARMS_FLOORS pair dropped; the catalogue is the subject, not a pointer
 WIRE-INTO-PROJECT.md:264                           migration: names the old pointer stub an adopter still holds
 WIRE-INTO-PROJECT.md:270                           migration: the step that folds that file's prose away
-tools/memory-tree/check-memory-hygiene.sh:270      the gate BANS these names; it cannot refuse what it may not spell
-tools/memory-tree/check-memory-hygiene.sh:529      retirement note for the STATUS.md check, naming what it retired
+tools/memory-tree/check-memory-hygiene.sh:286      the gate BANS these names; it cannot refuse what it may not spell
+tools/memory-tree/check-memory-hygiene.sh:547      retirement note for the STATUS.md check, naming what it retired
 tools/memory-tree/check-memory-hygiene.test.sh:1057   fixture creates the banned names to prove the refusal fires
-tools/memory-tree/check-memory-hygiene.test.sh:1159   fixture builds an over-long STATUS.md for the size arm
-tools/memory-tree/check-memory-hygiene.test.sh:1164   positive arm: check 6 hits the banned STATUS.md
-tools/memory-tree/check-memory-hygiene.test.sh:1203   negative arm: check 6 does NOT hit it once retired
+tools/memory-tree/check-memory-hygiene.test.sh:1166   fixture builds an over-long STATUS.md for the size arm
+tools/memory-tree/check-memory-hygiene.test.sh:1171   positive arm: check 6 hits the banned STATUS.md
+tools/memory-tree/check-memory-hygiene.test.sh:1227   negative arm: check 6 does NOT hit it once retired
