@@ -40,6 +40,7 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
 mkconf() { # wiring · gate
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="${3-2026-08-19}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
@@ -291,7 +292,7 @@ miss "$out" "rewrote the scope"
 # than its wording.
 rreset
 mutate memory/builds/tRun/README.md '/ARCH-tRun-1/d'
-hit "$(run --preflight tRun --keepalive-id k1)" "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for"
+hit "$(run --preflight tRun --keepalive-id k1)" "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for; additions are admitted and removals are not"
 
 # ...and the twin the id comparison exists to ADMIT: a row whose STATUS and REV moved, which is what
 # every build does to its own units, and which a byte comparison would have refused. Without this arm
@@ -311,12 +312,61 @@ out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "preflight OK"
 miss "$out" "absent from it now"
 
+# TOOL-aBoundedVerdict-11 S4 - the WORKING COPY's unit list must be READABLE at preflight, so an agent
+# meets the requirement here rather than at --close after a whole run. Two arms, because `region`
+# conflates ABSENT with MALFORMED and the refusal has to fire for both.
+rreset
+sed -i '/gen:build-units/d' memory/builds/tRun/README.md
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "the build README's unit list cannot be read, so every verb keyed on it would run blind"
+hit "$out" "the build README carries no single well-formed <!-- gen:build-units --> pair"
+miss "$out" "preflight OK"
+
+# ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
+# resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
+hit "$out" "the --write mode of tools/memory-tree/gen_build_index.py"
+
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
 rreset
 units tRun "| [ARCH-tRun-1 — a second region nobody granted](spec/one.md) | OPEN | rev-1 | 2026-08-01 |"
 hit "$(run --preflight tRun --keepalive-id k1)" "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared"
 git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# TOOL-aBoundedVerdict-11 S6a - a BASE with NO units pair, dated at or after UNITS_REGION_CUTOFF, is a
+# REFUSAL rather than an empty set. A subset test over an empty BASE is vacuously true, which is the
+# hole the id comparison exists to close. The fixture's anchor commit is made DURING this run, so its
+# date is today and therefore at or after the cutoff: the case the branch is written for.
+git checkout -qf main
+sed -i '/gen:build-units/d' memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m nounitsatbase --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+# the WORKING COPY gets the pair back: BASE lacks it, HEAD has it. Deleting it from both would make
+# S4's readability refusal fire first and mask the branch this arm is about.
+readme tRun; git add -A >/dev/null && git commit -q -m unitsathead --no-verify
+hit "$(run --preflight tRun --keepalive-id k1)" "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously"
+git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
+
+# ...and the BOOTSTRAP case, which is the whole reason the cutoff exists: a BASE that PREDATES it and
+# carries no pair is still authorized. Without this the unit is unlandable by any run, because every
+# candidate run's BASE is pinned before the migration render that creates the region.
+git checkout -qf main
+sed -i '/gen:build-units/d' memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m nounitsatbase2 --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+readme tRun
+# The conf is SOURCED by the driver, so the cutoff moves THERE rather than being exported - an
+# exported value never reaches a sourced conf, and an arm built that way passes for the wrong reason.
+# It is written BEFORE the commit: mkconf dirties the tree, and preflight refuses a dirty tree on
+# check_clean before authorization is ever reached, which is what made the first cut of this arm fail
+# for a reason that had nothing to do with the cutoff.
+mkconf true true 2099-01-01
+git add -A >/dev/null && git commit -q -m unitsathead2 --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "preflight OK"
+miss "$out" "dated at or after UNITS_REGION_CUTOFF"
+mkconf
+git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
 
 # ...and the BASE side MALFORMED: two pairs committed to the anchor. Without this arm the
 # grep-for-presence test and the well-formedness check cannot be told apart.

@@ -1287,6 +1287,18 @@ verb_preflight() { # slug · keepalive-id
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  # TOOL-aBoundedVerdict-11 S4 - the WORKING COPY's units region must be readable, and this is where
+  # an agent meets the requirement rather than discovering it at --close. The region is what every
+  # later verb reads for the unit list: --plan's roster join, --status's next unit, --landed's freeze
+  # and build-complete's terms. Refusing here costs one render; refusing at close costs a whole run.
+  #
+  # It reports through `status` rather than returning, so this refusal joins the others in one pass and
+  # the operator sees every unmet precondition at once instead of one per invocation.
+  if ! unit_rows "$(readme_of "$slug")" >/dev/null 2>&1; then
+    fail 44 "the build README's unit list cannot be read, so every verb keyed on it would run blind"
+    units_refusal "$(readme_of "$slug")"
+    status=1
+  fi
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
