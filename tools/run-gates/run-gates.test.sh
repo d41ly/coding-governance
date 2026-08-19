@@ -477,11 +477,14 @@ done
 
 # 4. THE HARDWARE PROFILE TABLE. The runner's knobs are DECLARED rather than computed from core
 #    count alone, and the governing invariant is that no knob may ever turn a leg into a PASS or a
-#    SKIP. Every arm below is driven against a SCRATCH repo carrying the kit's own table, and the
-#    threshold arms read their seam values FROM that table rather than pinning gov's figures — a
-#    number copied from one corpus into a harness that ships is
-#    memory/gotchas/pin-copied-from-another-corpus.md, and an adopter who tunes a threshold would
-#    inherit a red that says nothing about their tree.
+#    SKIP. Every arm below runs against a SCRATCH repo, never the real bar.
+#
+#    THE SELECTION ARMS DRIVE A FIXTURE TABLE, NOT THE SHIPPED ONE, and that is the whole design of
+#    this section. The shipped table is DATA an adopter is expected to tune, so an arm keyed on its
+#    figures is memory/gotchas/pin-copied-from-another-corpus.md — it would red on their tree while
+#    saying nothing about it. A fixture whose thresholds this file writes is true everywhere, needs
+#    no skip when the shipped table is edited or removed, and lets the arms name exact readings.
+#    Exactly ONE arm reads the shipped table (4e), because its subject IS that file's own content.
 P="$SCRATCH/prof"
 mkdir -p "$P/tools/run-gates" "$P/fx" "$P/shim"
 cp "$SCRATCH/tools/run-gates/run-gates.sh" "$P/tools/run-gates/run-gates.sh"
@@ -498,71 +501,72 @@ runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-ga
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
 
-# The kit's OWN table, copied in so the selection arms drive real declared rows. It is a shipped file
-# of this kit, so it is present in any tree that took the kit — and its ABSENCE is the documented
-# rollback, which arm 4f drives deliberately. A missing table here is therefore a loud SKIP and never
-# a silent pass: an arm that could not look has not looked.
+# THE FIXTURE TABLE the selection arms drive. Three rows, most-capable-first, zero-threshold
+# catch-all last — the shape the grammar declares — with thresholds this file chose so the arms can
+# name exact readings. It is INSTALLED as the scratch runner's own table, so no seam points at it and
+# the ordinary derivation is what finds it: an arm driving GATE_PROFILES would be grading the seam
+# rather than the path every real run takes.
+printf 'big\t16\t24000\twidth=8,timeout=0\nsmall\t4\t0\twidth=4,timeout=0\nany\t0\t0\twidth=2,timeout=0\n' \
+  > "$P/tools/run-gates/gate-profiles.txt"
+
+# 4a. the most-capable row is selected when BOTH its thresholds are met. Seams, not real hardware:
+#     the node running this suite is whatever it is, and an arm that depends on that grades the box.
+n=$((n+1))
+got=$(profname "$(runp GATE_CORES=16 GATE_RAM_MB=32000)")
+[ "$got" = big ] || { echo "canary: 16 cores and 32000 MB selected '$got', not the fixture's most-capable row 'big'"; fail=1; }
+
+# 4b. THE RAM GUARD, which is the whole reason this table exists: cores alone are the wrong question
+#     and the built-in formula cannot express this at all. SAME core count, a RAM reading below the
+#     top row's threshold, and the selection must land on the middle row instead.
+n=$((n+1))
+got=$(profname "$(runp GATE_CORES=16 GATE_RAM_MB=8000)")
+[ "$got" = small ] || { echo "canary: 16 cores and 8000 MB selected '$got', not the middle row 'small' — the RAM guard is not armed, and a high-core low-RAM box would take the widest profile"; fail=1; }
+
+# 4c. unknown hardware lands on the LAST row by ordinary threshold matching, and says so. A detection
+#     failure must cost SPEED, never COVERAGE, and the tag is how an operator tells the two apart
+#     afterwards.
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_CORES=0 GATE_RAM_MB=0)
+got=$(profname "$o")
+[ "$got" = any ] || { echo "canary: unknown hardware selected '$got', not the table's last (catch-all) row 'any'"; fail=1; }
+case "$(profline "$o")" in *'detection failed'*) ;; *) echo "canary: an unresolvable hardware reading was not tagged as a detection failure: $(profline "$o")"; fail=1 ;; esac
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+  || { echo "canary: a detection failure changed the VERDICT — a knob must only ever cost speed"; fail=1; }
+
+# 4d. a profile name that resolves to nothing REFUSES, and lists the names that do exist. An
+#     operator who mistyped a row name gets the roster, not a silent fall-through to some other row.
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILE=no-such-row-4f2a); rc=$?
+[ "$rc" = 2 ] || { echo "canary: an unknown GATE_PROFILE exited $rc, not 2"; fail=1; }
+printf '%s\n' "$o" | grep -q 'big' \
+  || { echo "canary: the unknown-GATE_PROFILE refusal did not list the row names that do exist"; fail=1; }
+
+# 4e. THE PINNED KNOB SET, and the ONE arm whose subject is the SHIPPED table rather than a fixture:
+#     what it grades is that file's own content. It is the left-shift of the governing invariant. The
+#     runner declares what it IMPLEMENTS; this pin declares what has been REVIEWED, and they are
+#     deliberately two separate statements — a knob added to the table reds here until an author
+#     edits this line, which is the moment they read the invariant. Collapsing the two would remove
+#     the only forcing function a coverage knob would ever meet.
+PINNED_KNOBS="timeout width"
 PTBL="$KITREL/gate-profiles.txt"
-if [ -f "$PTBL" ]; then
-  cp "$PTBL" "$P/tools/run-gates/gate-profiles.txt"
-  prow() { grep -vE '^[[:space:]]*(#|$)' "$PTBL" | sed -n "${1}p"; }
-  nrows=$(grep -cvE '^[[:space:]]*(#|$)' "$PTBL")
-  r1=$(prow 1); r1n=$(printf '%s' "$r1" | cut -f1); r1c=$(printf '%s' "$r1" | cut -f2); r1m=$(printf '%s' "$r1" | cut -f3)
-  rZn=$(prow "$nrows" | cut -f1)
-
-  # 4a. the most-capable row is selected when BOTH its thresholds are met. Seams, not real hardware:
-  #     the node running this suite is whatever it is, and an arm that depends on that grades the box.
 n=$((n+1))
-  got=$(profname "$(runp GATE_CORES="$r1c" GATE_RAM_MB="$r1m")")
-  [ "$got" = "$r1n" ] || { echo "canary: at the top row's own thresholds ($r1c cores / $r1m MB) the runner selected '$got', not '$r1n'"; fail=1; }
-
-  # 4b. THE RAM GUARD, which is the whole reason this table exists: cores alone are the wrong
-  #     question, and today's built-in formula cannot express this. Same core count, one MB below the
-  #     top row's RAM threshold, and the selection must move off that row. A top row declaring a zero
-  #     RAM threshold makes the case unreachable, so it is skipped OUT LOUD rather than passed.
-n=$((n+1))
-  if [ "$r1m" -gt 0 ]; then
-    got=$(profname "$(runp GATE_CORES="$r1c" GATE_RAM_MB="$(( r1m - 1 ))")")
-    [ "$got" != "$r1n" ] || { echo "canary: a box with $r1c cores and one MB BELOW the top row's RAM threshold still selected '$r1n' — the RAM guard is not armed"; fail=1; }
-  else
-    echo "canary: SKIP the RAM-guard arm — the top table row declares a zero RAM threshold, so there is no reading below it to drive"
-  fi
-
-  # 4c. unknown hardware lands on the LAST row by ordinary threshold matching, and says so. A
-  #     detection failure must cost SPEED, never COVERAGE, and the tag is how an operator tells the
-  #     two apart afterwards.
-n=$((n+1))
-n=$((n+1))
-  o=$(runp GATE_CORES=0 GATE_RAM_MB=0)
-  got=$(profname "$o")
-  [ "$got" = "$rZn" ] || { echo "canary: unknown hardware selected '$got', not the table's last (catch-all) row '$rZn'"; fail=1; }
-  case "$(profline "$o")" in *'detection failed'*) ;; *) echo "canary: an unresolvable hardware reading was not tagged as a detection failure: $(profline "$o")"; fail=1 ;; esac
-n=$((n+1))
-  printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
-    || { echo "canary: a detection failure changed the VERDICT — a knob must only ever cost speed"; fail=1; }
-
-  # 4d. a profile name that resolves to nothing REFUSES, and lists the names that do exist. An
-  #     operator who mistyped a row name gets the roster, not a silent fall-through to some other row.
-n=$((n+1))
-n=$((n+1))
-  o=$(runp GATE_PROFILE=no-such-row-4f2a); rc=$?
-  [ "$rc" = 2 ] || { echo "canary: an unknown GATE_PROFILE exited $rc, not 2"; fail=1; }
-  printf '%s\n' "$o" | grep -q "$r1n" \
-    || { echo "canary: the unknown-GATE_PROFILE refusal did not list the row names that do exist"; fail=1; }
-
-  # 4e. THE PINNED KNOB SET, and it is the left-shift of the governing invariant. The runner declares
-  #     what it IMPLEMENTS; this pin declares what has been REVIEWED, and they are deliberately two
-  #     separate statements — a knob added to the table reds here until an author edits this line,
-  #     which is the moment they read the invariant above. Collapsing the two would remove the only
-  #     forcing function a coverage knob would ever meet.
-  PINNED_KNOBS="timeout width"
-n=$((n+1))
+if [ ! -f "$PTBL" ]; then
+  # ANNOUNCED, and counted, so the executed total does not move with the table's presence. A skip
+  # that silently shrinks the count reds the floor with a message about arithmetic instead of a
+  # message about what went ungraded.
+  echo "canary: SKIP the pinned-knob arm — $PTBL is absent, so this tree declares no knobs to grade (the runner falls back to its built-in formula, which arm 4f drives on purpose)"
+else
   tblknobs=$(grep -vE '^[[:space:]]*(#|$)' "$PTBL" | cut -f4 | tr ',' '\n' | sed 's/=.*//' | sort -u | tr '\n' ' ')
+  # An EMPTY read makes the loop below unreachable, and an unreachable loop certifies the pin by
+  # never comparing it — a table whose rows carry no fourth field reads empty here and would pass.
+  [ -n "${tblknobs// /}" ] \
+    || { echo "canary: $PTBL yielded NO knob keys, so the pinned-set comparison below would pass by finding nothing"; fail=1; }
   for k in $tblknobs; do
     case " $PINNED_KNOBS " in *" $k "*) ;; *) echo "canary: $PTBL declares knob key '$k', which is not in this suite's pinned set ($PINNED_KNOBS). Read the governing invariant in the table's header before adding it: no knob may ever turn a leg into a PASS or a SKIP."; fail=1 ;; esac
   done
-else
-  echo "canary: SKIP arms 4a-4e — $PTBL is absent, so the declared table cannot be graded (this is the documented rollback state, which arm 4f drives on purpose)"
 fi
 
 # 4f. THE ROLLBACK. An ABSENT table is a fallback, never a refusal: this kit deploys, and an adopter

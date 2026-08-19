@@ -182,15 +182,10 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 
 - **AC1** — When the runner starts, it prints one line beginning `gate profile: ` before the first
   `GATE ` line, and `bash tools/run-gates/run-gates.test.sh` asserts that line is present.
-- **AC2** — When `GATE_CORES` and `GATE_RAM_MB` are set to the top row's own declared thresholds
-  read from `tools/run-gates/gate-profiles.txt`, `bash tools/run-gates/run-gates.test.sh` observes
-  that row selected; when `GATE_RAM_MB` is then dropped one MB below that threshold at the same core
-  count, it observes the selection move OFF that row — the RAM guard, which today's formula cannot
-  express, is the assertion. The seam values are READ FROM THE TABLE rather than written here: this
-  harness SHIPS, the table is data an adopter is expected to tune, and a figure pinned from gov's
-  hardware would red on their tree while saying nothing about it. The second half asserts the
-  selection MOVED rather than naming the next row, because a row's own thresholds are what decide
-  whether it is reachable at that reading and only the move is true of every declared table.
+- **AC2** — When `GATE_CORES=16` and `GATE_RAM_MB=32000` are set, the canary observes the
+  most-capable row selected; when `GATE_CORES=16` and `GATE_RAM_MB=8000` are set, it observes the
+  middle row — the RAM guard, which today's formula cannot express, is the assertion. The table those
+  readings are matched against is a FIXTURE the canary writes, not the shipped one: see §9 rev-5.
 - **AC3** — When `GATE_CORES=0` and `GATE_RAM_MB=0` are set, the canary observes the catch-all row
   and a provenance tag naming the sources tried.
 - **AC4** — When `GATE_PROFILE` names a row that does not exist, the runner exits 2 and lists the
@@ -286,12 +281,16 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
-- rev-5 · 2026-08-20 · built. AC2 restated: the arms read their seam values from the table's own
-  top row instead of the literal figures written here, and the second half asserts the selection moved
-  off that row rather than naming the middle one. The reason is that S7's arms live in the harness
-  that SHIPS, so a figure taken from this node's hardware is a pin copied from one corpus into
-  another tree — the class this build's own kit split exists to refuse — and an adopter who tunes a
-  threshold would inherit a red about nothing. Nothing else in the criteria moved.
+- rev-5 · 2026-08-20 · built. One design decision S7 did not state, recorded because it changes what
+  the arms grade: every selection arm drives a FIXTURE table the canary writes, and exactly one arm
+  reads the shipped table — the pinned-knob one, whose subject IS that file's content. The shipped
+  table is DATA an adopter is expected to tune, so an arm keyed on its figures is a pin copied from
+  one corpus into a tree that never agreed to it, and it would red there while saying nothing about
+  it. The first draft did key on the shipped table and a control proved the cost: one malformed row
+  in it cascaded into twelve arms with nothing to do with it, which is a diagnostic that names
+  everything except the fault. The pinned-knob arm also announces its skip AND counts it, so the
+  executed total does not move with the table's presence — a skip that shrinks the count reds the
+  floor with a message about arithmetic instead of about what went ungraded. No criterion moved.
 - rev-4 · 2026-08-18 · folded the round-2 spec audit. R23: AC11b restores S8's width-formula half.
   The round-1 fix restated AC11 positively for the FIGURE and dropped the formula, relocating the
   defect rather than closing it — S8 could land half done with every criterion green while the

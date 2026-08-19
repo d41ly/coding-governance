@@ -120,10 +120,12 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 
 ## Gaps
 
-- The shipped canary's threshold arms read their seam values FROM the table rather than pinning
-  figures, because the table is data an adopter is expected to tune and a pinned figure would red on
-  their tree while saying nothing about it. The cost is that the arms grade the mechanism, not gov's
-  particular thresholds; nothing observes a gov threshold that drifts away from gov's hardware.
+- The shipped canary's selection arms drive a FIXTURE table they write, not `gate-profiles.txt`,
+  because that file is data an adopter is expected to tune and an arm keyed on its figures would red
+  on their tree while saying nothing about it. Exactly one arm reads the shipped table — the pinned
+  knob set, whose subject is that file's own content. The cost is that nothing observes a gov
+  threshold drifting away from gov's hardware; the benefit is that a malformed shipped table reds one
+  arm instead of cascading into twelve that have nothing to do with it.
 
 - `adopt-run-gates.sh` has no WRITE path today: the `[gate_runner]` declaration is emitted by
   `govkit intake` from this kit's `[gate_runner_seed]`, because a declaration written at configure

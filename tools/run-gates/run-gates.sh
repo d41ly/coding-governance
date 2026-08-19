@@ -226,8 +226,9 @@ else
   # ABSENT is a FALLBACK, not a refusal: this kit deploys, and an adopter may take it without the
   # table. Deleting the table is therefore also the documented rollback for this whole mechanism, and
   # the arm that drives this branch is what proves the rollback rather than hoping for it.
-  # 8 is MEASURED, not guessed: at width 16 each leg dilates under load faster than the extra worker
-  # repays, so wall clock is the longest leg either way.
+  # The 8 here is the SAME value the table's top row declares, and its measurement is argued THERE,
+  # beside the number. Restating the argument in both places is how the two copies drift apart while
+  # still agreeing loudly enough that nobody checks.
   det_cores; det_ram
   bi=$DET_CORES; [ "$bi" -gt 0 ] || bi=4
   PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_TAG="built-in default"
@@ -350,7 +351,7 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
 # what keeps the split unambiguous rather than merely usually right. Every verb the sibling units
 # add conforms: two spaces before any parenthesised tail.
 report_one() { # leg index — emits exactly the line the serial bar has always emitted
-  local i=$1 rc
+  local i=$1 rc ftail
   n=$((n+1))
   if [ ! -f "$WORK/$i.rc" ]; then
     fails=$((fails+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
