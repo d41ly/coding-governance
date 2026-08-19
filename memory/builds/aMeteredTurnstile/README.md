@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5
+ids: TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5 TOOL-aMeteredTurnstile-6
 ---
 
 # aMeteredTurnstile — the bar gets an instrument before it gets another fix
@@ -41,7 +41,7 @@ against an existing backlog id or a new one, and landing any of them is a separa
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
-ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5
+ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5 TOOL-aMeteredTurnstile-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

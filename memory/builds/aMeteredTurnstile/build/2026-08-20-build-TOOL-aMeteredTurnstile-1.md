@@ -71,7 +71,55 @@ Consequence for the question that opened this session: the primary cache's 1997s
 two unattended legs, against 659.9s and 634.6s recorded two days earlier, are **not** evidence of a
 3x regression. They are incomparable cells from different runs at different load.
 
-## 3. What is actually making it slower over time
+## 3. What is actually making it slower — the bar did not grow, the machine got slower per process
+
+This is the finding the rest of the report was missing, and it was reached because the owner noticed
+the machine was barely loaded while three full bars ran at once.
+
+**The bar is not CPU-bound, not disk-bound, and not queueing.** Sampled while three bars ran:
+
+| Signal | Value |
+|---|---|
+| Logical cores | 16 |
+| CPU load | 39% |
+| **CPU queue length** | **0** |
+| **Disk queue length** | **0** |
+| Disk % time | 1.1% |
+| Defender real-time protection | ON (exclusions unreadable without admin) |
+
+Nothing is waiting for CPU and nothing is waiting for disk, yet the work crawls. That combination
+means the cost is **per-operation latency**, not resource contention.
+
+**Measured now, against the baseline this repo recorded on 2026-08-11 (`TOOL-aTimedTurnstile-4`):**
+
+| Operation | 2026-08-11 | 2026-08-20 | Change |
+|---|---:|---:|---:|
+| `bash -c true` | 22.5 ms | **581 ms** | **26x** |
+| `git rev-parse` | 23.9 ms | **727 ms** | **30x** |
+| `python -c pass` | 103.7 ms | **1297 ms** | **12.5x** |
+| `mktemp -d` plus `git init` | not recorded | **2751 ms** | not comparable |
+
+**The bar did not get slower. Process creation on this machine got roughly 25x slower.** A bar made
+of 86 legs, each spawning dozens to hundreds of processes, is a process-spawn amplifier: it turns a
+25x latency regression into an hour.
+
+### Adding width makes it WORSE, measured, so nobody retries it
+
+The obvious inference from an idle CPU is to widen the pool. It is wrong, and the counter-measurement
+is recorded here so the next person does not spend an afternoon on it. A 16-leg fixture, each leg
+doing exactly what a self-test does, being `mktemp -d` plus `git init` plus two `git config` calls:
+
+| Pool width | Wall |
+|---|---:|
+| 8 | **51.3 s** |
+| 24 | **64.6 s**, 26% SLOWER |
+
+CPU idle, queues empty, and more workers making it slower is the signature of a **serialized**
+bottleneck. The contended resource is the process-and-file-creation path itself, with a real-time
+antivirus filter driver in it, and that path does not parallelise. The runner's own comment that
+"8 is MEASURED, not guessed" survives this session intact.
+
+### The TMPDIR leak is real, and it is secondary
 
 **The bar leaks scratch git repositories into `TMPDIR`, and never cleans them.**
 
@@ -89,13 +137,19 @@ Sampled contents confirm the attribution — they hold `.git`, `.memory-tree.con
 is the shape a gate self-test builds. `run-gates.sh` traps and removes its own `$WORK`, but a leg
 killed or wedged mid-run leaves the scratch repo it built.
 
-This is a compounding cost, not a tidiness complaint. `TMPDIR` on this node is
-`C:\Users\...\AppData\Local\Temp`, every heavy leg calls `mktemp -d` there, and on Windows that
-directory is scanned by real-time antivirus. **`du -sh /tmp` did not complete within four minutes**
-during this session. Every leg that creates a scratch repo pays that traversal, every run, and the
-cost grows with every leg that ever died.
+`TMPDIR` now holds **6862 top-level entries**, and `du -sh /tmp` did not complete within four
+minutes. Its cost was isolated by measuring the same `git init` in two places on the same volume:
 
-That is the most credible mechanism for "it is getting slower", and it is the cheapest to fix.
+| Location | `git init` |
+|---|---:|
+| bloated TMPDIR, 6862 entries | 2350 ms |
+| clean directory, few siblings | 1564 ms |
+
+So the leak costs about **1.5x on the hottest operation the bar performs**. That is worth fixing and
+it is cheap, but it is not the main driver: a clean directory still costs 1564 ms against a 23.9 ms
+baseline-era `git rev-parse`. An earlier draft of this report called the leak the most credible
+mechanism for the slowdown. The latency measurement above supersedes that. The leak is a multiplier
+on a problem it did not cause.
 
 ## 4. The other structural findings
 
@@ -134,17 +188,21 @@ is reported as an observed configuration fact, not acted on.
 
 Ordered by measured value per unit of work. Each names the id it belongs to.
 
+Reordered after the latency measurement. The first two are environment, cost no code, and plausibly
+dwarf everything else. The rest are code.
+
 | # | Recommendation | Belongs to | Why it is where it is |
 |---|---|---|---|
-| G1 | Sweep `TMPDIR` of leaked scratch repos, and give every leg's `mktemp -d` an EXIT trap so a killed leg cleans up | new row | 786 leaked dirs; `du` of the tree exceeds 4 min. Cheapest fix, largest compounding win |
-| G2 | Give the runner a per-leg deadline that kills and reports the leg rather than the run | `TOOL-aBoundedVerdict-10` | wall clock is unbounded today; one wedge cost this run 21+ min |
-| G3 | Shard the two unattended selftests | `TOOL-aPacedTurnstile-8` | they alone are 78% of the wall on top of the other 84 |
-| G4 | Evict timing-cache rows on the manifest, not on the run | new row | 3 orphans, 965s, 12% inflation, and the misleading comment at `run-gates.sh:287` |
+| G1 | Add Defender exclusions for the repo root and TMPDIR, then re-run the spawn calibration | `TOOL-aMeteredTurnstile-6` | real-time protection is ON and sits in the serialized path every measurement above points at. Named as a lever in `TOOL-aTimedTurnstile-4` and still unquantified. No code, needs admin |
+| G2 | Sweep TMPDIR, and give every leg's `mktemp -d` an EXIT trap | `TOOL-aMeteredTurnstile-2` | 6862 entries; measured 1.5x on `git init`. Cheap, compounding, and it stops the leak recurring |
+| G3 | Reduce process COUNT in the two heavy legs, rather than making them concurrent | `TOOL-aPacedTurnstile-8` | on a spawn-latency-bound bar the only lever that scales is fewer spawns. `unattended.test.sh` issues about 118 full driver invocations |
+| G4 | Give the runner a per-leg deadline that kills and reports the leg, not the run | `TOOL-aBoundedVerdict-10` | wall clock is unbounded today; one leg cost this run 21+ minutes and a second never returned |
 | G5 | Emit a progress signal before the first leg returns | `TOOL-aPacedTurnstile-3` | 9.3 minutes of silence is what makes the bar feel broken rather than slow |
-| G6 | Correct the stale figure in `AGENTS.md:492` | new row | it claims 335s serial to ~95s at width 8, measured at 47 legs; there are 86, and this run exceeded 48 min |
+| G6 | Evict timing-cache rows on the manifest, not on the run | `TOOL-aMeteredTurnstile-3` | 3 orphans, 965s, 12% inflation, and a comment that describes the write path from the read path |
+| G7 | Correct the stale figure in `AGENTS.md:492` | `TOOL-aMeteredTurnstile-4` | it claims 335s serial to about 95s at width 8, measured at 47 legs; there are 86 |
 
-G1 and G2 are the two that change the experience. G3 is the only one that changes the floor, and it
-is already specced as its own build that does not yet exist.
+**Do not widen the pool.** Measured above at 26% slower. That inference is the natural one from an
+idle CPU and it is wrong here.
 
 ## 6. Recommendations for adopters
 
@@ -165,8 +223,15 @@ These are properties of any bounded-pool gate bar and carry no assumption about 
   grows superlinearly with the temp directory.
 - **Never pin a gate assertion to a wall clock.** Assert order and classification, which are
   properties of the runner. Send the seconds to a report.
-- **Measure spawn cost beside the bar.** On a spawn-bound bar, "slower" usually means the platform
-  got slower per process, not that the bar grew.
+- **Measure spawn cost beside the bar, every time you measure the bar.** This is the single
+  highest-value control and it is two lines of shell. It converts "the bar got slower" into "the bar
+  got slower per unit of spawn cost", and those have completely different fixes. Here the bar was
+  unchanged and the platform had regressed 25x.
+- **Read CPU queue and disk queue, not CPU percent.** An idle CPU with empty queues and slow work
+  means a serialized external path: antivirus, a filter driver, a network filesystem. Widening the
+  pool then makes it worse, which is the opposite of what an idle CPU suggests.
+- **On a latency-bound bar the only lever that scales is fewer operations.** Not more workers and not
+  better scheduling. Count the processes a leg spawns before optimising anything about leg order.
 - **Report time-to-first-signal as its own number.** Longest-first dispatch optimises makespan and
   pessimises feedback; both matter, and only one of them is usually measured.
 
