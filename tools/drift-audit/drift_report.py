@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.4"
+KIT_DRIFT_AUDIT_VERSION = "1.5"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -324,7 +324,13 @@ def signal_spec_status(ctx) -> dict:
         # The ORACLE: a non-terminal spec whose OWN id is cited by tracked PRODUCT source describes
         # work that demonstrably shipped. Product source only — keying a record's truth on another
         # record is circular, and upstream an id CATALOG (a recall alias file) certified all 110.
-        hit = ctx.git.run("grep", "-l", "-F", own.group(1), "--", *ctx.product_globs)
+        #
+        # `-w`, and it is load-bearing: without it `-F` matches a PREFIX, so `<slug>-1` hits
+        # inside every `<slug>-1[0-9]` sibling. TOOL-aBoundedVerdict-30 measured the cost - id
+        # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
+        # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
+        # and 3 to twenty siblings, each reading as a stale status header nobody can find.
+        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.product_globs)
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),

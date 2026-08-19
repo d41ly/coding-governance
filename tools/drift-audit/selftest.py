@@ -352,6 +352,26 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           v2["non_terminal_specs_cited_by_product_source"]["value"] == 1,
           f"got {v2['non_terminal_specs_cited_by_product_source']['value']}")
 
+    # --- the PREFIX arm: a SIBLING's id must not certify this spec --------------------------
+    # `-F` alone matches a PREFIX, so `TOOL-aThing-1` hit inside `TOOL-aThing-11`. Measured live on
+    # this repo at TOOL-aBoundedVerdict-30: id `-1` carried three citations and all three were
+    # `-11`'s. Without this arm the `-w` that fixes it is an unproven character.
+    (r / "src" / "app.py").write_text("# implements TOOL-aThing-11\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "cite only the SIBLING id"], r)
+    v2p = report(r)
+    check("a sibling id sharing this id's prefix does not fire it",
+          v2p["non_terminal_specs_cited_by_product_source"]["value"] == 0,
+          f"got {v2p['non_terminal_specs_cited_by_product_source']['value']} "
+          f"detail={v2p['non_terminal_specs_cited_by_product_source']['detail']}")
+    # Without this the arm above is satisfied by a probe that judged nothing.
+    check("...and the probe is still live, so that 0 is a measurement",
+          v2p["non_terminal_specs_cited_by_product_source"]["live"] is True)
+    # Restore the real citation: the arms below judge a repo where the id IS cited.
+    (r / "src" / "app.py").write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "restore the real citation"], r)
+
     # --- a TERMINAL status must not fire, or the signal is just counting specs -------------
     spec = r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aThing-1.md"
     spec.write_text(spec.read_text(encoding="utf-8").replace("SPECCED", "CLOSED"),

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build
 
-**Status:** INPROGRESS · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -207,6 +207,9 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — is `round` an integer the caller passes, or does the harness infer it from `priorFindings`
   being non-empty?** Inference costs no argument and is right in every case anyone will actually run.
   An explicit integer is readable in the report and lets round 3 say three. **Recommendation: accept
@@ -219,6 +222,10 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
   floor, and git's default abbreviation here is 7. A 40-hex requirement would refuse the spelling the
   corpus actually uses. **Recommendation: require 7+ hex and nothing but hex** — the same floor the
   driver's join already uses, for the same measured reason.
+  RESOLVED (agent, 2026-08-19, delegated): NO - a short sha is accepted. `baseLooksPinned` is
+  `/^[0-9a-f]{7,40}$/`, so 7 hex characters and up pass, which is the same width
+  `closing-review-recorded` joins on; a non-hex or under-7 value is refused at round > 1. Refusing
+  7 would have made the harness reject the exact form the DoD item reads.
 
 - **F3 — should a fold-scoped round N re-run the bug-class checklist over the fold range only, or
   over the full range?** M8 runs `gotchas.py --for-diff` as the lens brief before the review.
@@ -231,6 +238,7 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-19 · F2 RESOLVED in place: a short sha is ACCEPTED at 7+ hex, the width the DoD item joins on. §8 gains its machine-read first line; status INPROGRESS -> CLOSED at the landing.
 - rev-2 · 2026-08-19 · folded the M4 spec audit. **S7's premise was wrong in both halves**: the
   harness writes no binding line at all rather than a kind-less one, and it does not write the record
   — it instructs the synth agent to. So the change is to the prompt and the observable is the agent's

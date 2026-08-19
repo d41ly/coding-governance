@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on
 
-**Status:** INPROGRESS · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -208,6 +208,9 @@ documents its own fix — `memory/gotchas/absence-assertion-over-whole-file-text
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — is S6 a new leg, a new check inside the hygiene gate, or an arm in the driver's own test
   suite?** A new leg costs a `gate-legs.json` entry, a `[[gate_leg]]` row in `kit.toml`, a
   codebase-map dossier claim and the map's coverage assert. A hygiene check costs `ARMS_FLOORS` and an
@@ -223,15 +226,23 @@ documents its own fix — `memory/gotchas/absence-assertion-over-whole-file-text
   parse the `case` block between its `case`/`esac`, keyed on arm labels, and fail CLOSED if the block
   cannot be located** — a locator that silently finds nothing is
   `memory/gotchas/fixture-passes-by-finding-nothing.md`.
+  RESOLVED (agent, 2026-08-19, delegated): PARSE the `case` block, as recommended. Built as
+  `dodarm()` in `unattended.test.sh` - one awk pass keyed on the arm label between `dod_met`'s
+  `case`/`esac` - and it FAILS CLOSED: an arm whose body cannot be located prints that the rule
+  is grading nothing rather than scoring clean, which is the vacuity the fork was weighing.
 
 - **F3 — should the progress line in S7 be unconditional, or suppressed when stdout is not a
   terminal?** Unconditional is simpler and adds one line to every close, including the test suite's
   many `hit` assertions. Suppressing on a non-tty makes the tests silent and the humans informed, and
   makes the observable in AC8 untestable without a pty. **Recommendation: unconditional.** AC8 is the
   reason; a progress line an unattended run cannot observe is not a progress line.
+  RESOLVED (agent, 2026-08-19, delegated): unconditional, as recommended. The reason is carried
+  at the call site rather than only here: a progress line an unattended run cannot observe is not
+  a progress line, and the arm proving it needs stdout rather than a tty.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-19 · F2 and F3 RESOLVED in place, recording what was built rather than what was recommended (they agree: the `case`-block parse that fails closed, and the unconditional progress line). §8 gains its machine-read first line; status INPROGRESS -> CLOSED at the landing.
 - rev-2 · 2026-08-19 · folded the M4 spec audit. **S6's predicate was vacuous and is rewritten.** A
   literal `return 1` appears in only two `dod_met` arms and both already set `DOD_OUT`; the other six
   fail by falling off the end of their case arm, so rev-1's rule was satisfied by every arm on the

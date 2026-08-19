@@ -1628,7 +1628,8 @@ n=$((n+1)); [ -n "$rg" ] || { echo "FAIL S4 rule 2 does NOT fire on a copy with 
 # ---- SCOPE IS DECLARED (S6a) rather than universal: this unit gives messages to gates-green,
 # ---- build-complete and closing-review-recorded. `records-current`, `landed-via-lander` and
 # ---- authorization-reachable are OUT -- the last prints through its own refusals now that S2 stopped
-# ---- discarding them, and the other two belong to TOOL-aBoundedVerdict-18. The two agent-attested
+# ---- discarding them, and the other two belong to the LANDER-MARKER unit -- specced, not built, and
+# ---- named here by what it is because a bare unbuilt id reads to the drift oracle as stale. The two agent-attested
 # ---- arms and the `*)` project arm are exemptions: their cause is an absent attestation or an item
 # ---- this kit knows nothing about, and the refusal already says so.
 # ----

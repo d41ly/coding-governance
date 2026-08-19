@@ -1904,10 +1904,11 @@ while [ $# -gt 0 ]; do
     --preflight|--status|--resume|--close|--landed|--abort|--park|--attest) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
-    # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so
-    # TOOL-aBoundedVerdict-5's countable attestation needs no second verb: that unit wants the parked
-    # key's value to carry a COUNT the close can verify, and the current predicate already tolerates
-    # trailing text after yes-or-true.
+    # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
+    # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
+    # the close can verify, and the current predicate already tolerates trailing text after
+    # yes-or-true. Named by what it is, not by its id: it is SPECCED and not built, and shipped source
+    # that spells an unbuilt id reads to the drift oracle as a status header nobody updated.
     --value)        AT_VALUE="${2:-}"; shift 2 || shift ;;
     --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; WV_PEND=""; shift 2 || shift ;;
     --waive)        WAIVE_ITEMS+=("${2:-}"); WAIVE_REASONS+=(""); WV_PEND=wv; OV_PEND=""; shift 2 || shift ;;

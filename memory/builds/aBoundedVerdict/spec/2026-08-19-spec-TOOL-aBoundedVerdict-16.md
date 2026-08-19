@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range
 
-**Status:** INPROGRESS · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -180,6 +180,9 @@ version constant.
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does the item require the record to name a sha in range, or the LATEST such round?** Requiring
   the latest is what a reader of the item's name expects, and it needs a total order over the records,
   which their filenames do not reliably give — the join this corpus has measured wrong seven times.
@@ -193,15 +196,23 @@ version constant.
   depend on — it ships independently. **Recommendation: a local grep for the kind token on the
   `**Serves:**` line,** with a comment naming the grammar's owner so the two cannot silently diverge in
   their idea of where the kind sits.
+  RESOLVED (agent, 2026-08-19, delegated): by THIS arm. It greps `^\*\*Serves:\*\*.*diff-review`
+  against the index directly rather than routing through the existing parser, which performs a
+  filename join to `reviews/` that was measured wrong on 7 of 7 multi-unit builds and that this arm
+  deliberately does not do.
 
 - **F3 — should the item accept a record filed under ANOTHER build's `reviews/`?** The binding grammar
   explicitly allows a record to name a spec in another build, because one closing review legitimately
   covers two builds. This item scopes its search to this build's folder. **Recommendation: keep the
   scope,** and note the limit: a genuinely shared closing review must be filed under both builds or
   named in both, which is the grammar's own answer.
+  RESOLVED (agent, 2026-08-19, delegated): NO. The join is scoped to
+  `<memory>/builds/<slug>/reviews/*.md` - this build's own directory - so a record filed under
+  another build does not satisfy the item.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-19 · F2 and F3 RESOLVED in place: the kind is grepped by this arm, and the join stays scoped to this build's own `reviews/`. §8 gains its machine-read first line; status INPROGRESS -> CLOSED at the landing.
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's high 21 and low 26, with the
   audit's framing CORRECTED in §4: it claimed the honest fold-scoped round fails the item, and the item
   scans every record under `reviews/`, so round 1's record still carries it. The narrower true defects

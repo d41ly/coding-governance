@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** INPROGRESS · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-7 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -331,6 +331,9 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does the units region nest inside `gen:build-index`, or become a sibling entry in
   `GEN_REGIONS`?** Nesting keeps every existing reader's bracket byte-identical and costs the
   generator a nested-render path it does not have today. A sibling entry is the generator's natural
@@ -363,6 +366,7 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-19 · the three forks were already resolved in place; this rev adds §8's machine-read `none` first line, without which the gate reds the moment the status goes terminal, and flips INPROGRESS -> CLOSED at the landing.
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's blocker 1·8·27 and from
   the owner's ratified resolution recorded in the design pass. F1 and F2 resolved under the
   delegated fork rule with their grounds stated; F3 raised to the owner as a scope fork.

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb
 
-**Status:** INPROGRESS · rev-2 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -177,6 +177,9 @@ moves) · `python tools/memory-tree/check-arms.py` · `tools/check-testsuite-cou
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — is the verb `--attest <slug> --item <item>`, or `--attest <slug> <item>`?** The driver's
   existing verbs take a slug positionally and everything else as a named flag, and `--item` is already
   parsed for `--park`. **Recommendation: `--item`,** reusing the parsed flag rather than adding a
@@ -187,15 +190,24 @@ moves) · `python tools/memory-tree/check-arms.py` · `tools/check-testsuite-cou
   parked-surfaced key's value to carry a COUNT so the close can verify it against the record. If that
   unit lands, the value is not always `yes`. **Recommendation: accept an optional `--value`, defaulting
   to `yes`,** so unit 5 needs no second verb and this unit does not pre-empt its design.
+  RESOLVED (agent, 2026-08-19, delegated): an OPTIONAL value, defaulting to `yes`. Built as
+  `--value`, so the countable-attestation unit needs no second verb; the current predicate already
+  tolerates trailing text after yes-or-true, so the default path is byte-unchanged.
 
 - **F3 — should S4's stage rule cover every `set_fact` call, or only phase writes?** Every `set_fact`
   is the stronger rule and would catch a future fact writer that forgets. Some `set_fact` calls are
   legitimately followed by more writes before a single stage. **Recommendation: phase writes only,**
   keyed on the `phase` key, because the broader rule has known-good exceptions and a rule with
   exceptions is a rule nobody trusts.
+  RESOLVED (agent, 2026-08-19, delegated): phase writes only, plus DECLARED exemptions. Covering
+  every `set_fact` was tried and produced false positives on CORRECT code - `verb_landed` batches
+  three writes before one stage - so the rule is function-scoped, and the one genuine cross-function
+  case (`verb_preflight`'s guard lives in `check_waivers`) is named as an exemption in both the rule
+  and its red fixture rather than silently tolerated.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-19 · F2 and F3 RESOLVED in place: an optional `--value` defaulting to `yes`, and a phase-write-scoped stage rule with the one cross-function case declared rather than silently tolerated. §8 gains its machine-read first line; status INPROGRESS -> CLOSED at the landing.
 - rev-2 · 2026-08-19 · folded the M4 spec audit. **The premise was wrong by one**: `--close` is not
   the only phase writer that skips staging — `verb_phase` skips it too, so three of five stage rather
   than four. Corrected at every site rev-1 spelled it (§1, S1, §4, §5) and, more importantly, in S4
