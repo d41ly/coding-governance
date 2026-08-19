@@ -1,183 +1,192 @@
-# TOOL-aTetheredScratch-2 — one external scratch root per machine, and the sweep of what is already there
+# TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
-Tier-2 despite being three small edits: it changes the temp root every hermetic gate leg writes into,
-which is a cross-cutting change to the merge bar's runtime, and the grounding pass found a recorded
-refusal of a neighbouring move.
+Rev-1 specced a `TMPDIR` retarget. The spec audit measured it and the justification did not survive:
+there is no external scratch root on this machine, the tripwire could not fire, the carrier could not
+be verified, and unit 1's rev-2 allowlist made the retarget worthless to unit 1 anyway. Rev-2 keeps
+the sweep and replaces the retarget with the root cause it was working around.
 
 ## 1. Goal
 
-Give this machine one scratch root that is external to the working tree, sweepable in a single
-command, and not the shared `%TEMP%`; point `TMPDIR` at it for the agent's own shell; and remove the
-litter already sitting in the operator's home directory.
+Remove the litter from the operator's home directory, and repair the cleanup that is generating the
+`%TEMP%` crowding rather than relocating its output.
 
-The secondary prize is the documented bar timeout: `memory/guides/SESSION-KICKOFF.md:223-226` records
-30733 stale scratch dirs, 58 legs, over ten minutes and still running, against the same bar finishing
-on a fresh `TMPDIR`. A root that can be swept without touching the shared one makes that trap
-maintainable rather than merely documented.
+Measured on node `a` this session: `%TEMP%` holds 6865 entries and **4905 of them are `mrecall-*`**,
+the residue of `tools/memory-recall/selftest.py`. That is 71% of the crowding from one already
+diagnosed defect, `TOOL-aBranchedMandate-6`, OPEN since 2026-08-17 at 3,616 residues and now grown by
+a further 1,289. The bar timeout at `memory/guides/SESSION-KICKOFF.md:223-226` is downstream of it.
 
 ## 2. Scope (IN)
 
-- `.claude/settings.local.json` — untracked, per-machine, carrying `env.TMPDIR` pointed at an external
-  scratch root. On node `a` that is a dedicated subdirectory of `%TEMP%`, not `%TEMP%` itself.
-- `.gitignore` — the line that keeps `settings.local.json` untracked, so the machine-specific path
-  cannot be committed by accident. Today the file is two lines, `__pycache__/` and `*.pyc`.
-- The sweep: the eighteen loose files in the operator's home and the `~/.gov-push/` tree, removed
-  after their inventory is preserved outside the home directory.
-- `memory/guides/SESSION-KICKOFF.md` — one line in the environment-traps section recording that the
-  retarget exists as a per-machine opt-in and where it is configured, plus the `last-audit` re-stamp
-  the ratchet requires when a watched file moves.
+- `tools/memory-recall/selftest.py` — `cleanup()` made correct on Windows and made VERIFYING: it
+  clears the read-only bit that git sets on loose objects, retries, and REPORTS a survivor instead of
+  swallowing it. One function, 31 call sites, all routing through it.
+- The same file — one final arm asserting zero surviving scratch repos, modelled exactly on
+  `tools/memory-recall/test_recall_floor.py:461-467`, which already sweeps a `_SCRATCH` list and FAILs
+  if anything remains. That arm is the left-shift; without it the fix is a claim.
+- The sweep, by EXACT NAME and never by glob: the sixteen log and rc files, the two verified `.bak`
+  files, `~/.gov-push/`, and the `mrecall-*` residue in `%TEMP%`.
+- `memory/backlog/TOOL.md` — `TOOL-aBranchedMandate-6` moved to CLOSED in place, with a pointer to
+  this unit. The id is another build's and stays its own; only the status moves.
+- `memory/gotchas/` — one new class for the environment trap the audit surfaced against this build's
+  own rev-1: on Windows `%TEMP%` is a subtree of `$HOME`, so a guard keyed on a home prefix denies
+  every legitimate temp write. It cost this build a blocker and it will cost the next one too.
+- `memory/DECISIONS.md` — one appended row recording the diagnosis, since a future session reading
+  "the gate bar writes to the user root" in a stale note needs the correction to be findable.
 
 ## 3. Non-goals (OUT)
 
-- **A scratch root inside the working tree.** Refused on evidence, not taste — see §4. Two of the four
-  breaks are not repairable with an ignore rule.
-- **Writing `TMPDIR` into the tracked `.claude/settings.json`.** It is shared by nodes `a`, `b`, `c`
-  and `d`, whose home directories differ; a machine path there is wrong on three of them.
-- **Changing `run-gates.sh` to set `TMPDIR` for its legs.** A leg cannot set an environment variable —
-  `tools/run-gates/run-gates.sh` execs its argv vector with no shell, recorded at
-  `tools/check-template-size.sh:78-80` — so the value must come from the parent process, and the
-  parent process is the shell this unit already configures. A second carrier would be a second answer.
-- **Making any gate leg green by moving `TMPDIR`.** That is the refused shape named in
-  `memory/builds/aBranchedMandate/spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md:76-79`. This unit
-  moves `TMPDIR` for hygiene, and §6 makes it prove it did not buy a green leg as a side effect.
-- **Fixing `TOOL-aBranchedMandate-6`.** Relocating the accumulation is not repairing the cleanup.
-  The row stays OPEN and this unit does not touch it.
-- **Sweeping the shared `%TEMP%` root.** `memory/guides/SESSION-KICKOFF.md:226` says not to, in as many
-  words: "do not delete the shared one".
+- **Retargeting `TMPDIR`.** Refused on measurement — see §4. Rev-1 specced it; rev-2 records why it
+  was dropped rather than deleting the reasoning, because the next session will have the same idea.
+- **Sweeping the shared `%TEMP%` root itself.** `memory/guides/SESSION-KICKOFF.md:226` says not to,
+  in as many words. Only the `mrecall-*` residue and `~/.gov-push/` are removed, both by name.
+- **Any change to `tools/memory-recall/query.py`.** Its `_remove_cache_dir` is already correct and is
+  the model being followed, not a thing to edit.
+- **Re-opening `aBranchedMandate` as a build.** Only its backlog row's status moves.
+- **The guard hook.** That is `TOOL-aTetheredScratch-1`, which does not depend on this unit.
 
 ## 4. Design
 
-**Why the root must be external, with the evidence.** Pointing `TMPDIR` under the working tree breaks
-four legs. Two survive an ignore rule and two do not, which is what settles it:
+**Why the `TMPDIR` retarget was dropped, with the measurements.** Four findings, each independently
+sufficient:
 
-- `tools/check-template-size.sh:60-68` strips the repo-root prefix to derive its high-water key, so a
-  scratch subject inside the tree changes key and the arms that prove the keying —
-  `tools/check-template-size.test.sh:165`, `:178`, `:181`, `:205`, of which `:173` is commented as
-  "THE arm that proves the KEYING" — stop measuring. A path-membership test, immune to `.gitignore`.
-- `tools/check-wiring.test.sh:87` proves the non-git branch by `cd`-ing into a `mktemp -d` and
-  expecting `git rev-parse --show-toplevel` to fail. Inside the tree it succeeds and the arm silently
-  re-measures the ambient repo. Also immune to `.gitignore`.
-- The codebase-map filesystem extractors (`tools/codebase-map/map_extractors.py:47-52` and the
-  `no_subdirs` guards in `map_lib.py:215-225`) enumerate directories rather than tracked files, so a
-  scratch dir under `tools/`, `.githooks/`, `memory/gotchas/`, `memory/guides/`, `memory/backlog/` or
-  `tools/workflows/` is a hard `MapError`.
-- The three JS gates that enumerate untracked files —
-  `tools/workflows/check-review-join.sh:43-44`, `check-verifier-fanout.sh:39-40`,
-  `check-workflow-syntax.js:36-40` — would judge scratch fixtures written to spell banned shapes on
-  purpose. Repairable with an ignore line, and moot once the root is external.
+- **There is no external root.** `/tmp` on this node is an MSYS `usertemp` mount onto `%TEMP%`
+  (`mount` reports `C:/Users/DAILY-~1/AppData/Local/Temp on /tmp type ntfs (binary,noacl,posix=0,usertemp)`),
+  and `%TEMP%` is itself under `$HOME`. Every candidate root is inside the home directory the guard
+  protects, so "external" was never available.
+- **The spelling breaks a gate.** Measured both ways: ambient → `check-template-size.test.sh` PASSES;
+  `TMPDIR="C:/Users/daily-agent/AppData/Local/Temp"` → **4 arms FAIL**, because
+  `tools/check-template-size.sh:64` normalises its key through `cd && pwd` while `mktemp` echoes
+  `TMPDIR`'s spelling verbatim, so the gate writes `/c/Users/…` and the test looks up `C:/Users/…`.
+- **The tripwire could not fire.** Rev-1's abandonment condition rested on
+  `tools/unattended/adopt-unattended.test.sh:137`, which compares `pwd` against
+  `git rev-parse --show-toplevel`. That divergence is MSYS-form versus drive-letter form and is
+  invariant under every `TMPDIR` value, so the condition would have passed no matter what — the
+  charter's own "a gate you have only ever seen pass" class, inside the AC written to prevent it.
+- **The carrier could not be verified.** An `env` block in `.claude/settings.local.json` is not
+  documented as reaching Bash tool calls, `CLAUDE_ENV_FILE` is unset in this session, and settings
+  `env` applies only at session start — so no acceptance run in this session could have proved it.
 
-The repo's own precedent points the same way: run-gates and memory-recall both put durable scratch
-inside `.git` (`<git-dir>/gate-logs/`, `<git-dir>/recall/cache/`), where no working-tree enumerator
-sees it.
+**The leak, and why one function fixes 31 call sites.** `tools/memory-recall/selftest.py:143-144` is
+`shutil.rmtree(root, ignore_errors=True)`. The directories it is asked to remove are git repositories
+created at `:86-90`; git writes loose objects read-only, and on Windows `unlink` of a read-only file
+raises `PermissionError`, which `ignore_errors=True` swallows — so the directory survives and the
+caller believes it was removed. `.git` is the only read-only thing in these fixtures, which is why the
+same idiom works fine for the plain-JSONL `recallarm-*` dirs and fails only here. Every one of the 31
+call sites routes through `cleanup()`, so the fix goes in the one place they all pass through.
 
-**Why the carrier is `settings.local.json`.** `TMPDIR` is an absolute machine path and
-`.claude/settings.json` is tracked and shared. The untracked per-machine file keeps the value where it
-is true, and makes the retarget an opt-in each node takes for itself. `tools/settings-merge.py` reads
-and writes only `.claude/settings.json` and only its `hooks` key, so nothing in the kit chain is
-disturbed by a sibling file it never opens.
+**The repair follows the repo's own documented remedy.** `tools/memory-recall/query.py:483-494` already
+carries the argument against `ignore_errors=True` on this platform, in its own docstring, and the shape
+it prescribes: do the work, verify, and REPORT a failure rather than retrying or swallowing it.
+`cleanup()` therefore clears the read-only bit on the failing entry and retries once, then asserts the
+directory is gone and prints a named warning if it is not. Version-compat between `onerror` and `onexc`
+is resolved by feature detection, not by pinning a Python.
 
-**The abandonment condition, and why it is in the design rather than the risks.**
-`tools/unattended/adopt-unattended.test.sh:130-153` deliberately constructs a two-spelling divergence
-and asserts the spellings really differ before asserting the adoption, precisely so the arm cannot
-pass by finding nothing. A different temp root can collapse that divergence, in which case the arm
-degrades to a loud skip — safe, but it costs a live arm. `TOOL-aBranchedMandate-4` pinned its AC1 to
-the ambient `TMPDIR` on node `a` for that reason. So: if the retarget turns that arm into a skip, the
-retarget is reverted and unit 1 ships alone. This is a design constraint, not a contingency, because
-it determines whether the unit exists.
+**The final arm is what makes it a fix rather than a claim.** `test_recall_floor.py:461-467` is the
+precedent: collect every scratch path the run created, sweep, then FAIL if any survived. The charter's
+rule is that a new gate is not landed until its failing case has been observed, so the arm is staged
+red against the unrepaired `cleanup()` before the repair lands.
 
-**The sweep.** The inventory is written outside the home directory first, the removal is announced
-before it happens because it is irreversible, and only then do the eighteen files and `~/.gov-push/`
-go. `~/.gov-push/` holds `mrecall-*` repos with read-only git objects, so removal needs a force that
-`shutil.rmtree(ignore_errors=True)` does not have — the same platform fact `TOOL-aBranchedMandate-6`
-is about.
+**The sweep is by exact name.** The home directory also holds `.gitconfig`, `.ssh/`, `.aws/`,
+`.claude.json` and a `.claude.json.tmp.5240.356c33de8f26` that any plausible `~/.*.tmp*` glob would
+catch. So: eighteen literal names, no pattern, and the inventory written outside the home directory
+before anything is removed. The two `.bak` files are not logs — they are pre-edit snapshots of
+`memory/builds/aDeclaredBound/RUN.md` and `memory/builds/aPromptedMandate/RUN.md` carrying
+`phase: LANDING` where the committed versions carry `phase: LANDED` — so each is diffed against its
+committed counterpart and confirmed recoverable from `d1bc3f3` before removal, and that confirmation
+goes in the build record.
 
 ## 5. Production-readiness checklist
 
-- **Security** — no new surface. An untracked settings file holding one path; no credential, no
-  network, no execution. The path is machine-local and named in no tracked file.
-- **Blast radius** — every hermetic gate leg. That is the whole risk, and §6 discharges it with a full
-  bar run under the new value rather than by reasoning about it. The complete inventory of `mktemp`
-  and `TMPDIR` sites, grouped by kit, is in the build record from the grounding pass.
-- **The one fixed-name temp file** — `tools/check-playbook-parity.sh:125` is
-  `PPTMP="${TMPDIR:-/tmp}/pp.$$"`, keyed on PID with no randomisation and no EXIT trap. A long-lived
-  dedicated root makes PID reuse a narrower but real collision surface than a churning `%TEMP%`. The
-  leg already refuses to report agreement when it cannot write the file (`:126-131`), so the failure
-  mode is a loud red, not a false green. Recorded, not fixed here.
-- **Rollback** — delete `.claude/settings.local.json`. `TMPDIR` reverts to the ambient value on the
-  next session and every leg behaves as it does today. Nothing else is touched.
-- **Migration** — none. No state moves; the old root keeps whatever is in it until swept.
-- **Observability** — a wrong `TMPDIR` is loud: `mktemp -d` fails and `tools/check-wiring.sh:389`
-  already reports "cannot verify" rather than `ok`, an arm added for exactly this failure.
-- **Testing** — no new test file. The proof is the existing suite run under the new value, which is
-  the only thing that exercises the change.
-- **a11y / i18n** — N/A.
+- **Security** — none. A test-fixture cleanup and a file removal in the operator's own home.
+- **Data loss** — the real risk, and the reason for exact names, a pre-written inventory, and the git
+  verification of the two `.bak` files. Removal is announced before it happens because it is
+  irreversible.
+- **Perf** — `cleanup()` gains a retry on the failure path only; the success path is unchanged. The
+  final arm is one `exists()` check per recorded path.
+- **Blast radius** — one function in one selftest, plus deletions outside the repo. No gate leg's
+  logic changes; `memory-recall kit selftest` gains an arm.
+- **Rollback** — revert the commit. The swept files are gone either way, which is the point.
+- **Observability** — a surviving scratch dir is now named on stdout and fails the suite, where before
+  it was silent. That inversion is the whole unit.
+- **Migration / i18n / a11y** — N/A.
+- **Testing** — the final arm, staged red first. Plus the existing suite, which must stay green.
 
 ## 6. Acceptance criteria
 
-- **AC1** — The abandonment gate, run FIRST: `bash tools/unattended/adopt-unattended.test.sh` under the
-  new `TMPDIR` still PASSES and does not emit its skip line. A skip means the two-spelling divergence
-  collapsed, and the unit is reverted rather than landed.
-- **AC2** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is GREEN under the new `TMPDIR`, with the
-  same leg count reported as under the ambient value and no leg newly skipped.
-- **AC3** — The retarget bought no green: the set of failing legs under the ambient `TMPDIR` and under
-  the new one is compared and is identical. A leg that reds before and passes after is the refused
-  bypass shape and blocks the unit.
-- **AC4** — `mktemp -d` from a fresh agent shell resolves under the configured root, observed by
-  printing the path, and the root is outside `git rev-parse --show-toplevel`.
-- **AC5** — After the sweep, `ls -a ~` shows none of the eighteen inventoried names and no `.gov-push`,
-  and the inventory file survives outside the home directory as the record of what was removed.
-- **AC6** — `git status --short` is clean of `settings.local.json`, proving the `.gitignore` line
-  works rather than assuming it.
-- **AC7** — `bash skills/session-kickoff/manifest-check.sh` exits 0 after the manifest edit and the
-  `last-audit` re-stamp, with the delta line recorded in the commit message.
+- **AC1** — The failing case is OBSERVED before the repair: against the unrepaired `cleanup()`, the
+  new final arm FAILS and names at least one surviving `mrecall-*` directory. A gate whose red has
+  never been seen is an assertion about nothing.
+- **AC2** — After the repair, `python tools/memory-recall/selftest.py` exits 0 and the final arm
+  reports zero survivors.
+- **AC3** — Measured, not assumed: the `mrecall-*` count in `%TEMP%` is recorded before and after a
+  full selftest run, and the after-count does not exceed the before-count. Today a single run adds to
+  it.
+- **AC4** — The sweep is verified by exact name: after it, `ls -a ~` contains none of the eighteen
+  recorded names and no `.gov-push`, AND the remaining entry set of `~` equals a recorded allowlist,
+  so an unexpected removal reds rather than passing unnoticed.
+- **AC5** — Each `.bak` file is diffed against its committed counterpart and shown recoverable from
+  `d1bc3f3` before removal, with the diff summary in the build record.
+- **AC6** — The `mrecall-*` residue is swept and the count recorded: `%TEMP%` entry count before and
+  after, both in the build record.
+- **AC7** — `TOOL-aBranchedMandate-6` reads CLOSED in `memory/backlog/TOOL.md` with a pointer to this
+  unit, and `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 over the edited backlog.
+- **AC8** — The full bar is GREEN: `GATE_FULL=1 bash tools/run-gates/run-gates.sh`, with
+  `memory-recall kit selftest` among the legs that ran.
 
 ## 7. Gates
 
-`GATE_FULL=1 bash tools/run-gates/run-gates.sh`, run twice — once under the ambient `TMPDIR` to
-establish the comparison AC3 needs, once under the new one. Plus
-`bash skills/session-kickoff/manifest-check.sh` for the manifest edit.
+`GATE_FULL=1 bash tools/run-gates/run-gates.sh`. The legs this unit can red:
+`memory-recall kit selftest`, `recall floor`, `recall floor arms`, `memory-hygiene self-test`,
+`gotchas selftest`, `build-index selftest`.
 
-The legs most exposed to this change are every hermetic self-test, which is most of the manifest; the
-ones the grounding pass identified as location-sensitive are `template size gate selftest`,
-`check-wiring self-test`, `unattended adopter e2e`, `codebase-map coverage + freshness`,
-`review-join ban`, `verifier fan-out` and `workflow script syntax`.
+`tools/memory-recall/` is not a watched pathspec of the kickoff manifest, so no `last-audit` re-stamp
+follows from this unit; unit 1 carries that because it edits `tools/gate-legs.json`.
 
 ## 8. Open questions
 
-- **RESOLVED — internal versus external scratch root.** Considered a gitignored `.tmp/` at the repo
-  root, which is what the owner's phrasing suggested. Refused on the four breaks in §4, two of which
-  no ignore rule reaches. Ratified: external, a dedicated subdirectory of `%TEMP%`. Resolver: this
-  design pass, on the blast-radius reading.
-- **RESOLVED — tracked versus per-machine carrier.** Considered `env` in the tracked
-  `.claude/settings.json`. Refused: four registered nodes with different home directories.
-  Ratified: `.claude/settings.local.json` plus a `.gitignore` line. Resolver: this design pass.
-- **OPEN — whether the other three nodes should adopt this at all.** This unit configures node `a`
-  only, and deliberately leaves no tracked artifact that would configure `b`, `c` or `d`. Whether the
-  retarget becomes a documented per-node step is an owner decision, and the manifest line in §2 is
-  written to describe the opt-in rather than to prescribe it. Proceeding node-local because the
-  measurement that motivates it — 30733 stale dirs — was taken on node `a` and on no other.
+- **RESOLVED — retarget versus repair.** Rev-1 chose to relocate the accumulation. Refused on the four
+  measurements in §4, and because 4905 of 6865 entries are one defect rather than churn — relocating
+  it would have left the leak generating rubble in a new place. Ratified: repair `cleanup()`.
+  Resolver: the owner, on the audit's measurements, 2026-08-20.
+- **RESOLVED — the two `.bak` files.** Considered leaving them, and considered preserving them in-repo.
+  Ratified: verify each against `d1bc3f3`, record the diff, then remove — they are recoverable, so
+  keeping a second copy in the repo would be storing what git already stores. Resolver: the owner.
+- **OPEN — whether the final arm should FAIL the suite or only warn on a machine where the read-only
+  bit cannot be cleared.** Failing is correct here and matches `test_recall_floor.py:465-467`. A
+  hypothetical host where the retry legitimately cannot succeed would then red the bar for an
+  environmental reason. Proceeding with FAIL, because a warning is how this defect stayed open for
+  three days, and recording the question so a real occurrence is re-priced rather than argued from
+  first principles.
 
 ## 9. Revision log
 
-- **rev-1** — 2026-08-20 — authored. Grounded on the `TMPDIR` blast-radius recon, which supplied the
-  four breaks in §4, the recorded refusal in `TOOL-aBranchedMandate-4`, and the finding that no gate
-  leg can set an environment variable. Two forks resolved from that reading; one owner question left
-  open.
+- **rev-1** — 2026-08-20 — authored as a `TMPDIR` retarget plus sweep, on the blast-radius recon.
+- **rev-2** — 2026-08-20 — the M4 spec audit folded in, and the unit re-scoped by the owner. The
+  retarget is dropped and its refusal recorded with four measurements: `/tmp` is `%TEMP%` and is inside
+  `$HOME` so no external root exists; the Windows spelling breaks four arms of
+  `check-template-size.test.sh`; rev-1's abandonment tripwire was `TMPDIR`-invariant and could not
+  fire; and the carrier was unverifiable in-session. In its place, the root cause — 4905 of 6865
+  `%TEMP%` entries are `TOOL-aBranchedMandate-6`. Sweep corrected to exact names after the audit found
+  two of the eighteen files are run-state snapshots rather than logs, and AC4 strengthened from
+  eighteen named absences to a whole-directory set comparison.
 
 ## 10. Reuse audit
 
-No existing seam fits, and the probe is recorded rather than asserted. `python tools/memory-recall/query.py`
-with the terms
-`scratchpad TMPDIR mktemp hermetic scratch repo gate-logs HOME litter temp residue selftest cleanup redirect`
-returned forty hits and no record proposing a permanent `TMPDIR` retarget; the only decision touching
-the idea is the `TOOL-aBranchedMandate-4` refusal cited in §3, which is a refusal rather than a seam.
-`grep` over the tracked tree finds exactly one `TMPDIR` assignment, `tools/check-wiring.test.sh:400`,
-and it is a single-command env prefix inside one test arm — not a mechanism to extend.
+The seam is `tools/memory-recall/query.py:483-494`, and it is followed rather than extended. That
+docstring already carries the measured argument against `shutil.rmtree(ignore_errors=True)` on win32
+and the shape that replaces it — do the work, verify, report rather than swallow. The repair applies
+that reasoning to `selftest.py:143-144`; the two functions stay separate because they solve different
+failure modes on the same platform (an open sqlite handle versus a read-only git object) and merging
+them would couple a cache evictor to a test fixture.
 
-What is reused is the knowledge rather than the code: the environment trap at
-`memory/guides/SESSION-KICKOFF.md:223-226` already states the problem and the workaround, and this unit
-makes that workaround durable on one machine instead of re-derived per session. The extension point is
-therefore the manifest line, not a new tool — which is the reason this unit ships no new file under
-`tools/`.
+The final arm reuses `tools/memory-recall/test_recall_floor.py:461-467` verbatim in shape: accumulate
+the scratch paths, sweep, assert nothing survived, fail if something did. That file is in the same kit
+and was fixed for the same class of defect, which is the strongest evidence available that the pattern
+holds here.
+
+Recall terms used, recorded so a resuming pass re-runs the same query:
+`scratchpad TMPDIR mktemp hermetic scratch repo gate-logs HOME litter temp residue selftest cleanup redirect`.
+The probe surfaced `TOOL-aBranchedMandate-6` as its top hit, which rev-1 read as adjacent context and
+rev-2 makes the subject.
