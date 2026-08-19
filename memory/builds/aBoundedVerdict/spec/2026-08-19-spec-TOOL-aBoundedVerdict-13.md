@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -216,10 +216,14 @@ gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) 
   test suite**, which already reads both files' source for other arms and is not a subject of its own
   assertion.
 
-- **F3 — OWNER. Should the bound apply to the LANDING push as well?** Out of scope as written: the
-  push is `$LANDER`, a project declaration this kit does not wrap, and bounding someone else's lander
-  is a change to what the mandate delegates. Raised because a hung push is the same stall one command
-  later, and the answer decides whether a follow-up unit exists.
+- **F3 — should the bound apply to the LANDING push as well?** Out of scope as written: the push is
+  `$LANDER`, a project declaration this kit does not wrap, and bounding someone else's lander is a
+  change to what the mandate delegates. Raised because a hung push is the same stall one command later.
+  RESOLVED (owner, 2026-08-19): **yes, in a FOLLOW-UP UNIT, not here.** `TOOL-aBoundedVerdict-21`
+  carries it. This unit keeps its scope — the observations — because widening it to wrap a
+  project-declared command would change a contract every adopter reads, inside a unit reviewed for
+  something else. The cost the owner accepted: the hung-push stall survives until that unit lands, and
+  this spec says so rather than implying the bound is complete.
 
 ## 9. Revision log
 
@@ -228,6 +232,11 @@ gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) 
   ordering and status-collapse points kept as separately verifiable scope items because each is
   independently fixable. F1 and F2 resolved under the delegated fork rule; F3 raised to the owner
   because it changes what the mandate delegates.
+
+- rev-2 · 2026-08-19 · F3 resolved by the owner: the landing push IS bounded, but by
+  `TOOL-aBoundedVerdict-21` rather than here, so this unit's scope is unchanged. Recorded with the cost
+  the owner accepted — the hung-push stall survives until that unit lands — because a spec that bounds
+  "every remote observation" and leaves the push unbounded must not read as if it bounded everything.
 
 ## 10. Reuse audit
 

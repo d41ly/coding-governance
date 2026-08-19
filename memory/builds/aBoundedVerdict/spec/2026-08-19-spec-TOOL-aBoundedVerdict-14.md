@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -29,7 +29,9 @@ round N to the fold round N-1 introduced, and hand it what round N-1 already con
   record's tip is derivable when it does.
 - **S5** — `BUILD-METHOD.md` M8 gains the fix-round invocation: round 1 from the run's pinned BASE to
   the tip; round N>1 from round N-1's recorded tip to the current tip, with round N-1's confirmed
-  findings passed as `priorFindings`. The existing sentence "re-review the FIX, not the diff again"
+  findings passed as `priorFindings`. **The bug-class checklist keeps the FULL range on every round**
+  (`gotchas.py --for-diff <BASE>..HEAD`), per F3 — M8 must state the two scopes as two sentences, so
+  the review narrowing cannot be read as narrowing the checklist. The existing sentence "re-review the FIX, not the diff again"
   becomes an instruction a caller can execute rather than an intention.
 - **S6** — the synth-death hole is closed. Lens and skeptic deaths are counted and reported; a dead
   synthesis returns `report: null` with a `complete`-shaped note and every confirmed finding is lost
@@ -218,12 +220,14 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
   corpus actually uses. **Recommendation: require 7+ hex and nothing but hex** — the same floor the
   driver's join already uses, for the same measured reason.
 
-- **F3 — OWNER, not delegated. Should a fold-scoped round N also re-run the bug-class checklist over
-  the fold range only, or over the full range?** M8 runs `gotchas.py --for-diff` as the lens brief
-  before the review. Scoping it to the fold matches this unit; running it full keeps a class that a
-  fold reintroduces visible even when the fold's own files do not select it. The options differ in what
-  gets built — one is a caller change, the other adds a second checklist run per round — so it goes to
-  the owner.
+- **F3 — should a fold-scoped round N re-run the bug-class checklist over the fold range only, or
+  over the full range?** M8 runs `gotchas.py --for-diff` as the lens brief before the review.
+  RESOLVED (owner, 2026-08-19): **the FULL range, `BASE..HEAD`, on every round.** So the review scope
+  narrows to the fold and the checklist scope does not, which is deliberate asymmetry rather than an
+  inconsistency: a class the fold REINTRODUCES stays selected even when the fold's own files would not
+  select it, and `gotchas.py` is stdlib and seconds, so the round pays almost nothing for it. S5 states
+  both scopes explicitly, in one sentence each, because a reader who sees only "round N reviews the
+  fold" will otherwise narrow the checklist too.
 
 ## 9. Revision log
 
@@ -238,6 +242,12 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 - rev-1 · 2026-08-19 · initial draft. Derived from the owner's third report and from the close-path
   audit's highs 23 and 22, plus `TOOL-aLoosenedCeiling-6` from the TOOL backlog, which S7 closes. F1
   and F2 resolved under the delegated fork rule; F3 raised to the owner as a scope fork.
+
+- rev-3 · 2026-08-19 · F3 resolved by the owner: the bug-class checklist keeps the FULL `BASE..HEAD`
+  range on every round while the review narrows to the fold. S5 now states both scopes explicitly,
+  because the asymmetry is deliberate and a reader who sees only the narrowing will apply it to both.
+  The grounds: a class the fold reintroduces stays selected even when the fold's own files would not
+  select it, and the probe is stdlib and seconds.
 
 ## 10. Reuse audit
 

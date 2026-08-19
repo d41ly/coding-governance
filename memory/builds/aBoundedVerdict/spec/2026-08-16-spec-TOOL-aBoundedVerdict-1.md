@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-7 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** SPECCED · rev-8 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -71,6 +71,18 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
 - **S8a** — a promoted unit is reviewed as a SPEC (M4), not by re-running the closing diff review.
   That is the whole reason promotion terminates: a spec audit is one unit's document, and the closing
   diff review runs once more at the end, scoped to the fold per `TOOL-aBoundedVerdict-14`.
+- **S10** — **the ceiling firing is REPORTED, not just survived.** Under F4's resolution the run
+  promotes and lands when the runaway ceiling is reached, so the ceiling stops being a halt and becomes
+  a fact that must not be quiet. Two carriers, both required:
+  - the run's OWN OUTPUT says the ceiling was reached, names the subject, the sequence length and the
+    ceiling, and says in one sentence that the convergence predicate did not terminate — the same
+    message the halt would have carried, on a path that continues;
+  - the BUILD README gains a line recording it, so the fact outlives the transcript nobody reads. It
+    is written where the wrap-up derives from, which is what makes M9's "problems resolved" row able
+    to cite it.
+  A ceiling reached with neither carrier written is the defect this scope item exists to prevent, and
+  it is the one thing about the ceiling path that IS gate-checkable: the leg asserts that a run-state
+  file whose review sequence reached the ceiling has both.
 - **S9** — a blocker that cannot be promoted — because resolving it is outside the mandate's scope, or
   because it names a unit whose options differ in what gets built — is a PARK and the build does not
   close. This is the residual case S8 does not cover and it must be stated, or "promote everything"
@@ -84,7 +96,9 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
   over the existing corpus.
 - **No round CAP as the loop's mechanism.** Withdrawn at rev-6 on the owner's instruction. The
   runaway ceiling in S1a is not that mechanism wearing a new name: it is a backstop that a correct
-  convergence test never reaches, and the spec says plainly that reaching it is a defect.
+  convergence test never reaches, and the spec says plainly that reaching it is a defect. Under F4's
+  resolution it does not stop the run either — it is a REPORTED defect, not a halt, so the ceiling is
+  not a cap in any sense that could stall a build.
 - No join from a review record on disk to the unit it reviewed. The filename carries a per-build
   counter, the driver already refuses that join in its own source having measured it wrong on seven of
   seven multi-unit builds, and this unit does not retry it.
@@ -128,7 +142,7 @@ blockers(N) == 0                          -> CONVERGED    (exit, clean)
 blockers(N) <  blockers(N-1)              -> CONVERGING   (re-arm)
 blockers(N) >= blockers(N-1)              -> NON-CONVERGENT (exit, promote)
 N == 1                                    -> CONVERGING   (a first round always re-arms if blockers > 0)
-sequence length == RUNAWAY_CEILING        -> refuse, halt with the review-budget code
+sequence length == RUNAWAY_CEILING        -> CEILING: report loudly (S10), then promote and land
 ```
 
 `dClosedLexicon`'s measured sequence was 1, 1, 2, 1, 2 across rounds 2-7 — non-decreasing at round 3
@@ -297,9 +311,14 @@ figure as authority.
   `CONVERGING` and not `NON-CONVERGENT`; the empty-predecessor arm.
 - **AC2** — When a round reports `--blockers 0`, the verb reports `CONVERGED` and the loop's exit is
   recorded on disk as a `review` line whose reason carries the token and the count.
-- **AC2a** — When a run reaches the runaway ceiling, `--review` refuses naming the subject, the
-  sequence length and the ceiling, and the round is NOT recorded — asserted on the on-disk effect, not
-  the exit code alone.
+- **AC2a** — When a run reaches the runaway ceiling, `--review` reports `CEILING` naming the subject,
+  the sequence length and the ceiling, and states that the convergence predicate did not terminate; the
+  round IS recorded and the run is NOT refused. Rev-8: this criterion asserted a refusal until the
+  owner resolved F4 the other way.
+- **AC2b** — When the ceiling has been reached, the build README carries the line S10 requires, and
+  `bash tools/unattended/check-unattended.sh` reds against a fixture whose review sequence reached the
+  ceiling with no such line — the arm that makes the loud-reporting half enforceable rather than
+  advisory.
 - **AC3** — When the verdict is outside the kit-owned set,
   `bash tools/unattended/unattended.sh --review <slug> --subject <id> --verdict MAYBE` refuses naming
   the legal set, and that set is byte-identical to the one `TOOL-aBoundedVerdict-2` defines.
@@ -363,11 +382,15 @@ figure as authority.
   `TOOL-aBoundedVerdict-8`, which said to write this once all three mechanisms landed; there are now
   two, and one of them is observable.
 
-- **F4 — OWNER, not delegated. What happens the first time the runaway ceiling is reached?** §4 states
-  plainly that promotion's termination is likely and not guaranteed. If the ceiling fires in practice,
-  the answer is either a higher ceiling, a hard cap after all, or an owner turn — and that is a
-  decision about what gets built rather than how. Raised now so the answer is not improvised inside a
-  wedged run.
+- **F4 — what happens the first time the runaway ceiling is reached?** §4 states plainly that
+  promotion's termination is likely and not guaranteed. Options put to the owner: halt to the owner;
+  promote and land anyway; abort the run.
+  RESOLVED (owner, 2026-08-19): **promote and land anyway, and say loudly what happened** — in the
+  run's own output AND in the build README. S10 is the mechanism. The reasoning the owner's answer
+  rests on, recorded because it overrides this spec's own recommendation: a ceiling firing is a defect
+  in the PREDICATE, not a reason to keep the build's finished work off `main`, and the objection that
+  "nobody finds out" is answered by making the finding-out mandatory in two carriers rather than by
+  stalling.
 
 ## 9. Revision log
 
@@ -403,6 +426,16 @@ figure as authority.
   suffixed-BLOCKED group. Re-derived with an anchored token match. The argument is unchanged and the
   headline number was never the disputed one — bare `CLEAN` is 0 of 90, re-verified — but a spec that
   will be built from may not carry a number that does not reproduce.
+
+- rev-8 · 2026-08-19 · **F4 resolved by the owner, against this spec's own recommendation, and the
+  reversal is recorded rather than smoothed over.** The spec recommended halting to the owner; the
+  owner chose promote-and-land with a loud statement in the run's output and in the build README. The
+  grounds, as put: a ceiling firing is a defect in the predicate, not a reason to keep finished work
+  off `main`, and "nobody finds out" is answered by making the finding-out mandatory in two carriers
+  instead of by stalling. S10 is new and carries both carriers plus the one gate-checkable half — a
+  sequence that reached the ceiling with no README line reds. AC2a is INVERTED: it asserted a refusal,
+  and the ceiling no longer refuses. AC2b is new. §3's runaway-ceiling non-goal now says the ceiling
+  cannot stall a build in any sense, which is a stronger claim than rev-6 could make.
 
 ## 10. Reuse audit
 
