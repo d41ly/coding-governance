@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. EIGHTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. TWENTY checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -15,7 +15,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -77,6 +77,9 @@ PHASES_CORE=$(core_of PHASES_CORE)
 DOD_CORE=$(core_of DOD_CORE)
 DIRECTIVES_CORE=$(core_of DIRECTIVES_CORE)
 PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
+# TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
+# the leg never carries a second spelling of a driver declaration.
+PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
   exit "$status"
@@ -442,6 +445,33 @@ while IFS= read -r f; do
         /^---[[:space:]]*\r?$/ { exit }
         /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
       [ "$dslug" = "$bslug" ] || fail 13 "a build README at its run's recorded BASE declares a different slug, so the folder was renamed or its README copied from another build: declared $dslug, folder $bslug"
+      # ---- 19: THE AUTHORIZATION MODE, re-derived here rather than believed. TOOL-aPromptedMandate-1.
+      # ---- A SECOND OPINION in check 13's own shape: the same blob, an independent parse, compared
+      # ---- against what the run recorded. The driver reads this key to DECIDE which discipline binds
+      # ---- a run; a value only the driver ever reads is a value only the driver can be wrong about.
+      # ----
+      # ---- PRESENCE-GUARDED, deliberately. Every run-state file written before this unit carries no
+      # ---- `mode:` line at all, and the leg's documented idiom is silence on absence - so a legacy
+      # ---- record is outside this arm by construction rather than by a waiver. What is NOT guarded
+      # ---- is the other direction: a record that HAS a mode must agree with the README, and an
+      # ---- absent key at BASE means `slug`, which is what the driver writes for it.
+      # ----
+      # ---- WHAT THIS IS NOT, against `second-implementation-is-not-a-second-opinion`. It does not
+      # ---- recompute the driver's answer from the driver's inputs: it compares the driver's OUTPUT
+      # ---- (the recorded `mode:`) against the driver's INPUT (the README at BASE), which is a
+      # ---- provenance question and not an arithmetic one. The residual is the SHARED PARSE: both
+      # ---- sides read the key with an awk of the same shape, so a parse that is wrong the same way
+      # ---- twice agrees wrongly. That is smaller than the class it belongs to - a forged RECORD is
+      # ---- still caught, which is the threat - and it is stated here rather than left to be found.
+      recmode=$(fact_of "$f" mode)
+      if [ -n "$recmode" ]; then
+        dmode=$(printf '%s\n' "$bb" | awk '
+          NR == 1 { next }
+          /^---[[:space:]]*\r?$/ { exit }
+          /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
+        [ -n "$dmode" ] || dmode=slug
+        [ "$recmode" = "$dmode" ] || fail 19 "a run-state file records an authorization mode the build README at its own recorded BASE does not declare, so the discipline the run says bound it is not the one its authorization asked for: $recmode against $dmode"
+      fi
     else
       fail 13 "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it: $rb in $bre"
     fi
@@ -572,8 +602,29 @@ tmpl="$HERE/SKILL.template.md"
 # always accepted an extra handle — the driver composes both — while this join covered CORE alone,
 # so an extra was waivable by a verb and invisible to the agent, and the project could not fix that
 # by adding a table row because the Skill is rendered from a kit template. It has a row source now.
-core=$(printf '%s
-' $DIRECTIVES_CORE $DIRECTIVES_EXTRA | sort -u)
+# TOOL-aPromptedMandate-4 - a registry entry is now `<handle>:<section>[:<scope>]`, and everything
+# below consumes the TWO-field form: arm A comms `core` against the table's `handle:M<n>` pairs, and
+# arm B resolves the section as ${pair#*:}. Fed whole entries, both read `M12:prompt` as a section
+# and red on a CORRECT implementation - measured, four refusals, before this split existed.
+#
+# ONE splitter, here, rather than one per consumer. `corescope` is built from the CORE set alone: a
+# project's DIRECTIVES_EXTRA_TABLE rows are hand-authored and carry no scope column, and the join
+# below must not red an adopter for a column the kit never asked them to write.
+core=""; corescope=""
+for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  core="$core$_dh:$_ds
+"
+done
+for _de in $DIRECTIVES_CORE; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  corescope="$corescope$_dh:$_dc
+"
+done
+core=$(printf '%s' "$core" | grep . | sort -u)
+corescope=$(printf '%s' "$corescope" | grep . | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -632,6 +683,44 @@ else
     only_tbl=$(comm -13 <(printf '%s\n' "$core") <(printf '%s\n' "$tblpairs"))
     [ -z "$only_reg" ] || fail 16 "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown: $only_reg"
     [ -z "$only_tbl" ] || fail 16 "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept: $only_tbl"
+    # TOOL-aPromptedMandate-6 fold, review L2 - the scope is KIT-OWNED, and two carriers say so. It
+    # was enforceable only by convention: `scope_of` composes core PLUS extra, so a project could
+    # declare `house-style:M9:prompt` and select a binding the protocol says it may not. Refused here
+    # rather than silently honoured, which keeps the documents true.
+    for _xe in $DIRECTIVES_EXTRA; do
+      case "${_xe#*:}" in *:*)
+        fail 16 "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name: $_xe" ;;
+      esac
+    done
+    # TOOL-aPromptedMandate-4 - the SCOPE column, joined to the registry's third field. Scoped to the
+    # KIT table's rows: the handle set compared is the CORE set, so a project's own extra rows are
+    # outside this arm and an adopter is never redded for a column the kit did not ask them to write.
+    #
+    # ANTI-VACUITY FIRST. If the column is absent from every row the extraction is empty, and an
+    # empty-against-empty comparison is green - which is the shape this repo reds elsewhere by name.
+    # The guard is ordered ahead of the comparison for the reason arm A's and D's are.
+    tblscope=$(tr -d '\r' < "$tmpl" | awk -F'|' '
+      /^[[:space:]]*\|[[:space:]]*`[a-z][a-z-]*`[[:space:]]*\|/ {
+        h = ""; sc = ""
+        for (i = 2; i <= NF; i++) {
+          cell = $i
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+          if (h == "" && cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); h = cell; continue }
+          if (cell == "all" || cell == "prompt") sc = cell
+        }
+        if (h != "" && sc != "") print h ":" sc
+      }' | sort -u)
+    if [ -z "$tblscope" ]; then
+      fail 16 "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds exactly all or prompt"
+    else
+      # ONE branch, not a comm PAIR. Measured: changing a single scope cell puts the same handle in
+      # BOTH differences, so an only-in-table second branch cannot fire ALONE - it is reachable only
+      # alongside this one, or alongside arm A which already covers the handle set. A branch no
+      # fixture can isolate is a branch whose arm proves nothing, so there is one.
+      _cs=$(printf '%s' "$corescope" | tr '\n' ' ')
+      _ts=$(printf '%s' "$tblscope" | tr '\n' ' ')
+      [ "$corescope" = "$tblscope" ] || fail 16 "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it: $_cs against $_ts"
+    fi
   fi
   # Arm B: every cited section RESOLVES. SILENT when the carrier is absent — the leg grades the
   # TREE and an adopter may install this kit without the memory-tree one; the DRIVER is what grades
@@ -646,6 +735,14 @@ else
 fi
 # Arm C: the floor. Mirrors CORE_FLOOR's two branches — undeclared and malformed are both refusals,
 # because either one leaves the pin unenforced while the conf still looks configured.
+# TOOL-aPromptedMandate-6 fold, review H1 - a floor BELOW the kit's own core count is SLACK BY
+# CONSTRUCTION and cannot fire on the deletion it exists to catch. This build shipped exactly that:
+# the bump to 13 was reverted by a `git checkout --` during an unrelated probe, and arm C passed
+# because it only ever asked whether the count met the floor, never whether the floor met the kit.
+_ndc=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+if [ -n "$DIRECTIVES_FLOOR" ] && [ "$DIRECTIVES_FLOOR" -lt "$_ndc" ] 2>/dev/null; then
+  fail 16 "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it: $DIRECTIVES_FLOOR against $_ndc"
+fi
 if [ -z "$DIRECTIVES_FLOOR" ]; then
   fail 16 "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
 else
@@ -680,6 +777,31 @@ if [ -f "$proto" ]; then
     pd2=$(comm -13 <(printf '%s\n' "$pcore") <(printf '%s\n' "$pph"))
     [ -z "$pd1" ] || fail 16 "a CORE phase is enforced by the driver and absent from the protocol's run-order list, so the contract publishes a vocabulary the kit does not use: $pd1"
     [ -z "$pd2" ] || fail 16 "the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy: $pd2"
+    # TOOL-aPromptedMandate-2 - ...and the PASS-KIND subset, joined the same way. Adding a phase and
+    # calling it a pass kind is a claim about the build method, and the row join above cannot see it:
+    # the rows were right and only the prose was wrong is exactly how the DoD count sentence went
+    # stale in both copies while its leg stayed green.
+    ppk=$(tr -d '\r' < "$proto" | awk '
+      /PASS kinds:$/ { f = 1; next }
+      f && /^$/      { if (seen) exit; next }
+      f              { seen = 1; print }' | grep -oE '`[A-Z][A-Z_]*`' | tr -d '`' | sort -u)
+    if [ -z "$ppk" ]; then
+      fail 16 "the protocol names no phase as a build-method pass kind, so the pass-kind join would compare the driver's subset against nothing and pass by finding nothing; the anchor is the line ending 'PASS kinds:'"
+    else
+      # TOOL-aPromptedMandate-6 fold, review L3 - the subset relation, never asserted. A pass-kind
+    # naming a phase no run can occupy publishes a position the vocabulary does not carry, and the
+    # both-ways join to the protocol cannot see it: both sides would agree on the same wrong token.
+    for _pk in $PHASES_PASSKIND; do
+      case " $PHASES_CORE " in *" $_pk "*) ;;
+        *) fail 16 "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy: $_pk" ;;
+      esac
+    done
+    pkcore=$(printf '%s\n' $PHASES_PASSKIND | sort -u)
+      kd1=$(comm -23 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
+      kd2=$(comm -13 <(printf '%s\n' "$pkcore") <(printf '%s\n' "$ppk"))
+      [ -z "$kd1" ] || fail 16 "the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names: $kd1"
+      [ -z "$kd2" ] || fail 16 "the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not: $kd2"
+    fi
   fi
   # Item NAMES only. The checker column is deliberately not joined: measured today three cells read
   # `machine, PRE-LANDING` or `agent-attested` against the constant's `machine`/`agent`, and those
@@ -736,6 +858,36 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
     fail 18 "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check: $tmpl"
   elif [ "$kol" -lt "$pfl" ]; then
     fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
+  fi
+fi
+
+# ---- 20: the PROMPT path's own ordering, PER PATH. TOOL-aPromptedMandate-5.
+# ---- Check 18 above orders the FIRST --preflight against the FIRST /session-kickoff across the
+# ---- whole template. Once a second start path exists that check keeps grading the FIRST one and is
+# ---- SILENTLY BLIND to the other - which is the failure direction nobody notices, as against a
+# ---- false red, which somebody fixes in a minute. So the prompt path is ordered inside its OWN
+# ---- section rather than against the file.
+# ----
+# ---- What it holds: the single owner turn precedes the push, and the push precedes preflight. That
+# ---- ordering is the whole provenance argument - everything written before the push is older than
+# ---- the commit that authorizes the run, and an ask after it is an ask nobody is present for.
+if [ -f "$tmpl" ]; then
+  # The section, sliced heading-to-heading. A template with no prompt path at all is LEGAL and
+  # silent: this kit shipped without one, and an adopter reading an older copy is not in error.
+  psec=$(awk '
+    /^## Start a run from a PROMPT/ { f = 1; n = 0; next }
+    f && /^## / { exit }
+    f { n++; print n "\t" $0 }' "$tmpl")
+  if [ -n "$psec" ]; then
+    askl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "AskUserQuestion") { print $1; exit }')
+    pshl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "PUSH THE BRANCH") { print $1; exit }')
+    pfl2=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "**Preflight**") { print $1; exit }')
+    if [ -z "$askl" ] || [ -z "$pshl" ] || [ -z "$pfl2" ]; then
+      fail 20 "the Skill's prompt path does not name all three of its ordered steps, so the order that makes the owner turn provably older than the authorization cannot be checked at all; it looks for AskUserQuestion, PUSH THE BRANCH and a bolded Preflight"
+    else
+      [ "$askl" -lt "$pshl" ] || fail 20 "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it: $askl against $pshl"
+      [ "$pshl" -lt "$pfl2" ] || fail 20 "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run: $pshl against $pfl2"
+    fi
   fi
 fi
 

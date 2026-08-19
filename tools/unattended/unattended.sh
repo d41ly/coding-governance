@@ -30,7 +30,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.6   # gov:kit unattended@1.6 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -79,8 +79,14 @@ fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
 # CORE, in run order. A project EXTENDS via PHASES_EXTRA and deletes nothing: the gate leg asserts
 # core membership against a shrink-only floor, because a deletable core member is a silent,
 # reason-free override of everything keyed on it.
-PHASES_CORE="PREFLIGHT SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
+PHASES_CORE="PREFLIGHT RESEARCHING TESTING SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
 PHASES_TERMINAL="LANDED ABORTED"
+# TOOL-aPromptedMandate-2 - the subset NAMED FOR the build method's pass kinds, published so the
+# protocol's claim about it can be JOINED rather than believed. RESEARCHING and TESTING are
+# deliberately absent: the method closes its pass set and neither is in it, so they are POSITIONS a
+# prompt-started run occupies while performing the passes that set does name. Adding a phase and
+# calling it a pass kind now has to move this line, and the leg reds if the contract disagrees.
+PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
@@ -96,7 +102,14 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
 #
 # Two handles may cite one section - the section is the carrier, not the rule.
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9"
+# TOOL-aPromptedMandate-4 - an entry is `<handle>:<section>[:<scope>]`. The THIRD field is the
+# layer's first CONDITIONAL member: `prompt` binds only a run whose authorization declared that
+# mode, `all` (the default, and what an absent field means) binds every run. Two-field entries are
+# therefore unchanged in meaning, which is what keeps every adopter's registry working untouched.
+#
+# The scope is NOT a project knob. A project may EXTEND the set; it may not narrow the core, and a
+# project-selectable scope is narrowing wearing a different name.
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
@@ -104,6 +117,19 @@ dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
 # for a --waive handle reads THIS, so the effective set is composed in one place rather than in each
 # consumer.
 directives() { printf '%s %s\n' "$DIRECTIVES_CORE" "$DIRECTIVES_EXTRA"; }
+# TOOL-aPromptedMandate-4 - ONE splitter for the three-field entry, so no consumer re-derives it.
+# The two-field default falls out of the shortest/longest-prefix pair rather than being tested for,
+# which is why it cannot disagree with itself: with no third field `${rest#*:}` returns `rest`.
+scope_of() { # handle -> its declared scope; `all` when the entry carries no third field
+  local p rest sc
+  for p in $(directives); do
+    case "$p" in "$1:"*) rest=${p#*:}; sc=${rest#*:}
+      [ "$sc" = "$rest" ] && sc=all
+      printf '%s' "$sc"; return ;;
+    esac
+  done
+  printf 'all'
+}
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -194,6 +220,12 @@ fact() { # run-state file · key
 # party being pushed to, and the observation is RECORDED so a verifier off this machine can re-derive
 # the pin without trusting a byte the run wrote.
 AREF=""; ASHA=""; AURL=""
+# TOOL-aPromptedMandate-1 - the authorization MODE, read from the build README at the pinned BASE by
+# check_authorization and recorded by --preflight. An out-parameter with the return code as the
+# verdict, which is this file's idiom for every other derived value (observe_anchor, resolve_base,
+# trusted_base, dod_met). It is EVIDENCE and never an input: nothing in this kit branches on the
+# recorded value, for the reason anchor-kind carries in its own comment.
+AUTH_MODE=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -608,6 +640,20 @@ recorded_waivers() { # run-state file -> the handles already parked, sorted
   # handle the owner never waived — and refusal 38 compares against exactly this reading.
   sed -n 's/^[0-9][0-9-]*T[0-9:]*Z waiver · item \([^ ]*\) · reason .*$/\1/p' "$1" | sort -u
 }
+check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bound by
+  local n=${#WAIVE_ITEMS[@]} i=0 h sc
+  [ "$n" -gt 0 ] || return 0
+  while [ "$i" -lt "$n" ]; do
+    h=${WAIVE_ITEMS[$i]}; sc=$(scope_of "$h")
+    if [ "$sc" = prompt ] && [ "${AUTH_MODE:-}" != prompt ]; then
+      fail 45 "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it: $h"
+      return 1
+    fi
+    i=$((i + 1))
+  done
+  return 0
+}
+
 check_waivers() { # run-state file
   local rel="$1" n=${#WAIVE_ITEMS[@]} i=0 h r want have
   [ "$n" -gt 0 ] || return 0
@@ -695,7 +741,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug
+  local slug="$1" base="$2" rel blob fmslug _fm
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -715,10 +761,28 @@ check_authorization() { # slug · base
     *) fail 7 "the blob at the pinned BASE is not a build README - front matter opens at line 1 and this does not, so the path resolved to something that is not a build: $base:$rel"
        return 1 ;;
   esac
-  fmslug=$(printf '%s\n' "$blob" | awk '
+  # TOOL-aPromptedMandate-1 - ONE read, TWO answers. The program this replaces printed the slug and
+  # EXITED on its first match, so a second arm below it could never run, and an arm placed above it
+  # starved `fmslug` of the value the refusal below compares - tripping the slug mismatch instead.
+  # Both keys are emitted KEY-TAGGED and nothing exits on a match; the front-matter close still
+  # terminates the scan, which is what bounds it. No second `GIT show`: one blob, one parse.
+  _fm=$(printf '%s\n' "$blob" | awk '
     NR == 1 { next }
     /^---[[:space:]]*\r?$/ { exit }
-    /^slug:/ { sub(/^slug:[[:space:]]*/, ""); sub(/[[:space:]]*\r?$/, ""); print; exit }')
+    /^slug:/ { v = $0; sub(/^slug:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "slug=" v; next }
+    /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }')
+  fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
+  AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
+  # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
+  # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
+  # default: defaulting an unrecognised mode to either member lets a typo select a discipline
+  # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
+  [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
+  case "$AUTH_MODE" in
+    prompt|slug) ;;
+    *) fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared: $AUTH_MODE"
+       return 1 ;;
+  esac
   if [ "$fmslug" != "$slug" ]; then
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
@@ -910,7 +974,20 @@ missing_units() { # slug · dir
 # Reads the BUILD README's pair — the one home of the unit list since main's redesign removed the
 # run-state copy and required that region to be EMPTY. Pointing these at the emptied region made
 # `build-complete` unsatisfiable: a check that cannot PASS, caught by its own green control.
-unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \['; }
+# TOOL-aPromptedMandate-12 - the generated region renders TWO tables: the UNITS and the RECORDS.
+# Selecting every `^| [` row took both, so every review record M4 mandates and the closing review M8
+# mandates counted as a non-terminal unit and `build-complete` could never be met by a build that
+# followed the method. Measured on builds that had already LANDED: aBranchedMandate 13 rows against
+# 6 units, aStandingWrit 3 against 1.
+#
+# The discriminator is the LINK TARGET, which is what M2 already uses to define a unit's spec, so
+# this selector and that definition move together. Filtering on a status token instead would work
+# today and rot the moment a record's kind column holds a word that looks like one.
+#
+# `.*` and NOT `[^]]*`: a negated class stops at the first `]`, so a unit whose title contains one
+# would be DROPPED - and a dropped unit row is a false GREEN, because nonterminal_units cannot see it
+# and build-complete passes over an unfinished unit. Greedy `.*` takes the last `](spec/` on the line.
+unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \[.*\]\(spec/'; }
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 
 verb_plan() { # slug
@@ -1074,9 +1151,14 @@ verb_landed() { # slug
   # adding a unit would retroactively change what this landed run appears to have carried. Freezing
   # the ids at the moment of landing is what keeps a terminal record a record. It is written as an
   # authored FACT because nothing else in the tree holds it once the README moves on.
+  # TOOL-aPromptedMandate-12 fold - through `unit_rows`, which is the THIRD reader of this region's
+  # row grammar and the one the narrowing missed. Left open-coded it kept the broad `^| [`, so this
+  # verb froze RECORD rows into `units-at-landing` - a terminal, permanent fact validated by nothing,
+  # and the freeze is the whole reason the field exists. The second closing review reproduced it at
+  # 1162 bytes of raw markdown against this build's own README.
   set_fact "$rel" units-at-landing \
-    "$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null \
-       | grep -E '^\| \[' | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+    "$(unit_rows "$(readme_of "$slug")" \
+       | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
   return 0
@@ -1199,6 +1281,15 @@ verb_preflight() { # slug · keepalive-id
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  # TOOL-aPromptedMandate-4, S5 - the waiver SCOPE, and it CANNOT live in check_waivers: that runs
+  # before the authorization block above, where AUTH_MODE is unset for BOTH modes, so a refusal keyed
+  # there never fires for one spelling and always fires for the other. Placed here, after the read
+  # that produces the mode, for the same reason the anchor is observed before anything consuming it.
+  #
+  # Keyed on "the mode is not PROMPT" rather than on "the mode is slug": an UNDERIVABLE mode must
+  # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
+  # authorization read failed - which is the moment a silent grant would matter most.
+  check_waiver_scope || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
@@ -1224,22 +1315,28 @@ verb_preflight() { # slug · keepalive-id
     echo "unattended: retired the finished record — $rel -> $arch"
   fi
 
-  # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
-  # then discovers a refusal has already changed the state the refusal was about.
-  if [ ! -f "$rel" ]; then
-    scaffold_runmd "$slug" || { fail 9 "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in: $rel"; return 1; }
-  fi
-
   # The unit list is DERIVED at read time, never copied here. A copy has to be refreshed by
   # something, and the only writer was this verb — which refuses once a run is live. So an ordinary
   # pass (a spec rev bump moves the build index) left the copy stale with no reachable way to repair
   # it, and the refusal named a remedy that did not exist. Deriving removes the class rather than
-  # adding a verb to service it. Both markers are still VALIDATED here, because a malformed pair is
+  # adding a verb to service it. Both markers are still VALIDATED, because a malformed pair is
   # something to refuse rather than to guess around.
+  #
+  # TOOL-aPromptedMandate-6 fold, review M1 - the README's pair is validated BEFORE the scaffold, not
+  # after it. The comment below has always said the run-state file is created after EVERY precondition
+  # passed, and this one ran later, so a malformed README left an orphan untracked RUN.md behind a
+  # refusal - and the retry then met the DIRTY-TREE refusal instead, naming a cause that was this
+  # verb's own leftover. Observed during this build's first manual reproduction.
   src=$(readme_of "$slug")
   if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
     fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
     return 1
+  fi
+
+  # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
+  # then discovers a refusal has already changed the state the refusal was about.
+  if [ ! -f "$rel" ]; then
+    scaffold_runmd "$slug" || { fail 9 "cannot create the run-state file, so there is nothing for the run to record its phase, witness and parked decisions in: $rel"; return 1; }
   fi
   if ! region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1; then
     fail 9 "the run-state file's generated markers are malformed — exactly one open and one close, close after open: $rel"
@@ -1278,6 +1375,12 @@ verb_preflight() { # slug · keepalive-id
   # re-preflight — the base stayed pinned while the anchor evidence beside it moved to whatever
   # the remote said today, so the record described two different observations as one.
   [ -n "$(fact "$rel" anchor-kind)" ] || set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  # TOOL-aPromptedMandate-1 - the authorization mode, PINNED ONCE for the reason anchor-kind is:
+  # written unconditionally it would drift on a re-preflight while the base it is evidence for
+  # stayed pinned. `slug` is the fallback because an unreachable check_authorization leaves the
+  # global empty, and preflight has already refused by then - the default never reaches disk on a
+  # run that got here without the read.
+  [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1
@@ -1336,7 +1439,16 @@ verb_status() { # slug
   # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
   # from a copy inside this file, which is exactly the staleness that design removes — main's
   # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
-  unit=$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null          | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1          | sed -e 's/^| \[//' -e 's/\].*//')
+  # TOOL-aPromptedMandate-12 - through `nonterminal_units`, not a second copy of its pipeline. This
+  # line open-coded the identical `region | grep | grep -v | head -1 | sed` and never called either
+  # helper, so narrowing `unit_rows` alone would have left --close reading the units table while
+  # --status and --resume kept reading the records table - two answers to one question about one
+  # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
+  # --status on a landed build offered a `build/` record filename as the next unit.
+  # `](spec/` and not a bare `]`: the selector deliberately admits a unit whose TITLE contains one,
+  # so cutting at the first `]` would display a truncated id for exactly the row the narrowing was
+  # written to keep. Cut at the link instead, which is the only `](spec/` a unit row carries.
+  unit=$(nonterminal_units "$(readme_of "$slug")" | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave

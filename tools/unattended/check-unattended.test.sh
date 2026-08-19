@@ -723,7 +723,7 @@ reset_tree
 # arms that run the driver live; nothing else in this file reads the remote's advertisement.
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 git checkout -q main
-printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n' > memory/guides/BUILD-METHOD.md
+printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n\n## M12\n' > memory/guides/BUILD-METHOD.md
 mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
@@ -1015,6 +1015,151 @@ mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DI
 hit "$(run)" "a parked waiver names a handle outside the effective directive set"
 reset_tree
 
+# ---- check 19: the authorization MODE, re-derived by the BAR rather than believed.
+# ---- TOOL-aPromptedMandate-1. The driver reads `authorized-by:` at BASE to decide which discipline
+# ---- binds a run; a value only the driver ever reads is a value only the driver can be wrong about.
+# ----
+# ---- THE FORGED DIRECTION, which is the whole reason the check exists: the record claims `prompt`
+# ---- while the README at its own recorded BASE declares nothing. Note this arm does NOT need
+# ---- `anchor_break` - it breaks the RECORD, not the anchor, and the anchor staying honest is
+# ---- exactly what makes the disagreement visible.
+reset_tree
+sed -i '/^base: /a mode: prompt' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare, so the discipline the run says bound it is not the one its authorization asked for:"
+reset_tree
+
+# ---- THE AGREEING DIRECTION. Without it the arm above passes over a check that fires on every
+# ---- record carrying a mode at all, which would red the bar for every honest prompt-mode run. The
+# ---- README has to gain the key AT THE ANCHOR, so this one does need `anchor_break`.
+add_mode() { sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md; }
+anchor_break add_mode
+sed -i '/^base: /a mode: prompt' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+anchor_restore
+
+# ---- ABSENT is outside the arm BY CONSTRUCTION, not by a waiver: every run-state file written
+# ---- before this unit carries no `mode:` line, and the leg's documented idiom is silence on
+# ---- absence. tRun's pristine record is exactly such a file.
+reset_tree
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+reset_tree
+
+# TOOL-aPromptedMandate-2 - the PASS-KIND subset, joined both ways and guarded against its own
+# vacuity, exactly as D is. Each arm was run against the live tree with the template broken in that
+# one way BEFORE being written here, and each fired with the text below and no other. The line is
+# anchored ^...$ so it selects the pass-kind line and not the run-order line above it, which also
+# contains SPECCING.
+#
+# F, driver -> protocol: the driver publishes a pass kind the contract omits.
+reset_tree; pedit 's/^`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`$/`SPECCING` · `REVIEWING` · `FOLDING`/'
+out=$(run)
+hit "$out" "the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names:"
+miss "$out" "the contract claims the method names a position it does not"
+
+# F, protocol -> driver: the contract calls a POSITION a pass kind. This is the direction the spec
+# audit found - RESEARCHING and TESTING are positions, and a document that quietly promotes one
+# contradicts the build method's closed pass set with nothing to notice.
+reset_tree; pedit 's/^`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`$/`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RESEARCHING`/'
+out=$(run)
+hit "$out" "the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not:"
+miss "$out" "the contract understates which positions the method names"
+
+# F, the locator: the same vacuity hole D has, opened the same way - by rewording prose.
+reset_tree; pedit "s/Named for the build method's PASS kinds:/Named for the pass kinds of the method:/"
+out=$(run)
+hit "$out" "the protocol names no phase as a build-method pass kind, so the pass-kind join would compare the driver's subset against nothing and pass by finding nothing; the anchor is the line ending 'PASS kinds:'"
+miss "$out" "the contract understates which positions the method names"
+reset_tree
+
+# TOOL-aPromptedMandate-4 - the SCOPE column, joined to the registry's third field. Both branches
+# were run against the live tree before being written here, and each fired with the text below.
+#
+# G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
+# the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
+# would have proved nothing. Arm A already covers the handle set in both directions.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
+
+# G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
+# green - the vacuity shape every other join in this leg carries a guard for.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/ | all | D/ | D/; s/ | prompt | D/ | D/'
+out=$(run)
+hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds exactly all or prompt"
+miss "$out" "the agent is told which runs a rule binds by a table that disagrees"
+
+# G, the PROJECT's own extra rows carry no scope column and must NOT red: the kit never asked an
+# adopter to write one, and the join is scoped to the CORE set for exactly that reason.
+reset_tree
+mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+# The DISCRIMINATING string, not the vacuity one. Reproduced both ways in a scratch repo: with the
+# exclusion broken (`corescope` built from CORE **plus** EXTRA) the leg reds with the DISAGREEMENT
+# message naming `house-style:all`, while the vacuity string appears zero times in either build -
+# `tblscope` reads the kit template only, so that branch is unreachable here. The arm was green over
+# the broken implementation, which is the fixture-passes-by-finding-nothing class this leg's own
+# comments cite, committed in an arm written to guard against it.
+miss "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows"
+reset_tree
+
+# TOOL-aPromptedMandate-5 - check 20, the PROMPT path ordered inside its OWN section. Check 18
+# orders the file's FIRST --preflight against its FIRST /session-kickoff; once a second start path
+# exists that check keeps grading the first one and goes SILENTLY blind to the other. A false red is
+# noticed in a minute; silent blindness is not, so the second path gets its own ordering.
+#
+# H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
+# one question the path may ask would be asked by a run already authorized, with nobody present.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
+hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
+
+# H, the PUSH after preflight. Preflight run first meets the refusal that nothing published
+# authorizes the run - the exact refusal step 1 quotes so the agent does not have to diagnose it.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\.\*\*/4. **Commit.**/'
+mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
+hit "$(run)" "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run:"
+
+# H, the locator: a step no longer named at all. Without this the two order comparisons compare
+# against empty strings and are green - the vacuity shape every join in this leg carries a guard for.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/PUSH THE BRANCH/push the branch/'
+out=$(run)
+hit "$out" "the Skill's prompt path does not name all three of its ordered steps, so the order that makes the owner turn provably older than the authorization cannot be checked at all; it looks for AskUserQuestion, PUSH THE BRANCH and a bolded Preflight"
+miss "$out" "puts its owner turn AFTER the branch push"
+
+# H, a template with NO prompt path is legal and silent - this kit shipped without one, and an
+# adopter on an older copy is not in error. Deleting the heading empties the slice.
+reset_tree
+mutate tools/unattended/SKILL.template.md 's/^## Start a run from a PROMPT$/## Notes/'
+miss "$(run)" "the Skill's prompt path does not name all three of its ordered steps"
+reset_tree
+
+# TOOL-aPromptedMandate-6 fold — the three predicates the CLOSING REVIEW asked for. Each was measured
+# firing against the live tree before its arm was written, which is the claim that failed for exactly
+# one arm in this build and is why these say so explicitly.
+#
+# I, review H1: a floor BELOW the kit's own core count. This build SHIPPED that state - the bump to
+# 13 was reverted by a `git checkout --` during an unrelated probe and arm C passed, because it only
+# asked whether the count met the floor and never whether the floor met the kit.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_FLOOR="13"$/DIRECTIVES_FLOOR="11"/'
+hit "$(run)" "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it:"
+
+# I, review L2: a PROJECT-declared scope. Two carriers say the scope is kit-owned; nothing enforced
+# it, because scope_of composes core PLUS extra and would have honoured this silently.
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9:prompt"/'
+hit "$(run)" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
+
+# I, review L3: a pass kind outside the vocabulary. The both-ways join to the protocol cannot see it
+# - both sides would agree on the same wrong token, which is the two-derived-values class.
+reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
+hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1025,7 +1170,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=162
+FLOOR_ASSERTIONS=200
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

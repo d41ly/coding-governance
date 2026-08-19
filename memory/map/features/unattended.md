@@ -8,7 +8,7 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring", "unattended adopter e2e"]
+gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring", "unattended adopter e2e", "unattended cross-component"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []

@@ -143,6 +143,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
   verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
   0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
+- A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
+  and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
+  `TOOL-aPromptedMandate-4`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.

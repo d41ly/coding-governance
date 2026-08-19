@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.6 -->
+<!-- gov:kit unattended@1.7 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is
@@ -15,12 +15,19 @@ check, not merely removed.
 ## 1. The authorization
 
 The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
-committed before the run's branch existed. The owner's act is `/unattended <slug>`; they author
-nothing per run except the reason text of a directive waiver, which `--preflight` records on
-their behalf (§10). Four properties, all mechanical:
+that resolves at the anchor the project declares. On the default-branch anchor that means committed
+before the run's branch existed. The owner's act is `/unattended <slug>`, or — where the project
+admits the second anchor — an invocation carrying the authorizing parameter and the prose the build
+is scoped by. They author nothing per run except the reason text of a directive waiver, which
+`--preflight` records on their behalf (§10), and on the prompt path the prose itself plus whatever
+the agent asks at its single opening turn. Four properties, all mechanical:
 
-- **It is asserted, never written by the run.** `--preflight` refuses if it is absent; a run that
-    could write its own authorization has none.
+- **It is asserted, never written by the run — on the DEFAULT-BRANCH anchor.** `--preflight` refuses
+    if it is absent, and at that anchor a run that could write its own authorization has none. **On
+    the second anchor this property is weaker, deliberately**: the run may author its own build folder
+    and push it, which is cost 1 below made USABLE rather than merely conceded. Which anchor
+    authorized a run is recorded, and so is the discipline it claimed — neither is a verdict, and §9's
+    reduction applies to both.
 - **It is reachable from the pinned BASE.** A build folder introduced by a commit on the run's own
   branch grants nothing. Reachability is the machine-checkable form of "somebody with push rights put
   this here before this run branched" — and the run holds push rights by construction, so it is a
@@ -29,6 +36,14 @@ their behalf (§10). Four properties, all mechanical:
   is §9.
 - **Only its SHAPE is checked.** It resolves at BASE, parses as front matter, and its `slug:` names
   the build. No gate can tell whether the owner meant it.
+- **It may declare an authorization MODE, and that declaration is a RECORD rather than a verdict.**
+  An `authorized-by:` key in the front matter, over the closed set `prompt` / `slug`; absent is
+  `slug`, which is every build folder written before the key existed. `--preflight` reads it from the
+  blob at BASE and records it, and the merge bar re-derives it from that same blob independently — so
+  a run cannot record a discipline its own authorization did not carry. What this does NOT buy is
+  stated here rather than discovered: the key is a byte in a file, and §9's reduction applies to it
+  exactly as it applies to every other local input. It says which discipline the run declared it was
+  under, not that the declaration was true.
 - **Its ROSTER, when present, may not move under the run — on the DEFAULT-BRANCH anchor only.** A
   Units table inside a roster marker pair is compared across the BASE. Opt-in by presence; INTEGRITY,
   not a narrowing of the grant. **It does not hold on the second anchor**: there the BASE is a tip
@@ -168,11 +183,20 @@ the only exit: the spill exists so that never happens.
 
 Kit-owned core, in run order:
 
-`PREFLIGHT` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` · `RUNNING` · `VERIFYING` ·
-`LANDING` · `LANDED` · `ABORTED`
+`PREFLIGHT` · `RESEARCHING` · `TESTING` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` ·
+`RUNNING` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
 
-The four middle members are named for the build method's PASS kinds, so a run's phase and the pass it
-is performing are one vocabulary rather than two. `RUNNING` survives with a stated meaning — a run
+Named for the build method's PASS kinds:
+
+`SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING`
+
+— so a run's phase and the pass it is performing are one vocabulary rather than two. The list is a
+DECLARATION in the driver and this paragraph is joined to it in both directions, because a phase
+added and casually called a pass kind is a claim no row join can see.
+
+**`RESEARCHING` and `TESTING` are POSITIONS, not pass kinds.** The build method closes its pass set
+and neither is a member, so a prompt-started run OCCUPIES them while performing the passes that set
+does name — the commit boundary and the regrounding points stay exactly where the method puts them. `RUNNING` survives with a stated meaning — a run
 between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
 `LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
@@ -365,6 +389,19 @@ is where a project adds; the core is not deletable from the project layer, and `
 pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key holding the whole set
 was rejected: a project could then declare zero directives, which is a global waiver carrying no
 name, no reason and no record.
+
+**A directive may be SCOPED.** A registry entry is `<handle>:<section>[:<scope>]` over the closed set
+`all` / `prompt`. An absent third field is `all`, so every entry written before scopes existed keeps
+its meaning exactly. `all` binds every unattended run; `prompt` binds only a run whose build README
+declared `authorized-by: prompt`, because research and a solution test are obligations of a build
+whose solution was not given — imposing them on a run whose specs already chose one would be
+ceremony, not rigour.
+
+The scope is KIT-OWNED for the reason the set itself is: a project-selectable scope is a narrowing of
+the core wearing another name. A waiver of a `prompt`-scoped handle on a run that is not
+prompt-authorized is REFUSED rather than recorded, since a waiver relaxes a rule that never bound
+that run. That refusal is evaluated where the mode EXISTS — after the authorization read, not beside
+the other waiver checks — and an underivable mode refuses rather than grants.
 
 **This section names no handle.** The list an agent reads is the table in the rendered Skill, and
 naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both

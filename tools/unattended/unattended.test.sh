@@ -111,6 +111,19 @@ mutate memory/builds/tWrongSlug/README.md 's/^slug: tWrongSlug$/slug: someoneEls
 # tRun's would have worked only by making the tree dirty, which check 2 refuses first, so the arm
 # would have tested the dirty-tree refusal while claiming to test creation.
 readme tFresh
+# TOOL-aPromptedMandate-1 - the authorization MODE fixtures, both on MAIN for tFresh's reason. The
+# key is inserted AFTER `slug:` in both, deliberately: the parse this unit replaces printed the slug
+# and EXITED on its first match, so a fixture with the key FIRST would pass over the very defect the
+# re-shape exists to fix - and the arm would have proved nothing.
+readme tModeBad
+mutate memory/builds/tModeBad/README.md '/^slug: tModeBad$/a authorized-by: banana'
+readme tModeOk
+mutate memory/builds/tModeOk/README.md '/^slug: tModeOk$/a authorized-by: prompt'
+# review M1's subject: a README whose generated marker pair is UNPAIRED. On MAIN for tFresh's
+# reason - authored on the unit branch it never resolves at BASE, so check_authorization refuses
+# first and the region validation this arm is about is never reached. Measured.
+readme tUnpaired
+mutate memory/builds/tUnpaired/README.md 's|^<!-- /gen:build-index -->$||'
 # TOOL-cBriefedPilot-4: the build-method carrier, which --preflight now REFUSES without. A stub,
 # because the driver tests existence and nothing else; the file whose sections have to resolve lives
 # in the LEG's fixture. It is created before the initial commit deliberately - every arm begins with
@@ -647,6 +660,43 @@ out=$(run --close tRun)
 hit "$out" "build-complete"
 miss "$out" "records-current"
 
+# ---- TOOL-aPromptedMandate-12: the selector reads the UNITS table, not the whole region. The
+# ---- generated region renders TWO tables and the old `^| [` took both, so every review record M4
+# ---- mandates and the closing review M8 mandates counted as a non-terminal unit - the item was
+# ---- unsatisfiable for any build that followed the method. Measured on builds that had already
+# ---- LANDED: aBranchedMandate 13 rows against 6 units, aStandingWrit 3 against 1.
+# ----
+# ---- These run on the build-complete fixture, whose unit is CLOSED and whose roster pair exists.
+# ---- Written against `reset_tree` instead, both positive arms failed on the fixture's own OPEN
+# ---- unit and term 1's missing roster - measuring the fixture rather than the subject.
+bcopen
+# INSIDE the region, not appended. `>>` puts the row past `<!-- /gen:build-index -->`, where
+# `region()` never sees it - so these arms restated the green control and passed identically against
+# the PRE-FIX selector. The shipped fix had no regression gate, which is the class this same
+# changeset adds a gotcha sub-shape for. Caught by the second closing review, not by me.
+sed -i '/<!-- gen:build-index -->/a | [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |' memory/builds/tRun/README.md
+sed -i '/<!-- gen:build-index -->/a | [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |' memory/builds/tRun/RUN.md
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
+hit  "$out" "close OK"
+miss "$out" "build-complete"
+
+# ...and the SECOND reader agrees. `verb_status` open-coded the same pipeline and never called the
+# helper, so narrowing one left --close and --status disagreeing about one region. Before this,
+# --status on a landed build offered a `build/` record filename as the next unit.
+out=$(run --status tRun)
+miss "$out" "2026-08-01-review-ARCH-tRun-1-x.md"
+hit  "$out" "(no non-terminal unit)"
+
+# ---- a unit title containing `]` is STILL selected. `[^]]*` stops at the first one, and a dropped
+# ---- unit row is a false GREEN: nonterminal_units cannot see it, so build-complete passes over an
+# ---- unfinished unit. The spec audit caught this before the code was written.
+bcopen
+sed -i 's/ARCH-tRun-1 — the unit\]/ARCH-tRun-1 — the [bracketed] unit]/' memory/builds/tRun/README.md
+sed -i 's/ARCH-tRun-1 — the unit\]/ARCH-tRun-1 — the [bracketed] unit]/' memory/builds/tRun/RUN.md
+out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
+hit  "$out" "close OK"
+miss "$out" "build-complete"
+
 # the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
 # afterwards. A blocking gate whose override nobody can read is not a gate.
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "shipping 1 of 2 units deliberately")
@@ -794,18 +844,28 @@ out=$(run --status tRun)
 miss "$out" "unbound variable"
 hit "$out" "phase "
 
-# ---- eleven pairs, read from the driver's OWN constant line — the same line the gate leg's
-# ---- core_of() parses, so a count here and a count there cannot disagree.
+# ---- THIRTEEN pairs, read from the driver's OWN constant line — the same line the gate leg's
+# ---- core_of() parses, so a count here and a count there cannot disagree. It was eleven until
+# ---- TOOL-aPromptedMandate-4 added the two prompt-scoped handles.
 dirline=$(grep '^DIRECTIVES_CORE=' "$SCRIPT")
 ndir=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*' | wc -l | tr -d ' ')
-same "the registry declares eleven handles" "$ndir" "11"
+same "the registry declares thirteen handles" "$ndir" "13"
 
 # ---- every handle POINTS at a build-method section and none of them restates one. The pointer is
 # ---- the whole design: a gloss grown into a condition would be the M1 defect this build exists to
 # ---- avoid, and a shape check is the cheapest thing that notices it happening.
+# ----
+# ---- The grammar admits an OPTIONAL third field since TOOL-aPromptedMandate-4, over the closed set
+# ---- `all|prompt` and nothing wider - a free-text third field would be exactly the gloss this arm
+# ---- exists to refuse, one colon further along.
 nbad=$(printf '%s\n' "$dirline" | sed -e 's/^DIRECTIVES_CORE="//' -e 's/"$//' | tr ' ' '\n' \
-       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+$' || true)
-same "every registry entry is handle:M-section and nothing else" "$nbad" "0"
+       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+(:(all|prompt))?$' || true)
+same "every registry entry is handle:M-section with at most a closed scope" "$nbad" "0"
+
+# ---- ...and the scope vocabulary is CLOSED at the source, so a typo cannot invent a third value
+# ---- that the arm above would then bless as legal grammar.
+nscope=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*:[a-z]*' | sed 's/.*://' | sort -u | grep -cvE '^(all|prompt)$' || true)
+same "no registry entry declares a scope outside all/prompt" "$nscope" "0"
 
 # ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
 # ---- it can silently not ship while the suite stays green.
@@ -827,6 +887,18 @@ same "directives() composes core and extra" \
 # ---- stay green. The example is the kit's own declaration of the surface a project fills in, it is
 # ---- tracked, and no fixture can narrow it.
 example="$HERE/.unattended.conf.example"
+
+# ---- TOOL-aPromptedMandate-2, S5: the example's FLOORS, joined to the driver's own set sizes.
+# ---- The example shipped CORE_FLOOR="10:6" against an EIGHT-member DOD_CORE, and stayed wrong for
+# ---- its whole life because the only arm that read this file iterates key NAMES and never a value.
+# ---- The header tells an adopter to MEASURE rather than copy; nothing made that self-enforcing, so
+# ---- a project copying the example inherited a floor too slack to detect the deletion it exists to
+# ---- detect. `wc -w` is normalised because it pads on this platform and the comparison is textual.
+wcw() { grep -m1 "^$1=" "$SCRIPT" | cut -d\" -f2 | wc -w | tr -d " \t"; }
+same "the example CORE_FLOOR equals the driver phase and DoD set sizes" \
+  "$(sed -n 's/^CORE_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw PHASES_CORE):$(wcw DOD_CORE)"
+same "the example DIRECTIVES_FLOOR equals the driver directive count" \
+  "$(sed -n 's/^DIRECTIVES_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw DIRECTIVES_CORE)"
 initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
 undefaulted=""
 checked=0
@@ -1091,7 +1163,10 @@ same "--status names a non-terminal unit through the extracted helper" "$(run --
 # re-derives the slice with awk rather than calling `region`, which is a driver function and
 # not a command here — the first cut called it, got empty, and would have compared the helper
 # against nothing and passed forever.
-want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+# The control re-derives with the SAME selector the driver now uses. Left at the broad `^| [` it
+# asserted the fix had NOT happened - a control encoding the pre-fix behaviour turns green into
+# proof of the defect.
+want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[.*\]\(spec/' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
@@ -1663,11 +1738,73 @@ hit "$out" "no run-state file, so there is no run to park a decision against"
 same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
+# ---- check 44: the authorization mode is a CLOSED set, and a value outside it refuses rather than
+# ---- defaulting. Paired with a no-write arm, because "it printed a refusal" and "it changed
+# ---- nothing" are two claims - and this branch sits BEFORE the write gate precisely so both hold.
+reset_tree
+out=$(run --preflight tModeBad --keepalive-id k1)
+hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared"
+same "check 44 created no run-state file" "$([ -f memory/builds/tModeBad/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- the PASSING direction, which is the only thing that tells a WORKING reader from a dead one:
+# ---- with the key absent the record says `slug`, and with a dead parse it says `slug` too. This
+# ---- arm is the discriminator, and it is why the fixture orders the key after `slug:`.
+reset_tree
+out=$(run --preflight tModeOk --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tModeOk/RUN.md)" "mode: prompt"
+git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+
+# ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
+# ---- tFresh, an untouched fixture, so the arm cannot pass because of something this unit wrote.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tFresh/RUN.md)" "mode: slug"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+reset_tree
+
+# ---- check 45: a waiver of a PROMPT-scoped directive on a run that is not prompt-authorized. The
+# ---- refusal cannot live in check_waivers, which runs BEFORE the authorization read that produces
+# ---- the mode - there AUTH_MODE is unset for both modes, so one spelling never fires and the other
+# ---- always does. These arms are what prove it is evaluated where the mode exists.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
+hit "$out" "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it:"
+same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
+# ---- waiver path wearing a scope's name.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1 --waive reuse-first --reason "owner accepted the silence")
+hit "$out" "preflight OK"
+hit "$out" "directive waived — reuse-first"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+
+# ---- ...and the PROMPT-scoped handle IS accepted on a prompt-authorized run, which is the whole
+# ---- point of the scope rather than a way to refuse things.
+reset_tree
+out=$(run --preflight tModeOk --keepalive-id k1 --waive researched --reason "the prompt named one solution")
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tModeOk/RUN.md)" "waiver · item researched"
+git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+reset_tree
+
+# ---- review M1: a malformed build README must leave NO run-state file behind. `scaffold_runmd` ran
+# ---- BEFORE this validation, so the refusal fired over a tree the verb had already changed - and
+# ---- the retry then met the DIRTY-TREE refusal, naming a cause that was this verb's own leftover.
+# ---- The adjacent comment claimed the scaffold happens after every precondition; it now does.
+reset_tree
+out=$(run --preflight tUnpaired --keepalive-id k1)
+hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
+same "a malformed README leaves no orphan run-state file" "$([ -f memory/builds/tUnpaired/RUN.md ] && echo yes || echo no)" "no"
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=296
+FLOOR_ASSERTIONS=338
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -118,8 +118,20 @@ CONF="$ROOT/.unattended.conf"
 # not presence-of-value, and "" made every such key invisible to the only check looking for it.
 MEMORY_ROOT=memory; LANDER="{{LANDER}}"; KEEPALIVE_CREATE="{{KEEPALIVE_CREATE}}"
 KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVAL}}"
+# TOOL-aPromptedMandate-5 - ANCHOR_SCOPE is the ONE interpolated key that must NOT keep its
+# placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
+# means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
+ANCHOR_SCOPE=""
 # shellcheck disable=SC1090
 . "$CONF"
+# The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
+# anchor - the driver's own value guard falls through exactly this way - and the Skill has to state
+# what the run will DO rather than what the file happens to say. Deriving it here also means the
+# rendered sentence can never be a hole: there is no value of the key that produces an empty cell.
+case "$ANCHOR_SCOPE" in
+  published) ANCHOR_EFFECTIVE=published ;;
+  *)         ANCHOR_EFFECTIVE=default-branch ;;
+esac
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
@@ -157,6 +169,7 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
   out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
   out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
+  out=${out//\{\{ANCHOR_SCOPE\}\}/"$ANCHOR_EFFECTIVE"}
   printf '%s' "$out"
 }
 

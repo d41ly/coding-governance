@@ -69,6 +69,7 @@
       "testsuite counts (every bar self-test prints one)",
       "testsuite counts self-test",
       "unattended adopter e2e",
+      "unattended cross-component",
       "unattended driver selftest",
       "unattended gate selftest",
       "unattended kit gate",
