@@ -1,6 +1,6 @@
 # TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
+**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
 ## 1. Goal
 
@@ -15,6 +15,10 @@ is not on offer and this spec will not pretend otherwise.
   and `LENS_CAP`, mapping to the hook's `CAP`, `MAX_VERIFIERS` and `MAX_LENSES`. Named so none of
   them collides with `AGENT_CAP`, which stays a refused environment variable and must not read as
   the same knob under a new spelling.
+- **S1a** — the conf GRAMMAR is one `KEY=value` per line with `#` comments, which is the only
+  shape `drift_report.py`'s scalar reader matches — an anchored `KEY = "?digits"?` on a line of
+  its own, comments skipped. A trailing comment on the assignment line makes the ratchet read
+  nothing, so the grammar is a constraint on the file this unit ships and not a stylistic note.
 - **S1b** — the file is COMMITTED at the shipped values rather than left absent. That is not a
   style choice: S8's ratchet compares the value at the base ref against the value at head, and
   `drift_report.py` SKIPS a file that does not exist at the base. With no committed blob the
@@ -25,14 +29,39 @@ is not on offer and this spec will not pretend otherwise.
   file rather than a directory. This unit does not write a second one. Two things it must state
   that the existing helper leaves open: the declaration is read from the REPO ROOT and not the
   common dir, so every linked worktree can carry its own; and the walk anchors on the same
-  payload cwd the existing code anchors on, which is what the hook's own harness relies on for
-  test isolation.
+  payload cwd the existing code anchors on.
+- **S2a** — a SECOND walk is written after all, beside `gitCommonDir` rather than replacing it,
+  and rev-3's flat "does not write a second one" was wrong. `gitCommonDir` deliberately resolves
+  a linked worktree through to the SHARED git dir — its own comment says one budget per repo, not
+  per worktree — so a builder obeying rev-3 would read the main checkout's declaration from every
+  linked worktree, silently. The new walk returns the directory holding the `.git` ENTRY, which
+  is the worktree root. `gitCommonDir` keeps its collapsing behaviour untouched, because the slot
+  budget depends on it.
+- **S2c** — the Workflow modality has NO fixture isolation today and this unit adds it. The
+  payload-cwd anchor rev-3 leaned on is an Agent-modality property: measured, every Workflow arm
+  in the harness ships no `cwd` and the suite never changes directory before invoking the hook,
+  so those arms resolve against the process cwd — the repo root, where S1b commits the real
+  declaration. Since `MAX_LENSES` and `MAX_VERIFIERS` are consumed on exactly that modality,
+  every affected arm gains a `cwd` pointing at a scratch tree carrying a `.git` entry, on the
+  idiom the Agent arms already use. Without it AC1's premise is unreachable and no fixture
+  criterion below can be observed.
+- **S2b** — this unit carries the READS-IT half of unit 5's replacement predicate. Unit 5 asserts
+  the pointer SHAPE — that each section stating a bound names the file resolving it — and cannot
+  assert more, because the conf key and the hook's read of it are minted HERE and land after.
+  In the same commit that makes the hook read the declaration, `check-protocol-parity.test.sh`
+  gains the second half: the declaration the protocol names is one the hook actually reads.
+  Ratified by the owner as a split by landing.
 - **S3** — **lowering is free.** A declared value at or below the shipped constant applies with no
   ceremony, because a tighter bound is never the risk this guard exists to manage.
 - **S4** — **raising is attributed.** A declared value ABOVE the shipped constant applies only
   when the declaration carries an attribution line NAMING THAT KEY, in the grammar
-  `# <KEY> RAISED <old> -> <new> (owner, <date>): <reason>`, within a stated number of lines
-  above the assignment. Three details the first draft left open and each of which is a defect:
+  `# <KEY> RAISED <old> -> <new> (owner, <date>): <reason>`, within FIVE lines above the
+  assignment. Five, and stated rather than left open as rev-3 left it: the file is one key per
+  line with a short comment, so five reaches a justification without reaching the previous key's.
+  This window is INDEPENDENT of drift-audit's `RATCHET_LOOKBACK`, which unit 3 makes adopter-
+  declarable; unit 3's S1c says the same from its side. An adopter who narrows one and not the
+  other gets lines the hook accepts and the ratchet reds on, and that is a stated consequence
+  rather than a surprise. Three details the first draft left open and each of which is a defect:
   the key must appear, because all three bounds default to 5 and an unkeyed line would attribute
   a raise of one to a raise of another; the window must be stated, or the hook has no rule for
   how far to look; and the HOOK owns the regex, with the ratchet reading the same text through
@@ -44,7 +73,14 @@ is not on offer and this spec will not pretend otherwise.
   DECLARED value, which is what the ratchet already computes, and the hook accepts any `<old>`
   in a correctly keyed and shaped line rather than checking its value. The hook enforces SHAPE
   and the ratchet enforces ARITHMETIC — one sentence, two readers, neither duplicating the
-  other's job.
+  other's job. The hook DOES require the stated `<new>` to equal the value it is applying;
+  without that, an attribution line left behind by a previous raise authorises any further move
+  for the whole session, and only the bar would catch it.
+- **S4c** — the RATCHET is made key-aware, and this is a code change to drift-audit rather than a
+  statement about it. Its justification matcher is built from the two NUMBERS alone; executed
+  over a fixture with all three keys raised to 8 and a single `LENS_CAP RAISED 5 -> 8` comment,
+  all three raises read as justified. That is precisely the confusion S4 requires the key to
+  prevent, sitting in the reader S4b assigns the arithmetic to, so S4b is false until this lands.
 - **S5** — every failure direction falls back to the SHIPPED constant, never higher: no file, an
   unreadable file, a malformed value, a raise without attribution. A guard that fails open is worse
   than no guard, and the fallback is the shipped number rather than the declared one precisely so a
@@ -77,10 +113,16 @@ is not on offer and this spec will not pretend otherwise.
   assignment into a call would red that gate with a message about an unresolvable pair rather
   than about this unit. The declaration is READ separately; the constant stays where the pair
   can find it.
-- **S13** — the two new files are declared to the deployer. `tools/hooks/kit.toml` gains rows
-  for them and the govkit registry gains matching entries, because every depth-1 path under
-  `tools/` and everything the kit ships must be an entry, a member of a file rule, or an
-  exemption with a reason. A new shipped file that is none of those reds `govkit selfcheck`.
+- **S13** — THREE new files are declared to the deployer, and the mechanism rev-3 named does not
+  cover the one that matters. Measured: the govkit surface globs reach `tools/*`, `.githooks/**`,
+  `skills/session-kickoff/**` and two playbook root patterns, so a repo-root dotfile is OUTSIDE
+  the declared surface and `selfcheck` is green with or without it. The example therefore ships
+  from `tools/hooks/.agent-cap.conf.example` with an unprefixed destination, which the per-file
+  claim arm does cover; the kit's README is a third new file needing its own rule; and the
+  instance `.agent-cap.conf` is per-repo data rather than kit payload, which the spec now says
+  outright. `memory/guides/SESSION-KICKOFF.md` records that a new tool at the repo root silently
+  leaves the enforced surface — that is the objection §4's prefix-independence argument has to
+  beat, and it beats it only for the INSTANCE, never for the payload.
 
 ## 3. Non-goals (OUT)
 
@@ -113,16 +155,24 @@ behind when someone raises it."* Every clause of that is about the CHANNEL. A co
 opposite on each: it leaves a diff, the diff has an author and a date, the justification is in the
 same commit, and the drift ratchet reds if the justification is missing.
 
+The hook runs on the `Workflow|Agent` matcher rather than on every tool call.
+
 **What it does not buy is prevention.** An agent with shell access can edit `.agent-cap.conf`, write
 its own attribution line, edit `drift_signals.py` to drop the ratchet, and edit the hook itself. No
 arrangement of files in this repository changes that, and a spec that implied otherwise would be
 selling the same false comfort as the override this design keeps refusing. The protocol §9 already
 makes this argument for unattended runs and this unit points at it rather than restating it.
 
-So the honest claim is: **an agent cannot raise this quietly.** Raising it requires an edit to a file
-whose only purpose is this number, in a shaped sentence naming the owner and both values, or the bar
-reds. The control that actually binds is the same one §9 names — review of the diff, by a human, on
-the remote.
+So the honest claim is: **an agent cannot raise this quietly.** Raising it requires an edit to a
+file whose only purpose is this number, in a shaped sentence naming the key and both values, or
+the bar reds.
+
+Rev-3 named the binding control as "review of the diff, by a human, on the remote" and attributed
+that to the protocol's §9. It says no such thing. What §9 names is the same leg re-run in a clone
+the run never touched, by a party the run cannot execute code as — and it forbids any document
+here from implying otherwise, which rev-3 did. Corrected: with S4c landed, the control is the
+drift-audit ratchet leg re-run where this run cannot reach. Without S4c there is none, because a
+key-blind matcher justifies every raise from any one line.
 
 ### Why a file at the repo root rather than beside the kit
 
@@ -162,7 +212,13 @@ watching and content.
 - `tools/hooks/agent-cap.js` and its byte-identical `.claude/hooks/` copy — the resolver, the three
   reads, S6's reporting, S7's comment, the version constant.
 - `tools/hooks/agent-cap.test.sh` — S11's branch coverage.
+- `.agent-cap.conf` — the instance, committed at 5/5/5 per S1b. Per-repo data, not kit payload.
+- `tools/hooks/.agent-cap.conf.example` and a new `tools/hooks/README.md` — both NEW, both needing
+  their own `kit.toml` rules per S13.
 - `tools/drift-audit/drift_signals.py` — three ratchet declarations and their liveness statement.
+- `tools/drift-audit/drift_report.py` — S4c's key-aware matcher. Absent from rev-3's write set,
+  which left S4b describing behaviour nothing in the build could produce.
+- `tools/drift-audit/selftest.py` — the arms AC7 observes.
 - `tools/hooks/kit.toml` and the govkit registry — S13.
 - `memory/guides/REVIEW-PROTOCOL.md` — S9 and S10. A read-path member; unit 5 shrinks it first.
 - A shipped `.agent-cap.conf.example`, and the kit's README.
@@ -179,14 +235,24 @@ watching and content.
   session before anything reported it.
 - **Require attribution for LOWERING too.** Rejected: it prices the safe direction the same as the
   unsafe one, and the predictable result is that nobody lowers.
+- **Kit-owned and EXTEND-ONLY, the shape already built for the unattended directives.** A project
+  may add to a kit-owned set and never subtract, which needs no attribution grammar, no ratchet
+  rows and no second parser. Rejected because it forecloses the RAISE the owner asked for, and
+  that is the only reason — it is otherwise cheaper than the chosen design and the reader should
+  be able to price that. Two ratified rows argue for it and are named here rather than left
+  uncited: `TOOL-cBriefedPilot-2` refuses a conf key for the directive set because a key lets a
+  project declare zero and that is a global waiver carrying no name, no reason and no record; and
+  `TOOL-aBoundedVerdict-1` keeps a second cap as a driver file constant on the reused agent-cap
+  argument. The second is the cap that governs the review of this very spec.
 
 ## 5. Production-readiness checklist
 
 - security — this is the security-shaped unit of the build, and section 4 states its limit rather
   than its promise. The fallback direction is the control that matters: every failure yields the
   shipped constant, so no malformed input widens a bound.
-- perf / scale — one small file read per `Workflow`/`Agent` tool call, on a path that already reads
-  stdin and parses a script. Measured before landing, and cached within a single hook invocation.
+- perf / scale — one small file read per `Workflow`/`Agent` tool call, on a path that already
+  reads stdin and parses a script. No caching: the hook is a fresh process per call, so there is
+  nothing for a cache to outlive.
 - a11y · i18n — N/A.
 - error / empty / loading states — S5 enumerates all four failure directions; S6 makes each visible.
 - observability — S6. An operator who declared a raise and did not get one is told which key was
@@ -207,8 +273,11 @@ watching and content.
   and the denial names the declared bound rather than the shipped one.
 - **AC3** — When a fixture declares `LENS_CAP=8` with NO attribution line, an eight-lens script is
   denied at 5 and the hook's message names the ignored key.
-- **AC4** — When the same fixture adds `# RAISED 5 -> 8 (owner, <a date>): <a reason>` above the
-  key, the eight-lens script is allowed.
+- **AC4** — When the same fixture adds `# LENS_CAP RAISED 5 -> 8 (owner, 2026-08-18): <reason>`
+  within five lines above the key, the eight-lens script is allowed; when the line omits the key,
+  or names `VERIFIER_CAP` instead, the lens raise stays unapplied at 5. Rev-3's criterion tested
+  the exact unkeyed line its own S4 forbids, so a builder could satisfy one only by failing the
+  other.
 - **AC5** — When a fixture declares a non-numeric or negative value, `bash
   tools/hooks/agent-cap.test.sh` observes the shipped constant applying and the hook's message
   saying the declaration was unusable.
@@ -218,19 +287,20 @@ watching and content.
 - **AC7** — When a raise lands in `.agent-cap.conf` without the shaped justification, `python
   tools/drift-audit/selftest.py` observes a weakened ratchet — over a fixture whose BASE carries
   the file, since a base without it is the case `drift_report.py` skips.
-- **AC10** — When a declaration is present, malformed, and the resulting fan-out is ALLOWED,
+- **AC8** — When a declaration is present, malformed, and the resulting fan-out is ALLOWED,
   `bash tools/hooks/agent-cap.test.sh` observes the stderr report naming the key. This is the
   arm for S6's correction, and it is the case the first draft could not observe at all.
-- **AC11** — When `bash tools/check-playbook-parity.sh` runs, the `MAX_LENSES` pair still
+- **AC9** — When `bash tools/check-playbook-parity.sh` runs, the `MAX_LENSES` pair still
   resolves, and when `python tools/govkit/govkit.py selfcheck` runs, the two new files are
   declared rather than an undeclared widening of the shipped surface.
-- **AC8** — When `diff tools/hooks/agent-cap.js .claude/hooks/agent-cap.js` runs, it is empty.
-- **AC9** — When `bash tools/workflows/check-verifier-fanout.sh` runs, it enforces the declared
+- **AC10** — When `diff tools/hooks/agent-cap.js .claude/hooks/agent-cap.js` runs, it is empty.
+- **AC11** — When `bash tools/workflows/check-verifier-fanout.sh` runs, it enforces the declared
   bound, which it inherits by delegating to the hook rather than by reading the file itself.
 
 ## 7. Gates
 
-`bash tools/hooks/agent-cap.test.sh` · `bash tools/check-playbook-parity.sh` · `python
+`bash tools/hooks/agent-cap.test.sh` · `bash tools/check-agent-cap-restatement.sh` · `bash
+tools/check-agent-cap-restatement.test.sh` · `bash tools/check-playbook-parity.sh` · `python
 tools/govkit/govkit.py selfcheck` · `python tools/govkit/selftest.py` · `bash
 tools/workflows/check-verifier-fanout.sh` · `bash
 tools/workflows/check-verifier-fanout.test.sh` · `bash tools/workflows/check-protocol-parity.test.sh`
@@ -271,6 +341,17 @@ RESOLVED (owner, 2026-08-18): the shaped comment line, and the repo root for the
   refusal message this build makes false. S12 and S13 are gates the unit would otherwise have
   redded: the playbook-parity extraction and the deployer's surface declaration. Section 4's
   root-versus-kit justification was false and is replaced with the one that survives measurement.
+- rev-4 · 2026-08-18 · folded spec-audit round 2. The ratchet S4b assigns the arithmetic to is
+  KEY-BLIND — one attribution line justifies all three raises, reproduced by execution — so S4c
+  makes it key-aware and `drift_report.py` joins the write set it was missing from. S4 states the
+  five-line window it had only promised to state, and says it is independent of unit 3's lookback.
+  S2a admits the second walk this unit does write, because the existing resolver collapses linked
+  worktrees on purpose. S2c adds the Workflow fixture isolation that does not exist, without which
+  no fixture criterion here is observable. S2b takes the reads-it half of unit 5's predicate under
+  the owner's split-by-landing. S13 was wrong about govkit: a root dotfile is outside the declared
+  surface, so the example ships from the kit dir instead, and there are three new files not two.
+  Section 4's claim that the protocol's section 9 names human diff review as the binding control
+  was false and is corrected against what it actually says. AC4 tested the unkeyed line S4 forbids.
 - rev-3 · 2026-08-18 · both forks put to the owner and RESOLVED: the shaped comment line, and the
   repo root. No design change — the owner ratified what section 4 already argued for.
 

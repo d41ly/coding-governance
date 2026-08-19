@@ -2,13 +2,18 @@
 
 ```toml
 feature = "install-prefix"
-title = "tools/<kit>/ is the declared install prefix, and the gate that keeps shipped files honest"
+title = "dead paths in shipped text — the wrong-prefix half and the deleted-file half, and the two gates that hold them"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["install-prefix (shipped surface)", "install-prefix self-test"]
+gate-legs = [
+  "install-prefix (shipped surface)",
+  "install-prefix self-test",
+  "dead-path carriers (deleted files still named)",
+  "dead-path carriers self-test",
+]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -23,6 +28,9 @@ globs = [
   "tools/check-install-prefix.sh",
   "tools/check-install-prefix.test.sh",
   "tools/install-prefix-waivers.txt",
+  "tools/check-dead-paths.sh",
+  "tools/check-dead-paths.test.sh",
+  "tools/dead-path-waivers.txt",
 ]
 ```
 
@@ -44,6 +52,35 @@ rule-set document with seven kit paths that resolve to nothing in their tree, an
 exited 0 over it. The check designed to catch exactly that — dead repo-path citations — was
 structurally blind, because it classified a token as a repo path only when its first segment was a
 tracked top-level directory, and at a prefixed install a bare kit name is not one.
+
+## The other half of the class — a path dead because it was DELETED
+
+`check-install-prefix.sh` holds a path that resolves nowhere because it is spelled at the wrong
+PREFIX. `check-dead-paths.sh` holds the other half: a path that resolves nowhere because the file was
+deleted. They are one class — a sentence nothing executes — and they are two gates because the
+populations are derived from different sources and neither derivation can see the other's defect.
+
+MEASURED, which is why the second gate exists. The v3.0 charter convergence deleted two companion
+files and ELEVEN carriers kept naming them: the repo's front door, the charter every session reads,
+the install runbook twice, a kit README an adopter receives, the kickoff engine's hand-back offer,
+two self-test rule citations, a registry reason string, and `check-template-size.sh`'s own over-budget
+REMEDY — a message that fires 1.4 KiB from the ceiling, at the one moment someone needs a followable
+instruction. Four of the eleven sat on a line the same diff edited: the filename was updated and the
+clause beside it was not.
+
+THE NEEDLES ARE DERIVED FROM GIT, never listed: basenames this repo once tracked and no longer
+tracks, plus each one's distinctive tail, minus any that still suffix a tracked path. That derivation
+is what holds the false-positive rate at zero. The alternative — flagging any path-shaped token that
+does not resolve — was measured at 217 hits, essentially all legitimate fixture literals inside
+Python selftests, and would have been waived into uselessness on day one.
+
+WHAT IT DOES NOT CATCH, recorded because a reader who over-trusts it is worse off than one who does
+not use it: it matches FILENAMES. Three of the eleven carriers named the deleted thing in prose with
+no filename — "per its customize companion", "its own 'Customize before use' block", "the product
+template + its two companions" — and those were found by reading, not by the gate. It is a floor.
+
+`memory/` is out of scope by rule, not convenience: specs, reviews and archived snapshots are
+append-only records describing what WAS true, and rewriting one to please a gate falsifies the record.
 
 ## Shared seams
 
@@ -71,6 +108,11 @@ covered the day it lands rather than the day someone remembers to add it to a li
   them, which is why removing one is a behaviour change rather than a cleanup.
 
 ## Reuse affordance
+
+seam: check-dead-paths.sh — reuse whenever a repo must forbid naming something it DELETED: derive
+the needle set from `git log --diff-filter=D`, subtract every basename the tree still carries, and
+anchor the derivation on a frozen sentinel so an empty needle set reds instead of reporting clean.
+Extend by widening the haystack; the sentinel is what stops it going quietly vacuous.
 
 seam: check-install-prefix.sh — reuse whenever a repo must forbid a SPELLED path in files it ships
 rather than in files it runs: derive the population from `git ls-files`, derive the alternation from

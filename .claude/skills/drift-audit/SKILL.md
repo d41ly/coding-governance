@@ -54,7 +54,7 @@ findings. They did not originate the most consequential ones. That is the whole 
 
 ---
 
-## Tier 1 — targeted, one wave, ≤5 agents
+## Tier 1 — targeted, one wave, within the hook's bound
 
 Use when Tier 0 moved a signal and you want to know *why*, or when you suspect a specific instrument
 is blind. Not for open-ended discovery.

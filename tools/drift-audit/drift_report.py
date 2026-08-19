@@ -134,7 +134,32 @@ def load_project_layer(root: pathlib.Path):
 #
 # The base value is taken with `git show`, so this compares against the commit the branch forked
 # from, not against a working copy the same run could have edited.
-_RATCHET_LOOKBACK = 14
+# The SHIPPED default. An adopter overrides it by declaring RATCHET_LOOKBACK in their project
+# layer beside the ratchets it governs — NOT in a conf, because this module's own docstring commits
+# to no second conf and a key in an unrelated kit's conf is the objection TOOL-aDeclaredCeiling-1
+# ratified. The window's width is a statement about a repo's COMMENT DENSITY: too narrow and a
+# justification written above the pin falls outside it, too wide and a justification for a
+# DIFFERENT pin further up is read as this one's. This repo has two pins three lines apart at the
+# same value, which is the case that makes the second half real.
+DEFAULT_RATCHET_LOOKBACK = 14
+
+
+def _read_lookback(proj) -> int:
+    """The project layer's RATCHET_LOOKBACK, or the shipped default — a NAMED refusal otherwise.
+
+    Absent is the default, so a layer written before this key keeps working and does not fail to
+    import. Present-but-nonsense is a refusal on the same channel `load_project_layer` uses for a
+    missing required attribute, rather than an arithmetic surprise two frames down inside a slice.
+    """
+    raw = getattr(proj, "RATCHET_LOOKBACK", None)
+    if raw is None:
+        return DEFAULT_RATCHET_LOOKBACK
+    if not isinstance(raw, int) or isinstance(raw, bool) or raw < 1:
+        raise DriftError(
+            f"drift_signals.py declares RATCHET_LOOKBACK = {raw!r}; it must be a positive integer "
+            f"number of lines, or absent to take the shipped {DEFAULT_RATCHET_LOOKBACK}"
+        )
+    return raw
 
 
 def _scalar_at(text: str, key: str):
@@ -159,17 +184,17 @@ def _scalar_at(text: str, key: str):
     return None, None
 
 
-def _justified(text: str, at: int, old: int, new: int) -> bool:
-    """A comment near the pin naming BOTH numbers, in `<old> -> <new>` form."""
+def _justified(text: str, at: int, old: int, new: int, lookback: int) -> bool:
+    """A comment within `lookback` lines above the pin naming BOTH numbers, `<old> -> <new>`."""
     lines = text.splitlines()
     want = re.compile(r"\b" + str(old) + r"\b\s*(?:->|→|to)\s*\b" + str(new) + r"\b")
-    for line in lines[max(0, at - _RATCHET_LOOKBACK): at + 1]:
+    for line in lines[max(0, at - lookback): at + 1]:
         if want.search(line):
             return True
     return False
 
 
-def ratchet_findings(git: "Git", root: pathlib.Path, ratchets) -> list[str]:
+def ratchet_findings(git: "Git", root: pathlib.Path, ratchets, lookback: int = DEFAULT_RATCHET_LOOKBACK) -> list[str]:
     out: list[str] = []
     for r in ratchets or ():
         path, key, weakens = r["file"], r["key"], r["weakens"]
@@ -185,12 +210,12 @@ def ratchet_findings(git: "Git", root: pathlib.Path, ratchets) -> list[str]:
         weaker = now > was if weakens == "up" else now < was
         if not weaker:
             continue                      # a tightening ratchet is always free
-        if not _justified(head_txt, at, was, now):
+        if not _justified(head_txt, at, was, now, lookback):
             out.append(
                 f"{path}: {key} moved {was} -> {now}, which WEAKENS it, with no justification "
                 f"beside it. A raise and a drain are indistinguishable to the gate that owns this "
                 f"number — write why, naming both values as '{was} -> {now}', within "
-                f"{_RATCHET_LOOKBACK} lines above it."
+                f"{lookback} lines above it."
             )
     return out
 
@@ -840,6 +865,13 @@ def main(argv: list[str] | None = None) -> int:
         root = repo_root()
         conf = load_conf(root)
         proj = load_project_layer(root)
+        # RESOLVED HERE, beside the other project-layer reads, and not at the --check call site.
+        # An unusable RATCHET_LOOKBACK raised DriftError out of main() from there: a raw traceback
+        # and rc=1, which is the leg's "a gateable signal is over its pin" exit -- so a config error
+        # reported itself as drift. The docstring promised a refusal on this channel; this is the
+        # line that keeps it. It also means the key is validated on EVERY run, not only under
+        # --check, which is the run an adopter is told to make first.
+        lookback = _read_lookback(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
@@ -905,7 +937,7 @@ def main(argv: list[str] | None = None) -> int:
         # rule with no exception here would red every fresh adopter on their first run. The exception
         # is enumerated in the project layer, never inferred.
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
-        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()))
+        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]

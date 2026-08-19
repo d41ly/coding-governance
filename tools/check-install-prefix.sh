@@ -44,7 +44,7 @@ alt=$(printf '%s' "$kits" | tr '\n' '|'); alt=${alt%|}
 # paths, so a root spelling there becomes a root install in every repo that follows it. Highest
 # leverage member of the set, not an edge case.
 files=$(git ls-files -- 'tools/*' 'skills/*' '.githooks/*' '*.template.*' '*.fragment.json' \
-                       'parallel-coding-governance.*' 'WIRE-INTO-PROJECT.md' \
+                       'coding-governance-agents.template.md' 'WIRE-INTO-PROJECT.md' \
         | grep -vE '(\.test\.sh|\.test\.py|selftest\.py|\.conf\.example)$' \
         | grep -vE '^tools/(check-install-prefix\.sh|install-prefix-waivers\.txt)$')
 [ -n "$files" ] || { echo "install-prefix: the shipped surface is empty — that is not a pass"; exit 1; }

@@ -43,7 +43,7 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
-CORE_FLOOR="10:6"
+CORE_FLOOR="12:8"
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
@@ -59,7 +59,7 @@ KICKOFF_EXITS=""
 # that key has a recorded failure where ONE malformed spelling disarms BOTH its pins while the
 # conf still looks configured, and a third field would make one typo disarm three.
 DIRECTIVES_EXTRA=""
-DIRECTIVES_FLOOR="11"
+DIRECTIVES_FLOOR="13"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
 # resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`
@@ -71,6 +71,11 @@ DIRECTIVES_FLOOR="11"
 # a branch push is not gated by the pre-push hook; the bar's BASE check widens for EVERY adopter,
 # because this file is a working-tree file the run can commit and so the leg cannot read it; and
 # roster integrity stops being enforceable on the branch anchor. Protocol section 1 carries them.
+# TOOL-aPromptedMandate-5 - this key also gates the Skill's PROMPT start path. Left blank (the
+# default, and what this example ships) a run can only be started from a build folder somebody
+# already landed; the prompt path is rendered as unavailable and says so, rather than printing a
+# procedure that ends in a refusal. Declaring `published` turns it on and accepts the three costs
+# section 1 of the protocol enumerates.
 ANCHOR_SCOPE=""
 
 PHASES_EXTRA=""

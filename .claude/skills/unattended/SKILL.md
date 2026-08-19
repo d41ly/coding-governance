@@ -24,19 +24,27 @@ distinction real.
    it; none of them restates one, and a cell here that grew into a rule would be a defect in this
    table rather than a second source of truth.
 
-   | Handle | What it names | Carrier | From |
-   |---|---|---|---|
-   | `minimal-prose` | the transcript rule under a mandate | M10 | D1 |
-   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | D2 |
-   | `forks-resolved` | when open questions are settled | M3 | D3 |
-   | `specs-reviewed` | the spec audit that precedes code | M4 | D4 |
-   | `reuse-first` | the recall and reuse obligation | M5 | D5 |
-   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | D6 |
-   | `passes-committed` | the commit boundary | M6 | D8 |
-   | `diff-reviewed` | the closing review of the cumulative diff | M8 | D7 |
-   | `land-once-done` | when a build may land | M8 | D8 |
-   | `conflicts-reconciled` | merge-conflict disposition | M8 | D8 |
-   | `wrap-up-derived` | how the wrap-up is composed | M9 | D8 |
+   | Handle | What it names | Carrier | Scope | From |
+   |---|---|---|---|---|
+   | `minimal-prose` | the transcript rule under a mandate | M10 | all | D1 |
+   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | all | D2 |
+   | `forks-resolved` | when open questions are settled | M3 | all | D3 |
+   | `specs-reviewed` | the spec audit that precedes code | M4 | all | D4 |
+   | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
+   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | all | D6 |
+   | `passes-committed` | the commit boundary | M6 | all | D8 |
+   | `diff-reviewed` | the closing review of the cumulative diff | M8 | all | D7 |
+   | `land-once-done` | when a build may land | M8 | all | D8 |
+   | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
+   | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
+   | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
+   | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+
+   **`Scope`** is which runs a directive binds. `all` binds every unattended run; `prompt` binds only
+   a run whose build README declared `authorized-by: prompt`, because research and a solution test
+   are obligations of a build whose solution was not given. A waiver of a `prompt`-scoped handle is
+   REFUSED on a slug-authorized run rather than recorded, since it would relax a rule that never
+   bound it.
 
    Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
    against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,
@@ -44,10 +52,15 @@ distinction real.
    NAME the waiver, or the skip leaves no trace at all. **`land-once-done`** — waiving it does not
    remove the Definition-of-Done item that observes completeness; that still owes an override at
    close.
-1. **The build folder IS the authorization — you do not write one, and neither does the owner.** A
-   `memory/builds/<slug>/README.md` committed before your branch existed is the whole
-   precondition. Preflight refuses a build folder you created, because a run that authorizes itself
-   has no authorization. You also do not create the run-state file: preflight does that.
+1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
+   `memory/builds/<slug>/README.md` that resolves at the anchor this project declares is the
+   whole precondition. **This project's anchor scope is `published`.**
+   On the **default-branch** anchor that means committed before your branch existed, and preflight
+   REFUSES a build folder you created — a run that authorizes itself has no authorization. Where the
+   project declares **published**, the tip the remote advertises for your OWN branch also counts, so a
+   run may author its build folder and push it; protocol section 1 states what that costs, and the
+   run-state file records which anchor was used. You still do not create the run-state file:
+   preflight does that.
    **If the build is not on the default branch, PUSH YOUR BRANCH FIRST.** Where the project declares
    `ANCHOR_SCOPE="published"`, a build folder that does not resolve at the merge-base is looked for
    at the tip the remote advertises for the branch you are on — so an unpushed commit authorizes
@@ -110,6 +123,64 @@ distinction real.
    It buys the orientation preflight does not: the manifest audit, the pointer map, the tier rule,
    and the dated corrections and environment traps that repo has front-loaded. Skip it silently if
    the project has no such skill — that is legal, and this kit states none of what it carries.
+
+## Start a run from a PROMPT
+
+**Only when the invocation carries the authorizing parameter.** Prose alone is not an unattended
+build, however unattended it sounds — the parameter IS the authorization gesture, and inferring it
+from wording would let a description of a build start one. No parameter, no prompt path; use the slug
+path above or do ordinary attended work.
+
+**This project's anchor scope is `published`, and this path needs `published`.** Under
+`default-branch` there is no anchor a build folder you author can resolve at, so every step below
+would end in the refusal step 1 names, with its remedy inert. If the value above is not `published`,
+say so and stop — do not start, and do not write a build folder nothing can authorize.
+
+The steps are ORDERED and the order is the point. Everything before the push is provably older than
+the commit that authorizes the run; everything after it is contemporaneous with a run already
+authorized. That is what makes "the owner was asked at the start" a property of the commit graph
+rather than a claim in a transcript nobody reads.
+
+1. **Orient from the prose**, in the `/session-kickoff` manner — steps 0 to 4 of that engine. Derive
+   every field you can from the prose, the memory tree and the code. Do not ask yet.
+2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's, not this file's:
+   `bash <check-script> --task-skeleton` prints it. **ACCEPTANCE and GATES are disqualifying** — a
+   unit with no observable that proves it is not Ready, and no run can split it. Any other gap is
+   askable, and askable once.
+
+   **THIS IS THE ONLY OWNER TURN THERE IS.** One `AskUserQuestion`, every gap in it, four options
+   maximum per call because that is the call's own limit. Not one call per gap: the owner is trying
+   to walk away. From step 3 onward there is nobody to answer, and no verb will take an answer.
+
+   If ACCEPTANCE or GATES is still missing after the ask, **stop without writing anything**. No run
+   has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
+   file, and the kickoff engine's Step 5b exit 5 does not reach here — it is scoped to a run already
+   started. Nothing staged, nothing committed, nothing to clean up.
+3. **Write the build folder.** `memory/builds/<slug>/README.md`. **Front matter needs ALL
+   SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
+   **`authorized-by: prompt`**, the key recording which discipline bound this run, which the merge
+   bar re-derives from this same file. **And the body needs the generated-region marker pair**,
+   `<!-- gen:build-index -->` and its close, or preflight refuses at step 5 with *the build README's
+   generated markers are malformed*: the unit list is DERIVED from that region, so an unpaired marker
+   is not something the driver guesses around. Every one of these is checked AFTER the push, where
+   there is no owner turn left to ask about it. Carry the
+   owner's prose VERBATIM under its own heading, and every clarification with its answer. The roster
+   may be provisional: a roster that grows after preflight draws no refusal on this anchor, because
+   your own push re-satisfies the comparison.
+4. **Commit, then PUSH THE BRANCH.** Both, in that order. Skip the push and preflight refuses with
+   `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`
+   — read here so you do not have to diagnose it there.
+5. **Preflight**, exactly as the slug path does. It records the mode from the file you just pushed.
+6. **The kickoff hand-back**, at the slug path's step 5 and for its reason.
+
+**After any later roster change, commit AND PUSH before the next authorization read.** The roster
+comparison holds on this anchor only because you re-push; a roster grown and committed but not pushed
+is the ordinary state after research, and it blocks `--close` on `authorization-reachable` with no
+override available and nobody to interpret it.
+
+**The research and test obligations bind this path and not the slug path** — `researched` and
+`solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
+which is where the loop is stated.
 
 ## While it runs
 

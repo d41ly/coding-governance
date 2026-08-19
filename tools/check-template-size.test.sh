@@ -7,7 +7,7 @@
 #
 # WHY THIS EXISTS. Until this file landed, the gate had no test anywhere in the repo, no
 # `fail()` helper and therefore no entry in check-arms.py's population: its failing case had never
-# been observed by any committed harness. `parallel-coding-governance.domain-rules.md:44-45` — "a
+# been observed by any committed harness. `coding-governance-agents.template.md` §7 — "a
 # gate you have only ever seen pass is an assertion about nothing." The debt was paid at the moment
 # the gate's constant changed, because that is exactly when an unproven gate is most likely to be
 # silently wrong.
@@ -30,7 +30,7 @@ set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE="tools/check-template-size.sh"
-TEMPLATE="parallel-coding-governance.template.md"
+TEMPLATE="coding-governance-agents.template.md"
 fails=0
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -78,7 +78,7 @@ printf 'harness    shipped limit read from the gate: %s\n' "$LIMIT"
 # --- A0 · the SHIPPED ceiling, pinned to a literal ------------------------------------------
 # Deriving the limit (above) is right for the boundary arms — it keeps them honest about the
 # override paths — but it means NO arm pins the number itself. Mutating the default to 131072 or
-# to 40000 leaves every other arm green in both directions, on the one constant this whole build
+# to 47000 leaves every other arm green in both directions, on the one constant this whole build
 # was convened to change. This arm is the literal, and it is deliberately the only one.
 EXPECT_LIMIT=49152
 if [ "$LIMIT" = "$EXPECT_LIMIT" ]; then
@@ -92,19 +92,24 @@ fi
 # Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
 # its legs concurrently, so an arm that mutates a tracked file races every other leg.
 LIM="$TMP/limits"
-printf '%s	%d
-' "parallel-coding-governance.template.md" 40000 > "$LIM"
-# 40000 is deliberately NOT the hard default. The declared value and the default are both 49152 in
-# the shipped tree, so an arm using 49152 would pass whether or not the declaration is read at all —
-# 49152 -> 49152 proves nothing. That is the assertion-between-two-derived-values class one step
-# removed, and it is what the first draft of this arm did.
-expect_out "A14 the DECLARED row supplies the limit"   "/ 40000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
-expect_out "A15 a positional beats the declaration"   "/ 45000 bytes" 0 bash "$GATE" "$TEMPLATE" 45000 "" "$LIM"
+# The fixture limit is DERIVED from the subject's real size, never typed. It has rotted TWICE: it
+# read 40000, then 47000, and each time the charter grew past it the two precedence arms red on the
+# OVER-BUDGET branch instead of printing the resolved limit — so they stopped measuring precedence
+# and started measuring a stale constant, silently. A precedence fixture has two constraints, not
+# one: it must differ from the gate's hard default AND sit above the file. Both are now properties
+# of the derivation rather than of somebody's memory.
+_subj_bytes=$(tr -d '\r' < "$TEMPLATE" | wc -c | tr -d '[:space:]')
+LIM_VALUE=$((_subj_bytes + 1000))
+if [ "$LIM_VALUE" -eq 49152 ]; then LIM_VALUE=$((LIM_VALUE + 1)); fi   # never collide with the default
+printf '%s	%d\n' "coding-governance-agents.template.md" "$LIM_VALUE" > "$LIM"
+expect_out "A14 the DECLARED row supplies the limit"   "/ $LIM_VALUE bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
+A15_POS=$((_subj_bytes + 2000))
+expect_out "A15 a positional beats the declaration"   "/ $A15_POS bytes" 0 bash "$GATE" "$TEMPLATE" "$A15_POS" "" "$LIM"
 # The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
 out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
 case "$out" in
-  */\ 40000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
-  *) say_fail "A16 the declaration beats the environment" "expected 40000; got: $out" ;;
+  *"/ $LIM_VALUE bytes"*) say_ok "A16 the declaration beats the environment" ;;
+  *) say_fail "A16 the declaration beats the environment" "expected $LIM_VALUE; got: $out" ;;
 esac
 # A subject with NO row falls through to the environment, then to the default.
 mkfile 100 "$TMP/undeclared"

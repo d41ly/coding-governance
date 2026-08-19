@@ -24,6 +24,14 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+# The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
+# that can be absent, so blank turns each of them off; this one SELECTS between two section canons
+# and check 12 must pick one for every spec it grades. An empty string compares earlier than every
+# date, so a blank declaration would silently demand the ten-section canon of every grandfathered
+# spec in the tree — which is the one thing the cutoff mechanism exists to prevent. Blank therefore
+# resolves FORWARD to this value, below the conf source (TOOL-aDeclaredBound-2).
+SPEC10_CUTOFF="2026-08-04"  # date; specs dated >= this take the TEN-section canon (check 12)
+_SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback below needs no second literal
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -38,25 +46,33 @@ BUILD_README_CAP_BYTES=25600  ; BUILD_README_CAP_LINES=0
 # than a rotation, so inheriting a relaxed index cap would loosen the one class that cannot rotate.
 # Only reached where a codebase map is adopted; the selector is guarded on a non-empty MAP_SUB.
 DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
+# Check 7's ENTRY budget, per class, on the same footing (TOOL-aDeclaredBound-1). Characters, not
+# bytes: `length()` decides this verdict and whether it counts characters or bytes is a property of
+# the awk build and the ambient locale, which check 7 deliberately does not pin.
+ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
+: "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
 # the sibling classifier that asks this script for the index set gets a non-zero exit it turns into
 # its own named refusal rather than a set derived under a conf this script would not accept. This is
 # an ABORT, not a check failure: a gate that cannot read its own thresholds has not found a hygiene
 # regression, it has failed to run. Same channel and status as the no-python abort below.
 _capbad=""
-for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES DOSSIER_CAP_BYTES DOSSIER_CAP_LINES; do
+for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_README_CAP_BYTES BUILD_README_CAP_LINES DOSSIER_CAP_BYTES DOSSIER_CAP_LINES ENTRY_CAP_CHARS BUILD_README_ENTRY_CAP_CHARS; do
   eval "_v=\${$_k-}"
   case "$_v" in
     *[!0-9]*|"") _capbad="$_capbad $_k='$_v' (not a whole number)"; continue ;;
   esac
   # ARITHMETIC, not a literal match. `case ... in 0)` accepted "00" and "020", which awk's `+0` belt
   # then coerced to zero — the exact silent-green this guard exists to stop, one leading zero away.
+  # A zero LINE cap means "no independent line cap" and is legal. A zero BYTE or CHAR cap is not:
+  # it reds every file in its class, which reads as a misconfiguration and never as an intent.
   case "$_k" in
     *_BYTES) [ "$_v" -eq 0 ] && _capbad="$_capbad $_k='$_v' (a zero byte cap reds every file in its class)" ;;
+    *_CHARS) [ "$_v" -eq 0 ] && _capbad="$_capbad $_k='$_v' (a zero entry budget reds every line in its class)" ;;
   esac
 done
-[ -n "$_capbad" ] && { echo "HYGIENE — cannot run: check 6 cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
+[ -n "$_capbad" ] && { echo "HYGIENE — cannot run: size cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
 # CONVERGED. This branch (TOOL-aRelaxedShard-1) built the same feature independently and arrived at
 # two byte-only keys with blank resolving FORWARD to a shipped default. main's scheme is kept because
 # it is strictly more general — both axes of every class — and because its validation caught a trap the
@@ -390,7 +406,7 @@ index_set() {
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
     # A BUILD README is ROWS, not prose — TOOL-aWidenedGuide-1 split the cap by CLASS on exactly that
     # distinction, and after the generated surface landed this file is four rendered regions plus one
-    # bounded authored block. It carries its OWN tier below (BUILD_README_CAP_*, plus check 7's 350
+    # bounded authored block. It carries its OWN tier below (BUILD_README_CAP_*, plus check 7's
     # chars) rather than the row-document tier, which was measured against a corpus in which these
     # files were not members at all. The numbers live at the top of this file, declared once.
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/README\.md$"
@@ -425,7 +441,7 @@ if [ -n "$sel6" ]; then
   # A guide is prose the charter points a session at and reads end to end; for it a line limit is a
   # PROXY for the read budget rather than the budget itself — check 16's `READ_PATH_CEILING` is the real
   # one, measured in bytes, and it is not relaxed here. Every other class is a row set, and for a row set
-  # the line count was never the bound that bound: at check 7's 300-char entry budget a 250-line row
+  # the line count was never the bound that bound: at check 7's declared entry budget a 250-line row
   # document may hold 75,000 B, so the byte figure decided every real case and the line figure needed
   # rows averaging under 82 B. Measured over this corpus's backlog rows: 253.7 B.
   #
@@ -465,7 +481,7 @@ fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
 
-# 7 — entry budget ≤300 chars (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
+# 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
 #     not index rows — builds/*/RUN.md, whose standing-mandate block is quoted prose reproduced
 #     verbatim and must not be reflowed to fit an index budget — and, when the codebase-map kit is
 #     adopted under this tree, its dossiers/FOUNDATION (detail files).
@@ -490,12 +506,14 @@ sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
 done)
 bad7=""
 if [ -n "$sel7" ]; then
-  bad7=$(awk -v bp="$M/builds/" '
+  bad7=$(awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
     { f = $0; if (f == "") next
-      # PER-CLASS WIDTH. A build README is four rendered regions plus one authored block, and its
-      # widest authored lines sit between 300 and 331 — the tier is what buys those.
-      cap = 300
-      if (index(f, bp) == 1 && f ~ /\/README\.md$/) cap = 350
+      # PER-CLASS WIDTH, both declared. A build README is four rendered regions plus one authored
+      # block, and its widest authored lines were MEASURED between 300 and 331 — that measurement is
+      # why the class has its own tier, and it stays true whatever an adopter declares.
+      # +0 on both: awk compares an unset or non-numeric -v as a STRING, which reds nothing at all.
+      cap = ecc+0
+      if (index(f, bp) == 1 && f ~ /\/README\.md$/) cap = becc+0
       fence = ""; uln = 0; fm = 0; nl = 0
       while ((getline line < f) > 0) {
         sub(/\r$/, "", line)
@@ -522,7 +540,7 @@ if [ -n "$sel7" ]; then
       close(f)
     }' <<<"$sel7")
 fi
-[ -n "$bad7" ] && fail 7 "index entry lines over 300 chars:
+[ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 
 # 8 — status vocabulary on the backlog shards (grandfather: curation-debt.txt).
@@ -661,7 +679,11 @@ SPEC_CANON='## 1. Goal
 # §10 is date-gated exactly as the section canon itself is: a spec dated before SPEC10_CUTOFF keeps
 # the nine-section shape, so adopting reuse-audit never retroactively reds a landed spec. The kit
 # already ships tools/codebase-map/reuse_lookup.py; this is the check that makes anyone use it.
-SPEC10_CUTOFF="${SPEC10_CUTOFF:-2026-08-04}"
+# The DECLARATION moved up beside its three sibling cutoffs (TOOL-aDeclaredBound-2). It used to sit
+# here as `${SPEC10_CUTOFF:-<date>}`, which read the ENVIRONMENT after the conf had been sourced —
+# two channels for one value, and the only cutoff of the four with an env form. That form is
+# RETIRED: a conf declaration always won anyway, and an env override that outranks a committed
+# declaration leaves no diff behind.
 SPEC_CANON10="$SPEC_CANON
 ## 10. Reuse audit"
 # ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run

@@ -14,6 +14,50 @@
     ]
   },
   {
+    "name": "charter size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "AGENTS.md"
+    ]
+  },
+  {
+    "name": "micro-format definitions",
+    "argv": [
+      "bash",
+      "tools/check-microformats.sh"
+    ]
+  },
+  {
+    "name": "micro-format gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-microformats.test.sh"
+    ],
+    "guard": [
+      "tools/check-microformats.sh",
+      "tools/check-microformats.test.sh"
+    ]
+  },
+  {
+    "name": "line length",
+    "argv": [
+      "bash",
+      "tools/check-line-length.sh"
+    ]
+  },
+  {
+    "name": "line-length gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-line-length.test.sh"
+    ],
+    "guard": [
+      "tools/check-line-length.sh",
+      "tools/check-line-length.test.sh"
+    ]
+  },
+  {
     "name": "playbook parity",
     "argv": [
       "bash",
@@ -516,6 +560,17 @@
     ]
   },
   {
+    "name": "unattended cross-component",
+    "argv": [
+      "bash",
+      "tools/unattended/cross-component.test.sh"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/unattended/"
+    ]
+  },
+  {
     "name": "run-gates canary",
     "argv": [
       "bash",
@@ -575,6 +630,8 @@
       "tools/check-install-prefix.sh"
     ]
   },
+    {"name": "agent-cap restatement", "argv": ["bash", "tools/check-agent-cap-restatement.sh"]},
+    {"name": "agent-cap restatement self-test", "argv": ["bash", "tools/check-agent-cap-restatement.test.sh"]},
   {
     "name": "install-prefix self-test",
     "argv": [
@@ -584,6 +641,23 @@
     "guard": [
       "tools/",
       "tools/lib/"
+    ]
+  },
+  {
+    "name": "dead-path carriers (deleted files still named)",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.sh"
+    ]
+  },
+  {
+    "name": "dead-path carriers self-test",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.test.sh"
+    ],
+    "guard": [
+      "tools/"
     ]
   },
   {
@@ -694,7 +768,10 @@
       "tools/govkit/matrix.py"
     ],
     "guard": [
-      "tools/govkit/"
+      "tools/govkit/",
+      "tools/playbook/",
+      "tools/check-microformats.sh",
+      "tools/check-line-length.sh"
     ]
   },
   {
@@ -709,6 +786,27 @@
     "argv": [
       "bash",
       "tools/check-testsuite-counts.test.sh"
+    ]
+  },
+  {
+    "name": "playbook render wiring",
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--target",
+      ".",
+      "--check"
+    ]
+  },
+  {
+    "name": "playbook render selftest",
+    "guard": [
+      "tools/playbook/"
+    ],
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--selftest"
     ]
   }
 ]

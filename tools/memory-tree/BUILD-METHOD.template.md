@@ -5,8 +5,10 @@
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
-**Budget: ≤20 KB, ≤250 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤22 KB, ≤290 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
+It rose from ≤20 KB / ≤250 lines when M12 landed — an owner call, because the figure is a stated constraint of a
+governance carrier and M3's veto 2 makes changing one an owner turn rather than an agent's.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here
@@ -122,6 +124,9 @@ Two rules you cannot afford to look up: **a probe exits 0 on a miss**, so "nothi
 never a failure to retry with softer words; and **a hit can be STALE**, so verify any claim about current code
 against source before building on it and say in §10 where the two disagreed. The rest of the probe-failure
 taxonomy — blind layers, absent tools, which phrasing to try next — is in `{{KIT_DIR}}/README.md`.
+
+**"No existing seam fits" is where M12 begins.** A build whose solution is already chosen stops here; one
+started from an owner's prose has not chosen yet, and M12 is how it does.
 
 ## M6 — Passes, commits, parallelism
 
@@ -247,3 +252,32 @@ pointer table"**. The six are `skills/session-kickoff/SKILL.md`, `memory/TEMPLAT
 
 *The memory root is spelled `memory/` throughout; an adopter whose `MEMORY_ROOT` differs renames it here, the same
 caveat `HYGIENE.template.md` carries.*
+
+## M12 — Research, test, choose — when the solution is not given
+
+Reached from M5's "no existing seam fits", and only there. A build whose specs already name a solution passes
+through unchanged; one started from an owner's prose does not, because nobody has chosen yet.
+
+**This adds no PASS kind.** M6's set is closed and neither research nor testing is in it. The work happens INSIDE
+the passes that set does name — it is what "a spec authored" costs when the spec must decide between candidates
+first — and under a mandate the run occupies the `RESEARCHING` and `TESTING` positions while doing it. Commit
+boundaries and reground points stay exactly where M6 and M7 put them.
+
+**Find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
+three differing in MECHANISM is the shape; stop where a further candidate would differ only in detail. "Only one
+mechanism exists here" is a legitimate answer to RECORD, never a quota to fill — and it is a claim, so it owes the
+same evidence a pick does.
+
+**TEST before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
+refute it — a probe, a fixture, a measurement against the real tree — never by argument, and never by a test every
+candidate passes. Write down what would make each candidate LOSE before running anything: a test whose result
+cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar
+is full of gates against, one level up.
+
+**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after M3's
+vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your authority holds
+here too — a candidate set whose options differ in WHAT GETS BUILT is a scope fork, and scope is not delegated.
+
+**Record the LOSS, not just the win.** §10 already names the seam and the recall terms; this section adds one thing
+to it — for each candidate tested and rejected, the test that rejected it. A rejected candidate with no recorded
+test is indistinguishable from one nobody tried, and the next build pays to re-run it.

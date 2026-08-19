@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-19T17:36:09+03:00 @ b482cdca6466a56d77d96f7726a566ece19bacc9
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
-verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: fd8f6fa4a2fb89287a49a8581466b301625ffdf2
+last-audit: 2026-08-19T11:05:00+03:00 @ 960e3cd277c1ec55efe145fe1358cdd780269cf3
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
+last-body-change: 960e3cd277c1ec55efe145fe1358cdd780269cf3
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -52,7 +52,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
   ask, or a build folder committed before the run's branch existed (`memory/guides/UNATTENDED-PROTOCOL.md`).
-- **Governing docs:** `AGENTS.md` (the charter — authoritative) · `parallel-coding-governance.template.md`
+- **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
@@ -66,7 +66,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | the three `parallel-coding-governance.*` files · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker lockstep, TWO carriers) |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
@@ -132,7 +132,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   build can red check 16 on its own bookkeeping before it edits a guide. Read the margin
   from `python tools/memory-tree/corpus_ids.py --report`, never from the ceiling alone.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Prefer externalizing into `parallel-coding-governance.domain-rules.md` to
+  recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
 - Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
@@ -143,6 +143,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
   verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
   0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
+- A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
+  and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
+  `TOOL-aPromptedMandate-4`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
@@ -150,6 +153,13 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
   `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
   concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
+- A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
+  matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
+  zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.
+- Two constants that COINCIDE are not pinned equal. Ownership belongs to the one that CHANGES THE
+  OUTCOME — verify by moving it, not by reading it.
+- An exclusion is only as wide as the control it defers to, and a guard that a binding pair EXISTS
+  is not a guard that it COVERS. Prefer deleting an exclusion to widening its justification.
 - Editing `.claude/settings.json` takes effect MID-SESSION — hooks are re-read, not snapshotted at
   start. Measured 2026-08-10 with a throwaway `PreToolUse` hook that fired on the call which checked
   for it. Do not skip the liveness half of such a probe.
@@ -228,12 +238,3 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
   TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
   the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
-- `bash <gate> | tail -N` returns TAIL's exit status, so the idiom that makes a gate readable discards
-  the only thing it is for. It reported a RED bar as exit 0 twice in one session. Redirect to a file and
-  echo `$?`, never pipe a gate whose verdict you intend to read.
-- The verdict-epoch gate covers `gen_build_index.py`, not only the hygiene engine, and it reads git
-  HISTORY rather than the worktree: the three-place bump must be in a COMMIT at or after the engine
-  change. Editing the files and re-running it still reds.
-- A unit is not done when its arms are green. Every spec's own "Files touched" names documents — the
-  protocol pair, the rendered Skill, a backlog row, the kit version — and a build measured 1-of-5 on
-  those halves while every test suite passed. Sweep that list per unit before calling it built.

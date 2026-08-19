@@ -11,15 +11,19 @@
 #
 #   S1 kit coverage      — every tracked kit dir under tools/ is named in a playbook file or waived.
 #   S2 value parity      — a value the playbook STATES equals the source that OWNS it.
-#   S3 catalogue         — the placeholder counts customize.md states equal the measured sets.
+#
+# THERE IS NO S3. It asserted the placeholder arithmetic a deploy-time catalogue stated, and v3.0
+# deleted that catalogue along with the companion carrying it — the counts have no author left to
+# disagree with. Said here rather than left as a gap in the numbering, because a reader who trusts
+# a header enumerating a stage the script no longer runs believes the arithmetic is still checked.
 #
 # WHAT IT DOES NOT DO, said here rather than implied away: it holds STRUCTURAL claims only. A fluent
 # paraphrase that is subtly wrong still passes. Checking prose for accuracy in general is undecidable
 # and this gate does not pretend otherwise.
 #
-# ANTI-VACUITY IS THE LOAD-BEARING CONSTRAINT. `parallel-coding-governance.domain-rules.md` names the
-# failure this gate is most likely to have: "a coverage check that greps for a literal the real code
-# never spells … matches the empty set and passes checking nothing." Three arms guard it:
+# ANTI-VACUITY IS THE LOAD-BEARING CONSTRAINT. `memory/gotchas/vacuous-selector-empty-population.md`
+# owns the failure this gate is most likely to have: a selector that matches nothing prints nothing,
+# and nothing is exactly what a passing check prints. Three arms guard it:
 #   1. every S2 pair must extract a NON-EMPTY value on BOTH sides, or it reds as unresolvable;
 #   2. the S1 kit set must be non-empty AND contain the frozen sentinel `memory-tree`;
 #   3. the sibling self-test proves each arm reds, by feeding it a synthetic violation.
@@ -27,16 +31,19 @@ set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "playbook-parity: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
 
-TEMPLATE=parallel-coding-governance.template.md
-CUSTOMIZE=parallel-coding-governance.customize.md
-DOMAIN=parallel-coding-governance.domain-rules.md
+TEMPLATE=coding-governance-agents.template.md
+# The charter converged to ONE file at v3.0, so the kit-coverage haystack is the charter PLUS the
+# runbook, which is where the kit-adoption prose moved. TWO variables and a two-file precondition:
+# with no precondition on the runbook, an absent one reds every kit with a wrong reason instead of
+# exiting 2 with the right one.
+RUNBOOK=WIRE-INTO-PROJECT.md
 WAIVERS=${PLAYBOOK_KIT_WAIVERS:-tools/playbook-kit-waivers.txt}
 SENTINEL=memory-tree
 
 status=0
 fail() { printf 'PLAYBOOK-PARITY check %s FAILED — %s\n' "$1" "$2"; status=1; }
 
-for f in "$TEMPLATE" "$CUSTOMIZE" "$DOMAIN"; do
+for f in "$TEMPLATE" "$RUNBOOK"; do
   [ -f "$f" ] || { echo "playbook-parity: missing playbook file: $f"; exit 2; }
 done
 
@@ -71,7 +78,7 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 # when this comment was drafted and was 9 by the time the build landed, which is the same
 # stale-count defect one file over.
 named_in_playbook() { # <kit>
-  grep -qE "tools/$1/|\`$1/\`" "$TEMPLATE" "$CUSTOMIZE" "$DOMAIN" 2>/dev/null
+  grep -qE "tools/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
 }
 
 for k in $kits; do
@@ -105,6 +112,9 @@ done
 PAIRS="
 lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
+verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 "
 
 # The pair loop runs in a subshell (it is the right-hand side of a pipe), so its findings have to
@@ -146,38 +156,10 @@ while IFS='~' read -r tag label msg; do
 done < "$PPTMP"
 rm -f "$PPTMP"
 
-# ========================================================= S3 — catalogue arithmetic ============
-# The counts customize.md states must equal the measured placeholder sets. This is the check that
-# would have caught 23 + 14 = 37 against a stated 36.
-t_set=$(grep -oE '\{\{[A-Z_]+\}\}' "$TEMPLATE" | sort -u)
-d_set=$(grep -oE '\{\{[A-Z_]+\}\}' "$DOMAIN" | sort -u)
-t_n=$(printf '%s\n' "$t_set" | grep -c . )
-d_n=$(printf '%s\n' "$d_set" | grep -c . )
-u_n=$(printf '%s\n%s\n' "$t_set" "$d_set" | sort -u | grep -c . )
-shared=$(comm -12 <(printf '%s\n' "$t_set") <(printf '%s\n' "$d_set"))
-
-stated_total=$(sed -n 's/^\([0-9]\+\) in total.*/\1/p' "$CUSTOMIZE" | head -1)
-stated_t=$(sed -n "s/^### In \`$TEMPLATE\` — \([0-9]\+\).*/\1/p" "$CUSTOMIZE" | head -1)
-stated_d=$(sed -n "s/^### In \`$DOMAIN\` — \([0-9]\+\).*/\1/p" "$CUSTOMIZE" | head -1)
-
-if [ -z "$stated_total" ] || [ -z "$stated_t" ] || [ -z "$stated_d" ]; then
-  fail 8 "a stated placeholder count could not be extracted from the catalogue, so the arithmetic was never compared: total=${stated_total:-<none>} template=${stated_t:-<none>} companion=${stated_d:-<none>}"
-else
-  [ "$stated_total" = "$u_n" ] || fail 9 "the catalogue states a placeholder total that the measured union contradicts: says $stated_total, measured $u_n"
-  [ "$stated_t" = "$t_n" ]     || fail 10 "the catalogue states a template group size that the template contradicts: says $stated_t, measured $t_n"
-  [ "$stated_d" = "$d_n" ]     || fail 11 "the catalogue states a companion group size that the companion contradicts: says $stated_d, measured $d_n"
-fi
-
-# The intersection is checked STRUCTURALLY, not arithmetically: the file states two counts and a
-# total and never an intersection size, so an arithmetic check on it would compare against nothing.
-# Instead — the placeholder the file NAMES as shared must be exactly the measured intersection.
-named_shared=$(sed -n 's/.*\*\*[0-9]* shared: `\({{[A-Z_]*}}\)`\*\*.*/\1/p' "$CUSTOMIZE" | head -1)
-if [ -z "$named_shared" ]; then
-  fail 12 "the catalogue names no shared placeholder, so the structural intersection check had nothing to compare and would have passed vacuously"
-elif [ "$named_shared" != "$shared" ]; then
-  fail 13 "the placeholder the catalogue names as shared is not the measured intersection: names $named_shared, measured ${shared:-<none>}"
-fi
-
-[ "$status" -eq 0 ] && printf 'playbook-parity OK — %s kit(s) documented or waived · pairs in agreement · catalogue arithmetic holds (%s + %s over %s unique)\n' \
-  "$(printf '%s\n' "$kits" | grep -c .)" "$t_n" "$d_n" "$u_n"
+# The success line reads ONLY what the surviving stages assign. The catalogue stage above
+# assigned three counters this line used to print, and the script runs under `set -u` — so
+# deleting that stage without rewriting this line killed the gate with an unbound-variable
+# error instead of a verdict, which is the named-failure contract this tree enforces everywhere.
+[ "$status" -eq 0 ] && printf 'playbook-parity OK — %s kit(s) documented or waived · pairs in agreement\n' \
+  "$(printf '%s\n' "$kits" | grep -c .)"
 exit "$status"

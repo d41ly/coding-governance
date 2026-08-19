@@ -108,17 +108,19 @@ waived line unpins it, reddening a merge that touched nothing the waiver guards;
 whose text is gone reds as STALE, so a registry cannot quietly outlive what it excuses.
 
 **`check-placeholders.sh` asserts what is true of a SOURCE, not of a render.** In this repo the
-shipped playbook files ARE the un-instantiated templates and carry placeholders permanently by
+shipped playbook file IS the un-instantiated template and carries placeholders permanently by
 design, so a bare leg asserting "no placeholder survives" would red on its own landing commit. The
-bare mode therefore grades the CATALOGUE against the measurement — coverage, per-file tallies, the
-shared-placeholder declaration, and the marker lockstep — while the survival predicate lives in
-`--check <a> <b>` and runs only over fixtures. The render-side owner of survival already exists and
-stays where it is: `tools/govkit/entries/playbook.kit.toml`'s `playbook-placeholders` hole.
+bare mode therefore grades the version MARKER — present, and exactly one — while the survival
+predicate lives in `--check <a> <b>` and runs only over fixtures. The render-side owner of survival
+already exists and stays where it is: `tools/govkit/entries/playbook.kit.toml`'s
+`playbook-placeholders` hole.
 
-**TWO files carry the `governance-template` marker, not three.** `customize.md` is the deploy-time
-catalogue, is exempt from the shipped surface, and its only `vN.N` is prose. A gate built to "three"
-would compare a literal against a real version and red forever. That miscount reached a spec through
-a review fold and was caught only by measuring.
+**ONE file carries the `governance-template` marker as of v3.0, and the marker LOCKSTEP died with the
+second carrier.** It is not weakened, it is gone: a comparison over a population of one is not a
+comparison. The count has been miscounted in both directions — a spec once reached "three" through a
+review fold, when the deploy-time catalogue's only `vN.N` was prose and a gate built to three would
+have compared a literal against a real version and redded forever. Both miscounts were caught only by
+measuring, which is why the gate derives the count instead of asserting one.
 
 ## Shared seams
 

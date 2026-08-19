@@ -149,6 +149,12 @@ DECLARED_EMPTY: set[str] = {
 # watched. Ships EMPTY — seed it with the pins you actually keep.
 # --------------------------------------------------------------------------------------------
 
+# How many lines ABOVE a ratcheted pin this gate looks for the `<old> -> <new>` justification
+# that excuses a weakening move. Absent takes the kit's shipped 14. Widen it if your repo writes
+# long justifications above a pin; narrow it if your pins sit close together, so a justification
+# for a DIFFERENT pin cannot be read as this one's.
+# RATCHET_LOOKBACK = 14
+
 RATCHETS: list[dict] = [
     # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
 ]

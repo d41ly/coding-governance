@@ -28,48 +28,34 @@ arm() {
 TMPROOT=$(mktemp -d)
 trap 'rm -rf "$TMPROOT"' EXIT
 
-# ---- a fixture repo carrying a MINIATURE of the real playbook trio --------------------------------
-# Not a copy of the real files: a fixture that mirrors production drifts with it and stops testing
-# the predicate. Three placeholders, one of them deliberately shared.
-mkfixture() { # $1 = dir, $2 = catalogue body
+# ---- a fixture repo carrying a MINIATURE of the real playbook file -------------------------------
+# Not a copy of the real file: a fixture that mirrors production drifts with it and stops testing
+# the predicate. ONE carrier since v3.0 — the companions the trio-shaped fixture used to write were
+# deleted, and writing them here kept two dead paths alive in a file nothing else read.
+mkfixture() { # $1 = dir
   local d="$1"
   mkdir -p "$d"
   printf '<!-- governance-template: v9.9 -->\n{{ALPHA}} and {{BETA}} and {{MEMORY_ROOT}}\n' \
-    > "$d/parallel-coding-governance.template.md"
-  printf '<!-- governance-template: v9.9 -->\n{{GAMMA}} and {{MEMORY_ROOT}}\n' \
-    > "$d/parallel-coding-governance.domain-rules.md"
-  printf '%s\n' "$2" > "$d/parallel-coding-governance.customize.md"
+    > "$d/coding-governance-agents.template.md"
   # autocrlf off in the fixture: this repo's own `.gitattributes` does not reach a temp dir, so a
   # Windows global setting would emit a LF-to-CRLF warning per file per case and bury the arms.
   ( cd "$d" && git init -q && git config core.autocrlf false && git add -A \
       && git -c user.email=t@t -c user.name=t commit -qm f )
 }
 
-GOOD_CAT='## Placeholders
-4 in total as a UNION. The two groups are not disjoint.
+# 1. the green case — the one carrier well-formed
+mkfixture "$TMPROOT/good"
+arm "green: the single marker carrier is present and well-formed" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
 
-Shared between both files: `{{MEMORY_ROOT}}`.
-
-### In `parallel-coding-governance.template.md` — 3
-`{{ALPHA}}` `{{BETA}}` `{{MEMORY_ROOT}}`
-### In `parallel-coding-governance.domain-rules.md` — 2
-`{{GAMMA}}` `{{MEMORY_ROOT}}`'
-
-# 1. the green case — both carriers agreeing
-mkfixture "$TMPROOT/good" "$GOOD_CAT"
-arm "green: both marker carriers agree" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
-
-# 2. the lockstep — the whole point of the marker
-mkfixture "$TMPROOT/marker" "$GOOD_CAT"
-sed -i 's/v9\.9/v8.8/' "$TMPROOT/marker/parallel-coding-governance.domain-rules.md"
-( cd "$TMPROOT/marker" && git add -A && git -c user.email=t@t -c user.name=t commit -qm m ) >/dev/null 2>&1
-arm "red: the two marker-carrying files disagree" 1 "disagree on governance-template" --   bash -c "cd '$TMPROOT/marker' && bash '$GATE'"
-
-# 3. marker PRESENCE, not just distinctness. Counting distinct markers alone reads "one file has a
-# marker and the other has none" as agreement — a comparison over a population of one.
-mkfixture "$TMPROOT/nomarker" "$GOOD_CAT"
-sed -i '/governance-template/d' "$TMPROOT/nomarker/parallel-coding-governance.domain-rules.md"
+# 2. marker PRESENCE. With one carrier this is the whole marker question: there is no second file to
+# be in lockstep WITH, so presence plus well-formedness is what survives.
+mkfixture "$TMPROOT/nomarker"
+sed -i '/governance-template/d' "$TMPROOT/nomarker/coding-governance-agents.template.md"
 ( cd "$TMPROOT/nomarker" && git add -A && git -c user.email=t@t -c user.name=t commit -qm n ) >/dev/null 2>&1
+cp -r "$TMPROOT/good" "$TMPROOT/twomarkers"
+printf '<!-- governance-template: v9.9 -->\n' >> "$TMPROOT/twomarkers/coding-governance-agents.template.md"
+arm "red: the one carrier holds more than one marker" 1 "rather than exactly one" --   bash -c "cd '$TMPROOT/twomarkers' && bash '$GATE'"
+
 arm "red: a shipped file carrying NO marker at all" 1 "carries NO governance-template marker" --   bash -c "cd '$TMPROOT/nomarker' && bash '$GATE'"
 
 # ---- AC10 — the survival predicate, fixtures ONLY ------------------------------------------------
@@ -84,10 +70,12 @@ arm "red: --check names a SURVIVING placeholder" 1 "SURVIVING PLACEHOLDER" -- \
 arm "red: --check names the placeholder itself" 1 "{{MEMORY_ROOT}}" -- \
   bash "$GATE" --check "$TMPROOT/filled-a.md" "$TMPROOT/unfilled-b.md"
 
-# The predicate must never be pointed at the tracked sources. This arm PROVES the bare leg and the
+# The predicate must never be pointed at the tracked source. This arm PROVES the bare leg and the
 # survival mode are different questions: the real template would fail --check and passes bare.
-arm "the tracked sources FAIL --check, which is why the bare leg does not run it" 1 "SURVIVING PLACEHOLDER" -- \
-  bash "$GATE" --check "$ROOT/parallel-coding-governance.template.md" "$ROOT/parallel-coding-governance.domain-rules.md"
+# The SECOND operand is the clean fixture, not the template again: passing one path twice would pass
+# identically if the loop read only `$2`, leaving the first-position iteration unproven.
+arm "the tracked source FAILS --check, which is why the bare leg does not run it" 1 "SURVIVING PLACEHOLDER" -- \
+  bash "$GATE" --check "$ROOT/coding-governance-agents.template.md" "$TMPROOT/filled-a.md"
 
 # ---- usage refusals ------------------------------------------------------------------------------
 arm "--check with one path is a usage refusal" 2 "usage:" -- bash "$GATE" --check "$TMPROOT/filled-a.md"

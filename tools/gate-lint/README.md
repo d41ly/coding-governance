@@ -32,7 +32,7 @@ step, or a pre-commit hook:
 python3 tools/gate-lint/ps-hygiene.py . || exit 1
 ```
 
-Run `--selftest` in the same place. Per `parallel-coding-governance.domain-rules.md` §7, a gate
+Run `--selftest` in the same place. Per `coding-governance-agents.template.md` §7, a gate
 whose failing case has never been observed is not a gate — `--selftest` is how this one proves it
 can still fail after a refactor.
 

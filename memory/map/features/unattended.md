@@ -8,14 +8,14 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring", "unattended adopter e2e"]
+gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended skill wiring", "unattended adopter e2e", "unattended cross-component"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
-  "inputs-inside-the-subjects-reach.md",
+  "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
 ]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
@@ -77,10 +77,12 @@ tree derives — seven of them, enumerated in the protocol's own section 2 rathe
 IN-PROGRESS while the generated region of the same build's README correctly reads CLOSED. The
 authored half rotted and the derived half did not.
 
-**The template is byte-gated and this feature is kit-conditional.** The playbook has ~190 bytes of
-headroom, so the unattended rules live in the domain-rules companion (§1) with two amended clauses in
-the template proper, both written to stay true for a non-adopting re-puller. A new universal-core
-section for an opt-in kit was rejected on both counts.
+**The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
+in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
+the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
+the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
+body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
+opt-in kit was rejected on both counts.
 
 **A run is bound by eleven named directives, and each is a POINTER.** The set is a kit constant the
 project may extend but not delete; the rules live in the build method and the contract names zero

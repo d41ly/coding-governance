@@ -22,7 +22,7 @@
 # units had cited as binding. At the reversal the file measured 32682 of 32768 — 86 bytes free — so
 # every edit had to be funded by externalizing prose; the raise removed that funding constraint and
 # the high-water ratchet replaced it as the thing that prices growth. The ceiling has moved ONCE.
-parallel-coding-governance.template.md	49152
+coding-governance-agents.template.md	49152
 
 # --- the kickoff engine -------------------------------------------------------------------------
 # 18432 = 18 KiB. It has never moved. The engine rides the same gate as the template because the
@@ -35,3 +35,18 @@ parallel-coding-governance.template.md	49152
 # `MAX_BYTES=999999` could not lift the engine to 48 KiB. Moving the number here without putting the
 # declaration above the environment would have silently undone that, which the spec audit caught.
 skills/session-kickoff/SKILL.md	18432
+
+# --- this repo's own rendered charter -----------------------------------------------------------
+# 64512 bytes. SEEDED FROM THE LANDED MEASUREMENT, not from a projection: the file measured 59847
+# at the commit that created it, and this ceiling is that plus roughly 4 KB of headroom. The spec
+# projected ~56 KB and a projection is not a measurement, which is why the row was written after the
+# render rather than before it.
+#
+# Over the WHOLE file, and the alternative was considered: measuring the charter MINUS its rendered
+# region would price only what gov adds and leave the region to the template's own 48 KiB gate. It
+# was rejected because the number that matters is what a session reads every turn, and that is the
+# whole file. The apparent double-count is the honest reading — if the ruleset grows 5 KB, this
+# charter really did become 5 KB more expensive to read.
+#
+# The headroom's one known consumer is line-wrapping in the ruleset, which re-renders through here.
+AGENTS.md	64512
