@@ -13,6 +13,8 @@ gate-legs = [
   "verifier fan-out",
   "verifier fan-out self-test",
   "review-protocol parity (kit vs dogfood)",
+  "agent-cap restatement",
+  "agent-cap restatement self-test",
 ]
 kits = ["hooks"]
 git-hooks = []
@@ -27,6 +29,9 @@ lexicon-verbs = []
 globs = [
   "tools/hooks/*",
   ".claude/hooks/agent-cap.js",
+  "tools/check-agent-cap-restatement.sh",
+  "tools/check-agent-cap-restatement.test.sh",
+  "tools/agent-cap-restatement-waivers.txt",
   "tools/workflows/check-verifier-fanout.sh",
   "tools/workflows/check-verifier-fanout.test.sh",
   "tools/workflows/check-protocol-parity.test.sh",
@@ -38,8 +43,9 @@ globs = [
 ## Constraints & why
 
 **The rule is the charter's, not this kit's.** `memory/guides/REVIEW-PROTOCOL.md` is BINDING and states
-two numbers, both 5: a review's verify stage spawns at most 5 agents TOTAL, and all fan-out runs at
-most 5 at once. This feature is the machinery that makes those numbers true rather than aspirational.
+two bounds: a review's verify stage spawns at most a stated TOTAL, and all fan-out runs at most a
+stated number at once. Both are resolved by `tools/hooks/agent-cap.js` rather than written in the
+document, so neither goes stale when a repo declares its own. This feature is the machinery that makes those numbers true rather than aspirational.
 The document and the predicate are one feature for that reason — a rule enforced by a predicate that
 disagrees with it is worse than no predicate.
 

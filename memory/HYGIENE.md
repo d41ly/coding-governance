@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.22 -->
+<!-- gov:kit memory-tree@2.23 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -58,7 +58,9 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
 ## Index budgets, caps, rotation
 
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
-  `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail
+  `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤
+  `ENTRY_CAP_CHARS` (300 by default); a build `README.md` gets its own tier,
+  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
@@ -158,7 +160,8 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    75,000 B, so the byte figure decided every real case — but the line figure DID bind on 22 of the 29
    members, every dossier among them, which is why dossiers became their own class rather than
    inheriting the relaxed index cap.
-7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
+7. **entry budget** — index entry lines ≤ `ENTRY_CAP_CHARS` (300 by default), a build `README.md`
+   ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at

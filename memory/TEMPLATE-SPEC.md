@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.22 -->
+<!-- gov:kit memory-tree@2.23 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -12,12 +12,22 @@ by filename date — never retrofit them.
 
 ## SPEC10_CUTOFF — how §10 is phased in
 
-`§10 Reuse audit` is required only for specs whose FILENAME date is on or after `SPEC10_CUTOFF`
-(default `2026-08-04`, set in `tools/memory-tree/check-memory-hygiene.sh`). Specs dated before it
-keep the nine-section canon, so adopting the reuse audit never retroactively reds landed work. It is
-env-overridable for adoption in a repo with a different history — raising it grandfathers more, and
-lowering it is how you'd ratchet an existing corpus forward. It is a merge-bar knob: changing it
-changes what the gate demands, so change it in a commit that says why.
+`§10 Reuse audit` is required only for specs whose FILENAME date is on or after `SPEC10_CUTOFF`,
+DECLARED in `.memory-tree.conf` beside the three other cutoffs and shipped at `2026-08-04`. Specs
+dated before it keep the nine-section canon, so adopting the reuse audit never retroactively reds
+landed work. Raising it grandfathers more; lowering it is how you ratchet an existing corpus
+forward. It is a merge-bar knob: changing it changes what the gate demands, so change it in a commit
+that says why.
+
+Unlike its three siblings, a BLANK declaration does not turn anything off — it resolves FORWARD to
+the shipped date. Those three each switch a rule on or off, while this one SELECTS between two
+section canons and the check must pick one for every spec it grades; an empty string compares
+earlier than every date, so blank-means-off would silently demand the ten-section canon of every
+grandfathered spec in the tree.
+
+There is no environment override. There was one until `TOOL-aDeclaredBound-2`, and it was the only
+one of the four cutoffs to have it: the read sat AFTER the conf was sourced, so a conf declaration
+already won and the env form bought nothing except a second channel that leaves no diff behind.
 
 ## STREAMS_CUTOFF — the discipline is a header field, not a directory
 
