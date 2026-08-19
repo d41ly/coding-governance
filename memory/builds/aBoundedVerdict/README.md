@@ -281,6 +281,23 @@ than to spend it. Writing `--landed` or `--abort` onto another node's record is 
 So it is parked and escalated, which is what a gate-red-out-of-scope halt names. Two prior runs in
 this corpus met the same class and both parked; this is the third.
 
+### The four parked decisions — the owner's turn this run did not take
+
+Each was parked through the verb, so `RUN.md` carries the question, the options seen and the
+reason. Enumerated here because the wrap-up derives from this file, and a parked entry the
+owner never reads is the "forgotten" the method says a bare park is indistinguishable from.
+
+| # | The question | What the run did instead |
+|---|---|---|
+| 1 | **The closing review's base**, now that the run has merged `origin/main`. M8 pins it to the run's BASE, and that pin now predates 25 commits this run did not write. | Took the merge-base and recorded the deviation rather than silently reinterpreting a binding rule. |
+| 2 | **`-11` S8 retired the authored roster wholesale**, which made `build-complete`'s missing-units term a tautology — the generated region is a subset of the specs by construction. | SPLIT the two questions instead of retiring: authorization, presence and terminality read the generated region; the planned-but-unspecced question keeps the authored pair, the only thing that can express it. Dropping the term outright remains the owner's to prefer. |
+| 3 | **`gates-green` is unreachable**, because another node's run is live at `LANDING` and is not this run's record to write. | Escalated rather than overriding. Two prior runs in this corpus met the same class and both parked; this is the third. |
+| 4 | **`drift-audit`'s non-terminal-spec-citation signal is unsatisfiable** for any multi-unit build that cites its ids in code: CLOSED needs landing, landing needs green, green needs CLOSED. | Filed as `TOOL-aBoundedVerdict-30` with three options named, none of them this run's to pick. |
+
+One OWNER FORK also remains open in the spec set: `TOOL-aBoundedVerdict-21` F3 — whether a
+bounded-out push whose outcome is unknown should wake someone immediately rather than wait for
+the resume path. It would add an owner-notification mechanism this kit does not have.
+
 ### Recommendations, in the order that unblocks the most
 
 Put to the owner in the run's own turn and recorded here, because a recommendation
