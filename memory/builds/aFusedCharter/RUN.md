@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 witness: a8dc6886f8a512eb7155abe8c1ffec7d1739fe6e
-phase: BUILDING
+phase: LANDING
 branch-sha: bd6dd7f6a4aad362b47591f79386aab75f7ba448
 branch-ref: refs/heads/branch/governance-template-convergence-91c2c6
 anchor-kind: run-branch
