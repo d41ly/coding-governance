@@ -203,7 +203,7 @@ growing both the method and the unattended protocol, and it is one of seven spen
   all three carriers live, and its own header states it is structural only.
 - **AC7** — When the kickoff engine is unchanged, `bash tools/unattended/check-unattended.sh` still
   finds at least the declared floor of interactive exits.
-- **AC8** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC8** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -211,7 +211,7 @@ growing both the method and the unattended protocol, and it is one of seven spen
 `tools/unattended/adopt-unattended.sh --check` · `tools/memory-tree/check-memory-hygiene.sh` ·
 `tools/memory-tree/kit-dogfood-parity.test.sh` · `tools/memory-tree/check-method-carriers.sh` ·
 `tools/check-kit-versions.sh` · `python tools/codebase-map/test_codebase_map.py` ·
-`bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

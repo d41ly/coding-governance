@@ -199,7 +199,7 @@ them) · `tools/workflows/check-workflow-syntax.js` is a gate, not a change ·
 
 ## 7. Gates
 
-`bash tools/run-gates.sh` whole, and specifically: `review-harness gates`
+`bash tools/run-gates/run-gates.sh` whole, and specifically: `review-harness gates`
 (`tools/workflows/check-workflow-syntax.js`, `tools/workflows/check-review-join.sh`) ·
 `verifier fan-out` (`tools/workflows/check-verifier-fanout.sh`) · `memory/` hygiene check 21 ·
 `kit/dogfood doc parity` (`tools/memory-tree/kit-dogfood-parity.test.sh`) ·

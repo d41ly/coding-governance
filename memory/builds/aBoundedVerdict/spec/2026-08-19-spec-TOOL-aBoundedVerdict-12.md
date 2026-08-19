@@ -198,7 +198,7 @@ constant.
 
 ## 7. Gates
 
-`bash tools/run-gates.sh` whole, and specifically: `unattended driver selftest`
+`bash tools/run-gates/run-gates.sh` whole, and specifically: `unattended driver selftest`
 (`tools/unattended/unattended.test.sh`) · `unattended kit gate`
 (`tools/unattended/check-unattended.sh`) + `check-unattended.test.sh` · `harness arms`
 (`tools/memory-tree/check-arms.py`) · `testsuite counts`

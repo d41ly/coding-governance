@@ -420,7 +420,7 @@ surface in §6 is sound.
   about the shipped `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh` and
   `tools/workflows/tier2-review.js` as they stand at HEAD, read against the specs; no specced change
   was executed, so no AC was run as an AC.
-- **The gate.** `bash tools/run-gates.sh` was not run, nor any single leg. Where a finding says a
+- **The gate.** `bash tools/run-gates/run-gates.sh` was not run, nor any single leg. Where a finding says a
   unit "reds the bar", that is derived from the leg's source, not observed from a run.
 - **Ids `TOOL-aBoundedVerdict-6` through `-10`.** These are not specs in this set. `-10` is an OPEN
   backlog row (`memory/backlog/TOOL.md:81`) and was read only as prior art for `-13`.

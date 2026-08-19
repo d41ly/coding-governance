@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** SPECCED · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -46,7 +46,9 @@ instead of by row shape.
   tip — and the conf's own comment and `memory/guides/UNATTENDED-PROTOCOL.md:32-35` already say
   roster integrity stops being enforceable there. S6 states this rather than reading as if it closed
   the self-certification hole on this repo, which it does not.
-- **S8** — **the AUTHORED `roster:units` pair is RETIRED, and this unit owns it.** Rev-2 left it
+- **S8** — **the AUTHORED `roster:units` pair is RETIRED, and this unit owns it.** It closes
+  `TOOL-aPacedTurnstile-14`, which names this defect from another node's run and proposes a narrower
+  remedy §4 explains is superseded rather than adopted. Rev-2 left it
   standing and rev-3 corrects that, because `build-complete`'s FIRST term reads it
   (`unattended.sh:1495`) and so do `roster_ids` (`:889-890`), `missing_units` through it,
   `verb_plan` (`:928-929`) and `check_authorization` (`:731-738`) — five readers, none of them among
@@ -133,6 +135,27 @@ What this deliberately does not catch, stated rather than discovered later: a ro
 unchanged but whose spec LINK now points at a different file. That is a re-pointing rather than a
 scope change, the title moves with the spec's own H1 for legitimate reasons, and including either in
 the comparison reintroduces exactly the churn this correction removes.
+
+### Independently corroborated on another node, and this unit supersedes its remedy
+
+`TOOL-aPacedTurnstile-14` landed on `main` while this build was open and is the same defect found the
+same way — at `--close`, on a live unattended run, on node `a`. Its own words: the README carries no
+roster marker pair, so `--plan` "silently falls back" and `build-complete` "blocks with 'no
+well-formed roster marker pair' rather than with a unit list", and *"nothing gates the markers'
+PRESENCE, only their well-formedness once present"*. That last clause is S5's predicate, written by
+someone who had not read this spec.
+
+Two things follow. First, the defect is not an artifact of this build's reading: two nodes hit it
+independently, both at the moment a close blocked. Second, that row's proposed remedy — wrap the
+authored Units table in the marker pair — is SUPERSEDED here rather than adopted, and the reason is
+the one its own author gestures at by declining to fix it mid-run: wrapping keeps an AUTHORED region
+on the authorization path, so every build README stays a hand-edit away from closable and the next
+build folder created without the pair reproduces the whole thing. S8 removes the readers instead.
+
+Their run also declined to fix it in flight, on the ground that editing the authorization artifact at
+the moment a gate blocks on it is the wrong instinct. That judgement is correct and is worth keeping:
+it is the same reason S8 retires the pair by removing readers rather than by editing four build
+records.
 
 ### Inventory
 
@@ -278,7 +301,7 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
 
 ## 7. Gates
 
-`bash tools/run-gates.sh` whole, and specifically: `memory/` hygiene (check 9's fresh-render
+`bash tools/run-gates/run-gates.sh` whole, and specifically: `memory/` hygiene (check 9's fresh-render
 comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tree/marker-contract.test.sh` ·
 `unattended driver selftest` · `unattended kit gate` + its sibling test ·
 `tools/memory-tree/kit-dogfood-parity.test.sh` and `tools/workflows/check-protocol-parity.test.sh`
@@ -347,6 +370,16 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
   permit. **AC2 is re-measured**: six spec-linked rows for `aBranchedMandate`, not four — four was
   another build's number — and Migration's "six ids each" was wrong for the second frozen roster,
   which carries four. F2 gains the resolution mark its rev log already claimed.
+
+- rev-4 · 2026-08-19 · REGROUNDED after the run reconciled with `origin/main`, which had moved from
+  the pinned BASE by an entire landed build. Two changes, neither a design move. **The gate-runner
+  path is corrected**: `aPacedTurnstile` made the runner a deployable kit, so `tools/run-gates.sh` is
+  now `tools/run-gates/run-gates.sh` — 21 citations across 16 records in this build named a path that
+  no longer exists, which is exactly the stale-hit class M5 warns about, and the whole set's §7 would
+  have named a dead file. **`TOOL-aPacedTurnstile-14` is joined**: the same defect, found
+  independently at `--close` on another node's live run, with a narrower remedy this unit supersedes
+  and a clause — nothing gates the markers' presence — that is S5's predicate written by someone who
+  had not read this spec. S8 now closes that row.
 
 ## 10. Reuse audit
 

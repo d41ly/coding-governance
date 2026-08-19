@@ -19,3 +19,5 @@ anchor-ref: refs/heads/main
 base: 098bebd9876c8f2f61a528b5cc9ac0a6b5d7719a
 
 ## Parked
+
+2026-08-19T07:06:41Z decision · item the closing review's base, now that the run has merged origin/main · reason M8 says review from the run's PINNED BASE; the pin (098bebd9) now predates a merge that brought in an entire landed build (aPacedTurnstile, ~25 commits). A literal BASE..HEAD would review another node's landed work as if this run wrote it. Options seen: the literal pin, per M8; the merge-base with the reconciled main, which is this run's actual diff; or a two-part review. Taking the merge-base sha and recording it here rather than silently reinterpreting a binding instruction.

@@ -164,7 +164,7 @@ section and the fact list, if S4 adds a fact) · `tools/unattended/.unattended.c
 `check-unattended.test.sh` · `bash tools/unattended/adopt-unattended.sh --check` ·
 `.githooks/pre-push.test.sh` and `tools/push-main.test.sh` (the lander and the hook are both in the
 path this unit wraps) · `python tools/memory-tree/check-arms.py` ·
-`tools/check-testsuite-counts.sh` · `tools/check-kit-versions.sh` · `bash tools/run-gates.sh`.
+`tools/check-testsuite-counts.sh` · `tools/check-kit-versions.sh` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

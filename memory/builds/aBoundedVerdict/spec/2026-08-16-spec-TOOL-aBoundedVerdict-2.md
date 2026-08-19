@@ -320,7 +320,7 @@ are both on its watch list) · the kit version constants.
 - **AC11** — When any NEW `fail` branch exists, it is armed in that gate's sibling test or pinned in
   `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
   --check` exits 0. `ARMS_FLOORS` moves only where `--report` shows the measured counts grew.
-- **AC12** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC12** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -334,7 +334,7 @@ grows a read-path member, and rev-2's gate list omitted it ·
 `python tools/memory-tree/corpus_ids.py --report` for the read-path share ·
 `python tools/memory-tree/check-arms.py` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `python tools/drift-audit/drift_report.py
---check` · `bash tools/run-gates.sh`.
+--check` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

@@ -264,7 +264,7 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-6 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
 | [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-7 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | SPECCED | rev-3 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | SPECCED | rev-4 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | SPECCED | rev-3 | 2026-08-19 |

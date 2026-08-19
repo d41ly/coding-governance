@@ -173,7 +173,7 @@ sections stop implying a hand-edit) · `.memory-tree.conf` (`ARMS_FLOORS`) · th
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.sh` +
 `check-unattended.test.sh` · `bash tools/unattended/adopt-unattended.sh --check` (the rendered Skill
 moves) · `python tools/memory-tree/check-arms.py` · `tools/check-testsuite-counts.sh` ·
-`tools/check-kit-versions.sh` · `bash tools/run-gates.sh`.
+`tools/check-kit-versions.sh` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

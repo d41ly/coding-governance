@@ -344,7 +344,7 @@ figure as authority.
   `authorization-reachable` — the arm that joins this unit to `TOOL-aBoundedVerdict-11` and fails
   without it.
 - **AC9** — `python tools/memory-tree/check-arms.py` exits 0 with the unattended `ARMS_FLOORS` entries
-  raised, and `GATE_FULL=1 bash tools/run-gates.sh` is green.
+  raised, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -352,7 +352,7 @@ figure as authority.
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/memory-tree/check-memory-hygiene.sh` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `tools/check-kit-versions.sh` · `python tools/memory-tree/check-arms.py` ·
-`python tools/codebase-map/test_codebase_map.py` · `bash tools/run-gates.sh`.
+`python tools/codebase-map/test_codebase_map.py` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

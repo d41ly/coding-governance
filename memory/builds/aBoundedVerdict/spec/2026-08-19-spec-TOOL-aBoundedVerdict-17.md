@@ -168,7 +168,7 @@ one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning i
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.sh` +
 `check-unattended.test.sh` · `python tools/memory-tree/check-arms.py` ·
 `python tools/codebase-map/test_codebase_map.py` · `tools/check-kit-versions.sh` ·
-`tools/check-testsuite-counts.sh` · `bash tools/run-gates.sh`.
+`tools/check-testsuite-counts.sh` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

@@ -235,7 +235,7 @@ no file of its own.
 - **AC7** — When the Skill is re-rendered, `bash tools/unattended/adopt-unattended.sh --check`
   reports in sync and the render carries no surviving placeholder shape.
 - **AC8** — `python tools/memory-tree/check-arms.py --check` exits 0 with the driver's `ARMS_FLOORS`
-  entry raised, and `GATE_FULL=1 bash tools/run-gates.sh` is green.
+  entry raised, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -243,7 +243,7 @@ no file of its own.
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
 `python tools/memory-tree/check-arms.py` · `python tools/codebase-map/test_codebase_map.py` ·
-`bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

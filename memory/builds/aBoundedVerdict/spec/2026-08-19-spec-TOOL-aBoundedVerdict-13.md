@@ -192,7 +192,7 @@ status split) · `tools/unattended/unattended.test.sh` (arms per refusal, and th
 
 ## 7. Gates
 
-`bash tools/run-gates.sh` whole, and specifically: `unattended driver selftest` ·
+`bash tools/run-gates/run-gates.sh` whole, and specifically: `unattended driver selftest` ·
 `unattended kit gate` + `check-unattended.test.sh` · `harness arms`
 (`tools/memory-tree/check-arms.py`, one arm per new `fail`) · `testsuite counts` ·
 `pre-push self-test` (`.githooks/pre-push.test.sh`, because S4 changes what happens inside the hook's
