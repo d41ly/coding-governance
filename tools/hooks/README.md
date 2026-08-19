@@ -6,8 +6,10 @@ grammar is implementation detail of one hook and does not belong in a ruleset ev
 
 ## The two rules
 
-- **At most 5 agents in a verify stage, TOTAL.** Batching grows the batch, never the agent count.
-- **At most 5 running at once.** Concurrency is a separate bound from the total; they are two rules.
+- **The verify-stage TOTAL is whatever `agent-cap.js` resolves.** Batching grows the batch, never
+  the agent count.
+- **Concurrency is a SECOND bound, its own constant in the same file.** How many run at once is not
+  how many exist; they are two rules.
 
 ## Wiring
 
@@ -16,7 +18,7 @@ which is the configuration this hook was rewritten to stop shipping.
 
 ## What the hook DENIES, and how to satisfy it
 
-- A raw `parallel(` / `pipeline(` primitive. Route through a cap-5 helper instead —
+- A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —
   `boundedParallel(thunks, 5)` or `boundedPipeline(items, 5, …)`, inlined, because workflow scripts
   cannot import. The line carries a `gov:bounded-fanout` marker.
 - Any `agent(` fanned over a receiver the hook cannot PROVE bounded. The batching assignment carries

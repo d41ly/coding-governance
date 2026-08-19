@@ -507,9 +507,11 @@ dormant gates. Wiring the bar into remote CI needs a `workflow`-scoped push and 
 
 **Two protocols are BINDING, and they are rules rather than leg descriptions.**
 
-- `memory/guides/REVIEW-PROTOCOL.md` — a review's verify stage spawns **at most 5 agents TOTAL** (the
-  batch grows, the agent count never does) and **at most 5 run concurrently**. Enforced at the tool
-  call by `tools/hooks/agent-cap.js`, which sees the inline script where the rule actually gets
+- `memory/guides/REVIEW-PROTOCOL.md` — a review's verify stage spawns **at most the total
+  `tools/hooks/agent-cap.js` resolves** (the batch grows, the agent count never does), and how many
+  run at once is a **second bound held as its own constant in that same file**. Both are file
+  constants there and are written nowhere else, so this line points instead of restating. Enforced
+  at the tool call by that hook, which sees the inline script where the rule actually gets
   broken, and on the bar by a leg that delegates to that same hook rather than re-implementing it.
   The marker grammar it enforces is `tools/hooks/README.md`. Ready-made harness:
   `tools/workflows/tier2-review.js`.
