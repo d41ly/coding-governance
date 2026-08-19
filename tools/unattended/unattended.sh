@@ -1491,7 +1491,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
-  observe_anchor >/dev/null 2>&1 || true
+  # TOOL-aBoundedVerdict-12 S7 - one line BEFORE the network round-trip, so a close that is about to
+  # spend one has printed something. Unconditional: a progress line an unattended run cannot observe
+  # is not a progress line, and the arm that proves it needs stdout rather than a tty.
+  echo "unattended: --close $slug - observing the anchor, then evaluating the Definition of Done"
+  # S1 - the redirect is GONE. `fail` echoes to stdout, so `>/dev/null 2>&1` destroyed all EIGHT of
+  # observe_anchor's named refusals (checks 22-25 and 27-30), and the only surviving output was the
+  # bare `authorization-reachable` line - the one item `fail 21` forbids overriding. A wedge with no
+  # stated cause and no forward move. `|| true` alone is the form --landed and --preflight already use:
+  # the refusals are not fatal to --close, which is why they were suppressed rather than returned on,
+  # and that reasoning was always about the STATUS and never about the message.
+  observe_anchor || true
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
   refuse_if_terminal "$rel" --close || return 1
@@ -1519,7 +1529,15 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
+        # TOOL-aBoundedVerdict-12 S5 - the RECORD KEY, not only the item. `parked-decisions-surfaced`
+        # is read from a line spelled `parked-surfaced:`, so an operator obeying this refusal wrote a
+        # key nothing reads and re-ran forever. --abort already carries this mapping and says the key
+        # is not always the item name; this is that fix at the call site its author did not grep for.
+        local _akey
+        case "$item" in parked-decisions-surfaced) _akey=parked-surfaced ;; *) _akey="$item" ;; esac
         fail 13 "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict: $item"
+        printf '    write the RECORD KEY, which is not always the item name: %s: yes
+' "$_akey"
       else
         fail 13 "a machine-checked DoD item is unmet, so --close blocks: $item"
         # What the item had to SAY, indented under the refusal that is still the headline. The
@@ -1561,7 +1579,17 @@ dod_met() { # slug · run-state file · item · checker
       # test, and an absent `base:` line used to degenerate the comparison to the git index. The
       # ASHA guard is not decoration: with no observation there is no anchor, and an unanchored
       # merge-base is the thing this item exists to refuse.
-      [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" >/dev/null 2>&1 ;;
+      # TOOL-aBoundedVerdict-12 S2 - the redirect is GONE here too, and this one was worse than S1's.
+      # A redirection on an `&&` list binds only to its LAST simple command, so it silenced
+      # check_authorization's six refusals while trusted_base's continued to print. The failure
+      # therefore looked INTERMITTENT: whether the operator saw a cause depended on which of two
+      # functions refused, and the silenced half was exactly the operator-repairable one.
+      #
+      # trusted_base's own header records that it was rebuilt to return through a global BECAUSE a
+      # captured refusal made --close print only the downstream symptom. The very next call in the
+      # chain re-introduced it. That is the whole argument for S6's rule: the fix was made once,
+      # correctly, and never became one.
+      [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" ;;
     gates-green)
       # SURFACED, not discarded. `>/dev/null 2>&1` meant a blocked --close reported THAT the bar was
       # red and never WHICH leg, and recovering the name cost a second full bar run every time.
@@ -1609,11 +1637,38 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
         return 1
       fi
+      # TOOL-aBoundedVerdict-12 S3 - the four surviving terms are evaluated SEQUENTIALLY so each can
+      # say which one failed. They were ANDed into one verdict, so all four printed the same sentence
+      # and `--override build-complete` became the natural next move for a reader who could not tell
+      # a missing spec from an unfinished unit. Every value below was already computed in a
+      # substitution that was thrown away: only the messages were missing.
       DOD_OUT=""
-      [ -n "$(unit_ids_of "$slug")" ] \
-        && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
-        && [ -n "$(unit_rows "$(readme_of "$slug")")" ] \
-        && [ -z "$(nonterminal_units "$(readme_of "$slug")")" ] ;;
+      local _bcids _bcmiss _bcrows _bcnon
+      # ROWS BEFORE IDS, deliberately. A region with no rows has no ids either, so testing ids first
+      # made the no-rows message unreachable from any fixture - a branch nothing can exercise, which
+      # is the same defect as an arm that cannot fire, one layer down. Structure first, then content.
+      _bcrows=$(unit_rows "$(readme_of "$slug")")
+      if [ -z "$_bcrows" ]; then
+        DOD_OUT="the generated units region carries no unit ROWS, and 'no unit row is non-terminal' is vacuously true over none of them, so completeness cannot be read from it: $(readme_of "$slug")"
+        return 1
+      fi
+      _bcids=$(unit_ids_of "$slug")
+      if [ -z "$_bcids" ]; then
+        DOD_OUT="the build's generated units region names no unit id, so there is no roster to judge completeness against: $(readme_of "$slug")"
+        return 1
+      fi
+      _bcmiss=$(missing_units "$slug" "$M/builds/$slug")
+      if [ -n "$_bcmiss" ]; then
+        DOD_OUT="the authored plan names a unit that no tracked spec carries, so the build is incomplete by its own roster: $_bcmiss"
+        return 1
+      fi
+      _bcnon=$(nonterminal_units "$(readme_of "$slug")")
+      if [ -n "$_bcnon" ]; then
+        DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO:
+$_bcnon"
+        return 1
+      fi
+      return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
       # sha because every filename and sequence join was measured wrong on 7 of 7 multi-unit builds
@@ -1639,9 +1694,29 @@ dod_met() { # slug · run-state file · item · checker
       # only by a self-authored override, which is the one shape this kit exists to refuse. Seven is
       # a floor rather than a lucky number: a shorter prefix is a prefix of every longer spelling, so
       # it still matches a record written at eight, ten or forty.
+      # TOOL-aBoundedVerdict-12 S4 - four distinguishable failure modes where there was one silence.
+      # The UNTRACKED case is the likeliest and the least guessable: the join reads --cached, so a
+      # review record sitting on disk and never staged is invisible here and the operator has no way
+      # to tell that from having written no review at all.
+      DOD_OUT=""
       rb=$(fact "$rel" base)
-      [ ${#rb} -ge 7 ] \
-        && GIT grep --cached -qF -- "${rb:0:7}" -- "$M/builds/$slug/reviews/*.md" ;;
+      if [ ${#rb} -lt 7 ] ; then
+        DOD_OUT="the run-state file records no usable pinned base, and an absent one would make this join select the FIRST review record in the build - passing by finding anything: $rel"
+        return 1
+      fi
+      if [ -z "$(GIT ls-files -- "$M/builds/$slug/reviews/*.md" 2>/dev/null)" ]; then
+        if [ -n "$(ls -1 "$M/builds/$slug/reviews/" 2>/dev/null)" ]; then
+          DOD_OUT="a review record exists on disk but is NOT TRACKED, and this join reads the index, so it is invisible here; stage it with git add: $M/builds/$slug/reviews/"
+        else
+          DOD_OUT="no review record exists under this build at all, so nothing records that the closing review happened: $M/builds/$slug/reviews/"
+        fi
+        return 1
+      fi
+      if ! GIT grep --cached -qF -- "${rb:0:7}" -- "$M/builds/$slug/reviews/*.md"; then
+        DOD_OUT="a tracked review record exists but none names the base this run pinned, so no record is bound to THIS run: looking for ${rb:0:7} under $M/builds/$slug/reviews/"
+        return 1
+      fi
+      return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)

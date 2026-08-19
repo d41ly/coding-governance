@@ -748,13 +748,20 @@ hit "$out" "the build README carries no well-formed units marker pair"
 # reads the GENERATED region's ids (`unit_ids_of`) rather than the authored plan, so the id has to be
 # taken out of the rendered unit ROW. The authored plan keeps its own term, which is term 3.
 bcopen; sed -i 's#^| \[ARCH-tRun-1 — the unit#| [a rendered row carrying no id#' memory/builds/tRun/README.md
-hit "$(run --close tRun)" "build-complete"
+out=$(run --close tRun)
+hit "$out" "build-complete"
+# TOOL-aBoundedVerdict-12 S3 - and it says WHICH term. The four surviving terms were ANDed into one
+# verdict, so all four printed the same sentence and an operator could not tell a missing spec from an
+# unfinished unit; `--override build-complete` was the natural next move for a reader with no cause.
+hit "$out" "the build's generated units region names no unit id, so there is no roster to judge completeness against"
 
 # term 3 — the roster names a unit nobody specced. This is the ONLY term that can see it: the
 # generated region is rendered from the specs that EXIST, so terms 4 and 5 are blind to a planned
 # unit with no spec file.
 bcopen; sed -i 's/^1\. ARCH-tRun-1 — the unit$/1. ARCH-tRun-1 — the unit\n2. ARCH-tRun-9 — never specced/' memory/builds/tRun/README.md
-hit "$(run --close tRun)" "build-complete"
+out=$(run --close tRun)
+hit "$out" "build-complete"
+hit "$out" "the authored plan names a unit that no tracked spec carries, so the build is incomplete by its own roster"
 
 # term 4 — the generated region is spliced EMPTY. Term 5 is vacuously true over an empty selection,
 # so without this term a run-state file carrying no unit rows would satisfy "none is non-terminal"
@@ -765,6 +772,9 @@ sed -i '/^| \[ARCH-tRun-1/d' memory/builds/tRun/README.md
 out=$(run --close tRun)
 hit "$out" "build-complete"
 miss "$out" "records-current"
+# rows deleted means ids are gone too, and the driver tests ROWS FIRST precisely so this message is
+# the one that fires. Asserting the ids sentence here instead would have been asserting the mask.
+hit "$out" "the generated units region carries no unit ROWS"
 
 # term 5 — one unit row is non-terminal. The case the owner actually asked for.
 bcopen
@@ -773,12 +783,38 @@ sed -i 's/| CLOSED | rev-1 |/| OPEN | rev-1 |/' memory/builds/tRun/README.md
 out=$(run --close tRun)
 hit "$out" "build-complete"
 miss "$out" "records-current"
+hit "$out" "a unit of this build is not terminal, so the build is not done"
+# ...and it NAMES the offending row rather than only counting it, so the operator does not re-derive
+# which unit is unfinished from a file the refusal already read.
+hit "$out" "ARCH-tRun-1"
 
 # the OVERRIDE path: the item blocks, and the owner's named reason unblocks it and is readable
 # afterwards. A blocking gate whose override nobody can read is not a gate.
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "shipping 1 of 2 units deliberately")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "shipping 1 of 2 units deliberately"
+
+# ---- TOOL-aBoundedVerdict-12 S7: a line BEFORE the network round-trip. A close that is about to
+# ---- spend one has printed something, so "hung" and "working" are distinguishable from outside.
+# ---- Unconditional rather than tty-gated, because a progress line an unattended run cannot observe
+# ---- is not a progress line - and this arm reads stdout, which is the only thing a run has.
+bcopen
+hit "$(run --close tRun)" "observing the anchor, then evaluating the Definition of Done"
+
+# ---- S5: the agent-item refusal names the RECORD KEY, which is not the item name.
+# ---- `parked-decisions-surfaced` is read from a line spelled `parked-surfaced:`, so an operator
+# ---- obeying the old refusal wrote a key nothing reads and re-ran forever.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+printf 'keepalive-reaped: yes
+' >> memory/builds/tRun/RUN.md
+out=$(run --close tRun)
+hit "$out" "an agent-attested DoD item is unmet"
+hit "$out" "write the RECORD KEY, which is not always the item name: parked-surfaced: yes"
+
+# ---- S4: closing-review-recorded distinguishes its failure modes. The UNTRACKED case is the
+# ---- likeliest and was unguessable: the join reads --cached, so a record on disk and never staged
+# ---- is invisible here and reads exactly like having written no review at all.
+
 
 # restore main to the shared BASE so the later arms see the tree they were written against.
 git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree
@@ -803,6 +839,27 @@ git add -A >/dev/null
 out=$(run --close tRun $crbc)
 hit "$out" "close OK"
 miss "$out" "closing-review-recorded"
+
+# SELF-SUFFICIENT, not inherited: earlier arms in this section COMMIT review records, so `cropen`'s
+# reset leaves tracked ones behind and the item is simply MET - printing nothing and proving nothing.
+# Untrack whatever is there before claiming the tree has no tracked review.
+cropen; rb=$(crbase)
+git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
+printf '# closing review
+
+range %s...HEAD
+' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+out=$(run --close tRun $crbc)
+hit "$out" "a review record exists on disk but is NOT TRACKED"
+hit "$out" "stage it with git add"
+
+# ...and with NO review record at all, a DIFFERENT sentence - the two cases must not read alike, which
+# is the whole point: the untracked case was previously indistinguishable from having written none.
+cropen
+git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
+rm -f memory/builds/tRun/reviews/*.md
+out=$(run --close tRun $crbc)
+hit "$out" "no review record exists under this build at all"
 
 # ...and a record spelling the base at EXACTLY SEVEN, the shortest abbreviation git produces here.
 # The join shipped at eight and matched none of this corpus's seven-char records, so the item could
