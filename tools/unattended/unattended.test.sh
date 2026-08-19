@@ -1433,6 +1433,61 @@ done <<<"$ug"
 np=$(grep -nE '(^|[^-[:alnum:]])(python3?|py) ' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 
+# ---- SOURCE-level, TOOL-aBoundedVerdict-12 S6: every `dod_met` arm this unit gives a message to must
+# ---- actually carry a NON-EMPTY DOD_OUT assignment. The rule keys on the arm BODY rather than on a
+# ---- literal `return 1`, because rev-1's predicate did exactly that and was VACUOUS: a literal
+# ---- `return 1` appears in only two arms and both already set the variable, while six arms fail by
+# ---- falling off the end of their case arm with a false test. So the shipped driver satisfied the
+# ---- rule as first written, and the criterion claiming otherwise was false.
+# ----
+# ---- SCOPE IS DECLARED (S6a) rather than universal: this unit gives messages to gates-green,
+# ---- build-complete and closing-review-recorded. `records-current`, `landed-via-lander` and
+# ---- authorization-reachable are OUT -- the last prints through its own refusals now that S2 stopped
+# ---- discarding them, and the other two belong to TOOL-aBoundedVerdict-18. The two agent-attested
+# ---- arms and the `*)` project arm are exemptions: their cause is an absent attestation or an item
+# ---- this kit knows nothing about, and the refusal already says so.
+# ----
+# ---- NON-EMPTY is the load-bearing word. `gates-green` clears DOD_OUT to "" on success, so a rule
+# ---- satisfied by any assignment would be satisfied by the clearing one.
+dodarm() { # arm label -> that arm's body out of dod_met's case block
+  awk -v want="$1" '
+    /^dod_met\(\) \{/ { inf = 1 }
+    inf && $0 ~ "^    " want "\\)" { grab = 1; next }
+    grab && /^    [a-z*][a-z-]*\)/ { grab = 0 }
+    grab { print }
+  ' "$SCRIPT"
+}
+for arm in gates-green build-complete closing-review-recorded; do
+  body=$(dodarm "$arm")
+  n=$((n+1))
+  [ -n "$body" ] || { echo "FAIL S6 could not locate the $arm arm in dod_met, so this rule is grading nothing"; st=1; continue; }
+  # NOT a quoted literal only: `gates-green` assigns from a command substitution,
+  # DOD_OUT=$($GATE_CMD 2>&1), a good non-empty message the first cut called a violation.
+  # The predicate is 'assigns something other than the empty string', as the prose always said.
+  printf '%s\n' "$body" | grep -qE 'DOD_OUT=("[^"]|[^"])' \
+    || { echo "FAIL the $arm arm reaches its failing exit with no non-empty DOD_OUT, so a blocked close names the item and not the cause"; st=1; }
+done
+
+# ---- ...and the RED FIXTURE, without which the loop above is the vacuity it exists to replace: strip
+# ---- the assignments out of one arm in a COPY and prove the rule fires. A source rule with no red
+# ---- fixture is indistinguishable from one whose locator silently matches nothing.
+sfx="$TMP/s6-stripped.sh"   # $TMP is this suite's own scratch dir, made at line 14
+sed 's/DOD_OUT="the run-state file records.*/DOD_OUT=""/' "$SCRIPT" \
+  | sed 's/DOD_OUT="a review record exists on disk.*/DOD_OUT=""/' \
+  | sed 's/DOD_OUT="no review record exists under.*/DOD_OUT=""/' \
+  | sed 's/DOD_OUT="a tracked review record exists.*/DOD_OUT=""/' > "$sfx"
+sbody=$(awk -v want="closing-review-recorded" '
+    /^dod_met\(\) \{/ { inf = 1 }
+    inf && $0 ~ "^    " want "\\)" { grab = 1; next }
+    grab && /^    [a-z*][a-z-]*\)/ { grab = 0 }
+    grab { print }
+  ' "$sfx")
+n=$((n+1))
+[ -n "$sbody" ] || { echo "FAIL S6's red fixture lost the arm entirely, so the negative control proves nothing"; st=1; }
+n=$((n+1))
+printf '%s\n' "$sbody" | grep -qE 'DOD_OUT=("[^"]|[^"])' \
+  && { echo "FAIL S6's rule does NOT fire on an arm stripped of its messages, so it would not notice a regression"; st=1; }
+
 # ============================================================ S1/S2 — the terminal producers
 # The two verbs that let a run FINISH. Before them the vocabulary's last two members were
 # unreachable, so every completed run stayed non-terminal and the single-live counter grew forever.
