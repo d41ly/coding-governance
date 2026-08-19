@@ -431,13 +431,23 @@ def main() -> int:
         # AC10 — the playbook lands BYTES. It sits first in the default selection and, tagged
         # project-owned, landed nothing at all while its placeholder hole probed two absent paths.
         pb = make_target(tmp / "u1b", DEPLOY_FULL)
-        run("apply", "--target", str(pb), "--kits", "playbook")
+        # THE APPLY'S OWN VERDICT IS PART OF THE ARM. This call DISCARDED the CompletedProcess, so
+        # when `apply` refused, the refusal that named the cause was thrown away and the arm reported
+        # the empty directory listing instead. Measured on the post-merge bar of the aFusedCharter
+        # merge: `apply` lands bytes from the gov repo's HEAD, HEAD was still the pre-merge parent
+        # where the charter carried its old filename, and `apply` said so exactly —
+        # `entry 'playbook': coding-governance-agents.template.md does not resolve at c9d2c25f` —
+        # while this arm printed `FAIL the playbook entry lands its one file — []`. Three arms went
+        # red and not one of them named the file, the commit, or the word `apply`.
+        pbp = run("apply", "--target", str(pb), "--kits", "playbook")
         recpb = json.loads((pb / ".governance" / "install.json").read_text(encoding="utf-8"))
         # ONE file since v3.0. The charter converged and its domain companion was deleted, so an arm
         # asserting a PAIR here was asserting the shape of a product that no longer ships.
         check("the playbook entry lands its one file",
-              (pb / "docs" / "PARALLEL.md").is_file(),
-              str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
+              pbp.returncode == 0 and (pb / "docs" / "PARALLEL.md").is_file(),
+              chr(10).join(ln for ln in (pbp.stdout + pbp.stderr).splitlines()
+                           if ln.startswith("govkit: "))
+              or str(sorted(q.as_posix() for q in pb.rglob("docs/*"))))
         check("recorded as seed, which is the role whose re-apply contract is never-rewritten",
               all(f["role"] == "seed" for f in recpb["files"] if f["kit"] == "playbook"),
               str([f for f in recpb["files"] if f["kit"] == "playbook"]))

@@ -70,7 +70,15 @@ def check(label: str, cond: bool, detail: str = "") -> None:
         print(f"ok   {label}")
     else:
         FAILURES.append(label)
-        print(f"FAIL {label}" + (f" — {detail[:400]}" if detail else ""))
+        # TRUNCATED FROM THE HEAD, WHICH IS THE END THAT CARRIES THE ANSWER. `detail[:400]` kept the
+        # first 400 bytes, and for an `apply` detail those 400 bytes are the numbered step trace —
+        # `[1/BASELINE] ...`, `[2/ATTRIBUTES] ...` — while the refusal naming the cause is the LAST
+        # line the verb prints. Measured on the post-merge bar of the aFusedCharter merge: two arms
+        # reported `[1/BASELINE] this target's descriptor declares no [gate_runner] at all`, which is
+        # a step announcement and not a failure at all, and the line that actually explained the red
+        # sat just past the cut. A traceback's last line is its exception and a stated Refusal is its
+        # last line too, so the tail is the right end for every detail this file passes.
+        print(f"FAIL {label}" + (f" — {detail[-400:]}" if detail else ""))
 
 
 def git(cwd: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
