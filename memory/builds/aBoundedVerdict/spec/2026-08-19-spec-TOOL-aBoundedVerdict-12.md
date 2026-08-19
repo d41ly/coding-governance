@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
