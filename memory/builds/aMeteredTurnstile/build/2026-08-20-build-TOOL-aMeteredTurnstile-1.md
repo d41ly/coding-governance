@@ -1,5 +1,7 @@
 # The merge bar, measured — what is actually slow, and what would move it
 
+**Serves:** journal TOOL-aMeteredTurnstile-1
+
 Node `a` · 2026-08-20 · base `56b945cb` · 86 legs · width 8 · `GATE_FULL=1`.
 
 Every figure below was observed on this node in one run, or read from a file in this tree. Nothing
