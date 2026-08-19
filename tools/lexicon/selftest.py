@@ -23,7 +23,7 @@ from pathlib import Path
 
 
 @contextlib.contextmanager
-def tempdir():
+def build_tempdir():
     """A temp dir whose CLEANUP cannot fail this program.
 
     WINDOWS, and measured on this repo's own bar: a scanner or a lingering git child can still hold
@@ -76,7 +76,7 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 def run_case(files: dict, conf: str | None, waivers: dict | None = None):
     """Build a throwaway repo, run the engine in it, return (exit_code, output)."""
-    with tempdir() as td:
+    with build_tempdir() as td:
         root = Path(td)
         shutil.copytree(KIT, root / "tools" / "lexicon",
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -427,7 +427,7 @@ for path, pattern, want, why in [
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
 # reader requires an alphabetic verb. A kit whose first command writes a file its second command
 # rejects has no working adoption path at all.
-with tempdir() as td:
+with build_tempdir() as td:
     root = Path(td)
     shutil.copytree(KIT, root / "tools" / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
