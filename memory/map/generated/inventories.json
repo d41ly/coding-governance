@@ -57,6 +57,7 @@
       "playbook render selftest",
       "playbook render wiring",
       "pre-push self-test",
+      "profile-bar selftest",
       "push-main self-test",
       "pytest-guardrails self-test",
       "python resolver (behaviour + inline parity + idiom ban)",

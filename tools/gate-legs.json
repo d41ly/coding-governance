@@ -624,14 +624,36 @@
     "guard": []
   },
   {
+    "name": "profile-bar selftest",
+    "argv": [
+      "bash",
+      "tools/run-gates/profile_bar.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/"
+    ]
+  },
+  {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
       "tools/check-install-prefix.sh"
     ]
   },
-    {"name": "agent-cap restatement", "argv": ["bash", "tools/check-agent-cap-restatement.sh"]},
-    {"name": "agent-cap restatement self-test", "argv": ["bash", "tools/check-agent-cap-restatement.test.sh"]},
+  {
+    "name": "agent-cap restatement",
+    "argv": [
+      "bash",
+      "tools/check-agent-cap-restatement.sh"
+    ]
+  },
+  {
+    "name": "agent-cap restatement self-test",
+    "argv": [
+      "bash",
+      "tools/check-agent-cap-restatement.test.sh"
+    ]
+  },
   {
     "name": "install-prefix self-test",
     "argv": [

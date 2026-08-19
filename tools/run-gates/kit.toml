@@ -53,6 +53,14 @@ means = "adopted"
 # row naming a leg the manifest does not carry reds selfcheck at the adding unit's own landing,
 # which is the round-1 blocker this file was rewritten to avoid.
 [[gate_leg]]
+name = "profile-bar selftest"
+argv = ["bash", "{kit}/profile_bar.test.sh"]
+guard = ["{kit}/"]
+# Guarded on the kit dir ALONE, and that is COMPLETE rather than convenient: the harness drives the
+# profiler over its own `GATE_LEGS` fixtures in a scratch repo, so it reads nothing outside this kit —
+# not the real manifest, not the real timing cache. A guard may name what the leg READS.
+
+[[gate_leg]]
 name = "run-gates canary"
 argv = ["bash", "{kit}/run-gates.test.sh"]
 # Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
