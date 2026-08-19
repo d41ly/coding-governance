@@ -882,7 +882,7 @@ for bmd in $(GIT ls-files "$M/builds/*/README.md" 2>/dev/null); do
   bad_units="$bad_units $bmd"
 done
 if [ -n "$bad_units" ]; then
-  fail 19 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py:$bad_units"
+  fail 21 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py:$bad_units"
 fi
 
 # ---- 20: the PROMPT path's own ordering, PER PATH. TOOL-aPromptedMandate-5.

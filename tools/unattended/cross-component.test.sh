@@ -59,7 +59,11 @@ mk() { # slug · optional extra front-matter line
   { echo '---'; echo "slug: $1"; [ -n "${2:-}" ] && echo "$2"; echo 'streams: tooling'; echo '---'
     echo; echo "# $1"; echo; echo '<!-- roster:units -->'; echo '| # | Unit |'; echo '|---|---|'
     echo '| 1 | the unit |'; echo '<!-- /roster:units -->'
-    echo; echo '<!-- gen:build-index -->'; echo '<!-- /gen:build-index -->'; } > "memory/builds/$1/README.md"
+    echo; echo '<!-- gen:build-index -->'
+    # TOOL-aBoundedVerdict-11 S5 - the NESTED units pair. Check 21 requires it on every tracked build
+    # README, so a fixture that omits it reds the leg on the fixture rather than on the kit.
+    echo '<!-- gen:build-units -->'; echo '<!-- /gen:build-units -->'
+    echo '<!-- /gen:build-index -->'; } > "memory/builds/$1/README.md"
 }
 
 # ---- PRECONDITION: the fixture is COMPLETE before anything perturbs it. An arm that runs against a
@@ -91,23 +95,35 @@ out=$(leg); rc=$?
 same "arm 3: the leg accepts a run-branch anchor, exit code" "$rc" "0"
 same "arm 3: the leg accepts a run-branch anchor, output" "$out" ""
 
-# ---- ARM 4a: the roster GROWS and the run RE-PUSHES — the documented obligation. Keyed on the DoD
-# ---- VERDICT, never on close output: --close evaluates the item as
-# ---- `check_authorization … >/dev/null 2>&1`, so every message it emits is discarded and an arm
-# ---- reading that output is green whether the roster is legal, illegal, or the check is deleted.
-sed -i 's/| 1 | the unit |/| 1 | the unit |\n| 2 | what research found |/' memory/builds/tRun/README.md
-git add -A >/dev/null && git commit -q -m "roster grew" --no-verify && git push -qf origin unit
+# ---- ARM 4a/4b: the SCOPE-INTEGRITY seam, RE-AIMED by the aBoundedVerdict merge. These arms were
+# ---- written against the AUTHORED `roster:units` pair and byte-equality; TOOL-aBoundedVerdict-11 S6
+# ---- moved the authorization subject to the GENERATED `gen:build-units` region and compares unit-ID
+# ---- SETS, requiring the BASE set to be a SUBSET of HEAD. Perturbing the authored roster now moves
+# ---- nothing this check reads, so these arms would have passed vacuously against a DELETED check -
+# ---- which is the trap the original comment below warns about, one level up.
+# ----
+# ---- THE DIRECTIONS ARE NOT SYMMETRIC, and that is the design rather than a gap. An ADDITION comes
+# ---- from a new spec, and `build-complete` then requires that unit terminal before close, so a run
+# ---- cannot buy itself anything by widening. A REMOVAL is the attack: drop an unfinished unit and
+# ---- build-complete passes over work nobody did. 4a proves an addition is admitted; 4b proves a
+# ---- removal is refused.
+# ----
+# ---- Keyed on the DoD VERDICT, never on close output: --close evaluates the item as
+# ---- `check_authorization ... >/dev/null 2>&1`, so every message it emits is discarded and an arm
+# ---- reading that output is green whether the scope is legal, illegal, or the check is deleted.
+UROW='| [TOOL-tRun-1 - the unit](spec/2026-08-19-spec-TOOL-tRun-1.md) | OPEN | rev-1 | 2026-08-19 |'
+awk -v r="$UROW" '$0 == "<!-- /gen:build-units -->" { print r } { print }' memory/builds/tRun/README.md > "$WORK/r" && mv "$WORK/r" memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m "scope grew" --no-verify && git push -qf origin unit
 out=$(drive --close tRun)
 miss "$out" "authorization-reachable"
 
-# ---- ARM 4b: the roster grows and the run does NOT re-push — the ordinary post-research state, and
-# ---- the one that wedges a run at close. Both directions, because one cannot tell the mechanism
-# ---- from a fixture that happened to re-push.
-sed -i 's/| 2 | what research found |/| 2 | what research found |\n| 3 | and another |/' memory/builds/tRun/README.md
-git add -A >/dev/null && git commit -q -m "roster grew, unpushed" --no-verify
+# ---- 4b: the id present at the pinned BASE is REMOVED and the run does NOT re-push. BASE carries
+# ---- TOOL-tRun-1 because arm 4a pushed it, HEAD does not, so BASE is no longer a subset and this
+# ---- run narrowed the scope it was authorized for.
+grep -v "TOOL-tRun-1 " memory/builds/tRun/README.md > "$WORK/r" && mv "$WORK/r" memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m "scope narrowed, unpushed" --no-verify
 out=$(drive --close tRun)
 hit "$out" "authorization-reachable"
-
 # ---- ARM 5: the PROMPT-MODE seam. The driver records the mode from the blob at BASE and the leg
 # ---- re-derives it from that same blob independently. This is the driver/leg seam for the new mode
 # ---- bit, and without it two other specs name a left-shift gate that does not cover them.
