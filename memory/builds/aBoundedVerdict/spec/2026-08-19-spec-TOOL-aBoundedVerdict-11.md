@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** SPECCED · rev-4 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -34,12 +34,20 @@ instead of by row shape.
   admitted, removals refused. It compares the id set and **not the row bytes**; rev-2 corrects rev-1,
   which said "refusing any row CHANGED", and §4 states why that would have refused every run that did
   any work.
-- **S6a** — an ABSENT `gen:build-units` pair at BASE is a REFUSAL, not an empty set. A subset test is
-  vacuously true over an empty BASE, so inheriting the opt-in-by-presence guard at
-  `unattended.sh:731` would keep exactly the hole S6 exists to close — and every BASE before S5's
-  migration render, every adopter tree and every run pinned earlier is that case. The refusal names
-  the render command, as S4's does. Rev-2's Inventory promised the opt-in "goes away" and did not say
-  how; this is how.
+- **S6a** — an ABSENT `gen:build-units` pair at BASE is a REFUSAL, not an empty set — **but only for
+  a BASE at or after a declared cutoff.** A subset test is vacuously true over an empty BASE, so
+  inheriting the opt-in-by-presence guard at `unattended.sh:731` would keep exactly the hole S6 exists
+  to close. Rev-2's Inventory promised the opt-in "goes away" and did not say how; this is how.
+- **S6a-cutoff** — **the cutoff is not decoration; without it this unit bricks the run that builds
+  it.** Found by building, not by reading: a run's BASE is pinned before its own work, so the BASE of
+  the very run that lands S5's migration render CANNOT carry the region S6a demands. Measured on this
+  run — `git show 098bebd9:memory/builds/aBoundedVerdict/README.md | grep -c gen:build-units` returns
+  0 — so an uncutoff S6a refuses `authorization-reachable`, which `verb_close` will not override, and
+  the run that implements the unit can never close. A `UNITS_REGION_CUTOFF` date in
+  `.memory-tree.conf`, in the idiom this repo already uses three times (`STREAMS_CUTOFF`,
+  `SPEC10_CUTOFF`, `SPEC_WITNESS_CUTOFF`): a BASE committed before it inherits presence-based opt-in,
+  a BASE at or after it must carry the pair. The cutoff is the migration render's own date, so every
+  BASE that could carry the region is held to it and no earlier one is.
 - **S6b** — what S6 buys is SCOPED, because `.unattended.conf` here declares
   `ANCHOR_SCOPE="published"`. On the DEFAULT-BRANCH anchor the BASE blob is outside the run's reach
   and the comparison is a real integrity check. On the BRANCH anchor it is not — the run pushed that
@@ -202,6 +210,7 @@ BASE-blob against HEAD rather than against any recorded copy.
 `tools/memory-tree/gen_build_index.py` (the region and its `GEN_REGIONS` entry) ·
 `tools/memory-tree/marker-contract.test.sh` (a fourth reader joins the case table) ·
 `tools/unattended/unattended.sh` (the helper, three call sites, `--preflight`, `check_authorization`) ·
+`.memory-tree.conf` (`UNITS_REGION_CUTOFF`) ·
 `tools/unattended/unattended.test.sh` (S7's re-armed control, plus arms per new refusal) ·
 `tools/unattended/check-unattended.sh` + `.test.sh` (S5's check) ·
 `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` (the roster
@@ -245,8 +254,11 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
   term 4 already exists for that reason and its rationale is now load-bearing.
 - **observability** — the refusals in S3 and S4 name the render command. A refusal that does not tell
   an unattended agent the repair verb is a stall.
-- **risks** — the migration is a 49-file render; a partial migration is covered by the transitional
-  reader. Rollback is the fallback reader plus reverting the helper. The concurrency risk is real and
+- **risks** — the bootstrap deadlock in S6a-cutoff is the one that would have been discovered in
+  production: an uncutoff refusal makes this unit unlandable by any run, because every candidate run's
+  BASE predates the region. It is caught here only because the build was attempted rather than
+  reasoned about, and AC8c is the arm that keeps it caught. Beyond that, the migration is a 49-file
+  render; a partial migration is covered by the transitional reader. Rollback is the fallback reader plus reverting the helper. The concurrency risk is real and
   bounded by the build method's clause 3: this unit renders an artifact AND edits its generator, so it
   may not run concurrently with any pass that renders a build README.
 - **testing + left-shift gates** — S5's leg check is the left-shift for the corpus half; S7's re-armed
@@ -291,9 +303,13 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
   `build-complete` is MET — the S8 arm, which fails against the shipped driver because its first
   term reads the authored pair. `grep -c ROSTER_OPEN tools/unattended/unattended.sh` counts no
   remaining reader outside the constant's own definition.
-- **AC8b** — When the pinned BASE's README carries no `gen:build-units` pair, `check_authorization`
-  REFUSES naming the render command — the S6a arm, which fails under a plain subset test because an
-  empty BASE set satisfies it.
+- **AC8b** — When the pinned BASE's README carries no `gen:build-units` pair and the BASE commit is
+  dated at or after `UNITS_REGION_CUTOFF`, `check_authorization` REFUSES naming the render command —
+  the S6a arm, which fails under a plain subset test because an empty BASE set satisfies it.
+- **AC8c** — When the pinned BASE predates `UNITS_REGION_CUTOFF` and carries no pair,
+  `check_authorization` returns 0 — the bootstrap arm. It is asserted against THIS RUN's own base
+  (`098bebd9`), because that base is the case, and an implementation without the cutoff fails it by
+  refusing the run that landed the unit.
 - **AC9** — When `bash tools/memory-tree/marker-contract.test.sh` runs, its case table drives the new
   region through every live reader of the generated-region markers.
 - **AC10** — When the two existing `units-at-landing` facts are compared before and after this unit,
@@ -380,6 +396,16 @@ comparison over 49 READMEs) · `build README slot contract` · `tools/memory-tre
   independently at `--close` on another node's live run, with a narrower remedy this unit supersedes
   and a clause — nothing gates the markers' presence — that is S5's predicate written by someone who
   had not read this spec. S8 now closes that row.
+
+- rev-5 · 2026-08-19 · **S6a gains a dated cutoff, because building the unit revealed that S6a as
+  written bricks the run that builds it.** A run's BASE is pinned before its own work, so the BASE of
+  the run landing S5's migration render cannot carry the region S6a demands — measured on this run's
+  own base, which returns 0 for the pair. An uncutoff S6a therefore refuses `authorization-reachable`,
+  which `verb_close` will not override, making the unit unlandable by ANY run rather than merely
+  awkward for this one. `UNITS_REGION_CUTOFF` resolves it in the idiom this repo already uses three
+  times. AC8b is qualified and AC8c is new — the bootstrap arm, asserted against this run's real base,
+  which an implementation without the cutoff fails. Recorded as a risk in §5 with how it was found:
+  by attempting the build, not by reading the spec again.
 
 ## 10. Reuse audit
 
