@@ -117,6 +117,13 @@ GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
 # was the cheaper option and was refused: a renamed heading silently empties the comparison, which is
 # a check that passes by finding nothing.
 ROSTER_OPEN='<!-- roster:units -->'; ROSTER_CLOSE='<!-- /roster:units -->'
+# TOOL-aBoundedVerdict-11 S1/S2 - the GENERATED units region, nested inside the build-index pair.
+# Addressed BY NAME. The three readers below used to select unit rows out of the enclosing region by
+# ROW SHAPE, and `gen_build_index.py` renders a records table into that same region, so every review
+# and journal record counted as an unfinished unit: `build-complete` could not pass on any build
+# holding a record, `--landed` would have frozen record filenames as the units a run covered, and
+# `--status` told a resuming agent its next unit was a shell script under `build/`.
+UNITS_OPEN='<!-- gen:build-units -->'; UNITS_CLOSE='<!-- /gen:build-units -->'
 
 # Exactly one open, exactly one close, CLOSE AFTER OPEN, print the slice between them. Never a
 # whole-file regex — the splice contract this borrows from gen_build_index.py's apply_region().
@@ -910,8 +917,28 @@ missing_units() { # slug · dir
 # Reads the BUILD README's pair — the one home of the unit list since main's redesign removed the
 # run-state copy and required that region to be EMPTY. Pointing these at the emptied region made
 # `build-complete` unsatisfiable: a check that cannot PASS, caught by its own green control.
-unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \['; }
+# TOOL-aBoundedVerdict-11 S2/S3. Returns rows on stdout and NOTHING else, because callers capture it
+# in a command substitution and test it for emptiness - a diagnostic printed here would be captured
+# as a row. So absence-or-malformation is an EXIT STATUS (3, the same one `region` uses) and the
+# message is the caller's to print; `units_refusal` is the one place that message is spelled.
+unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
+  local out
+  out=$(region "$1" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null) || return 3
+  printf '%s\n' "$out" | grep -E '^\| \['
+}
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
+# S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
+# exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
+# status as "absent", so the message names both possibilities and the repair.
+units_refusal() { # build README path
+  # The remedy names the SCRIPT and its flag, never a launcher. Spelling a bare launcher here
+  # tripped the driver's own resolver ban, and the ban is right about more than form: a bare
+  # launcher is what this repo cannot assume exists, so telling an operator to type one is the
+  # defect the ban exists to stop. Same shape as absence-assertion-over-whole-file-text: the
+  # check cannot tell an invocation from a sentence about one, and need not when the sentence
+  # is right anyway.
+  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
+}
 
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state next="" miss nmiss=0
@@ -1074,9 +1101,11 @@ verb_landed() { # slug
   # adding a unit would retroactively change what this landed run appears to have carried. Freezing
   # the ids at the moment of landing is what keeps a terminal record a record. It is written as an
   # authored FACT because nothing else in the tree holds it once the README moves on.
+  # TOOL-aBoundedVerdict-11 S2 - through `unit_rows`, so this cannot freeze a record filename as one
+  # of the units the run covered. Both existing frozen facts were measured clean before the change.
   set_fact "$rel" units-at-landing \
-    "$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null \
-       | grep -E '^\| \[' | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+    "$(unit_rows "$(readme_of "$slug")" \
+       | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
   return 0
@@ -1336,7 +1365,10 @@ verb_status() { # slug
   # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
   # from a copy inside this file, which is exactly the staleness that design removes — main's
   # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
-  unit=$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null          | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1          | sed -e 's/^| \[//' -e 's/\].*//')
+  # TOOL-aBoundedVerdict-11 S2 - through `nonterminal_units`. This is the single line a resuming
+  # agent reads to learn what to do next, and by row shape it named a record: measured on
+  # aBranchedMandate it reported a repro shell script under `build/` as the next unit.
+  unit=$(nonterminal_units "$(readme_of "$slug")" | head -1          | sed -e 's/^| \[//' -e 's/\].*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave

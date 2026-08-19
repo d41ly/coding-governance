@@ -91,6 +91,7 @@ They sequence; the bump rides the later of the two, because the verdict-epoch le
 **Build status:** OPEN · 5 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 TOOL-aDeclaredBound-6
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | OPEN | rev-2 | 2026-08-18 |
@@ -98,6 +99,7 @@ ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDecl
 | [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | OPEN | rev-2 | 2026-08-18 |
 | [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-3 | 2026-08-18 |
 | [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | OPEN | rev-4 | 2026-08-18 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

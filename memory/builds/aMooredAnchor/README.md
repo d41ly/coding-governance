@@ -114,9 +114,11 @@ header of every spec in this folder — do not hand-edit it.
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aMooredAnchor-1 TOOL-aMooredAnchor-2 TOOL-aMooredAnchor-4
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aMooredAnchor-1 — marker grammar, the lifecycle the kit never had, and two silent skips](spec/2026-08-11-spec-aMooredAnchor-1.md) | CLOSED | rev-5 | 2026-08-11 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

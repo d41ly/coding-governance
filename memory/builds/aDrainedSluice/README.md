@@ -41,6 +41,7 @@ branch work and of each other.
 **Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-08-08 · streams tooling
 ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aDrainedSluice-1 — drain the tooling backlog to zero](spec/2026-08-08-spec-aDrainedSluice-1.md) | CLOSED | rev-2 | 2026-08-08 |
@@ -52,6 +53,7 @@ ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrai
 | [TOOL-aDrainedSluice-7 — V6: the recall cache is bounded](spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-8 — V7: three gates that could not see what they judge](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md) | CLOSED | rev-3 | 2026-08-08 |
 | [TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md) | INPROGRESS | rev-3 | 2026-08-08 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

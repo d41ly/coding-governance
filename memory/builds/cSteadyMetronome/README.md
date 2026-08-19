@@ -89,9 +89,11 @@ every spec in this folder — do not hand-edit it.
 **Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cSteadyMetronome-1
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

@@ -18,9 +18,11 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-07-20 · streams tooling
 ids TOOL-aLeasedGauntlet-1
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | CLOSED | rev-4 | 2026-07-20 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

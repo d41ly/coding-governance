@@ -320,6 +320,7 @@ ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefed
 ids TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25 TOOL-cBriefedPilot-26
 ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBriefedPilot-30 TOOL-cBriefedPilot-31 TOOL-cBriefedPilot-32 TOOL-cBriefedPilot-34 TOOL-cBriefedPilot-35 TOOL-cBriefedPilot-36 TOOL-cBriefedPilot-37 TOOL-cBriefedPilot-38
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | CLOSED | rev-3 | 2026-08-16 |
@@ -345,6 +346,7 @@ ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBrie
 | [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | CLOSED | rev-2 | 2026-08-16 |
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | CLOSED | rev-4 | 2026-08-16 |
 | [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | CLOSED | rev-2 | 2026-08-16 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

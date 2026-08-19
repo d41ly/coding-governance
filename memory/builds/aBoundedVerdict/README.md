@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21
+ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23
 ---
 
 # aBoundedVerdict — an unattended run stops reviewing, stops stalling, and says why it stopped
@@ -255,8 +255,9 @@ authority stays the BASE blob, re-derived through git by both the driver and the
 <!-- gen:build-index -->
 **Build status:** SPECCED · 15 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
-ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21
+ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-8 | 2026-08-19 |
@@ -274,6 +275,7 @@ ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL
 | [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-21 — the landing push is bounded too](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md) | SPECCED | rev-1 | 2026-08-19 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

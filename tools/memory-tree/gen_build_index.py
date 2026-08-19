@@ -59,6 +59,13 @@ PLAN_CLOSE = "<!-- /roster:units -->"
 #
 # The renderer is looked up by name at call time rather than stored, so this stays a plain data
 # declaration and a region cannot be half-registered.
+# TOOL-aBoundedVerdict-11 S1 — the units table's own pair, NESTED inside `build-index` rather than a
+# fifth GEN_REGIONS entry. It is deliberately not in GEN_REGIONS: that tuple drives region CREATION
+# and the canonical order check, and registering this one there would place the units table outside
+# the region every existing reader brackets. Consumers address it with `region()` like any other pair.
+UNITS_OPEN = "<!-- gen:build-units -->"
+UNITS_CLOSE = "<!-- /gen:build-units -->"
+
 GEN_REGIONS = (
     ("build-index", MARK_OPEN, MARK_CLOSE),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
@@ -583,6 +590,14 @@ def render_region(build: dict) -> str:
     # sitting exactly at the cap would pass on one node and red on another.
     out += _wrap_ids(build["roster"])
     out.append("")
+    # TOOL-aBoundedVerdict-11 S1 — the units table gets its own NESTED marker pair. The unattended
+    # driver used to select unit rows out of the enclosing region by ROW SHAPE (`^| \[`), which also
+    # matches the records table below, so every review and journal record counted as an unfinished
+    # unit and `build-complete` could not pass on any build holding a record. The pair is nested
+    # rather than a new GEN_REGIONS entry so the enclosing region's extent is byte-unchanged and the
+    # three legs and two dossiers that bracket it keep working; what changes is that the units table
+    # now has an ADDRESS a reader can name instead of a shape it has to guess.
+    out.append(UNITS_OPEN)
     if build["units"]:
         out += ["| Unit | Status | Rev | Last change |", "|---|---|---|---|"]
         for u in sorted(build["units"], key=lambda x: x["path"]):
@@ -592,6 +607,7 @@ def render_region(build: dict) -> str:
     else:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
+    out.append(UNITS_CLOSE)
     if build["kinds"]:
         ks = [f"`{k}/`" for k in build["kinds"]]
         joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]

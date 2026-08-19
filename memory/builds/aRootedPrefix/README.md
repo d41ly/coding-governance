@@ -19,9 +19,11 @@ shipped reinvention reports `collision_flags: 1` at a root install and `0` at a 
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | CLOSED | rev-3 | 2026-08-10 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

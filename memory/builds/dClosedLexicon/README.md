@@ -81,6 +81,7 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12
 ids TOOL-dClosedLexicon-13 TOOL-dClosedLexicon-14 TOOL-dClosedLexicon-15
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-dClosedLexicon-1 — §0 gains a fallback rule, and the §14 externalization is refuted](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md) | CLOSED | rev-3 | 2026-08-16 |
@@ -90,6 +91,7 @@ ids TOOL-dClosedLexicon-13 TOOL-dClosedLexicon-14 TOOL-dClosedLexicon-15
 | [TOOL-dClosedLexicon-11 — a build may have more than one unattended run](spec/2026-08-17-spec-dClosedLexicon-11.md) | CLOSED | rev-4 | 2026-08-17 |
 | [TOOL-dClosedLexicon-12 — the census question, measured: refuse the coupling, close the real hole](spec/2026-08-17-spec-dClosedLexicon-12.md) | CLOSED | rev-2 | 2026-08-17 |
 | [TOOL-dClosedLexicon-13 — govkit's preview promises writes `apply` will not perform](spec/2026-08-17-spec-dClosedLexicon-13.md) | CLOSED | rev-2 | 2026-08-17 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

@@ -209,9 +209,11 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
 ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

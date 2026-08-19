@@ -68,9 +68,11 @@ ids: ARCH-$1-1
 <!-- gen:build-index -->
 **Build status:** OPEN · 1 unit(s)
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [ARCH-$1-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
 <!-- /gen:build-index -->
 EOF
 }

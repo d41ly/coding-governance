@@ -92,10 +92,12 @@ from "no measurement at all" to "the link is measured, the content is reviewed".
 **Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-cTracedPromise-1 — a closed spec has to point at a commit that changed the product](spec/2026-08-14-spec-cTracedPromise-1.md) | CLOSED | rev-3 | 2026-08-15 |
 | [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | CLOSED | rev-4 | 2026-08-15 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`.
 <!-- /gen:build-index -->
