@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-19T15:00:55+03:00 @ b482cdca6466a56d77d96f7726a566ece19bacc9
+last-audit: 2026-08-19T17:30:45+03:00 @ b482cdca6466a56d77d96f7726a566ece19bacc9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; parallel-coding-governance.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; parallel-coding-governance.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5d2c32fe9e2c6165b84b14a275d138585b15b22a
+last-body-change: fd8f6fa4a2fb89287a49a8581466b301625ffdf2
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -228,3 +228,12 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
   TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
   the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
+- `bash <gate> | tail -N` returns TAIL's exit status, so the idiom that makes a gate readable discards
+  the only thing it is for. It reported a RED bar as exit 0 twice in one session. Redirect to a file and
+  echo `$?`, never pipe a gate whose verdict you intend to read.
+- The verdict-epoch gate covers `gen_build_index.py`, not only the hygiene engine, and it reads git
+  HISTORY rather than the worktree: the three-place bump must be in a COMMIT at or after the engine
+  change. Editing the files and re-running it still reds.
+- A unit is not done when its arms are green. Every spec's own "Files touched" names documents — the
+  protocol pair, the rendered Skill, a backlog row, the kit version — and a build measured 1-of-5 on
+  those halves while every test suite passed. Sweep that list per unit before calling it built.
