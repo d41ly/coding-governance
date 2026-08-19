@@ -9,10 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 | 2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 | 2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 | 2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md) | diff-review | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 | 2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
 keepalive-reaped: yes
 parked-surfaced: yes
-witness: 73b22de5810a8cc16ca01e9027aeec45b37f3470
-phase: LANDING
+witness: b482cdca6466a56d77d96f7726a566ece19bacc9
+phase: LANDED
 branch-sha: 497d25d0ab47e29b29f08189473adf05f926399f
 branch-ref: refs/heads/branch/unattended-apaced-turnstile-8bd231
 anchor-kind: run-branch
