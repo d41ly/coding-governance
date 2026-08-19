@@ -693,6 +693,46 @@ out=$(run --close tRun --override closing-review-recorded --reason "fixture buil
 hit "$out" "close OK"
 miss "$out" "build-complete"
 
+# ---- TOOL-aBoundedVerdict-11 S7: BOTH items MET, with NO --override at all. This is the control the
+# ---- close-path audit found DISARMED: `build-complete`'s green control above overrides
+# ---- `closing-review-recorded`, and every `closing-review-recorded` arm overrides `build-complete`,
+# ---- so nothing in this suite ever had both satisfied at once. That is how `build-complete` becoming
+# ---- unsatisfiable on 49 of 49 corpus builds rode the merge bar green: the arm written to catch
+# ---- exactly that was cleared by the override of the item it was measuring.
+bcopen
+mkdir -p memory/builds/tRun/reviews
+printf '# closing review
+
+range %s...HEAD
+' "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" > memory/builds/tRun/reviews/r1.md
+git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "close OK"
+miss "$out" "build-complete"
+miss "$out" "closing-review-recorded"
+
+# ---- ...and the REGRESSION arm for the defect itself: a records-shaped row inside `gen:build-index`
+# ---- but OUTSIDE `gen:build-units`. That is exactly what `gen_build_index.py` renders for any build
+# ---- holding a tracked record, and by row SHAPE it counted as an unfinished unit - which is what made
+# ---- the two items mutually unsatisfiable. The driver must not see it.
+bcopen
+mkdir -p memory/builds/tRun/reviews
+printf '# closing review
+
+range %s...HEAD
+' "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" > memory/builds/tRun/reviews/r1.md
+# `%` as the delimiter: the replacement is a markdown TABLE, so every `|` in it would have closed a
+# `|`-delimited sed expression early and produced a plausible-looking wrong file.
+sed -i 's%^<!-- /gen:build-units -->%<!-- /gen:build-units -->
+
+| Record | Kind | Serves |
+|---|---|---|
+| [r1.md](reviews/r1.md) | diff-review | ARCH-tRun-1 |%' memory/builds/tRun/README.md
+git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "close OK"
+miss "$out" "build-complete"
+
 # term 1 — no well-formed roster pair. A COMPLETENESS check cannot borrow check_authorization's
 # opt-in-by-presence disposition: on this tree 1 of 35 build READMEs carries the pair, so an opt-in
 # build-complete would be vacuously true for 34 of them and blind in the case it exists for.

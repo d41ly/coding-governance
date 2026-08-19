@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh — the merge-bar leg for the unattended-run kit. EIGHTEEN checks over the tree.
+# check-unattended.sh — the merge-bar leg for the unattended-run kit. NINETEEN checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -737,6 +737,30 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
   elif [ "$kol" -lt "$pfl" ]; then
     fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
   fi
+fi
+# ---- 19 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
+# ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
+# ---- the authorization scope, `--plan`'s roster join, `--status`'s next unit and `build-complete`'s
+# ---- terms - so a README without it is a build no run can close, and one with a duplicated or
+# ---- transposed pair is worse: `region` conflates absent with malformed.
+# ----
+# ---- POPULATION IS DERIVED, never listed: `git ls-files` over the memory root's build READMEs. A
+# ---- hand-kept list goes stale the first time a build folder lands. This check exists because
+# ---- nothing gated the markers' PRESENCE - only their well-formedness once present - which another
+# ---- node reported independently from a live run as TOOL-aPacedTurnstile-14.
+# ----
+# ---- The generator CREATES a missing pair on --write, so the repair is one render and the refusal
+# ---- names it: the SCRIPT and its mode, never a launcher, because this repo cannot assume a bare
+# ---- `python` exists and the driver's own resolver ban refuses one in source.
+bad_units=""
+for bmd in $(GIT ls-files "$M/builds/*/README.md" 2>/dev/null); do
+  no=$(grep -cxF -- '<!-- gen:build-units -->' "$bmd" 2>/dev/null || true)
+  nc=$(grep -cxF -- '<!-- /gen:build-units -->' "$bmd" 2>/dev/null || true)
+  [ "${no:-0}" = 1 ] && [ "${nc:-0}" = 1 ] && continue
+  bad_units="$bad_units $bmd"
+done
+if [ -n "$bad_units" ]; then
+  fail 19 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py:$bad_units"
 fi
 
 exit "$status"

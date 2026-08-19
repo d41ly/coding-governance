@@ -1294,7 +1294,11 @@ verb_preflight() { # slug · keepalive-id
   #
   # It reports through `status` rather than returning, so this refusal joins the others in one pass and
   # the operator sees every unmet precondition at once instead of one per invocation.
-  if ! unit_rows "$(readme_of "$slug")" >/dev/null 2>&1; then
+  # The test is on the REGION, not on `unit_rows`. `unit_rows` pipes through grep, so it returns 1 when
+  # the pair is WELL-FORMED BUT EMPTY - which is every build that has no specs yet, i.e. every brand
+  # new one. Refusing on any non-zero status therefore refused the ordinary case; only "no single
+  # well-formed pair" is a refusal, and that is what `region` alone reports.
+  if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
     fail 44 "the build README's unit list cannot be read, so every verb keyed on it would run blind"
     units_refusal "$(readme_of "$slug")"
     status=1

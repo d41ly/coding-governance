@@ -58,6 +58,8 @@ ids: ARCH-$1-1
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 1 unit(s)
+<!-- gen:build-units -->
+<!-- /gen:build-units -->
 <!-- /gen:build-index -->
 EOF
   cat > "memory/builds/$1/RUN.md" <<EOF
@@ -739,6 +741,8 @@ ids: ARCH-tWaive-1
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 1 unit(s)
+<!-- gen:build-units -->
+<!-- /gen:build-units -->
 <!-- /gen:build-index -->
 RM
 # tRun's record is RUNNING, and a second live run trips check 7 — 'the run' stops being well
@@ -837,6 +841,30 @@ hit "$(run)" "the Skill template never names /session-kickoff while this project
 reset_tree; kick_engine
 mutate tools/unattended/SKILL.template.md '/unattended.sh --preflight/d'
 hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
+
+# ---- 19 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
+# ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
+# ---- silent whether the predicate worked or not, which is the class this kit keeps meeting.
+reset_tree
+mutate memory/builds/tRun/README.md '/gen:build-units/d'
+# The arm carries the ENTIRE literal signature up to the first interpolation, not a readable prefix:
+# check-arms grades a branch on the whole thing, and a prefix reds. That is also why the remedy is
+# part of THIS assertion rather than a second one - the remedy is inside the same literal.
+hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py"
+
+# ...a DUPLICATED pair is refused too, not just an absent one. `region` conflates the two statuses, so
+# an arm for only the absent case would leave the malformed half unproven.
+reset_tree
+printf '
+%s
+%s
+' '<!-- gen:build-units -->' '<!-- /gen:build-units -->' >> memory/builds/tRun/README.md
+hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair"
+
+# ...and the GREEN control: an untouched corpus is silent on check 19. Without it the two arms above
+# could both be firing on something unrelated.
+reset_tree
+miss "$(run)" "well-formed generated-units marker pair"
 
 # ...a blank engine turns the check off, and the arm proves it by leaving the lines TRANSPOSED —
 # silent because the project ships no kickoff skill, not because the template is conforming.
