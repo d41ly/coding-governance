@@ -22,7 +22,7 @@ LANDER="bash tools/push-main.sh"
 BYPASS_BAN="--no-verify"
 
 # REPLACE. Your full merge bar, for the `gates-green` DoD item.
-GATE_CMD="bash tools/run-gates.sh"
+GATE_CMD="bash tools/run-gates/run-gates.sh"
 
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked

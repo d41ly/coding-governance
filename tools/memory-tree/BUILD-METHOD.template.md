@@ -4,7 +4,7 @@
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
-this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates.sh`.
+this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
 **Budget: ≤20 KB, ≤250 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
 

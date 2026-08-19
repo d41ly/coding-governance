@@ -17,8 +17,6 @@ tools/memory-tree/marker-contract.test.sh
 tools/memory-tree/merge-rows.test.sh
 tools/push-main.test.sh
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh
-tools/run-gates.evidence.test.sh
-tools/run-gates.test.sh
 tools/unattended/adopt-unattended.test.sh
 tools/workflows/check-protocol-parity.test.sh
 tools/workflows/check-review-join.test.sh

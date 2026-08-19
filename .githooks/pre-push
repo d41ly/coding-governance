@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
-# FULL gate (tools/run-gates.sh) once and BLOCKS the push if it reds. Other pushes do nothing.
+# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes do nothing.
 # Install once per clone: git config core.hooksPath .githooks. Override: git push --no-verify.
 #
 # Drift note: the ACTIVE hook here is the TRACKED .githooks/ dir (core.hooksPath), not an out-of-tree
@@ -81,7 +81,7 @@ echo "pre-push: full gate on $def push (${main_local:0:8})..."
 # no run would ever execute every leg against the tree that actually lands. Exported, not passed as an
 # argument, so a stubbed GOV_GATE_CMD inherits it too.
 export GATE_FULL=1
-gate=${GOV_GATE_CMD:-bash tools/run-gates.sh}
+gate=${GOV_GATE_CMD:-bash tools/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
 [ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."

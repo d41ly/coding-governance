@@ -1,26 +1,79 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
 # The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
-#   bash tools/run-gates.sh                # legs run CONCURRENTLY, width min(8, nproc)
-#   GATE_JOBS=1 bash tools/run-gates.sh    # one worker — the serial bar, through this same pool
-# Legs live in tools/gate-legs.json (single source); this runner is a thin iterator over it.
+#   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, width min(8, nproc)
+#   GATE_JOBS=1 bash <prefix>/run-gates/run-gates.sh # one worker — the serial bar, through this same pool
+# Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
+# a thin iterator over it and holds no leg command of its own.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
+KIT_RUN_GATES_VERSION=1.0   # gov:kit run-gates@1.0
+# THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
+# cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
+# `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
+# manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
+KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-. "$ROOT/tools/lib/resolve-python.sh"
-PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse tools/gate-legs.json"; exit 2; }
+# The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
+# kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and tools/lib/ is gov-internal and never travels:
+# sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
+# The resolver parity gate derives its copy population by grepping for the marker below, so this
+# copy enrols itself. Do not edit it here. (That gate's own script path is deliberately NOT
+# spelled in this file: the canary forbids a leg's script path appearing in the runner, and it
+# is right to — a comment naming one is one edit away from an inlined leg command.)
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
 fails=0; n=0; skips=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
 # re-runs the whole bar recursively and clobbers the live gate-last-summary.txt mid-run -- so the
 # evidence guarantee below had no way to be tested at all (TOOL-dNomadicAtlas-1).
-LEGS_FILE="${GATE_LEGS:-tools/gate-legs.json}"
+# The manifest is the kit dir's SIBLING, derived rather than spelled: this kit installs at
+# <prefix>/run-gates/ and a hardcoded "tools/gate-legs.json" resolves to nothing at any other
+# prefix. GATE_LEGS still outranks the derivation (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S3).
+# Both sides are normalised through the SAME `cd ... && pwd` chain before the strip. Under MSYS one
+# directory has two spellings — `git rev-parse --show-toplevel` answers `C:/...` and `pwd` answers
+# `/c/...` — and a prefix strip across the two flavours silently leaves an ABSOLUTE path, which then
+# resolves to nothing. Never compare path strings across flavours.
+ROOTN=$(cd "$ROOT" && pwd)
+KITREL=${KITDIR#"$ROOTN"/}
+LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
@@ -152,19 +205,26 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   printf '%s' "$rc" > "$WORK/$i.rc.tmp" && mv -f "$WORK/$i.rc.tmp" "$WORK/$i.rc"
 }
 
+# THE TAIL CONTRACT (the run-gates promotion spec's S5). Every tailed line is `<verb>  <leg name>  <tail>`:
+# TWO spaces before the parenthesised tail, on every verb, so a reader splits the remainder on a
+# double space and gets the bare leg name back. A single space made that split return a TRUNCATED
+# name for any leg whose name contains a space, which is most of them, and the deployer reads a
+# target's verdicts exactly that way. The canary forbids a double space INSIDE a leg NAME, which is
+# what keeps the split unambiguous rather than merely usually right. Every verb the sibling units
+# add conforms: two spaces before any parenthesised tail.
 report_one() { # leg index — emits exactly the line the serial bar has always emitted
   local i=$1 rc
   n=$((n+1))
   if [ ! -f "$WORK/$i.rc" ]; then
-    fails=$((fails+1)); printf 'GATE FAIL  %s (no result)\n' "${names[$i]}"
-    FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]} (no result)"$'\n'; return
+    fails=$((fails+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
+    FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
   if [ "$rc" = skip ]; then
-    skips=$((skips+1)); printf 'GATE skip  %s (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
+    skips=$((skips+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "${names[$i]}"
-  else fails=$((fails+1)); printf 'GATE FAIL  %s (exit %d)\n' "${names[$i]}" "$rc"; sed 's/^/    /' "$WORK/$i.out"
-       FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]} (exit $rc)"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
+  else fails=$((fails+1)); printf 'GATE FAIL  %s  (exit %d)\n' "${names[$i]}" "$rc"; sed 's/^/    /' "$WORK/$i.out"
+       FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (exit $rc)"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
        # and not only WHICH. A pointer, never the bytes — this file is what an operator quotes.
        lf="$(leg_log "${names[$i]}")" && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'; fi

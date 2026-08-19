@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 73 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -63,8 +63,11 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `row-grammar selftest` | row-grammar |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
+| `run-gates adopter e2e` | run-gates |
 | `run-gates canary` | baseline |
 | `run-gates evidence` | foundation |
+| `run-gates gov canary` | run-gates |
+| `run-gates wiring` | run-gates |
 | `settings-merge selftest` | baseline |
 | `template size <=48KiB` | baseline |
 | `template size gate selftest` | playbook |
@@ -96,6 +99,7 @@ Inventories: gate-legs: 70 · kits: 13 · git-hooks: 2 · workflow-scripts: 4 ·
 | `memory-recall` | memory-recall |
 | `memory-tree` | memory-tree-hygiene |
 | `pytest-parallel-guardrails` | baseline |
+| `run-gates` | run-gates |
 | `unattended` | unattended |
 | `workflows` | baseline |
 

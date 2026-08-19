@@ -49,6 +49,19 @@ if [ -z "$ac" ] || ! grep -qE "gov:kit agent-cap@$ac([^0-9.]|\$)" tools/hooks/ag
   fails=$((fails+1))
 fi
 need "KIT_SETTINGS_MERGE_VERSION" tools/settings-merge.py                   "KIT_SETTINGS_MERGE_VERSION = \"$V\""
+need "KIT_RUN_GATES_VERSION"      tools/run-gates/run-gates.sh              "^KIT_RUN_GATES_VERSION=$V([[:space:]]|\$)"
+
+# run-gates: the constant in the runner, the marker on that same line, and the marker in the kit
+# README a deployer greps. Asserted EQUAL rather than merely present, because this file has twice
+# recorded a half-bumped pair passing a presence-only check (agent-cap, settings-merge).
+rg=$(grep -oE "^KIT_RUN_GATES_VERSION=$V([[:space:]]|$)" tools/run-gates/run-gates.sh | head -1 | grep -oE "$V")
+if [ -z "$rg" ]; then
+  echo "kit-versions: KIT_RUN_GATES_VERSION is unreadable in tools/run-gates/run-gates.sh"
+  fails=$((fails+1))
+else
+  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" tools/run-gates/run-gates.sh     || { echo "kit-versions: run-gates.sh gov:kit marker != KIT_RUN_GATES_VERSION ($rg)"; fails=$((fails+1)); }
+  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" tools/run-gates/README.md     || { echo "kit-versions: tools/run-gates/README.md gov:kit marker != KIT_RUN_GATES_VERSION ($rg) — the README is where a deployer reads a kit's version in an adopting tree"; fails=$((fails+1)); }
+fi
 
 # settings-merge: constant plus the marker in its own module docstring, which is where a deployer
 # reads the version of a single-file kit. Presence-only left a half-bumped pair passing, same as

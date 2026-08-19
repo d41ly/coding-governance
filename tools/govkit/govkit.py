@@ -1590,6 +1590,16 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
         r.fail(f"[gate_runner].grammar = '{gr.get('grammar')}' — only 'json-array' is implemented")
     if gr.get("dedupe_key") not in (None, "name"):
         r.fail(f"[gate_runner].dedupe_key = '{gr.get('dedupe_key')}' — only 'name' is implemented")
+    # The observation templates are ITERATED by `read_gate_verdicts`, so a scalar is not a
+    # near-miss — it is walked character by character and silently classifies every line green.
+    # Refused BY NAME here rather than left to the reader, because the reader's failure is silent
+    # and this one is not. The assertion is what stops the next kit repeating it.
+    for _obs in ("observed_ran", "observed_failed", "observed_skipped"):
+        if isinstance(gr.get(_obs), str):
+            r.fail(f"[gate_runner].{_obs} is a STRING; it must be an array of templates. Its only "
+                   f"consumer iterates it, so a string is walked character by character: the head "
+                   f"becomes one character, no leg name is ever recovered, and every line is "
+                   f"classified by whichever state is scanned first")
     if isinstance(gr.get("command"), str):
         r.fail("[gate_runner].command is a STRING; it must be an argv array. Splitting a shell "
                "string is a guess about quoting this tool has no way to check, so it refuses "
@@ -2815,6 +2825,60 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             '',
             '[answers]']
     body += [f'{k} = "{answers[k]}"' for k in need]
+    # the run-gates promotion spec's S9: emit the target's [gate_runner] declaration from the selected
+    # entry's [gate_runner_seed]. A declaration written at CONFIGURE time cannot reach the same run's
+    # leg-emission step, so leaving it to the operator means the first `apply` after adopting a
+    # runner silently takes the "ORDERED, not emitted" branch and exits 0 — the silent-green
+    # direction this deployer refuses by name everywhere else.
+    #
+    # PATH TOKENS ONLY. `{prefix}` and `{kit}` are the deployer's to resolve; the runner's own
+    # `{name}` placeholder passes through VERBATIM, because that substitution belongs to the runner
+    # at report time and resolving it here would write a declaration matching one leg's line.
+    seeds = [(k, descs[k][0].get("gate_runner_seed")) for k in selection
+             if isinstance(descs.get(k), tuple) and descs[k][0].get("gate_runner_seed")]
+    if len(seeds) > 1:
+        raise Refusal(
+            "the selection carries more than one [gate_runner_seed] (" +
+            ", ".join(k for k, _ in seeds) + "). A target has ONE [gate_runner]; emitting two would "
+            "silently keep whichever the writer wrote last. Select one runner kit"
+        )
+    if seeds:
+        eid, seed = seeds[0]
+        gctx = {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}"}
+
+        def resolve_seed_value(v):
+            if isinstance(v, str):
+                out, missing = resolve_tokens(v, gctx)
+                # `{name}` is the RUNNER's, not ours: it is expected to survive.
+                unresolved = [m for m in missing if m != "name"]
+                if unresolved:
+                    raise Refusal(
+                        f"[gate_runner_seed] in entry '{eid}' leaves {', '.join(unresolved)} "
+                        f"unresolved in {v!r}; a path with a brace still in it is not a path"
+                    )
+                return out
+            if isinstance(v, list):
+                return [resolve_seed_value(x) for x in v]
+            return v
+
+        body += ['', '# [gate_runner] — emitted from the ' + eid + " kit's [gate_runner_seed] (S9).",
+                 "# The runner's own {name} placeholder is deliberately intact: it is substituted by",
+                 '# the runner at report time, not by this deployer.',
+                 '[gate_runner]']
+        # A LIST is emitted as a TOML ARRAY; only a scalar is quoted. Quoting every value turned the
+        # seed's observation templates into strings, and `read_gate_verdicts` iterates them — so it
+        # walked each one character by character and could never report a red leg. The emitter and
+        # the reader had never met, because every arm on the bar hand-writes the array form.
+        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env",
+                  "observed_ran", "observed_failed", "observed_skipped", "command"):
+            if k not in seed:
+                continue
+            v = resolve_seed_value(seed[k])
+            if isinstance(v, list):
+                body.append(f'{k} = [' + ", ".join(f'"{x}"' for x in v) + ']')
+            else:
+                body.append(f'{k} = "{v}"')
+
     body += ['', '[policy]',
              '# on_baseline_red: proceed | refuse — a target leg already red BEFORE the install',
              'on_baseline_red = "proceed"',
