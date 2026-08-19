@@ -329,7 +329,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 | [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | INPROGRESS | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | SPECCED | rev-3 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | SPECCED | rev-2 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | INPROGRESS | rev-2 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | SPECCED | rev-1 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-2 | 2026-08-19 |

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 

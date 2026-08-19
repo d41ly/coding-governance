@@ -1433,6 +1433,124 @@ done <<<"$ug"
 np=$(grep -nE '(^|[^-[:alnum:]])(python3?|py) ' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 
+# ============================================================ TOOL-aBoundedVerdict-15
+# ---- S1: the two phase writers that did NOT stage now do. The leg's whole per-run population is the
+# ---- INDEX, so an unstaged phase is invisible to every leg check -- and --landed's check_clean then
+# ---- refuses because the tree is dirty with --close's OWN write, blaming the operator's tree.
+# ---- The arm is the SEQUENCE: --close then --landed with no intervening git add. Asserting either
+# ---- verb alone passes today and proves nothing.
+bcopen
+run --close tRun >/dev/null 2>&1
+n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ] \
+  || { echo "FAIL --close left its phase write unstaged, so the leg cannot see the run at all"; st=1; }
+
+# ---- ...and --phase, the SECOND omission. Three of five staged, which is why rev-1's "the only phase
+# ---- writer that does not stage" was wrong and why the source rule had to wait for both.
+bcopen
+run --phase tRun BUILDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1
+n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ] \
+  || { echo "FAIL --phase left its write unstaged, and it was the second of the two omissions"; st=1; }
+
+# ---- S2: --attest, because the two AGENT-attested keys had no writer and --abort REQUIRES both. Its
+# ---- refusals first: no item, an undeclared item, and a MACHINE-checked item.
+# ...and with NO run-state file at all: --attest must not mint one, because a record created by an
+# attestation is a run that authorized its own existence.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+hit "$(run --attest tRun --item keepalive-reaped)" "no run-state file, so there is no run to attest anything about"
+
+bcopen
+hit "$(run --attest tRun)" "--attest requires --item: an attestation with no item named is not an attestation"
+hit "$(run --attest tRun --item not-a-real-item)" "--attest names an item that is not in the declared DoD set, so nothing would ever read it"
+# The refusal reads the item's declared CHECKER rather than matching a pair of names, so a project
+# that renames a machine item still gets refused and one that declares its own agent item gets the verb.
+hit "$(run --attest tRun --item gates-green)" "--attest refuses a MACHINE-checked item, because writing its key by hand is the self-certification the Definition of Done exists to prevent; this item is checked by the driver"
+
+# ---- ...and the accept path, which must derive the RECORD KEY rather than write the item name:
+# ---- `parked-decisions-surfaced` is read from a line spelled `parked-surfaced:`.
+bcopen
+out=$(run --attest tRun --item parked-decisions-surfaced)
+hit "$out" "attested"
+hit "$(cat memory/builds/tRun/RUN.md)" "parked-surfaced: yes"
+miss "$(cat memory/builds/tRun/RUN.md)" "parked-decisions-surfaced: yes"
+n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ] \
+  || { echo "FAIL --attest wrote the key but did not stage it, so the leg cannot read it back"; st=1; }
+
+# ---- ...and --abort becomes reachable WITHOUT a hand edit, which is the whole point of the verb.
+bcopen
+run --attest tRun --item keepalive-reaped >/dev/null
+run --attest tRun --item parked-decisions-surfaced >/dev/null
+hit "$(run --abort tRun --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
+
+# ---- S3: the override park is the FOURTH caller of a guard that existed in triplicate. A truthful
+# ---- reason -- one that says why the flag matters -- used to red leg check 11 permanently on a record
+# ---- no verb can rewrite. Refused in the validation loop, BEFORE anything is written.
+bcopen
+before=$(sum)
+out=$(run --close tRun --override build-complete --reason "the lander must never be given --no-verify")
+hit "$out" "an override item or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
+n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL the bypass-flag override refusal fired AFTER writing, so it prevented nothing"; st=1; }
+
+# ---- SOURCE-level, TOOL-aBoundedVerdict-15 S4: the two rules that were each followed everywhere but
+# ---- once. Landing LAST, deliberately: a meta-gate written before its subject is clean reds on the
+# ---- very diff that fixes it, and this repo has already paid a session for that ordering.
+# ----
+# ---- SCOPED BY FUNCTION, not by line distance. The first cut asked for `stage_or_fail` within three
+# ---- lines of a phase write and for a bypass guard within forty lines of a `park` call, and it
+# ---- produced three FALSE POSITIVES on correct code: verb_landed legitimately batches phase, witness
+# ---- and units-at-landing before one stage, and both guarded park sites sit further from their guard
+# ---- than an arbitrary window allows. A proximity rule measures text where the question is control
+# ---- flow, and a meta-gate that fires on correct code is worse than none - it teaches its readers to
+# ---- ignore it, or to contort code to satisfy it.
+#
+# Rule 1 - a function that writes the phase must also stage. Nothing about WHERE.
+badstage=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; ph[fn] = 0; sg[fn] = 0 }
+  fn && /set_fact "\$rel" phase/ { ph[fn] = 1 }
+  fn && /stage_or_fail/          { sg[fn] = 1 }
+  END { for (f in ph) if (ph[f] && !sg[f]) print f }
+' "$SCRIPT")
+n=$((n+1)); [ -z "$badstage" ] || { echo "FAIL a function writes the phase and never stages it: $badstage"; st=1; }
+
+# Rule 1's RED FIXTURE, without which the rule is silent whether it works or not: strip verb_close's
+# stage and prove the rule names verb_close.
+u4="$TMP/s4-unstaged.sh"
+awk '/set_fact "\$rel" phase LANDING/ { print; skip = 1; next }
+     skip && /stage_or_fail/ { skip = 0; next }
+     { print }' "$SCRIPT" > "$u4"
+ru=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; ph[fn] = 0; sg[fn] = 0 }
+  fn && /set_fact "\$rel" phase/ { ph[fn] = 1 }
+  fn && /stage_or_fail/          { sg[fn] = 1 }
+  END { for (f in ph) if (ph[f] && !sg[f]) print f }
+' "$u4")
+n=$((n+1)); [ -n "$ru" ] || { echo "FAIL S4 rule 1 does NOT fire on a copy with verb_close's stage removed, so it would not notice a regression"; st=1; }
+
+# Rule 2 - a function that parks must also carry the bypass-flag guard. Same scoping, same reason.
+#
+# ONE DECLARED EXEMPTION, and the rule's limit stated with it: `verb_preflight` parks a waiver, and its
+# guard lives in `check_waivers`, which it CALLS. This rule reads text and cannot follow a call, so a
+# cross-function guard is declared here rather than pretended away. That is the whole cost of the
+# scoping choice, and it is the second false positive this rule produced before being narrowed -- the
+# first was a proximity window, this one a call boundary. A NEW name appearing in this exemption list
+# deserves the scrutiny the rule exists to apply, not an edit to the list.
+badguard=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
+  fn && /^ *park "\$rel"/ { pk[fn] = 1 }
+  fn && /BYPASS_BAN/       { gd[fn] = 1 }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+' "$SCRIPT")
+n=$((n+1)); [ -z "$badguard" ] || { echo "FAIL a function parks an entry with no bypass-flag guard anywhere in it: $badguard"; st=1; }
+
+# Rule 2's RED FIXTURE. Rule 1 had one and rule 2 did not, which I said out loud rather than shipping
+# the asymmetry: a source rule with no negative control is the class this build keeps filing.
+rg=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
+  fn && /^ *park "\$rel"/ { pk[fn] = 1 }
+  fn && /BYPASS_BAN/       { gd[fn] = 1 }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+' <(sed '/BYPASS_BAN/d' "$SCRIPT"))
+n=$((n+1)); [ -n "$rg" ] || { echo "FAIL S4 rule 2 does NOT fire on a copy with every bypass guard deleted, so it would not notice a regression"; st=1; }
+
 # ---- SOURCE-level, TOOL-aBoundedVerdict-12 S6: every `dod_met` arm this unit gives a message to must
 # ---- actually carry a NON-EMPTY DOD_OUT assignment. The rule keys on the arm BODY rather than on a
 # ---- literal `return 1`, because rev-1's predicate did exactly that and was VACUOUS: a literal

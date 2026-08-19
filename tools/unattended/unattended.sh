@@ -1107,6 +1107,9 @@ verb_phase() { # slug · phase · witness
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
   set_fact "$rel" phase "$want" || return 1
+  # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
+  # that does not stage" was wrong. Three of five staged; this and --close were the two that did not.
+  stage_or_fail "$rel" || return 1
   set_fact "$rel" witness "$wit" || return 1
   echo "unattended: phase $want · witness $wit"
   return 0
@@ -1512,6 +1515,15 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     case " $(dod) " in *" $ov:"*) ;;
       *) fail 12 "--override names an item that is not in the declared DoD set, and an override on an item nobody declared is not an override: $ov"; return 1;; esac
     [ -n "$reason" ] || { fail 12 "--override requires --reason: an unrecorded override is indistinguishable from a passing check"; return 1; }
+    # TOOL-aBoundedVerdict-15 S3 - the FOURTH caller of a guard that existed in triplicate. --abort,
+    # --waive and --park all refuse text spelling the declared bypass flag; the override park did not,
+    # so a TRUTHFUL reason - one that says why the flag matters - reds leg check 11 permanently on a
+    # record no verb can rewrite. Checked HERE, in the loop that validates every pair before any of
+    # them is acted on, because a guard that fires after the write has not prevented anything.
+    if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$ov" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+      fail 12 "an override item or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"
+      return 1
+    fi
     # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
@@ -1565,6 +1577,11 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
   # make the record agree with reality.
   set_fact "$rel" phase LANDING || return 1
+  # TOOL-aBoundedVerdict-15 S1 - STAGED, like the four other phase writers. The gate leg's entire
+  # per-run population is `git ls-files`, which reads the INDEX, so an unstaged LANDING phase is
+  # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
+  # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
+  stage_or_fail "$rel" || return 1
   echo "unattended: close OK — every declared DoD item met; phase LANDING. Land with: $LANDER"
   return 0
 }
@@ -1741,6 +1758,39 @@ park() { # file · kind · item · reason
 # seen, and the reason the run refused" - had no writer at all, so an agent that refused a decision
 # at pass four had nowhere to put it that any gate reads. Hit during cBriefedPilot's own fold, where
 # the workaround was a backlog row: a different document, read by different people, at a later time.
+# TOOL-aBoundedVerdict-15 S2 - the two AGENT-ATTESTED DoD keys had no writer anywhere in the kit, so
+# --abort (the documented sole exit from a wedged run, which REQUIRES both) was reachable only by
+# hand-editing the authored region of a file the kit calls generated and whose grammar the driver owns.
+#
+# It refuses a MACHINE-checked item, and it does so by reading the item's declared CHECKER rather than
+# matching a pair of names: a project that declares its own agent-attested extra item gets the verb,
+# and one that renames a machine item still gets the refusal. Writing a machine key by hand is exactly
+# the self-certification this kit exists to prevent.
+#
+# The RECORD KEY is derived here too, so an operator never spells one: `parked-decisions-surfaced` is
+# read from a line spelled `parked-surfaced:`, and that mismatch is why the close-path refusal used to
+# send people to write a key nothing reads.
+verb_attest() { # slug · item · value
+  local slug="$1" item="$2" val="${3:-yes}" rel key ck
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 45 "no run-state file, so there is no run to attest anything about: $rel"; return 1; }
+  [ -n "$item" ] || { fail 45 "--attest requires --item: an attestation with no item named is not an attestation"; return 1; }
+  case " $(dod) " in *" $item:"*) ;;
+    *) fail 45 "--attest names an item that is not in the declared DoD set, so nothing would ever read it: $item"; return 1;; esac
+  ck=$(checker_of "$item")
+  if [ "$ck" != agent ]; then
+    fail 45 "--attest refuses a MACHINE-checked item, because writing its key by hand is the self-certification the Definition of Done exists to prevent; this item is checked by the driver: $item"
+    return 1
+  fi
+  refuse_if_terminal "$rel" --attest || return 1
+  case "$item" in parked-decisions-surfaced) key=parked-surfaced ;; *) key="$item" ;; esac
+  set_fact "$rel" "$key" "$val" || return 1
+  stage_or_fail "$rel" || return 1
+  echo "unattended: attested — $key: $val (an attestation, not a machine verdict)"
+  return 0
+}
+
 verb_park() { # slug · item · reason
   local slug="$1" item="$2" reason="$3" rel want pl
   check_slug "$slug" || return 1
@@ -1799,7 +1849,7 @@ PARKED
 # which is what `--abort <slug> --reason <text>` uses. A flag still pending when argv ends keeps the
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
-VERB=""; SLUG=""; KID=""; REASON=""; arg=""
+VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -1823,9 +1873,14 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
+    # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so
+    # TOOL-aBoundedVerdict-5's countable attestation needs no second verb: that unit wants the parked
+    # key's value to carry a COUNT the close can verify, and the current predicate already tolerates
+    # trailing text after yes-or-true.
+    --value)        AT_VALUE="${2:-}"; shift 2 || shift ;;
     --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; WV_PEND=""; shift 2 || shift ;;
     --waive)        WAIVE_ITEMS+=("${2:-}"); WAIVE_REASONS+=(""); WV_PEND=wv; OV_PEND=""; shift 2 || shift ;;
     --reason)       if [ "$OV_PEND" = ov ]; then OV_REASONS[$(( ${#OV_REASONS[@]} - 1 ))]="${2:-}"; OV_PEND=""
@@ -1846,7 +1901,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text>"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -1856,5 +1911,6 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
 esac
 exit "$status"
