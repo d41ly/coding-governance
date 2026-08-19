@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
 # The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
-#   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, width min(8, nproc)
+#   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
+#                                                    # <prefix>/run-gates/gate-profiles.txt declares
+#                                                    # for the detected cores and RAM
 #   GATE_JOBS=1 bash <prefix>/run-gates/run-gates.sh # one worker — the serial bar, through this same pool
+#   GATE_PROFILE=<row> bash …                        # select a table row by name, skipping detection
+#   GATE_PROFILES=<path> bash …                      # read a different table; an absent path falls
+#                                                    # back to the built-in formula (the rollback)
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
 #
@@ -155,8 +160,25 @@ det_cores() {
   CORE_SRC="$CORE_SRC,env"
   v=${NUMBER_OF_PROCESSORS:-}; if num_ok "$v"; then DET_CORES=$v; return; fi
 }
+# The cgroup root, seamed so a fixture can drive the container path. Without a seam this source is
+# untestable on a host that is not in a container, and an untestable source rots.
+CGROUP_ROOT="${GATE_CGROUP_ROOT:-/sys/fs/cgroup}"
+cgroup_ram_mb() {   # -> prints the ENFORCED limit in MB, or nothing
+  local f v
+  for f in "$CGROUP_ROOT/memory.max" "$CGROUP_ROOT/memory/memory.limit_in_bytes"; do
+    [ -r "$f" ] || continue
+    v=$(head -c 32 "$f" 2>/dev/null | tr -d '[:space:]')
+    # `max` (v2's no-limit spelling) and v1's 9223372036854771712 sentinel are both UNKNOWN, not
+    # readings. num_ok's 15-digit bound rejects the sentinel for us, which is the bound doing a second
+    # job rather than a coincidence — a 19-digit byte count is not a memory size anybody has.
+    num_ok "$v" || continue
+    v=$(( v / 1048576 )); num_ok "$v" || continue
+    printf '%s' "$v"; return 0
+  done
+  return 1
+}
 det_ram() {   # -> DET_RAM in MB
-  local pages pgsz kb v
+  local pages pgsz kb v lim
   DET_RAM=0
   if [ -n "${GATE_RAM_MB+x}" ]; then RAM_SRC="seam"; num_ok "${GATE_RAM_MB}" && DET_RAM=${GATE_RAM_MB}; return; fi
   RAM_SRC="getconf"
@@ -175,28 +197,58 @@ det_ram() {   # -> DET_RAM in MB
   v=$(sysctl -n hw.memsize 2>/dev/null)
   if num_ok "$v"; then v=$(( v / 1048576 )); if num_ok "$v"; then DET_RAM=$v; return; fi; fi
 }
+# THE ENFORCED LIMIT WINS OVER THE HOST READING, and the RAM guard is the reason. Every source above
+# reports HOST physical memory, which inside a memory-capped container is not the number that decides
+# whether eight scratch repos fit: a 4 GB CI runner on a 512 GB host reads 512 GB, selects the widest
+# row, and thrashes — the exact case the table was written for, in the environment this bar is
+# scheduled to move to. MIN rather than replace, so a bogus limit can only ever make the bar SLOWER,
+# which is the fail-safe direction this whole block is built on.
+det_ram_capped() {
+  det_ram
+  local lim
+  lim=$(cgroup_ram_mb) || return 0
+  [ "$DET_RAM" = 0 ] && { DET_RAM=$lim; RAM_SRC="$RAM_SRC,cgroup"; return 0; }
+  [ "$lim" -lt "$DET_RAM" ] && { DET_RAM=$lim; RAM_SRC="$RAM_SRC,cgroup"; }
+  return 0
+}
 
 PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
-  else det_cores; det_ram; fi
+  else det_cores; det_ram_capped; fi
   ln=0; declared=""; sel=""; selknobs=""
   # Every row is validated even after one is selected: a malformed row is an operator error wherever
   # it sits, and a refusal that depended on position would pass on the tables most likely to be wrong.
   while IFS=$'\t' read -r pname pcores pram pknobs || [ -n "$pname" ]; do
     ln=$((ln+1))
-    case "$pname" in ''|'#'*) continue ;; esac
+    # LEADING BLANKS STRIPPED BEFORE THE TEST, because the canary's own comment filter strips them
+    # and this parser did not: an INDENTED comment — which this file's header explicitly invites, and
+    # which the shipped table itself is full of — refused the whole bar with a message about field
+    # counts. Two readers of one file disagreeing about which lines are even rows is the drift this
+    # joins shut; the looser of the two wins, since no verdict can turn on a comment.
+    case "${pname#"${pname%%[![:space:]]*}"}" in ''|'#'*) continue ;; esac
     case "$pknobs" in *$'\t'*) prof_die "$PROFILES:$ln: malformed profile row (more than four tab-separated fields)" ;; esac
     [ -n "$pcores" ] && [ -n "$pram" ] && [ -n "$pknobs" ] \
       || prof_die "$PROFILES:$ln: malformed profile row (expected name, min cores, min RAM MB, knobs)"
     case "$pcores$pram" in *[!0-9]*) prof_die "$PROFILES:$ln: malformed profile row (thresholds must be digits: '$pcores', '$pram')" ;; esac
+    # THE DECLARED HALF OF THE COMPARISON, bounded exactly as num_ok bounds the detected half. Digits
+    # alone are not enough: `[ "$DET_CORES" -ge "$pcores" ]` ERRORS on an int64 overflow rather than
+    # comparing, so a twenty-digit threshold silently matched nothing and dropped the run to the
+    # catch-all with no refusal at all. A bound on one side of a comparison is not a bound.
+    { [ ${#pcores} -le 15 ] && [ ${#pram} -le 15 ]; } \
+      || prof_die "$PROFILES:$ln: threshold too long to compare (max 15 digits): '$pcores', '$pram'"
     # A silently ignored knob is a knob the operator believes they set, so an unknown key REFUSES.
     IFS=, read -ra kv <<<"$pknobs"
     for k in "${kv[@]}"; do
       case "$k" in *=*) ;; *) prof_die "$PROFILES:$ln: malformed knob '$k' (expected key=value)" ;; esac
       case " $KNOWN_KNOBS " in *" ${k%%=*} "*) ;; *) prof_die "$PROFILES:$ln: unknown knob key '${k%%=*}' (known: $KNOWN_KNOBS)" ;; esac
       case "${k#*=}" in ''|*[!0-9]*) prof_die "$PROFILES:$ln: knob '${k%%=*}' has a non-numeric value '${k#*=}'" ;; esac
+      # Same bound, same reason, and here the symptom was worse than a wrong width: an over-long
+      # `timeout=` made every later `[ "$PROF_TIMEOUT" -gt 0 ]` error instead of compare, so the knob
+      # was silently dropped AND the INERT warning that would have said so was disabled by the same
+      # failing test. The visibility line then reported `timeout off` beside a table declaring one.
+      case "${k#*=}" in ????????????????*) prof_die "$PROFILES:$ln: knob '${k%%=*}' value too long to compare (max 15 digits): '${k#*=}'" ;; esac
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -229,9 +281,17 @@ else
   # The 8 here is the SAME value the table's top row declares, and its measurement is argued THERE,
   # beside the number. Restating the argument in both places is how the two copies drift apart while
   # still agreeing loudly enough that nobody checks.
-  det_cores; det_ram
+  det_cores; det_ram_capped
   bi=$DET_CORES; [ "$bi" -gt 0 ] || bi=4
   PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_TAG="built-in default"
+  # A pin the operator set and this branch cannot honour. WARNED, not refused: refusing would block
+  # the documented rollback for anyone carrying GATE_PROFILE in their environment. Silence is the one
+  # option ruled out — the same typo is FATAL against a present table, so staying quiet here turns a
+  # refusal into an invisible no-op, which is the rule the row validator above states in as many words.
+  if [ -n "${GATE_PROFILE:-}" ]; then
+    echo "run-gates: GATE_PROFILE='${GATE_PROFILE}' is set but no profile table exists at $PROFILES — the built-in formula is in force and the request is IGNORED" >&2
+    PROF_TAG="$PROF_TAG, GATE_PROFILE ignored"
+  fi
 fi
 
 # A knob the operator set and the host cannot honour is worse than no knob: say so rather than run
@@ -327,8 +387,17 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # timeout wraps the exec when the selected row asks for one: a leg that outlives it exits 124 and
   # is reported RED naming itself, never skipped and never green. That is a COVERAGE improvement, not
   # a carve-out — an unbounded hang wedges the whole bar and names nothing.
-  if [ "$PROF_TIMEOUT" -gt 0 ]; then out=$(timeout "$PROF_TIMEOUT" "${argv[@]}" </dev/null 2>&1); rc=$?
-  else out=$("${argv[@]}" </dev/null 2>&1); rc=$?; fi
+  #
+  # CAPTURED THROUGH A FILE, NOT A PIPE, and that is the whole difference between a bound and a
+  # decoration. `out=$(timeout N cmd)` reads until EOF, and EOF arrives only when the LAST inherited
+  # write end closes — so a surviving grandchild holds the pipe and the worker blocks for the entire
+  # hang while `timeout` cheerfully reports 124. MEASURED on the first landing of this knob: 51.4 s
+  # wall against a 1 s bound, indistinguishable from the same fixture with the timeout off. The
+  # verdict was bounded and the clock was not, which is the one property the knob exists for.
+  # `-k` follows for the child that ignores SIGTERM; the file read cannot block on anybody.
+  if [ "$PROF_TIMEOUT" -gt 0 ]; then timeout -k 5s "$PROF_TIMEOUT" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
+  else "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?; fi
+  out=$(cat "$WORK/$i.raw" 2>/dev/null)
   e=$(date +%s%N)
   # TOOL-dNomadicAtlas-1, ported into the worker: persist EVERY leg, not only the failing one — a
   # passing leg's output is what a later bisect reads, and the bytes are already in memory. Redacted,

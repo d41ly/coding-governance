@@ -27,7 +27,8 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 
 | file | what it is |
 |---|---|
-| `run-gates.sh` | the runner. Legs run through a bounded pool, width `min(8, nproc)`, `GATE_JOBS` overrides |
+| `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
+| `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` override the readings |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |

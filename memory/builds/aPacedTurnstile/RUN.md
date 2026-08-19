@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 2d03cb5aaf4727a02888b8b7d1e1f5f358eea9c3
-phase: BUILDING
+witness: d37c8a4049acbeb93d1f97f2f94565e95be91354
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: 1c30905f
@@ -20,3 +20,7 @@ anchor-ref: refs/heads/main
 base: 56b945cbb0613b1352dd06221d4d39940db33419
 
 ## Parked
+
+2026-08-19T23:41:26Z decision · item The bar's own leg manifest, tools/gate-legs.json, was found overwritten with a two-leg FIXTURE and staged, during a full-bar run. Which leg writes it, and does any other leg share the defect? · reason Refused because I could not identify the writer and guessing one would put a false cause on the record. What I observed: the file held exactly the two-leg fixture arm 4h writes into its own scratch; the scratch itself held a DIFFERENT manifest, so my direct writes are accounted for and none of them targeted the repo; the corruption was also STAGED, which needs a git add that no command of mine ran after the preceding commit; and the same canary run in ISOLATION, twice, leaves the manifest byte-identical. So it needs the concurrency of a real bar to reproduce, which is where legs that build target trees and stage run alongside it. Options seen and rejected: (a) name arm 4h the culprit and fix it - rejected, the isolated runs falsify it as a sufficient cause; (b) bisect the 85 legs under load - rejected, it costs hours of full-bar runs and the run has a unit to land; (c) leave it silent - rejected outright, a narrowed manifest is a bar that reports green over legs it never ran. What I DID do: restored the file from HEAD, verified 85 legs and a clean codebase-map, and added a section-4 refusal to the canary that asserts by GIT IDENTITY that its scratch is not the repo under test, so that harness can no longer be the writer even under load. That guard closes one side of a hazard whose other sides are unaudited.
+
+2026-08-19T23:43:29Z decision · item SUPERSEDES the manifest-clobber entry above: the evidence now points at MY process, not at a leg. · reason The full bar's own tail carries the missing half. Its last two lines are a SYNTAX ERROR reading tools/run-gates/run-gates.sh at a line number inside the block my patch script was rewriting at that moment, and one leg earlier the testsuite-counts gate refused with 'the gate manifest names no *.test.sh' - it read the clobbered file and declined to grade an empty population rather than passing vacuously, which is that gate working exactly as written. So: I edited the kit while a full bar was executing it. A leg that re-enters the runner then read a half-written script, and the run as a whole was grading a tree that changed under it. That is a process error of mine and not a latent defect in a leg, and the earlier entry's 'cause unidentified' is superseded rather than deleted because the observations in it are still what I saw. What I am NOT claiming: I still cannot name the exact write that produced the two-leg manifest, only that it needed a bar running concurrently with my edits, which the isolated canary runs confirm from the other side. The rule this leaves: never edit the files a running bar reads - re-run it after, or run the edit in a worktree the bar is not in. The canary's new git-identity refusal stays regardless; it costs one assertion and forecloses one way this could be real.

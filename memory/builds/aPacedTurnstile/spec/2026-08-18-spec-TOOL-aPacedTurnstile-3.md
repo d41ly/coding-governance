@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-8 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -55,10 +55,12 @@ longest-first dispatch and manifest-order reporting.
   working from §2 would have written it back and re-created the red-on-arrival R10 named (round 3's
   T9). Existing arms keep their current assertions.
 - **S9** — `memory/guides/SESSION-KICKOFF.md`'s gate-command BLOCK gains the chunk contract and the
-  halt note. This unit owns that BLOCK for this build — not the file, which is now edited by three
+  halt note. This unit owns that BLOCK for this build — not the file, which is now edited by four
   units: `TOOL-aPacedTurnstile-1` S10 repoints four path spellings there including the
-  manifest-audit `watch:` line, and `TOOL-aPacedTurnstile-7` S9 rewrites the safety-property
-  sentence. The exclusive-ownership claim an earlier draft made was the set's only statement about
+  manifest-audit `watch:` line, `TOOL-aPacedTurnstile-2` repaired the width claim in this very block
+  (the kickoff ratchet refuses a commit touching a watched file whose §B claims it falsified, and the
+  runner is watched — so that edit was forced, not chosen; it also moved both audit stamps), and
+  `TOOL-aPacedTurnstile-7` S9 rewrites the safety-property sentence. The exclusive-ownership claim an earlier draft made was the set's only statement about
   who may touch that file and it was false, so a builder on `-1` would have read it as licence to
   skip the `watch:` repoint whose omission fails the kickoff ratchet (round 3's T17).
   `TOOL-aPacedTurnstile-2` §3's non-goal already used this narrower wording.
@@ -324,6 +326,12 @@ recommendation; the reason each survived the veto order is recorded with it.
   is where its value is, and AC6b is the arm that grades it there.
 
 ## 9. Revision log
+
+- rev-8 · 2026-08-20 · S9's editor map named three units and `TOOL-aPacedTurnstile-2` made it four:
+  that unit's own S8 falsified the width claim inside this block, and the kickoff ratchet forces the
+  repair rather than permitting it. Recorded here because this unit rebases onto a rewritten line and
+  onto both moved audit stamps, and a map that says three when four edited is the kind of false
+  record a builder trusts. Raised by that unit's closing diff review.
 
 - rev-1 · 2026-08-18 · initial draft.
 - rev-3 · 2026-08-18 · folded the blocker re-review: AC7 and AC8 pointed at a `header` path that

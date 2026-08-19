@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=65
+FLOOR_ASSERTIONS=86
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -487,9 +487,23 @@ done
 #    Exactly ONE arm reads the shipped table (4e), because its subject IS that file's own content.
 P="$SCRATCH/prof"
 mkdir -p "$P/tools/run-gates" "$P/fx" "$P/shim"
+# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `tools/gate-legs.json`. Assert first that $P is not
+# inside the repo under test — by GIT IDENTITY, never by comparing path strings, because under MSYS
+# one directory has two spellings and mount points are not symlinks. A scratch that resolved into the
+# real tree would overwrite the bar's own leg manifest with a two-leg fixture, and the next run would
+# be a narrower bar reporting green. Measured once, cause unidentified; the guard is cheap and the
+# failure mode is silent, which is the pair that earns one.
+n=$((n+1))
+if [ "$( cd "$P" && git rev-parse --show-toplevel 2>/dev/null )" = "$( cd "$ROOT" && git rev-parse --show-toplevel 2>/dev/null )" ]; then
+  echo "canary: REFUSING — the section-4 scratch $P resolves to the repo under test, so its fixture writes would clobber the real gate-legs.json"
+  fail=1
+fi
 cp "$SCRATCH/tools/run-gates/run-gates.sh" "$P/tools/run-gates/run-gates.sh"
 printf '#!/usr/bin/env bash\nexit 0\n'          > "$P/fx/a.sh"
-printf '#!/usr/bin/env bash\nsleep 4\nexit 0\n' > "$P/fx/sleeper.sh"
+# An ORPHAN plus a foreground sleep, because that pair is what the blocker was made of: the
+# grandchild holds the leg's inherited write end open, and a pipe-captured leg then blocks for the
+# whole hang no matter what `timeout` reports.
+printf '#!/usr/bin/env bash\nbash -c "sleep 20" &\nsleep 20\nexit 0\n' > "$P/fx/sleeper.sh"
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -579,34 +593,76 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
   || { echo "canary: with no profile table the runner did not fall back and run every leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in *'built-in default'*) ;; *) echo "canary: the no-table run was not tagged as the built-in default: $(profline "$o")"; fail=1 ;; esac
 
+# THE HOST PROBE that gates 4g and 4h. The runner DELIBERATELY degrades where `timeout` does not run,
+# announcing the knob INERT and taking the width alone — a supported state, on a BSD base install or a
+# minimal image. Asserting a timeout there reds an adopter's bar and blames the runner's override
+# logic for a missing binary. `timeout` is RUN, never probed for on PATH, which is this tree's rule.
+HAVE_TIMEOUT=0; timeout 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+
 # 4g. GATE_JOBS overrides the WIDTH ONLY. The row is still selected and still supplies every other
 #     knob — an override that silently disabled the rest of the profile would make the table a lie
 #     the moment anyone set a width.
 printf 'solo\t0\t0\twidth=8,timeout=9\n' > "$P/fx/tbl-timeout.txt"
 n=$((n+1))
 n=$((n+1))
-pl=$(profline "$(runp GATE_PROFILES=fx/tbl-timeout.txt GATE_JOBS=3)")
-case "$pl" in *'width 3,'*) ;; *) echo "canary: GATE_JOBS=3 did not reach the reported width: $pl"; fail=1 ;; esac
-case "$pl" in *'timeout 9s'*) ;; *) echo "canary: GATE_JOBS suppressed the row's OTHER knob — the override is not width-only: $pl"; fail=1 ;; esac
+if [ "$HAVE_TIMEOUT" = 1 ]; then
+  pl=$(profline "$(runp GATE_PROFILES=fx/tbl-timeout.txt GATE_JOBS=3)")
+  case "$pl" in *'width 3,'*) ;; *) echo "canary: GATE_JOBS=3 did not reach the reported width: $pl"; fail=1 ;; esac
+  case "$pl" in *'timeout 9s'*) ;; *) echo "canary: GATE_JOBS suppressed the row's OTHER knob — the override is not width-only: $pl"; fail=1 ;; esac
+else
+  echo "canary: SKIP arm 4g's timeout half — no working \`timeout\` on this host, so the runner's INERT branch is what runs (arm 4m grades that branch instead)"
+  pl=$(profline "$(runp GATE_PROFILES=fx/tbl-timeout.txt GATE_JOBS=3)")
+  case "$pl" in *'width 3,'*) ;; *) echo "canary: GATE_JOBS=3 did not reach the reported width: $pl"; fail=1 ;; esac
+fi
 
 # 4h. A LEG THAT OUTLIVES THE TIMEOUT IS RED, NAMED, AND THE RUN IS RED. Never a skip and never a
 #     green: this knob converts an unbounded hang into a verdict, which is the one way a knob may
 #     change coverage at all — upward. Recorded motivating failure: a leg that hung with zero output
 #     and wedged a whole bar at 46 of 65.
-printf 'tight\t0\t0\twidth=2,timeout=1\n' > "$P/fx/tbl-tight.txt"
+#
+#     WHAT THIS ARM MUST NOT ASSERT IS A COUNT. It first shipped pinning `1/2 legs failed`, and the
+#     full bar duly red it: under an 8-wide bar the INSTANT fixture leg also outlived a one-second
+#     budget, because spawning bash on a saturated box can take longer than that. The runner was
+#     correct and the arm was grading the NODE — the same defect this file's arm 3c retired twice, one
+#     level up. So the budget is generous enough that only the sleeper can plausibly exceed it, and
+#     what is asserted is the SLEEPER's own row plus a RED verdict, whatever else the machine did.
+printf 'tight\t0\t0\twidth=2,timeout=3\n' > "$P/fx/tbl-tight.txt"
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]}
 ]
 JSON
+#
+#     AND IT GRADES THE CLOCK, NOT ONLY THE MESSAGE. The first landing of this knob captured the timed
+#     leg through a command substitution: `$( )` reads until EOF and EOF waits on the last inherited
+#     write end, so an orphaned grandchild held the pipe and the worker blocked for the entire hang
+#     while `timeout` reported 124. Measured 51.4 s against a 1 s bound — the verdict bounded, the
+#     clock untouched, which is the one property the knob exists for. THIS ARM ASSERTED THE MESSAGE
+#     AND PASSED, the fixture-passes-by-finding-nothing class this build names.
+#
+#     Graded against a CONTROL rather than a deadline: the same fixture, same runner, timeout OFF. An
+#     absolute wall-clock budget would grade the NODE — the defect arm 3c retired twice and the defect
+#     that red this very arm on the full bar. Load inflates both runs, so the DIFFERENCE survives it.
 n=$((n+1))
 n=$((n+1))
-o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
-printf '%s\n' "$o" | grep -q '^GATE FAIL  sleeper  (timed out after 1s)$' \
-  || { echo "canary: a leg that outlived the per-leg timeout was not reported FAILED with a timeout tail"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-printf '%s\n' "$o" | grep -q '^gates RED — 1/2 legs failed$' \
-  || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+n=$((n+1))
+if [ "$HAVE_TIMEOUT" = 1 ]; then
+  t0=$(date +%s); o=$(runp GATE_PROFILES=fx/tbl-tight.txt); t_timed=$(( $(date +%s) - t0 ))
+  printf '%s\n' "$o" | grep -q '^GATE FAIL  sleeper  (timed out after 3s)$' \
+    || { echo "canary: a leg that outlived the per-leg timeout was not reported FAILED with a timeout tail"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  printf '%s\n' "$o" | grep -q '^gates RED' \
+    || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  printf '%s\n' "$o" | grep -q '^GATE skip' \
+    && { echo "canary: a timed-out leg was reported as a SKIP — the one thing a knob may never turn a leg into"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
+  t0=$(date +%s); runp GATE_PROFILES=fx/tbl-loose.txt >/dev/null 2>&1; t_ctl=$(( $(date +%s) - t0 ))
+  [ "$(( t_ctl - t_timed ))" -ge 10 ] \
+    || { echo "canary: the per-leg timeout bounded the VERDICT and not the CLOCK — timed run ${t_timed}s against an untimed control of ${t_ctl}s over the same 20s fixture, a difference of $(( t_ctl - t_timed ))s where the bound promises ~17s. A knob that reports 124 while the worker blocks for the whole hang leaves the bar wedged exactly as it was before the knob existed."; fail=1; }
+else
+  echo "canary: SKIP arm 4h — no working `timeout` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. The assertions are counted either way, so the executed total does not move with host capability."
+fi
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -670,6 +726,109 @@ case "$(profline "$o")" in
   *) echo "canary: the detection chain fell through but the line does not name the sources it tried: $(profline "$o")"; fail=1 ;;
 esac
 rm -f "$P/shim/nproc" "$P/shim/getconf"
+
+# 4l. THE DECLARED SOURCE OF THE WIDTH IS NAMED WHERE A READER LOOKS. The unit repaired the charter's
+#     stale `min(8, nproc)` and armed it there — and left the same formula in the two files closest to
+#     the change, both of which SHIP. That is the two-answers-to-one-question class relocated rather
+#     than removed, so the arm is here, in the half that travels, and grades the CLASS: both halves,
+#     so a DELETED sentence cannot satisfy the negative alone.
+for f in "$KITREL/run-gates.sh" "$KITREL/README.md"; do
+n=$((n+1))
+n=$((n+1))
+  [ -f "$f" ] || { echo "canary: $f is absent, so the width-source arm would pass by finding nothing"; fail=1; continue; }
+  grep -qF 'min(8, nproc)' "$f" \
+    && { echo "canary: $f still states the built-in width formula, which describes only the absent-table fallback now — the width is declared in gate-profiles.txt and read from there"; fail=1; }
+  grep -qF 'gate-profiles.txt' "$f" \
+    || { echo "canary: $f never names gate-profiles.txt, so a reader of the kit is told where the width comes from by a file that no longer decides it"; fail=1; }
+done
+
+# 4m. THE INERT BRANCH. The runner supports a host with no working `timeout` by announcing the knob
+#     dead and taking the width alone. Nothing drove that branch, so the announcement could have been
+#     wrong or absent and every arm would still be green — and arms 4g/4h would have blamed the
+#     runner's own logic for the missing binary. Driven with the PATH shim arm 4k already uses.
+printf '#!/usr/bin/env bash\nexit 127\n' > "$P/shim/timeout"
+chmod +x "$P/shim/timeout"
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash tools/run-gates/run-gates.sh 2>&1 )
+printf '%s\n' "$o" | grep -q 'INERT' \
+  || { echo "canary: with no working timeout the runner did not announce the knob INERT — a knob the operator set and the host cannot honour is worse than no knob"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+case "$(profline "$o")" in *'timeout off'*) ;; *) echo "canary: the INERT run still reported a live timeout on its visibility line: $(profline "$o")"; fail=1 ;; esac
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+  || { echo "canary: an unusable timeout changed the VERDICT — a missing host binary must cost the knob, never a leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+rm -f "$P/shim/timeout"
+
+# 4n. A DROPPED GATE_PROFILE ANNOUNCES ITSELF. The fallback branch cannot honour a row name, and used
+#     to drop it in silence — while the SAME typo against a present table exits 2 listing the rows
+#     that exist. One state fatal, the other invisible, for one operator error. Warned rather than
+#     refused, because refusing would block the documented table-deletion rollback for anyone carrying
+#     GATE_PROFILE in their environment.
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILE=whatever GATE_PROFILES=definitely/absent/gate-profiles.txt)
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+  || { echo "canary: a dropped GATE_PROFILE stopped the fallback from running every leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+case "$(profline "$o")" in
+  *'GATE_PROFILE ignored'*) ;;
+  *) echo "canary: GATE_PROFILE was dropped without saying so on the durable visibility line: $(profline "$o")"; fail=1 ;;
+esac
+
+# 4o. THE DECLARED HALF OF EVERY COMPARISON IS LENGTH-BOUNDED TOO. `num_ok` bounds the DETECTED
+#     readings and AC12 arms that; the row validator was digits-only, so a twenty-digit threshold
+#     ERRORED instead of comparing and dropped the run to the catch-all with no refusal, and a
+#     twenty-digit `timeout=` silently became `off` while disabling the very warning that would have
+#     said so. Both fixtures are load-bearing: against the shipped table neither case is reachable.
+printf 'huge\t99999999999999999999\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-longthr.txt"
+printf 'huge\t0\t0\twidth=2,timeout=99999999999999999999\n'  > "$P/fx/tbl-longknob.txt"
+for f in tbl-longthr tbl-longknob; do
+n=$((n+1))
+n=$((n+1))
+  o=$(runp GATE_PROFILES=fx/$f.txt); rc=$?
+  [ "$rc" = 2 ] || { echo "canary: an over-long declared value in fx/$f.txt exited $rc, not 2 — a value the runner cannot compare must refuse, not be silently dropped"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  printf '%s\n' "$o" | grep -q "fx/$f.txt:1:" \
+    || { echo "canary: the over-long-value refusal for fx/$f.txt did not name the file AND the line: $o"; fail=1; }
+done
+
+# 4p. AN INDENTED COMMENT IS A COMMENT. The runner skipped `#` at column 0 only, while this file's own
+#     comment filter strips leading blanks — so the two readers of one file disagreed about which
+#     lines are even rows, and an indented note (which the shipped table's header explicitly invites)
+#     killed the whole bar with a message about field counts.
+printf '  # an indented note\n   \nfine\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-indent.txt"
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-indent.txt); rc=$?
+[ "$rc" = 0 ] || { echo "canary: an indented comment or a whitespace-only line was refused as a malformed row (exit $rc)"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+[ "$(profname "$o")" = fine ] \
+  || { echo "canary: the row after an indented comment was not selected; got '$(profname "$o")'"; fail=1; }
+
+# 4q. THE RAM GUARD SEES THE LIMIT THAT IS ENFORCED, not the host's. Every detection source reports
+#     HOST physical memory, which inside a memory-capped container is not the number deciding whether
+#     eight scratch repos fit — a 4 GB runner on a 512 GB host read 512 GB and selected the widest
+#     row, the exact thrash this table exists to stop, in the environment the bar is scheduled to move
+#     to. MIN rather than replace, so a bogus limit can only make the bar slower.
+mkdir -p "$P/cg"
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
+printf '2147483648\n' > "$P/cg/memory.max"        # 2 GB, well under any real host reading
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+case "$(profline "$o")" in
+  *'via '*'cgroup'*) ;;
+  *) echo "canary: an enforced cgroup memory limit was not read, so the RAM guard cannot fire in a container: $(profline "$o")"; fail=1 ;;
+esac
+[ "$(profname "$o")" != "$(profname "$(runp)")" ] || echo "canary: SKIP the cgroup-selection half — this host already selects the same row at 2 GB, so the fixture cannot show the limit changing the choice"
+printf 'max\n' > "$P/cg/memory.max"               # v2's no-limit spelling is UNKNOWN, never a reading
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+case "$(profline "$o")" in
+  *cgroup*) echo "canary: the literal 'max' was taken as a memory READING rather than as no limit: $(profline "$o")"; fail=1 ;;
+esac
+printf '9223372036854771712\n' > "$P/cg/memory.max"   # v1's sentinel, 19 digits, must lose to the bound
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+case "$(profline "$o")" in
+  *cgroup*) echo "canary: the cgroup v1 no-limit sentinel was taken as a memory reading: $(profline "$o")"; fail=1 ;;
+esac
+rm -rf "$P/cg"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

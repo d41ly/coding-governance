@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-5 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-6 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -43,8 +43,13 @@ chose, and is overridable.
   floored at roughly 660 s by one leg, so what this unit buys here is a RAM guard on the low end and
   one declared place for every future knob to land. Stated plainly rather than dressed up.
 - Sharding the heavy legs, which is what would actually move the floor. Separate build.
-- Editing `memory/guides/SESSION-KICKOFF.md`. `TOOL-aPacedTurnstile-3` owns that file's gate-command
-  block; two units editing three shared lines is the collision this build's reconcile pass caught.
+- Editing `memory/guides/SESSION-KICKOFF.md` BEYOND the one line this unit falsifies.
+  `TOOL-aPacedTurnstile-3` owns that file's gate-command block for its own content — the chunk
+  contract and the halt note — and two units editing three shared lines is the collision this build's
+  reconcile pass caught. What this unit may not do is add content there; what it MUST do is repair the
+  width claim in that block, because the kickoff-manifest ratchet refuses a commit touching a watched
+  file whose §B claims it falsified, and `tools/run-gates/run-gates.sh` is on that watch list. See §9
+  rev-6: the non-goal as first written asked for a state the merge bar forbids.
 - An exemption row for the table. It lands inside the kit directory, which the kit's own file rule
   already claims, so a row would be a stale exemption the deployer's selfcheck reds on.
 
@@ -281,6 +286,14 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-6 · 2026-08-20 · folded the closing diff review. The §3 non-goal on
+  `memory/guides/SESSION-KICKOFF.md` asked for a state the merge bar forbids: the width claim in that
+  file's gate-command block is one of the two claims S8 exists to falsify, and the kickoff-manifest
+  ratchet refuses any commit touching a watched file without repairing the §B claims it feeds. The
+  non-goal now cuts at CONTENT rather than at the file, and `TOOL-aPacedTurnstile-3`'s S9 editor map
+  is corrected to name this unit. The review's other confirmed findings are behaviour and are folded
+  into the code rather than into this spec; the blocker was the per-leg timeout bounding the verdict
+  and not the clock, which the acceptance criteria could not see because AC8 graded the message.
 - rev-5 · 2026-08-20 · built. One design decision S7 did not state, recorded because it changes what
   the arms grade: every selection arm drives a FIXTURE table the canary writes, and exactly one arm
   reads the shipped table — the pinned-knob one, whose subject IS that file's content. The shipped

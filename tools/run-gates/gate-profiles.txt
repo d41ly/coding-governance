@@ -18,7 +18,12 @@
 #   width=<n>    the worker-pool width. `GATE_JOBS` overrides it — width ONLY: the row is still
 #                selected and still supplies every other knob.
 #   timeout=<s>  a per-leg wall-clock bound, 0 = off. A timeout that fires produces a RED naming its
-#                leg, never a skip and never a green: it converts a hang into a verdict.
+#                leg, never a skip and never a green: it converts a hang into a verdict AND returns
+#                the worker to the pool. The second half is not free — the first landing of this
+#                knob captured the leg through a pipe, so an orphaned grandchild held it open and
+#                the bound applied to the verdict alone: 51.4 s measured against a 1 s bound. The
+#                runner now captures through a file and adds a kill-after, and the canary grades
+#                the elapsed time against an untimed control rather than the message.
 #
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which

@@ -68,7 +68,11 @@ maps detected cores and RAM to a named row; the FIRST row satisfying both thresh
 last row is a zero-threshold catch-all, so unknown hardware is matched rather than special-cased.
 Cores alone were the wrong question — each heavy leg builds its own scratch repo, so a 16-core / 8 GB
 box used to select width 8 and thrash. The invariant is that a knob may cost SPEED or convert a hang
-into a bounded RED, never turn a leg into a pass or a skip; the runner declares the implemented set
+into a bounded RED, never turn a leg into a pass or a skip — and the BOUND is on the clock as well as
+on the verdict, which cost a blocker to learn: a leg captured through a command substitution keeps
+the worker blocked until the last inherited write end closes, so an orphan defeats the timeout while
+`timeout` still reports 124. Capture through a file, and grade the elapsed time against an untimed
+control rather than against the message; the runner declares the implemented set
 and the shipped canary PINS the same set separately, so a new knob reds until an author edits the pin
 and reads the rule. An ABSENT table falls back to the built-in formula and is the documented
 rollback; a MALFORMED one refuses, because a silently ignored knob is a knob the operator believes
