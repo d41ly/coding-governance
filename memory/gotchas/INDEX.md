@@ -18,6 +18,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 3 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
+| [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 2 | yes | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 1 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
@@ -30,6 +31,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 6 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-15 record(s): 15 class, 0 note, 0 superseded · 3 universal · 0 unanchored
+16 record(s): 16 class, 0 note, 0 superseded · 4 universal · 0 unanchored
 
 <!-- END GENERATED -->

@@ -143,6 +143,12 @@ ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 # which then dangles. MEASURED: `ls-remote --symref --exit-code HEAD` exits 2 against that, which
 # is check 28 - so without this line every arm below dies on a refusal about the FIXTURE.
 git init -q --bare "$ORIGIN"
+# An identity on the BARE repo too, because check 30 builds its ahead-commit with `commit-tree`
+# INSIDE it. A bare repo inherits nothing from the worktree clone above, so on a machine with no
+# global identity that call dies, $ahead comes back empty, and `update-ref` reports ": not a valid
+# SHA1" - which reads as a broken kit rather than an unconfigured fixture. MEASURED on node `a`.
+git --git-dir="$ORIGIN" config user.email t@t.test
+git --git-dir="$ORIGIN" config user.name t
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 git remote add origin "$ORIGIN"
 git push -q origin main
