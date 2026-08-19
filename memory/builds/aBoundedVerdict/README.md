@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24 TOOL-aBoundedVerdict-25
+ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24 TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26
 ---
 
 # aBoundedVerdict — an unattended run stops reviewing, stops stalling, and says why it stopped
@@ -252,11 +252,70 @@ The frozen scope cannot move into the run-state file. That file is written by th
 frozen where its subject can write it is `memory/gotchas/inputs-inside-the-subjects-reach.md`. The
 authority stays the BASE blob, re-derived through git by both the driver and the leg.
 
+## The unattended run, 2026-08-19 — what it built and what it cost
+
+Phase BUILDING, blocked short of landing. `RUN.md` holds the phase, the witness and three parked
+decisions; this section is the derivation an owner reads first.
+
+**Built and green:** `TOOL-aBoundedVerdict-11`, all eight scope items. Driver suite 333 assertions
+(315 before), leg sibling 182, `check-arms` clean. Status INPROGRESS rather than CLOSED, deliberately:
+CLOSED means built AND landed, and marking it otherwise would make `build-complete` pass on a claim
+the tree does not support — the class the unit exists to remove.
+
+**Not started:** the other fourteen units. One consumed the run, and beginning a second while the
+first cannot land would accumulate rather than finish.
+
+### Why it stopped
+
+`gates-green` is unreachable, and not because of this diff. Leg check 7 — at most one live run — reds
+on two non-terminal records: this one and `aPacedTurnstile`'s, which arrived with the merge from main
+at `6f598a1`. That run overrode `build-complete`, could not land because the primary tree's main was
+ahead by three commits of a different mid-flight build, and stopped at phase LANDING. `LANDING` is not
+in `PHASES_TERMINAL`, so the record is live forever and check 7 counts it against every later run: one
+stuck run is a fleet-wide block. `TOOL-aBoundedVerdict-24`.
+
+Every exit is outside this mandate. `--override gates-green` is refused on this repo's own record —
+`aBranchedMandate`'s commit says spending it means spending the one machine check between an
+unattended run and an unverified landing, and that someone else's red is a reason to escalate rather
+than to spend it. Writing `--landed` or `--abort` onto another node's record is not this run's to do.
+So it is parked and escalated, which is what a gate-red-out-of-scope halt names. Two prior runs in
+this corpus met the same class and both parked; this is the third.
+
+### The twelve defects the run found by EXECUTING
+
+None was reachable by reading. Two adversarial audits over this same material — 33 findings on the
+close path, 85 on the spec set — caught none of them.
+
+| where | what |
+|---|---|
+| `-11` design | the cutoff was missing, so the unit was unlandable by ANY run |
+| | the cutoff lived in a conf the driver cannot read |
+| | the cutoff comparison was INVERTED — it would have refused this run at close |
+| | S8 retired the authored roster wholesale, making a DoD term a tautology |
+| S4 | refused every BRAND-NEW build: `unit_rows` returns 1 on a well-formed but empty region |
+| test arms | a branch unreachable from any arm, because the fixture conf never declared the key |
+| | two arms that masked the branch under test by tripping an earlier refusal |
+| | a cutoff moved by export rather than through the conf the driver SOURCES |
+| fixtures | two fixture READMEs that could not exercise the check written for them |
+| tooling | a text-mode read destroyed three raw CR bytes and broke an unrelated check |
+| | `&&` put a `mkdir` inside a background job, so its sibling raced it |
+| naming | a loop variable called `rm` tripped the leg's own read-only guard, correctly |
+
+Three of the first four would have surfaced **at close, after all fifteen units were built**.
+
+### What the run corrected in its own specs
+
+`-11` moved rev-2 → rev-6 while being built: the id-set comparison replacing a byte compare that
+would have refused every run that built anything; the cutoff and its home; S8 narrowed from *retired*
+to *split*, because the authored roster is the only carrier of a planned-but-unspecced unit and the
+generated region is a subset of the specs by construction. Each rev names what was wrong and how it
+was found.
+
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
 ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24
-ids TOOL-aBoundedVerdict-25
+ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
