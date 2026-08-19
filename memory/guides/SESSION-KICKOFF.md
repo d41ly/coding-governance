@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-19T10:20:00+03:00 @ c9d2c25f0a73a8dc84528dbbb620da14cb9c7881
+last-audit: 2026-08-19T11:05:00+03:00 @ 960e3cd277c1ec55efe145fe1358cdd780269cf3
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6ec8449b810c4507396ea5b088365339163256dd
+last-body-change: 960e3cd277c1ec55efe145fe1358cdd780269cf3
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -66,7 +66,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0 · `tools/check-playbook-parity.sh` (its claims about THIS repo, machine-checked — read its refusal before editing prose it owns) · `check-template-size.sh` (48 KiB + high-water ratchet) · `check-placeholders.sh` (marker presence, ONE carrier) |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
 | tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
