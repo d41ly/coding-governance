@@ -343,6 +343,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_substitution",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "cache_dir",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -2073,6 +2078,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "scan",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
@@ -2146,11 +2156,6 @@
       "id": "selfcheck",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "selftest",
-      "kind": "function",
-      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "settings_merge_src",
@@ -2266,11 +2271,6 @@
       "id": "structure_identity",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
-    },
-    {
-      "id": "substitute",
-      "kind": "function",
-      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "subtokens",

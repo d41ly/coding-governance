@@ -248,7 +248,7 @@ def remove_fenced(text: str, drop: set[tuple[str, str]]) -> str:
 TABLE_ROW_RE = re.compile(r'^[ \t]*\|')
 
 
-def substitute(text: str, key: str, val: str) -> str:
+def build_substitution(text: str, key: str, val: str) -> str:
     """Replace every `{{KEY}}` with `val`, escaped for the HOST CONTEXT of each occurrence.
 
     A markdown TABLE ROW is a structured host and a verbatim substitution corrupts it: an unescaped
@@ -433,7 +433,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
                 notes.append(f'answered  {key}')
         else:
             raise Refusal(f'{key} declares class `{cls}`, which is not derived, asked or defaulted')
-        text = substitute(text, key, str(val))
+        text = build_substitution(text, key, str(val))
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
@@ -464,7 +464,7 @@ the codebase-map ruleset
 '''
 
 
-def _fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
+def _write_fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
     """Write a scratch engine dir + target and return both. `kits` is TOML array source."""
     eng, tgt = tmp / 'engine', tmp / 'target'
     (eng).mkdir(parents=True, exist_ok=True)
@@ -478,14 +478,14 @@ def _fixture(tmp: Path, kits: str, variances: str) -> tuple[Path, Path]:
     return eng, tgt
 
 
-def selftest() -> int:
+def run_selftest() -> int:
     import tempfile
     passed, failed = 0, 0
 
     def arm(name: str, kits: str, variances: str, want: str | None, in_body: str = ''):
         nonlocal passed, failed
         with tempfile.TemporaryDirectory() as td:
-            eng, tgt = _fixture(Path(td), kits, variances)
+            eng, tgt = _write_fixture(Path(td), kits, variances)
             try:
                 body, _ = render(eng, Path(td), tgt)
                 got = None
@@ -523,7 +523,7 @@ def selftest() -> int:
 
     # The escape is per OCCURRENCE: prose must not gain a backslash.
     with tempfile.TemporaryDirectory() as td:
-        eng, tgt = _fixture(Path(td), ok_kits, '"a | pipe"')
+        eng, tgt = _write_fixture(Path(td), ok_kits, '"a | pipe"')
         (tgt / 'CHARTER.md').write_text('prose {{VARIANCES_A}} here\n', encoding='utf-8')
         body, _ = render(eng, Path(td), tgt)
         if body.strip() == 'prose a | pipe here':
@@ -548,7 +548,7 @@ def main(argv: list[str]) -> int:
     a = ap.parse_args(argv)
 
     if a.selftest:
-        return selftest()
+        return run_selftest()
     if not a.target:
         ap.error('--target is required')
 
