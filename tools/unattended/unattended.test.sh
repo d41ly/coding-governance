@@ -746,11 +746,12 @@ range %s...HEAD
 ' "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" > memory/builds/tRun/reviews/r1.md
 # `%` as the delimiter: the replacement is a markdown TABLE, so every `|` in it would have closed a
 # `|`-delimited sed expression early and produced a plausible-looking wrong file.
-sed -i 's%^<!-- /gen:build-units -->%<!-- /gen:build-units -->
-
-| Record | Kind | Serves |
-|---|---|---|
-| [r1.md](reviews/r1.md) | diff-review | ARCH-tRun-1 |%' memory/builds/tRun/README.md
+# THROUGH `mutate`, and that is the point of this fix. The first cut of this line carried RAW
+# newlines in the replacement: GNU sed answers `unterminated 's' command`, exits 1, and edits
+# NOTHING - so the one negative control for the record-row defect BOTH nodes fixed passed while
+# testing zero bytes. `mutate` hashes before and after and reds on a no-op; the helper existed,
+# its own comment names this exact shape, and this call site did not use it.
+mutate memory/builds/tRun/README.md 's%^<!-- /gen:build-units -->%<!-- /gen:build-units -->\n\n| Record | Kind | Serves |\n|---|---|---|\n| [r1.md](reviews/r1.md) | diff-review | ARCH-tRun-1 |%'
 git add -A >/dev/null
 out=$(run --close tRun)
 hit "$out" "close OK"

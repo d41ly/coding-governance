@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name
 
-**Status:** CLOSED · rev-7 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-8 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -67,8 +67,13 @@ instead of by row shape.
   the three call sites S2 re-points. So the build's headline goal, an item that can pass, was owned
   by no unit in the set. Measured: of 49 build folders only FOUR carry the authored pair, and
   `memory/builds/aBoundedVerdict/README.md` is not one of them, so this build could not close itself.
-  All five readers move to the generated units region; the authored pair stops being read by
-  anything. This RESOLVES F3 rather than raising it — see §8.
+  FOUR of the five readers move to the generated units region. **`roster_ids` KEEPS the authored
+  pair, and rev-8 corrects this scope item to say so**, because pointing it at the generated region
+  makes `missing_units` a TAUTOLOGY: that region is rendered FROM the specs that exist, so the set of
+  planned-but-unspecced units it could report is empty by construction. The authored pair is the only
+  carrier that can express a unit somebody planned and nobody specced, so it survives as the input to
+  exactly that one question, and the driver states this at both sites. This RESOLVES F3 rather than
+  raising it — see §8.
 - **S7** — the disarmed control is re-armed: one driver test arm has `build-complete` and
   `closing-review-recorded` BOTH met with no `--override` at all, over a fixture whose README is
   re-rendered and whose `reviews/` holds a tracked record.
@@ -305,8 +310,10 @@ the two kit version constants · `.memory-tree.conf` (`ARMS_FLOORS`).
 - **AC8a** — When `--close` runs against a fixture build whose README carries NO authored
   `roster:units` pair and a well-formed `gen:build-units` pair with every unit terminal,
   `build-complete` is MET — the S8 arm, which fails against the shipped driver because its first
-  term reads the authored pair. `grep -c ROSTER_OPEN tools/unattended/unattended.sh` counts no
-  remaining reader outside the constant's own definition.
+  term reads the authored pair. Rev-8 DELETES this criterion's second sentence, which asserted that
+  `grep -c ROSTER_OPEN tools/unattended/unattended.sh` counts no reader outside the constant's own
+  definition: the true count is 3 — the definition plus the two lines of `roster_ids` that S8 now
+  says survive on purpose. An AC that a correct implementation cannot satisfy is worse than no AC.
 - **AC8b** — When the pinned BASE's README carries no `gen:build-units` pair and the BASE commit is
   dated at or after `UNITS_REGION_CUTOFF`, `check_authorization` REFUSES naming the render command —
   the S6a arm, which fails under a plain subset test because an empty BASE set satisfies it.
@@ -366,6 +373,7 @@ This line is the machine-read one; the bullets carry the reasoning.
 
 ## 9. Revision log
 
+- rev-8 · 2026-08-19 · **S8 and AC8a corrected to match the driver that shipped, found by the merge review rather than by a gate.** S8 claimed all five readers moved and the authored pair "stops being read by anything"; AC8a asserted a grep returning 0. Both false: `roster_ids` keeps the authored pair deliberately, because the generated region is rendered from the specs that exist and so cannot express a planned-but-unspecced unit — the tautology the split exists to avoid. The driver said this at two sites and claimed the spec was "corrected there too"; it was not. AC8a's grep sentence is deleted rather than re-numbered: a correct implementation could never satisfy it.
 - rev-7 · 2026-08-19 · the three forks were already resolved in place; this rev adds §8's machine-read `none` first line, without which the gate reds the moment the status goes terminal, and flips INPROGRESS -> CLOSED at the landing.
 - rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's blocker 1·8·27 and from
   the owner's ratified resolution recorded in the design pass. F1 and F2 resolved under the

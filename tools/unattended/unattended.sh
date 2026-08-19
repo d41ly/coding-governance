@@ -63,7 +63,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -1385,7 +1385,7 @@ verb_preflight() { # slug · keepalive-id
   # new one. Refusing on any non-zero status therefore refused the ordinary case; only "no single
   # well-formed pair" is a refusal, and that is what `region` alone reports.
   if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
-    fail 44 "the build README's unit list cannot be read, so every verb keyed on it would run blind"
+    fail 46 "the build README's unit list cannot be read, so every verb keyed on it would run blind"
     units_refusal "$(readme_of "$slug")"
     status=1
   fi
@@ -1914,13 +1914,13 @@ verb_attest() { # slug · item · value
   local slug="$1" item="$2" val="${3:-yes}" rel key ck
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
-  [ -f "$rel" ] || { fail 45 "no run-state file, so there is no run to attest anything about: $rel"; return 1; }
-  [ -n "$item" ] || { fail 45 "--attest requires --item: an attestation with no item named is not an attestation"; return 1; }
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to attest anything about: $rel"; return 1; }
+  [ -n "$item" ] || { fail 47 "--attest requires --item: an attestation with no item named is not an attestation"; return 1; }
   case " $(dod) " in *" $item:"*) ;;
-    *) fail 45 "--attest names an item that is not in the declared DoD set, so nothing would ever read it: $item"; return 1;; esac
+    *) fail 47 "--attest names an item that is not in the declared DoD set, so nothing would ever read it: $item"; return 1;; esac
   ck=$(checker_of "$item")
   if [ "$ck" != agent ]; then
-    fail 45 "--attest refuses a MACHINE-checked item, because writing its key by hand is the self-certification the Definition of Done exists to prevent; this item is checked by the driver: $item"
+    fail 47 "--attest refuses a MACHINE-checked item, because writing its key by hand is the self-certification the Definition of Done exists to prevent; this item is checked by the driver: $item"
     return 1
   fi
   refuse_if_terminal "$rel" --attest || return 1
