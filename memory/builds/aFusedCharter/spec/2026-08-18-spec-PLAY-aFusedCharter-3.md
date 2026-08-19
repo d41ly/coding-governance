@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-3 — AGENTS.md becomes a rendered region plus authored slots, and stops re-narrating its own gate manifest
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** CLOSED · rev-4 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 

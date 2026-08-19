@@ -1,6 +1,6 @@
 # PLAY-aFusedCharter-1 — the playbook converges into one file, and loses what does not govern a session
 
-**Status:** OPEN · rev-3 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams playbook
+**Status:** CLOSED · rev-3 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams playbook
 
 ## 1. Goal
 

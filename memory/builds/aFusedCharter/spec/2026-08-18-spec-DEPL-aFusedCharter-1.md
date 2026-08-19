@@ -1,6 +1,6 @@
 # DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires
 
-**Status:** OPEN · rev-6 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams deployer
+**Status:** CLOSED · rev-6 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams deployer
 
 ## 1. Goal
 

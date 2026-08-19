@@ -1,6 +1,6 @@
 # TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed
 
-**Status:** OPEN · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams tooling
 
 ## 1. Goal
 
