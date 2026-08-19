@@ -281,6 +281,48 @@ than to spend it. Writing `--landed` or `--abort` onto another node's record is 
 So it is parked and escalated, which is what a gate-red-out-of-scope halt names. Two prior runs in
 this corpus met the same class and both parked; this is the third.
 
+### Recommendations, in the order that unblocks the most
+
+Put to the owner in the run's own turn and recorded here, because a recommendation
+that lives only in a transcript is one nobody reads again.
+
+1. **Clear `aPacedTurnstile` first.** One command, and it unblocks the FLEET rather than
+   this run: its record sits at `LANDING`, which is not terminal, so check 7 counts it
+   against every later run. `--landed` if that push landed, `--abort` if it did not. Then
+   make `TOOL-aBoundedVerdict-24` a real unit — one stuck run becoming a fleet-wide bar
+   outage will recur, and it is not a subtle failure.
+
+2. **Land this branch before building the remaining ten units.** Five are built, armed and
+   green, and they fix owner issues 2 and 3 outright. Landing makes the rest CHEAPER,
+   because `build-complete`, the message channel and the review scoping start working.
+   The unlanded diff is already ~67 commits, and the closing review over it is exactly the
+   over-large review this build exists to prevent.
+
+3. **Fix `TOOL-aBoundedVerdict-30` before the next unattended run.** Recommended shape: add
+   a signal state for "cited by the diff that implements it". Do NOT stop citing unit ids in
+   shipped code — that provenance is what made half this run's findings traceable — and do
+   not touch a pin whose shrink-only direction is deliberate.
+
+4. **Take the four parked decisions and the one open owner fork** (`-21` F3, whether an
+   unknown-outcome push should wake someone). All carry their options and reasoning.
+
+5. **Two method changes, weighted highest.** The two adversarial audits produced 118
+   findings and caught NONE of the defects execution found, including three that would have
+   bricked the run at close after all fifteen units were built.
+   - **A completion sweep per unit.** Three times this run a unit was called done while its
+     own Files-touched list named carriers nobody had opened — four documentation halves,
+     two kit versions, a status flip; 1-of-5 at the low point. Mechanical, and gateable:
+     every id whose spec reads INPROGRESS must have its named carriers touched in the same
+     range.
+   - **Treat "green at an unchanged assertion count" as a failure.** It happened twice — six
+     scope items and an entire contract change, both unmeasured and both nearly read as
+     confirmation.
+
+**Not recommended:** building further units before landing, and spending
+`--override gates-green` for a red that belongs to another run. Two prior runs in this
+corpus refused that override on exactly these grounds, and the precedent is worth more than
+this run finishing.
+
 ### The twelve defects the run found by EXECUTING
 
 None was reachable by reading. Two adversarial audits over this same material — 33 findings on the
