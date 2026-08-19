@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build
 
-**Status:** SPECCED · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
