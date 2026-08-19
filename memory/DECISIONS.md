@@ -76,6 +76,8 @@
 - TOOL-aLoosenedCeiling-3 · a ceiling is re-derived on the MERGED tree, never carried from a base the merge superseded. main raised this one mid-build keeping the old headroom; that stands as the fifth movement and this is the sixth, which changes the convention
 - TOOL-aLoosenedCeiling-4 · an adopter's ceiling is sized from a MEASURED growth rate, not the overshoot, and a raise is legitimate only because rotation is SPENT — 646 B, not the 16403 B its own comment advertised. A key their kit cannot read is NOT declared for them
 
+- TOOL-aMeteredTurnstile-1 · the bar gets an INSTRUMENT before another fix. Its two lower bounds are the longest leg and work over width; the larger decides which lever works, and nothing computed it. The verb WRAPS an unmodified runner, since every unbuilt aPacedTurnstile unit edits that file
+
 ## DEPL — deployer
 
 *(none yet)*

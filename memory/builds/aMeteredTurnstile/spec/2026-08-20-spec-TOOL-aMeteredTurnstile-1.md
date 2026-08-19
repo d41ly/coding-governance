@@ -1,6 +1,6 @@
 # TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 ## 1. Goal
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-aMeteredTurnstile-1
+ids: TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5
 ---
 
 # aMeteredTurnstile — the bar gets an instrument before it gets another fix
@@ -40,14 +40,14 @@ It changes no scheduling and fixes no leg. It does not modify `tools/run-gates/r
 against an existing backlog id or a new one, and landing any of them is a separate unit.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
-ids TOOL-aMeteredTurnstile-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
+ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | INPROGRESS | rev-2 | 2026-08-20 |
 
-Records live under `spec/`.
+Records live under `spec/` and `build/`.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -64,4 +64,6 @@ Records live under `spec/`.
 
 - **`spec/`**
   - [2026-08-20-spec-TOOL-aMeteredTurnstile-1.md](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md)
+- **`build/`**
+  - [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md)
 <!-- /gen:build-docs -->
