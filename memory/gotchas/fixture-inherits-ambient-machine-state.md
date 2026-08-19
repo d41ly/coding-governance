@@ -2,7 +2,6 @@
 name: fixture-inherits-ambient-machine-state
 description: a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not
 kind: class
-universal: true
 ---
 
 # A fixture that reads ambient machine state it never declared

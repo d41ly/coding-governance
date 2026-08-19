@@ -130,6 +130,7 @@
       "armed-but-unreachable-rule.md",
       "assertion-between-two-derived-values.md",
       "concurrency-is-not-a-budget.md",
+      "fixture-inherits-ambient-machine-state.md",
       "fixture-passes-by-finding-nothing.md",
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
