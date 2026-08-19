@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: playbook+tooling+deployer
 roster: PLAY+TOOL+DEPL
-ids: DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3
+ids: DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 TOOL-aFusedCharter-4
 ---
 
 # aFusedCharter — the playbook converges into one deployable charter, and the deploy path becomes mechanical
@@ -180,7 +180,7 @@ region rather than on two readings of the same prose.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-18 · streams playbook+tooling+deployer
-ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3
+ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 TOOL-aFusedCharter-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

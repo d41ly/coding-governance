@@ -11,7 +11,7 @@ with its anchor evidence, and the parked decisions.
 ## Run facts
 mode: slug
 witness: 5f9efdb05c3386a32e0ed436d762fb94bb58b872
-phase: LANDING
+phase: ABORTED
 branch-sha: b9ebebaae6f776788046980199703c58575d8805
 branch-ref: refs/heads/branch/unattended-sessions-kit-extend-2e4038
 anchor-kind: run-branch
@@ -32,3 +32,5 @@ keepalive-reaped: yes
 parked-surfaced: yes
 
 2026-08-19T01:40:14Z decision · item the primary tree carries 46 unpushed commits from TWO other builds, one of which deliberately refused to land — may this run's landing push carry them? · reason push-main refuses everywhere but the primary tree. That tree is on main and clean, so the lander WOULD succeed - while carrying 46 commits this run did not author: aDeclaredBound (20) and aPacedTurnstile (22), plus 3 merges. aPacedTurnstile's own final commit says in terms: 'the run cannot land, and the reason is outside its authority' - it stopped at LANDING for this same reason and filed TOOL-aPacedTurnstile-15 (gates-green runs the bar on the RUN's tip, never on what the landing push would actually carry). Pushing main would therefore land a build that DECIDED it must not land, under this build's mandate: outward-facing, irreversible, every gate green, and no verb in the kit saying a word. Options seen: (a) push main and carry all 46 - refused, it spends another build's landing decision; (b) raw-push only this build's commits - refused, bypassing the lander discards the whole bar the authorization leaned on, and the lander is mandated for that reason; (c) stop at LANDING, which is the TRUE state - built, reviewed, DoD-evaluated with no overrides, branch pushed and durable at origin/branch/unattended-sessions-kit-extend-2e4038 - and hand the decision to the owner. REFUSED to pick between (a) and (b): the owner authorized landing THIS build, and neither of us knew the primary tree held two other builds' work when that was said.
+
+2026-08-19T11:35:00Z abort · item aPromptedMandate · reason This run merged into local main and stopped at LANDING without marking itself; its merge IS reachable from main, but nothing was ever pushed, so the run landed nothing. LANDED is not available and would not be true — the driver's own check 15 refuses a LANDED claim whose witness is not an ancestor of the tip the remote advertises, and it refused this exact edit when it was attempted. ABORTED is the same terminal state this fleet's aFusedCharter run took for the same reason on the same day. Set by the aFusedCharter session on the owner's explicit instruction, as part of landing main; that session did NOT perform this run and attests nothing about its Definition of Done. The work itself is unaffected and reaches the remote with this push.
