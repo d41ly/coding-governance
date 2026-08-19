@@ -701,7 +701,9 @@ miss "$out" "build-complete"
 # ---- exactly that was cleared by the override of the item it was measuring.
 bcopen
 mkdir -p memory/builds/tRun/reviews
-printf '# closing review
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
 
 range %s...HEAD
 ' "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" > memory/builds/tRun/reviews/r1.md
@@ -717,7 +719,9 @@ miss "$out" "closing-review-recorded"
 # ---- the two items mutually unsatisfiable. The driver must not see it.
 bcopen
 mkdir -p memory/builds/tRun/reviews
-printf '# closing review
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
 
 range %s...HEAD
 ' "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" > memory/builds/tRun/reviews/r1.md
@@ -834,18 +838,71 @@ crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
 
 # GREEN CONTROL: a TRACKED record naming the pinned base, abbreviated to eight, satisfies the item.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 out=$(run --close tRun $crbc)
 hit "$out" "close OK"
 miss "$out" "closing-review-recorded"
+
+# ---- TOOL-aBoundedVerdict-16 S1: a SPEC-AUDIT quoting the pinned base does NOT satisfy an item named
+# ---- for a closing review. Measured before the change: two of the four runs that matched did so on a
+# ---- spec-audit record, so the item was kind-blind and said so nowhere.
+cropen; rb=$(crbase)
+git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
+rm -f memory/builds/tRun/reviews/*.md
+printf '**Serves:** spec-audit ARCH-tRun-1
+
+# a design review
+
+range %s...HEAD
+' "$rb" > memory/builds/tRun/reviews/audit.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "none is a diff-review naming a commit in BASE..HEAD"
+miss "$out" "close OK"
+
+# ---- S2: a diff-review naming a sha strictly INSIDE the range is accepted -- the fold-scoped case,
+# ---- which the old pinned-base test rejected outright, and which -14 now makes the honest one.
+cropen; rb=$(crbase)
+git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
+rm -f memory/builds/tRun/reviews/*.md
+mid=$(git rev-parse HEAD)
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
+
+range %s...HEAD
+' "$mid" > memory/builds/tRun/reviews/fold.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+miss "$out" "closing-review-recorded"
+
+# ---- S3: a sha that is NOT an ancestor of HEAD is refused even though the STRING is present. A
+# ---- substring test cannot express range membership and would accept a sha off any branch.
+cropen; rb=$(crbase)
+git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
+rm -f memory/builds/tRun/reviews/*.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
+
+range deadbeefdeadbeefdeadbeefdeadbeefdeadbeef...HEAD
+' > memory/builds/tRun/reviews/off.md
+git add -A >/dev/null
+out=$(run --close tRun $crbc)
+hit "$out" "closing-review-recorded"
+miss "$out" "close OK"
 
 # SELF-SUFFICIENT, not inherited: earlier arms in this section COMMIT review records, so `cropen`'s
 # reset leaves tracked ones behind and the item is simply MET - printing nothing and proving nothing.
 # Untrack whatever is there before claiming the tree has no tracked review.
 cropen; rb=$(crbase)
 git rm -q --cached --ignore-unmatch memory/builds/tRun/reviews/*.md >/dev/null 2>&1 || true
-printf '# closing review
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
 
 range %s...HEAD
 ' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
@@ -866,7 +923,9 @@ hit "$out" "no review record exists under this build at all"
 # only ever be cleared by an override the run wrote for itself. Pinned by name, not by whatever
 # `git rev-parse --short` returns on the machine running this suite.
 cropen; rb=$(crbase)
-printf '# closing review
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review
 
 range %s...HEAD
 ' "${rb:0:7}" > memory/builds/tRun/reviews/r1.md
@@ -885,13 +944,17 @@ hit "$out" "closing-review-recorded"
 # arm 2 — the record exists in the WORKING TREE and is not tracked. `--cached` reads the index, so
 # this is excluded by construction rather than by a filter; without --cached it would pass.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
 
 # arm 3 — a tracked record that names a DIFFERENT sha. The record exists and the join still refuses,
 # which is the difference between "a review was written" and "the review covers what shipped".
 cropen
-printf '# closing review\n\nrange deadbee1...HEAD\n' > memory/builds/tRun/reviews/r1.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review\n\nrange deadbee1...HEAD\n' > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
 
@@ -900,7 +963,9 @@ hit "$(run --close tRun $crbc)" "closing-review-recorded"
 # every file, so without the >=8 test this arm would SELECT that record and the item would pass by
 # finding anything — the same degeneration an empty base once caused in check_authorization.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
@@ -908,7 +973,9 @@ hit "$(run --close tRun $crbc)" "closing-review-recorded"
 # arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
 # because "absent" and "too short to be a needle" reach the guard by different routes.
 cropen; rb=$(crbase)
-printf '# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
 hit "$(run --close tRun $crbc)" "closing-review-recorded"
@@ -1590,10 +1657,11 @@ done
 # ---- the assignments out of one arm in a COPY and prove the rule fires. A source rule with no red
 # ---- fixture is indistinguishable from one whose locator silently matches nothing.
 sfx="$TMP/s6-stripped.sh"   # $TMP is this suite's own scratch dir, made at line 14
-sed 's/DOD_OUT="the run-state file records.*/DOD_OUT=""/' "$SCRIPT" \
-  | sed 's/DOD_OUT="a review record exists on disk.*/DOD_OUT=""/' \
-  | sed 's/DOD_OUT="no review record exists under.*/DOD_OUT=""/' \
-  | sed 's/DOD_OUT="a tracked review record exists.*/DOD_OUT=""/' > "$sfx"
+# GENERIC, not a list of literal messages. The first cut named the four sentences it wanted gone, and
+# -16 then rewrote one of them -- so the strip went stale, the arm kept a non-empty DOD_OUT, and this
+# red fixture reported that the rule would not fire. It was right, which is what a negative control
+# is for. Emptying every quoted assignment cannot go stale when a message is reworded.
+sed 's/DOD_OUT="[^"]*"/DOD_OUT=""/g' "$SCRIPT" > "$sfx"
 sbody=$(awk -v want="closing-review-recorded" '
     /^dod_met\(\) \{/ { inf = 1 }
     inf && $0 ~ "^    " want "\\)" { grab = 1; next }

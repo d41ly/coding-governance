@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 

@@ -1729,8 +1729,36 @@ $_bcnon"
         fi
         return 1
       fi
-      if ! GIT grep --cached -qF -- "${rb:0:7}" -- "$M/builds/$slug/reviews/*.md"; then
-        DOD_OUT="a tracked review record exists but none names the base this run pinned, so no record is bound to THIS run: looking for ${rb:0:7} under $M/builds/$slug/reviews/"
+      # TOOL-aBoundedVerdict-16 S1/S2/S3 - the join asks for a DIFF-REVIEW naming a commit IN RANGE,
+      # where it used to ask for any file quoting the pinned BASE. Measured over the seven tracked runs
+      # before the change: three had no matching record at all, and two of the four that matched did so
+      # on a SPEC-AUDIT - an item named `closing-review-recorded` satisfied by a spec audit that
+      # happened to quote a sha.
+      #
+      # RANGE, not the pin: a fold-scoped round names the fold's base, which is a DESCENDANT of BASE.
+      # Under TOOL-aBoundedVerdict-14 the honest closing round names a sha the old test rejected.
+      #
+      # Membership is decided by GIT ANCESTRY, both directions, not by string comparison: a substring
+      # test cannot express "in this range" and would accept a sha from any branch sharing a prefix.
+      local _crfound="" _crkindless="" _crf _crsha
+      for _crf in $(GIT ls-files -- "$M/builds/$slug/reviews/*.md" 2>/dev/null); do
+        # The KIND comes off the binding line. Read with a local grep rather than through the hygiene
+        # engine's parser: that parser lives in the memory-tree kit and this kit ships without it.
+        # Grammar owner: memory/HYGIENE.md, "Record bindings".
+        GIT grep --cached -qE '^\*\*Serves:\*\*.*diff-review' -- "$_crf" || { _crkindless="$_crkindless $_crf"; continue; }
+        for _crsha in $(GIT grep --cached -hoE '[0-9a-f]{7,40}' -- "$_crf" 2>/dev/null | sort -u); do
+          GIT merge-base --is-ancestor "$rb" "$_crsha" 2>/dev/null || continue
+          GIT merge-base --is-ancestor "$_crsha" HEAD 2>/dev/null || continue
+          _crfound="$_crf"; break
+        done
+        [ -n "$_crfound" ] && break
+      done
+      if [ -z "$_crfound" ]; then
+        if [ -n "$_crkindless" ]; then
+          DOD_OUT="tracked review records exist under this build but none is a diff-review naming a commit in BASE..HEAD; these carry no diff-review binding line, so a spec audit cannot stand in for a closing review:$_crkindless"
+        else
+          DOD_OUT="a tracked diff-review exists but names no commit between the pinned BASE and HEAD, so it reviewed something outside this run's range: looking under $M/builds/$slug/reviews/"
+        fi
         return 1
       fi
       return 0 ;;
