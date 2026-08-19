@@ -27,8 +27,7 @@ globs = [
   "tools/*",
   ".githooks/**",
   "skills/session-kickoff/**",
-  "parallel-coding-governance.*.md",
-  "parallel-coding-governance.template.md",
+  "coding-governance-agents.template.md",
 ]
 
 # The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
@@ -37,6 +36,18 @@ globs = [
 default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall", "run-gates"]
 
 # ---------------------------------------------------------------- entries: kits with a directory
+[[entry]]
+id = "check-line-length"
+descriptor = "tools/govkit/entries/check-line-length.kit.toml"
+
+[[entry]]
+id = "check-microformats"
+descriptor = "tools/govkit/entries/check-microformats.kit.toml"
+
+[[entry]]
+id = "playbook-render"
+descriptor = "tools/playbook/kit.toml"
+
 [[entry]]
 id = "memory-tree"
 descriptor = "tools/memory-tree/kit.toml"
@@ -142,6 +153,10 @@ kind = "flat"
 # a stale exemption cannot quietly widen the surface.
 
 [[exempt]]
+path = "tools/line-length-limits.txt"
+why = "gov's OWN declaration, deliberately not shipped. It names gov's two subjects, neither of which exists in an adopter tree, where a row naming an absent path is a stale red — so seeding it would red an adopter on install day. The target authors its own, and a subject with no row is graded at the 450 default."
+
+[[exempt]]
 path = "tools/lib"
 why = """
 Not a kit. It has no README, no version constant and no adopter, and it ships nothing: it is
@@ -163,8 +178,22 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/check-dead-paths.sh"
+why = """
+gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
+"""
+
+[[exempt]]
+path = "tools/check-dead-paths.test.sh"
+why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
+path = "tools/dead-path-waivers.txt"
+why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and gov line numbers; seeded from this repo's measured population, meaningless in any other tree."
+
+[[exempt]]
 path = "tools/check-playbook-parity.sh"
-why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and reads this repo's customize.md arithmetic. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
+why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and compares values against the sources in this repo that own them. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
 
 [[exempt]]
 path = "tools/check-playbook-parity.test.sh"
@@ -172,7 +201,7 @@ why = "the red/green self-test for the above, which is itself exempt. Exemptions
 
 [[exempt]]
 path = "tools/playbook-kit-waivers.txt"
-why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the three shipped playbook files. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
+why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the shipped charter template. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
 
 [[exempt]]
 path = "tools/check-template-size.test.sh"
@@ -180,7 +209,7 @@ why = "gov's own red/green self-test for the template size gate, which is itself
 
 [[exempt]]
 path = "tools/template-size-limits.txt"
-why = "the DECLARED size ceilings for gov's own product template and kickoff engine, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
+why = "the DECLARED size ceilings for gov's own charter template, kickoff engine and rendered charter, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
 
 [[exempt]]
 path = "tools/template-size-highwater.txt"
@@ -198,15 +227,9 @@ why = "gov's own red/green self-test of the reference branch-guard block. The ru
 path = "skills/session-kickoff/manifest-check.test.sh"
 why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
 
-[[exempt]]
-path = "parallel-coding-governance.customize.md"
-why = "the deploy-time placeholder catalog. The runbook's own words are 'read it, don't ship it'. Counting it as a playbook member is how the spec over-stated that entry's file count for four revisions."
-
-# ------------------------------------------------------------------------- leg exemptions
-# A leg an adopter does NOT receive, each with its reason, on the same staleness rule as the
-# path exemptions above: a row naming a leg that is no longer in the manifest reds, and a leg
-# that is BOTH exempted and claimed by a descriptor reds too — an exemption and a claim for
-# one fact is the two-spellings class arriving through the escape hatch built to prevent it.
+[[exempt_leg]]
+name = "charter size"
+why = "it measures THIS repo's own rendered charter against a row in tools/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
 
 [[exempt_leg]]
 name = "branch-guard self-test"
@@ -224,6 +247,18 @@ gov's own recall-quality floor. The question set it grades is keyed on gov recor
 name = "recall floor arms"
 why = """
 the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
+"""
+
+[[exempt_leg]]
+name = "dead-path carriers (deleted files still named)"
+why = """
+gov's own dead-path scan. Its needle set is derived from this repo's deletion history and it is anchored on a frozen sentinel basename only this repo ever had, so the script is a registry exemption rather than an entry file and there is no descriptor for the leg to be claimed by.
+"""
+
+[[exempt_leg]]
+name = "dead-path carriers self-test"
+why = """
+the arms for the leg above, gov-only for the same reason. Its fixtures construct real deletion histories containing gov's sentinel basename, which is a fact about this repo rather than about the predicate.
 """
 
 [[exempt_leg]]

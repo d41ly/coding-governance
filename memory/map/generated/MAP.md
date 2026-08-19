@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 15 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -18,12 +18,15 @@ Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 ·
 | `branch-guard self-test` | baseline |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
+| `charter size` | playbook |
 | `check-arms selftest` | baseline |
 | `check-wiring self-test` | baseline |
 | `codebase-map adopter e2e` | codebase-map |
 | `codebase-map coverage + freshness` | codebase-map |
 | `codebase-map kit selftest` | codebase-map |
 | `corpus-ids selftest` | baseline |
+| `dead-path carriers (deleted files still named)` | install-prefix |
+| `dead-path carriers self-test` | install-prefix |
 | `drift-audit records` | baseline |
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
@@ -42,6 +45,8 @@ Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lexicon naming predicates` | lexicon |
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
+| `line length` | playbook |
+| `line-length gate selftest` | playbook |
 | `manifest-check self-test` | baseline |
 | `marker contract` | row-grammar |
 | `memory hygiene` | memory-tree-hygiene |
@@ -50,10 +55,14 @@ Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 ·
 | `memory-recall skill wiring` | memory-recall |
 | `method carriers (every pointer declared)` | build-method |
 | `method-carriers self-test` | build-method |
+| `micro-format definitions` | playbook |
+| `micro-format gate selftest` | playbook |
 | `placeholder-catalogue self-test` | lexicon |
 | `playbook parity` | playbook |
 | `playbook parity selftest` | playbook |
 | `playbook placeholder catalogue` | lexicon |
+| `playbook render selftest` | playbook |
+| `playbook render wiring` | playbook |
 | `pre-push self-test` | baseline |
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
@@ -101,6 +110,7 @@ Inventories: gate-legs: 76 · kits: 14 · git-hooks: 2 · workflow-scripts: 4 ·
 | `lib` | baseline |
 | `memory-recall` | memory-recall |
 | `memory-tree` | memory-tree-hygiene |
+| `playbook` | playbook |
 | `pytest-parallel-guardrails` | baseline |
 | `run-gates` | run-gates |
 | `unattended` | unattended |

@@ -1,0 +1,23 @@
+# dead-path waivers — deliberate spellings of a DELETED filename outside memory/.
+# One "<path>:<line>" per row, reason after whitespace. SHRINK-ONLY: the count may fall, never rise.
+# A row whose hit is gone reds as stale, so this file cannot quietly outlive what it excuses.
+#
+# Three classes only, and every row is one of them. (1) A GATE THAT BANS THE NAME must spell it —
+# the hygiene checker refuses `MEMORY.md`/`IN-FLIGHT.md`/`STATUS.md` by name, and its fixtures create
+# them to prove the refusal fires. (2) MIGRATION PROSE for an adopter whose tree still HAS the file
+# gov deleted: the runbook step that tells them how to leave it behind must name it. (3) PAST-TENSE
+# HISTORY explaining why a constant moved, where the name is the subject of the sentence rather than
+# a pointer a reader would follow.
+#
+# Seeded 2026-08-18 from the measured population, after the v3.0 carriers were repointed — so the
+# leg landed green over the tree it was written against rather than over an assumption about it.
+
+.memory-tree.conf:174                              history: why an ARMS_FLOORS pair dropped; the catalogue is the subject, not a pointer
+WIRE-INTO-PROJECT.md:264                           migration: names the old pointer stub an adopter still holds
+WIRE-INTO-PROJECT.md:270                           migration: the step that folds that file's prose away
+tools/memory-tree/check-memory-hygiene.sh:270      the gate BANS these names; it cannot refuse what it may not spell
+tools/memory-tree/check-memory-hygiene.sh:529      retirement note for the STATUS.md check, naming what it retired
+tools/memory-tree/check-memory-hygiene.test.sh:1057   fixture creates the banned names to prove the refusal fires
+tools/memory-tree/check-memory-hygiene.test.sh:1159   fixture builds an over-long STATUS.md for the size arm
+tools/memory-tree/check-memory-hygiene.test.sh:1164   positive arm: check 6 hits the banned STATUS.md
+tools/memory-tree/check-memory-hygiene.test.sh:1203   negative arm: check 6 does NOT hit it once retired

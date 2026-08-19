@@ -25,9 +25,7 @@ PRODUCT_GLOBS: list[str] = [
     # is product CONFIGURATION that moved into the tree, not a record. Naming the DIRECTORY would let
     # every spec cite its own id through the corpus and certify all of them at once.
     "memory/guides/SESSION-KICKOFF.md",
-    "parallel-coding-governance.template.md",
-    "parallel-coding-governance.customize.md",
-    "parallel-coding-governance.domain-rules.md",
+    "coding-governance-agents.template.md",
     "WIRE-INTO-PROJECT.md",
 ]
 
@@ -53,9 +51,7 @@ TRACE_CUTOFF: str = "2026-08-11"
 TRACE_GLOBS: list[str] = [
     "tools",
     "skills",
-    "parallel-coding-governance.template.md",
-    "parallel-coding-governance.customize.md",
-    "parallel-coding-governance.domain-rules.md",
+    "coding-governance-agents.template.md",
     "WIRE-INTO-PROJECT.md",
 ]
 
@@ -94,6 +90,8 @@ DECLARED_EMPTY: set[str] = {
     # ledger — and the declaration is not a muzzle: put one row back and the probe goes live and
     # scores again. selftest.py asserts both directions over one fixture.
     "ledger_rows_contradicting_git",
+    # its one HANDKEPT row retired with the charter section it graded, 2026-08-18
+    "handkept_inventories_disagreeing_with_source",
 }
 
 # --------------------------------------------------------------------------------------------
@@ -136,13 +134,17 @@ def _charter_mentions_every_leg(ctx) -> tuple[int, int]:
     return mentioned, total
 
 
-HANDKEPT: list[dict] = [
-    {
-        "record": "AGENTS.md gate-suite section names every leg",
-        "source": "tools/gate-legs.json",
-        "probe": _charter_mentions_every_leg,
-    },
-]
+# RETIRED 2026-08-18, ahead of the change that makes it necessary. The charter's gate-suite section
+# is deleted against an admission test, so the charter stops CLAIMING to name every leg and there is
+# nothing left to disagree with the source.
+# The retirement lands here rather than there because three units in between each ADD a gate leg,
+# and this signal is gateable at a drained pin of 0 — each of them would red `drift-audit records`
+# with no unit owning the fix. Between here and the cut the charter still names every pre-existing
+# leg, so retiring it early costs nothing.
+#
+# The probe function above is deliberately left defined and unreferenced: it is the record of what
+# was being asked, and re-arming it is a one-line change if the charter ever re-enumerates.
+HANDKEPT: list[dict] = []
 
 # --------------------------------------------------------------------------------------------
 # PINS — seeded at MEASURED values, never guessed. Lower each as its population drains; raising one

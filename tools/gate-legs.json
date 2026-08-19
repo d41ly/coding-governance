@@ -14,6 +14,50 @@
     ]
   },
   {
+    "name": "charter size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "AGENTS.md"
+    ]
+  },
+  {
+    "name": "micro-format definitions",
+    "argv": [
+      "bash",
+      "tools/check-microformats.sh"
+    ]
+  },
+  {
+    "name": "micro-format gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-microformats.test.sh"
+    ],
+    "guard": [
+      "tools/check-microformats.sh",
+      "tools/check-microformats.test.sh"
+    ]
+  },
+  {
+    "name": "line length",
+    "argv": [
+      "bash",
+      "tools/check-line-length.sh"
+    ]
+  },
+  {
+    "name": "line-length gate selftest",
+    "argv": [
+      "bash",
+      "tools/check-line-length.test.sh"
+    ],
+    "guard": [
+      "tools/check-line-length.sh",
+      "tools/check-line-length.test.sh"
+    ]
+  },
+  {
     "name": "playbook parity",
     "argv": [
       "bash",
@@ -600,6 +644,23 @@
     ]
   },
   {
+    "name": "dead-path carriers (deleted files still named)",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.sh"
+    ]
+  },
+  {
+    "name": "dead-path carriers self-test",
+    "argv": [
+      "bash",
+      "tools/check-dead-paths.test.sh"
+    ],
+    "guard": [
+      "tools/"
+    ]
+  },
+  {
     "name": "govkit selfcheck",
     "argv": [
       "python",
@@ -707,7 +768,10 @@
       "tools/govkit/matrix.py"
     ],
     "guard": [
-      "tools/govkit/"
+      "tools/govkit/",
+      "tools/playbook/",
+      "tools/check-microformats.sh",
+      "tools/check-line-length.sh"
     ]
   },
   {
@@ -722,6 +786,27 @@
     "argv": [
       "bash",
       "tools/check-testsuite-counts.test.sh"
+    ]
+  },
+  {
+    "name": "playbook render wiring",
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--target",
+      ".",
+      "--check"
+    ]
+  },
+  {
+    "name": "playbook render selftest",
+    "guard": [
+      "tools/playbook/"
+    ],
+    "argv": [
+      "bash",
+      "tools/playbook/adopt-playbook.sh",
+      "--selftest"
     ]
   }
 ]

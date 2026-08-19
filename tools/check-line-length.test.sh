@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# check-line-length.test.sh — the failing case for every branch the gate carries.
+#
+# ONE scratch repo, reused. `git init` measured ~7s on this fleet and the gate roots itself with
+# `git rev-parse`, so a repo per arm puts the suite past its own timeout while proving nothing.
+#
+# THE HARNESS RUNS SETUP AND THE GATE SEPARATELY, and that is not a style choice. An earlier draft
+# ran `sh -c 'setup; gate; cleanup'` and read the rc of the CLEANUP — so every red arm reported 0 and
+# the suite would have certified a gate that never fired. Setup happens first, the gate runs alone,
+# and its rc is the one compared.
+set -u
+HERE=$(cd "$(dirname "$0")" && pwd)
+ROOT=$(cd "$HERE/.." && pwd)
+GATE="$ROOT/tools/check-line-length.sh"
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+
+ASSERTIONS=0; FAILED=0
+say_ok()   { ASSERTIONS=$((ASSERTIONS+1)); printf 'arm ok    %s\n' "$1"; }
+say_fail() { ASSERTIONS=$((ASSERTIONS+1)); FAILED=$((FAILED+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
+
+W="$TMP/repo"; mkdir -p "$W/tools"
+git -C "$W" init -q 2>/dev/null
+git -C "$W" config user.email t@t; git -C "$W" config user.name t
+cp "$GATE" "$W/tools/check-line-length.sh"
+
+# RESOLVED, never named. The repo-wide ban exists because the MS-Store `python3` stub answers
+# `command -v` and exits 9009 without executing anything — being on PATH is not evidence, running is.
+PY=""
+for _c in "${GOV_PYTHON:-}" python3 python py; do
+  [ -n "$_c" ] || continue
+  if "$_c" -c "import sys" >/dev/null 2>&1; then PY=$_c; break; fi
+done
+[ -n "$PY" ] || { echo "check-line-length.test: no usable python launcher; each candidate was RUN"; exit 2; }
+line() { "$PY" -c "import sys;sys.stdout.write(sys.argv[1]*int(sys.argv[2])+chr(10))" "$1" "$2"; }
+
+reset() {                      # a subject the gate passes on, and a declaration naming it
+  line x 100 > "$W/subject.md"
+  printf 'subject.md\t450\n' > "$W/tools/line-length-limits.txt"
+  rm -f "$W/other.md"
+}
+
+# arm <label> <want-rc> <want-substring> [env] [gate-args...]
+arm() {
+  local label=$1 wrc=$2 want=$3 envv=$4; shift 4
+  local out rc
+  if [ -n "$envv" ]; then
+    out=$(cd "$W" && env "$envv" bash tools/check-line-length.sh "$@" 2>&1); rc=$?
+  else
+    out=$(cd "$W" && bash tools/check-line-length.sh "$@" 2>&1); rc=$?
+  fi
+  if [ "$rc" -eq "$wrc" ] && printf '%s' "$out" | grep -qF "$want"; then say_ok "$label"
+  else say_fail "$label" "expected rc $wrc naming '$want', got $rc: $(printf '%s' "$out" | head -2 | tr '\n' ' ')"; fi
+}
+
+reset
+arm "control · a short subject passes" 0 "0 over 450" ""
+
+# The `want` strings for red arms are each the branch's ENTIRE literal signature up to its first
+# interpolation, which the harness meta-gate requires. An arm asserting a readable prefix keeps
+# passing after the sentence it was written for is rewritten around it, and the branch quietly loses
+# its only proof.
+reset; line y 451 >> "$W/subject.md"
+arm "an over-length line reds naming the line and its length" 1 "a subject carries line(s) over its limit of" ""
+
+reset; line y 450 >> "$W/subject.md"
+arm "exactly at the limit passes" 0 "0 over 450" ""
+
+# ---------------------------------------------------------------- resolution order
+reset; printf 'subject.md\t200\n' > "$W/tools/line-length-limits.txt"; line y 300 >> "$W/subject.md"
+arm "the DECLARATION beats the environment" 1 "limit of 200" "LINE_MAX=9999"
+
+reset; line y 300 > "$W/other.md"
+arm "an UNDECLARED subject honours the environment" 1 "resolved from the environment" "LINE_MAX=200" other.md
+
+reset; line y 300 > "$W/other.md"
+arm "an undeclared subject with no environment falls through to 450" 0 "limit from the default" "" other.md
+
+reset; line y 300 >> "$W/subject.md"
+arm "a POSITIONAL beats the declaration" 1 "resolved from a positional" "" subject.md 200
+
+# ---------------------------------------------------------------- the exemption, and its boundary
+reset; { printf '```\n'; line y 600; printf '```\n'; } >> "$W/subject.md"
+arm "a long line INSIDE a fence does not red" 0 "0 over 450" ""
+
+reset; { printf '| '; line y 600; } >> "$W/subject.md"
+arm "a long line inside a TABLE does red" 1 "characters" ""
+
+# ---------------------------------------------------------------- measurement and declaration hygiene
+reset; line — 400 >> "$W/subject.md"
+arm "a non-ASCII line is measured in CHARACTERS, not bytes" 0 "0 over 450" ""
+
+reset; printf 'subject.md\t450\ngone.md\t450\n' > "$W/tools/line-length-limits.txt"
+arm "a row naming an ABSENT path reds as stale" 1 \
+  "the declaration names a subject that does not exist, so its row excuses nothing and is stale" ""
+
+reset; printf 'subject.md\tlots\n' > "$W/tools/line-length-limits.txt"
+arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 \
+  "the declared line limit for this subject is not a number, so the comparison below would be against text: '" ""
+
+reset; printf '# only a comment\n' > "$W/tools/line-length-limits.txt"
+arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" ""
+
+# ---------------------------------------------------------------- certify-without-measuring
+# THE FOUR ARMS BELOW ARE ONE CLASS: the gate printed `line-length OK … 0 over 0 characters` and
+# exited 0 in every one of them. `over` is empty on a clean subject and empty on a crashed scanner,
+# and the shell discarded the status that told them apart. Each arm asserts a NON-ZERO verdict, so a
+# regression cannot pass by printing the right words.
+reset; line y 300 >> "$W/subject.md"
+arm "a non-numeric POSITIONAL limit is a named failure, not a certified zero" 1 \
+  "the line limit is not a number, so nothing could be compared against it: '" "" subject.md abc
+
+reset; line y 10 > "$W/other.md"
+arm "a non-numeric LINE_MAX is a named failure, not a certified zero" 1 \
+  "the line limit is not a number, so nothing could be compared against it: '" "LINE_MAX=abc" other.md
+
+# A subject whose every line sits inside a fence measures ZERO lines. Empty-population is the
+# vacuity this tree bans by name: the old gate printed OK over a file it graded nothing in.
+reset; { printf '```\n'; line y 600; printf '```\n'; } > "$W/subject.md"
+arm "a subject with NO gradeable line is a dead probe, not a clean verdict" 1 \
+  "the scanner reached no gradeable line in this subject, so a clean verdict would certify a measurement that never happened" ""
+
+# The interpreter dies AFTER the resolver's probe accepted it — the shape a resolver cannot catch.
+reset
+printf '#!/usr/bin/env bash\n[ "$1" = "-c" ] && exit 0\nexit 4\n' > "$W/deadpy"; chmod +x "$W/deadpy"
+arm "a scanner that dies mid-run is a named failure, not a certified zero" 1 \
+  "the offender scan did not run for this subject, so no line was measured and OK would be a lie" "LINELEN_PY=$W/deadpy"
+
+# THE INSTALL-DAY PAIR, and the two must land on DIFFERENT verdicts. The kit withholds the
+# declaration on purpose — gov's rows name gov's paths, and a row naming an absent path is a stale
+# red — so ABSENT is the shape every adopter starts in, and the exit 2 it used to get there was the
+# very failure the withholding was made to prevent. Measured in a scratch install before this arm
+# existed. Its neighbour above is what stops this one being read as "an empty population is fine".
+reset; rm -f "$W/tools/line-length-limits.txt"
+arm "an ABSENT declaration is NOT ADOPTED at exit 0, not a red install day" 0 \
+  "NOT ADOPTED — no declaration at" ""
+
+printf '\n'
+if [ "$FAILED" -ne 0 ]; then
+  printf 'check-line-length.test.sh FAILED — %d arm(s)\n' "$FAILED"; exit 1
+fi
+FLOOR_ASSERTIONS=18
+if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
+  printf 'check-line-length.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
+    "$ASSERTIONS" "$FLOOR_ASSERTIONS"; exit 1
+fi
+echo "PASS ($ASSERTIONS assertions)"

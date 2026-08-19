@@ -8,12 +8,12 @@ machines/sessions on the same repo.
 
 ## Contents
 
-- **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
+- **`coding-governance-agents.template.md`** — the governance playbook template (the operating
   ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
-  snapshots live under `memory/archive/`. Two companions ship with it:
-  **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and
-  **`.domain-rules.md`** (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references
-  by §-stub — copy it alongside the template into a target repo).
+  snapshots live under `memory/archive/`. **ONE file as of v3.0** — the activity-scoped checklists
+  converged into the charter and the deploy-time placeholder catalog became a program. Install it
+  with `bash tools/playbook/adopt-playbook.sh --target <repo>`, which fills every placeholder from
+  the target's `deploy.toml` and drops the conditional blocks that target has no kit for.
 - **`tools/agent-instructions/`** — install a canonical `AGENTS.md` in a target repo and wire every AI
   tool's file to it (`CLAUDE.md` `@AGENTS.md` import, Gemini config, symlink/copy), with a `--check`
   drift gate. Use it to deploy the filled playbook as a project's agent-instruction file.

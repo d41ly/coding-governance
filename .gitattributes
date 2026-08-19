@@ -53,7 +53,10 @@ memory/backlog/*.md merge=rows
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
-parallel-coding-governance*.md text eol=lf
+coding-governance-agents.template.md text eol=lf
+AGENTS.md text eol=lf
+.governance/deploy.toml text eol=lf
+tools/line-length-limits.txt text eol=lf
 
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows

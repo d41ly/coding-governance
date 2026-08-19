@@ -138,6 +138,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "Refusal",
+      "kind": "class",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -333,6 +338,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "build_region",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "build_substitution",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "cache_dir",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -406,6 +421,11 @@
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_fences",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "check_layer_violation",
@@ -538,9 +558,59 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_ci_file",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_default_branch",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_gate_runner",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_id_families",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_install_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_lexicon_conf",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_memory_disciplines",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_memory_root",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_node_tag",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_primary_tree",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_project_name",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "derive_rule_kind",
@@ -551,6 +621,11 @@
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_worktree_root",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "destinations_for",
@@ -1068,6 +1143,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "load_declarations",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "load_deploy",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1261,6 +1341,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "main",
@@ -1573,6 +1658,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_conf",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1586,6 +1676,16 @@
       "id": "read_gate_verdicts",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_git",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_input",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_lines",
@@ -1653,6 +1753,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "remove_fenced",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "render",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -1666,6 +1771,11 @@
       "id": "render",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "render",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "render_affordance_exempt",
@@ -1768,6 +1878,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "resolve_declaration_paths",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "resolve_declared_sources",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1816,6 +1931,11 @@
       "id": "resolve_selection",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_template_path",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_tokens",
@@ -1956,6 +2076,11 @@
       "id": "run_rollup",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "scan",

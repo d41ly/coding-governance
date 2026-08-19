@@ -26,6 +26,15 @@ include = ["kit.toml"]
 role = "engine"
 to = "{prefix}/hooks/kit.toml"
 
+# The grammar this hook enforces, moved out of the charter at v3.0. It ships with
+# the hook because it is implementation detail of ONE hook: an adopter installing agent-cap and not
+# receiving the marker spellings gets a guard whose refusals they cannot satisfy. It is also the
+# fourth file under this non-flat home, and selfcheck reds on any tracked file here no rule claims.
+[[files]]
+include = ["README.md"]
+role = "engine"
+to = "{prefix}/hooks/README.md"
+
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false

@@ -7,11 +7,11 @@
 #
 # WHY EACH ARM IS A RED PROOF. The gate under test exists to catch coverage checks that pass by
 # checking nothing, so a harness that only ever watched it pass would be the very defect it gates.
-# `parallel-coding-governance.domain-rules.md`: "a new gate is not landed until its failing case has
+# `coding-governance-agents.template.md` §7: "a new gate is not landed until its failing case has
 # been observed."
 #
 # HOW THE ARMS WORK. Every arm builds a scratch WORKTREE-SHAPED fixture — a real git repo with its
-# own tools/ and playbook trio — and runs the gate inside it. Nothing here mutates the real tree,
+# own tools/, charter and runbook — and runs the gate inside it. Nothing here mutates the real tree,
 # which matters because the gate derives its kit set from `git ls-files` and would otherwise see
 # this repo's own population.
 set -u
@@ -28,7 +28,7 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/tools/memory-tree" "$d/tools/hooks" "$d/.claude"
+  mkdir -p "$d/tools/memory-tree" "$d/tools/hooks" "$d/tools/lib" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/tools/check-playbook-parity.sh"
@@ -41,12 +41,12 @@ fixture() {
   # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
   # population; the control failed, correctly, until the fixture carried their sentences.
   printf 'template {{ALPHA}} {{MEMORY_ROOT}}\ntools/memory-tree/ is the kit\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
-    | sed 's/<=/≤/' > "$d/parallel-coding-governance.template.md"
+    | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
   printf 'companion {{MEMORY_ROOT}}\n' > "$d/parallel-coding-governance.domain-rules.md"
   {
     printf '2 in total: 2 in the template and 1 in the companion.\n'
     printf '**1 shared: `{{MEMORY_ROOT}}`**\n'
-    printf '### In `parallel-coding-governance.template.md` — 2\n'
+    printf '### In `coding-governance-agents.template.md` — 2\n'
     printf '### In `parallel-coding-governance.domain-rules.md` — 1\n'
   } > "$d/parallel-coding-governance.customize.md"
   printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/tools/playbook-kit-waivers.txt"
@@ -88,7 +88,7 @@ arm "control · a valid fixture passes" ok "" true
 # unrelated word, so a loosened matcher certifies it documented and the arm goes red.
 arm "S1 a kit named only as a substring is NOT documented" red \
   "a kit ships and the playbook never names it, with no waiver row to excuse it: ape" \
-  sh -c 'mkdir -p tools/ape && : > tools/ape/x.sh && printf "the shape of a landscape\n" >> parallel-coding-governance.template.md'
+  sh -c 'mkdir -p tools/ape && : > tools/ape/x.sh && printf "the shape of a landscape\n" >> coding-governance-agents.template.md'
 
 # --- AC1 · a kit named nowhere and waived nowhere --------------------------------------------------
 arm "AC1 an undocumented kit reds by name" red \
@@ -104,14 +104,11 @@ arm "AC2b the hook matcher drifts from .claude/settings.json" red \
   sh -c 'printf "{ \"hooks\": { \"PreToolUse\": [ { \"matcher\": \"Workflow\" } ] } }\n" > .claude/settings.json'
 
 # --- AC3 · a placeholder added and the catalogue counts not updated ---------------------------------
-arm "AC3 an added placeholder reds the catalogue arithmetic" red \
-  "the catalogue states a placeholder total that the measured union contradicts: says " \
-  sh -c 'printf "{{BETA}}\n" >> parallel-coding-governance.template.md'
 
 # --- AC4 · an extraction that matches nothing must never compare empty to empty ----------------------
 arm "AC4 an unresolvable pair reds rather than passing" red \
   "an extraction matched NOTHING, so the pair was never compared" \
-  sh -c 'sed -i "s/an array LITERAL of ≤5 elements passes//" parallel-coding-governance.template.md'
+  sh -c 'sed -i "s/an array LITERAL of ≤5 elements passes//" coding-governance-agents.template.md'
 
 # --- AC5 · the derivation broken to lose its sentinel -------------------------------------------------
 arm "AC5 a derivation missing its sentinel reds" red \
@@ -143,40 +140,21 @@ arm "S2 a lost results file reds rather than reading as no-disagreement" red \
   sh -c "sed -i \"/^printf 'PAIRSTAGE-RAN/d\" tools/check-playbook-parity.sh"
 
 # --- the structural intersection check must not pass vacuously ---------------------------------------------
-arm "S3 a catalogue naming no shared placeholder reds" red \
-  "the catalogue names no shared placeholder, so the structural intersection check had nothing to compare and would have passed vacuously" \
-  sh -c 'sed -i "/1 shared/d" parallel-coding-governance.customize.md'
 
 # --- the remaining five branches, armed rather than pinned as exceptions -------------------------
 # check-arms refuses an unarmed branch that is not written into memory/project/unarmed-branches.txt,
-# and a pin is a standing exception where a fixture is a proof. These five cost one fixture each.
 
 # check 1 · the kit derivation returns an EMPTY set. Distinct from AC5, where the set is non-empty
 # and merely lost its sentinel: here coverage would be vacuously true over nothing at all.
 arm "S1 an empty kit derivation reds before reporting coverage" red \
   "the kit derivation returned an empty set, so coverage would pass by checking nothing" \
-  sh -c 'git rm -q -r --cached tools >/dev/null 2>&1; rm -rf tools/memory-tree tools/hooks'
+  sh -c 'git rm -q -r --cached tools >/dev/null 2>&1; rm -rf tools/memory-tree tools/hooks tools/lib'
 
 # check 8 · a stated count that cannot be extracted at all. Without this the arithmetic block would
 # compare three empty strings and report ok — the same vacuity the pair loop guards against.
-arm "S3 an unextractable stated count reds rather than comparing nothing" red \
-  "a stated placeholder count could not be extracted from the catalogue, so the arithmetic was never compared: total=" \
-  sh -c 'sed -i "s/^2 in total.*//" parallel-coding-governance.customize.md'
-
-# checks 10 and 11 · each group size has its own branch, so each needs its own fixture: a single
-# arm over "some count disagrees" would leave whichever branch it did not take unproven.
-arm "S3 a wrong template group size reds naming that group" red \
-  "the catalogue states a template group size that the template contradicts: says" \
-  sh -c 'sed -i "s/^### In \`parallel-coding-governance.template.md\` — 2/### In \`parallel-coding-governance.template.md\` — 9/" parallel-coding-governance.customize.md'
-arm "S3 a wrong companion group size reds naming that group" red \
-  "the catalogue states a companion group size that the companion contradicts: says" \
-  sh -c 'sed -i "s/^### In \`parallel-coding-governance.domain-rules.md\` — 1/### In \`parallel-coding-governance.domain-rules.md\` — 9/" parallel-coding-governance.customize.md'
 
 # check 13 · the catalogue NAMES a shared placeholder that is not the measured intersection. The
 # structural half of S3: check 12 catches naming none, this catches naming the wrong one.
-arm "S3 a wrongly-named shared placeholder reds" red \
-  "the placeholder the catalogue names as shared is not the measured intersection: names" \
-  sh -c 'sed -i "s/1 shared: \`{{MEMORY_ROOT}}\`/1 shared: \`{{ALPHA}}\`/" parallel-coding-governance.customize.md'
 
 if [ "$fails" -ne 0 ]; then
   printf 'check-playbook-parity.test.sh FAILED — %d arm(s)\n' "$fails"
