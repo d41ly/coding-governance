@@ -139,6 +139,7 @@ memory/map/affordance-exempt.toml text eol=lf
 # is a class this repo has already paid for twice.
 tools/govkit/*.toml text eol=lf
 tools/govkit/*.py text eol=lf
+tools/run-gates/*.py text eol=lf
 tools/govkit/entries/*.toml text eol=lf
 tools/*/kit.toml text eol=lf
 

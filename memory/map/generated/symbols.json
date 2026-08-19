@@ -433,6 +433,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_quiet",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -613,6 +618,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_regime",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -621,6 +631,11 @@
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_width",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "derive_worktree_root",
@@ -1350,6 +1365,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/settings-merge.py"
     },
     {
@@ -1381,6 +1401,11 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "measure_orphans",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "measure_overlap",
@@ -1548,6 +1573,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "parse_verdicts",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "parse_waiver",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -1571,6 +1601,16 @@
       "id": "population",
       "kind": "function",
       "file": "tools/govkit/refusal_join.py"
+    },
+    {
+      "id": "print_last",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "print_summary",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "pytest_configure",
@@ -1711,6 +1751,11 @@
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_timings",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "reconcile",
@@ -1876,6 +1921,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "resolve_declaration_paths",
@@ -2061,6 +2111,11 @@
       "id": "run_fts",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "run_grep",

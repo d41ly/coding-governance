@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-aPacedTurnstile-1"]
 
 [claims]
-gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"]
+gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring", "profile-bar selftest"]
 kits = ["run-gates"]
 git-hooks = []
 workflow-scripts = []
@@ -23,6 +23,8 @@ globs = [
   "tools/run-gates/run-gates.sh",
   "tools/run-gates/adopt-run-gates.sh",
   "tools/run-gates/kit.toml",
+  "tools/run-gates/profile_bar.py",
+  "tools/run-gates/profile_bar.test.sh",
 ]
 ```
 
