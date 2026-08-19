@@ -1151,9 +1151,14 @@ verb_landed() { # slug
   # adding a unit would retroactively change what this landed run appears to have carried. Freezing
   # the ids at the moment of landing is what keeps a terminal record a record. It is written as an
   # authored FACT because nothing else in the tree holds it once the README moves on.
+  # TOOL-aPromptedMandate-12 fold - through `unit_rows`, which is the THIRD reader of this region's
+  # row grammar and the one the narrowing missed. Left open-coded it kept the broad `^| [`, so this
+  # verb froze RECORD rows into `units-at-landing` - a terminal, permanent fact validated by nothing,
+  # and the freeze is the whole reason the field exists. The second closing review reproduced it at
+  # 1162 bytes of raw markdown against this build's own README.
   set_fact "$rel" units-at-landing \
-    "$(region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null \
-       | grep -E '^\| \[' | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+    "$(unit_rows "$(readme_of "$slug")" \
+       | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
   return 0
@@ -1440,7 +1445,10 @@ verb_status() { # slug
   # --status and --resume kept reading the records table - two answers to one question about one
   # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
   # --status on a landed build offered a `build/` record filename as the next unit.
-  unit=$(nonterminal_units "$(readme_of "$slug")" | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+  # `](spec/` and not a bare `]`: the selector deliberately admits a unit whose TITLE contains one,
+  # so cutting at the first `]` would display a truncated id for exactly the row the narrowing was
+  # written to keep. Cut at the link instead, which is the only `](spec/` a unit row carries.
+  unit=$(nonterminal_units "$(readme_of "$slug")" | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
   [ -n "$unit" ] || unit="(no non-terminal unit)"
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave

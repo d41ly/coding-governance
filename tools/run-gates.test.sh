@@ -212,6 +212,17 @@ clamp_target() {
     *)        [ "$1" -lt 1 ] 2>/dev/null && echo 1 || echo "$1" ;;
   esac
 }
+# ...and it is a COPY of run-gates' clamp, so it is JOINED to the source rather than trusted. Two
+# copies of one computation agree until they do not, and nothing here could observe a divergence:
+# the arms below read the source's own case arms and assert this function reproduces them, so a
+# clamp edit that this copy does not follow reds instead of silently sending the control to the
+# wrong width. The ORDER matters as much as the mapping - `nonsense` matches `?????*` too, and only
+# run-gates testing `*[!0-9]*` first makes it 1.
+_ct_src=$(sed -n 's/.*case "\$JOBS" in \(.*\) esac.*/\1/p' "$ROOT/tools/run-gates.sh" | head -1)
+case "$_ct_src" in
+  *'*[!0-9]*) JOBS=1'*'?????*) JOBS=64'*) ;;
+  *) echo "canary: run-gates' clamp no longer reads as the two ordered arms clamp_target mirrors, so the control width this suite computes is no longer joined to the source it copies: $_ct_src"; fail=1 ;;
+esac
 # THE LIVE CONTROL, as a function so the suite can drive BOTH its outcomes rather than wait for an
 # unlucky host. Exit 124 says the budget expired and NOTHING about why; the message this replaces
 # asserted a spinning clamp from it. The control runs the SAME fixture at the width the clamp should
@@ -265,10 +276,14 @@ case "$v" in
   *) echo "canary: the expiry verdict did not report an undecidable host when its own control expired: $v"; fail=1 ;;
 esac
 #        SPUN: a budget the control comfortably finishes inside leaves the clamp as the difference.
+#        It asserts the message ONLY when the control actually finished - on a loaded host it may
+#        not, and an arm that reds there would be naming a cause it never checked, which is the
+#        defect this whole unit removes. Reported as a loud skip instead of a silent pass.
 v=$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )
 case "$v" in
-  *"the clamp let it spin"*) ;;
-  *) echo "canary: the expiry verdict did not blame the clamp when its control finished: $v"; fail=1 ;;
+  *"the clamp let it spin"*)  ;;
+  *"BOTH expired"*) echo "canary: SKIP the spun-outcome arm - this host could not finish the control inside 60s, so the outcome it asserts was not produced" ;;
+  *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
 [ "$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )" != "$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )" ] \

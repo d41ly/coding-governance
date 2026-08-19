@@ -670,8 +670,12 @@ miss "$out" "records-current"
 # ---- Written against `reset_tree` instead, both positive arms failed on the fixture's own OPEN
 # ---- unit and term 1's missing roster - measuring the fixture rather than the subject.
 bcopen
-printf '| [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |\n' >> memory/builds/tRun/README.md
-printf '| [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |\n' >> memory/builds/tRun/RUN.md
+# INSIDE the region, not appended. `>>` puts the row past `<!-- /gen:build-index -->`, where
+# `region()` never sees it - so these arms restated the green control and passed identically against
+# the PRE-FIX selector. The shipped fix had no regression gate, which is the class this same
+# changeset adds a gotcha sub-shape for. Caught by the second closing review, not by me.
+sed -i '/<!-- gen:build-index -->/a | [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |' memory/builds/tRun/README.md
+sed -i '/<!-- gen:build-index -->/a | [2026-08-01-review-ARCH-tRun-1-x.md](reviews/2026-08-01-review-ARCH-tRun-1-x.md) | spec-audit | ARCH-tRun-1 |' memory/builds/tRun/RUN.md
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review")
 hit  "$out" "close OK"
 miss "$out" "build-complete"
@@ -1159,7 +1163,10 @@ same "--status names a non-terminal unit through the extracted helper" "$(run --
 # re-derives the slice with awk rather than calling `region`, which is a driver function and
 # not a command here — the first cut called it, got empty, and would have compared the helper
 # against nothing and passed forever.
-want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\].*//')
+# The control re-derives with the SAME selector the driver now uses. Left at the broad `^| [` it
+# asserted the fix had NOT happened - a control encoding the pre-fix behaviour turns green into
+# proof of the defect.
+want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[.*\]\(spec/' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
@@ -1797,7 +1804,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=315
+FLOOR_ASSERTIONS=338
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

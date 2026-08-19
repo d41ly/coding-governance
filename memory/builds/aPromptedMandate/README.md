@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-18
 streams: tooling
 roster: TOOL
-ids: TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13
+ids: TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 TOOL-aPromptedMandate-14
 ---
 
 # aPromptedMandate — an unattended run starts from the owner's prose, not from a landed slug
@@ -120,7 +120,7 @@ that may rewrite the rules it is authorized under has no rules.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12
-ids TOOL-aPromptedMandate-13
+ids TOOL-aPromptedMandate-13 TOOL-aPromptedMandate-14
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
@@ -141,6 +141,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
 | [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
 | [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 |
+| [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -170,4 +171,5 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md)
   - [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md)
   - [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md)
+  - [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md)
 <!-- /gen:build-docs -->
