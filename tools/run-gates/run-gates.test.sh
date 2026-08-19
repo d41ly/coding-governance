@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=37
+FLOOR_ASSERTIONS=65
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -177,11 +177,29 @@ npeaks_now() { ls "$SCRATCH/fx/ts"/*.peak 2>/dev/null | grep -c . || true; }
 #     path, so the serial reading is not a second implementation that can drift.
 s1=$(run_scratch 1); peaks1=$(peaks_now); n1=$(npeaks_now)
 s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
+# THE PROFILE LINE IS FILTERED BY NAME, because it legitimately differs between the two runs: it
+# reports the EFFECTIVE width, which is the one thing these runs are supposed to disagree about. The
+# companion arms below are what stop that filter from hiding the line's disappearance — a filter with
+# no presence check is a way to make any regression in the filtered line invisible.
+f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ')
+f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ')
 n=$((n+1))
-if [ "$s1" != "$s4" ]; then
+if [ "$f1" != "$f4" ]; then
   echo "canary: GATE_JOBS=1 and GATE_JOBS=4 disagree — concurrency changed the report"
-  diff <(printf '%s\n' "$s1") <(printf '%s\n' "$s4") | sed 's/^/    /'; fail=1
+  diff <(printf '%s\n' "$f1") <(printf '%s\n' "$f4") | sed 's/^/    /'; fail=1
 fi
+# The profile line exists AND precedes the first leg verdict — an operator who cannot see the knobs
+# before the run starts cannot tell a thrashing box from a slow one.
+first_marker() { printf '%s\n' "$1" | grep -E '^(gate profile: |GATE )' | head -1; }
+for _w in 1 4; do
+n=$((n+1))
+  eval "_s=\$s$_w"
+  case "$(first_marker "$_s")" in
+    'gate profile: '*) ;;
+    '') echo "canary: the width-$_w run printed no 'gate profile: ' line, so arm 3a's filter is hiding its absence rather than its width"; fail=1 ;;
+    *)  echo "canary: the width-$_w run printed a leg verdict BEFORE its 'gate profile: ' line: $(first_marker "$_s")"; fail=1 ;;
+  esac
+done
 
 # 3b. reporting is in MANIFEST order even though leg 1 finishes last.
 got=$(printf '%s\n' "$s4" | grep -c '^GATE ')
@@ -456,6 +474,198 @@ done
 #    full bar — a fact about gov's tree, sitting in the half whose whole contract is that every
 #    assertion holds in ANY tree. An adopter has no such hook unless they also took push-main, which
 #    is not in the default selection, so this arm was red on arrival in every default install.
+
+# 4. THE HARDWARE PROFILE TABLE. The runner's knobs are DECLARED rather than computed from core
+#    count alone, and the governing invariant is that no knob may ever turn a leg into a PASS or a
+#    SKIP. Every arm below is driven against a SCRATCH repo carrying the kit's own table, and the
+#    threshold arms read their seam values FROM that table rather than pinning gov's figures — a
+#    number copied from one corpus into a harness that ships is
+#    memory/gotchas/pin-copied-from-another-corpus.md, and an adopter who tunes a threshold would
+#    inherit a red that says nothing about their tree.
+P="$SCRATCH/prof"
+mkdir -p "$P/tools/run-gates" "$P/fx" "$P/shim"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$P/tools/run-gates/run-gates.sh"
+printf '#!/usr/bin/env bash\nexit 0\n'          > "$P/fx/a.sh"
+printf '#!/usr/bin/env bash\nsleep 4\nexit 0\n' > "$P/fx/sleeper.sh"
+cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "two", "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+( cd "$P" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-gates.sh 2>&1 ); }
+profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
+profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
+
+# The kit's OWN table, copied in so the selection arms drive real declared rows. It is a shipped file
+# of this kit, so it is present in any tree that took the kit — and its ABSENCE is the documented
+# rollback, which arm 4f drives deliberately. A missing table here is therefore a loud SKIP and never
+# a silent pass: an arm that could not look has not looked.
+PTBL="$KITREL/gate-profiles.txt"
+if [ -f "$PTBL" ]; then
+  cp "$PTBL" "$P/tools/run-gates/gate-profiles.txt"
+  prow() { grep -vE '^[[:space:]]*(#|$)' "$PTBL" | sed -n "${1}p"; }
+  nrows=$(grep -cvE '^[[:space:]]*(#|$)' "$PTBL")
+  r1=$(prow 1); r1n=$(printf '%s' "$r1" | cut -f1); r1c=$(printf '%s' "$r1" | cut -f2); r1m=$(printf '%s' "$r1" | cut -f3)
+  rZn=$(prow "$nrows" | cut -f1)
+
+  # 4a. the most-capable row is selected when BOTH its thresholds are met. Seams, not real hardware:
+  #     the node running this suite is whatever it is, and an arm that depends on that grades the box.
+n=$((n+1))
+  got=$(profname "$(runp GATE_CORES="$r1c" GATE_RAM_MB="$r1m")")
+  [ "$got" = "$r1n" ] || { echo "canary: at the top row's own thresholds ($r1c cores / $r1m MB) the runner selected '$got', not '$r1n'"; fail=1; }
+
+  # 4b. THE RAM GUARD, which is the whole reason this table exists: cores alone are the wrong
+  #     question, and today's built-in formula cannot express this. Same core count, one MB below the
+  #     top row's RAM threshold, and the selection must move off that row. A top row declaring a zero
+  #     RAM threshold makes the case unreachable, so it is skipped OUT LOUD rather than passed.
+n=$((n+1))
+  if [ "$r1m" -gt 0 ]; then
+    got=$(profname "$(runp GATE_CORES="$r1c" GATE_RAM_MB="$(( r1m - 1 ))")")
+    [ "$got" != "$r1n" ] || { echo "canary: a box with $r1c cores and one MB BELOW the top row's RAM threshold still selected '$r1n' — the RAM guard is not armed"; fail=1; }
+  else
+    echo "canary: SKIP the RAM-guard arm — the top table row declares a zero RAM threshold, so there is no reading below it to drive"
+  fi
+
+  # 4c. unknown hardware lands on the LAST row by ordinary threshold matching, and says so. A
+  #     detection failure must cost SPEED, never COVERAGE, and the tag is how an operator tells the
+  #     two apart afterwards.
+n=$((n+1))
+n=$((n+1))
+  o=$(runp GATE_CORES=0 GATE_RAM_MB=0)
+  got=$(profname "$o")
+  [ "$got" = "$rZn" ] || { echo "canary: unknown hardware selected '$got', not the table's last (catch-all) row '$rZn'"; fail=1; }
+  case "$(profline "$o")" in *'detection failed'*) ;; *) echo "canary: an unresolvable hardware reading was not tagged as a detection failure: $(profline "$o")"; fail=1 ;; esac
+n=$((n+1))
+  printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+    || { echo "canary: a detection failure changed the VERDICT — a knob must only ever cost speed"; fail=1; }
+
+  # 4d. a profile name that resolves to nothing REFUSES, and lists the names that do exist. An
+  #     operator who mistyped a row name gets the roster, not a silent fall-through to some other row.
+n=$((n+1))
+n=$((n+1))
+  o=$(runp GATE_PROFILE=no-such-row-4f2a); rc=$?
+  [ "$rc" = 2 ] || { echo "canary: an unknown GATE_PROFILE exited $rc, not 2"; fail=1; }
+  printf '%s\n' "$o" | grep -q "$r1n" \
+    || { echo "canary: the unknown-GATE_PROFILE refusal did not list the row names that do exist"; fail=1; }
+
+  # 4e. THE PINNED KNOB SET, and it is the left-shift of the governing invariant. The runner declares
+  #     what it IMPLEMENTS; this pin declares what has been REVIEWED, and they are deliberately two
+  #     separate statements — a knob added to the table reds here until an author edits this line,
+  #     which is the moment they read the invariant above. Collapsing the two would remove the only
+  #     forcing function a coverage knob would ever meet.
+  PINNED_KNOBS="timeout width"
+n=$((n+1))
+  tblknobs=$(grep -vE '^[[:space:]]*(#|$)' "$PTBL" | cut -f4 | tr ',' '\n' | sed 's/=.*//' | sort -u | tr '\n' ' ')
+  for k in $tblknobs; do
+    case " $PINNED_KNOBS " in *" $k "*) ;; *) echo "canary: $PTBL declares knob key '$k', which is not in this suite's pinned set ($PINNED_KNOBS). Read the governing invariant in the table's header before adding it: no knob may ever turn a leg into a PASS or a SKIP."; fail=1 ;; esac
+  done
+else
+  echo "canary: SKIP arms 4a-4e — $PTBL is absent, so the declared table cannot be graded (this is the documented rollback state, which arm 4f drives on purpose)"
+fi
+
+# 4f. THE ROLLBACK. An ABSENT table is a fallback, never a refusal: this kit deploys, and an adopter
+#     may take it without the table. Deleting it restores the built-in formula, and this arm is what
+#     proves that rather than hoping for it.
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=definitely/absent/gate-profiles.txt)
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+  || { echo "canary: with no profile table the runner did not fall back and run every leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+case "$(profline "$o")" in *'built-in default'*) ;; *) echo "canary: the no-table run was not tagged as the built-in default: $(profline "$o")"; fail=1 ;; esac
+
+# 4g. GATE_JOBS overrides the WIDTH ONLY. The row is still selected and still supplies every other
+#     knob — an override that silently disabled the rest of the profile would make the table a lie
+#     the moment anyone set a width.
+printf 'solo\t0\t0\twidth=8,timeout=9\n' > "$P/fx/tbl-timeout.txt"
+n=$((n+1))
+n=$((n+1))
+pl=$(profline "$(runp GATE_PROFILES=fx/tbl-timeout.txt GATE_JOBS=3)")
+case "$pl" in *'width 3,'*) ;; *) echo "canary: GATE_JOBS=3 did not reach the reported width: $pl"; fail=1 ;; esac
+case "$pl" in *'timeout 9s'*) ;; *) echo "canary: GATE_JOBS suppressed the row's OTHER knob — the override is not width-only: $pl"; fail=1 ;; esac
+
+# 4h. A LEG THAT OUTLIVES THE TIMEOUT IS RED, NAMED, AND THE RUN IS RED. Never a skip and never a
+#     green: this knob converts an unbounded hang into a verdict, which is the one way a knob may
+#     change coverage at all — upward. Recorded motivating failure: a leg that hung with zero output
+#     and wedged a whole bar at 46 of 65.
+printf 'tight\t0\t0\twidth=2,timeout=1\n' > "$P/fx/tbl-tight.txt"
+cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]}
+]
+JSON
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
+printf '%s\n' "$o" | grep -q '^GATE FAIL  sleeper  (timed out after 1s)$' \
+  || { echo "canary: a leg that outlived the per-leg timeout was not reported FAILED with a timeout tail"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+printf '%s\n' "$o" | grep -q '^gates RED — 1/2 legs failed$' \
+  || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "two", "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+
+# 4i. THE REFUSALS. A silently ignored knob is a knob the operator believes they set, so a table the
+#     runner cannot honour REFUSES rather than guessing. Each fixture below is load-bearing: against
+#     the shipped table every one of these is unreachable, so an arm driving the real file would pass
+#     by finding nothing — memory/gotchas/fixture-passes-by-finding-nothing.md.
+printf '# c\ngood\t0\t0\twidth=2,timeout=0\nthis row has no tabs at all\n' > "$P/fx/tbl-malformed.txt"
+printf 'good\t8\t0\twidth=8,turbo=1\nfallback\t0\t0\twidth=2,timeout=0\n'  > "$P/fx/tbl-badknob.txt"
+printf 'toobig\t99\t0\twidth=8,timeout=0\n'                                > "$P/fx/tbl-nocatchall.txt"
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-malformed.txt); rc=$?
+[ "$rc" = 2 ] || { echo "canary: a malformed profile row exited $rc, not 2"; fail=1; }
+printf '%s\n' "$o" | grep -q 'fx/tbl-malformed.txt:3:' \
+  || { echo "canary: the malformed-row refusal did not name the file AND the line number: $o"; fail=1; }
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-badknob.txt); rc=$?
+[ "$rc" = 2 ] || { echo "canary: an unknown knob key exited $rc, not 2 — a knob the runner ignores is a knob the operator believes they set"; fail=1; }
+printf '%s\n' "$o" | grep -q "turbo" \
+  || { echo "canary: the unknown-knob refusal did not name the offending key: $o"; fail=1; }
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_CORES=1 GATE_RAM_MB=1 GATE_PROFILES=fx/tbl-nocatchall.txt); rc=$?
+[ "$rc" = 2 ] || { echo "canary: a table matching NOTHING exited $rc, not 2 — unmatchable and absent are different states and only one is an operator error"; fail=1; }
+printf '%s\n' "$o" | grep -q 'fx/tbl-nocatchall.txt' \
+  || { echo "canary: the no-matching-row refusal did not name the table: $o"; fail=1; }
+
+# 4j. THE LENGTH BOUND on every hardware reading, and nothing else observes it. Both `[ "$v" -gt 0 ]`
+#     and `$(( ))` ERROR on an int64 overflow instead of comparing, which is how a 20-digit width
+#     value once span the dispatch loop forever having executed ZERO legs. A rejected reading is
+#     UNKNOWN, so the run still completes and every leg still runs.
+for bad in 99999999999999999999 not-a-number; do
+n=$((n+1))
+n=$((n+1))
+  o=$(runp GATE_CORES="$bad" GATE_RAM_MB="$bad")
+  printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+    || { echo "canary: hardware seam '$bad' did not complete with every leg run"; printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; }
+  case "$(profline "$o")" in *'detection failed'*) ;; *) echo "canary: hardware seam '$bad' was not rejected by the length bound: $(profline "$o")"; fail=1 ;; esac
+done
+
+# 4k. THE DETECTION CHAIN ITSELF. The GATE_CORES/GATE_RAM_MB seams BYPASS detection, so no arm above
+#     this one exercises a single real source. A PATH shim fails the first core source and the first
+#     RAM source; the runner must still resolve a profile, and its line must name the chain it walked
+#     rather than reading like a first-source hit.
+printf '#!/usr/bin/env bash\nexit 7\n' > "$P/shim/nproc"
+printf '#!/usr/bin/env bash\nexit 7\n' > "$P/shim/getconf"
+chmod +x "$P/shim/nproc" "$P/shim/getconf"
+n=$((n+1))
+n=$((n+1))
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" bash tools/run-gates/run-gates.sh 2>&1 )
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
+  || { echo "canary: with its first core and RAM sources failing, the runner did not complete"; printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; }
+case "$(profline "$o")" in
+  *'via nproc,getconf'*) ;;
+  *) echo "canary: the detection chain fell through but the line does not name the sources it tried: $(profline "$o")"; fail=1 ;;
+esac
+rm -f "$P/shim/nproc" "$P/shim/getconf"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

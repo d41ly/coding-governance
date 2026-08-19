@@ -110,3 +110,6 @@ why = "a CRLF shell script does not execute"
 [[lf_pin]]
 pattern = "{prefix}/gate-legs.json"
 why = "the runner parses it through python with LF-only byte writes, and the canary byte-compares its rows"
+[[lf_pin]]
+pattern = "{kit}/gate-profiles.txt"
+why = "the declared profile table is parsed at runtime with a TAB field separator, so a stray CR lands inside the last field and turns a knob value into one the runner refuses"

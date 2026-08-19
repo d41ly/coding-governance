@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-5 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -182,9 +182,15 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 
 - **AC1** — When the runner starts, it prints one line beginning `gate profile: ` before the first
   `GATE ` line, and `bash tools/run-gates/run-gates.test.sh` asserts that line is present.
-- **AC2** — When `GATE_CORES=16` and `GATE_RAM_MB=32000` are set, the canary observes the
-  most-capable row selected; when `GATE_CORES=16` and `GATE_RAM_MB=8000` are set, it observes the
-  middle row — the RAM guard, which today's formula cannot express, is the assertion.
+- **AC2** — When `GATE_CORES` and `GATE_RAM_MB` are set to the top row's own declared thresholds
+  read from `tools/run-gates/gate-profiles.txt`, `bash tools/run-gates/run-gates.test.sh` observes
+  that row selected; when `GATE_RAM_MB` is then dropped one MB below that threshold at the same core
+  count, it observes the selection move OFF that row — the RAM guard, which today's formula cannot
+  express, is the assertion. The seam values are READ FROM THE TABLE rather than written here: this
+  harness SHIPS, the table is data an adopter is expected to tune, and a figure pinned from gov's
+  hardware would red on their tree while saying nothing about it. The second half asserts the
+  selection MOVED rather than naming the next row, because a row's own thresholds are what decide
+  whether it is reachable at that reading and only the move is true of every declared table.
 - **AC3** — When `GATE_CORES=0` and `GATE_RAM_MB=0` are set, the canary observes the catch-all row
   and a provenance tag naming the sources tried.
 - **AC4** — When `GATE_PROFILE` names a row that does not exist, the runner exits 2 and lists the
@@ -280,6 +286,12 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-5 · 2026-08-20 · built. AC2 restated: the arms read their seam values from the table's own
+  top row instead of the literal figures written here, and the second half asserts the selection moved
+  off that row rather than naming the middle one. The reason is that S7's arms live in the harness
+  that SHIPS, so a figure taken from this node's hardware is a pin copied from one corpus into
+  another tree — the class this build's own kit split exists to refuse — and an adopter who tunes a
+  threshold would inherit a red about nothing. Nothing else in the criteria moved.
 - rev-4 · 2026-08-18 · folded the round-2 spec audit. R23: AC11b restores S8's width-formula half.
   The round-1 fix restated AC11 positively for the FIGURE and dropped the formula, relocating the
   defect rather than closing it — S8 could land half done with every criterion green while the

@@ -63,7 +63,7 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=4
+FLOOR_ASSERTIONS=9
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -148,6 +148,44 @@ fi
 # mean no run ever executes every leg against the tree that actually lands.
 a=$((a+1))
 grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push"   || { echo "gov-canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
+
+# ---- G4/G5. THE CHARTER STILL DESCRIBES THE RUNNER ------------------------------------------------
+# Two claims `AGENTS.md` made that the profile-table unit falsified, and NOTHING ELSE observes either:
+# the playbook-parity gate grades the playbook FILES rather than this repo's rendered charter, and
+# drift-audit's charter signal joins leg SCRIPT PATHS. A charter that goes on stating a width formula
+# the runner no longer uses is precisely the claim that unit exists to remove, so it is armed here —
+# in gov's own half, because an adopter has no `AGENTS.md` of this shape and the arm would red on
+# absence rather than on behaviour.
+#
+# BOTH HALVES OF EACH, and the positive half is why. A negative-only search passes when the sentence
+# it is guarding is DELETED, which is the same green as a sentence that was never wrong. The first
+# draft of this pair armed only the figure; the fix for it RELOCATED the defect to the formula half
+# and every criterion stayed green.
+CHARTER="$ROOT/AGENTS.md"
+a=$((a+1))
+if [ ! -f "$CHARTER" ]; then
+  echo "gov-canary: $CHARTER is absent, so the charter arms would pass by finding nothing — this is a refusal"
+  fail=1
+else
+  # G4 — the stale MEASUREMENT. The pair that replaced it is a real reading of the current bar.
+  a=$((a+1))
+  if grep -qE '335s|~?95s' "$CHARTER"; then
+    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 873 s wall against a 4018 s leg-sum"; fail=1
+  fi
+  a=$((a+1))
+  { grep -q '873 s' "$CHARTER" && grep -q '4018 s' "$CHARTER"; } \
+    || { echo "gov-canary: $CHARTER no longer states the measured pair (873 s wall against a 4018 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
+  # G5 — the stale WIDTH FORMULA, in the backticked spelling the file actually uses. The runner reads
+  # its width from a declared table now, so a charter naming a formula is telling a session something
+  # it cannot verify anywhere in the tree.
+  a=$((a+1))
+  if grep -qF 'min(8, nproc)' "$CHARTER"; then
+    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in tools/run-gates/gate-profiles.txt and read from there"; fail=1
+  fi
+  a=$((a+1))
+  grep -qF 'tools/run-gates/gate-profiles.txt' "$CHARTER" \
+    || { echo "gov-canary: $CHARTER does not name tools/run-gates/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
+fi
 
 # ---- verdict -------------------------------------------------------------------------------------
 # The executed assertion count, in the shape tools/check-testsuite-counts.sh reads, against a floor

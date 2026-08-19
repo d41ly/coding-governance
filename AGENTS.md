@@ -485,11 +485,14 @@ guard cost an early signal rather than a wrong merge verdict. A guard naming an 
 skip forever and silently, so the run-gates canary refuses one.
 
 **How the bar behaves**, because none of this is derivable from the manifest. Legs run through a
-bounded pool, width `min(8, nproc)`, overridable with `GATE_JOBS`. They are safe together because
-each heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
+bounded pool whose width is DECLARED rather than computed: `tools/run-gates/gate-profiles.txt` maps
+the detected cores and RAM to a named row of knobs, the runner prints the row it chose before the
+first leg verdict, and `GATE_JOBS` overrides the width alone. Legs are safe together because each
+heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
 scheduled longest-first from a timing cache at `<git-dir>/gate-timings.tsv`, while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
-clock only. Measured on node `a`: 335s serial to ~95s at width 8. Every leg's output is persisted
+clock only. Measured on node `a`: the full bar costs 873 s of wall clock against a 4018 s leg-sum,
+so concurrency is already paying and a single leg is most of what remains. Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
 only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.

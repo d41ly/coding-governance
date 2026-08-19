@@ -119,12 +119,131 @@ gd="$(git rev-parse --git-dir 2>/dev/null)"; sfile=""; TIMINGS=""
 # lives in report_one(), which is where FAILED_LEGS is built. Writing from the worker is strictly
 # better here — the writes are per-leg files and now happen concurrently.
 
-# Pool width. 8 is MEASURED, not guessed: at width 16 each leg dilates under load faster than the
-# extra worker repays, so wall clock is the longest leg either way. A non-numeric or <1 value is
-# clamped to 1 rather than refused — this knob only schedules work, it can never skip a leg.
-cores=$(nproc 2>/dev/null) || cores=${NUMBER_OF_PROCESSORS:-4}
-case "$cores" in ''|*[!0-9]*) cores=4 ;; esac
-JOBS=${GATE_JOBS:-$(( cores < 8 ? cores : 8 ))}
+# ---- hardware profiles (the profile-table unit) --------------------------------------------------
+# The knobs are DECLARED in a table beside this runner rather than computed from core count alone: a
+# 16-core / 8 GB VM used to select width 8 and thrash, because cores were the only question asked.
+# Grammar and reasoning live in the table itself; this block reads it, selects a row, and applies it.
+#
+# THE GOVERNING INVARIANT: no knob may ever turn a leg into a PASS or a SKIP. A knob may make the bar
+# slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
+# KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
+# stops a coverage knob being added without an author reading this paragraph.
+KNOWN_KNOBS="width timeout"
+PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
+prof_die() { echo "run-gates: $*" >&2; exit 2; }
+
+# LENGTH-BOUNDED BEFORE ANY ARITHMETIC. Both `[ "$v" -gt 0 ]` and `$(( ))` ERROR on an int64 overflow
+# instead of comparing, which is how a 20-digit width value once span the dispatch loop forever
+# having executed ZERO legs. 15 digits admits every real reading below (a byte count on a 900 TB box)
+# and cannot overflow int64 even after one multiply. Zero is "unknown", never a valid reading.
+num_ok() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; [ ${#1} -le 15 ] || return 1; [ "$1" -gt 0 ]; }
+
+# Every source is RUN and its output validated, never probed for existence — being on PATH is not
+# evidence, the lesson tools/lib/resolve-python.sh records. Measured on node `a`: the three core
+# sources all report 16, the page arithmetic and /proc/meminfo agree within 1 MB, and `sysctl` exits
+# 127, which is the case the chain must survive and does. CORE_SRC/RAM_SRC accumulate what was TRIED,
+# so the visibility line names the chain whether it answered on the first source or the third.
+DET_CORES=0; DET_RAM=0; CORE_SRC=""; RAM_SRC=""
+det_cores() {
+  local v
+  DET_CORES=0
+  if [ -n "${GATE_CORES+x}" ]; then CORE_SRC="seam"; num_ok "${GATE_CORES}" && DET_CORES=${GATE_CORES}; return; fi
+  CORE_SRC="nproc"
+  v=$(nproc 2>/dev/null); if num_ok "$v"; then DET_CORES=$v; return; fi
+  CORE_SRC="$CORE_SRC,getconf"
+  v=$(getconf _NPROCESSORS_ONLN 2>/dev/null); if num_ok "$v"; then DET_CORES=$v; return; fi
+  CORE_SRC="$CORE_SRC,env"
+  v=${NUMBER_OF_PROCESSORS:-}; if num_ok "$v"; then DET_CORES=$v; return; fi
+}
+det_ram() {   # -> DET_RAM in MB
+  local pages pgsz kb v
+  DET_RAM=0
+  if [ -n "${GATE_RAM_MB+x}" ]; then RAM_SRC="seam"; num_ok "${GATE_RAM_MB}" && DET_RAM=${GATE_RAM_MB}; return; fi
+  RAM_SRC="getconf"
+  pages=$(getconf _PHYS_PAGES 2>/dev/null); pgsz=$(getconf PAGESIZE 2>/dev/null)
+  if num_ok "$pages" && num_ok "$pgsz"; then
+    # Divide the PAGE SIZE first so the product stays small. A page under 1 KB truncates that divisor
+    # to zero, which would report NO MEMORY — a reading, and a wrong one. Guarded, so it reports
+    # UNKNOWN and falls through to the next source instead.
+    kb=$(( pgsz / 1024 ))
+    if [ "$kb" -gt 0 ]; then v=$(( pages * kb / 1024 )); if num_ok "$v"; then DET_RAM=$v; return; fi; fi
+  fi
+  RAM_SRC="$RAM_SRC,meminfo"
+  v=$(awk '/^MemTotal:/ { print int($2 / 1024); exit }' /proc/meminfo 2>/dev/null)
+  if num_ok "$v"; then DET_RAM=$v; return; fi
+  RAM_SRC="$RAM_SRC,sysctl"
+  v=$(sysctl -n hw.memsize 2>/dev/null)
+  if num_ok "$v"; then v=$(( v / 1048576 )); if num_ok "$v"; then DET_RAM=$v; return; fi; fi
+}
+
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_TAG=""; PROF_WHERE=""
+if [ -f "$PROFILES" ]; then
+  # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
+  if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
+  else det_cores; det_ram; fi
+  ln=0; declared=""; sel=""; selknobs=""
+  # Every row is validated even after one is selected: a malformed row is an operator error wherever
+  # it sits, and a refusal that depended on position would pass on the tables most likely to be wrong.
+  while IFS=$'\t' read -r pname pcores pram pknobs || [ -n "$pname" ]; do
+    ln=$((ln+1))
+    case "$pname" in ''|'#'*) continue ;; esac
+    case "$pknobs" in *$'\t'*) prof_die "$PROFILES:$ln: malformed profile row (more than four tab-separated fields)" ;; esac
+    [ -n "$pcores" ] && [ -n "$pram" ] && [ -n "$pknobs" ] \
+      || prof_die "$PROFILES:$ln: malformed profile row (expected name, min cores, min RAM MB, knobs)"
+    case "$pcores$pram" in *[!0-9]*) prof_die "$PROFILES:$ln: malformed profile row (thresholds must be digits: '$pcores', '$pram')" ;; esac
+    # A silently ignored knob is a knob the operator believes they set, so an unknown key REFUSES.
+    IFS=, read -ra kv <<<"$pknobs"
+    for k in "${kv[@]}"; do
+      case "$k" in *=*) ;; *) prof_die "$PROFILES:$ln: malformed knob '$k' (expected key=value)" ;; esac
+      case " $KNOWN_KNOBS " in *" ${k%%=*} "*) ;; *) prof_die "$PROFILES:$ln: unknown knob key '${k%%=*}' (known: $KNOWN_KNOBS)" ;; esac
+      case "${k#*=}" in ''|*[!0-9]*) prof_die "$PROFILES:$ln: knob '${k%%=*}' has a non-numeric value '${k#*=}'" ;; esac
+    done
+    declared="$declared $pname"
+    [ -n "$sel" ] && continue
+    if [ -n "${GATE_PROFILE:-}" ]; then
+      [ "$pname" = "${GATE_PROFILE}" ] && { sel=$pname; selknobs=$pknobs; }
+    elif [ "$DET_CORES" -ge "$pcores" ] && [ "$DET_RAM" -ge "$pram" ]; then
+      sel=$pname; selknobs=$pknobs
+    fi
+  done < "$PROFILES"
+  if [ -z "$sel" ]; then
+    [ -n "${GATE_PROFILE:-}" ] \
+      && prof_die "$PROFILES: GATE_PROFILE='${GATE_PROFILE}' names no row. Declared rows:$declared"
+    # Unmatchable is not the same state as ABSENT, and only one of them is an operator error: the
+    # catch-all row is what makes a match unconditional, so a table with none was declared wrong.
+    prof_die "$PROFILES: no row matches cores $DET_CORES / ram $DET_RAM MB — the table declares no catch-all row. Declared rows:$declared"
+  fi
+  PROF_NAME=$sel
+  IFS=, read -ra kv <<<"$selknobs"
+  for k in "${kv[@]}"; do
+    case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;; esac
+  done
+  [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
+  PROF_TAG="detected"
+  [ -n "${GATE_PROFILE:-}" ] && PROF_TAG="GATE_PROFILE"
+  [ -z "$PROF_WHERE" ] && { [ "$DET_CORES" = 0 ] || [ "$DET_RAM" = 0 ]; } && PROF_TAG="detection failed"
+else
+  # ABSENT is a FALLBACK, not a refusal: this kit deploys, and an adopter may take it without the
+  # table. Deleting the table is therefore also the documented rollback for this whole mechanism, and
+  # the arm that drives this branch is what proves the rollback rather than hoping for it.
+  # 8 is MEASURED, not guessed: at width 16 each leg dilates under load faster than the extra worker
+  # repays, so wall clock is the longest leg either way.
+  det_cores; det_ram
+  bi=$DET_CORES; [ "$bi" -gt 0 ] || bi=4
+  PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_TAG="built-in default"
+fi
+
+# A knob the operator set and the host cannot honour is worse than no knob: say so rather than run
+# inert. `timeout` is RUN, not probed — the same rule the detection chain follows.
+if [ "$PROF_TIMEOUT" -gt 0 ] && ! timeout 1 true >/dev/null 2>&1; then
+  echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
+  PROF_TIMEOUT=0
+fi
+
+# A non-numeric or <1 width is clamped to 1 rather than refused — this knob only schedules work, it
+# can never skip a leg. GATE_JOBS overrides the width ONLY: the row is still selected and still
+# supplies the timeout, which is what keeps the override from disabling the rest of the profile.
+JOBS=${GATE_JOBS:-$PROF_WIDTH}
 # Bound by LENGTH before any numeric test touches the value. Both `[ "$JOBS" -lt 1 ]` and `$(( JOBS < 1 ))`
 # ERROR on an int64 overflow instead of comparing, so a 20-digit value used to sail past the clamp into a
 # dispatch loop whose own `[ "$(live)" -lt "$JOBS" ]` errored identically: the runner spun forever having
@@ -133,6 +252,19 @@ JOBS=${GATE_JOBS:-$(( cores < 8 ? cores : 8 ))}
 # would be dead — the arm that "covered" it was measuring the default width, not the clamp.
 case "$JOBS" in *[!0-9]*) JOBS=1 ;; ?????*) JOBS=64 ;; esac
 [ "$JOBS" -lt 1 ] && JOBS=1
+
+# ONE visibility line, before the first leg verdict and copied into the durable records — a profile
+# nobody can see is a knob nobody can debug. The parenthesised tail follows the report's two-space
+# contract: `<head>  (<tail>)`, so a reader splits on the double space and gets the bare name back.
+# It reports the EFFECTIVE width (post-clamp, post-GATE_JOBS) and the sources the chain TRIED, so a
+# run that fell through to its second source says so instead of looking like a first-source hit.
+prof_n() { if [ "$1" = 0 ]; then printf '?'; else printf '%s' "$1"; fi; }
+[ -n "${GATE_JOBS:-}" ] && PROF_TAG="$PROF_TAG, GATE_JOBS"
+if [ -n "$PROF_WHERE" ]; then prof_where=$PROF_WHERE
+else prof_where="cores $(prof_n "$DET_CORES") via $CORE_SRC, ram $(prof_n "$DET_RAM") MB via $RAM_SRC"; fi
+prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
+echo "$PROF_LINE"
 
 WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 trap 'rm -rf "$WORK"' EXIT
@@ -190,7 +322,12 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
   s=$(date +%s%N)
-  out=$("${argv[@]}" </dev/null 2>&1); rc=$?   # legs never read stdin — deny it so a stray reader can't hang the bar
+  # legs never read stdin — deny it so a stray reader can't hang the bar. The profile's per-leg
+  # timeout wraps the exec when the selected row asks for one: a leg that outlives it exits 124 and
+  # is reported RED naming itself, never skipped and never green. That is a COVERAGE improvement, not
+  # a carve-out — an unbounded hang wedges the whole bar and names nothing.
+  if [ "$PROF_TIMEOUT" -gt 0 ]; then out=$(timeout "$PROF_TIMEOUT" "${argv[@]}" </dev/null 2>&1); rc=$?
+  else out=$("${argv[@]}" </dev/null 2>&1); rc=$?; fi
   e=$(date +%s%N)
   # TOOL-dNomadicAtlas-1, ported into the worker: persist EVERY leg, not only the failing one — a
   # passing leg's output is what a later bisect reads, and the bytes are already in memory. Redacted,
@@ -223,8 +360,12 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   if [ "$rc" = skip ]; then
     skips=$((skips+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "${names[$i]}"
-  else fails=$((fails+1)); printf 'GATE FAIL  %s  (exit %d)\n' "${names[$i]}" "$rc"; sed 's/^/    /' "$WORK/$i.out"
-       FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (exit $rc)"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
+  else fails=$((fails+1))
+       # `timeout` exits 124. Reported as a timeout ONLY when one was actually in force, so a leg
+       # that chooses 124 for its own reasons is still reported as the exit code it chose.
+       ftail="(exit $rc)"; { [ "$rc" = 124 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s)"
+       printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
+       FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
        # and not only WHICH. A pointer, never the bytes — this file is what an operator quotes.
        lf="$(leg_log "${names[$i]}")" && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'; fi
@@ -296,16 +437,16 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
 if [ "$fails" = 0 ]; then
-  [ -n "$sfile" ] && printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote" >"$sfile" 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
 else
-  [ -n "$sfile" ] && { printf '%s' "${FAILED_LEGS:-}" >"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
   echo "gates RED — $fails/$n legs failed$skipnote"
