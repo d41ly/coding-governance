@@ -55,7 +55,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 <!-- kit:unattended -->
 - That explicit ask has ONE substitute: a committed build folder the run did not create, whose shape your merge bar validates. The mandate is ASSERTED, never written by the run that uses it, and must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
 <!-- /kit:unattended -->
-- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
+- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.

@@ -201,6 +201,7 @@
     "guard": [
       "memory/HYGIENE.md",
       "memory/TEMPLATE-SPEC.md",
+      "memory/guides/BUILD-METHOD.md",
       "tools/lib/",
       "tools/memory-tree/"
     ]

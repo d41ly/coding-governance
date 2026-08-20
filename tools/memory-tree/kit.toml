@@ -109,7 +109,16 @@ guard = ["{kit}/"]
 [[gate_leg]]
 name = "kit/dogfood doc parity"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
-guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{kit}/"]
+guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{kit}/"]
+# BUILD-METHOD.md is in the guard because the leg VALIDATES it — the pairs this test compares are
+# HYGIENE.md, TEMPLATE-SPEC.md and guides/BUILD-METHOD.md, and the third was missing from both this
+# descriptor and gov's own manifest row. A guard that omits a file the leg reads makes the leg skip
+# on every scoped run in which only that file changed. While the push boundary forced a total run
+# that cost a late signal; now that the boundary DECIDES, it would cost a wrong merge verdict — which
+# is why the unit that removes the force closes this hole in the same commit rather than filing it.
+# TWO carriers, because govkit copies a descriptor's declared guard verbatim into a target: fixing
+# gov's manifest alone would leave the half that SHIPS open, and the hole would be exported rather
+# than fixed.
 
 [[gate_leg]]
 name = "method carriers (every pointer declared)"

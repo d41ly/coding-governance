@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-20T13:05:00+03:00 @ 43a6c13e853ba6149600a2053cd439962413dc9d
+last-audit: 2026-08-20T14:10:00+03:00 @ 43a6c13e853ba6149600a2053cd439962413dc9d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 4a5778e5ae8350c8d3f3f1c65bd2bfc539854b46
@@ -76,7 +76,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
-GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg guard — what .githooks/pre-push runs, and what a DoD needs
+GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg guard — what a DoD needs. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```

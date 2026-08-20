@@ -135,7 +135,14 @@ else
   fi
 fi
 # GATE_FULL bypasses every guard, so the run checks the whole bar. `.githooks/pre-push` sets it: a
-# guard may only ever scope a NON-authoritative run, which is what makes a too-narrow guard cost an
+# guard may scope ANY run now, including the authoritative one — and the property that used to make
+# that safe was `.githooks/pre-push` forcing GATE_FULL=1 on every push. That force is gone; what
+# replaces it is a BOUNDED, RECORDED obligation in the hook, which forces a total run when no
+# recorded full green covers the pushed tip, when it is more than a declared number of commits
+# behind, when its tree fingerprint does not reproduce at the sha it names, or when the leg
+# manifest itself moved. So a too-narrow guard costs an early signal for at most that many
+# commits, rather than never being caught — and it is the hook, not this line, that is now the
+# thing to read. Both fail-safes below keep their meaning: an unresolvable BASE runs everything,
 # early signal rather than a wrong merge verdict. Both fail-safes below keep their meaning — an
 # unresolvable BASE runs everything, and so does a guard that errors.
 changed() { [ -n "${GATE_FULL:-}" ] && return 0; [ -z "$BASE" ] && return 0; ! git diff --quiet "$BASE" -- "$@" 2>/dev/null; }

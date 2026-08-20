@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-9 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-10 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -469,7 +469,8 @@ its own landing.
 
 ## 8. Open questions
 
-One fork is OPEN, raised by the 2026-08-20 regrounding. The two below it are RESOLVED, each pick the
+none open — the fork raised by the 2026-08-20 regrounding was RESOLVED at build time, and the two
+below it were already resolved; each pick is the
 M3 ratification of the fork's own recommendation, with the reason it survived the veto order.
 
 - **What replaces `run-gates.gov.test.sh`'s G3.** That arm greps `.githooks/pre-push` for the exact
@@ -488,6 +489,20 @@ M3 ratification of the fork's own recommendation, with the reason it survived th
   reason the property exists. It is left OPEN because C makes a gov canary depend on the record's
   presence in a fresh clone, and whether that is a red or a skip is a decision about the canary's
   contract rather than about this unit.
+
+  RESOLVED (2026-08-20, at build time): **C with B beneath it, exactly as recommended, and the
+  question the fork could not answer resolves to a SKIP.** G3 went red the moment S1 landed, which
+  is the fork proving itself rather than a surprise. What replaced it: the behavioural half moved
+  to `.githooks/pre-push.test.sh`, which now carries one arm per forcing predicate PLUS the control
+  that a scoped run is ever chosen at all — without that control every forcing arm is satisfied by
+  a hook that forces unconditionally, which is the hook this unit replaced, passing its own tests.
+  What stayed in the gov canary is the half that is about this repository: that a forcing path
+  exists at all, and that the staleness bound is a SOURCE constant rather than an environment knob.
+
+  **The fresh-clone question is a skip, and a loud one.** A clone with no record is a legitimate
+  state, not a defect — the hook forces a total run there, which is the safe direction — so a red
+  would fail every clone on its first push while proving nothing. The arm announces the skip and
+  counts it, because a skip that looks like a pass is indistinguishable from coverage.
 - **The shipped default for `GATE_FULL_MAX_LAG`.** Options are `1` (full on nearly every push, so
   almost no saving), `10`, `25`, or a time bound rather than a commit bound. Recommendation: `10`.
   This repo took 13 commits between `origin/main` and the current tip inside a single build, so `10`
@@ -514,6 +529,38 @@ M3 ratification of the fork's own recommendation, with the reason it survived th
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-20 · BUILT and CLOSED. The push boundary DECIDES, and the property it retires
+  is replaced rather than deleted.
+
+  **Seven predicates, and every one of them FORCES.** There is no predicate that makes a run
+  smaller: the question is "is a scoped run good enough this time", and every way of not knowing
+  the answer is a force. That asymmetry is the whole safety argument — the block can be wrong in
+  one direction only. Predicate 4 joins the recorded fingerprint AT THE RECORDED SHA and calls the
+  shipped helper rather than reimplementing the digest; both were named blockers in earlier rounds
+  and both are now structural rather than remembered.
+
+  **S9 was executed as a SEARCH, and it found carriers the spec did not name.** Two of the seven
+  files it listed no longer exist. The live set was `AGENTS.md` twice, the product template, the
+  runner, the shipped canary, the kickoff manifest's gate-command block, and `.governance/
+  deploy.toml` — the last of which the spec never named and which OUTRANKS `AGENTS.md`, because it
+  is the renderer's input and the next deploy would have written the retired claim back. The
+  sweep is now clean over the whole tracked tree outside `archive/` and `builds/`, and this unit's
+  own hook comment was reworded so that a historical mention does not read as a live claim to the
+  probe.
+
+  **S10 closed the guard hole in BOTH carriers, which is the half that was nearly missed.**
+  `kit/dogfood doc parity` validates three pairs and guarded on two of them, so a change to only
+  `memory/guides/BUILD-METHOD.md` skipped the leg that checks it. While the boundary forced a total
+  run that cost a late signal; after this unit it would cost a wrong merge verdict. The same narrow
+  guard is declared in `tools/memory-tree/kit.toml`, and govkit copies a descriptor's guard verbatim
+  into a target — so fixing gov's manifest alone would have EXPORTED the hole rather than fixing it.
+
+  **The arm that mattered most was the one proving the cheap path is ever taken.** Its first
+  spelling read the hook's decision from stderr, as the refusal arms above it do; the decision line
+  is ordinary progress output on STDOUT, so `1>/dev/null` threw it away and seven arms reported
+  "the hook made no decision". A push with nothing to send also never invokes the hook at all, so
+  the helper now commits first — a hook that did not run is indistinguishable from one that decided
+  nothing.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-4 · 2026-08-18 · folded the blocker re-review: §2 described none of predicates 0, 6 or 7, so
   the scope under-described its own decision table; and predicate 0 is now stated as CALLING

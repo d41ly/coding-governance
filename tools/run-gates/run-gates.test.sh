@@ -515,7 +515,9 @@ grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
 
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
-#     `.githooks/pre-push` sets it, so a guard can only ever scope a NON-authoritative run and a
+#     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
+#     when no recorded full green covers the pushed tip. So a guard can now scope the
+#     authoritative run too, and what bounds the damage is that obligation rather than a
 #     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
 #     SAME fixture that skips without it, so the two readings differ only by the variable.
 for w in 1 4; do

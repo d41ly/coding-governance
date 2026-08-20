@@ -5,7 +5,7 @@ feature = "run-gates"
 title = "The gate runner, its harnesses, and the adopter that keeps a target's verdict reader honest"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-16"]
+decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-4", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-6", "TOOL-aPacedTurnstile-7", "TOOL-aPacedTurnstile-16"]
 
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring", "profile-bar selftest", "run-gates turnstile"]

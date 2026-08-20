@@ -73,14 +73,104 @@ if [ "$main_local" != "$head" ]; then
   exit 1
 fi
 
-# Run the full bar once, stdin denied so the gate can't consume any remaining ref lines. The gate
-# command is overridable (GOV_GATE_CMD) so the hook's own test can stub it.
-echo "pre-push: full gate on $def push (${main_local:0:8})..."
-# GATE_FULL makes run-gates.sh ignore every leg `guard`. This is THE run that must be total: the
-# self-test legs are diff-scoped on earlier (DoR / post-merge) runs, and if that scoping reached here
-# no run would ever execute every leg against the tree that actually lands. Exported, not passed as an
-# argument, so a stubbed GOV_GATE_CMD inherits it too.
-export GATE_FULL=1
+# ---- the boundary DECIDES, and the obligation it replaces is bounded rather than deleted --------
+# This hook used to export GATE_FULL=1 unconditionally, which made every landing pay the whole bar
+# — a records-only landing included. What that bought was a real property: a guard could only ever
+# narrow a run that was not the deciding one, so a too-narrow guard cost an early signal rather than
+# a wrong merge verdict. Deleting the force deletes that property, so it is REPLACED by a bounded,
+# RECORDED obligation: the full bar still runs, just not on every push, and the record says when it
+# last did. (The retired sentence is deliberately not quoted verbatim anywhere: a criterion greps the
+# tracked tree for it, and a historical mention is indistinguishable from a live claim to a probe.)
+#
+# EVERY PREDICATE BELOW FORCES. There is no predicate that makes a run smaller — the decision is
+# "is a scoped run good enough this time", and every way of not knowing the answer is a force. That
+# asymmetry is the whole safety argument: this block can be wrong in one direction only.
+
+# A SOURCE CONSTANT with its reasoning beside it, not an environment knob. How stale a recorded
+# green may be before the boundary stops trusting it is a policy decision about this repository,
+# and a policy that an environment variable can change at the moment it binds is not a policy.
+# TEN: this repo took 13 commits between origin/main and the tip inside a single build, so 10
+# forces roughly one full bar per build rather than one per push. The design pass recommended 1 —
+# behaviourally today's bar — and that was refused on the record: the owner's stated goal is to
+# stop paying the full bar per landing, and 1 defers essentially all of the saving. Lowering it
+# later needs no code.
+GATE_FULL_MAX_LAG=10
+
+gd=$(git rev-parse --git-dir 2>/dev/null)
+kitfp="$(git rev-parse --show-toplevel)/tools/run-gates/gate-fingerprint.sh"
+rec="$gd/gate-full-green"
+force=""
+rec_sha=""; rec_fp=""; rec_blob=""
+if [ -f "$rec" ]; then
+  rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$rec" 2>/dev/null)
+  rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$rec" 2>/dev/null)
+  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$rec" 2>/dev/null)
+fi
+
+# 1. no record at all — nothing has ever proven this bar here.
+[ -n "$rec_sha" ] || force="no recorded full green"
+
+# 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
+#    history entirely.
+[ -z "$force" ] && ! git merge-base --is-ancestor "$rec_sha" "$main_local" 2>/dev/null \
+  && force="the recorded full green ${rec_sha:0:8} is not an ancestor of the pushed tip"
+
+# 3. the recorded green is further behind the tip than the bound allows.
+if [ -z "$force" ]; then
+  lag=$(git rev-list --count "$rec_sha..$main_local" 2>/dev/null || echo 0)
+  [ "${lag:-0}" -gt "$GATE_FULL_MAX_LAG" ] \
+    && force="the recorded full green is $lag commits behind the tip (bound $GATE_FULL_MAX_LAG)"
+fi
+
+# 4. the record's TREE fingerprint does not reproduce AT THE SHA IT NAMES.
+#    AT THE RECORDED SHA, never at the tip. The digest is taken over the committed tree object, so
+#    it moves on every commit; joining it against a fresh fingerprint of the PUSHED TIP would fire
+#    on every push whose tree had moved, which is exactly the population predicates 2 and 3 already
+#    admit — it would force full forever while reading as caution. The helper is CALLED, never
+#    reimplemented: two implementations of one digest disagree silently and then force forever.
+if [ -z "$force" ] && [ -n "$rec_fp" ] && [ -x "$kitfp" ]; then
+  fresh=$(bash "$kitfp" "$rec_sha" 2>/dev/null)
+  [ -n "$fresh" ] && [ "$fresh" != "$rec_fp" ] \
+    && force="the recorded tree fingerprint does not reproduce at ${rec_sha:0:8}"
+fi
+
+# 5. the pushed tip is a MERGE whose second parent the record cannot speak for. Every build lands
+#    on the default branch here as a merge commit, so this row fires on any first-attempt landing
+#    whose recorded green was not earned on that exact second parent — not only on a retry. Kept at
+#    that width deliberately: a merge tip the record does not cover is precisely the case the record
+#    cannot speak for.
+if [ -z "$force" ]; then
+  p2=$(git rev-parse -q --verify "$main_local^2" 2>/dev/null || true)
+  [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$rec_sha" 2>/dev/null \
+    && force="the pushed tip is a merge whose second parent ${p2:0:8} the recorded green does not cover"
+fi
+
+# 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
+#    widened or removed in this very push cannot be trusted to scope this very push.
+if [ -z "$force" ]; then
+  git diff --quiet "$rec_sha" "$main_local" -- tools/gate-legs.json 2>/dev/null \
+    || force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"
+fi
+
+# 7. the recorded manifest blob differs from the one this tree holds — the same concern as 6, from
+#    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
+#    between two commits cannot see.
+if [ -z "$force" ] && [ -n "$rec_blob" ]; then
+  now_blob=$(git hash-object -- tools/gate-legs.json 2>/dev/null)
+  [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
+    && force="the leg manifest differs from the one the recorded green was earned on"
+fi
+
+# THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
+# is indistinguishable from one that is broken, and this line is the only place the choice is
+# visible to the person whose push it is.
+if [ -n "$force" ]; then
+  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force"
+  export GATE_FULL=1
+else
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG"
+  export GATE_BASE="$rec_sha"
+fi
 gate=${GOV_GATE_CMD:-bash tools/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?

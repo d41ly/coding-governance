@@ -67,7 +67,7 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=9
+FLOOR_ASSERTIONS=11
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -151,7 +151,41 @@ fi
 # The property it guards is still gov's and still worth guarding — a scoped authoritative run would
 # mean no run ever executes every leg against the tree that actually lands.
 a=$((a+1))
-grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push"   || { echo "gov-canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
+# THE PUSH BOUNDARY STILL OWES A TOTAL RUN, and this arm grades the OBLIGATION rather than the
+# mechanism. It used to grep for a literal `export GATE_FULL=1` at column 0, which was exactly
+# right while the hook forced unconditionally and became a false red the moment the hook started
+# DECIDING. Deleting it outright was the one answer this could not take: it is the only executable
+# statement anywhere that the authoritative run covers the whole bar, and removing the arm that
+# guards a property in the same commit that weakens the property is gating the instance rather
+# than the class.
+#
+# Two halves. The behavioural half — one arm per forcing predicate, plus the control proving a
+# scoped run is ever chosen at all — lives in `.githooks/pre-push.test.sh`, where the hook is
+# really driven. What stays here is the half that is about THIS repository: that the boundary can
+# still force, and that the record it decides against is not further behind than its own bound.
+grep -q 'export GATE_FULL=1' "$ROOT/.githooks/pre-push" \
+  || { echo "gov-canary: .githooks/pre-push has no forcing path at all — the boundary can never demand a total run"; fail=1; }
+a=$((a+1))
+grep -qE '^GATE_FULL_MAX_LAG=[0-9]+' "$ROOT/.githooks/pre-push" \
+  || { echo "gov-canary: the staleness bound is not a source constant in the hook — a policy an environment variable can change at the moment it binds is not a policy"; fail=1; }
+
+# THE RECORD, when there is one. A fresh clone has none, and that is a legitimate state rather
+# than a defect — the hook forces a full run there, which is the safe direction. So this arm
+# SKIPS, loudly and countably, instead of reddening: a skip that looks like a pass is
+# indistinguishable from coverage, and a red here would fail every clone on its first push.
+a=$((a+1))
+gc_rec="$(git rev-parse --git-dir)/gate-full-green"
+if [ -f "$gc_rec" ]; then
+  gc_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$gc_rec" 2>/dev/null)
+  gc_bound=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$ROOT/.githooks/pre-push" | grep -oE '[0-9]+')
+  if [ -n "$gc_sha" ] && [ -n "$gc_bound" ] && git merge-base --is-ancestor "$gc_sha" HEAD 2>/dev/null; then
+    gc_lag=$(git rev-list --count "$gc_sha..HEAD" 2>/dev/null || echo 0)
+    [ "${gc_lag:-0}" -le "$gc_bound" ] \
+      || echo "gov-canary: NOTE — the recorded full green is $gc_lag commits back, past the bound of $gc_bound, so the next push will force a total run (informational, not a failure)"
+  fi
+else
+  echo "gov-canary: SKIP the recorded-green lag arm — no gate-full-green in this git dir yet, so there is no record to measure. The boundary forces a total run in exactly this state."
+fi
 
 # ---- G4/G5. THE CHARTER STILL DESCRIBES THE RUNNER ------------------------------------------------
 # Two claims `AGENTS.md` made that the profile-table unit falsified, and NOTHING ELSE observes either:
