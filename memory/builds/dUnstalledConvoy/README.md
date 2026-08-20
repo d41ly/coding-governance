@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -181,7 +181,7 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- gen:build-index -->
 **Build status:** SPECCED · 13 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
-ids TOOL-dUnstalledConvoy-12
+ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
@@ -201,7 +201,11 @@ ids TOOL-dUnstalledConvoy-12
 | [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | SPECCED | rev-1 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -230,4 +234,6 @@ Records live under `spec/`.
   - [2026-08-20-spec-TOOL-dUnstalledConvoy-7.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md)
   - [2026-08-20-spec-TOOL-dUnstalledConvoy-8.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md)
   - [2026-08-20-spec-TOOL-dUnstalledConvoy-9.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md)
+- **`reviews/`**
+  - [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md)
 <!-- /gen:build-docs -->
