@@ -31,7 +31,7 @@ distinction real.
    | `forks-resolved` | when open questions are settled | M3 | all | D3 |
    | `specs-reviewed` | the spec audit that precedes code | M4 | all | D4 |
    | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
-   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | all | D6 |
+   | `parallel-when-disjoint` | the parallelism obligation | M6 | all | D6 |
    | `passes-committed` | the commit boundary | M6 | all | D8 |
    | `diff-reviewed` | the closing review of the cumulative diff | M8 | all | D7 |
    | `land-once-done` | when a build may land | M8 | all | D8 |

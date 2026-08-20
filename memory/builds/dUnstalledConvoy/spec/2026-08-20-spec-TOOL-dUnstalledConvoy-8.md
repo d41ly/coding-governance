@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -167,6 +167,13 @@ bar at the push boundary.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · SHIPPED, on the measurement rather than instead of it: the verdict token reads
+  `cleared`, so S6's condition never fired. The three conditions survive BYTE-IDENTICAL to BASE,
+  asserted as AC2's content comparison rather than a diff — the framing sentence shares its line with
+  the opening of condition 1, so any correct edit changes that line and a diff assertion would fail on
+  every valid one. ONE line of the two available, 288 to 289 of M1's 290. S5 found the directive cell
+  inaccurate rather than accidentally right: it called M6 a `default` and M6 no longer has one, so the
+  cell now names the obligation.
 - rev-2 · 2026-08-20 · folded the spec audit: M6 (the pointer target now lands earlier, per the reorder),
   M1 and H14 (S6 treats an unmeasured criterion as non-shipping, and the amendment row is writable at
   this unit's new position), M16 (AC2 becomes a content assertion, because the conditions are not a

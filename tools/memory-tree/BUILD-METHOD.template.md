@@ -156,12 +156,13 @@ followed by another: fix it, or park it with the reason. A pass that produced no
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the
 turn you did not take.
 
-**Sequence is the default; parallelism is a claim you substantiate.** Two passes run concurrently only if: (1) their
-WRITE sets — actual paths, written down before dispatch — do not intersect; (2) neither writes a file the other
-reads as a contract (conf, template, interface, generator input) or as an acceptance input, and neither depends on
-the other's output either way; (3) neither touches a shared mutable record — `memory/DECISIONS.md`,
-`memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
-cannot write both path lists down, the work is not known to be disjoint — sequence it.
+**Parallelism is REQUIRED where disjointness is PROVEN; sequence is the fallback.** Two passes MUST run
+concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
+not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
+input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
+shared mutable record — `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, or a generated index
+TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
+sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
 Clause 3 once named the build README outright, which was VACUOUS not strict: every pass changes a spec header it
 is regenerated from. What collides is two passes RENDERING one artifact, or one editing a generator another runs. The fan-out and concurrency
