@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** CLOSED · rev-2 · 2026-08-20 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 

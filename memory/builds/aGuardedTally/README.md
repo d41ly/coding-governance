@@ -15,13 +15,13 @@ The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-03 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-03 · streams tooling
 ids TOOL-aGuardedTally-1
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | INPROGRESS | rev-4 | 2026-08-03 |
+| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `reviews/` and `prompts/`.

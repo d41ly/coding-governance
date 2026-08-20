@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable
 
-**Status:** OPEN · rev-4 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 

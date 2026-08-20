@@ -34,7 +34,7 @@ import re
 import subprocess
 import sys
 
-KIT_GOVKIT_VERSION = "1.8"  # gov:kit govkit@1.8 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.9"  # gov:kit govkit@1.9 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
 
@@ -434,6 +434,83 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
 # matched the `{k}` inside `${k}` in a probe's own loop variable and reported a missing answer named
 # `k`. Two syntaxes sharing a brace is the collision; refusing to match after a `$` is the fix.
 TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
+
+
+_BASH: str | None = None
+
+
+def resolve_bash() -> str:
+    """The bash that shares THIS filesystem, not whatever the NAME `bash` resolves to.
+
+    MEASURED on node d, 2026-08-20: a descriptor declares `argv = ["bash", ...]`, govkit is a
+    WINDOWS python, and subprocess resolving the bare name goes through the Windows loader —
+    which finds C:/Windows/System32/bash.exe, the WSL launcher, before git-bash. WSL then sees a
+    different filesystem (the target resolves under /mnt/c/) and a different interpreter: its
+    python3 is 3.10.12, so the playbook adopter died on `import tomllib`, which needs 3.11. The
+    whole `govkit acceptance matrix` leg was RED for that reason and for no other.
+
+    This is the documented class `memory/gotchas/subprocess-resolves-a-different-shell.md`, and
+    the remedy it names is this one: name the EXECUTABLE, never the command. corpus_ids.py
+    carries the same function for the memory-tree kit. It is duplicated rather than imported
+    because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
+
+    A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
+    tools/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
+
+    WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
+    check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
+    else. GOV_BASH overrides, and an override that is set and unusable is a Refusal here rather
+    than a silent fall-through — the operator would believe they had chosen.
+    """
+    global _BASH
+    if _BASH:
+        return _BASH
+
+    def check_runs(cand: str) -> bool:
+        try:
+            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
+        except OSError:
+            return False
+
+    override = os.environ.get("GOV_BASH")
+    if override:
+        if check_runs(override):
+            _BASH = override
+            return _BASH
+        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
+                      f"that is set and unusable is this failure, not a fall-through.")
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in ("bash.exe", "bash"):
+            cand = os.path.join(d, name)
+            if not os.path.isfile(cand):
+                continue
+            low = cand.replace("\\", "/").lower()
+            if "/system32/" in low or "/windowsapps/" in low:
+                continue          # a launcher for a DIFFERENT filesystem
+            if not check_runs(cand):
+                continue          # on disk, cannot execute
+            _BASH = cand
+            return _BASH
+    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
+                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
+
+
+def resolve_shell_argv(argv: list[str]) -> list[str]:
+    """Replace a LEADING bare `bash` with the resolved executable; every other argv is untouched.
+
+    Only position 0 and only the bash names. A `bash` appearing as an ARGUMENT is a value the
+    target chose and is none of govkit's business, and `sh` is left alone because substituting
+    bash for it would change the language a target asked for.
+
+    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
+    exactly as it does today instead of newly refusing on a path that never needed this.
+    """
+    if not argv or argv[0] not in ("bash", "bash.exe"):
+        return list(argv)
+    try:
+        return [resolve_bash()] + list(argv[1:])
+    except Refusal:
+        return list(argv)
 
 
 def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
@@ -1362,7 +1439,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                 state = "landed-unmeasured"
                 detail = " (its check argv does not resolve)"
             else:
-                rc = subprocess.run([a for a, _m in pairs], cwd=str(target),
+                rc = subprocess.run(resolve_shell_argv([a for a, _m in pairs]), cwd=str(target),
                                     capture_output=True, text=True).returncode
                 state = "adopted" if rc == 0 else "landed-but-inert"
                 if rc != 0:
@@ -1398,7 +1475,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                        f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
                 continue
             try:
-                rc = subprocess.run(resolved, cwd=str(target), capture_output=True,
+                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
                                     text=True).returncode
             except OSError as e:
                 r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
@@ -1663,7 +1740,7 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                        "memory_root": "memory"}
                 resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
                 try:
-                    if subprocess.run(resolved, cwd=str(target),
+                    if subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
                         return True          # the hole is genuinely undischarged, right now
                 except OSError:
@@ -2216,7 +2293,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         if not argv:
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(resolved, cwd=str(target), capture_output=True, text=True).returncode
+        rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True).returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
         accepted = bool(outcome and outcome.get("ok"))

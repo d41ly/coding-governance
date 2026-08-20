@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar
 
-**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 

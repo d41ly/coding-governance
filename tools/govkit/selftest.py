@@ -1621,6 +1621,56 @@ user_skills = "/tmp/gk-fake-skills"
                 check(f"[{eid}] {key} recovers the bare leg name from a real runner line",
                       got == "memory hygiene", f"recovered {got!r} from {sample!r} via {tmpl!r}")
 
+    # ---- THE SHELL A LEG ACTUALLY GETS -------------------------------------------------
+    # Guards the govkit-matrix repair measured on node d, 2026-08-20. A descriptor declares
+    # `argv = ["bash", ...]`, govkit is a WINDOWS python, and the loader answers that bare name
+    # with C:/Windows/System32/bash.exe — the WSL launcher, which sees /mnt/c/ and carries its
+    # own python3 (3.10.12, no tomllib). Every arm below is the difference between a fix and a
+    # line anyone can delete: without them nothing reds until a node with WSL runs a FULL bar,
+    # and the leg is GUARDED, so a scoped bar never would.
+    sys.path.insert(0, str(HERE))
+    import govkit  # noqa: E402
+
+    rb = govkit.resolve_bash()
+    low = rb.replace(chr(92), "/").lower()
+    check("resolve_bash never returns a launcher for another filesystem",
+          "/system32/" not in low and "/windowsapps/" not in low, "resolved " + repr(rb))
+    check("resolve_bash returns something that RUNS",
+          subprocess.run([rb, "-c", ":"], capture_output=True).returncode == 0,
+          "resolved " + repr(rb) + " and it did not run")
+
+    got = govkit.resolve_shell_argv(["bash", "x.sh"])
+    check("resolve_shell_argv rewrites a LEADING bare bash", got == [rb, "x.sh"], "got " + repr(got))
+    got = govkit.resolve_shell_argv(["python", "x.py"])
+    check("resolve_shell_argv leaves a non-bash argv0 alone", got == ["python", "x.py"],
+          "got " + repr(got))
+    # `bash` as an ARGUMENT is a value the target chose. Rewriting it would be govkit editing
+    # the command rather than choosing the shell that runs it.
+    got = govkit.resolve_shell_argv(["sh", "-c", "bash"])
+    check("resolve_shell_argv leaves a bash in argument position alone", got == ["sh", "-c", "bash"],
+          "got " + repr(got))
+    check("resolve_shell_argv is a no-op on an empty argv", govkit.resolve_shell_argv([]) == [], "")
+
+    # An override that is SET and unusable must be THIS failure, never a quiet fall-through:
+    # the operator would believe they had chosen. The memo is cleared around the arm so it
+    # measures the resolver rather than the answer the arms above cached.
+    keep_bash, keep_env = govkit._BASH, os.environ.get("GOV_BASH")
+    govkit._BASH = None
+    os.environ["GOV_BASH"] = str(HERE / "no-such-bash-xyzzy")
+    try:
+        govkit.resolve_bash()
+        refused = False
+    except govkit.Refusal:
+        refused = True
+    finally:
+        govkit._BASH = keep_bash
+        if keep_env is None:
+            os.environ.pop("GOV_BASH", None)
+        else:
+            os.environ["GOV_BASH"] = keep_env
+    check("a GOV_BASH that is set and does not run is a Refusal, not a fall-through", refused,
+          "resolve_bash fell through to another shell instead of naming the bad override")
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

@@ -1,6 +1,6 @@
 # DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion
 
-**Status:** OPEN · rev-6 · 2026-08-16 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
+**Status:** CLOSED · rev-6 · 2026-08-20 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
 ## 1. Goal
 

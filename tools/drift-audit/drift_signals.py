@@ -37,6 +37,13 @@ PRODUCT_GLOBS: list[str] = [
 # STATUS-HEADER date, which TEMPLATE-SPEC defines as the last-change date and which on a CLOSED spec
 # is therefore the close date.
 #
+# The residual it trades in is LIVE as of 2026-08-20 and has a home: closing a spec whose product
+# landed BEFORE this date advances its header past the cutoff and reds it for want of a convention it
+# never had. That is not fixed by moving this date or by raising the pin — both were weighed and
+# refused, the first because a filename key exempts every in-flight spec forever and the second
+# because cTracedPromise-1 §3 rules it out in writing. The remedy is a row in
+# `memory/project/trace-waiver.txt`, which now exists and carries the first five.
+#
 # It is a grandfather, not a knob to tune until the number looks good. Before that commit the subjects
 # were `feat(memory-tree)!: U1 — …` and `fix(aStandingWrit): …` — the unit number or the slug, never
 # the id — so 36 CLOSED specs are correctly unjudgeable. A cutoff of 2026-08-12 would read 0 misses
@@ -71,6 +78,7 @@ SHRINK_ONLY: dict[str, str] = {
     "memory/project/curation-debt.txt": "files exempted from the index caps until they are curated",
     "memory/project/corpus-path-unresolved.txt": "citations that cannot legally be repaired",
     "memory/project/unarmed-branches.txt": "fail branches with no arm; empty today and meant to stay so",
+    "memory/project/trace-waiver.txt": "CLOSED specs no TRACE_GLOBS subject can name — signal 6's exemption",
 }
 
 # --------------------------------------------------------------------------------------------

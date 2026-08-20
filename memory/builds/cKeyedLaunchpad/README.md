@@ -31,9 +31,10 @@ Each unit below becomes its own conforming sub-spec under `spec/`.
 before any code (18 then 19 confirmed defects, both folded). The closing adversarial review of the
 cumulative diff is the last gate before landing.
 
-**Next action:** fold the closing review's blockers, then land through `tools/push-main.sh`, which
-reconciles the remote before gating — the remote moved under this build and the merge is not a
-fast-forward.
+**Next action:** none — the build is CLOSED. The closing review's blockers were folded at `0f4d308`,
+the build landed at `2eb9ac1`, and the post-merge audit re-stamped `last-audit` at `21351a4`. The one
+item this README was the sole holder of — `AGENTS.md` being reachable by no path gate — is now
+`TOOL-dSettledRoster-1`.
 
 **Build order**, corrected by the fix-verify pass: `-1` (independent) then `-2`, `-3`, `-4`, `-5`,
 `-6`, `-7`. U5 is no longer front-loadable — taking the `--for-paths` call site gave it an edge to U2.
@@ -216,19 +217,19 @@ not a skipped audit.
 
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling
+**Build status:** CLOSED · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling
 ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | OPEN | rev-2 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | OPEN | rev-2 | 2026-08-13 |
-| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | OPEN | rev-3 | 2026-08-13 |
-| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | OPEN | rev-3 | 2026-08-13 |
+| [KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check](spec/2026-08-13-spec-cKeyedLaunchpad-1.md) | CLOSED | rev-2 | 2026-08-20 |
+| [KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in](spec/2026-08-13-spec-cKeyedLaunchpad-2.md) | CLOSED | rev-3 | 2026-08-20 |
+| [KICK-cKeyedLaunchpad-3 — three checks the ratchet never had, and the stall it can actually measure](spec/2026-08-13-spec-cKeyedLaunchpad-3.md) | CLOSED | rev-3 | 2026-08-20 |
+| [KICK-cKeyedLaunchpad-4 — the sealed task region, and the duplication it must remove rather than ratify](spec/2026-08-13-spec-cKeyedLaunchpad-4.md) | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes](spec/2026-08-13-spec-cKeyedLaunchpad-5.md) | CLOSED | rev-3 | 2026-08-20 |
+| [KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped](spec/2026-08-13-spec-cKeyedLaunchpad-6.md) | CLOSED | rev-3 | 2026-08-20 |
+| [KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch](spec/2026-08-13-spec-cKeyedLaunchpad-7.md) | CLOSED | rev-3 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

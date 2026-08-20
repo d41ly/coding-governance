@@ -1,0 +1,31 @@
+# trace-waiver.txt — CLOSED specs that no TRACE_GLOBS commit subject can ever name, one row per
+# spec. SHRINK-ONLY. Read by drift-audit signal 6 (`closed_specs_with_no_product_commit`).
+#
+# Named by that signal's own spec, `memory/builds/cTracedPromise/spec/2026-08-14-spec-cTracedPromise-1.md`
+# §3, BEFORE any instance existed: "The remedy is NOT to raise the pin: it is a per-spec row in a new
+# shrink-only memory/project/trace-waiver.txt, added when the first real instance appears. Named here
+# so the first occurrence is not resolved by the ratchet it would defeat." This file is that first
+# occurrence, and the pin stays at 1.
+#
+# A row asserts ONE thing: no commit subject can name this unit. It does NOT assert the unit was
+# built, and it does not assert the build was faithful — that judgement is the M4 spec audit and the
+# M8 closing review, exactly as the signal's own docstring says.
+#
+# SELF-POLICING: a row is consumed only by a spec that is present, terminal and still untraceable.
+# A row left over — because its spec was deleted, reopened, or became traceable — is reported as a
+# finding of its own, so a waiver cannot outlive the thing it waives.
+#
+# Fields: <spec-path>	ab<unit-id>	ab<reason>.
+#
+# All five seed rows are the SAME shape, and it is the residual the header-date key knowingly trades
+# in (§4 of that spec: "touching a grandfathered CLOSED spec's header advances its date and pulls it
+# into the population, where it will red for want of a convention it never had"). Each unit's product
+# landed BEFORE TRACE_CUTOFF 2026-08-11, so its subjects follow the older convention — the unit
+# NUMBER, or the feature — and the id-in-subject rule did not exist to be followed. Their header
+# dates crossed the cutoff on 2026-08-20, when the records-only close-out flipped them.
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md	TOOL-aDrainedSluice-2	product landed 2408d4f 2026-08-08, subject 'feat(memory-tree): V1 — …'; pre-cutoff, names the unit number
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md	TOOL-aDrainedSluice-3	product landed f73dbd8 2026-08-08, subject 'feat(memory-tree): V3 — …'; pre-cutoff, names the unit number
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md	TOOL-aDrainedSluice-4	product landed a8263dc 2026-08-08, subject 'fix(memory-tree): V4 — …'; pre-cutoff, names the unit number
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md	TOOL-aDrainedSluice-9	product landed 6ff9a73 2026-08-08, subject 'fix(memory-tree): V8 — …'; pre-cutoff, names the unit number
+memory/builds/aWireWarden/spec/2026-07-15-spec-aWireWarden-1.md	TOOL-aWireWarden-1	product landed 78b23be 2026-07-15; it DOES name TOOL-aWireWarden-1, in the BODY, and subject-only is a declared non-goal of this signal
+memory/builds/dSettledRoster/spec/2026-08-20-spec-TOOL-dSettledRoster-5.md	TOOL-dSettledRoster-5	record written AFTER the work landed (474043e, d2a40aa) at the owner request, so no product subject could name a slug that did not exist yet

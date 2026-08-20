@@ -283,7 +283,13 @@ def main() -> int:
             want = SCRATCH_EXPECT.get(name)
             if want is None:
                 continue
-            lp = subprocess.run(argv, cwd=str(g), capture_output=True, text=True)
+            # Through govkit's own shell resolver, for the reason its docstring records: this
+            # harness is a WINDOWS python running a leg whose argv names a bare `bash`, and the
+            # Windows loader answers that with the System32 WSL launcher. A real operator's
+            # runner is already inside bash and never sees it, so the harness has to ask for
+            # the same shell the runner would have used, or it grades a leg nobody will run.
+            lp = subprocess.run(govkit.resolve_shell_argv(argv), cwd=str(g), capture_output=True,
+                                text=True)
             out = (lp.stdout or "") + (lp.stderr or "")
             check("scratch install: leg '%s' prints its stated verdict where it was installed"
                   % name, want in out, out)

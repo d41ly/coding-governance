@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-7 — the rename: every record filename names a spec
 
-**Status:** INPROGRESS · rev-2 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-20 · node a · Tier-1 · base 96141aed · streams tooling
 
 ## 1. Goal
 

@@ -20,7 +20,7 @@
 WIRE-INTO-PROJECT.md:264                           migration: names the old pointer stub an adopter still holds
 WIRE-INTO-PROJECT.md:270                           migration: the step that folds that file's prose away
 tools/memory-tree/check-memory-hygiene.sh:286      the gate BANS these names; it cannot refuse what it may not spell
-tools/memory-tree/check-memory-hygiene.sh:547      retirement note for the STATUS.md check, naming what it retired
+tools/memory-tree/check-memory-hygiene.sh:548      retirement note for the STATUS.md check, naming what it retired
 tools/memory-tree/check-memory-hygiene.test.sh:1057   fixture creates the banned names to prove the refusal fires
 tools/memory-tree/check-memory-hygiene.test.sh:1166   fixture builds an over-long STATUS.md for the size arm
 tools/memory-tree/check-memory-hygiene.test.sh:1171   positive arm: check 6 hits the banned STATUS.md

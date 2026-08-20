@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-1 — the installed engine, and why link-ness is the wrong thing to check
 
-**Status:** OPEN · rev-2 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
+**Status:** CLOSED · rev-2 · 2026-08-20 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
 ## 1. Goal
 
