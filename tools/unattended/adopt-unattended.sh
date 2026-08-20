@@ -138,6 +138,11 @@ SKILL_OUT="$SKILL_DIR/SKILL.md"
 PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"
 PROTO_REL="$MEMORY_ROOT/guides/UNATTENDED-PROTOCOL.md"
 PROTO_OUT="$ROOT/$PROTO_REL"
+# TOOL-dScriptedRepeat-2 - the THIRD artifact. COPIED rather than rendered, for the reason the
+# protocol is: it carries no placeholder, so a render step would be a second spelling of `cat`.
+PBT_SHIP="$KIT_DIR/PLAYBOOK-TEMPLATE.template.md"
+PBT_REL="$MEMORY_ROOT/guides/PLAYBOOK-TEMPLATE.md"
+PBT_OUT="$ROOT/$PBT_REL"
 
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
@@ -194,15 +199,25 @@ if [ "$MODE" = "--check" ]; then
     grep -nE '\{\{[A-Z_]+\}\}' "$SKILL_OUT" | head -5 | sed 's/^/    /'
     exit 1
   fi
-  # The adopter installs TWO artifacts, so --check verifies two. Checking only the one it renders
+  # The adopter installs THREE artifacts, so --check verifies three. Checking only the one it renders
   # reported "in sync" over a protocol half that had been deleted or hand-edited — and check 10 of
   # the gate fails HARD when that half is missing, so the drift would surface as an unexplained gate
-  # failure somewhere else entirely.
+  # failure somewhere else entirely. The count is stated here and in the arm below it; both move
+  # together or neither does.
   if [ ! -f "$PROTO_OUT" ]; then
     echo "unattended: $PROTO_REL is missing — run $0 to install the protocol's live half"; exit 1
   fi
   if ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
     echo "unattended: $PROTO_REL has drifted from the shipped protocol; re-run $0"; exit 1
+  fi
+  # TOOL-dScriptedRepeat-2 - the third artifact, with its own TWO refusals. NOT-INSTALLED and
+  # DRIFTED are separate messages: one sends the reader to run the adopter and the other to read a
+  # diff, and one message would send half of them to the wrong place.
+  if [ ! -f "$PBT_OUT" ]; then
+    echo "unattended: $PBT_REL is missing — run $0 to install the playbook template"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $PBT_REL has drifted from the shipped playbook template; re-run $0"; exit 1
   fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
@@ -217,6 +232,11 @@ mkdir -p "$ROOT/$MEMORY_ROOT/guides"
 if [ ! -f "$PROTO_OUT" ] || ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$PROTO_SHIP" > "$PROTO_OUT"
   echo "unattended: installed $PROTO_REL"
+fi
+# TOOL-dScriptedRepeat-2 - the playbook template, the same shape as the protocol above it.
+if [ ! -f "$PBT_OUT" ] || ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$PBT_SHIP" > "$PBT_OUT"
+  echo "unattended: installed $PBT_REL"
 fi
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2

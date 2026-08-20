@@ -162,3 +162,5 @@ tools/*/kit.toml text eol=lf
 # must fire. Not harmless, and MEASURED — this comment previously said "harmless today", which the
 # same kit's own selftest then disproved. The reader also strips CR; both halves are armed.
 .lexicon.conf text eol=lf
+memory/guides/PLAYBOOK-TEMPLATE.md eol=lf
+tools/unattended/PLAYBOOK-TEMPLATE.template.md eol=lf

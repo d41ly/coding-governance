@@ -22,6 +22,14 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
 placeholders = []
 
+# TOOL-dScriptedRepeat-2 - the playbook template. Placeholder-free like the protocol, so the
+# adopter copies it rather than rendering it.
+[[files]]
+include = ["PLAYBOOK-TEMPLATE.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+placeholders = []
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"
@@ -115,7 +123,10 @@ pattern = "{kit}/.unattended.conf.example"
 why = "the adopter copies it verbatim into the line above"
 [[lf_pin]]
 pattern = "{kit}/*.md"
-why = "the protocol is byte-compared against the shipped copy"
+why = "the protocol and the playbook template are byte-compared against the shipped copies"
+[[lf_pin]]
+pattern = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+why = "an installed artifact its own adopter byte-compares"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

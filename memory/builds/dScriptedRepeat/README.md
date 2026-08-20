@@ -86,26 +86,17 @@ raising the ceiling is a fork for the owner rather than an edit.
 ## What the research changed
 
 Six records under `build/` — five independent lenses and one contradiction hunt that cross-checked
-them against source. The hunt is the one to read first; it refuted four recommendations, found
-thirteen cites that do not resolve, and ranked twelve decisions still open.
+them against source. Read the hunt first: it refuted four recommendations, found thirteen cites that
+do not resolve, and ranked twelve decisions still open.
 
-**Fork 6's stated premise is false, and the ruling survives on other grounds.** The fork was ruled on
-my framing that "a park blocks the close". It does not. `park()` already writes four KINDS — `abort`,
-`waiver`, `override`, `decision` — into one region, and `parked-decisions-surfaced` is satisfied by a
-single derived `parked-surfaced:` line that neither distinguishes kinds nor blocks per entry. The
-asymmetry the fork asked for already holds. What the ruling buys is therefore a fifth KIND at roughly
-a tenth of the cost, and the residual tension is the fork's words "distinct region" — a fifth kind is
-the same region with a different first token. Recorded rather than quietly switched.
-
-**Fork 5 is the most damaged**, and the contradiction hunt carries the evidence: four measured
-instances of fork 5's own defect inside the reference the template derives from, and two playbooks that
-disagree on what a "step" is. Read it there rather than here.
-
-**The single most important discovery is not in any fork.** Every composition failure in the reference
-corpus was found by measuring the SET, never a piece: nine articles each reviewed carefully and passed
-were a monoculture no single-article review could have caught. A Definition of Done that counts pieces
-and declares each piece's legs green ships N monocultured pieces and reports GREEN. Set-scoped checks
-are the characteristic need of repeated generation and no fork covers them.
+Three findings changed the design rather than confirming it. **Fork 6's stated premise is false** — a
+park does not block the close, `park()` already writes four kinds through one region, and the
+asymmetry the fork asked for already held, so the ruling buys a fifth KIND at a tenth of the cost.
+**Fork 5 is the most damaged**: the reference the template derives from contains four measured
+instances of fork 5's own defect, and the two references disagree on what a "step" is. **The sharpest
+finding is in no fork at all** — every composition failure in the reference corpus was found by
+measuring the SET, never a piece, so a Definition of Done that counts pieces and finds each piece's
+legs green ships N monocultured pieces and reports GREEN. That is unit 7.
 
 ## The four forks the research opened, ruled 2026-08-20
 
@@ -251,16 +242,16 @@ Named here because the research raised each one and an unstated exclusion reads 
 
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 11 unit(s) · node d · opened 2026-08-20 · streams tooling
+**Build status:** INPROGRESS · 11 unit(s) · node d · opened 2026-08-20 · streams tooling
 ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | INPROGRESS | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-4 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | INPROGRESS | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-4 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-4 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-4 | 2026-08-20 |
@@ -280,10 +271,11 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | TOOL-dScriptedRepeat-2 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 
-Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
+Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
 
 Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
 <!-- /gen:build-index -->
@@ -319,6 +311,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
+  - [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md)
 - **`reviews/`**
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md)
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)

@@ -27,7 +27,7 @@ seed() { # dir  -> a git repo carrying the kit and a conf
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
   cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" \
-     "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$1/tools/unattended/"
+     "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/tools/unattended/"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 LANDER="bash tools/land.sh"
@@ -54,6 +54,10 @@ present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
 # when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
 present "$A/memory/guides/UNATTENDED-PROTOCOL.md" "arm 1 installed the protocol's live half"
 hit "$(cat "$A/memory/guides/UNATTENDED-PROTOCOL.md")" "The run is authorized by the **build folder itself**"
+# TOOL-dScriptedRepeat-2 - the THIRD artifact. Asserted on CONTENT for the reason arm 1 states
+# about the other two: a file appearing is satisfied by a copy that carried nothing.
+present "$A/memory/guides/PLAYBOOK-TEMPLATE.md" "arm 1 installed the playbook template"
+hit "$(cat "$A/memory/guides/PLAYBOOK-TEMPLATE.md")" "PROHIBITED OUTPUT unless it is a tracked"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
