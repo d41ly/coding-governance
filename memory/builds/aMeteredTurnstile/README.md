@@ -39,15 +39,32 @@ It changes no scheduling and fixes no leg. It does not modify `tools/run-gates/r
 `aPacedTurnstile` is actively editing. Every improvement it identifies is emitted as a recommendation
 against an existing backlog id or a new one, and landing any of them is a separate unit.
 
+## Units
+
+<!-- roster:units -->
+
+| Unit | Status | Tier | One-liner |
+|---|---|---|---|
+| [TOOL-aMeteredTurnstile-1](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | CLOSED | 2 | The bar gets a profiling verb that records a RUN and names the regime, so the next fix is chosen from a measurement rather than from a guess. |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
 ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5 TOOL-aMeteredTurnstile-6
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | INPROGRESS | rev-2 | 2026-08-20 |
+| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | CLOSED | rev-4 | 2026-08-20 |
 
-Records live under `spec/` and `build/`.
+Records live under `spec/`, `build/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md) | journal | TOOL-aMeteredTurnstile-1 |
+| [2026-08-20-review-TOOL-aMeteredTurnstile-1.md](reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md) | diff-review | TOOL-aMeteredTurnstile-1 |
+
+Ids no `spec-audit` record has ever named: TOOL-aMeteredTurnstile-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -66,4 +83,6 @@ Records live under `spec/` and `build/`.
   - [2026-08-20-spec-TOOL-aMeteredTurnstile-1.md](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md)
 - **`build/`**
   - [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md)
+- **`reviews/`**
+  - [2026-08-20-review-TOOL-aMeteredTurnstile-1.md](reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md)
 <!-- /gen:build-docs -->
