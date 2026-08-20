@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -31,9 +31,15 @@ run-state file in sight, which is what makes fork 1's "ONE gate" true across bot
 - **S6.** THE FIVE STATES: `verified` (joined AND every declared leg PASS), `failed` (joined, a leg
   recorded FAIL), `stale` (record present, hash mismatch), `unrecorded` (piece present, no record),
   `orphan-record` (record present, piece gone). Five messages, never a boolean.
-- **S7.** TWO NAMED ENUMERATION SCOPES, because unit 6 needs to distinguish them and the previous
-  revision offered only one: `enumerate_run` (the declared grain intersected with the paths this run
-  introduced, per unit 8's population) and `enumerate_corpus` (the grain over the whole tree).
+- **S7.** TWO NAMED ENUMERATION SCOPES: `enumerate_corpus` (the grain over the whole tree) and
+  `enumerate_run` (the pieces belonging to ONE run). `enumerate_run` is derived RUN-INDEPENDENTLY, from
+  the run identity each piece record already carries (unit 7 S4), never from unit 8's diff population —
+  that population needs a live remote observation and a run-state file, and S10/AC7 promise a reader
+  that has neither. Unit 6 evaluates at `--close`, where a run exists, and may intersect the two; the
+  READER never needs the network.
+- **S7b.** A per-piece CHECKS key, declared in the playbook's declaration block and owned by this unit.
+  S1, S5 and S6 all hinge on "every DECLARED per-piece leg" and no spec declared the key they read —
+  which under unit 2 AC3b's both-directions join reds on this build's own artifact.
 - **S8.** THE LIVENESS ASSERTION. The reader reports how many pieces it ENUMERATED alongside how many
   it verified, per scope. A zero-piece enumeration reports as a dead probe, never as a clean run.
 - **S9.** THE GRADING RULE, which the audit found undefined. The READER classifies and never grades.
@@ -76,7 +82,9 @@ Every other control here can be satisfied by a tree with no pieces in it. A read
 zero, joins zero and reports zero failures is indistinguishable from a clean run. So the reader reports
 the ENUMERATION COUNT first, per scope, and a zero enumeration is a dead probe with its own message.
 Two zero-states stay distinct and both must survive: no playbook at all is not the same fact as a
-declared grain resolving to zero pieces, and the leg's exit code differs.
+declared grain resolving to zero pieces. The first exits non-zero and the second is reported and does
+not red, per unit 3 S9b — a discrimination by BEHAVIOUR, which is observable, rather than by an exit
+code no spec ever named.
 
 ### Alternatives rejected
 
@@ -156,6 +164,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

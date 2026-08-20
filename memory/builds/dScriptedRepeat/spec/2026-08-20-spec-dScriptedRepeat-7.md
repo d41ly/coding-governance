@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -151,11 +151,14 @@ prose record.
 none — every fork below is RESOLVED in place.
 
 - **F1 — should a set-scoped check run against pieces from PREVIOUS runs of the same playbook?**
-  RESOLVED (agent, 2026-08-20, delegated): the population is declared PER CHECK as `run` or `corpus`,
-  using unit 5's two named scopes; a `corpus`-scoped check WARNS and never blocks, and its census
-  prints. A run cannot be blocked by a corpus it did not produce, and the monoculture the reference
-  measured was a corpus property — so both readings are real and the playbook picks per check. This
-  also removes the contradiction the audit found between this fork and §4.
+  RE-RESOLVED (agent, 2026-08-20, delegated): `enumerate_run` ONLY, which is what S3, S5 term 2 and §4
+  already say. The earlier resolution invented a per-check scope field that S1's grammar does not carry,
+  unit 2's key table does not own and unit 3's tag grammar does not enforce, and it shipped a
+  non-blocking corpus path with no arm and no acceptance criterion — so a `GATE`-tagged corpus check
+  recording FAIL both blocked and never blocked. Taking the narrow reading contradicts nothing and adds
+  no unarmed behaviour. The corpus question is real and survives as a follow-up rather than as an
+  unbuilt clause: a run cannot be blocked by a corpus it did not produce, and unit 6 already reports the
+  `enumerate_corpus` census without blocking, which is where a later build would extend.
 - **F2 — whether `set-checks-recorded` collapses into `pieces-complete`.** RESOLVED (agent,
   2026-08-20, delegated): keep them SEPARATE. They read different populations and fail for different
   reasons, and this repo's Definition-of-Done history is one long argument for splitting terms rather
@@ -163,6 +166,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

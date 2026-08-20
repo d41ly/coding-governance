@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
 
 ## 1. Goal
 
@@ -21,8 +21,15 @@ give owner-instructed AMENDMENT the same home.
 - **S3.** THE OUTPUT is a playbook conforming to unit 2's canon and unit 3's gate, committed to the
   tree. Unit 3's leg grades it from the moment it is tracked, so a playbook that does not validate
   cannot land — which is what makes a later run's `playbook:` reference safe without re-validating.
-- **S4.** THE ORDERING PROPERTY, and it is the reason this is a separate run rather than a first pass
-  of a playbook run. The playbook must be OLDER than the BASE of any run that names it. A creation run
+- **S4.** THE ORDERING PROPERTY, QUALIFIED BY ANCHOR, and it is the reason this is a separate run
+  rather than a first pass of a playbook run. The playbook must be OLDER than the BASE of any run that
+  names it. **Under `default-branch` this has a machine half** — unit 4's first refusal fires, because
+  the BASE is a merge-base the run cannot move. **Under `published` it does not**, and this repo
+  declares `published`: there the BASE is a tip the run itself pushed, so a create-and-follow run
+  resolves its own `playbook:` and unit 4's refusal never fires. Under that anchor S4 is a documented
+  CHECK with no machine half, stated the way unit 10 S5 states the attended path's. The real backstop
+  there is a DIFFERENT mechanism and worth naming: unit 8 no longer exempts the playbook, so a
+  `recipe`-mode run editing or creating one REDS on the unattended path. A creation run
   commits and lands the playbook; a later run's build README names it and resolves it at that run's
   own BASE. A single run that authored its playbook and then followed it would be authorizing its own
   instructions, which is the property unit 8's refusal and unit 9 §3 both exist to prevent.
@@ -99,17 +106,22 @@ run, which is exactly the branch the audit forced and is the first place it pays
 ## 6. Acceptance criteria
 
 - **AC1** — When a run authors a playbook and commits it under `authorized-by: prompt`,
-  `bash tools/unattended/check-playbook.sh` grades that playbook from the moment it is tracked.
+  `bash tools/unattended/check-playbook.sh` grades that playbook from the moment it is tracked, with NO
+  build README naming it — the tree-derived membership predicate of unit 3 S1 is what makes that
+  observable, and the seam-derived one it replaced could not.
 - **AC2** — When that same run's diff is evaluated, `bash tools/unattended/check-playbook.sh` does NOT
   apply the scope refusal, because the mode is not `recipe` mode. Observed, not assumed.
 - **AC3** — When a playbook fails unit 3's gate, `bash tools/run-gates/run-gates.sh` REDS and the
   playbook cannot land. Staged and observed.
 - **AC4** — When a later run's build README names that playbook, `--preflight` resolves it at BASE and
   does not refuse — the end-to-end join between this unit and unit 4.
-- **AC5** — When a single run both creates a playbook and then names it in its own build README,
-  `bash tools/unattended/unattended.sh --preflight` REFUSES, because the playbook does not resolve at
-  that run's BASE. Observed; this is S4's ordering property expressed as a refusal that already exists
-  rather than one this unit adds.
+- **AC5** — When a single run both creates a playbook and then names it in its own build README under
+  the `default-branch` anchor, `bash tools/unattended/unattended.sh --preflight` REFUSES, because the
+  playbook does not resolve at that run's BASE. Observed in a scratch tree declaring that anchor.
+- **AC5b** — When the SAME run is performed under `ANCHOR_SCOPE="published"`, preflight does NOT refuse
+  — observed, because this repo declares `published` and a spec whose protective arm cannot fire in its
+  own dogfood tree is an assertion about nothing. `bash tools/unattended/check-playbook.sh` REDS instead,
+  via unit 8's non-exempt playbook, and that is the backstop S4 names under this anchor.
 - **AC6** — When a `prompt`-mode run reaches `--close`, `pieces-complete` and `set-checks-recorded` are
   both MET-and-announced rather than blocking, via `bash tools/unattended/unattended.sh --close`.
 
@@ -121,7 +133,13 @@ run, which is exactly the branch the audit forced and is the first place it pays
 
 ## 8. Open questions
 
-none — every fork below is RESOLVED in place.
+none — every fork below is RESOLVED in place, but THIS UNIT'S EXISTENCE is parked for the owner
+(2026-08-20) and the parked entry in the run-state file carries the question. Round 1 of the spec audit
+said adding a creation path "needs an OWNER ruling first", and I added it without one; the corroborating
+signal is that this is the only spec of eleven with no `ratified` pointer. My reading — that the owner's
+ask names creation verbatim, so adding the unit implements the ask and declaring it OUT would have been
+the act needing a turn — is recorded in the park for the owner to weigh, not to inherit. This unit does
+not close while that is parked.
 
 - **F1 — does a creation run need its own directive?** RESOLVED (agent, 2026-08-20, delegated): NO;
   the gate is the enforcement. `prompt` mode's two scoped handles already bind research and a solution
@@ -135,6 +153,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

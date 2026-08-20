@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-1 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -115,8 +115,13 @@ research lens priced this. It is named here so the build does not discover it at
 
 none — every fork below is RESOLVED in place.
 
-- **F1 — did "distinct region" mean a distinct FILE?** RESOLVED (agent, 2026-08-20, delegated): a
-  fifth `park()` KIND, not a separate file. Both options deliver the same thing the ruling asked for —
+- **F1 — did "distinct region" mean a distinct FILE?** **PARKED for the owner (2026-08-20)** — the
+  earlier `(agent, delegated)` mark on this fork was WRONG and is withdrawn. The two options differ in
+  what gets built, which the build method reserves to the owner, and §4 of this spec concedes as much
+  when it says the alternative costs a new file plus a unit-8 exemption row. The parked entry in the
+  run-state file carries the question, both options and the refusal. The BUILT shape described below
+  stays the fifth `park()` KIND so the design is complete either way, but this unit does not close until
+  the owner rules. Recorded here rather than left to be inferred from a missing stamp. Both options deliver the same thing the ruling asked for —
   a proposal channel that reads as distinct from a blocker — so this is mechanism rather than scope,
   and the kind costs roughly a tenth as much while keeping proposals inside the file the wrap-up
   already derives from. If the owner meant a file literally, converting is a small follow-up and this
@@ -129,6 +134,10 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · folded the round-2 spec audit. D15 re-stamped this unit Tier-2 — it adds a new
+  write path and changes a shared row grammar, which the charter's own §8 makes Tier-2 by definition,
+  and the README said so in the same sentence that exempted it. D14 withdrew F1's delegated mark: the
+  fork is the owner's and is now parked.
 - rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

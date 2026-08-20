@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -11,8 +11,11 @@ whether it may be overridden.
 
 ## 2. Scope (IN)
 
-- **S1.** `pieces-complete:machine` joins `DOD_CORE` as a ninth core item, and `CORE_FLOOR`'s DoD half
-  rises by one in this repo's `.unattended.conf` in the SAME commit — the research found a recorded
+- **S1.** `pieces-complete:machine` joins `DOD_CORE` as a ninth core item. Units 6 and 7 CO-LAND, so
+  the PAIR adds two items and `CORE_FLOOR`'s DoD half moves from eight to TEN in that one commit, per
+  unit 7 S6. The previous revision said "rises by one in the SAME commit", which followed literally in
+  the co-landing commit writes nine against ten core items and reds the bar through this unit's own new
+  S7 slack arm — the arm working, on the instruction its own spec gave — the research found a recorded
   failure where a core set grew in the shipped example and not in the dogfood conf, leaving the pin
   slack while the file still looked configured. S7 is what makes that failure visible.
 - **S2.** THE MODE BRANCH, and it is term ZERO because everything else depends on it. `verb_close`
@@ -154,7 +157,7 @@ misclassification is real but arrives by a different route than the previous rev
   `--close` reports met, and the `enumerate_corpus` census is printed and does not block. Observed.
 - **AC7** — When `--override pieces-complete` is passed, `bash tools/unattended/unattended.sh` REFUSES
   with a message stating the item is not overridable and naming `--abort` as the honest exit.
-- **AC8** — When `DOD_CORE` holds nine items and the installed `.unattended.conf` still declares a DoD
+- **AC8** — When `DOD_CORE` holds ten items and the installed `.unattended.conf` still declares a DoD
   floor of eight, `bash tools/unattended/check-unattended.sh` REDS naming both numbers. Staged and
   observed; today this passes GREEN, which is the whole reason S7 exists.
 
@@ -177,6 +180,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

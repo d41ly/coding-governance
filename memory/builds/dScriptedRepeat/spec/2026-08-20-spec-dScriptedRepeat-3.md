@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-3 — the playbook validity gate
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -10,8 +10,13 @@ over every step it selects, the witness drain census, and whether each named leg
 
 ## 2. Scope (IN)
 
-- **S1.** `tools/unattended/check-playbook.sh`, a new merge-bar leg over every tracked playbook the
-  declaration seam names. It is a LEG rather than a check inside the existing kit gate because it runs
+- **S1.** `tools/unattended/check-playbook.sh`, a new merge-bar leg over every tracked file that IS a
+  playbook. Membership is TREE-DERIVED, not seam-derived: a tracked file is in the population when it
+  carries unit 2's declaration block, or matches a glob the project declares. Unit 4's `playbook:` is a
+  POINTER INTO that population, never its definition — the previous revision defined the population as
+  "what the declaration seam names", which excluded the fixture this same spec ships, excluded a freshly
+  created playbook no README names yet (unit 11's whole output), and contradicted F2's ruling that a
+  tracked playbook is graded from the moment it is tracked. It is a LEG rather than a check inside the existing kit gate because it runs
   over a different population — an adopter's playbooks, not the kit's own tree — and because unit 4
   makes its input a second blob read.
 - **S2.** The DECLARED STEP SELECTOR. A playbook declares `step_selector` in its declaration block, as
@@ -47,11 +52,16 @@ over every step it selects, the witness drain census, and whether each named leg
   `GATE FAIL`; `skip` comes ONLY from a guard file written before dispatch, and `run-gates.test.sh`
   refuses a guard pathspec matching no tracked path. So a leg cannot say `skipped`, and this repo tracks
   no playbook — meaning this leg would print `GATE ok` over an empty population forever while unit 5's
-  reader, unit 7's set records and unit 8's refusal all rode on it. The leg therefore exits NON-ZERO
-  when it can name a population and resolves none of it, prints an enumerated-count line, and ships ONE
-  TRACKED FIXTURE PLAYBOOK under `tools/unattended/` so the dogfood population is never empty and a
-  guard on that path passes the canary. Two zero-states stay distinct: no playbook declared at all, and
-  a declared grain resolving to zero pieces.
+  reader, unit 7's set records and unit 8's refusal all rode on it. The leg therefore exits NON-ZERO on
+  an empty PLAYBOOK population and prints an enumerated-count line, and ships ONE TRACKED FIXTURE
+  PLAYBOOK under `tools/unattended/` so the dogfood population is never empty and a guard on that path
+  passes the canary.
+  **THE PIECE level is graded differently, and the two must not share one rule.** The fixture ships
+  pieces under its own grain AND the verb-written records for them, so the piece population is non-empty
+  too. But a zero-PIECE enumeration is REPORTED and non-blocking on the leg, per unit 5 S9's grading
+  rule — the reader classifies and never grades. The previous revision's single rule ("non-zero when it
+  can name a population and resolves none of it") reached the piece level too and therefore either red
+  the dogfood bar permanently or re-opened green-by-absence, with no spec saying which.
 - **S9c.** `curated:` is resolved HERE rather than deferred. The gate reds a playbook whose `curated:`
   is absent or empty, with no run binding involved — the freeze is a tree property like everything else
   this leg reads, and it is the only machine consequence fork 4 has. Unit 2 AC5 states the same rule.
@@ -117,8 +127,10 @@ only quantitative handle on the third.
 - perf / scale — one pass per tracked playbook; the population is small by construction.
 - a11y — N/A.
 - i18n — the tag keywords are ASCII and closed; a playbook's prose is not constrained.
-- error / empty / loading states — no playbook in the tree is a legitimate state and must report as
-  SKIPPED with the reason, never as green. A declared selector matching zero lines reds via the floor.
+- error / empty / loading states — no playbook in the tree is NOT a legitimate state: the leg exits
+  non-zero and the bar prints `GATE FAIL` with the reason. There is no `skipped` verdict a leg can emit,
+  which S9b establishes and this row previously contradicted. A declared selector matching zero lines
+  reds via the floor; a zero-PIECE enumeration is reported and does not red here.
 - observability — the drain census and the derived budget print on every run, so a playbook's
   trajectory is visible without opening it.
 - risks — the biggest is a gate that passes because its predicate never matched. S9's requirement to
@@ -153,10 +165,14 @@ only quantitative handle on the third.
   gate on the gate, run before wiring.
 - **AC7** — When a required canon section is present but EMPTY the gate REDS; when it carries
   `none — <why>` the gate PASSES. Two arms, because one arm cannot distinguish them.
-- **AC8** — When the tree contains no playbook at all, `bash tools/unattended/check-playbook.sh` exits
-  non-zero and the bar prints `GATE FAIL` with the reason; and when the shipped fixture playbook is the
-  only one, the leg exits 0 having enumerated a non-zero population, printing that count. Two arms, and
-  the second is what proves the first is not a permanent red.
+- **AC8** — When no tracked file carries a declaration block or matches the declared glob,
+  `bash tools/unattended/check-playbook.sh` exits non-zero and the bar prints `GATE FAIL` with the
+  reason; and when the shipped fixture is the only playbook, the leg exits 0 having enumerated a
+  non-zero playbook population AND a non-zero piece population, printing both counts. Two arms against
+  the TREE-DERIVED predicate of S1, and the second is what proves the first is not a permanent red.
+- **AC8b** — When a playbook resolves zero pieces under its grain, the leg REPORTS the dead probe with
+  its count and exits 0; the same tree at `--close` BLOCKS via `pieces-complete`. Two observations of
+  one state, which is what keeps the leg's grading rule and unit 5 S9's from contradicting each other.
 
 ## 7. Gates
 
@@ -183,6 +199,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

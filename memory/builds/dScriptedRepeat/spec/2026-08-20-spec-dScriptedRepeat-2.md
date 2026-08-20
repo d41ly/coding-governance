@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -157,8 +157,13 @@ early — a wall in front of "updates existing playbooks".
   third artifact is missing, it REFUSES; and when the installed copy has drifted from the shipped
   template, it REFUSES with a distinct message. Two arms against the specific new `--check` arm S1 adds,
   because a byte-compare that no code path produces is not an acceptance criterion.
-- **AC3b** — When the declaration block carries a key no unit owns, or a unit reads a key the block does
-  not declare, `bash tools/unattended/check-playbook.sh` REDS. Both directions, staged and observed.
+- **AC3b** — When a playbook's declaration block carries a key absent from the template's owning-unit
+  key table, `bash tools/unattended/check-playbook.sh` REDS. That direction has a machine source on both
+  sides — the template's table and the playbook's block — and is staged and observed. The REVERSE
+  direction, "a unit reads a key the block does not declare", is a documented CHECK and says so in the
+  leg header: what a unit reads exists only as spec prose, so unlike unit 10's directive join there is no
+  second machine source to compare against. Its first victim would have been this build's own artifact,
+  since no spec declared the per-piece checks key unit 5 reads — now declared by unit 5 S7b.
 - **AC4** — When the template is read, the exemplar rule appears in `PLAYBOOK-TEMPLATE.template.md` and the template ITSELF quotes
   no sentence as a model except ones marked prohibited or pointing at a tracked fixture. Self-applying,
   and observed by reading, because a template that violates its own loudest rule teaches the violation.
@@ -196,6 +201,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.

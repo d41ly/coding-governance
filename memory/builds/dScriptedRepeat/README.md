@@ -97,12 +97,9 @@ asymmetry the fork asked for already holds. What the ruling buys is therefore a 
 a tenth of the cost, and the residual tension is the fork's words "distinct region" — a fifth kind is
 the same region with a different first token. Recorded rather than quietly switched.
 
-**Fork 5 is the most damaged.** The reference playbook that fork 4 derives the template from contains
-four measured instances of exactly the defect fork 5 exists to prevent, including two invariants its
-own validity gate has never once validated because they appear only in line-wrapped tags. The two
-playbooks also disagree on what a "step" is — nine or zero, depending on the selector — so a hardcoded
-step selector reports "every step is tagged" over an empty selection on one of the two files it was
-derived from. That is green-by-absence inside the fork meant to prevent it.
+**Fork 5 is the most damaged**, and the contradiction hunt carries the evidence: four measured
+instances of fork 5's own defect inside the reference the template derives from, and two playbooks that
+disagree on what a "step" is. Read it there rather than here.
 
 **The single most important discovery is not in any fork.** Every composition failure in the reference
 corpus was found by measuring the SET, never a piece: nine articles each reviewed carefully and passed
@@ -159,8 +156,11 @@ loop and the wrap-up derivation rather than by prose written for it.
 
 ## The unit set
 
-Ten units. One mechanism each, per the build method's M2. Every one is Tier 2 except unit 9 — this
-is a kit contract change throughout, which the manifest's tier rule makes Tier 2 by definition.
+One mechanism each, per the build method's M2, and every one is Tier 2 — this is a kit contract change
+throughout, which the manifest's tier rule makes Tier 2 by definition. The unit COUNT is not written
+here: the generated region below derives it, and a prose count beside a table that grew is the class
+this repo bans. Unit 9 carried a Tier-1 stamp until the round-2 audit observed that it adds a new write
+path and changes a shared row grammar, which is Tier 2 by the charter's own first bullet.
 
 The ORDER matters, is not the id order, and is stated as a PREDECESSOR list because the previous prose
 version contradicted four dependencies the specs themselves assert. Units 5, 7 and 8 all deliver their
@@ -179,7 +179,7 @@ every one of 5, 6, 7 and 8 reads a value unit 4's seam resolves.
 | 8 | 3, 4 · CO-LANDS with 6 |
 | 9 | 1 |
 | 10 | all of 1-9, 11 |
-| 11 | 2, 3 |
+| 11 | 2, 3 · and its EXISTENCE is parked for the owner |
 
 Two co-landing constraints, both from the specs' own reasoning. Units 6 and 8 land together because 6's
 piece count consumes 8's diff population and counts the wrong thing without it. Units 6 and 7 land
@@ -259,14 +259,14 @@ ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dS
 |---|---|---|---|
 | [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-4 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-3 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-3 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-4 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-3 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-5 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-5 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-5 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | SPECCED | rev-3 | 2026-08-20 |
 <!-- /gen:build-units -->
 
@@ -280,6 +280,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 
 Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
@@ -319,5 +320,6 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
 - **`reviews/`**
+  - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md)
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)
 <!-- /gen:build-docs -->

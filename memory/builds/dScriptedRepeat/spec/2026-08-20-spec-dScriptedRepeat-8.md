@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -17,6 +17,10 @@ the class this predicate cannot see.
 - **S1b.** A NAMED REFUSAL when the remote does not answer, in the shape `check-unattended.sh:349-355`
   already uses. The population depends on an observation of the remote, so silence must refuse rather
   than fall back to a local ref — the fallback is the class protocol §9 spends its whole argument on.
+  **GUARDED on there being a run**, the way the precedent it cites is: `check-unattended.sh:230` runs
+  the advertisement only when a population exists, because with no run-state file there is nothing whose
+  BASE could be checked and the round-trips buy nothing. An offline diff-scoped bar run therefore does
+  not pay the network, and unit 5's reader never depends on it.
 - **S2.** The EXEMPTION SET, closed and enumerated: the run's own build folder under the memory root;
   the generated work-state artifacts every build touches; the run-state file; the backlog shard the run
   appends to; and the decision log. **The playbook is NOT exempt.** The previous revision exempted it
@@ -33,9 +37,12 @@ the class this predicate cannot see.
 - **S5.** Running the candidate predicate over the REAL TREE before wiring it — over past builds'
   actual diffs — printing hits AND near-misses, per the charter's rule. The research already ran a
   first version and found it reds the mandated memory update, which is why S2 exists in this shape.
-- **S6.** Arms: an out-of-scope source edit reds; an exemption-set path passes; the playbook's own edit
-  passes; a merge commit's combined-diff change is SEEN; the predicate over a real past build's diff
-  produces the documented hit/near-miss list.
+- **S6.** Arms: an out-of-scope source edit reds; an exemption-set path passes; **a `recipe`-mode run's
+  edit of its own playbook REDS**, staged and observed; a merge commit's combined-diff change is SEEN;
+  the remote-silence refusal fires (AC8); the empty population exits non-zero (AC5); the predicate over
+  a real past build produces the documented hit/near-miss list. The third arm is INVERTED from the
+  previous revision, which ordered the arm AC3 forbids — S6 is what the test file is written from, so
+  following it would have certified the hole F9 was folded to close.
 
 ## 3. Non-goals (OUT)
 
@@ -137,16 +144,21 @@ spent the mandate. Evaluated at both moments.
   reach — `tools/run-gates/run-gates.sh:844-849` maps `skip` only from a pre-written guard file — so
   "reports a dead probe" had to be spelled as an exit code. Unit 3 owns the channel and this AC names
   the exact bar line.
-- **AC6** — When the candidate predicate is run over at least three real past builds in this tree
-  before wiring, the hits AND near-misses are recorded in
-  `memory/builds/dScriptedRepeat/build/`, and any false red is either fixed or its exemption added with
-  a reason. Per the charter's rule about running a predicate over the real tree first.
+- **AC6** — When the candidate predicate is run over at least three real past builds, the hits AND
+  near-misses are recorded in `memory/builds/dScriptedRepeat/build/`, and any false red is fixed or its
+  exemption added with a reason. **Measured RETROSPECTIVELY, the merge-base is taken against the default
+  tip AS IT WAS when that build ran**, not today's: every build in this tree is landed, so today's tip is
+  a descendant and `merge-base` returns the build's own tip, yielding an empty population. The
+  retrospective form uses the build's recorded BASE as the stand-in for the tip it observed, and the
+  record says so — the live form in S1 is unchanged and is what ships.
 - **AC7** — When the mode is not `recipe` mode, the gate does not evaluate, and it says so through
   the channel unit 3 defines rather than through the bare word `skipped`, which no leg can emit.
 - **AC8** — When the remote does not answer, `bash tools/unattended/check-playbook.sh` REFUSES by name
   rather than falling back to a local ref. Staged and observed.
-- **AC9** — When the predicate is run over the `aSiftedPlaybook` build, the first-parent population
-  returns the authored count rather than the range's inflated one, and both numbers are recorded.
+- **AC9** — When the predicate is run over the `aSiftedPlaybook` build in AC6's retrospective form, the
+  first-parent walk returns the authored count rather than the range's inflated one, and both numbers
+  are recorded. The naive form was re-measured and does NOT produce this: `merge-base HEAD <that build's
+  witness>` returns the witness itself, because the build is landed.
 
 ## 7. Gates
 
@@ -170,6 +182,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
+  the fold range. Every change here repairs a place where two sentences in this build ordered opposite
+  implementations and neither was marked the loser.
 - rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.
