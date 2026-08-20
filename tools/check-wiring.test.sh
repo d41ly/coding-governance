@@ -84,10 +84,10 @@ cleanup
 newrepo; git config core.hooksPath .githooks; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 all wired -> exit 0" 1 || ck "AC5 all wired -> exit 0" 0
 cleanup
 # AC5b — non-git dir -> exit 0
-D=$(mktemp -d); cd "$D"; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
+D=$(mktemp -d); cd "$D" || exit 2; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
 cleanup
 # AC5c — repo without .githooks -> skip, exit 0
-D=$(mktemp -d); cd "$D"; git init -q -b main; git config user.email t@e; git config user.name t; git commit -q --allow-empty -m init
+D=$(mktemp -d); cd "$D" || exit 2; git init -q -b main; git config user.email t@e; git config user.name t; git commit -q --allow-empty -m init
 chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 no .githooks -> skip, exit 0" 1 || ck "AC5 no .githooks -> skip, exit 0" 0
 cleanup
 
