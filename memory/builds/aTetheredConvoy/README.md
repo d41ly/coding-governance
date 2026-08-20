@@ -23,7 +23,11 @@ version constant, to cover a file added inside it, or to deploy anything at all.
 
 ## Start here
 
-**State.** Seven units, all OPEN, none built. Unit 1 is at rev-2; the rest are rev-1. The unit map
+**State.** CLOSED. All seven units are built and on `origin/main` — `0dfc56f`, `e4d14c4`, `a21e2ce`,
+`66d6f18`, `9ea510b`, `0daa263`, `a211461` — plus the follow-on reconcile at `39a364b`. Two items the
+fork sweep raised were never owner-reviewed and are live in adopters today; they are now
+`DEPL-dSettledRoster-1` (gov's line-ending pins win over a target's) and `DEPL-dSettledRoster-2` (an
+`apply` runs a manifest-kind target's own command twice). The unit map
 below IS the scope; it is ordered, and the order is a contract rather than a preference — each spec's
 §3 names the units it supersedes and the ones it assumes.
 
@@ -83,19 +87,19 @@ The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-16 · streams deployer+tooling
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams deployer+tooling
 ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 DEPL-aTetheredConvoy-8 DEPL-aTetheredConvoy-9 TOOL-aTetheredConvoy-1
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | OPEN | rev-6 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | OPEN | rev-4 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | OPEN | rev-4 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | OPEN | rev-4 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | OPEN | rev-4 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | OPEN | rev-4 | 2026-08-16 |
-| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | OPEN | rev-4 | 2026-08-16 |
+| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | CLOSED | rev-6 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

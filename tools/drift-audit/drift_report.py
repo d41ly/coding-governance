@@ -549,6 +549,31 @@ def signal_closed_specs_untraceable(ctx) -> dict:
                        "--format=%s", "--", *ctx.trace_globs)
     subjects = walk.stdout if walk.returncode == 0 else ""
 
+    # THE WAIVER, named by this signal's own spec BEFORE the first instance existed, so the first
+    # occurrence could not be resolved by the ratchet it would defeat: a CLOSED unit that leaves no
+    # TRACE_GLOBS subject naming it gets a per-spec row here, NEVER a raised pin. Two shapes reach
+    # it — a unit whose deliverable is records-only, and a unit whose product landed BEFORE the
+    # id-in-subject convention but whose header date crosses TRACE_CUTOFF when it finally closes.
+    # The second is the residual the header-date key knowingly trades in, and this is where
+    # cTracedPromise-1 §3 sends it, in writing, rather than to the pin.
+    #
+    # WHAT A ROW DOES NOT BUY: it asserts only that no subject CAN name this unit, never that the
+    # unit was built or built faithfully. It suppresses one linkage finding and nothing else.
+    #
+    # The unused-row sweep below is what makes this an exemption rather than a hole. A row is
+    # consumed only by a spec that is present, terminal and still untraceable; any row left over
+    # becomes a finding in its own right, because a waiver outliving its subject silently widens
+    # the surface it was written to narrow.
+    waived: dict[str, str] = {}
+    wpath = ctx.root / ctx.memory_root / "project" / "trace-waiver.txt"
+    if wpath.is_file():
+        for raw_row in wpath.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not raw_row.strip() or raw_row.lstrip().startswith("#"):
+                continue
+            cols = raw_row.split("\t")
+            waived[cols[0].strip()] = cols[-1].strip() if len(cols) > 1 else ""
+    used: set[str] = set()
+
     suspect, checked, unjudged = [], 0, 0
     for p in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = p.read_text(encoding="utf-8", errors="replace")[:4000]
@@ -570,9 +595,19 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         # the id half could never decide a case the slug half did not already decide.
         if re.search(r"\b" + re.escape(slug) + r"\b", subjects):
             continue
+        rel = str(p.relative_to(ctx.root)).replace("\\", "/")
+        if rel in waived:
+            used.add(rel)
+            continue
         suspect.append({
-            "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
-            "id": uid, "slug": slug, "closed": when.group(1),
+            "file": rel, "id": uid, "slug": slug, "closed": when.group(1),
+        })
+    # A row left OVER is a finding, not a silence. Same shape as the append above so `--check`,
+    # the gate leg and the JSON detail all carry it without a second code path.
+    for rel in sorted(set(waived) - used):
+        suspect.append({
+            "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
+            "note": "waives a spec that is absent, not terminal, or traceable again",
         })
     return {
         "signal": "closed_specs_with_no_product_commit",

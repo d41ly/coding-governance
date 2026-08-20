@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-7 — the engine's prose pass, and the three strings it must not touch
 
-**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-1 · base f006691f · streams kickoff+tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-1 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 
