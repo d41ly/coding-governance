@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -20,8 +20,11 @@ than spellings, and make a residual mismatch a warning rather than a wedge.
   catches the honest misconfiguration."* A cost-raiser that wedges the un-overridable item is
   disproportionate to its own stated purpose.
 - **S3** — the warning is recorded where an unattended run's reader will find it, not only on stdout
-  that a caller may have discarded: it rides the same channel as the other close-path diagnostics, so
-  `TOOL-aBoundedVerdict-12` is a dependency rather than an ornament.
+  that a caller may have discarded: it rides the same channel as the other close-path diagnostics —
+  `DOD_OUT` plus the `observe_anchor` output `TOOL-aBoundedVerdict-12` stopped silencing. **That unit
+  is CLOSED as of 2026-08-20**, so this is a caller of a channel that already exists at HEAD, not a
+  dependency on unlanded work; what the builder owes is a re-read of the landed channel's shape, not a
+  wait.
 - **S4** — `remote.<name>.pushurl` and `url.<base>.pushInsteadOf` are both exercised by fixtures,
   because they are two different mechanisms that produce the same split and only one of them is
   visible in `remote.origin.url`.
@@ -48,7 +51,7 @@ than spellings, and make a residual mismatch a warning rather than a wedge.
 
 ### What was measured
 
-`unattended.sh:231-235` reads:
+`unattended.sh:231-235`, at this spec's declared base, reads:
 
 ```
 uf=$(GIT ls-remote --get-url "$rem")
@@ -56,9 +59,12 @@ up=$(GIT remote get-url --push "$rem")
 if [ "$uf" != "$up" ]; then  fail 25 …; return 1;  fi
 ```
 
-A literal comparison. On this node the clone has one URL and no `pushurl`, so it passes — which is why
-the defect is latent rather than observed here, and why it needs fixtures rather than a corpus
-measurement. The split it refuses is produced by two independent mechanisms:
+A literal comparison, and it is **unchanged at HEAD** — re-read 2026-08-20, byte for byte; only its
+line numbers moved. The reference above is deliberately left at the declared base rather than
+renumbered to a HEAD that will move again. Locate it with
+`grep -n 'fail 25' tools/unattended/unattended.sh`. On this node the clone has one URL and no
+`pushurl`, so it passes — which is why the defect is latent rather than observed here, and why it
+needs fixtures rather than a corpus measurement. The split it refuses is produced by two independent mechanisms:
 
 | mechanism | visible in `remote.origin.url` | produces a split |
 |---|---|---|
@@ -88,21 +94,38 @@ reader from believing the check proves same-endpoint identity; it proves same-sp
 
 ### Migration
 
-None. No clone in this fleet carries a split today, so nothing changes for anyone currently running;
-the unit removes a trap rather than repairing damage.
+None. This node's clone has one URL and no `pushurl` (re-verified 2026-08-20 with
+`git config --get-regexp 'remote\..*\.(url|pushurl)|url\..*\.pushinsteadof'`), so nothing changes for
+it. The claim is scoped to what is observable from here: the other registered nodes' local config
+cannot be read from this tree, so "no clone in the fleet carries a split" is not a claim this spec
+can make and no longer makes one. The unit removes a trap rather than repairing damage either way.
 
 ### Rollout
 
 S1 and S5 together — the normalisation and the surviving refusal are one edit and separating them would
-ship a check that accepts everything. S2 next. S3 after `TOOL-aBoundedVerdict-12`, since a warning on a
-channel that is discarded is not a warning. S4's fixtures land with S1.
+ship a check that accepts everything. S2 next. S3 needs the close-path diagnostic channel to exist,
+which it now does — `TOOL-aBoundedVerdict-12` is CLOSED — so S3 waits on nothing and only has to name
+the channel as landed rather than as planned. S4's fixtures land with S1.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` (the normaliser and check 25) ·
-`tools/unattended/unattended.test.sh` (four fixtures: two split mechanisms, one equivalent-modulo-`.git`,
-one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning is a new call site) ·
-`memory/map/features/unattended.md` (the dossier states what check 25 proves) · the kit version constant.
+- `tools/unattended/unattended.sh` — the normaliser and check 25.
+- `tools/unattended/unattended.test.sh` — four fixtures: two split mechanisms, one
+  equivalent-modulo-`.git`, one genuinely different.
+- `.memory-tree.conf` (`ARMS_FLOORS`, if the warning is a new call site).
+- `memory/map/features/unattended.md` — the dossier states what check 25 proves.
+- `memory/guides/SESSION-KICKOFF.md` — `.memory-tree.conf` is on the kickoff manifest's watch list
+  (the list is that file's manifest-audit block), so the claims derived from it are re-audited and
+  `last-audit` re-stamped in the SAME commit as the change, or the manifest ratchet reds it. This
+  rides the `ARMS_FLOORS` edit above and is conditional in exactly the same way: no `.memory-tree.conf`
+  edit, no re-stamp owed by this unit.
+- **the kit version bump, which is NOT one carrier.** `tools/check-kit-versions.sh` forces the whole
+  set: `KIT_UNATTENDED_VERSION=` **and** its same-line `gov:kit` marker in both
+  `tools/unattended/unattended.sh` and `tools/unattended/check-unattended.sh`; the `gov:kit` marker in
+  `tools/unattended/PROTOCOL.template.md` and in `tools/unattended/SKILL.template.md`; and the
+  re-rendered `.claude/skills/unattended/SKILL.md`, which `check-wiring.sh` compares against the
+  tracked template. Read the enforcing script for the set rather than trusting a count typed here —
+  "the constant", singular, is how a bump lands half-done and reds the bar.
 
 ### Alternatives rejected
 
@@ -157,8 +180,8 @@ one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning i
 - **AC5** — When either URL is empty, the check does not report equivalence — the
   `fixture-passes-by-finding-nothing` arm, which sets `remote.origin.pushurl` to the empty string.
 - **AC6** — When a mismatch survives normalisation, the run does not refuse and the diagnostic channel
-  carries a line naming both URLs — observed in `--close`'s output, and dependent on
-  `TOOL-aBoundedVerdict-12`.
+  carries a line naming both URLs — observed in `--close`'s output, on the channel
+  `TOOL-aBoundedVerdict-12` already landed.
 - **AC7** — When `memory/map/features/unattended.md` is read, it states that check 25 proves
   same-spelling-modulo-transport rather than same endpoint, and
   `python tools/codebase-map/test_codebase_map.py` is clean.
@@ -182,6 +205,10 @@ This line is the machine-read one; the bullets carry the reasoning.
   answer is a two-minute grep at build time, which is why this is a fork and not a design.
   RESOLVED (agent, 2026-08-19, delegated): share if and only if the leg duplicates it, decided by
   grep at build time. Mechanism-only.
+  Read on 2026-08-20, and recorded as an observation rather than as a re-resolution: the leg's only
+  remote observations are its two `ls-remote` calls and it carries no fetch-versus-push URL comparison
+  at all, so on that reading the answer is DO NOT share. Re-run the grep at build time — the point of
+  the fork was that the answer is cheap and dated, and this note does not spend it.
 
 - **F2 — is the surviving mismatch a warning on every verb, or only on `--close`?** `--preflight` is
   where an operator can still fix it, so warning there is more useful; `--close` is where an unattended
@@ -204,6 +231,34 @@ This line is the machine-read one; the bullets carry the reasoning.
 - rev-2 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, both verbs — the
   check already runs where both call, so the narrow option costs a suppression the wide one does not.
   §8's first non-blank line is now the machine-legal `none` form.
+
+- rev-3 · 2026-08-20 · the M4 spec audit's 2026-08-20 round, folded, plus a re-verification of every
+  factual claim this spec makes about the driver and the leg — its figures were taken at a base five
+  landed units ago. What was wrong:
+  **H20** — Files touched said "the kit version constant", one file, where `tools/check-kit-versions.sh`
+  forces a set: the `KIT_UNATTENDED_VERSION=` assignment **and** its same-line `gov:kit` marker in the
+  driver and in the leg, the marker in `PROTOCOL.template.md` and in `SKILL.template.md`, and the
+  re-rendered `.claude/skills/unattended/SKILL.md`. Named singular, a bump lands half-done and reds the
+  bar; the carriers are now enumerated with the enforcing script named as their source rather than a
+  count.
+  **M13** — `.memory-tree.conf` is on the kickoff manifest's watch list and
+  `memory/guides/SESSION-KICKOFF.md` was absent from Files touched, so the ratchet would have redded the
+  commit both staged and committed. Added, with the same-commit re-stamp note and the honest caveat
+  that it is conditional in exactly the way the `ARMS_FLOORS` edit it rides is.
+  **The re-verification, and it found one claim that had gone false.** `TOOL-aBoundedVerdict-12` is
+  CLOSED, so S3's "a dependency rather than an ornament", the Rollout's "S3 after
+  `TOOL-aBoundedVerdict-12`" and AC6's "dependent on" all described a wait that no longer exists. All
+  three now name the channel — `DOD_OUT` plus the `observe_anchor` output that unit stopped silencing —
+  as landed, and what the builder owes is a re-read of its shape rather than a sequencing constraint.
+  Three claims that still HOLD, checked rather than assumed: check 25's five lines are byte-identical at
+  HEAD (only the line numbers moved, and the base-era reference is left alone per the fold rule, with a
+  grep given instead); `authorization-reachable` is still in `DOD_CORE` and still the item the close
+  path refuses to override; and `tools/check-testsuite-counts.sh` and `memory/map/features/unattended.md`
+  both still exist under the paths §7 and Files touched give. One claim NARROWED rather than deleted:
+  Migration said "no clone in this fleet carries a split", which this tree cannot observe — it is now
+  scoped to this node's config, with the command that read it. And F1 gains a dated observation, not a
+  re-resolution: the leg carries no fetch-versus-push comparison at HEAD, so today's answer to "share
+  the normaliser?" is no, re-grep at build time.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-7 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -32,6 +32,12 @@ proceeds, parks or halts rather than stopping with nothing written.
   owner: the spec must name the probe, the observation that decides it, and a liveness assertion
   showing the probe can produce a negative result. The winner is taken from the observation only when
   it falls out with no further judgment; otherwise the fork is not a fact question and S2 governs.
+  **The MARK that flags such a fork in a spec's §8 is not defined here.** Its grammar is
+  `TOOL-aBoundedVerdict-4`'s, spelled in that unit's own scope and its single case table beside the
+  resolution mark, because that unit owns the predicate that has to read both. This spec CITES it and
+  restates nothing: F2 resolved the placement to the bullet prefix, -4 lands earlier in the dependency
+  order so the definition exists before this unit's rule refers to it, and a mark defined in two
+  documents is exactly the drift the method's pointer rule exists to prevent.
 - **S5** — the bound on probing. A probe reads and measures over artifacts that already exist. It
   does NOT build an arm of the fork, for two stated reasons: building an arm is not one of the
   method's five pass kinds, so it inherits no commit, regrounding or gate discipline; and it puts
@@ -115,34 +121,58 @@ fork rather than burying it here.
 
 ### Files touched (estimate)
 
-`memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` ·
-`memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` ·
-`tools/memory-tree/README.md`, receiving the displaced paragraph ·
-`tools/unattended/SKILL.template.md` and the rendered Skill · possibly `memory/TEMPLATE-SPEC.md`'s
-open-questions section, for the fact-question mark · `memory/gotchas/vacuous-selector-empty-population.md`
-if §8's F4 is taken · `memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; the method and the
-kickoff engine are both on its watch list) · the kit version constants for whichever kits move, and
-their marker files.
+- `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` — S1, S3 and S8.
+- `memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` — S2, S4, S5, S6.
+- `tools/memory-tree/README.md` — receives the displaced paragraph.
+- `tools/unattended/SKILL.template.md` and the rendered `.claude/skills/unattended/SKILL.md`.
+- `memory/gotchas/vacuous-selector-empty-population.md` — the method anchor, no longer conditional:
+  §8's F4 is RESOLVED to ADD it.
+- `memory/backlog/TOOL.md` — the dependency-field row §8's F3 defers to a backlog row rather than a
+  scope item. F3 resolves to judgment plus that row, so the row is part of this unit's landing commit
+  and the file belongs in this list.
+- `memory/guides/SESSION-KICKOFF.md` — the manifest is re-stamped in the same commit, because
+  `memory/guides/BUILD-METHOD.md` is on its watch list.
+- The kit version bump for each kit that moves, enumerated rather than named: for the unattended kit
+  the constant AND its same-line `gov:kit` marker in both `tools/unattended/unattended.sh` and
+  `tools/unattended/check-unattended.sh`, the marker in every tracked
+  `tools/unattended/*.template.md`, and the re-render; for the memory-tree kit the same shape over its
+  own constant and every tracked `tools/memory-tree/*.template.md`, which is a DERIVED population and
+  includes templates this unit does not otherwise edit. `tools/check-kit-versions.sh` pairs all of
+  them, and naming one file is one carrier short of what it forces.
 
-### The method document's size budget — measured, and not what rev-1 said
+`memory/TEMPLATE-SPEC.md` is NOT in this list. Rev-8 removes it: the fact-question mark's grammar is
+`TOOL-aBoundedVerdict-4`'s (S4), so the spec-format document is that unit's carrier to edit, and two
+units writing one definition is the drift both are trying to avoid.
+
+### The method document's size budget — read at build time, carried here as an obligation
 
 Rev-1 called this "the largest displacement demand of any unit in this build" against the wrong
-instrument. Measured at base: `memory/guides/BUILD-METHOD.md` is 236 lines and 16466 bytes against a
-gated cap of 61440 bytes and 750 lines for a `memory/guides/` file — 31% of the cap. The 20 KB and
-250-line figures are the method's own line-8 self-declaration, which no gate reads for a guide.
+instrument. Rev-2 fixed the instrument and introduced a worse defect: a SNAPSHOT. Its line count and
+byte count were exact when written, went stale inside four days, and disagreed with a sibling spec
+measuring the SAME tree at the same commit — two specs, one file, two answers. Rev-8 deletes every
+figure from this section. Two instruments bind and neither one is spelled in this spec:
 
-The displacement obligation is therefore EDITORIAL — M1's growth rule, machine-checked by nothing —
-and it is real for that reason and not because a gate would catch it. S2, S4, S5 and S6 are four
-rules and will not fit in the 14 lines M1's own budget leaves, so the displacement is identified and
-made in the same commit.
+- **The method's OWN declared cap**, stated in its M1 section. It is the STRICTER of the two and it is
+  the one that binds this unit. Read the live pair and the cap together, at build time:
+  `wc -lc memory/guides/BUILD-METHOD.md` and M1's own budget line.
+- The hygiene gate's cap for any file under `memory/guides/`, declared in `.memory-tree.conf`. Far
+  looser, and not the constraint here.
 
-The MECHANICAL budget is the charter read-path ceiling. **This spec no longer carries the figure**:
-rev-6 removed a total measured against a ceiling of 86476 that has since been retired, which is a
-number that was true once and then quietly stopped being — the exact failure mode the "stated ONCE"
-rule exists to prevent, reproduced by a spec that stated the rule. The live pair is in the build
-README's cross-unit rules, re-measured at this base, and the builder reads it from
-`python tools/memory-tree/corpus_ids.py --report` before spending. This unit spends from it twice,
-growing both the method and the unattended protocol, and it is one of seven spenders.
+Two consequences, and both are obligations rather than numbers. **The displacement is MANDATORY.**
+The headroom against the method's own cap is now a handful of lines, S2, S4, S5 and S6 are four
+rules, and no arithmetic makes four rules fit in a handful of lines — so the paragraph to displace is
+identified and moved in the SAME commit, which is what AC5 observes. **Raising that cap is not this
+unit's to take.** It is a stated constraint of a governance carrier, which M3's veto 2 makes an owner
+turn, and M1 itself records that the last raise was exactly that. A run that finds the displacement
+insufficient parks the shortfall; it does not edit the cap.
+
+The MECHANICAL budget is the charter read-path ceiling, and this spec carries no figure for that
+either. Rev-6 removed a total measured against a ceiling that has since been retired — a number that
+was true once and then quietly stopped being, which is the exact failure mode the "stated ONCE" rule
+exists to prevent, reproduced by a spec that stated the rule. The live pair comes from
+`python tools/memory-tree/corpus_ids.py --report`, read before spending. This unit spends from it
+twice, growing both the method and the unattended protocol; the spender SET is the build README's and
+is not counted here.
 
 ## 5. Production-readiness checklist
 
@@ -175,6 +205,15 @@ growing both the method and the unattended protocol, and it is one of seven spen
   awaiting-approval status in all three cases §2 enumerates, and
   `bash tools/unattended/adopt-unattended.sh --check` reports the installed protocol in sync with
   `tools/unattended/PROTOCOL.template.md`.
+- **AC1a** — When the protocol pair is read after S8's edit, the build-folder grant's cost list
+  carries the new entry — a spec reachable at the pinned base is scope-approved by the same act — in
+  BOTH `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, in that
+  list's own shape; the list's entry count is exactly ONE higher than the same list at the pinned
+  base, both counted at build time rather than compared against a figure written here; and
+  `bash tools/unattended/check-unattended.sh` check 10, the protocol byte-diff, reports the two halves
+  identical. Without the count arm the criterion passes on an edit that merely rewords an
+  existing entry. S8 is the one item in this unit the owner explicitly ratified (§8 F1) and rev-7 left
+  it with nothing observing it at all.
 - **AC2** — When the method's fork section is read, the collapse for vetoes two and three is stated
   in the same paragraph as the vetoes, and `bash tools/memory-tree/kit-dogfood-parity.test.sh` is
   green.
@@ -201,8 +240,14 @@ growing both the method and the unattended protocol, and it is one of seven spen
   stays in §7 because the Skill template and its render are declared carriers, but it CANNOT witness
   this criterion — its population loop skips every tracked path under the memory root, which is where
   all three carriers live, and its own header states it is structural only.
-- **AC7** — When the kickoff engine is unchanged, `bash tools/unattended/check-unattended.sh` still
-  finds at least the declared floor of interactive exits.
+- **AC7** — When the three dispositions are read back, each one is written in the protocol or the
+  method per S7, and NONE of them appears in the kickoff engine's enumeration of interactive exits —
+  so the engine's exit floor is unchanged for the STATED reason §3 gives (no seventh exit; the three
+  sites are reached during the build, not at kickoff) rather than by accident, and
+  `bash tools/unattended/check-unattended.sh` still finds at least that floor. Rev-8 replaced the old
+  AC7, which asserted only the second half: it was green today, green on an empty diff, and green on a
+  wrong implementation of S1–S8, because this unit changes no kickoff exit and the engine is not in
+  Files touched. The absence half is what makes the arm distinguish this unit's work from no work.
 - **AC8** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
@@ -306,6 +351,42 @@ This line is the machine-read one; the bullets carry the reasoning.
   writes. F2's resolution is recorded as a CONSTRAINT on `TOOL-aBoundedVerdict-4` rather than a
   preference: the two units share one predicate and a mark it cannot read is a spec that never goes
   terminal. §8's first non-blank line is now the machine-legal `none` form.
+
+- rev-8 · 2026-08-20 · folded the M4 spec audit's second round: H7, H18, M7, M8.
+  **H7 — the size section was a snapshot, and it had gone stale twice.** "236 lines and 16466 bytes"
+  was a retired base's measurement; the same tree measured at the DECLARED base gave a different pair,
+  which the sibling spec states, so two specs in one build disagreed about one file. The derived "14
+  lines M1's own budget leaves" reproduced in NO era — not at the retired base, not at the declared
+  one, not at HEAD. Every figure is deleted and replaced by the commands that produce them
+  (`wc -lc memory/guides/BUILD-METHOD.md` plus M1's own budget line, and
+  `python tools/memory-tree/corpus_ids.py --report` for the read path). The section also had the
+  binding instrument WRONG: it argued the displacement was merely editorial because no gate reads the
+  method's self-declaration, when that declaration is the stricter of the two caps and is what binds
+  this unit. It is now stated as two obligations instead: the displacement is MANDATORY, because the
+  headroom is a handful of lines against four new rules, and raising the cap is an OWNER TURN under
+  M3's veto 2 — a run short on room parks the shortfall rather than editing a governance carrier's
+  stated constraint. The "one of seven spenders" count went with the rest; the spender set is the
+  README's.
+  **H7's second half — D4.** S4 now CITES `TOOL-aBoundedVerdict-4`'s FACT-QUESTION mark grammar
+  instead of leaving it undefined or restating it, and the dependency points forwards to the unit built
+  earlier. `memory/TEMPLATE-SPEC.md` is REMOVED from Files touched as the consequence: the mark's
+  definition is -4's carrier, and two units writing one definition is the drift F2's coordination
+  exists to prevent.
+  **M7** — S8, the only item here the owner explicitly ratified, had no acceptance criterion at all.
+  AC1a observes it: the new entry present in BOTH protocol halves, the list's entry count exactly one
+  higher than at the pinned base (counted at build time, no figure written into the spec), and the
+  byte-diff clean. The count arm is the load-bearing half — without it a reworded existing entry
+  passes.
+  **M8** — AC7 was green before any work: it passed today, on an empty diff, and on a wrong
+  implementation of S1–S8. Taken the REPLACE branch rather than the DELETE one, because replacing
+  widens nothing — the new arm observes files already in the write set plus a read-only absence in the
+  engine — while deleting would drop the only observation that §3's no-seventh-exit non-goal held. AC7
+  now asserts the three dispositions are written in the protocol or the method and are NOT enumerated
+  as kickoff exits, so an unchanged floor means something.
+  **H18** — `memory/backlog/TOOL.md` was committed to by §8's F3 and declared in no list; it is in
+  Files touched now, along with the F4 anchor that stopped being conditional when the sweep resolved
+  it, and the kit version bump enumerated by site rather than abbreviated to "the kit version
+  constants".
 
 ## 10. Reuse audit
 

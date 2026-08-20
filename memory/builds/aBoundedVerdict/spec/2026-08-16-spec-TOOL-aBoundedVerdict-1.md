@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** SPECCED · rev-10 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -24,39 +24,64 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
 - **S2** — `unattended.sh --review <slug> --subject <id-or-slug> --verdict <TOKEN> --blockers <N>`
   records the round and its confirmed-blocker count, evaluates the convergence predicate, and reports
   which of three states the loop is in: CONVERGING (re-arm), CONVERGED (blockers zero), or
-  NON-CONVERGENT (stop). It REFUSES only at the runaway ceiling.
-- **S3** — the verdict vocabulary is kit-owned and closed, and an unlisted verdict is refused. The
-  method names three tokens in prose and no machine anywhere reads them; the corpus carries eighteen
-  distinct verdict lines, five leading tokens, and 32 records with no verdict line at all.
+  NON-CONVERGENT (stop). It refuses an unlisted verdict, a missing subject or blocker count, and a
+  round on a subject whose group has already terminated; it does NOT refuse at the runaway ceiling,
+  which under F4 is reported and survived (S10).
+- **S3** — the verdict vocabulary is kit-owned and closed, and an unlisted verdict is refused. **The
+  set is exactly three members: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`** — the three the build method
+  already names in its review-recording rule, and the floor for any later addition. No machine
+  anywhere reads them today: the corpus carries eighteen distinct verdict lines, five leading tokens,
+  and 32 records with no verdict line at all.
+  **The canonical owner is the MEMORY-TREE kit**, because that kit is what enforces review-record
+  grammar (`memory/HYGIENE.md` check 5 and `tools/memory-tree/check-memory-hygiene.sh`) and what
+  renders `memory/guides/BUILD-METHOD.md`. The unattended kit cannot import from it — a
+  copy-installed kit carries what it needs inline — so the driver's set is a STATED duplication of
+  the memory-tree one, and the drift is ARMED rather than hoped away: one row in the case table
+  `tools/memory-tree/marker-contract.test.sh` already carries, which is the same harness
+  `TOOL-aBoundedVerdict-4` S2 extends. One harness, no new gate leg, and no cross-kit import.
   `TOOL-aBoundedVerdict-2` owns making that token a REQUIRED first line of a review record; this unit
-  owns only the set the verb accepts, and the two must name the same set.
+  owns only the set the verb accepts, and the two spell the same three members.
 - **S4** — a round is recorded as one line in the PARKED region under a `review` KIND, through the
   existing park helper unchanged, carrying the subject, the verdict and the blocker count. The
-  sequence is the number of `review` lines naming that subject. **No new authored fact**, so the
-  region's fact pin does not move here: an append-only history of rounds is exactly what a park kind
+  sequence is the number of `review` lines naming that subject. **The TERMINAL LINE, defined once
+  here and nowhere else:** when the predicate EXITS on a round, the verb writes the exit token it
+  reported — `CONVERGED`, `NON-CONVERGENT` or `CEILING` — into that same free-text `reason` field,
+  after the verdict and the count. A group's terminal line is the line whose reason carries an exit
+  token, and that is the ONE observable S6 and AC4 use for "the loop stopped here". It adds no field,
+  no new grammar and no new computation: S2 already derives and reports the token, and the leg still
+  splits only the park helper's own output. The promoted-unit row F3 asserts on is a DIFFERENT
+  observable, used by S6's third clause alone, and the two are not interchangeable. **No new authored
+  fact**, so the region's fact pin does not move here: an append-only history of rounds is what a kind
   is for, and a tracked sibling spec set the precedent by adding a kind rather than a field for the
   same reason. `TOOL-aBoundedVerdict-2` takes the FACT route for the halt code, which is a per-run
   singleton read by key, and the two shapes are chosen deliberately rather than for consistency. The
   helper's output leads with a timestamp, so the region's anchor ban is satisfied by construction.
-- **S4a** — the `review` kind is a **record** kind — the class `TOOL-aBoundedVerdict-5` S7 names and
-  owns. Its surfaced-count refusal counts DECISION kinds only, so review rounds do not inflate the
-  count of decisions the owner must be shown. The two class names are `decision` and `record`, taken
-  verbatim from the owning spec rather than paraphrased here.
+- **S4a** — the `review` kind is a **`history`** kind. The two CLASS names are `surfaced` and
+  `history`, owned by `TOOL-aBoundedVerdict-5` S7 and taken verbatim from it rather than paraphrased
+  here — the split exists because "decision" was doing duty as both a KIND token and a class name.
+  The surfaced-count refusal counts `surfaced`-class kinds only, read from the one driver constant
+  that holds that set, so review rounds do not inflate the count the owner must be shown. **The
+  shipped counter is correct today** — every live kind is `surfaced`, waiver included — and it becomes
+  wrong on the day this unit lands the first `history` kind. That is the whole reason the taxonomy
+  must exist before this unit's verb, and it is why the Rollout sequences `TOOL-aBoundedVerdict-5`
+  ahead of it. No claim of a present inflation is made here.
 - **S5** — the SUBJECT is the spec document for a method spec-audit round, and the BUILD SLUG for the
   method's closing diff review. One predicate, two denominators, because the two review kinds have two
   denominators and a single per-unit rule would price a build-level event on a unit-level count.
 - **S6** — a leg check in `check-unattended.sh`: for every tracked run-state file, the `review` lines
   in the parked region are grouped by their `item` field, no group exceeds the runaway ceiling read
   FROM the driver, and no group's blocker counts are non-decreasing across more than two consecutive
-  rounds without a terminal disposition line. **There is no round-count fact to parse** — the sequence
-  is derived from the line set, and the only grammar the leg splits is the park helper's own output.
+  rounds unless that group carries a TERMINAL LINE as S4 defines it. Its third clause is F3's: an
+  exited subject was actually disposed of, observed as a unit row in the generated units region.
+  **There is no round-count fact to parse** — the sequence is derived from the line set, and the only
+  grammar the leg splits is the park helper's own output.
 - **S7** — the build method's review sections gain the stated disposition for a blocked verdict, the
   convergence rule, and the clarification that folding a round's own fixes does not by itself re-arm
   the loop. Method rules binding on any run; the convergence predicate is machine-checked in the
   driver for unattended runs and advisory for attended ones.
-- **S7a** — the method's WRAP-UP derivation row is narrowed to DECISION-kind parked entries, handed to
-  this unit by `TOOL-aBoundedVerdict-5` S7c because this unit already has the method in its write set
-  and lands after the taxonomy exists. The row today says every parked entry with its question,
+- **S7a** — the method's WRAP-UP derivation row is narrowed to `surfaced`-class parked entries,
+  handed to this unit by `TOOL-aBoundedVerdict-5` S7c because this unit already has the method in its
+  write set and lands after the taxonomy exists. The row today says every parked entry with its question,
   options and reason — a shape a `review` line does not carry — so without the narrowing the wrap-up
   would demand three fields of a line that has two. This is the only place in the set that edits that
   row, and no other spec may claim it.
@@ -80,13 +105,18 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
   - the BUILD README gains a line recording it, so the fact outlives the transcript nobody reads. It
     is written where the wrap-up derives from, which is what makes M9's "problems resolved" row able
     to cite it.
-  A ceiling reached with neither carrier written is the defect this scope item exists to prevent, and
-  it is the one thing about the ceiling path that IS gate-checkable: the leg asserts that a run-state
-  file whose review sequence reached the ceiling has both.
+  A ceiling reached with neither carrier written is the defect this scope item exists to prevent.
+  **One carrier per observer, because no gate can watch a transcript:** the LEG asserts the README
+  line against a run-state file whose review sequence reached the ceiling (AC2b), and the run's own
+  output line is observed at the verb by AC2a. Nothing here asks a gate to grade stdout.
 - **S9** — a blocker that cannot be promoted — because resolving it is outside the mandate's scope, or
   because it names a unit whose options differ in what gets built — is a PARK and the build does not
   close. This is the residual case S8 does not cover and it must be stated, or "promote everything"
-  becomes a licence to widen scope without an owner.
+  becomes a licence to widen scope without an owner. **The non-close half is ADVISORY method prose,
+  not a driver refusal:** `--close` does not refuse on a parked blocker, and making it refuse would be
+  a new close-path predicate this unit does not own. What IS graded is the prose itself — AC6a — and
+  the test it must state is a SCOPE test, never a difficulty test, which is the failure mode that
+  turns this clause into an escape hatch.
 
 ## 3. Non-goals (OUT)
 
@@ -129,9 +159,9 @@ becomes a spec unit in the build and is resolved rather than re-reviewed.
 `BUILD-METHOD.md:104-105` states the only exit: once a synthesis pass calls the design clean, stop
 reviewing. The token that satisfies it has never been written here. So the loop's engine is not a
 missing count — it is an exit condition with a 0/90 hit rate and a most-common outcome with no rule.
-A cap does not add an exit; it relocates the stall. `dClosedLexicon` holds 10 review records in one
-day and reached ABORTED; a cap of two would have stopped it at round two with the same blockers and
-the same absence of a next move.
+A cap does not add an exit; it relocates the stall. `dClosedLexicon` holds 10 review records across
+two days, 8 of them on 2026-08-16, and reached ABORTED; a cap of two would have stopped it at round
+two with the same blockers and the same absence of a next move.
 
 ### The convergence predicate
 
@@ -173,9 +203,9 @@ One appended line per round, in the PARKED region, under a `review` kind:
 
 | Field | Value |
 |---|---|
-| kind | `review` — a `record` kind, per `TOOL-aBoundedVerdict-5`'s taxonomy |
+| kind | `review` — a `history` kind, per `TOOL-aBoundedVerdict-5`'s taxonomy |
 | item | the subject: a spec document for a spec-audit round, the build slug for the closing round |
-| reason | the verdict token, then the confirmed-blocker count |
+| reason | the verdict token, then the confirmed-blocker count, then the exit token on a terminal line (S4) |
 
 The sequence is derived, not stored. Rev-1 made these AUTHORED FACTS, one key per subject, which was
 wrong twice over: the binding protocol pins the authored region at a closed enumerated set of facts
@@ -217,39 +247,75 @@ streams ratchet took for the same reason.
 
 ### Rollout
 
-`TOOL-aBoundedVerdict-2`'s vocabulary first — S3 refuses outside a set that unit defines. Then
-`TOOL-aBoundedVerdict-11`, because S8's promotion is refused by the authorization check until that
-unit lands. Then this unit's verb and predicate, then the leg check, then the method prose.
+In the build README's dependency order, three units precede this one and all three are hard:
+
+- `TOOL-aBoundedVerdict-11`, because S8's promotion is refused by the authorization check until that
+  unit lands.
+- `TOOL-aBoundedVerdict-5`, because S4a takes its `surfaced`/`history` class names by name and AC3a
+  grades its class-aware counter. A builder working an older Rollout that omitted it would implement
+  the `review` kind before the taxonomy that classifies it exists, which is exactly the day the
+  shipped counter starts over-counting.
+- `TOOL-aBoundedVerdict-2`'s vocabulary, because S3 refuses outside a set that unit makes required.
+
+Then this unit's verb and predicate, then the leg check, then the method prose.
 `TOOL-aBoundedVerdict-14` may land at any point and is what makes the rounds cheap.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` (the verb, the predicate, the ceiling constant) ·
-`tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.sh` +
-`check-unattended.test.sh` (S6) · `memory/guides/BUILD-METHOD.md` and
-`tools/memory-tree/BUILD-METHOD.template.md` (S7, S7a, both halves) ·
-`memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` (the verb table) ·
-`tools/unattended/SKILL.template.md` and the rendered Skill · `tools/memory-tree/README.md` (receiving
-any displaced paragraph) · `.memory-tree.conf` (`ARMS_FLOORS`) · the kit version constants ·
-`memory/map/features/build-method.md` and `memory/map/features/unattended.md`.
+- `tools/unattended/unattended.sh` — the verb, the predicate, the ceiling constant, and the exit
+  token S4 puts in the `reason` field.
+- `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.sh` and
+  `check-unattended.test.sh` (S6) — **including the leg's header check COUNT, moved one past the
+  value `TOOL-aBoundedVerdict-2` leaves.** That header line is the ONLY carrier of the figure: the
+  charter's gate-suite enumeration no longer exists (it was replaced by a pointer at
+  `tools/gate-legs.json`) and the charter body is generated between `gov:playbook` markers, so a
+  hand-edit there reds the playbook parity leg and a template edit is out of scope. Do not recreate
+  that bullet. AC10 grades the header.
+- `memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md` — S7, S7a and
+  S9's advisory park case, both halves.
+- `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` — the verb table.
+- `tools/memory-tree/marker-contract.test.sh` — the one case-table row that arms the verdict-set
+  duplication S3 states.
+- `tools/memory-tree/README.md` — receiving any displaced paragraph.
+- `.memory-tree.conf` (`ARMS_FLOORS`).
+- `memory/backlog/TOOL.md` — row `TOOL-aBoundedVerdict-8` is superseded by this unit; F3 states the
+  new status and the superseding text.
+- `memory/guides/SESSION-KICKOFF.md` — `.memory-tree.conf` and `memory/guides/BUILD-METHOD.md` are
+  both on the kickoff manifest's watch list (the list is that file's manifest-audit block), so the
+  claims derived from them are re-audited and `last-audit` re-stamped in the SAME commit as this
+  unit's change. The ratchet is a merge-bar leg and reds a watched file changed without the re-stamp.
+- the kit version bump, which is NOT one carrier: `KIT_UNATTENDED_VERSION=` **and** its same-line
+  `gov:kit` marker in both `tools/unattended/unattended.sh` and
+  `tools/unattended/check-unattended.sh`; the `gov:kit` marker in
+  `tools/unattended/PROTOCOL.template.md` and in `tools/unattended/SKILL.template.md`; and the
+  re-rendered `.claude/skills/unattended/SKILL.md`, which `check-wiring.sh` compares to the tracked
+  template. `tools/check-kit-versions.sh` is what forces that set — read it there rather than trust a
+  count typed here.
+- `memory/map/features/build-method.md` and `memory/map/features/unattended.md`.
 
 ### The read-path budget
 
-`memory/guides/BUILD-METHOD.md` is 17460 bytes at this base and the hygiene cap for a
-`memory/guides/` file is 61440 bytes, so the file is at 28% of the gated cap. The 20 KB and 250-line
-figures are the method's OWN self-declaration, which no gate reads for a guide — the two classes were
-split by a recorded decision. So the displacement obligation is EDITORIAL, not mechanical: it exists
-because M7 re-reads the file whole at every pass boundary, and no gate will catch a failure to honour
-it.
+Two budgets, and only one of them is mechanical. **This section carries no figure for either**, which
+is not fastidiousness: every figure it used to carry went stale twice in four days, and one of the two
+is a CONSUMABLE rather than an illustration.
 
-The budget that IS mechanical is the charter read-path ceiling: measured at this base at **91997 bytes
-against a ceiling of 112987 — 20990 bytes of headroom**. `LIVE.md` is generated, so the total drifts
-between renders and the figure is a snapshot, never an allowance. It is shared by more units than
-before: this unit and `TOOL-aBoundedVerdict-3` grow the method; `TOOL-aBoundedVerdict-2`, `-3`, `-5`
-and `-11` grow the unattended protocol at 27582 bytes; `TOOL-aBoundedVerdict-14` grows the method
-again. The spender set is stated ONCE, in the README's cross-unit rules, and the builder re-measures
-with `python tools/memory-tree/corpus_ids.py --report` before spending rather than treating either
-figure as authority.
+`memory/guides/BUILD-METHOD.md` declares its own size cap in its own opening section, and no gate
+reads that declaration — the hygiene cap for a `memory/guides/` file is a separate and much larger
+figure in `.memory-tree.conf`, the two classes having been split by a recorded decision. Read both
+live at build time: `wc -lc memory/guides/BUILD-METHOD.md` against the cap the file itself declares.
+So the displacement obligation is EDITORIAL, not mechanical: it exists because M7 re-reads the file
+whole at every pass boundary, and no gate will catch a failure to honour it. **AC6 is what makes this
+unit's method growth displacement-neutral by criterion rather than by good intentions** — any
+paragraph displaced to make room must be absent from the method and present in
+`tools/memory-tree/README.md`. Raising the method's own declared cap is an owner turn under M3's
+veto 2 and is not in this unit's scope.
+
+The budget that IS mechanical is the charter read-path ceiling, and it is a consumable that landed
+units have already spent most of. The builder runs `python tools/memory-tree/corpus_ids.py --report`
+immediately before spending and reads the live total, the live ceiling and the per-file split from
+that output. `LIVE.md` is generated, so the total drifts between renders and no snapshot of it is ever
+an allowance. This unit spends from that shared budget; the spender set and the live pair are stated
+in the build README and nowhere else, this spec included.
 
 ### Alternatives rejected
 
@@ -281,17 +347,18 @@ figure as authority.
 - **perf / scale** — N/A. One appended line per round; the predicate reads a bounded line set.
 - **a11y** — N/A.
 - **i18n** — the verdict tokens are identifiers.
-- **error / empty / loading states** — a review on a slug with no run-state file, an unlisted verdict, a
-  missing subject or blocker count, a sequence at the ceiling, and a terminal record are five distinct
-  refusals. The empty case that matters: a FIRST round must not read as non-convergent for want of a
-  predecessor, which the predicate's `N == 1` arm handles explicitly.
+- **error / empty / loading states** — a review on a slug with no run-state file, an unlisted verdict,
+  a missing subject or blocker count, and a round on an already-terminated group are the distinct
+  refusals. A sequence AT the ceiling is not among them: under F4 it is reported and survived, so it
+  is an output path and not a refusal. The empty case that matters: a FIRST round must not read as
+  non-convergent for want of a predecessor, which the predicate's `N == 1` arm handles explicitly.
 - **observability** — the verb reports the loop state by name on every call, so a run knows whether it
   is re-arming, exiting clean, or promoting. That report is the observation this unit is graded on.
 - **risks** — the highest is now the inverse of rev-5's: not that the exit is unreachable, but that
   promotion does not terminate. §4 states that limit and does not claim otherwise. Second: a run that
   reports a shrinking count it did not earn, which §4's boundary covers. Third: S9's park case being
   used as an escape from ordinary work, which the method prose must phrase as a scope test rather than
-  a difficulty test.
+  a difficulty test — observed by AC6a, so this risk is graded rather than merely noted.
 - **testing + left-shift gates** — the leg check plus red and green fixtures, an arm per refusal, and
   one arm per state of the predicate including the oscillating sequence. The left-shift for the
   vacuity risk is the fixture pair, not the corpus.
@@ -319,24 +386,48 @@ figure as authority.
   `bash tools/unattended/check-unattended.sh` reds against a fixture whose review sequence reached the
   ceiling with no such line — the arm that makes the loud-reporting half enforceable rather than
   advisory.
-- **AC3** — When the verdict is outside the kit-owned set,
+- **AC3** — When the verdict is outside the closed set,
   `bash tools/unattended/unattended.sh --review <slug> --subject <id> --verdict MAYBE` refuses naming
-  the legal set, and that set is byte-identical to the one `TOOL-aBoundedVerdict-2` defines.
-- **AC3a** — When a run-state file carries `review` lines for one subject and `decision` lines for
-  another, `bash tools/unattended/unattended.sh --close <slug>` counts only the DECISION-kind lines
-  against the attestation — the fixture carries at least one line of each class, so the arm fails under
-  a count of all parked lines and passes only under the taxonomy-aware one.
+  the legal set, and that set is the three members S3 enumerates. The duplication against the
+  memory-tree owner is not asserted by eye: a row in `tools/memory-tree/marker-contract.test.sh`'s
+  case table reds when the driver's set and the memory-tree kit's set diverge, and that test is green.
+- **AC3a** — When a run-state file carries `review` lines for one subject and `surfaced`-class lines
+  (a `decision`, an `abort`, an `override` or a `waiver`) for another,
+  `bash tools/unattended/unattended.sh --close <slug>` counts only the `surfaced`-class lines against
+  the attestation — the fixture carries at least one line of each class, so the arm fails under a count
+  of all parked lines and passes only under the taxonomy-aware one.
 - **AC4** — When a tracked run-state file carries a `review` group whose blocker counts are
-  non-decreasing across three consecutive rounds with no terminal disposition,
-  `bash tools/unattended/check-unattended.sh` reds naming the file and the subject; both the red and the
-  green fixture live in `tools/unattended/check-unattended.test.sh`, because the corpus exercises
-  neither.
-- **AC5** — When the leg reads the ceiling, it reads it from the driver:
-  `grep -c 'RUNAWAY' tools/unattended/check-unattended.sh` counts no assignment of its own.
+  non-decreasing across three consecutive rounds and whose lines carry no exit token — no TERMINAL
+  LINE per S4 — `bash tools/unattended/check-unattended.sh` reds naming the file and the subject; the
+  same group WITH a terminal line is green. Both fixtures live in
+  `tools/unattended/check-unattended.test.sh`, because the corpus exercises neither.
+- **AC4a** — When a `review` group carries a TERMINAL LINE as S4 defines it and the generated units
+  region gained NO unit row, `bash tools/unattended/check-unattended.sh` reds naming the file and the
+  subject; the same fixture WITH the promoted unit row is green. This is S6's THIRD clause — F3's
+  ratified addition — and without this criterion that clause is a ratified decision no criterion
+  observes, which is the class this build's own spec audit opens by naming. Both fixtures in
+  `tools/unattended/check-unattended.test.sh`; the corpus exercises neither, and AC8 grades the
+  promotion at the VERB rather than at the leg, so it does not stand in for this.
+- **AC5** — When the leg reads the ceiling, it reads it from the DRIVER and holds no copy: the leg's
+  only reference to the key is a `core_of` call taking it as the argument, sitting beside the five
+  core-set reads already at `tools/unattended/check-unattended.sh:76-82`, and NO assignment of that
+  key appears anywhere in the leg. Asserted as the COMPLEMENT over `grep -n`, word-anchored, with the
+  sanctioned line set pinned in the arm — never as a count. A count cannot express "no assignment":
+  run today the count is zero and its no-match exit is non-zero, so the arm is green by absence AND
+  breaks a `&&` chain; run after a CORRECT implementation the count rises while the leg is right, so
+  the metric moves the wrong way. Same shape as this build's own sibling criteria for the two other
+  absence assertions in the set.
 - **AC6** — When the method's review sections are read, they state the blocked-verdict disposition, the
   convergence rule and the promotion rule; any paragraph displaced to make room is absent from
   `memory/guides/BUILD-METHOD.md` and present in `tools/memory-tree/README.md`; and
   `python tools/memory-tree/corpus_ids.py --report` shows the read path still under its ceiling.
+- **AC6a** — When the method's review section is read, S9's residual-park case is present and its test
+  is a SCOPE test: the paragraph turns on the blocker being outside the mandate's scope or naming
+  options that differ in what gets built, and it contains no difficulty or effort test. It also says
+  the non-close is method prose rather than a driver refusal, so no reader expects `--close` to
+  enforce it. Both halves of the method pair carry the paragraph identically, which
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh` observes — this is the criterion S9 lacked, and
+  it grades the prose because the prose is the whole mechanism.
 - **AC7** — When the method template and the installed copy are compared,
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` is green.
 - **AC8** — When a promotion is exercised end to end on a fixture, the run adds a unit row to the
@@ -345,14 +436,20 @@ figure as authority.
   without it.
 - **AC9** — `python tools/memory-tree/check-arms.py` exits 0 with the unattended `ARMS_FLOORS` entries
   raised, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
+- **AC10** — When `tools/unattended/check-unattended.sh` is read, the check count in its header line
+  equals the number of checks the leg actually runs, and an arm in
+  `tools/unattended/check-unattended.test.sh` DERIVES that number from the leg rather than restating
+  it, so the header cannot drift silently past a check this unit adds. The arm reds against a header
+  left at `TOOL-aBoundedVerdict-2`'s value.
 
 ## 7. Gates
 
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/memory-tree/check-memory-hygiene.sh` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
-`tools/check-kit-versions.sh` · `python tools/memory-tree/check-arms.py` ·
-`python tools/codebase-map/test_codebase_map.py` · `bash tools/run-gates/run-gates.sh`.
+`tools/memory-tree/marker-contract.test.sh` · `tools/check-kit-versions.sh` ·
+`python tools/memory-tree/check-arms.py` · `python tools/codebase-map/test_codebase_map.py` ·
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 
@@ -390,6 +487,14 @@ This line is the machine-read one; the bullets carry the reasoning.
   RESOLVED (agent, 2026-08-20, delegated): YES, as S6's third clause, and it supersedes the backlog
   row named above. Mechanism-only: the promotion leaves a unit row in the generated region, so the
   assertion has a real subject rather than the prose-caller grep this repo has found vacuous twice.
+  **What that supersession does to the row, stated here because a commitment nobody spells is a
+  commitment nobody honours:** `TOOL-aBoundedVerdict-8` currently reads OPEN and prescribes the
+  OPPOSITE of this resolution — "the check spans three units' mechanisms (cap, park verb, halt code);
+  write it once all three have landed, not before". On this unit's landing the row goes **SUPERSEDED
+  by `TOOL-aBoundedVerdict-1`**, with the superseding text: *the cap is withdrawn, so the row's third
+  mechanism no longer exists; the disposition check is written now, as S6's third clause, against the
+  promoted unit row in the generated units region.* `memory/backlog/TOOL.md` is in Files touched for
+  that reason. The row's own edit is a build-level write, not this unit's code.
 
 - **F4 — what happens the first time the runaway ceiling is reached?** §4 states plainly that
   promotion's termination is likely and not guaranteed. Options put to the owner: halt to the owner;
@@ -451,6 +556,66 @@ This line is the machine-read one; the bullets carry the reasoning.
   non-blank line is now the machine-legal `none` form, without which this spec reds hygiene the
   moment its status goes terminal, which is the failure mode `TOOL-aBoundedVerdict-4` exists to make
   impossible to reach silently. No scope change; no acceptance criterion moved.
+
+- rev-10 · 2026-08-20 · the M4 spec audit's 2026-08-20 round, folded. What was actually wrong:
+  **H3** — S3 called the verdict set "kit-owned and closed" while enumerating no member and naming no
+  owner, and AC3 demanded byte-identity with a set `TOOL-aBoundedVerdict-2` never spelled either, so
+  two specs pointed at each other over an empty set. S3 now enumerates the three members, names the
+  MEMORY-TREE kit as canonical (it owns review-record grammar via hygiene check 5 and renders the
+  method), states the duplication because the unattended kit cannot import from it, and ARMS the drift
+  with one row in the case table `tools/memory-tree/marker-contract.test.sh` already carries — the
+  harness `TOOL-aBoundedVerdict-4` S2 extends, so no new gate leg. AC3 grades that row instead of an
+  unobservable byte-identity.
+  **H5, H6 and the spec-1 half of H7** — every byte figure in "The read-path budget" was measured at
+  a base five landed units ago, and the charter read path is a CONSUMABLE, so the section was telling
+  a builder there was headroom that had been spent. The method's "20 KB and 250-line" self-declaration
+  was stale too — the file raised its own cap. Both figures are deleted and replaced by the commands
+  (`python tools/memory-tree/corpus_ids.py --report` and `wc -lc memory/guides/BUILD-METHOD.md`
+  against the cap the method itself declares). The competing enumeration of the spender set is
+  deleted outright: it omitted `-19`, disagreed with the README's set, and did so in the same
+  paragraph that cited the state-it-once rule. What is left is the obligation, the displacement
+  requirement AC6 already grades, and a pointer at the README.
+  **H18** — F3 committed to superseding backlog row `TOOL-aBoundedVerdict-8` whose OPEN text
+  prescribes the opposite, and no spec named `memory/backlog/TOOL.md`. F3 now states the row's new
+  status and the superseding text, and the file is in Files touched. The row's own edit stays a
+  build-level write.
+  **H19** — "a terminal disposition line" occurred nowhere in the tree except S6 and AC4, so the leg
+  check could not be written and AC4's fixture could not be built. S4 now defines ONE observable, the
+  TERMINAL LINE: the exit token the verb already computes, written into the `reason` field it already
+  writes. Chosen over F3's promoted-unit row because it adds no field, no grammar and no cross-file
+  join — the unit row stays what S6's third clause alone observes. The undefined phrase is gone from
+  S6 and AC4.
+  **M1** — S10 required the leg to assert BOTH ceiling carriers, one of which is the run's own stdout;
+  no gate can observe a transcript. The leg now asserts the README line (AC2b) and the output line is
+  observed at the verb by AC2a. One carrier per observer.
+  **M2** — S9 was the escape hatch S8 depends on and had no acceptance criterion, and its "the build
+  does not close" was ambiguous between prose and a `--close` refusal. Taken the narrow fix rather
+  than the binding one, because binding it needs a new close-path predicate this unit does not own:
+  S9 now says the non-close is advisory method prose, and new AC6a grades the paragraph — scope test,
+  not difficulty test, identical in both halves of the method pair.
+  **M3** — the unattended leg's header check COUNT is a two-mover coordination with
+  `TOOL-aBoundedVerdict-2` that this spec named nowhere and observed with nothing. It is in Files
+  touched with the "one past -2's value" instruction, and new AC10 ties the header figure to the
+  number of checks the leg runs, DERIVED by the arm. Per H4 the charter is explicitly NOT a second
+  carrier: that bullet was replaced by a pointer at `tools/gate-legs.json` and the body is generated
+  between `gov:playbook` markers, so a hand-edit reds the parity leg.
+  **M4** — the Rollout omitted `TOOL-aBoundedVerdict-5` entirely while S4a took its class names and
+  AC3a graded its counter, so a builder following the Rollout alone would build the `review` kind
+  before the taxonomy existed. The Rollout now lists all three hard predecessors in the README's
+  dependency order with the reason for each.
+  **M13** — `.memory-tree.conf` and `memory/guides/BUILD-METHOD.md` are both on the kickoff manifest's
+  watch list and `memory/guides/SESSION-KICKOFF.md` was absent from Files touched, so the ratchet
+  would have redded the commit. Added with the same-commit re-stamp note.
+  **M15** — "`dClosedLexicon` holds 10 review records in one day" was wrong on the day count; it is 10
+  across two days, 8 of them on 2026-08-16. The cap-relocation argument is unaffected.
+  **Also folded, not from a finding row but from the same class as B3/M6 (a rev that reached the prose
+  and missed a site):** rev-8 inverted the ceiling from a refusal into a reported survival, and two
+  sites still called it a refusal — S2's "It REFUSES only at the runaway ceiling" and §5's
+  error-states list. Both now agree with F4 and S10. **And D5's taxonomy rename**: S4a and AC3a said
+  the class names were `decision` and `record`; the owning spec's classes are `surfaced` and
+  `history`, `review` is the first `history` kind, and the shipped counter is CORRECT today with all
+  four live kinds surfaced — the claim of a present inflation is withdrawn and replaced by the real
+  argument, which is that the counter goes wrong the day this unit lands a `history` kind.
 
 ## 10. Reuse audit
 

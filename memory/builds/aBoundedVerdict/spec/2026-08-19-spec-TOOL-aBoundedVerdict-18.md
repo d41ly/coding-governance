@@ -1,14 +1,17 @@
 # TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
 Two close-path checks are green because nothing they could catch is reachable: the
 `landed-via-lander` Definition-of-Done item is two conf-non-empty tests plus a grep the merge bar has
-already run inside the same close, and the gate leg's check 8 exempts terminal records and every
-tracked record is terminal, so it has zero subjects while three of them carry exactly the bytes it
-exists to refuse. Give each one a subject, or say in the source why it has none.
+already run inside the same close, and the gate leg's check 8 exempts terminal records wholesale, so
+its emptiness branch has no reachable subject over a corpus that is terminal almost everywhere — while
+exempt records carry exactly the bytes it exists to refuse. Give each one a subject, or say in the
+source why it has none. Every population figure in this spec is a command, not a numeral: the
+run-state corpus is `git ls-files 'memory/builds/*/RUN*.md'` plus each record's `phase:` line, and it
+moves with every run.
 
 ## 2. Scope (IN)
 
@@ -33,10 +36,16 @@ exists to refuse. Give each one a subject, or say in the source why it has none.
 - **S2** — the redundant grep is DELETED regardless of S1, because it duplicates leg check 11 inside
   the same close. Where the marker key is undeclared, the item's remaining claim is stated honestly in
   the protocol's Asserts cell: an item that says less beats one that implies a check it does not run.
-- **S3** — leg check 8's terminal exemption either goes, or gains a comment stating why retired bytes
-  are exempt. Measured: all seven tracked run-state records are terminal, so the check has zero
-  subjects, while three of them carry 1280, 3082 and 4032 bytes of the copied unit list the check
-  exists to refuse.
+- **S3** — leg check 8's terminal exemption is SCOPED to the emptiness branch, not kept wholesale.
+  Today it clears `rd` for any terminal phase, which skips the malformed-generated-markers refusal as
+  well as the emptiness one; backlog row `TOOL-cSettledDocket-11` (OPEN, `memory/backlog/TOOL.md`)
+  prescribes exactly that scoping, and F1 resolves with the row rather than around it. After S3 the
+  marker-shape refusal runs on every record including terminal ones, and the emptiness refusal keeps
+  its exemption plus S5's note. The row is SATISFIED by this unit, not by this spec: its status edit
+  rides the landing commit and is the orchestrator's bookkeeping.
+  Measured: unexempting the marker-shape branch reds nothing today — every tracked record has a
+  well-formed marker pair. Re-derive both populations at build time from the command in §1; no figure
+  for either is written in this spec, because the corpus moves with every run.
 - **S4** — whichever way S3 resolves, the check gains a RED fixture in
   `check-unattended.test.sh`. A check whose only evidence is a corpus that cannot trigger it is the
   `fixture-passes-by-finding-nothing` class, and this unit's whole subject is that class.
@@ -49,7 +58,7 @@ exists to refuse. Give each one a subject, or say in the source why it has none.
   slot; what changes is what it observes or what it claims.
 - Not leg check 11, which owns the bypass-flag ban over the run-state file and does it correctly. S1's
   redundancy is on the driver side.
-- Not a general vacuity sweep of the other seventeen leg checks. The audit examined four; the rest are
+- Not a general vacuity sweep of the leg's other checks. The audit examined four; the rest are
   named as uncovered in its own coverage section and a sweep is a separate unit if the owner wants one.
 - Not the `landed-via-lander` item's TRUST properties. Whether a run could lie about having used the
   lander is protocol section nine's subject and unchanged here.
@@ -83,19 +92,28 @@ a read of the git index. Presence is not provenance.
 ### Check 8, as it stands
 
 The check refuses a run-state file carrying a copied unit list — the staleness the main redesign removed
-by making the unit list derived. It exempts `LANDED` and `ABORTED` records. Every tracked record is one
-or the other. So the check has no subjects at all, and three of the exempt records carry the exact bytes
-it refuses, in quantity.
+by making the unit list derived. It has TWO refusals, not one, and both hang off the same variable:
 
-Two readings, and they lead to different fixes:
+```
+rd=${f%/RUN.md}/README.md
+case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
+if [ -n "$rd" ] && [ -f "$rd" ]; then   # malformed markers, then emptiness
+```
 
-- the exemption is CORRECT and retired bytes are history that must not be rewritten — in which case the
-  check is fine and needs S5's note plus S4's fixture, because its correctness is currently indistinguishable
-  from its emptiness;
-- or the exemption was a convenience that let the corpus pass — in which case it goes, and three records
-  need either repair or a waiver.
+Clearing `rd` on a terminal phase disables the malformed-generated-markers refusal as well as the
+emptiness one. That over-wide scoping is what backlog row `TOOL-cSettledDocket-11` records against
+`cBriefedPilot-36`, and it is the half the vacuity argument never reached: retired bytes are a reason to
+tolerate a stale COPY, never a reason to stop reading whether the region's markers parse at all. A
+record whose markers are malformed cannot be read by anything, terminal or not.
 
-S3 forces the choice rather than leaving it implicit, and F1 is where it is made.
+So the two refusals resolve differently, which is what F1 now says:
+
+- the EMPTINESS refusal keeps its exemption — retired bytes are history that must not be rewritten, and
+  a check firing on frozen records produces a red nobody can clear. Its correctness stays
+  indistinguishable from its emptiness until S4's fixture and S5's note make it legible;
+- the MARKER-SHAPE refusal loses it, per the row. Measured: unexempting it reds nothing today, because
+  every tracked record has a well-formed marker pair, so this is a scope repair with no migration
+  attached.
 
 ### Inventory
 
@@ -106,30 +124,52 @@ S3 forces the choice rather than leaving it implicit, and F1 is where it is made
 | a marker left by a PREVIOUS landing | would satisfy a presence test | refused: the witness does not match |
 | an adopter whose lander writes nothing | — | the key is undeclared, the item degrades to its narrow claim |
 | its redundant grep | duplicates leg check 11 | deleted |
-| leg check 8's subjects | zero, corpus-wide | non-zero, or a stated reason for zero |
-| check 8's evidence | a corpus that cannot trigger it | a red fixture |
+| check 8's emptiness refusal | exempt on every terminal record, so unreachable over this corpus | exemption kept, with a dated note saying it was measured |
+| check 8's marker-shape refusal | exempted by the same cleared `rd`, for no stated reason | runs on every record, terminal included (`TOOL-cSettledDocket-11`) |
+| check 8's evidence | a corpus that cannot trigger it | a red fixture per branch |
 | why either check is narrow | unrecorded | a dated note in source |
 
 ### Migration
 
-Depends on F1. If check 8's exemption goes, three tracked terminal records carry bytes it refuses, and
-they must NOT be rewritten — a terminal record is a record. So the migration is a waiver registry entry
-naming those three, shrink-only, which is how this repo already handles a measured pre-existing
-population. If the exemption stays, there is no migration.
+None, and F1's re-resolution is what removes it. The EMPTINESS exemption stays, so the terminal records
+carrying copied unit lists stay exempt and are not touched — a terminal record is a record, and
+rewriting one to satisfy a check written later is what the freeze exists to prevent. The MARKER-SHAPE
+refusal loses its exemption and reds nothing today, so it needs no waiver either. Re-run the §1 command
+before building: if the corpus has since acquired a record with a malformed marker pair, the fix is a
+shrink-only entry in the `*.txt` waiver registry pattern beside the other gate lists (§10), never a
+rewrite of the record and never a re-widening of the exemption.
 
 ### Rollout
 
 S5 and S4 first: they are additive, they cost nothing, and they make the current state legible before
-it changes. Then S3's decision and its consequence. S1/S2 last, because the answer to whether
-`--landed` can observe the lander decides which of the two it is.
+it changes. Then S3's scoping, which is a two-line edit plus its fixture arm. S1/S2 last, because they
+are the ones that touch a shipped contract and the adopter path.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` (the item's arm) · `tools/unattended/check-unattended.sh` (check 8) ·
-`tools/unattended/check-unattended.test.sh` (S4's fixture) ·
-`tools/unattended/unattended.test.sh` · possibly a waiver registry beside the other `*.txt` lists ·
-`memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` (the Asserts cell,
-if S2 fires) · the kit version constant.
+The leg and the driver: `tools/unattended/unattended.sh` (the item's arm) ·
+`tools/unattended/check-unattended.sh` (check 8) · `tools/unattended/check-unattended.test.sh` (S4's
+fixture) · `tools/unattended/unattended.test.sh`.
+
+The declaration and the adopter path S1a and S1c put in scope, none of which were listed through rev-3
+even though AC4b and AC4c grade them: `.unattended.conf` (this repo's own declaration of the marker
+key) · `tools/unattended/.unattended.conf.example` (the key and the compliant-lander contract) ·
+`tools/unattended/adopt-unattended.sh` (seeding the key — today this script only READS the conf, so
+seeding is new code, not a template edit) · `tools/push-main.sh` (this repo's declared lander, which
+must write the marker).
+
+`.unattended.conf` is on the kickoff manifest's `watch:` list, so `memory/guides/SESSION-KICKOFF.md` is
+touched too: the manifest is re-stamped in the SAME commit that edits the conf, with the delta line in
+that commit's message. The watch list is in that file's manifest-audit block.
+
+The protocol pair, if S2 fires: `memory/guides/UNATTENDED-PROTOCOL.md` and
+`tools/unattended/PROTOCOL.template.md` (the Asserts cell, byte-compared by leg check 10).
+
+The kit version bump is not one carrier. `tools/check-kit-versions.sh` forces five files and seven
+sites: `KIT_UNATTENDED_VERSION=` and its same-line `gov:kit` marker in both
+`tools/unattended/unattended.sh` and `tools/unattended/check-unattended.sh`, the `gov:kit` marker in
+`tools/unattended/PROTOCOL.template.md` and in `tools/unattended/SKILL.template.md`, and the re-render
+`.claude/skills/unattended/SKILL.md`, which `check-wiring.sh` compares against the tracked template.
 
 ### Alternatives rejected
 
@@ -147,8 +187,13 @@ if S2 fires) · the kit version constant.
 - **Leave check 8 as it is and accept the vacuity.** Rejected on this repo's own rule: a check that
   cannot fail is recorded as such or fixed, never left to read as coverage. S5 is the minimum acceptable
   outcome and it is still a change.
-- **Repair the three terminal records so check 8 has clean subjects.** Refused: a terminal record is a
-  record, and rewriting one to satisfy a check written later is the opposite of what the freeze is for.
+- **Repair the terminal records carrying copied unit lists so check 8's emptiness branch has clean
+  subjects.** Refused: a terminal record is a record, and rewriting one to satisfy a check written
+  later is the opposite of what the freeze is for.
+- **Keep the terminal exemption wholesale, as rev-3 resolved it.** Rejected at F1 against
+  `TOOL-cSettledDocket-11`: the exemption clears one variable and disables two refusals, and the
+  frozen-history argument reaches only the emptiness one. Nothing about a retired record makes its
+  generated markers unreadable-by-design.
 
 ## 5. Production-readiness checklist
 
@@ -164,22 +209,34 @@ if S2 fires) · the kit version constant.
 - **error / empty / loading states** — the empty case IS the subject of this unit.
 - **observability** — S5's dated notes are the observability deliverable: they let a reader distinguish
   a narrow check from an empty one without re-measuring.
-- **risks** — low. The one real risk is S3 resolving toward removing the exemption and the three
-  affected records being repaired rather than waived, which Migration forbids explicitly.
+- **risks** — low. The one real risk left after F1 is S3's scoping being implemented by removing the
+  exemption outright, which would red the exempt terminal records carrying copied unit lists and tempt
+  a repair. Migration forbids the repair explicitly, and AC1a's control arm is what proves the
+  emptiness exemption is still in force after the edit.
 - **testing + left-shift gates** — S4 is the left-shift and it is the point of the unit.
-- **migration / rollback** — see Migration; conditional on F1.
-- **user docs** — the protocol's Asserts cell, only if S2 fires.
+- **migration / rollback** — none; see Migration, which F1's scoped resolution empties.
+- **user docs** — the protocol's Asserts cell, only if S2 fires. The conf example is the OTHER doc S1c
+  moves, and it is a shipped contract rather than a note: it is where an adopter reads what a compliant
+  lander must write.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When leg check 8 runs against a fixture holding a NON-terminal run-state record carrying a
   copied unit list, it reds naming the file; the red fixture in
   `tools/unattended/check-unattended.test.sh` that does not exist today.
+- **AC1a** — When leg check 8 runs against a fixture holding a TERMINAL record whose `run:generated`
+  markers are malformed, it reds naming the file — the branch S3 unexempts, which passes today for the
+  wrong reason. Its control arm: the same terminal record with a well-formed EMPTY-or-populated region
+  stays clean, so the emptiness exemption is proven still in force rather than removed by accident.
 - **AC2** — When `bash tools/unattended/check-unattended.sh` runs against the real tree it is clean, and
-  `tools/unattended/check-unattended.sh` carries a dated note saying its check-8 subject count over this
-  corpus was measured at zero.
-- **AC3** — When `grep -c 'BYPASS_BAN' tools/unattended/unattended.sh` is compared before and after, the
-  `landed-via-lander` arm no longer greps the run-state file for the flag — the redundancy S1 removes.
+  `tools/unattended/check-unattended.sh` carries a dated note recording that check 8's emptiness-branch
+  subject population over this corpus was MEASURED, naming the command that measures it rather than the
+  figure it returned.
+- **AC3** — When the `landed-via-lander` case body in `tools/unattended/unattended.sh` is extracted by
+  line range and compared against its pre-change body as the control, the after-body no longer contains
+  `grep -qF -- "$BYPASS_BAN" "$rel"` and the before-body does. A whole-file `grep -c 'BYPASS_BAN'` is
+  NOT the assertion: the token appears across several unrelated call sites, so a count delta of one
+  identifies nothing and any unrelated edit forges it.
 - **AC4** — When a fixture run lands through a lander that writes the declared marker naming the slug
   and witness, `landed-via-lander` is MET; when the same run lands via a bare `git push` and no marker
   is written, the item is UNMET — the two arms that make the item able to fail for something the run
@@ -196,14 +253,17 @@ if S2 fires) · the kit version constant.
   declared lander rather than through a stub.
 - **AC5** — When either check's source is read, it carries the S5 note, and
   `python tools/memory-tree/check-arms.py` is clean with any changed `ARMS_FLOORS` entry updated.
-- **AC6** — When the three terminal records carrying copied unit lists are inspected after this unit,
-  `git diff` over `memory/builds/*/RUN.md` is empty for them — the arm that proves Migration's
-  prohibition held.
+- **AC6** — When the tracked run-state records are enumerated by §1's command after this unit,
+  `git diff` over `memory/builds/*/RUN*.md` is empty for every one of them — the arm that proves
+  Migration's prohibition held and that no record was repaired to satisfy a check.
 
 ## 7. Gates
 
 `tools/unattended/check-unattended.sh` + `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/unattended.test.sh` · `bash tools/unattended/adopt-unattended.sh --check` ·
+`tools/unattended/adopt-unattended.test.sh` (S1c's seeding is new code in that script) ·
+`tools/push-main.test.sh` (the lander now writes the marker) ·
+`bash skills/session-kickoff/manifest-check.sh` (`.unattended.conf` is watched) ·
 `python tools/memory-tree/check-arms.py` · `tools/check-testsuite-counts.sh` ·
 `tools/check-kit-versions.sh` · `bash tools/run-gates/run-gates.sh`.
 
@@ -212,15 +272,21 @@ if S2 fires) · the kit version constant.
 none - every fork below is RESOLVED in place, each naming the resolver and the authority.
 This line is the machine-read one; the bullets carry the reasoning.
 
-- **F1 — does check 8's terminal exemption stay or go?** Measured: it has zero subjects, and three
-  exempt records carry the bytes it refuses. Staying means the check is correct and merely
-  unexercised, which S4 and S5 make legible. Going means three records need a shrink-only waiver,
-  because repairing them is forbidden. **Recommendation: it STAYS, with S4's fixture and S5's note.**
-  Grounds: the bytes in question are in terminal records the redesign has already superseded, and a
-  check that fires on frozen history produces a red nobody can clear — which is a worse defect than the
-  one it would catch.
-  RESOLVED (agent, 2026-08-19, delegated): stays. Mechanism-only fork, and the alternative creates an
-  unclearable red on frozen records.
+- **F1 — does check 8's terminal exemption stay or go, and for WHICH of its two refusals?** The
+  exemption clears one variable and disables two refusals: malformed generated markers, then a
+  non-empty region. Backlog row `TOOL-cSettledDocket-11` (OPEN, `memory/backlog/TOOL.md`) prescribes
+  scoping it to emptiness alone, naming the over-wide scoping `cBriefedPilot-36` shipped; rev-3
+  resolved "stays" wholesale without citing the row, and closed it by silence. The row is right on the
+  half rev-3's grounds never reached: frozen history is a reason to tolerate a stale COPY, never a
+  reason to stop reading whether the markers parse. **Recommendation: SCOPED — the exemption stays for
+  the emptiness refusal and goes for the marker-shape one**, plus S4's fixture and S5's note.
+  Grounds, both halves: a check firing on the copied bytes in superseded terminal records produces a red
+  nobody can clear, which is worse than the defect it catches; and unexempting the marker-shape refusal
+  reds nothing today, so the repair is free. Re-run §1's command before building rather than trusting
+  that last clause.
+  RESOLVED (agent, 2026-08-20, delegated): scoped to emptiness. Mechanism-only fork, it makes the spec
+  agree with an OPEN backlog row instead of overriding one by silence, and neither branch changes a
+  public surface.
 
 - **F2 — can `--landed` observe that the push went through `$LANDER`, and is it worth a mechanism?**
   Options: parse the lander's output (rejected in §4 as coupling); have the lander write a marker the
@@ -258,12 +324,52 @@ This line is the machine-read one; the bullets carry the reasoning.
   every bullet carrying the mark on the bullet's OWN line, and this spec's marks sit on continuation
   lines. Without this the unit could not have gone terminal despite having no open question at all.
 
+- rev-4 · 2026-08-20 · the spec-audit fold, `2026-08-20-review-TOOL-aBoundedVerdict-1.md`, verdict
+  BLOCKED. Five findings.
+  **B8** (blocker): S1a declares a new `.unattended.conf` key and S1c puts the adopter path in scope,
+  and AC4b/AC4c grade exactly those — while Files touched named NONE of the four paths that carry them.
+  A unit cannot be graded on files it does not admit it edits. Added `.unattended.conf`,
+  `tools/unattended/.unattended.conf.example`, `tools/unattended/adopt-unattended.sh` (noting that this
+  script only READS the conf today, so seeding is new code rather than a template edit) and
+  `tools/push-main.sh`, plus `memory/guides/SESSION-KICKOFF.md`, because `.unattended.conf` is on the
+  kickoff manifest's `watch:` list and the manifest re-stamps in the same commit. §7 gains
+  `tools/unattended/adopt-unattended.test.sh`, `tools/push-main.test.sh` and the manifest check. The
+  same edit removes "the kit version constant" as a single carrier: `tools/check-kit-versions.sh`
+  forces five files across seven sites and they are now enumerated.
+  **H21** (high): F1 resolved the terminal exemption as "stays" wholesale without citing OPEN backlog
+  row `TOOL-cSettledDocket-11`, which prescribes the opposite and names the over-wide scoping
+  `cBriefedPilot-36` shipped. The row is right about the half rev-3's grounds never reached — the
+  exemption clears ONE variable and disables TWO refusals, and the frozen-history argument covers only
+  the emptiness one. Nothing about a superseded record makes its `run:generated` markers
+  unreadable-by-design. F1 is re-resolved SCOPED: the exemption stays for the emptiness refusal, goes
+  for the marker-shape one. Measured: unexempting it reds nothing, so Migration drops from a
+  shrink-only waiver registry to none, and §5's risk becomes the implementation over-shooting into
+  removing the exemption outright. S3, the design section, the inventory and the alternatives all
+  carry the split now; the row's own status edit is the landing commit's bookkeeping and is NOT this
+  spec's to make.
+  **M11** (medium): the README roster gives this unit Tier 1 and this header says Tier-2. The header is
+  right — F2 moved it in rev-2 because the unit now changes what `LANDER` means for every adopter — so
+  Tier-2 is KEPT and the roster's Tier cell is the orchestrator's fix, not this file's.
+  **M12** (medium): AC3 asserted on a whole-file `grep -c 'BYPASS_BAN'`, which counts several unrelated
+  call sites, so a delta of one identifies nothing and any unrelated edit forges it. Re-written to
+  extract the `landed-via-lander` case body by line range and assert the token's absence there, with
+  the pre-change body as the control.
+  **M13** (medium): same missing `memory/guides/SESSION-KICKOFF.md` entry as B8's last item, folded once
+  in Files touched with the re-stamp note.
+  Also, under the fold's no-stale-numeral rule: every population figure for the run-state corpus is
+  gone (the "seven tracked records", the "zero subjects", the "three records" and their 1280/3082/4032
+  byte sizes) and replaced by the command in §1, because that corpus moves with every run — and the
+  "other seventeen leg checks" in §3 became "the leg's other checks" for the same reason. AC1a is new:
+  it arms the marker-shape branch S3 unexempts, with a control arm proving the emptiness exemption
+  survived the edit.
+
 ## 10. Reuse audit
 
 Two seams, both existing. Leg check 11 already owns the bypass-flag ban over the run-state file, which is
 why S1's deletion is a deletion and not a move — the predicate has a home and this item was a second
 copy of it. And the shrink-only `*.txt` waiver registry pattern beside the other gate lists is what
-Migration would use if F1 had gone the other way; naming it means no new registry mechanism is invented.
+Migration reaches for if the corpus has acquired a malformed-marker record by build time; naming it
+means no new registry mechanism is invented for a contingency that is empty today.
 
 `checker_of` and the CORE floor are read, not changed: the floor is why deleting the item was rejected
 rather than considered.

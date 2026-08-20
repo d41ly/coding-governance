@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -8,6 +8,11 @@ Nothing in the unattended kit bounds a remote round-trip, and `--close` opens wi
 partitioned network turns the close into an indefinite silent wait, and the same calls inside the
 gate leg turn a `git push` into a hung push rather than a red one. Bound every remote observation,
 and stop paying for one before the free refusals that would have blocked the close anyway.
+
+**The tracked incident is backlog row `TOOL-aBoundedVerdict-10`** (OPEN): the `unattended driver
+selftest` leg hung inside its first `--preflight` with zero output and wedged the whole bar. That row
+names TWO fixes — a per-leg deadline in `run-gates.sh`, and a timeout on the driver's anchor call —
+and **this unit delivers only the second**, so the row does not close when this unit lands (§3).
 
 ## 2. Scope (IN)
 
@@ -24,9 +29,13 @@ and stop paying for one before the free refusals that would have blocked the clo
   `credential.interactive` and `guiPrompt` unset, so a GUI prompt is reachable and would block with
   nothing on stdout. Set `credential.interactive=never` (or an askpass that refuses) at every call
   site.
-- **S4** — the same three bounds apply in `check-unattended.sh` (`:211-212`, `:228`, `:230`), where an
-  unbounded call is strictly worse: the leg runs inside `$GATE_CMD`, which runs inside
-  `.githooks/pre-push`, so a stall hangs the push instead of reddening it.
+- **S4** — the same three bounds apply in `check-unattended.sh`, at its TWO call sites — the
+  `ADV_HEAD` symref advertisement (`:228`) and the `ADV_TIPS` heads listing (`:230`), both inside the
+  leg's one-advertisement-per-run block — where an unbounded call is strictly worse: the leg runs
+  inside `$GATE_CMD`, which runs inside `.githooks/pre-push`, so a stall hangs the push instead of
+  reddening it. **`:211-212` is NOT a third call site**: it is the `GIT_TERMINAL_PROMPT=0` rationale
+  COMMENT that S5 corrects. Rev-3 listed it beside the two calls, which sent a builder hunting for a
+  site that does not exist; it is named here as the comment it is.
 - **S5** — the leg's comment claiming `GIT_TERMINAL_PROMPT=0` makes a credential prompt *refuse
   rather than hang* is corrected to what it does.
 - **S6** — `refuse_if_terminal` moves ABOVE the `observe_anchor` prologue in `verb_close`, so a close
@@ -52,6 +61,16 @@ and stop paying for one before the free refusals that would have blocked the clo
   bounded one that prints nothing is still unreadable.
 - No change to which anchors exist, to `ANCHOR_SCOPE`'s value set, or to the number of round-trips a
   close makes — except S6, which changes only WHEN the first one happens.
+- **Not `run-gates.sh`'s per-leg deadline.** That is the OTHER half of `TOOL-aBoundedVerdict-10`, and
+  the row keeps it: it stays OPEN after this unit lands, amended to say the anchor-timeout half is
+  done and the deadline half is not. A bound on one leg's slowest call is not a bound on a leg, and a
+  leg with no deadline can still wedge the bar from any other call.
+- **This unit does not claim to fix the traced 240s hang, and the measurement says it will not.**
+  Backlog row `TOOL-aPromptedMandate-9` measured the driver's precondition chain on node `a` and
+  found the `ls-remote` answering in seconds while `check-wiring.sh --check` dominated the chain,
+  I/O-bound — read the figures in that row, not here. So §4's grounds for a generous cap survive
+  (no advertisement in this fleet is slow), but the corollary is stated plainly: bounding the
+  observation makes a PARTITION terminate, and leaves the slow-preflight problem to that row.
 - Not the rest of the bar's runtime. That the full bar is slow, and slower on a polluted `TMPDIR`, is
   environmental and separately recorded.
 
@@ -92,13 +111,20 @@ working slow link into a refused close, which is a new stall wearing the fix's c
 
 | Concern | Today | After |
 |---|---|---|
-| `ls-remote` call sites | 2 in the driver, 3 in the leg, none bounded | all bounded through one helper |
+| `ls-remote` NETWORK call sites | 2 in the driver — `observe_anchor`'s HEAD advertisement and `branch_tip_quiet`'s branch tip — and 2 in the leg, the `ADV_HEAD` symref and the `ADV_TIPS` heads listing; none bounded | every one bounded through one helper |
+| `ls-remote --get-url` | 1 in the driver, OFFLINE by design, measured 0s against an unreachable URL | unchanged, and excluded from the bound by name rather than by accident |
 | a partition under `--close` | indefinite silent wait | named refusal naming endpoint and bound |
 | a partition under `pre-push` | the push hangs | the leg reds |
 | a credential helper prompt | reachable, blocks | prevented |
 | `--close` on a terminal record | pays a round-trip first | refuses for free |
 | transport failure vs "no such ref" | collapsed to one status | split, as `observe_anchor` already does |
 | the leg's comment about `GIT_TERMINAL_PROMPT=0` | states a bound it does not provide | states what it does |
+
+**Two more `ls-remote` hits are PROSE, not sites.** A grep over the pair also returns the driver's
+`resolve_base` note about an adopter paying no extra `ls-remote`, and the leg's
+`GIT_TERMINAL_PROMPT=0` rationale that S5 corrects. Neither is a call. Both are why AC5 is written
+over `grep -n` and excludes comment lines by name — a count over the file text cannot tell a call
+from a sentence about one.
 
 ### Migration
 
@@ -116,9 +142,23 @@ purpose: it runs inside the pre-push hook, so a defect there is discovered at th
 
 `tools/unattended/unattended.sh` (the helper, the constant, two call sites, the ordering move, the
 status split) · `tools/unattended/unattended.test.sh` (arms per refusal, and the ordering arm) ·
-`tools/unattended/check-unattended.sh` (three call sites, one comment) + `check-unattended.test.sh` ·
-`.memory-tree.conf` (`ARMS_FLOORS`, for the new `fail` call sites) · the kit version constant ·
-`memory/map/features/unattended.md` (the dossier claims the bound).
+`tools/unattended/check-unattended.sh` (TWO call sites and one comment — the third `ls-remote`
+reference in that file is the comment) + `check-unattended.test.sh` ·
+`.memory-tree.conf` (`ARMS_FLOORS`, for the new `fail` call sites) ·
+`memory/guides/SESSION-KICKOFF.md` — the kickoff manifest is re-stamped in the SAME commit, because
+`.memory-tree.conf` is on its `watch:` list and an unstamped edit reds the ratchet both staged and
+committed ·
+**the kit version bump, which is not one carrier** — `tools/unattended/unattended.sh` and
+`tools/unattended/check-unattended.sh` each move `KIT_UNATTENDED_VERSION=` AND the `gov:kit` marker
+on the same line, `tools/unattended/PROTOCOL.template.md` and `tools/unattended/SKILL.template.md`
+each move their `gov:kit` marker, and `.claude/skills/unattended/SKILL.md` is re-rendered because
+`check-wiring.sh` compares it to the tracked template; `tools/check-kit-versions.sh` forces all of
+them ·
+`memory/map/features/unattended.md` (the dossier claims the bound) ·
+`memory/backlog/TOOL.md` — section 3's non-goal commits to amending `TOOL-aBoundedVerdict-10` on
+landing, to say the anchor-timeout half is done and the per-leg-deadline half is not, so the file that
+carries that row is declared here rather than edited by a commitment nothing lists. Three sibling
+units in this build declare the same carrier for the same reason.
 
 ### Alternatives rejected
 
@@ -154,10 +194,15 @@ status split) · `tools/unattended/unattended.test.sh` (arms per refusal, and th
   so the number is discoverable without source.
 - **risks** — the false-positive on a slow link, mitigated by a generous cap plus precise transport
   options. Concurrency: none. Data loss: none; every call is a read.
-- **testing + left-shift gates** — the fixture is a blackhole IP or an unroutable host, which is
-  hermetic and needs no network. The left-shift is a source-level rule that no `ls-remote` may appear
-  outside the helper, in both the driver and the leg — and it must be written to survive the comment
-  that documents it (`memory/gotchas/absence-assertion-over-whole-file-text.md`).
+- **testing + left-shift gates** — TWO fixture mechanisms, because one does not reach both arms. The
+  timeout arms use an unroutable address, which is hermetic and needs no network. The FALSE-POSITIVE
+  arm (AC8) cannot: an unroutable address transfers nothing, so it can never present a slow-but-
+  working transfer. That arm drives the helper against a stub that sleeps under the bound and then
+  succeeds — wall clock only, no network, no git transport. The left-shift is a source-level rule
+  that no `ls-remote` may appear outside the helper, in both the driver and the leg, armed in
+  `tools/unattended/unattended.test.sh` per §8 F2 — and it must be written to survive the COMMENTS
+  that document it (`memory/gotchas/absence-assertion-over-whole-file-text.md`), which is what AC5
+  spells out.
 - **migration / rollback** — none; revert is the helper's removal.
 - **user docs** — the map dossier, and the leg's corrected comment. The protocol describes WHAT is
   observed, not with what bound, so it needs no change.
@@ -176,19 +221,35 @@ status split) · `tools/unattended/unattended.test.sh` (arms per refusal, and th
   returns its "no such ref" status; when the remote is unreachable, it returns a DIFFERENT status and
   the caller's message does not tell the operator to push. Two arms in
   `tools/unattended/unattended.test.sh`.
-- **AC5** — When `grep -cE 'ls-remote' tools/unattended/unattended.sh tools/unattended/check-unattended.sh`
-  is taken, every hit is inside the bounded helper or is the offline `--get-url` call, asserted by the
-  source-level arm S5's checklist item names.
+- **AC5** — When `grep -n 'ls-remote' tools/unattended/unattended.sh
+  tools/unattended/check-unattended.sh` is taken, EVERY hit's LINE is a member of a sanctioned set
+  written into the arm: the bounded helper's own body, the offline `--get-url` line, or a COMMENT
+  line, matched as such by its leading `#` and excluded deliberately rather than by luck. Any other
+  hit fails the arm. The arm lives in `tools/unattended/unattended.test.sh` (§8 F2) and implements
+  §5's testing + left-shift item. **`grep -c` cannot express this criterion** — it prints one number
+  per file, a number that already includes the two prose hits, so no value of it distinguishes a call
+  site from a sentence. That is the class at
+  `memory/gotchas/absence-assertion-over-whole-file-text.md`, and rev-3's AC5 was an instance of it.
 - **AC6** — When a credential helper would prompt, it does not: asserted by driving a fixture whose
   remote requires auth with `credential.interactive` observable as `never` in the invocation, via
   `git -c credential.interactive=never`.
 - **AC7** — When `tools/unattended/check-unattended.sh` is read, its comment about
   `GIT_TERMINAL_PROMPT=0` states that the variable bounds git's own prompt and not a configured
   helper.
-- **AC8** — When a slow-but-working remote is simulated below the `http.lowSpeedLimit` threshold's
-  tolerance, `--close` still succeeds — the false-positive arm in
-  `tools/unattended/unattended.test.sh`, and the one that proves the cap is not merely tight enough to
-  pass AC1.
+- **AC8** — When the bounded helper is driven against a STUB THAT SLEEPS AND THEN SUCCEEDS — a fake
+  `git` ahead of the real one on `PATH` that sleeps a fixed interval below the wall-clock bound on
+  `ls-remote` and forwards every other subcommand to the real binary, then exits 0 with a well-formed
+  advertisement on stdout — the helper returns the stub's answer and
+  `--close` still succeeds; the bound does not fire. Wall clock only: no network, no git transport, no
+  remote. This is the false-positive arm, the only one proving the cap is not merely tight enough to
+  pass AC1, and it lives in `tools/unattended/unattended.test.sh`. **The `http.lowSpeedLimit` /
+  `lowSpeedTime` arm is NOT COVERED, deliberately.** Exercising it needs a remote that accepts a
+  connection and then transfers below the threshold for longer than `lowSpeedTime`, and neither
+  fixture can produce that: an unroutable address transfers nothing at all, and the sleeping stub
+  never reaches git's transport layer. Those two options are therefore asserted by INSPECTION only —
+  they appear in the helper's invocation, where AC5's arm reads them — and their runtime effect is
+  untested. Written here so a green AC8 is never misread as coverage of §4's "server accepts, then
+  stalls" row.
 
 ## 7. Gates
 
@@ -197,7 +258,8 @@ status split) · `tools/unattended/unattended.test.sh` (arms per refusal, and th
 (`tools/memory-tree/check-arms.py`, one arm per new `fail`) · `testsuite counts` ·
 `pre-push self-test` (`.githooks/pre-push.test.sh`, because S4 changes what happens inside the hook's
 gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) ·
-`kit version markers`.
+`kit version markers` · `skills/session-kickoff/manifest-check.sh` (the `.memory-tree.conf` edit is
+on the manifest's watch list, so the re-stamp rides in the same commit).
 
 ## 8. Open questions
 
@@ -248,6 +310,51 @@ This line is the machine-read one; the bullets carry the reasoning.
 - rev-3 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended — the rule is
   armed in the driver's test suite, not in the kit gate, because a gate asserting it about its own
   source would need an exclusion. §8's first non-blank line is now the machine-legal `none` form.
+
+- rev-4 · 2026-08-20 · folded the second M4 spec audit
+  (`reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md`): H9, H10, H11, H12, M13, L2.
+  **H9 — the inventory sent a builder after a call site that does not exist.** It said "3 in the leg";
+  `check-unattended.sh` has exactly TWO `ls-remote` calls, at the declared base and at HEAD, and the
+  third reference S4 listed (`:211-212`) is the `GIT_TERMINAL_PROMPT=0` rationale COMMENT — which is
+  S5's own subject, so the spec was counting its comment fix as a call site. The inventory row now
+  breaks the population down by NAME rather than by count — `observe_anchor` and `branch_tip_quiet`
+  in the driver, `ADV_HEAD` and `ADV_TIPS` in the leg — with the offline `--get-url` on its own row,
+  and a paragraph names the two PROSE hits so a grep result reads correctly. Every other line
+  reference in S1, S4 and §4 resolves exactly at base `098bebd9` and was deliberately NOT renumbered.
+  **H10 — AC5 could not fail for the right reason.** It was written over `grep -cE`, which prints one
+  count per file; a count cannot express a LOCATION property, and the counts already included the two
+  comment hits, so no value of them distinguished a call from a sentence about one. That is the class
+  at `memory/gotchas/absence-assertion-over-whole-file-text.md` — flagged in §5 and ignored by the
+  criterion two sections later. AC5 is now over `grep -n`, with the sanctioned set (helper body,
+  `--get-url` line, comment lines matched by a leading `#`) written into the arm and the comment
+  exclusion made explicit instead of incidental.
+  **H11 — the false-positive arm had no mechanism that could exercise it.** AC8 is the only criterion
+  proving the cap is not merely tight enough to pass AC1, and the sole declared fixture was an
+  unroutable address, which transfers NOTHING and so can never present a rate below
+  `http.lowSpeedLimit`. AC8 now names the real mechanism — a stub ahead of `git` on `PATH` that
+  sleeps under the bound on `ls-remote`, forwards everything else, and succeeds; wall clock only, no
+  network — and RECORDS THE SKIP: the `lowSpeedLimit`/`lowSpeedTime` arm is not covered, because
+  neither fixture reaches git's transport layer, so those options are asserted by inspection only.
+  §5's testing item carries the same two-mechanism split. A skip that announces itself, rather than a
+  green row that reads as coverage of §4's "accepts, then stalls" failure.
+  **H12 — the unit half-closed an OPEN backlog row and cited it nowhere.** `TOOL-aBoundedVerdict-10`
+  names two fixes and this unit delivers one, so the row read as closed on landing. §1 now cites it
+  and says which half lands; §3 gains a non-goal putting `run-gates.sh`'s per-leg deadline out of
+  scope, with that same row keeping it. §3 also weighs `TOOL-aPromptedMandate-9`'s measurement, which
+  found the `ls-remote` answering in seconds while `check-wiring.sh --check` dominated the
+  precondition chain: §4's grounds for a generous cap survive it, but the corollary is now stated —
+  this unit makes a PARTITION terminate and does not fix the traced slow preflight. The figures stay
+  in that row rather than being copied here.
+  **M13 (build decision D6)** — `.memory-tree.conf` is on the kickoff manifest's `watch:` list and
+  `memory/guides/SESSION-KICKOFF.md` was missing from Files touched, so the ratchet would red the
+  commit staged and committed alike; it is added with the same-commit re-stamp note, and §7 gains the
+  ratchet leg. While there, **build decision D7**: "the kit version constant" was one phrase standing
+  for five files and seven sites, and is now enumerated, because a builder cannot move a carrier the
+  spec does not name.
+  **L2** — AC5 attributed its source-level rule to "S5's checklist item"; S5 is the comment
+  correction. The rule is §5's testing + left-shift item, and the arm's home is
+  `tools/unattended/unattended.test.sh` per F2's resolution, which the criterion had not carried.
+  Both are now written where they belong.
 
 ## 10. Reuse audit
 

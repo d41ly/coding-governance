@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-7 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -25,22 +25,34 @@ stopped without reading prose.
 - **S2** — `--abort <slug> --reason <text> --code <CODE>`, with the code REQUIRED and validated
   against the effective vocabulary. An unlisted code is refused naming the legal set.
 - **S3** — the code is recorded as an AUTHORED FACT through the existing fact writer, not buried in
-  the reason prose, so a reader is a field read rather than a parse. It is therefore a NEW fact, and S7 moves
-  whatever ordinal the pin currently states rather than leaving the spec silently in breach of it.
-  **Rev-6 deletes every ordinal this spec used to spell.** The live pin reads ELEVEN — measured at
-  `memory/guides/UNATTENDED-PROTOCOL.md:110` and `tools/unattended/PROTOCOL.template.md:110`, with an
-  enumeration running 1..11 beneath it — so the halt code is the twelfth, not the ninth this spec
-  said, and not the eighth or seventh it said elsewhere. The ordinal is READ AT BUILD TIME from the
-  carrier and is never restated here: the pin's history across its carriers is non-monotone, so a
-  number written into a spec is a number that was true once. The justification is the protocol's own membership test — nothing in the tree derives the
-  code, and only the run knows it — and the shape: a halt code is a per-run SINGLETON that three
-  readers read by key, which is what a fact is for. **The in-tree precedent is now exact**: the
-  eighth fact, the roster frozen at landing, is a singleton written by a TERMINAL verb, which is the
-  same shape this code has. A tracked sibling spec declined what is now a ninth fact and added a park
-  KIND instead, and that remains the right answer for append-only history; it is the wrong answer for
-  a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
-  takes the park-kind route for exactly that reason, so this build uses both shapes deliberately and
-  moves the pin exactly once.
+  the reason prose, so a reader is a field read rather than a parse. It is therefore a NEW fact, and
+  S7 moves the region's fact pin wherever it is spelled rather than leaving the spec silently in
+  breach of it. **No ordinal and no count appears anywhere in this spec.** The pin's value, and the
+  ordinal the code takes, are READ AT BUILD TIME out of the carriers S7 enumerates: the pin's history
+  across those carriers is non-monotone, so a number written into a spec is a number that was true
+  once, and this spec has already carried three wrong ones. The justification is the protocol's own
+  membership test — nothing in the tree derives the code, and only the run knows it — and the shape: a
+  halt code is a per-run SINGLETON that three readers read by key, which is what a fact is for. **The
+  in-tree precedent is exact**: the fact recording the roster frozen at landing is a singleton written
+  by a TERMINAL verb, which is the same shape this code has. A tracked sibling spec declined a new
+  fact and added a park KIND instead, and that remains the right answer for append-only history; it is
+  the wrong answer for a singleton nobody would grep a region to recount. `TOOL-aBoundedVerdict-1`
+  takes the park-kind route for exactly that reason, so this build uses both shapes deliberately.
+
+  **This unit is the pin's ONLY mover in this build.** `TOOL-aBoundedVerdict-21` would have been the
+  second and is PARKED: the fix its own blocker needs is refused by that unit's §3 Non-goal, so there
+  is no sibling mover to sequence against, no shared carrier list to split, and no "one apart"
+  arithmetic anywhere in S7.
+
+  **The ratified decision row is partly stale, and this spec says which part.** `memory/DECISIONS.md:68`
+  is the append-only, owner-ratified row for this unit. What SURVIVES is the decision itself — a
+  validated halt CODE, never a new phase, ratified by the owner — and its three measurements: nothing
+  outside the kit reads the phase, a new terminal is unwritable without a producer verb, and a
+  non-terminal one wedges the next preflight. What does NOT survive is its final clause, which pins
+  the code to an ORDINAL: true at the base, false at HEAD, and the exact reason this spec now states
+  none. The row is append-only so it is never edited; a superseding row that DROPS the ordinal rather
+  than re-spelling it is the BUILD's to commit at landing and is not in this unit's write set. A
+  builder who greps the decision log and finds the ordinal reads this bullet as the correction.
 - **S4** — two new `.unattended.conf` keys, spelled here rather than described, in the shape the
   existing `PHASES_EXTRA` / `DOD_EXTRA` / `CORE_FLOOR` trio already sets:
   - `HALT_CODES_EXTRA` — OPTIONAL, empty legal, the project's appended members.
@@ -62,36 +74,71 @@ stopped without reading prose.
   and rev-2 pre-applied that recommendation to the files list while leaving the scope item pointing
   at the method. If F3 is resolved the other way, `memory/guides/BUILD-METHOD.md` and its kit
   template join Files touched, and the manifest re-stamp and read-path clauses apply with them.
-- **S7** — the EIGHT-FACT PIN moves to nine, in every place it is spelled, because it has now moved
-  THREE times and left a stale reader every time — the third move landed while this spec was open,
-  which is the argument for enumerating the sites rather than trusting a builder to find them. The
-  three carriers now disagree three ways, and each needs its own edit:
-  - the "exactly eight facts and nothing else" sentence in `tools/unattended/PROTOCOL.template.md`
-    and the installed `memory/guides/UNATTENDED-PROTOCOL.md` — currently correct at eight, moving to
-    nine — plus the closed enumeration beneath it, which gains the code as its NINTH entry;
-  - the driver comment in `unattended.sh`'s resume path, which says the region carries FIVE and has
-    been stale across two moves;
-  - **BOTH** count statements in `memory/map/features/unattended.md`, which say SEVEN — one as a bare
-    numeral before "of them", one before "facts".
+- **S7** — the region's FACT PIN moves, in every place it is spelled, because one new authored fact
+  makes every count statement about that region stale at once. It has moved before and left a stale
+  reader at every move — which is the argument for enumerating the carriers rather than trusting a
+  builder to find them. **No count appears below.** Read the live value out of the protocol at build
+  time; the carriers do not agree with each other today, so the protocol pair is the source and the
+  rest are followers.
+  - `memory/guides/UNATTENDED-PROTOCOL.md` — the count sentence introducing the authored region, and
+    the numbered enumeration beneath it, which gains the code as one more entry.
+  - `tools/unattended/PROTOCOL.template.md` — the same sentence and the same enumeration in the
+    SHIPPED template. The leg byte-compares the shipped template against the installed copy
+    (`check-unattended.sh` check 10), so these two move together or that check reds.
+  - `tools/unattended/unattended.sh` — the resume path's comment about the authored region, which
+    carries its own count statement, is stale at HEAD, and is read by no gate at all.
+  - `memory/map/features/unattended.md` — TWO count statements: one in the run-state-split paragraph,
+    one in the Gaps section's re-derivation note. That dossier's own prose says dossier prose is
+    ungated, so nothing there catches a carrier left behind either.
 
-  Nothing counts the facts, so no leg catches a missed one. Read the current value from the protocol
-  at build time rather than from this bullet: it was seven when this spec was drafted.
+  Nothing counts the facts, so no leg catches a missed carrier. AC8 is the assertion that closes that
+  hole, and it asserts AGREEMENT across these paths rather than any value.
 - **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
-  rendered Skill, and the kit version constants.
+  rendered Skill, and the kit version SITES — which Files touched enumerates BY PATH rather than
+  calling them "the constant", because they are several sites across two kits and naming one is how
+  a half-bumped version ships.
 - **S10** — the REVIEW VERDICT vocabulary gets the same treatment as the halt vocabulary, because it
-  is the same defect one document over and this unit's title is the promise to fix it. Measured over 90
-  tracked review records: 18 distinct `## Verdict` lines, 5 leading tokens, 32 records with no verdict
-  line at all, 2 where `Verdict` is a section heading rather than a verdict, and **zero** carrying the
-  literal clean token the method names as the loop's only exit. So the vocabulary the method states in
-  prose is read by nothing and written consistently by no one. S10 makes a token from a closed set the
-  FIRST line of a review record, adds it to `memory/HYGIENE.md` check 5's grammar for `diff-review` and
-  `spec-audit` records, and makes `TOOL-aBoundedVerdict-1`'s `--review` verb accept exactly that set.
-  **Forward-only**: no retrofit of the 90, for the reason §3 already gives about existing records.
+  is the same defect one document over and this unit's title is the promise to fix it. Measured over
+  the tracked review corpus at this spec's base: 18 distinct `## Verdict` lines, 5 leading tokens, 32
+  records with no verdict line at all, 2 where `Verdict` is a section heading rather than a verdict,
+  and **zero** carrying the literal clean token the method names as the loop's only exit. That is a
+  motivating measurement, not a target — re-derive it with
+  `git ls-files 'memory/builds/*/reviews/*.md'` and read each file's first line. So the vocabulary the
+  method states in prose is read by nothing and written consistently by no one.
+
+  **The set is CLOSED and has exactly three members: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`** — the
+  three `memory/guides/BUILD-METHOD.md:103` already states in prose, which is the floor and not a
+  starting point. **The canonical owner is the MEMORY-TREE kit**: `memory/HYGIENE.md` check 5 and
+  `tools/memory-tree/check-memory-hygiene.sh` enforce record grammar, and the build method is rendered
+  by that kit, so the set lives where the records live.
+
+  S10 makes a member the FIRST line of a review record, adds it to check 5's grammar for
+  `diff-review` and `spec-audit` records, and `TOOL-aBoundedVerdict-1`'s `--review` verb accepts
+  exactly that set. **That is a duplication, and it is STATED rather than resolved**: the two homes
+  sit in independently installable kits and neither may import the other
+  (`TOOL-aBoundedVerdict-4`'s spec records why at `:120-123`), so the set is spelled twice on purpose.
+  The drift is ARMED and not left to prose — ONE row in the cross-kit case table
+  `tools/memory-tree/marker-contract.test.sh` carries, the same harness `TOOL-aBoundedVerdict-4` S2
+  extends and for the same reason. One harness, no new gate leg, and `TOOL-aBoundedVerdict-1`'s AC3 is
+  satisfied by that row rather than by an unobservable claim of byte-identity.
+
+  **Check 5 keeps its number.** It is today a recording-file NAME grammar, and S10 extends the SAME
+  check to the record's first line. Minting a new check number is the alternative, and it moves the
+  hygiene leg's declared check count for no gain, so it is refused.
+
+  **Forward-only**: no retrofit of the existing corpus, for the reason §3 already gives about existing
+  records. **One thing S10 does not settle, stated rather than hidden:** WHICH selector makes check 5
+  forward-only over that corpus. Check 5 already carries a grandfather registry
+  (`memory/project/legacy-files.txt`) and `TOOL-aBoundedVerdict-4` S6 declares a conf CUTOFF key for
+  check 12; either serves and both already exist in this kit, so no new mechanism is needed. Picking
+  between them is the builder's call inside S10's write set, and AC13's green-over-the-real-tree arm
+  is what forces the pick to be made rather than assumed.
+
   S10's write set is `memory/HYGIENE.md` (check 5's grammar),
-  `tools/memory-tree/check-memory-hygiene.sh` and its sibling test, and
-  `tools/memory-tree/HYGIENE.template.md` — none of which rev-5 declared, which is why rev-6 adds
-  them to Files touched and gives S10 its own acceptance criteria. A scope item with no observable
-  and no declared write set is half a unit.
+  `tools/memory-tree/HYGIENE.template.md` (the shipped source of that document),
+  `tools/memory-tree/check-memory-hygiene.sh`, and `tools/memory-tree/check-memory-hygiene.test.sh`.
+  All four are in Files touched and AC13 is the observable. Rev-5 declared none of them and rev-6
+  claimed to have added them without doing so; rev-8 actually does.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
   arm asserts they cannot silently stop carrying it. No existing gate joins a documented invocation
   to the driver's argument set — the adopter check, the protocol parity check and the kickoff-engine
@@ -108,8 +155,10 @@ stopped without reading prose.
   silently.
 - No code on the landed terminal. A landing needs no reason.
 - No code on a park. Parking is unit 5's mechanism and a park is not a halt.
-- No retrofit of existing terminal records BEYOND the ones §4 enumerates. Exactly one tracked record
-  claims the aborted terminal without a code, it is named, and it is migrated by this unit's commit.
+- No retrofit of existing terminal records BEYOND the ones §4 enumerates. The population is the
+  records §4 enumerates AT BUILD TIME, re-derived by the command §4 gives rather than capped at a
+  number here: it grows every time any run aborts, and it has grown repeatedly while this spec was
+  open. Every record that command finds is migrated by this unit's commit, ARCHIVED records included.
   A blanket no-retrofit rule was the rev-3 position and rested on a population that was zero at the
   old base and is not at this one.
 - No claim that the code is trustworthy. The run writes it, as it writes every other authored fact,
@@ -163,28 +212,51 @@ vocabulary already is.
 
 ### Migration
 
-**The population is ONE, named, and it must be retrofitted — re-measured at the merge base.** There
-are four tracked run-state files. Three claim the LANDED terminal; `memory/builds/dClosedLexicon/RUN.md`
-claims ABORTED and carries no code. Rev-2 said the population was zero, which was true at the old
-base and false at this one: that record landed while this spec was open.
+**The population is RE-DERIVED AT BUILD TIME and is not a number in this paragraph.** Every tracked
+run-state file that claims the aborted terminal and carries no code fact is a live subject for AC4's
+leg check, so each one reds the merge bar the day that check lands. Enumerate it with:
 
-So AC4's leg check has a live subject and would red the merge bar the day it lands. The disposition
-is a RETROFIT of that one record, enumerated here rather than waived:
+```bash
+git ls-files 'memory/builds/*/RUN*.md' | xargs grep -l '^phase: ABORTED'   # then read each for a code fact
+```
 
-- The code is `fork unresolvable`, and it is read from the record rather than invented. Its own
-  parked text says the two candidate resolutions are not resolver calls "under a mandate that does
-  not delegate scope" and that its unit is BLOCKED — which is that member's definition.
+**Archived records are NOT exempt, and this is the answer rather than an open question.**
+`check-unattended.sh` selects `memory/builds/<slug>/RUN(.<PHASE>.<blob8>)?.md` — the live record PLUS
+every rotated one, widened at kit 1.6 so that checks 9, 13 and 15 quantify over both. A per-file
+check added by this unit therefore sees an archived `RUN.ABORTED.<blob8>.md` like any other file, and
+exempting them would take a special case in the new check with no reason behind it while leaving the
+bar green over records the leg already reads everywhere else.
+
+The disposition is a RETROFIT, enumerated rather than waived. Each code is READ FROM THAT RECORD'S OWN
+PARKED TEXT and never invented. The table is that reading as measured on 2026-08-20; a record the
+command above finds and this table does not name is migrated the same way, by the same rule:
+
+| record | the code, and the phrase in its own parked text that gives it |
+|---|---|
+| `memory/builds/aMeteredTurnstile/RUN.md` | `gate red out of scope` — aborts "at the landing boundary because the merge bar cannot pass on this host", the canary correctly refusing to certify what it could not observe, landing handed to the owner |
+| `memory/builds/aWalkedCorpus/RUN.md` | `gate red out of scope` — "origin/main is RED on two of its own merge-bar legs", and raising another build's shrink-only pin "is a SCOPE decision a standing mandate does not delegate" |
+| `memory/builds/cBriefedPilot/RUN.md` | `fork unresolvable` — "WHAT I REFUSED TO DECIDE: whether 16 of 22 units is a landable build. That is a scope decision, reserved to the owner by M3 and not delegated" |
+| `memory/builds/dClosedLexicon/RUN.md` | `fork unresolvable` — "REFUSED TO DECIDE ... all three are scope calls the standing mandate does not delegate" |
+| `memory/builds/aBoundedVerdict/RUN.ABORTED.fc79c21d.md` | `gate red out of scope` — the record NAMES the member: "the fix is outside this mandate's authority, which is exactly the gate-red-out-of-scope case" |
+| `memory/builds/aDeclaredBound/RUN.ABORTED.08aaae74.md` | `fork unresolvable` — "neither live blocker is mine to resolve. The first is a SCOPE question ... M3 reserves a fork whose options differ in what gets built to the owner" |
+
+`aDeclaredBound`'s record is the only one with two readings, and the choice is recorded here rather
+than left to the builder: it ALSO spent the review round cap. `review budget exhausted` is not it,
+because S1 re-read that member to name the RUNAWAY CEILING — a backstop whose being reached is itself
+a defect — and that run reached the ordinary round cap instead. Its own text names the surviving
+blocker as a scope fork, so that is the code.
+
+Two properties of the migration, unchanged since rev-4:
+
 - It is a DATA migration performed by this unit's commit, not a driver verb. The driver refuses to
-  move a terminal record on purpose, and nothing here changes that refusal.
-- One record, named in Files touched. No waiver registry, no cutoff, no enumeration file: a
-  one-row registry would need a path, a grammar and a reader, which is more machinery than the row
-  it holds.
-
-**Re-measure before building.** The population moves every time a run aborts, and it moved once
-already inside this build. The count is not carried out of this paragraph.
+  move a terminal record on purpose and nothing here changes that refusal. Adding a code fact to a
+  record that is ALREADY terminal is not the act `memory/builds/aBoundedVerdict/RUN.ABORTED.fc79c21d.md`
+  records refusing, which was writing a TERMINAL onto another node's live run.
+- No waiver registry, no cutoff, no enumeration file: a registry would need a path, a grammar and a
+  reader, which is more machinery than the rows it would hold. The rows are the table above and AC4a.
 
 The corpus therefore DOES exercise the new check, which is better than rev-2's position: the red arm
-has a live subject as well as fixtures in `tools/unattended/check-unattended.test.sh`, rather than
+has live subjects as well as fixtures in `tools/unattended/check-unattended.test.sh`, rather than
 fixtures alone.
 
 ### Rollout
@@ -205,17 +277,18 @@ arm asserts that every tracked file spelling the abort invocation also spells th
 ### The kickoff engine's size budget
 
 S9 edits `skills/session-kickoff/SKILL.md`, which rides a HARD gate leg no other unit in this build
-touches and which this spec's §7 did not name. The file is 18215 bytes against an 18432 ceiling —
-217 under, at 98.8% — and the edit is the code argument on the one abort line plus a code named on
-each code-bearing exit, measured at 102 bytes against a scratch copy, landing at 18317 with 115 to
-spare. **It fits, and the finding is that nothing in the spec knew the margin existed.**
+touches and which this spec's §7 did not name. **No byte figure for that file appears here.** The
+INVOCATION moved at the merge base and the ceiling is no longer a positional: `tools/gate-legs.json`'s
+argv is now `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` with no number, and
+the limit is DECLARED in `tools/template-size-limits.txt`. That leg prints the file's size, its limit,
+the bytes under and the percentage on every run, so the builder measures through the leg's own argv
+and no number is carried in this paragraph — the numbers rev-4 carried here had already moved by the
+time this fold was written, which is the whole argument.
 
-The INVOCATION moved at the merge base and the spec must not carry the old one: the ceiling is no
-longer a positional. `tools/gate-legs.json`'s argv is now `bash tools/check-template-size.sh
-skills/session-kickoff/SKILL.md` with no number, and the limit is DECLARED in the new
-`tools/template-size-limits.txt`. So a unit growing that file spends against a declared limit rather
-than one spelled in a leg, and the builder re-measures through the leg's own argv rather than
-through either number here.
+The edit is the code argument on the one abort line plus a code named on each code-bearing exit —
+tens of bytes, not a rewrite — and it fits with room left over. **The finding is that nothing in the
+spec knew a margin existed at all**, and the fix is that AC9 now re-measures it rather than asserting
+it.
 
 ### Alternatives rejected
 
@@ -237,21 +310,36 @@ through either number here.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` (the vocabulary, the verb, and the stale five-fact comment in the
-resume path) · `tools/unattended/check-unattended.sh` and its sibling ·
+`tools/unattended/unattended.sh` (the vocabulary, the verb, and the resume path's stale fact-count
+comment) · `tools/unattended/check-unattended.sh` and its sibling ·
 `tools/unattended/unattended.test.sh` · `.unattended.conf` ·
 `tools/unattended/.unattended.conf.example` — the seed a real adopter copies, which nothing
 validates against the required-key set · `tools/unattended/kit.toml` ·
 `tools/unattended/PROTOCOL.template.md` and the installed protocol (the verb section, the phase
-section, and the seven-fact pin with its enumeration) · `tools/unattended/SKILL.template.md` and the
+section, and the fact pin with its enumeration) · `tools/unattended/SKILL.template.md` and the
 rendered Skill · `skills/session-kickoff/SKILL.md` (the exits' abort disposition names the code) ·
-`memory/builds/dClosedLexicon/RUN.md` — the ONE tracked record §4's migration retrofits ·
-`memory/map/features/unattended.md` (BOTH fact counts) · `tools/unattended/check-unattended.sh`'s
-header check COUNT and the matching count in `AGENTS.md`'s gate-suite bullet, which S5 moves by one
-and which no gate observes — `TOOL-aBoundedVerdict-1` moves it again, so the two units state their
-moves one apart rather than both writing the same number ·
-`memory/guides/SESSION-KICKOFF.md` (the manifest re-stamp; `.unattended.conf` and the kickoff engine
-are both on its watch list) · the kit version constants.
+EVERY run-state record §4's migration table enumerates, re-derived at build time by §4's command ·
+`memory/map/features/unattended.md` (BOTH of its fact-count statements) ·
+`tools/unattended/check-unattended.sh`'s own header check COUNT, which S5 moves by one and which no
+gate observes — `TOOL-aBoundedVerdict-1` moves it again, so the two units state their moves one apart
+rather than both writing the same number. That header comment is the ONLY carrier of that count: the
+charter's gate-suite enumeration it used to be paired with no longer exists, because the legs are
+single-sourced from `tools/gate-legs.json` now, and `AGENTS.md`'s body is generated between
+`gov:playbook` markers — a hand-edit there reds the playbook parity leg and a template edit is
+outside this unit · S10's four carriers: `memory/HYGIENE.md`,
+`tools/memory-tree/HYGIENE.template.md`, `tools/memory-tree/check-memory-hygiene.sh` and
+`tools/memory-tree/check-memory-hygiene.test.sh` · `memory/guides/SESSION-KICKOFF.md` (the manifest
+re-stamp; `.unattended.conf`, `skills/session-kickoff/SKILL.md` and
+`tools/memory-tree/check-memory-hygiene.sh` are all on its watch list) · the KIT VERSION sites, which
+are never "the constant": for the UNATTENDED kit, `KIT_UNATTENDED_VERSION=` and its same-line
+`gov:kit` marker in BOTH `tools/unattended/unattended.sh` and
+`tools/unattended/check-unattended.sh`, the `gov:kit` marker in
+`tools/unattended/PROTOCOL.template.md` and in `tools/unattended/SKILL.template.md`, and the
+re-rendered `.claude/skills/unattended/SKILL.md` that `tools/check-wiring.sh` compares against the
+tracked copy — all of them forced by `tools/check-kit-versions.sh`; and for the MEMORY-TREE kit that
+S10 edits, `KIT_MEMORY_TREE_VERSION=` in `tools/memory-tree/check-memory-hygiene.sh` plus the
+`gov:kit memory-tree@` marker on every tracked `tools/memory-tree/*.template.md`, a population that
+gate DERIVES rather than lists.
 
 ## 5. Production-readiness checklist
 
@@ -285,12 +373,18 @@ are both on its watch list) · the kit version constants.
   `--resume <slug>` both name it, and resume states the run is finished rather than resumable.
 - **AC4** — When a tracked run-state file claims the aborted terminal and carries no code fact,
   `bash tools/unattended/check-unattended.sh` reds naming the file. No exemption clause and no
-  waiver: the one tracked record in that state is migrated by this unit, so the check is green over
-  the real tree on the day it lands, and both arms also live in
+  waiver: every record §4's migration enumerates at build time is migrated by this unit, so the check
+  is green over the real tree on the day it lands, and both arms also live in
   `tools/unattended/check-unattended.test.sh` fixtures.
-- **AC4a** — When `memory/builds/dClosedLexicon/RUN.md` is read after the migration, it carries the
-  `fork unresolvable` code, and `bash tools/unattended/check-unattended.sh` is green over the whole
-  tracked population re-measured at build time rather than at the count this spec states.
+- **AC4a** — When each record §4's migration table names is read after the migration, it carries the
+  code that table reads out of its own parked text: `gate red out of scope` in
+  `memory/builds/aMeteredTurnstile/RUN.md`, `memory/builds/aWalkedCorpus/RUN.md` and
+  `memory/builds/aBoundedVerdict/RUN.ABORTED.fc79c21d.md`; `fork unresolvable` in
+  `memory/builds/cBriefedPilot/RUN.md`, `memory/builds/dClosedLexicon/RUN.md` and
+  `memory/builds/aDeclaredBound/RUN.ABORTED.08aaae74.md`. And
+  `bash tools/unattended/check-unattended.sh` is green over the whole tracked population RE-DERIVED at
+  build time by §4's command, ARCHIVED records included — a record that command finds and the table
+  does not name is migrated the same way BEFORE this criterion is claimed.
 - **AC5** — When the core vocabulary shrinks below its declared floor,
   `bash tools/unattended/check-unattended.sh` reds; when the floor key is absent or malformed, it
   refuses rather than passing with the pin disarmed.
@@ -303,14 +397,32 @@ are both on its watch list) · the kit version constants.
 - **AC7** — When every tracked file spelling the abort invocation is greped, each also spells the
   code argument — all three documented call sites — and the arm that asserts it lives in
   `tools/unattended/unattended.test.sh`.
-- **AC8** — When the region's fact count is greped across the FIVE statements it is spelled in, none
-  states a stale count. The pattern is NUMBER-AGNOSTIC, not an alternation of the values that happen
-  to be stale today —
-  `grep -rniE '(one|two|three|four|five|six|seven|eight|nine|ten|[0-9]+)[[:space:]]+(facts|of them)' tools/unattended/ memory/guides/ memory/map/`
-  returns only statements naming the current count. Rev-3's two-value alternation would have returned
-  nothing while two carriers still said `eight`, because the pin moved after it was written — the
-  criterion failing in exactly the way it exists to prevent, one word later. The pin has moved three
-  times and a value-listing pattern has been wrong at every move.
+- **AC8** — When the region's fact count is extracted with `sed -nE` from each carrier S7 enumerates
+  — `memory/guides/UNATTENDED-PROTOCOL.md`, `tools/unattended/PROTOCOL.template.md`,
+  `tools/unattended/unattended.sh` and `memory/map/features/unattended.md` — every carrier yields
+  exactly ONE token and all carriers yield the SAME token. The criterion asserts AGREEMENT and never
+  a value, and it is anchored PER CARRIER on that carrier's own sentence rather than on a list of the
+  numerals that happen to be stale today:
+
+  ```bash
+  for f in memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/PROTOCOL.template.md \
+           tools/unattended/unattended.sh memory/map/features/unattended.md; do
+    printf '%s => ' "$f"
+    sed -nE 's/.*(exactly|carries) ([[:alpha:]]+|[0-9]+) facts.*/\2/p;
+             s/.*[^[:alnum:]]([[:alpha:]]+|[0-9]+) of them, enumerated.*/\1/p' "$f" \
+      | sort -u | tr '\n' ' '; echo
+  done
+  ```
+
+  A carrier printing NOTHING is a carrier whose sentence stopped matching, and that reds as loudly as
+  a disagreement. That is the failure the rev-3 and rev-4 patterns each walked into in turn: an
+  alternation of VALUES stops matching the moment the pin moves past its longest listed word, returns
+  zero hits, and reads as green over a stale pin — the criterion failing in exactly the way it exists
+  to prevent. Run over the tree before the edit this prints DISAGREEING tokens, so the criterion is
+  red by construction today and its failing case has been observed rather than imagined.
+  **What it does not check:** it does not count the protocol's numbered enumeration, so it cannot
+  catch an entry added without the count being moved. S7's edit does both in one pass; this criterion
+  catches a carrier LEFT BEHIND, which is the failure that has actually happened at every move.
 - **AC9** — When `skills/session-kickoff/SKILL.md` is edited,
   `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` is green — no positional; the
   ceiling is declared in `tools/template-size-limits.txt` — re-measured rather than assumed.
@@ -321,6 +433,20 @@ are both on its watch list) · the kit version constants.
   `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
   --check` exits 0. `ARMS_FLOORS` moves only where `--report` shows the measured counts grew.
 - **AC12** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
+- **AC13** — When a review record's first line is outside the closed verdict set,
+  `bash tools/memory-tree/check-memory-hygiene.sh` reds naming the file; when it is a member, the
+  check is green — both arms in `tools/memory-tree/check-memory-hygiene.test.sh` fixtures, and green
+  over the real tree, which is what forces S10's forward-only selector to be chosen rather than
+  assumed. The cross-kit agreement row does NOT land here and this criterion does not grade it: the
+  row in `tools/memory-tree/marker-contract.test.sh`'s case table asserts that the hygiene gate and
+  `TOOL-aBoundedVerdict-1`'s `--review` verb accept the same set, and that verb does not exist on the
+  day this unit lands — this unit is sequenced ahead of it. So the armed form of S10's duplication is
+  claimed by that unit, whose Files touched names the harness and whose own criterion grades the row;
+  this unit ships the SET and states the duplication, and the drift arm arrives with the second
+  reader. A criterion graded on a file its spec does not admit editing is the defect this same review
+  round found twice elsewhere in this build. And `bash tools/memory-tree/check-verdict-epoch.sh` is green,
+  which requires `KIT_MEMORY_TREE_VERSION` to move in the same commit because check 5's verdicts
+  changed.
 
 ## 7. Gates
 
@@ -328,9 +454,14 @@ are both on its watch list) · the kit version constants.
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
 `tools/check-template-size.sh skills/session-kickoff/SKILL.md` — the hard leg on the kickoff engine,
-at 98.8% of the ceiling declared in `tools/template-size-limits.txt` · `skills/session-kickoff/manifest-check.sh` ·
-`tools/memory-tree/check-memory-hygiene.sh` — this unit edits two files under the memory root and
-grows a read-path member, and rev-2's gate list omitted it ·
+whose ceiling is declared in `tools/template-size-limits.txt` and whose headroom the leg itself
+prints · `skills/session-kickoff/manifest-check.sh` ·
+`tools/memory-tree/check-memory-hygiene.sh` and `tools/memory-tree/check-memory-hygiene.test.sh` —
+S10 edits check 5's grammar, and this unit also edits two files under the memory root and grows a
+read-path member · `tools/memory-tree/check-verdict-epoch.sh` — the constant that DATES the engine's
+verdicts must move when they do, and S10 moves them ·
+`tools/memory-tree/marker-contract.test.sh` — the cross-kit case table that carries S10's
+verdict-set agreement row ·
 `python tools/memory-tree/corpus_ids.py --report` for the read-path share ·
 `python tools/memory-tree/check-arms.py` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `python tools/drift-audit/drift_report.py
@@ -430,6 +561,48 @@ This line is the machine-read one; the bullets carry the reasoning.
   stopped at rev-5 — a rev bump whose only record is the number in the header is the change nobody can
   audit, and it is the same class as a fork mark that never landed. What rev-6 added, recovered from
   §4: the three carriers rev-5 did not declare.
+
+- rev-8 · 2026-08-20 · folded the M4 spec audit's 2026-08-20 round — three blockers, and every one of
+  them was a stale MEASUREMENT still being treated as a fact. **B1**: §4's migration said there were
+  four tracked run-state files with one codeless ABORTED record, while §3 capped the retrofit at
+  "exactly one" and AC4 forbade both an exemption and a waiver — so a builder obeying §3 would have
+  landed a leg check that reds the bar over every record §3 told it to leave alone. The population is
+  now RE-DERIVED by a command, the records are enumerated in a table with each code read out of that
+  record's own parked text, §3's cap points at that table instead of at a number, and the question
+  nobody had answered — are the two archived `RUN.<phase>.<blob8>.md` records exempt — is answered
+  NO, from the leg's own selector, which has quantified over archived records since kit 1.6.
+  **B2 and L4**: S7 instructed an edit of numerals that exist in no carrier (`eight`→`nine`, a "NINTH
+  entry", a driver comment said to read FIVE) and Files touched said "the seven-fact pin", so the pin
+  move would silently not have happened while S3 in the same spec said every ordinal had been deleted.
+  S7 is now a numeral-free list of carrier PATHS with each site's role, and so is Files touched. The
+  audit's brief listed the map dossier as no longer a carrier; it still holds TWO count statements at
+  HEAD, so it stays in the list — dropping a live carrier is how this pin went stale three times.
+  **B3**: S10 asserted that rev-6 "adds them to Files touched and gives S10 its own acceptance
+  criteria" and NEITHER had happened — no memory-tree carrier was in Files touched and no AC mentioned
+  a verdict token. The false self-claim is deleted, the four carriers are declared, AC13 is the red/green
+  criterion over hygiene check 5, and `check-verdict-epoch.sh`, the hygiene sibling test and the
+  marker-contract harness join §7. **H1**: AC8's "number-agnostic" alternation stopped at `ten` while
+  the pin reads past it, so it returned zero hits and read GREEN over a stale pin — the failure its own
+  text says it was rewritten to prevent, one word later. It now extracts one token per carrier and
+  asserts the tokens are EQUAL, anchored on each carrier's own sentence; the predicate was run over the
+  real tree during the fold and prints disagreeing tokens, so its failing case has been observed.
+  It also states what it does not check. **H2**: S3 said this build "moves the pin exactly once" against
+  a README that had been corrected to name two movers; with `TOOL-aBoundedVerdict-21` PARKED there is
+  exactly one mover again, and S3 says which and why rather than counting. **H3**: the verdict token set
+  was demanded byte-identical to "the one -2 defines" while -2 enumerated no member and named no source.
+  S10 now enumerates `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`, names the memory-tree kit as canonical
+  owner, and replaces the unobservable byte-identity claim with a row in the cross-kit case table
+  `TOOL-aBoundedVerdict-4` S2 already extends — one harness, no new gate leg. **H4**: Files touched
+  instructed an edit to `AGENTS.md`'s gate-suite bullet, which no longer exists and sits inside a
+  generated `gov:playbook` region besides; that carrier is deleted and the leg's own header comment is
+  named as the only one. **H22**: `memory/DECISIONS.md:68` is now cited in S3, which states that the
+  decision and its three measurements survive and the ORDINAL clause does not, and that the superseding
+  row is the build's to commit rather than this unit's to write. Two fixes offered a choice and both took
+  the narrower option: check 5 is EXTENDED rather than renumbered (a new number moves the hygiene leg's
+  check count for nothing), and S10 stays in this unit rather than splitting into its own (a split needs
+  an id, a spec and a roster edit to fix a false sentence). Not folded by choice: the byte figures for
+  the kickoff engine's size budget were deleted for the same reason as everything else here — the leg
+  prints size, limit and headroom on every run, and the numbers rev-4 wrote had already moved.
 
 ## 10. Reuse audit
 
