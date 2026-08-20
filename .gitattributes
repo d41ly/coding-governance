@@ -164,3 +164,6 @@ tools/*/kit.toml text eol=lf
 .lexicon.conf text eol=lf
 memory/guides/PLAYBOOK-TEMPLATE.md eol=lf
 tools/unattended/PLAYBOOK-TEMPLATE.template.md eol=lf
+tools/unattended/check-playbook.sh eol=lf
+tools/unattended/check-playbook.test.sh eol=lf
+tools/unattended/playbook.fixture.md eol=lf

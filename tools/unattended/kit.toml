@@ -62,6 +62,20 @@ argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
 red_after_land = true
 
+# TOOL-dScriptedRepeat-3 - the playbook validity leg. No guard: it grades an adopter's playbooks and
+# the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
+# change a playbook.
+[[gate_leg]]
+name = "playbook validity gate"
+argv = ["bash", "{kit}/check-playbook.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
+name = "playbook validity selftest"
+argv = ["bash", "{kit}/check-playbook.test.sh"]
+guard = ["{kit}/"]
+
 [[gate_leg]]
 name = "unattended skill wiring"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 88 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 17 · guides: 4 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 90 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 17 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -63,6 +63,8 @@ Inventories: gate-legs: 88 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `playbook placeholder catalogue` | lexicon |
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
+| `playbook validity gate` | playbook-mode |
+| `playbook validity selftest` | playbook-mode |
 | `pre-push self-test` | baseline |
 | `profile-bar selftest` | run-gates |
 | `push-main self-test` | baseline |
@@ -177,6 +179,7 @@ Inventories: gate-legs: 88 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | key | claimant |
 |---|---|
 | `BUILD-METHOD.md` | build-method |
+| `PLAYBOOK-TEMPLATE.md` | playbook-mode |
 | `REVIEW-PROTOCOL.md` | agent-cap |
 | `SESSION-KICKOFF.md` | session-kickoff |
 | `UNATTENDED-PROTOCOL.md` | unattended |
