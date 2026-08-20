@@ -869,7 +869,14 @@ fi
 # ---- POPULATION IS DERIVED, never listed: `git ls-files` over the memory root's build READMEs. A
 # ---- hand-kept list goes stale the first time a build folder lands. This check exists because
 # ---- nothing gated the markers' PRESENCE - only their well-formedness once present - which another
-# ---- node reported independently from a live run as TOOL-aPacedTurnstile-14.
+# ---- node reported independently from a live run.
+# ----
+# ---- That report named the AUTHORED `roster:units` pair, and S5's answer was to make the GENERATED
+# ---- pair mandatory instead - so this gates a DIFFERENT pair from the one reported missing, and
+# ---- reading it as the report's own fix is wrong. The report is a live row in the tooling backlog
+# ---- shard, filed from the aPacedTurnstile run. Its id is deliberately NOT spelled here: it now
+# ---- names a non-terminal spec, and drift-audit's oracle reads a shipped-source citation of one as
+# ---- proof that its work shipped. Re-adding the id reds `drift-audit records` on the next bar.
 # ----
 # ---- The generator CREATES a missing pair on --write, so the repair is one render and the refusal
 # ---- names it: the SCRIPT and its mode, never a launcher, because this repo cannot assume a bare
