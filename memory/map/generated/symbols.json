@@ -433,6 +433,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_packing",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

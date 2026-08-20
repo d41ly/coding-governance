@@ -1,6 +1,6 @@
 # TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess
 
-**Status:** INPROGRESS · rev-3 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 ## 1. Goal
 
@@ -177,6 +177,9 @@ none — the three forks below are RESOLVED (agent, 2026-08-20, delegated) and m
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-4 · 2026-08-20 · CLOSED. The closing review returned 3 blockers; all are fixed
+  and each fix carries an arm observed RED against the reintroduced defect. Fold-in
+  recorded in `reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md`.
 - rev-3 · 2026-08-20 · §8 gained a machine-legal first line. All three forks were already marked
   RESOLVED in place, but the classifier reads §8's first non-blank line and nothing else, so the unit
   read FORKED to `--plan` while being materially resolved. No option changed.

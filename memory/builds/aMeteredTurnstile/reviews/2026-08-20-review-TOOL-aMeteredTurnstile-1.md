@@ -2,6 +2,8 @@
 
 **Serves:** diff-review TOOL-aMeteredTurnstile-1
 
+Run BASE pinned by `--preflight`: `3355837a`. The range reviewed below deliberately starts EARLIER, at `56b945cb`, which is where this build's own diff begins — the unattended run was opened after the code was written, so the run's base and the build's base are different shas and both are recorded rather than conflated.
+
 
 Reviewed range: `56b945cbb0613b1352dd06221d4d39940db33419...HEAD` — the cumulative diff landing on `main`
 (5 commits, 18 files, +1198/-5). The whole product surface under review is
