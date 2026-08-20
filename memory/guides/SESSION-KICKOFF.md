@@ -111,6 +111,11 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-20 · `AGENTS.md`'s merge-bar section states the bar costs 873 s of wall against a 4018 s
+  leg-sum · MEASURED over four `GATE_FULL` width-8 runs on node `a`: spans 925-1058 s, mean 1001.3 s,
+  leg-sums 4644-6128 s. The stated wall is 14.7 % low and the leg-sum is low by more. Both are prose
+  beside a source that owns them, which is the rule that line breaks. `TOOL-aMeteredTurnstile-4` ·
+  prune when the charter stops stating either number.
 
 
 ### Environment traps worth front-loading
@@ -155,6 +160,9 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
   re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
+- The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
+  `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
+  here: checks 5, 9 and 21 all fired only once the folder was staged.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The hooks kit (1.5) ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
