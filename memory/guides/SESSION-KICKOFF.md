@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-20T18:11:07+03:00 @ e6098aa43b8341c1977532d8fec17105cb7aa1e5
+last-audit: 2026-08-20T18:22:20+03:00 @ e6098aa43b8341c1977532d8fec17105cb7aa1e5
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 4a5778e5ae8350c8d3f3f1c65bd2bfc539854b46
+last-body-change: e6098aa43b8341c1977532d8fec17105cb7aa1e5
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -98,8 +98,9 @@ Tier 1 (gates + one focused self-review).
 
 ### ID + work-state protocol
 
-`FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = node tag
-(`a`) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+`FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = YOUR node tag
+(identify the node by machine/user against the AGENTS.md registry, never by path — all four rows pin the
+same primary tree, so the path cannot tell them apart) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
@@ -109,6 +110,12 @@ re-renders them from build front matter); there is no authored ledger to update.
 
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
+
+- 2026-08-20 · the DoD bar · `GATE_FULL=1 bash tools/run-gates/run-gates.sh` cannot go green on
+  `main` today: the `govkit acceptance matrix` leg is RED there, verified on a clean detached
+  worktree at `e6098aa`. `render_playbook.py:64` imports `tomllib` unconditionally and the scratch
+  install resolves a python below 3.11. The leg is GUARDED, so every scoped bar skips it and only a
+  full run sees it. · prune when `TOOL-dSettledRoster-3` closes.
 
 
 ### Environment traps worth front-loading
