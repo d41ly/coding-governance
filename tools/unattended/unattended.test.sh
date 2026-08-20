@@ -2250,6 +2250,12 @@ reset_tree
 # ---- the mechanism is measured on THIS node first and the wiring is read at source afterwards.
 # ---------------------------------------------------------------------------------------------
 
+# PROGRESS MARKERS, on stderr, unconditional, and deliberate rather than debug residue. This
+# leg's tracked incident is a 240s SILENT hang that wedged the whole bar, and on a contended
+# node a hang and mere slowness are indistinguishable from a wall clock alone — measured while
+# arming this block, which failed to finish inside 1200s once and printed nothing inside 900s
+# another time, both while a second session held the box. A marker per arm turns "the leg is
+# stuck" into "the leg is stuck HERE", which is the difference between a bisect and a guess.
 echo "MARK mechanism" >&2
 # ---- AC1a, THE MECHANISM ARM, and the reason it leads: `out=$(timeout N cmd)` does NOT bound the
 # ---- clock. The substitution reads until EOF, EOF arrives when the last inherited write end closes,
@@ -2471,7 +2477,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=338
+FLOOR_ASSERTIONS=426
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
