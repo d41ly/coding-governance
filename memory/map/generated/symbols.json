@@ -163,6 +163,16 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "addRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "addTarget",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "adopt",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -286,6 +296,31 @@
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "buildBlankedRun",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildCommandView",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildComparablePath",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildResolvedTarget",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildRootVariants",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "build_base_dir",
@@ -416,6 +451,16 @@
       "id": "check",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "checkCommand",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkUnderRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "check_audit",
@@ -1285,6 +1330,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
     {
@@ -1703,6 +1753,16 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readTokenAt",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1833,6 +1893,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "renderDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "render_affordance_exempt",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1926,6 +1991,21 @@
       "id": "resolve",
       "kind": "function",
       "file": "tools/memory-recall/recall_conf.py"
+    },
+    {
+      "id": "resolveAllowedRoots",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveHomeRoots",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveRealPath",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "resolve_bash",
@@ -2161,6 +2241,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scanWriteTargets",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scan_claimed_paths",

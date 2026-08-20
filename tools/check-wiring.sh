@@ -17,7 +17,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.0
+KIT_CHECK_WIRING_VERSION=1.1
 set -u
 
 MODE=check
@@ -143,6 +143,56 @@ check_agentcap() {
     echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-tools/settings-merge.py}"
   else
     echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
+  fi
+  unwired=$((unwired+1))
+}
+
+# --- Check S: scratch-guard PreToolUse hook -------------------------------------------------------
+# Reads marker, matcher and hook path from the SHIPPED fragment, the way the recall arm does and the
+# agent-cap arm above does not. That is deliberate: this arm should assert nothing the kit does not
+# itself declare, so widening the matcher is a one-line fragment edit rather than a two-file edit
+# with a drift window between them.
+#
+# Unlike recall, this hook is NOT an opt-in — it ships wired with the hooks kit — so an absent hook
+# file means "kit not adopted here" and a present-but-unwired one is a real UNWIRED, exactly as for
+# agent-cap. A guard that is silent when unwired looks identical to a guard that is passing.
+# Advisory like every other arm: no mode rewrites settings.json.
+check_scratch_guard() {
+  local frag smerge marker hookjs smatcher found
+  frag=$(first_of hooks/scratch-guard.fragment.json tools/hooks/scratch-guard.fragment.json)
+  if [ -z "$frag" ]; then
+    echo "skip     scratch   — hooks kit does not ship scratch-guard.fragment.json here"
+    return
+  fi
+  smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  marker=$(json_str "$frag" marker)
+  hookjs=$(json_str "$frag" hook_path)
+  smatcher=$(json_str "$frag" matcher)
+  if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
+    echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+    unwired=$((unwired+1))
+    return
+  fi
+  if [ ! -f "$hookjs" ]; then
+    if wired "$marker" "$smatcher"; then
+      echo "UNWIRED  scratch   — settings.json dispatches the guard but $hookjs is missing; every shell call runs node against nothing. Fix: cp ${frag%/*}/scratch-guard.js $hookjs"
+      unwired=$((unwired+1))
+    else
+      echo "skip     scratch   — not adopted ($hookjs absent)"
+    fi
+    return
+  fi
+  if wired "$marker" "$smatcher"; then
+    echo "ok       scratch   — PreToolUse guard wired in .claude/settings.json (matcher '$smatcher')"
+    return
+  fi
+  # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
+  # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
+  found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
+  if [ -n "$found" ]; then
+    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+  else
+    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
   fi
   unwired=$((unwired+1))
 }
@@ -556,6 +606,7 @@ check_skill_install() {
 
 check_hooks
 check_agentcap
+check_scratch_guard
 check_recall_opened
 check_merge_rows
 check_eol

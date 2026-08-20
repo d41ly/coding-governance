@@ -78,6 +78,8 @@
 - TOOL-aBoundedVerdict-11 · the units region becomes GENERATED and MANDATORY; the frozen scope is its unit-ID SET (BASE subset of HEAD), never row bytes, which carry status and rev. Reverses aBoundedVerdict-1's cap knowingly (owner): the method's only exit occurs 0 of 90
 
 - TOOL-aMeteredTurnstile-1 · the bar gets an INSTRUMENT before another fix. Its two lower bounds are the longest leg and work over width; the larger decides which lever works, and nothing computed it. The verb WRAPS an unmodified runner, since every unbuilt aPacedTurnstile unit edits that file
+- TOOL-aTetheredScratch-1 · the home-directory litter was AGENT-authored: no tracked file writes to `$HOME`, so the guard binds at the tool call. Its allowlist is DERIVED from `TMPDIR`/`TEMP`/`TMP` — `%TEMP%` is INSIDE `$HOME` on Windows, and a hardcoded one denied 73 of 123 legitimate commands
+- TOOL-aTetheredScratch-2 · the `TMPDIR` retarget was specced, audited and REFUSED on measurement: `/tmp` is a `usertemp` mount onto `%TEMP%`, which is under `$HOME`, so no external root exists. 71% of the crowding was one defect, so the defect was fixed instead
 
 ## DEPL — deployer
 

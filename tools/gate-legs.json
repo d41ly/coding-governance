@@ -160,6 +160,17 @@
     ]
   },
   {
+    "name": "scratch-guard self-test",
+    "argv": [
+      "bash",
+      "tools/hooks/scratch-guard.test.sh"
+    ],
+    "guard": [
+      "tools/hooks/",
+      "tools/lib/"
+    ]
+  },
+  {
     "name": "agent-instructions self-test",
     "argv": [
       "bash",
