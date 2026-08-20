@@ -1268,11 +1268,102 @@ miss "$out" "check 22 skipped"
 miss "$out" "check 22 FAILED"
 reset_tree
 
+# ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.
+# ---- The sibling verb records what a dispatched pass said it would write; this is the half that can
+# ---- catch the declaration out, because the two artifacts are made by different acts at different
+# ---- times. What it cannot buy is in its own header: both are authored by the run.
+drow() {               # unit · declared paths — a dispatch row at the CURRENT HEAD
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' \
+    "$(git rev-parse --short=8 HEAD)" "$1" "$2" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+
+# a pass that commits INSIDE its declared set is clean
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# ...declaring MORE than you use is conservative and fine
+reset_tree
+drow ARCH-tRun-1 "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
+# ---- the same silence with the declared paths MOVED is the join being dodged.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
+miss "$(run)" "check 23 FAILED"
+
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
+hit "$(run)" "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
+
+# ---- AMBIGUOUS ATTRIBUTION is refused rather than guessed: a subset test over a commit that could
+# ---- belong to either of two passes proves nothing about either.
+reset_tree
+# BOTH ROWS AT ONE ANCHOR — that is what makes them one GROUP. Declaring them in two commits gives
+# them two anchors and no sibling relation, which is a fixture that tests nothing.
+G=$(git rev-parse --short=8 HEAD)
+printf '
+2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt
+' "$G" >> memory/builds/tRun/RUN.md
+printf '
+2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-2 · reason work/two.txt
+' "$G" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "declare both passes of one group" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 in one commit" --no-verify
+hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
+
+# ---- THE WINDOW IS THE FIRST COMMIT AND NOTHING AFTER IT. A pass's later review fold lands outside
+# ---- its group by construction, and grading it would red an ordinary sequential fold with no
+# ---- in-band repair — which is the defect this rule was rewritten to avoid.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf 'folded\n' > work/later.txt
+git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
+# ---- default run must still print nothing.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
+out=$(run)
+miss "$out" "check 23 skipped"
+miss "$out" "check 23 FAILED"
+
+reset_tree
+printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "a group anchor this clone does not carry" --no-verify
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
+reset_tree
+
+# RAISED 200 -> 243 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
+# it is a number: the sibling suite carried a sixty-arm slack and hid FIFTY stranded arms behind it in
+# this same session. Pinned AT the count.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=200
+FLOOR_ASSERTIONS=243
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

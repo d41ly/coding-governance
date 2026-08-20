@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-TWO checks over the tree.
+# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-THREE checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -968,6 +968,110 @@ for f in $RUNS; do
       done
   fi
 
+done
+
+# ---- 23: a DECLARED write set against what the pass actually committed. TOOL-dUnstalledConvoy-10.
+# ---- The sibling verb records what a concurrently dispatched pass SAID it would write; this is the
+# ---- half that can catch the declaration out. The two artifacts are produced by different acts at
+# ---- different times, which is the whole of why the comparison is worth making.
+# ----
+# ---- WHAT IT CANNOT BUY: both artifacts are authored by the run — it wrote the rows and it made the
+# ---- commits — so a run determined to hide a collision can simply declare the wider set up front.
+# ---- That is a more expensive lie than the failure this catches, and this check does not claim to
+# ---- reach it. A green row here is not proof two passes were disjoint.
+# ----
+# ---- THE JOIN is the unit id in the commit subject, which the build method already requires of every
+# ---- pass commit for its own reasons. This check consumes that rule rather than inventing an
+# ---- attribution mechanism, and refuses an ambiguous subject rather than guessing which pass a
+# ---- commit belongs to.
+# ----
+# ---- THE WINDOW is the FIRST commit after the group anchor naming the unit, and nothing later. A
+# ---- pass's own review fold or spec bump lands after its group has ended and is outside it by
+# ---- construction; grading those would red an ordinary sequential fold with no in-band repair.
+for f in $RUNS; do
+  [ -f "$f" ] || continue
+  case "$f" in *"/RUN.md") ;; *) continue ;; esac
+  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
+  dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null || true)
+  if [ -z "$dsrows" ]; then
+    report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
+    continue
+  fi
+  while IFS= read -r dsrow; do
+    [ -n "$dsrow" ] || continue
+    dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
+    dsgrp=${dsitem%% *}; dsunit=${dsitem#* }
+    dsdecl=${dsrow#* · reason }
+    if ! GIT rev-parse --verify --quiet "$dsgrp^{commit}" >/dev/null 2>&1; then
+      report "check 23 skipped for $dsunit in $f — the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
+      continue
+    fi
+    if ! GIT merge-base --is-ancestor "$dsgrp" HEAD 2>/dev/null; then
+      report "check 23 skipped for $dsunit in $f — the group anchor is not an ancestor of HEAD, so this clone does not carry the history the declaration was made against"
+      continue
+    fi
+    # THE FIRST commit naming the unit, oldest-first, and nothing after it.
+    # A RUN-STATE BOOKKEEPING COMMIT IS NOT A PASS COMMIT, and skipping it is not a convenience.
+    # `--dispatch` STAGES the run-state file, so the run commits the declaration itself — and that
+    # commit's subject names the unit, being about it. Without this skip the DECLARATION is read as
+    # the pass's own commit, the subset test runs against a diff touching only the run-state file, and
+    # the check reds on every correctly declared pass. Measured on this unit's own fixture.
+    dshit=""
+    for dsc in $(GIT log --reverse --format=%H "$dsgrp"..HEAD 2>/dev/null); do
+      case "$(GIT log -1 --format=%s "$dsc" 2>/dev/null)" in *"$dsunit"*) ;; *) continue ;; esac
+      case "$(GIT diff-tree --no-commit-id --name-only -r "$dsc" 2>/dev/null | grep -v -x -F "$f")" in
+        "") continue ;;
+      esac
+      dshit="$dsc"; break
+    done
+    if [ -z "$dshit" ]; then
+      # NO COMMIT NAMES THE PASS. Legal when the pass produced no change - M6 says a pass that
+      # changed nothing commits nothing. NOT legal when the declared paths moved anyway: that is the
+      # declared work happening while the join is dodged, and it is the only reading of this state
+      # that is a defect. Keyed on the PATHS and not on a subject naming no id at all, because the
+      # latter reds on every witness commit a run makes between passes.
+      dsmoved=""
+      for dsp in $dsdecl; do
+        GIT log --format=%H "$dsgrp"..HEAD -- "$dsp" 2>/dev/null | grep -q . && dsmoved="$dsmoved $dsp"
+      done
+      # ...and the run-state file is excluded from the OUTSIDE test too, for the same reason.
+      if [ -n "$dsmoved" ]; then
+        fail 23 "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged: $dsunit wrote$dsmoved in $f"
+      else
+        report "check 23 observed for $dsunit in $f — no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
+      fi
+      continue
+    fi
+    # AMBIGUOUS ATTRIBUTION is a refusal, never a guess: a subset test over a commit that could
+    # belong to either of two passes proves nothing about either.
+    dsother=""
+    while IFS= read -r dssib; do
+      [ -n "$dssib" ] || continue
+      dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
+      dssunit=${dssitem#* }
+      [ "$dssunit" = "$dsunit" ] && continue
+      case "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" in *"$dssunit"*) dsother="$dssunit" ;; esac
+    done <<DSSIBS
+$(grep -F -- " dispatch · item $dsgrp " "$f" 2>/dev/null)
+DSSIBS
+    if [ -n "$dsother" ]; then
+      fail 23 "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available: $dsunit and $dsother in $f"
+      continue
+    fi
+    # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
+    # declaration is the defect.
+    dsout=""
+    for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+      dsok=0
+      for dsp in $dsdecl; do
+        case "$dsq" in "$dsp"|"$dsp"/*) dsok=1; break ;; esac
+      done
+      [ "$dsok" = 1 ] || dsout="$dsout $dsq"
+    done
+    [ -z "$dsout" ] || fail 23 "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked: $dsunit at $dshit wrote$dsout in $f"
+  done <<DSROWS
+$dsrows
+DSROWS
 done
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed

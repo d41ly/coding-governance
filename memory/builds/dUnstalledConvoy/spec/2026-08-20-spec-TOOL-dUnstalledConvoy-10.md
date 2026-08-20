@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -13,22 +13,28 @@ formality into a claim that can be caught out.
 
 - **S1** — a new check inside `tools/unattended/check-unattended.sh`, not a new gate leg, for the
   reason units 6 and 13 give.
-- **S2** — for each `dispatch` row, the check selects commits in a BOUNDED range: after the row's
-  recorded group anchor and at or before the group's recorded CLOSE anchor, whose subject names the
-  row's unit id. Review fold: H7. An open-topped range graded every later commit for that unit against
-  a window that had closed — and M6's pass set includes a spec reviewed and a review's fixes folded
-  in, both of which routinely happen after a concurrent group ends, so an ordinary sequential fold
-  would red the bar with no in-band repair. The close anchor is recorded by the same verb that records
-  the group, as its own row.
+- **S2** — for each `dispatch` row, the check selects the FIRST commit after the row's recorded group
+  anchor whose subject names the row's unit id, and grades that one alone. Later commits naming the
+  same unit are outside the group BY CONSTRUCTION. Review fold: H7, whose second disposition this is.
+  An open-topped range graded every later commit against a window that had closed — and M6's pass set
+  includes a spec reviewed and a review's fixes folded in, both of which routinely happen after a
+  concurrent group ends, so an ordinary sequential fold would have redded the bar with no in-band
+  repair. **Amended at rev-3, before any code:** H7's FIRST disposition was a recorded CLOSE anchor,
+  and it needs a verb and a row type the sibling unit never built. A first-commit rule needs neither,
+  bounds the window just as tightly, and cannot drift out of step with a close nobody remembered to
+  record. The cost is stated rather than hidden: a pass that legitimately commits TWICE inside its own
+  group has only its first commit graded, which is a narrower check than a close anchor would give.
 - **S3** — the union of paths those commits touched must be a SUBSET of the row's declared set. A
   path outside it is a refusal naming the unit id, the path, and the commit that carried it.
-- **S4** — the no-commit case is SPLIT, because one line was covering two very different states.
-  Review fold: M2. An EMPTY range between the anchors is an announced observation: a declared pass
-  that produced no change is legal, and M6 says so. But a range containing a commit whose subject
-  names NO unit id from the group is a REFUSAL — that is a pass which committed while evading the
-  only join this check has, and M6's id-in-subject rule is an instruction no gate anywhere enforces,
-  so it is reachable by accident as much as by design. Collapsing the two made the evasion look
-  exactly like the benign case.
+- **S4** — the no-commit case is SPLIT, because one line was covering two very different states, and
+  the split keys on the DECLARED PATHS rather than on subject-naming. Review fold: M2, refined at
+  rev-4. An empty outcome is an announced observation: a declared pass that produced no change is
+  legal and M6 says so. But if any commit after the group anchor TOUCHES A PATH IN THAT PASS'S
+  DECLARED SET while no commit names the unit, that is the evasion — the declared work happened and
+  the join was dodged — and it is a REFUSAL. The first draft keyed the refusal on a commit whose
+  subject named no unit id at all, which would red on every ordinary witness or bookkeeping commit a
+  run makes between passes, so it was a check that reds on correct behaviour. Keying on the declared
+  paths catches exactly the case the finding was about and nothing else.
 - **S5** — a commit whose subject names TWO unit ids from the same group is a refusal, because the
   join becomes ambiguous and a subset test over an ambiguous attribution proves nothing.
 - **S6** — every case the check cannot compare ANNOUNCES itself: an unresolvable group anchor, a run
@@ -136,8 +142,9 @@ every run in the tree today and would look like coverage of a mechanism nobody h
 - **AC3** — A fixture whose range between the anchors is EMPTY produces an announced observation and
   does NOT red; a fixture whose range holds a commit with an id-less subject REDS. Both observed in
   `tools/unattended/check-unattended.test.sh`. Review fold: M2, one criterion per branch.
-- **AC9** — A fixture with a post-group sequential commit naming the unit id, made after the recorded
-  close anchor, PASSES, observed in `tools/unattended/check-unattended.test.sh`. Review fold: H7.
+- **AC9** — A fixture whose pass commits, and then commits AGAIN later naming the same unit id with a
+  path outside the declared set, PASSES — the second commit is outside the group by construction.
+  Observed in `tools/unattended/check-unattended.test.sh`. Review fold: H7.
 - **AC10** — The header of the new check STATES what it cannot buy, observed by `grep` over
   `tools/unattended/check-unattended.sh`. Review fold: L1.
 - **AC4** — A fixture with one commit naming two unit ids from the same group reds on ambiguous
@@ -171,6 +178,23 @@ boundary.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · built, and ONE defect the spec could not have predicted: `--dispatch` STAGES
+  the run-state file, so the run commits the DECLARATION itself — and that commit's subject names the
+  unit, being about it. The join therefore read the declaration as the pass's own commit, ran the
+  subset test against a diff touching only the run-state file, and redded every correctly declared
+  pass. A run-state bookkeeping commit is not a pass commit, and the check now says so and skips it.
+  Caught by the fixture, like every other defect this build has found in its own checks.
+- rev-4 · 2026-08-21 · S2 amended before any code, per M2. rev-3 folded H7 as a recorded group CLOSE
+  anchor, and that needs a verb and a row type `TOOL-dUnstalledConvoy-9` never built — the same
+  cross-spec interface gap the widening rule was, caught the same way, by reading the pair together at
+  the pass boundary. H7's SECOND disposition needs neither: the FIRST commit after the anchor naming
+  the unit is the pass's commit, and later ones are outside the group by construction. It bounds the
+  window just as tightly and cannot drift out of step with a close nobody remembered to record. The
+  narrower coverage it buys — a pass that commits twice inside its own group has only its first commit
+  graded — is stated in S2 rather than left implicit. S4 is refined in the same pass: its refusal keys
+  on the DECLARED PATHS being touched without the unit being named, because the drafted version keyed
+  on a subject naming no unit id and would have redded on every witness commit a run makes between
+  passes — a check that reds on correct behaviour.
 - rev-3 · 2026-08-20 · folded the spec audit: H7 (the commit range gains a recorded CLOSE anchor, so a
   later sequential fold is not graded against a window that has closed), M2 (the no-commit case splits
   — an empty range announces, an id-less subject reds), M8 (documentation is the check's own source
