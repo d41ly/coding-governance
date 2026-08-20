@@ -131,14 +131,24 @@ concurrently — and their write sets intersect in the protocol document, so the
   measured counts actually grew. Measured: adding one refusal to the driver reds the meta-gate
   immediately, naming the unarmed branch — and only one of the two unattended gates is fully armed,
   the driver carrying a standing pin for one branch.
-- **The authored region's fact pin moves exactly once, and only for a singleton.** The binding
-  protocol pins that region at a closed, enumerated set of facts, and the pin has moved twice before
-  leaving a stale reader each time — the driver's own resume comment still says five. This build
-  therefore splits by SHAPE, not by convenience: `TOOL-aBoundedVerdict-2`'s halt code is a per-run
-  singleton three readers read by key, so it becomes the eighth fact and that unit moves the pin in
-  all four places it is spelled. `TOOL-aBoundedVerdict-1`'s review rounds are append-only history, so
-  they become lines under a new park KIND and move nothing — which is what a tracked sibling spec
-  chose for the identical question, by name.
+- **The authored region's fact pin moves only for a per-run SINGLETON, and whoever moves it moves
+  every spelling of it.** The binding protocol pins that region at a closed, enumerated set of facts,
+  and the pin has moved three times before leaving a stale reader each time. This build therefore
+  splits by SHAPE, not by convenience. Two units qualify and both move it:
+  `TOOL-aBoundedVerdict-2`'s halt code is a per-run singleton three readers read by key, and
+  `TOOL-aBoundedVerdict-21`'s push-attempt record is a per-run singleton the resume path reads by key.
+  `TOOL-aBoundedVerdict-1`'s review rounds are append-only history, so they become lines under a new
+  park KIND and move nothing — which is what a tracked sibling spec chose for the identical question,
+  by name.
+  **Corrected 2026-08-20 (M3 fork sweep).** This rule read "moves exactly once", and it was written
+  before `TOOL-aBoundedVerdict-21` existed — the owner created that unit on 2026-08-19 by resolving
+  `TOOL-aBoundedVerdict-13` F3, and its F2 needs a fact for a reason the once-rule never weighed: S5's
+  resume path READS the attempt by key, and a parked line is append-only prose no reader can join on.
+  A build rule that forbids what a later owner-created unit requires is a defect in the rule. What the
+  rule was actually protecting — no fact for a non-singleton, and no partial pin move — is kept
+  verbatim and both movers are bound by it. The rule also spelled a NUMERAL ("the eighth fact"), which
+  had already gone stale twice by the time anyone read it; the pin is now read at build time and this
+  file states no ordinal.
 - **Any unit touching a path on the kickoff manifest's watch list re-audits the claims derived from
   it and re-stamps the manifest in the same commit.** Every unit in this build touches at least one:
   the hygiene engine and `.memory-tree.conf`, `.unattended.conf`, the kickoff engine, and the build
@@ -379,21 +389,21 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-8 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-6 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-6 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-7 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-9 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-7 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-7 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-6 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-8 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | CLOSED | rev-8 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | CLOSED | rev-3 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-2 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-3 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | CLOSED | rev-4 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | CLOSED | rev-3 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | CLOSED | rev-2 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | SPECCED | rev-1 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-2 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | SPECCED | rev-1 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-21 — the landing push is bounded too](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md) | SPECCED | rev-1 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-21 — the landing push is bounded too](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md) | SPECCED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

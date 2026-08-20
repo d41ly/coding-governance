@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-6 · 2026-08-20 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -237,6 +237,9 @@ conf are both on its watch list).
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does a §8 with NO items and no none form refuse, or pass?** This is the shape reached
   through the empty-first-line branch and silently resolved today; it is the only genuinely
   undecided population, and it is exactly what §4's condition 1 protects. Options: refuse, which is
@@ -249,6 +252,19 @@ conf are both on its watch list).
   the shape costs one pattern and catches a mark whose date field holds prose. Recommendation: shape
   only, on the same grounds the acceptance-witness rule gives for checking that a bullet names
   something rather than that the thing exists.
+  RESOLVED (agent, 2026-08-20, delegated): SHAPE only. Mechanism-only, and the grounds are the ones
+  the bullet already states: this gate checks that a mark NAMES a date, not that the date is true,
+  the same distinction the acceptance-witness rule draws. A validator that parses the value is a
+  second answer to a question the shape already answers.
+
+- **F3 — does the predicate recognise `TOOL-aBoundedVerdict-3`'s fact-question mark?** That unit's
+  F2 resolved to a PREFIX on the fork's own bullet, which lands inside the population this unit's
+  predicate grades. A prefix the predicate does not know reads as an unresolved fork and blocks the
+  spec carrying it from ever going terminal.
+  RESOLVED (agent, 2026-08-20, delegated): the predicate reads BOTH marks — the resolution mark it
+  already grades, and the fact-question prefix — from one place, so the two units cannot drift into
+  two spellings of one rule. Raised and resolved in the same sweep because it is a cross-unit
+  constraint neither spec carried and both depend on.
 
 ## 9. Revision log
 
@@ -284,6 +300,13 @@ conf are both on its watch list).
   demoted to a sketch, with S5's build-time run as the authority. The marker-contract leg was RENAMED
   and its name is now spelled in four places, so the extension's cost is four-part rather than one.
   One of its four readers has had no caller since the unattended kit's 1.5.
+- rev-6 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, shape only.
+  **F3 is NEW and is a cross-unit constraint the sweep surfaced:** `TOOL-aBoundedVerdict-3` F2
+  resolved its fact-question mark to a bullet prefix, which lands inside the population this unit's
+  hardened predicate grades, and neither spec said so. Both now do, and both name one predicate
+  reading both marks. §8's first non-blank line is now the machine-legal `none` form — this spec of
+  all of them, since it is the unit that makes that line load-bearing.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "decide whether a spec's open questions are resolved"`

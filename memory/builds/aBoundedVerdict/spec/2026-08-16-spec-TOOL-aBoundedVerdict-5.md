@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-7 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -247,11 +247,18 @@ no file of its own.
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does `--park` take a unit id?** A park almost always concerns one unit, and recording which
   would let the wrap-up group them. Against it: the anchor ban means the id cannot lead the line, and
   an id in the middle of free text is not a join anything can rely on. Options: no id field, and the
   question text names the unit in prose; or an explicit field placed after the timestamp.
   Recommendation: no field. The wrap-up is composed by an agent reading the record, not by a parser.
+  RESOLVED (agent, 2026-08-20, delegated): NO id field. Mechanism-only, and the richer option is
+  discarded by a rule already in the protocol rather than by taste: the anchor ban forbids an id
+  leading a dash row, so the field could only sit mid-line where nothing can join on it — a field
+  that cannot be parsed is prose with a colon in it. The question text names the unit in prose.
 - **F2 — is S6 in this unit or its own?** It changes a Definition-of-Done item's evaluation, which is
   a different mechanism from a verb, and this build's own rule is one mechanism per spec.
   **RESOLVED (owner, 2026-08-17): keep it in this unit.** The refusal is only reachable once a verb
@@ -310,6 +317,11 @@ no file of its own.
   the constant or the counter is buildable. That split also corrects rev-6's arithmetic: the counter
   is inflated by one class member, not by three kinds. The `park()` caller count is corrected from
   two to four.
+
+- rev-8 · 2026-08-20 · M3 fork sweep, before any code. F1 RESOLVED as recommended, no id field, on
+  the anchor ban's grounds rather than on the wrap-up's — a field the ban confines to mid-line is one
+  no reader can join on, which is a stronger reason than "an agent reads it". §8's first non-blank
+  line is now the machine-legal `none` form.
 
 ## 10. Reuse audit
 

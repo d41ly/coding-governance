@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -201,6 +201,9 @@ gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) 
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — what is the wall-clock bound, in seconds?** It must exceed a cold ssh handshake to a busy
   host and a large advertisement on a slow link, and it must be short enough that an unattended run
   fails within a keepalive interval rather than between two of them — that interval is declared as ten
@@ -215,6 +218,10 @@ gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) 
   self-reference this repo already handles elsewhere with an exclusion. **Recommendation: the driver's
   test suite**, which already reads both files' source for other arms and is not a subject of its own
   assertion.
+  RESOLVED (agent, 2026-08-20, delegated): the DRIVER'S TEST SUITE. Mechanism-only, and the
+  alternative is the self-reference the bullet names: a gate asserting a source-level rule about its
+  own source needs an exclusion, and an exclusion is only as wide as the control it defers to. The
+  suite already reads both files for other arms and is not a subject of its own assertion.
 
 - **F3 — should the bound apply to the LANDING push as well?** Out of scope as written: the push is
   `$LANDER`, a project declaration this kit does not wrap, and bounding someone else's lander is a
@@ -237,6 +244,10 @@ gate run) · `codebase-map coverage + freshness` (the dossier claims the bound) 
   `TOOL-aBoundedVerdict-21` rather than here, so this unit's scope is unchanged. Recorded with the cost
   the owner accepted — the hung-push stall survives until that unit lands — because a spec that bounds
   "every remote observation" and leaves the push unbounded must not read as if it bounded everything.
+
+- rev-3 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended — the rule is
+  armed in the driver's test suite, not in the kit gate, because a gate asserting it about its own
+  source would need an exclusion. §8's first non-blank line is now the machine-legal `none` form.
 
 ## 10. Reuse audit
 

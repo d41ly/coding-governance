@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -172,6 +172,9 @@ one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning i
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does the normaliser live in the driver only, or is it shared with the gate leg?** The leg makes
   its own remote observations, so it may carry the same comparison. **Recommendation: check the leg
   first and share only if it duplicates the predicate** — a helper extracted for one caller is the
@@ -184,6 +187,10 @@ one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning i
   where an operator can still fix it, so warning there is more useful; `--close` is where an unattended
   run reads it. **Recommendation: both**, since the check runs in `observe_anchor` and both verbs call
   it — so this costs nothing and the choice is really about whether to suppress it anywhere.
+  RESOLVED (agent, 2026-08-20, delegated): BOTH verbs. Mechanism-only and the feature-rich
+  survivor at zero cost — the check runs inside `observe_anchor`, which both verbs already call, so
+  warning on one of them would mean adding suppression rather than saving work. `--preflight` is
+  where an operator can still fix it; `--close` is where an unattended run reads it.
 
 ## 9. Revision log
 
@@ -193,6 +200,10 @@ one genuinely different) · `.memory-tree.conf` (`ARMS_FLOORS`, if the warning i
   defect is LATENT on this fleet — this clone has one URL and no `pushurl` — which is why the unit
   specifies fixtures and says plainly that no corpus arm exists. F1 resolved under the delegated fork
   rule; F2 carries a recommendation and is left open.
+
+- rev-2 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, both verbs — the
+  check already runs where both call, so the narrow option costs a suppression the wide one does not.
+  §8's first non-blank line is now the machine-legal `none` form.
 
 ## 10. Reuse audit
 

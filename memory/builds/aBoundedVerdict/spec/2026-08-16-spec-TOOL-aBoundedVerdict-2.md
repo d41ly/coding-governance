@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-7 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -338,23 +338,39 @@ grows a read-path member, and rev-2's gate list omitted it ·
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — what does a run do when no code fits?** Options: add a catch-all member, which is a hole
   that will swallow the vocabulary within a few runs; require the project to declare an extra, which
   stalls a run at the moment it is trying to stop; or refuse to abort, which is the worst of the
   three. Recommendation: no catch-all, and the unclassifiable case aborts under the closest code with
   the specifics in the free-text reason — with the mismatch itself worth a backlog row when it
   happens.
+  RESOLVED (agent, 2026-08-20, delegated): as recommended — NO catch-all member. The
+  unclassifiable case aborts under the closest code with the specifics in the free-text reason, and
+  the mismatch earns a backlog row when it is first hit. Mechanism-only. The two alternatives are
+  strictly worse and the spec already says why: a catch-all is a hole that swallows the vocabulary,
+  and requiring a fresh project declaration stalls a run at the moment it is trying to stop.
 - **F2 — does the leg assert the code is REACHABLE, not merely legal?** A member no verb can produce
   is the phase vocabulary's disease. A reachability assertion would grep the callers for each member.
   Recommendation: not in this unit. The one-to-one table in §4 is the human-readable form of the same
   claim, and a grep-based reachability check over prose callers is the kind of predicate this repo
   has found vacuous twice.
+  RESOLVED (agent, 2026-08-20, delegated): NOT in this unit. Mechanism-only, and the richer option
+  is discarded by this repo's own rule against a predicate it cannot arm: a grep over prose callers
+  is the vacuous-selector class, and §4's one-to-one table already carries the claim in the form a
+  reader can check. Recorded as a limit of the leg rather than dropped silently.
 - **F3 — does the wrap-up row in the build method make this a cross-kit change?** The wrap-up
   derivation lives in the memory-tree kit's rendered method document, so S6 moves a memory-tree
   carrier for an unattended-kit reason. Options: put the row there anyway, since the method already
   points at the unattended protocol for exactly this kind of fact; or leave the method alone and let
   the code reach the owner through the protocol only. Recommendation: leave the method alone —
   its own rule is that a fact stated in it and in a carrier it points at is a defect in it.
+  RESOLVED (agent, 2026-08-20, delegated): LEAVE the build method alone. Mechanism-only, and the
+  alternative is refused by the method's own stated rule rather than by preference — M9's wrap-up
+  row already derives from the authored record, and the halt code lands in that record, so the
+  owner reaches it through a carrier the method already points at. No cross-kit change.
 
 ## 9. Revision log
 
@@ -405,6 +421,15 @@ grows a read-path member, and rev-2's gate list omitted it ·
   itself a defect, and the owner turn it names changes with it — the old wording would have told a
   returning owner to re-scope a unit when the real question is whether the convergence predicate
   terminated. The member is NOT removed, so the shrink-only floor does not move.
+
+- rev-7 · 2026-08-20 · M3 fork sweep, before any code. F1, F2 and F3 RESOLVED under the delegated
+  rule; all three were mechanism-only and all three took the spec's own recommendation, F2 because the
+  richer option is an unarmable predicate and F3 because the build method's own rule refuses it. §8's
+  first non-blank line is now the machine-legal `none` form. **Also repaired: rev-6 had no §9 entry.**
+  The status header was bumped to rev-6 and §4:92 explains what rev-6 added, but the revision log
+  stopped at rev-5 — a rev bump whose only record is the number in the header is the change nobody can
+  audit, and it is the same class as a fork mark that never landed. What rev-6 added, recovered from
+  §4: the three carriers rev-5 did not declare.
 
 ## 10. Reuse audit
 

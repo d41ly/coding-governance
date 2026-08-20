@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -163,6 +163,9 @@ moves.
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does S5's note live in the protocol document's header or in the leg's source?** The document is
   what an author edits; the leg is what makes the claim. **Recommendation: the leg's source**, beside
   check 10, because that is where someone about to trust the check is standing — and the protocol pair
@@ -174,6 +177,10 @@ moves.
   `TOOL-cBriefedPilot-18`?** The id's slug is node `c`'s and this session is on node `c`, so there is no
   cross-node hand-off to make. **Recommendation: a TOOL row here**, which is the shard the id already
   belongs to.
+  RESOLVED (agent, 2026-08-20, delegated): a TOOL row, filed here. Mechanism-only. Re-verified at
+  this run's base rather than inherited: the id's slug is node `c`'s and this run is on node `c`, so
+  the bullet's premise still holds and there is still no cross-node hand-off to make. A row in the
+  shard the id already belongs to is where a reader of that id looks.
 
 ## 9. Revision log
 
@@ -183,6 +190,11 @@ moves.
   one Tier-1 unit because all three are documents that disagree with code and all three survived for one
   reason — the parity legs compare the copies to each other, which S5 records. F1 and F2 resolved under
   the delegated fork rule.
+
+- rev-2 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, a TOOL row filed
+  here — and its premise was RE-VERIFIED rather than inherited, because "this session is on node c" is
+  exactly the kind of claim that is true when written and false when read. It is still true. §8's
+  first non-blank line is now the machine-legal `none` form.
 
 ## 10. Reuse audit
 

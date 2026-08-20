@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-8 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** SPECCED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -356,6 +356,9 @@ figure as authority.
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — how does the closing DIFF review's subject interact with the predicate?** At rev-5 this fork
   asked whether the cap bound the closing review at two rounds; the owner answered "two, uniformly"
   and that answer died with the cap. Re-opened in the new frame: the closing review's subject is the
@@ -374,6 +377,9 @@ figure as authority.
   predicate. The token is what lets S8's disposition be chosen without re-reading the review record and
   what lets a later check ask whether an exited subject was disposed of. **Recommendation: both**, as
   S4 specifies.
+  RESOLVED (agent, 2026-08-20, delegated): BOTH — the count drives the predicate and the token is
+  recorded beside it. Mechanism-only fork, and the feature-rich survivor: the count alone cannot
+  answer whether an exited subject was disposed of, which is exactly what F3's check needs.
 
 - **F3 — should the leg assert that an EXITED subject was actually disposed of?** At rev-5 this was
   deferred because the disposition spanned three units' mechanisms. Under rev-6 the disposition is a
@@ -381,6 +387,9 @@ figure as authority.
   is now writable. **Recommendation: yes, and it is S6's third clause.** It supersedes the backlog row
   `TOOL-aBoundedVerdict-8`, which said to write this once all three mechanisms landed; there are now
   two, and one of them is observable.
+  RESOLVED (agent, 2026-08-20, delegated): YES, as S6's third clause, and it supersedes the backlog
+  row named above. Mechanism-only: the promotion leaves a unit row in the generated region, so the
+  assertion has a real subject rather than the prose-caller grep this repo has found vacuous twice.
 
 - **F4 — what happens the first time the runaway ceiling is reached?** §4 states plainly that
   promotion's termination is likely and not guaranteed. Options put to the owner: halt to the owner;
@@ -436,6 +445,12 @@ figure as authority.
   sequence that reached the ceiling with no README line reds. AC2a is INVERTED: it asserted a refusal,
   and the ceiling no longer refuses. AC2b is new. §3's runaway-ceiling non-goal now says the ceiling
   cannot stall a build in any sense, which is a stronger claim than rev-6 could make.
+
+- rev-9 · 2026-08-20 · M3 fork sweep, before any code. F2 and F3 RESOLVED under the delegated rule —
+  both were mechanism-only with a stated recommendation and no veto reached either. §8's first
+  non-blank line is now the machine-legal `none` form, without which this spec reds hygiene the
+  moment its status goes terminal, which is the failure mode `TOOL-aBoundedVerdict-4` exists to make
+  impossible to reach silently. No scope change; no acceptance criterion moved.
 
 ## 10. Reuse audit
 

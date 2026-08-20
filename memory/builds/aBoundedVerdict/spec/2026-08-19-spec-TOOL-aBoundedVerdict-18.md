@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects
 
-**Status:** SPECCED · rev-2 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -209,6 +209,9 @@ if S2 fires) · the kit version constant.
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does check 8's terminal exemption stay or go?** Measured: it has zero subjects, and three
   exempt records carry the bytes it refuses. Staying means the check is correct and merely
   unexercised, which S4 and S5 make legible. Going means three records need a shrink-only waiver,
@@ -248,6 +251,12 @@ if S2 fires) · the kit version constant.
   `tools/push-main.sh`, so the dogfood is the first adopter. S2 keeps the grep deletion, which was
   never conditional on F2. AC4 splits into four. §5 states what the marker still does not buy: a run
   with shell access can write it, so this stops an honest bypass and not a deliberate one.
+
+- rev-3 · 2026-08-20 · M3 fork sweep, before any code. No fork moved: F1 and F2 were both already
+  RESOLVED in place, F2 by the owner. What was missing is the machine-legal `none` first line in §8 —
+  and its absence is not cosmetic, because the hygiene gate grades a terminal spec on that line OR on
+  every bullet carrying the mark on the bullet's OWN line, and this spec's marks sit on continuation
+  lines. Without this the unit could not have gone terminal despite having no open question at all.
 
 ## 10. Reuse audit
 

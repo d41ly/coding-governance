@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-7 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -215,6 +215,9 @@ growing both the method and the unattended protocol, and it is one of seven spen
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — does S1's reading of the authorization need the owner's ratification?** It concludes that
   committing a build folder approves the scope of every spec inside it, which is a widening of what
   the grant is read to mean even though it creates no new grant. Options: ratify it explicitly, the
@@ -229,11 +232,20 @@ growing both the method and the unattended protocol, and it is one of seven spen
   bullet, which puts it where the resolution mark already goes and where another unit in this build
   is hardening the predicate; or a separate sub-head. Recommendation: the bullet prefix, and it is
   worth coordinating with that unit so one predicate reads both marks.
+  RESOLVED (agent, 2026-08-20, delegated): the BULLET PREFIX, and the coordination is a hard
+  constraint rather than an aspiration — `TOOL-aBoundedVerdict-4` hardens the §8 predicate in this
+  same build, so a mark it does not recognise turns a fact-question into an unresolved fork and
+  blocks the spec from ever going terminal. Mechanism-only; the sub-head option costs a second
+  place for a reader to look for one answer.
 - **F3 — is S3's "every remaining unit depends on it" test derivable?** Nothing in the tree records
   inter-unit dependencies; the build README's authored order carries them in prose. Options: leave
   the test to the run's judgment, which is what every other ordering decision already is; or add a
   dependency field to the README front matter, which is a new mechanism and belongs to its own unit.
   Recommendation: judgment, and a backlog row for the field.
+  RESOLVED (agent, 2026-08-20, delegated): JUDGMENT, with the dependency field filed as a backlog
+  row this unit writes. Mechanism-only. The richer option is discarded by veto 2 — a dependency
+  field in the README front matter is a new mechanism in a schema the generator and two legs read,
+  which is its own unit and not a clause inside this one.
 - **F4 — does `memory/gotchas/vacuous-selector-empty-population.md` gain an anchor naming the build
   method?** Without one, the counter-rule S6 writes is prose no checklist ever surfaces to a reviewer
   touching the method. With one, every future diff touching the method carries that class. Options:
@@ -241,6 +253,10 @@ growing both the method and the unattended protocol, and it is one of seven spen
   unit's Files touched; or leave it, and rely on the rule being read in the method itself where it
   binds. Recommendation: add it — the record already fires for the hygiene gate, and the method is
   where the rule now lives.
+  RESOLVED (agent, 2026-08-20, delegated): ADD the anchor. Mechanism-only and the feature-rich
+  survivor: one backticked path puts the class on the checklist of every future diff touching the
+  method, which is the whole left-shift this repo asks of a confirmed finding. The alternative
+  leaves the counter-rule as prose no checklist surfaces.
 
 ## 9. Revision log
 
@@ -283,6 +299,13 @@ growing both the method and the unattended protocol, and it is one of seven spen
   side of "a thing the run cannot resolve" is now `TOOL-aBoundedVerdict-1` S9's park case, which is this
   unit's rule applied to a blocker; the two must stay phrased as a SCOPE test rather than a difficulty
   test, or both become an escape from ordinary work.
+
+- rev-7 · 2026-08-20 · M3 fork sweep, before any code. F2, F3 and F4 RESOLVED under the delegated
+  rule. F3's richer option — a dependency field in the README front matter — was discarded by veto 2
+  as a new mechanism in a schema other readers share, and survives as the backlog row this unit
+  writes. F2's resolution is recorded as a CONSTRAINT on `TOOL-aBoundedVerdict-4` rather than a
+  preference: the two units share one predicate and a mark it cannot read is a spec that never goes
+  terminal. §8's first non-blank line is now the machine-legal `none` form.
 
 ## 10. Reuse audit
 
